@@ -68,10 +68,8 @@ Create a new .xml file with the following minimal SAML metadata contents:
 
 Set or replace the variables with the values from the next screen as follows:
 
-- `${ENTITYID}`: google.com/a/<your_domain>
-- `${ACSURL}`: https://www.google.com/a/<your_domain>/acs
-
-`<your_domain>` is the domain you have verified in Google Workspace.
+- `${ENTITYID}`: *google.com/a/`VERIFIED_GOOGLE_WORKSPACE_DOMAIN`*
+- `${ACSURL}`: *https://<span>www</span>.google.com/a/`VERIFIED_GOOGLE_WORKSPACE_DOMAIN`/acs*
 
 In your existing project:
 
@@ -103,11 +101,9 @@ Save the settings.
 
 Now you should be all set to verify your setup:
 
-- Open Gmail in an incognito session with the following link: https://mail.google.com/a/<your_domain>
+- Open Gmail in an incognito session with the following link: *https://<span></span>mail.google.com/a/`VERIFIED_GOOGLE_WORKSPACE_DOMAIN`*
 - Enter your username and credentials
 - You should be redirected to Gmail and logged in
-
-`<your_domain>` is the domain you have verified in Google Workspace.
 
 ## Third-party SSO SAML profile
 
@@ -165,10 +161,10 @@ Create a new .xml file with the following minimal SAML metadata contents:
 
 Set or replace the variables with the values from the next screen as follows:
 
-- `${ENTITYID}`: https://accounts.google.com/samlrp/metadata?rpid=<your_value>
-- `${ACSURL}`: https://accounts.google.com/samlrp/acs?rpid=<your_value>
+- `${ENTITYID}`: *https://<span></span>accounts.google.com/samlrp/metadata?rpid=`VALUE`*
+- `${ACSURL}`: *https://<span></span>accounts.google.com/samlrp/acs?rpid=`VALUE`*
 
-Replace `<your_value>` with the values from the [SSO profile](#entity-id-and-acs-url).
+Replace *`VALUE`* with the values from the [SSO profile](#entity-id-and-acs-url).
 
 In your existing project:
 
@@ -200,11 +196,9 @@ Save the settings.
 
 Now you should be all set to verify your setup:
 
-- Open Gmail in an incognito session with the following link: https://mail.google.com/a/<your_domain>
+- Open Gmail in an incognito session with the following link: *https://<span></span>mail.google.com/a/`VERIFIED_GOOGLE_WORKSPACE_DOMAIN`*
 - Enter your username and credentials
 - You should be redirected to Gmail and logged in
-
-`<your_domain>` is the domain you have verified in Google Workspace.
 
 ### Troubleshooting
 

@@ -78,9 +78,9 @@ The request from the API to the introspection endpoint should be in the followin
 
 ```bash
 curl --request POST \
- --url {your_domain}/oauth/v2/introspect \
+ --url $ZITADEL_DOMAIN/oauth/v2/introspect \
  --header 'Content-Type: application/x-www-form-urlencoded' \
- --header 'Authorization: Basic {your_basic_auth_header}' \
+ --header 'Authorization: Basic $BASIC_AUTH_HEADER' \
  --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
  ```
 

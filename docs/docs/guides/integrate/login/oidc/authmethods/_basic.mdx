@@ -60,10 +60,10 @@ So check [Client Secret Basic Auth Method](/apis/openidoauth/authn-methods#clien
 
 ```curl
 curl --request POST \
---url {your-domain}/oauth/v2/token \
---header 'Authorization: Basic ${basic}' \
+--url ${ZITADEL_DOMAIN}/oauth/v2/token \
+--header 'Authorization: Basic ${BASIC}' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data grant_type=authorization_code \
---data code=${code} \
---data redirect_uri=${redirect_uri}
+--data code=${CODE} \
+--data redirect_uri=${REDIRECT_URI}
 ```

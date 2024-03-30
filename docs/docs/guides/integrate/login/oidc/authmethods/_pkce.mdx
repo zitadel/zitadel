@@ -67,11 +67,11 @@ Send your `client_id` and the previously generated string as `code_verifier` for
 
 ```curl
 curl --request POST \
---url {your-domain}/oauth/v2/token \
+--url ${ZITADEL_DOMAIN}/oauth/v2/token \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data grant_type=authorization_code \
---data code=${code} \
---data redirect_uri=${redirect_uri} \
---data client_id=${client_id} \
---data code_verifier=${code_verifier}
+--data code=${CODE} \
+--data redirect_uri=${REDIRECT_URI} \
+--data client_id=${CLIENT_ID} \
+--data code_verifier=${CODE_VERIFIER}
 ```

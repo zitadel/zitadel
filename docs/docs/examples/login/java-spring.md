@@ -31,7 +31,7 @@ The Redirect URIs field tells ZITADEL where it's allowed to redirect users after
 The Post-logout redirect send the users back to a route on your application after they have logged out.
 
 :::info
-If you are following along with the [example](https://github.com/zitadel/zitadel-java), set the dev mode to `true`, the Redirect URIs to `http://localhost:18080/webapp/login/oauth2/code/zitadel` and Post redirect URI to `http://localhost:18080/webapp`.
+If you are following along with the [example](https://github.com/zitadel/zitadel-java), set the dev mode to `true`, the Redirect URIs to *http://<span></span>localhost:18080/webapp/login/oauth2/code/zitadel* and Post redirect URI to *http://<span></span>localhost:18080/webapp*.
 :::
 
 ![Create app in console - set redirectURI](/img/java-spring/app-create-redirect.png)
@@ -162,7 +162,7 @@ java \
   -jar web/target/web-0.0.2-SNAPSHOT.jar
 ```
 
-If you then visit on <http://localhost:18080/webapp> you should directly be redirected to your ZITADEL instance.
+If you then visit on http://localhost:18080/webapp you should directly be redirected to your ZITADEL instance.
 After login with your existing user you will be presented the profile page:
 
 ![Profile Page](/img/java-spring/app-profile.png)

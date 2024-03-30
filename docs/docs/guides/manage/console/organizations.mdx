@@ -42,7 +42,7 @@ At the moment the username only allows e-mail formatted input. (This will be cha
 If this behavior is not suitable for you, ZITADEL has the option to suffix the usernames with the organization domain.
 This setting is called **User Loginname must contain orgdomain** and is part of your [Domain settings](./default-settings#domain-settings).
 
-Those loginnames consist of the format `{username}@{domainname}.{zitadeldomain}`.
+Those loginnames consist of the format *`USERNAME`@`ORG_DOMAIN`.`ZITADEL_DOMAIN`*.
 If your user had the username `john.doe`, the generated loginname would be `john.doe@acme.zitadel.cloud`.
 This also means that only one user with the username `john.doe` can exist in your organization called `ACME`.
 
@@ -65,7 +65,7 @@ An organization can have multiple domain names, but only one domain can be prima
 The primary domain defines which login name ZITADEL displays to the user, and what information gets asserted in access_tokens (`preferred_username`).
 
 Please note that domain verification also removes the login name from all users, who might have used this combination in the global organization (ie. users not belonging to a specific organization).
-Relating to our example with acme.ch: If a user ‘coyote’ exists in the global organization with the login name coyote@acme.ch, then after verification of acme.ch, this login name will be replaced with `coyote@{randomvalue.tld}`.
+Relating to our example with acme.ch: If a user ‘coyote’ exists in the global organization with the login name coyote@acme.ch, then after verification of acme.ch, this login name will be replaced with *coyote@`RANDOM_VALUE`*.
 ZITADEL will notify users affected by this change.
 
 ## Verify your domain name
@@ -127,9 +127,7 @@ You can define [default settings](/docs/guides/manage/console/default-settings) 
 Per default the ZITADEL Login will always show what is defined per default. As soon as the Organization context is given, the settings defined on the specific organization can be triggered.
 This means when you want to trigger the settings of an organization directly, make sure to send the organization scope in the authentication request.
 
-```bash
-urn:zitadel:iam:org:id:{id}
-```
+*urn:zitadel:iam:org:id:`ID`*
 
 Read more about the [scopes](/docs/apis/openidoauth/scopes#reserved-scopes) or try it out in our [OIDC Playground](/docs/apis/openidoauth/authrequest).
 

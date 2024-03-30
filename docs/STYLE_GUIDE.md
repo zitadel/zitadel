@@ -1,0 +1,2 @@
+- Symbols and static Values are *italic*
+- Variables are *`ITALIC_UPPERCASED_AND_UNDERSCORED_CODE`*,

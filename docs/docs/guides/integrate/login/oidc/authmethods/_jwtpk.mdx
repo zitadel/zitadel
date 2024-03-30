@@ -62,11 +62,11 @@ for us to validate the signature against the registered public key:
 
 ```curl
 curl --request POST \
---url {your-domain}/oauth/v2/token \
+--url ${ZITADEL_DOMAIN}/oauth/v2/token \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data grant_type=authorization_code \
---data code=${code} \
---data redirect_uri=${redirect_uri} \
---data client_assertion=${client_assertion} \
+--data code=${CODE} \
+--data redirect_uri=${REDIRECT_URI} \
+--data client_assertion=${CLIENT_ASSERTION} \
 --data client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
 ```
