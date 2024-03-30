@@ -1,5 +1,7 @@
-/** @type {import('@docusaurus/types').DocusaurusConfig} */
-module.exports = {
+import type {Config} from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
+
+const config : Config = {
   title: "ZITADEL Docs",
   trailingSlash: false,
   url: "https://zitadel.com",
@@ -223,7 +225,7 @@ module.exports = {
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
-          docLayoutComponent: "@theme/DocPage",
+          docRootComponent: "@theme/DocPage",
           docItemComponent:  '@theme/ApiItem'
         },
         theme: {
@@ -342,3 +344,5 @@ module.exports = {
   ],
   themes: ["@saucelabs/theme-github-codeblock", "docusaurus-theme-openapi-docs"],
 };
+
+export default config;
