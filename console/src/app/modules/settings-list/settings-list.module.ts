@@ -28,7 +28,7 @@ import IamViewsModule from '../iam-views/iam-views.module';
 import EventsModule from '../events/events.module';
 import OrgListModule from 'src/app/pages/org-list/org-list.module';
 import { OrgTableModule } from '../org-table/org-table.module';
-import { SMTPSettingsModule } from '../policies/smtp-settings/smtp-settings.module';
+import { NotificationSMTPProviderModule } from '../policies/notification-smtp-provider/notification-smtp-provider.module';
 
 @NgModule({
   declarations: [SettingsListComponent],
@@ -44,13 +44,14 @@ import { SMTPSettingsModule } from '../policies/smtp-settings/smtp-settings.modu
     LanguageSettingsModule,
     NotificationPolicyModule,
     IdpSettingsModule,
-    SMTPSettingsModule,
+    NotificationSMTPProviderModule,
     PrivacyPolicyModule,
     MessageTextsPolicyModule,
     SecurityPolicyModule,
     DomainsModule,
     LoginTextsPolicyModule,
     OrgTableModule,
+    OrgListModule,
     DomainPolicyModule,
     TranslateModule,
     HasRolePipeModule,

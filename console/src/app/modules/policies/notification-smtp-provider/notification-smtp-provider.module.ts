@@ -8,13 +8,13 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { CardModule } from '../../card/card.module';
-import { SMTPSettingsComponent } from './smtp-settings.component';
+import { NotificationSMTPProviderComponent } from './notification-smtp-provider.component';
 import { InputModule } from '../../input/input.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
 import { SMTPTableModule } from '../../smtp-table/smtp-table.module';
 
 @NgModule({
-  declarations: [SMTPSettingsComponent],
+  declarations: [NotificationSMTPProviderComponent],
   imports: [
     InputModule,
     FormFieldModule,
@@ -28,6 +28,6 @@ import { SMTPTableModule } from '../../smtp-table/smtp-table.module';
     MatProgressSpinnerModule,
     TranslateModule,
   ],
-  exports: [SMTPSettingsComponent],
+  exports: [NotificationSMTPProviderComponent],
 })
-export class SMTPSettingsModule {}
+export class NotificationSMTPProviderModule {}

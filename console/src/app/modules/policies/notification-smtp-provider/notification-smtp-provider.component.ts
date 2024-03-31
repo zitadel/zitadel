@@ -6,11 +6,11 @@ import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { SMTPKnownProviders } from '../../smtp-provider/known-smtp-providers-settings';
 
 @Component({
-  selector: 'cnsl-smtp-settings',
-  templateUrl: './smtp-settings.component.html',
-  styleUrls: ['./smtp-settings.component.scss'],
+  selector: 'cnsl-notification-smtp-provider',
+  templateUrl: './notification-smtp-provider.component.html',
+  styleUrls: ['./notification-smtp-provider.component.scss'],
 })
-export class SMTPSettingsComponent implements OnInit {
+export class NotificationSMTPProviderComponent implements OnInit {
   @Input() public serviceType!: PolicyComponentServiceType;
   public service!: ManagementService | AdminService;
 
@@ -29,6 +29,4 @@ export class SMTPSettingsComponent implements OnInit {
         break;
     }
   }
-
-  public createGoogle() {}
 }

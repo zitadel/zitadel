@@ -6,6 +6,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
@@ -16,10 +17,11 @@ import { InputModule } from '../../input/input.module';
 import { WarnDialogModule } from '../../warn-dialog/warn-dialog.module';
 import { DialogAddSMSProviderComponent } from './dialog-add-sms-provider/dialog-add-sms-provider.component';
 import { NotificationSMSProviderComponent } from './notification-sms-provider.component';
-import { PasswordDialogComponent } from './password-dialog-sms-provider/password-dialog.component';
+import { PasswordDialogSMSProviderComponent } from './password-dialog-sms-provider/password-dialog-sms-provider.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
-  declarations: [NotificationSMSProviderComponent, DialogAddSMSProviderComponent, PasswordDialogComponent],
+  declarations: [NotificationSMSProviderComponent, DialogAddSMSProviderComponent, PasswordDialogSMSProviderComponent],
   imports: [
     CommonModule,
     CardModule,
@@ -36,6 +38,7 @@ import { PasswordDialogComponent } from './password-dialog-sms-provider/password
     MatSelectModule,
     MatProgressSpinnerModule,
     MatSelectModule,
+    MatDialogModule,
     TranslateModule,
   ],
   exports: [NotificationSMSProviderComponent],

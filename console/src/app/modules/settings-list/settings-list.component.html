@@ -34,7 +34,7 @@
     <cnsl-notification-policy [serviceType]="serviceType"></cnsl-notification-policy>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'smtpprovider' && serviceType === PolicyComponentServiceType.ADMIN">
-    <cnsl-smtp-settings [serviceType]="serviceType"></cnsl-smtp-settings>
+    <cnsl-notification-smtp-provider [serviceType]="serviceType"></cnsl-notification-smtp-provider>
   </ng-container>
   <ng-container *ngIf="currentSetting === 'smsprovider' && serviceType === PolicyComponentServiceType.ADMIN">
     <cnsl-notification-sms-provider [serviceType]="serviceType"></cnsl-notification-sms-provider>

@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SMTPSettingsComponent } from './smtp-settings.component';
+import { NotificationSMTPProviderComponent } from './notification-smtp-provider.component';
 
 describe('IdpSettingsComponent', () => {
-  let component: SMTPSettingsComponent;
-  let fixture: ComponentFixture<SMTPSettingsComponent>;
+  let component: NotificationSMTPProviderComponent;
+  let fixture: ComponentFixture<NotificationSMTPProviderComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [SMTPSettingsComponent],
+      declarations: [NotificationSMTPProviderComponent],
     }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SMTPSettingsComponent);
+    fixture = TestBed.createComponent(NotificationSMTPProviderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
