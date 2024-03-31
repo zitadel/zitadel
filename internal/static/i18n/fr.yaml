@@ -61,7 +61,6 @@ Errors:
   Notification:
     NoDomain: Aucun domaine trouvé pour le message
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: L'utilisateur n'a pas été trouvé
     AlreadyExists: L'utilisateur existe déjà
     NotFoundOnOrg: L'utilisateur n'a pas été trouvé dans l'organisation choisie
@@ -480,6 +479,7 @@ Errors:
     CloseRows: L'instruction SQL n'a pas pu être terminée
     SQLStatement: L'instruction SQL n'a pas pu être créée
     InvalidRequest: La requête n'est pas valide
+    TooManyNestingLevels: Trop de niveaux d'imbrication de requêtes (maximum 20)
   Quota:
     AlreadyExists: Contingent existe déjà pour cette unité
     NotFound: Contingent non trouvé pour cette unité
@@ -547,6 +547,27 @@ Errors:
     NotFound: Exécution introuvable
     IncludeNotFound: Inclure introuvable
     NoTargets: Aucune cible définie
+  UserSchema:
+    NotEnabled: La fonctionnalité "Schéma utilisateur" n'est pas activée
+    Type:
+      Missing: Type de schéma utilisateur manquant
+      AlreadyExists: Le type de schéma utilisateur existe déjà
+    Authenticator:
+      Invalid: Type d'authentificateur invalide
+    NotActive: Schéma utilisateur non actif
+    NotInactive: Le schéma utilisateur n'est pas inactif
+    NotExists: Le schéma utilisateur n'existe pas
+  TokenExchange:
+    FeatureDisabled: La fonctionnalité Token Exchange est désactivée pour votre instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Le jeton est manquant
+      Invalid: Le jeton n'est pas valide
+      TypeMissing: Le type de jeton est manquantg
+      TypeNotAllowed: Le type de jeton n'est pas autorisé
+      TypeNotSupported: Le type de jeton n'est pas pris en charge
+      NotForAPI: Les jetons usurpés d'identité ne sont pas autorisés pour l'API
+    Impersonation:
+      PolicyDisabled: L'usurpation d'identité est désactivée dans la politique de sécurité de l'instance
 
 AggregateTypes:
   action: Action
@@ -560,6 +581,7 @@ AggregateTypes:
   feature: Fonctionnalité
   target: Cible
   execution: Exécution
+  user_schema: Schéma utilisateur
 
 EventTypes:
   execution:
@@ -581,6 +603,7 @@ EventTypes:
         failed: La vérification de l'initialisation a échoué
     token:
       added: Jeton d'accès créé
+    impersonated: Utilisateur usurpé l'identité
     username:
       reserved: Nom d'utilisateur réservé
       released: Nom d'utilisateur libéré
@@ -1109,6 +1132,12 @@ EventTypes:
     deactivated: Action désactivée
     reactivated: Action réactivée
     removed: Action supprimée
+  user_schema:
+    created: Schéma utilisateur créé
+    updated: Schéma utilisateur mis à jour
+    deactivated: Schéma utilisateur désactivé
+    reactivated: Schéma utilisateur réactivé
+    deleted: Schéma utilisateur supprimé
 instance:
   added: Instance ajoutée
   changed: Instance modifiée

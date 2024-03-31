@@ -1,0 +1,81 @@
+---
+title: Configure LinkedIn as an OAuth Identity Provider in ZITADEL
+sidebar_label: LinkedIn generic OIDC
+id: linkedin-oauth
+---
+
+import GeneralConfigDescription from './_general_config_description.mdx';
+import Intro from './_intro.mdx';
+import CustomLoginPolicy from './_custom_login_policy.mdx';
+import IDPsOverview from './_idps_overview.mdx';
+import GenericOAuth from './_generic_oauth.mdx';
+import Activate from './_activate.mdx';
+import PrefillAction from './_prefill_action.mdx';
+import TestSetup from './_test_setup.mdx';
+
+<Intro provider="LinkedIn"/>
+
+## LinkedIn Configuration
+
+### Register a new client
+
+1. Go to the LinkedIn Developer console and create a new App: https://www.linkedin.com/developers/apps/new
+2. Add your App Name, your Company Page and a Logo
+3. Add "Sign In with LinkedIn using OpenID Connect" by clicking "Request access"
+4. Go to the Auth Settings of the App and add the following URL to the "Authorized redirect URLs"
+ - {your-domain}/ui/login/login/externalidp/callback
+ - Example redirect url for the domain `https://acme.zitadel.cloud` would look like this:  `https://acme.zitadel.cloud/ui/login/login/externalidp/callback`
+5. Verify the app as your company
+6. In the Auth - OAuth 2.0 scopes section you should see `openid`, `profile` and `email` listed
+7. Save Client ID and Primary Client Secret from the Application credentials
+
+![Add new Application in LinkedIn](/img/guides/linkedin_add_app.png)
+
+## ZITADEL Configuration
+
+### Add custom login policy
+
+<CustomLoginPolicy/>
+
+### Go to the IdP Providers Overview
+
+<IDPsOverview templates="Generic OAuth"/>
+
+### Create a new Generic OAuth Provider
+
+<GenericOAuth
+    name=": e.g. LinkedIn"
+    authendpoint="https://www.linkedin.com/oauth/v2/authorization"
+    tokenendpoint="https://www.linkedin.com/oauth/v2/accessToken"
+    userendpoint="https://api.linkedin.com/v2/userinfo"
+    id="sub"
+    clientid=": Client id from the application previously created in your LinkedIn account"
+    clientsecret=": Client Secret from the application previously created in your LinkedIn account"
+/>
+
+
+<GeneralConfigDescription provider_account="LinkedIn account" />
+
+![LinkedIn Provider](/img/guides/zitadel_linkedin_create_provider.png)
+
+### Activate IdP
+
+<Activate/>
+
+![Activate the LinkedIn Provider](/img/guides/zitadel_activate_linkedin.png)
+
+## Test the setup
+
+<TestSetup loginscreen="your LinkedIn login"/>
+
+![LinkedIn Button](/img/guides/zitadel_login_linkedin.png)
+
+![LinkedIn Login](/img/guides/linkedin_login.png)
+
+## Optional: Add ZITADEL action to autofill userdata
+
+<PrefillAction fields="firstname, lastname, username, email and email verified" provider="LinkedIn"/>
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/linkedin_identity_provider.js
+```

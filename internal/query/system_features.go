@@ -18,6 +18,8 @@ type SystemFeatures struct {
 	LoginDefaultOrg                 FeatureSource[bool]
 	TriggerIntrospectionProjections FeatureSource[bool]
 	LegacyIntrospection             FeatureSource[bool]
+	UserSchema                      FeatureSource[bool]
+	TokenExchange                   FeatureSource[bool]
 }
 
 func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {

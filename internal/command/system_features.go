@@ -12,12 +12,16 @@ type SystemFeatures struct {
 	LoginDefaultOrg                 *bool
 	TriggerIntrospectionProjections *bool
 	LegacyIntrospection             *bool
+	TokenExchange                   *bool
+	UserSchema                      *bool
 }
 
 func (m *SystemFeatures) isEmpty() bool {
 	return m.LoginDefaultOrg == nil &&
 		m.TriggerIntrospectionProjections == nil &&
-		m.LegacyIntrospection == nil
+		m.LegacyIntrospection == nil &&
+		m.UserSchema == nil &&
+		m.TokenExchange == nil
 }
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {

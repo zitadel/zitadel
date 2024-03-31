@@ -11,6 +11,8 @@ type InstanceFeatures struct {
 	LoginDefaultOrg                 FeatureSource[bool]
 	TriggerIntrospectionProjections FeatureSource[bool]
 	LegacyIntrospection             FeatureSource[bool]
+	UserSchema                      FeatureSource[bool]
+	TokenExchange                   FeatureSource[bool]
 }
 
 func (q *Queries) GetInstanceFeatures(ctx context.Context, cascade bool) (_ *InstanceFeatures, err error) {

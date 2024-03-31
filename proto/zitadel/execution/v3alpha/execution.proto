@@ -13,23 +13,37 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha;execution";
 
-message SetConditions{
+message Execution {
+  string execution_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"request.zitadel.session.v2beta.SessionService\"";
+    }
+  ];
+  // Details provide some base information (such as the last change date) of the target.
+  zitadel.object.v2beta.Details details = 2;
+  // Targets which are called in the defined conditions.
+  repeated string targets = 3;
+  // Included executions with the same condition-types.
+  repeated string includes = 4;
+}
+
+message Condition {
   // Condition-types under which conditions the execution should happen, only one possible.
   oneof condition_type {
     option (validate.required) = true;
 
     // Condition-type to execute if a request on the defined API point happens.
-    SetRequestExecution request = 1;
+    RequestExecution request = 1;
     // Condition-type to execute on response if a request on the defined API point happens.
-    SetResponseExecution response = 2;
+    ResponseExecution response = 2;
     // Condition-type to execute if function is used, replaces actions v1.
     string function = 3;
     // Condition-type to execute if an event is created in the system.
-    SetEventExecution event = 4;
+    EventExecution event = 4;
   }
 }
 
-message SetRequestExecution{
+message RequestExecution {
   // Condition for the request execution, only one possible.
   oneof condition{
     // GRPC-method as condition.
@@ -55,7 +69,7 @@ message SetRequestExecution{
   }
 }
 
-message SetResponseExecution{
+message ResponseExecution {
   // Condition for the response execution, only one possible.
   oneof condition{
     // GRPC-method as condition.
@@ -81,7 +95,7 @@ message SetResponseExecution{
   }
 }
 
-message SetEventExecution{
+message EventExecution{
   // Condition for the event execution, only one possible.
   oneof condition{
     // Event name as condition.

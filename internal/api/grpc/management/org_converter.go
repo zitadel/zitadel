@@ -110,7 +110,7 @@ func BulkSetOrgMetadataToDomain(req *mgmt_pb.BulkSetOrgMetadataRequest) []*domai
 
 func ListOrgMetadataToDomain(req *mgmt_pb.ListOrgMetadataRequest) (*query.OrgMetadataSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries, err := metadata.MetadataQueriesToQuery(req.Queries)
+	queries, err := metadata.OrgMetadataQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
 	}

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	UserTable        = "projections.users10"
+	UserTable        = "projections.users11"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -30,9 +30,10 @@ const (
 	UserUsernameCol      = "username"
 	UserTypeCol          = "type"
 
-	UserHumanSuffix        = "humans"
-	HumanUserIDCol         = "user_id"
-	HumanUserInstanceIDCol = "instance_id"
+	UserHumanSuffix             = "humans"
+	HumanUserIDCol              = "user_id"
+	HumanUserInstanceIDCol      = "instance_id"
+	HumanPasswordChangeRequired = "password_change_required"
 
 	// profile
 	HumanFirstNameCol         = "first_name"
@@ -61,14 +62,15 @@ const (
 	MachineAccessTokenTypeCol = "access_token_type"
 
 	// notify
-	UserNotifySuffix       = "notifications"
-	NotifyUserIDCol        = "user_id"
-	NotifyInstanceIDCol    = "instance_id"
-	NotifyLastEmailCol     = "last_email"
-	NotifyVerifiedEmailCol = "verified_email"
-	NotifyLastPhoneCol     = "last_phone"
-	NotifyVerifiedPhoneCol = "verified_phone"
-	NotifyPasswordSetCol   = "password_set"
+	UserNotifySuffix            = "notifications"
+	NotifyUserIDCol             = "user_id"
+	NotifyInstanceIDCol         = "instance_id"
+	NotifyLastEmailCol          = "last_email"
+	NotifyVerifiedEmailCol      = "verified_email"
+	NotifyVerifiedEmailLowerCol = "verified_email_lower"
+	NotifyLastPhoneCol          = "last_phone"
+	NotifyVerifiedPhoneCol      = "verified_phone"
+	NotifyPasswordSetCol        = "password_set"
 )
 
 type userProjection struct{}
@@ -112,6 +114,7 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(HumanIsEmailVerifiedCol, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(HumanPhoneCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(HumanIsPhoneVerifiedCol, handler.ColumnTypeBool, handler.Nullable()),
+			handler.NewColumn(HumanPasswordChangeRequired, handler.ColumnTypeBool),
 		},
 			handler.NewPrimaryKey(HumanUserInstanceIDCol, HumanUserIDCol),
 			UserHumanSuffix,
@@ -341,6 +344,7 @@ func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 				handler.NewCol(HumanGenderCol, &sql.NullInt16{Int16: int16(e.Gender), Valid: e.Gender.Specified()}),
 				handler.NewCol(HumanEmailCol, e.EmailAddress),
 				handler.NewCol(HumanPhoneCol, &sql.NullString{String: string(e.PhoneNumber), Valid: e.PhoneNumber != ""}),
+				handler.NewCol(HumanPasswordChangeRequired, e.ChangeRequired),
 			},
 			handler.WithTableSuffix(UserHumanSuffix),
 		),
@@ -389,6 +393,7 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 				handler.NewCol(HumanGenderCol, &sql.NullInt16{Int16: int16(e.Gender), Valid: e.Gender.Specified()}),
 				handler.NewCol(HumanEmailCol, e.EmailAddress),
 				handler.NewCol(HumanPhoneCol, &sql.NullString{String: string(e.PhoneNumber), Valid: e.PhoneNumber != ""}),
+				handler.NewCol(HumanPasswordChangeRequired, e.ChangeRequired),
 			},
 			handler.WithTableSuffix(UserHumanSuffix),
 		),
@@ -903,17 +908,28 @@ func (p *userProjection) reduceHumanPasswordChanged(event eventstore.Event) (*ha
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-jqXUY", "reduce.wrong.event.type %s", user.HumanPasswordChangedType)
 	}
-
-	return handler.NewUpdateStatement(
+	return handler.NewMultiStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(NotifyPasswordSetCol, true),
-		},
-		[]handler.Condition{
-			handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
-			handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
-		},
-		handler.WithTableSuffix(UserNotifySuffix),
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(HumanPasswordChangeRequired, e.ChangeRequired),
+			},
+			[]handler.Condition{
+				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
+				handler.NewCond(HumanUserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			handler.WithTableSuffix(UserHumanSuffix),
+		),
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(NotifyPasswordSetCol, true),
+			},
+			[]handler.Condition{
+				handler.NewCond(NotifyUserIDCol, e.Aggregate().ID),
+				handler.NewCond(NotifyInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			handler.WithTableSuffix(UserNotifySuffix),
+		),
 	), nil
 }
 

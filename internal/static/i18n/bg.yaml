@@ -63,7 +63,6 @@ Errors:
   Notification:
     NoDomain: Няма намерен домейн за съобщение
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Потребителят не може да бъде намерен
     AlreadyExists: Вече съществува потребител
     NotFoundOnOrg: Потребителят не може да бъде намерен в избраната организация
@@ -494,6 +493,7 @@ Errors:
     CloseRows: SQL изразът не можа да бъде завършен
     SQLStatement: SQL изразът не може да бъде създаден
     InvalidRequest: Заявката е невалидна
+    TooManyNestingLevels: Твърде много нива на влагане на заявката (макс. 20)
   Quota:
     AlreadyExists: Вече съществува квота за тази единица
     NotFound: Не е намерена квота за тази единица
@@ -564,6 +564,27 @@ Errors:
     NotFound: Изпълнението не е намерено
     IncludeNotFound: Включването не е намерено
     NoTargets: Няма определени цели
+  UserSchema:
+    NotEnabled: Функцията „Потребителска схема“ не е активирана
+    Type:
+      Missing: Липсва тип потребителска схема
+      AlreadyExists: Типът потребителска схема вече съществува
+    Authenticator:
+      Invalid: Невалиден тип удостоверител
+    NotActive: Потребителската схема не е активна
+    NotInactive: Потребителската схема не е неактивна
+    NotExists: Потребителската схема не съществува
+  TokenExchange:
+    FeatureDisabled: Функцията Token Exchange е деактивирана за вашето копие. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Токенът липсва
+      Invalid: Токенът е невалиден
+      TypeMissing: Липсва тип токен
+      TypeNotAllowed: Типът токен не е разрешен
+      TypeNotSupported: Типът токен не се поддържа
+      NotForAPI: Имитирани токени не са разрешени за API
+    Impersonation:
+      PolicyDisabled: Имитирането е деактивирано в политиката за сигурност на екземпляра
 
 AggregateTypes:
   action: Действие
@@ -577,6 +598,7 @@ AggregateTypes:
   feature: Особеност
   target: Целта
   execution: Екзекуция
+  user_schema: Потребителска схема
 
 EventTypes:
   execution:
@@ -599,6 +621,7 @@ EventTypes:
     token:
       added: Токенът за достъп е създаден
       removed: Токенът за достъп е премахнат
+    impersonated: Имитиран потребител
     username:
       reserved: Потребителското име е запазено
       released: Потребителското име е освободено
@@ -1274,6 +1297,12 @@ EventTypes:
         password:
           changed: Паролата на SMTP конфигурацията е променена
         removed: Премахната SMTP конфигурация
+  user_schema:
+    created: Създадена е потребителска схема
+    updated: Потребителската схема е актуализирана
+    deactivated: Потребителската схема е деактивирана
+    reactivated: Потребителската схема е активирана отново
+    deleted: Потребителската схема е изтрита
 Application:
   OIDC:
     UnsupportedVersion: Вашата OIDC версия не се поддържа
