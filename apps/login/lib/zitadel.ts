@@ -55,11 +55,15 @@ if (!getServers().length) {
 }
 
 export async function getBrandingSettings(
-  server: ZitadelServer
+  server: ZitadelServer,
+  organization?: string
 ): Promise<BrandingSettings | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
-    .getBrandingSettings({}, {})
+    .getBrandingSettings(
+      { ctx: organization ? { orgId: organization } : { instance: true } },
+      {}
+    )
     .then((resp: GetBrandingSettingsResponse) => resp.settings);
 }
 

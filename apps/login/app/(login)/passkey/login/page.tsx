@@ -1,5 +1,6 @@
-import { getSession, server } from "#/lib/zitadel";
+import { getBrandingSettings, getSession, server } from "#/lib/zitadel";
 import Alert from "#/ui/Alert";
+import DynamicTheme from "#/ui/DynamicTheme";
 import LoginPasskey from "#/ui/LoginPasskey";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
@@ -29,33 +30,37 @@ export default async function Page({
     });
   }
 
+  const branding = await getBrandingSettings(server, organization);
+
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <h1>{title}</h1>
+    <DynamicTheme branding={branding}>
+      <div className="flex flex-col items-center space-y-4">
+        <h1>{title}</h1>
 
-      {sessionFactors && (
-        <UserAvatar
-          loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-          displayName={sessionFactors.factors?.user?.displayName}
-          showDropdown
-        ></UserAvatar>
-      )}
-      <p className="ztdl-p mb-6 block">{description}</p>
+        {sessionFactors && (
+          <UserAvatar
+            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
+            displayName={sessionFactors.factors?.user?.displayName}
+            showDropdown
+          ></UserAvatar>
+        )}
+        <p className="ztdl-p mb-6 block">{description}</p>
 
-      {!sessionFactors && <div className="py-4"></div>}
+        {!sessionFactors && <div className="py-4"></div>}
 
-      {!loginName && (
-        <Alert>Provide your active session as loginName param</Alert>
-      )}
+        {!loginName && (
+          <Alert>Provide your active session as loginName param</Alert>
+        )}
 
-      {loginName && (
-        <LoginPasskey
-          loginName={loginName}
-          authRequestId={authRequestId}
-          altPassword={altPassword === "true"}
-          organization={organization}
-        />
-      )}
-    </div>
+        {loginName && (
+          <LoginPasskey
+            loginName={loginName}
+            authRequestId={authRequestId}
+            altPassword={altPassword === "true"}
+            organization={organization}
+          />
+        )}
+      </div>
+    </DynamicTheme>
   );
 }

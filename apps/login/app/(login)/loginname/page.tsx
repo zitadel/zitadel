@@ -1,10 +1,14 @@
 import {
+  getBrandingSettings,
   getLegalAndSupportSettings,
   getLoginSettings,
   server,
 } from "#/lib/zitadel";
+import DynamicTheme from "#/ui/DynamicTheme";
 import { SignInWithIDP } from "#/ui/SignInWithIDP";
+import ThemeWrapper from "#/ui/ThemeWrapper";
 import UsernameForm from "#/ui/UsernameForm";
+import { BrandingSettings } from "@zitadel/server";
 import {
   GetActiveIdentityProvidersResponse,
   IdentityProvider,
@@ -46,26 +50,30 @@ export default async function Page({
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000";
 
+  const branding = await getBrandingSettings(server, organization);
+
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <h1>Welcome back!</h1>
-      <p className="ztdl-p">Enter your login data.</p>
+    <DynamicTheme branding={branding}>
+      <div className="flex flex-col items-center space-y-4">
+        <h1>Welcome back!</h1>
+        <p className="ztdl-p">Enter your login data.</p>
 
-      <UsernameForm
-        loginSettings={loginSettings}
-        loginName={loginName}
-        authRequestId={authRequestId}
-        organization={organization}
-        submit={submit}
-      />
-
-      {legal && identityProviders && process.env.ZITADEL_API_URL && (
-        <SignInWithIDP
-          host={host}
-          identityProviders={identityProviders}
+        <UsernameForm
+          loginSettings={loginSettings}
+          loginName={loginName}
           authRequestId={authRequestId}
-        ></SignInWithIDP>
-      )}
-    </div>
+          organization={organization}
+          submit={submit}
+        />
+
+        {legal && identityProviders && process.env.ZITADEL_API_URL && (
+          <SignInWithIDP
+            host={host}
+            identityProviders={identityProviders}
+            authRequestId={authRequestId}
+          ></SignInWithIDP>
+        )}
+      </div>
+    </DynamicTheme>
   );
 }
