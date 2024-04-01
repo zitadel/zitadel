@@ -9,8 +9,6 @@ import (
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"github.com/zitadel/passwap"
-	"github.com/zitadel/passwap/bcrypt"
 
 	"github.com/zitadel/zitadel/internal/api/assets"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -95,6 +93,7 @@ func NewServer(
 	userAgentCookie, instanceHandler func(http.Handler) http.Handler,
 	accessHandler *middleware.AccessInterceptor,
 	fallbackLogger *slog.Logger,
+	hashConfig crypto.HashConfig,
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
@@ -121,7 +120,10 @@ func NewServer(
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider")
 	}
-
+	hasher, err := hashConfig.NewHasher()
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "OIDC-Aij4e", "cannot create secret hasher")
+	}
 	server := &Server{
 		LegacyServer:               op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
 		repo:                       repo,
@@ -135,7 +137,7 @@ func NewServer(
 		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime,
 		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime,
 		fallbackLogger:             fallbackLogger,
-		hasher:                     passwap.NewSwapper(bcrypt.New(10)), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
+		hasher:                     hasher,
 		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
 		assetAPIPrefix:             assets.AssetAPI(externalSecure),
 	}

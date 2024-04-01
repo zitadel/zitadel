@@ -379,7 +379,7 @@ func (c *Commands) oidcSecretCheckSucceeded(ctx context.Context, agg *eventstore
 		project_repo.NewOIDCConfigSecretCheckSucceededEvent(ctx, agg, appID),
 	)
 	if updated != "" {
-		project_repo.NewOIDCConfigSecretHashUpdatedEvent(ctx, agg, appID, updated)
+		cmds = append(cmds, project_repo.NewOIDCConfigSecretHashUpdatedEvent(ctx, agg, appID, updated))
 	}
 	c.asyncPush(ctx, cmds...)
 }

@@ -114,7 +114,7 @@ func (c *Commands) MachineSecretCheckSucceeded(ctx context.Context, userID, reso
 		user.NewMachineSecretCheckSucceededEvent(ctx, &agg.Aggregate),
 	)
 	if updated != "" {
-		user.NewMachineSecretHashUpdatedEvent(ctx, &agg.Aggregate, updated)
+		cmds = append(cmds, user.NewMachineSecretHashUpdatedEvent(ctx, &agg.Aggregate, updated))
 	}
 	c.asyncPush(ctx, cmds...)
 }

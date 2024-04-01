@@ -9,10 +9,10 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"github.com/zitadel/passwap"
 
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -35,7 +35,7 @@ type Server struct {
 	defaultIdTokenLifetime     time.Duration
 
 	fallbackLogger      *slog.Logger
-	hasher              *passwap.Swapper
+	hasher              *crypto.Hasher
 	signingKeyAlgorithm string
 	assetAPIPrefix      func(ctx context.Context) string
 }
