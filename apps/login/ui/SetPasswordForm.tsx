@@ -106,7 +106,7 @@ export default function SetPasswordForm({
           value.password
         ).then((session) => {
           setLoading(false);
-          const params: any = { userID: humanResponse.userId };
+          const params: any = { userId: humanResponse.userId };
 
           if (authRequestId) {
             params.authRequestId = authRequestId;

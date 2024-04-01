@@ -77,8 +77,8 @@ export default function RegisterForm({
   }
 
   function submitAndLink(value: Inputs): Promise<boolean | void> {
-    return submitRegister(value).then((resp: any) => {
-      const params: any = { userId: resp.userId };
+    return submitRegister(value).then((session) => {
+      const params: any = { userId: session.userId };
 
       if (organization) {
         params.organization = organization;
@@ -86,6 +86,10 @@ export default function RegisterForm({
 
       if (authRequestId) {
         params.authRequestId = authRequestId;
+      }
+
+      if (session && session.sessionId) {
+        params.sessionId = session.sessionId;
       }
 
       return router.push(`/verify?` + new URLSearchParams(params));
