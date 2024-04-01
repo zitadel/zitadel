@@ -25,9 +25,9 @@ export default async function Page({ searchParams }: { searchParams: any }) {
           Enter the Code provided in the verification email.
         </p>
 
-        {userID ? (
+        {userId ? (
           <VerifyEmailForm
-            userId={userID}
+            userId={userId}
             code={code}
             submit={submit === "true"}
             organization={organization}
