@@ -18,6 +18,7 @@ type Props = {
   submit: boolean;
   organization?: string;
   authRequestId?: string;
+  sessionId?: string;
 };
 
 export default function VerifyEmailForm({
@@ -26,6 +27,7 @@ export default function VerifyEmailForm({
   submit,
   organization,
   authRequestId,
+  sessionId,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -96,7 +98,19 @@ export default function VerifyEmailForm({
 
   function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
     return submitCode(value).then((resp: any) => {
-      return router.push(`/loginname`);
+      const params = new URLSearchParams({});
+
+      if (organization) {
+        params.set("organization", organization);
+      }
+
+      if (authRequestId && sessionId) {
+        params.set("authRequest", authRequestId);
+        params.set("sessionId", sessionId);
+        return router.push(`/login?` + params);
+      } else {
+        return router.push(`/loginname?` + params);
+      }
     });
   }
 

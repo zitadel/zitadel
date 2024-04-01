@@ -271,7 +271,7 @@ export type AddHumanUserData = {
 export async function addHumanUser(
   server: ZitadelServer,
   { email, firstName, lastName, password, organization }: AddHumanUserData
-): Promise<string> {
+): Promise<AddHumanUserResponse> {
   const userService = user.getUser(server);
 
   const payload: Partial<AddHumanUserRequest> = {
@@ -284,19 +284,15 @@ export async function addHumanUser(
     payload.organization = { orgId: organization };
   }
 
-  return userService
-    .addHumanUser(
-      password
-        ? {
-            ...payload,
-            password: { password },
-          }
-        : payload,
-      {}
-    )
-    .then((resp: AddHumanUserResponse) => {
-      return resp.userId;
-    });
+  return userService.addHumanUser(
+    password
+      ? {
+          ...payload,
+          password: { password },
+        }
+      : payload,
+    {}
+  );
 }
 
 export async function listUsers(

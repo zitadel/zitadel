@@ -5,7 +5,8 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 export default async function Page({ searchParams }: { searchParams: any }) {
   const {
-    userID,
+    userId,
+    sessionId,
     code,
     submit,
     organization,
@@ -31,6 +32,7 @@ export default async function Page({ searchParams }: { searchParams: any }) {
             submit={submit === "true"}
             organization={organization}
             authRequestId={authRequestId}
+            sessionId={sessionId}
           />
         ) : (
           <div className="w-full flex flex-row items-center justify-center border border-yellow-600/40 dark:border-yellow-500/20 bg-yellow-200/30 text-yellow-600 dark:bg-yellow-700/20 dark:text-yellow-200 rounded-md py-2 scroll-px-40">

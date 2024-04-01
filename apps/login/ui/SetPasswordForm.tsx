@@ -104,7 +104,7 @@ export default function SetPasswordForm({
         return createSessionWithLoginNameAndPassword(
           email,
           value.password
-        ).then(() => {
+        ).then((session) => {
           setLoading(false);
           const params: any = { userID: humanResponse.userId };
 
@@ -113,6 +113,9 @@ export default function SetPasswordForm({
           }
           if (organization) {
             params.organization = organization;
+          }
+          if (session && session.sessionId) {
+            params.sessionId = session.sessionId;
           }
 
           return router.push(`/verify?` + new URLSearchParams(params));

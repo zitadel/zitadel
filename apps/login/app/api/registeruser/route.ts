@@ -1,4 +1,8 @@
 import { addHumanUser, server } from "#/lib/zitadel";
+import {
+  createSessionAndUpdateCookie,
+  createSessionForUserIdAndUpdateCookie,
+} from "#/utils/session";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -20,8 +24,18 @@ export async function POST(request: NextRequest) {
       password: password ? password : undefined,
       organization,
     })
-      .then((userId) => {
-        return NextResponse.json({ userId });
+      .then((user) => {
+        return createSessionForUserIdAndUpdateCookie(
+          user.userId,
+          password,
+          undefined,
+          authRequestId
+        ).then((session) => {
+          return NextResponse.json({
+            userId: user.userId,
+            sessionId: session.id,
+          });
+        });
       })
       .catch((error) => {
         return NextResponse.json(error, { status: 500 });

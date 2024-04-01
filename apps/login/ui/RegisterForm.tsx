@@ -78,7 +78,7 @@ export default function RegisterForm({
 
   function submitAndLink(value: Inputs): Promise<boolean | void> {
     return submitRegister(value).then((resp: any) => {
-      const params: any = { userID: resp.userId };
+      const params: any = { userId: resp.userId };
 
       if (organization) {
         params.organization = organization;
