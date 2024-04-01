@@ -7,7 +7,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
 	"github.com/zitadel/passwap"
 	"github.com/zitadel/passwap/bcrypt"
 

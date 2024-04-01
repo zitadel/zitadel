@@ -10,12 +10,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/passwap"
 	"github.com/zitadel/passwap/bcrypt"
+	"go.uber.org/mock/gomock"
+
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"go.uber.org/mock/gomock"
 )
 
 func mockEncryptedCode(code string, exp time.Duration) encrypedCodeFunc {

@@ -120,6 +120,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 		return nil, err
 	}
 	plain, err = domain.SetNewClientSecretIfNeeded(apiApp, func() (string, string, error) {
+		//nolint:SA1019
 		return c.newHashedSecret(ctx, c.eventstore.Filter)
 	})
 	if err != nil {

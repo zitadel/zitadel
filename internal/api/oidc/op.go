@@ -80,6 +80,7 @@ type OPStorage struct {
 }
 
 func NewServer(
+	ctx context.Context,
 	config Config,
 	defaultLogoutRedirectURI string,
 	externalSecure bool,
@@ -100,7 +101,7 @@ func NewServer(
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
 	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
-	keyCache := newPublicKeyCache(context.TODO(), config.PublicKeyCacheMaxAge, query.GetPublicKeyByID)
+	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, query.GetPublicKeyByID)
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 

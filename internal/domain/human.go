@@ -4,10 +4,11 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/net/context"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	"golang.org/x/net/context"
 )
 
 type Human struct {
