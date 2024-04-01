@@ -207,13 +207,18 @@ export default function LoginPasskey({
             type="button"
             variant={ButtonVariants.Secondary}
             onClick={() => {
-              const params = { loginName, alt: "true" };
+              const params: any = { loginName, alt: "true" };
+
+              if (authRequestId) {
+                params.authRequestId = authRequestId;
+              }
+
+              if (organization) {
+                params.organization = organization;
+              }
 
               return router.push(
-                "/password?" +
-                  new URLSearchParams(
-                    authRequestId ? { ...params, authRequestId } : params
-                  ) // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
+                "/password?" + new URLSearchParams(params) // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
               );
             }}
           >
