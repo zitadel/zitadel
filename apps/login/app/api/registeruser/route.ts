@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({
             userId: user.userId,
             sessionId: session.id,
+            factors: session.factors,
           });
         });
       })

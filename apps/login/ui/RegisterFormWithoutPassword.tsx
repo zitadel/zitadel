@@ -64,27 +64,6 @@ export default function RegisterFormWithoutPassword({
     return res.json();
   }
 
-  async function createSessionWithLoginName(loginName: string) {
-    setLoading(true);
-    const res = await fetch("/api/session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        loginName: loginName,
-        organization: organization,
-        authRequestId: authRequestId,
-      }),
-    });
-
-    setLoading(false);
-    if (!res.ok) {
-      throw new Error("Failed to set user");
-    }
-    return res.json();
-  }
-
   async function submitAndContinue(
     value: Inputs,
     withPassword: boolean = false
@@ -102,22 +81,20 @@ export default function RegisterFormWithoutPassword({
     return withPassword
       ? router.push(`/register?` + new URLSearchParams(registerParams))
       : submitAndRegister(value)
-          .then((resp: any) => {
-            createSessionWithLoginName(value.email).then(({ factors }) => {
-              setError("");
+          .then((session) => {
+            setError("");
 
-              const params: any = { loginName: factors.user.loginName };
+            const params: any = { loginName: session.factors.user.loginName };
 
-              if (organization) {
-                params.organization = organization;
-              }
+            if (organization) {
+              params.organization = organization;
+            }
 
-              if (authRequestId) {
-                params.authRequestId = authRequestId;
-              }
+            if (authRequestId) {
+              params.authRequestId = authRequestId;
+            }
 
-              return router.push(`/passkey/add?` + new URLSearchParams(params));
-            });
+            return router.push(`/passkey/add?` + new URLSearchParams(params));
           })
           .catch((errorDetails: Error) => {
             setLoading(false);

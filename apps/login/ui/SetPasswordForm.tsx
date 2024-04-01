@@ -15,7 +15,6 @@ import {
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { AuthRequest } from "@zitadel/server";
 
 type Inputs =
   | {
@@ -74,52 +73,25 @@ export default function SetPasswordForm({
     return res.json();
   }
 
-  async function createSessionWithLoginNameAndPassword(
-    loginName: string,
-    password: string
-  ) {
-    const res = await fetch("/api/session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        loginName: loginName,
-        password: password,
-        organization: organization,
-        authRequestId, //, register does not need an oidc callback
-      }),
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to set user");
-    }
-    return res.json();
-  }
-
   function submitAndLink(value: Inputs): Promise<boolean | void> {
     return submitRegister(value)
-      .then((humanResponse: any) => {
+      .then((registerResponse) => {
         setError("");
-        return createSessionWithLoginNameAndPassword(
-          email,
-          value.password
-        ).then((session) => {
-          setLoading(false);
-          const params: any = { userId: humanResponse.userId };
 
-          if (authRequestId) {
-            params.authRequestId = authRequestId;
-          }
-          if (organization) {
-            params.organization = organization;
-          }
-          if (session && session.sessionId) {
-            params.sessionId = session.sessionId;
-          }
+        setLoading(false);
+        const params: any = { userId: registerResponse.userId };
 
-          return router.push(`/verify?` + new URLSearchParams(params));
-        });
+        if (authRequestId) {
+          params.authRequestId = authRequestId;
+        }
+        if (organization) {
+          params.organization = organization;
+        }
+        if (registerResponse && registerResponse.sessionId) {
+          params.sessionId = registerResponse.sessionId;
+        }
+
+        return router.push(`/verify?` + new URLSearchParams(params));
       })
       .catch((errorDetails: Error) => {
         setLoading(false);
