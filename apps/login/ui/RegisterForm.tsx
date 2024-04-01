@@ -18,6 +18,7 @@ import {
 } from "#/utils/validators";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
+import { AuthRequest } from "@zitadel/server";
 
 type Inputs =
   | {
@@ -33,12 +34,14 @@ type Props = {
   legal: LegalAndSupportSettings;
   passwordComplexitySettings: PasswordComplexitySettings;
   organization?: string;
+  authRequestId?: string;
 };
 
 export default function RegisterForm({
   legal,
   passwordComplexitySettings,
   organization,
+  authRequestId,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -79,6 +82,10 @@ export default function RegisterForm({
 
       if (organization) {
         params.organization = organization;
+      }
+
+      if (authRequestId) {
+        params.authRequestId = authRequestId;
       }
 
       return router.push(`/verify?` + new URLSearchParams(params));

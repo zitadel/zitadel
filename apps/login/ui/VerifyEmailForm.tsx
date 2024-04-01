@@ -17,6 +17,7 @@ type Props = {
   code: string;
   submit: boolean;
   organization?: string;
+  authRequestId?: string;
 };
 
 export default function VerifyEmailForm({
@@ -24,6 +25,7 @@ export default function VerifyEmailForm({
   code,
   submit,
   organization,
+  authRequestId,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
