@@ -452,7 +452,6 @@ export async function verifyPasskeyRegistration(
     {
       passkeyId,
       passkeyName,
-
       publicKeyCredential,
       userId,
     },

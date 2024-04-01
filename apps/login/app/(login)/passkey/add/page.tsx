@@ -10,7 +10,8 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, promptPasswordless, organization } = searchParams;
+  const { loginName, promptPasswordless, organization, authRequestId } =
+    searchParams;
 
   const sessionFactors = await loadSession(loginName);
 
@@ -75,6 +76,8 @@ export default async function Page({
           <RegisterPasskey
             sessionId={sessionFactors.id}
             isPrompt={!!promptPasswordless}
+            organization={organization}
+            authRequestId={authRequestId}
           />
         )}
       </div>

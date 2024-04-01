@@ -6,16 +6,23 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { RegisterPasskeyResponse } from "@zitadel/server";
+import { AuthRequest, RegisterPasskeyResponse } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "#/utils/base64";
 type Inputs = {};
 
 type Props = {
   sessionId: string;
   isPrompt: boolean;
+  authRequestId?: string;
+  organization?: string;
 };
 
-export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
+export default function RegisterPasskey({
+  sessionId,
+  isPrompt,
+  organization,
+  authRequestId,
+}: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
@@ -141,7 +148,20 @@ export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
                 },
               };
               return submitVerify(passkeyId, "", data, sessionId).then(() => {
-                router.push("/accounts");
+                const params = new URLSearchParams();
+
+                if (organization) {
+                  params.set("organization", organization);
+                }
+
+                if (authRequestId) {
+                  params.set("authRequest", authRequestId);
+                  params.set("sessionId", sessionId);
+
+                  router.push("/login?" + params);
+                } else {
+                  router.push("/accounts?" + params);
+                }
               });
             } else {
               setLoading(false);
@@ -175,7 +195,18 @@ export default function RegisterPasskey({ sessionId, isPrompt }: Props) {
           <Button
             type="button"
             variant={ButtonVariants.Secondary}
-            onClick={() => router.push("/accounts")}
+            onClick={() => {
+              const params = new URLSearchParams();
+              if (authRequestId) {
+                params.set("authRequestId", authRequestId);
+              }
+
+              if (organization) {
+                params.set("organization", organization);
+              }
+
+              router.push("/accounts?" + params);
+            }}
           >
             skip
           </Button>
