@@ -106,7 +106,16 @@ export default function SetPasswordForm({
           value.password
         ).then(() => {
           setLoading(false);
-          return router.push(`/verify?userID=${humanResponse.userId}`);
+          const params: any = { userID: humanResponse.userId };
+
+          if (authRequestId) {
+            params.authRequestId = authRequestId;
+          }
+          if (organization) {
+            params.organization = organization;
+          }
+
+          return router.push(`/verify?` + new URLSearchParams(params));
         });
       })
       .catch((errorDetails: Error) => {
