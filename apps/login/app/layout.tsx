@@ -33,41 +33,43 @@ export default async function RootLayout({
     <html lang="en" className={`${lato.className}`} suppressHydrationWarning>
       <head />
       <body>
-        <div
-          className={`h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600 ${
-            showNav
-              ? "bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]"
-              : ""
-          }`}
-        >
-          {showNav ? (
-            <GlobalNav />
-          ) : (
-            <div className="absolute bottom-0 right-0 flex flex-row p-4">
-              <Theme />
-            </div>
-          )}
-
+        <ThemeProvider>
           <div
-            className={`${
-              showNav ? "lg:pl-72" : ""
-            } pb-4 flex flex-col justify-center h-full`}
+            className={`h-screen overflow-y-scroll bg-background-light-600 dark:bg-background-dark-600 ${
+              showNav
+                ? "bg-[url('/grid-light.svg')] dark:bg-[url('/grid-dark.svg')]"
+                : ""
+            }`}
           >
-            <div className="mx-auto max-w-[440px] space-y-8 pt-20 lg:py-8 w-full">
-              {showNav && (
-                <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
-                  <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
-                    <AddressBar domain={domain} />
-                  </div>
-                </div>
-              )}
+            {showNav ? (
+              <GlobalNav />
+            ) : (
+              <div className="absolute bottom-0 right-0 flex flex-row p-4">
+                <Theme />
+              </div>
+            )}
 
-              {children}
+            <div
+              className={`${
+                showNav ? "lg:pl-72" : ""
+              } pb-4 flex flex-col justify-center h-full`}
+            >
+              <div className="mx-auto max-w-[440px] space-y-8 pt-20 lg:py-8 w-full">
+                {showNav && (
+                  <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20">
+                    <div className="rounded-lg bg-background-light-400 dark:bg-background-dark-500">
+                      <AddressBar domain={domain} />
+                    </div>
+                  </div>
+                )}
+
+                {children}
+              </div>
             </div>
           </div>
-        </div>
 
-        <Analytics />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -106,6 +106,9 @@ export default function UsernameForm({
             if (authRequestId) {
               paramsPasskey.authRequestId = authRequestId;
             }
+            if (organization) {
+              paramsPasskey.organization = organization;
+            }
 
             return router.push(
               "/passkey/login?" + new URLSearchParams(paramsPasskey)
@@ -120,6 +123,10 @@ export default function UsernameForm({
             if (authRequestId) {
               paramsPasskeyDefault.authRequestId = authRequestId;
             }
+            if (organization) {
+              paramsPasskeyDefault.organization = organization;
+            }
+
             return router.push(
               "/password?" + new URLSearchParams(paramsPasskeyDefault)
             );
@@ -143,6 +150,10 @@ export default function UsernameForm({
             passkeyParams.authRequestId = authRequestId;
           }
 
+          if (organization) {
+            passkeyParams.organization = organization;
+          }
+
           return router.push(
             "/passkey/login?" + new URLSearchParams(passkeyParams)
           );
@@ -156,6 +167,10 @@ export default function UsernameForm({
 
           if (authRequestId) {
             paramsPasswordDefault.authRequestId = authRequestId;
+          }
+
+          if (organization) {
+            paramsPasswordDefault.organization = organization;
           }
 
           return router.push(
