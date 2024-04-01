@@ -16,9 +16,15 @@ type Props = {
   userId: string;
   code: string;
   submit: boolean;
+  organization?: string;
 };
 
-export default function VerifyEmailForm({ userId, code, submit }: Props) {
+export default function VerifyEmailForm({
+  userId,
+  code,
+  submit,
+  organization,
+}: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
     defaultValues: {
@@ -50,6 +56,7 @@ export default function VerifyEmailForm({ userId, code, submit }: Props) {
       body: JSON.stringify({
         code: values.code,
         userId,
+        organization,
       }),
     });
 

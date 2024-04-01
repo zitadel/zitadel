@@ -32,11 +32,13 @@ type Inputs =
 type Props = {
   legal: LegalAndSupportSettings;
   passwordComplexitySettings: PasswordComplexitySettings;
+  organization?: string;
 };
 
 export default function RegisterForm({
   legal,
   passwordComplexitySettings,
+  organization,
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -58,6 +60,7 @@ export default function RegisterForm({
         password: values.password,
         firstName: values.firstname,
         lastName: values.lastname,
+        organization: organization,
       }),
     });
 
@@ -72,7 +75,13 @@ export default function RegisterForm({
 
   function submitAndLink(value: Inputs): Promise<boolean | void> {
     return submitRegister(value).then((resp: any) => {
-      return router.push(`/verify?userID=${resp.userId}`);
+      const params: any = { userID: resp.userId };
+
+      if (organization) {
+        params.organization = organization;
+      }
+
+      return router.push(`/verify?` + new URLSearchParams(params));
     });
   }
 

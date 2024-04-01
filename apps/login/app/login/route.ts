@@ -89,9 +89,11 @@ export async function GET(request: NextRequest) {
 
     if (
       authRequest?.scope &&
-      authRequest.scope.find((s) => ORG_SCOPE_REGEX.test(s))
+      authRequest.scope.find((s: string) => ORG_SCOPE_REGEX.test(s))
     ) {
-      const orgId = authRequest.scope.find((s) => ORG_SCOPE_REGEX.test(s));
+      const orgId = authRequest.scope.find((s: string) =>
+        ORG_SCOPE_REGEX.test(s)
+      );
 
       if (orgId) {
         const matched = ORG_SCOPE_REGEX.exec(orgId);

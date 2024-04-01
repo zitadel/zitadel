@@ -4,13 +4,21 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
-    const { email, password, firstName, lastName } = body;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      organization,
+      authRequestId,
+    } = body;
 
     return addHumanUser(server, {
       email: email,
       firstName,
       lastName,
       password: password ? password : undefined,
+      organization,
     })
       .then((userId) => {
         return NextResponse.json({ userId });

@@ -1,15 +1,14 @@
 import { ProviderSlug } from "#/lib/demos";
-import { server } from "#/lib/zitadel";
+import { getBrandingSettings, server } from "#/lib/zitadel";
 import Alert, { AlertType } from "#/ui/Alert";
+import DynamicTheme from "#/ui/DynamicTheme";
 import IdpSignin from "#/ui/IdpSignin";
-import { createSessionForIdpAndUpdateCookie } from "#/utils/session";
 import {
   AddHumanUserRequest,
   IDPInformation,
   RetrieveIdentityProviderIntentResponse,
   user,
   IDPLink,
-  Session,
 } from "@zitadel/server";
 import { ClientError } from "nice-grpc";
 
@@ -89,8 +88,10 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: { provider: ProviderSlug };
 }) {
-  const { id, token, authRequestId } = searchParams;
+  const { id, token, authRequestId, organization } = searchParams;
   const { provider } = params;
+
+  const branding = await getBrandingSettings(server, organization);
 
   if (provider && id && token) {
     return retrieveIDPIntent(id, token)
@@ -100,40 +101,46 @@ export default async function Page({
           // handle login
           if (userId) {
             return (
-              <div className="flex flex-col items-center space-y-4">
-                <h1>Login successful</h1>
-                <div>You have successfully been loggedIn!</div>
+              <DynamicTheme branding={branding}>
+                <div className="flex flex-col items-center space-y-4">
+                  <h1>Login successful</h1>
+                  <div>You have successfully been loggedIn!</div>
 
-                <IdpSignin
-                  userId={userId}
-                  idpIntent={{ idpIntentId: id, idpIntentToken: token }}
-                  authRequestId={authRequestId}
-                />
-              </div>
+                  <IdpSignin
+                    userId={userId}
+                    idpIntent={{ idpIntentId: id, idpIntentToken: token }}
+                    authRequestId={authRequestId}
+                  />
+                </div>
+              </DynamicTheme>
             );
           } else {
             // handle register
             return createUser(provider, idpInformation)
               .then((userId) => {
                 return (
-                  <div className="flex flex-col items-center space-y-4">
-                    <h1>Register successful</h1>
-                    <div>You have successfully been registered!</div>
-                  </div>
+                  <DynamicTheme branding={branding}>
+                    <div className="flex flex-col items-center space-y-4">
+                      <h1>Register successful</h1>
+                      <div>You have successfully been registered!</div>
+                    </div>
+                  </DynamicTheme>
                 );
               })
               .catch((error: ClientError) => {
                 return (
-                  <div className="flex flex-col items-center space-y-4">
-                    <h1>Register failed</h1>
-                    <div className="w-full">
-                      {
-                        <Alert type={AlertType.ALERT}>
-                          {JSON.stringify(error.message)}
-                        </Alert>
-                      }
+                  <DynamicTheme branding={branding}>
+                    <div className="flex flex-col items-center space-y-4">
+                      <h1>Register failed</h1>
+                      <div className="w-full">
+                        {
+                          <Alert type={AlertType.ALERT}>
+                            {JSON.stringify(error.message)}
+                          </Alert>
+                        }
+                      </div>
                     </div>
-                  </div>
+                  </DynamicTheme>
                 );
               });
           }
@@ -143,16 +150,18 @@ export default async function Page({
       })
       .catch((error) => {
         return (
-          <div className="flex flex-col items-center space-y-4">
-            <h1>An error occurred</h1>
-            <div className="w-full">
-              {
-                <Alert type={AlertType.ALERT}>
-                  {JSON.stringify(error.message)}
-                </Alert>
-              }
+          <DynamicTheme branding={branding}>
+            <div className="flex flex-col items-center space-y-4">
+              <h1>An error occurred</h1>
+              <div className="w-full">
+                {
+                  <Alert type={AlertType.ALERT}>
+                    {JSON.stringify(error.message)}
+                  </Alert>
+                }
+              </div>
             </div>
-          </div>
+          </DynamicTheme>
         );
       });
   } else {

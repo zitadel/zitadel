@@ -53,6 +53,7 @@ export default function RegisterFormWithoutPassword({
         email: values.email,
         firstName: values.firstname,
         lastName: values.lastname,
+        organization: organization,
       }),
     });
     setLoading(false);
@@ -88,16 +89,30 @@ export default function RegisterFormWithoutPassword({
     value: Inputs,
     withPassword: boolean = false
   ) {
+    const registerParams: any = value;
+
+    if (organization) {
+      registerParams.organization = organization;
+    }
+
     return withPassword
-      ? router.push(`/register?` + new URLSearchParams(value))
+      ? router.push(`/register?` + new URLSearchParams(registerParams))
       : submitAndRegister(value)
           .then((resp: any) => {
             createSessionWithLoginName(value.email).then(({ factors }) => {
               setError("");
-              return router.push(
-                `/passkey/add?` +
-                  new URLSearchParams({ loginName: factors.user.loginName })
-              );
+
+              const params: any = { loginName: factors.user.loginName };
+
+              if (organization) {
+                params.organization = organization;
+              }
+
+              if (authRequestId) {
+                params.authRequestId = authRequestId;
+              }
+
+              return router.push(`/passkey/add?` + new URLSearchParams(params));
             });
           })
           .catch((errorDetails: Error) => {

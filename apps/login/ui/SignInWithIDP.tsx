@@ -16,6 +16,7 @@ export interface SignInWithIDPProps {
   host: string;
   identityProviders: any[];
   authRequestId?: string;
+  organization?: string;
   startIDPFlowPath?: (idpId: string) => string;
 }
 
@@ -26,6 +27,7 @@ export function SignInWithIDP({
   host,
   identityProviders,
   authRequestId,
+  organization,
   startIDPFlowPath = START_IDP_FLOW_PATH,
 }: SignInWithIDPProps) {
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,6 +37,16 @@ export function SignInWithIDP({
   async function startFlow(idpId: string, provider: ProviderSlug) {
     setLoading(true);
 
+    const params = new URLSearchParams();
+
+    if (authRequestId) {
+      params.set("authRequestId", authRequestId);
+    }
+
+    if (organization) {
+      params.set("organization", organization);
+    }
+
     const res = await fetch("/api/idp/start", {
       method: "POST",
       headers: {
@@ -42,11 +54,10 @@ export function SignInWithIDP({
       },
       body: JSON.stringify({
         idpId,
-        successUrl: authRequestId
-          ? `${host}/idp/${provider}/success?` +
-            new URLSearchParams({ authRequestId })
-          : `${host}/idp/${provider}/success`,
-        failureUrl: `${host}/idp/${provider}/failure`,
+        successUrl:
+          `${host}/idp/${provider}/success?` + new URLSearchParams(params),
+        failureUrl:
+          `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
       }),
     });
 

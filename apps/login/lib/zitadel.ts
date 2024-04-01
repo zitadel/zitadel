@@ -87,11 +87,15 @@ export async function getGeneralSettings(
 }
 
 export async function getLegalAndSupportSettings(
-  server: ZitadelServer
+  server: ZitadelServer,
+  organization?: string
 ): Promise<LegalAndSupportSettings | undefined> {
   const settingsService = settings.getSettings(server);
   return settingsService
-    .getLegalAndSupportSettings({}, {})
+    .getLegalAndSupportSettings(
+      { ctx: organization ? { orgId: organization } : { instance: true } },
+      {}
+    )
     .then((resp: GetLegalAndSupportSettingsResponse) => {
       return resp.settings;
     });
@@ -261,11 +265,12 @@ export type AddHumanUserData = {
   lastName: string;
   email: string;
   password: string | undefined;
+  organization: string | undefined;
 };
 
 export async function addHumanUser(
   server: ZitadelServer,
-  { email, firstName, lastName, password }: AddHumanUserData
+  { email, firstName, lastName, password, organization }: AddHumanUserData
 ): Promise<string> {
   const userService = user.getUser(server);
 
@@ -274,6 +279,11 @@ export async function addHumanUser(
     username: email,
     profile: { givenName: firstName, familyName: lastName },
   };
+
+  if (organization) {
+    payload.organization = { orgId: organization };
+  }
+
   return userService
     .addHumanUser(
       password

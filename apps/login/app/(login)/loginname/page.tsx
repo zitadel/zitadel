@@ -6,9 +6,7 @@ import {
 } from "#/lib/zitadel";
 import DynamicTheme from "#/ui/DynamicTheme";
 import { SignInWithIDP } from "#/ui/SignInWithIDP";
-import ThemeWrapper from "#/ui/ThemeWrapper";
 import UsernameForm from "#/ui/UsernameForm";
-import { BrandingSettings } from "@zitadel/server";
 import {
   GetActiveIdentityProvidersResponse,
   IdentityProvider,
@@ -71,6 +69,7 @@ export default async function Page({
             host={host}
             identityProviders={identityProviders}
             authRequestId={authRequestId}
+            organization={organization}
           ></SignInWithIDP>
         )}
       </div>
