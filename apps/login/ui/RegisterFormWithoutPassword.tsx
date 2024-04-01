@@ -95,6 +95,10 @@ export default function RegisterFormWithoutPassword({
       registerParams.organization = organization;
     }
 
+    if (authRequestId) {
+      registerParams.authRequestId = authRequestId;
+    }
+
     return withPassword
       ? router.push(`/register?` + new URLSearchParams(registerParams))
       : submitAndRegister(value)
