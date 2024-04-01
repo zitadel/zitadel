@@ -11,10 +11,10 @@ import (
 const (
 	machineSecretPrefix             = machineEventPrefix + "secret."
 	MachineSecretSetType            = machineSecretPrefix + "set"
+	MachineSecretHashUpdatedType    = machineSecretPrefix + "updated"
 	MachineSecretRemovedType        = machineSecretPrefix + "removed"
 	MachineSecretCheckSucceededType = machineSecretPrefix + "check.succeeded"
 	MachineSecretCheckFailedType    = machineSecretPrefix + "check.failed"
-	MachineSecretHashUpdatedType    = machineSecretPrefix + "hash.updated"
 )
 
 type MachineSecretSetEvent struct {
