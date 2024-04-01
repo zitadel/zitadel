@@ -148,7 +148,6 @@ func StartCommands(
 		checkPermission:                 permissionCheck,
 		newEncryptedCode:                newEncryptedCode,
 		newEncryptedCodeWithDefault:     newEncryptedCodeWithDefaultConfig,
-		newHashedSecret:                 newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret),
 		sessionTokenCreator:             sessionTokenCreator(idGenerator, sessionAlg),
 		sessionTokenVerifier:            sessionTokenVerifier,
 		defaultAccessTokenLifetime:      defaultAccessTokenLifetime,
@@ -169,6 +168,10 @@ func StartCommands(
 				Issuer:    defaults.Multifactors.OTP.Issuer,
 			},
 		},
+	}
+
+	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
+		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
 	}
 	return repo, nil
 }
