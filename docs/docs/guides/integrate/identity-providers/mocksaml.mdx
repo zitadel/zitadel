@@ -27,10 +27,6 @@ fill in the URL when creating the SAML SP in ZITADEL.
 
 ## ZITADEL configuration
 
-### Add custom login policy
-
-<CustomLoginPolicy/>
-
 ### Go to the IdP providers overview
 
 <IDPsOverview templates="SAML SP"/>
@@ -56,10 +52,13 @@ They are available under [https://{CUSTOMDOMAIN}/idps/{ID of the provider in ZIT
 
 ![Activate the SAML SP Provider](/img/guides/zitadel_activate_saml.png)
 
+### Ensure your Login Policy allows External IDPs
+
+<CustomLoginPolicy/>
+
 ## Test the setup
 
 <TestSetup loginscreen="your SAML SP login"/>
-
 
 ![SAML SP Button](/img/guides/zitadel_login_saml.png)
 

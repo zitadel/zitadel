@@ -16,7 +16,7 @@ The API will validate the access token on the [introspect endpoint](https://zita
 
 The API application uses [Client Secret Basic](https://zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic) to authenticate against ZITADEL and access the introspection endpoint.
 You can use any valid access_token from a user or service account to send requests to the example API.
-In this example we will use a service account with a [personal access token](https://zitadel.com/docs/guides/integrate/pat) which can be used directly to access the example API.
+In this example we will use a service account with a [personal access token](https://zitadel.com/docs/guides/integrate/service-users/personal-access-token) which can be used directly to access the example API.
 
 
 ## Running the example
@@ -191,7 +191,7 @@ CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 
 ![Create a service user](/img/python-flask/3.png)
 
-1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](https://zitadel.com/docs/guides/integrate/pat#create-a-service-user-with-a-pat). 
+1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](https://zitadel.com/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat). 
 2. To enable authorization, follow [this guide](https://zitadel.com/docs/guides/manage/console/roles) to create a role `read:messages` on your project. 
 3. Next, create an authorization for the service user you created by adding the role `read:messages` to the user. Follow this [guide](https://zitadel.com/docs/guides/manage/console/roles#authorizations) for more information on creating an authorization. 
 

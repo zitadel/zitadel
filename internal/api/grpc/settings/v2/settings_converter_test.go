@@ -13,6 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
@@ -34,11 +35,11 @@ func Test_loginSettingsToPb(t *testing.T) {
 		DisableLoginWithEmail:      true,
 		DisableLoginWithPhone:      true,
 		DefaultRedirectURI:         "example.com",
-		PasswordCheckLifetime:      time.Hour,
-		ExternalLoginCheckLifetime: time.Minute,
-		MFAInitSkipLifetime:        time.Millisecond,
-		SecondFactorCheckLifetime:  time.Microsecond,
-		MultiFactorCheckLifetime:   time.Nanosecond,
+		PasswordCheckLifetime:      database.Duration(time.Hour),
+		ExternalLoginCheckLifetime: database.Duration(time.Minute),
+		MFAInitSkipLifetime:        database.Duration(time.Millisecond),
+		SecondFactorCheckLifetime:  database.Duration(time.Microsecond),
+		MultiFactorCheckLifetime:   database.Duration(time.Nanosecond),
 		SecondFactors: []domain.SecondFactorType{
 			domain.SecondFactorTypeTOTP,
 			domain.SecondFactorTypeU2F,

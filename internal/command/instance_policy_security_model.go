@@ -35,6 +35,9 @@ func (wm *InstanceSecurityPolicyWriteModel) Reduce() error {
 			if e.AllowedOrigins != nil {
 				wm.AllowedOrigins = *e.AllowedOrigins
 			}
+			if e.EnableImpersonation != nil {
+				wm.EnableImpersonation = *e.EnableImpersonation
+			}
 		}
 	}
 	return wm.WriteModel.Reduce()
