@@ -9,7 +9,7 @@ import { Config } from '../config.js';
 export async function setup() {
   const tokens = loginByUsernamePassword(Config.admin);
   console.info("setup: admin signed in");
-  
+
   const org = await createOrg(tokens.accessToken);
   console.info(`setup: org (${org.organizationId}) created`);
 
@@ -18,7 +18,6 @@ export async function setup() {
   });
   machines = await Promise.all(machines);
   machines = machines.map((machine) => {
-    // return {userId: user.userId, loginName: user.loginNames[0], password: 'Password1!'};
     return {userId: machine.userId, loginName: machine.loginNames[0]};
   });
   console.info(`setup: ${machines.length} machines created`);

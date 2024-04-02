@@ -156,6 +156,8 @@ export function addMachinePat(userId, org, accessToken){
             check(res, {
                 "add pat status ok": (r) => r.status === 200
             }) || reject(`unable to add pat (user id: ${userId}) status: ${res.status} body: ${res.body}`);
+            
+            addMachinePatTrend.add(res.timings.duration);
             resolve(res.json());
         });
     });
@@ -163,7 +165,7 @@ export function addMachinePat(userId, org, accessToken){
 
 const addProjectTrend = new Trend('setup_add_project_duration', true);
 export function createProject(name, org, accessToken) {
-    return Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         let response = http.asyncRequest(
             'POST',
             url('/management/v1/projects'),
@@ -177,13 +179,22 @@ export function createProject(name, org, accessToken) {
                     'x-zitadel-orgid': org.organizationId
                 }
             }
-        )
+        );
+        response.then((res) => {
+            check(res, {
+                "add project status ok": (r) => r.status === 200
+            }) || reject(`unable to add project status: ${res.status} body: ${res.body}`);
+            resolve(res.json());
+
+            addProjectTrend.add(res.timings.duration);
+            resolve(res.json());
+        });
     });
 }
 
 const addAPITrend = new Trend('setup_add_app_duration', true);
 export function createAPI(name, projectId, org, accessToken) {
-    return Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         let response = http.asyncRequest(
             'POST',
             url(`/management/v1/projects/${projectId}/apps/api`),
@@ -198,19 +209,27 @@ export function createAPI(name, projectId, org, accessToken) {
                     'x-zitadel-orgid': org.organizationId
                 }
             }
-        )
+        );
+        response.then((res) => {
+            check(res, {
+                "add api status ok": (r) => r.status === 200
+            }) || reject(`unable to add api project: ${projectId} status: ${res.status} body: ${res.body}`);
+            resolve(res.json());
+            
+            addAPITrend.add(res.timings.duration);
+            resolve(res.json());
+        });
     });
 }
 
 const addAppKeyTrend = new Trend('setup_add_app_key_duration', true);
-export function createAppKey(name, projectId, org, accessToken) {
-    return Promise((resolve, reject) => {
+export function createAppKey(appId, projectId, org, accessToken) {
+    return new Promise((resolve, reject) => {
         let response = http.asyncRequest(
             'POST',
-            url(`/management/v1/projects/${projectId}/apps/api`),
+            url(`/management/v1/projects/${projectId}/apps/${appId}/keys`),
             JSON.stringify({
-                name: name,
-                authMethodType: "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
+                type: "KEY_TYPE_JSON"
             }),
             {
                 headers: {
@@ -219,6 +238,16 @@ export function createAppKey(name, projectId, org, accessToken) {
                     'x-zitadel-orgid': org.organizationId
                 }
             }
-        )
+        );
+        response.then((res) => {
+            check(res, {
+                "add app key status ok": (r) => r.status === 200
+            }) || reject(`unable to add app key project: ${projectId} app: ${appId} status: ${res.status} body: ${res.body}`);
+            resolve(res.json());
+            
+            
+            addAPITrend.add(res.timings.duration);
+            resolve(res.json());
+        });
     });
 }
