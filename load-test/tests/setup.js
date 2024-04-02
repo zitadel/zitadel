@@ -160,3 +160,65 @@ export function addMachinePat(userId, org, accessToken){
         });
     });
 }
+
+const addProjectTrend = new Trend('setup_add_project_duration', true);
+export function createProject(name, org, accessToken) {
+    return Promise((resolve, reject) => {
+        let response = http.asyncRequest(
+            'POST',
+            url('/management/v1/projects'),
+            JSON.stringify({
+                name: name
+            }),
+            {
+                headers: {
+                    authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                    'x-zitadel-orgid': org.organizationId
+                }
+            }
+        )
+    });
+}
+
+const addAPITrend = new Trend('setup_add_app_duration', true);
+export function createAPI(name, projectId, org, accessToken) {
+    return Promise((resolve, reject) => {
+        let response = http.asyncRequest(
+            'POST',
+            url(`/management/v1/projects/${projectId}/apps/api`),
+            JSON.stringify({
+                name: name,
+                authMethodType: "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
+            }),
+            {
+                headers: {
+                    authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                    'x-zitadel-orgid': org.organizationId
+                }
+            }
+        )
+    });
+}
+
+const addAppKeyTrend = new Trend('setup_add_app_key_duration', true);
+export function createAppKey(name, projectId, org, accessToken) {
+    return Promise((resolve, reject) => {
+        let response = http.asyncRequest(
+            'POST',
+            url(`/management/v1/projects/${projectId}/apps/api`),
+            JSON.stringify({
+                name: name,
+                authMethodType: "API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT"
+            }),
+            {
+                headers: {
+                    authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                    'x-zitadel-orgid': org.organizationId
+                }
+            }
+        )
+    });
+}
