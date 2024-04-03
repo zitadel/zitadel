@@ -106,7 +106,7 @@ func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, messageTextTy
 	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-fju90", "Errors.CustomMessageText.NotFound")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(ctx, &customText.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(&customText.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewCustomTextTemplateRemovedEvent(ctx, instanceAgg, messageTextType, lang))
 	if err != nil {
 		return nil, err

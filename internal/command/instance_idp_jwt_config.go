@@ -21,7 +21,7 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-2m00d", "Errors.IAM.IDPConfig.AlreadyExists")
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingConfig.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(&existingConfig.WriteModel)
 	changedEvent, hasChanged, err := existingConfig.NewChangedEvent(
 		ctx,
 		instanceAgg,

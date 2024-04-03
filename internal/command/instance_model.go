@@ -1,8 +1,6 @@
 package command
 
 import (
-	"context"
-
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -83,6 +81,6 @@ func (wm *InstanceWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func InstanceAggregateFromWriteModel(ctx context.Context, wm *eventstore.WriteModel) *eventstore.Aggregate {
+func InstanceAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
 	return eventstore.AggregateFromWriteModel(wm, instance.AggregateType, instance.AggregateVersion)
 }

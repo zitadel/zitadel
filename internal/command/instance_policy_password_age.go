@@ -34,7 +34,7 @@ func (c *Commands) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *d
 		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-0oPew", "Errors.IAM.PasswordAgePolicy.NotFound")
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(ctx, &existingPolicy.PasswordAgePolicyWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PasswordAgePolicyWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.ExpireWarnDays, policy.MaxAgeDays)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-180sf", "Errors.IAM.PasswordAgePolicy.NotChanged")

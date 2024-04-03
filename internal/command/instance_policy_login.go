@@ -54,7 +54,7 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 		return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-2B0ps", "Errors.IAM.LoginPolicy.IDP.AlreadyExists")
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(ctx, &idpModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(&idpModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewIdentityProviderAddedEvent(ctx, instanceAgg, idpProvider.IDPConfigID))
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-39fjs", "Errors.IAM.LoginPolicy.IDP.NotExisting")
 	}
 
-	instanceAgg := InstanceAggregateFromWriteModel(ctx, &idpModel.IdentityProviderWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
 	events := c.removeIDPProviderFromDefaultLoginPolicy(ctx, instanceAgg, idpProvider, false)
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
@@ -145,7 +145,7 @@ func (c *Commands) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context,
 	if secondFactorModel.State == domain.FactorStateUnspecified || secondFactorModel.State == domain.FactorStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-3M9od", "Errors.IAM.LoginPolicy.MFA.NotExisting")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(ctx, &secondFactorModel.SecondFactorWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLoginPolicySecondFactorRemovedEvent(ctx, instanceAgg, secondFactor))
 	if err != nil {
 		return nil, err
@@ -182,7 +182,7 @@ func (c *Commands) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, 
 	if multiFactorModel.State == domain.FactorStateUnspecified || multiFactorModel.State == domain.FactorStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-3M9df", "Errors.IAM.LoginPolicy.MFA.NotExisting")
 	}
-	instanceAgg := InstanceAggregateFromWriteModel(ctx, &multiFactorModel.MultiFactorWriteModel.WriteModel)
+	instanceAgg := InstanceAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewLoginPolicyMultiFactorRemovedEvent(ctx, instanceAgg, multiFactor))
 	if err != nil {
 		return nil, err

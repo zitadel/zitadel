@@ -53,7 +53,7 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 		return "", nil, err
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigAddedEvent(
 		ctx,
 		iamAgg,
@@ -119,7 +119,7 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 		return nil, err
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
 
 	changedEvent, hasChanged, err := smtpConfigWriteModel.NewChangedEvent(
 		ctx,
@@ -211,7 +211,7 @@ func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activ
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ed3lr", "Errors.SMTPConfig.AlreadyActive")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigActivatedEvent(
 		ctx,
 		iamAgg,
@@ -242,7 +242,7 @@ func (c *Commands) DeactivateSMTPConfig(ctx context.Context, instanceID, id stri
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-km8g3", "Errors.SMTPConfig.AlreadyDeactivated")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigDeactivatedEvent(
 		ctx,
 		iamAgg,
@@ -270,7 +270,7 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context, instanceID, id string) 
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-kg8rt", "Errors.SMTPConfig.NotFound")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(ctx, &smtpConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigRemovedEvent(
 		ctx,
 		iamAgg,
