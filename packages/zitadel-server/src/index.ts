@@ -87,6 +87,7 @@ export {
 export {
   SetHumanPasswordResponse,
   SetHumanPasswordRequest,
+  GetOrgByDomainGlobalResponse,
 } from "./proto/server/zitadel/management";
 export * from "./proto/server/zitadel/idp";
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2beta/legal_settings";

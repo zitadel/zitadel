@@ -1,11 +1,12 @@
 import {
   createCallback,
   getAuthRequest,
+  getOrgByDomain,
   listSessions,
   server,
 } from "#/lib/zitadel";
 import { SessionCookie, getAllSessions } from "#/utils/cookies";
-import { Session, AuthRequest, Prompt, login } from "@zitadel/server";
+import { Session, AuthRequest, Prompt } from "@zitadel/server";
 import { NextRequest, NextResponse } from "next/server";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
@@ -18,6 +19,7 @@ async function loadSessions(ids: string[]): Promise<Session[]> {
 }
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
+const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TODO: check regex for all domain character options
 
 function findSession(
   sessions: Session[],
@@ -91,13 +93,26 @@ export async function GET(request: NextRequest) {
       authRequest?.scope &&
       authRequest.scope.find((s: string) => ORG_SCOPE_REGEX.test(s))
     ) {
-      const orgId = authRequest.scope.find((s: string) =>
+      const orgScope = authRequest.scope.find((s: string) =>
         ORG_SCOPE_REGEX.test(s)
       );
 
-      if (orgId) {
-        const matched = ORG_SCOPE_REGEX.exec(orgId);
+      if (orgScope) {
+        const matched = ORG_SCOPE_REGEX.exec(orgScope);
         organization = matched?.[1] ?? "";
+      } else {
+        const orgDomainScope = authRequest.scope.find((s: string) =>
+          ORG_DOMAIN_SCOPE_REGEX.test(s)
+        );
+
+        if (orgDomainScope) {
+          const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
+          const orgDomain = matched?.[1] ?? "";
+          if (orgDomain) {
+            const org = await getOrgByDomain(orgDomain);
+            organization = org?.org?.id ?? "";
+          }
+        }
       }
     }
 

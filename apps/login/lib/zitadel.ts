@@ -22,10 +22,11 @@ import {
   SetSessionResponse,
   SetSessionRequest,
   ListUsersResponse,
-  ListUsersRequest,
+  management,
   DeleteSessionResponse,
   VerifyPasskeyRegistrationResponse,
   LoginSettings,
+  GetOrgByDomainGlobalResponse,
   GetLoginSettingsResponse,
   ListAuthenticationMethodTypesResponse,
   StartIdentityProviderIntentRequest,
@@ -329,6 +330,13 @@ export async function listUsers(
     },
     {}
   );
+}
+
+export async function getOrgByDomain(
+  domain: string
+): Promise<GetOrgByDomainGlobalResponse> {
+  const mgmtService = management.getManagement(server);
+  return mgmtService.getOrgByDomainGlobal({ domain }, {});
 }
 
 export async function startIdentityProviderFlow(
