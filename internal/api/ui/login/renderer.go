@@ -83,6 +83,7 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		tmplLDAPLogin:                    "ldap_login.html",
 		tmplDeviceAuthUserCode:           "device_usercode.html",
 		tmplDeviceAuthAction:             "device_action.html",
+		tmplLinkingPrompt:                "linking_prompt.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {

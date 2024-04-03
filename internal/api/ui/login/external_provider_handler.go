@@ -449,6 +449,20 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback(w, r, authReq)
 }
 
+func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) {
+	if provider.AutoLinking == domain.AutoLinkingOptionUsername {
+		user, err := l.query.GetUserByLoginName(r.Context(), false, string(externalUser.Email))
+		if err == nil {
+			l.renderLinkingPrompt(w, r, authReq, user, provider.AutoLinking, nil)
+			return
+		}
+		_ = user
+	}
+	if provider.AutoLinking == domain.AutoLinkingOptionEmail {
+		//l.query.GetUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
+	}
+}
+
 // externalUserNotExisting is called if an externalAuthentication couldn't find a corresponding externalID
 // possible solutions are:
 //
@@ -470,6 +484,12 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 	}
 
 	human, idpLink, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
+	// let's check if auto-linking is enabled and if the user would be found by the corresponding option
+	if provider.AutoLinking != domain.AutoLinkingOptionUnspecified {
+		l.checkAutoLinking(w, r, authReq, provider, externalUser, changed)
+		return
+	}
+
 	// if auto creation or creation itself is disabled, send the user to the notFoundOption
 	if !provider.IsCreationAllowed || !provider.IsAutoCreation {
 		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
