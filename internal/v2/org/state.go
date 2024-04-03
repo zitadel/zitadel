@@ -22,3 +22,15 @@ func (s State) Is(state State) bool {
 func (s State) IsValidState(state State) bool {
 	return s.IsValid() && s.Is(state)
 }
+
+func (s State) IsValidStates(states ...State) bool {
+	if !s.IsValid() {
+		return false
+	}
+	for _, state := range states {
+		if s.Is(state) {
+			return true
+		}
+	}
+	return false
+}
