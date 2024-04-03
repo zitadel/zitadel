@@ -39,9 +39,9 @@ export async function createSessionAndUpdateCookie(
         const sessionCookie: SessionCookie = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
-          creationDate: response.session.creationDate?.toString() ?? "",
-          expirationDate: (response.session.expirationDate ?? "")?.toString(),
-          changeDate: response.session.changeDate?.toString() ?? "",
+          creationDate: `${response.session.creationDate?.getTime() ?? ""}`,
+          expirationDate: `${response.session.expirationDate?.getTime() ?? ""}`,
+          changeDate: `${response.session.changeDate?.getTime() ?? ""}`,
           loginName: response.session.factors.user.loginName ?? "",
           organization: response.session.factors.user.organizationId ?? "",
         };
@@ -89,9 +89,9 @@ export async function createSessionForUserIdAndUpdateCookie(
         const sessionCookie: SessionCookie = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
-          creationDate: response.session.creationDate?.toString() ?? "",
-          expirationDate: (response.session.expirationDate ?? "")?.toString(),
-          changeDate: response.session.changeDate?.toString() ?? "",
+          creationDate: `${response.session.creationDate?.getTime() ?? ""}`,
+          expirationDate: `${response.session.expirationDate?.getTime() ?? ""}`,
+          changeDate: `${response.session.changeDate?.getTime() ?? ""}`,
           loginName: response.session.factors.user.loginName ?? "",
         };
 
@@ -141,9 +141,9 @@ export async function createSessionForIdpAndUpdateCookie(
         const sessionCookie: SessionCookie = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
-          creationDate: response.session.creationDate?.toString() ?? "",
-          expirationDate: (response.session.expirationDate ?? "")?.toString(),
-          changeDate: response.session.changeDate?.toString() ?? "",
+          creationDate: `${response.session.creationDate?.getTime() ?? ""}`,
+          expirationDate: `${response.session.expirationDate?.getTime() ?? ""}`,
+          changeDate: `${response.session.changeDate?.getTime() ?? ""}`,
           loginName: response.session.factors.user.loginName ?? "",
           organization: response.session.factors.user.organizationId ?? "",
         };
@@ -193,7 +193,7 @@ export async function setSessionAndUpdateCookie(
         token: updatedSession.sessionToken,
         creationDate: recentCookie.creationDate,
         expirationDate: recentCookie.expirationDate,
-        changeDate: updatedSession.details?.changeDate?.toString() ?? "",
+        changeDate: `${updatedSession.details?.changeDate?.getTime() ?? ""}`,
         loginName: recentCookie.loginName,
         organization: recentCookie.organization,
       };
@@ -216,7 +216,7 @@ export async function setSessionAndUpdateCookie(
                 token: updatedSession.sessionToken,
                 creationDate: sessionCookie.creationDate,
                 expirationDate: sessionCookie.expirationDate,
-                changeDate: session.changeDate?.toString() ?? "",
+                changeDate: `${session.changeDate?.getTime() ?? ""}`,
                 loginName: session.factors?.user?.loginName ?? "",
                 organization: session.factors?.user?.organizationId ?? "",
               };

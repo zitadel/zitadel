@@ -1,6 +1,5 @@
 "use server";
 
-import { login } from "@zitadel/server";
 import { cookies } from "next/headers";
 
 export type SessionCookie = {
