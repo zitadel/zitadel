@@ -11,7 +11,6 @@ import (
 type Query struct {
 	instance   string
 	filters    []*Filter
-	reducer    Reducer
 	tx         *sql.Tx
 	pagination *Pagination
 	// TODO: await push
@@ -23,10 +22,6 @@ func (q *Query) Instance() string {
 
 func (q *Query) Filters() []*Filter {
 	return q.filters
-}
-
-func (q *Query) Reducer() Reducer {
-	return q.reducer
 }
 
 func (q *Query) Tx() *sql.Tx {
@@ -51,12 +46,6 @@ func NewQuery(instance string, opts ...QueryOpt) *Query {
 }
 
 type QueryOpt func(query *Query)
-
-func QueryReducer(reducer Reducer) QueryOpt {
-	return func(query *Query) {
-		query.reducer = reducer
-	}
-}
 
 func QueryTx(tx *sql.Tx) QueryOpt {
 	return func(query *Query) {
@@ -330,15 +319,36 @@ func Offset(offset uint32) paginationOpt {
 	}
 }
 
-// WithPosition prepares the condition as follows
+type PositionCondition struct {
+	min, max *GlobalPosition
+}
+
+func (pc *PositionCondition) Max() *GlobalPosition {
+	if pc == nil || pc.max == nil {
+		return nil
+	}
+	max := *pc.max
+	return &max
+}
+
+func (pc *PositionCondition) Min() *GlobalPosition {
+	if pc == nil || pc.min == nil {
+		return nil
+	}
+	min := *pc.min
+	return &min
+}
+
+// PositionGreater prepares the condition as follows
 // if inPositionOrder is set: position = AND in_tx_order > OR or position >
 // if inPositionOrder is NOT set: position >
 func PositionGreater(position float64, inPositionOrder uint32) paginationOpt {
 	return func(p *Pagination) {
 		p.ensurePosition()
-
-		p.position.Position = position
-		p.position.InPositionOrder = inPositionOrder
+		p.position.max = &GlobalPosition{
+			Position:        position,
+			InPositionOrder: inPositionOrder,
+		}
 	}
 }
 
@@ -349,9 +359,36 @@ func GlobalPositionGreater(position *GlobalPosition) paginationOpt {
 	return PositionGreater(position.Position, position.InPositionOrder)
 }
 
+// PositionLess prepares the condition as follows
+// if inPositionOrder is set: position = AND in_tx_order > OR or position >
+// if inPositionOrder is NOT set: position >
+func PositionLess(position float64, inPositionOrder uint32) paginationOpt {
+	return func(p *Pagination) {
+		p.ensurePosition()
+		p.position.min = &GlobalPosition{
+			Position:        position,
+			InPositionOrder: inPositionOrder,
+		}
+	}
+}
+
+func PositionBetween(min, max *GlobalPosition) paginationOpt {
+	return func(p *Pagination) {
+		GlobalPositionGreater(min)(p)
+		GlobalPositionLess(max)(p)
+	}
+}
+
+// GlobalPositionLess prepares the condition as follows
+// if inPositionOrder is set: position = AND in_tx_order > OR or position >
+// if inPositionOrder is NOT set: position >
+func GlobalPositionLess(position *GlobalPosition) paginationOpt {
+	return PositionGreater(position.Position, position.InPositionOrder)
+}
+
 type Pagination struct {
 	pagination *database.Pagination
-	position   *GlobalPosition
+	position   *PositionCondition
 
 	desc bool
 }
@@ -365,7 +402,7 @@ func (p *Pagination) Pagination() *database.Pagination {
 	return p.pagination
 }
 
-func (p *Pagination) Position() *GlobalPosition {
+func (p *Pagination) Position() *PositionCondition {
 	if p == nil {
 		return nil
 	}
@@ -391,7 +428,7 @@ func (p *Pagination) ensurePosition() {
 	if p.position != nil {
 		return
 	}
-	p.position = new(GlobalPosition)
+	p.position = new(PositionCondition)
 }
 
 func Descending() paginationOpt {

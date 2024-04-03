@@ -40,7 +40,7 @@ type Pusher interface {
 
 type Querier interface {
 	healther
-	Query(ctx context.Context, query *Query) error
+	Query(ctx context.Context, reducer Reducer, query *Query) error
 }
 
 type Aggregate struct {

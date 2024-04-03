@@ -69,16 +69,16 @@ func (f *TextCondition[T]) writeCaseInsensitive(stmt *Statement, columnName stri
 	stmt.Builder.WriteString(columnName)
 	stmt.Builder.WriteString(") ")
 	stmt.Builder.WriteString(f.comp.String())
-	stmt.Builder.WriteString(" LOWER(")
 	f.writeArg(stmt)
-	stmt.Builder.WriteString(")")
 }
 
 func (f *TextCondition[T]) writeArg(stmt *Statement) {
 	var v any = f.value
 	// workaround for placeholder
 	if placeholder, ok := v.(placeholder); ok {
+		stmt.Builder.WriteString(" LOWER(")
 		stmt.WriteArg(placeholder)
+		stmt.Builder.WriteString(")")
 	}
 	stmt.WriteArg(strings.ToLower(fmt.Sprint(f.value)))
 }

@@ -557,6 +557,24 @@ func Test_writeFilter(t *testing.T) {
 			},
 		},
 		{
+			name: "position pagination between",
+			args: args{
+				filter: eventstore.NewFilter(
+					eventstore.FilterPagination(
+						eventstore.PositionGreater(123.4, 0),
+						eventstore.PositionLess(125.4, 10),
+					),
+				),
+			},
+			want: wantQuery{
+				query: " WHERE instance_id = $1 AND position > $2 AND ((position = $3 AND in_tx_order < $4) OR position < $5) ORDER BY position, in_tx_order",
+				args:  []any{"i1", 123.4, 125.4, uint32(10), 125.4},
+				// TODO: (adlerhurst) would require some refactoring to reuse existing args
+				// query: " WHERE instance_id = $1 AND position > $2 AND ((position = $3 AND in_tx_order < $4) OR position < $3) ORDER BY position, in_tx_order",
+				// args:  []any{"i1", 123.4, 125.4, uint32(10)},
+			},
+		},
+		{
 			name: "position and inPositionOrder pagination",
 			args: args{
 				filter: eventstore.NewFilter(

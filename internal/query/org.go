@@ -7,14 +7,14 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/v2/readmodel"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -91,31 +91,29 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
+func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if shouldTriggerBulk {
-		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgProjection")
-		ctx, err = projection.OrgProjection.Trigger(ctx, handler.WithAwaitRunning())
-		logging.OnError(err).Debug("trigger failed")
-		traceSpan.EndWithError(err)
-	}
-
-	stmt, scan := prepareOrgQuery(ctx, q.client)
-	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.identifier():         id,
-		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}).ToSql()
+	org := readmodel.NewOrg(id)
+	err = q.newEventStore.Query(ctx, org, eventstore.NewQuery(
+		authz.GetInstance(ctx).InstanceID(),
+		eventstore.AppendFilters(org.Filter()...),
+	))
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
 	}
 
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		org, err = scan(row)
-		return err
-	}, query, args...)
-	return org, err
+	return &Org{
+		ID:            org.ID,
+		CreationDate:  org.CreationDate,
+		ChangeDate:    org.ChangeDate,
+		ResourceOwner: org.Owner,
+		State:         domain_pkg.OrgState(org.State.State),
+		Sequence:      uint64(org.Sequence),
+		Name:          org.Name,
+		Domain:        org.PrimaryDomain.Domain,
+	}, nil
 }
 
 func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *Org, err error) {

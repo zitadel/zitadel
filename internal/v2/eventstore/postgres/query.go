@@ -7,30 +7,33 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
-func (s *Storage) Query(ctx context.Context, query *eventstore.Query) (err error) {
+func (s *Storage) Query(ctx context.Context, reducer eventstore.Reducer, query *eventstore.Query) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	var stmt database.Statement
 	writeQuery(&stmt, query)
 
 	if query.Tx() != nil {
-		return executeQuery(ctx, query.Tx(), &stmt, query.Reducer())
+		return executeQuery(ctx, query.Tx(), &stmt, reducer)
 	}
 
-	tx, err := s.client.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted, ReadOnly: false})
-	if err != nil {
-		return err
-	}
-	defer func() {
-		err = database.CloseTx(tx, err)
-	}()
-
-	return executeQuery(ctx, tx, &stmt, query.Reducer())
+	return executeQuery(ctx, s.client.DB, &stmt, reducer)
 }
 
-func executeQuery(ctx context.Context, tx *sql.Tx, stmt *database.Statement, reducer eventstore.Reducer) error {
+type querier interface {
+	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
+}
+
+func executeQuery(ctx context.Context, tx querier, stmt *database.Statement, reducer eventstore.Reducer) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	rows, err := tx.QueryContext(ctx, stmt.String(), stmt.Args()...)
 	if err != nil {
 		return err
@@ -118,26 +121,49 @@ func writePagination(stmt *database.Statement, pagination *eventstore.Pagination
 	}
 }
 
-func writePosition(stmt *database.Statement, position *eventstore.GlobalPosition) {
+func writePosition(stmt *database.Statement, position *eventstore.PositionCondition) {
 	if position == nil {
 		return
 	}
 
+	max := position.Max()
+	min := position.Min()
+
 	stmt.WriteString(" AND ")
 
-	if position.InPositionOrder == 0 {
-		database.NewNumberGreater(position.Position).Write(stmt, "position")
-		return
+	if max != nil {
+		if max.InPositionOrder > 0 {
+			stmt.WriteString("((")
+			database.NewNumberEquals(max.Position).Write(stmt, "position")
+			stmt.WriteString(" AND ")
+			database.NewNumberGreater(max.InPositionOrder).Write(stmt, "in_tx_order")
+			stmt.WriteRune(')')
+			stmt.WriteString(" OR ")
+		}
+		database.NewNumberGreater(max.Position).Write(stmt, "position")
+		if max.InPositionOrder > 0 {
+			stmt.WriteRune(')')
+		}
 	}
 
-	stmt.WriteString("((")
-	database.NewNumberEquals(position.Position).Write(stmt, "position")
-	stmt.WriteString(" AND ")
-	database.NewNumberGreater(position.InPositionOrder).Write(stmt, "in_tx_order")
-	stmt.WriteRune(')')
-	stmt.WriteString(" OR ")
-	database.NewNumberGreater(position.Position).Write(stmt, "position")
-	stmt.WriteRune(')')
+	if max != nil && min != nil {
+		stmt.WriteString(" AND ")
+	}
+
+	if min != nil {
+		if min.InPositionOrder > 0 {
+			stmt.WriteString("((")
+			database.NewNumberEquals(min.Position).Write(stmt, "position")
+			stmt.WriteString(" AND ")
+			database.NewNumberLess(min.InPositionOrder).Write(stmt, "in_tx_order")
+			stmt.WriteRune(')')
+			stmt.WriteString(" OR ")
+		}
+		database.NewNumberLess(min.Position).Write(stmt, "position")
+		if min.InPositionOrder > 0 {
+			stmt.WriteRune(')')
+		}
+	}
 }
 
 func writeAggregateFilters(stmt *database.Statement, filters []*eventstore.AggregateFilter) {

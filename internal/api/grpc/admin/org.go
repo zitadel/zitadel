@@ -47,31 +47,16 @@ func (s *Server) RemoveOrg(ctx context.Context, req *admin_pb.RemoveOrgRequest) 
 }
 
 func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {
-	// org, err := s.query.OrgByID(ctx, true, authz.GetInstance(ctx).DefaultOrganisationID())
-	// return &admin_pb.GetDefaultOrgResponse{Org: org_grpc.OrgToPb(org)}, err
-
-	org := readmodel.NewOrg(authz.GetInstance(ctx).DefaultOrganisationID())
-
-	// if err := s.es.Query(ctx, authz.GetInstance(ctx).InstanceID(), org, org.Filter()...); err != nil {
-	// 	return nil, err
-	// }
-
-	return &admin_pb.GetDefaultOrgResponse{Org: orgToPb(org)}, nil
+	org, err := s.query.OrgByID(ctx, true, authz.GetInstance(ctx).DefaultOrganisationID())
+	return &admin_pb.GetDefaultOrgResponse{Org: org_grpc.OrgToPb(org)}, err
 }
 
 func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest) (*admin_pb.GetOrgByIDResponse, error) {
-	org := readmodel.NewOrg(req.GetId())
-
-	// if err := s.es.Query(ctx, authz.GetInstance(ctx).InstanceID(), org, org.Filter()...); err != nil {
-	// 	return nil, err
-	// }
-
-	return &admin_pb.GetOrgByIDResponse{Org: orgToPb(org)}, nil
-	// org, err := s.query.OrgByID(ctx, true, req.Id)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return &admin_pb.GetOrgByIDResponse{Org: org_grpc.OrgViewToPb(org)}, nil
+	org, err := s.query.OrgByID(ctx, true, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetOrgByIDResponse{Org: org_grpc.OrgViewToPb(org)}, nil
 }
 
 func orgToPb(org *readmodel.Org) *org_pb.Org {
@@ -107,6 +92,8 @@ func stateToPb(state *projection.OrgState) org_pb.OrgState {
 		return org_pb.OrgState_ORG_STATE_INACTIVE
 	case org.RemovedState:
 		return org_pb.OrgState_ORG_STATE_REMOVED
+	case org.UndefinedState:
+		fallthrough
 	default:
 		return org_pb.OrgState_ORG_STATE_UNSPECIFIED
 	}

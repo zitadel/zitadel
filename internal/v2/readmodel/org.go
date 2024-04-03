@@ -29,14 +29,6 @@ func NewOrg(id string) *Org {
 }
 
 func (rm *Org) Filter() []*eventstore.Filter {
-	return eventstore.MergeFilters(
-		rm.filter,
-		rm.State.Filter,
-		rm.PrimaryDomain.Filter,
-	)
-}
-
-func (rm *Org) filter() []*eventstore.Filter {
 	return []*eventstore.Filter{
 		// we don't need the filters of the projections as we filter all events of the read model
 		eventstore.NewFilter(
