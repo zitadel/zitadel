@@ -9,12 +9,11 @@ jobs:
       fail-fast: false
       matrix:
         browser: [firefox, chrome]
-    runs-on:
-      group: zitadel-public
+    runs-on: ubuntu-latest
     steps:
       - 
         name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       -
         uses: actions/download-artifact@v4
         with:

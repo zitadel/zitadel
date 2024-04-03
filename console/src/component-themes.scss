@@ -28,6 +28,7 @@
 @import 'src/app/modules/filter-events/filter-events.component';
 @import 'src/app/modules/top-view/top-view.component';
 @import 'src/app/pages/projects/projects.component';
+@import 'src/app/pages/grants/grants.component';
 @import 'src/app/modules/edit-text/edit-text.component.scss';
 @import 'src/app/pages/projects/apps/integrate/integrate.component.scss';
 @import 'src/app/modules/providers/providers.scss';
@@ -72,6 +73,8 @@
 @import 'src/app/modules/create-layout/create-layout.component.scss';
 @import 'src/app/modules/domains/domain-verification/domain-verification.component.scss';
 @import './styles/codemirror.scss';
+@import 'src/app/components/copy-row/copy-row.component.scss';
+@import 'src/app/modules/providers/provider-next/provider-next.component.scss';
 
 @mixin component-themes($theme) {
   @include cnsl-color-theme($theme);
@@ -84,6 +87,7 @@
   @include idp-table-theme($theme);
   @include events-theme($theme);
   @include projects-theme($theme);
+  @include grants-theme($theme);
   @include top-view-theme($theme);
   @include info-overlay-theme($theme);
   @include app-auth-method-radio-theme($theme);
@@ -147,4 +151,6 @@
   @include contact-theme($theme);
   @include app-integrate-theme($theme);
   @include domain-verification-theme($theme);
+  @include copy-row-theme($theme);
+  @include provider-next-theme($theme);
 }

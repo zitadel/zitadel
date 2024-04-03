@@ -75,7 +75,7 @@ func BulkSetUserMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*dom
 
 func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) (*query.UserMetadataSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries, err := metadata.MetadataQueriesToQuery(req.Queries)
+	queries, err := metadata.UserMetadataQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
 	}

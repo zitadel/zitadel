@@ -51,7 +51,7 @@ module.exports = {
     {
       type: "category",
       label: "Examples & SDKs",
-      link: {type: 'doc', id: 'sdk-examples/introduction'},
+      link: { type: "doc", id: "sdk-examples/introduction" },
       items: [
         "sdk-examples/introduction",
         "sdk-examples/angular",
@@ -82,8 +82,8 @@ module.exports = {
         },
         {
           type: "link",
-              label: "Node.js",
-            href: "https://www.npmjs.com/package/@zitadel/node",
+          label: "Node.js",
+          href: "https://www.npmjs.com/package/@zitadel/node",
         },
         {
           type: "link",
@@ -205,13 +205,13 @@ module.exports = {
           label: "Login Users",
           link: {
             type: "generated-index",
-            title: "Integrate",
+            title: "Login users with ZITADEL",
             slug: "guides/integrate/login",
             description:
-              "Integrate your users and application with ZITADEL. In this section you will find resource on how to authenticate your users, configure external identity providers, access the ZITADEL APIs to manage resources, and integrate with third party services and tools.",
+              "Sign-in users and application with ZITADEL. In this section you will find resources on how to authenticate your users by using the hosted login via OpenID Connect and SAML. Follow our dedicated guides to build your custom login user interface, if you want to customize the login behavior further.",
           },
           items: [
-            'guides/integrate/login/login-users',
+            "guides/integrate/login/login-users",
             {
               type: "category",
               label: "Openid Connect",
@@ -220,7 +220,8 @@ module.exports = {
                 type: "generated-index",
                 title: "Authenticate users with OpenID Connect (OIDC)",
                 slug: "guides/integrate/login/oidc",
-                description: "This guide explains how to utilize ZITADEL for user authentication within your applications using OpenID Connect (OIDC). Here, we offer comprehensive guidance on seamlessly integrating ZITADEL's authentication features, ensuring both security and user experience excellence. Throughout this documentation, we'll cover the setup process for ZITADEL authentication, including the recommended OIDC flows tailored to different application types. Additionally, we'll provide clear instructions on securely signing out or logging out users from your application, ensuring data security and user privacy. With our guidance, you'll be equipped to leverage ZITADEL's authentication capabilities effectively, enhancing your application's security posture while delivering a seamless login experience for your users.",
+                description:
+                  "This guide explains how to utilize ZITADEL for user authentication within your applications using OpenID Connect (OIDC). Here, we offer comprehensive guidance on seamlessly integrating ZITADEL's authentication features, ensuring both security and user experience excellence. Throughout this documentation, we'll cover the setup process for ZITADEL authentication, including the recommended OIDC flows tailored to different application types. Additionally, we'll provide clear instructions on securely signing out or logging out users from your application, ensuring data security and user privacy. With our guidance, you'll be equipped to leverage ZITADEL's authentication capabilities effectively, enhancing your application's security posture while delivering a seamless login experience for your users.",
               },
               items: [
                 "guides/integrate/login/oidc/login-users",
@@ -257,8 +258,8 @@ module.exports = {
             title: "Onboard Customers and Users",
             slug: "/guides/integrate/onboarding",
             description:
-                "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
-                "These guides will explain the built-in solution for onboarding new tenants, customers, and users and how you can handle more advanced onboarding use cases. ",
+              "When building your own application, one of the first questions you have to face, is 'How do my customers onboard to my application?'\n" +
+              "These guides will explain the built-in solution for onboarding new tenants, customers, and users and how you can handle more advanced onboarding use cases. ",
           },
           collapsed: true,
           items: [
@@ -269,34 +270,28 @@ module.exports = {
         {
           type: "category",
           label: "Token Introspection",
-          link: {
-            type: "generated-index",
-            title: "Token Introspection",
-            slug: "/guides/integrate/token-introspection",
-            description: 
-              "Token introspection is the process of checking whether an access token is valid and can be used to access protected resources. You have an API that acts as an OAuth resource server and can be accessed by user-facing applications. To validate an access token by calling the ZITADEL introspection API, you can use the JSON Web Token (JWT) Profile (recommended) or Basic Authentication for token introspection. It's crucial to understand that the API is entirely separate from the front end. The API shouldn’t concern itself with the token type received. Instead, it's about how the API chooses to call the introspection endpoint, either through JWT Profile or Basic Authentication. Many APIs assume they might receive a JWT and attempt to verify it based on signature or expiration. However, with ZITADEL, you can send either a JWT or an opaque Bearer token from the client end to the API. This flexibility is one of ZITADEL's standout features.",
-          },
           collapsed: true,
           items: [
-            "guides/integrate/token-introspection/private-key-jwt",
-            "guides/integrate/token-introspection/basic-auth",
+            {
+              type: "autogenerated",
+              dirName: "guides/integrate/token-introspection",
+            },
           ],
         },
+        "guides/integrate/token-exchange",
         {
           type: "category",
-          label: "Authenticate Service Users",
+          label: "Service Users",
           link: {
-            type: "generated-index",
-            title: "Authenticate ZITADEL Service Users",
-            slug: "/guides/integrate/serviceusers",
-            description:
-              "How to authenticate service users for machine-to-machine (M2M) communication between services. You also need to authenticate service users to access ZITADEL's APIs.",
+            type: "doc",
+            id: "guides/integrate/service-users/authenticate-service-users"
           },
           collapsed: true,
           items: [
-            "guides/integrate/private-key-jwt",
-            "guides/integrate/client-credentials",
-            "guides/integrate/pat",
+            {
+              type: "autogenerated",
+              dirName: "guides/integrate/service-users",
+            },
           ],
         },
         {
@@ -326,56 +321,45 @@ module.exports = {
             "guides/integrate/login-ui/password-reset",
             "guides/integrate/login-ui/logout",
             "guides/integrate/login-ui/oidc-standard",
+            "guides/integrate/login-ui/typescript-repo",
           ],
         },
         {
           type: "category",
-          label: "Configure Identity Providers",
-          link: {
-            type: "generated-index",
-            title:
-              "Let Users Login with Preferred Identity Provider in ZITADEL",
-            slug: "/guides/integrate/identity-providers",
-            description:
-              "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
-          },
+          label: "Login users with SSO",
+          link: { type: "doc", id: "guides/integrate/identity-providers/introduction" },
           collapsed: true,
           items: [
             "guides/integrate/identity-providers/google",
-            "guides/integrate/identity-providers/azure-ad",
+            "guides/integrate/identity-providers/azure-ad-oidc",
+            "guides/integrate/identity-providers/azure-ad-saml",
             "guides/integrate/identity-providers/github",
             "guides/integrate/identity-providers/gitlab",
             "guides/integrate/identity-providers/apple",
             "guides/integrate/identity-providers/ldap",
             "guides/integrate/identity-providers/openldap",
-            "guides/integrate/identity-providers/migrate",
-            "guides/integrate/identity-providers/okta",
+            "guides/integrate/identity-providers/okta-oidc",
+            "guides/integrate/identity-providers/okta-saml",
             "guides/integrate/identity-providers/keycloak",
+            "guides/integrate/identity-providers/linkedin-oauth",
             "guides/integrate/identity-providers/mocksaml",
+            "guides/integrate/identity-providers/jwt_idp",
+            "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/additional-information",
           ],
         },
         {
           type: "category",
-          label: "Access ZITADEL APIs",
+          label: "ZITADEL APIs",
+          link: {
+            type: "doc",
+            id: "guides/integrate/zitadel-apis/access-zitadel-apis"
+          },
           collapsed: true,
           items: [
             {
-              type: "link",
-              label: "Authenticate Service Users",
-              href: "/guides/integrate/serviceusers",
-            },
-            "guides/integrate/access-zitadel-apis",
-            "guides/integrate/access-zitadel-system-api",
-            "guides/integrate/event-api",
-            {
-              type: "category",
-              label: "Example Code",
-              items: [
-                "examples/call-zitadel-api/go",
-                "examples/call-zitadel-api/dot-net",
-              ],
-              collapsed: true,
+              type: "autogenerated",
+              dirName: "guides/integrate/zitadel-apis",
             },
           ],
         },
@@ -536,11 +520,6 @@ module.exports = {
         "support/software-release-cycles-support",
         "support/troubleshooting",
         {
-          type: "link",
-          label: "Support Service Descriptions",
-          href: "/legal/service-description/support-services",
-        },
-        {
           type: "category",
           label: "Technical Advisory",
           link: {
@@ -577,7 +556,8 @@ module.exports = {
             type: "generated-index",
             title: "APIs V1 (GA)",
             slug: "/apis/services/",
-            description: "APIs V1 organize access by context (authenticated user, organisation, instance, system), unlike resource-specific V2 APIs.",
+            description:
+              "APIs V1 organize access by context (authenticated user, organisation, instance, system), unlike resource-specific V2 APIs.",
           },
           items: [
             {
@@ -588,7 +568,7 @@ module.exports = {
                 title: "Auth API",
                 slug: "/apis/resources/auth",
                 description:
-                    "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+                  "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
               },
               items: require("./docs/apis/resources/auth/sidebar.js"),
             },
@@ -600,7 +580,7 @@ module.exports = {
                 title: "Management API",
                 slug: "/apis/resources/mgmt",
                 description:
-                    "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
+                  "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
               },
               items: require("./docs/apis/resources/mgmt/sidebar.js"),
             },
@@ -612,7 +592,7 @@ module.exports = {
                 title: "Admin API",
                 slug: "/apis/resources/admin",
                 description:
-                    "This API is intended to configure and manage one ZITADEL instance itself.",
+                  "This API is intended to configure and manage one ZITADEL instance itself.",
               },
               items: require("./docs/apis/resources/admin/sidebar.js"),
             },
@@ -624,9 +604,9 @@ module.exports = {
                 title: "System API",
                 slug: "/apis/resources/system",
                 description:
-                    "This API is intended to manage the different ZITADEL instances within the system.\n" +
-                    "\n" +
-                    "Checkout the guide how to access the ZITADEL System API.",
+                  "This API is intended to manage the different ZITADEL instances within the system.\n" +
+                  "\n" +
+                  "Checkout the guide how to access the ZITADEL System API.",
               },
               items: require("./docs/apis/resources/system/sidebar.js"),
             },
@@ -705,13 +685,13 @@ module.exports = {
                 title: "Feature Service API (Beta)",
                 slug: "/apis/resources/feature_service",
                 description:
-                  "This API is intended to manage features for ZITADEL. Feature settings that are available on multiple \"levels\", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n" +
+                  'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n' +
                   "\n" +
                   "This project is in beta state. It can AND will continue breaking until a stable version is released.",
               },
               items: require("./docs/apis/resources/feature_service_v2/sidebar.js"),
             },
-          ]
+          ],
         },
         {
           type: "category",
@@ -730,9 +710,9 @@ module.exports = {
                 title: "User Schema Service API (Preview)",
                 slug: "/apis/resources/user_schema_service",
                 description:
-                    "This API is intended to manage data schemas for users in a ZITADEL instance.\n" +
-                    "\n" +
-                    "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
+                  "This API is intended to manage data schemas for users in a ZITADEL instance.\n" +
+                  "\n" +
+                  "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
               },
               items: require("./docs/apis/resources/user_schema_service_v3/sidebar.js"),
             },
@@ -744,9 +724,9 @@ module.exports = {
                 title: "User Service API (Preview)",
                 slug: "/apis/resources/user_service_v3",
                 description:
-                    "This API is intended to manage users with your own data schema in a ZITADEL instance.\n"+
-                    "\n"+
-                    "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services."
+                  "This API is intended to manage users with your own data schema in a ZITADEL instance.\n" +
+                  "\n" +
+                  "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
               },
               items: require("./docs/apis/resources/user_service_v3/sidebar.js"),
             },
@@ -758,13 +738,13 @@ module.exports = {
                 title: "Execution Service API (Preview)",
                 slug: "/apis/resources/execution_service_v3",
                 description:
-                    "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.\n"+
-                    "\n"+
-                    "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
+                  "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.\n" +
+                  "\n" +
+                  "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
               },
               items: require("./docs/apis/resources/execution_service_v3/sidebar.js"),
             },
-          ]
+          ],
         },
         {
           type: "category",
@@ -807,6 +787,7 @@ module.exports = {
       items: [
         "apis/actions/introduction",
         "apis/actions/modules",
+        "apis/actions/code-examples",
         "apis/actions/internal-authentication",
         "apis/actions/external-authentication",
         "apis/actions/complement-token",

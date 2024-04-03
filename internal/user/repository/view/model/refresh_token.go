@@ -39,6 +39,7 @@ type RefreshTokenView struct {
 	Expiration            time.Time                  `json:"-" gorm:"column:expiration"`
 	Sequence              uint64                     `json:"-" gorm:"column:sequence"`
 	InstanceID            string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	Actor                 TokenActor                 `json:"actor" gorm:"column:actor"`
 }
 
 func RefreshTokenViewsToModel(tokens []*RefreshTokenView) []*usr_model.RefreshTokenView {
@@ -66,6 +67,7 @@ func RefreshTokenViewToModel(token *RefreshTokenView) *usr_model.RefreshTokenVie
 		IdleExpiration:        token.IdleExpiration,
 		Expiration:            token.Expiration,
 		Sequence:              token.Sequence,
+		Actor:                 token.Actor.TokenActor,
 	}
 }
 
@@ -135,6 +137,7 @@ func (t *RefreshTokenView) appendAddedEvent(event eventstore.Event) error {
 	t.Scopes = e.Scopes
 	t.Token = e.TokenID
 	t.UserAgentID = e.UserAgentID
+	t.Actor = TokenActor{e.Actor}
 	return nil
 }
 

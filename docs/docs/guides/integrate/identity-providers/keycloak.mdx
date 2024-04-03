@@ -8,11 +8,19 @@ import GeneralConfigDescription from './_general_config_description.mdx';
 import Intro from './_intro.mdx';
 import CustomLoginPolicy from './_custom_login_policy.mdx';
 import IDPsOverview from './_idps_overview.mdx';
-import GenericOIDC from './_generic_oidc.mdx';
 import Activate from './_activate.mdx';
 import TestSetup from './_test_setup.mdx';
 
 <Intro provider="Keycloak"/>
+
+## Open the Generic OIDC Provider Template
+
+<IDPsOverview templates="Generic OIDC"/>
+
+Click on the ZITADEL Callback URL to copy it to your clipboard.
+You will have to paste it in the Keycloak Client later.
+
+![Generic OIDC Provider](/img/guides/zitadel_generic_oidc_create_provider.png)
 
 ## Keycloak Configuration
 
@@ -22,9 +30,7 @@ import TestSetup from './_test_setup.mdx';
 2. Click on "Create Client"
 3. Choose OpenID Connect as Client Type and give your client an ID
 4. Enable Client authentication and the standard flow and direct access grants as authentication flow
-5. Add the valid redirect URIs
- - {your-domain}/ui/login/login/externalidp/callback
- - Example redirect url for the domain `https://acme-gzoe4x.zitadel.cloud` would look like this:  `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
+5. [Paste the ZITADEL Callback URL you copied before](#open-the-generic-oidc-provider-template) to the redirect URIs
 6. Go to the credentials tab and copy the secret
 
 ![Add new OIDC Client in Keycloak](/img/guides/keycloak_add_client.png)
@@ -32,22 +38,17 @@ import TestSetup from './_test_setup.mdx';
 
 ## ZITADEL configuration
 
-### Add custom login policy
+1. Go back [to the Generic OIDC Provider template you opened before in ZITADEL](#open-the-generic-oidc-provider-template).
+2. Add the [client ID and secret created before on your Keycloak Client](#register-a-new-client).
+3. Give the provider a name, e.g. Keycloak. This name will be displayed on the login screen button.
+4. Add the issuer URL of your Keycloak realm with the path /auth/realms/$REALM, e.g. `https://lemur-0.cloud-iam.com/auth/realms/acme`
 
-<CustomLoginPolicy/>
+You can optionally configure the following settings.
+A useful default will be filled if you don't change anything.
 
-### Go to the IdP providers overview
-
-<IDPsOverview templates="Generic OIDC"/>
-
-### Create a new generic OIDC provider
-
-<GenericOIDC
-    name=": e.g. Keycloak"
-    issuer=": The domain where your Keycloak can be reached with the path /auth/realms/$REALM, Example: https://lemur-0.cloud-iam.com/auth/realms/acme"
-    clientid=": Client id from the client previously created in your Keycloak account"
-/>
-
+**Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
+This information will be taken to create/update the user within ZITADEL.
+ZITADEL ensures that at least the `openid`-scope is always sent.
 
 <GeneralConfigDescription provider_account="Keycloak account" />
 
@@ -59,10 +60,13 @@ import TestSetup from './_test_setup.mdx';
 
 ![Activate the Keycloak Provider](/img/guides/zitadel_activate_keycloak.png)
 
+### Ensure your Login Policy allows External IDPs
+
+<CustomLoginPolicy/>
+
 ## Test the setup
 
 <TestSetup loginscreen="your Keycloak login"/>
-
 
 ![Keycloak Button](/img/guides/zitadel_login_keycloak.png)
 

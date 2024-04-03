@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -18,16 +19,17 @@ const (
 type HumanRefreshTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TokenID               string        `json:"tokenId"`
-	ClientID              string        `json:"clientId"`
-	UserAgentID           string        `json:"userAgentId"`
-	Audience              []string      `json:"audience"`
-	Scopes                []string      `json:"scopes"`
-	AuthMethodsReferences []string      `json:"authMethodReferences"`
-	AuthTime              time.Time     `json:"authTime"`
-	IdleExpiration        time.Duration `json:"idleExpiration"`
-	Expiration            time.Duration `json:"expiration"`
-	PreferredLanguage     string        `json:"preferredLanguage"`
+	TokenID               string             `json:"tokenId"`
+	ClientID              string             `json:"clientId"`
+	UserAgentID           string             `json:"userAgentId"`
+	Audience              []string           `json:"audience"`
+	Scopes                []string           `json:"scopes"`
+	AuthMethodsReferences []string           `json:"authMethodReferences"`
+	AuthTime              time.Time          `json:"authTime"`
+	IdleExpiration        time.Duration      `json:"idleExpiration"`
+	Expiration            time.Duration      `json:"expiration"`
+	PreferredLanguage     string             `json:"preferredLanguage"`
+	Actor                 *domain.TokenActor `json:"actor,omitempty"`
 }
 
 func (e *HumanRefreshTokenAddedEvent) Payload() interface{} {
@@ -55,6 +57,7 @@ func NewHumanRefreshTokenAddedEvent(
 	authTime time.Time,
 	idleExpiration,
 	expiration time.Duration,
+	actor *domain.TokenActor,
 ) *HumanRefreshTokenAddedEvent {
 	return &HumanRefreshTokenAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -72,6 +75,7 @@ func NewHumanRefreshTokenAddedEvent(
 		IdleExpiration:        idleExpiration,
 		Expiration:            expiration,
 		PreferredLanguage:     preferredLanguage,
+		Actor:                 actor,
 	}
 }
 

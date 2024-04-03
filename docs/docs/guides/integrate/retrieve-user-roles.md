@@ -32,7 +32,7 @@ You must first of all generate a token for the user. For human users, the typica
 How to generate a token: 
 
 - [Generate tokens for human users](/docs/guides/integrate/login/oidc/login-users)
-- [Generate tokens for service users](/docs/guides/integrate/serviceusers)
+- [Generate tokens for service users](/docs/guides/integrate/service-users/authenticate-service-users)
 
 In order to access role information via the token you must include the right audience and the necessary role claims in the scope and/or select the required role settings in the ZITADEL console before requesting the token. 
 
@@ -191,6 +191,19 @@ This request can be tested out in the following way:
 2. Include the role claims in the scope as given.
 3. When you run the command, you will see the roles in the response.
 4. If you remove the role claims in the scope and run the command, you will not receive the roles.
+
+#### Customize roles using actions
+
+If your application requires a custom role structure, [ZITADEL actions](/docs/apis/actions/complement-token#pre-userinfo-creation-id_token--userinfo--introspection-endpoint) allow you to customize your claims.
+
+<details open="open">
+<summary>Example on github</summary>
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/custom_roles.js
+```
+
+</details>
 
 ### Retrieve roles using the auth API
 

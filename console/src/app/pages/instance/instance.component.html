@@ -1,7 +1,7 @@
 <cnsl-top-view
   [hasBackButton]="false"
-  title="{{ 'IAM.TITLE' | translate }}"
-  sub="{{ 'IAM.DESCRIPTION' | translate }}"
+  title="{{ 'DESCRIPTIONS.SETTINGS.INSTANCE.TITLE' | translate }}"
+  sub="{{ 'DESCRIPTIONS.SETTINGS.INSTANCE.DESCRIPTION' | translate }}"
   [isActive]="instance?.state === State.STATE_RUNNING"
   [isInactive]="instance?.state === State.STATE_STOPPED || instance?.state === State.STATE_STOPPING"
   [hasContributors]="true"

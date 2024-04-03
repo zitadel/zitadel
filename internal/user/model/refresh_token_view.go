@@ -23,6 +23,7 @@ type RefreshTokenView struct {
 	Scopes                []string
 	Sequence              uint64
 	Token                 string
+	Actor                 *domain.TokenActor
 }
 
 type RefreshTokenSearchRequest struct {

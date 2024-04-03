@@ -27,15 +27,18 @@ import (
 )
 
 const (
-	ScopeProjectRolePrefix  = "urn:zitadel:iam:org:project:role:"
-	ScopeProjectsRoles      = "urn:zitadel:iam:org:projects:roles"
-	ClaimProjectRoles       = "urn:zitadel:iam:org:project:roles"
-	ClaimProjectRolesFormat = "urn:zitadel:iam:org:project:%s:roles"
-	ScopeUserMetaData       = "urn:zitadel:iam:user:metadata"
-	ClaimUserMetaData       = ScopeUserMetaData
-	ScopeResourceOwner      = "urn:zitadel:iam:user:resourceowner"
-	ClaimResourceOwner      = ScopeResourceOwner + ":"
-	ClaimActionLogFormat    = "urn:zitadel:iam:action:%s:log"
+	ClaimPrefix                     = "urn:zitadel:iam"
+	ScopeProjectRolePrefix          = "urn:zitadel:iam:org:project:role:"
+	ScopeProjectsRoles              = "urn:zitadel:iam:org:projects:roles"
+	ClaimProjectRoles               = "urn:zitadel:iam:org:project:roles"
+	ClaimProjectRolesFormat         = "urn:zitadel:iam:org:project:%s:roles"
+	ScopeUserMetaData               = "urn:zitadel:iam:user:metadata"
+	ClaimUserMetaData               = ScopeUserMetaData
+	ScopeResourceOwner              = "urn:zitadel:iam:user:resourceowner"
+	ClaimResourceOwnerID            = ScopeResourceOwner + ":id"
+	ClaimResourceOwnerName          = ScopeResourceOwner + ":name"
+	ClaimResourceOwnerPrimaryDomain = ScopeResourceOwner + ":primary_domain"
+	ClaimActionLogFormat            = "urn:zitadel:iam:action:%s:log"
 
 	oidcCtx = "oidc"
 )
@@ -520,6 +523,9 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 			actions.SetFields("v1",
 				actions.SetFields("userinfo",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if userInfo.Claims[key] == nil {
 							userInfo.AppendClaims(key, value)
 							return
@@ -532,6 +538,9 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 				),
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if userInfo.Claims[key] == nil {
 							userInfo.AppendClaims(key, value)
 							return
@@ -737,6 +746,9 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 			actions.SetFields("v1",
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if _, ok := claims[key]; !ok {
 							claims = appendClaim(claims, key, value)
 							return
@@ -868,9 +880,9 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 		return nil, err
 	}
 	return map[string]string{
-		ClaimResourceOwner + "id":             resourceOwner.ID,
-		ClaimResourceOwner + "name":           resourceOwner.Name,
-		ClaimResourceOwner + "primary_domain": resourceOwner.Domain,
+		ClaimResourceOwnerID:            resourceOwner.ID,
+		ClaimResourceOwnerName:          resourceOwner.Name,
+		ClaimResourceOwnerPrimaryDomain: resourceOwner.Domain,
 	}, nil
 }
 
