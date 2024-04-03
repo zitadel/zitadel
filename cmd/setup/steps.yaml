@@ -1,3 +1,4 @@
+# By using the FirstInstance section, you can overwrite the DefaultInstance configuration for the first instance created by zitadel setup.
 FirstInstance:
   # The machine key from the section FirstInstance.Org.Machine.MachineKey is written to the MachineKeyPath.
   MachineKeyPath: # ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH

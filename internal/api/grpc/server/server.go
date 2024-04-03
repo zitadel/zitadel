@@ -39,6 +39,7 @@ func CreateServer(
 	authConfig authz.Config,
 	queries *query.Queries,
 	hostHeaderName string,
+	externalDomain string,
 	tlsConfig *tls.Config,
 	accessSvc *logstore.Service[*record.AccessLog],
 ) *grpc.Server {
@@ -50,7 +51,7 @@ func CreateServer(
 				middleware.DefaultTracingServer(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
-				middleware.InstanceInterceptor(queries, hostHeaderName, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
+				middleware.InstanceInterceptor(queries, hostHeaderName, externalDomain, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
 				middleware.AccessStorageInterceptor(accessSvc),
 				middleware.ErrorHandler(),
 				middleware.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),

@@ -1,0 +1,127 @@
+---
+title: Onboard Users
+sidebar_label: Onboard Users
+---
+
+End Users have three different possibilities on how to login with ZITADEL.
+1. Local Account with Username, Password, MFA, Passkey, etc
+2. Social Login like Google, Apple, Github, etc
+3. External Identity Provider hosted/managed by Organization like Entra ID, LDAP, Okta etc
+
+You can either use the hosted login of ZITADEL to let users register themselves, or you can build your own UI and use the existing APIs.
+
+## Manually add/invite users
+
+import CreateUser from '/docs/guides/manage/console/_create-user.mdx';
+
+<CreateUser/>
+
+## Automated / Self-registration possibilities
+
+If you want to start automating the process of onboarding your users and let them do self-registration the following sections give you some guidance.
+
+### Built-in register form
+
+#### Prompt registration form
+
+When users first access your application, they'll typically need to either log in or register.
+By default, redirecting from your application displays the login page.
+
+OpenID Connect (OIDC) allows you to control the initial screen by sending a [prompt](/docs/apis/openidoauth/endpoints#additional-parameters) parameter in the authorization request.
+With the `prompt=create`, the registration form/options will directly be shown to the user.
+You can test the impact of the different prompts on your login UI in our [OIDC Playground](/docs/apis/openidoauth/authrequest).
+
+Per default a user will be registered to the default organization.
+By sending the scope below in your authorization request you can choose the organization to which the user will be added.
+```
+urn:zitadel:iam:org:id:{id}
+```
+
+
+Unfortunately, SAML doesn't offer the same level of control over the initial screen.
+You won't be able to directly influence which page (login or registration) is shown through the SAML flow.
+
+#### Choose Registration Option
+
+If an organization allows local user registration as well as registration with a social or enterprise login, the user can choose an option to register.
+
+As soon as users click the "register" button, they will be presented with a screen showing the different registration options.
+
+<img src="/docs/img/guides/solution-scenarios/register-options.png" alt="Register Options"/>
+
+After that, the user can select either local user registration or an external provider.
+By pressing the button of an external provider, the user will directly be redirected to the provider for consent.
+
+:::info
+The options are dependent on the settings of the organization.
+If only one option is possible, the option will directly be selected and shown.
+:::
+
+#### Local User Registration
+
+To allow users to register themselves, you have to enable the "register allowed" in the login behavior settings.
+You will now see the register button on the login screen.
+
+<img src="/docs/img/guides/solution-scenarios/register-end-user.png" alt="Register End User"/>
+
+If nothing else is specified, a user will be registered to the default organization.
+<img src="/docs/img/guides/solution-scenarios/default-organization.png" alt="Default Organization"/>
+
+You can specify another organization, by sending the organization scope in the authorization requests.
+By sending the scope below the settings of the specified organization will be triggered and only users of the said organization will be able to authenticate.
+The users will be registered to the given organization.
+```
+urn:zitadel:iam:org:id:{id}
+```
+
+If the user chooses to register a local account, the register form will be shown.
+All the mandatory fields like given name, family name, e-mail and password have to be filled.
+You can only setup authentication with the built-in form.
+
+<img src="/docs/img/guides/solution-scenarios/register-local-user.png" alt="Register local user"/>
+
+#### Registration with Social Login
+
+To allow your users to register with social logins you have to configure the external identity providers.
+If you only need the social logins for your end users and you want to have them all in the organization, we recommend using the default organization for those users.
+In that case you can configure the identity providers on the default organization.
+If you want to have the social logins on different organizations you can configure the default on the instance, and enable it on the needed organizations.
+
+Please follow the configuration guides for the needed providers: [Let Users Login with Preferred Identity Provider in ZITADEL](/docs/guides/integrate/identity-providers/introduction)
+
+The configured providers will be shown on the first login screen or when the users click on the registration button, they will be able to choose between local account or the social login.
+
+<img src="/docs/img/guides/solution-scenarios/register-end-user.png" alt="Register End User"/>
+
+#### Registration with Organization External Identity Provider
+
+If your business customer already have an identity provider, and you want to allow SSO for them, you can configure their providers directly for their organization.
+Configure the needed provider such as Entra ID or OKTA.
+
+Please follow the configuration guides for the needed providers: [Let Users Login with Preferred Identity Provider in ZITADEL](/docs/guides/integrate/identity-providers/introduction)
+
+import OrgLoginDescription from "./_org_login_description.mdx";
+
+<OrgLoginDescription name="OrgLodinDescription" />
+
+### Build your own registration form
+
+ZITADEL allows you to build your own registration form and login UI.
+The registration process highly depends on your needs.
+
+We do have a guide series on how to build your own login ui, which also includes the registration of different authentication methods, such as:
+- Password authentication
+- Multi-Factor
+- Passkeys
+- External Login Providers
+
+You can find all the guides here: [Build your own login UI](https://zitadel.com/docs/guides/integrate/login-ui)
+
+The create user request also allows you to add metadata (key, value) to the user.
+This gives you the possibility to collect additional data from your users during the registration process and store it directly to the user in ZITADEL.
+We recommend storing business relevant data in the database of your application, and only authentication and authorization relevant data in ZITADEL to follow the separation of concern pattern.
+
+#### Registration with Organization External Identity Provider
+
+If you want to know more about the multi-tenancy possibilities of ZITADEL, read the following blog post:
+[Multi-Tenancy and Delegated Access Management with Organizations](https://zitadel.com/blog/multi-tenancy-with-organizations)

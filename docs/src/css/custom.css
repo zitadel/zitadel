@@ -600,3 +600,16 @@ p strong {
 :root[data-theme="dark"] .hideonlight {
   display: block !important;
 }
+
+
+.player-wrapper {
+  position: relative;
+  padding-top: 56.25%; /* Player ratio: 100 / (1280 / 720) */
+  margin-bottom: 2rem;
+}
+
+.react-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

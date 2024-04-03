@@ -191,7 +191,7 @@ Currently it is not possible to migrate passkeys directly from another system.
 
 ## Users linked to an external IDP
 
-A users `sub` is bound to the external [IDP's Client ID](https://zitadel.com/docs/guides/manage/console/instance-settings#identity-providers).
+A users `sub` is bound to the external [IDP's Client ID](https://zitadel.com/docs/guides/manage/console/default-settings#identity-providers).
 This means that the IDP Client ID configured in ZITADEL must be the same ID as in the legacy system.
 
 Users should be imported with their `externalUserId`.

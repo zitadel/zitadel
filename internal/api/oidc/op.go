@@ -3,12 +3,12 @@ package oidc
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"golang.org/x/exp/slog"
 
 	"github.com/zitadel/zitadel/internal/api/assets"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -42,7 +42,6 @@ type Config struct {
 	DeviceAuth                        *DeviceAuthorizationConfig
 	DefaultLoginURLV2                 string
 	DefaultLogoutURLV2                string
-	Features                          Features
 	PublicKeyCacheMaxAge              time.Duration
 }
 
@@ -60,11 +59,6 @@ type EndpointConfig struct {
 type Endpoint struct {
 	Path string
 	URL  string
-}
-
-type Features struct {
-	TriggerIntrospectionProjections bool
-	LegacyIntrospection             bool
 }
 
 type OPStorage struct {
@@ -128,7 +122,6 @@ func NewServer(
 
 	server := &Server{
 		LegacyServer:               op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
-		features:                   config.Features,
 		repo:                       repo,
 		query:                      query,
 		command:                    command,

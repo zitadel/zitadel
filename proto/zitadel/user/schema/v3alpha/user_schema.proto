@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+package zitadel.user.schema.v3alpha;
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/object/v2beta/object.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha";
+
+message UserSchema {
+
+  // ID is the read-only unique identifier of the schema.
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\""
+    }
+  ];
+  // Details provide some base information (such as the last change date) of the schema.
+  zitadel.object.v2beta.Details details = 2;
+  // Type is a human readable text describing the schema.
+  string type = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"employees\""
+    }
+  ];
+  // Current state of the schema.
+  State state = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"STATE_ACTIVE\""
+    }
+  ];
+  // Revision is a read only version of the schema, each update of the `schema`-field increases the revision.
+  uint32 revision = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2\""
+    }
+  ];
+  // JSON schema representation defining the user.
+  google.protobuf.Struct schema = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "{\"$schema\":\"https://example.com/user/employees\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"required\":true},\"description\":{\"type\":\"string\"}}}"
+    }
+  ];
+  // Defines the possible types of authenticators.
+  // This allows creating different user types like human/machine without usage of actions to validate possible authenticators.
+  // Removal of an authenticator does not remove the authenticator on a user.
+  repeated AuthenticatorType possible_authenticators = 7  [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"AUTHENTICATOR_TYPE_USERNAME\",\"AUTHENTICATOR_TYPE_PASSWORD\",\"AUTHENTICATOR_TYPE_WEBAUTHN\"]";
+    }
+  ];
+}
+
+enum FieldName {
+  FIELD_NAME_UNSPECIFIED = 0;
+  FIELD_NAME_TYPE = 1;
+  FIELD_NAME_STATE = 2;
+  FIELD_NAME_REVISION = 3;
+  FIELD_NAME_CHANGE_DATE = 4;
+}
+
+message SearchQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    // Union the results of each sub query ('OR').
+    OrQuery or_query = 1;
+    // Limit the result to match all sub queries ('AND').
+    // Note that if you specify multiple queries, they will be implicitly used as andQueries.
+    // Use the andQuery in combination with orQuery and notQuery.
+    AndQuery and_query = 2;
+    // Exclude / Negate the result of the sub query ('NOT').
+    NotQuery not_query = 3;
+
+    // Limit the result to a specific schema type.
+    TypeQuery type_query = 5;
+    // Limit the result to a specific state of the schema.
+    StateQuery state_query = 6;
+    // Limit the result to a specific schema ID.
+    IDQuery id_query = 7;
+  }
+}
+
+message OrQuery {
+  repeated SearchQuery queries = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) =  {
+      example: "[{\"idQuery\": {\"id\": \"163840776835432705\",\"method\": \"TEXT_QUERY_METHOD_EQUALS\"}},{\"idQuery\": {\"id\": \"163840776835943483\",\"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]"
+    }
+  ];
+}
+message AndQuery {
+  repeated SearchQuery queries = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) =  {
+      example: "[{\"typeQuery\": {\"id\": \"employees\",\"method\": \"TEXT_QUERY_METHOD_STARTS_WITH\"}},{\"stateQuery\": {\"state\": \"STATE_ACTIVE\"}}]"
+    }
+  ];
+}
+
+message NotQuery {
+  SearchQuery query = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) =  {
+      example: "{\"stateQuery\": {\"state\": \"STATE_ACTIVE\"}}"
+    }
+  ];
+}
+
+message IDQuery {
+  // Defines the ID of the user schema to query for.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+  // Defines which text comparison method used for the id query.
+  zitadel.object.v2beta.TextQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message TypeQuery {
+  // Defines which type to query for.
+  string type = 1 [
+    (validate.rules).string = {max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200,
+      example: "\"employees\"";
+    }
+  ];
+  // Defines which text comparison method used for the type query.
+  zitadel.object.v2beta.TextQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true
+  ];
+}
+
+message StateQuery {
+  // Defines the state to query for.
+  State state = 1 [
+    (validate.rules).enum.defined_only = true,
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"STATE_ACTIVE\""
+    }
+  ];
+}
+
+enum State {
+  STATE_UNSPECIFIED = 0;
+  STATE_ACTIVE = 1;
+  STATE_INACTIVE = 2;
+}
+
+enum AuthenticatorType {
+  AUTHENTICATOR_TYPE_UNSPECIFIED = 0;
+  AUTHENTICATOR_TYPE_USERNAME = 1;
+  AUTHENTICATOR_TYPE_PASSWORD = 2;
+  AUTHENTICATOR_TYPE_WEBAUTHN = 3;
+  AUTHENTICATOR_TYPE_TOTP = 4;
+  AUTHENTICATOR_TYPE_OTP_EMAIL = 5;
+  AUTHENTICATOR_TYPE_OTP_SMS = 6;
+  AUTHENTICATOR_TYPE_AUTHENTICATION_KEY = 7;
+  AUTHENTICATOR_TYPE_IDENTITY_PROVIDER = 8;
+}

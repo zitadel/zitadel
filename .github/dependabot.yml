@@ -33,10 +33,10 @@ updates:
   commit-message:
     prefix: chore
     include: scope
-- package-ecosystem: "docker"
-  directory: "/build/operator"
+- package-ecosystem: "github-actions"
+  directory: "/"
   schedule:
-    interval: "weekly"
+    interval: weekly
     time: "02:00"
   open-pull-requests-limit: 10
   commit-message:

@@ -3,7 +3,9 @@
 package user_test
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
@@ -24,6 +26,14 @@ func TestServer_SetEmail(t *testing.T) {
 		want    *user.SetEmailResponse
 		wantErr bool
 	}{
+		{
+			name: "user not existing",
+			req: &user.SetEmailRequest{
+				UserId: "xxx",
+				Email:  "default-verifier@mouse.com",
+			},
+			wantErr: true,
+		},
 		{
 			name: "default verfication",
 			req: &user.SetEmailRequest{
@@ -120,6 +130,107 @@ func TestServer_SetEmail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.SetEmail(CTX, tt.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			integration.AssertDetails(t, tt.want, got)
+			if tt.want.GetVerificationCode() != "" {
+				assert.NotEmpty(t, got.GetVerificationCode())
+			}
+		})
+	}
+}
+
+func TestServer_ResendEmailCode(t *testing.T) {
+	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	verifiedUserID := Tester.CreateHumanUserVerified(CTX, Tester.Organisation.ID, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
+
+	tests := []struct {
+		name    string
+		req     *user.ResendEmailCodeRequest
+		want    *user.ResendEmailCodeResponse
+		wantErr bool
+	}{
+		{
+			name: "user not existing",
+			req: &user.ResendEmailCodeRequest{
+				UserId: "xxx",
+			},
+			wantErr: true,
+		},
+		{
+			name: "user no code",
+			req: &user.ResendEmailCodeRequest{
+				UserId: verifiedUserID,
+			},
+			wantErr: true,
+		},
+		{
+			name: "resend",
+			req: &user.ResendEmailCodeRequest{
+				UserId: userID,
+			},
+			want: &user.ResendEmailCodeResponse{
+				Details: &object.Details{
+					Sequence:      1,
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "custom url template",
+			req: &user.ResendEmailCodeRequest{
+				UserId: userID,
+				Verification: &user.ResendEmailCodeRequest_SendCode{
+					SendCode: &user.SendEmailVerificationCode{
+						UrlTemplate: gu.Ptr("https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}"),
+					},
+				},
+			},
+			want: &user.ResendEmailCodeResponse{
+				Details: &object.Details{
+					Sequence:      1,
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "template error",
+			req: &user.ResendEmailCodeRequest{
+				UserId: userID,
+				Verification: &user.ResendEmailCodeRequest_SendCode{
+					SendCode: &user.SendEmailVerificationCode{
+						UrlTemplate: gu.Ptr("{{"),
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "return code",
+			req: &user.ResendEmailCodeRequest{
+				UserId: userID,
+				Verification: &user.ResendEmailCodeRequest_ReturnCode{
+					ReturnCode: &user.ReturnEmailVerificationCode{},
+				},
+			},
+			want: &user.ResendEmailCodeResponse{
+				Details: &object.Details{
+					Sequence:      1,
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+				VerificationCode: gu.Ptr("xxx"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.ResendEmailCode(CTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

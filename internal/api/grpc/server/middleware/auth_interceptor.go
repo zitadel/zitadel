@@ -44,28 +44,15 @@ func authorize(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 
 func orgIDAndDomainFromRequest(ctx context.Context, req interface{}) (id, domain string) {
 	orgID := grpc_util.GetHeader(ctx, http.ZitadelOrgID)
-	o, ok := req.(OrganizationFromRequest)
-	if !ok {
-		return orgID, ""
-	}
-	id = o.OrganizationFromRequest().ID
-	domain = o.OrganizationFromRequest().Domain
-	if id != "" || domain != "" {
-		return id, domain
-	}
-	// check if the deprecated organisation is used.
-	// to be removed before going GA (https://github.com/zitadel/zitadel/issues/6718)
-	id = o.OrganisationFromRequest().ID
-	domain = o.OrganisationFromRequest().Domain
-	if id != "" || domain != "" {
-		return id, domain
+	oz, ok := req.(OrganizationFromRequest)
+	if ok {
+		id = oz.OrganizationFromRequest().ID
+		domain = oz.OrganizationFromRequest().Domain
+		if id != "" || domain != "" {
+			return id, domain
+		}
 	}
 	return orgID, domain
-}
-
-// Deprecated: will be removed in favor of OrganizationFromRequest (https://github.com/zitadel/zitadel/issues/6718)
-type OrganisationFromRequest interface {
-	OrganisationFromRequest() *Organization
 }
 
 type Organization struct {
@@ -75,5 +62,4 @@ type Organization struct {
 
 type OrganizationFromRequest interface {
 	OrganizationFromRequest() *Organization
-	OrganisationFromRequest
 }

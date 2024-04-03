@@ -143,6 +143,7 @@ func TestServer_SetPassword(t *testing.T) {
 			},
 			want: &user.SetPasswordResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
@@ -173,6 +174,7 @@ func TestServer_SetPassword(t *testing.T) {
 			},
 			want: &user.SetPasswordResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
@@ -206,6 +208,7 @@ func TestServer_SetPassword(t *testing.T) {
 			},
 			want: &user.SetPasswordResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},

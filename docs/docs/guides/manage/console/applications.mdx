@@ -47,7 +47,7 @@ At the moment ZITADEL offers four client types:
 The first three options (Web, Native and User Agent) require user interaction, the fourth option (API) has no direct user-interaction.
 Depending on the app type, there are small differences in the possible settings.
 
-To get a good understanding about user profiles and recommended flows, read the following [guide](../../integrate/oauth-recommended-flows.md#different-client-profiles).
+To get a good understanding about user profiles and recommended flows, read the following [guide](../../integrate/login/oidc/oauth-recommended-flows.md#different-client-profiles).
 
 ### Web
 
@@ -122,6 +122,29 @@ When disabled only https is allowed, as ZITADEL's configuration is secure by def
   src="/docs/img/guides/console/developmentmode.png"
   width="600px"
 />
+
+Development mode also allows glob patterns in redirect URIs with the following special terms in the patterns:
+
+| Special Terms | Meaning                                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------------------------------- |
+| `*`           | matches any sequence of non-path-separators                                                                |
+| `/**/`        | matches zero or more directories                                                                           |
+| `?`           | matches any single non-path-separator character                                                            |
+| `[class]`     | matches any single non-path-separator character against a class of characters [see "character classes"][1] |
+| `{alt1,...}`  | matches a sequence of characters if one of the comma-separated alternatives matches                        |
+
+[1]: https://github.com/bmatcuk/doublestar?tab=readme-ov-file#character-classes
+
+Special character can be escaped with a backslash (`\`).
+
+Double stars (`**`) should appear surrounded by a path separators such as `/**/`.
+A mid-pattern double star (`**`) behaves like bash's glob star option: a pattern
+such as `path/to/**.txt` would return the same results as `path/to/*.txt`. The
+pattern you're looking for is `path/to/**/*.txt`.
+
+*Source: [github.com/bmatcuk/doublestar](https://github.com/bmatcuk/doublestar?tab=readme-ov-file#patterns)*
+
+> When IPv6 URIs are used as redirects in development mode, square brackets must be escaped as they are also Special Terms for globs. `http://\[::1\]:80`
 
 ## Review Configuration
 

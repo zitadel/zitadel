@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: 未找到对应的域名
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: 找不到用户
     AlreadyExists: 用户已存在
     NotFoundOnOrg: 在所选组织中找不到用户
@@ -128,6 +127,7 @@ Errors:
       NotFound: 验证码不存在
       Expired: 验证码已过期
       GeneratorAlgNotSupported: 不支持的生成器算法
+      Invalid: 代码无效
     Password:
       NotFound: 未找到密码
       Empty: 密码为空
@@ -327,7 +327,7 @@ Errors:
       NotActive: 项目授权不是启用状态
       NotInactive: 项目授权不是停用状态
   IAM:
-    NotFound: 实例未找到。查看 https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM 未找到。确保您有正确的域。查看 https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: 角色没有改变
     MemberInvalid: 成员无效
@@ -478,6 +478,7 @@ Errors:
     CloseRows: SQL 语句无法完成
     SQLStatement: 无法创建 SQL 语句
     InvalidRequest: 请求无效
+    TooManyNestingLevels: 查询嵌套级别过多（最多 20 个）
   Quota:
     AlreadyExists: 这个单位的配额已经存在
     NotFound: 没有找到该单位的配额
@@ -534,6 +535,38 @@ Errors:
     NotExisting: 功能不存在
     TypeNotSupported: 不支持功能类型
     InvalidValue: 此功能的值无效
+  Target:
+    Invalid: 目标无效
+    NoTimeout: 目标没有超时
+    InvalidURL: 目标的 URL 无效
+    NotFound: 未找到目标
+  Execution:
+    ConditionInvalid: 执行条件无效
+    Invalid: 执行无效
+    NotFound: 未找到执行
+    IncludeNotFound: 包括未找到的内容
+    NoTargets: 没有定义目标
+  UserSchema:
+    NotEnabled: 未启用“用户架构”功能
+    Type:
+      Missing: 缺少用户架构类型
+      AlreadyExists: 用户架构类型已存在
+    Authenticator:
+      Invalid: 验证器类型无效
+    NotActive: 用户架构未激活
+    NotInactive: 用户架构未处于非活动状态
+    NotExists: 用户架构不存在
+  TokenExchange:
+    FeatureDisabled: 您的实例已禁用令牌交换功能。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: 令牌丢失
+      Invalid: 令牌无效
+      TypeMissing: 缺少令牌类型
+      TypeNotAllowed: 不允许的令牌类型
+      TypeNotSupported: 不支持令牌类型
+      NotForAPI: API 不允许使用模拟令牌
+    Impersonation:
+      PolicyDisabled: 实例安全策略中禁用模拟
 
 AggregateTypes:
   action: 动作
@@ -545,8 +578,18 @@ AggregateTypes:
   usergrant: 用户授权
   quota: 配额
   feature: 特征
+  target: 靶
+  execution: 执行
+  user_schema: 用户模式
 
 EventTypes:
+  execution:
+    set: 执行集
+    removed: 执行已删除
+  target:
+    added: 目标已创建
+    changed: 目标改变
+    removed: 目标已删除
   user:
     added: 已添加用户
     selfregistered: 自注册用户
@@ -559,6 +602,7 @@ EventTypes:
         failed: 初始化检查失败
     token:
       added: 已创建访问令牌
+    impersonated: 用户冒充
     username:
       reserved: 保留用户名
       released: 用户名已发布
@@ -1044,6 +1088,12 @@ EventTypes:
     deactivated: 停用动作
     reactivated: 启用动作
     removed: 删除动作
+  user_schema:
+    created: 已创建用户架构
+    updated: 用户架构已更新
+    deactivated: 用户架构已停用
+    reactivated: 用户架构已重新激活
+    deleted: 用户架构已删除
 
 Application:
   OIDC:

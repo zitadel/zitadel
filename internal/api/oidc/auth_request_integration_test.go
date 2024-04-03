@@ -54,7 +54,7 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// callback on a succeeded request must fail
 	linkResp, err = Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -108,7 +108,7 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 	require.NoError(t, err)
 	claims, err := rp.VerifyTokens[*oidc.IDTokenClaims](context.Background(), accessToken, idToken, provider.IDTokenVerifier())
 	require.NoError(t, err)
-	assertIDTokenClaims(t, claims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, claims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// callback on a succeeded request must fail
 	linkResp, err = Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -143,7 +143,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 }
 
 func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
@@ -168,14 +168,14 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// test actual refresh grant
 	newTokens, err := refreshTokens(t, clientID, tokens.RefreshToken)
 	require.NoError(t, err)
 	assertTokens(t, newTokens, true)
 	// auth time must still be the initial
-	assertIDTokenClaims(t, newTokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, newTokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// refresh with an old refresh_token must fail
 	_, err = rp.RefreshTokens[*oidc.IDTokenClaims](CTX, provider, tokens.RefreshToken, "", "")
@@ -204,7 +204,7 @@ func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// revoke access token
 	err = rp.RevokeToken(CTX, provider, tokens.AccessToken, "access_token")
@@ -247,7 +247,7 @@ func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// revoke access token
 	err = rp.RevokeToken(CTX, provider, tokens.AccessToken, "refresh_token")
@@ -284,7 +284,7 @@ func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// revoke refresh token -> invalidates also access token
 	err = rp.RevokeToken(CTX, provider, tokens.RefreshToken, "refresh_token")
@@ -327,7 +327,7 @@ func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// revoke refresh token even with a wrong hint
 	err = rp.RevokeToken(CTX, provider, tokens.RefreshToken, "access_token")
@@ -362,7 +362,7 @@ func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// simulate second client (not part of the audience) trying to revoke the token
 	otherClientID := createClient(t)
@@ -394,7 +394,7 @@ func TestOPStorage_TerminateSession(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// userinfo must not fail
 	_, err = rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
@@ -431,7 +431,7 @@ func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// userinfo must not fail
 	_, err = rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
@@ -475,7 +475,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	postLogoutRedirect, err := rp.EndSession(CTX, provider, "", logoutRedirectURI, "state")
 	require.NoError(t, err)
@@ -530,8 +530,8 @@ func assertTokens(t *testing.T, tokens *oidc.Tokens[*oidc.IDTokenClaims], requir
 	}
 }
 
-func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, arm []string, sessionStart, sessionChange time.Time) {
-	assert.Equal(t, User.GetUserId(), claims.Subject)
+func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, userID string, arm []string, sessionStart, sessionChange time.Time) {
+	assert.Equal(t, userID, claims.Subject)
 	assert.Equal(t, arm, claims.AuthenticationMethodsReferences)
 	assertOIDCTimeRange(t, claims.AuthTime, sessionStart, sessionChange)
 }

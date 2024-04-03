@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"go.uber.org/mock/gomock"
 
@@ -40,6 +41,8 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 		authTime              time.Time
 		refreshIdleExpiration time.Duration
 		refreshExpiration     time.Duration
+		reason                domain.TokenReason
+		actor                 *domain.TokenActor
 	}
 	type res struct {
 		token        *domain.Token
@@ -135,6 +138,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							24*time.Hour,
+							nil,
 						)),
 						eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
 							context.Background(),
@@ -173,6 +177,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 							time.Now(),
 							-1*time.Hour,
 							24*time.Hour,
+							nil,
 						)),
 					),
 				),
@@ -292,7 +297,7 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
 			got, gotRefresh, err := c.AddAccessAndRefreshToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.refreshToken,
-				tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.refreshIdleExpiration, tt.args.refreshExpiration, tt.args.authTime)
+				tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.refreshIdleExpiration, tt.args.refreshExpiration, tt.args.authTime, tt.args.reason, tt.args.actor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -372,6 +377,7 @@ func TestCommands_RevokeRefreshToken(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							10*time.Hour,
+							nil,
 						)),
 					),
 					expectPushFailed(zerrors.ThrowInternal(nil, "ERROR", "internal"),
@@ -411,6 +417,7 @@ func TestCommands_RevokeRefreshToken(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							10*time.Hour,
+							nil,
 						)),
 					),
 					expectPush(
@@ -506,6 +513,7 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							10*time.Hour,
+							nil,
 						)),
 					),
 					expectFilter(),
@@ -539,6 +547,7 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							10*time.Hour,
+							nil,
 						)),
 					),
 					expectFilter(
@@ -555,6 +564,7 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							10*time.Hour,
+							nil,
 						)),
 					),
 					expectPushFailed(zerrors.ThrowInternal(nil, "ERROR", "internal"),
@@ -599,6 +609,7 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							10*time.Hour,
+							nil,
 						)),
 					),
 					expectFilter(
@@ -615,6 +626,7 @@ func TestCommands_RevokeRefreshTokens(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							10*time.Hour,
+							nil,
 						)),
 					),
 					expectPush(
@@ -691,6 +703,7 @@ func TestCommands_addRefreshToken(t *testing.T) {
 		authTime              time.Time
 		idleExpiration        time.Duration
 		expiration            time.Duration
+		actor                 *domain.TokenActor
 	}
 	type res struct {
 		event        *user.HumanRefreshTokenAddedEvent
@@ -745,6 +758,7 @@ func TestCommands_addRefreshToken(t *testing.T) {
 					authTime,
 					1*time.Hour,
 					10*time.Hour,
+					nil,
 				),
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID:refreshTokenID:refreshTokenID")),
 			},
@@ -756,7 +770,7 @@ func TestCommands_addRefreshToken(t *testing.T) {
 				eventstore:   tt.fields.eventstore,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
-			gotEvent, gotRefreshToken, err := c.addRefreshToken(tt.args.ctx, tt.args.accessToken, tt.args.authMethodsReferences, tt.args.authTime, tt.args.idleExpiration, tt.args.expiration)
+			gotEvent, gotRefreshToken, err := c.addRefreshToken(tt.args.ctx, tt.args.accessToken, tt.args.authMethodsReferences, tt.args.authTime, tt.args.idleExpiration, tt.args.expiration, tt.args.actor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -788,13 +802,13 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 		event           *user.HumanRefreshTokenRenewedEvent
 		refreshTokenID  string
 		newRefreshToken string
-		err             func(error) bool
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
+		name    string
+		fields  fields
+		args    args
+		want    *renewedRefreshToken
+		wantErr func(error) bool
 	}{
 		{
 			name: "empty token, error",
@@ -804,9 +818,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
+			wantErr: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "invalid token, error",
@@ -818,9 +830,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				ctx:          context.Background(),
 				refreshToken: "invalid",
 			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
+			wantErr: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "invalid token (invalid userID), error",
@@ -834,9 +844,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				orgID:        "orgID",
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID2:tokenID:token")),
 			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
+			wantErr: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "token inactive, error",
@@ -856,6 +864,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							24*time.Hour,
+							nil,
 						)),
 						eventFromEventPusher(user.NewHumanRefreshTokenRemovedEvent(
 							context.Background(),
@@ -872,9 +881,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				orgID:        "orgID",
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:token")),
 			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
+			wantErr: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "token expired, error",
@@ -894,6 +901,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							24*time.Hour,
+							nil,
 						)),
 					),
 				),
@@ -905,9 +913,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				orgID:        "orgID",
 				refreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:tokenID")),
 			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
+			wantErr: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "user deactivated, error",
@@ -927,6 +933,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							24*time.Hour,
+							nil,
 						)),
 						eventFromEventPusher(
 							user.NewUserDeactivatedEvent(
@@ -945,9 +952,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				refreshToken:   base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:tokenID")),
 				idleExpiration: 1 * time.Hour,
 			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
+			wantErr: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "user signedout, error",
@@ -967,6 +972,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							24*time.Hour,
+							nil,
 						)),
 						eventFromEventPusher(
 							user.NewHumanSignedOutEvent(
@@ -986,9 +992,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				refreshToken:   base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:tokenID")),
 				idleExpiration: 1 * time.Hour,
 			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
+			wantErr: zerrors.IsErrorInvalidArgument,
 		},
 		{
 			name: "token renewed, ok",
@@ -1008,6 +1012,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 							time.Now(),
 							1*time.Hour,
 							24*time.Hour,
+							nil,
 						)),
 					),
 				),
@@ -1021,7 +1026,7 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				refreshToken:   base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:tokenID")),
 				idleExpiration: 1 * time.Hour,
 			},
-			res: res{
+			want: &renewedRefreshToken{
 				event: user.NewHumanRefreshTokenRenewedEvent(
 					context.Background(),
 					&user.NewAggregate("userID", "orgID").Aggregate,
@@ -1029,8 +1034,9 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 					"refreshToken1",
 					1*time.Hour,
 				),
-				refreshTokenID:  "tokenID",
-				newRefreshToken: base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:refreshToken1")),
+				authMethodsReferences: []string{"password"},
+				tokenID:               "tokenID",
+				token:                 base64.RawURLEncoding.EncodeToString([]byte("userID:tokenID:refreshToken1")),
 			},
 		},
 	}
@@ -1041,17 +1047,16 @@ func TestCommands_renewRefreshToken(t *testing.T) {
 				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
-			gotEvent, gotRefreshTokenID, gotNewRefreshToken, err := c.renewRefreshToken(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.refreshToken, tt.args.idleExpiration)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
+			got, err := c.renewRefreshToken(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.refreshToken, tt.args.idleExpiration)
+			if tt.wantErr != nil && !tt.wantErr(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.event, gotEvent)
-				assert.Equal(t, tt.res.refreshTokenID, gotRefreshTokenID)
-				assert.Equal(t, tt.res.newRefreshToken, gotNewRefreshToken)
+			if tt.wantErr == nil {
+				require.NoError(t, err)
+				assert.Equal(t, tt.want.event, got.event)
+				assert.Equal(t, tt.want.authMethodsReferences, got.authMethodsReferences)
+				assert.Equal(t, tt.want.tokenID, got.tokenID)
+				assert.Equal(t, tt.want.token, got.token)
 			}
 		})
 	}

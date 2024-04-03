@@ -52,6 +52,46 @@ The object has the following fields and methods:
 - `text()` *string*  
   Returns the body
 
+### Example
+
+```js reference
+https://github.com/zitadel/actions/blob/main/examples/make_api_call.js#L10-L20
+```
+
+## Log
+
+The log module provides you with the functionality to log to stdout.
+
+### Import
+
+```js
+   let logger = require("zitadel/log")
+```
+
+### `log()`, `warn()`, `error()` function
+
+The logger offers three distinct log levels (info, warn, and error) to effectively communicate messages based on their severity, enhancing debugging and troubleshooting efficiency.
+Use the function that reflects your log level.
+
+- log()
+- warn()
+- error()
+
+### Example
+
+```js
+logger.info("This is an info log.")
+
+logger.warn("This is a warn log.")
+
+logger.error("This is an error log.")
+```
+
+#### Parameters
+
+- `msg` *string*  
+  The message you want to print out.
+
 ## UUID
 
 This module provides functionality to generate a UUID

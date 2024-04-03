@@ -56,7 +56,7 @@ func (key *MachineKey) Detail() ([]byte, error) {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "KEY-sp2l2m", "Errors.Internal")
 	}
 	if key.Type == domain.AuthNKeyTypeJSON {
-		return domain.MachineKeyMarshalJSON(key.KeyID, key.PrivateKey, key.AggregateID)
+		return domain.MachineKeyMarshalJSON(key.KeyID, key.PrivateKey, key.ExpirationDate, key.AggregateID)
 	}
 	return nil, zerrors.ThrowPreconditionFailed(nil, "KEY-dsg52", "Errors.Internal")
 }

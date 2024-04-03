@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -23,10 +24,11 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		span.EndWithError(err)
 	}()
 
-	if s.features.LegacyIntrospection {
+	features := authz.GetFeatures(ctx)
+	if features.LegacyIntrospection {
 		return s.LegacyServer.Introspect(ctx, r)
 	}
-	if s.features.TriggerIntrospectionProjections {
+	if features.TriggerIntrospectionProjections {
 		// Execute all triggers in one concurrent sweep.
 		query.TriggerIntrospectionProjections(ctx)
 	}
@@ -104,16 +106,19 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		return nil, err
 	}
 	introspectionResp := &oidc.IntrospectionResponse{
-		Active:     true,
-		Scope:      token.scope,
-		ClientID:   token.clientID,
-		TokenType:  oidc.BearerToken,
-		Expiration: oidc.FromTime(token.tokenExpiration),
-		IssuedAt:   oidc.FromTime(token.tokenCreation),
-		NotBefore:  oidc.FromTime(token.tokenCreation),
-		Audience:   token.audience,
-		Issuer:     op.IssuerFromContext(ctx),
-		JWTID:      token.tokenID,
+		Active:                          true,
+		Scope:                           token.scope,
+		ClientID:                        token.clientID,
+		TokenType:                       oidc.BearerToken,
+		Expiration:                      oidc.FromTime(token.tokenExpiration),
+		IssuedAt:                        oidc.FromTime(token.tokenCreation),
+		AuthTime:                        oidc.FromTime(token.authTime),
+		NotBefore:                       oidc.FromTime(token.tokenCreation),
+		Audience:                        token.audience,
+		AuthenticationMethodsReferences: AuthMethodTypesToAMR(token.authMethods),
+		Issuer:                          op.IssuerFromContext(ctx),
+		JWTID:                           token.tokenID,
+		Actor:                           actorDomainToClaims(token.actor),
 	}
 	introspectionResp.SetUserInfo(userInfo)
 	return op.NewResponse(introspectionResp), nil

@@ -45,7 +45,7 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// test actual userinfo
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
@@ -154,7 +154,7 @@ func TestServer_Introspect(t *testing.T) {
 			tokens, err := exchangeTokens(t, app.GetClientId(), code, redirectURI)
 			require.NoError(t, err)
 			assertTokens(t, tokens, true)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 			// test actual introspection
 			introspection, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
@@ -213,9 +213,9 @@ func assertIntrospection(
 	assertOIDCTime(t, introspection.UpdatedAt, User.GetDetails().GetChangeDate().AsTime())
 
 	require.NotNil(t, introspection.Claims)
-	assert.Equal(t, User.Details.ResourceOwner, introspection.Claims[oidc_api.ClaimResourceOwner+"id"])
-	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwner+"name"])
-	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwner+"primary_domain"])
+	assert.Equal(t, User.Details.ResourceOwner, introspection.Claims[oidc_api.ClaimResourceOwnerID])
+	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwnerName])
+	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
 }
 
 // TestServer_VerifyClient tests verification by running code flow tests
@@ -360,7 +360,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assertTokens(t, tokens, false)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 		})
 	}
 }

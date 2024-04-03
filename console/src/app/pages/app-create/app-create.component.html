@@ -1,25 +1,53 @@
 <cnsl-create-layout title="{{ 'APP.PAGES.CREATE' | translate }}" (closed)="close()">
   <div class="app-create-main-content">
-    <h1>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h1>
+    <cnsl-framework-change *ngIf="initialParam()" (frameworkChanged)="framework.set($event)"></cnsl-framework-change>
+    <div class="content-wrapper" [ngClass]="{ reverse: initialParam() }">
+      <div>
+        <h1>{{ 'APP.PAGES.CREATE_SELECT_PROJECT' | translate }}</h1>
 
-    <cnsl-search-project-autocomplete
-      class="block"
-      [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
-      (selectionChanged)="selectProject($any($event.project))"
+        <cnsl-search-project-autocomplete
+          class="block"
+          [autocompleteType]="ProjectAutocompleteType.PROJECT_OWNED"
+          (selectionChanged)="selectProject($any($event))"
+          (valueChanged)="projectName = $any($event)"
+        >
+        </cnsl-search-project-autocomplete>
+
+        <p>{{ 'APP.PAGES.CREATE_NEW_PROJECT' | translate }}</p>
+      </div>
+
+      <div *ngIf="!initialParam()">
+        <h1>{{ 'QUICKSTART.SELECT_FRAMEWORK' | translate }}</h1>
+
+        <cnsl-framework-autocomplete
+          *ngIf="frameworks"
+          [frameworkId]="framework()?.id"
+          [frameworks]="frameworks"
+          [withCustom]="true"
+          (selectionChanged)="findFramework($event)"
+        ></cnsl-framework-autocomplete>
+      </div>
+    </div>
+
+    <cnsl-info-section *ngIf="error()" [type]="InfoSectionType.WARN"
+      ><span class="error-msg">{{ error() }}</span></cnsl-info-section
     >
-    </cnsl-search-project-autocomplete>
-
-    <div [innerHtml]="'APP.PAGES.CREATE_NEW_PROJECT' | translate: { url: '/projects/create' }"></div>
 
     <div class="app-create-btn-container">
       <button
         color="primary"
         mat-raised-button
         class="continue-button"
-        [disabled]="!projectId"
-        (click)="goToAppCreatePage()"
+        [disabled]="(!project && !projectName) || !(framework() || customFramework())"
+        (click)="project && project.name === projectName ? goToAppIntegratePage() : createProjectAndContinue()"
       >
-        {{ 'ACTIONS.CONTINUE' | translate }}
+        {{
+          !project && !projectName
+            ? ('ACTIONS.CONTINUE' | translate)
+            : project && project.name === projectName
+              ? ('ACTIONS.CONTINUEWITH' | translate: { value: project.name })
+              : ('QUICKSTART.CREATEPROJECTFORAPP' | translate: { value: projectName })
+        }}
       </button>
     </div>
   </div>

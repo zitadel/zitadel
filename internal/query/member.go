@@ -3,10 +3,10 @@ package query
 import (
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
+
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-
-	sq "github.com/Masterminds/squirrel"
 )
 
 type MembersQuery struct {

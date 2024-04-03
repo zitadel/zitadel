@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/query"
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 )
 
 func (s *Server) GetLoginSettings(ctx context.Context, req *settings.GetLoginSettingsRequest) (*settings.GetLoginSettingsResponse, error) {
@@ -122,5 +122,25 @@ func (s *Server) GetGeneralSettings(ctx context.Context, _ *settings.GetGeneralS
 		SupportedLanguages: domain.LanguagesToStrings(i18n.SupportedLanguages()),
 		DefaultOrgId:       instance.DefaultOrganisationID(),
 		DefaultLanguage:    instance.DefaultLanguage().String(),
+	}, nil
+}
+
+func (s *Server) GetSecuritySettings(ctx context.Context, req *settings.GetSecuritySettingsRequest) (*settings.GetSecuritySettingsResponse, error) {
+	policy, err := s.query.SecurityPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &settings.GetSecuritySettingsResponse{
+		Settings: securityPolicyToSettingsPb(policy),
+	}, nil
+}
+
+func (s *Server) SetSecuritySettings(ctx context.Context, req *settings.SetSecuritySettingsRequest) (*settings.SetSecuritySettingsResponse, error) {
+	details, err := s.command.SetSecurityPolicy(ctx, securitySettingsToCommand(req))
+	if err != nil {
+		return nil, err
+	}
+	return &settings.SetSecuritySettingsResponse{
+		Details: object.DomainToDetailsPb(details),
 	}, nil
 }

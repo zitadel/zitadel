@@ -40,7 +40,7 @@ func TestOrgMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_metadata2 (instance_id, org_id, key, resource_owner, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, org_id, key) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, value) = (EXCLUDED.resource_owner, EXCLUDED.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
+							expectedStmt: "INSERT INTO projections.org_metadata2 (instance_id, org_id, key, resource_owner, creation_date, change_date, sequence, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, org_id, key) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, value) = (EXCLUDED.resource_owner, projections.org_metadata2.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.value)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",

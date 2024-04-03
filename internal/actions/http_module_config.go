@@ -3,8 +3,10 @@ package actions
 import (
 	"net"
 	"reflect"
+	"strings"
 
 	"github.com/mitchellh/mapstructure"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -41,12 +43,18 @@ func HTTPConfigDecodeHook(from, to reflect.Value) (interface{}, error) {
 	}
 
 	c := HTTPConfig{
-		DenyList: make([]AddressChecker, len(config.DenyList)),
+		DenyList: make([]AddressChecker, 0),
 	}
 
-	for i, entry := range config.DenyList {
-		if c.DenyList[i], err = parseDenyListEntry(entry); err != nil {
-			return nil, err
+	for _, unsplit := range config.DenyList {
+		for _, split := range strings.Split(unsplit, ",") {
+			parsed, parseErr := parseDenyListEntry(split)
+			if parseErr != nil {
+				return nil, parseErr
+			}
+			if parsed != nil {
+				c.DenyList = append(c.DenyList, parsed)
+			}
 		}
 	}
 

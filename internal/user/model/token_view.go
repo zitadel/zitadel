@@ -1,10 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-
-	"time"
 )
 
 type TokenView struct {
@@ -22,6 +22,8 @@ type TokenView struct {
 	PreferredLanguage string
 	RefreshTokenID    string
 	IsPAT             bool
+	Reason            domain.TokenReason
+	Actor             *domain.TokenActor
 }
 
 type TokenSearchRequest struct {

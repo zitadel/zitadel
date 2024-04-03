@@ -20,7 +20,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Session Service";
     version: "2.0-beta";
-    description: "This API is intended to manage sessions in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    description: "This API is intended to manage sessions in a ZITADEL instance. Follow the guides on how to [build your own Login UI](/docs/guides/integrate/login-ui) and learn how to use the Session API. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"

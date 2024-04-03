@@ -13,10 +13,12 @@ import OnboardingModule from 'src/app/modules/onboarding/onboarding.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.component';
+import { QuickstartComponent } from 'src/app/components/quickstart/quickstart.component';
 
 @NgModule({
   declarations: [HomeComponent],
   imports: [
+    QuickstartComponent,
     CommonModule,
     MatIconModule,
     HasRoleModule,

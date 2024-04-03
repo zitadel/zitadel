@@ -8,19 +8,18 @@ If you are new to ZITADEL your first action is to create your first ZITADEL inst
 The ZITADEL customer Portal is used to manage all your different ZITADEL instances.
 You can also manage your subscriptions, billing, newsletters and support requests.
 
-Go to [ZITADEL Customer Portal](https://zitadel.cloud) and enter all the detail information.
-As soon as you click "Let's go" you will get two initialization mails to finish your registration.
-One is for your Customer Portal account and the other for your new created ZITADEL instance, verify both to be able to login to the systems.
-
-To get started, enter the following data:
-
-- Firstname
-- Lastname
-- Email
-- Username
-- Organization Name
+Go to [ZITADEL Customer Portal](https://zitadel.com) and start by entering you email or use an existing account like Google.
 
 ![Customer Portal Landing Page](/img/manuals/portal/customer_portal_landing_page.png)
 
-The instance you have created will automatically be in the free subscription, which already allows you to use all the features.
-Sign in to [ZITADEL Customer Portal](https://zitadel.cloud), to manage all you instances.
+In a second step fill out your user data like First-, Last- and Team-name.
+
+![Customer Portal Landing Page Step 2](/img/manuals/portal/customer_portal_landing_page_2.png)
+
+If you did start with your email instead of a social login (e.g Google) you have to fill a password for your authentication.
+In that case you will get an initialization mail to verify your account.
+
+![Customer Portal Landing Page Step 3](/img/manuals/portal/customer_portal_landing_page_3.png)
+
+You are now registered with a free account and ready to try all the features of ZITADEL.
+Sign in to [ZITADEL Customer Portal](https://zitadel.com), to manage all you instances.

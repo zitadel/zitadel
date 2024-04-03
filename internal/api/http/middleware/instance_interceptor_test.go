@@ -14,6 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 func Test_instanceInterceptor_Handler(t *testing.T) {
@@ -342,4 +343,12 @@ func (m *mockInstance) RequestedHost() string {
 
 func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
+}
+
+func (m *mockInstance) EnableImpersonation() bool {
+	return false
+}
+
+func (m *mockInstance) Features() feature.Features {
+	return feature.Features{}
 }

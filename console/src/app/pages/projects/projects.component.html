@@ -1,36 +1,43 @@
 <div class="max-width-container">
   <div class="enlarged-container">
     <div class="project-title-row">
-      <h1>{{ 'PROJECT.PAGES.LIST' | translate }}</h1>
-      <a mat-icon-button href="https://zitadel.com/docs/guides/manage/console/projects" rel="noreferrer" target="_blank">
+      <h1>{{ 'DESCRIPTIONS.PROJECTS.TITLE' | translate }}</h1>
+      <a mat-icon-button href="https://zitadel.com/docs/concepts/structure/projects" rel="noreferrer" target="_blank">
         <mat-icon class="icon">info_outline</mat-icon>
       </a>
     </div>
-    <p class="sub cnsl-secondary-text max-width-description">{{ 'PROJECT.PAGES.LISTDESCRIPTION' | translate }}</p>
-
+    <p class="sub cnsl-secondary-text max-width-description">
+      {{ 'DESCRIPTIONS.PROJECTS.DESCRIPTION' | translate }}
+    </p>
     <div class="projects-controls">
       <div class="project-toggle-group">
         <cnsl-nav-toggle
-          label="{{ 'PROJECT.PAGES.TYPE.OWNED' | translate }}"
+          label="{{ 'DESCRIPTIONS.PROJECTS.OWNED.TITLE' | translate }}"
           [count]="mgmtService.ownedProjectsCount | async"
           (clicked)="setType(ProjectType.PROJECTTYPE_OWNED)"
           [active]="(projectType$ | async) === ProjectType.PROJECTTYPE_OWNED"
         ></cnsl-nav-toggle>
         <cnsl-nav-toggle
-          label="{{ 'PROJECT.PAGES.TYPE.GRANTED' | translate }}"
+          label="{{ 'DESCRIPTIONS.PROJECTS.GRANTED.TITLE' | translate }}"
           [count]="mgmtService.grantedProjectsCount | async"
           (clicked)="setType(ProjectType.PROJECTTYPE_GRANTED)"
           [active]="(projectType$ | async) === ProjectType.PROJECTTYPE_GRANTED"
         ></cnsl-nav-toggle>
       </div>
-
       <span class="fill-space"></span>
       <button class="grid-btn" (click)="grid = !grid" mat-icon-button data-e2e="toggle-grid">
         <i *ngIf="grid" class="show list view las la-th-list"></i>
         <i *ngIf="!grid" class="las la-border-all"></i>
       </button>
     </div>
-
+    <p class="sub cnsl-secondary-text max-width-description">
+      {{
+        ((projectType$ | async) === ProjectType.PROJECTTYPE_OWNED
+          ? 'DESCRIPTIONS.PROJECTS.OWNED.DESCRIPTION'
+          : 'DESCRIPTIONS.PROJECTS.GRANTED.DESCRIPTION'
+        ) | translate
+      }}
+    </p>
     <cnsl-project-grid
       *ngIf="grid"
       [projectType$]="projectType$"

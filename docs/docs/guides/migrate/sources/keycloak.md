@@ -97,7 +97,7 @@ As explained in this [ZITADEL user migration guide](https://zitadel.com/docs/gui
 
 ### Create a service user to consume ZITADEL API
 
-But first of all, in order to use this ZITADEL API, you need to create a [service user](https://zitadel.com/docs/guides/integrate/serviceusers#exercise-create-a-service-user). 
+But first of all, in order to use this ZITADEL API, you need to create a [service user](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users#exercise-create-a-service-user). 
 
 Go to the **Users** menu and select the **Service Users** tab. And click the **+ New** button. 
 
@@ -113,7 +113,7 @@ Your service user is now created and listed.
 
 ### Provide 'Org Owner' permissions to the service user
 
-This service user needs to have elevated permissions in order to import users. For this example, you should make the service user an organization owner as explained in [this guide](https://zitadel.com/docs/guides/integrate/access-zitadel-apis#add-org_owner-to-service-user). 
+This service user needs to have elevated permissions in order to import users. For this example, you should make the service user an organization owner as explained in [this guide](/docs/guides/integrate/zitadel-apis/access-zitadel-apis#add-org_owner-to-service-user). 
 
 Let's change the permissions as follows: 
 
@@ -127,7 +127,7 @@ Next, select your service user that you created and select the **Org Owner** che
 
 ### Generate an access token for the service user
 
-In order for the service user to access the API, they must be able to authenticate themselves. To authenticate the user, you can use either [JWT with Private Key](/docs/guides/integrate/serviceusers#authenticating-a-service-user) flow (recommended for production) or [Personal Access Tokens](/docs/guides/integrate/pat)(PAT). In this guide, we will choose the latter. 
+In order for the service user to access the API, they must be able to authenticate themselves. To authenticate the user, you can use either [JWT with Private Key](/docs/guides/integrate/service-users/authenticate-service-users#authenticating-a-service-user) flow (recommended for production) or [Personal Access Tokens](/docs/guides/integrate/service-users/personal-access-token)(PAT). In this guide, we will choose the latter. 
 
 Go to **Users** -> **Service Users** again and click on the service user, then select **Personal Access Tokens** on the left and click the **+ New** button. Copy the generated personal access token to use it later.  Click **Close** after copying the PAT. 
 
@@ -262,8 +262,7 @@ Ensure `my-realm-users-0.json` is in the same directory for the tool to process 
 Now copy the following portion to a separate file and name the file `zitadel-users-file.json`.
 
 ```bash
-"userId": "826731b2-bf17-4bd9-b45c-6a26c76ddaae",
-"user": {
+{
   "userName": "test-user",
   "profile": {
     "firstName": "John",

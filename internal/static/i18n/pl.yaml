@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: Nie znaleziono domeny dla wiadomości
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Nie znaleziono użytkownika
     AlreadyExists: Użytkownik już istnieje
     NotFoundOnOrg: Użytkownik nie został znaleziony w wybranej organizacji
@@ -128,6 +127,7 @@ Errors:
       NotFound: Kod nie znaleziony
       Expired: Kod jest przedawniony
       GeneratorAlgNotSupported: Nieobsługiwany algorytm generatora
+      Invalid: Kod jest nieprawidłowy
     Password:
       NotFound: Hasło nie znalezione
       Empty: Hasło jest puste
@@ -327,7 +327,7 @@ Errors:
       NotActive: Grant projektu jest nieaktywny
       NotInactive: Grant projektu nie jest nieaktywny
   IAM:
-    NotFound: Instancja nie znaleziona. Sprawdź https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM nie znaleziony. Upewnij się, że masz poprawną domenę. Sprawdź https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Role nie zmienione
     MemberInvalid: Członek jest nieprawidłowy
@@ -478,6 +478,7 @@ Errors:
     CloseRows: Instrukcja SQL nie mogła zostać zakończona
     SQLStatement: Instrukcja SQL nie mogła zostać utworzona
     InvalidRequest: Żądanie jest nieprawidłowe
+    TooManyNestingLevels: Zbyt wiele poziomów zagnieżdżenia zapytań (maks. 20)
   Quota:
     AlreadyExists: Limit już istnieje dla tej jednostki
     NotFound: Nie znaleziono limitu dla tej jednostki
@@ -534,6 +535,38 @@ Errors:
     NotExisting: Funkcja nie istnieje
     TypeNotSupported: Typ funkcji nie jest obsługiwany
     InvalidValue: Nieprawidłowa wartość dla tej funkcji
+  Target:
+    Invalid: Cel jest nieprawidłowy
+    NoTimeout: Cel nie ma limitu czasu
+    InvalidURL: Cel ma nieprawidłowy adres URL
+    NotFound: Nie znaleziono celu
+  Execution:
+    ConditionInvalid: Warunek wykonania jest nieprawidłowy
+    Invalid: Wykonanie jest nieprawidłowe
+    NotFound: Nie znaleziono wykonania
+    IncludeNotFound: Nie znaleziono uwzględnienia
+    NoTargets: Nie zdefiniowano celów
+  UserSchema:
+    NotEnabled: Funkcja „Schemat użytkownika” nie jest włączona
+    Type:
+      Missing: Brak typu schematu użytkownika
+      AlreadyExists: Typ schematu użytkownika już istnieje
+    Authenticator:
+      Invalid: Nieprawidłowy typ uwierzytelnienia
+    NotActive: Schemat użytkownika nieaktywny
+    NotInactive: Schemat użytkownika nie jest nieaktywny
+    NotExists: Schemat użytkownika nie istnieje
+  TokenExchange:
+    FeatureDisabled: Funkcja wymiany tokenów jest wyłączona dla Twojej instancji. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Brak tokena
+      Invalid: Token jest nieprawidłowy
+      TypeMissing: Brak typu tokena
+      TypeNotAllowed: Typ tokenu jest niedozwolony
+      TypeNotSupported: Typ tokena nie jest obsługiwany
+      NotForAPI: Podrabiane tokeny nie są dozwolone w interfejsie API
+    Impersonation:
+      PolicyDisabled: Podszywanie się jest wyłączone w polityce bezpieczeństwa instancji
 
 AggregateTypes:
   action: Działanie
@@ -545,8 +578,18 @@ AggregateTypes:
   usergrant: Uprawnienie użytkownika
   quota: Limit
   feature: Funkcja
+  target: Cel
+  execution: Wykonanie
+  user_schema: Schemat użytkownika
 
 EventTypes:
+  execution:
+    set: Zestaw wykonawczy
+    removed: Wykonanie usunięte
+  target:
+    added: Cel został utworzony
+    changed: Cel zmieniony
+    removed: Cel usunięty
   user:
     added: Użytkownik dodany
     selfregistered: Użytkownik zarejestrował się
@@ -560,6 +603,7 @@ EventTypes:
     token:
       added: Token dostępu utworzony
       removed: Token dostępu usunięty
+    impersonated: Użytkownik podszywał się pod użytkownika
     username:
       reserved: Nazwa użytkownika zarezerwowana
       released: Nazwa użytkownika zwolniona
@@ -1215,6 +1259,12 @@ EventTypes:
         password:
           changed: Hasło konfiguracji SMTP zmienione
         removed: Konfiguracja SMTP usunięta
+  user_schema:
+    created: Utworzono schemat użytkownika
+    updated: Schemat użytkownika zaktualizowany
+    deactivated: Schemat użytkownika dezaktywowany
+    reactivated: Schemat użytkownika został ponownie aktywowany
+    deleted: Schemat użytkownika został usunięty
 
 Application:
   OIDC:

@@ -60,6 +60,6 @@ If you only want to enable a subset of the supported languages, you can configur
 The login UI and notification messages are only rendered in one of the allowed languages and fallback to the instances default language.
 Also, the instances OIDC discovery endpoint will only list the allowed languages in the *ui_locales_supported* field.
 
-All language settings are also configurable in the consoles *Languages* instance settings.
+All language settings are also configurable in the consoles *Languages* default settings.
 
 ![Languages](/img/guides/console/languages.png)

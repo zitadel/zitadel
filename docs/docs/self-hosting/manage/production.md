@@ -90,7 +90,7 @@ but in the Projections.Customizations.Telemetry section
 ### Prefer CockroachDB
 
 ZITADEL supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/).
-We highly recommend using CockroachDB,
+We recommend using CockroachDB,
 as horizontal scaling is much easier than with PostgreSQL.
 Also, if you are concerned about multi-regional data locality,
 [the way to go is with CockroachDB](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html).

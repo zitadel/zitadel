@@ -147,6 +147,10 @@ func (c *CookieHandler) httpSetWithSameSite(w http.ResponseWriter, name, host, v
 	secure := c.secureOnly || (sameSite == http.SameSiteNoneMode && domain == "localhost")
 	// prefix the cookie for secure cookies (TLS only, therefore not for samesite none on http://localhost)
 	prefixedName := SetCookiePrefix(name, c.secureOnly, c.prefix)
+	// in case the host prefix is set, we need to make sure the domain is not set (otherwise the browser will reject the cookie)
+	if secure && c.prefix == PrefixHost {
+		domain = ""
+	}
 	http.SetCookie(w, &http.Cookie{
 		Name:     prefixedName,
 		Value:    value,

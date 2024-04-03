@@ -56,7 +56,7 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.Has
 		}
 
 		for _, origin := range app.AdditionalOrigins {
-			if !http_util.IsOrigin(origin) {
+			if !http_util.IsOrigin(strings.TrimSpace(origin)) {
 				return nil, zerrors.ThrowInvalidArgument(nil, "V2-DqWPX", "Errors.Invalid.Argument")
 			}
 		}
@@ -98,19 +98,19 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.Has
 					app.ID,
 					app.ClientID,
 					app.ClientSecret,
-					app.RedirectUris,
+					trimStringSliceWhiteSpaces(app.RedirectUris),
 					app.ResponseTypes,
 					app.GrantTypes,
 					app.ApplicationType,
 					app.AuthMethodType,
-					app.PostLogoutRedirectUris,
+					trimStringSliceWhiteSpaces(app.PostLogoutRedirectUris),
 					app.DevMode,
 					app.AccessTokenType,
 					app.AccessTokenRoleAssertion,
 					app.IDTokenRoleAssertion,
 					app.IDTokenUserinfoAssertion,
 					app.ClockSkew,
-					app.AdditionalOrigins,
+					trimStringSliceWhiteSpaces(app.AdditionalOrigins),
 					app.SkipSuccessPageForNativeApp,
 				),
 			}, nil
@@ -182,19 +182,19 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		oidcApp.AppID,
 		oidcApp.ClientID,
 		oidcApp.ClientSecret,
-		oidcApp.RedirectUris,
+		trimStringSliceWhiteSpaces(oidcApp.RedirectUris),
 		oidcApp.ResponseTypes,
 		oidcApp.GrantTypes,
 		oidcApp.ApplicationType,
 		oidcApp.AuthMethodType,
-		oidcApp.PostLogoutRedirectUris,
+		trimStringSliceWhiteSpaces(oidcApp.PostLogoutRedirectUris),
 		oidcApp.DevMode,
 		oidcApp.AccessTokenType,
 		oidcApp.AccessTokenRoleAssertion,
 		oidcApp.IDTokenRoleAssertion,
 		oidcApp.IDTokenUserinfoAssertion,
 		oidcApp.ClockSkew,
-		oidcApp.AdditionalOrigins,
+		trimStringSliceWhiteSpaces(oidcApp.AdditionalOrigins),
 		oidcApp.SkipNativeAppSuccessPage,
 	))
 
@@ -233,8 +233,8 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		ctx,
 		projectAgg,
 		oidc.AppID,
-		oidc.RedirectUris,
-		oidc.PostLogoutRedirectUris,
+		trimStringSliceWhiteSpaces(oidc.RedirectUris),
+		trimStringSliceWhiteSpaces(oidc.PostLogoutRedirectUris),
 		oidc.ResponseTypes,
 		oidc.GrantTypes,
 		oidc.ApplicationType,
@@ -246,7 +246,7 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 		oidc.IDTokenRoleAssertion,
 		oidc.IDTokenUserinfoAssertion,
 		oidc.ClockSkew,
-		oidc.AdditionalOrigins,
+		trimStringSliceWhiteSpaces(oidc.AdditionalOrigins),
 		oidc.SkipNativeAppSuccessPage,
 	)
 	if err != nil {
@@ -358,4 +358,11 @@ func getOIDCAppWriteModel(ctx context.Context, filter preparation.FilterToQueryR
 	appWriteModel.AppendEvents(events...)
 	err = appWriteModel.Reduce()
 	return appWriteModel, err
+}
+
+func trimStringSliceWhiteSpaces(slice []string) []string {
+	for i, s := range slice {
+		slice[i] = strings.TrimSpace(s)
+	}
+	return slice
 }

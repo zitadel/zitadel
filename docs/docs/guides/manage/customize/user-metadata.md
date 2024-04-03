@@ -29,7 +29,7 @@ Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequ
 :::info Getting a token
 In case you want to test out different settings configure an application with code flow (PKCE).
 Grab the code from the url parameter after a successful login and exchange the code for tokens by calling the [token endpoint](/docs/apis/openidoauth/endpoints#token_endpoint).
-You will find more information in our guides on how to [authenticate users](/docs/guides/integrate/login-users).
+You will find more information in our guides on how to [authenticate users](/docs/guides/integrate/login/oidc/login-users).
 :::
 
 ## Use tokens to get user metadata

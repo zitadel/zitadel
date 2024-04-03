@@ -42,17 +42,18 @@ type User struct {
 }
 
 type Human struct {
-	FirstName         string              `json:"first_name,omitempty"`
-	LastName          string              `json:"last_name,omitempty"`
-	NickName          string              `json:"nick_name,omitempty"`
-	DisplayName       string              `json:"display_name,omitempty"`
-	AvatarKey         string              `json:"avatar_key,omitempty"`
-	PreferredLanguage language.Tag        `json:"preferred_language,omitempty"`
-	Gender            domain.Gender       `json:"gender,omitempty"`
-	Email             domain.EmailAddress `json:"email,omitempty"`
-	IsEmailVerified   bool                `json:"is_email_verified,omitempty"`
-	Phone             domain.PhoneNumber  `json:"phone,omitempty"`
-	IsPhoneVerified   bool                `json:"is_phone_verified,omitempty"`
+	FirstName              string              `json:"first_name,omitempty"`
+	LastName               string              `json:"last_name,omitempty"`
+	NickName               string              `json:"nick_name,omitempty"`
+	DisplayName            string              `json:"display_name,omitempty"`
+	AvatarKey              string              `json:"avatar_key,omitempty"`
+	PreferredLanguage      language.Tag        `json:"preferred_language,omitempty"`
+	Gender                 domain.Gender       `json:"gender,omitempty"`
+	Email                  domain.EmailAddress `json:"email,omitempty"`
+	IsEmailVerified        bool                `json:"is_email_verified,omitempty"`
+	Phone                  domain.PhoneNumber  `json:"phone,omitempty"`
+	IsPhoneVerified        bool                `json:"is_phone_verified,omitempty"`
+	PasswordChangeRequired bool                `json:"password_change_required,omitempty"`
 }
 
 type Profile struct {
@@ -127,7 +128,7 @@ func (u *Users) RemoveNoPermission(ctx context.Context, permissionCheck domain.P
 	for i := range u.Users {
 		ctxData := authz.GetCtxData(ctx)
 		if ctxData.UserID != u.Users[i].ID {
-			if err := permissionCheck(ctx, domain.PermissionUserRead, ctxData.OrgID, u.Users[i].ID); err != nil {
+			if err := permissionCheck(ctx, domain.PermissionUserRead, u.Users[i].ResourceOwner, u.Users[i].ID); err != nil {
 				removableIndexes = append(removableIndexes, i)
 			}
 		}
@@ -275,6 +276,11 @@ var (
 		name:  projection.HumanIsPhoneVerifiedCol,
 		table: humanTable,
 	}
+
+	HumanPasswordChangeRequiredCol = Column{
+		name:  projection.HumanPasswordChangeRequired,
+		table: humanTable,
+	}
 )
 
 var (
@@ -323,6 +329,10 @@ var (
 		name:           projection.NotifyVerifiedEmailCol,
 		table:          notifyTable,
 		isOrderByLower: true,
+	}
+	NotifyVerifiedEmailLowerCaseCol = Column{
+		name:  projection.NotifyVerifiedEmailLowerCol,
+		table: notifyTable,
 	}
 	NotifyPhoneCol = Column{
 		name:  projection.NotifyLastPhoneCol,
@@ -714,8 +724,8 @@ func NewUserPhoneSearchQuery(value string, comparison TextComparison) (SearchQue
 	return NewTextQuery(HumanPhoneCol, value, comparison)
 }
 
-func NewUserVerifiedEmailSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
-	return NewTextQuery(NotifyVerifiedEmailCol, value, comparison)
+func NewUserVerifiedEmailSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(NotifyVerifiedEmailLowerCaseCol, strings.ToLower(value), TextEquals)
 }
 
 func NewUserVerifiedPhoneSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
@@ -812,6 +822,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	isEmailVerified := sql.NullBool{}
 	phone := sql.NullString{}
 	isPhoneVerified := sql.NullBool{}
+	passwordChangeRequired := sql.NullBool{}
 
 	machineID := sql.NullString{}
 	name := sql.NullString{}
@@ -842,6 +853,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		&isEmailVerified,
 		&phone,
 		&isPhoneVerified,
+		&passwordChangeRequired,
 		&machineID,
 		&name,
 		&description,
@@ -861,17 +873,18 @@ func scanUser(row *sql.Row) (*User, error) {
 
 	if humanID.Valid {
 		u.Human = &Human{
-			FirstName:         firstName.String,
-			LastName:          lastName.String,
-			NickName:          nickName.String,
-			DisplayName:       displayName.String,
-			AvatarKey:         avatarKey.String,
-			PreferredLanguage: language.Make(preferredLanguage.String),
-			Gender:            domain.Gender(gender.Int32),
-			Email:             domain.EmailAddress(email.String),
-			IsEmailVerified:   isEmailVerified.Bool,
-			Phone:             domain.PhoneNumber(phone.String),
-			IsPhoneVerified:   isPhoneVerified.Bool,
+			FirstName:              firstName.String,
+			LastName:               lastName.String,
+			NickName:               nickName.String,
+			DisplayName:            displayName.String,
+			AvatarKey:              avatarKey.String,
+			PreferredLanguage:      language.Make(preferredLanguage.String),
+			Gender:                 domain.Gender(gender.Int32),
+			Email:                  domain.EmailAddress(email.String),
+			IsEmailVerified:        isEmailVerified.Bool,
+			Phone:                  domain.PhoneNumber(phone.String),
+			IsPhoneVerified:        isPhoneVerified.Bool,
+			PasswordChangeRequired: passwordChangeRequired.Bool,
 		}
 	} else if machineID.Valid {
 		u.Machine = &Machine{
@@ -916,6 +929,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			HumanIsEmailVerifiedCol.identifier(),
 			HumanPhoneCol.identifier(),
 			HumanIsPhoneVerifiedCol.identifier(),
+			HumanPasswordChangeRequiredCol.identifier(),
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
@@ -1302,6 +1316,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			HumanIsEmailVerifiedCol.identifier(),
 			HumanPhoneCol.identifier(),
 			HumanIsPhoneVerifiedCol.identifier(),
+			HumanPasswordChangeRequiredCol.identifier(),
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
@@ -1340,6 +1355,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				isEmailVerified := sql.NullBool{}
 				phone := sql.NullString{}
 				isPhoneVerified := sql.NullBool{}
+				passwordChangeRequired := sql.NullBool{}
 
 				machineID := sql.NullString{}
 				name := sql.NullString{}
@@ -1370,6 +1386,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 					&isEmailVerified,
 					&phone,
 					&isPhoneVerified,
+					&passwordChangeRequired,
 					&machineID,
 					&name,
 					&description,
@@ -1388,17 +1405,18 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 
 				if humanID.Valid {
 					u.Human = &Human{
-						FirstName:         firstName.String,
-						LastName:          lastName.String,
-						NickName:          nickName.String,
-						DisplayName:       displayName.String,
-						AvatarKey:         avatarKey.String,
-						PreferredLanguage: language.Make(preferredLanguage.String),
-						Gender:            domain.Gender(gender.Int32),
-						Email:             domain.EmailAddress(email.String),
-						IsEmailVerified:   isEmailVerified.Bool,
-						Phone:             domain.PhoneNumber(phone.String),
-						IsPhoneVerified:   isPhoneVerified.Bool,
+						FirstName:              firstName.String,
+						LastName:               lastName.String,
+						NickName:               nickName.String,
+						DisplayName:            displayName.String,
+						AvatarKey:              avatarKey.String,
+						PreferredLanguage:      language.Make(preferredLanguage.String),
+						Gender:                 domain.Gender(gender.Int32),
+						Email:                  domain.EmailAddress(email.String),
+						IsEmailVerified:        isEmailVerified.Bool,
+						Phone:                  domain.PhoneNumber(phone.String),
+						IsPhoneVerified:        isPhoneVerified.Bool,
+						PasswordChangeRequired: passwordChangeRequired.Bool,
 					}
 				} else if machineID.Valid {
 					u.Machine = &Machine{

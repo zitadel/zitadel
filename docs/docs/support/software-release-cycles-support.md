@@ -31,7 +31,6 @@ If you encounter issues with an enterprise supported feature and you are eligibl
 
 **Enterprise supported features**
 
-- Database PostgreSQL
 - LDAP Identity Provider
 - [Terraform Provider](https://github.com/zitadel/terraform-provider-zitadel)
 
@@ -51,7 +50,13 @@ Therefore, it's recommended to use caution when using Alpha and Beta software, a
 
 Only features in General Availability will be covered by support services.
 
-We encourage our community to test Alpha and Beta software and provide feedback via our [Discord Chat](https://zitadel.com/chat).
+We encourage our community to check out Preview and test Alpha and Beta software and provide feedback via our [Discord Chat](https://zitadel.com/chat).
+
+### Preview
+
+The Preview state is our initial stage to document planned futures and collect early feedback on the design.
+Features are not yet implemented at all or availability is limited to designated testers.
+We recommend that users exercise caution when using Preview software and avoid using it for critical tasks, as support is limited during this phase.
 
 ### Alpha
 

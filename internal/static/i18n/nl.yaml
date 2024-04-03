@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: Geen domein gevonden voor bericht
   User:
-    TooManyNestingLevels: Te veel query nesting niveaus (Max 20).
     NotFound: Gebruiker kon niet worden gevonden
     AlreadyExists: Gebruiker bestaat al
     NotFoundOnOrg: Gebruiker kon niet worden gevonden op gekozen organisatie
@@ -128,6 +127,7 @@ Errors:
       NotFound: Code niet gevonden
       Expired: Code is verlopen
       GeneratorAlgNotSupported: Generator algoritme wordt niet ondersteund
+      Invalid: Code is ongeldig
     Password:
       NotFound: Wachtwoord niet gevonden
       Empty: Wachtwoord is leeg
@@ -327,7 +327,7 @@ Errors:
       NotActive: Projecttoekenning is niet actief
       NotInactive: Projecttoekenning is niet gedeactiveerd
   IAM:
-    NotFound: Instantie niet gevonden. Bekijk https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM niet gevonden. Zorg ervoor dat u het juiste domein heeft. Kijk op https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Rollen zijn niet veranderd
     MemberInvalid: Lid is ongeldig
@@ -478,6 +478,7 @@ Errors:
     CloseRows: SQL Statement kon niet worden voltooid
     SQLStatement: SQL Statement kon niet worden gemaakt
     InvalidRequest: Verzoek is ongeldig
+    TooManyNestingLevels: Te veel query nesting niveaus (Max 20)
   Quota:
     AlreadyExists: Quota bestaat al voor deze eenheid
     NotFound: Quota niet gevonden voor deze eenheid
@@ -534,6 +535,38 @@ Errors:
     NotExisting: Functie bestaat niet
     TypeNotSupported: Functie type wordt niet ondersteund
     InvalidValue: Ongeldige waarde voor deze functie
+  Target:
+    Invalid: Doel is ongeldig
+    NoTimeout: Doel heeft geen time-out
+    InvalidURL: Doel heeft een ongeldige URL
+    NotFound: Doel niet gevonden
+  Execution:
+    ConditionInvalid: Uitvoeringsvoorwaarde is ongeldig
+    Invalid: Uitvoering is ongeldig
+    NotFound: Uitvoering niet gevonden
+    IncludeNotFound: Inclusief niet gevonden
+    NoTargets: Geen doelstellingen gedefinieerd
+  UserSchema:
+    NotEnabled: Functie "Gebruikersschema" is niet ingeschakeld
+    Type:
+      Missing: Type gebruikersschema ontbreekt
+      AlreadyExists: Type gebruikersschema bestaat al
+    Authenticator:
+      Invalid: Ongeldig authenticatortype
+    NotActive: Gebruikersschema niet actief
+    NotInactive: Gebruikersschema niet inactief
+    NotExists: Gebruikersschema bestaat niet
+  TokenExchange:
+    FeatureDisabled: De Token Exchange-functie is uitgeschakeld voor uw instantie. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token ontbreekt
+      Invalid: Token is ongeldig
+      TypeMissing: Tokentype ontbreekt
+      TypeNotAllowed: Tokentype is niet toegestaan
+      TypeNotSupported: Tokentype wordt niet ondersteund
+      NotForAPI: Nagebootste tokens zijn niet toegestaan voor API
+    Impersonation:
+      PolicyDisabled: Nabootsing van identiteit is uitgeschakeld in het beveiligingsbeleid van de instantie.
 
 AggregateTypes:
   action: Actie
@@ -545,8 +578,18 @@ AggregateTypes:
   usergrant: Gebruikerstoekenning
   quota: Quota
   feature: Functie
+  target: Doel
+  execution: Executie
+  user_schema: Gebruikersschema
 
 EventTypes:
+  execution:
+    set: Uitvoering ingesteld
+    removed: Uitvoering verwijderd
+  target:
+    added: Doel gemaakt
+    changed: Doel gewijzigd
+    removed: Doel verwijderd
   user:
     added: Gebruiker toegevoegd
     selfregistered: Gebruiker heeft zichzelf geregistreerd
@@ -560,6 +603,7 @@ EventTypes:
     token:
       added: Toegangstoken aangemaakt
       removed: Toegangstoken verwijderd
+    impersonated: Gebruiker nagebootst
     username:
       reserved: Gebruikersnaam gereserveerd
       released: Gebruikersnaam vrijgegeven
@@ -1215,6 +1259,12 @@ EventTypes:
         password:
           changed: Wachtwoord van SMTP-configuratie gewijzigd
         removed: SMTP-configuratie verwijderd
+  user_schema:
+    created: Gebruikersschema gemaakt
+    updated: Gebruikersschema bijgewerkt
+    deactivated: Gebruikersschema gedeactiveerd
+    reactivated: Gebruikersschema opnieuw geactiveerd
+    deleted: Gebruikersschema verwijderd
 
 Application:
   OIDC:

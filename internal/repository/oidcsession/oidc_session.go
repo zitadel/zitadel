@@ -71,9 +71,11 @@ func NewAddedEvent(ctx context.Context,
 type AccessTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID       string        `json:"id"`
-	Scope    []string      `json:"scope"`
-	Lifetime time.Duration `json:"lifetime"`
+	ID       string             `json:"id,omitempty"`
+	Scope    []string           `json:"scope,omitempty"`
+	Lifetime time.Duration      `json:"lifetime,omitempty"`
+	Reason   domain.TokenReason `json:"reason,omitempty"`
+	Actor    *domain.TokenActor `json:"actor,omitempty"`
 }
 
 func (e *AccessTokenAddedEvent) Payload() interface{} {
@@ -94,6 +96,8 @@ func NewAccessTokenAddedEvent(
 	id string,
 	scope []string,
 	lifetime time.Duration,
+	reason domain.TokenReason,
+	actor *domain.TokenActor,
 ) *AccessTokenAddedEvent {
 	return &AccessTokenAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -104,6 +108,8 @@ func NewAccessTokenAddedEvent(
 		ID:       id,
 		Scope:    scope,
 		Lifetime: lifetime,
+		Reason:   reason,
+		Actor:    actor,
 	}
 }
 

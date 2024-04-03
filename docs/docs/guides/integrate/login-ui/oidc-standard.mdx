@@ -1,5 +1,5 @@
 ---
-title: Support for the OpenID Connect(OIDC) Standard in ZITADEL
+title: Support for the OpenID Connect(OIDC) Standard in a Custom Login UI
 sidebar_label: OIDC Standard
 ---
 
@@ -37,7 +37,11 @@ https://login.example.com/oauth/v2/authorize?client_id=170086824411201793%40your
 The auth request includes all the relevant information for the OIDC standard and in this example we also have a login hint for the login name "minnie-mouse".
 
 You now have to proxy the auth request from your own UI to the authorize Endpoint of ZITADEL.
-Make sure to add the user id of your login UI as a header to the request: ```x-zitadel-login-client: <userid>```
+Make sure to add the user id of your login UI service/machine user as a header to the request: ```x-zitadel-login-client: <userid>```
+
+:::note
+The user id sent in the 'x-zitadel-login-client' has to match to the PAT you are sending in the request.
+:::
 
 Read more about the [Authorize Endpoint Documentation](/docs/apis/openidoauth/endpoints#authorization_endpoint)
 

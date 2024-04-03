@@ -40,7 +40,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     steps:
     - 
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - 
       uses: bufbuild/buf-setup-action@v1
       with:
@@ -61,9 +61,9 @@ jobs:
     steps:
     -
       name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     -
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node_version }}
         cache: 'yarn'
@@ -81,13 +81,13 @@ jobs:
     steps:
     -
       name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - 
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ inputs.go_version }}
     - 
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       timeout-minutes: 1
       name: restore core
       with:
@@ -95,7 +95,7 @@ jobs:
         key: ${{ inputs.core_cache_key }}
         fail-on-cache-miss: true
     - 
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@v4
       with:
         version: ${{ inputs.go_lint_version }}
         github-token: ${{ github.token }}
