@@ -7,10 +7,10 @@ import { Config } from '../config.js';
 
 export async function setup() {
   const tokens = loginByUsernamePassword(Config.admin);
-  console.log("admin signed in");
+  console.log("setup: admin signed in");
   
   const org = await createOrg(tokens.accessToken);
-  console.log(`org (${org.organizationId}) created`);
+  console.log(`setup: org (${org.organizationId}) created`);
 
   let humans = Array.from({length: __ENV.MAX_VUS || 1}, (_, i) => {
     return createHuman(`zitizen-${i}`, org, tokens.accessToken);
@@ -19,7 +19,7 @@ export async function setup() {
   humans = humans.map((user, i) => {
     return {userId: user.userId, loginName: user.loginNames[0], password: 'Password1!'};
   })
-  console.log(`${humans.length} users created`);
+  console.log(`setup: ${humans.length} users created`);
   return {tokens, users: humans, org};
 }
 

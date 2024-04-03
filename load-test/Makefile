@@ -7,7 +7,7 @@ ADMIN_PASSWORD ?=
 
 .PHONY: human_password_login
 human_password_login:
-	k6 run tests/use_cases/password_login.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
+	k6 run tests/use_cases/human_password_login.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
 
 .PHONY: machine_pat_login
 machine_pat_login:

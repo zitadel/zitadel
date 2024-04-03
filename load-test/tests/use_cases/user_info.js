@@ -5,7 +5,10 @@ import { Config } from '../config.js';
 
 export async function setup() {
   const tokens = loginByUsernamePassword(Config.admin);
+  console.info("setup: admin signed in");
+
   const setup = await Setup(tokens.accessToken);
+  console.info("setup: user set up");
   return {tokens: loginByUsernamePassword({loginName: setup.user.loginNames[0], password: 'Password1!'})};
 }
 
