@@ -16,3 +16,7 @@ export default function (data) {
   userinfo(data.tokens.accessToken);
 }
 
+export function teardown(data) {
+  removeOrg(data.org, data.tokens.accessToken);
+  console.info('teardown: org removed')
+}
