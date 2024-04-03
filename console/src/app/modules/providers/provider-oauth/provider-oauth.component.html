@@ -18,6 +18,10 @@
     </div>
 
     <cnsl-provider-next
+      [configureProvider]="(justCreated$ | async) === ''"
+      [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE' | translate: { provider: 'OAuth' }"
+      [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION' | translate: { provider: 'OAuth' }"
+      [copyUrls]="copyUrls$ | async"
       [autofillLink]="autofillLink$ | async"
       [activateLink]="activateLink$ | async"
       [expanded]="!!(expandWhatNow$ | async)"

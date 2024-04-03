@@ -34,6 +34,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 		userCode   string
 		expires    time.Time
 		scopes     []string
+		audience   []string
 	}
 	tests := []struct {
 		name        string
@@ -51,6 +52,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 						deviceauth.NewAggregate("123", "instance1"),
 						"client_id", "123", "456", now,
 						[]string{"a", "b", "c"},
+						[]string{"projectID", "clientID"},
 					),
 				)),
 			},
@@ -61,6 +63,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 				userCode:   "456",
 				expires:    now,
 				scopes:     []string{"a", "b", "c"},
+				audience:   []string{"projectID", "clientID"},
 			},
 			wantDetails: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
@@ -75,6 +78,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 						deviceauth.NewAggregate("123", "instance1"),
 						"client_id", "123", "456", now,
 						[]string{"a", "b", "c"},
+						[]string{"projectID", "clientID"},
 					)),
 				),
 			},
@@ -85,6 +89,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 				userCode:   "456",
 				expires:    now,
 				scopes:     []string{"a", "b", "c"},
+				audience:   []string{"projectID", "clientID"},
 			},
 			wantErr: pushErr,
 		},
@@ -94,7 +99,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			gotDetails, err := c.AddDeviceAuth(tt.args.ctx, tt.args.clientID, tt.args.deviceCode, tt.args.userCode, tt.args.expires, tt.args.scopes)
+			gotDetails, err := c.AddDeviceAuth(tt.args.ctx, tt.args.clientID, tt.args.deviceCode, tt.args.userCode, tt.args.expires, tt.args.scopes, tt.args.audience)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.wantDetails, gotDetails)
 		})
@@ -148,6 +153,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"},
 						),
 					)),
 					expectPushFailed(pushErr,
@@ -177,6 +183,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"},
 						),
 					)),
 					expectPush(
@@ -251,6 +258,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"},
 						),
 					)),
 					expectPushFailed(pushErr,
@@ -275,6 +283,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"},
 						),
 					)),
 					expectPush(
@@ -301,6 +310,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 							deviceauth.NewAggregate("123", "instance1"),
 							"client_id", "123", "456", now,
 							[]string{"a", "b", "c"},
+							[]string{"projectID", "clientID"},
 						),
 					)),
 					expectPush(

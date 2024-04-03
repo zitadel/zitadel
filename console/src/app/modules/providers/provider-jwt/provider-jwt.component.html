@@ -18,7 +18,7 @@
     </div>
 
     <cnsl-provider-next
-      [configureProvider]="(exists$ | async) === false"
+      [configureProvider]="(justCreated$ | async) === ''"
       [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.JWT.TITLE' | translate"
       [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.JWT.DESCRIPTION' | translate"
       configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/jwt-idp"

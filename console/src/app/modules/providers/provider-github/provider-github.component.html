@@ -19,7 +19,7 @@
     </div>
 
     <cnsl-provider-next
-      [configureProvider]="(exists$ | async) === false"
+      [configureProvider]="(justCreated$ | async) === ''"
       [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE' | translate: { provider: 'GitHub' }"
       [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION' | translate: { provider: 'GitHub' }"
       configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/github#github-configuration"

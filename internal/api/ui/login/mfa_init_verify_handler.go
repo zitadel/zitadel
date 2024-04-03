@@ -5,12 +5,11 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/domain"
-
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/qrcode"
 )
 
