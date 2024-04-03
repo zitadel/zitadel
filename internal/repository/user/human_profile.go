@@ -3,10 +3,11 @@ package user
 import (
 	"context"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	"golang.org/x/text/language"
 )
 
 const (
