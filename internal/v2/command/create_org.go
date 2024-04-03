@@ -34,6 +34,7 @@ func (c *CreateOrg) ToPushIntent(ctx context.Context) (eventstore.PushIntent, er
 		return nil, err
 	}
 	c.aggregate = org.NewAggregate(ctx, orgID)
+	c.aggregate.Owner = orgID
 
 	c.Domain, err = domain.NewIAMDomainName(c.Name, authz.GetInstance(ctx).RequestedDomain())
 	if err != nil {
