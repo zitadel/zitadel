@@ -1,13 +1,14 @@
 package admin
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	milestone_pb "github.com/zitadel/zitadel/pkg/grpc/milestone"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func listMilestonesToModel(instanceID string, req *admin_pb.ListMilestonesRequest) (*query.MilestonesSearchQueries, error) {
