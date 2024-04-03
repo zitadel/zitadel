@@ -3,12 +3,12 @@ package middleware
 import (
 	"context"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	//import to make sure go.mod does not lose it
 	//because dependency is only needed for generated code
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func ValidationHandler() grpc.UnaryServerInterceptor {
@@ -17,8 +17,8 @@ func ValidationHandler() grpc.UnaryServerInterceptor {
 	}
 }
 
-//validator interface needed for github.com/envoyproxy/protoc-gen-validate
-//(it does not expose an interface itself)
+// validator interface needed for github.com/envoyproxy/protoc-gen-validate
+// (it does not expose an interface itself)
 type validator interface {
 	Validate() error
 }
