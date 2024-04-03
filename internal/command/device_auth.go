@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes []string) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes, audience []string) (*domain.ObjectDetails, error) {
 	aggr := deviceauth.NewAggregate(deviceCode, authz.GetInstance(ctx).InstanceID())
 	model := NewDeviceAuthWriteModel(deviceCode, aggr.ResourceOwner)
 
@@ -23,6 +23,7 @@ func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, user
 		userCode,
 		expires,
 		scopes,
+		audience,
 	))
 	if err != nil {
 		return nil, err

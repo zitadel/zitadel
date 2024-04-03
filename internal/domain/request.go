@@ -63,6 +63,7 @@ type AuthRequestDevice struct {
 	DeviceCode string
 	UserCode   string
 	Scopes     []string
+	Audience   []string
 }
 
 func (*AuthRequestDevice) Type() AuthRequestType {
