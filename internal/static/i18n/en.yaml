@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Machine key not found
         AlreadyExisting: Machine key already existing
+        Invalid: Public key is not a valid RSA public key in PKIX format with PEM encoding
       Secret:
         NotExisting: Secret doesn't exist
         Invalid: Secret is invalid

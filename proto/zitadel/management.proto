@@ -8504,7 +8504,12 @@ message AddMachineKeyRequest {
             description: "The date the key will expire and no logins will be possible";
         }
     ];
-    bytes pubkey = 4;
+    bytes public_key = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+           example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
+           description: "Optionally provide a public key of your own generated RSA private key.";
+        }
+    ];
 }
 
 message AddMachineKeyResponse {
