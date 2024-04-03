@@ -30,9 +30,15 @@ SELECT e.instance_id,
        t.timeout,
        t.async,
        t.interrupt_on_error
-FROM (SELECT instance_id, id, unnest(targets) AS target
-      FROM rel_tree
-      WHERE id = ANY (string_to_array($2,','))
-      ORDER BY id DESC
-      LIMIT 1) e
+FROM ((SELECT instance_id, id, unnest(targets) AS target
+       FROM rel_tree
+       WHERE id = ANY (string_to_array($2,','))
+       ORDER BY id DESC
+       LIMIT 1)
+      UNION
+      (SELECT instance_id, id, unnest(targets) AS target
+       FROM rel_tree
+       WHERE id = ANY (string_to_array($3,','))
+       ORDER BY id DESC
+       LIMIT 1)) e
          LEFT JOIN projections.targets AS t ON t.instance_id = e.instance_id AND t.id = e.target;

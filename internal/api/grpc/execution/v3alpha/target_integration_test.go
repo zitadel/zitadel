@@ -184,7 +184,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *execution.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", false, false, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
@@ -213,7 +213,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change name, ok",
 			prepare: func(request *execution.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", false, false, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
@@ -233,7 +233,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change type, ok",
 			prepare: func(request *execution.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", false, false, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
@@ -257,7 +257,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change url, ok",
 			prepare: func(request *execution.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", false, false, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
@@ -281,7 +281,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change timeout, ok",
 			prepare: func(request *execution.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", false, false, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
@@ -301,7 +301,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change execution type, ok",
 			prepare: func(request *execution.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", false, false, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
@@ -338,7 +338,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 }
 
 func TestServer_DeleteTarget(t *testing.T) {
-	target := Tester.CreateTarget(CTX, t)
+	target := Tester.CreateTarget(CTX, t, "", "https://example.com", false, false, false)
 	tests := []struct {
 		name    string
 		ctx     context.Context

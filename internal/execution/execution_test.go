@@ -13,8 +13,39 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
 )
+
+var _ Target = &mockTarget{}
+
+type mockTarget struct {
+	InstanceID       string
+	ExecutionID      string
+	TargetID         string
+	TargetType       domain.TargetType
+	URL              string
+	Timeout          time.Duration
+	Async            bool
+	InterruptOnError bool
+}
+
+func (e *mockTarget) GetTargetID() string {
+	return e.TargetID
+}
+func (e *mockTarget) IsInterruptOnError() bool {
+	return e.InterruptOnError
+}
+func (e *mockTarget) IsAsync() bool {
+	return e.Async
+}
+func (e *mockTarget) GetURL() string {
+	return e.URL
+}
+func (e *mockTarget) GetTargetType() domain.TargetType {
+	return e.TargetType
+}
+func (e *mockTarget) GetTimeout() time.Duration {
+	return e.Timeout
+}
 
 func Test_Call(t *testing.T) {
 	type args struct {
@@ -109,7 +140,7 @@ func testCall(ctx context.Context, timeout time.Duration, body []byte) func(stri
 }
 
 func testCallTarget(ctx context.Context,
-	target *query.Target,
+	target *mockTarget,
 	info ContextInfoRequest,
 ) func(string) ([]byte, error) {
 	return func(url string) (r []byte, err error) {
@@ -188,7 +219,7 @@ func (c *mockContextInfoRequest) GetContent() []byte {
 func Test_CallTarget(t *testing.T) {
 	type args struct {
 		ctx    context.Context
-		target *query.Target
+		target *mockTarget
 		sleep  time.Duration
 
 		info ContextInfoRequest
@@ -215,7 +246,7 @@ func Test_CallTarget(t *testing.T) {
 				sleep:  time.Second,
 				method: http.MethodPost,
 				info:   newMockContextInfoRequest("content1"),
-				target: &query.Target{
+				target: &mockTarget{
 					TargetType: 3,
 				},
 				body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
@@ -233,7 +264,7 @@ func Test_CallTarget(t *testing.T) {
 				sleep:  time.Second,
 				method: http.MethodPost,
 				info:   newMockContextInfoRequest("content1"),
-				target: &query.Target{
+				target: &mockTarget{
 					TargetType: domain.TargetTypeWebhook,
 					Timeout:    time.Minute,
 				},
@@ -252,7 +283,7 @@ func Test_CallTarget(t *testing.T) {
 				sleep:  time.Second,
 				method: http.MethodPost,
 				info:   newMockContextInfoRequest("content1"),
-				target: &query.Target{
+				target: &mockTarget{
 					TargetType: domain.TargetTypeWebhook,
 					Timeout:    time.Minute,
 				},
@@ -271,7 +302,7 @@ func Test_CallTarget(t *testing.T) {
 				sleep:  time.Second,
 				method: http.MethodPost,
 				info:   newMockContextInfoRequest("content1"),
-				target: &query.Target{
+				target: &mockTarget{
 					TargetType: domain.TargetTypeRequestResponse,
 					Timeout:    time.Minute,
 				},
@@ -290,7 +321,7 @@ func Test_CallTarget(t *testing.T) {
 				sleep:  time.Second,
 				method: http.MethodPost,
 				info:   newMockContextInfoRequest("content1"),
-				target: &query.Target{
+				target: &mockTarget{
 					TargetType: domain.TargetTypeRequestResponse,
 					Timeout:    time.Minute,
 				},

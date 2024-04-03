@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -12,33 +13,45 @@ import (
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		request, err := executeTargetsForRequest(ctx, queries, info.FullMethod, req)
+
+		requestTargets, responseTargets, err := queryTargets(ctx, queries, info.FullMethod)
 		if err != nil {
 			return nil, err
 		}
 
-		resp, err := handler(ctx, request)
+		// call targets otherwise return req
+		handledReq, err := executeTargetsForRequest(ctx, requestTargets, info.FullMethod, req)
 		if err != nil {
 			return nil, err
 		}
 
-		return executeTargetsForResponse(ctx, queries, info.FullMethod, req, resp)
+		response, err := handler(ctx, handledReq)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("request")
+		fmt.Println(handledReq)
+		fmt.Println("resp")
+		fmt.Println(response)
+
+		handledResponse, err := executeTargetsForResponse(ctx, responseTargets, info.FullMethod, handledReq, response)
+		if err != nil {
+			fmt.Println("error request: " + err.Error())
+		}
+		fmt.Println("resp")
+		fmt.Println(handledResponse)
+		return handledResponse, err
 	}
 }
 
-func executeTargetsForRequest(ctx context.Context, queries ExecutionQueries, fullMethod string, req interface{}) (interface{}, error) {
-	targets, err := queryTargets(ctx, queries, fullMethod, domain.ExecutionTypeRequest)
-	if err != nil {
-		// if no targets are found, return without any calls
-		if zerrors.IsNotFound(err) {
-			return req, nil
-		}
-		return nil, err
+func executeTargetsForRequest(ctx context.Context, targets []execution.Target, fullMethod string, req interface{}) (interface{}, error) {
+	// if no targets are found, return without any calls
+	if len(targets) == 0 {
+		return req, nil
 	}
 
 	ctxData := authz.GetCtxData(ctx)
@@ -52,6 +65,7 @@ func executeTargetsForRequest(ctx context.Context, queries ExecutionQueries, ful
 	}
 
 	request, err := execution.CallTargets(ctx, targets, info)
+	// error gets only returned if InterruptOnError is set, or internal errors occur
 	if err != nil {
 		// if an error is returned still return also the original request
 		return req, err
@@ -59,14 +73,10 @@ func executeTargetsForRequest(ctx context.Context, queries ExecutionQueries, ful
 	return request, err
 }
 
-func executeTargetsForResponse(ctx context.Context, queries ExecutionQueries, fullMethod string, req, resp interface{}) (interface{}, error) {
-	targets, err := queryTargets(ctx, queries, fullMethod, domain.ExecutionTypeResponse)
-	if err != nil {
-		// if no targets are found, return without any calls
-		if zerrors.IsNotFound(err) {
-			return resp, nil
-		}
-		return nil, err
+func executeTargetsForResponse(ctx context.Context, targets []execution.Target, fullMethod string, req, resp interface{}) (interface{}, error) {
+	// if no targets are found, return without any calls
+	if len(targets) == 0 {
+		return resp, nil
 	}
 
 	ctxData := authz.GetCtxData(ctx)
@@ -79,6 +89,7 @@ func executeTargetsForResponse(ctx context.Context, queries ExecutionQueries, fu
 		Request:    req,
 		Response:   resp,
 	}
+	fmt.Println(info)
 
 	response, err := execution.CallTargets(ctx, targets, info)
 	if err != nil {
@@ -89,37 +100,37 @@ func executeTargetsForResponse(ctx context.Context, queries ExecutionQueries, fu
 }
 
 type ExecutionQueries interface {
-	ExecutionTargetsRequestResponse(ctx context.Context, fullMethod, service, all string) (execution *query.ExecutionTargets, err error)
-	SearchTargets(ctx context.Context, queries *query.TargetSearchQueries) (targets *query.Targets, err error)
+	ExecutionTargetsCombined(ctx context.Context, ids1, ids2 []string) (execution []*query.ExecutionTarget, err error)
 }
 
 func queryTargets(
 	ctx context.Context,
 	queries ExecutionQueries,
 	fullMethod string,
-	executionType domain.ExecutionType,
-) ([]*query.Target, error) {
-	exectargets, err := queries.ExecutionTargetsRequestResponse(ctx, exec_repo.ID(executionType, fullMethod), exec_repo.ID(executionType, serviceFromFullMethod(fullMethod)), exec_repo.IDAll(executionType))
+) ([]execution.Target, []execution.Target, error) {
+	targets, err := queries.ExecutionTargetsCombined(ctx,
+		idsForFullMethod(fullMethod, domain.ExecutionTypeRequest),
+		idsForFullMethod(fullMethod, domain.ExecutionTypeResponse),
+	)
 	if err != nil {
-		return nil, err
-	}
-	if exectargets == nil || len(exectargets.Targets) == 0 {
-		return nil, zerrors.ThrowNotFound(err, "EXEC-m70fpc7a9q", "Errors.Execution.NotFound")
+		return nil, nil, err
 	}
 
-	targetIDsQuery, err := query.NewTargetInIDsSearchQuery(exectargets.Targets)
-	if err != nil {
-		return nil, err
+	requestTargets := make([]execution.Target, 0)
+	responseTargets := make([]execution.Target, 0)
+	for _, target := range targets {
+		if strings.HasPrefix(target.GetExecutionID(), exec_repo.IDAll(domain.ExecutionTypeRequest)) {
+			requestTargets = append(requestTargets, target)
+		} else if strings.HasPrefix(target.GetExecutionID(), exec_repo.IDAll(domain.ExecutionTypeResponse)) {
+			responseTargets = append(responseTargets, target)
+		}
 	}
 
-	targets, err := queries.SearchTargets(ctx, &query.TargetSearchQueries{Queries: []query.SearchQuery{targetIDsQuery}})
-	if err != nil {
-		return nil, err
-	}
-	if targets == nil || len(targets.Targets) == 0 {
-		return nil, zerrors.ThrowNotFound(err, "EXEC-x2r3cnfadi", "Errors.Execution.NotFound")
-	}
-	return targets.Targets, nil
+	return requestTargets, responseTargets, nil
+}
+
+func idsForFullMethod(fullMethod string, executionType domain.ExecutionType) []string {
+	return []string{exec_repo.ID(executionType, fullMethod), exec_repo.ID(executionType, serviceFromFullMethod(fullMethod)), exec_repo.IDAll(executionType)}
 }
 
 func serviceFromFullMethod(s string) string {

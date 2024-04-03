@@ -3,6 +3,7 @@ package execution
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -10,7 +11,6 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -20,8 +20,17 @@ type ContextInfo interface {
 	SetHTTPResponseBody([]byte) error
 }
 
+type Target interface {
+	GetTargetID() string
+	IsAsync() bool
+	IsInterruptOnError() bool
+	GetURL() string
+	GetTargetType() domain.TargetType
+	GetTimeout() time.Duration
+}
+
 func CallTargets(ctx context.Context,
-	targets []*query.Target,
+	targets []Target,
 	info ContextInfo,
 ) (interface{}, error) {
 	for _, target := range targets {
@@ -32,17 +41,17 @@ func CallTargets(ctx context.Context,
 		}
 
 		// call target async, ignore response and if error occur
-		if target.Async {
-			go func(target query.Target) {
+		if target.IsAsync() {
+			go func(target Target) {
 				if _, err := callF(ctx, info); err != nil {
-					logging.OnError(err).Error(err)
+					logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 				}
-			}(*target)
+			}(target)
 			// else call synchronous, and handle error if interrupt is set
 		} else {
 			resp, err := callF(ctx, info)
-			if err != nil && target.InterruptOnError {
-				return info.GetContent(), err
+			if err != nil && target.IsInterruptOnError() {
+				return nil, err
 			}
 			if resp != nil {
 				// error in unmarshalling
@@ -61,18 +70,18 @@ type ContextInfoRequest interface {
 
 // CallTargetFunc get function to call the desired type of target
 func CallTargetFunc(
-	target *query.Target,
+	target Target,
 ) (func(ctx context.Context, info ContextInfoRequest) (res []byte, err error), error) {
-	switch target.TargetType {
+	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
 	case domain.TargetTypeWebhook:
 		return func(ctx context.Context, info ContextInfoRequest) (res []byte, err error) {
-			return nil, webhook(ctx, target.URL, target.Timeout, info.GetHTTPRequestBody())
+			return nil, webhook(ctx, target.GetURL(), target.GetTimeout(), info.GetHTTPRequestBody())
 		}, nil
 	// get request, return response and error
 	case domain.TargetTypeRequestResponse:
 		return func(ctx context.Context, info ContextInfoRequest) (res []byte, err error) {
-			return call(ctx, target.URL, target.Timeout, info.GetHTTPRequestBody())
+			return call(ctx, target.GetURL(), target.GetTimeout(), info.GetHTTPRequestBody())
 		}, nil
 	default:
 		return nil, zerrors.ThrowInternal(nil, "EXEC-auqnansr2m", "Errors.Execution.Unknown")
@@ -124,6 +133,8 @@ func call(ctx context.Context, url string, timeout time.Duration, body []byte) (
 		}
 		return io.ReadAll(resp.Body)
 	}
-
-	return nil, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk9g", "Errors.Execution.Failed")
+	data, _ := io.ReadAll(resp.Body)
+	fmt.Println("data")
+	fmt.Println(string(data))
+	return nil, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed")
 }

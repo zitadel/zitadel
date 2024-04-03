@@ -14,23 +14,44 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
-	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type mockExecutionQueries struct {
-	executionTargets *query.ExecutionTargets
-	etError          error
-	targets          *query.Targets
-	tError           error
+var _ execution.Target = &mockExecutionTarget{}
+
+type mockExecutionTarget struct {
+	InstanceID       string
+	ExecutionID      string
+	TargetID         string
+	TargetType       domain.TargetType
+	URL              string
+	Timeout          time.Duration
+	Async            bool
+	InterruptOnError bool
 }
 
-func (e *mockExecutionQueries) ExecutionTargetsRequestResponse(_ context.Context, _, _, _ string) (execution *query.ExecutionTargets, err error) {
-	return e.executionTargets, e.etError
+func (e *mockExecutionTarget) SetURL(url string) {
+	e.URL = url
 }
-
-func (e *mockExecutionQueries) SearchTargets(_ context.Context, _ *query.TargetSearchQueries) (targets *query.Targets, err error) {
-	return e.targets, e.tError
+func (e *mockExecutionTarget) IsInterruptOnError() bool {
+	return e.InterruptOnError
+}
+func (e *mockExecutionTarget) IsAsync() bool {
+	return e.Async
+}
+func (e *mockExecutionTarget) GetURL() string {
+	return e.URL
+}
+func (e *mockExecutionTarget) GetTargetType() domain.TargetType {
+	return e.TargetType
+}
+func (e *mockExecutionTarget) GetTimeout() time.Duration {
+	return e.Timeout
+}
+func (e *mockExecutionTarget) GetTargetID() string {
+	return e.TargetID
+}
+func (e *mockExecutionTarget) GetExecutionID() string {
+	return e.ExecutionID
 }
 
 type mockContentRequest struct {
@@ -43,8 +64,8 @@ func newMockContentRequest(content string) *mockContentRequest {
 	}
 }
 
-func newMockContextInfoRequest(fullMethod, request string) *ContextInfoResponse {
-	return &ContextInfoResponse{
+func newMockContextInfoRequest(fullMethod, request string) *ContextInfoRequest {
+	return &ContextInfoRequest{
 		FullMethod: fullMethod,
 		Request:    newMockContentRequest(request),
 	}
@@ -68,10 +89,10 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 	type args struct {
 		ctx context.Context
 
-		queries    *mockExecutionQueries
-		targets    []target
-		fullMethod string
-		req        interface{}
+		executionTargets []execution.Target
+		targets          []target
+		fullMethod       string
+		req              interface{}
 	}
 	type res struct {
 		want    interface{}
@@ -83,93 +104,42 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 		res  res
 	}{
 		{
-			"target, not found",
+			"target, executionTargets nil",
 			args{
-				ctx:        context.Background(),
-				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					etError: zerrors.ThrowNotFound(nil, "error", "NotFound"),
-				},
-				req: newMockContentRequest("request"),
+				ctx:              context.Background(),
+				fullMethod:       "/service/method",
+				executionTargets: nil,
+				req:              newMockContentRequest("request"),
 			},
 			res{
 				want: newMockContentRequest("request"),
 			},
 		},
 		{
-			"target, not existing",
+			"target, executionTargets empty",
 			args{
-				ctx:        context.Background(),
-				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{},
-					},
-				},
-				req: newMockContentRequest("request"),
+				ctx:              context.Background(),
+				fullMethod:       "/service/method",
+				executionTargets: []execution.Target{},
+				req:              newMockContentRequest("request"),
 			},
 			res{
 				want: newMockContentRequest("request"),
 			},
 		},
 		{
-			"target, targets not found",
+			"target, not reachable",
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					tError: zerrors.ThrowNotFound(nil, "error", "NotFound"),
-				},
-				req: newMockContentRequest("request"),
-			},
-			res{
-				want: newMockContentRequest("request"),
-			},
-		},
-		{
-			"target, targets empty",
-			args{
-				ctx:        context.Background(),
-				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{},
-					},
-				},
-				req: newMockContentRequest("request"),
-			},
-			res{
-				want: newMockContentRequest("request"),
-			},
-		},
-		{
-			"target, not found",
-			args{
-				ctx:        context.Background(),
-				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
 					},
 				},
 				targets: []target{},
@@ -185,19 +155,13 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:         "target",
-								TargetType: domain.TargetTypeRequestResponse,
-								Timeout:    time.Minute,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:  "instance",
+						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:    "target",
+						TargetType:  domain.TargetTypeRequestResponse,
+						Timeout:     time.Minute,
 					},
 				},
 				targets: []target{
@@ -219,22 +183,17 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
 					},
 				},
+
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
@@ -255,20 +214,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Second,
-								InterruptOnError: true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Second,
+						InterruptOnError: true,
 					},
 				},
 				targets: []target{
@@ -291,20 +244,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Second,
-								InterruptOnError: true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Second,
+						InterruptOnError: true,
 					},
 				},
 				targets: []target{
@@ -322,20 +269,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
 					},
 				},
 				targets: []target{
@@ -357,20 +298,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:         "target",
-								TargetType: domain.TargetTypeRequestResponse,
-								Timeout:    time.Second,
-								Async:      true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:  "instance",
+						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:    "target",
+						TargetType:  domain.TargetTypeRequestResponse,
+						Timeout:     time.Second,
+						Async:       true,
 					},
 				},
 				targets: []target{
@@ -392,20 +327,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:         "target",
-								TargetType: domain.TargetTypeRequestResponse,
-								Timeout:    time.Minute,
-								Async:      true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:  "instance",
+						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:    "target",
+						TargetType:  domain.TargetTypeRequestResponse,
+						Timeout:     time.Minute,
+						Async:       true,
 					},
 				},
 				targets: []target{
@@ -427,20 +356,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target",
-								TargetType:       domain.TargetTypeWebhook,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       domain.TargetTypeWebhook,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
 					},
 				},
 				targets: []target{
@@ -462,20 +385,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target",
-								TargetType:       domain.TargetTypeWebhook,
-								Timeout:          time.Second,
-								InterruptOnError: true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       domain.TargetTypeWebhook,
+						Timeout:          time.Second,
+						InterruptOnError: true,
 					},
 				},
 				targets: []target{
@@ -498,20 +415,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target",
-								TargetType:       domain.TargetTypeWebhook,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       domain.TargetTypeWebhook,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
 					},
 				},
 				targets: []target{
@@ -533,32 +444,33 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target1", "target2", "target3"},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target1",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
 					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target1",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							}, {
-								ID:               "target2",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							}, {
-								ID:               "target3",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							},
-						},
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target2",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
+					},
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target3",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
 					},
 				},
+
 				targets: []target{
 					{
 						reqBody:    newMockContextInfoRequest("/service/method", "content"),
@@ -591,30 +503,30 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target1", "target2", "target3"},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target1",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
 					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target1",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							}, {
-								ID:               "target2",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Second,
-								InterruptOnError: true,
-							}, {
-								ID:               "target3",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Second,
-								InterruptOnError: true,
-							},
-						},
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target2",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Second,
+						InterruptOnError: true,
+					},
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target3",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Second,
+						InterruptOnError: true,
 					},
 				},
 				targets: []target{
@@ -644,63 +556,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				wantErr: true,
 			},
 		},
-		{
-			"with includes, ok",
-			args{
-				ctx:        context.Background(),
-				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target1", "target2", "target3"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target1",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							}, {
-								ID:               "target2",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							}, {
-								ID:               "target3",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							},
-						},
-					},
-				},
-				targets: []target{
-					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content"),
-						respBody:   newMockContentRequest("content1"),
-						sleep:      0,
-						statusCode: http.StatusOK,
-					},
-					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content1"),
-						respBody:   newMockContentRequest("content2"),
-						sleep:      0,
-						statusCode: http.StatusOK,
-					},
-					{
-						reqBody:    newMockContextInfoRequest("/service/method", "content2"),
-						respBody:   newMockContentRequest("content3"),
-						sleep:      0,
-						statusCode: http.StatusOK,
-					},
-				},
-				req: newMockContentRequest("content"),
-			},
-			res{
-				want: newMockContentRequest("content3"),
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -713,13 +568,14 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					target.respBody,
 				)
 
-				tt.args.queries.targets.Targets[i].URL = url
+				et := tt.args.executionTargets[i].(*mockExecutionTarget)
+				et.SetURL(url)
 				closeFuncs[i] = closeF
 			}
 
 			resp, err := executeTargetsForRequest(
 				tt.args.ctx,
-				tt.args.queries,
+				tt.args.executionTargets,
 				tt.args.fullMethod,
 				tt.args.req,
 			)
@@ -796,11 +652,11 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 	type args struct {
 		ctx context.Context
 
-		queries    *mockExecutionQueries
-		targets    []target
-		fullMethod string
-		req        interface{}
-		resp       interface{}
+		executionTargets []execution.Target
+		targets          []target
+		fullMethod       string
+		req              interface{}
+		resp             interface{}
 	}
 	type res struct {
 		want    interface{}
@@ -812,34 +668,26 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 		res  res
 	}{
 		{
-			"target, targets not found",
+			"target, executionTargets nil",
 			args{
-				ctx:        context.Background(),
-				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					tError: zerrors.ThrowNotFound(nil, "error", "NotFound"),
-				},
-				req:  newMockContentRequest("request"),
-				resp: newMockContentRequest("response"),
+				ctx:              context.Background(),
+				fullMethod:       "/service/method",
+				executionTargets: nil,
+				req:              newMockContentRequest("request"),
+				resp:             newMockContentRequest("response"),
 			},
 			res{
 				want: newMockContentRequest("response"),
 			},
 		},
 		{
-			"target, not found",
+			"target, executionTargets empty",
 			args{
-				ctx:        context.Background(),
-				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					etError: zerrors.ThrowNotFound(nil, "error", "NotFound"),
-				},
-				req:  newMockContentRequest("request"),
-				resp: newMockContentRequest("response"),
+				ctx:              context.Background(),
+				fullMethod:       "/service/method",
+				executionTargets: []execution.Target{},
+				req:              newMockContentRequest("request"),
+				resp:             newMockContentRequest("response"),
 			},
 			res{
 				want: newMockContentRequest("response"),
@@ -850,20 +698,14 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			args{
 				ctx:        context.Background(),
 				fullMethod: "/service/method",
-				queries: &mockExecutionQueries{
-					executionTargets: &query.ExecutionTargets{
-						ID:      "/zitadel.session.v2beta.SessionService/SetSession",
-						Targets: []string{"target"},
-					},
-					targets: &query.Targets{
-						Targets: []*query.Target{
-							{
-								ID:               "target",
-								TargetType:       domain.TargetTypeRequestResponse,
-								Timeout:          time.Minute,
-								InterruptOnError: true,
-							},
-						},
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "response./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       domain.TargetTypeRequestResponse,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
 					},
 				},
 				targets: []target{
@@ -893,13 +735,14 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 					target.respBody,
 				)
 
-				tt.args.queries.targets.Targets[i].URL = url
+				et := tt.args.executionTargets[i].(*mockExecutionTarget)
+				et.SetURL(url)
 				closeFuncs[i] = closeF
 			}
 
 			resp, err := executeTargetsForResponse(
 				tt.args.ctx,
-				tt.args.queries,
+				tt.args.executionTargets,
 				tt.args.fullMethod,
 				tt.args.req,
 				tt.args.resp,

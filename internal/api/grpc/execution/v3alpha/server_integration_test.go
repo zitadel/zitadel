@@ -14,6 +14,7 @@ import (
 
 var (
 	CTX    context.Context
+	userID string
 	Tester *integration.Tester
 	Client execution.ExecutionServiceClient
 )

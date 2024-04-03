@@ -519,45 +519,28 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 	require.NoError(t, err)
 }
 
-func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.CreateTargetResponse {
+func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, url string, resp, async, interrupt bool) *execution.CreateTargetResponse {
+	nameSet := fmt.Sprint(time.Now().UnixNano() + 1)
+	if name != "" {
+		nameSet = name
+	}
 	req := &execution.CreateTargetRequest{
-		Name: fmt.Sprint(time.Now().UnixNano() + 1),
-		TargetType: &execution.CreateTargetRequest_RestWebhook{
-			RestWebhook: &execution.SetRESTWebhook{
-				Url: "https://example.com",
-			},
-		},
+		Name:    nameSet,
 		Timeout: durationpb.New(10 * time.Second),
 	}
-	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
-	require.NoError(t, err)
-	return target
-}
+	if resp {
+		req.TargetType = &execution.CreateTargetRequest_RestRequestResponse{
+			RestRequestResponse: &execution.SetRESTRequestResponse{
+				Url: url,
+			},
+		}
 
-func (s *Tester) CreateTargetURL(ctx context.Context, t *testing.T, url string) *execution.CreateTargetResponse {
-	req := &execution.CreateTargetRequest{
-		Name: fmt.Sprint(time.Now().UnixNano() + 1),
-		TargetType: &execution.CreateTargetRequest_RestWebhook{
+	} else {
+		req.TargetType = &execution.CreateTargetRequest_RestWebhook{
 			RestWebhook: &execution.SetRESTWebhook{
 				Url: url,
 			},
-		},
-		Timeout: durationpb.New(10 * time.Second),
-	}
-	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
-	require.NoError(t, err)
-	return target
-}
-
-func (s *Tester) CreateTargetWithNameAndType(ctx context.Context, t *testing.T, name string, async bool, interrupt bool) *execution.CreateTargetResponse {
-	req := &execution.CreateTargetRequest{
-		Name: name,
-		TargetType: &execution.CreateTargetRequest_RestWebhook{
-			RestWebhook: &execution.SetRESTWebhook{
-				Url: "https://example.com",
-			},
-		},
-		Timeout: durationpb.New(10 * time.Second),
+		}
 	}
 	if async {
 		req.ExecutionType = &execution.CreateTargetRequest_IsAsync{

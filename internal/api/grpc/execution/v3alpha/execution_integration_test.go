@@ -15,7 +15,7 @@ import (
 )
 
 func TestServer_SetExecution_Request(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
 
 	tests := []struct {
 		name    string
@@ -167,7 +167,8 @@ func TestServer_SetExecution_Request(t *testing.T) {
 }
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
+
 	executionCond := "request"
 	Tester.SetExecution(CTX, t,
 		&execution.Condition{
@@ -272,7 +273,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Request(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
 
 	tests := []struct {
 		name    string
@@ -436,7 +437,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 }
 
 func TestServer_SetExecution_Response(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
 
 	tests := []struct {
 		name    string
@@ -588,7 +589,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Response(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
 
 	tests := []struct {
 		name    string
@@ -754,7 +755,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 }
 
 func TestServer_SetExecution_Event(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
 
 	tests := []struct {
 		name    string
@@ -916,7 +917,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Event(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
 
 	tests := []struct {
 		name    string
@@ -1106,7 +1107,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 }
 
 func TestServer_SetExecution_Function(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
 
 	tests := []struct {
 		name    string
@@ -1189,7 +1190,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Function(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
 
 	tests := []struct {
 		name    string
