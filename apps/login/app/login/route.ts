@@ -89,10 +89,7 @@ export async function GET(request: NextRequest) {
     const { authRequest } = await getAuthRequest(server, { authRequestId });
     let organization;
 
-    if (
-      authRequest?.scope &&
-      authRequest.scope.find((s: string) => ORG_SCOPE_REGEX.test(s))
-    ) {
+    if (authRequest?.scope) {
       const orgScope = authRequest.scope.find((s: string) =>
         ORG_SCOPE_REGEX.test(s)
       );
