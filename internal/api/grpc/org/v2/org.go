@@ -12,20 +12,11 @@ import (
 )
 
 func (s *Server) AddOrganization(ctx context.Context, request *org.AddOrganizationRequest) (*org.AddOrganizationResponse, error) {
-	intent, err := cmd_v2.NewCreateOrg("test").ToPushIntent(ctx)
+	intent, err := cmd_v2.NewCreateOrg(request.GetName()).ToPushIntent(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return new(org.AddOrganizationResponse), s.es.Push(ctx, intent)
-	// orgSetup, err := addOrganizationRequestToCommand(request)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// createdOrg, err := s.command.SetUpOrg(ctx, orgSetup, false)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// return createdOrganizationToPb(createdOrg)
 }
 
 func addOrganizationRequestToCommand(request *org.AddOrganizationRequest) (*command.OrgSetup, error) {
