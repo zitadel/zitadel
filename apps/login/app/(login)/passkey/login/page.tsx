@@ -3,7 +3,10 @@ import Alert from "#/ui/Alert";
 import DynamicTheme from "#/ui/DynamicTheme";
 import LoginPasskey from "#/ui/LoginPasskey";
 import UserAvatar from "#/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
+import {
+  getMostRecentCookieWithLoginname,
+  getSessionCookieById,
+} from "#/utils/cookies";
 
 const title = "Authenticate with a passkey";
 const description =
@@ -14,15 +17,30 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, altPassword, authRequestId, organization } = searchParams;
+  const { loginName, altPassword, authRequestId, organization, sessionId } =
+    searchParams;
 
-  const sessionFactors = await loadSession(loginName, organization);
+  const sessionFactors = sessionId
+    ? await loadSessionById(sessionId, organization)
+    : await loadSessionByLoginname(loginName, organization);
 
-  async function loadSession(loginName?: string, organization?: string) {
+  async function loadSessionByLoginname(
+    loginName?: string,
+    organization?: string
+  ) {
     const recent = await getMostRecentCookieWithLoginname(
       loginName,
       organization
     );
+    return getSession(server, recent.id, recent.token).then((response) => {
+      if (response?.session) {
+        return response.session;
+      }
+    });
+  }
+
+  async function loadSessionById(sessionId: string, organization?: string) {
+    const recent = await getSessionCookieById(sessionId, organization);
     return getSession(server, recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;

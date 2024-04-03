@@ -155,10 +155,12 @@ export default function RegisterPasskey({
                 }
 
                 if (authRequestId) {
-                  params.set("authRequest", authRequestId);
+                  params.set("authRequestId", authRequestId);
                   params.set("sessionId", sessionId);
+                  // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
+                  // params.set("loginName", resp.loginName);
 
-                  router.push("/login?" + params);
+                  router.push("/passkey/login?" + params);
                 } else {
                   router.push("/accounts?" + params);
                 }
