@@ -18,11 +18,17 @@ user_info:
 	k6 run tests/use_cases/user_info.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
 
 .PHONY: introspect
-introspect:
-	# k6 run tests/use_cases/introspection.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
-	cd ../../loadtest && xk6 build --with xk6-zitadel=.
-	./../../loadtest/k6 run tests/use_cases/introspection.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
+introspect: ensure_modules
+	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
+	./../../xk6-modules/k6 run tests/use_cases/introspection.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
 
+.PHONY: ensure_modules
+ensure_modules:
+ifeq (,$(wildcard $(PWD)/../../xk6-modules))
+	@echo "cloning xk6-modules"
+	cd ../.. && git clone git@github.com:zitadel/xk6-modules.git
+endif
+	cd ../../xk6-modules && git pull
 
 .PHONY: transpile
 transpile:

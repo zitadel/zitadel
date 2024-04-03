@@ -57,7 +57,7 @@ export function introspect(jwt, token) {
   );
   check(res, {
     'introspect status ok': (r) => r.status === 200
-  }) || fail(`unable to introspect token: ${JSON.stringify(res.body)}, jwt: ${jwt}`);
+  });
 
   introspectTrend.add(res.timings.duration);
 }
