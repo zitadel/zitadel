@@ -46,6 +46,7 @@ export default defineConfig({
     html: true,
     json: true,
   },
+  video: true,
 
   trashAssetsBeforeRuns: false,
   defaultCommandTimeout: 10000,
