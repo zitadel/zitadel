@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -14,6 +15,8 @@ import (
 
 // Push implements eventstore.Pusher.
 func (s *Storage) Push(ctx context.Context, pushIntents ...eventstore.PushIntent) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 	tx, err := s.client.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable, ReadOnly: false})
 	if err != nil {
 		return err
@@ -72,7 +75,10 @@ func setAppName(ctx context.Context, tx *sql.Tx, name string) error {
 	return nil
 }
 
-func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.PushIntent) ([]*intent, error) {
+func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.PushIntent) (_ []*intent, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	var stmt database.Statement
 
 	stmt.WriteString("WITH existing AS (")
@@ -124,7 +130,10 @@ func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.Pu
 	return res, nil
 }
 
-func push(ctx context.Context, tx *sql.Tx, commands []*command) error {
+func push(ctx context.Context, tx *sql.Tx, commands []*command) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	var stmt database.Statement
 
 	stmt.WriteString(`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES `)
@@ -164,7 +173,10 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) error {
 	})
 }
 
-func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) error {
+func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	var stmt database.Statement
 
 	for _, cmd := range commands {
@@ -187,12 +199,12 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) err
 				stmt.WriteArgs(instance)
 			case eventstore.UniqueConstraintRemove:
 				stmt.WriteString(`DELETE FROM eventstore.unique_constraints WHERE `)
-				stmt.WriteString(deleteUniqueConstraintClause)
 				stmt.AppendArgs(
 					sql.Named("@instanceId", instance),
 					sql.Named("@uniqueType", constraint.UniqueType),
 					sql.Named("@uniqueField", constraint.UniqueField),
 				)
+				stmt.WriteString(deleteUniqueConstraintClause)
 			}
 			_, err := tx.ExecContext(ctx, stmt.String(), stmt.Args()...)
 			if err != nil {

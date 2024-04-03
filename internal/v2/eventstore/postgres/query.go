@@ -71,7 +71,7 @@ func executeQuery(ctx context.Context, tx querier, stmt *database.Statement, red
 
 var (
 	selectColumns       = `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision`
-	instancePlaceholder = database.Placeholder("instance_id")
+	instancePlaceholder = database.Placeholder("@instance_id")
 )
 
 func writeQuery(stmt *database.Statement, query *eventstore.Query) {

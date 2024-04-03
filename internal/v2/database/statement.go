@@ -1,6 +1,7 @@
 package database
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"strconv"
@@ -38,6 +39,9 @@ func (stmt *Statement) SetNamedArg(name placeholder, value any) (placeholder str
 	stmt.copyCheck()
 	stmt.args = append(stmt.args, value)
 	placeholder = fmt.Sprintf("$%d", len(stmt.args))
+	if !strings.HasPrefix(name.string, "@") {
+		name.string = "@" + name.string
+	}
 	stmt.namedArgs[name] = placeholder
 	return placeholder
 }
@@ -94,6 +98,24 @@ func (stmt *Statement) WriteArg(arg any) {
 	stmt.args = append(stmt.args, arg)
 	stmt.Builder.WriteString("$")
 	stmt.Builder.WriteString(strconv.Itoa(len(stmt.args)))
+}
+
+// WriteString extends [strings.Builder.WriteString]
+// it replaces named args with the previously provided named args
+func (stmt *Statement) WriteString(s string) {
+	for name, placeholder := range stmt.namedArgs {
+		s = strings.ReplaceAll(s, name.string, placeholder)
+	}
+	stmt.Builder.WriteString(s)
+}
+
+// Write extends [strings.Builder.Write]
+// it replaces named args with the previously provided named args
+func (stmt *Statement) Write(b []byte) {
+	for name, placeholder := range stmt.namedArgs {
+		bytes.ReplaceAll(b, []byte(name.string), []byte(placeholder))
+	}
+	stmt.Builder.Write(b)
 }
 
 // String builds the query and replaces placeholders starting with "@"
