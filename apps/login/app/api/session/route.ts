@@ -63,10 +63,21 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
 
   if (body) {
-    const { loginName, organization, password, webAuthN, authRequestId } = body;
+    const {
+      loginName,
+      sessionId,
+      organization,
+      password,
+      webAuthN,
+      authRequestId,
+    } = body;
     const challenges: RequestChallenges = body.challenges;
 
-    const recentPromise: Promise<SessionCookie> = loginName
+    const recentPromise: Promise<SessionCookie> = sessionId
+      ? getSessionCookieById(sessionId).catch((error) => {
+          return Promise.reject(error);
+        })
+      : loginName
       ? getSessionCookieByLoginName(loginName, organization).catch((error) => {
           return Promise.reject(error);
         })

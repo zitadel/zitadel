@@ -7,8 +7,10 @@ import { Button, ButtonVariants } from "./Button";
 import Alert from "./Alert";
 import { Spinner } from "./Spinner";
 
+// either loginName or sessionId must be provided
 type Props = {
-  loginName: string;
+  loginName?: string;
+  sessionId?: string;
   authRequestId?: string;
   altPassword: boolean;
   organization?: string;
@@ -16,6 +18,7 @@ type Props = {
 
 export default function LoginPasskey({
   loginName,
+  sessionId,
   authRequestId,
   altPassword,
   organization,
@@ -66,6 +69,7 @@ export default function LoginPasskey({
       },
       body: JSON.stringify({
         loginName,
+        sessionId,
         organization,
         challenges: {
           webAuthN: {
@@ -94,6 +98,7 @@ export default function LoginPasskey({
       },
       body: JSON.stringify({
         loginName,
+        sessionId,
         organization,
         webAuthN: { credentialAssertionData: data },
         authRequestId,
@@ -207,7 +212,15 @@ export default function LoginPasskey({
             type="button"
             variant={ButtonVariants.Secondary}
             onClick={() => {
-              const params: any = { loginName, alt: "true" };
+              const params: any = { alt: "true" };
+
+              if (loginName) {
+                params.loginName = loginName;
+              }
+
+              if (sessionId) {
+                params.sessionId = sessionId;
+              }
 
               if (authRequestId) {
                 params.authRequestId = authRequestId;

@@ -66,13 +66,14 @@ export default async function Page({
 
         {!sessionFactors && <div className="py-4"></div>}
 
-        {!loginName && (
+        {!(loginName || sessionId) && (
           <Alert>Provide your active session as loginName param</Alert>
         )}
 
-        {loginName && (
+        {(loginName || sessionId) && (
           <LoginPasskey
             loginName={loginName}
+            sessionId={sessionId}
             authRequestId={authRequestId}
             altPassword={altPassword === "true"}
             organization={organization}
