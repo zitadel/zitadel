@@ -22,7 +22,7 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		OidcTriggerIntrospectionProjections: gu.Ptr(false),
 		OidcLegacyIntrospection:             nil,
 		UserSchema:                          gu.Ptr(true),
-		Execution:                           gu.Ptr(true),
+		Actions:                             gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
 	}
 	want := &command.SystemFeatures{
@@ -30,7 +30,7 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		TriggerIntrospectionProjections: gu.Ptr(false),
 		LegacyIntrospection:             nil,
 		UserSchema:                      gu.Ptr(true),
-		Execution:                       gu.Ptr(true),
+		Actions:                         gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
 	}
 	got := systemFeaturesToCommand(arg)
@@ -60,7 +60,7 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: true,
 		},
-		Execution: query.FeatureSource[bool]{
+		Actions: query.FeatureSource[bool]{
 			Level: feature.LevelSystem,
 			Value: true,
 		},
@@ -95,7 +95,7 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
-		Execution: &feature_pb.FeatureFlag{
+		Actions: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
@@ -111,7 +111,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		OidcLegacyIntrospection:             nil,
 		UserSchema:                          gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
-		Execution:                           gu.Ptr(true),
+		Actions:                             gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
@@ -119,7 +119,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		LegacyIntrospection:             nil,
 		UserSchema:                      gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
-		Execution:                       gu.Ptr(true),
+		Actions:                         gu.Ptr(true),
 	}
 	got := instanceFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -148,7 +148,7 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
-		Execution: query.FeatureSource[bool]{
+		Actions: query.FeatureSource[bool]{
 			Level: feature.LevelInstance,
 			Value: true,
 		},
@@ -179,7 +179,7 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
-		Execution: &feature_pb.FeatureFlag{
+		Actions: &feature_pb.FeatureFlag{
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},

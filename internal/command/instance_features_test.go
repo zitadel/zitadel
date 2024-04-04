@@ -156,12 +156,12 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceExecutionEventType, true,
+						feature_v2.InstanceActionsEventType, true,
 					),
 				),
 			),
 			args: args{ctx, &InstanceFeatures{
-				Execution: gu.Ptr(true),
+				Actions: gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
@@ -206,7 +206,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 					),
 					feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceExecutionEventType, true,
+						feature_v2.InstanceActionsEventType, true,
 					),
 				),
 			),
@@ -215,7 +215,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				TriggerIntrospectionProjections: gu.Ptr(false),
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
-				Execution:                       gu.Ptr(true),
+				Actions:                         gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",

@@ -1,6 +1,6 @@
 //go:build integration
 
-package execution_test
+package action_test
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
@@ -21,20 +21,20 @@ func TestServer_GetTargetByID(t *testing.T) {
 	ensureFeatureEnabled(t)
 	type args struct {
 		ctx context.Context
-		dep func(context.Context, *execution.GetTargetByIDRequest, *execution.GetTargetByIDResponse) error
-		req *execution.GetTargetByIDRequest
+		dep func(context.Context, *action.GetTargetByIDRequest, *action.GetTargetByIDResponse) error
+		req *action.GetTargetByIDRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *execution.GetTargetByIDResponse
+		want    *action.GetTargetByIDResponse
 		wantErr bool
 	}{
 		{
 			name: "missing permission",
 			args: args{
 				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-				req: &execution.GetTargetByIDRequest{},
+				req: &action.GetTargetByIDRequest{},
 			},
 			wantErr: true,
 		},
@@ -42,7 +42,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 			name: "not found",
 			args: args{
 				ctx: CTX,
-				req: &execution.GetTargetByIDRequest{TargetId: "notexisting"},
+				req: &action.GetTargetByIDRequest{TargetId: "notexisting"},
 			},
 			wantErr: true,
 		},
@@ -50,7 +50,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 			name: "get, ok",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
+				dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTargetWithNameAndType(ctx, t, name, false, false)
 					request.TargetId = resp.GetId()
@@ -62,15 +62,15 @@ func TestServer_GetTargetByID(t *testing.T) {
 					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
 					return nil
 				},
-				req: &execution.GetTargetByIDRequest{},
+				req: &action.GetTargetByIDRequest{},
 			},
-			want: &execution.GetTargetByIDResponse{
-				Target: &execution.Target{
+			want: &action.GetTargetByIDResponse{
+				Target: &action.Target{
 					Details: &object.Details{
 						ResourceOwner: Tester.Instance.InstanceID(),
 					},
-					TargetType: &execution.Target_RestWebhook{
-						RestWebhook: &execution.SetRESTWebhook{
+					TargetType: &action.Target_RestWebhook{
+						RestWebhook: &action.SetRESTWebhook{
 							Url: "https://example.com",
 						},
 					},
@@ -82,7 +82,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 			name: "get, async, ok",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
+				dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTargetWithNameAndType(ctx, t, name, true, false)
 					request.TargetId = resp.GetId()
@@ -94,20 +94,20 @@ func TestServer_GetTargetByID(t *testing.T) {
 					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
 					return nil
 				},
-				req: &execution.GetTargetByIDRequest{},
+				req: &action.GetTargetByIDRequest{},
 			},
-			want: &execution.GetTargetByIDResponse{
-				Target: &execution.Target{
+			want: &action.GetTargetByIDResponse{
+				Target: &action.Target{
 					Details: &object.Details{
 						ResourceOwner: Tester.Instance.InstanceID(),
 					},
-					TargetType: &execution.Target_RestWebhook{
-						RestWebhook: &execution.SetRESTWebhook{
+					TargetType: &action.Target_RestWebhook{
+						RestWebhook: &action.SetRESTWebhook{
 							Url: "https://example.com",
 						},
 					},
 					Timeout:       durationpb.New(10 * time.Second),
-					ExecutionType: &execution.Target_IsAsync{IsAsync: true},
+					ExecutionType: &action.Target_IsAsync{IsAsync: true},
 				},
 			},
 		},
@@ -115,7 +115,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 			name: "get, interruptOnError, ok",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
+				dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTargetWithNameAndType(ctx, t, name, false, true)
 					request.TargetId = resp.GetId()
@@ -127,20 +127,20 @@ func TestServer_GetTargetByID(t *testing.T) {
 					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
 					return nil
 				},
-				req: &execution.GetTargetByIDRequest{},
+				req: &action.GetTargetByIDRequest{},
 			},
-			want: &execution.GetTargetByIDResponse{
-				Target: &execution.Target{
+			want: &action.GetTargetByIDResponse{
+				Target: &action.Target{
 					Details: &object.Details{
 						ResourceOwner: Tester.Instance.InstanceID(),
 					},
-					TargetType: &execution.Target_RestWebhook{
-						RestWebhook: &execution.SetRESTWebhook{
+					TargetType: &action.Target_RestWebhook{
+						RestWebhook: &action.SetRESTWebhook{
 							Url: "https://example.com",
 						},
 					},
 					Timeout:       durationpb.New(10 * time.Second),
-					ExecutionType: &execution.Target_InterruptOnError{InterruptOnError: true},
+					ExecutionType: &action.Target_InterruptOnError{InterruptOnError: true},
 				},
 			},
 		},
@@ -182,20 +182,20 @@ func TestServer_ListTargets(t *testing.T) {
 	ensureFeatureEnabled(t)
 	type args struct {
 		ctx context.Context
-		dep func(context.Context, *execution.ListTargetsRequest, *execution.ListTargetsResponse) error
-		req *execution.ListTargetsRequest
+		dep func(context.Context, *action.ListTargetsRequest, *action.ListTargetsResponse) error
+		req *action.ListTargetsRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *execution.ListTargetsResponse
+		want    *action.ListTargetsResponse
 		wantErr bool
 	}{
 		{
 			name: "missing permission",
 			args: args{
 				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-				req: &execution.ListTargetsRequest{},
+				req: &action.ListTargetsRequest{},
 			},
 			wantErr: true,
 		},
@@ -203,10 +203,10 @@ func TestServer_ListTargets(t *testing.T) {
 			name: "list, not found",
 			args: args{
 				ctx: CTX,
-				req: &execution.ListTargetsRequest{
-					Queries: []*execution.TargetSearchQuery{
-						{Query: &execution.TargetSearchQuery_InTargetIdsQuery{
-							InTargetIdsQuery: &execution.InTargetIDsQuery{
+				req: &action.ListTargetsRequest{
+					Queries: []*action.TargetSearchQuery{
+						{Query: &action.TargetSearchQuery_InTargetIdsQuery{
+							InTargetIdsQuery: &action.InTargetIDsQuery{
 								TargetIds: []string{"notfound"},
 							},
 						},
@@ -214,22 +214,22 @@ func TestServer_ListTargets(t *testing.T) {
 					},
 				},
 			},
-			want: &execution.ListTargetsResponse{
+			want: &action.ListTargetsResponse{
 				Details: &object.ListDetails{
 					TotalResult: 0,
 				},
-				Result: []*execution.Target{},
+				Result: []*action.Target{},
 			},
 		},
 		{
 			name: "list single id",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.ListTargetsRequest, response *execution.ListTargetsResponse) error {
+				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTargetWithNameAndType(ctx, t, name, false, false)
-					request.Queries[0].Query = &execution.TargetSearchQuery_InTargetIdsQuery{
-						InTargetIdsQuery: &execution.InTargetIDsQuery{
+					request.Queries[0].Query = &action.TargetSearchQuery_InTargetIdsQuery{
+						InTargetIdsQuery: &action.InTargetIDsQuery{
 							TargetIds: []string{resp.GetId()},
 						},
 					}
@@ -242,21 +242,21 @@ func TestServer_ListTargets(t *testing.T) {
 					response.Result[0].Name = name
 					return nil
 				},
-				req: &execution.ListTargetsRequest{
-					Queries: []*execution.TargetSearchQuery{{}},
+				req: &action.ListTargetsRequest{
+					Queries: []*action.TargetSearchQuery{{}},
 				},
 			},
-			want: &execution.ListTargetsResponse{
+			want: &action.ListTargetsResponse{
 				Details: &object.ListDetails{
 					TotalResult: 1,
 				},
-				Result: []*execution.Target{
+				Result: []*action.Target{
 					{
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
-						TargetType: &execution.Target_RestWebhook{
-							RestWebhook: &execution.SetRESTWebhook{
+						TargetType: &action.Target_RestWebhook{
+							RestWebhook: &action.SetRESTWebhook{
 								Url: "https://example.com",
 							},
 						},
@@ -268,11 +268,11 @@ func TestServer_ListTargets(t *testing.T) {
 			name: "list single name",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.ListTargetsRequest, response *execution.ListTargetsResponse) error {
+				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTargetWithNameAndType(ctx, t, name, false, false)
-					request.Queries[0].Query = &execution.TargetSearchQuery_TargetNameQuery{
-						TargetNameQuery: &execution.TargetNameQuery{
+					request.Queries[0].Query = &action.TargetSearchQuery_TargetNameQuery{
+						TargetNameQuery: &action.TargetNameQuery{
 							TargetName: name,
 						},
 					}
@@ -285,21 +285,21 @@ func TestServer_ListTargets(t *testing.T) {
 					response.Result[0].Name = name
 					return nil
 				},
-				req: &execution.ListTargetsRequest{
-					Queries: []*execution.TargetSearchQuery{{}},
+				req: &action.ListTargetsRequest{
+					Queries: []*action.TargetSearchQuery{{}},
 				},
 			},
-			want: &execution.ListTargetsResponse{
+			want: &action.ListTargetsResponse{
 				Details: &object.ListDetails{
 					TotalResult: 1,
 				},
-				Result: []*execution.Target{
+				Result: []*action.Target{
 					{
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
-						TargetType: &execution.Target_RestWebhook{
-							RestWebhook: &execution.SetRESTWebhook{
+						TargetType: &action.Target_RestWebhook{
+							RestWebhook: &action.SetRESTWebhook{
 								Url: "https://example.com",
 							},
 						},
@@ -312,15 +312,15 @@ func TestServer_ListTargets(t *testing.T) {
 			name: "list multiple id",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.ListTargetsRequest, response *execution.ListTargetsResponse) error {
+				dep: func(ctx context.Context, request *action.ListTargetsRequest, response *action.ListTargetsResponse) error {
 					name1 := fmt.Sprint(time.Now().UnixNano() + 1)
 					name2 := fmt.Sprint(time.Now().UnixNano() + 3)
 					name3 := fmt.Sprint(time.Now().UnixNano() + 5)
 					resp1 := Tester.CreateTargetWithNameAndType(ctx, t, name1, false, false)
 					resp2 := Tester.CreateTargetWithNameAndType(ctx, t, name2, true, false)
 					resp3 := Tester.CreateTargetWithNameAndType(ctx, t, name3, false, true)
-					request.Queries[0].Query = &execution.TargetSearchQuery_InTargetIdsQuery{
-						InTargetIdsQuery: &execution.InTargetIDsQuery{
+					request.Queries[0].Query = &action.TargetSearchQuery_InTargetIdsQuery{
+						InTargetIdsQuery: &action.InTargetIDsQuery{
 							TargetIds: []string{resp1.GetId(), resp2.GetId(), resp3.GetId()},
 						},
 					}
@@ -341,21 +341,21 @@ func TestServer_ListTargets(t *testing.T) {
 					response.Result[2].Name = name3
 					return nil
 				},
-				req: &execution.ListTargetsRequest{
-					Queries: []*execution.TargetSearchQuery{{}},
+				req: &action.ListTargetsRequest{
+					Queries: []*action.TargetSearchQuery{{}},
 				},
 			},
-			want: &execution.ListTargetsResponse{
+			want: &action.ListTargetsResponse{
 				Details: &object.ListDetails{
 					TotalResult: 3,
 				},
-				Result: []*execution.Target{
+				Result: []*action.Target{
 					{
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
-						TargetType: &execution.Target_RestWebhook{
-							RestWebhook: &execution.SetRESTWebhook{
+						TargetType: &action.Target_RestWebhook{
+							RestWebhook: &action.SetRESTWebhook{
 								Url: "https://example.com",
 							},
 						},
@@ -365,25 +365,25 @@ func TestServer_ListTargets(t *testing.T) {
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
-						TargetType: &execution.Target_RestWebhook{
-							RestWebhook: &execution.SetRESTWebhook{
+						TargetType: &action.Target_RestWebhook{
+							RestWebhook: &action.SetRESTWebhook{
 								Url: "https://example.com",
 							},
 						},
 						Timeout:       durationpb.New(10 * time.Second),
-						ExecutionType: &execution.Target_IsAsync{IsAsync: true},
+						ExecutionType: &action.Target_IsAsync{IsAsync: true},
 					},
 					{
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
-						TargetType: &execution.Target_RestWebhook{
-							RestWebhook: &execution.SetRESTWebhook{
+						TargetType: &action.Target_RestWebhook{
+							RestWebhook: &action.SetRESTWebhook{
 								Url: "https://example.com",
 							},
 						},
 						Timeout:       durationpb.New(10 * time.Second),
-						ExecutionType: &execution.Target_InterruptOnError{InterruptOnError: true},
+						ExecutionType: &action.Target_InterruptOnError{InterruptOnError: true},
 					},
 				},
 			},
@@ -428,20 +428,20 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 
 	type args struct {
 		ctx context.Context
-		dep func(context.Context, *execution.ListExecutionsRequest, *execution.ListExecutionsResponse) error
-		req *execution.ListExecutionsRequest
+		dep func(context.Context, *action.ListExecutionsRequest, *action.ListExecutionsResponse) error
+		req *action.ListExecutionsRequest
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *execution.ListExecutionsResponse
+		want    *action.ListExecutionsResponse
 		wantErr bool
 	}{
 		{
 			name: "missing permission",
 			args: args{
 				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-				req: &execution.ListExecutionsRequest{},
+				req: &action.ListExecutionsRequest{},
 			},
 			wantErr: true,
 		},
@@ -449,7 +449,7 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 			name: "list single condition",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.ListExecutionsRequest, response *execution.ListExecutionsResponse) error {
+				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) error {
 					resp := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[0], []string{targetResp.GetId()}, []string{})
 
 					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
@@ -459,14 +459,14 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
 					return nil
 				},
-				req: &execution.ListExecutionsRequest{
-					Queries: []*execution.SearchQuery{{
-						Query: &execution.SearchQuery_InConditionsQuery{
-							InConditionsQuery: &execution.InConditionsQuery{
-								Conditions: []*execution.Condition{{
-									ConditionType: &execution.Condition_Request{
-										Request: &execution.RequestExecution{
-											Condition: &execution.RequestExecution_Method{
+				req: &action.ListExecutionsRequest{
+					Queries: []*action.SearchQuery{{
+						Query: &action.SearchQuery_InConditionsQuery{
+							InConditionsQuery: &action.InConditionsQuery{
+								Conditions: []*action.Condition{{
+									ConditionType: &action.Condition_Request{
+										Request: &action.RequestExecution{
+											Condition: &action.RequestExecution_Method{
 												Method: "/zitadel.session.v2beta.SessionService/GetSession",
 											},
 										},
@@ -478,11 +478,11 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 					}},
 				},
 			},
-			want: &execution.ListExecutionsResponse{
+			want: &action.ListExecutionsResponse{
 				Details: &object.ListDetails{
 					TotalResult: 1,
 				},
-				Result: []*execution.Execution{
+				Result: []*action.Execution{
 					{
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
@@ -497,20 +497,20 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 			name: "list single target",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.ListExecutionsRequest, response *execution.ListExecutionsResponse) error {
+				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) error {
 					target := Tester.CreateTarget(ctx, t)
 					// add target as query to the request
-					request.Queries[0] = &execution.SearchQuery{
-						Query: &execution.SearchQuery_TargetQuery{
-							TargetQuery: &execution.TargetQuery{
+					request.Queries[0] = &action.SearchQuery{
+						Query: &action.SearchQuery_TargetQuery{
+							TargetQuery: &action.TargetQuery{
 								TargetId: target.GetId(),
 							},
 						},
 					}
-					resp := Tester.SetExecution(ctx, t, &execution.Condition{
-						ConditionType: &execution.Condition_Request{
-							Request: &execution.RequestExecution{
-								Condition: &execution.RequestExecution_Method{
+					resp := Tester.SetExecution(ctx, t, &action.Condition{
+						ConditionType: &action.Condition_Request{
+							Request: &action.RequestExecution{
+								Condition: &action.RequestExecution_Method{
 									Method: "/zitadel.management.v1.ManagementService/UpdateAction",
 								},
 							},
@@ -525,15 +525,15 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 					response.Result[0].Targets[0] = target.GetId()
 					return nil
 				},
-				req: &execution.ListExecutionsRequest{
-					Queries: []*execution.SearchQuery{{}},
+				req: &action.ListExecutionsRequest{
+					Queries: []*action.SearchQuery{{}},
 				},
 			},
-			want: &execution.ListExecutionsResponse{
+			want: &action.ListExecutionsResponse{
 				Details: &object.ListDetails{
 					TotalResult: 1,
 				},
-				Result: []*execution.Execution{
+				Result: []*action.Execution{
 					{
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
@@ -547,20 +547,20 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 			name: "list single include",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.ListExecutionsRequest, response *execution.ListExecutionsResponse) error {
-					Tester.SetExecution(ctx, t, &execution.Condition{
-						ConditionType: &execution.Condition_Request{
-							Request: &execution.RequestExecution{
-								Condition: &execution.RequestExecution_Method{
+				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) error {
+					Tester.SetExecution(ctx, t, &action.Condition{
+						ConditionType: &action.Condition_Request{
+							Request: &action.RequestExecution{
+								Condition: &action.RequestExecution_Method{
 									Method: "/zitadel.management.v1.ManagementService/GetAction",
 								},
 							},
 						},
 					}, []string{targetResp.GetId()}, []string{})
-					resp2 := Tester.SetExecution(ctx, t, &execution.Condition{
-						ConditionType: &execution.Condition_Request{
-							Request: &execution.RequestExecution{
-								Condition: &execution.RequestExecution_Method{
+					resp2 := Tester.SetExecution(ctx, t, &action.Condition{
+						ConditionType: &action.Condition_Request{
+							Request: &action.RequestExecution{
+								Condition: &action.RequestExecution_Method{
 									Method: "/zitadel.management.v1.ManagementService/ListActions",
 								},
 							},
@@ -574,19 +574,19 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 					response.Result[0].Details.Sequence = resp2.GetDetails().GetSequence()
 					return nil
 				},
-				req: &execution.ListExecutionsRequest{
-					Queries: []*execution.SearchQuery{{
-						Query: &execution.SearchQuery_IncludeQuery{
-							IncludeQuery: &execution.IncludeQuery{Include: "request./zitadel.management.v1.ManagementService/GetAction"},
+				req: &action.ListExecutionsRequest{
+					Queries: []*action.SearchQuery{{
+						Query: &action.SearchQuery_IncludeQuery{
+							IncludeQuery: &action.IncludeQuery{Include: "request./zitadel.management.v1.ManagementService/GetAction"},
 						},
 					}},
 				},
 			},
-			want: &execution.ListExecutionsResponse{
+			want: &action.ListExecutionsResponse{
 				Details: &object.ListDetails{
 					TotalResult: 1,
 				},
-				Result: []*execution.Execution{
+				Result: []*action.Execution{
 					{
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
@@ -601,7 +601,7 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 			name: "list multiple conditions",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.ListExecutionsRequest, response *execution.ListExecutionsResponse) error {
+				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) error {
 
 					resp1 := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[0], []string{targetResp.GetId()}, []string{})
 					response.Result[0].Details.ChangeDate = resp1.GetDetails().GetChangeDate()
@@ -618,33 +618,33 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 					response.Result[2].Details.Sequence = resp3.GetDetails().GetSequence()
 					return nil
 				},
-				req: &execution.ListExecutionsRequest{
-					Queries: []*execution.SearchQuery{{
-						Query: &execution.SearchQuery_InConditionsQuery{
-							InConditionsQuery: &execution.InConditionsQuery{
-								Conditions: []*execution.Condition{
+				req: &action.ListExecutionsRequest{
+					Queries: []*action.SearchQuery{{
+						Query: &action.SearchQuery_InConditionsQuery{
+							InConditionsQuery: &action.InConditionsQuery{
+								Conditions: []*action.Condition{
 									{
-										ConditionType: &execution.Condition_Request{
-											Request: &execution.RequestExecution{
-												Condition: &execution.RequestExecution_Method{
+										ConditionType: &action.Condition_Request{
+											Request: &action.RequestExecution{
+												Condition: &action.RequestExecution_Method{
 													Method: "/zitadel.session.v2beta.SessionService/GetSession",
 												},
 											},
 										},
 									},
 									{
-										ConditionType: &execution.Condition_Request{
-											Request: &execution.RequestExecution{
-												Condition: &execution.RequestExecution_Method{
+										ConditionType: &action.Condition_Request{
+											Request: &action.RequestExecution{
+												Condition: &action.RequestExecution_Method{
 													Method: "/zitadel.session.v2beta.SessionService/CreateSession",
 												},
 											},
 										},
 									},
 									{
-										ConditionType: &execution.Condition_Request{
-											Request: &execution.RequestExecution{
-												Condition: &execution.RequestExecution_Method{
+										ConditionType: &action.Condition_Request{
+											Request: &action.RequestExecution{
+												Condition: &action.RequestExecution_Method{
 													Method: "/zitadel.session.v2beta.SessionService/SetSession",
 												},
 											},
@@ -656,11 +656,11 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 					}},
 				},
 			},
-			want: &execution.ListExecutionsResponse{
+			want: &action.ListExecutionsResponse{
 				Details: &object.ListDetails{
 					TotalResult: 3,
 				},
-				Result: []*execution.Execution{
+				Result: []*action.Execution{
 					{
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),

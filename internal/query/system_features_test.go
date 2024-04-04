@@ -63,7 +63,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemExecutionEventType, true,
+						feature_v2.SystemActionsEventType, true,
 					)),
 				),
 			),
@@ -87,7 +87,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					Level: feature.LevelSystem,
 					Value: false,
 				},
-				Execution: FeatureSource[bool]{
+				Actions: FeatureSource[bool]{
 					Level: feature.LevelSystem,
 					Value: true,
 				},
@@ -115,7 +115,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemExecutionEventType, false,
+						feature_v2.SystemActionsEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						context.Background(), aggregate,
@@ -147,7 +147,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
-				Execution: FeatureSource[bool]{
+				Actions: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
@@ -175,7 +175,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemExecutionEventType, false,
+						feature_v2.SystemActionsEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						context.Background(), aggregate,
@@ -207,7 +207,7 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
-				Execution: FeatureSource[bool]{
+				Actions: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},

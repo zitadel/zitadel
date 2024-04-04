@@ -1,6 +1,6 @@
 //go:build integration
 
-package execution_test
+package action_test
 
 import (
 	"context"
@@ -13,14 +13,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 )
 
 var (
 	CTX    context.Context
 	Tester *integration.Tester
-	Client execution.ExecutionServiceClient
+	Client action.ActionServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
-		Client = Tester.Client.ExecutionV3
+		Client = Tester.Client.a
 
 		CTX, _ = Tester.WithAuthorization(ctx, integration.IAMOwner), errCtx
 		return m.Run()
@@ -42,7 +42,7 @@ func ensureFeatureEnabled(t *testing.T) {
 		Inheritance: true,
 	})
 	require.NoError(t, err)
-	if f.Execution.GetEnabled() {
+	if f.action.GetEnabled() {
 		return
 	}
 	_, err = Tester.Client.FeatureV2.SetInstanceFeatures(CTX, &feature.SetInstanceFeaturesRequest{
@@ -59,7 +59,7 @@ func ensureFeatureEnabled(t *testing.T) {
 				Inheritance: true,
 			})
 			require.NoError(ttt, err)
-			if f.Execution.GetEnabled() {
+			if f.action.GetEnabled() {
 				return
 			}
 		},

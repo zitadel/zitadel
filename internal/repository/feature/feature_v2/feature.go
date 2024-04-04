@@ -17,7 +17,7 @@ var (
 	SystemLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLegacyIntrospection)
 	SystemUserSchemaEventType                      = setEventTypeFromFeature(feature.LevelSystem, feature.KeyUserSchema)
 	SystemTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTokenExchange)
-	SystemExecutionEventType                       = setEventTypeFromFeature(feature.LevelSystem, feature.KeyExecution)
+	SystemActionsEventType                         = setEventTypeFromFeature(feature.LevelSystem, feature.KeyActions)
 
 	InstanceResetEventType                           = resetEventTypeFromFeature(feature.LevelInstance)
 	InstanceLoginDefaultOrgEventType                 = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginDefaultOrg)
@@ -25,7 +25,7 @@ var (
 	InstanceLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLegacyIntrospection)
 	InstanceUserSchemaEventType                      = setEventTypeFromFeature(feature.LevelInstance, feature.KeyUserSchema)
 	InstanceTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTokenExchange)
-	InstanceExecutionEventType                       = setEventTypeFromFeature(feature.LevelInstance, feature.KeyExecution)
+	InstanceActionsEventType                         = setEventTypeFromFeature(feature.LevelInstance, feature.KeyActions)
 )
 
 const (

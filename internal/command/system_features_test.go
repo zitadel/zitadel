@@ -124,12 +124,12 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				expectPush(
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemExecutionEventType, true,
+						feature_v2.SystemActionsEventType, true,
 					),
 				),
 			),
 			args: args{context.Background(), &SystemFeatures{
-				Execution: gu.Ptr(true),
+				Actions: gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
@@ -174,7 +174,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 					),
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemExecutionEventType, true,
+						feature_v2.SystemActionsEventType, true,
 					),
 				),
 			),
@@ -183,7 +183,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				TriggerIntrospectionProjections: gu.Ptr(false),
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
-				Execution:                       gu.Ptr(true),
+				Actions:                         gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
@@ -230,7 +230,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 					),
 					feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
-						feature_v2.SystemExecutionEventType, false,
+						feature_v2.SystemActionsEventType, false,
 					),
 				),
 			),
@@ -239,7 +239,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				TriggerIntrospectionProjections: gu.Ptr(false),
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
-				Execution:                       gu.Ptr(false),
+				Actions:                         gu.Ptr(false),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",

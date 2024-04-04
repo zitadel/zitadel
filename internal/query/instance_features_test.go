@@ -107,7 +107,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceExecutionEventType, false,
+						feature_v2.InstanceActionsEventType, false,
 					)),
 				),
 			),
@@ -132,7 +132,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Level: feature.LevelInstance,
 					Value: false,
 				},
-				Execution: FeatureSource[bool]{
+				Actions: FeatureSource[bool]{
 					Level: feature.LevelInstance,
 					Value: false,
 				},
@@ -164,7 +164,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceExecutionEventType, false,
+						feature_v2.InstanceActionsEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						ctx, aggregate,
@@ -197,7 +197,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
-				Execution: FeatureSource[bool]{
+				Actions: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
@@ -225,7 +225,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					)),
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						ctx, aggregate,
-						feature_v2.InstanceExecutionEventType, false,
+						feature_v2.InstanceActionsEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						ctx, aggregate,
@@ -258,7 +258,7 @@ func TestQueries_GetInstanceFeatures(t *testing.T) {
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
-				Execution: FeatureSource[bool]{
+				Actions: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
