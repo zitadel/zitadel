@@ -12,7 +12,7 @@ describe("register idps", () => {
   });
 
   it("should redirect the user to the correct url", () => {
-    cy.visit("/register/idp");
+    cy.visit("/idp");
     cy.get('button[e2e="google"]').click();
     cy.origin(IDP_URL, { args: IDP_URL }, (url) => {
       cy.location("href", { timeout: 10_000 }).should("eq", url);
