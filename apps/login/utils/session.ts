@@ -1,8 +1,7 @@
 "use server";
 
 import {
-  createSessionForLoginname,
-  createSessionForUserId,
+  createSessionFromChecks,
   createSessionForUserIdAndIdpIntent,
   getSession,
   server,
@@ -22,10 +21,15 @@ export async function createSessionAndUpdateCookie(
   organization?: string,
   authRequestId?: string
 ): Promise<Session> {
-  const createdSession = await createSessionForLoginname(
+  const createdSession = await createSessionFromChecks(
     server,
-    loginName,
-    password,
+    password
+      ? {
+          user: { loginName },
+          password: { password },
+          // totp: { code: totpCode },
+        }
+      : { user: { loginName } },
     challenges
   );
 
@@ -72,10 +76,15 @@ export async function createSessionForUserIdAndUpdateCookie(
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined
 ): Promise<Session> {
-  const createdSession = await createSessionForUserId(
+  const createdSession = await createSessionFromChecks(
     server,
-    userId,
-    password,
+    password
+      ? {
+          user: { userId },
+          password: { password },
+          // totp: { code: totpCode },
+        }
+      : { user: { userId } },
     challenges
   );
 
@@ -177,6 +186,7 @@ export async function setSessionAndUpdateCookie(
   password: string | undefined,
   webAuthN: { credentialAssertionData: any } | undefined,
   challenges: RequestChallenges | undefined,
+  totpCode: string | undefined,
   authRequestId: string | undefined
 ): Promise<SessionWithChallenges> {
   return setSession(
@@ -184,6 +194,7 @@ export async function setSessionAndUpdateCookie(
     recentCookie.id,
     recentCookie.token,
     password,
+    totpCode,
     webAuthN,
     challenges
   ).then((updatedSession) => {

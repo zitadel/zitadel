@@ -19,6 +19,7 @@ import {
   PasswordComplexitySettings,
   GetSessionResponse,
   VerifyEmailResponse,
+  Checks,
   SetSessionResponse,
   SetSessionRequest,
   ListUsersResponse,
@@ -118,68 +119,23 @@ export async function getPasswordComplexitySettings(
     .then((resp: GetPasswordComplexitySettingsResponse) => resp.settings);
 }
 
-export async function createSessionForLoginname(
+export async function createSessionFromChecks(
   server: ZitadelServer,
-  loginName: string,
-  password: string | undefined,
+  checks: Checks,
   challenges: RequestChallenges | undefined
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
-  return password
-    ? sessionService.createSession(
-        {
-          checks: { user: { loginName }, password: { password } },
-          challenges,
-          lifetime: {
-            seconds: 300,
-            nanos: 0,
-          },
-        },
-        {}
-      )
-    : sessionService.createSession(
-        {
-          checks: { user: { loginName } },
-          challenges,
-          lifetime: {
-            seconds: 300,
-            nanos: 0,
-          },
-        },
-        {}
-      );
-}
-
-export async function createSessionForUserId(
-  server: ZitadelServer,
-  userId: string,
-  password: string | undefined,
-  challenges: RequestChallenges | undefined
-): Promise<CreateSessionResponse | undefined> {
-  const sessionService = session.getSession(server);
-  return password
-    ? sessionService.createSession(
-        {
-          checks: { user: { userId }, password: { password } },
-          challenges,
-          lifetime: {
-            seconds: 300,
-            nanos: 0,
-          },
-        },
-        {}
-      )
-    : sessionService.createSession(
-        {
-          checks: { user: { userId } },
-          challenges,
-          lifetime: {
-            seconds: 300,
-            nanos: 0,
-          },
-        },
-        {}
-      );
+  return sessionService.createSession(
+    {
+      checks: checks,
+      challenges,
+      lifetime: {
+        seconds: 300,
+        nanos: 0,
+      },
+    },
+    {}
+  );
 }
 
 export async function createSessionForUserIdAndIdpIntent(
@@ -209,6 +165,7 @@ export async function setSession(
   sessionId: string,
   sessionToken: string,
   password: string | undefined,
+  totpCode: string | undefined,
   webAuthN: { credentialAssertionData: any } | undefined,
   challenges: RequestChallenges | undefined
 ): Promise<SetSessionResponse | undefined> {
@@ -224,6 +181,10 @@ export async function setSession(
 
   if (password && payload.checks) {
     payload.checks.password = { password };
+  }
+
+  if (totpCode && payload.checks) {
+    payload.checks.totp = { code: totpCode };
   }
 
   if (webAuthN && payload.checks) {

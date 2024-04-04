@@ -51,6 +51,7 @@ export {
   CreateSessionResponse,
   SetSessionResponse,
   SetSessionRequest,
+  Checks,
   DeleteSessionResponse,
 } from "./proto/server/zitadel/session/v2beta/session_service";
 export {
