@@ -304,10 +304,10 @@ func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAgentID string) (err error) {
+func (repo *AuthRequestRepo) SelectUser(ctx context.Context, authReqID, userID, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, id, userAgentID)
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
