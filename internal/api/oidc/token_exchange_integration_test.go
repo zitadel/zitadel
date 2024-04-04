@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/tokenexchange"
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
