@@ -363,8 +363,8 @@ func TestServer_ListTargets(t *testing.T) {
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
-						TargetType: &execution.Target_RestWebhook{
-							RestWebhook: &execution.SetRESTWebhook{
+						TargetType: &execution.Target_RestRequestResponse{
+							RestRequestResponse: &execution.SetRESTRequestResponse{
 								Url: "https://example.com",
 							},
 						},

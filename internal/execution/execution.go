@@ -132,6 +132,5 @@ func call(ctx context.Context, url string, timeout time.Duration, body []byte) (
 		}
 		return io.ReadAll(resp.Body)
 	}
-	data, _ := io.ReadAll(resp.Body)
 	return nil, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed")
 }
