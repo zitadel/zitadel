@@ -132,13 +132,18 @@ func (q *Queries) ExecutionTargets(ctx context.Context, ids []string) (execution
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.End() }()
 
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	if instanceID == "" {
+		return nil, nil
+	}
+
 	err = q.client.QueryContext(ctx,
 		func(rows *sql.Rows) error {
 			execution, err = scanExecutionTargets(rows)
 			return err
 		},
 		executionTargetsQuery,
-		authz.GetInstance(ctx).InstanceID(),
+		instanceID,
 		strings.Join(ids, ","),
 	)
 	return execution, err
@@ -148,13 +153,18 @@ func (q *Queries) ExecutionTargetsCombined(ctx context.Context, ids1, ids2 []str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.End() }()
 
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	if instanceID == "" {
+		return nil, nil
+	}
+
 	err = q.client.QueryContext(ctx,
 		func(rows *sql.Rows) error {
 			execution, err = scanExecutionTargets(rows)
 			return err
 		},
 		executionTargetsCombinedQuery,
-		authz.GetInstance(ctx).InstanceID(),
+		instanceID,
 		strings.Join(ids1, ","),
 		strings.Join(ids2, ","),
 	)
