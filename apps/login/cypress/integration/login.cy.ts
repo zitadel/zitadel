@@ -6,7 +6,8 @@ describe("login", () => {
       data: {
         details: {
           sequence: 859,
-          changeDate: "1519211810362",
+          changeDate:
+            "Wed Feb 21 2018 12:16:50 GMT+0100 (Central European Standard Time)",
           resourceOwner: "220516472055706145",
         },
         sessionId: "221394658884845598",
@@ -20,7 +21,8 @@ describe("login", () => {
       data: {
         session: {
           id: "221394658884845598",
-          creationDate: "1519211810362",
+          creationDate:
+            "Wed Feb 21 2018 12:16:50 GMT+0100 (Central European Standard Time)",
           changeDate: "1519211810999",
           sequence: 859,
           factors: {
