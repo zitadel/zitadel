@@ -98,8 +98,10 @@ export async function PUT(request: NextRequest) {
           password,
           webAuthN,
           challenges,
+          undefined,
           authRequestId
         ).then((session) => {
+          console.log(session);
           return NextResponse.json({
             sessionId: session.id,
             factors: session.factors,

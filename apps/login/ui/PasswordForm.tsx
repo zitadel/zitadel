@@ -7,12 +7,14 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
+import { LoginSettings } from "@zitadel/server";
 
 type Inputs = {
   password: string;
 };
 
 type Props = {
+  loginSettings: LoginSettings | undefined;
   loginName?: string;
   organization?: string;
   authRequestId?: string;
@@ -21,6 +23,7 @@ type Props = {
 };
 
 export default function PasswordForm({
+  loginSettings,
   loginName,
   organization,
   authRequestId,
@@ -83,6 +86,19 @@ export default function PasswordForm({
 
         return router.push(`/passkey/add?` + params);
       } else {
+        let continueWithMfa = undefined;
+        if (
+          loginSettings?.forceMfa &&
+          loginSettings.secondFactors?.length >= 1 // TODO replace with user methods - if forceMFA is set and no user methods prompt to add method (/mfa/add)
+        ) {
+          if (loginSettings.secondFactors?.length === 1) {
+            continueWithMfa = loginSettings.secondFactors[0];
+          } else {
+            // continueWithMfa = loginSettings.secondFactors[0];
+            // render selection page for mfa (/mfa/select)
+          }
+        }
+        // OIDC flows
         if (authRequestId && resp && resp.sessionId) {
           const params = new URLSearchParams({
             sessionId: resp.sessionId,
@@ -95,6 +111,7 @@ export default function PasswordForm({
 
           return router.push(`/login?` + params);
         } else {
+          // without OIDC flow
           const params = new URLSearchParams(
             authRequestId
               ? {
