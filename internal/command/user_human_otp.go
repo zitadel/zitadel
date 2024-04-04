@@ -455,7 +455,7 @@ func (c *Commands) sendHumanOTP(
 	if !existingOTP.OTPAdded() {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady")
 	}
-	config, err := cryptoGeneratorConfigWithDefault(ctx, c.eventstore.Filter, secretGeneratorType, defaultSecretGenerator)
+	config, err := cryptoGeneratorConfigWithDefault(ctx, c.eventstore.Filter, secretGeneratorType, defaultSecretGenerator) //nolint:staticcheck
 	if err != nil {
 		return err
 	}

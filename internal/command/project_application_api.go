@@ -120,7 +120,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 		return nil, err
 	}
 	plain, err = domain.SetNewClientSecretIfNeeded(apiApp, func() (string, string, error) {
-		return c.newHashedSecret(ctx, c.eventstore.Filter)
+		return c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
 	})
 	if err != nil {
 		return nil, err
@@ -201,7 +201,7 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	if !existingAPI.IsAPI() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-aeH4", "Errors.Project.App.IsNotAPI")
 	}
-	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter)
+	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}

@@ -76,7 +76,7 @@ func (c *Commands) ChangeUserEmailVerified(ctx context.Context, userID, email st
 }
 
 func (c *Commands) changeUserEmailWithCode(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
-	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (c *Commands) resendUserEmailCodeWithGeneratorEvents(ctx context.Context, u
 }
 
 func (c *Commands) VerifyUserEmail(ctx context.Context, userID, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
-	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}

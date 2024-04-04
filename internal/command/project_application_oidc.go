@@ -168,7 +168,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, err
 	}
 	plain, err = domain.SetNewClientSecretIfNeeded(oidcApp, func() (string, string, error) {
-		return c.newHashedSecret(ctx, c.eventstore.Filter)
+		return c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
 	})
 	if err != nil {
 		return nil, err
@@ -282,7 +282,7 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	if !existingOIDC.IsOIDC() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Ghrh3", "Errors.Project.App.IsNotOIDC")
 	}
-	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter)
+	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
