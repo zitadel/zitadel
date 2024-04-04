@@ -249,7 +249,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		resp.IssuedTokenType = oidc.JWTTokenType
 
 	case oidc.IDTokenType:
-		resp.AccessToken, resp.ExpiresIn, err = s.createExchangeIDToken(ctx, signingKey, client, subjectToken.userID, "", audience, userInfo, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.AccessToken, resp.ExpiresIn, err = s.createExchangeIDToken(ctx, signingKey, client, subjectToken.userID, "", audience, userInfo, actorToken.authMethods, actorToken.authTime, actor)
 		resp.TokenType = TokenTypeNA
 		resp.IssuedTokenType = oidc.IDTokenType
 	case oidc.RefreshTokenType, UserIDTokenType:
@@ -262,7 +262,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	}
 
 	if slices.Contains(scopes, oidc.ScopeOpenID) && tokenType != oidc.IDTokenType {
-		resp.IDToken, _, err = s.createExchangeIDToken(ctx, signingKey, client, subjectToken.userID, resp.AccessToken, audience, userInfo, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.IDToken, _, err = s.createExchangeIDToken(ctx, signingKey, client, subjectToken.userID, resp.AccessToken, audience, userInfo, actorToken.authMethods, actorToken.authTime, actor)
 		if err != nil {
 			return nil, err
 		}
@@ -306,7 +306,7 @@ func (s *Server) createExchangeJWT(ctx context.Context, signingKey op.SigningKey
 	return accessToken, refreshToken, timeToOIDCExpiresIn(expTime), nil
 }
 
-func (s *Server) createExchangeIDToken(ctx context.Context, signingKey op.SigningKey, client *Client, userID, accessToken string, audience []string, userInfo *oidc.UserInfo, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
+func (s *Server) createExchangeIDToken(ctx context.Context, signingKey op.SigningKey, client *Client, userID, accessToken string, audience []string, userInfo *oidc.UserInfo, authMethods []domain.UserAuthMethodType, authTime time.Time, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
 	expTime := time.Now().Add(client.IDTokenLifetime()).Add(client.ClockSkew())
 	claims := oidc.NewIDTokenClaims(op.IssuerFromContext(ctx), userID, audience, expTime, authTime, "", "", AuthMethodTypesToAMR(authMethods), client.GetID(), client.ClockSkew())
 	claims.Actor = actorDomainToClaims(actor)
@@ -333,15 +333,14 @@ func (s *Server) createAccessTokenCommands(ctx context.Context, client *Client, 
 	settings := client.client.Settings
 	if slices.Contains(scopes, oidc.ScopeOfflineAccess) {
 		return s.command.AddAccessAndRefreshToken(
-			ctx, resourceOwner, "", client.GetID(), userID, "", audience, scopes, AuthMethodTypesToAMR(authMethods),
-			settings.AccessTokenLifetime, settings.RefreshTokenIdleExpiration, settings.RefreshTokenExpiration,
-			authTime, reason, actor,
+			ctx, resourceOwner, "", client.GetID(), client.client.ProjectID, userID, "", audience, scopes,
+			AuthMethodTypesToAMR(authMethods), settings.AccessTokenLifetime, settings.RefreshTokenIdleExpiration,
+			settings.RefreshTokenExpiration, authTime, reason, actor,
 		)
 	}
 	tokenInfo, err = s.command.AddUserToken(
-		ctx, resourceOwner, "", client.GetID(), userID, audience, scopes, AuthMethodTypesToAMR(authMethods),
-		settings.AccessTokenLifetime,
-		authTime, reason, actor,
+		ctx, resourceOwner, "", client.GetID(), client.client.ProjectID, userID, audience, scopes,
+		AuthMethodTypesToAMR(authMethods), settings.AccessTokenLifetime, authTime, reason, actor,
 	)
 	return tokenInfo, "", err
 }

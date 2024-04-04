@@ -41,7 +41,7 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 	if err != nil {
 		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("access token invalid").WithParent(err), http.StatusUnauthorized)
 	}
-	userInfo, err := s.userInfo(ctx, token.userID, "", token.scope, token.audience)
+	userInfo, err := s.userInfo(ctx, token.userID, token.projectID, token.scope, token.audience)
 	if err != nil {
 		return nil, err
 	}

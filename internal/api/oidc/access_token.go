@@ -23,6 +23,7 @@ type accessToken struct {
 	resourceOwner   string
 	subject         string
 	clientID        string
+	projectID       string
 	audience        []string
 	scope           []string
 	authMethods     []domain.UserAuthMethodType
@@ -75,6 +76,7 @@ func accessTokenV1(tokenID, subject string, token *model.TokenView) *accessToken
 		resourceOwner:   token.ResourceOwner,
 		subject:         subject,
 		clientID:        token.ApplicationID,
+		projectID:       token.ProjectID,
 		audience:        token.Audience,
 		scope:           token.Scopes,
 		tokenCreation:   token.CreationDate,
@@ -91,6 +93,7 @@ func accessTokenV2(tokenID, subject string, token *query.OIDCSessionAccessTokenR
 		resourceOwner:   token.ResourceOwner,
 		subject:         subject,
 		clientID:        token.ClientID,
+		projectID:       token.ProjectID,
 		audience:        token.Audience,
 		scope:           token.Scope,
 		authMethods:     token.AuthMethods,

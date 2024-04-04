@@ -20,6 +20,7 @@ type OIDCSessionAccessTokenReadModel struct {
 	UserID                string
 	SessionID             string
 	ClientID              string
+	ProjectID             string
 	Audience              []string
 	Scope                 []string
 	AuthMethods           []domain.UserAuthMethodType
@@ -84,6 +85,7 @@ func (wm *OIDCSessionAccessTokenReadModel) reduceAdded(e *oidcsession.AddedEvent
 
 func (wm *OIDCSessionAccessTokenReadModel) reduceAccessTokenAdded(e *oidcsession.AccessTokenAddedEvent) {
 	wm.AccessTokenID = e.ID
+	wm.ProjectID = e.ProjectID
 	wm.AccessTokenCreation = e.CreationDate()
 	wm.AccessTokenExpiration = e.CreationDate().Add(e.Lifetime)
 	wm.Reason = e.Reason

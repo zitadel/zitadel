@@ -22,7 +22,7 @@ type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserID      string                      `json:"userID"`
-	SessionID   string                      `json:"sessionID"`
+	SessionID   string                      `json:"sessionID,omitempty"`
 	ClientID    string                      `json:"clientID"`
 	Audience    []string                    `json:"audience"`
 	Scope       []string                    `json:"scope"`
@@ -71,11 +71,12 @@ func NewAddedEvent(ctx context.Context,
 type AccessTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID       string             `json:"id,omitempty"`
-	Scope    []string           `json:"scope,omitempty"`
-	Lifetime time.Duration      `json:"lifetime,omitempty"`
-	Reason   domain.TokenReason `json:"reason,omitempty"`
-	Actor    *domain.TokenActor `json:"actor,omitempty"`
+	ID        string             `json:"id,omitempty"`
+	ProjectID string             `json:"project_id,omitempty"`
+	Scope     []string           `json:"scope,omitempty"`
+	Lifetime  time.Duration      `json:"lifetime,omitempty"`
+	Reason    domain.TokenReason `json:"reason,omitempty"`
+	Actor     *domain.TokenActor `json:"actor,omitempty"`
 }
 
 func (e *AccessTokenAddedEvent) Payload() interface{} {
@@ -93,7 +94,8 @@ func (e *AccessTokenAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 func NewAccessTokenAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	id string,
+	id,
+	projectID string,
 	scope []string,
 	lifetime time.Duration,
 	reason domain.TokenReason,
@@ -105,11 +107,12 @@ func NewAccessTokenAddedEvent(
 			aggregate,
 			AccessTokenAddedType,
 		),
-		ID:       id,
-		Scope:    scope,
-		Lifetime: lifetime,
-		Reason:   reason,
-		Actor:    actor,
+		ID:        id,
+		ProjectID: projectID,
+		Scope:     scope,
+		Lifetime:  lifetime,
+		Reason:    reason,
+		Actor:     actor,
 	}
 }
 
