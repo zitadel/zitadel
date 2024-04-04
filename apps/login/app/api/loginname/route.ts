@@ -20,7 +20,6 @@ export async function POST(request: NextRequest) {
           authRequestId
         )
           .then((session) => {
-            console.log(session);
             if (session.factors?.user?.id) {
               return listAuthenticationMethodTypes(session.factors?.user?.id)
                 .then((methods) => {

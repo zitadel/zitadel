@@ -48,7 +48,6 @@ export async function GET(request: NextRequest) {
 
   const sessionCookies: SessionCookie[] = await getAllSessions();
   const ids = sessionCookies.map((s) => s.id);
-  console.log("sessionIds", ids);
   let sessions: Session[] = [];
   if (ids && ids.length) {
     sessions = await loadSessions(ids);

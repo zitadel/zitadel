@@ -302,7 +302,6 @@ export async function listUsers(
 ): Promise<ListUsersResponse> {
   const userService = user.getUser(server);
 
-  console.log("listUsers", userName, organizationId);
   return userService.listUsers(
     {
       queries: organizationId
