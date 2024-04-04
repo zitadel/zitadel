@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
-func (s *Storage) Query(ctx context.Context, reducer eventstore.Reducer, query *eventstore.Query) (err error) {
+func (s *Storage) Query(ctx context.Context, query *eventstore.Query) (eventCount int, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -20,26 +20,26 @@ func (s *Storage) Query(ctx context.Context, reducer eventstore.Reducer, query *
 	writeQuery(&stmt, query)
 
 	if query.Tx() != nil {
-		return executeQuery(ctx, query.Tx(), &stmt, reducer)
+		return executeQuery(ctx, query.Tx(), &stmt, query)
 	}
 
-	return executeQuery(ctx, s.client.DB, &stmt, reducer)
+	return executeQuery(ctx, s.client.DB, &stmt, query)
 }
 
 type querier interface {
 	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
 }
 
-func executeQuery(ctx context.Context, tx querier, stmt *database.Statement, reducer eventstore.Reducer) (err error) {
+func executeQuery(ctx context.Context, tx querier, stmt *database.Statement, reducer eventstore.Reducer) (eventCount int, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	rows, err := tx.QueryContext(ctx, stmt.String(), stmt.Args()...)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return database.MapRowsToObject(rows, func(scan func(dest ...any) error) error {
+	err = database.MapRowsToObject(rows, func(scan func(dest ...any) error) error {
 		e := &event{
 			aggregate: &eventstore.Aggregate{},
 		}
@@ -64,9 +64,12 @@ func executeQuery(ctx context.Context, tx querier, stmt *database.Statement, red
 			return err
 		}
 		e.payload = payload.V
+		eventCount++
 
 		return reducer.Reduce(e)
 	})
+
+	return eventCount, err
 }
 
 var (

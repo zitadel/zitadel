@@ -36,7 +36,7 @@ func (s *Server) SetDefaultOrg(ctx context.Context, req *admin_pb.SetDefaultOrgR
 }
 
 func (s *Server) RemoveOrg(ctx context.Context, req *admin_pb.RemoveOrgRequest) (*admin_pb.RemoveOrgResponse, error) {
-	intent, err := cmd_v2.NewRemoveOrg(req.GetOrgId()).ToPushIntent(ctx, s.es.Querier)
+	intent, err := cmd_v2.NewRemoveOrg(req.GetOrgId()).ToPushIntent(ctx)
 	if err != nil {
 		return nil, err
 	}

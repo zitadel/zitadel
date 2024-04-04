@@ -89,6 +89,8 @@ func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.Pu
 		stmt.WriteArgs(intent.Aggregate().Type)
 		stmt.WriteString(` AND aggregate_id = `)
 		stmt.WriteArgs(intent.Aggregate().ID)
+		stmt.WriteString(` AND owner = `)
+		stmt.WriteArgs(intent.Aggregate().Owner)
 		stmt.WriteString(` ORDER BY "sequence" DESC LIMIT 1)`)
 
 		if i < len(pushIntents)-1 {

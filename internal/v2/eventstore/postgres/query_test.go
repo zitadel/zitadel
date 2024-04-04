@@ -648,7 +648,7 @@ func Test_writeFilter(t *testing.T) {
 			var stmt database.Statement
 			stmt.SetNamedArg(instancePlaceholder, "i1")
 			// ensure a parent is set on the filter
-			eventstore.NewQuery("instance", eventstore.AppendFilters(tt.args.filter))
+			eventstore.NewQuery("instance", nil, eventstore.AppendFilters(tt.args.filter))
 
 			writeFilter(&stmt, tt.args.filter)
 			assertQuery(t, &stmt, tt.want)
@@ -670,6 +670,7 @@ func Test_writeQuery(t *testing.T) {
 			args: args{
 				query: eventstore.NewQuery(
 					"i1",
+					nil,
 					eventstore.AppendFilters(
 						eventstore.NewFilter(),
 					),
@@ -685,6 +686,7 @@ func Test_writeQuery(t *testing.T) {
 			args: args{
 				query: eventstore.NewQuery(
 					"i1",
+					nil,
 					eventstore.AppendFilters(
 						eventstore.NewFilter(
 							eventstore.AppendAggregateFilter(
@@ -705,6 +707,7 @@ func Test_writeQuery(t *testing.T) {
 			args: args{
 				query: eventstore.NewQuery(
 					"i1",
+					nil,
 					eventstore.AppendFilters(
 						eventstore.NewFilter(
 							eventstore.AppendAggregateFilter(
@@ -752,6 +755,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 			args: args{
 				query: eventstore.NewQuery(
 					"instance",
+					nil,
 					eventstore.AppendFilters(
 						eventstore.NewFilter(
 							eventstore.AppendAggregateFilter("aggregate"),
@@ -772,6 +776,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 			args: args{
 				query: eventstore.NewQuery(
 					"instance",
+					nil,
 					eventstore.QueryPagination(
 						eventstore.Descending(),
 					),
@@ -793,6 +798,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 			args: args{
 				query: eventstore.NewQuery(
 					"instance",
+					nil,
 					eventstore.AppendFilters(
 						eventstore.NewFilter(
 							eventstore.AppendAggregateFilter("agg1"),
@@ -819,6 +825,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 			args: args{
 				query: eventstore.NewQuery(
 					"instance",
+					nil,
 					eventstore.AppendFilters(
 						eventstore.NewFilter(
 							eventstore.AppendAggregateFilter("agg1", eventstore.AggregateID("id")),
@@ -847,6 +854,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 			args: args{
 				query: eventstore.NewQuery(
 					"instance",
+					nil,
 					eventstore.AppendFilter(
 						eventstore.AppendAggregateFilter(
 							"agg1",
@@ -881,6 +889,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 			args: args{
 				query: eventstore.NewQuery(
 					"instance",
+					nil,
 					eventstore.AppendFilters(
 
 						eventstore.NewFilter(

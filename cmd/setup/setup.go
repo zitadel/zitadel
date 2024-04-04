@@ -272,13 +272,13 @@ func initProjections(
 		logging.WithFields("name", p.String()).OnError(err).Fatal("migration failed")
 	}
 
-	es := es_v4.NewEventstoreFromOne(postgres.New(queryDBClient))
+	es_v4.InitEvenStoreFromOne(postgres.New(queryDBClient))
+	// es := es_v4.NewEventstoreFromOne(postgres.New(queryDBClient))
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 	queries, err := query.StartQueries(
 		ctx,
 		eventstoreClient,
-		es.Querier,
 		queryDBClient,
 		projectionDBClient,
 		config.Projections,

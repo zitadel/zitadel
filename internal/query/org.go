@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
-	"github.com/zitadel/zitadel/internal/v2/org"
 	"github.com/zitadel/zitadel/internal/v2/readmodel"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -97,15 +96,16 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	defer func() { span.EndWithError(err) }()
 
 	foundOrg := readmodel.NewOrg(id)
-	err = q.newEventStore.Query(ctx, foundOrg, eventstore.NewQuery(
+	eventCount, err := eventstore.NewQuery(
 		authz.GetInstance(ctx).InstanceID(),
+		foundOrg,
 		eventstore.AppendFilters(foundOrg.Filter()...),
-	))
+	).Execute(ctx)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
 	}
 
-	if !foundOrg.State.State.IsValidStates(org.ActiveState, org.InactiveState) {
+	if eventCount == 0 {
 		return nil, zerrors.ThrowNotFound(nil, "QUERY-leq5Q", "Errors.Org.NotFound")
 	}
 

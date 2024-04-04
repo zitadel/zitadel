@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -33,8 +32,6 @@ type Server struct {
 	userCodeAlg       crypto.EncryptionAlgorithm
 	passwordHashAlg   crypto.HashAlgorithm
 	auditLogRetention time.Duration
-
-	es *eventstore.EventStore
 }
 
 type Config struct {
@@ -49,7 +46,6 @@ func CreateServer(
 	externalSecure bool,
 	userCodeAlg crypto.EncryptionAlgorithm,
 	auditLogRetention time.Duration,
-	es *eventstore.EventStore,
 ) *Server {
 	return &Server{
 		database:          database,
@@ -59,7 +55,6 @@ func CreateServer(
 		userCodeAlg:       userCodeAlg,
 		passwordHashAlg:   crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 		auditLogRetention: auditLogRetention,
-		es:                es,
 	}
 }
 

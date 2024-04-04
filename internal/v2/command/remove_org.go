@@ -30,7 +30,7 @@ func NewRemoveOrg(id string) *RemoveOrg {
 	}
 }
 
-func (i *RemoveOrg) ToPushIntent(ctx context.Context, querier eventstore.Querier) (eventstore.PushIntent, error) {
+func (i *RemoveOrg) ToPushIntent(ctx context.Context) (eventstore.PushIntent, error) {
 	i.aggregate = org.NewAggregate(ctx, i.id)
 	i.aggregate.Owner = i.id
 

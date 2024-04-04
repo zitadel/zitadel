@@ -1,6 +1,7 @@
 package eventstore
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"time"
@@ -13,7 +14,13 @@ type Query struct {
 	filters    []*Filter
 	tx         *sql.Tx
 	pagination *Pagination
+	reducer    Reducer
+	querier    Querier
 	// TODO: await push
+}
+
+func (q *Query) Execute(ctx context.Context) (eventCount int, err error) {
+	return q.querier.Query(ctx, q)
 }
 
 func (q *Query) Instance() string {
@@ -33,9 +40,15 @@ func (q *Query) Pagination() *Pagination {
 	return q.pagination
 }
 
-func NewQuery(instance string, opts ...QueryOpt) *Query {
+func (q *Query) Reduce(events ...Event) error {
+	return q.reducer.Reduce(events...)
+}
+
+func NewQuery(instance string, reducer Reducer, opts ...QueryOpt) *Query {
 	query := &Query{
 		instance: instance,
+		reducer:  reducer,
+		querier:  querier,
 	}
 
 	for _, opt := range opts {
@@ -50,6 +63,12 @@ type QueryOpt func(query *Query)
 func QueryTx(tx *sql.Tx) QueryOpt {
 	return func(query *Query) {
 		query.tx = tx
+	}
+}
+
+func QueryExecuter(q Querier) QueryOpt {
+	return func(query *Query) {
+		query.querier = q
 	}
 }
 

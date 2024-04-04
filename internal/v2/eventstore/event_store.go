@@ -5,25 +5,29 @@ import (
 	"time"
 )
 
+var (
+	querier Querier
+	pusher  Pusher
+)
+
+func InitEventStore(push Pusher, query Querier) {
+	pusher = push
+	querier = query
+}
+
+func InitEvenStoreFromOne(o one) {
+	pusher = o
+	querier = o
+}
+
 type EventStore struct {
 	Pusher
 	Querier
 }
 
-func NewEventstore(push Pusher, query Querier) *EventStore {
-	return &EventStore{
-		Pusher:  push,
-		Querier: query,
-	}
-}
-
 type one interface {
 	Pusher
 	Querier
-}
-
-func NewEventstoreFromOne(o one) *EventStore {
-	return NewEventstore(o, o)
 }
 
 type healther interface {
@@ -40,7 +44,7 @@ type Pusher interface {
 
 type Querier interface {
 	healther
-	Query(ctx context.Context, reducer Reducer, query *Query) error
+	Query(ctx context.Context, query *Query) (eventCount int, err error)
 }
 
 type Aggregate struct {
@@ -114,20 +118,6 @@ type GlobalPosition struct {
 	InPositionOrder uint32
 }
 
-// func (gp *GlobalPosition) GetPosition() float64 {
-// 	if gp == nil {
-// 		return 0
-// 	}
-// 	return gp.Position
-// }
-
-// func (gp *GlobalPosition) GetInPositionOrder() uint32 {
-// 	if gp == nil {
-// 		return 0
-// 	}
-// 	return gp.InPositionOrder
-// }
-
 type Event interface {
 	action
 
@@ -158,3 +148,5 @@ type action interface {
 type Reducer interface {
 	Reduce(events ...Event) error
 }
+
+type Reduce func(events ...Event) error
