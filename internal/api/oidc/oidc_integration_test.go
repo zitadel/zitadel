@@ -39,17 +39,17 @@ const (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(10 * time.Minute)
+		ctx, _, cancel := integration.Contexts(10 * time.Minute)
 		defer cancel()
 
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 
-		CTX, _ = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
+		CTX = Tester.WithAuthorization(ctx, integration.OrgOwner)
 		User = Tester.CreateHumanUser(CTX)
 		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword, false)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
-		CTXLOGIN, _ = Tester.WithAuthorization(ctx, integration.Login), errCtx
+		CTXLOGIN = Tester.WithAuthorization(ctx, integration.Login)
 		return m.Run()
 	}())
 }

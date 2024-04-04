@@ -5,18 +5,48 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"slices"
 	"strings"
 
 	"github.com/dop251/goja"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/actions/object"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
+
+func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
+
+	features := authz.GetFeatures(ctx)
+	if features.LegacyIntrospection {
+		return s.LegacyServer.UserInfo(ctx, r)
+	}
+	if features.TriggerIntrospectionProjections {
+		query.TriggerOIDCUserInfoProjections(ctx)
+	}
+
+	token, err := s.verifyAccessToken(ctx, r.Data.AccessToken)
+	if err != nil {
+		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("access token invalid").WithParent(err), http.StatusUnauthorized)
+	}
+	userInfo, err := s.userInfo(ctx, token.userID, "", token.scope, token.audience)
+	if err != nil {
+		return nil, err
+	}
+	return op.NewResponse(userInfo), nil
+}
 
 func (s *Server) userInfo(ctx context.Context, userID, projectID string, scope, roleAudience []string) (_ *oidc.UserInfo, err error) {
 	roleAudience, requestedRoles := prepareRoles(ctx, projectID, scope, roleAudience)

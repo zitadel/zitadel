@@ -26,6 +26,8 @@ var introspectionTriggerHandlers = sync.OnceValue(func() []*handler.Handler {
 	)
 })
 
+// TriggerIntrospectionProjections triggers all projections
+// relevant to introspection queries concurrently.
 func TriggerIntrospectionProjections(ctx context.Context) {
 	triggerBatch(ctx, introspectionTriggerHandlers()...)
 }

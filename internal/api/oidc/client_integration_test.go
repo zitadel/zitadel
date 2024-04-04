@@ -172,17 +172,6 @@ func TestServer_Introspect(t *testing.T) {
 	}
 }
 
-func assertUserinfo(t *testing.T, userinfo *oidc.UserInfo) {
-	assert.Equal(t, User.GetUserId(), userinfo.Subject)
-	assert.Equal(t, "Mickey", userinfo.GivenName)
-	assert.Equal(t, "Mouse", userinfo.FamilyName)
-	assert.Equal(t, "Mickey Mouse", userinfo.Name)
-	assert.NotEmpty(t, userinfo.PreferredUsername)
-	assert.Equal(t, userinfo.PreferredUsername, userinfo.Email)
-	assert.False(t, bool(userinfo.EmailVerified))
-	assertOIDCTime(t, userinfo.UpdatedAt, User.GetDetails().GetChangeDate().AsTime())
-}
-
 func assertIntrospection(
 	t *testing.T,
 	introspection *oidc.IntrospectionResponse,

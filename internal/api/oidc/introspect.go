@@ -29,7 +29,6 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		return s.LegacyServer.Introspect(ctx, r)
 	}
 	if features.TriggerIntrospectionProjections {
-		// Execute all triggers in one concurrent sweep.
 		query.TriggerIntrospectionProjections(ctx)
 	}
 
