@@ -29,6 +29,7 @@ func (m *DeviceAuthReadModel) Reduce() error {
 			m.UserCode = e.UserCode
 			m.Expires = e.Expires
 			m.Scopes = e.Scopes
+			m.Audience = e.Audience
 			m.State = e.State
 		case *deviceauth.ApprovedEvent:
 			m.State = domain.DeviceAuthStateApproved
