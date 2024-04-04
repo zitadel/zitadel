@@ -16,13 +16,14 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
+
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 )
 
 func setTokenExchangeFeature(t *testing.T, value bool) {
@@ -107,6 +108,7 @@ func refreshTokenVerifier(ctx context.Context, provider rp.RelyingParty, subject
 			require.NotNil(t, tokens.IDTokenClaims.Actor)
 			assert.Equal(t, actorSubject, tokens.IDTokenClaims.Actor.Subject)
 		}
+		assert.NotEmpty(t, tokens.RefreshToken)
 	}
 }
 
