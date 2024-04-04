@@ -383,9 +383,6 @@ func (p *appProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-vnZKi", "reduce.wrong.event.type %s", project.APIConfigChangedType)
 	}
 	cols := make([]handler.Column, 0, 2)
-	if e.ClientSecret != nil {
-		cols = append(cols, handler.NewCol(AppAPIConfigColumnClientSecret, string(e.ClientSecret.Crypted)))
-	}
 	if e.AuthMethodType != nil {
 		cols = append(cols, handler.NewCol(AppAPIConfigColumnAuthMethod, *e.AuthMethodType))
 	}

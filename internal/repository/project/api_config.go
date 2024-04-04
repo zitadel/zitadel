@@ -96,15 +96,7 @@ func APIConfigAddedEventMapper(event eventstore.Event) (eventstore.Event, error)
 type APIConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID string `json:"appId"`
-
-	// TBD IN REVIEW:
-	// I did not find any callers that set the ClientSecret field.
-	// It is not reduced in the writeModel.
-	// It is reduced in the projection.
-	// Do we have legacy events that might have this field set,
-	// or is it safe to remove this field?
-	ClientSecret   *crypto.CryptoValue       `json:"clientSecret,omitempty"`
+	AppID          string                    `json:"appId"`
 	AuthMethodType *domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
 
