@@ -21,7 +21,7 @@ describe("login", () => {
         session: {
           id: "221394658884845598",
           creationDate: new Date("2024-04-04T09:40:55.577Z"),
-          changeDate: "1519211810999",
+          changeDate: new Date("2024-04-04T09:40:55.577Z"),
           sequence: 859,
           factors: {
             user: {
