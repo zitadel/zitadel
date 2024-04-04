@@ -47,12 +47,6 @@ describe("login", () => {
   });
   describe("password login", () => {
     beforeEach(() => {
-      stub("zitadel.user.v2beta.UserService", "ListAuthenticationMethodTypes", {
-        data: {
-          authMethodTypes: [1], // 1 for password authentication
-        },
-      });
-
       stub("zitadel.user.v2beta.UserService", "ListUsers", {
         data: {
           details: {
@@ -83,6 +77,11 @@ describe("login", () => {
               },
             },
           ],
+        },
+      });
+      stub("zitadel.user.v2beta.UserService", "ListAuthenticationMethodTypes", {
+        data: {
+          authMethodTypes: [1], // 1 for password authentication
         },
       });
     });
@@ -119,6 +118,38 @@ describe("login", () => {
   });
   describe("passkey login", () => {
     beforeEach(() => {
+      stub("zitadel.user.v2beta.UserService", "ListUsers", {
+        data: {
+          details: {
+            totalResult: 1,
+          },
+          result: [
+            {
+              userId: "221394658884845598",
+              state: 1,
+              username: "john@zitadel.com",
+              loginNames: ["john@zitadel.com"],
+              preferredLoginName: "john@zitadel.com",
+              human: {
+                userId: "221394658884845598",
+                state: 1,
+                username: "john@zitadel.com",
+                loginNames: ["john@zitadel.com"],
+                preferredLoginName: "john@zitadel.com",
+                profile: {
+                  givenName: "John",
+                  familyName: "Doe",
+                  avatarUrl: "https://zitadel.com/avatar.jpg",
+                },
+                email: {
+                  email: "john@zitadel.com",
+                  isVerified: true,
+                },
+              },
+            },
+          ],
+        },
+      });
       stub("zitadel.user.v2beta.UserService", "ListAuthenticationMethodTypes", {
         data: {
           authMethodTypes: [2], // 2 for passwordless authentication
