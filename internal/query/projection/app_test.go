@@ -352,7 +352,7 @@ func TestAppProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "project reduceAPIConfigChanged, v1 secret",
+			name: "project reduceAPIConfigChanged",
 			args: args{
 				event: getEvent(
 					testEvent(
@@ -361,7 +361,6 @@ func TestAppProjection_reduces(t *testing.T) {
 						[]byte(`{
 		            "appId": "app-id",
 					"clientId": "client-id",
-					"clientSecret": {"CryptoType":1,"Algorithm":"bcrypt","Crypted":"c2VjcmV0"},
 				    "authMethodType": 1
 				}`),
 					), project.APIConfigChangedEventMapper),
@@ -373,9 +372,8 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.apps7_api_configs SET (client_secret, auth_method) = ($1, $2) WHERE (app_id = $3) AND (instance_id = $4)",
+							expectedStmt: "UPDATE projections.apps7_api_configs SET auth_method = $1 WHERE (app_id = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
-								"secret",
 								domain.APIAuthMethodTypePrivateKeyJWT,
 								"app-id",
 								"instance-id",
