@@ -3,7 +3,6 @@ package execution
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -134,7 +133,5 @@ func call(ctx context.Context, url string, timeout time.Duration, body []byte) (
 		return io.ReadAll(resp.Body)
 	}
 	data, _ := io.ReadAll(resp.Body)
-	fmt.Println("data")
-	fmt.Println(string(data))
 	return nil, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed")
 }

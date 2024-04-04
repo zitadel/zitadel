@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -17,7 +16,6 @@ import (
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-
 		requestTargets, responseTargets, err := queryTargets(ctx, queries, info.FullMethod)
 		if err != nil {
 			return nil, err
@@ -33,18 +31,8 @@ func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("request")
-		fmt.Println(handledReq)
-		fmt.Println("resp")
-		fmt.Println(response)
 
-		handledResponse, err := executeTargetsForResponse(ctx, responseTargets, info.FullMethod, handledReq, response)
-		if err != nil {
-			fmt.Println("error request: " + err.Error())
-		}
-		fmt.Println("resp")
-		fmt.Println(handledResponse)
-		return handledResponse, err
+		return executeTargetsForResponse(ctx, responseTargets, info.FullMethod, handledReq, response)
 	}
 }
 
@@ -89,7 +77,6 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 		Request:    req,
 		Response:   resp,
 	}
-	fmt.Println(info)
 
 	response, err := execution.CallTargets(ctx, targets, info)
 	if err != nil {

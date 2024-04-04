@@ -45,14 +45,14 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// create target for target changes
 				targetCreatedName := fmt.Sprint("GetTargetByID", time.Now().UnixNano()+1)
 				targetCreatedURL := "https://nonexistent"
-				targetCreated := Tester.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, true, false, true)
+				targetCreated := Tester.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, true, false, false)
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instanceID, OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
 				changedRequest := &execution.GetTargetByIDRequest{TargetId: targetCreated.GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
-				targetRequest := Tester.CreateTarget(ctx, t, "", urlRequest, true, false, true)
+				targetRequest := Tester.CreateTarget(ctx, t, "", urlRequest, true, false, false)
 				Tester.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), []string{targetRequest.GetId()}, []string{})
 				// GetTargetByID with used target
 				request.TargetId = targetRequest.GetId()
@@ -68,8 +68,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 								Url: targetCreatedURL,
 							},
 						},
-						Timeout:       durationpb.New(10 * time.Second),
-						ExecutionType: &execution.Target_InterruptOnError{InterruptOnError: true},
+						Timeout: durationpb.New(10 * time.Second),
 					},
 				}
 				// has to be set separately because of the pointers
@@ -82,8 +81,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 							Url: targetCreatedURL,
 						},
 					},
-					Timeout:       durationpb.New(10 * time.Second),
-					ExecutionType: &execution.Target_InterruptOnError{InterruptOnError: true},
+					Timeout: durationpb.New(10 * time.Second),
 				}
 
 				// content for partial update
@@ -107,7 +105,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				}
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusOK, changedResponse)
-				targetResponse := Tester.CreateTarget(ctx, t, "", targetResponseURL, true, false, true)
+				targetResponse := Tester.CreateTarget(ctx, t, "", targetResponseURL, true, false, false)
 				Tester.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), []string{targetResponse.GetId()}, []string{})
 
 				return func() {

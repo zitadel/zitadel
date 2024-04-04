@@ -51,7 +51,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
-					resp := Tester.CreateTarget(ctx, t, name, "https://exmaple.com", false, false, false)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", false, false, false)
 					request.TargetId = resp.GetId()
 
 					response.Target.TargetId = resp.GetId()
@@ -83,7 +83,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
-					resp := Tester.CreateTarget(ctx, t, name, "https://exmaple.com", false, true, false)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", false, true, false)
 					request.TargetId = resp.GetId()
 
 					response.Target.TargetId = resp.GetId()
@@ -116,7 +116,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
-					resp := Tester.CreateTarget(ctx, t, name, "https://exmaple.com", false, false, true)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", false, false, true)
 					request.TargetId = resp.GetId()
 
 					response.Target.TargetId = resp.GetId()
@@ -225,7 +225,7 @@ func TestServer_ListTargets(t *testing.T) {
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.ListTargetsRequest, response *execution.ListTargetsResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
-					resp := Tester.CreateTarget(ctx, t, name, "https://exmaple.com", false, false, false)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", false, false, false)
 					request.Queries[0].Query = &execution.TargetSearchQuery_InTargetIdsQuery{
 						InTargetIdsQuery: &execution.InTargetIDsQuery{
 							TargetIds: []string{resp.GetId()},
@@ -268,7 +268,7 @@ func TestServer_ListTargets(t *testing.T) {
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.ListTargetsRequest, response *execution.ListTargetsResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
-					resp := Tester.CreateTarget(ctx, t, name, "https://exmaple.com", false, false, false)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", false, false, false)
 					request.Queries[0].Query = &execution.TargetSearchQuery_TargetNameQuery{
 						TargetNameQuery: &execution.TargetNameQuery{
 							TargetName: name,
@@ -314,9 +314,9 @@ func TestServer_ListTargets(t *testing.T) {
 					name1 := fmt.Sprint(time.Now().UnixNano() + 1)
 					name2 := fmt.Sprint(time.Now().UnixNano() + 3)
 					name3 := fmt.Sprint(time.Now().UnixNano() + 5)
-					resp1 := Tester.CreateTarget(ctx, t, name1, "https://exmaple.com", false, false, false)
-					resp2 := Tester.CreateTarget(ctx, t, name2, "https://exmaple.com", true, true, false)
-					resp3 := Tester.CreateTarget(ctx, t, name3, "https://exmaple.com", false, false, true)
+					resp1 := Tester.CreateTarget(ctx, t, name1, "https://example.com", false, false, false)
+					resp2 := Tester.CreateTarget(ctx, t, name2, "https://example.com", true, true, false)
+					resp3 := Tester.CreateTarget(ctx, t, name3, "https://example.com", false, false, true)
 					request.Queries[0].Query = &execution.TargetSearchQuery_InTargetIdsQuery{
 						InTargetIdsQuery: &execution.InTargetIDsQuery{
 							TargetIds: []string{resp1.GetId(), resp2.GetId(), resp3.GetId()},
