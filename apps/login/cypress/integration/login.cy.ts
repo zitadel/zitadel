@@ -52,6 +52,36 @@ describe("login", () => {
           authMethodTypes: [1], // 1 for password authentication
         },
       });
+
+      stub("zitadel.user.v2beta.UserService", "ListUsers", {
+        data: {
+          result: [
+            {
+              userId: "1231231231",
+              state: 1,
+              username: "max",
+              loginNames: ["max"],
+              preferredLoginName: "max",
+              human: {
+                userId: "123123123",
+                state: 1,
+                username: "max",
+                loginNames: ["max"],
+                preferredLoginName: "max",
+                profile: {
+                  givenName: "Max",
+                  familyName: "Mustermann",
+                  avatarUrl: "https://zitadel.com/avatar.jpg",
+                },
+                email: {
+                  email: "string",
+                  isVerified: true,
+                },
+              },
+            },
+          ],
+        },
+      });
     });
     it("should redirect a user with password authentication to /password", () => {
       cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
