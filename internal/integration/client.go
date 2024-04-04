@@ -567,6 +567,13 @@ func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution
 	return target
 }
 
+func (s *Tester) DeleteExecution(ctx context.Context, t *testing.T, cond *execution.Condition) {
+	_, err := s.Client.ExecutionV3.DeleteExecution(ctx, &execution.DeleteExecutionRequest{
+		Condition: cond,
+	})
+	require.NoError(t, err)
+}
+
 func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {
 	return s.CreateUserSchemaWithType(ctx, t, fmt.Sprint(time.Now().UnixNano()+1))
 }

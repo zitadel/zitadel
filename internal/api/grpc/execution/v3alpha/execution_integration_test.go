@@ -162,6 +162,9 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
+
+			// cleanup to not impact other requests
+			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
@@ -268,6 +271,9 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
+
+			// cleanup to not impact other requests
+			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
@@ -584,6 +590,9 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
+
+			// cleanup to not impact other requests
+			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
@@ -912,6 +921,9 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
+
+			// cleanup to not impact other requests
+			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
@@ -1054,12 +1066,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 					},
 				},
 			},
-			want: &execution.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
+			wantErr: true,
 		},
 		{
 			name: "all, ok",
@@ -1185,6 +1192,9 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
+
+			// cleanup to not impact other requests
+			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
