@@ -130,10 +130,10 @@ export async function createSessionForLoginname(
         {
           checks: { user: { loginName }, password: { password } },
           challenges,
-          // lifetime: {
-          //   seconds: 300,
-          //   nanos: 0,
-          // },
+          lifetime: {
+            seconds: 300,
+            nanos: 0,
+          },
         },
         {}
       )
@@ -141,10 +141,10 @@ export async function createSessionForLoginname(
         {
           checks: { user: { loginName } },
           challenges,
-          // lifetime: {
-          //   seconds: 300,
-          //   nanos: 0,
-          // },
+          lifetime: {
+            seconds: 300,
+            nanos: 0,
+          },
         },
         {}
       );
@@ -162,10 +162,10 @@ export async function createSessionForUserId(
         {
           checks: { user: { userId }, password: { password } },
           challenges,
-          // lifetime: {
-          //   seconds: 300,
-          //   nanos: 0,
-          // },
+          lifetime: {
+            seconds: 300,
+            nanos: 0,
+          },
         },
         {}
       )
@@ -173,10 +173,10 @@ export async function createSessionForUserId(
         {
           checks: { user: { userId } },
           challenges,
-          // lifetime: {
-          //   seconds: 300,
-          //   nanos: 0,
-          // },
+          lifetime: {
+            seconds: 300,
+            nanos: 0,
+          },
         },
         {}
       );

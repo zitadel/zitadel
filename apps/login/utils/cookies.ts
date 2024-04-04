@@ -45,15 +45,15 @@ export async function addSessionToCookie(
     currentSessions = [...currentSessions, session];
   }
 
-  // if (cleanup) {
-  //   const now = new Date();
-  //   const filteredSessions = currentSessions.filter(
-  //     (session) => new Date(session.expirationDate) > now
-  //   );
-  //   return setSessionHttpOnlyCookie(filteredSessions);
-  // } else {
-  return setSessionHttpOnlyCookie(currentSessions);
-  // }
+  if (cleanup) {
+    const now = new Date();
+    const filteredSessions = currentSessions.filter((session) =>
+      session.expirationDate ? new Date(session.expirationDate) > now : true
+    );
+    return setSessionHttpOnlyCookie(filteredSessions);
+  } else {
+    return setSessionHttpOnlyCookie(currentSessions);
+  }
 }
 
 export async function updateSessionCookie(
@@ -72,15 +72,15 @@ export async function updateSessionCookie(
 
   if (foundIndex > -1) {
     sessions[foundIndex] = session;
-    // if (cleanup) {
-    //   const now = new Date();
-    //   const filteredSessions = sessions.filter(
-    //     (session) => new Date(session.expirationDate) > now
-    //   );
-    //   return setSessionHttpOnlyCookie(filteredSessions);
-    // } else {
-    return setSessionHttpOnlyCookie(sessions);
-    // }
+    if (cleanup) {
+      const now = new Date();
+      const filteredSessions = sessions.filter((session) =>
+        session.expirationDate ? new Date(session.expirationDate) > now : true
+      );
+      return setSessionHttpOnlyCookie(filteredSessions);
+    } else {
+      return setSessionHttpOnlyCookie(sessions);
+    }
   } else {
     throw "updateSessionCookie: session id now found";
   }
@@ -98,15 +98,15 @@ export async function removeSessionFromCookie(
     : [session];
 
   const reducedSessions = sessions.filter((s) => s.id !== session.id);
-  // if (cleanup) {
-  //   const now = new Date();
-  //   const filteredSessions = reducedSessions.filter(
-  //     (session) => new Date(session.expirationDate) > now
-  //   );
-  //   return setSessionHttpOnlyCookie(filteredSessions);
-  // } else {
-  return setSessionHttpOnlyCookie(reducedSessions);
-  // }
+  if (cleanup) {
+    const now = new Date();
+    const filteredSessions = reducedSessions.filter((session) =>
+      session.expirationDate ? new Date(session.expirationDate) > now : true
+    );
+    return setSessionHttpOnlyCookie(filteredSessions);
+  } else {
+    return setSessionHttpOnlyCookie(reducedSessions);
+  }
 }
 
 export async function getMostRecentSessionCookie(): Promise<any> {
@@ -192,14 +192,16 @@ export async function getAllSessionCookieIds(
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
 
-    // if (cleanup) {
-    //   const now = new Date();
-    //   return sessions
-    //     .filter((session) => new Date(session.expirationDate) > now)
-    //     .map((session) => session.id);
-    // } else {
-    return sessions.map((session) => session.id);
-    // }
+    if (cleanup) {
+      const now = new Date();
+      return sessions
+        .filter((session) =>
+          session.expirationDate ? new Date(session.expirationDate) > now : true
+        )
+        .map((session) => session.id);
+    } else {
+      return sessions.map((session) => session.id);
+    }
   } else {
     return [];
   }
@@ -219,14 +221,14 @@ export async function getAllSessions(
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie[] = JSON.parse(stringifiedCookie?.value);
 
-    // if (cleanup) {
-    //   const now = new Date();
-    //   return sessions.filter(
-    //     (session) => new Date(session.expirationDate) > now
-    //   );
-    // } else {
-    return sessions;
-    // }
+    if (cleanup) {
+      const now = new Date();
+      return sessions.filter((session) =>
+        session.expirationDate ? new Date(session.expirationDate) > now : true
+      );
+    } else {
+      return sessions;
+    }
   } else {
     return [];
   }
