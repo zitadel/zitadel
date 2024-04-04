@@ -58,3 +58,27 @@ func (q *Queries) GetOIDCClientByID(ctx context.Context, clientID string, getKey
 	}
 	return client, err
 }
+
+//go:embed oidc_client_project.sql
+var oidcClientProjectQuery string
+
+func (q *Queries) GetProjectIDByOIDClientID(ctx context.Context, clientID string) (projectID string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	scan := func(row *sql.Row) error {
+		var dest sql.NullString
+		err := row.Scan(&dest)
+		projectID = dest.String
+		return err
+	}
+
+	err = q.client.QueryRowContext(ctx, scan, oidcClientProjectQuery, authz.GetInstance(ctx).InstanceID(), clientID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", zerrors.ThrowNotFound(err, "QUERY-beeW8", "Errors.App.NotFound")
+	}
+	if err != nil {
+		return "", zerrors.ThrowInternal(err, "QUERY-Ais4r", "Errors.Internal")
+	}
+	return projectID, nil
+}
