@@ -55,26 +55,29 @@ describe("login", () => {
 
       stub("zitadel.user.v2beta.UserService", "ListUsers", {
         data: {
+          details: {
+            totalResult: 1,
+          },
           result: [
             {
-              userId: "1231231231",
+              userId: "221394658884845598",
               state: 1,
-              username: "max",
-              loginNames: ["max"],
-              preferredLoginName: "max",
+              username: "john@zitadel.com",
+              loginNames: ["john@zitadel.com"],
+              preferredLoginName: "john@zitadel.com",
               human: {
-                userId: "123123123",
+                userId: "221394658884845598",
                 state: 1,
-                username: "max",
-                loginNames: ["max"],
-                preferredLoginName: "max",
+                username: "john@zitadel.com",
+                loginNames: ["john@zitadel.com"],
+                preferredLoginName: "john@zitadel.com",
                 profile: {
-                  givenName: "Max",
-                  familyName: "Mustermann",
+                  givenName: "John",
+                  familyName: "Doe",
                   avatarUrl: "https://zitadel.com/avatar.jpg",
                 },
                 email: {
-                  email: "string",
+                  email: "john@zitadel.com",
                   isVerified: true,
                 },
               },
