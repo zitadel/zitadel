@@ -6,17 +6,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
     const { loginName, authRequestId, organization } = body;
-    // TODO - search for users with org
-    console.log(
-      "loginName",
-      loginName,
-      "authRequestId",
-      authRequestId,
-      "organization",
-      organization
-    );
     return listUsers(loginName, organization).then((users) => {
-      console.log("users", users);
       if (
         users.details &&
         users.details.totalResult == 1 &&
@@ -30,7 +20,6 @@ export async function POST(request: NextRequest) {
           authRequestId
         )
           .then((session) => {
-            console.log(session);
             if (session.factors?.user?.id) {
               return listAuthenticationMethodTypes(session.factors?.user?.id)
                 .then((methods) => {
@@ -48,6 +37,7 @@ export async function POST(request: NextRequest) {
             }
           })
           .catch((error) => {
+            console.error(error);
             return NextResponse.json(error, { status: 500 });
           });
       } else {
