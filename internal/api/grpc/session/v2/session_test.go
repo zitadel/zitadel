@@ -157,7 +157,6 @@ func Test_sessionsToPb(t *testing.T) {
 					Id:             "345",
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
-					OrganisationId: "org1",
 					OrganizationId: "org1",
 				},
 			},
@@ -174,7 +173,6 @@ func Test_sessionsToPb(t *testing.T) {
 					Id:             "345",
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
-					OrganisationId: "org1",
 					OrganizationId: "org1",
 				},
 				Password: &session.PasswordFactor{
@@ -194,7 +192,6 @@ func Test_sessionsToPb(t *testing.T) {
 					Id:             "345",
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
-					OrganisationId: "org1",
 					OrganizationId: "org1",
 				},
 				WebAuthN: &session.WebAuthNFactor{
@@ -215,7 +212,6 @@ func Test_sessionsToPb(t *testing.T) {
 					Id:             "345",
 					LoginName:      "donald",
 					DisplayName:    "donald duck",
-					OrganisationId: "org1",
 					OrganizationId: "org1",
 				},
 				Totp: &session.TOTPFactor{

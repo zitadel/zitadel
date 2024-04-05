@@ -106,16 +106,19 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		return nil, err
 	}
 	introspectionResp := &oidc.IntrospectionResponse{
-		Active:     true,
-		Scope:      token.scope,
-		ClientID:   token.clientID,
-		TokenType:  oidc.BearerToken,
-		Expiration: oidc.FromTime(token.tokenExpiration),
-		IssuedAt:   oidc.FromTime(token.tokenCreation),
-		NotBefore:  oidc.FromTime(token.tokenCreation),
-		Audience:   token.audience,
-		Issuer:     op.IssuerFromContext(ctx),
-		JWTID:      token.tokenID,
+		Active:                          true,
+		Scope:                           token.scope,
+		ClientID:                        token.clientID,
+		TokenType:                       oidc.BearerToken,
+		Expiration:                      oidc.FromTime(token.tokenExpiration),
+		IssuedAt:                        oidc.FromTime(token.tokenCreation),
+		AuthTime:                        oidc.FromTime(token.authTime),
+		NotBefore:                       oidc.FromTime(token.tokenCreation),
+		Audience:                        token.audience,
+		AuthenticationMethodsReferences: AuthMethodTypesToAMR(token.authMethods),
+		Issuer:                          op.IssuerFromContext(ctx),
+		JWTID:                           token.tokenID,
+		Actor:                           actorDomainToClaims(token.actor),
 	}
 	introspectionResp.SetUserInfo(userInfo)
 	return op.NewResponse(introspectionResp), nil

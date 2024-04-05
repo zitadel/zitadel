@@ -29,7 +29,7 @@ func (s *Server) userInfo(ctx context.Context, userID, projectID string, scope, 
 	return userInfo, s.userinfoFlows(ctx, qu, userInfo)
 }
 
-// prepareRoles scans the requested scopes, appends to roleAudiendce and returns the requestedRoles.
+// prepareRoles scans the requested scopes, appends to roleAudience and returns the requestedRoles.
 //
 // When [ScopeProjectsRoles] is present and roleAudience was empty,
 // project IDs with the [domain.ProjectIDScope] prefix are added to the roleAudience.
@@ -153,9 +153,9 @@ func setUserInfoMetadata(metadata []query.UserMetadata, out *oidc.UserInfo) {
 
 func setUserInfoOrgClaims(user *query.OIDCUserInfo, out *oidc.UserInfo) {
 	if org := user.Org; org != nil {
-		out.AppendClaims(ClaimResourceOwner+"id", org.ID)
-		out.AppendClaims(ClaimResourceOwner+"name", org.Name)
-		out.AppendClaims(ClaimResourceOwner+"primary_domain", org.PrimaryDomain)
+		out.AppendClaims(ClaimResourceOwnerID, org.ID)
+		out.AppendClaims(ClaimResourceOwnerName, org.Name)
+		out.AppendClaims(ClaimResourceOwnerPrimaryDomain, org.PrimaryDomain)
 	}
 }
 
@@ -223,6 +223,9 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 			actions.SetFields("v1",
 				actions.SetFields("userinfo",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if userInfo.Claims[key] == nil {
 							userInfo.AppendClaims(key, value)
 							return
@@ -235,6 +238,9 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 				),
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if userInfo.Claims[key] == nil {
 							userInfo.AppendClaims(key, value)
 							return

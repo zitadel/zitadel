@@ -12,6 +12,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 
 	"github.com/zitadel/zitadel/internal/database"
+	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -405,7 +406,10 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		client, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+		client, mock, err := sqlmock.New(
+			sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual),
+			sqlmock.ValueConverterOption(new(db_mock.TypeConverter)),
+		)
 		if err != nil {
 			t.Fatalf("unable to mock db: %v", err)
 		}

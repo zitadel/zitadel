@@ -10,8 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jackc/pgconn"
-
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -21,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type EventStore interface {
@@ -331,7 +331,7 @@ func (ai *existingInstances) AppendEvents(events ...eventstore.Event) {
 		case instance.InstanceAddedEventType:
 			*ai = append(*ai, event.Aggregate().InstanceID)
 		case instance.InstanceRemovedEventType:
-			slices.DeleteFunc(*ai, func(s string) bool {
+			*ai = slices.DeleteFunc(*ai, func(s string) bool {
 				return s == event.Aggregate().InstanceID
 			})
 		}
@@ -479,7 +479,9 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		defer cancel()
 	}
 
+	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := h.client.BeginTx(txCtx, nil)
+	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return false, err
 	}
