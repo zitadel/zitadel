@@ -48,7 +48,7 @@ func (c *Commands) verifyUserPasskeyCode(ctx context.Context, userID, resourceOw
 	if err != nil {
 		return nil, err
 	}
-	err = verifyCryptoCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg, wm.ChangeDate, wm.Expiration, wm.CryptoCode, code)
+	err = verifyEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg, wm.ChangeDate, wm.Expiration, wm.CryptoCode, code) //nolint:staticcheck
 	if err != nil || wm.State != domain.PasswordlessInitCodeStateActive {
 		c.verifyUserPasskeyCodeFailed(ctx, wm)
 		return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-Eeb2a", "Errors.User.Code.Invalid")
@@ -156,6 +156,6 @@ func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner
 	}, nil
 }
 
-func (c *Commands) newPasskeyCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
-	return c.newCode(ctx, filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
+func (c *Commands) newPasskeyCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
+	return c.newEncryptedCode(ctx, filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
 }

@@ -5,11 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zitadel/logging"
-
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	project_repo "github.com/zitadel/zitadel/internal/repository/project"
@@ -36,12 +33,12 @@ type addOIDCApp struct {
 	SkipSuccessPageForNativeApp bool
 
 	ClientID          string
-	ClientSecret      *crypto.CryptoValue
+	ClientSecret      string
 	ClientSecretPlain string
 }
 
 // AddOIDCAppCommand prepares the commands to add an oidc app. The ClientID will be set during the CreateCommands
-func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.HashAlgorithm) preparation.Validation {
+func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if app.ID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument")
@@ -77,11 +74,10 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.Has
 			}
 
 			if app.AuthMethodType == domain.OIDCAuthMethodTypeBasic || app.AuthMethodType == domain.OIDCAuthMethodTypePost {
-				code, err := c.newAppClientSecret(ctx, filter, clientSecretAlg)
+				app.ClientSecret, app.ClientSecretPlain, err = c.newHashedSecret(ctx, filter)
 				if err != nil {
 					return nil, err
 				}
-				app.ClientSecret, app.ClientSecretPlain = code.Crypted, code.Plain
 			}
 
 			return []eventstore.Command{
@@ -118,7 +114,7 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp, clientSecretAlg crypto.Has
 	}
 }
 
-func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner, appID string, appSecretGenerator crypto.Generator) (_ *domain.OIDCApp, err error) {
+func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner, appID string) (_ *domain.OIDCApp, err error) {
 	existingApp, err := c.getOIDCAppWriteModel(ctx, oidcApp.AggregateID, appID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -132,10 +128,10 @@ func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-3m9s2", "Errors.Project.NotFound")
 	}
 
-	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, project, appID, appSecretGenerator)
+	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, project, appID)
 }
 
-func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.OIDCApp, err error) {
+func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string) (_ *domain.OIDCApp, err error) {
 	if oidcApp == nil || oidcApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Project.App.Invalid")
 	}
@@ -153,11 +149,10 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 		return nil, err
 	}
 
-	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, project, appID, appSecretGenerator)
+	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, project, appID)
 }
 
-func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string, project *domain.Project, appID string, appSecretGenerator crypto.Generator) (_ *domain.OIDCApp, err error) {
-
+func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string, project *domain.Project, appID string) (_ *domain.OIDCApp, err error) {
 	addedApplication := NewOIDCApplicationWriteModel(oidcApp.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
 
@@ -167,12 +162,14 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		project_repo.NewApplicationAddedEvent(ctx, projectAgg, oidcApp.AppID, oidcApp.AppName),
 	}
 
-	var stringPw string
+	var plain string
 	err = domain.SetNewClientID(oidcApp, c.idGenerator, project)
 	if err != nil {
 		return nil, err
 	}
-	stringPw, err = domain.SetNewClientSecretIfNeeded(oidcApp, appSecretGenerator)
+	plain, err = domain.SetNewClientSecretIfNeeded(oidcApp, func() (string, string, error) {
+		return c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +178,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		oidcApp.OIDCVersion,
 		oidcApp.AppID,
 		oidcApp.ClientID,
-		oidcApp.ClientSecret,
+		oidcApp.EncodedHash,
 		trimStringSliceWhiteSpaces(oidcApp.RedirectUris),
 		oidcApp.ResponseTypes,
 		oidcApp.GrantTypes,
@@ -208,7 +205,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, err
 	}
 	result := oidcWriteModelToOIDCConfig(addedApplication)
-	result.ClientSecretString = stringPw
+	result.ClientSecretString = plain
 	result.FillCompliance()
 	return result, nil
 }
@@ -270,7 +267,7 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 	return result, nil
 }
 
-func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string, appSecretGenerator crypto.Generator) (*domain.OIDCApp, error) {
+func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.OIDCApp, error) {
 	if projectID == "" || appID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-99i83", "Errors.IDMissing")
 	}
@@ -285,14 +282,14 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	if !existingOIDC.IsOIDC() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Ghrh3", "Errors.Project.App.IsNotOIDC")
 	}
-	cryptoSecret, stringPW, err := domain.NewClientSecret(appSecretGenerator)
+	encodedHash, plain, err := c.newHashedSecret(ctx, c.eventstore.Filter) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingOIDC.WriteModel)
 
-	pushedEvents, err := c.eventstore.Push(ctx, project_repo.NewOIDCConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
+	pushedEvents, err := c.eventstore.Push(ctx, project_repo.NewOIDCConfigSecretChangedEvent(ctx, projectAgg, appID, encodedHash))
 	if err != nil {
 		return nil, err
 	}
@@ -302,7 +299,7 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	}
 
 	result := oidcWriteModelToOIDCConfig(existingOIDC)
-	result.ClientSecretString = stringPW
+	result.ClientSecretString = plain
 	return result, err
 }
 
@@ -315,26 +312,35 @@ func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID,
 		return err
 	}
 	if !app.State.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.NotExisting")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D8hba", "Errors.Project.App.NotExisting")
 	}
 	if !app.IsOIDC() {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-BHgn2", "Errors.Project.App.IsNotOIDC")
 	}
-	if app.ClientSecret == nil {
+	if app.HashedSecret == "" {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.OIDCConfigInvalid")
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
-	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
-	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.codeAlg)
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
+	updated, err := c.secretHasher.Verify(app.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
-		_, err = c.eventstore.Push(ctx, project_repo.NewOIDCConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
-		return err
+		c.oidcSecretCheckSucceeded(ctx, projectAgg, appID, updated)
+		return nil
 	}
-	_, err = c.eventstore.Push(ctx, project_repo.NewOIDCConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
-	logging.OnError(err).Error("could not push event OIDCClientSecretCheckFailed")
-	return zerrors.ThrowInvalidArgument(nil, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid")
+	c.oidcSecretCheckFailed(ctx, projectAgg, appID)
+	return zerrors.ThrowInvalidArgument(err, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid")
+}
+
+func (c *Commands) OIDCSecretCheckSucceeded(ctx context.Context, appID, projectID, resourceOwner, updated string) {
+	agg := project_repo.NewAggregate(projectID, resourceOwner)
+	c.oidcSecretCheckSucceeded(ctx, &agg.Aggregate, appID, updated)
+}
+
+func (c *Commands) OIDCSecretCheckFailed(ctx context.Context, appID, projectID, resourceOwner string) {
+	agg := project_repo.NewAggregate(projectID, resourceOwner)
+	c.oidcSecretCheckFailed(ctx, &agg.Aggregate, appID)
 }
 
 func (c *Commands) getOIDCAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*OIDCApplicationWriteModel, error) {
@@ -365,4 +371,19 @@ func trimStringSliceWhiteSpaces(slice []string) []string {
 		slice[i] = strings.TrimSpace(s)
 	}
 	return slice
+}
+
+func (c *Commands) oidcSecretCheckSucceeded(ctx context.Context, agg *eventstore.Aggregate, appID, updated string) {
+	cmds := append(
+		make([]eventstore.Command, 0, 2),
+		project_repo.NewOIDCConfigSecretCheckSucceededEvent(ctx, agg, appID),
+	)
+	if updated != "" {
+		cmds = append(cmds, project_repo.NewOIDCConfigSecretHashUpdatedEvent(ctx, agg, appID, updated))
+	}
+	c.asyncPush(ctx, cmds...)
+}
+
+func (c *Commands) oidcSecretCheckFailed(ctx context.Context, agg *eventstore.Aggregate, appID string) {
+	c.asyncPush(ctx, project_repo.NewOIDCConfigSecretCheckFailedEvent(ctx, agg, appID))
 }

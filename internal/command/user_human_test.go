@@ -28,9 +28,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
 		idGenerator        id.Generator
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 		codeAlg            crypto.EncryptionAlgorithm
-		newCode            cryptoCodeFunc
+		newCode            encrypedCodeFunc
 	}
 	type args struct {
 		ctx             context.Context
@@ -245,7 +245,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:     mockCode("userinit", time.Hour),
+				newCode:     mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -312,7 +312,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:     mockCode("userinit", time.Hour),
+				newCode:     mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -380,7 +380,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:     mockCode("userinit", time.Hour),
+				newCode:     mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -450,7 +450,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:            mockCode("userinit", time.Hour),
+				newCode:            mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -521,7 +521,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:            mockCode("emailCode", time.Hour),
+				newCode:            mockEncryptedCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -593,7 +593,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:            mockCode("emailCode", time.Hour),
+				newCode:            mockEncryptedCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -996,7 +996,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:            mockCode("phonecode", time.Hour),
+				newCode:            mockEncryptedCode("phonecode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1061,7 +1061,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:     mockCode("userinit", time.Hour),
+				newCode:     mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1136,7 +1136,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
 				codeAlg:            crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:            mockCode("phoneCode", time.Hour),
+				newCode:            mockEncryptedCode("phoneCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1204,7 +1204,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				codeAlg:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				newCode:     mockCode("userinit", time.Hour),
+				newCode:     mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1242,7 +1242,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				userEncryption:     tt.fields.codeAlg,
 				idGenerator:        tt.fields.idGenerator,
-				newCode:            tt.fields.newCode,
+				newEncryptedCode:   tt.fields.newCode,
 			}
 			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
 			if tt.res.err == nil {
@@ -1266,7 +1266,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
 		idGenerator        id.Generator
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx                  context.Context
@@ -2483,7 +2483,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
 		idGenerator        id.Generator
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx             context.Context
@@ -4328,7 +4328,7 @@ func TestAddHumanCommand(t *testing.T) {
 	type args struct {
 		human         *AddHuman
 		orgID         string
-		hasher        *crypto.PasswordHasher
+		hasher        *crypto.Hasher
 		filter        preparation.FilterToQueryReducer
 		codeAlg       crypto.EncryptionAlgorithm
 		allowInitMail bool

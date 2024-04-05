@@ -5,6 +5,7 @@
 //
 //	mockgen -source crypto.go -destination ./crypto_mock.go -package crypto
 //
+
 // Package crypto is a generated GoMock package.
 package crypto
 
@@ -13,43 +14,6 @@ import (
 
 	gomock "go.uber.org/mock/gomock"
 )
-
-// MockCrypto is a mock of Crypto interface.
-type MockCrypto struct {
-	ctrl     *gomock.Controller
-	recorder *MockCryptoMockRecorder
-}
-
-// MockCryptoMockRecorder is the mock recorder for MockCrypto.
-type MockCryptoMockRecorder struct {
-	mock *MockCrypto
-}
-
-// NewMockCrypto creates a new mock instance.
-func NewMockCrypto(ctrl *gomock.Controller) *MockCrypto {
-	mock := &MockCrypto{ctrl: ctrl}
-	mock.recorder = &MockCryptoMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCrypto) EXPECT() *MockCryptoMockRecorder {
-	return m.recorder
-}
-
-// Algorithm mocks base method.
-func (m *MockCrypto) Algorithm() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Algorithm")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// Algorithm indicates an expected call of Algorithm.
-func (mr *MockCryptoMockRecorder) Algorithm() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Algorithm", reflect.TypeOf((*MockCrypto)(nil).Algorithm))
-}
 
 // MockEncryptionAlgorithm is a mock of EncryptionAlgorithm interface.
 type MockEncryptionAlgorithm struct {
@@ -159,70 +123,4 @@ func (m *MockEncryptionAlgorithm) EncryptionKeyID() string {
 func (mr *MockEncryptionAlgorithmMockRecorder) EncryptionKeyID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EncryptionKeyID", reflect.TypeOf((*MockEncryptionAlgorithm)(nil).EncryptionKeyID))
-}
-
-// MockHashAlgorithm is a mock of HashAlgorithm interface.
-type MockHashAlgorithm struct {
-	ctrl     *gomock.Controller
-	recorder *MockHashAlgorithmMockRecorder
-}
-
-// MockHashAlgorithmMockRecorder is the mock recorder for MockHashAlgorithm.
-type MockHashAlgorithmMockRecorder struct {
-	mock *MockHashAlgorithm
-}
-
-// NewMockHashAlgorithm creates a new mock instance.
-func NewMockHashAlgorithm(ctrl *gomock.Controller) *MockHashAlgorithm {
-	mock := &MockHashAlgorithm{ctrl: ctrl}
-	mock.recorder = &MockHashAlgorithmMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockHashAlgorithm) EXPECT() *MockHashAlgorithmMockRecorder {
-	return m.recorder
-}
-
-// Algorithm mocks base method.
-func (m *MockHashAlgorithm) Algorithm() string {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Algorithm")
-	ret0, _ := ret[0].(string)
-	return ret0
-}
-
-// Algorithm indicates an expected call of Algorithm.
-func (mr *MockHashAlgorithmMockRecorder) Algorithm() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Algorithm", reflect.TypeOf((*MockHashAlgorithm)(nil).Algorithm))
-}
-
-// CompareHash mocks base method.
-func (m *MockHashAlgorithm) CompareHash(hashed, comparer []byte) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CompareHash", hashed, comparer)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CompareHash indicates an expected call of CompareHash.
-func (mr *MockHashAlgorithmMockRecorder) CompareHash(hashed, comparer any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CompareHash", reflect.TypeOf((*MockHashAlgorithm)(nil).CompareHash), hashed, comparer)
-}
-
-// Hash mocks base method.
-func (m *MockHashAlgorithm) Hash(value []byte) ([]byte, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Hash", value)
-	ret0, _ := ret[0].([]byte)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Hash indicates an expected call of Hash.
-func (mr *MockHashAlgorithmMockRecorder) Hash(value any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Hash", reflect.TypeOf((*MockHashAlgorithm)(nil).Hash), value)
 }

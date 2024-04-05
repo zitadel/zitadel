@@ -800,18 +800,13 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 }
 
 func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.GenerateMachineSecretRequest) (*mgmt_pb.GenerateMachineSecretResponse, error) {
-	// use SecretGeneratorTypeAppSecret as the secrets will be used in the client_credentials grant like a client secret
-	secretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
-	if err != nil {
-		return nil, err
-	}
 	user, err := s.getUserByID(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
 	}
 
 	set := new(command.GenerateMachineSecret)
-	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, secretGenerator, set)
+	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, set)
 	if err != nil {
 		return nil, err
 	}
