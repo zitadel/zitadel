@@ -190,7 +190,8 @@ func (e *SetExecution) Existing(c *Commands, ctx context.Context, resourceOwner 
 		return zerrors.ThrowNotFound(nil, "COMMAND-slgj0l4cdz", "Errors.Execution.IncludeNotFound")
 	}
 	get, set := createIncludeCacheFunctions()
-	return checkForIncludeCircular(ctx, e.AggregateID, resourceOwner, e.Includes, c.getExecutionIncludes(get, set))
+	// maxLevels could be configurable, but set as 5 for now
+	return checkForIncludeCircular(ctx, e.AggregateID, resourceOwner, e.Includes, c.getExecutionIncludes(get, set), 5)
 }
 
 func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resourceOwner string) (_ *domain.ObjectDetails, err error) {
@@ -297,15 +298,16 @@ func createIncludeCacheFunctions() (func(s string) ([]string, bool), func(s stri
 
 type includeCacheFunc func(ctx context.Context, id string, resourceOwner string) ([]string, error)
 
-func checkForIncludeCircular(ctx context.Context, id string, resourceOwner string, includes []string, cache includeCacheFunc) error {
+func checkForIncludeCircular(ctx context.Context, id string, resourceOwner string, includes []string, cache includeCacheFunc, maxLevels int) error {
 	if len(includes) == 0 {
 		return nil
 	}
+	level := 0
 	for _, include := range includes {
 		if id == include {
 			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-mo1cmjp5k7", "Errors.Execution.CircularInclude")
 		}
-		if err := checkForIncludeCircularRecur(ctx, []string{id}, resourceOwner, include, cache); err != nil {
+		if err := checkForIncludeCircularRecur(ctx, []string{id}, resourceOwner, include, cache, maxLevels, level); err != nil {
 			return err
 		}
 	}
@@ -330,10 +332,14 @@ func (c *Commands) getExecutionIncludes(
 	}
 }
 
-func checkForIncludeCircularRecur(ctx context.Context, ids []string, resourceOwner string, include string, cache includeCacheFunc) error {
+func checkForIncludeCircularRecur(ctx context.Context, ids []string, resourceOwner string, include string, cache includeCacheFunc, maxLevels, level int) error {
 	included, err := cache(ctx, include, resourceOwner)
 	if err != nil {
 		return err
+	}
+	currentLevel := level + 1
+	if currentLevel >= maxLevels {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-gbhd3g57oo", "Errors.Execution.MaxLevelsInclude")
 	}
 	for _, includedInclude := range included {
 		if include == includedInclude {
@@ -344,7 +350,7 @@ func checkForIncludeCircularRecur(ctx context.Context, ids []string, resourceOwn
 				return zerrors.ThrowPreconditionFailed(nil, "COMMAND-819opvhgjv", "Errors.Execution.CircularInclude")
 			}
 		}
-		if err := checkForIncludeCircularRecur(ctx, append(ids, include), resourceOwner, includedInclude, cache); err != nil {
+		if err := checkForIncludeCircularRecur(ctx, append(ids, include), resourceOwner, includedInclude, cache, maxLevels, currentLevel); err != nil {
 			return err
 		}
 	}
