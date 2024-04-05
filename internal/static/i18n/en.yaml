@@ -590,7 +590,6 @@ AggregateTypes:
   restrictions: Restrictions
   system: System
 
-milestone:
 EventTypes:
   execution:
     set: Execution set
