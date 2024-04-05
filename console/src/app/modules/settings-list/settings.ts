@@ -10,6 +10,15 @@ export const ORGANIZATIONS: SidenavSetting = {
   },
 };
 
+export const FEATURESETTINGS: SidenavSetting = {
+  id: 'features',
+  i18nKey: 'SETTINGS.LIST.FEATURES',
+  groupI18nKey: 'SETTINGS.GROUPS.GENERAL',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['events.read'],
+  },
+};
+
 export const LANGUAGES: SidenavSetting = {
   id: 'languages',
   i18nKey: 'SETTINGS.LIST.LANGUAGES',
