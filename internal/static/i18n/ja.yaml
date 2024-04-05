@@ -624,6 +624,7 @@ EventTypes:
         removed: キーの削除
       secret:
         set: シークレットのセット
+        updated: 秘密のハッシュが更新されました
         removed: シークレットの削除
         check:
           succeeded: シークレットチェックの成功
@@ -998,6 +999,11 @@ EventTypes:
           check:
             succeeded: OIDCクライアントシークレットチェックの成功
             failed: OIDCクライアントシークレットチェックの失敗
+      api:
+        secret:
+          check:
+            succeeded: APIシークレットチェックに成功しました
+            failed: APIシークレットチェックに失敗しました
         key:
           added: アプリケーションキーの追加
           removed: アプリケーションキーの削除
@@ -1010,11 +1016,13 @@ EventTypes:
           changed: OIDC構成の変更
           secret:
             changed: OIDCシークレットの変更
+            updated: OIDC シークレットハッシュが更新されました
         api:
           added: API構成の追加
           changed: API構成の変更
           secret:
             changed: APIのシークレットの変更
+            updated: API シークレット ハッシュが更新されました
   policy:
     password:
       complexity:

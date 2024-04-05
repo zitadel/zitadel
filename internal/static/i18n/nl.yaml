@@ -635,6 +635,7 @@ EventTypes:
         removed: Sleutel verwijderd
       secret:
         set: Geheim ingesteld
+        updated: Geheime hash bijgewerkt
         removed: Geheim verwijderd
         check:
           succeeded: Geheimcontrole geslaagd
@@ -1009,6 +1010,11 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret controle geslaagd
             failed: OIDC Client Secret controle mislukt
+      api:
+        secret:
+          check:
+            succeeded: API-geheimcontrole geslaagd
+            failed: API-geheimcontrole mislukt
         key:
           added: Applicatiesleutel toegevoegd
           removed: Applicatiesleutel verwijderd
@@ -1021,11 +1027,13 @@ EventTypes:
           changed: OIDC Configuratie gewijzigd
           secret:
             changed: OIDC geheim gewijzigd
+            updated: OIDC geheime hash bijgewerkt
         api:
           added: API Configuratie toegevoegd
           changed: API Configuratie gewijzigd
           secret:
             changed: API geheim gewijzigd
+            updated: API-geheime hash bijgewerkt
   policy:
     password:
       complexity:

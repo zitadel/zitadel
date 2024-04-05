@@ -213,7 +213,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       metadataXml: [{ value: '', disabled: true }],
     });
 
-    this.samlForm.valueChanges.subscribe((form) => {
+    this.samlForm.valueChanges.subscribe(() => {
+      if (!this.app) {
+        this.app = new App().toObject();
+      }
+      if (!this.app.samlConfig) {
+        this.app.samlConfig = new SAMLConfig().toObject();
+      }
+
       let minimalMetadata =
         this.entityId?.value && this.acsURL?.value
           ? `<?xml version="1.0"?>
@@ -224,15 +231,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 </md:EntityDescriptor>`
           : '';
 
-      if (this.metadataUrl && this.metadataUrl.value.length > 0) {
-        if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
-          this.app.samlConfig.metadataXml = '';
-        }
-      }
-
-      if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml && minimalMetadata) {
+      if (minimalMetadata) {
         const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
         this.app.samlConfig.metadataXml = base64;
+        this.app.samlConfig.metadataUrl = '';
+      }
+
+      if (this.metadataUrl?.value) {
+        this.app.samlConfig.metadataXml = '';
+        this.app.samlConfig.metadataUrl = this.metadataUrl?.value;
       }
     });
   }
@@ -713,8 +720,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       req.setProjectId(this.projectId);
       req.setAppId(this.app.id);
 
-      if (this.app.samlConfig) {
+      if (this.app.samlConfig?.metadataUrl.length > 0) {
         req.setMetadataUrl(this.app.samlConfig?.metadataUrl);
+      }
+      if (this.app.samlConfig?.metadataXml.length > 0) {
         req.setMetadataXml(this.app.samlConfig?.metadataXml);
       }
 

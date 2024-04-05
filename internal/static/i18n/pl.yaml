@@ -635,6 +635,7 @@ EventTypes:
         removed: Usunięto klucz
       secret:
         set: Sekret ustawiony
+        updated: Zaktualizowano tajny skrót
         removed: Sekret usunięty
         check:
           succeeded: Sprawdzenie sekretu powiodło się
@@ -1009,6 +1010,11 @@ EventTypes:
           check:
             succeeded: Sprawdzenie sekretu OIDC Klienta powiodło się
             failed: Sprawdzenie sekretu OIDC Klienta nie powiodło się
+      api:
+        secret:
+          check:
+            succeeded: Sprawdzenie tajnego interfejsu API powiodło się
+            failed: Sprawdzanie tajnego interfejsu API nie powiodło się
         key:
           added: Dodano klucz aplikacji
           removed: Usunięto klucz aplikacji
@@ -1021,11 +1027,13 @@ EventTypes:
           changed: Zmieniono konfigurację OIDC
           secret:
             changed: Zmieniono sekret OIDC
+            updated: Zaktualizowano tajny skrót OIDC
         api:
           added: Dodano konfigurację API
           changed: Zmieniono konfigurację API
           secret:
             changed: Zmieniono sekret API
+            updated: Zaktualizowano tajny skrót API
   policy:
     password:
       complexity:
