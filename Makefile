@@ -115,6 +115,10 @@ core_integration_setup:
 core_integration_test: core_integration_setup
 	go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./...
 
+.PHONY: core_integration_test_fast
+core_integration_test_fast: core_integration_setup
+	go test -tags=integration -p 1 ./...
+
 .PHONY: console_lint
 console_lint:
 	cd console && \

@@ -16,6 +16,6 @@ type Phone struct {
 	ReturnCode bool
 }
 
-func (c *Commands) newPhoneCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
-	return c.newCode(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg)
+func (c *Commands) newPhoneCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
+	return c.newEncryptedCode(ctx, filter, domain.SecretGeneratorTypeVerifyPhoneCode, alg)
 }

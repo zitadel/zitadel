@@ -15,14 +15,20 @@ const (
 	APIConfigSecretChangedType        = applicationEventTypePrefix + "config.api.secret.changed"
 	APIClientSecretCheckSucceededType = applicationEventTypePrefix + "api.secret.check.succeeded"
 	APIClientSecretCheckFailedType    = applicationEventTypePrefix + "api.secret.check.failed"
+	APIConfigSecretHashUpdatedType    = applicationEventTypePrefix + "config.api.secret.updated"
 )
 
 type APIConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID          string                   `json:"appId"`
-	ClientID       string                   `json:"clientId,omitempty"`
-	ClientSecret   *crypto.CryptoValue      `json:"clientSecret,omitempty"`
+	AppID    string `json:"appId"`
+	ClientID string `json:"clientId,omitempty"`
+
+	// New events only use EncodedHash. However, the ClientSecret field
+	// is preserved to handle events older than the switch to Passwap.
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
+
 	AuthMethodType domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
 
@@ -39,7 +45,7 @@ func NewAPIConfigAddedEvent(
 	aggregate *eventstore.Aggregate,
 	appID,
 	clientID string,
-	clientSecret *crypto.CryptoValue,
+	hashedSecret string,
 	authMethodType domain.APIAuthMethodType,
 ) *APIConfigAddedEvent {
 	return &APIConfigAddedEvent{
@@ -50,7 +56,7 @@ func NewAPIConfigAddedEvent(
 		),
 		AppID:          appID,
 		ClientID:       clientID,
-		ClientSecret:   clientSecret,
+		HashedSecret:   hashedSecret,
 		AuthMethodType: authMethodType,
 	}
 }
@@ -91,7 +97,6 @@ type APIConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	AppID          string                    `json:"appId"`
-	ClientSecret   *crypto.CryptoValue       `json:"clientSecret,omitempty"`
 	AuthMethodType *domain.APIAuthMethodType `json:"authMethodType,omitempty"`
 }
 
@@ -151,8 +156,12 @@ func APIConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, erro
 type APIConfigSecretChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID        string              `json:"appId"`
+	AppID string `json:"appId"`
+
+	// New events only use EncodedHash. However, the ClientSecret field
+	// is preserved to handle events older than the switch to Passwap.
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
 }
 
 func (e *APIConfigSecretChangedEvent) Payload() interface{} {
@@ -167,7 +176,7 @@ func NewAPIConfigSecretChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
-	clientSecret *crypto.CryptoValue,
+	hashedSecret string,
 ) *APIConfigSecretChangedEvent {
 	return &APIConfigSecretChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -176,7 +185,7 @@ func NewAPIConfigSecretChangedEvent(
 			APIConfigSecretChangedType,
 		),
 		AppID:        appID,
-		ClientSecret: clientSecret,
+		HashedSecret: hashedSecret,
 	}
 }
 
@@ -275,4 +284,40 @@ func APIConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.E
 	}
 
 	return e, nil
+}
+
+type APIConfigSecretHashUpdatedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+
+	AppID        string `json:"appId"`
+	HashedSecret string `json:"hashedSecret,omitempty"`
+}
+
+func NewAPIConfigSecretHashUpdatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID string,
+	hashedSecret string,
+) *APIConfigSecretHashUpdatedEvent {
+	return &APIConfigSecretHashUpdatedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			APIConfigSecretHashUpdatedType,
+		),
+		AppID:        appID,
+		HashedSecret: hashedSecret,
+	}
+}
+
+func (e *APIConfigSecretHashUpdatedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
+func (e *APIConfigSecretHashUpdatedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *APIConfigSecretHashUpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
 }

@@ -277,10 +277,13 @@ func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user u2f")
 }
 
-func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
+func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) {
 	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
-		UserId:      userID,
-		NewPassword: &user.Password{Password: password},
+		UserId: userID,
+		NewPassword: &user.Password{
+			Password:       password,
+			ChangeRequired: changeRequired,
+		},
 	})
 	logging.OnError(err).Fatal("set user password")
 }

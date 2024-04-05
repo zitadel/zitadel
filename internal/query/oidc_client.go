@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -20,7 +19,7 @@ type OIDCClient struct {
 	AppID                    string                     `json:"app_id,omitempty"`
 	State                    domain.AppState            `json:"state,omitempty"`
 	ClientID                 string                     `json:"client_id,omitempty"`
-	ClientSecret             *crypto.CryptoValue        `json:"client_secret,omitempty"`
+	HashedSecret             string                     `json:"client_secret,omitempty"`
 	RedirectURIs             []string                   `json:"redirect_uris,omitempty"`
 	ResponseTypes            []domain.OIDCResponseType  `json:"response_types,omitempty"`
 	GrantTypes               []domain.OIDCGrantType     `json:"grant_types,omitempty"`

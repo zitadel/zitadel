@@ -134,34 +134,44 @@ message SetMetadataEntry {
 }
 
 message HumanUser {
+  // Unique identifier of the user.
   string user_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
     }
   ];
+  // State of the user, for example active, inactive, locked, deleted, initial.
   UserState state = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "current state of the user";
     }
   ];
+  // Username of the user, which can be globally unique or unique on organization level.
   string username = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"minnie-mouse\"";
     }
   ];
+  // Possible usable login names for the user.
   repeated string login_names = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[\"gigi@zitadel.com\", \"gigi@zitadel.zitadel.ch\"]";
     }
   ];
+  // Preferred login name of the user.
   string preferred_login_name = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"gigi@zitadel.com\"";
     }
   ];
+  // Profile information of the user.
   HumanProfile profile = 6;
+  // Email of the user, if defined.
   HumanEmail email = 7;
+  // Phone of the user, if defined.
   HumanPhone phone = 8;
+  // User is required to change the used password on the next login.
+  bool password_change_required = 9;
 }
 
 message User {

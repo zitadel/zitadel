@@ -37,6 +37,10 @@ var (
 		name:  projection.DeviceAuthRequestColumnScopes,
 		table: deviceAuthRequestTable,
 	}
+	DeviceAuthRequestColumnAudience = Column{
+		name:  projection.DeviceAuthRequestColumnAudience,
+		table: deviceAuthRequestTable,
+	}
 	DeviceAuthRequestColumnCreationDate = Column{
 		name:  projection.DeviceAuthRequestColumnCreationDate,
 		table: deviceAuthRequestTable,
@@ -61,6 +65,7 @@ type DeviceAuth struct {
 	UserCode        string
 	Expires         time.Time
 	Scopes          []string
+	Audience        []string
 	State           domain.DeviceAuthState
 	Subject         string
 	UserAuthMethods []domain.UserAuthMethodType
@@ -109,6 +114,7 @@ var deviceAuthSelectColumns = []string{
 	DeviceAuthRequestColumnDeviceCode.identifier(),
 	DeviceAuthRequestColumnUserCode.identifier(),
 	DeviceAuthRequestColumnScopes.identifier(),
+	DeviceAuthRequestColumnAudience.identifier(),
 }
 
 func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*domain.AuthRequestDevice, error)) {
@@ -116,7 +122,8 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 		func(row *sql.Row) (*domain.AuthRequestDevice, error) {
 			dst := new(domain.AuthRequestDevice)
 			var (
-				scopes database.TextArray[string]
+				scopes   database.TextArray[string]
+				audience database.TextArray[string]
 			)
 
 			err := row.Scan(
@@ -124,6 +131,7 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				&dst.DeviceCode,
 				&dst.UserCode,
 				&scopes,
+				&audience,
 			)
 			if errors.Is(err, sql.ErrNoRows) {
 				return nil, zerrors.ThrowNotFound(err, "QUERY-Sah9a", "Errors.DeviceAuth.NotExisting")
@@ -132,6 +140,7 @@ func prepareDeviceAuthQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				return nil, zerrors.ThrowInternal(err, "QUERY-Voo3o", "Errors.Internal")
 			}
 			dst.Scopes = scopes
+			dst.Audience = audience
 			return dst, nil
 		}
 }

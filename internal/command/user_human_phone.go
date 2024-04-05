@@ -79,7 +79,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, phoneCodeGenerator)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, phoneCodeGenerator.Alg())
 	if err == nil {
 		pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 		if err != nil {
@@ -115,7 +115,7 @@ func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID,
 	if existingPhone.IsPhoneVerified {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2M9sf", "Errors.User.Phone.AlreadyVerified")
 	}
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
