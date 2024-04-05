@@ -47,7 +47,7 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 			return nil, err
 		}
 	}
-	userInfo, err := s.userInfo(ctx, token.userID, token.projectID, token.scope, token.audience)
+	userInfo, err := s.userInfo(ctx, token.userID, token.projectID, token.scope, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (s *Server) userInfo(ctx context.Context, userID, projectID string, scope, 
 //
 // Scopes with [ScopeProjectRolePrefix] are added to requestedRoles.
 //
-// If the resulting requestedRoles or roleAudience are not not empty,
+// If the resulting requestedRoles or roleAudience are not empty,
 // the current projectID will always be parts or roleAudience.
 // Else nil, nil is returned.
 func prepareRoles(ctx context.Context, projectID string, scope, roleAudience []string) (ra, requestedRoles []string) {

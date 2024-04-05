@@ -25,36 +25,6 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
-func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
-	clientID := createClient(t)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
-	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
-		AuthRequestId: authRequestID,
-		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
-			Session: &oidc_pb.Session{
-				SessionId:    sessionID,
-				SessionToken: sessionToken,
-			},
-		},
-	})
-	require.NoError(t, err)
-
-	// code exchange
-	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
-	require.NoError(t, err)
-	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
-
-	// test actual userinfo
-	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
-	require.NoError(t, err)
-	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
-	require.NoError(t, err)
-	assertUserinfo(t, userinfo)
-}
-
 func TestServer_Introspect(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)

@@ -3,15 +3,20 @@
 package oidc_test
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"golang.org/x/oauth2"
 
+	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/integration"
 	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 )
 
@@ -55,8 +60,94 @@ func TestServer_UserInfo(t *testing.T) {
 }
 
 func testServer_UserInfo(t *testing.T) {
-	clientID := createClient(t)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess)
+	const role = "testUserRole"
+	clientID, projectID := createClient(t)
+	_, err := Tester.Client.Mgmt.AddProjectRole(CTX, &management.AddProjectRoleRequest{
+		ProjectId:   projectID,
+		RoleKey:     role,
+		DisplayName: "test",
+	})
+	require.NoError(t, err)
+	_, err = Tester.Client.Mgmt.AddUserGrant(CTX, &management.AddUserGrantRequest{
+		UserId:    User.GetUserId(),
+		ProjectId: projectID,
+		RoleKeys:  []string{role},
+	})
+	require.NoError(t, err)
+
+	tests := []struct {
+		name       string
+		prepare    func(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims]
+		scope      []string
+		assertions []func(*testing.T, *oidc.UserInfo)
+		wantErr    bool
+	}{
+		{
+			name: "invalid token",
+			prepare: func(*testing.T, string, []string) *oidc.Tokens[*oidc.IDTokenClaims] {
+				return &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: "DEAFBEEFDEADBEEF",
+						TokenType:   oidc.BearerToken,
+					},
+					IDTokenClaims: &oidc.IDTokenClaims{
+						TokenClaims: oidc.TokenClaims{
+							Subject: User.GetUserId(),
+						},
+					},
+				}
+			},
+			scope: []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				func(t *testing.T, ui *oidc.UserInfo) {
+					assert.Nil(t, ui)
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name:    "standard scopes",
+			prepare: getTokens,
+			scope:   []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				assertUserinfo,
+				func(t *testing.T, ui *oidc.UserInfo) {
+					assertNoReservedScopes(t, ui.Claims)
+				},
+			},
+		},
+		{
+			name:    "projects roles scope",
+			prepare: getTokens,
+			scope:   []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess, oidc_api.ScopeProjectRolePrefix + role},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				assertUserinfo,
+				func(t *testing.T, ui *oidc.UserInfo) {
+					assertProjectRoleClaims(t, projectID, ui.Claims, role)
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tokens := tt.prepare(t, clientID, tt.scope)
+			provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
+			require.NoError(t, err)
+			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+			if tt.wantErr {
+				assert.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			for _, assertion := range tt.assertions {
+				assertion(t, userinfo)
+			}
+		})
+	}
+}
+
+func getTokens(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
+	authRequestID := createAuthRequest(t, clientID, redirectURI, scope...)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -76,15 +167,11 @@ func testServer_UserInfo(t *testing.T) {
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
-	// test actual userinfo
-	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
-	require.NoError(t, err)
-	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
-	require.NoError(t, err)
-	assertUserinfo(t, userinfo)
+	return tokens
 }
 
 func assertUserinfo(t *testing.T, userinfo *oidc.UserInfo) {
+	t.Helper()
 	assert.Equal(t, User.GetUserId(), userinfo.Subject)
 	assert.Equal(t, "Mickey", userinfo.GivenName)
 	assert.Equal(t, "Mouse", userinfo.FamilyName)
@@ -93,4 +180,26 @@ func assertUserinfo(t *testing.T, userinfo *oidc.UserInfo) {
 	assert.Equal(t, userinfo.PreferredUsername, userinfo.Email)
 	assert.False(t, bool(userinfo.EmailVerified))
 	assertOIDCTime(t, userinfo.UpdatedAt, User.GetDetails().GetChangeDate().AsTime())
+}
+
+func assertNoReservedScopes(t *testing.T, claims map[string]any) {
+	t.Helper()
+	t.Log(claims)
+	for claim := range claims {
+		assert.Falsef(t, strings.HasPrefix(claim, oidc_api.ClaimPrefix), "claim %s has prefix %s", claim, oidc_api.ClaimPrefix)
+	}
+}
+
+func assertProjectRoleClaims(t *testing.T, projectID string, claims map[string]any, roles ...string) {
+	t.Helper()
+	projectIDRoleClaim := fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, projectID)
+	for _, claim := range []string{oidc_api.ClaimProjectRoles, projectIDRoleClaim} {
+		roleMap, ok := claims[claim].(map[string]any)
+		require.Truef(t, ok, "claim %s not found or wrong type %T", claim, claims[claim])
+		for _, roleKey := range roles {
+			role, ok := roleMap[roleKey].(map[string]any)
+			require.Truef(t, ok, "role %s not found or wrong type %T", roleKey, roleMap[roleKey])
+			assert.Equal(t, role[Tester.Organisation.ID], Tester.Organisation.Domain, "org domain in role")
+		}
+	}
 }

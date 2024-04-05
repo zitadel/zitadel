@@ -55,7 +55,7 @@ func TestMain(m *testing.M) {
 }
 
 func Test_ZITADEL_API_missing_audience_scope(t *testing.T) {
-	clientID := createClient(t)
+	clientID, _ := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -84,7 +84,7 @@ func Test_ZITADEL_API_missing_audience_scope(t *testing.T) {
 }
 
 func Test_ZITADEL_API_missing_authentication(t *testing.T) {
-	clientID := createClient(t)
+	clientID, _ := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
 	createResp, err := Tester.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -118,7 +118,7 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 }
 
 func Test_ZITADEL_API_missing_mfa(t *testing.T) {
-	clientID := createClient(t)
+	clientID, _ := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasswordSession(t, CTX, User.GetUserId(), integration.UserPassword)
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -146,7 +146,7 @@ func Test_ZITADEL_API_missing_mfa(t *testing.T) {
 }
 
 func Test_ZITADEL_API_success(t *testing.T) {
-	clientID := createClient(t)
+	clientID, _ := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -176,7 +176,7 @@ func Test_ZITADEL_API_success(t *testing.T) {
 
 func Test_ZITADEL_API_glob_redirects(t *testing.T) {
 	const redirectURI = "https://my-org-1yfnjl2xj-my-app.vercel.app/api/auth/callback/zitadel"
-	clientID := createClientWithOpts(t, clientOpts{
+	clientID, _ := createClientWithOpts(t, clientOpts{
 		redirectURI: "https://my-org-*-my-app.vercel.app/api/auth/callback/zitadel",
 		logoutURI:   "https://my-org-*-my-app.vercel.app/",
 		devMode:     true,
@@ -209,7 +209,7 @@ func Test_ZITADEL_API_glob_redirects(t *testing.T) {
 }
 
 func Test_ZITADEL_API_inactive_access_token(t *testing.T) {
-	clientID := createClient(t)
+	clientID, _ := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess, zitadelAudienceScope)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -249,7 +249,7 @@ func Test_ZITADEL_API_inactive_access_token(t *testing.T) {
 }
 
 func Test_ZITADEL_API_terminated_session(t *testing.T) {
-	clientID := createClient(t)
+	clientID, _ := createClient(t)
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess, zitadelAudienceScope)
@@ -291,7 +291,7 @@ func Test_ZITADEL_API_terminated_session(t *testing.T) {
 }
 
 func Test_ZITADEL_API_terminated_session_user_disabled(t *testing.T) {
-	clientID := createClient(t)
+	clientID, _ := createClient(t)
 	tests := []struct {
 		name    string
 		disable func(userID string) error
@@ -361,7 +361,7 @@ func Test_ZITADEL_API_terminated_session_user_disabled(t *testing.T) {
 	}
 }
 
-func createClient(t testing.TB) string {
+func createClient(t testing.TB) (clientID, projectID string) {
 	return createClientWithOpts(t, clientOpts{
 		redirectURI: redirectURI,
 		logoutURI:   logoutRedirectURI,
@@ -375,12 +375,12 @@ type clientOpts struct {
 	devMode     bool
 }
 
-func createClientWithOpts(t testing.TB, opts clientOpts) string {
+func createClientWithOpts(t testing.TB, opts clientOpts) (clientID, projectID string) {
 	project, err := Tester.CreateProject(CTX)
 	require.NoError(t, err)
 	app, err := Tester.CreateOIDCNativeClient(CTX, opts.redirectURI, opts.logoutURI, project.GetId(), opts.devMode)
 	require.NoError(t, err)
-	return app.GetClientId()
+	return app.GetClientId(), project.GetId()
 }
 
 func createImplicitClient(t testing.TB) string {
