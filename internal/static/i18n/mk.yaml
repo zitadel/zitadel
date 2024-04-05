@@ -588,6 +588,7 @@ AggregateTypes:
   oidc_session: OIDC сесија
   restrictions: Ограничувања
   system: Систем
+  session: Сесија
 
 EventTypes:
   execution:

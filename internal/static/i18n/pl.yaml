@@ -589,6 +589,7 @@ AggregateTypes:
   oidc_session: Sesja OIDC
   restrictions: Ograniczenia
   system: System
+  session: Sesja
 
 EventTypes:
   execution:

@@ -578,6 +578,7 @@ AggregateTypes:
   oidc_session: OIDCセッション
   restrictions: 制限
   system: システム
+  session: セッション
 
 EventTypes:
   execution:

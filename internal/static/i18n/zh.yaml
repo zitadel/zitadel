@@ -589,6 +589,7 @@ AggregateTypes:
   oidc_session: OIDC 会话
   restrictions: 限制
   system: 系统
+  session: 会话
 
 EventTypes:
   execution:

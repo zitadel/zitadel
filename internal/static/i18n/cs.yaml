@@ -587,6 +587,7 @@ AggregateTypes:
   oidc_session: OIDC sezení
   restrictions: Omezení
   system: Systém
+  session: Sezení
 
 EventTypes:
   execution:

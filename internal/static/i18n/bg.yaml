@@ -606,6 +606,7 @@ AggregateTypes:
   oidc_session: OIDC сесия
   restrictions: Ограничения
   system: Система
+  session: Сесия
 
 EventTypes:
   execution:
