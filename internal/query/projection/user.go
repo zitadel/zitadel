@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -15,7 +16,7 @@ import (
 )
 
 const (
-	UserTable        = "projections.users11"
+	UserTable        = "projections.users12"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -125,7 +126,7 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(MachineUserInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(MachineNameCol, handler.ColumnTypeText),
 			handler.NewColumn(MachineDescriptionCol, handler.ColumnTypeText, handler.Nullable()),
-			handler.NewColumn(MachineSecretCol, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(MachineSecretCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(MachineAccessTokenTypeCol, handler.ColumnTypeEnum, handler.Default(0)),
 		},
 			handler.NewPrimaryKey(MachineUserInstanceIDCol, MachineUserIDCol),
@@ -286,6 +287,10 @@ func (p *userProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceMachineSecretSet,
 				},
 				{
+					Event:  user.MachineSecretHashUpdatedType,
+					Reduce: p.reduceMachineSecretHashUpdated,
+				},
+				{
 					Event:  user.MachineSecretRemovedType,
 					Reduce: p.reduceMachineSecretRemoved,
 				},
@@ -354,7 +359,7 @@ func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 				handler.NewCol(NotifyInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(NotifyLastEmailCol, e.EmailAddress),
 				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: string(e.PhoneNumber), Valid: e.PhoneNumber != ""}),
-				handler.NewCol(NotifyPasswordSetCol, user.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""),
+				handler.NewCol(NotifyPasswordSetCol, crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""),
 			},
 			handler.WithTableSuffix(UserNotifySuffix),
 		),
@@ -403,7 +408,7 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 				handler.NewCol(NotifyInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(NotifyLastEmailCol, e.EmailAddress),
 				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: string(e.PhoneNumber), Valid: e.PhoneNumber != ""}),
-				handler.NewCol(NotifyPasswordSetCol, user.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""),
+				handler.NewCol(NotifyPasswordSetCol, crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""),
 			},
 			handler.WithTableSuffix(UserNotifySuffix),
 		),
@@ -952,7 +957,37 @@ func (p *userProjection) reduceMachineSecretSet(event eventstore.Event) (*handle
 		),
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(MachineSecretCol, e.ClientSecret),
+				handler.NewCol(MachineSecretCol, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
+			},
+			[]handler.Condition{
+				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
+				handler.NewCond(MachineUserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+			handler.WithTableSuffix(UserMachineSuffix),
+		),
+	), nil
+}
+
+func (p *userProjection) reduceMachineSecretHashUpdated(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.MachineSecretHashUpdatedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Wieng4u", "reduce.wrong.event.type %s", user.MachineSecretHashUpdatedType)
+	}
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(UserChangeDateCol, e.CreationDate()),
+				handler.NewCol(UserSequenceCol, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(UserIDCol, e.Aggregate().ID),
+				handler.NewCond(UserInstanceIDCol, e.Aggregate().InstanceID),
+			},
+		),
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MachineSecretCol, e.HashedSecret),
 			},
 			[]handler.Condition{
 				handler.NewCond(MachineUserIDCol, e.Aggregate().ID),
