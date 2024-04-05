@@ -85,7 +85,7 @@ func (email *Email) HandleMessage(message channels.Message) error {
 }
 
 func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err error) {
-	host, _, err := net.SplitHostPort(smtpConfig.Host)
+	host, port, err := net.SplitHostPort(smtpConfig.Host)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EMAIL-spR56", "could not split host and port for connect to smtp")
 	}
@@ -99,7 +99,7 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 		return nil, err
 	}
 
-	err = smtpConfig.smtpAuth(client, host)
+	err = smtpConfig.smtpAuth(client, host, port)
 	if err != nil {
 		return nil, err
 	}
@@ -147,15 +147,12 @@ func (smtpConfig SMTP) getSMPTClientWithStartTls(host string) (*smtp.Client, err
 	return client, nil
 }
 
-func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
+func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host, port string) error {
 	if !smtpConfig.HasAuth() {
 		return nil
 	}
 	// Auth
-	auth := unencryptedAuth{
-		smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host),
-	}
-	err := client.Auth(auth)
+	err := client.Auth(PlainOrLoginAuth(smtpConfig.User, smtpConfig.Password, host))
 	if err != nil {
 		return zerrors.ThrowInternalf(err, "EMAIL-s9kfs", "could not add smtp auth for user %s", smtpConfig.User)
 	}
