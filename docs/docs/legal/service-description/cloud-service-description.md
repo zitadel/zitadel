@@ -4,7 +4,7 @@ sidebar_label: Service description
 custom_edit_url: null
 --- 
 
-Last updated on November 15, 2023
+Last updated on April 5, 2024
 
 This annex of the [Framework Agreement](../terms-of-service) describes the services offered by us.
 
@@ -39,6 +39,35 @@ Support staff will have no access to your infrastructure and will only provide t
 Operation and direct maintenance of ZITADEL will be done by you.
 
 You can freely choose the infrastructure and location to host ZITADEL.
+
+### Responsibilities
+
+Your obligations while operating and using ZITADEL are detailed in our [terms of service](/docs/legal/terms-of-service#your-obligations) given the provisions in our [acceptable use policy](/docs/legal/policies/acceptable-use-policy).
+When using ZITADEL Cloud, we may processing data on behalf according to the [data processing agreement](/docs/legal/data-processing-agreement).
+
+In a self-hosted setup, you will be responsible for the cost, operations, and availability of your infrastructure.
+For DDoS, bot, and threat detection and protection we rely on external services in ZITADEL Cloud.
+In a self-hosted setup, it is your responsibility to secure the infrastructure to protect confidentiality, integrity, and availability of your data.
+
+ZITADEL Cloud comes with pre-configured SMTP service, SMS service, and a generated domain name.
+The SMTP service and SMS service are limited in use.
+You should configure your own service providers for production use cases.
+In a self-hosted setup, you will be responsible for SMTP / SMS services, domains and certificates.
+
+| Responsibility | ZITADEL Cloud | Self-Hosted |
+| --- | --- | --- |
+| Data / Information | Customer | Customer |
+| User Access | Customer | Customer |
+| SMTP Service | Customer (trial: ZITADEL) | Customer |
+| SMS Service | Customer (trial: ZITADEL) | Customer |
+| Custom Domain / TLS | Customer (trial: ZITADEL) | Customer |
+| DDoS & Bot protection | ZITADEL | Customer |
+| WAF / Threat detection | ZITADEL | Customer |
+| [Backup](#backup) | ZITADEL | Customer |
+| Networking | ZITADEL | Customer |
+| Compute / Scaling | ZITADEL | Customer |
+| Database | ZITADEL | Customer |
+| Application | ZITADEL | ZITADEL |
 
 ## Data location
 
