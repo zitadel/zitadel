@@ -413,6 +413,15 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("request.include", "org1"),
+								[]string{"othertarget"},
+								nil,
+							),
+						),
+					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
 							execution.NewAggregate("request.method", "org1"),
@@ -478,6 +487,15 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("request.include", "org1"),
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
 							execution.NewAggregate("request.service", "org1"),
@@ -533,6 +551,15 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, all include",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEvent(context.Background(),
+								execution.NewAggregate("request.include", "org1"),
+								[]string{"target"},
+								nil,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
