@@ -30,7 +30,7 @@ func TestMain(m *testing.M) {
 
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
-		Client = Tester.Client.a
+		Client = Tester.Client.ActionV3
 
 		CTX, _ = Tester.WithAuthorization(ctx, integration.IAMOwner), errCtx
 		return m.Run()
@@ -42,11 +42,11 @@ func ensureFeatureEnabled(t *testing.T) {
 		Inheritance: true,
 	})
 	require.NoError(t, err)
-	if f.action.GetEnabled() {
+	if f.Actions.GetEnabled() {
 		return
 	}
 	_, err = Tester.Client.FeatureV2.SetInstanceFeatures(CTX, &feature.SetInstanceFeaturesRequest{
-		Execution: gu.Ptr(true),
+		Actions: gu.Ptr(true),
 	})
 	require.NoError(t, err)
 	retryDuration := time.Minute
@@ -59,7 +59,7 @@ func ensureFeatureEnabled(t *testing.T) {
 				Inheritance: true,
 			})
 			require.NoError(ttt, err)
-			if f.action.GetEnabled() {
+			if f.Actions.GetEnabled() {
 				return
 			}
 		},
