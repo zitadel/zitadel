@@ -183,6 +183,35 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 		[]string{},
 	)
 
+	circularExecutionService := "zitadel.session.v2beta.SessionService"
+	Tester.SetExecution(CTX, t,
+		&execution.Condition{
+			ConditionType: &execution.Condition_Response{
+				Response: &execution.ResponseExecution{
+					Condition: &execution.ResponseExecution_Service{
+						Service: circularExecutionService,
+					},
+				},
+			},
+		},
+		[]string{},
+		[]string{executionCond},
+	)
+	circularExecutionMethod := "/zitadel.session.v2beta.SessionService/ListSessions"
+	Tester.SetExecution(CTX, t,
+		&execution.Condition{
+			ConditionType: &execution.Condition_Response{
+				Response: &execution.ResponseExecution{
+					Condition: &execution.ResponseExecution_Method{
+						Method: circularExecutionMethod,
+					},
+				},
+			},
+		},
+		[]string{},
+		[]string{"response." + circularExecutionService},
+	)
+
 	tests := []struct {
 		name    string
 		ctx     context.Context
@@ -190,6 +219,23 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 		want    *execution.SetExecutionResponse
 		wantErr bool
 	}{
+		{
+			name: "method, circular error",
+			ctx:  CTX,
+			req: &execution.SetExecutionRequest{
+				Condition: &execution.Condition{
+					ConditionType: &execution.Condition_Response{
+						Response: &execution.ResponseExecution{
+							Condition: &execution.ResponseExecution_Service{
+								Service: circularExecutionService,
+							},
+						},
+					},
+				},
+				Includes: []string{"response." + circularExecutionMethod},
+			},
+			wantErr: true,
+		},
 		{
 			name: "method, ok",
 			ctx:  CTX,
