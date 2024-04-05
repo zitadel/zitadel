@@ -61,7 +61,8 @@ export class AccountsCardComponent implements OnInit {
   public selectNewAccount(): void {
     const configWithPrompt: Partial<AuthConfig> = {
       customQueryParams: {
-        prompt: 'login',
+        prompt: 'create',
+        scope: 'openid profile email urn:zitadel:iam:org:domain:primary:maxgitlab1.zitadel.app',
       } as any,
     };
     this.authService.authenticate(configWithPrompt);

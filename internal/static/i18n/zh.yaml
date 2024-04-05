@@ -581,6 +581,14 @@ AggregateTypes:
   target: 靶
   execution: 执行
   user_schema: 用户模式
+  auth_request: 认证请求
+  device_auth: 设备认证
+  idpintent: IDP 意图
+  limits: 限制
+  milestone: 里程碑
+  oidc_session: OIDC 会话
+  restrictions: 限制
+  system: 系统
 
 EventTypes:
   execution:

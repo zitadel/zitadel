@@ -580,6 +580,14 @@ AggregateTypes:
   target: Цел
   execution: Извршување
   user_schema: Корисничка шема
+  auth_request: Барање за автентикација
+  device_auth: Уред за автентикација
+  idpintent: Намера на IDP
+  limits: Ограничувања
+  milestone: Милениум
+  oidc_session: OIDC сесија
+  restrictions: Ограничувања
+  system: Систем
 
 EventTypes:
   execution:

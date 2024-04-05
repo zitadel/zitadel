@@ -581,7 +581,16 @@ AggregateTypes:
   target: Target
   execution: Execution
   user_schema: User Schema
+  auth_request: Auth Request
+  device_auth: Device Auth
+  idpintent: IDP Intent
+  limits: Limits
+  milestone: Milestone
+  oidc_session: OIDC Session
+  restrictions: Restrictions
+  system: System
 
+milestone:
 EventTypes:
   execution:
     set: Execution set

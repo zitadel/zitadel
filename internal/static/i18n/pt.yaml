@@ -575,6 +575,14 @@ AggregateTypes:
   target: Objetivo
   execution: Execução
   user_schema: Esquema do usuário
+  auth_request: Solicitação de autenticação
+  device_auth: Autenticação de dispositivo
+  idpintent: Intenção de IDP
+  limits: Limites
+  milestone: Marco
+  oidc_session: Sessão OIDC
+  restrictions: Restrições
+  system: Sistema
 
 EventTypes:
   execution:
