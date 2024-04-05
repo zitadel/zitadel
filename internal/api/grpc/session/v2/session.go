@@ -6,10 +6,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
-
-	"github.com/muhlemmer/gu"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
@@ -237,7 +236,6 @@ func userFactorToPb(factor query.SessionUserFactor) *session.UserFactor {
 		Id:             factor.UserID,
 		LoginName:      factor.LoginName,
 		DisplayName:    factor.DisplayName,
-		OrganisationId: factor.ResourceOwner,
 		OrganizationId: factor.ResourceOwner,
 	}
 }

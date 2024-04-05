@@ -1,0 +1,902 @@
+---
+title: Impersonation and delegation using Token Exchange
+sidebar_label: Token Exchange
+---
+
+import TokenExchangeTypes from "../../apis/openidoauth/_token_exchange_types.mdx";
+import TokenExchangeRequest from "../../apis/openidoauth/_token_exchange_request.mdx";
+import TokenExchangeResponse from "../../apis/openidoauth/_token_exchange_response.mdx";
+
+The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. This guide will explain how token exchange is implemented inside ZITADEL and gives some usage examples.
+
+:::info
+Token Exchange is currently an experimental beta](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable it on the [feature API](#feature-api) before using it.
+:::
+
+In this guide we assume that the application performing the token exchange is already in possession of tokens. You should already have a good understanding on the following topics before starting with this guide:
+
+- Integrate your app with the [OIDC flow](/docs/guides/integrate/login/oidc/login-users) to obtain tokens
+- [Claims](/docs/apis/openidoauth/claims)
+- [Scope](/docs/apis/openidoauth/scopes)
+- Audience
+
+## The basics
+
+Token Exchange is a complex and broad subject. Before we get our hands dirty with the "how-to" part, lets first cover some basics.
+
+### Token types
+
+Token Exchange offers a range of possibilities for providing and requesting different token types. The existence of the various `*_token_type` fields in the request and response data helps defining which tokens we are sending, which ones we wish to receive and finally which one(s) we did receive in the response.
+
+<TokenExchangeTypes />
+
+#### Access Token type
+
+```
+urn:ietf:params:oauth:token-type:access_token
+```
+
+Access tokens can be supplied in the request, or requested to be in the response. When supplied as `subject_token` or `actor_token` this may be an opaque token or JWT.
+The client does not need to care about the difference between the access token types in this case, it can pass the `access_token` value previously obtained from the token endpoint as-is.
+
+When requesting an access token, token exchange will always return an opaque token. If a JWT is required, use the `urn:ietf:params:oauth:token-type:jwt` identifier for `requested_token_type`.
+
+#### Refresh Token type
+
+```
+urn:ietf:params:oauth:token-type:refresh_token
+```
+
+At the moment we do not support sending refresh tokens as part of the Token Exchange grant. Instead, use the [`refresh_token` grant](/docs/apis/openidoauth/endpoints#refresh-token-grant).
+
+#### ID Token type
+
+```
+urn:ietf:params:oauth:token-type:id_token
+```
+
+ID Tokens can be supplied as `subject_token` and `actor_token`. We currently reject any expired ID Tokens, even as `subject_token`. This might change in future.
+
+When requested as `requested_token_type`, the [response](#token-exchange-response) will carry the ID Token in the `access_token` field. The `token_type` will be set `N_A`, meaning that the returned `access_token` value cannot be used as Access Token. This is how the RFC specifies the behavior.
+
+If you want both a "real" access token and ID token, request an access token or JWT token-type and set the `openid` scope. This will return both tokens similar to the other grand types.
+
+#### JWT Token type
+
+```
+urn:ietf:params:oauth:token-type:jwt
+```
+
+The JWT token type caries a double meaning.
+
+When used as a `subject_token_type`, ZITADEL will try to verify the `subject_token` in a similar way as a JWT Profile. The `sub` field of the JWT is used to set the subject of the requested token. Currently we only allow self-signed JWT as `subject_token` in combination with a valid `actor_token` for impersonation. A self-signed JWT is not enough to obtain other token types from the Token Exchange Grant. You will need to use the [JWT Profile grant](/docs/apis/openidoauth/endpoints#jwt-profile-grant) instead.
+
+When used as a `requested_token_type`, ZITADEL will return an access token as JWT.
+
+#### User ID Token type
+
+```
+urn:zitadel:params:oauth:token-type:user_id
+```
+
+Technically not a token and an addition to the standard. It is provided for impersonation cases where there is no token available yet for the impersonated user.
+This allows setting the plain zitadel user ID in the `subject_token`, along with a valid `actor_token` from the impersonator. The existence of the user is checked.
+
+Sending only the user ID in the `subject_token` is not allowed and will result in an error.
+
+### Token exchange request
+
+The details supplied in the request changes how Token Exchange operates. While the standard is very permissive, we need to clarify how ZITADEL implements it.
+
+<TokenExchangeRequest />
+
+#### Subject token
+
+The `subject_token` and `subject_token_type` fields come in a pair. The [token type](#token-types) describes the subject token that is passed. This tells ZITADEL how we can verify the token.
+
+The subject token is the most basic input for the token exchange. It describes for _who_ we want to obtain a token. If only the `subject_token` with proper `subject_token_type` are supplied, a new access token is returned for the same user, with the same scope and the same audience.
+
+We currently allow all token types, except refresh tokens, to be used as subject token. The JWT and User ID types depend on the presence of the [`actor_token`](#actor-token)
+
+#### Actor token
+
+The actor parameters are optional and enable impersonation and delegation. At ZITADEL we don't make any distinction between the two concepts, so we call both cases impersonation from this point.The `actor_token` and `actor_token_type` come in a pair. If the actor token is provided, the actor token type must also be specified.
+
+Currently only a valid access token or ID token are allowed as actor token. The user represented by the actor token must have the [impersonation permission](#impersonation-permissions) set, or else the request will be rejected and an error returned.
+
+
+#### Requested token type
+
+The `requested_token_type` is an optional field that tells ZITADEL the type of token that is requested for the `access_token` response field. Note that the response can also contain ID and refresh tokens, based on [scope](#scope), even if the requested token type was an access token.
+
+Currently ZITADEL supports requesting of:
+
+- Opaque Access Token with the `urn:ietf:params:oauth:token-type:access_token` type;
+- JWT Access Token with the `urn:ietf:params:oauth:token-type:jwt` type;
+- ID Token with the `urn:ietf:params:oauth:token-type:id_token` type;
+
+#### Scope
+
+[Scope](/docs/apis/openidoauth/scopes) is an optional parameter that allows changing the scope of the supplied token, for the requested token. Scope can be entirely different from any of the supplied tokens. It can be used to extend or decrease the scope of the new token.
+
+When scope is omitted in the request, it is taken from the `subject_token`. If the `subject_token` doesn't carry any scope (some types can't), it is taken from the `actor_token`. All allowed token types for the `actor_token` typically have a scope.
+
+#### Audience
+
+Audience is an optional parameter that allows to decrease the audience of the requested token. When supplied it may never contain an audience which was not already present in either the `subject_token` or `actor_token` combined.
+This is to prevent applications from one project or organization authorizing themselves access to applications of another project or organization and circumventing current ZITADEL authorization schemas.
+
+When audience is omitted in the request, it is taken from the `subject_token`. If the `subject_token` doesn't carry any audience (some types can't), it is taken from the `actor_token`. All allowed token types for the `actor_token` typically have an audience.
+
+#### Resource
+
+The resource parameter would allow mapping a URI to a target audience. This is further defined in [RFC 8707 Resource Indicators for OAuth 2.0](https://datatracker.ietf.org/doc/html/rfc8707).
+
+ZITADEL does not yet support Resource Indicators. Supplying this parameter will always result in a `invalid_target` error.
+
+### Token exchange response
+
+The response schema looks very similar to the model of other token endpoint responses. The RFC attempts to reuse the same fields, however they might have different contents then they lead you to believe. This can lead to confusing situations, so be sure to read this section!
+
+<TokenExchangeResponse />
+
+#### Access token
+
+The `access_token` field contains the requested token, of the requested token type. **Even if the requested token is not an access token!** For example if the `requested_token_type` is an ID Token, the `access_token` field will actually contain an ID Token.
+:exploding_head:
+
+#### Token Type
+
+The `token_type` field gives us an idea of the token returned in the `access_token` field. It is not one of the `*_token_types` described above. It behaves almost like the other grand types. Normally this value is always `Bearer` but token exchange may also return `N_A` when a token cannot be used as a bearer token.
+
+For example when the requested token type is an ID token, this value will be set to `N_A`, as an ID token cannot be send to an API as bearer token.
+
+#### Issued token type.
+
+The `issued_token_type` contains one of the [token types](#token-types) described above. It should match the `requested_token_type` from the request.
+
+#### Refresh token
+
+The `refresh_token` may contain a new refresh token that can be used to refresh the `access_token` at a later moment. ZITADEL does not allow using refresh tokens in the Token Exchange grant. Refresh tokens can be used for the [`refresh_token` grant](/docs/apis/openidoauth/endpoints#refresh-token-grant) instead, including ones obtained through Token Exchange.
+
+A refresh token can be obtained by setting the `offline_access` [scope](#scope) in the request or applicable token.
+
+#### ID Token
+
+The `id_token` may contain an ID token. This is a non-standard field added by ZITADEL in order to match OpenID token responses. An ID Token may be obtained together with an access token or JWT token-type when the `openid` [scope](#scope) is set in the request or applicable token.
+
+#### Expires in
+
+The `expires_in` returns the time in seconds the new `access_token` is valid. This value is given for all token types, even non-access tokens.
+
+#### Scope
+
+The `scope` field contains the final scope of the obtained token. Scope might be different as the one requested, as ZITADEL validates the input. In the RFC the scope field is optional, but ZITADEL always send the value.
+
+Now that we have the basics covered, we can get started with using the Token Exchange.
+
+## Simple Token Exchange examples
+
+First we will cover "simple" Token Exchange which only involves exchanging the `subject_token` for a new token.
+
+### Preparation
+
+These preparation steps are needed for all Token Exchange interaction, including impersonation.
+
+#### Feature API
+
+As Token Exchange is still a beta feature, the feature needs to be enabled for your instance by an `IAM_OWNER` first:
+
+```bash
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/features/instance' \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-H 'Authorization: Bearer <IAM_OWNER_TOKEN>' \
+--data-raw '{
+  "oidcTokenExchange": true
+}'
+```
+
+If you are self-hosting, you can also enable the feature for the complete system (all instances) using the [set system level features](/docs/apis/resources/feature_service_v2/feature-service-set-system-features) endpoint.
+
+#### Application
+
+Next we need to select an application that is allowed to perform Token Exchange. As with the other grant types, we need to enable the `urn:ietf:params:oauth:grant-type:token-exchange` grant type.
+
+:::important
+ZITADEL allows any application to use Token Exchange, however we strongly recommend to only configure confidential clients (using either client credentials or JWT assertion) with the Token Exchange grant type. This is because there is some trust placed in the application when it comes to defining scope and that it obtained tokens in a legitimate way. For example, if the app possesses a token of an admin user with impersonation permissions it can obtain tokens for any other user in your instance. It is your responsibility to make sure the application can be trusted with this kind of powers. If you configure a public client with the Token Exchange grant, you risk a leaked token can be used by an attacker who knows the client ID of a granted public client.
+:::
+
+![Screenshot showing enabling of Token Exchange grant on a ZITADEL application](/img/guides/token-exchange/app-token-exchange-grant.png)
+
+#### Organization layout
+
+For this example we have the following projects in our organization:
+
+- **portal** contains the end user interfaces. In this case a web-app that initiated user login and performs operations on other APIs. The web-app has the token exchange grant type enabled;
+- **aggregates** a project that contains APIs of low privilege which aggregate public data to return to the user;
+- **settings** a project that contains APIs for settings and other privileged operations;
+- **ZITADEL** the build-in project used for the zitadel console and APIs;
+
+#### Authenticated user tokens
+
+The _portal_ web-app has been configured to include user info in the ID Token and completed a code-flow login for an user with the following scope:
+
+```
+openid profile email urn:zitadel:iam:org:project:id:259254020357488642:aud urn:zitadel:iam:org:project:id:259256588127174658:aud urn:zitadel:iam:org:project:id:zitadel:aud
+```
+
+The scope requested an access token and ID Token. The reserved scopes are used to add all of our defined projects to the audience of the token.
+The resulting ID Token, user info and introspection responses will provide user profile information, user email and the token audience.
+At the end of the code flow we have the following tokens:
+
+Opaque Access token:
+
+```
+NaUAPHy5mLFQlwUCeUGYeDyhcQYuNhzTiYgwMor9BxP_bfMy2iDdLxJ87nntUc85vNyeHOY
+```
+
+ID token:
+
+```
+eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTQxNjcwLCJpYXQiOjE3MTEwOTg0NzAsImF1dGhfdGltZSI6MTcxMTA5ODQ2OCwiYW1yIjpbInBhc3N3b3JkIiwicHdkIl0sImF6cCI6IjI1OTI1NDQwOTMyMDUyOTkyMkBwb3J0YWwiLCJjbGllbnRfaWQiOiIyNTkyNTQ0MDkzMjA1Mjk5MjJAcG9ydGFsIiwiYXRfaGFzaCI6InQxVDc4czhSVFZrdTJzeEJnMDNSQ1EiLCJjX2hhc2giOiJQdXBDMmNyak9aQXI2X08xdVRsR2R3IiwibmFtZSI6ImVuZCB1c2VyIiwiZ2l2ZW5fbmFtZSI6ImVuZCIsImZhbWlseV9uYW1lIjoidXNlciIsIm5pY2tuYW1lIjoiZW5kLXVzZXIiLCJnZW5kZXIiOiJmZW1hbGUiLCJsb2NhbGUiOiJlbiIsInVwZGF0ZWRfYXQiOjE3MTEwMTYyOTYsInByZWZlcnJlZF91c2VybmFtZSI6ImVuZC11c2VyIiwiZW1haWwiOiJ0aW0rZW5kLXVzZXJAeml0YWRlbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZX0.Dw8lfQwJTksCOr9dHLfWqpSf4gJwkcTdKMZGCkLueBMDdyqzL-qR_KcYCcp-NKDkY-o9e8SxJtIBkPlWzI2x0WutIg67SqzJbwS_Be88MkDKv-sRqKy_bVnyNTcYjuUReGzu4ycufjMu6aKtqYFEivdZsB2-2Pxnj5WSs_CY7jvBe_YQtfThSU88i1LPQDucQdSZZpOpOhEV4AI5C3XXbnv2nw0PMZ-Beq6svpCYqs_3Azeg0-UgxipuRgJfnqnqEqH0zlFNCndnkRuknUoda6-peuEI2KnRg9WkX7DoYrTToPde8Ay8NI48cWipm9dhxNxQbIr4ZDWQEazmsz9SpQ
+```
+
+The ID token is a JWT and contains the following claims:
+
+```json
+{
+  "iss": "http://localhost:9000",
+  "sub": "259242039378444290",
+  "aud": [
+    "259254409320529922@portal",
+    "259297773508165634@portal",
+    "259254317079330818",
+    "259254020357488642",
+    "259256588127174658",
+    "257786991247294468"
+  ],
+  "exp": 1711141670,
+  "iat": 1711098470,
+  "auth_time": 1711098468,
+  "amr": ["password", "pwd"],
+  "azp": "259254409320529922@portal",
+  "client_id": "259254409320529922@portal",
+  "at_hash": "t1T78s8RTVku2sxBg03RCQ",
+  "c_hash": "PupC2crjOZAr6_O1uTlGdw",
+  "name": "end user",
+  "given_name": "end",
+  "family_name": "user",
+  "nickname": "end-user",
+  "gender": "female",
+  "locale": "en",
+  "updated_at": 1711016296,
+  "preferred_username": "end-user",
+  "email": "tim+end-user@zitadel.com",
+  "email_verified": true
+}
+```
+
+The audience contains 2 client IDs from the current project (*portal*) and the IDs of the projects we described earlier, including the ZITADEL project ID.
+
+### Reduce audience and scope example
+
+Now imagine that the portal web-app needs to call an aggregate API. The API is externally developed and configured to use ZITADEL's introspection endpoint to validate access tokens.
+Besides that, we do not trust the API. If we were to forward the current access token in an `Authorization: Bearer` header, the untrusted API will get access to user information it might not need in order execute its business logic.
+Another issue is that the API might start acting malicious and it would be able to call the **settings** and **ZITADEL** APIs with the same privilege as the passed token.
+
+In this token exchange call we will reduce the scope and audience of the access token, so that we can forward the new token instead:
+
+```bash
+curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-H 'Accept: application/json' \
+-u '259254409320529922@portal:eNdXJzB5RK5CXSpa4HqEfbdDqlM7drpskEHq1RBYMby0tM1MaCidyWsWlp5mglbN' \
+-d 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
+-d 'subject_token=NaUAPHy5mLFQlwUCeUGYeDyhcQYuNhzTiYgwMor9BxP_bfMy2iDdLxJ87nntUc85vNyeHOY' \
+-d 'subject_token_type=urn:ietf:params:oauth:token-type:access_token' \
+-d 'scope=openid' \
+-d 'audience=259254020357488642' | jq
+```
+
+This gives the following response:
+
+```json
+{
+  "access_token": "CV3iikwgHfBqeGmzFebMIlbdoo3EHEz30LbOKWa-19FL0irJxcbITiLtOvUxouG0xuqECd0",
+  "issued_token_type": "urn:ietf:params:oauth:token-type:access_token",
+  "token_type": "Bearer",
+  "expires_in": 43199,
+  "scope": "openid",
+  "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0MDIwMzU3NDg4NjQyIiwiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCJdLCJleHAiOjE3MTExNDE4NDksImlhdCI6MTcxMTA5ODY0OSwiYXpwIjoiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsImNsaWVudF9pZCI6IjI1OTI1NDQwOTMyMDUyOTkyMkBwb3J0YWwiLCJhdF9oYXNoIjoiMGhqckJDcEhyLS1iYjg2ZlZtQmFjdyJ9.D7_upLZ3fEXRvdlX-EfK2x9FLgppDJZZ3QPvFHgw11rfRFgmMoZAgGmh3rNBbvBuDM8UYPw5FEcIlaEMMVaorKhTFbKQB-t0M0krZ81_uIrDa8J7svW5iPACg36Ge77PQz_aGUfbwoRcqSm26OG1Bw0Grmu3mxm7blnhqUHBFtZi5DLWmdK-EfKID6D4s7JR1JEH11nZyFT3LUY87wQ_9FQFWVcqtmvELmseVQsvENJkwifPRkzphgyABpiixMWZEh0HcoMVw7uYQBQS9-6yVyf0I4ScnTR7GtUUL650xw3yerxMTJVo3TfwDchVy7BzSXyWF9RSr46xgHY-48b1Tw"
+}
+```
+
+As indicated by the `token_type` the new access token can be used as Bearer. Once the web-app will make a call to one of the aggregate APIs, that API can make an [introspection](/docs/apis/openidoauth/endpoints#introspection_endpoint) call with the access token. Note we use the credentials of the API here:
+
+```bash
+curl -L -X POST 'http://localhost:9000/oauth/v2/introspect' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -u '259284000017809410@aggregates:ES1i1JWgGiHNW6bBljyynZyvQIlotEpVwzbgrTIYZzndOo2KxDkwap1WvdSdBjtk' \
+  -d token=CV3iikwgHfBqeGmzFebMIlbdoo3EHEz30LbOKWa-19FL0irJxcbITiLtOvUxouG0xuqECd0 | jq
+```
+
+The introspection response would look like:
+
+```json
+{
+  "active": true,
+  "scope": "openid",
+  "client_id": "259254409320529922@portal",
+  "token_type": "Bearer",
+  "exp": 1711141849,
+  "iat": 1711098649,
+  "nbf": 1711098649,
+  "sub": "259242039378444290",
+  "aud": ["259254020357488642"],
+  "iss": "http://localhost:9000",
+  "jti": "259380204902809602"
+}
+```
+
+We can see that the audience and scope are reduced and we are not sharing any sensitive user information with the API. If the API tries to use the token on any API outside the aggregate project, it would be useless:
+
+```bash
+curl -L -X GET 'http://localhost:9000/auth/v1/users/me' \
+-H 'Accept: application/json' \
+-H 'Authorization: Bearer CV3iikwgHfBqeGmzFebMIlbdoo3EHEz30LbOKWa-19FL0irJxcbITiLtOvUxouG0xuqECd0' | jq
+```
+
+```json
+{
+  "code": 16,
+  "message": "Errors.Token.Invalid (AUTH-7fs1e)",
+  "details": [
+    {
+      "@type": "type.googleapis.com/zitadel.v1.ErrorDetail",
+      "id": "AUTH-7fs1e",
+      "message": "Errors.Token.Invalid"
+    }
+  ]
+}
+```
+
+### Change token-type example
+
+We can also use Token Exchange to change the type of token we are dealing with. For example, the first opaque token after user login can be exchanged for a JWT access token, while maintaining the same scope and audience:
+
+```bash
+curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-H 'Accept: application/json' \
+-u '259254409320529922@portal:eNdXJzB5RK5CXSpa4HqEfbdDqlM7drpskEHq1RBYMby0tM1MaCidyWsWlp5mglbN' \
+-d 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
+-d 'subject_token=NaUAPHy5mLFQlwUCeUGYeDyhcQYuNhzTiYgwMor9BxP_bfMy2iDdLxJ87nntUc85vNyeHOY' \
+-d 'subject_token_type=urn:ietf:params:oauth:token-type:access_token' \
+-d 'requested_token_type=urn:ietf:params:oauth:token-type:jwt' | jq
+```
+
+Will give the following response:
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTQyMjc0LCJpYXQiOjE3MTEwOTkwNzQsIm5iZiI6MTcxMTA5OTA3NCwianRpIjoiMjU5MzgwOTE2ODQzOTcwNTYyIn0.dsX-8bXTGaZL4d3FJ7Fmrhty4oIvSIOg5suZ16MIVXdogOZHWNpTvP3bXeyHL7zHX2prUjSxTg9EX_U9XcSnX4VeAzt4sG6_vH20pJLeXMivVbCDJBp9rv8rG2gVdEwVkfxhpK_2KHhtRzCpMj_xyjlM1eh7VbRBvEuH0m1Kqv96Gspc4w0jahl8hkDuV3v0PjTo7lB72emghVEwHyXhj6a53AKzPWzrZYOJnVSEKz0MgZeHcjT93D-nN3fYWulDw9VvTs6L65G3KnoRbB29plZtLrO5F-c0AJkVKi1W9dhd-_Yj-f8o5benxymAUxUAhWsROO2syWu89M9cdnjh9A",
+  "issued_token_type": "urn:ietf:params:oauth:token-type:jwt",
+  "token_type": "Bearer",
+  "expires_in": 43199,
+  "scope": "openid email profile urn:zitadel:iam:org:project:id:259254020357488642:aud urn:zitadel:iam:org:project:id:259256588127174658:aud urn:zitadel:iam:org:project:id:zitadel:aud",
+  "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTQyMjc0LCJpYXQiOjE3MTEwOTkwNzQsImF6cCI6IjI1OTI1NDQwOTMyMDUyOTkyMkBwb3J0YWwiLCJjbGllbnRfaWQiOiIyNTkyNTQ0MDkzMjA1Mjk5MjJAcG9ydGFsIiwiYXRfaGFzaCI6IjVVeUJ1el9rMVd3VTVPbUVNa21zSFEiLCJuYW1lIjoiZW5kIHVzZXIiLCJnaXZlbl9uYW1lIjoiZW5kIiwiZmFtaWx5X25hbWUiOiJ1c2VyIiwibmlja25hbWUiOiJlbmQtdXNlciIsImdlbmRlciI6ImZlbWFsZSIsImxvY2FsZSI6ImVuIiwidXBkYXRlZF9hdCI6MTcxMTAxNjI5NiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZW5kLXVzZXIiLCJlbWFpbCI6InRpbStlbmQtdXNlckB6aXRhZGVsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlfQ.eXxM3hGM5_hn9Vieg-BGlt67KWNfeL3NjKkOiHyZKJNkWMYUmIO2bdk6eZC4_eEWgIMUv093UvTZ1t-xF01evrNaCQ68KROUCWVe6SW85XAaLFb2wtKCJwNAQYWYHl8IzCJdEs5JLlZ7BlU6qgTxdw5MN0npLJbjM4osI_R-9152QfDLjivJlM7F9DWOnA5DdnwBzrHHtOUU-JWvsR6BBXY9eaCZmTjNt2v9yNh6rR4FazlBOYQN-EcYc90Ybckm2Vyow0vRsAnj7moKDQlUdOSyBSwxnSs9sSMr_Nm7uPxcolJ5raIRonGD5FndYYaSc8vuKkkDzQ8yr1v2GVJMyQ"
+}
+```
+
+You can now inspect the access token JWT and see the following claims:
+
+```json
+{
+  "iss": "http://localhost:9000",
+  "sub": "259242039378444290",
+  "aud": [
+    "259254409320529922@portal",
+    "259297773508165634@portal",
+    "259254317079330818",
+    "259254020357488642",
+    "259256588127174658",
+    "257786991247294468"
+  ],
+  "exp": 1711142274,
+  "iat": 1711099074,
+  "nbf": 1711099074,
+  "jti": "259380916843970562"
+}
+```
+
+Doing similar request you can:
+
+- Exchange an ID token to opaque or JWT access token
+- Exchange an opaque access token to a JWT access token
+- Exchange a JWT access token to an opaque access token
+- Exchange any access token to an ID token
+
+### Request an ID token example
+
+In the following example we exchange the intitial opaque access token to a new ID token. The usefulness of this is up to the imagination of the reader, but it demonstrates the weird behavior of requesting an ID token, as defined by the RFC.
+
+:::info
+You can also obtain an ID token in the `id_token` response field by requestion an access token and the `openid` scope.
+:::
+
+```bash
+curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-H 'Accept: application/json' \
+-d 'client_id=259254409320529922@portal' \
+-d 'client_secret=eNdXJzB5RK5CXSpa4HqEfbdDqlM7drpskEHq1RBYMby0tM1MaCidyWsWlp5mglbN' \
+-d 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
+-d 'subject_token=eZCZcbA-lpS1UnbyLvG2Mw2p6ix7CiES3HCDKBn6KMebhMu34hwu9p86N6EgOmkN6estous' \
+-d 'subject_token_type=urn:ietf:params:oauth:token-type:access_token' \
+-d 'requested_token_type=urn:ietf:params:oauth:token-type:id_token' | jq
+```
+
+This gives us a response with the ID token in the `access_token` field and the `token_type` set to `N_A`:
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTIzOTc0MDQxMzMxMzAyNiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI1NDMxNzA3OTMzMDgxOCIsIjI1OTI1NDAyMDM1NzQ4ODY0MiIsIjI1OTI1NjU4ODEyNzE3NDY1OCIsIjI1Nzc4Njk5MTI0NzI5NDQ2OCJdLCJleHAiOjE3MTEwODk2MzcsImlhdCI6MTcxMTA0NjQzNywiYXpwIjoiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsImNsaWVudF9pZCI6IjI1OTI1NDQwOTMyMDUyOTkyMkBwb3J0YWwiLCJuYW1lIjoiZW5kIHVzZXIiLCJnaXZlbl9uYW1lIjoiZW5kIiwiZmFtaWx5X25hbWUiOiJ1c2VyIiwibmlja25hbWUiOiJlbmQtdXNlciIsImdlbmRlciI6ImZlbWFsZSIsImxvY2FsZSI6ImVuIiwidXBkYXRlZF9hdCI6MTcxMTAxNjI5NiwicHJlZmVycmVkX3VzZXJuYW1lIjoiZW5kLXVzZXIiLCJlbWFpbCI6InRpbStlbmQtdXNlckB6aXRhZGVsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlfQ.N2MfKznzdH-LaEV3qWPeqHW9dxlsgEoEm-ivU3uakVbtOe7AnpNTF56aPMlt3macNizixusm1vZWFHhHc-kBczMDqlzgFvEbwzSBi1ETmF0OIfazlbzGIJL0G1PCzD3883vR1oh80mwPUvoPqLkjHvQa3UaYIZ-Z08i8Oq-Cut8D3e2PhIfn9YCK9htq65GOJCHaWfWMPJrb65M5nTm6TyM4VfYe4iQgJ1D8Kuol_UQEpIeVnb7agu6mk9h1BdjhMGwBFPJjRbxSh9Mb7glFuRvgI1LWcbmr70HMMh0n0UVxPlIQUGJbrT0Wu97aJjFBdzEq5Rof4oJ2COAmvKvwVw",
+  "issued_token_type": "urn:ietf:params:oauth:token-type:id_token",
+  "token_type": "N_A",
+  "expires_in": 43199,
+  "scope": "openid profile email urn:zitadel:iam:org:project:id:259254020357488642:aud urn:zitadel:iam:org:project:id:259256588127174658:aud urn:zitadel:iam:org:project:id:zitadel:aud"
+}
+```
+
+## Impersonation examples
+
+With impersonation we can let one user assume the role of another user.
+
+:::info
+Currently impersonated tokens cannot be used for the ZITADEL API. This is to prevent privilege escalation where a impersonator could become an IAM owner, for example. We might enable the use of impersonated tokens in the future.
+:::
+
+### Preparation
+
+We continue with the same application and project layout from the above examples. We will introduce a new user, the impersonator, which will assume the identity of the end user from the previous example.
+
+#### Impersonation security settings
+
+If you want to impersonate users by Token Exchange, the security settings of the instance must be configured to allow this. Go to "Default settings" and in the sidebar select "Security Settings". Enable the "Allow Impersonation" setting.
+
+![Screenshot showing enabling of the impersonation security setting](/img/guides/token-exchange/instance-security-impersonation.png)
+
+#### Impersonation permissions
+
+Next we need to configure which users are allowed to impersonate other users. ZITADEL provides 4 [management roles](/docs/guides/manage/console/managers):
+
+| Name                   | Role                      | Description                                                       |
+| ---------------------- | ------------------------- | ----------------------------------------------------------------- |
+| IAM Admin Impersonator | IAM_ADMIN_IMPERSONATOR    | Allow impersonation of admin and end users from all organizations |
+| IAM Impersonator       | IAM_END_USER_IMPERSONATOR | Allow impersonation of end users from all organizations           |
+| Org Admin Impersonator | ORG_ADMIN_IMPERSONATOR    | Allow impersonation of admin and end users from the organization  |
+| Org Impersonator       | ORG_END_USER_IMPERSONATOR | Allow impersonation of end users from the organization            |
+
+ In this example we will assign the `ORG_END_USER_IMPERSONATOR` role to a user:
+
+![Screenshot showing assignment of an impersonator role](/img/guides/token-exchange/org-role-end-user-impersonator.png)
+
+#### Authenticated impersonator tokens
+
+At this point the _portal_ web-app must have completed a code-flow login for an user with the `ORG_END_USER_IMPERSONATOR` ZITADEL role. The impersonator does not have a profile. In this case we only need the `openid` scope.
+However, as we cannot extend audience during token exchange, it is important that the project scopes are requested for the impersonator during login.
+
+```
+openid urn:zitadel:iam:org:project:id:259254020357488642:aud urn:zitadel:iam:org:project:id:259256588127174658:aud urn:zitadel:iam:org:project:id:zitadel:aud
+```
+
+At the end of the code flow we have the following tokens:
+
+Opaque access token:
+
+```
+_oFT8JOKtqpS_5M5ml03P4TEQpCj8AT1XFq2jT_iKvgIB9lzjbrOl4MHJ3o3G-RSO_y0FR4
+```
+
+ID token:
+
+```
+eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDE5NDQ2NTQyODI3NTQiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTQxMzcwLCJpYXQiOjE3MTEwOTgxNzAsImF1dGhfdGltZSI6MTcxMTA5ODE2OSwiYW1yIjpbInBhc3N3b3JkIiwicHdkIl0sImF6cCI6IjI1OTI1NDQwOTMyMDUyOTkyMkBwb3J0YWwiLCJjbGllbnRfaWQiOiIyNTkyNTQ0MDkzMjA1Mjk5MjJAcG9ydGFsIiwiYXRfaGFzaCI6InQ1X2dqR2k5TVNPYTNlNTBkUEdDVEEiLCJjX2hhc2giOiJnb3IzQ0tWN0ljVW8wNUpxTnd6aFp3In0.iN8LNj9VV-Kmb68frPesMM8L7PYWvwqcqlvvU4EsfNM_Q8_Upec8_8bXFk1EG7Ecg65JfrGdceQjYamldaMJyV2X9n-aZ9Db4CpyHUduJOIvWkeBQBxWDytiTFBiAaS-YhQ9L5UmDoz6b2HNrHGNlqGd_F0_rMdMZ0P4A8RQck-akNz8IntTpvQlbN6vWPC7_4Cy0xYqgWlqsCVWJkJ8v97XYLJlKPnu-tvoHQ48eZRXBgqUdrQAV8nAyp-1oglGQwJFGNzWBE-cRIkFJ5uMum7jRfuFPQGTSL8XNMQfAzRHCLOMLyFxttsL5ynMpcp2_w35DssmSY9r1J91tGdydg
+```
+
+The ID token has the following claims:
+
+```json
+{
+  "iss": "http://localhost:9000",
+  "sub": "259241944654282754",
+  "aud": [
+    "259254409320529922@portal",
+    "259297773508165634@portal",
+    "259254317079330818",
+    "259254020357488642",
+    "259256588127174658",
+    "257786991247294468"
+  ],
+  "exp": 1711141370,
+  "iat": 1711098170,
+  "auth_time": 1711098169,
+  "amr": [
+    "password",
+    "pwd"
+  ],
+  "azp": "259254409320529922@portal",
+  "client_id": "259254409320529922@portal",
+  "at_hash": "t5_gjGi9MSOa3e50dPGCTA",
+  "c_hash": "gor3CKV7IcUo05JqNwzhZw"
+}
+```
+
+### Delegation by token example
+
+Let's assume that the web-app has the ability for an end-user to enable delegation. That option would make the end-user's token available to a user with impersonation permissions. The web-app will send a token exchange request with the `subject_token` of the end-user and the `actor_token` of the impersonator.
+
+In this example we will also request a JWT access token, so we can inspect it later. Any other allowed type could be used.
+
+```bash
+curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-H 'Accept: application/json' \
+-u '259254409320529922@portal:eNdXJzB5RK5CXSpa4HqEfbdDqlM7drpskEHq1RBYMby0tM1MaCidyWsWlp5mglbN' \
+-d 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
+-d 'subject_token=NaUAPHy5mLFQlwUCeUGYeDyhcQYuNhzTiYgwMor9BxP_bfMy2iDdLxJ87nntUc85vNyeHOY' \
+-d 'subject_token_type=urn:ietf:params:oauth:token-type:access_token' \
+-d 'actor_token=_oFT8JOKtqpS_5M5ml03P4TEQpCj8AT1XFq2jT_iKvgIB9lzjbrOl4MHJ3o3G-RSO_y0FR4' \
+-d 'actor_token_type=urn:ietf:params:oauth:token-type:access_token' \
+-d 'requested_token_type=urn:ietf:params:oauth:token-type:jwt' | jq
+```
+
+Will give the following response:
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTQyODc1LCJpYXQiOjE3MTEwOTk2NzUsIm5iZiI6MTcxMTA5OTY3NSwianRpIjoiMjU5MzgxOTI2Mjk1NTAyODUwIiwiYWN0Ijp7ImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsInN1YiI6IjI1OTI0MTk0NDY1NDI4Mjc1NCJ9fQ.rz0M_r_rLN0OIf5UKOTi9Fz5-X3CFLMA4jBaZHDy1pdbBwfbnByL3LeB9UYtSjzMwaYmXJJJRlxAvO9I2bu2ReHYi97DzFo2gKX9p-rLoaEUYcAjg3HmJ0c9J1Ucvc05yXu2OXhNKDb7_qcX4IfaddpazPRvjNnpRk4NWFxKbTBLG4mpqxv5brM4iDPmzejUdoYKxSzlCH-ChZIf28vbE_ORf0HfxkptXAsZ3P9I9Fr-d_fenCmBFHAMP0u_tQ7z-IzgxDg9H54fWEm_LNrkFJf6PEPWLc1TFFOKMgU5nnGorSe0dLZGXOB_GJz6wTw6-ts8QKxJ_zajd4r3K4kKSg",
+  "issued_token_type": "urn:ietf:params:oauth:token-type:jwt",
+  "token_type": "Bearer",
+  "expires_in": 43199,
+  "scope": "openid email profile urn:zitadel:iam:org:project:id:259254020357488642:aud urn:zitadel:iam:org:project:id:259256588127174658:aud urn:zitadel:iam:org:project:id:zitadel:aud",
+  "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTQyODc1LCJpYXQiOjE3MTEwOTk2NzUsImF6cCI6IjI1OTI1NDQwOTMyMDUyOTkyMkBwb3J0YWwiLCJjbGllbnRfaWQiOiIyNTkyNTQ0MDkzMjA1Mjk5MjJAcG9ydGFsIiwiYWN0Ijp7ImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsInN1YiI6IjI1OTI0MTk0NDY1NDI4Mjc1NCJ9LCJhdF9oYXNoIjoiYnZPQVhzMUhkQmFZWTZqN1B6T3RqZyIsIm5hbWUiOiJlbmQgdXNlciIsImdpdmVuX25hbWUiOiJlbmQiLCJmYW1pbHlfbmFtZSI6InVzZXIiLCJuaWNrbmFtZSI6ImVuZC11c2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwibG9jYWxlIjoiZW4iLCJ1cGRhdGVkX2F0IjoxNzExMDE2Mjk2LCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJlbmQtdXNlciIsImVtYWlsIjoidGltK2VuZC11c2VyQHppdGFkZWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWV9.cza4Fgn73Jez29l9uzcCcG-QYGvsqjReAICGajWjFFIij7PohhSWYkJNpQuixXeyp_JD7qxLuG1yFUGcXS-IS8ui_yHpiWuXr7ik81OX00_iCwBr6Qn6Ae6Qc3LOLNieSo1jRY2vx6pTXn0ZPnXpL_AbtVU3bruyaxbBeQhhyVDZ0NOLOgB3r-0Vc43VDnziI4-7Ngl1lQpU6Jp-kRNmqar36S59Aj3upcUus77I8tCfS633T4E8PcIAlqPla8RYcpAan6Qpc3ge7ybqjdfmh_qLv672rY_rQvh3rbe3sHup0nK1XzZNr9Fl1_LeZtUiv5or7WB4c4cGpqc3SAuxow"
+}
+```
+
+In the access token [claims](/docs/apis/openidoauth/claims) we can see that the subject and audience are taken from the `subject_token`. The `act` claim contains the subject and issuer of the `actor_token`, so we can always determine the impersonator that obtained the token.
+
+```json
+{
+  "iss": "http://localhost:9000",
+  "sub": "259242039378444290",
+  "aud": [
+    "259254409320529922@portal",
+    "259297773508165634@portal",
+    "259254317079330818",
+    "259254020357488642",
+    "259256588127174658",
+    "257786991247294468"
+  ],
+  "exp": 1711142875,
+  "iat": 1711099675,
+  "nbf": 1711099675,
+  "jti": "259381926295502850",
+  "act": {
+    "iss": "http://localhost:9000",
+    "sub": "259241944654282754"
+  }
+}
+```
+
+### Impersonation by user ID example
+
+The previous example required us to have an active token of the user we want to impersonate. There are situations where this requirement cannot be met. For example, the user does not have an active session and we still need to impersonate them.
+
+ZITADEL allows passing a user ID as the `subject_token`, along with a valid `actor_token`. This is an addition to enable this specific use-case.
+
+:::info
+User ID as subject token is an experimental addition and is provided pending evaluation of our community. This method might be considered insecure and trust is fully placed into the app making the request. This might be removed in the future.
+:::
+
+In the following example we are again requesting a JWT access token. Instead of a token, we use the user ID of the end-user in the `subject_token` field and adjust the `subject_token_type` accordingly. As the user ID does not carry any scope and the impersonator / actor does not have a profile, we need to add some scopes to the request in order to receive an ID token with profile and email information.
+
+```bash
+curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-H 'Accept: application/json' \
+-u '259254409320529922@portal:eNdXJzB5RK5CXSpa4HqEfbdDqlM7drpskEHq1RBYMby0tM1MaCidyWsWlp5mglbN' \
+-d 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
+-d 'subject_token=259242039378444290' \
+-d 'subject_token_type=urn:zitadel:params:oauth:token-type:user_id' \
+-d 'actor_token=_oFT8JOKtqpS_5M5ml03P4TEQpCj8AT1XFq2jT_iKvgIB9lzjbrOl4MHJ3o3G-RSO_y0FR4' \
+-d 'actor_token_type=urn:ietf:params:oauth:token-type:access_token' \
+-d 'requested_token_type=urn:ietf:params:oauth:token-type:jwt' \
+-d 'scope=openid profile email' | jq
+```
+
+This gives us the following response:
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTQzNTEyLCJpYXQiOjE3MTExMDAzMTIsIm5iZiI6MTcxMTEwMDMxMiwianRpIjoiMjU5MzgyOTk0NDMzNzM2NzA2IiwiYWN0Ijp7ImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsInN1YiI6IjI1OTI0MTk0NDY1NDI4Mjc1NCJ9fQ.amF1wF090KItNNErpv_PaEw1t-zIQNh54IWPo_ECk7neNaWoTQjiUDQwuOBDpe8rqukP7gUnKlq9s3GOB0C5dGWyETMrezVeTQGkGEtGOhyvP21KWG8mAJ9MWP4VZ0XNXyzscioHdDC1ICPeRZPenfsGltcVKk0jzISW_wCprnJWXbVECBY_oEzZaVdopqv8kYYM2oXC-5Yi8tMBcm_R-9demCPoUUpKPHXRp524bv1jDfEti5WSziM-VbkFVWOB5VjSR1vFu7mXWmP9foRr11206EUkOrRUMewluRLUNm_aprhKADEo1nZ8WY76V3LLDH7wQ7L8v0UxqUtdw9v_kw",
+  "issued_token_type": "urn:ietf:params:oauth:token-type:jwt",
+  "token_type": "Bearer",
+  "expires_in": 43199,
+  "scope": "openid profile email",
+  "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTQzNTEyLCJpYXQiOjE3MTExMDAzMTIsImF6cCI6IjI1OTI1NDQwOTMyMDUyOTkyMkBwb3J0YWwiLCJjbGllbnRfaWQiOiIyNTkyNTQ0MDkzMjA1Mjk5MjJAcG9ydGFsIiwiYWN0Ijp7ImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsInN1YiI6IjI1OTI0MTk0NDY1NDI4Mjc1NCJ9LCJhdF9oYXNoIjoicXVYS1JENWY0YmxOb3YxS3Y2bnB5ZyIsIm5hbWUiOiJlbmQgdXNlciIsImdpdmVuX25hbWUiOiJlbmQiLCJmYW1pbHlfbmFtZSI6InVzZXIiLCJuaWNrbmFtZSI6ImVuZC11c2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwibG9jYWxlIjoiZW4iLCJ1cGRhdGVkX2F0IjoxNzExMDE2Mjk2LCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJlbmQtdXNlciIsImVtYWlsIjoidGltK2VuZC11c2VyQHppdGFkZWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWV9.kMRBX6te4bPh9PWQrKeQu7hWr13p_ehvIbOigrTs5ods3klM6PpCPTmDLuj65Ssd8SA5i_YTuNHDuoDzRlZAdvHx4X06eytF1yQQd0eME187cOaf3ffzK90ZWvuFk34N--teW41LjM0nq15wbUXMO8UWk4AStkl901nWBxAWhRLmR356ksQWNs8TAGLsSLCaG4py0pw807yUXCFy1EGwG7z-eAeA58mRmIYSxFmycU-uRqsCPzDuDSu4JD1G3sh1G3GKRF_DqwmEm4ClBx-_gNUJnH52o-xvTOX57QM40Ai6vub_Ncy5nxVFETU-PnpAXpslvNIsOz4CHwz7yDVPYg"
+}
+```
+
+The new access token looks similar to the last example. However, the audience is now taken from the `actor_token`. As both audiences were the same you will not see the difference here.
+
+```json
+{
+  "iss": "http://localhost:9000",
+  "sub": "259242039378444290",
+  "aud": [
+    "259254409320529922@portal",
+    "259297773508165634@portal",
+    "259254317079330818",
+    "259254020357488642",
+    "259256588127174658",
+    "257786991247294468"
+  ],
+  "exp": 1711143512,
+  "iat": 1711100312,
+  "nbf": 1711100312,
+  "jti": "259382994433736706",
+  "act": {
+    "iss": "http://localhost:9000",
+    "sub": "259241944654282754"
+  }
+}
+```
+
+In the ID Token we see the profile and email information of the end-user:
+
+```json
+{
+  "iss": "http://localhost:9000",
+  "sub": "259242039378444290",
+  "aud": [
+    "259254409320529922@portal",
+    "259297773508165634@portal",
+    "259254317079330818",
+    "259254020357488642",
+    "259256588127174658",
+    "257786991247294468"
+  ],
+  "exp": 1711143512,
+  "iat": 1711100312,
+  "azp": "259254409320529922@portal",
+  "client_id": "259254409320529922@portal",
+  "act": {
+    "iss": "http://localhost:9000",
+    "sub": "259241944654282754"
+  },
+  "at_hash": "quXKRD5f4blNov1Kv6npyg",
+  "name": "end user",
+  "given_name": "end",
+  "family_name": "user",
+  "nickname": "end-user",
+  "gender": "female",
+  "locale": "en",
+  "updated_at": 1711016296,
+  "preferred_username": "end-user",
+  "email": "tim+end-user@zitadel.com",
+  "email_verified": true
+}
+```
+
+### Refresh an impersonated token example
+
+If we use the previous example and append the `offline_access` scope, we will also receive a refresh token:
+
+```bash
+curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-H 'Accept: application/json' \
+-u '259254409320529922@portal:eNdXJzB5RK5CXSpa4HqEfbdDqlM7drpskEHq1RBYMby0tM1MaCidyWsWlp5mglbN' \
+-d 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
+-d 'subject_token=259242039378444290' \
+-d 'subject_token_type=urn:zitadel:params:oauth:token-type:user_id' \
+-d 'actor_token=_oFT8JOKtqpS_5M5ml03P4TEQpCj8AT1XFq2jT_iKvgIB9lzjbrOl4MHJ3o3G-RSO_y0FR4' \
+-d 'actor_token_type=urn:ietf:params:oauth:token-type:access_token' \
+-d 'requested_token_type=urn:ietf:params:oauth:token-type:jwt' \
+-d 'scope=openid profile email offline_access' | jq
+```
+
+Response with refresh token:
+
+```bash
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTU5Mzg1LCJpYXQiOjE3MTExMTYxODUsIm5iZiI6MTcxMTExNjE4NSwianRpIjoiMjU5NDA5NjI1NjYzNjY4MjI2IiwiYWN0Ijp7ImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsInN1YiI6IjI1OTI0MTk0NDY1NDI4Mjc1NCJ9fQ.QoPVZFOZUolPVOWwTYY1PZe7CKp2j8dqV8kt8a5Xz9ij1Y4TYZeKivDor68hfvlyulfT04gT8WNc3VLPtxJjNHQaydk9KrhzIN1liovh5Jy54KKvq4-jZpMPkBSy0Zkvv-lSuGEzM9wDurIOBUUy_JKmek3uySxH7bEQU4Jt6qQ_kQTT82rqFXAl3SWMQpaaVjvGMqEmzlmZacudSa1KETLyF2_UTCqoXXFWW-1mZtNGyy4EaMiU-k0h6MC1XBSyjr1aIVO2o4uWYmQYjIydmnKAoqJJEKkd-ZmSkCMEV9fFa8bKT816Agw1UNMDKMxF3tSW540oyAdGsLKSg39uIg",
+  "issued_token_type": "urn:ietf:params:oauth:token-type:jwt",
+  "token_type": "Bearer",
+  "expires_in": 43199,
+  "scope": "openid profile email offline_access",
+  "refresh_token": "Rh1SRrRBGkBAmyK7KxrMcHtZ0_ewzStK5-l6IDOQG5S6EmZ42gHkP9KdMP3u-cV2cgFzxcnaRHbae9ZjPq9tD0ZbPdvjgyER",
+  "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTU5Mzg1LCJpYXQiOjE3MTExMTYxODUsImF6cCI6IjI1OTI1NDQwOTMyMDUyOTkyMkBwb3J0YWwiLCJjbGllbnRfaWQiOiIyNTkyNTQ0MDkzMjA1Mjk5MjJAcG9ydGFsIiwiYWN0Ijp7ImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsInN1YiI6IjI1OTI0MTk0NDY1NDI4Mjc1NCJ9LCJhdF9oYXNoIjoiSmtRZ1JTZHlqVzJ5ZnZ5M3hUQUc4USIsIm5hbWUiOiJlbmQgdXNlciIsImdpdmVuX25hbWUiOiJlbmQiLCJmYW1pbHlfbmFtZSI6InVzZXIiLCJuaWNrbmFtZSI6ImVuZC11c2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwibG9jYWxlIjoiZW4iLCJ1cGRhdGVkX2F0IjoxNzExMDE2Mjk2LCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJlbmQtdXNlciIsImVtYWlsIjoidGltK2VuZC11c2VyQHppdGFkZWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWV9.SvSD5hgR-MkabVV41Zta0jgtHmhlhSvAbP1BQNbr7Pjzia-f-3zVRodKkPU6OkjVvI2D4Yqk2bBPO7ZUW9w76oDoScnlJoqJvZsBQDPxO8z7Gtgtj7rQAPQKC-JKU7Aeb-V072tZhOt0NG-S0yWeiObS4stMXHGrBYQbwyarboyqMO69qjYey2MkGVFmhEOVGZ9w7Np6HZPfBgs2qFUXoQ51FbBVVOxxuCF5KSUkD_QRgmjK03KFDlLI8adtvC3TUsWLJeTaiaYAmXU2VouGtEqDXfOmDzxeZI69gUxj4_io2v3tHLn3SuslMi1ulihplTircsDk3H4oAp2clqj4TA"
+}
+```
+
+The refresh token can be used for the `refresh_token` grant:
+
+```bash
+curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-H 'Accept: application/json' \
+-u '259254409320529922@portal:eNdXJzB5RK5CXSpa4HqEfbdDqlM7drpskEHq1RBYMby0tM1MaCidyWsWlp5mglbN' \
+-d 'grant_type=refresh_token' \
+-d 'refresh_token=Rh1SRrRBGkBAmyK7KxrMcHtZ0_ewzStK5-l6IDOQG5S6EmZ42gHkP9KdMP3u-cV2cgFzxcnaRHbae9ZjPq9tD0ZbPdvjgyER' | jq
+```
+
+The response now caries an opaque token again, because that is what is configured for the application:
+
+```json
+{
+  "access_token": "N4At8XdtlFySthaLzCSYX3GrEH_UmPgUzXjGF3WNLC_cl-Oy6s5G7ytZSV7zSClB3aSltYY",
+  "token_type": "Bearer",
+  "expires_in": 43199,
+  "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTU5NDI3LCJpYXQiOjE3MTExMTYyMjcsImF6cCI6IjI1OTI1NDQwOTMyMDUyOTkyMkBwb3J0YWwiLCJjbGllbnRfaWQiOiIyNTkyNTQ0MDkzMjA1Mjk5MjJAcG9ydGFsIiwiYWN0Ijp7ImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsInN1YiI6IjI1OTI0MTk0NDY1NDI4Mjc1NCJ9LCJhdF9oYXNoIjoiUVZRRm1RejFUS3hiOTgxM3Y2RUlMQSIsIm5hbWUiOiJlbmQgdXNlciIsImdpdmVuX25hbWUiOiJlbmQiLCJmYW1pbHlfbmFtZSI6InVzZXIiLCJuaWNrbmFtZSI6ImVuZC11c2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwibG9jYWxlIjoiZW4iLCJ1cGRhdGVkX2F0IjoxNzExMDE2Mjk2LCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJlbmQtdXNlciIsImVtYWlsIjoidGltK2VuZC11c2VyQHppdGFkZWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWV9.M-lZwJ2UKpsGARLtGVV0IMQWWeHGw--Q75XcnSIOQat3FZRswUVPpo7Ir2xqvOoi4RCaPdq2Wy8Zl34-RnLOJ0ZtgPhdjx3qLFfJxfZtm_KTCfAaeTRprlwCEjLvZ2RdDsnSZasawRb1Bg_oajtckkEj4MfPyIEhq_RYgERbSZFMNFkQ99WIWnpP6bXVekkYCx2dGpJU3ZHQKUcjt0ejYteGo0-qVRrJCRR994fQddVkB7yYk8fDP7PwNcB6be9db1plpkWJGP3tiOSC6DvBoP8LhMeda4TFM7hgh9iiCqhB-FDbhXuhDFLcGhTrF0XYrowd8LNEtHdAS_T9RNN8xw"
+}
+```
+
+If we inspect the ID token we can see that the actor claim is preserved, even after token refresh:
+
+```json
+{
+  "iss": "http://localhost:9000",
+  "sub": "259242039378444290",
+  "aud": [
+    "259254409320529922@portal",
+    "259297773508165634@portal",
+    "259254317079330818",
+    "259254020357488642",
+    "259256588127174658",
+    "257786991247294468"
+  ],
+  "exp": 1711159427,
+  "iat": 1711116227,
+  "azp": "259254409320529922@portal",
+  "client_id": "259254409320529922@portal",
+  "act": {
+    "iss": "http://localhost:9000",
+    "sub": "259241944654282754"
+  },
+  "at_hash": "QVQFmQz1TKxb9813v6EILA",
+  "name": "end user",
+  "given_name": "end",
+  "family_name": "user",
+  "nickname": "end-user",
+  "gender": "female",
+  "locale": "en",
+  "updated_at": 1711016296,
+  "preferred_username": "end-user",
+  "email": "tim+end-user@zitadel.com",
+  "email_verified": true
+}
+```
+
+### Impersonation by JWT profile example
+
+If the web-app uses client assertion with JWT, it is also possible to create a self-singed JWT as subject token.
+
+```bash
+curl -L -X POST 'http://localhost:9000/oauth/v2/token' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-H 'Accept: application/json' \
+-d 'client_assertion=eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTI5Nzc5ODk0MjM1OTU1NCJ9.eyJpc3MiOiIyNTkyOTc3NzM1MDgxNjU2MzRAcG9ydGFsIiwic3ViIjoiMjU5Mjk3NzczNTA4MTY1NjM0QHBvcnRhbCIsImF1ZCI6WyJodHRwOi8vbG9jYWxob3N0OjkwMDAiXSwiaWF0IjoxNzExMTAyNjU3LCJleHAiOjE3MTExMDYyNTd9.QVyS01stBxEeoMsA6FGXrEcbZebGMkj9PzuMO8-Gq-4dkk94O2SkD9LFGOU2QCgQgdUUxYyK363mfO9ihQs01CgYybwsqv8ijcpa_koAK5K2qx6Vrjtiipyr-GTB5egyoETMlxxc9JrvrI4xhtrczXUJNMJ3a4XwxNL7h8pwQCzoJmgAvZXX7JyuWzp8qToN5R9opv-mIpezziDZA4Cm9R8Uo1ASK-pdQ-Fx_DIQgvFXerEfPWAG0tRWV8Usq_bpMPedjWrFB--XeOu3aSFp7YYmo0WLJshIoWI9dJwWrfVI5oG3lHgvvuWpFmzFhi_zkOz4VXdqrPEjs9IUzGwcgQ' \
+-d 'client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer' \
+-d 'grant_type=urn:ietf:params:oauth:grant-type:token-exchange' \
+-d 'subject_token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTI5Nzc5ODk0MjM1OTU1NCJ9.eyJpc3MiOiIyNTkyOTc3NzM1MDgxNjU2MzRAcG9ydGFsIiwic3ViIjoiMjU5MjQyMDM5Mzc4NDQ0MjkwIiwiYXVkIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCJdLCJpYXQiOjE3MTExMDI1NjAsImV4cCI6MTcxMTEwNjE2MH0.d5B-hXi36QfoiBlLxzmUev32RtbD_tSBymPiaph10a6bRvwcwp6mTP9SMFWtYt4wUiITOXRYTaFADqga8xIfa5ZmfR28kES8bqlOtXNlnfQFUH4_yYy8bw02d9v0jArVIkdYpQTVl_Zi9VyRKGcGXmkChNdQXKsF1FIigJeG78jpPTKs0sqRrTIbeDiwvAsWhiUSWPmZ1UsZThsNPrVynUgswLpMADz-f0mbNkc3MT9psDJbTF0tCI7yNTzbGPQymThd5CDVusEHkPA7abiQb4yvhbJvl4yFZxJyodkmNr0CotER-LgzcAYBeLFD07EWmf5Cwsbu3ZMIzcibJNtN5Q' \
+-d 'subject_token_type=urn:ietf:params:oauth:token-type:jwt' \
+-d 'actor_token=_oFT8JOKtqpS_5M5ml03P4TEQpCj8AT1XFq2jT_iKvgIB9lzjbrOl4MHJ3o3G-RSO_y0FR4' \
+-d 'actor_token_type=urn:ietf:params:oauth:token-type:access_token' \
+-d 'requested_token_type=urn:ietf:params:oauth:token-type:jwt' \
+-d 'scope=openid profile email' | jq
+```
+
+The `client_assertion` has the following claims:
+
+```json
+{
+  "iss": "259297773508165634@portal",
+  "sub": "259297773508165634@portal",
+  "aud": [
+    "http://localhost:9000"
+  ],
+  "iat": 1711102657,
+  "exp": 1711106257
+}
+```
+
+And the `subject_token`:
+
+```json
+{
+  "iss": "259297773508165634@portal",
+  "sub": "259242039378444290",
+  "aud": [
+    "http://localhost:9000"
+  ],
+  "iat": 1711102560,
+  "exp": 1711106160
+}
+```
+
+In both cases the issuer is the web application, the audience must be the zitadel domain. For the assertion the subject is the application and for the subject token the subject is the impersonated user.
+
+Response:
+
+```json
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTQ1OTUxLCJpYXQiOjE3MTExMDI3NTEsIm5iZiI6MTcxMTEwMjc1MSwianRpIjoiMjU5Mzg3MDg2NDYzODI3OTcwIiwiYWN0Ijp7ImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsInN1YiI6IjI1OTI0MTk0NDY1NDI4Mjc1NCJ9fQ.sq5lGzxcQ0YePXcl-HjfqlQ8XaDcKhgVR2NJ-t5eMcfMasBKRhAzDhTPPojS32F7RClXgcRbiW-Jgemr4SsUAeZ3abmIGQnjzTu3alDFp9vtOcN1OvWttMl6tgvhW6JzsyRUnPRbC3n4_nRX9rXFi3eg5I3mNYo-a6yOw-pKdLxC2vNBYurFn_1uUbEGG0Z1UTzSHx8PVPpAeJ2nNWd8EN-HskpjSmSpklVazknu6NJHolNvmic0WmlZz_SAQ8M4uvea4aVOw3Uw4QRaPczsUuO0nB0g_bSi8lDH9GIP7CFNuD0BeDwJ-lKdH0QV-cPMuadAgG4G9W_t4IjvXcQYYQ",
+  "issued_token_type": "urn:ietf:params:oauth:token-type:jwt",
+  "token_type": "Bearer",
+  "expires_in": 43199,
+  "scope": "openid profile email",
+  "id_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI1OTM3OTQwMTIwNzA1NDMzOCIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjkwMDAiLCJzdWIiOiIyNTkyNDIwMzkzNzg0NDQyOTAiLCJhdWQiOlsiMjU5MjU0NDA5MzIwNTI5OTIyQHBvcnRhbCIsIjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCIyNTkyNTQzMTcwNzkzMzA4MTgiLCIyNTkyNTQwMjAzNTc0ODg2NDIiLCIyNTkyNTY1ODgxMjcxNzQ2NTgiLCIyNTc3ODY5OTEyNDcyOTQ0NjgiXSwiZXhwIjoxNzExMTQ1OTUxLCJpYXQiOjE3MTExMDI3NTEsImF6cCI6IjI1OTI5Nzc3MzUwODE2NTYzNEBwb3J0YWwiLCJjbGllbnRfaWQiOiIyNTkyOTc3NzM1MDgxNjU2MzRAcG9ydGFsIiwiYWN0Ijp7ImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6OTAwMCIsInN1YiI6IjI1OTI0MTk0NDY1NDI4Mjc1NCJ9LCJhdF9oYXNoIjoiMENlN0pUMExHYUVJTmxwQVRIYzFRQSIsIm5hbWUiOiJlbmQgdXNlciIsImdpdmVuX25hbWUiOiJlbmQiLCJmYW1pbHlfbmFtZSI6InVzZXIiLCJuaWNrbmFtZSI6ImVuZC11c2VyIiwiZ2VuZGVyIjoiZmVtYWxlIiwibG9jYWxlIjoiZW4iLCJ1cGRhdGVkX2F0IjoxNzExMDE2Mjk2LCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJlbmQtdXNlciIsImVtYWlsIjoidGltK2VuZC11c2VyQHppdGFkZWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWV9.cMWoJBIPeakjtXWzsW3SGOAjMl27E0q8iePXtUHGueSUMhPibpOn7JiKd7VaZhgMDqN6c5TCU0EErdVm-6bc4SkxqrnYFjX4YIOygoTSbNzqkiOss6ZpcAGHt_RAd-i6NGcEm2_Fqp-EUO45V7jBEWgo3O4XLHsCVV1LQFpCHaSPK0ZtmjmNw-s-UKKF-kdSLLBpYKEUNmWGSMp3MqMgKLwl0SKFOiMY_HmBb-zSDRGN6s68b9Ays6Edxt-EnQ0pfR0TYFbnVSBQCqi5VXt3AcdnV1LRFQWi8ux6YTOiU10fZ3jbOiDjfS85bEKl9Nq5mhxVn9VsO4IiynjA9ZmlLQ"
+}
+```
+
+And again the access token claims:
+
+```json
+{
+  "iss": "http://localhost:9000",
+  "sub": "259242039378444290",
+  "aud": [
+    "259254409320529922@portal",
+    "259297773508165634@portal",
+    "259254317079330818",
+    "259254020357488642",
+    "259256588127174658",
+    "257786991247294468"
+  ],
+  "exp": 1711145951,
+  "iat": 1711102751,
+  "nbf": 1711102751,
+  "jti": "259387086463827970",
+  "act": {
+    "iss": "http://localhost:9000",
+    "sub": "259241944654282754"
+  }
+}
+```
+
+### Other usage examples
+
+Above we gave some of the most staightforward usecases. Of course, you can combine these examples to:
+
+- Impersonate and change the token type
+- Impersonate and change scope
+- Impersonate and reduce audience
+- Impersonate, change the token type, scope and audience
+
+## Audit trail
+
+In the user view of the console we can see whenever a new access token is created for a user.
+The existing `Access Token created` event is also used in the case of a token exchange.
+When there was an `actor_token` present during token exchange, we also log a `User impersonated` event.
+
+![Screenshot showing the user audit log with token creation and impersonation](/img/guides/token-exchange/user-audit-log.png)
+
+In the [instance event list](/docs/concepts/eventstore/overview) the `User impersonated` carries the actor in the payload:
+
+```json
+{
+  "actor": {
+    "issuer": "http://localhost:9000",
+    "user_id": "259241944654282754"
+  },
+  "applicationId": "259297773508165634@portal",
+}
+```
+
+## Finishing notes
+
+The current implementation of the Token Exchange grant was our first iteration on the subject.
+We love to hear feedback from our user! This is a [GitHub discussion](https://github.com/zitadel/zitadel/discussions/7624) opened specifically for this pupose.

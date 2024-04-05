@@ -277,10 +277,13 @@ func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user u2f")
 }
 
-func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
+func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) {
 	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
-		UserId:      userID,
-		NewPassword: &user.Password{Password: password},
+		UserId: userID,
+		NewPassword: &user.Password{
+			Password:       password,
+			ChangeRequired: changeRequired,
+		},
 	})
 	logging.OnError(err).Fatal("set user password")
 }
@@ -570,6 +573,10 @@ func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution
 }
 
 func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {
+	return s.CreateUserSchemaWithType(ctx, t, fmt.Sprint(time.Now().UnixNano()+1))
+}
+
+func (s *Tester) CreateUserSchemaWithType(ctx context.Context, t *testing.T, schemaType string) *schema.CreateUserSchemaResponse {
 	userSchema := new(structpb.Struct)
 	err := userSchema.UnmarshalJSON([]byte(`{
 		"$schema": "urn:zitadel:schema:v1",
@@ -578,7 +585,7 @@ func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.Cre
 	}`))
 	require.NoError(t, err)
 	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &schema.CreateUserSchemaRequest{
-		Type: fmt.Sprint(time.Now().UnixNano() + 1),
+		Type: schemaType,
 		DataType: &schema.CreateUserSchemaRequest_Schema{
 			Schema: userSchema,
 		},

@@ -32,7 +32,7 @@ message UserSchema {
       example: "\"STATE_ACTIVE\""
     }
   ];
-  // Revision is a read only version of the schema, each update increases the revision.
+  // Revision is a read only version of the schema, each update of the `schema`-field increases the revision.
   uint32 revision = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"2\""
@@ -59,7 +59,7 @@ enum FieldName {
   FIELD_NAME_TYPE = 1;
   FIELD_NAME_STATE = 2;
   FIELD_NAME_REVISION = 3;
-  FIELD_NAME_CREATION_DATE = 4;
+  FIELD_NAME_CHANGE_DATE = 4;
 }
 
 message SearchQuery {
@@ -79,6 +79,8 @@ message SearchQuery {
     TypeQuery type_query = 5;
     // Limit the result to a specific state of the schema.
     StateQuery state_query = 6;
+    // Limit the result to a specific schema ID.
+    IDQuery id_query = 7;
   }
 }
 

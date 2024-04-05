@@ -2,6 +2,8 @@
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
+  $button-text-color: map-get($foreground, text);
+  $button-disabled-text-color: map-get($foreground, disabled-button);
 
   .identity-provider-desc {
     font-size: 14px;
@@ -190,5 +192,20 @@
     h2 {
       margin: 1rem 0.25rem 1rem 0;
     }
+  }
+}
+
+.cnsl-state-dot {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &.active {
+    background-color: var(--success);
+  }
+
+  &.inactive {
+    background-color: var(--warn);
   }
 }

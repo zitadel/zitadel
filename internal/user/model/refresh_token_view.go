@@ -1,10 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-
-	"time"
 )
 
 type RefreshTokenView struct {
@@ -23,6 +23,7 @@ type RefreshTokenView struct {
 	Scopes                []string
 	Sequence              uint64
 	Token                 string
+	Actor                 *domain.TokenActor
 }
 
 type RefreshTokenSearchRequest struct {
