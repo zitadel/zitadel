@@ -1,37 +1,17 @@
 {{template "main-top" .}}
 
 <div class="lgn-head">
-    {{if .Linking}}
-    <h1>{{t "Login.TitleLinking"}}</h1>
-    <p>{{t "Login.DescriptionLinking"}}{{if .OrgName}} {{t "Login.MustBeMemberOfOrg" "OrgName" .OrgName}}{{end}}</p>
-    {{else}}
-    <h1>{{t "Login.Title"}}</h1>
-    <p>{{t "Login.Description"}}{{if .OrgName}} {{t "Login.MustBeMemberOfOrg" "OrgName" .OrgName}}{{end}}</p>
-    {{end}}
+    <h1>{{t "LinkingUserPrompt.Title"}}</h1>
+    <p>{{t "LinkingUserPrompt.Description"}} {{.Username}}</p>
 </div>
 
 
-<form action="{{ loginNameUrl }}" method="POST">
+<form action="{{ linkingPromptUrl }}" method="POST">
 
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
-
-    <p>{{.Identification}}
-        {{if .DisplayLoginNameSuffix}}{{.LoginName}}{{else}}{{.UserName}}{{end}}</p>
-
-    {{if hasUsernamePasswordLogin }}
-    <div class="fields">
-        <label class="lgn-label" for="loginName">{{t "Login.LoginNameLabel"}}</label>
-        <div class="lgn-suffix-wrapper">
-            <input class="lgn-input lgn-suffix-input" type="text" id="loginName" name="loginName" placeholder="{{if .OrgID }}{{t "Login.UsernamePlaceHolder"}}{{else}}{{t "Login.LoginnamePlaceHolder"}}{{end}}"
-            value="{{ .UserName }}" {{if .ErrMessage}}shake {{end}} autocomplete="username" autofocus required>
-            {{if .DisplayLoginNameSuffix}}
-                <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
-            {{end}}
-        </div>
-    </div>
-    {{end}}
+    <input type="hidden" name="userID" value="{{ .UserID }}" />
 
     {{template "error-message" .}}
 
@@ -39,9 +19,9 @@
         <a class="lgn-icon-button lgn-left-action" id="back-button" href="#">
             <i class="lgn-icon-arrow-left-solid"></i>
         </a>
-        <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "Login.NextButtonText"}}</button>
+        <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "LinkingUserPrompt.LinkButtonText"}}</button>
         <span class="fill-space"></span>
-        <button class="lgn-stroked-button" name="other" value="true" formnovalidate>{{t "Login.NextButtonText"}}</button>
+        <button class="lgn-stroked-button" name="other" value="true" formnovalidate>{{t "LinkingUserPrompt.CancelButtonText"}}</button>
     </div>
 
 </form>

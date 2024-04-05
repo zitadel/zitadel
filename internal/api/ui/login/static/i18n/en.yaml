@@ -331,6 +331,12 @@ LinkingUsersDone:
   CancelButtonText: Cancel
   NextButtonText: Next
 
+LinkingUserPrompt:
+  Title: Existing User Found
+  Description: "Do you want to link your existing account:"
+  LinkButtonText: Link
+  CancelButtonText: Cancel
+
 ExternalNotFound:
   Title: External User Not Found
   Description: External user not found. Do you want to link your user or auto register a new one.

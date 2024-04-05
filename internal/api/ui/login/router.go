@@ -53,6 +53,8 @@ const (
 
 	EndpointDeviceAuth       = "/device"
 	EndpointDeviceAuthAction = "/device/{action}"
+
+	EndpointLinkingPrompt = "/link/user"
 )
 
 var (
@@ -122,5 +124,6 @@ func CreateRouter(login *Login, interceptors ...mux.MiddlewareFunc) *mux.Router 
 	router.SkipClean(true).Handle("", http.RedirectHandler(HandlerPrefix+"/", http.StatusMovedPermanently))
 	router.HandleFunc(EndpointDeviceAuth, login.handleDeviceAuthUserCode).Methods(http.MethodGet, http.MethodPost)
 	router.HandleFunc(EndpointDeviceAuthAction, login.handleDeviceAuthAction).Methods(http.MethodGet, http.MethodPost)
+	router.HandleFunc(EndpointLinkingPrompt, login.handleLinkingPrompt).Methods(http.MethodPost)
 	return router
 }

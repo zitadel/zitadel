@@ -236,6 +236,9 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		"ldapUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLDAPCallback)
 		},
+		"linkingPromptUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointLinkingPrompt)
+		},
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(

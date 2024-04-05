@@ -13,29 +13,30 @@ const (
 
 type linkingPromptData struct {
 	userData
-	Identification string
-	Linking        domain.AutoLinkingOption
+	Username string
+	Linking  domain.AutoLinkingOption
+	UserID   string
 }
 
 type linkingPromptFormData struct {
 	OtherUser bool   `schema:"other"`
-	UserID    string `schema:"userId"`
+	UserID    string `schema:"userID"`
 }
 
-func (l *Login) renderLinkingPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *query.User, linking domain.AutoLinkingOption, err error) {
+func (l *Login) renderLinkingPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	//if singleIDPAllowed(authReq) {
-	//	l.handleIDP(w, r, authReq, authReq.AllowedExternalIDPs[0].IDPConfigID)
-	//	return
-	//}
 	translator := l.getTranslator(r.Context(), authReq)
+	identification := user.PreferredLoginName
+	if authReq.LabelPolicy != nil && authReq.LabelPolicy.HideLoginNameSuffix {
+		identification = user.Username
+	}
 	data := &linkingPromptData{
-		Identification: user.PreferredLoginName,
-		Linking:        linking,
-		userData:       l.getUserData(r, authReq, translator, "Login.Title", "Login.Description", errID, errMessage),
+		Username: identification,
+		UserID:   user.ID,
+		userData: l.getUserData(r, authReq, translator, "Login.Title", "Login.Description", errID, errMessage),
 	}
 	funcs := map[string]interface{}{
 		"hasUsernamePasswordLogin": func() bool {
@@ -64,7 +65,7 @@ func (l *Login) handleLinkingPrompt(w http.ResponseWriter, r *http.Request) {
 	}
 	err = l.authRepo.SelectUser(r.Context(), authReq.ID, data.UserID, authReq.AgentID)
 	if err != nil {
-		l.renderLinkingPrompt(w, r, authReq, nil, 0, err)
+		l.renderLogin(w, r, authReq, err)
 		return
 	}
 	l.renderNextStep(w, r, authReq)
