@@ -111,7 +111,7 @@ func Test_newCryptoCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := newEncryptedCode(context.Background(), tt.eventstore.Filter, tt.args.typ, tt.args.alg)
+			got, err := newEncryptedCode(context.Background(), tt.eventstore.Filter, tt.args.typ, tt.args.alg) //nolint:staticcheck
 			require.ErrorIs(t, err, tt.wantErr)
 			if tt.wantErr == nil {
 				require.NotNil(t, got)
@@ -127,7 +127,7 @@ func Test_verifyCryptoCode(t *testing.T) {
 	es := eventstoreExpect(t, expectFilter(
 		eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypeVerifyEmailCode)),
 	))
-	code, err := newEncryptedCode(context.Background(), es.Filter, domain.SecretGeneratorTypeVerifyEmailCode, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
+	code, err := newEncryptedCode(context.Background(), es.Filter, domain.SecretGeneratorTypeVerifyEmailCode, crypto.CreateMockEncryptionAlg(gomock.NewController(t))) //nolint:staticcheck
 	require.NoError(t, err)
 
 	type args struct {
@@ -185,7 +185,7 @@ func Test_verifyCryptoCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := verifyEncryptedCode(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg, time.Now(), tt.args.expiry, tt.args.crypted, tt.args.plain)
+			err := verifyEncryptedCode(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg, time.Now(), tt.args.expiry, tt.args.crypted, tt.args.plain) //nolint:staticcheck
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -246,7 +246,7 @@ func Test_cryptoCodeGenerator(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotConf, err := encryptedCodeGenerator(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg, tt.args.defaultConfig)
+			got, gotConf, err := encryptedCodeGenerator(context.Background(), tt.eventsore.Filter, tt.args.typ, tt.args.alg, tt.args.defaultConfig) //nolint:staticcheck
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.IsType(t, tt.want, got)
 			assert.Equal(t, tt.wantConf, gotConf)
@@ -307,7 +307,7 @@ func Test_newHashedSecretWithDefault(t *testing.T) {
 				IncludeLowerLetters: true,
 			}
 			generate := newHashedSecretWithDefault(hasher, defaultConfig)
-			encodedHash, plain, err := generate(context.Background(), tt.eventstore(t).Filter)
+			encodedHash, plain, err := generate(context.Background(), tt.eventstore(t).Filter) //nolint:staticcheck
 			if tt.wantErr {
 				require.Error(t, err)
 				return

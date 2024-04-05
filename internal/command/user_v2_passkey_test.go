@@ -138,7 +138,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	es := eventstoreExpect(t,
 		expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 	)
-	code, err := newEncryptedCode(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
+	code, err := newEncryptedCode(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg) //nolint:staticcheck
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
@@ -236,7 +236,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 	es := eventstoreExpect(t,
 		expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 	)
-	code, err := newEncryptedCode(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
+	code, err := newEncryptedCode(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg) //nolint:staticcheck
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
