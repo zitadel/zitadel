@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -17,13 +16,12 @@ import (
 
 func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
 		userID        string
 		resourceOwner string
-		generator     crypto.Generator
 		set           *GenerateMachineSecret
 	}
 	type res struct {
@@ -40,15 +38,12 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 		{
 			name: "user invalid, invalid argument error userID",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
 				userID:        "",
 				resourceOwner: "org1",
-				generator:     GetMockSecretGenerator(t),
 				set:           nil,
 			},
 			res: res{
@@ -58,15 +53,12 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 		{
 			name: "user invalid, invalid argument error resourceowner",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "",
-				generator:     GetMockSecretGenerator(t),
 				set:           nil,
 			},
 			res: res{
@@ -76,8 +68,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -85,7 +76,6 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
-				generator:     GetMockSecretGenerator(t),
 				set:           nil,
 			},
 			res: res{
@@ -95,8 +85,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 		{
 			name: "add machine secret, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -112,12 +101,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 					expectPush(
 						user.NewMachineSecretSetEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
+							"secret",
 						),
 					),
 				),
@@ -126,7 +110,6 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
-				generator:     GetMockSecretGenerator(t),
 				set:           &GenerateMachineSecret{},
 			},
 			res: res{
@@ -134,7 +117,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 					ResourceOwner: "org1",
 				},
 				secret: &GenerateMachineSecret{
-					ClientSecret: "a",
+					ClientSecret: "secret",
 				},
 			},
 		},
@@ -142,9 +125,13 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				newHashedSecret: mockHashedSecret("secret"),
+				defaultSecretGenerators: &SecretGenerators{
+					ClientSecret: emptyConfig,
+				},
 			}
-			got, err := r.GenerateMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.generator, tt.args.set)
+			got, err := r.GenerateMachineSecret(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.set)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -274,12 +261,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 						eventFromEventPusher(
 							user.NewMachineSecretSetEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 							),
 						),
 					),
@@ -333,7 +315,7 @@ func TestCommands_MachineSecretCheckSucceeded(t *testing.T) {
 			expectPushSlow(time.Second/100, cmd),
 		),
 	}
-	c.MachineSecretCheckSucceeded(ctx, "userID", "orgID")
+	c.MachineSecretCheckSucceeded(ctx, "userID", "orgID", "")
 	require.NoError(t, c.Close(ctx))
 }
 

@@ -1,10 +1,12 @@
 package domain
 
 import (
+	"context"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -30,7 +32,7 @@ type PasswordCode struct {
 	NotificationType NotificationType
 }
 
-func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, hasher *crypto.PasswordHasher) error {
+func (p *Password) HashPasswordIfExisting(ctx context.Context, policy *PasswordComplexityPolicy, hasher *crypto.Hasher) error {
 	if p.SecretString == "" {
 		return nil
 	}
@@ -40,7 +42,9 @@ func (p *Password) HashPasswordIfExisting(policy *PasswordComplexityPolicy, hash
 	if err := policy.Check(p.SecretString); err != nil {
 		return err
 	}
+	_, spanHash := tracing.NewNamedSpan(ctx, "passwap.Hash")
 	encoded, err := hasher.Hash(p.SecretString)
+	spanHash.EndWithError(err)
 	if err != nil {
 		return err
 	}
