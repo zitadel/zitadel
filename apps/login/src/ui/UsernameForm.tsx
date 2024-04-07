@@ -6,8 +6,8 @@ import { TextInput } from "./Input";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
-import { LoginSettings } from "@zitadel/server";
 import Alert from "./Alert";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
 
 type Inputs = {
   loginName: string;

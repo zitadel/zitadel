@@ -10,11 +10,12 @@ import {
 import { useRouter } from "next/navigation";
 import { ProviderSlug } from "@/lib/demos";
 import Alert from "./Alert";
+import { IdentityProvider } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
   host: string;
-  identityProviders: any[];
+  identityProviders: IdentityProvider[];
   authRequestId?: string;
   organization?: string;
   startIDPFlowPath?: (idpId: string) => string;
@@ -30,6 +31,11 @@ export function SignInWithIDP({
   organization,
   startIDPFlowPath = START_IDP_FLOW_PATH,
 }: SignInWithIDPProps) {
+  // TODO: remove casting when bufbuild/protobuf-es@v2 is released
+  identityProviders = identityProviders.map((idp) =>
+    IdentityProvider.fromJson(idp as any),
+  );
+
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const router = useRouter();

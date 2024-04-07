@@ -7,12 +7,9 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import {
-  LoginSettings,
-  AuthFactor,
-  Checks,
-  AuthenticationMethodType,
-} from "@zitadel/server";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
 
 type Inputs = {
   password: string;
@@ -83,7 +80,8 @@ export default function PasswordForm({
 
       // exclude password
       const availableSecondFactors = resp.authMethods?.filter(
-        (m: AuthenticationMethodType) => m !== 1,
+        (m: AuthenticationMethodType) =>
+          m !== AuthenticationMethodType.PASSWORD,
       );
       if (availableSecondFactors.length == 1) {
         const params = new URLSearchParams({

@@ -1,17 +1,15 @@
-import { Session } from "@zitadel/server";
-import { getBrandingSettings, listSessions, server } from "@/lib/zitadel";
+import { getBrandingSettings, listSessions } from "@/lib/zitadel";
 import { getAllSessionCookieIds } from "@/utils/cookies";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import SessionsList from "@/ui/SessionsList";
 import DynamicTheme from "@/ui/DynamicTheme";
 
-async function loadSessions(): Promise<Session[]> {
+async function loadSessions() {
   const ids = await getAllSessionCookieIds();
 
   if (ids && ids.length) {
     const response = await listSessions(
-      server,
       ids.filter((id: string | undefined) => !!id),
     );
     return response?.sessions ?? [];
@@ -31,7 +29,7 @@ export default async function Page({
 
   let sessions = await loadSessions();
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>

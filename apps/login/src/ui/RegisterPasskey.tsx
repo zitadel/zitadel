@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { AuthRequest, RegisterPasskeyResponse } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
+import { RegisterPasskeyResponse } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
 type Inputs = {};
 
 type Props = {
@@ -89,37 +89,31 @@ export default function RegisterPasskey({
   function submitRegisterAndContinue(value: Inputs): Promise<boolean | void> {
     return submitRegister().then((resp: RegisterPasskeyResponse) => {
       const passkeyId = resp.passkeyId;
+      const options: CredentialCreationOptions =
+        (resp.publicKeyCredentialCreationOptions?.toJson() as CredentialCreationOptions) ??
+        {};
 
-      if (
-        resp.publicKeyCredentialCreationOptions &&
-        resp.publicKeyCredentialCreationOptions.publicKey
-      ) {
-        resp.publicKeyCredentialCreationOptions.publicKey.challenge =
-          coerceToArrayBuffer(
-            resp.publicKeyCredentialCreationOptions.publicKey.challenge,
-            "challenge",
-          );
-        resp.publicKeyCredentialCreationOptions.publicKey.user.id =
-          coerceToArrayBuffer(
-            resp.publicKeyCredentialCreationOptions.publicKey.user.id,
-            "userid",
-          );
-        if (
-          resp.publicKeyCredentialCreationOptions.publicKey.excludeCredentials
-        ) {
-          resp.publicKeyCredentialCreationOptions.publicKey.excludeCredentials.map(
-            (cred: any) => {
-              cred.id = coerceToArrayBuffer(
-                cred.id as string,
-                "excludeCredentials.id",
-              );
-              return cred;
-            },
-          );
+      if (options?.publicKey) {
+        options.publicKey.challenge = coerceToArrayBuffer(
+          options.publicKey.challenge,
+          "challenge",
+        );
+        options.publicKey.user.id = coerceToArrayBuffer(
+          options.publicKey.user.id,
+          "userid",
+        );
+        if (options.publicKey.excludeCredentials) {
+          options.publicKey.excludeCredentials.map((cred: any) => {
+            cred.id = coerceToArrayBuffer(
+              cred.id as string,
+              "excludeCredentials.id",
+            );
+            return cred;
+          });
         }
 
         navigator.credentials
-          .create(resp.publicKeyCredentialCreationOptions)
+          .create(options)
           .then((resp) => {
             if (
               resp &&

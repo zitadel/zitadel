@@ -4,7 +4,6 @@ import {
   getBrandingSettings,
   getSession,
   registerTOTP,
-  server,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import { Button, ButtonVariants } from "@/ui/Button";
@@ -13,9 +12,8 @@ import { Spinner } from "@/ui/Spinner";
 import TOTPRegister from "@/ui/TOTPRegister";
 import UserAvatar from "@/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
-import { RegisterTOTPResponse } from "@zitadel/server";
 import Link from "next/link";
-import { ClientError } from "nice-grpc";
+import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
 
 export default async function Page({
   searchParams,
@@ -28,11 +26,11 @@ export default async function Page({
     searchParams;
   const { method } = params;
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
   const { session, token } = await loadSession(loginName, organization);
 
   let totpResponse: RegisterTOTPResponse | undefined,
-    totpError: ClientError | undefined;
+    totpError: Error | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
       await registerTOTP(session.factors.user.id)
@@ -63,7 +61,7 @@ export default async function Page({
       organization,
     );
 
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       return { session: response?.session, token: recent.token };
     });
   }
@@ -111,7 +109,7 @@ export default async function Page({
 
         {totpError && (
           <div className="py-4">
-            <Alert>{totpError?.details}</Alert>
+            <Alert>{totpError?.message}</Alert>
           </div>
         )}
 

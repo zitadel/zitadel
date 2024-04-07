@@ -5,8 +5,9 @@ import {
   getSessionCookieByLoginName,
 } from "@/utils/cookies";
 import { setSessionAndUpdateCookie } from "@/utils/session";
-import { Checks } from "@zitadel/server";
 import { NextRequest, NextResponse, userAgent } from "next/server";
+import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
+import { PlainMessage } from "@zitadel/client2";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     return recentPromise
       .then((recent) => {
-        const checks: Checks = {};
+        const checks: PlainMessage<Checks> = {};
 
         if (method === "time-based") {
           checks.totp = {

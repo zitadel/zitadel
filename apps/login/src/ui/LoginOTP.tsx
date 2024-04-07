@@ -6,10 +6,11 @@ import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
 import { Button, ButtonVariants } from "./Button";
 import Alert, { AlertType } from "./Alert";
 import { Spinner } from "./Spinner";
-import { Checks } from "@zitadel/server";
 import { useForm } from "react-hook-form";
 import { TextInput } from "./Input";
-import { Challenges } from "@zitadel/server";
+import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
+import { PlainMessage } from "@zitadel/client2";
+import { Challenges } from "@zitadel/proto/zitadel/session/v2beta/challenge_pb";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -63,7 +64,7 @@ export default function LoginOTP({
   }, []);
 
   async function updateSessionForOTPChallenge() {
-    const challenges: Challenges = {};
+    const challenges: PlainMessage<Challenges> = {};
 
     if (method === "email") {
       challenges.otpEmail = "";
@@ -111,7 +112,7 @@ export default function LoginOTP({
       body.authRequestId = authRequestId;
     }
 
-    const checks: Checks = {};
+    const checks: PlainMessage<Checks> = {};
     if (method === "sms") {
       checks.otpSms = { code: values.code };
     }

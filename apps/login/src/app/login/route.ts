@@ -3,15 +3,17 @@ import {
   getAuthRequest,
   getOrgByDomain,
   listSessions,
-  server,
 } from "@/lib/zitadel";
 import { SessionCookie, getAllSessions } from "@/utils/cookies";
-import { Session, AuthRequest, Prompt } from "@zitadel/server";
 import { NextRequest, NextResponse } from "next/server";
+import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
+import {
+  AuthRequest,
+  Prompt,
+} from "@zitadel/proto/zitadel/oidc/v2beta/authorization_pb";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(
-    server,
     ids.filter((id: string | undefined) => !!id),
   );
 
@@ -81,9 +83,12 @@ export async function GET(request: NextRequest) {
           sessionToken: cookie?.token,
         };
 
-        const { callbackUrl } = await createCallback(server, {
+        const { callbackUrl } = await createCallback({
           authRequestId,
-          session,
+          callbackKind: {
+            case: "session",
+            value: session,
+          },
         });
         return NextResponse.redirect(callbackUrl);
       }
@@ -92,7 +97,7 @@ export async function GET(request: NextRequest) {
 
   if (authRequestId) {
     console.log(`Login with authRequest: ${authRequestId}`);
-    const { authRequest } = await getAuthRequest(server, { authRequestId });
+    const { authRequest } = await getAuthRequest({ authRequestId });
 
     let organization = "";
 
@@ -132,7 +137,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(accountsUrl);
     };
 
-    if (authRequest && authRequest.prompt.includes(Prompt.PROMPT_CREATE)) {
+    if (authRequest && authRequest.prompt.includes(Prompt.CREATE)) {
       const registerUrl = new URL("/register", request.url);
       if (authRequest?.id) {
         registerUrl.searchParams.set("authRequestId", authRequest?.id);
@@ -147,9 +152,9 @@ export async function GET(request: NextRequest) {
     // use existing session and hydrate it for oidc
     if (authRequest && sessions.length) {
       // if some accounts are available for selection and select_account is set
-      if (authRequest.prompt.includes(Prompt.PROMPT_SELECT_ACCOUNT)) {
+      if (authRequest.prompt.includes(Prompt.SELECT_ACCOUNT)) {
         return gotoAccounts();
-      } else if (authRequest.prompt.includes(Prompt.PROMPT_LOGIN)) {
+      } else if (authRequest.prompt.includes(Prompt.LOGIN)) {
         // if prompt is login
         const loginNameUrl = new URL("/loginname", request.url);
         if (authRequest?.id) {
@@ -162,7 +167,7 @@ export async function GET(request: NextRequest) {
           loginNameUrl.searchParams.set("organization", organization);
         }
         return NextResponse.redirect(loginNameUrl);
-      } else if (authRequest.prompt.includes(Prompt.PROMPT_NONE)) {
+      } else if (authRequest.prompt.includes(Prompt.NONE)) {
         // NONE prompt - silent authentication
 
         let selectedSession = findSession(sessions, authRequest);
@@ -177,9 +182,12 @@ export async function GET(request: NextRequest) {
               sessionId: cookie?.id,
               sessionToken: cookie?.token,
             };
-            const { callbackUrl } = await createCallback(server, {
+            const { callbackUrl } = await createCallback({
               authRequestId,
-              session,
+              callbackKind: {
+                case: "session",
+                value: session,
+              },
             });
             return NextResponse.redirect(callbackUrl);
           } else {
@@ -209,9 +217,12 @@ export async function GET(request: NextRequest) {
               sessionToken: cookie?.token,
             };
             try {
-              const { callbackUrl } = await createCallback(server, {
+              const { callbackUrl } = await createCallback({
                 authRequestId,
-                session,
+                callbackKind: {
+                  case: "session",
+                  value: session,
+                },
               });
               if (callbackUrl) {
                 return NextResponse.redirect(callbackUrl);

@@ -4,7 +4,6 @@ import {
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
-  server,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import ChooseSecondFactorToSetup from "@/ui/ChooseSecondFactorToSetup";
@@ -14,7 +13,6 @@ import {
   getMostRecentCookieWithLoginname,
   getSessionCookieById,
 } from "@/utils/cookies";
-import { user } from "@zitadel/server";
 
 export default async function Page({
   searchParams,
@@ -36,16 +34,21 @@ export default async function Page({
       loginName,
       organization,
     );
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         const userId = response.session.factors.user.id;
         return listAuthenticationMethodTypes(userId).then((methods) => {
           return getUserByID(userId).then((user) => {
+            const humanUser =
+              user.user?.type.case === "human"
+                ? user.user?.type.value
+                : undefined;
+
             return {
               factors: response.session?.factors,
               authMethods: methods.authMethodTypes ?? [],
-              phoneVerified: user.user?.human?.phone?.isVerified ?? false,
-              emailVerified: user.user?.human?.email?.isVerified ?? false,
+              phoneVerified: humanUser?.phone?.isVerified ?? false,
+              emailVerified: humanUser?.email?.isVerified ?? false,
             };
           });
         });
@@ -55,16 +58,20 @@ export default async function Page({
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById(sessionId, organization);
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         const userId = response.session.factors.user.id;
         return listAuthenticationMethodTypes(userId).then((methods) => {
           return getUserByID(userId).then((user) => {
+            const humanUser =
+              user.user?.type.case === "human"
+                ? user.user?.type.value
+                : undefined;
             return {
               factors: response.session?.factors,
               authMethods: methods.authMethodTypes ?? [],
-              phoneVerified: user.user?.human?.phone?.isVerified ?? false,
-              emailVerified: user.user?.human?.email?.isVerified ?? false,
+              phoneVerified: humanUser?.phone?.isVerified ?? false,
+              emailVerified: humanUser?.email?.isVerified ?? false,
             };
           });
         });
@@ -72,8 +79,8 @@ export default async function Page({
     });
   }
 
-  const branding = await getBrandingSettings(server, organization);
-  const loginSettings = await getLoginSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
+  const loginSettings = await getLoginSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>

@@ -1,6 +1,5 @@
 "use client";
 
-import { PasswordComplexitySettings } from "@zitadel/server";
 import PasswordComplexity from "./PasswordComplexity";
 import { useState } from "react";
 import { Button, ButtonVariants } from "./Button";
@@ -15,6 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
+import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2beta/password_settings_pb";
 
 type Inputs =
   | {

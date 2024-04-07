@@ -4,7 +4,7 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/utils/validators";
-import { PasswordComplexitySettings } from "@zitadel/server";
+import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2beta/password_settings_pb";
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;
@@ -68,7 +68,7 @@ export default function PasswordComplexity({
         <div className="flex flex-row items-center">
           {hasMinLength ? check : cross}
           <span className={desc}>
-            Password length {passwordComplexitySettings.minLength}
+            Password length {passwordComplexitySettings.minLength.toString()}
           </span>
         </div>
       ) : (

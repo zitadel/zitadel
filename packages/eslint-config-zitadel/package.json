@@ -3,14 +3,14 @@
   "version": "0.0.0",
   "main": "index.js",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "eslint-config-next": "^14.2.3",
     "@typescript-eslint/parser": "^7.9.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-config-turbo": "^1.13.3"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

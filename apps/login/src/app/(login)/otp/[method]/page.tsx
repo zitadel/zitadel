@@ -2,7 +2,6 @@ import {
   getBrandingSettings,
   getLoginSettings,
   getSession,
-  server,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
@@ -24,7 +23,7 @@ export default async function Page({
 
   const { session, token } = await loadSession(loginName, organization);
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   async function loadSession(loginName?: string, organization?: string) {
     const recent = await getMostRecentCookieWithLoginname(
@@ -32,7 +31,7 @@ export default async function Page({
       organization,
     );
 
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       return { session: response?.session, token: recent.token };
     });
   }

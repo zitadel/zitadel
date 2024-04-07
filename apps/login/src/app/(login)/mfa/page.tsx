@@ -2,7 +2,6 @@ import {
   getBrandingSettings,
   getSession,
   listAuthenticationMethodTypes,
-  server,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import ChooseSecondFactor from "@/ui/ChooseSecondFactor";
@@ -33,7 +32,7 @@ export default async function Page({
       loginName,
       organization,
     );
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes(
           response.session.factors.user.id,
@@ -49,7 +48,7 @@ export default async function Page({
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById(sessionId, organization);
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes(
           response.session.factors.user.id,
@@ -63,7 +62,7 @@ export default async function Page({
     });
   }
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>
