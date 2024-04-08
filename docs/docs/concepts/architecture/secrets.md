@@ -64,7 +64,7 @@ ZITADEL hashes all Passwords and Client Secrets in an non reversible way to furt
 Passwords and secrets are always hashed with a random salt and stored as an encoded string that contains the Algorithm, its Parameters, Salt and Hash.
 The storage encoding used by ZITADEL is Modular Crypt Format and a full reference can be found in our [Passwap library](https://github.com/zitadel/passwap#encoding).
 
-The following hash algorithms are supported for user passwords:
+The following hash algorithms are supported:
 
 - argon2i / id[^1]
 - bcrypt (Default)
@@ -81,8 +81,6 @@ the first time verification succeeds.
 This allows to increase cost along with growing computing power.
 ZITADEL allows to import user passwords from systems that use any of the above hashing algorithms.
 :::
-
-Client Secrets always use bcrypt.
 
 ### Encrypted Secrets
 

@@ -36,11 +36,11 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:
-			wm.EncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+			wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive
 		case *user.HumanRegisteredEvent:
-			wm.EncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+			wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.UserState = domain.UserStateActive
 		case *user.HumanInitialCodeAddedEvent:
@@ -48,7 +48,7 @@ func (wm *HumanPasswordWriteModel) Reduce() error {
 		case *user.HumanInitializedCheckSucceededEvent:
 			wm.UserState = domain.UserStateActive
 		case *user.HumanPasswordChangedEvent:
-			wm.EncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+			wm.EncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.SecretChangeRequired = e.ChangeRequired
 			wm.Code = nil
 			wm.PasswordCheckFailedCount = 0

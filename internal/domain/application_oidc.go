@@ -5,7 +5,6 @@ import (
 	"time"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
 
@@ -28,7 +27,7 @@ type OIDCApp struct {
 	AppID                    string
 	AppName                  string
 	ClientID                 string
-	ClientSecret             *crypto.CryptoValue
+	EncodedHash              string
 	ClientSecretString       string
 	RedirectUris             []string
 	ResponseTypes            []OIDCResponseType
@@ -62,8 +61,8 @@ func (a *OIDCApp) setClientID(clientID string) {
 	a.ClientID = clientID
 }
 
-func (a *OIDCApp) setClientSecret(clientSecret *crypto.CryptoValue) {
-	a.ClientSecret = clientSecret
+func (a *OIDCApp) setClientSecret(encodedHash string) {
+	a.EncodedHash = encodedHash
 }
 
 func (a *OIDCApp) requiresClientSecret() bool {
