@@ -19,7 +19,7 @@ func SessionTokenVerifier(algorithm crypto.EncryptionAlgorithm) func(ctx context
 	return func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error) {
 		decodedToken, err := base64.RawURLEncoding.DecodeString(sessionToken)
 		if err != nil {
-			return err
+			return zerrors.ThrowInvalidArgument(err, "COMMAND-hi6Ph", "Errors.Session.Token.Invalid")
 		}
 		_, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
 		token, err := algorithm.DecryptString(decodedToken, algorithm.EncryptionKeyID())
