@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jackc/pgx/v4/stdlib"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"

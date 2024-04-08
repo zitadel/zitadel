@@ -8,8 +8,10 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -56,6 +58,12 @@ func mustNewProjectionsConfig(v *viper.Viper) *ProjectionsConfig {
 func mustNewConfig(v *viper.Viper, config any) {
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
+			hooks.SliceTypeStringDecode[*command.SetQuota],
+			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
+			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
+			hooks.MapTypeStringDecode[domain.Feature, any],
+			hooks.MapHTTPHeaderStringDecode,
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
@@ -63,8 +71,6 @@ func mustNewConfig(v *viper.Viper, config any) {
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
-			systemAPIUsersDecodeHook,
-			hook.EnumHookFunc(domain.FeatureString),
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
 		)),
 	)

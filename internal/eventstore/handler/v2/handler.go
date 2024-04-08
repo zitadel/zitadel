@@ -225,10 +225,11 @@ func (h *Handler) didInitialize(ctx context.Context) bool {
 }
 
 func (h *Handler) schedule(ctx context.Context) {
-	if h.requeueEvery <= 0 {
-		h.log().Info("schedule skipped")
-		return
-	}
+	// TODO: (adlerhurst) needed anymore?
+	// if h.requeueEvery <= 0 {
+	// 	h.log().Info("schedule skipped")
+	// 	return
+	// }
 	//  start the projection and its configured `RequeueEvery`
 	reset := randomizeStart(0, h.requeueEvery.Seconds())
 	if !h.didInitialize(ctx) {

@@ -40,20 +40,6 @@ import (
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
-	"github.com/zitadel/zitadel/internal/repository/action"
-	"github.com/zitadel/zitadel/internal/repository/authrequest"
-	"github.com/zitadel/zitadel/internal/repository/idpintent"
-	iam_repo "github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/repository/keypair"
-	"github.com/zitadel/zitadel/internal/repository/limits"
-	"github.com/zitadel/zitadel/internal/repository/oidcsession"
-	"github.com/zitadel/zitadel/internal/repository/org"
-	"github.com/zitadel/zitadel/internal/repository/project"
-	"github.com/zitadel/zitadel/internal/repository/quota"
-	"github.com/zitadel/zitadel/internal/repository/restrictions"
-	"github.com/zitadel/zitadel/internal/repository/session"
-	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
-	"github.com/zitadel/zitadel/internal/repository/usergrant"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	"github.com/zitadel/zitadel/internal/webauthn"
 )
@@ -84,7 +70,7 @@ type ProjectionsConfig struct {
 	Destination    database.Config
 	Projections    projection.Config
 	EncryptionKeys *encryptionKeyConfig
-	SystemAPIUsers SystemAPIUsers
+	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
 	Eventstore     *eventstore.Config
 
 	Admin admin_es.Config
@@ -158,6 +144,7 @@ func projections(
 		},
 		0,
 		config.SystemAPIUsers,
+		false,
 	)
 	logging.OnError(err).Fatal("unable to start queries")
 
@@ -196,8 +183,6 @@ func projections(
 		config.DefaultInstance.SecretGenerators,
 	)
 	logging.OnError(err).Fatal("unable to start commands")
-
-	registerMappers(es)
 
 	err = projection.Create(ctx, client, es, config.Projections, keys.OIDC, keys.SAML, config.SystemAPIUsers)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -294,23 +279,6 @@ func execProjections(ctx context.Context, instances <-chan string, failedInstanc
 		logging.WithFields("instance", instance).Info("projections done")
 	}
 	wg.Done()
-}
-
-func registerMappers(es *eventstore.Eventstore) {
-	iam_repo.RegisterEventMappers(es)
-	usr_repo.RegisterEventMappers(es)
-	org.RegisterEventMappers(es)
-	project.RegisterEventMappers(es)
-	action.RegisterEventMappers(es)
-	keypair.RegisterEventMappers(es)
-	usergrant.RegisterEventMappers(es)
-	session.RegisterEventMappers(es)
-	idpintent.RegisterEventMappers(es)
-	authrequest.RegisterEventMappers(es)
-	oidcsession.RegisterEventMappers(es)
-	quota.RegisterEventMappers(es)
-	limits.RegisterEventMappers(es)
-	restrictions.RegisterEventMappers(es)
 }
 
 // returns the instance configured by flag
