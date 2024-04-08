@@ -2027,7 +2027,13 @@
       "ISCREATIONALLOWED": "Account creatie toegestaan",
       "ISCREATIONALLOWED_DESC": "Bepaalt of accounts kunnen worden aangemaakt.",
       "ISLINKINGALLOWED": "Account koppeling toegestaan",
-      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit kan worden gekoppeld aan een bestaand account."
+      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit kan worden gekoppeld aan een bestaand account.",
+      "AUTOLINKING_DESC": "Bepaalt of een identiteit wordt gevraagd om te worden gekoppeld aan een bestaand account.",
+      "AUTOLINKINGTYPE": {
+        "0": "Uitgeschakeld",
+        "1": "Controleren op bestaande gebruikersnaam",
+        "2": "Controleren op bestaand e-mailadres"
+      }
     },
     "OWNERTYPES": {
       "0": "onbekend",

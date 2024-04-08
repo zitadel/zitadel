@@ -2018,7 +2018,13 @@
       "ISCREATIONALLOWED": "tworzenie dozwolone",
       "ISCREATIONALLOWED_DESC": "Określa, czy można tworzyć konta.",
       "ISLINKINGALLOWED": "dozwolone łączenie rachunków",
-      "ISLINKINGALLOWED_DESC": "Określa, czy tożsamość może być powiązana z istniejącym kontem."
+      "ISLINKINGALLOWED_DESC": "Określa, czy tożsamość może być powiązana z istniejącym kontem.",
+      "AUTOLINKING_DESC": "Określa, czy tożsamość będzie proszona o połączenie z istniejącym kontem.",
+      "AUTOLINKINGTYPE": {
+        "0": "Wyłączone",
+        "1": "Sprawdź istniejącą nazwę użytkownika",
+        "2": "Sprawdź istniejący adres e-mail"
+      }
     },
     "OWNERTYPES": {
       "0": "nieznany",

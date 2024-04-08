@@ -317,10 +317,15 @@ LogoutDone:
   Description: Вие излязохте успешно.
   LoginButtonText: Влизам
 LinkingUsersDone:
-  Title: Свързване с потребители
-  Description: Свързването с потребители е готово.
-  CancelButtonText: анулиране
-  NextButtonText: следващия
+  Title: Linking User
+  Description: User linked.
+  CancelButtonText: Cancel
+  NextButtonText: Next
+LinkingUserPrompt:
+  Title: Намерен съществуващ потребител
+  Description: „Искате ли да свържете съществуващия си акаунт:“
+  LinkButtonText: Връзка
+  OtherButtonText: Други възможности
 ExternalNotFound:
   Title: Външен потребител не е намерен
   Description: 'Външен потребител не е намерен. '

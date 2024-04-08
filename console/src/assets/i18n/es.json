@@ -2020,7 +2020,13 @@
       "ISCREATIONALLOWED": "Creación de cuentas permitida",
       "ISCREATIONALLOWED_DESC": "Determina si se pueden crear cuentas.",
       "ISLINKINGALLOWED": "Permitida la vinculación de cuentas",
-      "ISLINKINGALLOWED_DESC": "Determina si una identidad puede vincularse a una cuenta existente."
+      "ISLINKINGALLOWED_DESC": "Determina si una identidad puede vincularse a una cuenta existente.",
+      "AUTOLINKING_DESC": "Determina si se pedirá a una identidad que se vincule a una cuenta existente.",
+      "AUTOLINKINGTYPE": {
+        "0": "Desactivado",
+        "1": "Comprobar nombre de usuario existente",
+        "2": "Comprobar correo electrónico existente"
+      }
     },
     "OWNERTYPES": {
       "0": "desconocido",

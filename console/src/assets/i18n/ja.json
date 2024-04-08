@@ -2015,7 +2015,13 @@
       "ISCREATIONALLOWED": "アカウント作成を許可",
       "ISCREATIONALLOWED_DESC": "アカウントを作成できるかどうかを決めます。",
       "ISLINKINGALLOWED": "アカウントリンクを許可",
-      "ISLINKINGALLOWED_DESC": "IDを既存のアカウントにリンクできるかどうかを決めます。"
+      "ISLINKINGALLOWED_DESC": "IDを既存のアカウントにリンクできるかどうかを決めます。",
+      "AUTOLINKING_DESC": "アイデンティティが既存のアカウントにリンクされるように促されるかどうかを決定します。",
+      "AUTOLINKINGTYPE": {
+        "0": "無効",
+        "1": "既存のユーザー名のチェック",
+        "2": "既存のメールアドレスのチェック"
+      }
     },
     "OWNERTYPES": {
       "0": "不明",
