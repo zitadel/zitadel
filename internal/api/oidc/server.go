@@ -35,7 +35,7 @@ type Server struct {
 	defaultIdTokenLifetime     time.Duration
 
 	fallbackLogger      *slog.Logger
-	hashAlg             crypto.HashAlgorithm
+	hasher              *crypto.Hasher
 	signingKeyAlgorithm string
 	assetAPIPrefix      func(ctx context.Context) string
 }

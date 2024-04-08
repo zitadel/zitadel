@@ -93,7 +93,7 @@ func (wm *InstanceIDPOIDCConfigWriteModel) NewChangedEvent(
 	authorizationEndpoint,
 	tokenEndpoint,
 	clientSecretString string,
-	secretCrypto crypto.Crypto,
+	secretCrypto crypto.EncryptionAlgorithm,
 	idpDisplayNameMapping,
 	userNameMapping domain.OIDCMappingField,
 	scopes ...string,
