@@ -478,7 +478,7 @@ func (c *Commands) sendHumanOTP(
 	if !existingOTP.OTPAdded() {
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFD52", "Errors.User.MFA.OTP.NotReady")
 	}
-	config, err := secretGeneratorConfigWithDefault(ctx, c.eventstore.Filter, secretGeneratorType, defaultSecretGenerator)
+	config, err := cryptoGeneratorConfigWithDefault(ctx, c.eventstore.Filter, secretGeneratorType, defaultSecretGenerator) //nolint:staticcheck
 	if err != nil {
 		return err
 	}
@@ -538,7 +538,7 @@ func (c *Commands) humanCheckOTP(
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound")
 	}
 	userAgg := &user.NewAggregate(userID, existingOTP.ResourceOwner()).Aggregate
-	verifyErr := crypto.VerifyCodeWithAlgorithm(existingOTP.CodeCreationDate(), existingOTP.CodeExpiry(), existingOTP.Code(), code, c.userEncryption)
+	verifyErr := crypto.VerifyCode(existingOTP.CodeCreationDate(), existingOTP.CodeExpiry(), existingOTP.Code(), code, c.userEncryption)
 
 	// recheck for additional events (failed OTP checks or locks)
 	recheckErr := c.eventstore.FilterToQueryReducer(ctx, existingOTP)

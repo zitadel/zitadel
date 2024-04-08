@@ -127,7 +127,6 @@ type SetQuotas struct {
 }
 
 type SecretGenerators struct {
-	PasswordSaltCost         uint
 	ClientSecret             *crypto.GeneratorConfig
 	InitializeUserCode       *crypto.GeneratorConfig
 	EmailVerificationCode    *crypto.GeneratorConfig
@@ -458,7 +457,6 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
 		commands.AddAPIAppCommand(
@@ -470,7 +468,6 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
 		commands.AddAPIAppCommand(
@@ -482,10 +479,9 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
-		commands.AddOIDCAppCommand(cnsl, nil),
+		commands.AddOIDCAppCommand(cnsl),
 		SetIAMConsoleID(instanceAgg, &cnsl.ClientID, &ids.consoleAppID),
 	)
 }

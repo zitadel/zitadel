@@ -55,6 +55,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 						ctx,
 						deviceauth.NewAggregate("device1", "instance1"),
 						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
+						[]string{"projectID", "clientID"},
 					)),
 				),
 			),
@@ -64,6 +65,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 				UserCode:   "user-code",
 				Expires:    timestamp,
 				Scopes:     []string{"foo", "bar"},
+				Audience:   []string{"projectID", "clientID"},
 				State:      domain.DeviceAuthStateInitiated,
 			},
 		},
@@ -75,6 +77,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 						ctx,
 						deviceauth.NewAggregate("device1", "instance1"),
 						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
+						[]string{"projectID", "clientID"},
 					)),
 					eventFromEventPusher(deviceauth.NewApprovedEvent(
 						ctx,
@@ -90,6 +93,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 				UserCode:        "user-code",
 				Expires:         timestamp,
 				Scopes:          []string{"foo", "bar"},
+				Audience:        []string{"projectID", "clientID"},
 				State:           domain.DeviceAuthStateApproved,
 				Subject:         "user1",
 				UserAuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
@@ -104,6 +108,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 						ctx,
 						deviceauth.NewAggregate("device1", "instance1"),
 						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
+						[]string{"projectID", "clientID"},
 					)),
 					eventFromEventPusher(deviceauth.NewCanceledEvent(
 						ctx,
@@ -118,6 +123,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 				UserCode:   "user-code",
 				Expires:    timestamp,
 				Scopes:     []string{"foo", "bar"},
+				Audience:   []string{"projectID", "clientID"},
 				State:      domain.DeviceAuthStateDenied,
 			},
 		},
@@ -129,6 +135,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 						ctx,
 						deviceauth.NewAggregate("device1", "instance1"),
 						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
+						[]string{"projectID", "clientID"},
 					)),
 					eventFromEventPusher(deviceauth.NewCanceledEvent(
 						ctx,
@@ -143,6 +150,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 				UserCode:   "user-code",
 				Expires:    timestamp,
 				Scopes:     []string{"foo", "bar"},
+				Audience:   []string{"projectID", "clientID"},
 				State:      domain.DeviceAuthStateExpired,
 			},
 		},
@@ -161,14 +169,15 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 
 const (
 	expectedDeviceAuthQueryC = `SELECT` +
-		` projections.device_auth_requests.client_id,` +
-		` projections.device_auth_requests.device_code,` +
-		` projections.device_auth_requests.user_code,` +
-		` projections.device_auth_requests.scopes` +
-		` FROM projections.device_auth_requests`
+		` projections.device_auth_requests1.client_id,` +
+		` projections.device_auth_requests1.device_code,` +
+		` projections.device_auth_requests1.user_code,` +
+		` projections.device_auth_requests1.scopes,` +
+		` projections.device_auth_requests1.audience` +
+		` FROM projections.device_auth_requests1`
 	expectedDeviceAuthWhereUserCodeQueryC = expectedDeviceAuthQueryC +
-		` WHERE projections.device_auth_requests.instance_id = $1` +
-		` AND projections.device_auth_requests.user_code = $2`
+		` WHERE projections.device_auth_requests1.instance_id = $1` +
+		` AND projections.device_auth_requests1.user_code = $2`
 )
 
 var (
@@ -179,12 +188,14 @@ var (
 		"device1",
 		"user-code",
 		database.TextArray[string]{"a", "b", "c"},
+		[]string{"projectID", "clientID"},
 	}
 	expectedDeviceAuth = &domain.AuthRequestDevice{
 		ClientID:   "client-id",
 		DeviceCode: "device1",
 		UserCode:   "user-code",
 		Scopes:     []string{"a", "b", "c"},
+		Audience:   []string{"projectID", "clientID"},
 	}
 )
 

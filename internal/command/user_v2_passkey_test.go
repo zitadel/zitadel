@@ -138,7 +138,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	es := eventstoreExpect(t,
 		expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 	)
-	code, err := newCryptoCode(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
+	code, err := newEncryptedCode(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg) //nolint:staticcheck
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
@@ -236,7 +236,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 	es := eventstoreExpect(t,
 		expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 	)
-	code, err := newCryptoCode(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg)
+	code, err := newEncryptedCode(ctx, es.Filter, domain.SecretGeneratorTypePasswordlessInitCode, alg) //nolint:staticcheck
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
@@ -457,7 +457,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 	alg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
-		newCode     cryptoCodeFunc
+		newCode     encrypedCodeFunc
 		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
@@ -475,7 +475,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 		{
 			name: "id generator error",
 			fields: fields{
-				newCode:     mockCode("passkey1", time.Hour),
+				newCode:     mockEncryptedCode("passkey1", time.Hour),
 				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
@@ -488,7 +488,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				newCode: mockCode("passkey1", time.Minute),
+				newCode: mockEncryptedCode("passkey1", time.Minute),
 				eventstore: expectEventstore(
 					expectFilter(eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -530,9 +530,9 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				newCode:     tt.fields.newCode,
-				eventstore:  tt.fields.eventstore(t),
-				idGenerator: tt.fields.idGenerator,
+				newEncryptedCode: tt.fields.newCode,
+				eventstore:       tt.fields.eventstore(t),
+				idGenerator:      tt.fields.idGenerator,
 			}
 			got, err := c.AddUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -546,7 +546,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 
 	type fields struct {
-		newCode     cryptoCodeFunc
+		newCode     encrypedCodeFunc
 		eventstore  *eventstore.Eventstore
 		idGenerator id.Generator
 	}
@@ -565,7 +565,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 		{
 			name: "template error",
 			fields: fields{
-				newCode:    newCryptoCode,
+				newCode:    newEncryptedCode,
 				eventstore: eventstoreExpect(t),
 			},
 			args: args{
@@ -578,7 +578,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 		{
 			name: "id generator error",
 			fields: fields{
-				newCode:     newCryptoCode,
+				newCode:     newEncryptedCode,
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
@@ -592,7 +592,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				newCode: mockCode("passkey1", time.Minute),
+				newCode: mockEncryptedCode("passkey1", time.Minute),
 				eventstore: eventstoreExpect(t,
 					expectFilter(eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -638,9 +638,9 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				newCode:     tt.fields.newCode,
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				newEncryptedCode: tt.fields.newCode,
+				eventstore:       tt.fields.eventstore,
+				idGenerator:      tt.fields.idGenerator,
 			}
 			got, err := c.AddUserPasskeyCodeURLTemplate(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -653,7 +653,7 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 	alg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
-		newCode     cryptoCodeFunc
+		newCode     encrypedCodeFunc
 		eventstore  *eventstore.Eventstore
 		idGenerator id.Generator
 	}
@@ -671,7 +671,7 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 		{
 			name: "id generator error",
 			fields: fields{
-				newCode:     newCryptoCode,
+				newCode:     newEncryptedCode,
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
@@ -684,7 +684,7 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				newCode: mockCode("passkey1", time.Minute),
+				newCode: mockEncryptedCode("passkey1", time.Minute),
 				eventstore: eventstoreExpect(t,
 					expectFilter(eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -730,9 +730,9 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				newCode:     tt.fields.newCode,
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				newEncryptedCode: tt.fields.newCode,
+				eventstore:       tt.fields.eventstore,
+				idGenerator:      tt.fields.idGenerator,
 			}
 			got, err := c.AddUserPasskeyCodeReturn(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -745,7 +745,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 	alg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
-		newCode     cryptoCodeFunc
+		newCode     encrypedCodeFunc
 		eventstore  *eventstore.Eventstore
 		idGenerator id.Generator
 	}
@@ -763,7 +763,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 		{
 			name: "id generator error",
 			fields: fields{
-				newCode:     newCryptoCode,
+				newCode:     newEncryptedCode,
 				eventstore:  eventstoreExpect(t),
 				idGenerator: id_mock.NewIDGeneratorExpectError(t, io.ErrClosedPipe),
 			},
@@ -776,7 +776,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 		{
 			name: "crypto error",
 			fields: fields{
-				newCode:     newCryptoCode,
+				newCode:     newEncryptedCode,
 				eventstore:  eventstoreExpect(t, expectFilterError(io.ErrClosedPipe)),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			},
@@ -789,7 +789,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 		{
 			name: "filter query error",
 			fields: fields{
-				newCode: newCryptoCode,
+				newCode: newEncryptedCode,
 				eventstore: eventstoreExpect(t,
 					expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
 					expectFilterError(io.ErrClosedPipe),
@@ -805,7 +805,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 		{
 			name: "push error",
 			fields: fields{
-				newCode: mockCode("passkey1", time.Minute),
+				newCode: mockEncryptedCode("passkey1", time.Minute),
 				eventstore: eventstoreExpect(t,
 					expectFilter(eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -844,7 +844,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				newCode: mockCode("passkey1", time.Minute),
+				newCode: mockEncryptedCode("passkey1", time.Minute),
 				eventstore: eventstoreExpect(t,
 					expectFilter(eventFromEventPusher(
 						user.NewHumanAddedEvent(context.Background(),
@@ -890,9 +890,9 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				newCode:     tt.fields.newCode,
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				newEncryptedCode: tt.fields.newCode,
+				eventstore:       tt.fields.eventstore,
+				idGenerator:      tt.fields.idGenerator,
 			}
 			got, err := c.addUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, "", false)
 			require.ErrorIs(t, err, tt.wantErr)
