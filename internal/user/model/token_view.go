@@ -14,7 +14,6 @@ type TokenView struct {
 	ResourceOwner     string
 	UserID            string
 	ApplicationID     string
-	ProjectID         string
 	UserAgentID       string
 	Audience          []string
 	Expiration        time.Time

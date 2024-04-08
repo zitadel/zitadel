@@ -41,13 +41,11 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 	if err != nil {
 		return nil, op.NewStatusError(oidc.ErrAccessDenied().WithDescription("access token invalid").WithParent(err), http.StatusUnauthorized)
 	}
-	if token.projectID == "" {
-		token.projectID, err = s.query.GetProjectIDByOIDClientID(ctx, token.clientID)
-		if err != nil {
-			return nil, err
-		}
+	projectID, err := s.query.GetProjectIDByOIDClientID(ctx, token.clientID)
+	if err != nil {
+		return nil, err
 	}
-	userInfo, err := s.userInfo(ctx, token.userID, token.projectID, token.scope, nil)
+	userInfo, err := s.userInfo(ctx, token.userID, projectID, token.scope, nil)
 	if err != nil {
 		return nil, err
 	}

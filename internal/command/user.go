@@ -237,7 +237,6 @@ func (c *Commands) AddUserToken(
 	orgID,
 	agentID,
 	clientID,
-	projectID,
 	userID string,
 	audience,
 	scopes,
@@ -251,7 +250,7 @@ func (c *Commands) AddUserToken(
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
-	cmds, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, projectID, "", audience, scopes, authMethodsReferences, lifetime, authTime, reason, actor)
+	cmds, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, "", audience, scopes, authMethodsReferences, lifetime, authTime, reason, actor)
 	if err != nil {
 		return nil, err
 	}
@@ -278,7 +277,7 @@ func (c *Commands) RevokeAccessToken(ctx context.Context, userID, orgID, tokenID
 	return writeModelToObjectDetails(&accessTokenWriteModel.WriteModel), nil
 }
 
-func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, projectID, refreshTokenID string, audience, scopes, authMethodsReferences []string, lifetime time.Duration, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) ([]eventstore.Command, *domain.Token, error) {
+func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, refreshTokenID string, audience, scopes, authMethodsReferences []string, lifetime time.Duration, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) ([]eventstore.Command, *domain.Token, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, userWriteModel)
 	if err != nil {
 		return nil, nil, err
@@ -313,7 +312,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 	}
 
 	cmds = append(cmds,
-		user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, projectID, agentID, preferredLanguage, refreshTokenID, audience, scopes, authMethodsReferences, authTime, expiration, reason, actor),
+		user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, refreshTokenID, audience, scopes, authMethodsReferences, authTime, expiration, reason, actor),
 	)
 
 	return cmds, &domain.Token{

@@ -15,7 +15,6 @@ func (c *Commands) AddAccessAndRefreshToken(
 	orgID,
 	agentID,
 	clientID,
-	projectID,
 	userID,
 	refreshToken string,
 	audience,
@@ -29,9 +28,9 @@ func (c *Commands) AddAccessAndRefreshToken(
 	actor *domain.TokenActor,
 ) (accessToken *domain.Token, newRefreshToken string, err error) {
 	if refreshToken == "" {
-		return c.AddNewRefreshTokenAndAccessToken(ctx, userID, orgID, agentID, clientID, projectID, audience, scopes, authMethodsReferences, refreshExpiration, accessLifetime, refreshIdleExpiration, authTime, reason, actor)
+		return c.AddNewRefreshTokenAndAccessToken(ctx, userID, orgID, agentID, clientID, audience, scopes, authMethodsReferences, refreshExpiration, accessLifetime, refreshIdleExpiration, authTime, reason, actor)
 	}
-	return c.RenewRefreshTokenAndAccessToken(ctx, userID, orgID, refreshToken, agentID, clientID, projectID, audience, scopes, refreshIdleExpiration, accessLifetime, actor)
+	return c.RenewRefreshTokenAndAccessToken(ctx, userID, orgID, refreshToken, agentID, clientID, audience, scopes, refreshIdleExpiration, accessLifetime, actor)
 }
 
 func (c *Commands) AddNewRefreshTokenAndAccessToken(
@@ -39,8 +38,7 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	userID,
 	orgID,
 	agentID,
-	clientID,
-	projectID string,
+	clientID string,
 	audience,
 	scopes,
 	authMethodsReferences []string,
@@ -59,7 +57,7 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	if err != nil {
 		return nil, "", err
 	}
-	cmds, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, projectID, refreshTokenID, audience, scopes, authMethodsReferences, accessLifetime, authTime, reason, actor)
+	cmds, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, refreshTokenID, audience, scopes, authMethodsReferences, accessLifetime, authTime, reason, actor)
 	if err != nil {
 		return nil, "", err
 	}
@@ -81,8 +79,7 @@ func (c *Commands) RenewRefreshTokenAndAccessToken(
 	orgID,
 	refreshToken,
 	agentID,
-	clientID,
-	projectID string,
+	clientID string,
 	audience,
 	scopes []string,
 	idleExpiration,
@@ -94,7 +91,7 @@ func (c *Commands) RenewRefreshTokenAndAccessToken(
 		return nil, "", err
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
-	cmds, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, projectID, renewed.tokenID, audience, scopes, renewed.authMethodsReferences, accessLifetime, renewed.authTime, domain.TokenReasonRefresh, actor)
+	cmds, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, renewed.tokenID, audience, scopes, renewed.authMethodsReferences, accessLifetime, renewed.authTime, domain.TokenReasonRefresh, actor)
 	if err != nil {
 		return nil, "", err
 	}

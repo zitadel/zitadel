@@ -24,7 +24,6 @@ type AddedEvent struct {
 
 	LoginClient   string                    `json:"login_client"`
 	ClientID      string                    `json:"client_id"`
-	ProjectID     string                    `json:"project_id"`
 	RedirectURI   string                    `json:"redirect_uri"`
 	State         string                    `json:"state,omitempty"`
 	Nonce         string                    `json:"nonce,omitempty"`

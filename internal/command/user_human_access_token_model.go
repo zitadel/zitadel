@@ -13,7 +13,6 @@ type UserAccessTokenWriteModel struct {
 
 	TokenID           string
 	ApplicationID     string
-	ProjectID         string
 	UserAgentID       string
 	Audience          []string
 	Scopes            []string
@@ -67,7 +66,6 @@ func (wm *UserAccessTokenWriteModel) Reduce() error {
 		case *user.UserTokenAddedEvent:
 			wm.TokenID = e.TokenID
 			wm.ApplicationID = e.ApplicationID
-			wm.ProjectID = e.ProjectID
 			wm.UserAgentID = e.UserAgentID
 			wm.Audience = e.Audience
 			wm.Scopes = e.Scopes

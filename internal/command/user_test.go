@@ -1504,7 +1504,7 @@ func TestCommandSide_AddUserToken(t *testing.T) {
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddUserToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, "projectID", tt.args.userID, tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.authTime, tt.args.reason, tt.args.actor)
+			got, err := r.AddUserToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.authTime, tt.args.reason, tt.args.actor)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1564,7 +1564,6 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 								&user.NewAggregate("userID", "orgID").Aggregate,
 								"tokenID",
 								"clientID",
-								"projectID",
 								"agentID",
 								"de",
 								"refreshTokenID",
@@ -1601,7 +1600,6 @@ func TestCommands_RevokeAccessToken(t *testing.T) {
 								&user.NewAggregate("userID", "orgID").Aggregate,
 								"tokenID",
 								"clientID",
-								"projectID",
 								"agentID",
 								"de",
 								"refreshTokenID",

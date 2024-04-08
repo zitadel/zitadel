@@ -15,7 +15,6 @@ type OIDCSessionWriteModel struct {
 	UserID                     string
 	SessionID                  string
 	ClientID                   string
-	ProjectID                  string
 	Audience                   []string
 	Scope                      []string
 	AuthMethods                []domain.UserAuthMethodType
@@ -102,7 +101,6 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 
 func (wm *OIDCSessionWriteModel) reduceAccessTokenAdded(e *oidcsession.AccessTokenAddedEvent) {
 	wm.AccessTokenID = e.ID
-	wm.ProjectID = e.ProjectID
 	wm.AccessTokenExpiration = e.CreationDate().Add(e.Lifetime)
 	wm.AccessTokenReason = e.Reason
 	wm.AccessTokenActor = e.Actor

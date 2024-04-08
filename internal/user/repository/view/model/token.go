@@ -33,7 +33,6 @@ type TokenView struct {
 	ResourceOwner     string                     `json:"-" gorm:"column:resource_owner"`
 	UserID            string                     `json:"-" gorm:"column:user_id"`
 	ApplicationID     string                     `json:"applicationId" gorm:"column:application_id"`
-	ProjectID         string                     `json:"projectID" gorm:"column:project_id"`
 	UserAgentID       string                     `json:"userAgentId" gorm:"column:user_agent_id"`
 	Audience          database.TextArray[string] `json:"audience" gorm:"column:audience"`
 	Scopes            database.TextArray[string] `json:"scopes" gorm:"column:scopes"`
@@ -88,7 +87,6 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 		ResourceOwner:     token.ResourceOwner,
 		UserID:            token.UserID,
 		ApplicationID:     token.ApplicationID,
-		ProjectID:         token.ProjectID,
 		UserAgentID:       token.UserAgentID,
 		Audience:          token.Audience,
 		Scopes:            token.Scopes,

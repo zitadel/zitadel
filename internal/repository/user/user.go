@@ -212,7 +212,6 @@ type UserTokenAddedEvent struct {
 
 	TokenID               string             `json:"tokenId,omitempty"`
 	ApplicationID         string             `json:"applicationId,omitempty"`
-	ProjectID             string             `json:"projectID,omitempty"`
 	UserAgentID           string             `json:"userAgentId,omitempty"`
 	RefreshTokenID        string             `json:"refreshTokenID,omitempty"`
 	Audience              []string           `json:"audience,omitempty"`
@@ -238,7 +237,6 @@ func NewUserTokenAddedEvent(
 	aggregate *eventstore.Aggregate,
 	tokenID,
 	applicationID,
-	projectID,
 	userAgentID,
 	preferredLanguage,
 	refreshTokenID string,
@@ -258,7 +256,6 @@ func NewUserTokenAddedEvent(
 		),
 		TokenID:           tokenID,
 		ApplicationID:     applicationID,
-		ProjectID:         projectID,
 		UserAgentID:       userAgentID,
 		RefreshTokenID:    refreshTokenID,
 		Audience:          audience,
