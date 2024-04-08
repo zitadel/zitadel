@@ -116,25 +116,6 @@ func MergeFilters(creators ...FilterCreator) []*Filter {
 	return filters
 }
 
-// Merge returns an error if filters diverge
-func Merge(filters ...*Filter) []*Filter {
-	if len(filters) == 1 {
-		return filters
-	}
-	return filters
-
-	// merged := filters[0]
-	// for i := 1; i < len(filters); i++{
-	// 	filter := filters[i]
-	// 	if merged.desc != filter.desc {
-	// 		return nil, FilterMergeErr
-	// 	}
-
-	// }
-
-	// return merged, nil
-}
-
 type Filter struct {
 	parent     *Query
 	pagination *Pagination
@@ -194,7 +175,7 @@ func (f *Filter) ensurePagination() {
 
 func NewAggregateFilter(typ string, opts ...AggregateFilterOpt) *AggregateFilter {
 	filter := &AggregateFilter{
-		typ: database.NewTextEqual(typ),
+		typ: typ,
 	}
 
 	for _, opt := range opts {
@@ -205,17 +186,17 @@ func NewAggregateFilter(typ string, opts ...AggregateFilterOpt) *AggregateFilter
 }
 
 type AggregateFilter struct {
-	typ    database.TextFilter[string]
-	id     database.TextFilter[string]
+	typ    string
+	id     string
 	events []*EventFilter
 }
 
 func (f *AggregateFilter) Type() database.TextFilter[string] {
-	return f.typ
+	return database.NewTextEqual(f.typ)
 }
 
 func (f *AggregateFilter) ID() database.TextFilter[string] {
-	return f.id
+	return database.NewTextEqual(f.id)
 }
 
 func (f *AggregateFilter) Events() []*EventFilter {
@@ -226,13 +207,7 @@ type AggregateFilterOpt func(f *AggregateFilter)
 
 func AggregateID(id string) AggregateFilterOpt {
 	return func(filter *AggregateFilter) {
-		filter.id = database.NewTextEqual(id)
-	}
-}
-
-func AggregateIDList(cond *database.ListFilter[string]) AggregateFilterOpt {
-	return func(filter *AggregateFilter) {
-		filter.id = cond
+		filter.id = id
 	}
 }
 
