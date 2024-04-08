@@ -237,7 +237,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         this.samlAppRequest.setMetadataUrl(form.metadataUrl);
       }
 
-      if (this.samlAppRequest) {
+      if (this.samlAppRequest && minimalMetadata.length > 0) {
         const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
         this.samlAppRequest.setMetadataXml(base64);
       }

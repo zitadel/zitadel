@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -32,10 +31,20 @@ func TriggerIntrospectionProjections(ctx context.Context) {
 	triggerBatch(ctx, introspectionTriggerHandlers()...)
 }
 
+type AppType string
+
+const (
+	AppTypeAPI  = "api"
+	AppTypeOIDC = "oidc"
+)
+
 type IntrospectionClient struct {
+	AppID                string
 	ClientID             string
-	ClientSecret         *crypto.CryptoValue
+	HashedSecret         string
+	AppType              AppType
 	ProjectID            string
+	ResourceOwner        string
 	ProjectRoleAssertion bool
 	PublicKeys           database.Map[[]byte]
 }
@@ -53,7 +62,16 @@ func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID strin
 	)
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		return row.Scan(&client.ClientID, &client.ClientSecret, &client.ProjectID, &client.ProjectRoleAssertion, &client.PublicKeys)
+		return row.Scan(
+			&client.AppID,
+			&client.ClientID,
+			&client.HashedSecret,
+			&client.AppType,
+			&client.ProjectID,
+			&client.ResourceOwner,
+			&client.ProjectRoleAssertion,
+			&client.PublicKeys,
+		)
 	},
 		introspectionClientByIDQuery,
 		instanceID, clientID, getKeys,

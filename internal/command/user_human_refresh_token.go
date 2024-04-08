@@ -99,7 +99,7 @@ func (c *Commands) RenewRefreshTokenAndAccessToken(
 	if err != nil {
 		return nil, "", err
 	}
-	return accessToken, newRefreshToken, nil
+	return accessToken, renewed.token, nil
 }
 
 func (c *Commands) RevokeRefreshToken(ctx context.Context, userID, orgID, tokenID string) (*domain.ObjectDetails, error) {

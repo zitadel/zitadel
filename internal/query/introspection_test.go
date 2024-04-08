@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	_ "embed"
-	"encoding/json"
 	"regexp"
 	"testing"
 
@@ -12,20 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 )
 
 func TestQueries_GetIntrospectionClientByID(t *testing.T) {
-	secret := &crypto.CryptoValue{
-		CryptoType: crypto.TypeHash,
-		Algorithm:  "alg",
-		KeyID:      "keyID",
-		Crypted:    []byte("secret"),
-	}
-	encSecret, err := json.Marshal(secret)
-	require.NoError(t, err)
-
 	pubkeys := database.Map[[]byte]{
 		"key1": {1, 2, 3},
 		"key2": {4, 5, 6},
@@ -61,13 +50,16 @@ func TestQueries_GetIntrospectionClientByID(t *testing.T) {
 				getKeys:  false,
 			},
 			mock: mockQuery(expQuery,
-				[]string{"client_id", "client_secret", "project_id", "project_role_assertion", "public_keys"},
-				[]driver.Value{"clientID", encSecret, "projectID", true, nil},
+				[]string{"app_id", "client_id", "client_secret", "app_type", "project_id", "resource_owner", "project_role_assertion", "public_keys"},
+				[]driver.Value{"appID", "clientID", "secret", "oidc", "projectID", "orgID", true, nil},
 				"instanceID", "clientID", false),
 			want: &IntrospectionClient{
+				AppID:                "appID",
 				ClientID:             "clientID",
-				ClientSecret:         secret,
+				HashedSecret:         "secret",
+				AppType:              AppTypeOIDC,
 				ProjectID:            "projectID",
+				ResourceOwner:        "orgID",
 				ProjectRoleAssertion: true,
 				PublicKeys:           nil,
 			},
@@ -79,13 +71,16 @@ func TestQueries_GetIntrospectionClientByID(t *testing.T) {
 				getKeys:  true,
 			},
 			mock: mockQuery(expQuery,
-				[]string{"client_id", "client_secret", "project_id", "project_role_assertion", "public_keys"},
-				[]driver.Value{"clientID", nil, "projectID", true, encPubkeys},
+				[]string{"app_id", "client_id", "client_secret", "app_type", "project_id", "resource_owner", "project_role_assertion", "public_keys"},
+				[]driver.Value{"appID", "clientID", "", "oidc", "projectID", "orgID", true, encPubkeys},
 				"instanceID", "clientID", true),
 			want: &IntrospectionClient{
+				AppID:                "appID",
 				ClientID:             "clientID",
-				ClientSecret:         nil,
+				HashedSecret:         "",
+				AppType:              AppTypeOIDC,
 				ProjectID:            "projectID",
+				ResourceOwner:        "orgID",
 				ProjectRoleAssertion: true,
 				PublicKeys:           pubkeys,
 			},
