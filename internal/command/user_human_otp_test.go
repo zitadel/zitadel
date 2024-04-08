@@ -1793,7 +1793,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
+				err: zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
 			},
 		},
 		{
@@ -1923,7 +1923,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked"),
 			},
 		},
 	}
@@ -2887,7 +2887,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
+				err: zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
 			},
 		},
 		{
@@ -3017,7 +3017,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 				},
 			},
 			res: res{
-				err: caos_errs.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked"),
 			},
 		},
 	}
