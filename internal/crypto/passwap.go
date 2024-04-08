@@ -16,12 +16,12 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type PasswordHasher struct {
+type Hasher struct {
 	*passwap.Swapper
 	Prefixes []string
 }
 
-func (h *PasswordHasher) EncodingSupported(encodedHash string) bool {
+func (h *Hasher) EncodingSupported(encodedHash string) bool {
 	for _, prefix := range h.Prefixes {
 		if strings.HasPrefix(encodedHash, prefix) {
 			return true
@@ -54,12 +54,12 @@ const (
 	HashModeSHA512 HashMode = "sha512"
 )
 
-type PasswordHashConfig struct {
+type HashConfig struct {
 	Verifiers []HashName
 	Hasher    HasherConfig
 }
 
-func (c *PasswordHashConfig) PasswordHasher() (*PasswordHasher, error) {
+func (c *HashConfig) NewHasher() (*Hasher, error) {
 	verifiers, vPrefixes, err := c.buildVerifiers()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "CRYPT-sahW9", "password hash config invalid")
@@ -68,7 +68,7 @@ func (c *PasswordHashConfig) PasswordHasher() (*PasswordHasher, error) {
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "CRYPT-Que4r", "password hash config invalid")
 	}
-	return &PasswordHasher{
+	return &Hasher{
 		Swapper:  passwap.NewSwapper(hasher, verifiers...),
 		Prefixes: append(hPrefixes, vPrefixes...),
 	}, nil
@@ -105,7 +105,7 @@ var knowVerifiers = map[HashName]prefixVerifier{
 	},
 }
 
-func (c *PasswordHashConfig) buildVerifiers() (verifiers []verifier.Verifier, prefixes []string, err error) {
+func (c *HashConfig) buildVerifiers() (verifiers []verifier.Verifier, prefixes []string, err error) {
 	verifiers = make([]verifier.Verifier, len(c.Verifiers))
 	prefixes = make([]string, 0, len(c.Verifiers)+1)
 	for i, name := range c.Verifiers {

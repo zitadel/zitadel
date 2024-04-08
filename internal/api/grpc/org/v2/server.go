@@ -29,13 +29,13 @@ func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
 	checkPermission domain.PermissionCheck,
-	es *eventstore.EventStore,
+	// es *eventstore.EventStore,
 ) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
 		checkPermission: checkPermission,
-		es:              es,
+		// es:              es,
 	}
 }
 

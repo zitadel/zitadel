@@ -292,7 +292,7 @@ func TestCommandSide_ResendInitialMail(t *testing.T) {
 func TestCommandSide_VerifyInitCode(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx             context.Context

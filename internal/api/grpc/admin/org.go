@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	cmd_v2 "github.com/zitadel/zitadel/internal/v2/command"
+	// cmd_v2 "github.com/zitadel/zitadel/internal/v2/command"
 	"github.com/zitadel/zitadel/internal/v2/org"
 	"github.com/zitadel/zitadel/internal/v2/projection"
 	"github.com/zitadel/zitadel/internal/v2/readmodel"
@@ -36,14 +36,22 @@ func (s *Server) SetDefaultOrg(ctx context.Context, req *admin_pb.SetDefaultOrgR
 }
 
 func (s *Server) RemoveOrg(ctx context.Context, req *admin_pb.RemoveOrgRequest) (*admin_pb.RemoveOrgResponse, error) {
-	intent, err := cmd_v2.NewRemoveOrg(req.GetOrgId()).ToPushIntent(ctx)
+	details, err := s.command.RemoveOrg(ctx, req.OrgId)
 	if err != nil {
 		return nil, err
 	}
-	if intent == nil {
-		return new(admin_pb.RemoveOrgResponse), nil
-	}
-	return new(admin_pb.RemoveOrgResponse), s.es.Push(ctx, intent)
+	return &admin_pb.RemoveOrgResponse{
+		Details: object.DomainToChangeDetailsPb(details),
+	}, nil
+
+	// intent, err := cmd_v2.NewRemoveOrg(req.GetOrgId()).ToPushIntent(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// if intent == nil {
+	// 	return new(admin_pb.RemoveOrgResponse), nil
+	// }
+	// return new(admin_pb.RemoveOrgResponse), s.es.Push(ctx, intent)
 }
 
 func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {
@@ -154,9 +162,6 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain str
 		return nil, err
 	}
 	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}})
-	if err != nil {
-		return nil, err
-	}
 	if err != nil {
 		return nil, err
 	}
