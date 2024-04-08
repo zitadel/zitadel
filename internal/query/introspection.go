@@ -33,13 +33,14 @@ func TriggerIntrospectionProjections(ctx context.Context) {
 }
 
 type IntrospectionClient struct {
-	ClientID     string
-	ClientSecret *crypto.CryptoValue
-	ProjectID    string
-	PublicKeys   database.Map[[]byte]
+	ClientID             string
+	ClientSecret         *crypto.CryptoValue
+	ProjectID            string
+	ProjectRoleAssertion bool
+	PublicKeys           database.Map[[]byte]
 }
 
-//go:embed embed/introspection_client_by_id.sql
+//go:embed introspection_client_by_id.sql
 var introspectionClientByIDQuery string
 
 func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID string, getKeys bool) (_ *IntrospectionClient, err error) {
@@ -52,7 +53,7 @@ func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID strin
 	)
 
 	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		return row.Scan(&client.ClientID, &client.ClientSecret, &client.ProjectID, &client.PublicKeys)
+		return row.Scan(&client.ClientID, &client.ClientSecret, &client.ProjectID, &client.ProjectRoleAssertion, &client.PublicKeys)
 	},
 		introspectionClientByIDQuery,
 		instanceID, clientID, getKeys,

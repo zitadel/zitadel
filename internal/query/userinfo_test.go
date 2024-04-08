@@ -338,3 +338,51 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 		})
 	}
 }
+
+func TestQueries_GetOIDCUserinfoClientByID(t *testing.T) {
+	expQuery := regexp.QuoteMeta(oidcUserinfoClientQuery)
+	cols := []string{"client_id", "project_id", "project_role_assertion"}
+
+	tests := []struct {
+		name    string
+		mock    sqlExpectation
+		want    *OIDCUserInfoClient
+		wantErr error
+	}{
+		{
+			name:    "no rows",
+			mock:    mockQueryErr(expQuery, sql.ErrNoRows, "instanceID", "clientID"),
+			wantErr: zerrors.ThrowNotFound(sql.ErrNoRows, "QUERY-beeW8", "Errors.App.NotFound"),
+		},
+		{
+			name:    "internal error",
+			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "instanceID", "clientID"),
+			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-Ais4r", "Errors.Internal"),
+		},
+		{
+			name: "found",
+			mock: mockQuery(expQuery, cols, []driver.Value{"clientID", "projectID", true}, "instanceID", "clientID"),
+			want: &OIDCUserInfoClient{
+				ClientID:             "clientID",
+				ProjectID:            "projectID",
+				ProjectRoleAssertion: true,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			execMock(t, tt.mock, func(db *sql.DB) {
+				q := &Queries{
+					client: &database.DB{
+						DB:       db,
+						Database: &prepareDB{},
+					},
+				}
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+				got, err := q.GetOIDCUserinfoClientByID(ctx, "clientID")
+				require.ErrorIs(t, err, tt.wantErr)
+				assert.Equal(t, tt.want, got)
+			})
+		})
+	}
+}

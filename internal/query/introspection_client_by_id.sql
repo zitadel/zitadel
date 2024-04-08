@@ -18,6 +18,7 @@ keys as (
 		and expiration > current_timestamp
 	group by identifier
 )
-select config.client_id, config.client_secret, apps.project_id, keys.public_keys from config
-join projections.apps6 apps on apps.id = config.app_id
+select config.client_id, config.client_secret, apps.project_id, p.project_role_assertion, keys.public_keys from config
+join projections.apps6 apps on apps.id = config.app_id and apps.instance_id = $1
+join projections.projects4 p on p.id = apps.project_id and p.instance_id = $1
 left join keys on keys.client_id = config.client_id;

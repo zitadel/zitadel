@@ -35,7 +35,7 @@ func TriggerOIDCUserInfoProjections(ctx context.Context) {
 	triggerBatch(ctx, oidcUserInfoTriggerHandlers()...)
 }
 
-//go:embed embed/userinfo_by_id.sql
+//go:embed userinfo_by_id.sql
 var oidcUserInfoQuery string
 
 func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudience []string) (_ *OIDCUserInfo, err error) {
@@ -69,4 +69,33 @@ type UserInfoOrg struct {
 	ID            string `json:"id,omitempty"`
 	Name          string `json:"name,omitempty"`
 	PrimaryDomain string `json:"primary_domain,omitempty"`
+}
+
+type OIDCUserInfoClient struct {
+	ClientID             string
+	ProjectID            string
+	ProjectRoleAssertion bool
+}
+
+//go:embed userinfo_client_by_id.sql
+var oidcUserinfoClientQuery string
+
+func (q *Queries) GetOIDCUserinfoClientByID(ctx context.Context, clientID string) (_ *OIDCUserInfoClient, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	client := new(OIDCUserInfoClient)
+	scan := func(row *sql.Row) error {
+		err := row.Scan(&client.ClientID, &client.ProjectID, &client.ProjectRoleAssertion)
+		return err
+	}
+
+	err = q.client.QueryRowContext(ctx, scan, oidcUserinfoClientQuery, authz.GetInstance(ctx).InstanceID(), clientID)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, zerrors.ThrowNotFound(err, "QUERY-beeW8", "Errors.App.NotFound")
+	}
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-Ais4r", "Errors.Internal")
+	}
+	return client, nil
 }
