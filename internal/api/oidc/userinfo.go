@@ -45,15 +45,15 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 	if err != nil {
 		return nil, err
 	}
-	userInfo, err := s.userInfo(ctx, token.userID, client.ProjectID, token.scope, nil)
+	userInfo, err := s.userInfo(ctx, token.userID, client.ProjectID, client.ProjectRoleAssertion, token.scope, nil)
 	if err != nil {
 		return nil, err
 	}
 	return op.NewResponse(userInfo), nil
 }
 
-func (s *Server) userInfo(ctx context.Context, userID, projectID string, scope, roleAudience []string) (_ *oidc.UserInfo, err error) {
-	roleAudience, requestedRoles := prepareRoles(ctx, projectID, scope, roleAudience)
+func (s *Server) userInfo(ctx context.Context, userID, projectID string, projectRoleAssertion bool, scope, roleAudience []string) (_ *oidc.UserInfo, err error) {
+	roleAudience, requestedRoles := prepareRoles(ctx, projectID, projectRoleAssertion, scope, roleAudience)
 	qu, err := s.query.GetOIDCUserInfo(ctx, userID, roleAudience)
 	if err != nil {
 		return nil, err
@@ -65,15 +65,14 @@ func (s *Server) userInfo(ctx context.Context, userID, projectID string, scope, 
 
 // prepareRoles scans the requested scopes, appends to roleAudience and returns the requestedRoles.
 //
+// Scopes with [ScopeProjectRolePrefix] are added to requestedRoles.
 // When [ScopeProjectsRoles] is present and roleAudience was empty,
 // project IDs with the [domain.ProjectIDScope] prefix are added to the roleAudience.
 //
-// Scopes with [ScopeProjectRolePrefix] are added to requestedRoles.
-//
-// If the resulting requestedRoles or roleAudience are not empty,
+// If projectRoleAssertion is true and the resulting requestedRoles or roleAudience are not empty,
 // the current projectID will always be parts or roleAudience.
 // Else nil, nil is returned.
-func prepareRoles(ctx context.Context, projectID string, scope, roleAudience []string) (ra, requestedRoles []string) {
+func prepareRoles(ctx context.Context, projectID string, projectRoleAssertion bool, scope, roleAudience []string) (ra, requestedRoles []string) {
 	// if all roles are requested take the audience for those from the scopes
 	if slices.Contains(scope, ScopeProjectsRoles) && len(roleAudience) == 0 {
 		roleAudience = domain.AddAudScopeToAudience(ctx, roleAudience, scope)
@@ -84,11 +83,11 @@ func prepareRoles(ctx context.Context, projectID string, scope, roleAudience []s
 			requestedRoles = append(requestedRoles, role)
 		}
 	}
-	if len(requestedRoles) == 0 && len(roleAudience) == 0 {
+	if !projectRoleAssertion && len(requestedRoles) == 0 && len(roleAudience) == 0 {
 		return nil, nil
 	}
 
-	if projectID != "" && !slices.Contains(roleAudience, projectID) {
+	if !slices.Contains(roleAudience, projectID) {
 		roleAudience = append(roleAudience, projectID)
 	}
 	return roleAudience, requestedRoles

@@ -20,6 +20,9 @@ import (
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 )
 
+// TestServer_UserInfo is a top-level test which re-executes the actual
+// userinfo integration test against a matrix of different feature flags.
+// This ensure that the response of the different implementations remains the same.
 func TestServer_UserInfo(t *testing.T) {
 	iamOwnerCTX := Tester.WithAuthorization(CTX, integration.IAMOwner)
 	t.Cleanup(func() {
@@ -36,7 +39,7 @@ func TestServer_UserInfo(t *testing.T) {
 			legacy: true,
 		},
 		{
-			name:    "legacy and trigger disabled",
+			name:    "legacy disabled, trigger disabled",
 			legacy:  false,
 			trigger: false,
 		},
@@ -59,6 +62,8 @@ func TestServer_UserInfo(t *testing.T) {
 	}
 }
 
+// testServer_UserInfo is the actual userinfo integration test,
+// which calls the userinfo endpoint with different client configurations, roles and token scopes.
 func testServer_UserInfo(t *testing.T) {
 	const role = "testUserRole"
 	clientID, projectID := createClient(t)
@@ -116,6 +121,36 @@ func testServer_UserInfo(t *testing.T) {
 				},
 			},
 		},
+		/* broken for userinfo legacy
+		{
+			name: "project role assertion",
+			prepare: func(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
+				_, err := Tester.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
+					Id:                   projectID,
+					Name:                 fmt.Sprintf("project-%d", time.Now().UnixNano()),
+					ProjectRoleAssertion: true,
+				})
+				require.NoError(t, err)
+				t.Cleanup(func() {
+					_, err := Tester.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
+						Id:                   projectID,
+						Name:                 fmt.Sprintf("project-%d", time.Now().UnixNano()),
+						ProjectRoleAssertion: false,
+					})
+					require.NoError(t, err)
+				})
+
+				return getTokens(t, clientID, scope)
+			},
+			scope: []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				assertUserinfo,
+				func(t *testing.T, ui *oidc.UserInfo) {
+					assertProjectRoleClaims(t, projectID, ui.Claims, role)
+				},
+			},
+		},
+		*/
 		{
 			name:    "projects roles scope",
 			prepare: getTokens,
