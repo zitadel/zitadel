@@ -14,28 +14,29 @@ import PrefillAction from './_prefill_action.mdx';
 
 <Intro provider="GitHub"/>
 
+## Open the GitHub Identity Provider Template
+
+<IDPsOverview templates="GitHub or GitHub Enterprise Server"/>
+
+Click on the ZITADEL Callback URL to copy it to your clipboard.
+You will have to paste it to the GitHub OAuth application later.
+
+![GitHub Provider](/img/guides/zitadel_github_create_provider.png)
+
 ## GitHub Configuration
 
 ### Register a new application
 
-For **GitHub** browse to the [Register a new OAuth application](https://github.com/settings/applications/new). You can find this link withing [Settings](https://github.com/settings/profile) - [Developer Settings](https://github.com/settings/apps) - - [OAuth Apps](https://github.com/settings/developers).
-
-For **GitHub Enterprise** go to your GitHub Enterprise home page and then to Settings - Developer Settings - OAuth Apps - Register a new application/New OAuth App
-
-Fill in the application name and homepage URL.
-
-You have to add the authorization callback URL, where GitHub should redirect, after the user has authenticated himself.
-In this example our test instance has the domain `https://acme-gzoe4x.zitadel.cloud`.
-This results in the following authorization callback URL:
- `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
-
-:::info
-To adapt this for you setup just replace the domain
-:::
+1. Create a new OAuth application
+   - For **GitHub** browse to the [Register a new OAuth application](https://github.com/settings/applications/new). You can find this link withing [Settings](https://github.com/settings/profile) - [Developer Settings](https://github.com/settings/apps) - - [OAuth Apps](https://github.com/settings/developers).
+   - For **GitHub Enterprise** go to your GitHub Enterprise home page and then to Settings - Developer Settings - OAuth Apps - Register a new application/New OAuth App
+2. Fill in the application name and homepage URL.
+3. [Paste the ZITADEL Callback URL you copied before](#open-the-github-identity-provider-template) to the Authorization callback URL field.
+4. Click "Register application".
 
 ![Register an OAuth application](/img/guides/github_oauth_app_registration.png)
 
-### Client ID and Secret
+### Client ID and secret
 
 After clicking "Register application", you see the detail page of the application you have just created.
 Copy the client ID directly from the detail page.
@@ -46,32 +47,27 @@ Make sure to save the secret, as you will not be able to show it again.
 
 ## ZITADEL Configuration
 
-### Add custom login policy
+Go back [to the GitHub provider template you opened before in ZITADEL](#open-the-github-identity-provider-template).
+Add the [client ID and secret you created before when you registered your GitHub OAuth application](#client-id-and-secret).
 
-<CustomLoginPolicy/>
-
-### Go to the IdP Providers Overview
-
-<IDPsOverview templates="GitHub or GitHub Enterprise"/>
-
-### Create a new GitHub Provider
-
-The GitHub provider templates have everything you need preconfigured. You only have to add the client ID and secret, you have created in the step before.
-
-You can configure the following settings if you like, a useful default will be filled if you don't change anything:
+You can optionally configure the following settings.
+A useful default will be filled if you don't change anything.
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
-This information is used to create and/or update the user within ZITADEL. ZITADEL ensures that at least the `openid`-scope is always sent.
+This information is used to create and/or update the user within ZITADEL.
+ZITADEL ensures that at least the `openid`-scope is always sent.
 
 <GeneralConfigDescription provider_account="GitHub account" />
-
-![GitHub Provider](/img/guides/zitadel_github_create_provider.png)
 
 ### Activate IdP
 
 <Activate/>
 
 ![Activate the GitHub](/img/guides/zitadel_activate_github.png)
+
+### Ensure your Login Policy allows External IDPs
+
+<CustomLoginPolicy/>
 
 ## Test the setup
 

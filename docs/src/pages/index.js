@@ -38,13 +38,13 @@ const features = [
               description=""
             />
             <ListElement
-              link="/docs/examples/sdks"
+              link="/docs/sdk-examples/introduction"
               type={ICONTYPE.APIS}
               title="SDKs"
               description=""
             />
             <ListElement
-              link="/docs/examples/introduction"
+              link="/docs/sdk-examples/introduction"
               type={ICONTYPE.APIS}
               title="Example Apps"
               description=""
@@ -104,7 +104,7 @@ const features = [
     title: "Get Started",
     darkImageUrl: "/docs/img/index/Quickstarts-dark.svg",
     lightImageUrl: "img/index/Quickstarts-light.svg",
-    link: "examples/introduction",
+    link: "/docs/sdk-examples/introduction",
     description: (
       <>
         Learn how to integrate your applications and build secure workflows and
@@ -133,7 +133,7 @@ const features = [
             description=""
           />
           <ListElement
-            link="/docs/examples/introduction"
+            link="/docs/sdk-examples/introduction"
             type={ICONTYPE.APIS}
             title="Examples"
             description="Clone an existing example application."

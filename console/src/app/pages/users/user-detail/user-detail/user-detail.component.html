@@ -243,6 +243,9 @@
         <ng-container *ngIf="currentSetting && currentSetting === 'metadata'">
           <cnsl-metadata
             [metadata]="metadata"
+            [description]="
+              (user.machine ? 'DESCRIPTIONS.USERS.MACHINES.METADATA' : 'DESCRIPTIONS.USERS.HUMANS.METADATA') | translate
+            "
             [disabled]="(['user.write:' + user.id, 'user.write'] | hasRole | async) === false"
             *ngIf="user && user.id"
             (editClicked)="editMetadata()"

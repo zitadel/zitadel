@@ -15,6 +15,7 @@ func UsersToPb(users []*query.User, assetPrefix string) []*user_pb.User {
 	}
 	return u
 }
+
 func UserToPb(user *query.User, assetPrefix string) *user_pb.User {
 	return &user_pb.User{
 		Id:                 user.ID,
@@ -72,7 +73,7 @@ func MachineToPb(view *query.Machine) *user_pb.Machine {
 	return &user_pb.Machine{
 		Name:            view.Name,
 		Description:     view.Description,
-		HasSecret:       view.Secret != nil,
+		HasSecret:       view.EncodedSecret != "",
 		AccessTokenType: AccessTokenTypeToPb(view.AccessTokenType),
 	}
 }

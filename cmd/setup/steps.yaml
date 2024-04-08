@@ -1,3 +1,4 @@
+# By using the FirstInstance section, you can overwrite the DefaultInstance configuration for the first instance created by zitadel setup.
 FirstInstance:
   # If set to true zitadel is setup without initial data
   Skip: false

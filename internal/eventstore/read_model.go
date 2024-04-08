@@ -44,7 +44,6 @@ func (rm *ReadModel) Reduce() error {
 	rm.ChangeDate = rm.Events[len(rm.Events)-1].CreatedAt()
 	rm.ProcessedSequence = rm.Events[len(rm.Events)-1].Sequence()
 	// all events processed and not needed anymore
-	rm.Events = nil
-	rm.Events = []Event{}
+	rm.Events = rm.Events[0:0]
 	return nil
 }

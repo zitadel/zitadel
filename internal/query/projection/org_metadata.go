@@ -106,7 +106,7 @@ func (p *orgMetadataProjection) reduceMetadataSet(event eventstore.Event) (*hand
 			handler.NewCol(OrgMetadataColumnOrgID, e.Aggregate().ID),
 			handler.NewCol(OrgMetadataColumnKey, e.Key),
 			handler.NewCol(OrgMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),
-			handler.NewCol(OrgMetadataColumnCreationDate, e.CreationDate()),
+			handler.NewCol(OrgMetadataColumnCreationDate, handler.OnlySetValueOnInsert(OrgMetadataProjectionTable, e.CreationDate())),
 			handler.NewCol(OrgMetadataColumnChangeDate, e.CreationDate()),
 			handler.NewCol(OrgMetadataColumnSequence, e.Sequence()),
 			handler.NewCol(OrgMetadataColumnValue, e.Value),

@@ -59,6 +59,10 @@ func Start(ctx context.Context) {
 	}
 }
 
+func Projections() []*handler2.Handler {
+	return projections
+}
+
 func ProjectInstance(ctx context.Context) error {
 	for _, projection := range projections {
 		_, err := projection.Trigger(ctx)

@@ -93,8 +93,8 @@ func (h *Handler) setState(tx *sql.Tx, updatedState *state) error {
 		updatedState.offset,
 	)
 	if err != nil {
-		h.log().WithError(err).Debug("unable to update state")
-		return err
+		h.log().WithError(err).Warn("unable to update state")
+		return zerrors.ThrowInternal(err, "V2-WF23g2", "unable to update state")
 	}
 	if affected, err := res.RowsAffected(); affected == 0 {
 		h.log().OnError(err).Error("unable to check if states are updated")

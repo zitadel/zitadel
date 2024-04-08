@@ -1,0 +1,82 @@
+@mixin framework-change-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: map-get($primary, 500);
+
+  $warn-color: map-get($warn, 500);
+  $accent-color: map-get($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  $list-background-color: map-get($background, 300);
+  $card-background-color: map-get($background, cards);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $border-selected-color: if($is-dark-theme, #fff, #000);
+
+  .framework-change-wrapper {
+    .framework-card-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .framework-card {
+        position: relative;
+        flex-shrink: 0;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        box-sizing: border-box;
+        transition: all 0.1s ease-in;
+        display: flex;
+        flex-direction: row;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: fit-content;
+        // background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
+        // box-shadow: 0 0 3px #0000001a;
+        border: 1px solid rgba(#8795a1, 0.2);
+        padding: 0 0.5rem;
+
+        img {
+          width: 100%;
+          height: 100%;
+          max-width: 40px;
+          max-height: 40px;
+          object-fit: contain;
+          object-position: center;
+        }
+
+        .dark-only {
+          display: if($is-dark-theme, block, none);
+        }
+
+        .light-only {
+          display: if($is-dark-theme, none, block);
+        }
+
+        span {
+          margin: 0.5rem;
+          text-align: center;
+          color: map-get($foreground, text);
+        }
+
+        .action-row {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          font-size: 14px;
+          margin-bottom: 0.5rem;
+          color: map-get($primary, 400);
+
+          .icon {
+            margin-left: 0rem;
+          }
+        }
+      }
+    }
+  }
+}

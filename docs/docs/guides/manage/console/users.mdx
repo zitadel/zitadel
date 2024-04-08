@@ -21,33 +21,9 @@ To get an understanding on how service users are used, take a look at our NextJS
 
 ## Create User
 
-To create a new user, go to Users and click on **New**. Enter the required contact details and save by clicking “Create”.
+import CreateUser from './_create-user.mdx';
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-
-<Tabs>
-  <TabItem value="human" label="Human User" default>
-    <img src="/docs/img/guides/console/addhuman.png" width="680px" alt="Add Human" />
-  </TabItem>
-  <TabItem value="service" label="Service User">
-    <img
-      src="/docs/img/guides/console/addmachine.png"
-      width="540px"
-      alt="Add Service User"
-    />
-  </TabItem>
-</Tabs>
-
-After a human user is created, by default, an initialization mail with a code is sent to the registered email. This code then has to be verified on first login.
-If you want to omit this mail, you can check the **email verified** and **set initial password** toggle.
-If no password is set initially, the initialization mail prompting the user to set his password is sent.
-
-You can prompt the user to add a second factor method too by checking the **Force MFA** toggle in [Login behaviour settings](./instance-settings#login-behaviour-and-access).
-
-When logged in, a user can then manage his profile in console himself, adding a profile picture, external IDPs and Passwordless authentication devices.
-
-<img src="/docs/img/guides/console/myprofile.png" alt="Profile Self Manage" />
+<CreateUser/>
 
 ## Metadata
 

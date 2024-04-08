@@ -23,7 +23,11 @@ func TestMain(m *testing.M) {
 		defer cancel()
 		CTX = ctx
 
-		Tester = integration.NewTester(ctx)
+		Tester = integration.NewTester(ctx, `
+Quotas:
+  Access:
+    Enabled: true
+`)
 		defer Tester.Done()
 
 		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)

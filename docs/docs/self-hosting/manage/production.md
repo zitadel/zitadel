@@ -90,7 +90,7 @@ but in the Projections.Customizations.Telemetry section
 ### Prefer CockroachDB
 
 ZITADEL supports [CockroachDB](https://www.cockroachlabs.com/) and [PostgreSQL](https://www.postgresql.org/).
-We highly recommend using CockroachDB,
+We recommend using CockroachDB,
 as horizontal scaling is much easier than with PostgreSQL.
 Also, if you are concerned about multi-regional data locality,
 [the way to go is with CockroachDB](https://www.cockroachlabs.com/docs/stable/multiregion-overview.html).
@@ -121,7 +121,7 @@ Database:
 You also might want to configure how [projections](/concepts/eventstore/implementation#projections) are computed. These are the default values:
 
 ```yaml
-# The Projections section defines the behaviour for the scheduled and synchronous events projections.
+# The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
   # Time interval between scheduled projections
   RequeueEvery: 60s

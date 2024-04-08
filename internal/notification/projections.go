@@ -53,3 +53,7 @@ func ProjectInstance(ctx context.Context) error {
 	}
 	return nil
 }
+
+func Projections() []*handler.Handler {
+	return projections
+}

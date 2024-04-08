@@ -7,11 +7,31 @@ If you have a self-hosted ZITADEL environment, you can limit the usage of your [
 For example, if you provide your customers [their own virtual instances](/concepts/structure/instance#multiple-virtual-instances) with access on their own domains, you can design a pricing model based on the usage of their instances.
 The usage control features are currently limited to the instance level only.
 
+## Block Instances
+
+You can block an instance using the [system API](/category/apis/resources/system/limits).
+
+Most requests to a blocked instance are rejected with the HTTP status *429 Too Many Requests* or the gRPC status *8 Resource Exhausted*.
+However, requests to the [system API](/apis/introduction#system) are still allowed.
+Requests to paths with the prefix */ui/login* return a redirect with HTTP status *302 Found* to */ui/console*, where the user is guided to *InstanceManagementURL*.
+Blocked HTTP requests additionally set a cookie to make it easy to block traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
+
+You can block new instances by default using the *DefaultInstance.Limits.Block* runtime configuration.
+The following snippets shows the default YAML:
+
+```yaml
+DefaultInstance:
+  Limits:
+    # If Block is true, all requests except to /ui/console or the system API are blocked and /ui/login is redirected to /ui/console.
+    # /ui/console shows a message that the instance is blocked with a link to Console.InstanceManagementURL
+    Block: # ZITADEL_DEFAULTINSTANCE_LIMITS_BLOCK
+```
+
 ## Limit Audit Trails
 
 You can restrict the maximum age of events returned by the following APIs:
 
-- [Events Search](/apis/resources/admin/admin-service-list-events), See also the [Event API guide](guides/integrate/event-api)
+- [Events Search](/apis/resources/admin/admin-service-list-events), See also the [Event API guide](/guides/integrate/zitadel-apis/event-api)
 - [My User History](/apis/resources/auth/auth-service-list-my-user-changes)
 - [A Users History](/apis/resources/mgmt/management-service-list-user-changes)
 - [An Applications History](/apis/resources/mgmt/management-service-list-app-changes)
@@ -107,8 +127,9 @@ DefaultInstance:
 
 ### Exhausted Authenticated Requests
 
-If a quota is configured to limit requests and the quotas amount is exhausted, all further requests are blocked except requests to the System API.
-Also, a cookie is set, to make it easier to block further traffic before it reaches your ZITADEL runtime.
+If a quota is configured to limit requests and the quotas amount is exhausted, all further authenticated requests are blocked except requests to the [system API](/apis/introduction#system).
+Also, a cookie is set, to make it easier to block further traffic before it reaches your ZITADEL runtime, for example with a WAF rule.
+The console is still served, but it only shows a dialog that says that the instance is blocked with a link to *InstanceManagementURL*.
 
 ### Exhausted Action Run Seconds
 

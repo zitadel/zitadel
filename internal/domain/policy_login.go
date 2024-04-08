@@ -66,6 +66,13 @@ func (p IDPProvider) IsValid() bool {
 	return p.IDPConfigID != ""
 }
 
+// DisplayName returns the name or a default
+// It's used for html rendering
+// to be used when always a name must be displayed (e.g. login)
+func (p IDPProvider) DisplayName() string {
+	return IDPName(p.Name, p.IDPType)
+}
+
 type PasswordlessType int32
 
 const (
@@ -79,6 +86,12 @@ func (f PasswordlessType) Valid() bool {
 	return f >= 0 && f < passwordlessCount
 }
 
+// HasSecondFactors is used in html rendering
 func (p *LoginPolicy) HasSecondFactors() bool {
 	return len(p.SecondFactors) > 0
+}
+
+// HasMultiFactors is used in html rendering
+func (p *LoginPolicy) HasMultiFactors() bool {
+	return len(p.MultiFactors) > 0
 }

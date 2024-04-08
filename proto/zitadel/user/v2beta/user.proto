@@ -58,7 +58,7 @@ message SetHumanProfile {
       example: "\"en\"";
     }
   ];
-  optional zitadel.user.v2beta.Gender gender = 6 [
+  optional Gender gender = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"GENDER_FEMALE\"";
     }
@@ -98,9 +98,15 @@ message HumanProfile {
       example: "\"en\"";
     }
   ];
-  optional zitadel.user.v2beta.Gender gender = 6 [
+  optional Gender gender = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"GENDER_FEMALE\"";
+    }
+  ];
+  string avatar_url = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "avatar URL of the user"
+      example: "\"https://api.zitadel.ch/assets/v1/avatar-32432jkh4kj32\"";
     }
   ];
 }
@@ -128,6 +134,47 @@ message SetMetadataEntry {
 }
 
 message HumanUser {
+  // Unique identifier of the user.
+  string user_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  // State of the user, for example active, inactive, locked, deleted, initial.
+  UserState state = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "current state of the user";
+    }
+  ];
+  // Username of the user, which can be globally unique or unique on organization level.
+  string username = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"minnie-mouse\"";
+    }
+  ];
+  // Possible usable login names for the user.
+  repeated string login_names = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"gigi@zitadel.com\", \"gigi@zitadel.zitadel.ch\"]";
+    }
+  ];
+  // Preferred login name of the user.
+  string preferred_login_name = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"gigi@zitadel.com\"";
+    }
+  ];
+  // Profile information of the user.
+  HumanProfile profile = 6;
+  // Email of the user, if defined.
+  HumanEmail email = 7;
+  // Phone of the user, if defined.
+  HumanPhone phone = 8;
+  // User is required to change the used password on the next login.
+  bool password_change_required = 9;
+}
+
+message User {
   string user_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
@@ -153,9 +200,46 @@ message HumanUser {
       example: "\"gigi@zitadel.com\"";
     }
   ];
-  HumanProfile profile = 6;
-  HumanEmail email = 7;
-  HumanPhone phone = 8;
+  oneof type {
+    HumanUser human = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "one of type use human or machine"
+      }
+    ];
+    MachineUser machine = 7 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "one of type use human or machine"
+      }
+    ];
+  }
+}
+
+message MachineUser {
+  string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"zitadel\"";
+    }
+  ];
+  string description = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"The one and only IAM\"";
+    }
+  ];
+  bool has_secret = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"true\"";
+    }
+  ];
+  AccessTokenType access_token_type = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Type of access token to receive";
+    }
+  ];
+}
+
+enum AccessTokenType {
+  ACCESS_TOKEN_TYPE_BEARER = 0;
+  ACCESS_TOKEN_TYPE_JWT = 1;
 }
 
 enum UserState {
@@ -164,6 +248,5 @@ enum UserState {
   USER_STATE_INACTIVE = 2;
   USER_STATE_DELETED = 3;
   USER_STATE_LOCKED = 4;
-  USER_STATE_SUSPEND = 5;
-  USER_STATE_INITIAL = 6;
+  USER_STATE_INITIAL = 5;
 }

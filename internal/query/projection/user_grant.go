@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	UserGrantProjectionTable = "projections.user_grants3"
+	UserGrantProjectionTable = "projections.user_grants5"
 
 	UserGrantID                   = "id"
 	UserGrantCreationDate         = "creation_date"
@@ -29,15 +29,11 @@ const (
 	UserGrantInstanceID           = "instance_id"
 	UserGrantUserID               = "user_id"
 	UserGrantResourceOwnerUser    = "resource_owner_user"
-	UserGrantUserOwnerRemoved     = "user_owner_removed"
 	UserGrantProjectID            = "project_id"
 	UserGrantResourceOwnerProject = "resource_owner_project"
-	UserGrantProjectOwnerRemoved  = "project_owner_removed"
 	UserGrantGrantID              = "grant_id"
 	UserGrantGrantedOrg           = "granted_org"
-	UserGrantGrantedOrgRemoved    = "granted_org_removed"
 	UserGrantRoles                = "roles"
-	UserGrantOwnerRemoved         = "owner_removed"
 )
 
 type userGrantProjection struct {
@@ -64,23 +60,15 @@ func (*userGrantProjection) Init() *old_handler.Check {
 			handler.NewColumn(UserGrantInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantUserID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantResourceOwnerUser, handler.ColumnTypeText),
-			handler.NewColumn(UserGrantUserOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(UserGrantProjectID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantResourceOwnerProject, handler.ColumnTypeText),
-			handler.NewColumn(UserGrantProjectOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(UserGrantGrantID, handler.ColumnTypeText),
 			handler.NewColumn(UserGrantGrantedOrg, handler.ColumnTypeText),
-			handler.NewColumn(UserGrantGrantedOrgRemoved, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(UserGrantRoles, handler.ColumnTypeTextArray, handler.Nullable()),
-			handler.NewColumn(UserGrantOwnerRemoved, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
 			handler.WithIndex(handler.NewIndex("user_id", []string{UserGrantUserID})),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{UserGrantResourceOwner})),
-			handler.WithIndex(handler.NewIndex("owner_removed", []string{UserGrantOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("user_owner_removed", []string{UserGrantUserOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("project_owner_removed", []string{UserGrantProjectOwnerRemoved})),
-			handler.WithIndex(handler.NewIndex("granted_org_removed", []string{UserGrantGrantedOrgRemoved})),
 		),
 	)
 }
@@ -182,23 +170,9 @@ func (p *userGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 	}
 
 	ctx := setUserGrantContext(e.Aggregate())
-	userOwner, err := getResourceOwnerOfUser(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
+	userOwner, projectOwner, grantOwner, err := getUserGrantResourceOwners(ctx, p.es, e.Aggregate().InstanceID, e.UserID, e.ProjectID, e.ProjectGrantID)
 	if err != nil {
 		return nil, err
-	}
-
-	projectOwner := ""
-	grantOwner := ""
-	if e.ProjectGrantID != "" {
-		grantOwner, err = getGrantedOrgOfGrantedProject(ctx, p.es, e.Aggregate().InstanceID, e.ProjectID, e.ProjectGrantID)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		projectOwner, err = getResourceOwnerOfProject(ctx, p.es, e.Aggregate().InstanceID, e.ProjectID)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return handler.NewCreateStatement(
@@ -425,74 +399,80 @@ func (p *userGrantProjection) reduceOwnerRemoved(event eventstore.Event) (*handl
 	), nil
 }
 
-func getResourceOwnerOfUser(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
-	events, err := es.Filter(
-		ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AwaitOpenTransactions().
-			InstanceID(instanceID).
-			AddQuery().
-			AggregateTypes(user.AggregateType).
-			AggregateIDs(aggID).
-			EventTypes(user.HumanRegisteredType, user.HumanAddedType, user.MachineAddedEventType).
-			Builder(),
-	)
-	if err != nil {
-		return "", err
+func getUserResourceOwner(ctx context.Context, es handler.EventStore, instanceID, userID string) (string, error) {
+	userRO, _, _, err := getResourceOwners(ctx, es, instanceID, userID, "", "")
+	if userRO == "" {
+		return "", zerrors.ThrowNotFound(nil, "PROJ-uahkkord22", "Errors.NotFound")
 	}
-	if len(events) != 1 {
-		return "", zerrors.ThrowNotFound(nil, "PROJ-0I92sp", "Errors.User.NotFound")
-	}
-	return events[0].Aggregate().ResourceOwner, nil
+	return userRO, err
 }
 
-func getResourceOwnerOfProject(ctx context.Context, es handler.EventStore, instanceID, aggID string) (string, error) {
-	events, err := es.Filter(
-		ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AwaitOpenTransactions().
-			InstanceID(instanceID).
-			AddQuery().
-			AggregateTypes(project.AggregateType).
-			AggregateIDs(aggID).
-			EventTypes(project.ProjectAddedType).
-			Builder(),
-	)
+func getUserGrantResourceOwners(ctx context.Context, es handler.EventStore, instanceID, userID, projectID, grantID string) (string, string, string, error) {
+	userRO, projectRO, grantedOrg, err := getResourceOwners(ctx, es, instanceID, userID, projectID, grantID)
 	if err != nil {
-		return "", err
+		return "", "", "", err
 	}
-	if len(events) != 1 {
-		return "", zerrors.ThrowNotFound(nil, "PROJ-0I91sp", "Errors.Project.NotFound")
+	// user grant always has a user defined
+	if userRO == "" {
+		return "", "", "", zerrors.ThrowNotFound(nil, "PROJ-8x5behx5jy", "Errors.NotFound")
 	}
-	return events[0].Aggregate().ResourceOwner, nil
+	// either a projectID
+	if projectID != "" && projectRO == "" {
+		return "", "", "", zerrors.ThrowNotFound(nil, "PROJ-1ldp25o3bx", "Errors.NotFound")
+	}
+	// or a grantID
+	if grantID != "" && grantedOrg == "" {
+		return "", "", "", zerrors.ThrowNotFound(nil, "PROJ-9ngp5dcn76", "Errors.NotFound")
+	}
+	return userRO, projectRO, grantedOrg, nil
 }
 
-func getGrantedOrgOfGrantedProject(ctx context.Context, es handler.EventStore, instanceID, projectID, grantID string) (string, error) {
-	events, err := es.Filter(
-		ctx,
-		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AwaitOpenTransactions().
-			InstanceID(instanceID).
-			AddQuery().
+func getResourceOwners(ctx context.Context, es handler.EventStore, instanceID, userID, projectID, grantID string) (userRO string, projectRO string, grantedOrg string, err error) {
+	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AwaitOpenTransactions().
+		InstanceID(instanceID).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(userID).
+		EventTypes(user.HumanRegisteredType, user.HumanAddedType, user.MachineAddedEventType)
+
+	// if it's a project grant then we only need the resourceowner for the projectgrant, else the project
+	if grantID != "" {
+		builder = builder.Or().
 			AggregateTypes(project.AggregateType).
 			AggregateIDs(projectID).
 			EventTypes(project.GrantAddedType).
 			EventData(map[string]interface{}{
 				"grantId": grantID,
-			}).
-			Builder(),
+			})
+	}
+	if projectID != "" {
+		builder = builder.Or().
+			AggregateTypes(project.AggregateType).
+			AggregateIDs(projectID).
+			EventTypes(project.ProjectAddedType)
+	}
+
+	events, err := es.Filter(
+		ctx,
+		builder.Builder(),
 	)
 	if err != nil {
-		return "", err
+		return "", "", "", err
 	}
-	if len(events) != 1 {
-		return "", zerrors.ThrowNotFound(nil, "PROJ-MoaSpw", "Errors.Grant.NotFound")
+
+	// sorted ascending
+	for _, event := range events {
+		switch e := event.(type) {
+		case *project.GrantAddedEvent:
+			grantedOrg = e.GrantedOrgID
+		case *project.ProjectAddedEvent:
+			projectRO = e.Aggregate().ResourceOwner
+		case *user.HumanRegisteredEvent, *user.HumanAddedEvent, *user.MachineAddedEvent:
+			userRO = e.Aggregate().ResourceOwner
+		}
 	}
-	grantAddedEvent, ok := events[0].(*project.GrantAddedEvent)
-	if !ok {
-		return "", zerrors.ThrowNotFound(nil, "PROJ-P0s2o0", "Errors.Grant.NotFound")
-	}
-	return grantAddedEvent.GrantedOrgID, nil
+	return userRO, projectRO, grantedOrg, nil
 }
 
 func setUserGrantContext(aggregate *eventstore.Aggregate) context.Context {

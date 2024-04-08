@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -216,6 +217,7 @@ func TestServer_AddOTPEmail(t *testing.T) {
 			},
 			want: &user.AddOTPEmailResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
@@ -282,6 +284,7 @@ func TestServer_RemoveOTPEmail(t *testing.T) {
 			},
 			want: &user.RemoveOTPEmailResponse{
 				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Organisation.ResourceOwner,
 				},
 			},

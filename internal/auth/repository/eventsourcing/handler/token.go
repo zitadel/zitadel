@@ -244,7 +244,8 @@ func agentIDFromSession(event eventstore.Event) (string, error) {
 		logging.WithError(err).Error("could not unmarshal event data")
 		return "", zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
-	return session["userAgentID"].(string), nil
+	agentID, _ := session["userAgentID"].(string)
+	return agentID, nil
 }
 
 func applicationFromSession(event eventstore.Event) (*project_es_model.Application, error) {

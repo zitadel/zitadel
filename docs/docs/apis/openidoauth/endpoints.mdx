@@ -5,6 +5,9 @@ sidebar_label: OpenID Connect Endpoints
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import TokenExchangeRequest from "./_token_exchange_request.mdx";
+import TokenExchangeResponse from "./_token_exchange_response.mdx";
+import TokenExchangeTypes from "./_token_exchange_types.mdx";
 
 ## OpenID Connect 1.0 Discovery
 
@@ -330,10 +333,10 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 #### Required request parameters
 
-| Parameter  | Description                                                                                                             |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
-| grant_type | Must be `client_credentials`                                                                                            |
-| scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid profile`        |
+| Parameter  | Description                                                                                                |
+| ---------- | ---------------------------------------------------------------------------------------------------------- |
+| grant_type | Must be `client_credentials`                                                                               |
+| scope      | [Scopes](scopes) you would like to request from ZITADEL. Scopes are space delimited, e.g. `openid profile` |
 
 Additionally, you need to authenticate your client by either sending `client_id` and `client_secret` as Basic Auth Header.
 Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
@@ -373,6 +376,71 @@ curl --request POST \
 | scope        | Scopes of the `access_token`. These might differ from the provided `scope` parameter. |
 | token_type   | Type of the `access_token`. Value is always `Bearer`                                  |
 
+### Token Exchange grant
+
+The Token Exchange grant implements [RFC 8693, OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693) and can be used to exchange tokens to a different scope, audience or subject. Changing the subject of an authenticated token is called impersonation or delegation. ZITADEL also provides a [token exchange guide](/docs/guides/integrate/token-exchange) with more details on using the Token Exchange Grant.
+
+:::info
+Token Exchange is currently an experimental [beta](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable it on the [feature API](/docs/guides/integrate/token-exchange#feature-api) before using it.
+:::
+
+#### Request parameters
+
+<TokenExchangeRequest />
+
+Depending on your authorization method you will have to provide additional parameters or headers:
+
+<Tabs
+    groupId="token-auth-methods"
+    defaultValue="client_secret_basic"
+    values={[
+        {label: 'client_secret_basic', value: 'client_secret_basic'},
+        {label: 'client_secret_post', value: 'client_secret_post'},
+        {label: 'none', value: 'none'},
+        {label: 'private_key_jwt', value: 'private_key_jwt'},
+    ]}
+>
+
+<TabItem value="client_secret_basic">
+
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+
+</TabItem>
+<TabItem value="client_secret_post">
+
+Send your `client_id` and `client_secret` as parameters in the body:
+
+| Parameter     | Description                      |
+| ------------- | -------------------------------- |
+| client_id     | client_id of the application     |
+| client_secret | client_secret of the application |
+
+</TabItem>
+<TabItem value="none">
+
+Send your `client_id` as parameter in the body. No authentication is required.
+
+</TabItem>
+<TabItem value="private_key_jwt">
+
+Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
+
+| Parameter             | Description                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#jwt-with-private-key) |
+| client_assertion_type | Must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                             |
+
+</TabItem>
+</Tabs>
+
+#### Successful token exchange response {#token-exchange-response}
+
+<TokenExchangeResponse />
+
+#### Token types
+
+<TokenExchangeTypes />
+
 ### Error response
 
 | error_type             | Possible reason                                                                                                                                                                                                                                              |
@@ -399,12 +467,12 @@ this endpoint will check if the token is not revoked (by client or logout).
 Depending on your authorization method you will have to provide additional parameters or headers:
 
 <Tabs
-    groupId="introspect-auth-methods"
-    defaultValue="client_secret_basic"
-    values={[
-        {label: 'client_secret_basic', value: 'client_secret_basic'},
-        {label: 'private_key_jwt', value: 'private_key_jwt'},
-    ]}
+groupId="introspect-auth-methods"
+defaultValue="client_secret_basic"
+values={[
+{label: 'client_secret_basic', value: 'client_secret_basic'},
+{label: 'private_key_jwt', value: 'private_key_jwt'},
+]}
 >
 <TabItem value="client_secret_basic">
 
@@ -509,14 +577,14 @@ the corresponding `access_token` will be revoked as well.
 Depending on your authorization method you will have to provide additional parameters or headers:
 
 <Tabs
-    groupId="token-auth-methods"
-    defaultValue="client_secret_basic"
-    values={[
-        {label: 'client_secret_basic', value: 'client_secret_basic'},
-        {label: 'client_secret_post', value: 'client_secret_post'},
-        {label: 'none (PKCE)', value: 'none'},
-        {label: 'private_key_jwt', value: 'private_key_jwt'},
-    ]}
+groupId="token-auth-methods"
+defaultValue="client_secret_basic"
+values={[
+{label: 'client_secret_basic', value: 'client_secret_basic'},
+{label: 'client_secret_post', value: 'client_secret_post'},
+{label: 'none (PKCE)', value: 'none'},
+{label: 'private_key_jwt', value: 'private_key_jwt'},
+]}
 >
 <TabItem value="client_secret_basic">
 
@@ -569,7 +637,7 @@ curl --request POST \
 
 The endpoint has to be opened in the user agent (browser) to terminate the user sessions.
 
-No parameters are needed apart from the user agent cookie, but you can provide the following to customize the behaviour:
+No parameters are needed apart from the user agent cookie, but you can provide the following to customize the behavior:
 
 | Parameter                | Description                                                                                                                      |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |

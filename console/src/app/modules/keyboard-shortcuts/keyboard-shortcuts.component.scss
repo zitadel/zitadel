@@ -1,19 +1,28 @@
-@mixin keyboard-shortcuts-theme($theme) {
-  $primary: map-get($theme, primary);
-  $background: map-get($theme, background);
-  $foreground: map-get($theme, foreground);
-  $text-color: map-get($foreground, text);
-  $accent: map-get($theme, accent);
-  $is-dark-theme: map-get($theme, is-dark);
-  $accent-color: map-get($primary, 500);
-  $back: map-get($background, background);
-  $card-background-color: map-get($background, cards);
+.keyboard-shortcuts {
+  padding: 1.5rem;
+  border-radius: 6px !important;
+
+  .action {
+    display: flex;
+    margin-top: 1rem;
+    button {
+      border-radius: 0.5rem;
+      .mat-mdc-button-persistent-ripple {
+        border-style: none !important;
+      }
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+  }
+
+  .title {
+    font-size: 1.2rem;
+    margin-top: 0;
+  }
 
   .keyboard-shortcuts-group {
-    $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-
-    border: 1px solid $border-color;
-    background-color: $card-background-color;
     padding: 1rem;
     border-radius: 0.5rem;
     margin: 0.5rem 0 0 0;
@@ -34,14 +43,6 @@
 
         .keyboard-shortcut-name {
           font-size: 14px;
-
-          strong {
-            color: $text-color;
-          }
-        }
-
-        &:not(:last-child) {
-          border-bottom: 1px solid map-get($foreground, dividers);
         }
 
         .fill-space {
@@ -67,7 +68,6 @@
       right: 0;
       bottom: 0;
       left: 0;
-      background: if($is-dark-theme, #fff, #000);
       opacity: 0.15;
       border-radius: 4px;
     }
@@ -87,19 +87,49 @@
   }
 }
 
-.title {
-  font-size: 1.2rem;
-  margin-top: 0;
-}
+@mixin keyboard-shortcuts-theme($theme) {
+  $primary: map-get($theme, primary);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $text-color: map-get($foreground, text);
+  $accent: map-get($theme, accent);
+  $is-dark-theme: map-get($theme, is-dark);
+  $accent-color: map-get($primary, 500);
+  $back: map-get($background, background);
+  $card-background-color: map-get($background, cards);
 
-.action {
-  display: flex;
+  .keyboard-shortcuts {
+    .title {
+      color: $text-color;
+    }
 
-  button {
-    border-radius: 0.5rem;
-  }
+    .keyboard-shortcuts-group {
+      $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+      border: 1px solid $border-color;
+      background-color: $card-background-color;
 
-  .fill-space {
-    flex: 1;
+      h2 {
+        color: $text-color;
+      }
+
+      .keyboard-shortcuts-wrapper {
+        .keyboard-shortcut {
+          .keyboard-shortcut-name {
+            strong {
+              color: $text-color;
+            }
+          }
+          &:not(:last-child) {
+            border-bottom: 1px solid map-get($foreground, dividers);
+          }
+        }
+      }
+    }
+
+    .keyboard-shortcuts-action-key {
+      .keyboard-shortcuts-key-overlay {
+        background: if($is-dark-theme, #fff, #000);
+      }
+    }
   }
 }

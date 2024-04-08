@@ -15,31 +15,15 @@ const (
 )
 
 func (v *View) UserSessionByIDs(agentID, userID, instanceID string) (*model.UserSessionView, error) {
-	return view.UserSessionByIDs(v.Db, userSessionTable, agentID, userID, instanceID)
-}
-
-func (v *View) UserSessionsByUserID(userID, instanceID string) ([]*model.UserSessionView, error) {
-	return view.UserSessionsByUserID(v.Db, userSessionTable, userID, instanceID)
+	return view.UserSessionByIDs(v.client, agentID, userID, instanceID)
 }
 
 func (v *View) UserSessionsByAgentID(agentID, instanceID string) ([]*model.UserSessionView, error) {
-	return view.UserSessionsByAgentID(v.Db, userSessionTable, agentID, instanceID)
-}
-
-func (v *View) UserSessionsByOrgID(orgID, instanceID string) ([]*model.UserSessionView, error) {
-	return view.UserSessionsByOrgID(v.Db, userSessionTable, orgID, instanceID)
-}
-
-func (v *View) ActiveUserSessionsCount() (uint64, error) {
-	return view.ActiveUserSessions(v.Db, userSessionTable)
+	return view.UserSessionsByAgentID(v.client, agentID, instanceID)
 }
 
 func (v *View) PutUserSession(userSession *model.UserSessionView) error {
 	return view.PutUserSession(v.Db, userSessionTable, userSession)
-}
-
-func (v *View) PutUserSessions(userSession []*model.UserSessionView) error {
-	return view.PutUserSessions(v.Db, userSessionTable, userSession...)
 }
 
 func (v *View) DeleteUserSessions(userID, instanceID string) error {

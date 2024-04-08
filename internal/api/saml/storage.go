@@ -151,7 +151,7 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 	setUserinfo(user, userinfo, attributes, customAttributes)
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse)
+	activity.Trigger(ctx, user.ResourceOwner, user.ID, activity.SAMLResponse, p.eventstore.FilterToQueryReducer)
 	return nil
 }
 
@@ -249,6 +249,24 @@ func (p *Storage) getCustomAttributes(ctx context.Context, user *query.User, use
 					return object.UserGrantsFromQuery(c, userGrants)
 				}),
 			),
+			actions.SetFields("org",
+				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
+					return func(goja.FunctionCall) goja.Value {
+						metadata, err := p.query.SearchOrgMetadata(
+							ctx,
+							true,
+							user.ResourceOwner,
+							&query.OrgMetadataSearchQueries{},
+							false,
+						)
+						if err != nil {
+							logging.WithError(err).Info("unable to get org metadata in action")
+							panic(err)
+						}
+						return object.OrgMetadataListFromQuery(c, metadata)
+					}
+				}),
+			),
 		),
 	)
 
@@ -328,7 +346,7 @@ func (p *Storage) getGrants(ctx context.Context, userID, applicationID string) (
 			projectQuery,
 			userIDQuery,
 		},
-	}, true, false)
+	}, true)
 }
 
 type customAttribute struct {

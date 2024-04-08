@@ -1,0 +1,21 @@
+<div class="framework-change-wrapper">
+  <div class="framework-card-wrapper">
+    <div class="framework-card card" *ngIf="framework | async as framework; else frameworkFallback">
+      <div>
+        <img class="dark-only" *ngIf="framework.imgSrcDark" [src]="framework.imgSrcDark" />
+        <img class="light-only" *ngIf="framework.imgSrcLight" [src]="framework.imgSrcLight" />
+      </div>
+      <span>{{ framework.title }}</span>
+    </div>
+
+    <ng-template #frameworkFallback>
+      <div class="framework-card card">
+        <span>{{ 'QUICKSTART.SELECT_FRAMEWORK' | translate }}</span>
+      </div>
+    </ng-template>
+
+    <button (click)="openDialog()" mat-stroked-button>
+      {{ 'ACTIONS.CHANGE' | translate }}
+    </button>
+  </div>
+</div>

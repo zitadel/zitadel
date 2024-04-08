@@ -13,6 +13,7 @@ import (
 	cache "github.com/zitadel/zitadel/internal/auth_request/repository"
 	"github.com/zitadel/zitadel/internal/auth_request/repository/mock"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -518,8 +519,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
 						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeTOTP},
-						PasswordCheckLifetime:     10 * 24 * time.Hour,
-						SecondFactorCheckLifetime: 18 * time.Hour,
+						PasswordCheckLifetime:     database.Duration(10 * 24 * time.Hour),
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
 					},
 				},
 				privacyPolicyProvider: &mockPrivacyPolicy{
@@ -820,7 +821,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						MultiFactorCheckLifetime: 10 * time.Hour,
+						MultiFactorCheckLifetime: database.Duration(10 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{},
@@ -845,7 +846,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						MultiFactorCheckLifetime: 10 * time.Hour,
+						MultiFactorCheckLifetime: database.Duration(10 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{},
@@ -871,7 +872,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						MultiFactorCheckLifetime: 10 * time.Hour,
+						MultiFactorCheckLifetime: database.Duration(10 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{},
@@ -953,7 +954,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						SecondFactorCheckLifetime: 18 * time.Hour,
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{},
@@ -986,7 +987,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						SecondFactorCheckLifetime: 18 * time.Hour,
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{
@@ -1054,7 +1055,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						PasswordCheckLifetime: 10 * 24 * time.Hour,
+						PasswordCheckLifetime: database.Duration(10 * 24 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{},
@@ -1591,7 +1592,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						SecondFactorCheckLifetime: 18 * time.Hour,
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
 					},
 				},
 				userEventProvider:    &mockEventUser{},

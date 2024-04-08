@@ -175,7 +175,7 @@ func (p *userAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 		},
 		[]handler.Column{
 			handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
-			handler.NewCol(UserAuthMethodCreationDateCol, event.CreatedAt()),
+			handler.NewCol(UserAuthMethodCreationDateCol, handler.OnlySetValueOnInsert(UserAuthMethodTable, event.CreatedAt())),
 			handler.NewCol(UserAuthMethodChangeDateCol, event.CreatedAt()),
 			handler.NewCol(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
 			handler.NewCol(UserAuthMethodInstanceIDCol, event.Aggregate().InstanceID),

@@ -12,13 +12,16 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+type Stateful interface {
+	SetState(*State)
+}
 
 type State struct {
 	LastRun time.Time
@@ -83,33 +86,13 @@ func (q *Queries) SearchCurrentStates(ctx context.Context, queries *CurrentState
 }
 
 func (q *Queries) latestState(ctx context.Context, projections ...table) (state *State, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	query, scan := prepareLatestState(ctx, q.client)
-	or := make(sq.Or, len(projections))
-	for i, projection := range projections {
-		or[i] = sq.Eq{CurrentStateColProjectionName.identifier(): projection.name}
-	}
-	stmt, args, err := query.
-		Where(or).
-		Where(sq.Eq{CurrentStateColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}).
-		OrderBy(CurrentStateColEventDate.identifier() + " DESC").
-		ToSql()
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
-	}
-
-	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
-		state, err = scan(row)
-		return err
-	}, stmt, args...)
-
-	return state, err
+	return latestState(ctx, q.client, projections...)
 }
 
 func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {
+	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := q.client.BeginTx(ctx, nil)
+	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}

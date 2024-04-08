@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -15,7 +17,7 @@ type LastFailed struct {
 	dbClient *sql.DB
 }
 
-func (mig *LastFailed) Execute(ctx context.Context) error {
+func (mig *LastFailed) Execute(ctx context.Context, _ eventstore.Event) error {
 	_, err := mig.dbClient.ExecContext(ctx, lastFailedStmts)
 	return err
 }

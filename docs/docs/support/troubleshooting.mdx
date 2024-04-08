@@ -73,3 +73,40 @@ The WebFinger requirement and setup is a step a user has to take outside of thei
 On their custom domain, e.g example.com, users need to host a WebFinger endpoint at https://example.com/.well-known/webfinger. When queried, this endpoint returns a JSON response detailing the issuer. Users would need to host the endpoint with the link to the ZITADEL issuer. Tailscale only looks up this endpoint once when a user signs up, and will only look up this endpoint again if the user needs to make a configuration change to their identity provider.
 
 The requirements and a set up guide is detailed in the [Tailscale documentation](https://tailscale.com/kb/1240/sso-custom-oidc/).
+
+## Login not possible. The organization of the user must be granted to the project
+
+![Organization must be granted Error](/img/support/login_not_possible_error.png)
+
+ZITADEL is not only capable of handling authentication but also authorization.
+This error message tells you, that a project grant is missing from the owner organization to the organization of the authenticating user.
+
+You do have two organizations, an owner (Organization A) and a customer (Organization B).
+The Organization A owns a Project, and has to grant it to Organization B, so users are allowed to authenticate.
+The error message is shown to users of Organization B that the permission is required, but the project is not granted to Organization B.
+![Project Grant Missing](/img/support/project_grant_missing.png)
+
+
+You do have two possibilities.
+1. Disable the permission check
+2. Give the permission to the organization
+
+### Disable the permission check
+
+1. Go to the organization, who owns the project, where the user tries to authenticate.
+2. Navigate to the general settings of the needed project
+3. Disable "Check for Project on Authentication"
+
+![Project Settings](/img/support/check_for_project_on_authentication.png)
+
+
+### Give the needed permission to the organization
+
+1. Go to the organization, who owns the project, where the user tries to authenticate.
+2. Navigate to the grants page of the needed project
+3. Click on the "New" button
+4. Search for the organization to which you want to grant the project (e.g Organization B)
+5. Select the roles you want to grant
+6. Click save
+
+![Project Grant for Organization B](/img/support/project_grant_for_customer_b.png)

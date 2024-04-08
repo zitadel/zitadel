@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"time"
 
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -394,11 +395,11 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string, orgIDPs []str
 		return nil, err
 	}
 	if !queriedLogin.IsDefault {
-		pwCheck := durationpb.New(queriedLogin.PasswordCheckLifetime)
-		externalLogin := durationpb.New(queriedLogin.ExternalLoginCheckLifetime)
-		mfaInitSkip := durationpb.New(queriedLogin.MFAInitSkipLifetime)
-		secondFactor := durationpb.New(queriedLogin.SecondFactorCheckLifetime)
-		multiFactor := durationpb.New(queriedLogin.MultiFactorCheckLifetime)
+		pwCheck := durationpb.New(time.Duration(queriedLogin.PasswordCheckLifetime))
+		externalLogin := durationpb.New(time.Duration(queriedLogin.ExternalLoginCheckLifetime))
+		mfaInitSkip := durationpb.New(time.Duration(queriedLogin.MFAInitSkipLifetime))
+		secondFactor := durationpb.New(time.Duration(queriedLogin.SecondFactorCheckLifetime))
+		multiFactor := durationpb.New(time.Duration(queriedLogin.MultiFactorCheckLifetime))
 
 		secondFactors := []policy_pb.SecondFactorType{}
 		for _, factor := range queriedLogin.SecondFactors {
@@ -978,7 +979,7 @@ func (s *Server) getNecessaryUserGrantsForOrg(ctx context.Context, org string, p
 		return nil, err
 	}
 
-	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}}, true, false)
+	queriedUserGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantSearchOrg}}, true)
 	if err != nil {
 		return nil, err
 	}

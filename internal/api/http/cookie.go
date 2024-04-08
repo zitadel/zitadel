@@ -10,9 +10,11 @@ import (
 )
 
 const (
-	prefixSecure = "__Secure-"
-	prefixHost   = "__Host-"
+	PrefixSecure cookiePrefix = "__Secure-"
+	PrefixHost   cookiePrefix = "__Host-"
 )
+
+type cookiePrefix string
 
 type CookieHandler struct {
 	securecookie *securecookie.SecureCookie
@@ -21,6 +23,7 @@ type CookieHandler struct {
 	sameSite     http.SameSite
 	path         string
 	maxAge       int
+	prefix       cookiePrefix
 }
 
 func NewCookieHandler(opts ...CookieHandlerOpt) *CookieHandler {
@@ -78,14 +81,17 @@ func WithMaxAge(maxAge int) CookieHandlerOpt {
 	}
 }
 
-func SetCookiePrefix(name, domain, path string, secureOnly bool) string {
+func WithPrefix(prefix cookiePrefix) CookieHandlerOpt {
+	return func(c *CookieHandler) {
+		c.prefix = prefix
+	}
+}
+
+func SetCookiePrefix(name string, secureOnly bool, prefix cookiePrefix) string {
 	if !secureOnly {
 		return name
 	}
-	if domain != "" || path != "/" {
-		return prefixSecure + name
-	}
-	return prefixHost + name
+	return string(prefix) + name
 }
 
 func (c *CookieHandler) GetCookieValue(r *http.Request, name string) (string, error) {
@@ -97,7 +103,7 @@ func (c *CookieHandler) GetCookieValue(r *http.Request, name string) (string, er
 }
 
 func (c *CookieHandler) GetEncryptedCookieValue(r *http.Request, name string, value interface{}) error {
-	cookie, err := r.Cookie(SetCookiePrefix(name, r.Host, c.path, c.secureOnly))
+	cookie, err := r.Cookie(SetCookiePrefix(name, c.secureOnly, c.prefix))
 	if err != nil {
 		return err
 	}
@@ -131,19 +137,28 @@ func (c *CookieHandler) DeleteCookie(w http.ResponseWriter, name string) {
 	c.httpSet(w, name, "", "", -1)
 }
 
-func (c *CookieHandler) httpSet(w http.ResponseWriter, name, domain, value string, maxage int) {
-	c.httpSetWithSameSite(w, name, domain, value, maxage, c.sameSite)
+func (c *CookieHandler) httpSet(w http.ResponseWriter, name, domain, value string, maxAge int) {
+	c.httpSetWithSameSite(w, name, domain, value, maxAge, c.sameSite)
 }
 
-func (c *CookieHandler) httpSetWithSameSite(w http.ResponseWriter, name, domain, value string, maxage int, sameSite http.SameSite) {
+func (c *CookieHandler) httpSetWithSameSite(w http.ResponseWriter, name, host, value string, maxAge int, sameSite http.SameSite) {
+	domain := strings.Split(host, ":")[0]
+	// same site none requires the secure flag, so we'll set it even if the cookie is set on non-TLS for localhost
+	secure := c.secureOnly || (sameSite == http.SameSiteNoneMode && domain == "localhost")
+	// prefix the cookie for secure cookies (TLS only, therefore not for samesite none on http://localhost)
+	prefixedName := SetCookiePrefix(name, c.secureOnly, c.prefix)
+	// in case the host prefix is set, we need to make sure the domain is not set (otherwise the browser will reject the cookie)
+	if secure && c.prefix == PrefixHost {
+		domain = ""
+	}
 	http.SetCookie(w, &http.Cookie{
-		Name:     SetCookiePrefix(name, domain, c.path, c.secureOnly),
+		Name:     prefixedName,
 		Value:    value,
-		Domain:   strings.Split(domain, ":")[0],
+		Domain:   domain,
 		Path:     c.path,
-		MaxAge:   maxage,
+		MaxAge:   maxAge,
 		HttpOnly: c.httpOnly,
-		Secure:   c.secureOnly,
+		Secure:   secure,
 		SameSite: sameSite,
 	})
 	varyValues := w.Header().Values("vary")

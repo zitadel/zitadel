@@ -294,10 +294,10 @@ func TestUserReadModel(t *testing.T) {
 		},
 	)
 
-	es.RegisterFilterEventMapper(UserAddedEventMapper()).
-		RegisterFilterEventMapper(UserFirstNameChangedMapper()).
-		RegisterFilterEventMapper(UserPasswordCheckedMapper()).
-		RegisterFilterEventMapper(UserDeletedMapper())
+	eventstore.RegisterFilterEventMapper(UserAddedEventMapper())
+	eventstore.RegisterFilterEventMapper(UserFirstNameChangedMapper())
+	eventstore.RegisterFilterEventMapper(UserPasswordCheckedMapper())
+	eventstore.RegisterFilterEventMapper(UserDeletedMapper())
 
 	events, err := es.Push(context.Background(),
 		NewUserAddedEvent("1", "hodor"),

@@ -19,9 +19,9 @@ type StepStates struct {
 func (*StepStates) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
-		AggregateTypes(aggregateType).
-		AggregateIDs(aggregateID).
-		EventTypes(StartedType, doneType, repeatableDoneType, failedType).
+		AggregateTypes(SystemAggregate).
+		AggregateIDs(SystemAggregateID).
+		EventTypes(StartedType, DoneType, repeatableDoneType, failedType).
 		Builder()
 }
 
@@ -38,7 +38,7 @@ func (s *StepStates) Reduce() error {
 		switch step.EventType {
 		case StartedType:
 			state.state = StepStarted
-		case doneType:
+		case DoneType:
 			state.state = StepDone
 		case repeatableDoneType:
 			state.state = StepDone

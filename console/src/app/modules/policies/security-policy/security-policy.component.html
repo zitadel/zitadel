@@ -1,23 +1,27 @@
-<h2>{{ 'SETTINGS.LIST.SECURITY' | translate }}</h2>
+<h2>{{ 'DESCRIPTIONS.SETTINGS.SECURITY.TITLE' | translate }}</h2>
+<p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.SECURITY.DESCRIPTION' | translate }}</p>
 
 <div class="spinner-wr">
   <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
 </div>
 
 <div class="security-wrapper">
-  <cnsl-info-section [type]="InfoSectionType.ALERT">{{ 'SETTING.SECURITY.DESCRIPTION' | translate }}</cnsl-info-section>
+  <h3>{{ 'SETTING.SECURITY.IFRAMETITLE' | translate }}</h3>
 
   <mat-checkbox
     card-actions
     class="security-policy-toggle"
     color="primary"
     ngDefaultControl
-    (change)="enabledChanged($event)"
-    [(ngModel)]="enabled"
+    (change)="iframeEnabledChanged($event)"
+    [(ngModel)]="iframeEnabled"
     [disabled]="(['iam.policy.write'] | hasRole | async) === false"
   >
     {{ 'SETTING.SECURITY.IFRAMEENABLED' | translate }}
   </mat-checkbox>
+  <cnsl-info-section [type]="InfoSectionType.ALERT">{{
+    'SETTING.SECURITY.IFRAMEDESCRIPTION' | translate
+  }}</cnsl-info-section>
 
   <form class="security-allowed-originsform" (ngSubmit)="add(redInput)">
     <cnsl-form-field class="formfield">
@@ -29,14 +33,14 @@
       matTooltip="{{ 'ACTIONS.ADD' | translate }}"
       type="submit"
       mat-icon-button
-      [disabled]="!enabled || originsControl.invalid || (['iam.policy.write'] | hasRole | async) === false"
+      [disabled]="!iframeEnabled || originsControl.invalid || (['iam.policy.write'] | hasRole | async) === false"
     >
       <mat-icon>add</mat-icon>
     </button>
   </form>
 
   <div class="security-allowed-uris-list">
-    <div *ngFor="let uri of originsList" class="uri-line" [ngClass]="{ disabled: !enabled }">
+    <div *ngFor="let uri of originsList" class="uri-line" [ngClass]="{ disabled: !iframeEnabled }">
       <span class="uri">{{ uri }}</span>
       <span class="fill-space"></span>
 
@@ -45,6 +49,21 @@
       </button>
     </div>
   </div>
+
+  <h3>{{ 'SETTING.SECURITY.IMPERSONATIONTITLE' | translate }}</h3>
+  <mat-checkbox
+    card-actions
+    class="security-policy-toggle"
+    color="primary"
+    ngDefaultControl
+    [(ngModel)]="impersonationEnabled"
+    [disabled]="(['iam.policy.write'] | hasRole | async) === false"
+  >
+    {{ 'SETTING.SECURITY.IMPERSONATIONENABLED' | translate }}
+  </mat-checkbox>
+  <cnsl-info-section [type]="InfoSectionType.INFO">{{
+    'SETTING.SECURITY.IMPERSONATIONDESCRIPTION' | translate
+  }}</cnsl-info-section>
 </div>
 
 <div class="general-btn-container">

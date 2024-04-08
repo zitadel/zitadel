@@ -1,0 +1,105 @@
+---
+title: Go
+sidebar_label: Go
+---
+
+<table>
+    <tr>
+        <td width="100px">
+            <img width="100px" src="/docs/img/tech/golang.svg" alt="go logo"/>
+        </td>
+        <td>
+            <a href="https://go.dev/" target="_blank">Go</a> is an open-source, compiled programming language that is known for its simplicity, efficiency, and concurrency capabilities.
+            Get started integrating authentication to your Go Application by checking out our <a href="https://github.com/zitadel/zitadel-go" target="_blank">zitadel-go</a> SDK.
+        </td>
+    </tr>
+</table>
+
+
+### Resources
+- [Example App Repository](https://github.com/zitadel/zitadel-go)
+- [Go SDK](https://github.com/zitadel/zitadel-go)
+- [Web APP Step-By-Step Guide](/docs/examples/login/go)
+- [API APP Step-By-Step Guide](/docs/examples/secure-api/go)
+- [Go OIDC Library](https://github.com/zitadel/oidc)
+
+### Go SDK
+
+The [zitadel-go](https://github.com/zitadel/zitadel-go) SDK is a wrapper around the [zitadel/oidc](https://github.com/zitadel/oidc) to integrate Login into your Web App and abstracts the handling of specific configurations for ZITADEL.
+Additionally secure your business APIs and handle permission checks for your users.
+Last part is the integration of the ZITADEL APIs to handle user and resource management.
+
+The following features are covered by the SDK:
+- Authentication in your Web App
+    - Authenticate your user with ZITADEL using OIDC
+    - Requesting ZITADEL userinfo endpoint to get user data
+    - Refresh Token
+    - Requesting User Roles from userinfo
+    - Check if user has specified role
+    - Logout
+- Secure your APIs
+    - Authorization Check using OAuth2 Introspection
+    - Check User Roles on Endpoint
+- Manage Resources through ZITADEL APIs
+    - Authenticate Service User
+    - Generated gRPC Clients for integrating ZITADEL API
+    - User, Organization, Project, etc. Management
+
+The goal is to extend the SDK over the time with the following features:
+- Build your own login UI using our Session API
+
+### Go Examples
+
+You can find different examples for building your Go application in the following package of the repository:
+[zitadel-go/example](https://github.com/zitadel/zitadel-go/tree/next/example)
+
+#### Web Application Example
+
+What does the Web Application Example include:
+- Home Page with Login Button
+- Authenticating user with OIDC PKCE Flow
+- Public Page: Accessible without authentication
+- Private Page: Shows user information of authenticated user, only accessible after login
+- Logout
+
+[Example Web App](https://github.com/zitadel/zitadel-go/tree/next/example/app)
+
+#### API Application Example
+
+What does the API Application Example include:
+- REST API Application secured with Spring Security and OAuth2
+- Public Endpoint: Accessible without authentication
+- Private Endpoint: Accessible with a token
+- Administrator Endpoint: Accessible with a token of a user with admin role
+
+[Example API App](https://github.com/zitadel/zitadel-go/tree/next/example/api/http)
+
+### Step-By-Step Guide
+
+For Go we do have two different Step-By-Step Guides.
+One to create your web application with integrated login and one to create your API with permission checks for calling users.
+The guides lead you through the whole process from configuring the right application in ZITADEL to a ready application with integrated login or authentication checks.
+
+#### Web Application Guide
+
+After completing the Step-By-Step Guide you will have:
+1. Example Web Application with integrated ZITADEL Login
+2. Example page accessible by authenticated user showing retrieved user information
+4. Logout
+5. Correct setup for your application in ZITADEL
+
+[Web APP Step-By-Step Guide](/docs/examples/login/go)
+
+![Home Page](/img/go/app-home.png)
+![Profile Page](/img/go/app-profile.png)
+
+#### API Application Guide
+
+After completing the Step-By-Step Guide you will have:
+1. Example REST API checking tokens against ZITADEL with OAuth2
+2. Public Endpoint accessible by any user
+3. Private Endpoint accessible by authenticated user
+4. Private Endpoint accessible by user with role 'admin'
+5. Correct setup for your application in ZITADEL
+
+[API APP Step-By-Step Guide](/docs/examples/secure-api/go)

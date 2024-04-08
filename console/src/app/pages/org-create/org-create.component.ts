@@ -21,6 +21,7 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { LanguagesService } from '../../services/languages.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 @Component({
   selector: 'cnsl-org-create',
@@ -59,6 +60,7 @@ export class OrgCreateComponent {
     private _location: Location,
     private fb: UntypedFormBuilder,
     private mgmtService: ManagementService,
+    private authService: GrpcAuthService,
     public langSvc: LanguagesService,
     breadcrumbService: BreadcrumbService,
   ) {
@@ -101,6 +103,7 @@ export class OrgCreateComponent {
     this.adminService
       .SetUpOrg(createOrgRequest, humanRequest)
       .then(() => {
+        this.authService.revalidateOrgs();
         this.router.navigate(['/orgs']);
       })
       .catch((error) => {
@@ -191,6 +194,7 @@ export class OrgCreateComponent {
       this.mgmtService
         .addOrg(this.name.value)
         .then(() => {
+          this.authService.revalidateOrgs();
           this.router.navigate(['/orgs']);
         })
         .catch((error) => {

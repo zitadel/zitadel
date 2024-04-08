@@ -280,8 +280,7 @@ func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
 }
 
 func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
-	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &command.AddLink{
+	details, err := s.command.AddUserIDPLink(ctx, req.UserId, "", &command.AddLink{
 		IDPID:         req.GetIdpLink().GetIdpId(),
 		DisplayName:   req.GetIdpLink().GetUserName(),
 		IDPExternalID: req.GetIdpLink().GetUserId(),
@@ -315,7 +314,7 @@ func (s *Server) removeUserDependencies(ctx context.Context, userID string) ([]*
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
 		Queries: []query.SearchQuery{userGrantUserQuery},
-	}, true, true)
+	}, true)
 	if err != nil {
 		return nil, nil, err
 	}

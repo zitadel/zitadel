@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -18,12 +18,16 @@ import (
 
 func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionRequest]) (resp *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
-	if s.features.LegacyIntrospection {
+	features := authz.GetFeatures(ctx)
+	if features.LegacyIntrospection {
 		return s.LegacyServer.Introspect(ctx, r)
 	}
-	if s.features.TriggerIntrospectionProjections {
+	if features.TriggerIntrospectionProjections {
 		// Execute all triggers in one concurrent sweep.
 		query.TriggerIntrospectionProjections(ctx)
 	}
@@ -101,16 +105,19 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		return nil, err
 	}
 	introspectionResp := &oidc.IntrospectionResponse{
-		Active:     true,
-		Scope:      token.scope,
-		ClientID:   token.clientID,
-		TokenType:  oidc.BearerToken,
-		Expiration: oidc.FromTime(token.tokenExpiration),
-		IssuedAt:   oidc.FromTime(token.tokenCreation),
-		NotBefore:  oidc.FromTime(token.tokenCreation),
-		Audience:   token.audience,
-		Issuer:     op.IssuerFromContext(ctx),
-		JWTID:      token.tokenID,
+		Active:                          true,
+		Scope:                           token.scope,
+		ClientID:                        token.clientID,
+		TokenType:                       oidc.BearerToken,
+		Expiration:                      oidc.FromTime(token.tokenExpiration),
+		IssuedAt:                        oidc.FromTime(token.tokenCreation),
+		AuthTime:                        oidc.FromTime(token.authTime),
+		NotBefore:                       oidc.FromTime(token.tokenCreation),
+		Audience:                        token.audience,
+		AuthenticationMethodsReferences: AuthMethodTypesToAMR(token.authMethods),
+		Issuer:                          op.IssuerFromContext(ctx),
+		JWTID:                           token.tokenID,
+		Actor:                           actorDomainToClaims(token.actor),
 	}
 	introspectionResp.SetUserInfo(userInfo)
 	return op.NewResponse(introspectionResp), nil
@@ -141,8 +148,8 @@ func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCrede
 			return client.ClientID, client.ProjectID, nil
 
 		}
-		if client.ClientSecret != nil {
-			if err := crypto.CompareHash(client.ClientSecret, []byte(cc.ClientSecret), s.hashAlg); err != nil {
+		if client.HashedSecret != "" {
+			if err := s.introspectionClientSecretAuth(ctx, client, cc.ClientSecret); err != nil {
 				return "", "", oidc.ErrUnauthorizedClient().WithParent(err)
 			}
 			return client.ClientID, client.ProjectID, nil
@@ -157,6 +164,35 @@ func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCrede
 		projectID: projectID,
 		err:       err,
 	}
+}
+
+var errNoAppType = errors.New("introspection client without app type")
+
+func (s *Server) introspectionClientSecretAuth(ctx context.Context, client *query.IntrospectionClient, secret string) error {
+	var (
+		successCommand func(ctx context.Context, appID, projectID, resourceOwner, updated string)
+		failedCommand  func(ctx context.Context, appID, projectID, resourceOwner string)
+	)
+	switch client.AppType {
+	case query.AppTypeAPI:
+		successCommand = s.command.APISecretCheckSucceeded
+		failedCommand = s.command.APISecretCheckFailed
+	case query.AppTypeOIDC:
+		successCommand = s.command.OIDCSecretCheckSucceeded
+		failedCommand = s.command.OIDCSecretCheckFailed
+	default:
+		return zerrors.ThrowInternal(errNoAppType, "OIDC-ooD5Ot", "Errors.Internal")
+	}
+
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
+	updated, err := s.hasher.Verify(client.HashedSecret, secret)
+	spanPasswordComparison.EndWithError(err)
+	if err != nil {
+		failedCommand(ctx, client.AppID, client.ProjectID, client.ResourceOwner)
+		return err
+	}
+	successCommand(ctx, client.AppID, client.ProjectID, client.ResourceOwner, updated)
+	return nil
 }
 
 // clientFromCredentials parses the client ID early,

@@ -14,6 +14,7 @@ services:
       - PGUSER=zitadel
       - POSTGRES_DB=zitadel
       - POSTGRES_HOST_AUTH_METHOD=trust
+    command: postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: '10s'

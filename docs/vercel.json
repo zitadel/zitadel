@@ -19,6 +19,26 @@
         { "source": "/docs/apis/mgmt/:slug*", "destination": "/docs/apis/resources/mgmt/:slug*", "permanent": true },
         { "source": "/docs/apis/auth/:slug*", "destination": "/docs/apis/resources/auth/:slug*", "permanent": true },
         { "source": "/docs/apis/system/:slug*", "destination": "/docs/apis/resources/system/:slug*", "permanent": true },
-        { "source": "/docs/apis/admin/:slug*", "destination": "/docs/apis/resources/admin/:slug*", "permanent": true }
+        { "source": "/docs/apis/admin/:slug*", "destination": "/docs/apis/resources/admin/:slug*", "permanent": true },
+        { "source": "/docs/guides/integrate/human-users", "destination": "/docs/guides/integrate/login", "permanent": true },
+        { "source": "/docs/guides/solution-scenarios/device-authorization", "destination": "/docs/guides/integrate/login/oidc/device-authorization", "permanent": true },
+        { "source": "/docs/guides/integrate/oauth-recommended-flows", "destination": "/docs/guides/integrate/login/oidc/oauth-recommended-flows", "permanent": true },
+        { "source": "/docs/guides/integrate/login-users", "destination": "/docs/guides/integrate/login/oidc/login-users", "permanent": true },
+        { "source": "/docs/guides/integrate/logout", "destination": "/docs/guides/integrate/login/oidc/logout", "permanent": true },
+        { "source": "/docs/guides/solution-scenarios/onboarding", "destination": "/docs/guides/integrate/onboarding", "permanent": true },
+        { "source": "/docs/guides/solution-scenarios/onboarding/b2b", "destination": "/docs/guides/integrate/onboarding/b2b", "permanent": true },
+        { "source": "/docs/guides/solution-scenarios/onboarding/end-users", "destination": "/docs/guides/integrate/onboarding/end-users", "permanent": true },
+        { "source": "/docs/concepts/structure/jwt_idp", "destination": "/docs/guides/integrate/identity-providers/jwt-idp", "permanent": true },
+        { "source": "/docs/guides/solution-scenarios/onboarding/end-users", "destination": "/docs/guides/integrate/onboarding/end-users", "permanent": true },
+        { "source": "/docs/guides/integrate/serviceusers", "destination": "/docs/guides/integrate/service-users/authenticate-service-users", "permanent": true },
+        { "source": "/docs/guides/integrate/private-key-jwt", "destination": "/docs/guides/integrate/service-users/private-key-jwt", "permanent": true },
+        { "source": "/docs/guides/integrate/client-credentials", "destination": "/docs/guides/integrate/service-users/client-credentials", "permanent": true },
+        { "source": "/docs/guides/integrate/pat", "destination": "/docs/guides/integrate/service-users/private-access-token", "permanent": true },
+        { "source": "/docs/guides/integrate/access-zitadel-apis", "destination": "/docs/guides/integrate/zitadel-apis/access-zitadel-apis", "permanent": true },
+        { "source": "/docs/guides/integrate/access-zitadel-system-api", "destination": "/docs/guides/integrate/zitadel-apis/access-zitadel-system-api", "permanent": true },
+        { "source": "/docs/guides/integrate/event-api", "destination": "/docs/guides/integrate/zitadel-apis/event-api", "permanent": true },
+        { "source": "/docs/examples/call-zitadel-api/go", "destination": "/docs/guides/integrate/zitadel-apis/example-zitadel-api-with-go", "permanent": true },
+        { "source": "/docs/examples/call-zitadel-api/dot-net", "destination": "/docs/guides/integrate/zitadel-apis/example-zitadel-api-with-dot-net", "permanent": true },
+        { "source": "/docs/guides/integrate/identity-providers", "destination": "/docs/guides/integrate/identity-providers/introduction", "permanent": true }
     ]
 }

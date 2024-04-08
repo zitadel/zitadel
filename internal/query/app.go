@@ -42,8 +42,8 @@ type App struct {
 
 type OIDCApp struct {
 	RedirectURIs             database.TextArray[string]
-	ResponseTypes            database.Array[domain.OIDCResponseType]
-	GrantTypes               database.Array[domain.OIDCGrantType]
+	ResponseTypes            database.NumberArray[domain.OIDCResponseType]
+	GrantTypes               database.NumberArray[domain.OIDCGrantType]
 	AppType                  domain.OIDCApplicationType
 	ClientID                 string
 	AuthMethodType           domain.OIDCAuthMethodType
@@ -476,9 +476,16 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries, wit
 	return apps, err
 }
 
-func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries) (ids []string, err error) {
+func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries, shouldTriggerBulk bool) (ids []string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerAppProjection")
+		ctx, err = projection.AppProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
+	}
 
 	query, scan := prepareClientIDsQuery(ctx, q.client)
 	eq := sq.Eq{AppColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID()}
@@ -828,8 +835,8 @@ type sqlOIDCConfig struct {
 	iDTokenUserinfoAssertion sql.NullBool
 	clockSkew                sql.NullInt64
 	additionalOrigins        database.TextArray[string]
-	responseTypes            database.Array[domain.OIDCResponseType]
-	grantTypes               database.Array[domain.OIDCGrantType]
+	responseTypes            database.NumberArray[domain.OIDCResponseType]
+	grantTypes               database.NumberArray[domain.OIDCGrantType]
 	skipNativeAppSuccessPage sql.NullBool
 }
 

@@ -1,0 +1,53 @@
+<div class="configuration-wrapper">
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.NAME' | translate }}
+    </span>
+    <span class="right name">
+      <span>{{ name }}</span>
+      <button (click)="changeName.emit()" mat-icon-button><i class="las la-pen"></i></button>
+    </span>
+  </div>
+
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.TYPE' | translate }}
+    </span>
+    <span class="right">
+      {{ 'APP.OIDC.APPTYPE.' + configuration.appType | translate }}
+    </span>
+  </div>
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.GRANT' | translate }}
+    </span>
+    <span class="right" *ngIf="configuration.grantTypesList && configuration.grantTypesList.length > 0">
+      [<span *ngFor="let element of configuration.grantTypesList ?? []; index as i">
+        {{ 'APP.OIDC.GRANT.' + element | translate }}
+        {{ i < configuration.grantTypesList.length - 1 ? ', ' : '' }} </span
+      >]
+    </span>
+  </div>
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.OIDC.RESPONSETYPE' | translate }}
+    </span>
+    <span class="right" *ngIf="configuration.responseTypesList && configuration.responseTypesList.length > 0">
+      [<span *ngFor="let element of configuration.responseTypesList ?? []; index as i">
+        {{ 'APP.OIDC.RESPONSE.' + element | translate }}
+        {{ i < configuration.responseTypesList.length - 1 ? ', ' : '' }} </span
+      >]
+    </span>
+  </div>
+
+  <div class="row">
+    <span class="left cnsl-secondary-text">
+      {{ 'APP.AUTHMETHOD' | translate }}
+    </span>
+    <span class="right">
+      <span>
+        {{ 'APP.OIDC.AUTHMETHOD.' + configuration.authMethodType | translate }}
+      </span>
+    </span>
+  </div>
+</div>

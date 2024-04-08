@@ -4,7 +4,6 @@ package oidc_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -43,10 +42,10 @@ func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code)
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// test actual userinfo
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
@@ -152,10 +151,10 @@ func TestServer_Introspect(t *testing.T) {
 
 			// code exchange
 			code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-			tokens, err := exchangeTokens(t, app.GetClientId(), code)
+			tokens, err := exchangeTokens(t, app.GetClientId(), code, redirectURI)
 			require.NoError(t, err)
 			assertTokens(t, tokens, true)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 			// test actual introspection
 			introspection, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
@@ -214,9 +213,9 @@ func assertIntrospection(
 	assertOIDCTime(t, introspection.UpdatedAt, User.GetDetails().GetChangeDate().AsTime())
 
 	require.NotNil(t, introspection.Claims)
-	assert.Equal(t, User.Details.ResourceOwner, introspection.Claims[oidc_api.ClaimResourceOwner+"id"])
-	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwner+"name"])
-	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwner+"primary_domain"])
+	assert.Equal(t, User.Details.ResourceOwner, introspection.Claims[oidc_api.ClaimResourceOwnerID])
+	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwnerName])
+	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
 }
 
 // TestServer_VerifyClient tests verification by running code flow tests
@@ -330,8 +329,6 @@ func TestServer_VerifyClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fmt.Printf("\n\n%s\n\n", tt.client.keyData)
-
 			authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, tt.client.authReqClientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, oidc.ScopeOpenID)
 			require.NoError(t, err)
 			linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -363,7 +360,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assertTokens(t, tokens, false)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 		})
 	}
 }

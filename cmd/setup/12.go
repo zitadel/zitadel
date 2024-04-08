@@ -5,6 +5,7 @@ import (
 	_ "embed"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -16,7 +17,7 @@ type AddOTPColumns struct {
 	dbClient *database.DB
 }
 
-func (mig *AddOTPColumns) Execute(ctx context.Context) error {
+func (mig *AddOTPColumns) Execute(ctx context.Context, _ eventstore.Event) error {
 	_, err := mig.dbClient.ExecContext(ctx, addOTPColumns)
 	return err
 }

@@ -2,7 +2,7 @@ import { apiAuth } from '../../support/api/apiauth';
 import { ensureOIDCSettingsSet } from '../../support/api/oidc-settings';
 
 describe('oidc settings', () => {
-  const oidcSettingsPath = `/settings?id=oidc`;
+  const oidcSettingsPath = `/instance?id=oidc`;
   const accessTokenPrecondition = 1;
   const idTokenPrecondition = 2;
   const refreshTokenExpirationPrecondition = 7;

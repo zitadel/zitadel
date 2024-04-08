@@ -458,6 +458,41 @@ service SystemService {
     };
   }
 
+  // Sets many instance level limits
+  rpc BulkSetLimits(BulkSetLimitsRequest) returns (BulkSetLimitsResponse) {
+    option (google.api.http) = {
+      put: "/instances/limits/_bulk"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "system.limits.write";
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      tags: ["Usage Control", "Limits"];
+      responses: {
+        key: "200";
+        value: {
+          description: "Instance limits set";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "At least one limit must be specified for each instance";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+
+
   // Resets instance level limits
   rpc ResetLimits(ResetLimitsRequest) returns (ResetLimitsResponse) {
     option (google.api.http) = {
@@ -769,10 +804,25 @@ message SetLimitsRequest {
       description: "auditLogRetention limits the number of events that can be queried via the events API by their age. A value of '0s' means that all events are available. If this value is set, it overwrites the system default.";
     }
   ];
+  optional bool block = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "if block is true, requests are responded with a resource exhausted error code.";
+    }
+  ];
 }
+
 
 message SetLimitsResponse {
   zitadel.v1.ObjectDetails details = 1;
+}
+
+message BulkSetLimitsRequest {
+  repeated SetLimitsRequest limits = 1;
+}
+
+message BulkSetLimitsResponse {
+  zitadel.v1.ObjectDetails details = 1;
+  repeated zitadel.v1.ObjectDetails target_details = 2;
 }
 
 message ResetLimitsRequest {

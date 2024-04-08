@@ -3,12 +3,12 @@ package oidc
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"golang.org/x/exp/slog"
 
 	"github.com/zitadel/zitadel/internal/api/assets"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -42,7 +42,7 @@ type Config struct {
 	DeviceAuth                        *DeviceAuthorizationConfig
 	DefaultLoginURLV2                 string
 	DefaultLogoutURLV2                string
-	Features                          Features
+	PublicKeyCacheMaxAge              time.Duration
 }
 
 type EndpointConfig struct {
@@ -59,11 +59,6 @@ type EndpointConfig struct {
 type Endpoint struct {
 	Path string
 	URL  string
-}
-
-type Features struct {
-	TriggerIntrospectionProjections bool
-	LegacyIntrospection             bool
 }
 
 type OPStorage struct {
@@ -85,6 +80,7 @@ type OPStorage struct {
 }
 
 func NewServer(
+	ctx context.Context,
 	config Config,
 	defaultLogoutRedirectURI string,
 	externalSecure bool,
@@ -98,18 +94,23 @@ func NewServer(
 	userAgentCookie, instanceHandler func(http.Handler) http.Handler,
 	accessHandler *middleware.AccessInterceptor,
 	fallbackLogger *slog.Logger,
+	hashConfig crypto.HashConfig,
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
 	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
-	var options []op.Option
+	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, query.GetPublicKeyByID)
+	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
+	idTokenHintKeySet := newOidcKeySet(keyCache)
+
+	options := []op.Option{
+		op.WithAccessTokenKeySet(accessTokenKeySet),
+		op.WithIDTokenHintKeySet(idTokenHintKeySet),
+	}
 	if !externalSecure {
 		options = append(options, op.WithAllowInsecure())
-	}
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
 	provider, err := op.NewProvider(
 		opConfig,
@@ -120,40 +121,45 @@ func NewServer(
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider")
 	}
-
+	hasher, err := hashConfig.NewHasher()
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "OIDC-Aij4e", "cannot create secret hasher")
+	}
 	server := &Server{
 		LegacyServer:               op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
-		features:                   config.Features,
 		repo:                       repo,
 		query:                      query,
 		command:                    command,
-		keySet:                     newKeySet(context.TODO(), time.Hour, query.GetActivePublicKeyByID),
+		accessTokenKeySet:          accessTokenKeySet,
+		idTokenHintKeySet:          idTokenHintKeySet,
 		defaultLoginURL:            fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID),
 		defaultLoginURLV2:          config.DefaultLoginURLV2,
 		defaultLogoutURLV2:         config.DefaultLogoutURLV2,
 		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime,
 		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime,
 		fallbackLogger:             fallbackLogger,
-		hashAlg:                    crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
+		hasher:                     hasher,
 		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
 		assetAPIPrefix:             assets.AssetAPI(externalSecure),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	server.Handler = op.RegisterLegacyServer(server, op.WithHTTPMiddleware(
-		middleware.MetricsHandler(metricTypes),
-		middleware.TelemetryHandler(),
-		middleware.NoCacheInterceptor().Handler,
-		instanceHandler,
-		userAgentCookie,
-		http_utils.CopyHeadersToContext,
-		accessHandler.HandleIgnorePathPrefixes(ignoredQuotaLimitEndpoint(config.CustomEndpoints)),
-		middleware.ActivityHandler,
-	))
+	server.Handler = op.RegisterLegacyServer(server,
+		op.WithFallbackLogger(fallbackLogger),
+		op.WithHTTPMiddleware(
+			middleware.MetricsHandler(metricTypes),
+			middleware.TelemetryHandler(),
+			middleware.NoCacheInterceptor().Handler,
+			instanceHandler,
+			userAgentCookie,
+			http_utils.CopyHeadersToContext,
+			accessHandler.HandleWithPublicAuthPathPrefixes(publicAuthPathPrefixes(config.CustomEndpoints)),
+			middleware.ActivityHandler,
+		))
 
 	return server, nil
 }
 
-func ignoredQuotaLimitEndpoint(endpoints *EndpointConfig) []string {
+func publicAuthPathPrefixes(endpoints *EndpointConfig) []string {
 	authURL := op.DefaultEndpoints.Authorization.Relative()
 	keysURL := op.DefaultEndpoints.JwksURI.Relative()
 	if endpoints == nil {

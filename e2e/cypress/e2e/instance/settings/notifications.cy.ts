@@ -1,6 +1,6 @@
-const notificationPath = `/settings?id=notifications`;
-const smtpPath = `/settings?id=smtpprovider`;
-const smsPath = `/settings?id=smsprovider`;
+const notificationPath = `/instance?id=notifications`;
+const smtpPath = `/instance?id=smtpprovider`;
+const smsPath = `/instance?id=smsprovider`;
 
 beforeEach(() => {
   cy.context().as('ctx');

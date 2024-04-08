@@ -2,13 +2,13 @@ package oidc
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"golang.org/x/exp/slog"
 
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
@@ -21,12 +21,12 @@ import (
 type Server struct {
 	http.Handler
 	*op.LegacyServer
-	features Features
 
-	repo    repository.Repository
-	query   *query.Queries
-	command *command.Commands
-	keySet  *keySetCache
+	repo              repository.Repository
+	query             *query.Queries
+	command           *command.Commands
+	accessTokenKeySet *oidcKeySet
+	idTokenHintKeySet *oidcKeySet
 
 	defaultLoginURL            string
 	defaultLoginURLV2          string
@@ -35,7 +35,7 @@ type Server struct {
 	defaultIdTokenLifetime     time.Duration
 
 	fallbackLogger      *slog.Logger
-	hashAlg             crypto.HashAlgorithm
+	hasher              *crypto.Hasher
 	signingKeyAlgorithm string
 	assetAPIPrefix      func(ctx context.Context) string
 }
@@ -110,10 +110,13 @@ func (s *Server) Ready(ctx context.Context, r *op.Request[struct{}]) (_ *op.Resp
 
 func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	restrictions, err := s.query.GetInstanceRestrictions(ctx)
 	if err != nil {
-		return nil, err
+		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithDescription("internal server error"), http.StatusInternalServerError)
 	}
 	allowedLanguages := restrictions.AllowedLanguages
 	if len(allowedLanguages) == 0 {
@@ -169,13 +172,6 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 	defer func() { span.EndWithError(err) }()
 
 	return s.LegacyServer.JWTProfile(ctx, r)
-}
-
-func (s *Server) TokenExchange(ctx context.Context, r *op.ClientRequest[oidc.TokenExchangeRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.TokenExchange(ctx, r)
 }
 
 func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequest[oidc.ClientCredentialsRequest]) (_ *op.Response, err error) {

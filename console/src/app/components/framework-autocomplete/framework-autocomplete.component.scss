@@ -1,0 +1,69 @@
+@mixin framework-autocomplete-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: map-get($primary, 500);
+
+  $warn-color: map-get($warn, 500);
+  $accent-color: map-get($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  $list-background-color: map-get($background, 300);
+  $card-background-color: map-get($background, cards);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $border-selected-color: if($is-dark-theme, #fff, #000);
+
+  .full-width {
+    width: 100%;
+  }
+
+  input {
+    max-width: 500px;
+  }
+
+  .framework-option {
+    display: flex;
+    align-items: center;
+
+    .framework-option-column {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+
+      span {
+        line-height: normal;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .img-wrapper {
+        width: 50px;
+        margin-right: 1rem;
+
+        img {
+          width: 100%;
+          height: 100%;
+          max-width: 30px;
+          max-height: 30px;
+          object-fit: contain;
+          object-position: center;
+        }
+      }
+
+      .dark-only {
+        display: if($is-dark-theme, block, none);
+      }
+
+      .light-only {
+        display: if($is-dark-theme, none, block);
+      }
+    }
+  }
+}

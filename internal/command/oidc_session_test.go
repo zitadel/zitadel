@@ -196,7 +196,7 @@ func TestCommands_AddOIDCSessionAccessToken(t *testing.T) {
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"at_accessTokenID", []string{"openid"}, time.Hour),
+							"at_accessTokenID", []string{"openid"}, time.Hour, domain.TokenReasonAuthRequest, nil),
 						authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 					),
 				),
@@ -397,7 +397,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"}, []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour),
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
 						oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -441,7 +441,7 @@ func TestCommands_AddOIDCSessionRefreshAndAccessToken(t *testing.T) {
 
 func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 	type fields struct {
-		eventstore                      *eventstore.Eventstore
+		eventstore                      func(*testing.T) *eventstore.Eventstore
 		idGenerator                     id.Generator
 		defaultAccessTokenLifetime      time.Duration
 		defaultRefreshTokenLifetime     time.Duration
@@ -469,7 +469,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 		{
 			"invalid refresh token format error",
 			fields{
-				eventstore:   eventstoreExpect(t),
+				eventstore:   expectEventstore(),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
@@ -484,7 +484,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 		{
 			"inactive session error",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
@@ -501,7 +501,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 		{
 			"invalid refresh token error",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -509,7 +509,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						),
 						eventFromEventPusher(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
 						),
 					),
 				),
@@ -527,7 +527,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 		{
 			"expired refresh token error",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -535,7 +535,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						),
 						eventFromEventPusher(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
 						),
 						eventFromEventPusher(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -557,7 +557,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 		{
 			"refresh successful",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -565,7 +565,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -575,7 +575,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour),
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonRefresh, nil),
 						oidcsession.NewRefreshTokenRenewedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"rt_refreshTokenID2", 24*time.Hour),
 					),
@@ -602,7 +602,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:                      tt.fields.eventstore,
+				eventstore:                      tt.fields.eventstore(t),
 				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
@@ -682,7 +682,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 						),
 						eventFromEventPusher(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
 						),
 					),
 				),
@@ -707,7 +707,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 						),
 						eventFromEventPusher(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
 						),
 						eventFromEventPusher(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -736,7 +736,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -892,7 +892,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -969,7 +969,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour),
+								"at_accessTokenID", []string{"openid", "profile", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
 						),
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,

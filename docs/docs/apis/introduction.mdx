@@ -14,8 +14,21 @@ The [OpenID Connect & OAuth endpoints](/docs/apis/openidoauth/endpoints) and [SA
 
 ## Authentication & authorization
 
+### Authentication for human users (interactive)
+
 ZITADEL implements industry standards such as OpenID Connect, OAuth 2.0, or SAML for authentication.
-Please refer to our guides how to [authenticate users](/docs/guides/integrate/human-users) through an interactive authentication process and how to [authenticate service users](/docs/guides/integrate/serviceusers) with a programmatic authentication.
+Please refer to our guides how to [authenticate users](/docs/guides/integrate/login/login-users) through an interactive authentication process.
+
+For user authentication on devices with limited accessibility (eg, SmartTV, Smart Watch etc.) use the [device authorization grant](/docs/guides/integrate/login/oidc/device-authorization).
+
+Additionally, you can use the [session API](../apis/resources/session_service/) to authenticate users, for example by building a [custom login UI](/docs/guides/integrate/login-ui/).
+
+### Authenticate service users and machines
+
+Service users allow for machine-to-machine (M2M) communication.
+Follow the guides to learn how to [authenticate service users](/docs/guides/integrate/service-users/authenticate-service-users).
+
+Accessing the ZITADEL APIs through a service user might require additional steps, please follow the guide on how to [access ZITADEL APIs](../guides/integrate/zitadel-apis/access-zitadel-apis) to include the correct audience scope in your requests.
 
 ### OpenID Connect & OAuth
 
@@ -39,7 +52,7 @@ Refer to our guide to learn how to [build your own login UI](/docs/guides/integr
 
 ## ZITADEL APIs (resource-based)
 
-ZITADEL provides APIs for each [core resource](/docs/apis/resources):
+ZITADEL provides APIs for each [core resource](/docs/apis/v2):
 
 - [User](/docs/apis/resources/user_service)
 - [Session](/docs/apis/resources/session_service)
@@ -163,7 +176,7 @@ API Reference:
 
 This API is intended to manage the different ZITADEL instances within the system.
 
-Checkout the guide how to [access the ZITADEL System API](/guides/integrate/access-zitadel-system-api).
+Checkout the guide how to [access the ZITADEL System API](/docs/guides/integrate/zitadel-apis/access-zitadel-system-api).
 
 </div>
 <div className="apicard-right">
@@ -221,7 +234,7 @@ The last API (assets) is only a REST API because ZITADEL uses multipart form dat
 
 ### SDKs
 
-ZITADEL provides some [official and community supported SDKs](/docs/examples/sdks) for multiple languages and frameworks.
+ZITADEL provides some [official and community supported SDKs](/docs/sdk-examples/introduction) for multiple languages and frameworks.
 Most languages allow you to build a client from proto definitions, which allows you to build your own client in case an SDK is missing.
 
 ### Proto
@@ -267,6 +280,8 @@ In the table below you can see the URI of those calls.
 ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or your custom domain `$ZITADEL_DOMAIN`
 
 The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `{your_domain}/ui/console/`.
+
+Are you self-hosting and having troubles with *Instance not found* errors? [Check out this page](https://zitadel.com/docs/self-hosting/manage/custom-domain).
 
 ## API path prefixes
 

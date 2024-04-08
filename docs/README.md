@@ -8,11 +8,13 @@ To add a new site to the already existing structure simply save the `md` file in
 
 ## Installation
 
+Install dependencies with
+
 ```
 yarn install
 ```
 
-## Generate
+then run 
 
 ```
 yarn generate
@@ -21,8 +23,16 @@ yarn generate
 
 ## Local Development
 
+Start a local development server with
+
 ```
 yarn start
+```
+
+When working on the API docs, run a local development server with 
+
+```
+yarn start:api
 ```
 
 ## Container Image

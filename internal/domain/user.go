@@ -18,7 +18,7 @@ func (s UserState) Exists() bool {
 	return s != UserStateUnspecified && s != UserStateDeleted
 }
 
-func (s UserState) NotDisabled() bool {
+func (s UserState) IsEnabled() bool {
 	return s == UserStateActive || s == UserStateInitial
 }
 
@@ -42,6 +42,7 @@ const (
 	UserAuthMethodTypeIDP
 	UserAuthMethodTypeOTPSMS
 	UserAuthMethodTypeOTPEmail
+	UserAuthMethodTypeOTP // generic OTP when parsing AMR from OIDC
 	userAuthMethodTypeCount
 )
 
@@ -59,7 +60,8 @@ func HasMFA(methods []UserAuthMethodType) bool {
 			UserAuthMethodTypeTOTP,
 			UserAuthMethodTypeOTPSMS,
 			UserAuthMethodTypeOTPEmail,
-			UserAuthMethodTypeIDP:
+			UserAuthMethodTypeIDP,
+			UserAuthMethodTypeOTP:
 			factors++
 		case UserAuthMethodTypeUnspecified,
 			userAuthMethodTypeCount:

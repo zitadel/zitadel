@@ -1,3 +1,20 @@
+.actions-title-row {
+  display: flex;
+  align-items: center;
+
+  h1 {
+    margin: 0;
+  }
+
+  a {
+    .icon {
+      font-size: 1.2rem;
+      height: 1.2rem;
+      width: 1.2rem;
+    }
+  }
+}
+
 @mixin actions-theme($theme) {
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);

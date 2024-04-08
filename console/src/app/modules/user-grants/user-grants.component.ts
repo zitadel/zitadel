@@ -8,7 +8,7 @@ import { tap } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { UserGrant as AuthUserGrant } from 'src/app/proto/generated/zitadel/auth_pb';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
-import { Type, UserGrant as MgmtUserGrant, UserGrantQuery } from 'src/app/proto/generated/zitadel/user_pb';
+import { Type, UserGrant as MgmtUserGrant, UserGrantQuery, UserGrant } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -18,6 +18,7 @@ import { PageEvent, PaginatorComponent } from '../paginator/paginator.component'
 import { UserGrantRoleDialogComponent } from '../user-grant-role-dialog/user-grant-role-dialog.component';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
+import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 
 export enum UserGrantListSearchKey {
   DISPLAY_NAME,
@@ -68,6 +69,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() public type: Type | undefined = undefined;
 
   public filterOpen: boolean = false;
+  public myOrgs: Array<Org.AsObject> = [];
   constructor(
     private authService: GrpcAuthService,
     private userService: ManagementService,
@@ -115,6 +117,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
 
     this.loadGrantsPage(this.type);
+    this.authService.listMyProjectOrgs(undefined, 0).then((orgs) => {
+      this.myOrgs = orgs.resultList;
+    });
   }
 
   public ngAfterViewInit(): void {
@@ -298,6 +303,23 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     } else {
       this.userGrantListSearchKey = undefined;
       this.loadGrantsPage(this.type);
+    }
+  }
+
+  public showUser(grant: UserGrant.AsObject) {
+    const org: Org.AsObject = {
+      id: grant.grantedOrgId,
+      name: grant.grantedOrgName,
+      state: OrgState.ORG_STATE_ACTIVE,
+      primaryDomain: grant.grantedOrgDomain,
+    };
+
+    // Check if user has permissions for that org before changing active org
+    if (this.myOrgs.find((org) => org.id === grant.grantedOrgId)) {
+      this.authService.setActiveOrg(org);
+      this.router.navigate(['/users', grant.userId]);
+    } else {
+      this.toast.showInfo('GRANTS.TOAST.CANTSHOWINFO', true);
     }
   }
 }

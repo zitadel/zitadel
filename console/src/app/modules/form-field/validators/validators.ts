@@ -83,3 +83,23 @@ function i18nErr(err: ValidationErrors | null | undefined, i18nKey: string, para
     };
   }
 }
+
+const isFieldEmpty = (fieldName: string, g: AbstractControl) => {
+  const field = g.get(fieldName)?.value;
+  if (typeof field === 'number') {
+    return field && field >= 0 ? true : false;
+  }
+  if (typeof field === 'string') {
+    return field && field.length > 0 ? true : false;
+  }
+  return false;
+};
+
+// Reference: https://stackoverflow.com/a/56057955
+export function atLeastOneIsFilled(...fields: string[]): ValidationErrors | null {
+  return (g: AbstractControl): ValidationErrors | null => {
+    return fields.some((fieldName) => isFieldEmpty(fieldName, g))
+      ? null
+      : ({ atLeastOne: 'At least one field has to be provided.' } as ValidationErrors);
+  };
+}

@@ -8,35 +8,44 @@ services:
     image: 'ghcr.io/zitadel/zitadel:latest'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
-      - 'ZITADEL_DATABASE_COCKROACH_HOST=crdb'
+      - 'ZITADEL_DATABASE_POSTGRES_HOST=db'
+      - 'ZITADEL_DATABASE_POSTGRES_PORT=5432'
+      - 'ZITADEL_DATABASE_POSTGRES_DATABASE=zitadel'
+      - 'ZITADEL_DATABASE_POSTGRES_USER_USERNAME=zitadel'
+      - 'ZITADEL_DATABASE_POSTGRES_USER_PASSWORD=zitadel'
+      - 'ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE=disable'
+      - 'ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME=postgres'
+      - 'ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD=postgres'
+      - 'ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE=disable'
       - 'ZITADEL_EXTERNALSECURE=false'
       - 'ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH=/machinekey/zitadel-admin-sa.json'
       - 'ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME=zitadel-admin-sa'
       - 'ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME=Admin'
       - 'ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINEKEY_TYPE=1'
     depends_on:
-      crdb:
+      db:
         condition: 'service_healthy'
     ports:
       - '8080:8080'
     volumes:
       - ./machinekey:/machinekey
 
-  crdb:
+  db:
     restart: 'always'
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     networks:
       - 'zitadel'
-    image: 'cockroachdb/cockroach:latest'
-    command: 'start-single-node --insecure'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
       interval: '10s'
       timeout: '30s'
       retries: 5
       start_period: '20s'
     ports:
-      - '9090:8080'
-      - '26257:26257'
+      - '5432:5432'
 
 networks:
   zitadel:

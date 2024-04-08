@@ -5,9 +5,14 @@ gen_zitadel_path := "$(go_bin)/protoc-gen-zitadel"
 now := $(shell date --rfc-3339=seconds | sed 's/ /T/')
 VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
+ZITADEL_IMAGE ?= zitadel:local
 
 .PHONY: compile
 compile: core_build console_build compile_pipeline
+
+.PHONY: docker_image
+docker_image: compile
+	DOCKER_BUILDKIT=1 docker build -f build/Dockerfile -t $(ZITADEL_IMAGE) .
 
 .PHONY: compile_pipeline
 compile_pipeline: console_move
@@ -28,10 +33,10 @@ core_static:
 
 .PHONY: core_generate_all
 core_generate_all:
-	go install github.com/dmarkham/enumer@v1.5.9
-	go install github.com/rakyll/statik@v0.1.7
-	go install go.uber.org/mock/mockgen@v0.3.0
-	go install golang.org/x/tools/cmd/stringer@v0.15.0
+	go install github.com/dmarkham/enumer@v1.5.9 		# https://pkg.go.dev/github.com/dmarkham/enumer?tab=versions
+	go install github.com/rakyll/statik@v0.1.7			# https://pkg.go.dev/github.com/rakyll/statik?tab=versions
+	go install go.uber.org/mock/mockgen@v0.4.0			# https://pkg.go.dev/go.uber.org/mock/mockgen?tab=versions
+	go install golang.org/x/tools/cmd/stringer@v0.19.0	# https://pkg.go.dev/golang.org/x/tools/cmd/stringer?tab=versions
 	go generate ./...
 
 .PHONY: core_assets
@@ -52,12 +57,12 @@ endif
 
 .PHONY: core_grpc_dependencies
 core_grpc_dependencies:
-	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31 
-	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.18.1 
-	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.18.1 
-	go install github.com/envoyproxy/protoc-gen-validate@v1.0.2
-	go install github.com/bufbuild/buf/cmd/buf@v1.27.2
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.33 							# https://pkg.go.dev/google.golang.org/protobuf/cmd/protoc-gen-go?tab=versions
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3 							# https://pkg.go.dev/google.golang.org/grpc/cmd/protoc-gen-go-grpc?tab=versions
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.19.1	# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway?tab=versions
+	go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.19.1 		# https://pkg.go.dev/github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2?tab=versions
+	go install github.com/envoyproxy/protoc-gen-validate@v1.0.4								# https://pkg.go.dev/github.com/envoyproxy/protoc-gen-validate?tab=versions
+	go install github.com/bufbuild/buf/cmd/buf@v1.30.0										# https://pkg.go.dev/github.com/bufbuild/buf/cmd/buf?tab=versions
 
 .PHONY: core_api
 core_api: core_api_generator core_grpc_dependencies
@@ -103,19 +108,23 @@ core_unit_test:
 core_integration_setup:
 	go build -o zitadel main.go
 	./zitadel init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-	./zitadel setup --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/zitadel.yaml --steps internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+	./zitadel setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/zitadel.yaml --steps internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	$(RM) zitadel
 
 .PHONY: core_integration_test
 core_integration_test: core_integration_setup
-	go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./internal/integration ./internal/api/grpc/...  ./internal/notification/handlers/... ./internal/api/oidc/...
+	go test -tags=integration -race -p 1 -coverprofile=profile.cov -coverpkg=./internal/...,./cmd/... ./...
+
+.PHONY: core_integration_test_fast
+core_integration_test_fast: core_integration_setup
+	go test -tags=integration -p 1 ./...
 
 .PHONY: console_lint
 console_lint:
 	cd console && \
 	yarn lint
 
-.PHONE: core_lint
+.PHONY: core_lint
 core_lint:
 	golangci-lint run \
 		--timeout 10m \

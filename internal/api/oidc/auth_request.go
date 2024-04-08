@@ -28,7 +28,10 @@ const (
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	headers, _ := http_utils.HeadersFromCtx(ctx)
 	if loginClient := headers.Get(LoginClientHeader); loginClient != "" {
@@ -38,20 +41,28 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	return o.createAuthRequest(ctx, req, userID)
 }
 
-func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.AuthRequest, hintUserID, loginClient string) (op.AuthRequest, error) {
-	project, err := o.query.ProjectByClientID(ctx, req.ClientID)
+func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, clientID string, reqScope []string) (scope, audience []string, err error) {
+	project, err := o.query.ProjectByClientID(ctx, clientID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	scope, err := o.assertProjectRoleScopesByProject(ctx, project, req.Scopes)
+	scope, err = o.assertProjectRoleScopesByProject(ctx, project, reqScope)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	audience, err := o.audienceFromProjectID(ctx, project.ID)
-	if err != nil {
-		return nil, err
-	}
+	audience, err = o.audienceFromProjectID(ctx, project.ID)
 	audience = domain.AddAudScopeToAudience(ctx, audience, scope)
+	if err != nil {
+		return nil, nil, err
+	}
+	return scope, audience, nil
+}
+
+func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.AuthRequest, hintUserID, loginClient string) (op.AuthRequest, error) {
+	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
+	if err != nil {
+		return nil, err
+	}
 	authRequest := &command.AuthRequest{
 		LoginClient:   loginClient,
 		ClientID:      req.ClientID,
@@ -85,11 +96,12 @@ func (o *OPStorage) createAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if !ok {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
-	req.Scopes, err = o.assertProjectRoleScopes(ctx, req.ClientID, req.Scopes)
+	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
 	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(err, "OIDC-Gqrfg", "Errors.Internal")
+		return nil, err
 	}
-	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
+	req.Scopes = scope
+	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID, audience)
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {
 		return nil, err
@@ -102,7 +114,7 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	appIDs, err := o.query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, true)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +124,10 @@ func (o *OPStorage) audienceFromProjectID(ctx context.Context, projectID string)
 
 func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if strings.HasPrefix(id, command.IDPrefixV2) {
 		req, err := o.command.GetCurrentAuthRequest(ctx, id)
@@ -135,7 +150,10 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 
 func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	plainCode, err := o.decryptGrant(code)
 	if err != nil {
@@ -166,7 +184,10 @@ func (o *OPStorage) decryptGrant(grant string) (string, error) {
 
 func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	if strings.HasPrefix(id, command.IDPrefixV2) {
 		return o.command.AddAuthRequestCode(ctx, id, code)
@@ -181,61 +202,61 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err erro
 
 func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	return o.repo.DeleteAuthRequest(ctx, id)
 }
 
 func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	var userAgentID, applicationID, userOrgID string
-	switch authReq := req.(type) {
-	case *AuthRequest:
-		userAgentID = authReq.AgentID
-		applicationID = authReq.ApplicationID
-		userOrgID = authReq.UserOrgID
-	case *AuthRequestV2:
-		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
+	if authReq, ok := req.(*AuthRequestV2); ok {
+		activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken, o.eventstore.FilterToQueryReducer)
 		return o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
-	case op.IDTokenRequest:
-		applicationID = authReq.GetClientID()
 	}
 
+	userAgentID, applicationID, userOrgID, authTime, amr, reason, actor := getInfoFromRequest(req)
 	accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
 	if err != nil {
 		return "", time.Time{}, err
 	}
 
-	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), accessTokenLifetime) //PLANNED: lifetime from client
+	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), amr, accessTokenLifetime, authTime, reason, actor)
 	if err != nil {
 		return "", time.Time{}, err
 	}
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCAccessToken)
+	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCAccessToken, o.eventstore.FilterToQueryReducer)
 	return resp.TokenID, resp.Expiration, nil
 }
 
 func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	// handle V2 request directly
 	switch tokenReq := req.(type) {
 	case *AuthRequestV2:
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken)
+		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
 		return o.command.AddOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.GetID())
 	case *RefreshTokenRequestV2:
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken)
+		activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
 		return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
 	}
 
-	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences := getInfoFromRequest(req)
+	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences, reason, actor := getInfoFromRequest(req)
 	scopes, err := o.assertProjectRoleScopes(ctx, applicationID, req.GetScopes())
 	if err != nil {
 		return "", "", time.Time{}, zerrors.ThrowPreconditionFailed(err, "OIDC-Df2fq", "Errors.Internal")
@@ -251,7 +272,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 
 	resp, token, err := o.command.AddAccessAndRefreshToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(),
 		refreshToken, req.GetAudience(), scopes, authMethodsReferences, accessTokenLifetime,
-		refreshTokenIdleExpiration, refreshTokenExpiration, authTime) //PLANNED: lifetime from client
+		refreshTokenIdleExpiration, refreshTokenExpiration, authTime, reason, actor) //PLANNED: lifetime from client
 	if err != nil {
 		if zerrors.IsErrorInvalidArgument(err) {
 			err = oidc.ErrInvalidGrant().WithParent(err)
@@ -260,26 +281,33 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	}
 
 	// trigger activity log for authentication for user
-	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCRefreshToken)
+	activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
 	return resp.TokenID, token, resp.Expiration, nil
 }
 
-func getInfoFromRequest(req op.TokenRequest) (string, string, string, time.Time, []string) {
+func getInfoFromRequest(req op.TokenRequest) (agentID string, clientID string, userOrgID string, authTime time.Time, amr []string, reason domain.TokenReason, actor *domain.TokenActor) {
 	switch r := req.(type) {
 	case *AuthRequest:
-		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR()
+		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR(), domain.TokenReasonAuthRequest, nil
 	case *RefreshTokenRequest:
-		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences
+		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences, domain.TokenReasonRefresh, r.Actor
 	case op.IDTokenRequest:
-		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR()
+		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR(), domain.TokenReasonAuthRequest, nil
+	case *oidc.JWTTokenRequest:
+		return "", "", "", r.GetAuthTime(), nil, domain.TokenReasonJWTProfile, nil
+	case *clientCredentialsRequest:
+		return "", "", "", time.Time{}, nil, domain.TokenReasonClientCredentials, nil
 	default:
-		return "", "", "", time.Time{}, nil
+		return "", "", "", time.Time{}, nil, domain.TokenReasonAuthRequest, nil
 	}
 }
 
 func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (_ op.RefreshTokenRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	plainToken, err := o.decryptGrant(refreshToken)
 	if err != nil {
@@ -291,7 +319,7 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 			return nil, err
 		}
 		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", oidcSession.UserID, activity.OIDCRefreshToken)
+		activity.Trigger(ctx, "", oidcSession.UserID, activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
 		return &RefreshTokenRequestV2{OIDCSessionWriteModel: oidcSession}, nil
 	}
 
@@ -301,13 +329,16 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 	}
 
 	// trigger activity log for use of refresh token for user
-	activity.Trigger(ctx, tokenView.ResourceOwner, tokenView.UserID, activity.OIDCRefreshToken)
+	activity.Trigger(ctx, tokenView.ResourceOwner, tokenView.UserID, activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
 	return RefreshTokenRequestFromBusiness(tokenView), nil
 }
 
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
 	if !ok {
 		logging.Error("no user agent id")
@@ -331,7 +362,10 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 
 func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionRequest *op.EndSessionRequest) (redirectURI string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
 
 	// check for the login client header
 	// and if not provided, terminate the session using the V1 method
@@ -408,6 +442,12 @@ func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID s
 }
 
 func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, token string) (userID string, tokenID string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		err = oidcError(err)
+		span.EndWithError(err)
+	}()
+
 	plainToken, err := o.decryptGrant(token)
 	if err != nil {
 		return "", "", op.ErrInvalidRefreshToken

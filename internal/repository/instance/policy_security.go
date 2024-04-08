@@ -15,8 +15,12 @@ const (
 type SecurityPolicySetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Enabled        *bool     `json:"enabled,omitempty"`
-	AllowedOrigins *[]string `json:"allowedOrigins,omitempty"`
+	// Enabled is a legacy field which was used before for Iframe Embedding.
+	// It is kept so older events can still be reduced.
+	Enabled               *bool     `json:"enabled,omitempty"`
+	EnableIframeEmbedding *bool     `json:"enable_iframe_embedding,omitempty"`
+	AllowedOrigins        *[]string `json:"allowedOrigins,omitempty"`
+	EnableImpersonation   *bool     `json:"enable_impersonation,omitempty"`
 }
 
 func NewSecurityPolicySetEvent(
@@ -42,9 +46,9 @@ func NewSecurityPolicySetEvent(
 
 type SecurityPolicyChanges func(event *SecurityPolicySetEvent)
 
-func ChangeSecurityPolicyEnabled(enabled bool) func(event *SecurityPolicySetEvent) {
+func ChangeSecurityPolicyEnableIframeEmbedding(enabled bool) func(event *SecurityPolicySetEvent) {
 	return func(e *SecurityPolicySetEvent) {
-		e.Enabled = &enabled
+		e.EnableIframeEmbedding = &enabled
 	}
 }
 
@@ -54,6 +58,12 @@ func ChangeSecurityPolicyAllowedOrigins(allowedOrigins []string) func(event *Sec
 			allowedOrigins = []string{}
 		}
 		e.AllowedOrigins = &allowedOrigins
+	}
+}
+
+func ChangeSecurityPolicyEnableImpersonation(enabled bool) func(event *SecurityPolicySetEvent) {
+	return func(e *SecurityPolicySetEvent) {
+		e.EnableImpersonation = &enabled
 	}
 }
 

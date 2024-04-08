@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -30,8 +29,8 @@ type LoginPolicy struct {
 	AllowExternalIDPs          bool
 	ForceMFA                   bool
 	ForceMFALocalOnly          bool
-	SecondFactors              database.Array[domain.SecondFactorType]
-	MultiFactors               database.Array[domain.MultiFactorType]
+	SecondFactors              database.NumberArray[domain.SecondFactorType]
+	MultiFactors               database.NumberArray[domain.MultiFactorType]
 	PasswordlessType           domain.PasswordlessType
 	IsDefault                  bool
 	HidePasswordReset          bool
@@ -40,22 +39,22 @@ type LoginPolicy struct {
 	DisableLoginWithEmail      bool
 	DisableLoginWithPhone      bool
 	DefaultRedirectURI         string
-	PasswordCheckLifetime      time.Duration
-	ExternalLoginCheckLifetime time.Duration
-	MFAInitSkipLifetime        time.Duration
-	SecondFactorCheckLifetime  time.Duration
-	MultiFactorCheckLifetime   time.Duration
+	PasswordCheckLifetime      database.Duration
+	ExternalLoginCheckLifetime database.Duration
+	MFAInitSkipLifetime        database.Duration
+	SecondFactorCheckLifetime  database.Duration
+	MultiFactorCheckLifetime   database.Duration
 	IDPLinks                   []*IDPLoginPolicyLink
 }
 
 type SecondFactors struct {
 	SearchResponse
-	Factors database.Array[domain.SecondFactorType]
+	Factors database.NumberArray[domain.SecondFactorType]
 }
 
 type MultiFactors struct {
 	SearchResponse
-	Factors database.Array[domain.MultiFactorType]
+	Factors database.NumberArray[domain.MultiFactorType]
 }
 
 var (
@@ -198,29 +197,22 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, shouldTriggerBulk bool, o
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		policy, err = q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+		policy, err = scan(rows)
 		return err
 	}, stmt, args...)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-SWgr3", "Errors.Internal")
 	}
-	return policy, nil
+	return policy, q.addLinksToLoginPolicy(ctx, policy)
 }
 
-func (q *Queries) scanAndAddLinksToLoginPolicy(ctx context.Context, rows *sql.Rows, scan func(*sql.Rows) (*LoginPolicy, error)) (*LoginPolicy, error) {
-	policy, err := scan(rows)
-	if err != nil {
-		return nil, err
-	}
-
+func (q *Queries) addLinksToLoginPolicy(ctx context.Context, policy *LoginPolicy) error {
 	links, err := q.IDPLoginPolicyLinks(ctx, policy.OrgID, &IDPLoginPolicyLinksSearchQuery{}, false)
 	if err != nil {
-		return nil, err
+		return zerrors.ThrowInternal(err, "QUERY-aa4Ve", "Errors.Internal")
 	}
-	for _, link := range links.Links {
-		policy.IDPLinks = append(policy.IDPLinks, link)
-	}
-	return policy, nil
+	policy.IDPLinks = append(policy.IDPLinks, links.Links...)
+	return nil
 }
 
 func (q *Queries) DefaultLoginPolicy(ctx context.Context) (policy *LoginPolicy, err error) {
@@ -237,13 +229,13 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (policy *LoginPolicy, 
 	}
 
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		policy, err = q.scanAndAddLinksToLoginPolicy(ctx, rows, scan)
+		policy, err = scan(rows)
 		return err
 	}, stmt, args...)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-SArt2", "Errors.Internal")
 	}
-	return policy, nil
+	return policy, q.addLinksToLoginPolicy(ctx, policy)
 }
 
 func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (factors *SecondFactors, err error) {

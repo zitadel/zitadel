@@ -46,6 +46,7 @@ func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, idGene
 	opts := []http_utils.CookieHandlerOpt{
 		http_utils.WithEncryption(cookieKey, cookieKey),
 		http_utils.WithMaxAge(int(config.MaxAge.Seconds())),
+		http_utils.WithPrefix(http_utils.PrefixHost),
 	}
 	if !externalSecure {
 		opts = append(opts, http_utils.WithUnsecure())

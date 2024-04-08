@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limits not found
     NoneSpecified: No limits specified
+    Instance:
+      Blocked: Instance is blocked
   Restrictions:
     NoneSpecified: No restrictions specified
     DefaultLanguageMustBeAllowed: The default language must be allowed
@@ -58,7 +60,6 @@ Errors:
   Notification:
     NoDomain: No Domain found for message
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: User could not be found
     AlreadyExists: User already exists
     NotFoundOnOrg: User could not be found on chosen organization
@@ -126,6 +127,7 @@ Errors:
       NotFound: Code not found
       Expired: Code is expired
       GeneratorAlgNotSupported: Unsupported generator algorithm
+      Invalid: Code is invalid
     Password:
       NotFound: Password not found
       Empty: Password is empty
@@ -325,7 +327,7 @@ Errors:
       NotActive: Project grant is not active
       NotInactive: Project grant is not inactive
   IAM:
-    NotFound: Instance not found. Check out https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: Instance not found. Make sure you got the domain right. Check out https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: Roles have not been changed
     MemberInvalid: Member is invalid
@@ -476,6 +478,7 @@ Errors:
     CloseRows: SQL Statement could not be finished
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
+    TooManyNestingLevels: Too many query nesting levels (Max 20)
   Quota:
     AlreadyExists: Quota already exists for this unit
     NotFound: Quota not found for this unit
@@ -532,6 +535,38 @@ Errors:
     NotExisting: Feature does not exist
     TypeNotSupported: Feature type is not supported
     InvalidValue: Invalid value for this feature
+  Target:
+    Invalid: Target is invalid
+    NoTimeout: Target has no timeout
+    InvalidURL: Target has an invalid URL
+    NotFound: Target not found
+  Execution:
+    ConditionInvalid: Execution condition is invalid
+    Invalid: Execution is invalid
+    NotFound: Execution not found
+    IncludeNotFound: Include not found
+    NoTargets: No targets defined
+  UserSchema:
+    NotEnabled: Feature "User Schema" is not enabled
+    Type:
+      Missing: User Schema Type missing
+      AlreadyExists: User Schema Type already exists
+    Authenticator:
+      Invalid: Invalid authenticator type
+    NotActive: User Schema not active
+    NotInactive: User Schema not inactive
+    NotExists: User Schema does not exist
+  TokenExchange:
+    FeatureDisabled: Token Exchange feature is disabled for your instance. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Token is missing
+      Invalid: Token is invalid
+      TypeMissing: Token type is missing
+      TypeNotAllowed: Token type is not allowed
+      TypeNotSupported: Token type is not supported
+      NotForAPI: Impersonated tokens not allowed for API
+    Impersonation:
+      PolicyDisabled: Impersonation is disabled in the instance security policy
 
 AggregateTypes:
   action: Action
@@ -543,11 +578,21 @@ AggregateTypes:
   usergrant: User grant
   quota: Quota
   feature: Feature
+  target: Target
+  execution: Execution
+  user_schema: User Schema
 
 EventTypes:
+  execution:
+    set: Execution set
+    removed: Execution deleted
+  target:
+    added: Target created
+    changed: Target changed
+    removed: Target deleted
   user:
     added: User added
-    selfregistered: User registered himself
+    selfregistered: User registered themself
     initialization:
       code:
         added: Initialization code generated
@@ -558,6 +603,7 @@ EventTypes:
     token:
       added: Access Token created
       removed: Access Token removed
+    impersonated: User impersonated
     username:
       reserved: Username reserved
       released: Username released
@@ -580,13 +626,14 @@ EventTypes:
         removed: Key removed
       secret:
         set: Secret set
+        updated: Secret hash updated
         removed: Secret removed
         check:
           succeeded: Secret check succeeded
           failed: Secret check failed
     human:
       added: Person added
-      selfregistered: Person registered himself
+      selfregistered: Person registered themself
       avatar:
         added: Avatar added
         removed: Avatar removed
@@ -954,6 +1001,11 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret check succeeded
             failed: OIDC Client Secret check failed
+      api:
+        secret:
+          check:
+            succeeded: API secret check succeeded
+            failed: API secret check failed
         key:
           added: Application key added
           removed: Application key removed
@@ -966,11 +1018,13 @@ EventTypes:
           changed: OIDC Configuration changed
           secret:
             changed: OIDC secret changed
+            updated: OIDC secret hash updated
         api:
           added: API Configuration added
           changed: API Configuration changed
           secret:
             changed: API secret changed
+            updated: API secret hash updated
   policy:
     password:
       complexity:
@@ -1213,6 +1267,12 @@ EventTypes:
         password:
           changed: Password of SMTP configuration changed
         removed: SMTP configuration removed
+  user_schema:
+    created: User Schema created
+    updated: User Schema updated
+    deactivated: User Schema deactivated
+    reactivated: User Schema reactivated
+    deleted: User Schema deleted
 
 Application:
   OIDC:

@@ -105,7 +105,7 @@ func (p *instanceMemberProjection) reduceAdded(event eventstore.Event) (*handler
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-pGNCu", "reduce.wrong.event.type %s", instance.MemberAddedEventType)
 	}
 	ctx := setMemberContext(e.Aggregate())
-	userOwner, err := getResourceOwnerOfUser(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
+	userOwner, err := getUserResourceOwner(ctx, p.es, e.Aggregate().InstanceID, e.UserID)
 	if err != nil {
 		return nil, err
 	}

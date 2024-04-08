@@ -38,6 +38,13 @@ func (m *mockEventStore) Filter(ctx context.Context, queryFactory *eventstore.Se
 	return m.filterResponse[m.filterCounter-1], nil
 }
 
+func (m *mockEventStore) FilterToQueryReducer(ctx context.Context, reducer eventstore.QueryReducer) error {
+	m.filterCounter++
+	events := m.filterResponse[m.filterCounter-1]
+	reducer.AppendEvents(events...)
+	return reducer.Reduce()
+}
+
 func (m *mockEventStore) Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error) {
 	m.pushCounter++
 	return m.pushResponse[m.pushCounter-1], nil

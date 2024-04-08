@@ -21,6 +21,11 @@ This guide assumes you are familiar with [running ZITADEL using the least amount
 You can configure the runtime using the `--config` flag of the `zitadel` binary.
 Also, you can use the environment variables listed in the defaults.yaml.
 
+:::tip
+For overwriting the default configuration for the first instance created by zitadel setup, use the FirstInstance section in the [database initialization file](#database-initialization-file).
+:::
+
+
 <details>
   <summary>defaults.yaml</summary>
   <CodeBlock language="yaml">{DefaultsYamlSource}</CodeBlock>
@@ -31,6 +36,10 @@ Also, you can use the environment variables listed in the defaults.yaml.
 ZITADEL uses a [different configuration file](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml) for _database initialization steps_.
 Use the `--steps` flag of the `zitadel` binary to provide this configuration file.
 Also, you can use the environment variables listed in the steps.yaml.
+
+:::tip
+By using the FirstInstance section, you can overwrite the [DefaultInstance configuration](#runtime-configuration-file) for the first instance created by zitadel setup.
+:::
 
 <details>
   <summary>steps.yaml</summary>
@@ -98,7 +107,7 @@ This is the IAM admin users login according to your configuration in the [exampl
 
 ## What's next
 
-- Read more about [the login process](/guides/integrate/login-users).
+- Read more about [the login process](/guides/integrate/login/login-users).
 - If you are running ZITADEL in production, you need to [customize your own domain](./custom-domain).
 - Check out all possible [runtime configuration properties and their defaults in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml)
 - Check out all possible [setup step configuration properties and their defaults in the source code](https://github.com/zitadel/zitadel/blob/main/cmd/setup/steps.yaml)

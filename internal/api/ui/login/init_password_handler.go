@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -21,6 +22,7 @@ type initPasswordFormData struct {
 	Password        string `schema:"password"`
 	PasswordConfirm string `schema:"passwordconfirm"`
 	UserID          string `schema:"userID"`
+	OrgID           string `schema:"orgID"`
 	Resend          bool   `schema:"resend"`
 }
 
@@ -55,7 +57,7 @@ func (l *Login) handleInitPasswordCheck(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if data.Resend {
-		l.resendPasswordSet(w, r, authReq)
+		l.resendPasswordSet(w, r, authReq, data)
 		return
 	}
 	l.checkPWCode(w, r, authReq, data)
@@ -71,7 +73,8 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	_, err := l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password)
+	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	_, err := l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
@@ -79,27 +82,20 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 	l.renderInitPasswordDone(w, r, authReq, userOrg)
 }
 
-func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	if authReq == nil {
-		l.renderError(w, r, nil, zerrors.ThrowInternal(nil, "LOGIN-8sn7s", "Errors.AuthRequest.NotFound"))
-		return
-	}
-	userOrg := login
+func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *initPasswordFormData) {
+	userOrg := data.OrgID
+	userID := data.UserID
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
-	}
-	user, err := l.query.GetUserByLoginName(setContext(r.Context(), userOrg), false, authReq.LoginName)
-	if err != nil {
-		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
-		return
+		userID = authReq.UserID
 	}
 	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.userCodeAlg)
 	if err != nil {
-		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
+		l.renderInitPassword(w, r, authReq, userID, "", err)
 		return
 	}
-	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), user.ID, user.ResourceOwner, domain.NotificationTypeEmail, passwordCodeGenerator)
-	l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
+	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), userID, userOrg, domain.NotificationTypeEmail, passwordCodeGenerator)
+	l.renderInitPassword(w, r, authReq, userID, "", err)
 }
 
 func (l *Login) renderInitPassword(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, err error) {

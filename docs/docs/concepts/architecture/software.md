@@ -136,16 +136,12 @@ It is also responsible to execute authorization checks. To check if a request is
 
 ### Storage Layer
 
-As ZITADEL itself is built completely stateless only the storage layer is needed for storing things.
-The storage layer of ZITADEL is responsible for multiple things. For example:
+As ZITADEL itself is built completely stateless only the storage layer is needed to persist states.
+The storage layer of ZITADEL is responsible for multiple tasks. For example:
 
-- Distributing data for high availability over multiple server, data centers or regions
 - Guarantee strong consistency for the command side
 - Guarantee good query performance for the query side
-- Ability to store data in specific data centers or regions for data residency (This is only supported with CockroachDB Cloud or Enterprise)
 - Backup and restore operation for disaster recovery purpose
 
-ZITADEL currently supports CockroachDB as first choice of storage due to its perfect match for ZITADELs needs.
-Alternatively you can run ZITADEL also with Postgres which is [Enterprise Supported](/docs/support/software-release-cycles-support#partially-supported).
-Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-cockroachdb) before you decide to use it.
-
+ZITADEL currently supports PostgreSQL and CockroachDB..
+Make sure to read our [Production Guide](/docs/self-hosting/manage/production#prefer-cockroachdb) before you decide on using one of them.

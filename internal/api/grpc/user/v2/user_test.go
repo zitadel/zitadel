@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
-	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -21,8 +20,6 @@ import (
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
-
-var ignoreTypes = []protoreflect.FullName{"google.protobuf.Duration", "google.protobuf.Struct"}
 
 func Test_idpIntentToIDPIntentPb(t *testing.T) {
 	decryption := func(err error) crypto.EncryptionAlgorithm {

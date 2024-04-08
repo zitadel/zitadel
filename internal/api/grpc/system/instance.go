@@ -151,7 +151,7 @@ func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequ
 }
 
 func (s *Server) AddDomain(ctx context.Context, req *system_pb.AddDomainRequest) (*system_pb.AddDomainResponse, error) {
-	instance, err := s.query.Instance(ctx, true)
+	instance, err := s.query.InstanceByID(ctx)
 	if err != nil {
 		return nil, err
 	}

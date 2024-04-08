@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/jackc/pgx/v4/stdlib"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
@@ -80,7 +80,7 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 		return nil, err
 	}
 
-	client.SetMaxOpenConns(int(connConfig.MaxIdleConns))
+	client.SetMaxOpenConns(int(connConfig.MaxOpenConns))
 	client.SetMaxIdleConns(int(connConfig.MaxIdleConns))
 	client.SetConnMaxLifetime(c.MaxConnLifetime)
 	client.SetConnMaxIdleTime(c.MaxConnIdleTime)

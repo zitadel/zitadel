@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
@@ -57,6 +56,7 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 			if err := query.Commit().Error; err != nil {
 				logging.OnError(err).Info("commit failed")
 			}
+			query.RollbackUnlessCommitted()
 		}()
 
 		query = query.Count(&count)

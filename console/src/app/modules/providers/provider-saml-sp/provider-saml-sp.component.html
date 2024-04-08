@@ -6,8 +6,28 @@
     <div class="title-row">
       <img class="idp-logo" src="./assets/images/idp/saml-icon.svg" alt="saml" />
       <h1>{{ 'IDP.CREATE.SAML.TITLE' | translate }}</h1>
+      <ng-container *ngIf="exists$ | async">
+        <div
+          *ngIf="{ isNotActive: (activateLink$ | async) } as idp"
+          class="cnsl-state-dot"
+          [matTooltip]="(idp.isNotActive ? 'IDP.STATES.2' : 'IDP.STATES.1') | translate"
+          [ngClass]="{ active: !idp.isNotActive, inactive: !!idp.isNotActive }"
+        ></div>
+      </ng-container>
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
+
+    <cnsl-provider-next
+      [configureProvider]="exists$ | async"
+      [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.SAML.TITLE' | translate"
+      [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.SAML.DESCRIPTION' | translate"
+      configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml"
+      [autofillLink]="autofillLink$ | async"
+      [activateLink]="activateLink$ | async"
+      [copyUrls]="copyUrls$ | async"
+      [expanded]="!!(expandWhatNow$ | async)"
+      (activate)="activate()"
+    ></cnsl-provider-next>
 
     <p class="identity-provider-desc cnsl-secondary-text">
       {{ !provider ? ('IDP.CREATE.SAML.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}
@@ -21,7 +41,12 @@
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.SAML.METADATAXML' | translate }}</cnsl-label>
-          <input cnslInput formControlName="metadataXml" />
+          <textarea
+            cnslInput
+            formControlName="metadataXml"
+            placeholder="base64 encoded metadata xml"
+            class="metadata-xml"
+          ></textarea>
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.SAML.METADATAURL' | translate }}</cnsl-label>
@@ -29,7 +54,7 @@
         </cnsl-form-field>
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.SAML.BINDING' | translate }}</cnsl-label>
-          <mat-select formControlName="binding">
+          <mat-select formControlName="binding" [compareWith]="compareBinding">
             <mat-option *ngFor="let binding of bindingValues" [value]="binding">{{ binding }}</mat-option>
           </mat-select>
         </cnsl-form-field>
@@ -50,7 +75,6 @@
           (optionsChanged)="options = $event"
         ></cnsl-provider-options>
       </div>
-
       <div class="identity-provider-create-actions">
         <button
           color="primary"
@@ -59,8 +83,9 @@
           [disabled]="form.invalid || form.disabled"
           type="submit"
         >
-          <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
-          <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
+          <span *ngIf="{ exists: (exists$ | async) } as idp">{{
+            (!!idp.exists ? 'ACTIONS.SAVE' : 'ACTIONS.CREATE') | translate
+          }}</span>
         </button>
       </div>
     </form>

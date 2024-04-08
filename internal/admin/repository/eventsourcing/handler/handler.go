@@ -41,6 +41,10 @@ func Register(ctx context.Context, config Config, view *view.View, static static
 	))
 }
 
+func Projections() []*handler2.Handler {
+	return projections
+}
+
 func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)

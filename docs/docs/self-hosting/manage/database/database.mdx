@@ -13,16 +13,16 @@ import Postgres from './_postgres.mdx'
     groupId="database-vendor"
     default="cockroach"
     values={[
-        {'label': 'Cockroach', 'value': 'crdb'},
         {'label': 'Postgres', 'value': 'pg'},
+        {'label': 'Cockroach', 'value': 'crdb'},
     ]}
 >
-    <TabItem value="crdb">
-        <Cockroach/>
-        <More/>
-    </TabItem>
     <TabItem value="pg">
         <Postgres/>
+        <More/>
+    </TabItem>
+    <TabItem value="crdb">
+        <Cockroach/>
         <More/>
     </TabItem>
 </Tabs>

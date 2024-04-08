@@ -7,10 +7,11 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -23,7 +24,7 @@ type NewEventsTable struct {
 	dbClient *database.DB
 }
 
-func (mig *NewEventsTable) Execute(ctx context.Context) error {
+func (mig *NewEventsTable) Execute(ctx context.Context, _ eventstore.Event) error {
 	migrations, err := newEventsTable.ReadDir("14/" + mig.dbClient.Type())
 	if err != nil {
 		return err

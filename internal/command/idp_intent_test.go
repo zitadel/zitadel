@@ -1166,11 +1166,12 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 			"azure tokens",
 			args{
 				&azuread.Session{
-					Session: &oauth.Session{
+					OAuthSession: &oauth.Session{
 						Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 							Token: &oauth2.Token{
 								AccessToken: "accessToken",
 							},
+							IDToken: "idToken",
 						},
 					},
 				},
@@ -1183,7 +1184,7 @@ func Test_tokensForSucceededIDPIntent(t *testing.T) {
 					KeyID:      "id",
 					Crypted:    []byte("accessToken"),
 				},
-				idToken: "",
+				idToken: "idToken",
 				err:     nil,
 			},
 		},

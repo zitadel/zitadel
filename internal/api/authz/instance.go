@@ -2,8 +2,11 @@ package authz
 
 import (
 	"context"
+	"time"
 
 	"golang.org/x/text/language"
+
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 var (
@@ -20,6 +23,10 @@ type Instance interface {
 	DefaultLanguage() language.Tag
 	DefaultOrganisationID() string
 	SecurityPolicyAllowedOrigins() []string
+	EnableImpersonation() bool
+	Block() *bool
+	AuditLogRetention() *time.Duration
+	Features() feature.Features
 }
 
 type InstanceVerifier interface {
@@ -34,6 +41,15 @@ type instance struct {
 	appID     string
 	clientID  string
 	orgID     string
+	features  feature.Features
+}
+
+func (i *instance) Block() *bool {
+	return nil
+}
+
+func (i *instance) AuditLogRetention() *time.Duration {
+	return nil
 }
 
 func (i *instance) InstanceID() string {
@@ -72,12 +88,24 @@ func (i *instance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }
 
+func (i *instance) EnableImpersonation() bool {
+	return false
+}
+
+func (i *instance) Features() feature.Features {
+	return i.features
+}
+
 func GetInstance(ctx context.Context) Instance {
 	instance, ok := ctx.Value(instanceKey).(Instance)
 	if !ok {
 		return emptyInstance
 	}
 	return instance
+}
+
+func GetFeatures(ctx context.Context) feature.Features {
+	return GetInstance(ctx).Features()
 }
 
 func WithInstance(ctx context.Context, instance Instance) context.Context {
@@ -107,5 +135,14 @@ func WithConsole(ctx context.Context, projectID, appID string) context.Context {
 	i.projectID = projectID
 	i.appID = appID
 	//i.clientID = clientID
+	return context.WithValue(ctx, instanceKey, i)
+}
+
+func WithFeatures(ctx context.Context, f feature.Features) context.Context {
+	i, ok := ctx.Value(instanceKey).(*instance)
+	if !ok {
+		i = new(instance)
+	}
+	i.features = f
 	return context.WithValue(ctx, instanceKey, i)
 }

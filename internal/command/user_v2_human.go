@@ -51,7 +51,7 @@ type Password struct {
 	ChangeRequired bool
 }
 
-func (h *ChangeHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
+func (h *ChangeHuman) Validate(hasher *crypto.Hasher) (err error) {
 	if h.Email != nil && h.Email.Address != "" {
 		if err := h.Email.Validate(); err != nil {
 			return err
@@ -72,7 +72,7 @@ func (h *ChangeHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
 	return nil
 }
 
-func (p *Password) Validate(hasher *crypto.PasswordHasher) error {
+func (p *Password) Validate(hasher *crypto.Hasher) error {
 	if p.EncodedPasswordHash != nil {
 		if !hasher.EncodingSupported(*p.EncodedPasswordHash) {
 			return zerrors.ThrowInvalidArgument(nil, "USER-oz74onzvqr", "Errors.User.Password.NotSupported")
@@ -373,7 +373,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 
 	// Either have a code to set the password
 	if password.PasswordCode != nil {
-		if err := crypto.VerifyCodeWithAlgorithm(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, *password.PasswordCode, alg); err != nil {
+		if err := crypto.VerifyCode(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, *password.PasswordCode, alg); err != nil {
 			return cmds, err
 		}
 	}
@@ -394,7 +394,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 
 	// password already hashed in request
 	if password.EncodedPasswordHash != nil {
-		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.EncodedPasswordHash, password.ChangeRequired, true)
+		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.EncodedPasswordHash, "", password.ChangeRequired, true)
 		if cmd != nil {
 			return append(cmds, cmd), err
 		}
@@ -402,7 +402,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	}
 	// password already hashed in verify
 	if encodedPassword != "" {
-		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, encodedPassword, password.ChangeRequired, true)
+		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, encodedPassword, "", password.ChangeRequired, true)
 		if cmd != nil {
 			return append(cmds, cmd), err
 		}
@@ -410,7 +410,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	}
 	// password still to be hashed
 	if password.Password != nil {
-		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.Password, password.ChangeRequired, false)
+		cmd, err := c.setPasswordCommand(ctx, &wm.Aggregate().Aggregate, wm.UserState, *password.Password, "", password.ChangeRequired, false)
 		if cmd != nil {
 			return append(cmds, cmd), err
 		}

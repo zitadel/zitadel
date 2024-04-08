@@ -24,12 +24,12 @@ You can do so by using [Console](../console/users) or [setting user metadata](/d
 
 Most of the methods below require you to login with the correct user while setting some scopes.
 Make sure you pick the right user when logging into the test application.
-Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 :::info Getting a token
 In case you want to test out different settings configure an application with code flow (PKCE).
 Grab the code from the url parameter after a successful login and exchange the code for tokens by calling the [token endpoint](/docs/apis/openidoauth/endpoints#token_endpoint).
-You will find more information in our guides on how to [authenticate users](/docs/guides/integrate/login-users).
+You will find more information in our guides on how to [authenticate users](/docs/guides/integrate/login/oidc/login-users).
 :::
 
 ## Use tokens to get user metadata
@@ -157,7 +157,7 @@ You can use the authentication service to request and search for the user's meta
 The introspection endpoint and the token endpoint in the examples above do not require a special scope to access.
 Yet when accessing the authentication service, you need to pass the [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:org:project:id:zitadel:aud` along with the authentication request.
 This scope allows the user to access ZITADEL's APIs, specifically the authentication API that we need for this method.
-Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 :::note Invalid audience
 If you get the error "invalid audience (APP-Zxfako)", then you need to add the reserved scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your authentication request.

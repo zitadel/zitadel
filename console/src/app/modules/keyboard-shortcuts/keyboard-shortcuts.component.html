@@ -1,49 +1,51 @@
-<h1 class="title" mat-dialog-title>{{ 'KEYBOARDSHORTCUTS.TITLE' | translate }}</h1>
-<div mat-dialog-content>
-  <div *ngIf="isNotOnSystem" class="keyboard-shortcuts-group">
-    <h2>{{ 'KEYBOARDSHORTCUTS.UNDERORGCONTEXT' | translate }}</h2>
-    <div class="keyboard-shortcuts-wrapper">
-      <div class="keyboard-shortcut" *ngFor="let shortcut of orgShortcuts">
-        <span class="keyboard-shortcut-name cnsl-secondary-text" [innerHTML]="shortcut.i18nKey | translate"></span>
-        <span class="fill-space"></span>
-        <template
-          *ngFor="let key of shortcut.keyboardKeys; index as i"
-          [ngTemplateOutlet]="actionkey"
-          [ngTemplateOutletContext]="{ key: key, last: i === shortcut.keyboardKeys.length - 1 }"
-        ></template>
+<div class="keyboard-shortcuts">
+  <h1 class="title" mat-dialog-title>{{ 'KEYBOARDSHORTCUTS.TITLE' | translate }}</h1>
+  <div mat-dialog-content>
+    <div *ngIf="isNotOnSystem" class="keyboard-shortcuts-group">
+      <h2>{{ 'KEYBOARDSHORTCUTS.UNDERORGCONTEXT' | translate }}</h2>
+      <div class="keyboard-shortcuts-wrapper">
+        <div class="keyboard-shortcut" *ngFor="let shortcut of orgShortcuts">
+          <span class="keyboard-shortcut-name cnsl-secondary-text" [innerHTML]="shortcut.i18nKey | translate"></span>
+          <span class="fill-space"></span>
+          <template
+            *ngFor="let key of shortcut.keyboardKeys; index as i"
+            [ngTemplateOutlet]="actionkey"
+            [ngTemplateOutletContext]="{ key: key, last: i === shortcut.keyboardKeys.length - 1 }"
+          ></template>
+        </div>
+      </div>
+    </div>
+    <div class="keyboard-shortcuts-group">
+      <h2>{{ 'KEYBOARDSHORTCUTS.SIDEWIDE' | translate }}</h2>
+      <div class="keyboard-shortcuts-wrapper">
+        <ng-container *ngFor="let shortcut of shortcuts">
+          <ng-template cnslHasRole [hasRole]="shortcut.permissions">
+            <div class="keyboard-shortcut">
+              <span class="keyboard-shortcut-name cnsl-secondary-text" [innerHTML]="shortcut.i18nKey | translate"></span>
+              <span class="fill-space"></span>
+              <template
+                *ngFor="let key of shortcut.keyboardKeys; index as i"
+                [ngTemplateOutlet]="actionkey"
+                [ngTemplateOutletContext]="{ key: key, last: i === shortcut.keyboardKeys.length - 1 }"
+              ></template>
+            </div>
+          </ng-template>
+        </ng-container>
       </div>
     </div>
   </div>
-  <div class="keyboard-shortcuts-group">
-    <h2>{{ 'KEYBOARDSHORTCUTS.SIDEWIDE' | translate }}</h2>
-    <div class="keyboard-shortcuts-wrapper">
-      <ng-container *ngFor="let shortcut of shortcuts">
-        <ng-template cnslHasRole [hasRole]="shortcut.permissions">
-          <div class="keyboard-shortcut">
-            <span class="keyboard-shortcut-name cnsl-secondary-text" [innerHTML]="shortcut.i18nKey | translate"></span>
-            <span class="fill-space"></span>
-            <template
-              *ngFor="let key of shortcut.keyboardKeys; index as i"
-              [ngTemplateOutlet]="actionkey"
-              [ngTemplateOutletContext]="{ key: key, last: i === shortcut.keyboardKeys.length - 1 }"
-            ></template>
-          </div>
-        </ng-template>
-      </ng-container>
-    </div>
+  <div mat-dialog-actions class="action">
+    <button cdkFocusInitial mat-stroked-button (click)="closeDialog()">
+      {{ 'ACTIONS.CLOSE' | translate }}
+    </button>
+    <span class="fill-space"></span>
   </div>
-</div>
-<div mat-dialog-actions class="action">
-  <button cdkFocusInitial mat-stroked-button (click)="closeDialog()">
-    {{ 'ACTIONS.CLOSE' | translate }}
-  </button>
-  <span class="fill-space"></span>
-</div>
 
-<ng-template #actionkey let-key="key" let-last="last">
-  <div class="keyboard-shortcuts-action-key">
-    <div class="keyboard-shortcuts-key-overlay"></div>
-    <span class="keyboard-shortcuts-span">{{ key }}</span>
-  </div>
-  <!-- <span *ngIf="!last" class="keyboard-shortcuts-plus cnsl-secondary-text">+</span> -->
-</ng-template>
+  <ng-template #actionkey let-key="key" let-last="last">
+    <div class="keyboard-shortcuts-action-key">
+      <div class="keyboard-shortcuts-key-overlay"></div>
+      <span class="keyboard-shortcuts-span">{{ key }}</span>
+    </div>
+    <!-- <span *ngIf="!last" class="keyboard-shortcuts-plus cnsl-secondary-text">+</span> -->
+  </ng-template>
+</div>

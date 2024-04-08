@@ -159,6 +159,9 @@ func (p *Provider) GetSP() (*samlsp.Middleware, error) {
 	if p.requestTracker != nil {
 		sp.RequestTracker = p.requestTracker
 	}
+	if p.binding != "" {
+		sp.Binding = p.binding
+	}
 	return sp, nil
 }
 

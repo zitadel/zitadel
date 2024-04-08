@@ -232,16 +232,29 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
+func (c *Commands) AddUserToken(
+	ctx context.Context,
+	orgID,
+	agentID,
+	clientID,
+	userID string,
+	audience,
+	scopes,
+	authMethodsReferences []string,
+	lifetime time.Duration,
+	authTime time.Time,
+	reason domain.TokenReason,
+	actor *domain.TokenActor,
+) (*domain.Token, error) {
 	if userID == "" { //do not check for empty orgID (JWT Profile requests won't provide it, so service user requests fail)
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
-	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, "", audience, scopes, lifetime)
+	cmds, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, "", audience, scopes, authMethodsReferences, lifetime, authTime, reason, actor)
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.eventstore.Push(ctx, event)
+	_, err = c.eventstore.Push(ctx, cmds...)
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +277,7 @@ func (c *Commands) RevokeAccessToken(ctx context.Context, userID, orgID, tokenID
 	return writeModelToObjectDetails(&accessTokenWriteModel.WriteModel), nil
 }
 
-func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, refreshTokenID string, audience, scopes []string, lifetime time.Duration) (*user.UserTokenAddedEvent, *domain.Token, error) {
+func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, refreshTokenID string, audience, scopes, authMethodsReferences []string, lifetime time.Duration, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) ([]eventstore.Command, *domain.Token, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, userWriteModel)
 	if err != nil {
 		return nil, nil, err
@@ -273,10 +286,22 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-1d6Gg", "Errors.User.NotFound")
 	}
 
-	audience = domain.AddAudScopeToAudience(ctx, audience, scopes)
+	//nolint:contextcheck
+	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
+
+	var cmds []eventstore.Command
+	if reason == domain.TokenReasonImpersonation {
+		if err := c.checkPermission(ctx, "impersonation", userWriteModel.ResourceOwner, userWriteModel.AggregateID); err != nil {
+			return nil, nil, err
+		}
+		cmds = append(cmds, user.NewUserImpersonatedEvent(ctx, userAgg, clientID, actor))
+	}
 
 	preferredLanguage := ""
 	existingHuman, err := c.getHumanWriteModelByID(ctx, userWriteModel.AggregateID, userWriteModel.ResourceOwner)
+	if err != nil {
+		return nil, nil, err
+	}
 	if existingHuman != nil {
 		preferredLanguage = existingHuman.PreferredLanguage.String()
 	}
@@ -286,21 +311,25 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 		return nil, nil, err
 	}
 
-	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
-	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, refreshTokenID, audience, scopes, expiration),
-		&domain.Token{
-			ObjectRoot: models.ObjectRoot{
-				AggregateID: userWriteModel.AggregateID,
-			},
-			TokenID:           tokenID,
-			UserAgentID:       agentID,
-			ApplicationID:     clientID,
-			RefreshTokenID:    refreshTokenID,
-			Audience:          audience,
-			Scopes:            scopes,
-			Expiration:        expiration,
-			PreferredLanguage: preferredLanguage,
-		}, nil
+	cmds = append(cmds,
+		user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, refreshTokenID, audience, scopes, authMethodsReferences, authTime, expiration, reason, actor),
+	)
+
+	return cmds, &domain.Token{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: userWriteModel.AggregateID,
+		},
+		TokenID:           tokenID,
+		UserAgentID:       agentID,
+		ApplicationID:     clientID,
+		RefreshTokenID:    refreshTokenID,
+		Audience:          audience,
+		Scopes:            scopes,
+		Expiration:        expiration,
+		PreferredLanguage: preferredLanguage,
+		Reason:            reason,
+		Actor:             actor,
+	}, nil
 }
 
 func (c *Commands) removeAccessToken(ctx context.Context, userID, orgID, tokenID string) (*user.UserTokenRemovedEvent, *UserAccessTokenWriteModel, error) {
@@ -447,8 +476,8 @@ func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 	return exists, nil
 }
 
-func (c *Commands) newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*CryptoCode, error) {
-	return c.newCode(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
+func (c *Commands) newUserInitCode(ctx context.Context, filter preparation.FilterToQueryReducer, alg crypto.EncryptionAlgorithm) (*EncryptedCode, error) {
+	return c.newEncryptedCode(ctx, filter, domain.SecretGeneratorTypeInitCode, alg)
 }
 
 func userWriteModelByID(ctx context.Context, filter preparation.FilterToQueryReducer, userID, resourceOwner string) (*UserWriteModel, error) {

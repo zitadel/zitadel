@@ -180,13 +180,13 @@ export class CnslFormFieldComponent extends CnslFormFieldBase implements OnDestr
               validationErrors: combined[0],
             }
           : combined[1]
-          ? <Help>{
-              type: 'errors',
-            }
-          : <Help>{
-              type: 'hints',
-              validationErrors: undefined,
-            };
+            ? <Help>{
+                type: 'errors',
+              }
+            : <Help>{
+                type: 'hints',
+                validationErrors: undefined,
+              };
       }),
     );
     this._changeDetectorRef.markForCheck();

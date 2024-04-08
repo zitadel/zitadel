@@ -59,6 +59,8 @@ message Factors {
 }
 
 message UserFactor {
+  reserved 5;
+  reserved "organisation_id";
   google.protobuf.Timestamp verified_at = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"time when the user was last checked\"";
@@ -77,12 +79,6 @@ message UserFactor {
   string display_name = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"display name of the checked user\"";
-    }
-  ];
-  // deprecated: use organization_id, will be remove before GA (https://github.com/zitadel/zitadel/issues/6718)
-  string organisation_id = 5 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"organization id of the checked user; deprecated: use organization_id\"";
     }
   ];
   string organization_id = 6 [

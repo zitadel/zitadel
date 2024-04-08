@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -60,14 +61,21 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 	for i, eventType := range req.EventTypes {
 		eventTypes[i] = eventstore.EventType(eventType)
 	}
+
 	aggregateIDs := make([]string, 0, 1)
 	if req.AggregateId != "" {
 		aggregateIDs = append(aggregateIDs, req.AggregateId)
 	}
+
 	aggregateTypes := make([]eventstore.AggregateType, len(req.AggregateTypes))
 	for i, aggregateType := range req.AggregateTypes {
 		aggregateTypes[i] = eventstore.AggregateType(aggregateType)
 	}
+	if len(aggregateTypes) == 0 {
+		aggregateTypes = aggregateTypesFromEventTypes(eventTypes)
+	}
+	aggregateTypes = slices.Compact(aggregateTypes)
+
 	limit := uint64(req.Limit)
 	if limit == 0 || limit > maxLimit {
 		limit = maxLimit
@@ -99,4 +107,14 @@ func eventRequestToFilter(ctx context.Context, req *admin_pb.ListEventsRequest) 
 		builder.CreationDateBefore(fromTime)
 	}
 	return builder, nil
+}
+
+func aggregateTypesFromEventTypes(eventTypes []eventstore.EventType) []eventstore.AggregateType {
+	aggregateTypes := make([]eventstore.AggregateType, 0, len(eventTypes))
+
+	for _, eventType := range eventTypes {
+		aggregateTypes = append(aggregateTypes, eventstore.AggregateTypeFromEventType(eventType))
+	}
+
+	return aggregateTypes
 }

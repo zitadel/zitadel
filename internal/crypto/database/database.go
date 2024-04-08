@@ -8,10 +8,11 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	z_db "github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type database struct {
+type Database struct {
 	client    *z_db.DB
 	masterKey string
 	encrypt   func(key, masterKey string) (encryptedKey string, err error)
@@ -24,11 +25,11 @@ const (
 	encryptionKeysKeyCol = "key"
 )
 
-func NewKeyStorage(client *z_db.DB, masterKey string) (*database, error) {
+func NewKeyStorage(client *z_db.DB, masterKey string) (*Database, error) {
 	if err := checkMasterKeyLength(masterKey); err != nil {
 		return nil, err
 	}
-	return &database{
+	return &Database{
 		client:    client,
 		masterKey: masterKey,
 		encrypt:   crypto.EncryptAESString,
@@ -36,7 +37,7 @@ func NewKeyStorage(client *z_db.DB, masterKey string) (*database, error) {
 	}, nil
 }
 
-func (d *database) ReadKeys() (crypto.Keys, error) {
+func (d *Database) ReadKeys() (crypto.Keys, error) {
 	keys := make(map[string]string)
 	stmt, args, err := sq.Select(encryptionKeysIDCol, encryptionKeysKeyCol).
 		From(EncryptionKeysTable).
@@ -67,7 +68,7 @@ func (d *database) ReadKeys() (crypto.Keys, error) {
 	return keys, nil
 }
 
-func (d *database) ReadKey(id string) (_ *crypto.Key, err error) {
+func (d *Database) ReadKey(id string) (_ *crypto.Key, err error) {
 	stmt, args, err := sq.Select(encryptionKeysKeyCol).
 		From(EncryptionKeysTable).
 		Where(sq.Eq{encryptionKeysIDCol: id}).
@@ -99,7 +100,7 @@ func (d *database) ReadKey(id string) (_ *crypto.Key, err error) {
 	}, nil
 }
 
-func (d *database) CreateKeys(ctx context.Context, keys ...*crypto.Key) error {
+func (d *Database) CreateKeys(ctx context.Context, keys ...*crypto.Key) error {
 	insert := sq.Insert(EncryptionKeysTable).
 		Columns(encryptionKeysIDCol, encryptionKeysKeyCol).PlaceholderFormat(sq.Dollar)
 	for _, key := range keys {
@@ -113,7 +114,9 @@ func (d *database) CreateKeys(ctx context.Context, keys ...*crypto.Key) error {
 	if err != nil {
 		return zerrors.ThrowInternal(err, "", "unable to insert new keys")
 	}
+	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := d.client.BeginTx(ctx, nil)
+	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "", "unable to insert new keys")
 	}

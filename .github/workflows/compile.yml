@@ -33,9 +33,9 @@ jobs:
     
     steps:
     - 
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - 
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       timeout-minutes: 1
       name: restore console
       with:
@@ -43,7 +43,7 @@ jobs:
         key: ${{ inputs.console_cache_key }}
         fail-on-cache-miss: true
     - 
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       timeout-minutes: 1
       name: restore core
       with:
@@ -51,7 +51,7 @@ jobs:
         key: ${{ inputs.core_cache_key }}
         fail-on-cache-miss: true
     -
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: ${{ inputs.go_version }}
     - 
@@ -72,7 +72,7 @@ jobs:
         cp README.md zitadel-${{ matrix.goos }}-${{ matrix.goarch }}/
         tar -czvf zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
     - 
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
         path: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}.tar.gz
@@ -82,7 +82,7 @@ jobs:
     needs: executable
     steps:
     - 
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: executables
     - 
@@ -93,7 +93,7 @@ jobs:
       run: sha256sum * > checksums.txt
       working-directory: executables
     - 
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: checksums.txt
         path: executables/checksums.txt

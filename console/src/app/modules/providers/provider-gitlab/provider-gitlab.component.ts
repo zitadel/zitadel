@@ -4,7 +4,7 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute } from '@angular/router';
-import { take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddGitLabProviderRequest as AdminAddGitLabProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
@@ -24,6 +24,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
   selector: 'cnsl-provider-gitlab',
@@ -32,8 +33,11 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 export class ProviderGitlabComponent {
   public showOptional: boolean = false;
   public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
@@ -45,6 +49,25 @@ export class ProviderGitlabComponent {
   public provider?: Provider.AsObject;
   public updateClientSecret: boolean = false;
 
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#optional-add-zitadel-action-to-autofill-userdata`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/gitlab#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+  public copyUrls$ = this.nextSvc.callbackUrls();
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -52,6 +75,7 @@ export class ProviderGitlabComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
+    private nextSvc: ProviderNextService,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', []),
@@ -65,8 +89,8 @@ export class ProviderGitlabComponent {
         this.serviceType === PolicyComponentServiceType.ADMIN
           ? ['iam.idp.write']
           : this.serviceType === PolicyComponentServiceType.MGMT
-          ? ['org.idp.write']
-          : [],
+            ? ['org.idp.write']
+            : [],
       )
       .pipe(take(1))
       .subscribe((allowed) => {
@@ -111,6 +135,10 @@ export class ProviderGitlabComponent {
     });
   }
 
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
+  }
+
   private getData(id: string): void {
     const req =
       this.serviceType === PolicyComponentServiceType.ADMIN
@@ -134,7 +162,7 @@ export class ProviderGitlabComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateGitlabProvider() : this.addGitlabProvider();
+    this.provider || this.justCreated$.value ? this.updateGitlabProvider() : this.addGitlabProvider();
   }
 
   public addGitlabProvider(): void {
@@ -152,11 +180,9 @@ export class ProviderGitlabComponent {
     this.loading = true;
     this.service
       .addGitLabProvider(req)
-      .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.close();
-        }, 2000);
+      .then((addedIDP) => {
+        this.justCreated$.next(addedIDP.id);
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -165,12 +191,12 @@ export class ProviderGitlabComponent {
   }
 
   public updateGitlabProvider(): void {
-    if (this.provider) {
+    if (this.provider || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateGitLabProviderRequest()
           : new AdminUpdateGitLabProviderRequest();
-      req.setId(this.provider.id);
+      req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setClientId(this.clientId?.value);
       req.setScopesList(this.scopesList?.value);

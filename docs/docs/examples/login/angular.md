@@ -161,7 +161,7 @@ This line automatically refreshes a token before it expires.
 
 Congratulations! You have successfully integrated your Angular application with ZITADEL!
 
-If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-angular) application. This application includes all the funcationalities mentioned in this quickstart. You can start by cloning the repository and replacing the _AuthConfig_ in the _AppModule_ with your own configuration. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel).
+If you get stuck, consider checking out our [example](https://github.com/zitadel/zitadel-angular) application. This application includes all the functionalities mentioned in this quick-start. You can start by cloning the repository and replacing the _AuthConfig_ in the _AppModule_ with your own configuration. If you face issues, contact us or raise an issue on [GitHub](https://github.com/zitadel/zitadel).
 
 ![App in console](/img/angular/app-screen.png)
 

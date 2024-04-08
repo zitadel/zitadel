@@ -269,7 +269,7 @@ MZbmlCoBru+rC8ITlTX/0V1ZcsSbL8tYWhthyu9x6yjo1bH85wiVI4gs0MhU8f2a
 -----END PUBLIC KEY-----
 `
 
-func TestQueries_GetActivePublicKeyByID(t *testing.T) {
+func TestQueries_GetPublicKeyByID(t *testing.T) {
 	now := time.Now()
 	future := now.Add(time.Hour)
 
@@ -293,38 +293,6 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 				expectFilter(),
 			),
 			wantErr: zerrors.ThrowNotFound(nil, "QUERY-Ahf7x", "Errors.Key.NotFound"),
-		},
-		{
-			name: "expired error",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(key_repo.NewAddedEvent(context.Background(),
-						&eventstore.Aggregate{
-							ID:            "keyID",
-							Type:          key_repo.AggregateType,
-							ResourceOwner: "instanceID",
-							InstanceID:    "instanceID",
-							Version:       key_repo.AggregateVersion,
-						},
-						domain.KeyUsageSigning, "alg",
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
-							Algorithm:  "alg",
-							KeyID:      "keyID",
-							Crypted:    []byte("private"),
-						},
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
-							Algorithm:  "alg",
-							KeyID:      "keyID",
-							Crypted:    []byte("public"),
-						},
-						now.Add(-time.Hour),
-						now.Add(-time.Hour),
-					)),
-				),
-			),
-			wantErr: zerrors.ThrowInvalidArgument(nil, "QUERY-ciF4k", "Errors.Key.ExpireBeforeNow"),
 		},
 		{
 			name: "decrypt error",
@@ -470,7 +438,7 @@ func TestQueries_GetActivePublicKeyByID(t *testing.T) {
 				q.keyEncryptionAlgorithm = tt.encryption(t)
 			}
 			ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
-			key, err := q.GetActivePublicKeyByID(ctx, "keyID", now)
+			key, err := q.GetPublicKeyByID(ctx, "keyID")
 			if tt.wantErr != nil {
 				require.ErrorIs(t, err, tt.wantErr)
 				return

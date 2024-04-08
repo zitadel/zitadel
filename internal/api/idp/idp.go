@@ -393,7 +393,7 @@ func (h *Handler) fetchIDPUserFromCode(ctx context.Context, identityProvider idp
 	case *openid.Provider:
 		session = &openid.Session{Provider: provider, Code: code}
 	case *azuread.Provider:
-		session = &azuread.Session{Session: &oauth.Session{Provider: provider.Provider, Code: code}}
+		session = &azuread.Session{Provider: provider, Code: code}
 	case *github.Provider:
 		session = &oauth.Session{Provider: provider.Provider, Code: code}
 	case *gitlab.Provider:

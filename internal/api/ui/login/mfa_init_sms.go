@@ -99,7 +99,7 @@ func (l *Login) handleRegisterSMSCheck(w http.ResponseWriter, r *http.Request) {
 	if formData.Code == "" {
 		data.Phone = formData.NewPhone
 		if formData.NewPhone != formData.Phone {
-			_, err = l.command.ChangeUserPhone(ctx, authReq.UserID, authReq.UserOrgID, formData.NewPhone, l.userCodeAlg)
+			_, err = l.command.ChangeUserPhone(ctx, authReq.UserID, formData.NewPhone, l.userCodeAlg)
 			if err != nil {
 				// stay in edit more
 				data.Edit = true
@@ -109,7 +109,7 @@ func (l *Login) handleRegisterSMSCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = l.command.VerifyUserPhone(ctx, authReq.UserID, authReq.UserOrgID, formData.Code, l.userCodeAlg)
+	_, err = l.command.VerifyUserPhone(ctx, authReq.UserID, formData.Code, l.userCodeAlg)
 	if err != nil {
 		l.renderRegisterSMS(w, r, authReq, data, err)
 		return

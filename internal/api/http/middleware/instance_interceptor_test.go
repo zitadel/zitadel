@@ -7,12 +7,14 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	zitadel_http "github.com/zitadel/zitadel/internal/api/http"
+	"github.com/zitadel/zitadel/internal/feature"
 )
 
 func Test_instanceInterceptor_Handler(t *testing.T) {
@@ -299,6 +301,14 @@ func (m *mockInstanceVerifier) InstanceByID(context.Context) (authz.Instance, er
 
 type mockInstance struct{}
 
+func (m *mockInstance) Block() *bool {
+	panic("shouldn't be called here")
+}
+
+func (m *mockInstance) AuditLogRetention() *time.Duration {
+	panic("shouldn't be called here")
+}
+
 func (m *mockInstance) InstanceID() string {
 	return "instanceID"
 }
@@ -333,4 +343,12 @@ func (m *mockInstance) RequestedHost() string {
 
 func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
+}
+
+func (m *mockInstance) EnableImpersonation() bool {
+	return false
+}
+
+func (m *mockInstance) Features() feature.Features {
+	return feature.Features{}
 }

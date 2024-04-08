@@ -1,8 +1,11 @@
 package settings
 
 import (
+	"time"
+
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
@@ -31,11 +34,11 @@ func loginSettingsToPb(current *query.LoginPolicy) *settings.LoginSettings {
 		DisableLoginWithEmail:      current.DisableLoginWithEmail,
 		DisableLoginWithPhone:      current.DisableLoginWithPhone,
 		DefaultRedirectUri:         current.DefaultRedirectURI,
-		PasswordCheckLifetime:      durationpb.New(current.PasswordCheckLifetime),
-		ExternalLoginCheckLifetime: durationpb.New(current.ExternalLoginCheckLifetime),
-		MfaInitSkipLifetime:        durationpb.New(current.MFAInitSkipLifetime),
-		SecondFactorCheckLifetime:  durationpb.New(current.SecondFactorCheckLifetime),
-		MultiFactorCheckLifetime:   durationpb.New(current.MultiFactorCheckLifetime),
+		PasswordCheckLifetime:      durationpb.New(time.Duration(current.PasswordCheckLifetime)),
+		ExternalLoginCheckLifetime: durationpb.New(time.Duration(current.ExternalLoginCheckLifetime)),
+		MfaInitSkipLifetime:        durationpb.New(time.Duration(current.MFAInitSkipLifetime)),
+		SecondFactorCheckLifetime:  durationpb.New(time.Duration(current.SecondFactorCheckLifetime)),
+		MultiFactorCheckLifetime:   durationpb.New(time.Duration(current.MultiFactorCheckLifetime)),
 		SecondFactors:              second,
 		MultiFactors:               multi,
 		ResourceOwnerType:          isDefaultToResourceOwnerTypePb(current.IsDefault),
@@ -203,5 +206,23 @@ func idpTypeToPb(idpType domain.IDPType) settings.IdentityProviderType {
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE
 	default:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED
+	}
+}
+
+func securityPolicyToSettingsPb(policy *query.SecurityPolicy) *settings.SecuritySettings {
+	return &settings.SecuritySettings{
+		EmbeddedIframe: &settings.EmbeddedIframeSettings{
+			Enabled:        policy.EnableIframeEmbedding,
+			AllowedOrigins: policy.AllowedOrigins,
+		},
+		EnableImpersonation: policy.EnableImpersonation,
+	}
+}
+
+func securitySettingsToCommand(req *settings.SetSecuritySettingsRequest) *command.SecurityPolicy {
+	return &command.SecurityPolicy{
+		EnableIframeEmbedding: req.GetEmbeddedIframe().GetEnabled(),
+		AllowedOrigins:        req.GetEmbeddedIframe().GetAllowedOrigins(),
+		EnableImpersonation:   req.GetEnableImpersonation(),
 	}
 }

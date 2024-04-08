@@ -2,6 +2,8 @@
   <h1 class="home-title" data-e2e="authenticated-welcome">{{ 'HOME.WELCOME' | translate }}</h1>
 
   <div class="home-wrapper enlarged-container">
+    <cnsl-quickstart></cnsl-quickstart>
+
     <ng-container *ngIf="['iam.read$'] | hasRole | async; else defaultHome">
       <cnsl-onboarding></cnsl-onboarding>
     </ng-container>
@@ -15,27 +17,6 @@
     <h2 class="desc">{{ 'ONBOARDING.MOREDESCRIPTION' | translate }}</h2>
 
     <div class="home-grid-container">
-      <a href="https://zitadel.com/docs" target="_blank" rel="noreferrer" class="grid-item">
-        <div
-          class="icon-wrapper"
-          [ngStyle]="{
-            background: (themeService.isDarkTheme | async) ? bluedark + 50 : bluelight + 50
-          }"
-        >
-          <div
-            class="inner"
-            [ngStyle]="{
-              background: (themeService.isDarkTheme | async) ? bluedark : bluelight,
-              color: (themeService.isDarkTheme | async) ? bluelight : bluedark
-            }"
-          >
-            <i class="las la-file-alt"></i>
-          </div>
-        </div>
-
-        <span>{{ 'HOME.DOCUMENTATION.TITLE' | translate }}</span>
-      </a>
-
       <a href="https://zitadel.com/docs/guides/start/quickstart" target="_blank" rel="noreferrer" class="grid-item">
         <div
           class="icon-wrapper"
@@ -53,10 +34,38 @@
             <i class="las la-play"></i>
           </div>
         </div>
-        <span>{{ 'HOME.GETSTARTED.TITLE' | translate }}</span>
+        <div class="text-block">
+          <span>{{ 'DESCRIPTIONS.HOME.MORE_SHORTCUTS.GET_STARTED.TITLE' | translate }}</span>
+          <div class="more-shortcuts-description">
+            <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.HOME.MORE_SHORTCUTS.GET_STARTED.DESCRIPTION' | translate }}</p>
+          </div>
+        </div>
       </a>
-
-      <a href="https://zitadel.com/docs/examples/introduction" target="_blank" rel="noreferrer" class="grid-item">
+      <a href="https://zitadel.com/docs" target="_blank" rel="noreferrer" class="grid-item">
+        <div
+          class="icon-wrapper"
+          [ngStyle]="{
+            background: (themeService.isDarkTheme | async) ? bluedark + 50 : bluelight + 50
+          }"
+        >
+          <div
+            class="inner"
+            [ngStyle]="{
+              background: (themeService.isDarkTheme | async) ? bluedark : bluelight,
+              color: (themeService.isDarkTheme | async) ? bluelight : bluedark
+            }"
+          >
+            <i class="las la-file-alt"></i>
+          </div>
+        </div>
+        <div class="text-block">
+          <span>{{ 'DESCRIPTIONS.HOME.MORE_SHORTCUTS.DOCS.TITLE' | translate }}</span>
+          <div class="more-shortcuts-description">
+            <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.HOME.MORE_SHORTCUTS.DOCS.DESCRIPTION' | translate }}</p>
+          </div>
+        </div>
+      </a>
+      <a href="https://zitadel.com/docs/sdk-examples/introduction" target="_blank" rel="noreferrer" class="grid-item">
         <div
           class="icon-wrapper"
           [ngStyle]="{
@@ -73,7 +82,12 @@
             <i class="las la-play"></i>
           </div>
         </div>
-        <span>{{ 'HOME.QUICKSTARTS.TITLE' | translate }}</span>
+        <div class="text-block">
+          <span>{{ 'DESCRIPTIONS.HOME.MORE_SHORTCUTS.EXAMPLES.TITLE' | translate }}</span>
+          <div class="more-shortcuts-description">
+            <p class="cnsl-secondary-text">{{ 'DESCRIPTIONS.HOME.MORE_SHORTCUTS.EXAMPLES.DESCRIPTION' | translate }}</p>
+          </div>
+        </div>
       </a>
     </div>
   </div>

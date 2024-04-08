@@ -23,8 +23,8 @@
         'project.member.write:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
           ? $any(project)?.id
           : projectType === ProjectType.PROJECTTYPE_GRANTED
-          ? $any(project)?.projectId
-          : ''
+            ? $any(project)?.projectId
+            : ''
       ]
         | hasRole
         | async
@@ -35,8 +35,8 @@
         'project.member.delete:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
           ? $any(project)?.id
           : projectType === ProjectType.PROJECTTYPE_GRANTED
-          ? $any(project)?.projectId
-          : ''
+            ? $any(project)?.projectId
+            : ''
       ]
         | hasRole
         | async
@@ -50,8 +50,8 @@
         'project.member.delete:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
           ? $any(project)?.id
           : projectType === ProjectType.PROJECTTYPE_GRANTED
-          ? $any(project)?.projectId
-          : '',
+            ? $any(project)?.projectId
+            : '',
         'project.member.delete'
       ]"
     >
@@ -74,8 +74,8 @@
         'project.member.write:' + (projectType === ProjectType.PROJECTTYPE_OWNED)
           ? $any(project)?.id
           : projectType === ProjectType.PROJECTTYPE_GRANTED
-          ? $any(project)?.projectId
-          : '',
+            ? $any(project)?.projectId
+            : '',
         'project.member.write'
       ]"
     >

@@ -1,0 +1,115 @@
+[
+  {
+    "id": "angular",
+    "title": "Angular",
+    "description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
+    "imgSrcLight": "/docs/img/tech/angular.svg",
+    "imgSrcDark": "/docs/img/tech/angular.svg",
+    "docsLink": "/docs/sdk-examples/angular"
+  },
+  {
+    "id": "flutter",
+    "title": "Flutter",
+    "imgSrcDark": "/docs/img/tech/flutter.svg",
+    "docsLink": "/docs/sdk-examples/flutter"
+  },
+  {
+    "title": "Go",
+    "imgSrcDark": "/docs/img/tech/golang.svg",
+    "docsLink": "/docs/sdk-examples/go"
+  },
+  {
+    "id": "java",
+    "title": "Java",
+    "imgSrcDark": "/docs/img/tech/java.svg",
+    "docsLink": "/docs/sdk-examples/java"
+  },
+  {
+    "title": "NestJS",
+    "imgSrcDark": "/docs/img/tech/nestjs.svg",
+    "docsLink": "/docs/sdk-examples/nestjs"
+  },
+  {
+    "id": "next",
+    "title": "Next.js",
+    "imgSrcDark": "/docs/img/tech/nextjs.svg",
+    "imgSrcLight": "/docs/img/tech/nextjslight.svg",
+    "docsLink": "/docs/sdk-examples/nextjs"
+  },
+  {
+    "id": "django",
+    "title": "Python Django",
+    "imgSrcDark": "/docs/img/tech/django.png",
+    "docsLink": "/docs/sdk-examples/python-django"
+  },
+  {
+    "title": "Python Flask",
+    "imgSrcDark": "/docs/img/tech/flask.svg",
+    "imgSrcLight": "/docs/img/tech/flasklight.svg",
+    "docsLink": "/docs/sdk-examples/python-flask"
+  },
+  {
+    "id": "react",
+    "title": "React",
+    "description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
+    "imgSrcDark": "/docs/img/tech/react.png",
+    "docsLink": "/docs/sdk-examples/react"
+  },
+  {
+    "id": "symfony",
+    "title": "Symfony",
+    "imgSrcDark": "/docs/img/tech/php.svg",
+    "docsLink": "/docs/sdk-examples/symfony"
+  },
+  {
+    "id": "vue",
+    "title": "Vue.js",
+    "description": "This preset sets up an OIDC configuration with Authentication Code Flow, secured by PKCE",
+    "imgSrcDark": "/docs/img/tech/vue.svg",
+    "docsLink": "/docs/sdk-examples/vue"
+  },
+  {
+    "title": "Dart",
+    "imgSrcDark": "/docs/img/tech/dart.svg",
+    "docsLink": "https://github.com/smartive/zitadel-dart",
+    "external": true
+  },
+  {
+    "title": "Elixir",
+    "imgSrcDark": "/docs/img/tech/elixir.svg",
+    "docsLink": "https://github.com/maennchen/zitadel_api",
+    "external": true
+  },
+  {
+    "title": "NextAuth",
+    "imgSrcDark": "/docs/img/tech/nextjs.svg",
+    "imgSrcLight": "/docs/img/tech/nextjslight.svg",
+    "docsLink": "https://next-auth.js.org/providers/zitadel",
+    "external": true
+  },
+  {
+    "title": "Node.js",
+    "imgSrcDark": "/docs/img/tech/nodejs.svg",
+    "docsLink": "https://www.npmjs.com/package/@zitadel/node",
+    "external": true
+  },
+  {
+    "title": ".Net",
+    "imgSrcDark": "/docs/img/tech/dotnet.svg",
+    "docsLink": "https://github.com/smartive/zitadel-net",
+    "external": true
+  },
+  {
+    "title": "Passport.js",
+    "imgSrcDark": "/docs/img/tech/passportjs.svg",
+    "docsLink": "https://github.com/buehler/node-passport-zitadel",
+    "external": true
+  },
+  {
+    "title": "Rust",
+    "imgSrcLight": "/docs/img/tech/rust.svg",
+    "imgSrcDark": "/docs/img/tech/rustlight.svg",
+    "docsLink": "https://github.com/smartive/zitadel-rust",
+    "external": true
+  }
+]

@@ -1,6 +1,6 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, signal } from '@angular/core';
 import { AbstractControl, FormControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
@@ -77,6 +77,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public authMethods: RadioItemAuthType[] = [];
   private subscription?: Subscription;
   public projectId: string = '';
+  public appId: string = '';
   public app?: App.AsObject;
 
   public environmentMap$ = this.envSvc.env.pipe(
@@ -92,7 +93,26 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       };
     }),
   );
-  public wellKnownMap$ = this.envSvc.wellKnown;
+  public apiMap$ = this.envSvc.env.pipe(
+    map((env) => {
+      return {
+        issuer: env.issuer,
+        adminServiceUrl: `${env.api}/admin/v1`,
+        mgmtServiceUrl: `${env.api}/management/v1`,
+        authServiceUrl: `${env.api}/auth/v1`,
+      };
+    }),
+  );
+  public samlMap$ = this.envSvc.env.pipe(
+    map((env) => {
+      return {
+        samlCertificateURL: `${env.issuer}/saml/v2/certificate`,
+        samlSSO: `${env.issuer}/saml/v2/SSO`,
+        samlSLO: `${env.issuer}/saml/v2/SLO`,
+      };
+    }),
+  );
+  public wellknownMap$ = this.envSvc.wellknown;
 
   public oidcResponseTypes: OIDCResponseType[] = [
     OIDCResponseType.OIDC_RESPONSE_TYPE_CODE,
@@ -104,6 +124,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     OIDCGrantType.OIDC_GRANT_TYPE_IMPLICIT,
     OIDCGrantType.OIDC_GRANT_TYPE_DEVICE_CODE,
     OIDCGrantType.OIDC_GRANT_TYPE_REFRESH_TOKEN,
+    OIDCGrantType.OIDC_GRANT_TYPE_TOKEN_EXCHANGE,
   ];
   public oidcAppTypes: OIDCAppType[] = [
     OIDCAppType.OIDC_APP_TYPE_WEB,
@@ -149,6 +170,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public settingsList: SidenavSetting[] = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION' }];
   public currentSetting: string | undefined = this.settingsList[0].id;
 
+  public isNew = signal<boolean>(false);
   constructor(
     private envSvc: EnvironmentService,
     public translate: TranslateService,
@@ -191,7 +213,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       metadataXml: [{ value: '', disabled: true }],
     });
 
-    this.samlForm.valueChanges.subscribe((form) => {
+    this.samlForm.valueChanges.subscribe(() => {
+      if (!this.app) {
+        this.app = new App().toObject();
+      }
+      if (!this.app.samlConfig) {
+        this.app.samlConfig = new SAMLConfig().toObject();
+      }
+
       let minimalMetadata =
         this.entityId?.value && this.acsURL?.value
           ? `<?xml version="1.0"?>
@@ -202,15 +231,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 </md:EntityDescriptor>`
           : '';
 
-      if (this.metadataUrl && this.metadataUrl.value.length > 0) {
-        if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml) {
-          this.app.samlConfig.metadataXml = '';
-        }
-      }
-
-      if (this.app && this.app.samlConfig && this.app.samlConfig.metadataXml && minimalMetadata) {
+      if (minimalMetadata) {
         const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
         this.app.samlConfig.metadataXml = base64;
+        this.app.samlConfig.metadataUrl = '';
+      }
+
+      if (this.metadataUrl?.value) {
+        this.app.samlConfig.metadataXml = '';
+        this.app.samlConfig.metadataUrl = this.metadataUrl?.value;
       }
     });
   }
@@ -245,9 +274,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     const projectId = this.route.snapshot.paramMap.get('projectid');
     const appId = this.route.snapshot.paramMap.get('appid');
+    const isNew = this.route.snapshot.queryParamMap.get('new');
+
+    this.isNew.set(isNew === 'true');
 
     if (projectId && appId) {
       this.projectId = projectId;
+      this.appId = appId;
       this.getData(projectId, appId);
     }
   }
@@ -635,6 +668,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               this.currentAuthMethod = this.authMethodFromPartialConfig(config);
             }
             this.toast.showInfo('APP.TOAST.OIDCUPDATED', true);
+            setTimeout(() => {
+              this.getData(this.projectId, this.appId);
+            }, 1000);
           })
           .catch((error) => {
             this.toast.showError(error);
@@ -684,8 +720,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       req.setProjectId(this.projectId);
       req.setAppId(this.app.id);
 
-      if (this.app.samlConfig) {
+      if (this.app.samlConfig?.metadataUrl.length > 0) {
         req.setMetadataUrl(this.app.samlConfig?.metadataUrl);
+      }
+      if (this.app.samlConfig?.metadataXml.length > 0) {
         req.setMetadataXml(this.app.samlConfig?.metadataXml);
       }
 

@@ -31,11 +31,11 @@ type SessionCommands struct {
 	eventstore         *eventstore.Eventstore
 	eventCommands      []eventstore.Command
 
-	hasher      *crypto.PasswordHasher
+	hasher      *crypto.Hasher
 	intentAlg   crypto.EncryptionAlgorithm
 	totpAlg     crypto.EncryptionAlgorithm
 	otpAlg      crypto.EncryptionAlgorithm
-	createCode  cryptoCodeWithDefaultFunc
+	createCode  encryptedCodeWithDefaultFunc
 	createToken func(sessionID string) (id string, token string, err error)
 	now         func() time.Time
 }
@@ -49,7 +49,7 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 		intentAlg:         c.idpConfigEncryption,
 		totpAlg:           c.multifactors.OTP.CryptoMFA,
 		otpAlg:            c.userEncryption,
-		createCode:        c.newCodeWithDefault,
+		createCode:        c.newEncryptedCodeWithDefault,
 		createToken:       c.sessionTokenCreator,
 		now:               time.Now,
 	}
@@ -228,7 +228,7 @@ func (s *SessionCommands) OTPEmailChecked(ctx context.Context, checkedAt time.Ti
 
 func (s *SessionCommands) SetToken(ctx context.Context, tokenID string) {
 	// trigger activity log for session for user
-	activity.Trigger(ctx, s.sessionWriteModel.UserResourceOwner, s.sessionWriteModel.UserID, activity.SessionAPI)
+	activity.Trigger(ctx, s.sessionWriteModel.UserResourceOwner, s.sessionWriteModel.UserID, activity.SessionAPI, s.eventstore.FilterToQueryReducer)
 	s.eventCommands = append(s.eventCommands, session.NewTokenSetEvent(ctx, s.sessionWriteModel.aggregate, tokenID))
 }
 

@@ -19,6 +19,7 @@
   .home-title {
     font-size: 2rem;
     margin-bottom: 1rem;
+    margin-top: 3rem;
   }
 
   .home-wrapper {
@@ -62,7 +63,7 @@
         padding: 1rem;
         display: flex;
         flex-direction: row;
-        align-items: center;
+        align-items: flex-start;
         box-sizing: border-box;
         font-size: 14px;
         background-color: $card-background-color;
@@ -127,6 +128,7 @@
           border-radius: 50vw;
           flex-shrink: 0;
           margin-right: 1rem;
+          align-self: center;
 
           .inner {
             border-radius: 50vw;

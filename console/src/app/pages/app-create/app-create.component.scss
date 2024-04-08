@@ -5,6 +5,20 @@ h1 {
 .app-create-main-content {
   max-width: 35rem;
 
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    &.reverse {
+      flex-direction: column-reverse;
+    }
+  }
+
+  .error-msg {
+    margin-top: 0.25rem;
+    display: block;
+  }
+
   .app-create-btn-container {
     display: flex;
     align-items: center;
@@ -16,10 +30,5 @@ h1 {
       height: 3.5rem;
       padding: 0 4rem;
     }
-  }
-
-  .complexity-view {
-    width: 100%;
-    margin: 0 0.5rem;
   }
 }

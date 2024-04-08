@@ -3,7 +3,6 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/feature"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	auth_handler "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -77,7 +76,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			ProjectProvider:           queryView,
 			ApplicationProvider:       queries,
 			CustomTextProvider:        queries,
-			FeatureCheck:              feature.NewCheck(esV2),
 			IdGenerator:               id.SonyFlakeGenerator(),
 		},
 		eventstore.TokenRepo{
@@ -118,7 +116,7 @@ func (q queryViewWrapper) UserGrantsByProjectAndUserID(ctx context.Context, proj
 		return nil, err
 	}
 	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID}}
-	grants, err := q.Queries.UserGrants(ctx, queries, true, false)
+	grants, err := q.Queries.UserGrants(ctx, queries, true)
 	if err != nil {
 		return nil, err
 	}

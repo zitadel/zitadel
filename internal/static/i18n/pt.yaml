@@ -31,6 +31,8 @@ Errors:
   Limits:
     NotFound: Limite não encontrado
     NoneSpecified: Nenhum limite especificado
+    Instance:
+      Blocked: A instância está bloqueada
   Restrictions:
     NoneSpecified: Nenhuma restrição especificada
     DefaultLanguageMustBeAllowed: O idioma padrão deve ser permitido
@@ -58,7 +60,6 @@ Errors:
   Notification:
     NoDomain: Nenhum domínio encontrado para a mensagem
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: Usuário não pôde ser encontrado
     AlreadyExists: Usuário já existe
     NotFoundOnOrg: Usuário não pôde ser encontrado na organização escolhida
@@ -126,6 +127,7 @@ Errors:
       NotFound: Código não encontrado
       Expired: Código expirou
       GeneratorAlgNotSupported: Algoritmo do gerador não suportado
+      Invalid: Código é inválido
     Password:
       NotFound: Senha não encontrada
       Empty: Senha está vazia
@@ -323,7 +325,7 @@ Errors:
       NotActive: A concessão do projeto não está ativa
       NotInactive: A concessão do projeto não está inativa
   IAM:
-    NotFound: Instância não encontrada. Confira https://zitadel.com/docs/self-hosting/manage/custom-domain
+    NotFound: IAM não encontrado. Verifique se você tem o domínio correto. Consulte https://zitadel.com/docs/apis/introduction#domains
     Member:
       RolesNotChanged: As funções não foram alteradas
     MemberInvalid: O membro é inválido
@@ -474,6 +476,7 @@ Errors:
     CloseRows: A instrução SQL não pôde ser concluída
     SQLStatement: Não foi possível criar a instrução SQL
     InvalidRequest: O pedido é inválido
+    TooManyNestingLevels: muitos níveis de aninhamento de consulta (máx. 20)
   Quota:
     AlreadyExists: Cota já existe para esta unidade
     NotFound: Cota não encontrada para esta unidade
@@ -526,6 +529,38 @@ Errors:
     NotExisting: O recurso não existe
     TypeNotSupported: O tipo de recurso não é compatível
     InvalidValue: Valor inválido para este recurso
+  Target:
+    Invalid: A meta é inválida
+    NoTimeout: O destino não tem tempo limite
+    InvalidURL: O destino tem um URL inválido
+    NotFound: Destino não encontrado
+  Execution:
+    ConditionInvalid: A condição de execução é inválida
+    Invalid: A execução é inválida
+    NotFound: Execução não encontrada
+    IncludeNotFound: Incluir não encontrado
+    NoTargets: Nenhuma meta definida
+  UserSchema:
+    NotEnabled: O recurso "Esquema do usuário" não está habilitado
+    Type:
+      Missing: Tipo de esquema de usuário ausente
+      AlreadyExists: O tipo de esquema de usuário já existe
+    Authenticator:
+      Invalid: Tipo de autenticador inválido
+    NotActive: Esquema do usuário não ativo
+    NotInactive: Esquema do usuário não inativo
+    NotExists: O esquema do usuário não existe
+  TokenExchange:
+    FeatureDisabled: O recurso Token Exchange está desabilitado para sua instância. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: O token está faltando
+      Invalid: O token é inválido
+      TypeMissing: O tipo de token está faltando
+      TypeNotAllowed: O tipo de token não é permitido
+      TypeNotSupported: O tipo de token não é compatível
+      NotForAPI: Tokens personificados não permitidos para API
+    Impersonation:
+      PolicyDisabled: A representação está desativada na política de segurança da instância
 
 AggregateTypes:
   action: Ação
@@ -537,8 +572,18 @@ AggregateTypes:
   usergrant: Concessão de usuário
   quota: Cota
   feature: Recurso
+  target: Objetivo
+  execution: Execução
+  user_schema: Esquema do usuário
 
 EventTypes:
+  execution:
+    set: Conjunto de execução
+    removed: Execução excluída
+  target:
+    added: Destino criado
+    changed: Destino alterada
+    removed: Destino excluído
   user:
     added: Usuário adicionado
     selfregistered: Usuário se registrou
@@ -552,6 +597,7 @@ EventTypes:
     token:
       added: Token de acesso criado
       removed: Token de acesso removido
+    impersonated: Usuário personificado
     username:
       reserved: Nome de usuário reservado
       released: Nome de usuário liberado
@@ -574,6 +620,7 @@ EventTypes:
         removed: Chave removida
       secret:
         set: Segredo definido
+        updated: Hash secreto atualizado
         removed: Segredo removido
         check:
           succeeded: Verificação de segredo bem-sucedida
@@ -948,6 +995,11 @@ EventTypes:
           check:
             succeeded: Verificação de segredo do cliente OIDC bem-sucedida
             failed: Verificação de segredo do cliente OIDC falhou
+      api:
+        secret:
+          check:
+            succeeded: Verificação secreta da API bem-sucedida
+            failed: Falha na verificação do segredo da API
         key:
           added: Chave do aplicativo adicionada
           removed: Chave do aplicativo removida
@@ -960,11 +1012,13 @@ EventTypes:
           changed: Configuração OIDC alterada
           secret:
             changed: Segredo OIDC alterado
+            updated: Hash secreto do OIDC atualizado
         api:
           added: Configuração de API adicionada
           changed: Configuração de API alterada
           secret:
             changed: Segredo da API alterado
+            updated: Hash secreto da API atualizado
   policy:
     password:
       complexity:
@@ -1207,6 +1261,12 @@ EventTypes:
         password:
           changed: Senha da configuração SMTP alterada
         removed: Configuração SMTP removida
+  user_schema:
+    created: Esquema de usuário criado
+    updated: Esquema do usuário atualizado
+    deactivated: Esquema de usuário desativado
+    reactivated: Esquema do usuário reativado
+    deleted: Esquema do usuário excluído
 
 Application:
   OIDC:

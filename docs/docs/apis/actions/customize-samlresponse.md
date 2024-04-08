@@ -2,11 +2,15 @@
 title: Complement SAMLResponse
 ---
 
-This flow is executed before the return of the SAMLResponse.
+This flow is executed before the return of the SAML Response.
+
+The flow is represented by the following Ids in the API: `4`
 
 ## Pre SAMLResponse creation
 
 This trigger is called before attributes are set in the SAMLResponse.
+
+The trigger is represented by the following Ids in the API: `6`.
 
 ### Parameters of Pre SAMLResponse creation
 
@@ -17,6 +21,8 @@ This trigger is called before attributes are set in the SAMLResponse.
     - `user`
       - `getMetadata()` [*metadataResult*](./objects#metadata-result)
       - `grants` [*UserGrantList*](./objects#user-grant-list)
+    - `org`
+      - `getMetadata()` [*metadataResult*](./objects#metadata-result)
 - `api`  
   The second parameter contains the following fields:
   - `v1`
