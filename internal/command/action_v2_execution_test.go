@@ -19,7 +19,6 @@ func existsMock(exists bool) func(method string) bool {
 		return exists
 	}
 }
-
 func TestCommands_SetExecutionRequest(t *testing.T) {
 	type fields struct {
 		eventstore        *eventstore.Eventstore
@@ -66,7 +65,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				ctx:           context.Background(),
 				cond:          &ExecutionAPICondition{},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -85,7 +84,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					false,
 				},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -105,7 +104,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					false,
 				},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -125,7 +124,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					false,
 				},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -148,7 +147,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					Targets:  []string{"invalid"},
 					Includes: []string{"invalid"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -159,22 +158,12 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("request.valid", "org1"),
+							execution.NewAggregate("request.valid", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -192,7 +181,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsPreconditionFailed,
@@ -214,7 +203,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -236,7 +225,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -249,19 +238,18 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
+								target.NewAggregate("target", "instance"),
 								"name",
 								domain.TargetTypeWebhook,
 								"https://example.com",
 								time.Second,
-								true,
 								true,
 							),
 						),
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("request.method", "org1"),
+							execution.NewAggregate("request.method", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -279,11 +267,11 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -294,19 +282,18 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
+								target.NewAggregate("target", "instance"),
 								"name",
 								domain.TargetTypeWebhook,
 								"https://example.com",
 								time.Second,
-								true,
 								true,
 							),
 						),
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("request.service", "org1"),
+							execution.NewAggregate("request.service", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -324,11 +311,11 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -339,19 +326,18 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
+								target.NewAggregate("target", "instance"),
 								"name",
 								domain.TargetTypeWebhook,
 								"https://example.com",
 								time.Second,
-								true,
 								true,
 							),
 						),
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("request", "org1"),
+							execution.NewAggregate("request", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -368,11 +354,11 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -394,7 +380,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Includes: []string{"request.include"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -407,7 +393,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("request.include", "org1"),
+								execution.NewAggregate("request.include", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -415,7 +401,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("request.method", "org1"),
+							execution.NewAggregate("request.method", "instance"),
 							nil,
 							[]string{"request.include"},
 						),
@@ -433,11 +419,11 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Includes: []string{"request.include"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -459,7 +445,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Includes: []string{"request.include"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -472,7 +458,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("request.include", "org1"),
+								execution.NewAggregate("request.include", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -480,7 +466,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("request.service", "org1"),
+							execution.NewAggregate("request.service", "instance"),
 							nil,
 							[]string{"request.include"},
 						),
@@ -498,11 +484,11 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Includes: []string{"request.include"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -523,7 +509,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Includes: []string{"request.include"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -536,7 +522,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("request.include", "org1"),
+								execution.NewAggregate("request.include", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -544,7 +530,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("request", "org1"),
+							execution.NewAggregate("request", "instance"),
 							nil,
 							[]string{"request.include"},
 						),
@@ -561,11 +547,11 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				set: &SetExecution{
 					Includes: []string{"request.include"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -637,7 +623,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 				ctx:           context.Background(),
 				cond:          &ExecutionAPICondition{},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -656,7 +642,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					false,
 				},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -676,7 +662,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					false,
 				},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -696,7 +682,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					false,
 				},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -719,7 +705,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					Targets:  []string{"invalid"},
 					Includes: []string{"invalid"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -731,19 +717,18 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						target.NewAddedEvent(context.Background(),
-							target.NewAggregate("target", "org1"),
+							target.NewAggregate("target", "instance"),
 							"name",
 							domain.TargetTypeWebhook,
 							"https://example.com",
 							time.Second,
-							true,
 							true,
 						),
 					),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("response.valid", "org1"),
+							execution.NewAggregate("response.valid", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -761,7 +746,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsPreconditionFailed,
@@ -783,7 +768,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -805,7 +790,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -818,19 +803,18 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
+								target.NewAggregate("target", "instance"),
 								"name",
 								domain.TargetTypeWebhook,
 								"https://example.com",
 								time.Second,
-								true,
 								true,
 							),
 						),
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("response.method", "org1"),
+							execution.NewAggregate("response.method", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -848,11 +832,11 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -861,21 +845,11 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("response.service", "org1"),
+							execution.NewAggregate("response.service", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -893,11 +867,11 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -906,21 +880,11 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("response", "org1"),
+							execution.NewAggregate("response", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -937,11 +901,11 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -1013,7 +977,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 				ctx:           context.Background(),
 				cond:          &ExecutionEventCondition{},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1032,7 +996,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					false,
 				},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1052,7 +1016,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					false,
 				},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1072,7 +1036,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					false,
 				},
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1095,7 +1059,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					Targets:  []string{"invalid"},
 					Includes: []string{"invalid"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1106,22 +1070,12 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("event.valid", "org1"),
+							execution.NewAggregate("event.valid", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -1139,7 +1093,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsPreconditionFailed,
@@ -1161,7 +1115,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -1183,7 +1137,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -1194,21 +1148,11 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("event.event", "org1"),
+							execution.NewAggregate("event.event", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -1226,11 +1170,11 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -1239,21 +1183,11 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("event.group", "org1"),
+							execution.NewAggregate("event.group", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -1271,11 +1205,11 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -1284,21 +1218,11 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("event", "org1"),
+							execution.NewAggregate("event", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -1315,11 +1239,11 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -1391,7 +1315,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 				ctx:           context.Background(),
 				cond:          "",
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1407,7 +1331,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 				ctx:           context.Background(),
 				cond:          "function",
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1423,7 +1347,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 				ctx:           context.Background(),
 				cond:          "function",
 				set:           &SetExecution{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1442,7 +1366,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 					Targets:  []string{"invalid"},
 					Includes: []string{"invalid"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1453,22 +1377,12 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("function.function", "org1"),
+							execution.NewAggregate("function.function", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -1482,7 +1396,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsPreconditionFailed,
@@ -1501,7 +1415,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -1519,7 +1433,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -1530,21 +1444,11 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			fields{
 				eventstore: eventstoreExpect(t,
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("target", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								time.Second,
-								true,
-								true,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("function.function", "org1"),
+							execution.NewAggregate("function.function", "instance"),
 							[]string{"target"},
 							nil,
 						),
@@ -1558,11 +1462,11 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 				set: &SetExecution{
 					Targets: []string{"target"},
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -1628,7 +1532,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				cond:          &ExecutionAPICondition{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1646,7 +1550,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					"notvalid",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1659,7 +1563,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("request.valid", "org1"),
+								execution.NewAggregate("request.valid", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -1668,7 +1572,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("request.valid", "org1"),
+							execution.NewAggregate("request.valid", "instance"),
 						),
 					),
 				),
@@ -1680,7 +1584,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					"",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsPreconditionFailed,
@@ -1700,7 +1604,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					"",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -1713,7 +1617,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("request.method", "org1"),
+								execution.NewAggregate("request.method", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -1721,7 +1625,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("request.method", "org1"),
+							execution.NewAggregate("request.method", "instance"),
 						),
 					),
 				),
@@ -1733,11 +1637,11 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					"",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -1748,7 +1652,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("request.service", "org1"),
+								execution.NewAggregate("request.service", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -1756,7 +1660,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("request.service", "org1"),
+							execution.NewAggregate("request.service", "instance"),
 						),
 					),
 				),
@@ -1768,11 +1672,11 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					"service",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -1783,7 +1687,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("request", "org1"),
+								execution.NewAggregate("request", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -1791,7 +1695,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("request", "org1"),
+							execution.NewAggregate("request", "instance"),
 						),
 					),
 				),
@@ -1803,11 +1707,11 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 					"",
 					true,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -1872,7 +1776,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				cond:          &ExecutionAPICondition{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1890,7 +1794,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					"notvalid",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1903,7 +1807,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("response.valid", "org1"),
+								execution.NewAggregate("response.valid", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -1912,7 +1816,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("response.valid", "org1"),
+							execution.NewAggregate("response.valid", "instance"),
 						),
 					),
 				),
@@ -1924,7 +1828,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					"",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsPreconditionFailed,
@@ -1944,7 +1848,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					"",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -1957,7 +1861,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("response.method", "org1"),
+								execution.NewAggregate("response.method", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -1965,7 +1869,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("response.method", "org1"),
+							execution.NewAggregate("response.method", "instance"),
 						),
 					),
 				),
@@ -1977,11 +1881,11 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					"",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -1992,7 +1896,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("response.service", "org1"),
+								execution.NewAggregate("response.service", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -2000,7 +1904,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("response.service", "org1"),
+							execution.NewAggregate("response.service", "instance"),
 						),
 					),
 				),
@@ -2012,11 +1916,11 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					"service",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -2027,7 +1931,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("response", "org1"),
+								execution.NewAggregate("response", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -2035,7 +1939,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("response", "org1"),
+							execution.NewAggregate("response", "instance"),
 						),
 					),
 				),
@@ -2047,11 +1951,11 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 					"",
 					true,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -2116,7 +2020,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				cond:          &ExecutionEventCondition{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -2129,7 +2033,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("event.valid", "org1"),
+								execution.NewAggregate("event.valid", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -2138,7 +2042,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("event.valid", "org1"),
+							execution.NewAggregate("event.valid", "instance"),
 						),
 					),
 				),
@@ -2150,7 +2054,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					"",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsPreconditionFailed,
@@ -2170,7 +2074,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					"",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -2190,7 +2094,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					"",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -2203,7 +2107,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("event.valid", "org1"),
+								execution.NewAggregate("event.valid", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -2211,7 +2115,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("event.valid", "org1"),
+							execution.NewAggregate("event.valid", "instance"),
 						),
 					),
 				),
@@ -2223,11 +2127,11 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					"",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -2245,7 +2149,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					"valid",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -2258,7 +2162,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("event.group", "org1"),
+								execution.NewAggregate("event.group", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -2266,7 +2170,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("event.group", "org1"),
+							execution.NewAggregate("event.group", "instance"),
 						),
 					),
 				),
@@ -2278,11 +2182,11 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					"group",
 					false,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -2300,7 +2204,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					"",
 					true,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -2313,7 +2217,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("event", "org1"),
+								execution.NewAggregate("event", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -2321,7 +2225,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("event", "org1"),
+							execution.NewAggregate("event", "instance"),
 						),
 					),
 				),
@@ -2333,11 +2237,11 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					"",
 					true,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -2402,7 +2306,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				cond:          "",
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -2415,7 +2319,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("function.function", "org1"),
+								execution.NewAggregate("function.function", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -2424,7 +2328,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("function.function", "org1"),
+							execution.NewAggregate("function.function", "instance"),
 						),
 					),
 				),
@@ -2432,7 +2336,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				cond:          "function",
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsPreconditionFailed,
@@ -2448,7 +2352,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				cond:          "function",
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -2461,7 +2365,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEvent(context.Background(),
-								execution.NewAggregate("function.function", "org1"),
+								execution.NewAggregate("function.function", "instance"),
 								[]string{"target"},
 								nil,
 							),
@@ -2469,7 +2373,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("function.function", "org1"),
+							execution.NewAggregate("function.function", "instance"),
 						),
 					),
 				),
@@ -2477,11 +2381,11 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				cond:          "function",
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},

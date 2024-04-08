@@ -128,7 +128,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 	}, {
 		name: "button url with event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/ui/login/user/init?userID=%s&loginname=%s&code=%s&orgID=%s&passwordset=%t", eventOrigin, userID, preferredLoginName, testCode, orgID, false)
 			w.message = messages.Email{
@@ -162,7 +162,7 @@ func Test_userNotifier_reduceInitCodeAdded(t *testing.T) {
 	}, {
 		name: "button url without event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/user/init?userID=%s&loginname=%s&code=%s&orgID=%s&passwordset=%t", externalProtocol, instancePrimaryDomain, externalPort, userID, preferredLoginName, testCode, orgID, false)
 			w.message = messages.Email{
@@ -305,7 +305,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 	}, {
 		name: "button url with event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/ui/login/mail/verification?userID=%s&code=%s&orgID=%s", eventOrigin, userID, testCode, orgID)
 			w.message = messages.Email{
@@ -342,7 +342,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 	}, {
 		name: "button url without event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/mail/verification?userID=%s&code=%s&orgID=%s", externalProtocol, instancePrimaryDomain, externalPort, userID, testCode, orgID)
 			w.message = messages.Email{
@@ -383,7 +383,7 @@ func Test_userNotifier_reduceEmailCodeAdded(t *testing.T) {
 	}, {
 		name: "button url with url template and event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
@@ -524,7 +524,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 	}, {
 		name: "button url with event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/ui/login/password/init?userID=%s&code=%s&orgID=%s", eventOrigin, userID, testCode, orgID)
 			w.message = messages.Email{
@@ -561,7 +561,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 	}, {
 		name: "button url without event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/password/init?userID=%s&code=%s&orgID=%s", externalProtocol, instancePrimaryDomain, externalPort, userID, testCode, orgID)
 			w.message = messages.Email{
@@ -602,7 +602,7 @@ func Test_userNotifier_reducePasswordCodeAdded(t *testing.T) {
 	}, {
 		name: "button url with url template and event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
@@ -836,7 +836,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 	}, {
 		name: "button url with event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			testCode := "testcode"
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectContent := fmt.Sprintf("%s/ui/login/login/passwordless/init?userID=%s&orgID=%s&codeID=%s&code=%s", eventOrigin, userID, orgID, codeID, testCode)
@@ -874,7 +874,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 	}, {
 		name: "button url without event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			testCode := "testcode"
 			codeAlg, code := cryptoValue(t, ctrl, testCode)
 			expectContent := fmt.Sprintf("%s://%s:%d/ui/login/login/passwordless/init?userID=%s&orgID=%s&codeID=%s&code=%s", externalProtocol, instancePrimaryDomain, externalPort, userID, orgID, codeID, testCode)
@@ -916,7 +916,7 @@ func Test_userNotifier_reducePasswordlessCodeRequested(t *testing.T) {
 	}, {
 		name: "button url with url template and event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			urlTemplate := "https://my.custom.url/org/{{.OrgID}}/user/{{.UserID}}/verify/{{.Code}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/org/%s/user/%s/verify/%s", orgID, userID, testCode)
@@ -1157,7 +1157,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 	}, {
 		name: "button url with event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s/otp/verify?loginName=%s&code=%s", eventOrigin, preferredLoginName, testCode)
 			w.message = messages.Email{
@@ -1195,7 +1195,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 	}, {
 		name: "button url without event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("%s://%s:%d/otp/verify?loginName=%s&code=%s", externalProtocol, instancePrimaryDomain, externalPort, preferredLoginName, testCode)
 			w.message = messages.Email{
@@ -1236,7 +1236,7 @@ func Test_userNotifier_reduceOTPEmailChallenged(t *testing.T) {
 	}, {
 		name: "button url with url template and event trigger url",
 		test: func(ctrl *gomock.Controller, queries *mock.MockQueries, commands *mock.MockCommands) (f fields, a args, w want) {
-			givenTemplate := "{{.URL}}"
+			givenTemplate := "{{.Endpoint}}"
 			urlTemplate := "https://my.custom.url/user/{{.LoginName}}/verify"
 			testCode := "testcode"
 			expectContent := fmt.Sprintf("https://my.custom.url/user/%s/verify", preferredLoginName)

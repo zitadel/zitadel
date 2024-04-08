@@ -78,7 +78,7 @@ func CallTargetFunc(
 			return nil, webhook(ctx, target.GetURL(), target.GetTimeout(), info.GetHTTPRequestBody())
 		}, nil
 	// get request, return response and error
-	case domain.TargetTypeRequestResponse:
+	case domain.TargetTypeCall:
 		return func(ctx context.Context, info ContextInfoRequest) (res []byte, err error) {
 			return call(ctx, target.GetURL(), target.GetTimeout(), info.GetHTTPRequestBody())
 		}, nil

@@ -28,7 +28,7 @@ func TestNotify_SendPasswordlessRegistrationLink(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "default URL",
+			name: "default Endpoint",
 			args: args{
 				user: &query.NotifyUser{
 					ID:            "user1",

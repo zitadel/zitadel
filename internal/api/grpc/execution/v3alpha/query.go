@@ -63,8 +63,6 @@ func targetFieldNameToSortingColumn(field execution.TargetFieldName) query.Colum
 		return query.TargetColumnURL
 	case execution.TargetFieldName_FIELD_NAME_TIMEOUT:
 		return query.TargetColumnTimeout
-	case execution.TargetFieldName_FIELD_NAME_ASYNC:
-		return query.TargetColumnAsync
 	case execution.TargetFieldName_FIELD_NAME_INTERRUPT_ON_ERROR:
 		return query.TargetColumnInterruptOnError
 	default:
@@ -126,19 +124,16 @@ func targetToPb(t *query.Target) *execution.Target {
 		TargetId: t.ID,
 		Name:     t.Name,
 		Timeout:  durationpb.New(t.Timeout),
-	}
-	if t.Async {
-		target.ExecutionType = &execution.Target_IsAsync{IsAsync: t.Async}
-	}
-	if t.InterruptOnError {
-		target.ExecutionType = &execution.Target_InterruptOnError{InterruptOnError: t.InterruptOnError}
+		Endpoint: t.Endpoint,
 	}
 
 	switch t.TargetType {
 	case domain.TargetTypeWebhook:
-		target.TargetType = &execution.Target_RestWebhook{RestWebhook: &execution.SetRESTWebhook{Url: t.URL}}
-	case domain.TargetTypeRequestResponse:
-		target.TargetType = &execution.Target_RestRequestResponse{RestRequestResponse: &execution.SetRESTRequestResponse{Url: t.URL}}
+		target.TargetType = &execution.Target_RestWebhook{RestWebhook: &execution.SetRESTWebhook{InterruptOnError: t.InterruptOnError}}
+	case domain.TargetTypeCall:
+		target.TargetType = &execution.Target_RestCall{RestCall: &execution.SetRESTCall{InterruptOnError: t.InterruptOnError}}
+	case domain.TargetTypeAsync:
+		target.TargetType = &execution.Target_RestAsync{RestAsync: &execution.SetRESTAsync{}}
 	default:
 		target.TargetType = nil
 	}

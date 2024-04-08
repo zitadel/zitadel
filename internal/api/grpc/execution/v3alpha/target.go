@@ -47,22 +47,23 @@ func (s *Server) DeleteTarget(ctx context.Context, req *execution.DeleteTargetRe
 
 func createTargetToCommand(req *execution.CreateTargetRequest) *command.AddTarget {
 	var targetType domain.TargetType
-	var url string
+	var interruptOnError bool
 	switch t := req.GetTargetType().(type) {
 	case *execution.CreateTargetRequest_RestWebhook:
 		targetType = domain.TargetTypeWebhook
-		url = t.RestWebhook.GetUrl()
-	case *execution.CreateTargetRequest_RestRequestResponse:
-		targetType = domain.TargetTypeRequestResponse
-		url = t.RestRequestResponse.GetUrl()
+		interruptOnError = t.RestWebhook.InterruptOnError
+	case *execution.CreateTargetRequest_RestCall:
+		targetType = domain.TargetTypeCall
+		interruptOnError = t.RestCall.InterruptOnError
+	case *execution.CreateTargetRequest_RestAsync:
+		targetType = domain.TargetTypeAsync
 	}
 	return &command.AddTarget{
 		Name:             req.GetName(),
 		TargetType:       targetType,
-		URL:              url,
+		Endpoint:         req.GetEndpoint(),
 		Timeout:          req.GetTimeout().AsDuration(),
-		Async:            req.GetIsAsync(),
-		InterruptOnError: req.GetInterruptOnError(),
+		InterruptOnError: interruptOnError,
 	}
 }
 
@@ -74,22 +75,24 @@ func updateTargetToCommand(req *execution.UpdateTargetRequest) *command.ChangeTa
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: req.GetTargetId(),
 		},
-		Name: req.Name,
+		Name:     req.Name,
+		Endpoint: req.Endpoint,
 	}
-	switch t := req.GetTargetType().(type) {
-	case *execution.UpdateTargetRequest_RestWebhook:
-		target.TargetType = gu.Ptr(domain.TargetTypeWebhook)
-		target.URL = gu.Ptr(t.RestWebhook.GetUrl())
-	case *execution.UpdateTargetRequest_RestRequestResponse:
-		target.TargetType = gu.Ptr(domain.TargetTypeRequestResponse)
-		target.URL = gu.Ptr(t.RestRequestResponse.GetUrl())
+	if req.TargetType != nil {
+		switch t := req.GetTargetType().(type) {
+		case *execution.UpdateTargetRequest_RestWebhook:
+			target.TargetType = gu.Ptr(domain.TargetTypeWebhook)
+			target.InterruptOnError = gu.Ptr(t.RestWebhook.InterruptOnError)
+		case *execution.UpdateTargetRequest_RestCall:
+			target.TargetType = gu.Ptr(domain.TargetTypeCall)
+			target.InterruptOnError = gu.Ptr(t.RestCall.InterruptOnError)
+		case *execution.UpdateTargetRequest_RestAsync:
+			target.TargetType = gu.Ptr(domain.TargetTypeAsync)
+			target.InterruptOnError = gu.Ptr(false)
+		}
 	}
 	if req.Timeout != nil {
 		target.Timeout = gu.Ptr(req.GetTimeout().AsDuration())
-	}
-	if req.ExecutionType != nil {
-		target.Async = gu.Ptr(req.GetIsAsync())
-		target.InterruptOnError = gu.Ptr(req.GetInterruptOnError())
 	}
 	return target
 }

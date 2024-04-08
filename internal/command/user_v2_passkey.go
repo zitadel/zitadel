@@ -99,7 +99,7 @@ func (c *Commands) pushUserPasskey(ctx context.Context, wm *HumanWebAuthNWriteMo
 }
 
 // AddUserPasskeyCode generates a Passkey code and sends an email
-// with the default generated URL (pointing to zitadel).
+// with the default generated Endpoint (pointing to zitadel).
 func (c *Commands) AddUserPasskeyCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
 	details, err := c.addUserPasskeyCode(ctx, userID, resourceOwner, alg, "", false)
 	if err != nil {
@@ -109,7 +109,7 @@ func (c *Commands) AddUserPasskeyCode(ctx context.Context, userID, resourceOwner
 }
 
 // AddUserPasskeyCodeURLTemplate generates a Passkey code and sends an email
-// with the URL created from passed template string.
+// with the Endpoint created from passed template string.
 // The template is executed as a test, before pushing to the eventstore.
 func (c *Commands) AddUserPasskeyCodeURLTemplate(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm, urlTmpl string) (*domain.ObjectDetails, error) {
 	if err := domain.RenderPasskeyURLTemplate(io.Discard, urlTmpl, userID, resourceOwner, "codeID", "code"); err != nil {

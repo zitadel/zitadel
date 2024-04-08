@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -51,7 +52,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
-					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", false, false, false)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
 					request.TargetId = resp.GetId()
 
 					response.Target.TargetId = resp.GetId()
@@ -68,10 +69,9 @@ func TestServer_GetTargetByID(t *testing.T) {
 					Details: &object.Details{
 						ResourceOwner: Tester.Instance.InstanceID(),
 					},
+					Endpoint: "https://example.com",
 					TargetType: &execution.Target_RestWebhook{
-						RestWebhook: &execution.SetRESTWebhook{
-							Url: "https://example.com",
-						},
+						RestWebhook: &execution.SetRESTWebhook{},
 					},
 					Timeout: durationpb.New(10 * time.Second),
 				},
@@ -83,7 +83,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
-					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", false, true, false)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeAsync, false)
 					request.TargetId = resp.GetId()
 
 					response.Target.TargetId = resp.GetId()
@@ -100,23 +100,21 @@ func TestServer_GetTargetByID(t *testing.T) {
 					Details: &object.Details{
 						ResourceOwner: Tester.Instance.InstanceID(),
 					},
-					TargetType: &execution.Target_RestWebhook{
-						RestWebhook: &execution.SetRESTWebhook{
-							Url: "https://example.com",
-						},
+					Endpoint: "https://example.com",
+					TargetType: &execution.Target_RestAsync{
+						RestAsync: &execution.SetRESTAsync{},
 					},
-					Timeout:       durationpb.New(10 * time.Second),
-					ExecutionType: &execution.Target_IsAsync{IsAsync: true},
+					Timeout: durationpb.New(10 * time.Second),
 				},
 			},
 		},
 		{
-			name: "get, interruptOnError, ok",
+			name: "get, webhook interruptOnError, ok",
 			args: args{
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
-					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", false, false, true)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, true)
 					request.TargetId = resp.GetId()
 
 					response.Target.TargetId = resp.GetId()
@@ -133,13 +131,79 @@ func TestServer_GetTargetByID(t *testing.T) {
 					Details: &object.Details{
 						ResourceOwner: Tester.Instance.InstanceID(),
 					},
+					Endpoint: "https://example.com",
 					TargetType: &execution.Target_RestWebhook{
 						RestWebhook: &execution.SetRESTWebhook{
-							Url: "https://example.com",
+							InterruptOnError: true,
 						},
 					},
-					Timeout:       durationpb.New(10 * time.Second),
-					ExecutionType: &execution.Target_InterruptOnError{InterruptOnError: true},
+					Timeout: durationpb.New(10 * time.Second),
+				},
+			},
+		},
+		{
+			name: "get, call, ok",
+			args: args{
+				ctx: CTX,
+				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
+					name := fmt.Sprint(time.Now().UnixNano() + 1)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, false)
+					request.TargetId = resp.GetId()
+
+					response.Target.TargetId = resp.GetId()
+					response.Target.Name = name
+					response.Target.Details.ResourceOwner = resp.GetDetails().GetResourceOwner()
+					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
+					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					return nil
+				},
+				req: &execution.GetTargetByIDRequest{},
+			},
+			want: &execution.GetTargetByIDResponse{
+				Target: &execution.Target{
+					Details: &object.Details{
+						ResourceOwner: Tester.Instance.InstanceID(),
+					},
+					Endpoint: "https://example.com",
+					TargetType: &execution.Target_RestCall{
+						RestCall: &execution.SetRESTCall{
+							InterruptOnError: false,
+						},
+					},
+					Timeout: durationpb.New(10 * time.Second),
+				},
+			},
+		},
+		{
+			name: "get, call interruptOnError, ok",
+			args: args{
+				ctx: CTX,
+				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
+					name := fmt.Sprint(time.Now().UnixNano() + 1)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, true)
+					request.TargetId = resp.GetId()
+
+					response.Target.TargetId = resp.GetId()
+					response.Target.Name = name
+					response.Target.Details.ResourceOwner = resp.GetDetails().GetResourceOwner()
+					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
+					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					return nil
+				},
+				req: &execution.GetTargetByIDRequest{},
+			},
+			want: &execution.GetTargetByIDResponse{
+				Target: &execution.Target{
+					Details: &object.Details{
+						ResourceOwner: Tester.Instance.InstanceID(),
+					},
+					Endpoint: "https://example.com",
+					TargetType: &execution.Target_RestCall{
+						RestCall: &execution.SetRESTCall{
+							InterruptOnError: true,
+						},
+					},
+					Timeout: durationpb.New(10 * time.Second),
 				},
 			},
 		},
@@ -225,7 +289,7 @@ func TestServer_ListTargets(t *testing.T) {
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.ListTargetsRequest, response *execution.ListTargetsResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
-					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", false, false, false)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
 					request.Queries[0].Query = &execution.TargetSearchQuery_InTargetIdsQuery{
 						InTargetIdsQuery: &execution.InTargetIDsQuery{
 							TargetIds: []string{resp.GetId()},
@@ -253,9 +317,10 @@ func TestServer_ListTargets(t *testing.T) {
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
+						Endpoint: "https://example.com",
 						TargetType: &execution.Target_RestWebhook{
 							RestWebhook: &execution.SetRESTWebhook{
-								Url: "https://example.com",
+								InterruptOnError: false,
 							},
 						},
 						Timeout: durationpb.New(10 * time.Second),
@@ -268,7 +333,7 @@ func TestServer_ListTargets(t *testing.T) {
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.ListTargetsRequest, response *execution.ListTargetsResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
-					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", false, false, false)
+					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
 					request.Queries[0].Query = &execution.TargetSearchQuery_TargetNameQuery{
 						TargetNameQuery: &execution.TargetNameQuery{
 							TargetName: name,
@@ -296,9 +361,10 @@ func TestServer_ListTargets(t *testing.T) {
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
+						Endpoint: "https://example.com",
 						TargetType: &execution.Target_RestWebhook{
 							RestWebhook: &execution.SetRESTWebhook{
-								Url: "https://example.com",
+								InterruptOnError: false,
 							},
 						},
 						Timeout: durationpb.New(10 * time.Second),
@@ -314,9 +380,9 @@ func TestServer_ListTargets(t *testing.T) {
 					name1 := fmt.Sprint(time.Now().UnixNano() + 1)
 					name2 := fmt.Sprint(time.Now().UnixNano() + 3)
 					name3 := fmt.Sprint(time.Now().UnixNano() + 5)
-					resp1 := Tester.CreateTarget(ctx, t, name1, "https://example.com", false, false, false)
-					resp2 := Tester.CreateTarget(ctx, t, name2, "https://example.com", true, true, false)
-					resp3 := Tester.CreateTarget(ctx, t, name3, "https://example.com", false, false, true)
+					resp1 := Tester.CreateTarget(ctx, t, name1, "https://example.com", domain.TargetTypeWebhook, false)
+					resp2 := Tester.CreateTarget(ctx, t, name2, "https://example.com", domain.TargetTypeCall, true)
+					resp3 := Tester.CreateTarget(ctx, t, name3, "https://example.com", domain.TargetTypeAsync, false)
 					request.Queries[0].Query = &execution.TargetSearchQuery_InTargetIdsQuery{
 						InTargetIdsQuery: &execution.InTargetIDsQuery{
 							TargetIds: []string{resp1.GetId(), resp2.GetId(), resp3.GetId()},
@@ -352,9 +418,10 @@ func TestServer_ListTargets(t *testing.T) {
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
+						Endpoint: "https://example.com",
 						TargetType: &execution.Target_RestWebhook{
 							RestWebhook: &execution.SetRESTWebhook{
-								Url: "https://example.com",
+								InterruptOnError: false,
 							},
 						},
 						Timeout: durationpb.New(10 * time.Second),
@@ -363,25 +430,23 @@ func TestServer_ListTargets(t *testing.T) {
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
-						TargetType: &execution.Target_RestRequestResponse{
-							RestRequestResponse: &execution.SetRESTRequestResponse{
-								Url: "https://example.com",
+						Endpoint: "https://example.com",
+						TargetType: &execution.Target_RestCall{
+							RestCall: &execution.SetRESTCall{
+								InterruptOnError: true,
 							},
 						},
-						Timeout:       durationpb.New(10 * time.Second),
-						ExecutionType: &execution.Target_IsAsync{IsAsync: true},
+						Timeout: durationpb.New(10 * time.Second),
 					},
 					{
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
-						TargetType: &execution.Target_RestWebhook{
-							RestWebhook: &execution.SetRESTWebhook{
-								Url: "https://example.com",
-							},
+						Endpoint: "https://example.com",
+						TargetType: &execution.Target_RestAsync{
+							RestAsync: &execution.SetRESTAsync{},
 						},
-						Timeout:       durationpb.New(10 * time.Second),
-						ExecutionType: &execution.Target_InterruptOnError{InterruptOnError: true},
+						Timeout: durationpb.New(10 * time.Second),
 					},
 				},
 			},
@@ -421,7 +486,7 @@ func TestServer_ListTargets(t *testing.T) {
 }
 
 func TestServer_ListExecutions_Request(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://example.com", false, false, false)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 
 	type args struct {
 		ctx context.Context
@@ -495,7 +560,7 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.ListExecutionsRequest, response *execution.ListExecutionsResponse) error {
-					target := Tester.CreateTarget(CTX, t, "", "https://example.com", false, false, false)
+					target := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 					// add target as query to the request
 					request.Queries[0] = &execution.SearchQuery{
 						Query: &execution.SearchQuery_TargetQuery{

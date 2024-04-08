@@ -303,7 +303,7 @@ func Test_CallTarget(t *testing.T) {
 				method: http.MethodPost,
 				info:   newMockContextInfoRequest("content1"),
 				target: &mockTarget{
-					TargetType: domain.TargetTypeRequestResponse,
+					TargetType: domain.TargetTypeCall,
 					Timeout:    time.Minute,
 				},
 				body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
@@ -322,7 +322,7 @@ func Test_CallTarget(t *testing.T) {
 				method: http.MethodPost,
 				info:   newMockContextInfoRequest("content1"),
 				target: &mockTarget{
-					TargetType: domain.TargetTypeRequestResponse,
+					TargetType: domain.TargetTypeCall,
 					Timeout:    time.Minute,
 				},
 				body:       []byte("{\"request\":{\"request\":\"content1\"}}"),

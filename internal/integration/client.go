@@ -519,37 +519,32 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 	require.NoError(t, err)
 }
 
-func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, url string, resp, async, interrupt bool) *execution.CreateTargetResponse {
+func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *execution.CreateTargetResponse {
 	nameSet := fmt.Sprint(time.Now().UnixNano() + 1)
 	if name != "" {
 		nameSet = name
 	}
 	req := &execution.CreateTargetRequest{
-		Name:    nameSet,
-		Timeout: durationpb.New(10 * time.Second),
+		Name:     nameSet,
+		Endpoint: endpoint,
+		Timeout:  durationpb.New(10 * time.Second),
 	}
-	if resp {
-		req.TargetType = &execution.CreateTargetRequest_RestRequestResponse{
-			RestRequestResponse: &execution.SetRESTRequestResponse{
-				Url: url,
-			},
-		}
-
-	} else {
+	switch ty {
+	case domain.TargetTypeWebhook:
 		req.TargetType = &execution.CreateTargetRequest_RestWebhook{
 			RestWebhook: &execution.SetRESTWebhook{
-				Url: url,
+				InterruptOnError: interrupt,
 			},
 		}
-	}
-	if async {
-		req.ExecutionType = &execution.CreateTargetRequest_IsAsync{
-			IsAsync: true,
+	case domain.TargetTypeCall:
+		req.TargetType = &execution.CreateTargetRequest_RestWebhook{
+			RestWebhook: &execution.SetRESTWebhook{
+				InterruptOnError: interrupt,
+			},
 		}
-	}
-	if interrupt {
-		req.ExecutionType = &execution.CreateTargetRequest_InterruptOnError{
-			InterruptOnError: true,
+	case domain.TargetTypeAsync:
+		req.TargetType = &execution.CreateTargetRequest_RestAsync{
+			RestAsync: &execution.SetRESTAsync{},
 		}
 	}
 	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)

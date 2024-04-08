@@ -9,13 +9,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
 func TestServer_SetExecution_Request(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -170,7 +171,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 }
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	executionCond := "request"
 	Tester.SetExecution(CTX, t,
@@ -279,7 +280,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Request(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -443,7 +444,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 }
 
 func TestServer_SetExecution_Response(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -598,7 +599,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Response(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -764,7 +765,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 }
 
 func TestServer_SetExecution_Event(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -929,7 +930,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Event(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -1114,7 +1115,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 }
 
 func TestServer_SetExecution_Function(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -1200,7 +1201,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 }
 
 func TestServer_DeleteExecution_Function(t *testing.T) {
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", false, false, false)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string

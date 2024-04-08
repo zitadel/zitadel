@@ -35,4 +35,4 @@ FROM (SELECT instance_id, id, unnest(targets) AS target
       WHERE id = ANY (string_to_array($2,','))
       ORDER BY id DESC
       LIMIT 1) e
-         LEFT JOIN projections.targets AS t ON t.instance_id = e.instance_id AND t.id = e.target;
+         LEFT JOIN projections.targets1 AS t ON t.instance_id = e.instance_id AND t.id = e.target;

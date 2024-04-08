@@ -19,7 +19,7 @@ import (
 
 func TestCommands_AddTarget(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
@@ -41,7 +41,7 @@ func TestCommands_AddTarget(t *testing.T) {
 		{
 			"no resourceowner, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -55,12 +55,12 @@ func TestCommands_AddTarget(t *testing.T) {
 		{
 			"no name, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
 				add:           &AddTarget{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -69,14 +69,14 @@ func TestCommands_AddTarget(t *testing.T) {
 		{
 			"no timeout, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
 				add: &AddTarget{
 					Name: "name",
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -85,7 +85,7 @@ func TestCommands_AddTarget(t *testing.T) {
 		{
 			"no url, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
@@ -94,7 +94,7 @@ func TestCommands_AddTarget(t *testing.T) {
 					Timeout: time.Second,
 					URL:     "",
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -103,7 +103,7 @@ func TestCommands_AddTarget(t *testing.T) {
 		{
 			"no parsable url, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
@@ -112,7 +112,7 @@ func TestCommands_AddTarget(t *testing.T) {
 					Timeout: time.Second,
 					URL:     "://",
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -121,17 +121,16 @@ func TestCommands_AddTarget(t *testing.T) {
 		{
 			"unique constraint failed, error",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						target.NewAddedEvent(context.Background(),
-							target.NewAggregate("id1", "org1"),
+							target.NewAggregate("id1", "instance"),
 							"name",
 							domain.TargetTypeWebhook,
 							"https://example.com",
 							time.Second,
-							false,
 							false,
 						),
 					),
@@ -146,7 +145,7 @@ func TestCommands_AddTarget(t *testing.T) {
 					Timeout:    time.Second,
 					TargetType: domain.TargetTypeWebhook,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsPreconditionFailed,
@@ -155,17 +154,9 @@ func TestCommands_AddTarget(t *testing.T) {
 		{
 			"already existing",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
-						target.NewAddedEvent(context.Background(),
-							target.NewAggregate("id1", "org1"),
-							"name",
-							domain.TargetTypeWebhook,
-							"https://example.com",
-							time.Second,
-							false,
-							false,
-						),
+						targetAddEvent("target", "instance"),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id1"),
@@ -178,7 +169,7 @@ func TestCommands_AddTarget(t *testing.T) {
 					Timeout:    time.Second,
 					URL:        "https://example.com",
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -187,18 +178,10 @@ func TestCommands_AddTarget(t *testing.T) {
 		{
 			"push ok",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
-						target.NewAddedEvent(context.Background(),
-							target.NewAggregate("id1", "org1"),
-							"name",
-							domain.TargetTypeWebhook,
-							"https://example.com",
-							time.Second,
-							false,
-							false,
-						),
+						targetAddEvent("target", "instance"),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id1"),
@@ -211,30 +194,22 @@ func TestCommands_AddTarget(t *testing.T) {
 					Timeout:    time.Second,
 					URL:        "https://example.com",
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				id: "id1",
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
 		{
 			"push full ok",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
-						target.NewAddedEvent(context.Background(),
-							target.NewAggregate("id1", "org1"),
-							"name",
-							domain.TargetTypeWebhook,
-							"https://example.com",
-							time.Second,
-							true,
-							true,
-						),
+						targetAddEvent("target", "instance"),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id1"),
@@ -249,12 +224,12 @@ func TestCommands_AddTarget(t *testing.T) {
 					Async:            true,
 					InterruptOnError: true,
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				id: "id1",
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -262,7 +237,7 @@ func TestCommands_AddTarget(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore,
+				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
 			details, err := c.AddTarget(tt.args.ctx, tt.args.add, tt.args.resourceOwner)
@@ -282,7 +257,7 @@ func TestCommands_AddTarget(t *testing.T) {
 
 func TestCommands_ChangeTarget(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -302,7 +277,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		{
 			"resourceowner missing, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -316,12 +291,12 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		{
 			"id missing, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
 				change:        &ChangeTarget{},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -330,14 +305,14 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		{
 			"name empty, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
 				change: &ChangeTarget{
 					Name: gu.Ptr(""),
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -346,14 +321,14 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		{
 			"timeout empty, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
 				change: &ChangeTarget{
 					Timeout: gu.Ptr(time.Duration(0)),
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -362,14 +337,14 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		{
 			"url empty, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
 				change: &ChangeTarget{
 					URL: gu.Ptr(""),
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -378,14 +353,14 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		{
 			"url not parsable, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
 				change: &ChangeTarget{
 					URL: gu.Ptr("://"),
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -394,7 +369,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		{
 			"not found, error",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -406,7 +381,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					},
 					Name: gu.Ptr("name"),
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -415,19 +390,9 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		{
 			"no changes",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("id1", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								0,
-								false,
-								false,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 				),
 			},
@@ -439,35 +404,25 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					},
 					TargetType: gu.Ptr(domain.TargetTypeWebhook),
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
 		{
 			"unique constraint failed, error",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("id1", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								0,
-								false,
-								false,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						target.NewChangedEvent(context.Background(),
-							target.NewAggregate("id1", "org1"),
+							target.NewAggregate("id1", "instance"),
 							[]target.Changes{
 								target.ChangeName("name", "name2"),
 							},
@@ -483,7 +438,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					},
 					Name: gu.Ptr("name2"),
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsPreconditionFailed,
@@ -492,23 +447,13 @@ func TestCommands_ChangeTarget(t *testing.T) {
 		{
 			"push ok",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("id1", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								0,
-								false,
-								false,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPush(
 						target.NewChangedEvent(context.Background(),
-							target.NewAggregate("id1", "org1"),
+							target.NewAggregate("id1", "instance"),
 							[]target.Changes{
 								target.ChangeName("name", "name2"),
 							},
@@ -524,40 +469,29 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					},
 					Name: gu.Ptr("name2"),
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
 		{
 			"push full ok",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("id1", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								0,
-								false,
-								false,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPush(
 						target.NewChangedEvent(context.Background(),
-							target.NewAggregate("id1", "org1"),
+							target.NewAggregate("id1", "instance"),
 							[]target.Changes{
 								target.ChangeName("name", "name2"),
-								target.ChangeURL("https://example2.com"),
-								target.ChangeTargetType(domain.TargetTypeRequestResponse),
+								target.ChangeEndpoint("https://example2.com"),
+								target.ChangeTargetType(domain.TargetTypeCall),
 								target.ChangeTimeout(time.Second),
-								target.ChangeAsync(true),
 								target.ChangeInterruptOnError(true),
 							},
 						),
@@ -572,16 +506,16 @@ func TestCommands_ChangeTarget(t *testing.T) {
 					},
 					Name:             gu.Ptr("name2"),
 					URL:              gu.Ptr("https://example2.com"),
-					TargetType:       gu.Ptr(domain.TargetTypeRequestResponse),
+					TargetType:       gu.Ptr(domain.TargetTypeCall),
 					Timeout:          gu.Ptr(time.Second),
 					Async:            gu.Ptr(true),
 					InterruptOnError: gu.Ptr(true),
 				},
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -589,7 +523,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			details, err := c.ChangeTarget(tt.args.ctx, tt.args.change, tt.args.resourceOwner)
 			if tt.res.err == nil {
@@ -607,7 +541,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 
 func TestCommands_DeleteTarget(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -627,12 +561,12 @@ func TestCommands_DeleteTarget(t *testing.T) {
 		{
 			"id missing, error",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
 				id:            "",
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -641,14 +575,14 @@ func TestCommands_DeleteTarget(t *testing.T) {
 		{
 			"not found, error",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
 			args{
 				ctx:           context.Background(),
 				id:            "id1",
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				err: zerrors.IsNotFound,
@@ -657,23 +591,13 @@ func TestCommands_DeleteTarget(t *testing.T) {
 		{
 			"remove ok",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
-						eventFromEventPusher(
-							target.NewAddedEvent(context.Background(),
-								target.NewAggregate("id1", "org1"),
-								"name",
-								domain.TargetTypeWebhook,
-								"https://example.com",
-								0,
-								false,
-								false,
-							),
-						),
+						targetAddEvent("target", "instance"),
 					),
 					expectPush(
 						target.NewRemovedEvent(context.Background(),
-							target.NewAggregate("id1", "org1"),
+							target.NewAggregate("id1", "instance"),
 							"name",
 						),
 					),
@@ -682,11 +606,11 @@ func TestCommands_DeleteTarget(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				id:            "id1",
-				resourceOwner: "org1",
+				resourceOwner: "instance",
 			},
 			res{
 				details: &domain.ObjectDetails{
-					ResourceOwner: "org1",
+					ResourceOwner: "instance",
 				},
 			},
 		},
@@ -694,7 +618,7 @@ func TestCommands_DeleteTarget(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			details, err := c.DeleteTarget(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
 			if tt.res.err == nil {

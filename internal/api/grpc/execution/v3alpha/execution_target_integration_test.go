@@ -18,6 +18,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 )
@@ -45,14 +46,15 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// create target for target changes
 				targetCreatedName := fmt.Sprint("GetTargetByID", time.Now().UnixNano()+1)
 				targetCreatedURL := "https://nonexistent"
-				targetCreated := Tester.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, true, false, false)
+
+				targetCreated := Tester.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, domain.TargetTypeCall, false)
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instanceID, OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
 				changedRequest := &execution.GetTargetByIDRequest{TargetId: targetCreated.GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
-				targetRequest := Tester.CreateTarget(ctx, t, "", urlRequest, true, false, false)
+				targetRequest := Tester.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, false)
 				Tester.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), []string{targetRequest.GetId()}, []string{})
 				// GetTargetByID with used target
 				request.TargetId = targetRequest.GetId()
@@ -63,9 +65,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						TargetId: targetCreated.GetId(),
 						Details:  targetCreated.GetDetails(),
 						Name:     targetCreatedName,
-						TargetType: &execution.Target_RestRequestResponse{
-							RestRequestResponse: &execution.SetRESTRequestResponse{
-								Url: targetCreatedURL,
+						Endpoint: targetCreatedURL,
+						TargetType: &execution.Target_RestCall{
+							RestCall: &execution.SetRESTCall{
+								InterruptOnError: false,
 							},
 						},
 						Timeout: durationpb.New(10 * time.Second),
@@ -76,9 +79,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					TargetId: targetCreated.GetId(),
 					Details:  targetCreated.GetDetails(),
 					Name:     targetCreatedName,
-					TargetType: &execution.Target_RestRequestResponse{
-						RestRequestResponse: &execution.SetRESTRequestResponse{
-							Url: targetCreatedURL,
+					TargetType: &execution.Target_RestCall{
+						RestCall: &execution.SetRESTCall{
+							InterruptOnError: false,
 						},
 					},
 					Timeout: durationpb.New(10 * time.Second),
@@ -105,7 +108,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				}
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusOK, changedResponse)
-				targetResponse := Tester.CreateTarget(ctx, t, "", targetResponseURL, true, false, false)
+				targetResponse := Tester.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, false)
 				Tester.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), []string{targetResponse.GetId()}, []string{})
 
 				return func() {
