@@ -314,6 +314,7 @@ Errors:
       APIAuthMethodNoSecret: Wybrany metoda uwierzytelniania API nie wymaga tajnego
       AuthMethodNoPrivateKeyJWT: Wybrana metoda uwierzytelniania nie wymaga klucza
       ClientSecretInvalid: Tajne klienta jest nieprawidłowe
+      ClientSecretNotSet: Klucz tajny klienta nie jest ustawiony
       Key:
         AlreadyExisting: Klucz aplikacji już istnieje
         NotFound: Klucz aplikacji nie znaleziony

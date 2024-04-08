@@ -313,6 +313,7 @@ Errors:
       APIAuthMethodNoSecret: Избраниот API метод за автентикација не бара таен клуч
       AuthMethodNoPrivateKeyJWT: Избраниот метод за автентикација не бара приватен клуч
       ClientSecretInvalid: Клиентскиот таен клуч е невалиден
+      ClientSecretNotSet: Тајната на клиентот не е поставена
       Key:
         AlreadyExisting: Клучот за апликацијата веќе постои
         NotFound: Клучот за апликацијата не е пронајден

@@ -259,7 +259,12 @@ func TestCompareHash(t *testing.T) {
 		},
 		{
 			"wrong",
-			args{&CryptoValue{CryptoType: TypeHash, Algorithm: "hash", Crypted: []byte("test")}, []byte("test2"), &mockHashCrypto{}},
+			args{&CryptoValue{CryptoType: TypeHash, Algorithm: "hash", Crypted: []byte("test")}, []byte("test"), &mockHashCrypto{}},
+			false,
+		},
+		{
+			"nil",
+			args{nil, []byte("test2"), &mockHashCrypto{}},
 			true,
 		},
 	}

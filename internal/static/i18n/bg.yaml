@@ -316,6 +316,7 @@ Errors:
       APIAuthMethodNoSecret: Избраният API Auth Method не изисква тайна
       AuthMethodNoPrivateKeyJWT: Избраният метод за удостоверяване не изисква ключ
       ClientSecretInvalid: Тайната на клиента е невалидна
+      ClientSecretNotSet: Тайната на клиента не е зададена
       Key:
         AlreadyExisting: Вече съществува ключ за приложение
         NotFound: Ключът на приложението не е намерен

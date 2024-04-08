@@ -308,6 +308,7 @@ Errors:
       APIAuthMethodNoSecret: Выбранный метод аутентификации API не требует ключа
       AuthMethodNoPrivateKeyJWT: Выбранный метод аутентификации не требует ключа
       ClientSecretInvalid: Клиентский ключ недействителен
+      ClientSecretNotSet: Секрет клиента не установлен
       Key:
         AlreadyExisting: Ключ приложения уже существует
         NotFound: Ключ приложения не найден
