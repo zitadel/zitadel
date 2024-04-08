@@ -449,14 +449,15 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback(w, r, authReq)
 }
 
-func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser, changed bool) bool {
+func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
 	queries := make([]query.SearchQuery, 0, 2)
 	var user *query.NotifyUser
+	var err error
 	switch provider.AutoLinking {
 	case domain.AutoLinkingOptionUsername:
-		username, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEquals)
-		_ = err
-		queries = append(queries, username)
+		//username, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEquals)
+		//_ = err
+		//queries = append(queries, username)
 		user, err = l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
 		if err != nil {
 			return false
@@ -466,11 +467,15 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 		}
 	case domain.AutoLinkingOptionEmail:
 		emailQuery, err := query.NewUserVerifiedEmailSearchQuery(string(externalUser.Email))
-		_ = err
+		if err != nil {
+			return false
+		}
 		queries = append(queries, emailQuery)
 		if authReq.RequestedOrgID != "" {
 			resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(authReq.RequestedOrgID, query.TextEquals)
-			_ = err
+			if err != nil {
+				return false
+			}
 			queries = append(queries, resourceOwnerQuery)
 		}
 		user, err = l.query.GetNotifyUser(r.Context(), false, queries...)
@@ -508,7 +513,7 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 	human, idpLink, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
 	// let's check if auto-linking is enabled and if the user would be found by the corresponding option
 	if provider.AutoLinking != domain.AutoLinkingOptionUnspecified {
-		if l.checkAutoLinking(w, r, authReq, provider, externalUser, changed) {
+		if l.checkAutoLinking(w, r, authReq, provider, externalUser) {
 			return
 		}
 	}

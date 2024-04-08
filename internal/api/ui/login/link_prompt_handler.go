@@ -36,20 +36,9 @@ func (l *Login) renderLinkingPrompt(w http.ResponseWriter, r *http.Request, auth
 	data := &linkingPromptData{
 		Username: identification,
 		UserID:   user.ID,
-		userData: l.getUserData(r, authReq, translator, "Login.Title", "Login.Description", errID, errMessage),
+		userData: l.getUserData(r, authReq, translator, "LinkingUserPrompt.Title", "LinkingUserPrompt.Description", errID, errMessage),
 	}
-	funcs := map[string]interface{}{
-		"hasUsernamePasswordLogin": func() bool {
-			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowUsernamePassword
-		},
-		"hasExternalLogin": func() bool {
-			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowExternalIDP && authReq.AllowedExternalIDPs != nil && len(authReq.AllowedExternalIDPs) > 0
-		},
-		"hasRegistration": func() bool {
-			return authReq != nil && authReq.LoginPolicy != nil && authReq.LoginPolicy.AllowRegister
-		},
-	}
-	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplLinkingPrompt], data, funcs)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplLinkingPrompt], data, nil)
 }
 
 func (l *Login) handleLinkingPrompt(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +49,7 @@ func (l *Login) handleLinkingPrompt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if data.OtherUser {
-		l.renderLogin(w, r, authReq, nil)
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil)
 		return
 	}
 	err = l.authRepo.SelectUser(r.Context(), authReq.ID, data.UserID, authReq.AgentID)
