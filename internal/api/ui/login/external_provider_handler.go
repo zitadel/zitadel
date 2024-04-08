@@ -486,7 +486,7 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 		return false
 	}
 
-	l.renderLinkingPrompt(w, r, authReq, user, nil)
+	l.renderLinkingUserPrompt(w, r, authReq, user, nil)
 	return true
 }
 

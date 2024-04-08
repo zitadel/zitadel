@@ -83,7 +83,7 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		tmplLDAPLogin:                    "ldap_login.html",
 		tmplDeviceAuthUserCode:           "device_usercode.html",
 		tmplDeviceAuthAction:             "device_action.html",
-		tmplLinkingPrompt:                "linking_prompt.html",
+		tmplLinkingUserPrompt:            "link_user_prompt.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -236,8 +236,8 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		"ldapUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLDAPCallback)
 		},
-		"linkingPromptUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointLinkingPrompt)
+		"linkingUserPromptUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointLinkingUserPrompt)
 		},
 	}
 	var err error

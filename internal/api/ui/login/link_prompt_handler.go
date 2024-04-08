@@ -8,22 +8,22 @@ import (
 )
 
 const (
-	tmplLinkingPrompt = "linking_prompt"
+	tmplLinkingUserPrompt = "link_user_prompt"
 )
 
-type linkingPromptData struct {
+type linkingUserPromptData struct {
 	userData
 	Username string
 	Linking  domain.AutoLinkingOption
 	UserID   string
 }
 
-type linkingPromptFormData struct {
+type linkingUserPromptFormData struct {
 	OtherUser bool   `schema:"other"`
 	UserID    string `schema:"userID"`
 }
 
-func (l *Login) renderLinkingPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser, err error) {
+func (l *Login) renderLinkingUserPrompt(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -33,16 +33,16 @@ func (l *Login) renderLinkingPrompt(w http.ResponseWriter, r *http.Request, auth
 	if authReq.LabelPolicy != nil && authReq.LabelPolicy.HideLoginNameSuffix {
 		identification = user.Username
 	}
-	data := &linkingPromptData{
+	data := &linkingUserPromptData{
 		Username: identification,
 		UserID:   user.ID,
 		userData: l.getUserData(r, authReq, translator, "LinkingUserPrompt.Title", "LinkingUserPrompt.Description", errID, errMessage),
 	}
-	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplLinkingPrompt], data, nil)
+	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplLinkingUserPrompt], data, nil)
 }
 
-func (l *Login) handleLinkingPrompt(w http.ResponseWriter, r *http.Request) {
-	data := new(linkingPromptFormData)
+func (l *Login) handleLinkingUserPrompt(w http.ResponseWriter, r *http.Request) {
+	data := new(linkingUserPromptFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)

@@ -2,11 +2,14 @@
 
 <div class="lgn-head">
     <h1>{{t "LinkingUserPrompt.Title"}}</h1>
-    <p>{{t "LinkingUserPrompt.Description"}} {{.Username}}</p>
+    <p>
+        {{t "LinkingUserPrompt.Description"}}<br>
+        {{.Username}}
+    </p>
 </div>
 
 
-<form action="{{ linkingPromptUrl }}" method="POST">
+<form action="{{ linkingUserPromptUrl }}" method="POST">
 
     {{ .CSRF }}
 
