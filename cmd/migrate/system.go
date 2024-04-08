@@ -42,53 +42,7 @@ func copySystem(ctx context.Context, config *Migration) {
 	logging.OnError(err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 
-	copyKeys(ctx, sourceClient, destClient)
 	copyAssets(ctx, sourceClient, destClient)
-}
-
-func copyKeys(ctx context.Context, source, dest *database.DB) {
-	start := time.Now()
-
-	sourceConn, err := source.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire connection")
-	defer sourceConn.Close()
-
-	r, w := io.Pipe()
-	errs := make(chan error, 1)
-
-	go func() {
-		err = sourceConn.Raw(func(driverConn interface{}) error {
-			conn := driverConn.(*stdlib.Conn).Conn()
-			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT id, key FROM system.encryption_keys) TO stdout")
-			w.Close()
-			return err
-		})
-		errs <- err
-	}()
-
-	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire connection")
-	defer destConn.Close()
-
-	var eventCount int64
-	err = destConn.Raw(func(driverConn interface{}) error {
-		conn := driverConn.(*stdlib.Conn).Conn()
-
-		if shouldReplace {
-			_, err := conn.Exec(ctx, "TRUNCATE system.encryption_keys")
-			if err != nil {
-				return err
-			}
-		}
-
-		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY system.encryption_keys FROM stdin")
-		eventCount = tag.RowsAffected()
-
-		return err
-	})
-	logging.OnError(err).Fatal("unable to copy encryption keys to destination")
-	logging.OnError(<-errs).Fatal("unable to copy encryption keys from source")
-	logging.WithFields("took", time.Since(start), "count", eventCount).Info("encryption keys migrated")
 }
 
 func copyAssets(ctx context.Context, source, dest *database.DB) {
