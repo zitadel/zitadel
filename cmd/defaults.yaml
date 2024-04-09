@@ -428,7 +428,6 @@ SystemAPIUsers:
 
 SystemDefaults:
   SecretGenerators:
-    PasswordSaltCost: 14 # ZITADEL_SYSTEMDEFAULTS_SECRETGENERATORS_PASSWORDSALTCOST
     MachineKeySize: 2048 # ZITADEL_SYSTEMDEFAULTS_SECRETGENERATORS_MACHINEKEYSIZE
     ApplicationKeySize: 2048 # ZITADEL_SYSTEMDEFAULTS_SECRETGENERATORS_APPLICATIONKEYSIZE
   PasswordHasher:
@@ -482,6 +481,13 @@ SystemDefaults:
     #   - "md5"
     #   - "scrypt"
     #   - "pbkdf2" # verifier for all pbkdf2 hash modes.
+  SecretHasher:
+    # Set hasher configuration for machine users, API and OIDC client secrets.
+    # See PasswordHasher for all possible options
+    Hasher:
+      Algorithm: "bcrypt" # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_ALGORITHM
+      Cost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_COST
+    Verifiers:
   Multifactors:
     OTP:
       # If this is empty, the issuer is the requested domain
@@ -590,7 +596,6 @@ DefaultInstance:
         # date format: 2023-01-01T00:00:00Z
         ExpirationDate: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE
   SecretGenerators:
-    PasswordSaltCost: 14 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_PASSWORDSALTCOST
     ClientSecret:
       Length: 64 # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_CLIENTSECRET_LENGTH
       IncludeLowerLetters: true # ZITADEL_DEFAULTINSTANCE_SECRETGENERATORS_CLIENTSECRET_INCLUDELOWERLETTERS

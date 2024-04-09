@@ -16,15 +16,21 @@ const (
 	OIDCConfigSecretChangedType        = applicationEventTypePrefix + "config.oidc.secret.changed"
 	OIDCClientSecretCheckSucceededType = applicationEventTypePrefix + "oidc.secret.check.succeeded"
 	OIDCClientSecretCheckFailedType    = applicationEventTypePrefix + "oidc.secret.check.failed"
+	OIDCConfigSecretHashUpdatedType    = applicationEventTypePrefix + "config.oidc.secret.updated"
 )
 
 type OIDCConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Version                  domain.OIDCVersion         `json:"oidcVersion,omitempty"`
-	AppID                    string                     `json:"appId"`
-	ClientID                 string                     `json:"clientId,omitempty"`
-	ClientSecret             *crypto.CryptoValue        `json:"clientSecret,omitempty"`
+	Version  domain.OIDCVersion `json:"oidcVersion,omitempty"`
+	AppID    string             `json:"appId"`
+	ClientID string             `json:"clientId,omitempty"`
+
+	// New events only use EncodedHash. However, the ClientSecret field
+	// is preserved to handle events older than the switch to Passwap.
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
+
 	RedirectUris             []string                   `json:"redirectUris,omitempty"`
 	ResponseTypes            []domain.OIDCResponseType  `json:"responseTypes,omitempty"`
 	GrantTypes               []domain.OIDCGrantType     `json:"grantTypes,omitempty"`
@@ -55,7 +61,7 @@ func NewOIDCConfigAddedEvent(
 	version domain.OIDCVersion,
 	appID string,
 	clientID string,
-	clientSecret *crypto.CryptoValue,
+	hashedSecret string,
 	redirectUris []string,
 	responseTypes []domain.OIDCResponseType,
 	grantTypes []domain.OIDCGrantType,
@@ -80,7 +86,7 @@ func NewOIDCConfigAddedEvent(
 		Version:                  version,
 		AppID:                    appID,
 		ClientID:                 clientID,
-		ClientSecret:             clientSecret,
+		HashedSecret:             hashedSecret,
 		RedirectUris:             redirectUris,
 		ResponseTypes:            responseTypes,
 		GrantTypes:               grantTypes,
@@ -357,8 +363,12 @@ func OIDCConfigChangedEventMapper(event eventstore.Event) (eventstore.Event, err
 type OIDCConfigSecretChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID        string              `json:"appId"`
+	AppID string `json:"appId"`
+
+	// New events only use EncodedHash. However, the ClientSecret field
+	// is preserved to handle events older than the switch to Passwap.
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
 }
 
 func (e *OIDCConfigSecretChangedEvent) Payload() interface{} {
@@ -373,7 +383,7 @@ func NewOIDCConfigSecretChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
-	clientSecret *crypto.CryptoValue,
+	hashedSecret string,
 ) *OIDCConfigSecretChangedEvent {
 	return &OIDCConfigSecretChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -382,7 +392,7 @@ func NewOIDCConfigSecretChangedEvent(
 			OIDCConfigSecretChangedType,
 		),
 		AppID:        appID,
-		ClientSecret: clientSecret,
+		HashedSecret: hashedSecret,
 	}
 }
 
@@ -481,4 +491,40 @@ func OIDCConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.
 	}
 
 	return e, nil
+}
+
+type OIDCConfigSecretHashUpdatedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+
+	AppID        string `json:"appId"`
+	HashedSecret string `json:"hashedSecret,omitempty"`
+}
+
+func NewOIDCConfigSecretHashUpdatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	appID string,
+	hashedSecret string,
+) *OIDCConfigSecretHashUpdatedEvent {
+	return &OIDCConfigSecretHashUpdatedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			OIDCConfigSecretHashUpdatedType,
+		),
+		AppID:        appID,
+		HashedSecret: hashedSecret,
+	}
+}
+
+func (e *OIDCConfigSecretHashUpdatedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
+func (e *OIDCConfigSecretHashUpdatedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *OIDCConfigSecretHashUpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
 }

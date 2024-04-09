@@ -55,7 +55,7 @@ func (c *Commands) requestPasswordReset(ctx context.Context, userID string, retu
 			return nil, nil, err
 		}
 	}
-	code, err := c.newCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption)
+	code, err := c.newEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption) //nolint:staticcheck
 	if err != nil {
 		return nil, nil, err
 	}
