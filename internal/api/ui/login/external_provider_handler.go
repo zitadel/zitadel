@@ -455,9 +455,6 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 	var err error
 	switch provider.AutoLinking {
 	case domain.AutoLinkingOptionUsername:
-		//username, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEquals)
-		//_ = err
-		//queries = append(queries, username)
 		user, err = l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
 		if err != nil {
 			return false

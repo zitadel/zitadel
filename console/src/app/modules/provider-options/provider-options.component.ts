@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@a
 import { FormControl, FormGroup } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { Options, AutoLinkingOption } from 'src/app/proto/generated/zitadel/idp_pb';
-import {AccessTokenType} from "../../proto/generated/zitadel/user_pb";
+import { AccessTokenType } from '../../proto/generated/zitadel/user_pb';
 
 @Component({
   selector: 'cnsl-provider-options',
@@ -27,7 +27,6 @@ export class ProviderOptionsComponent implements OnChanges, OnDestroy {
     AutoLinkingOption.AUTO_LINKING_OPTION_EMAIL,
   ];
 
-
   constructor() {
     this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       if (value) {
@@ -36,7 +35,7 @@ export class ProviderOptionsComponent implements OnChanges, OnDestroy {
         opt.setIsAutoUpdate(value.isAutoUpdate);
         opt.setIsCreationAllowed(value.isCreationAllowed);
         opt.setIsLinkingAllowed(value.isLinkingAllowed);
-        opt.setAutoLinking(value.autoLinking)
+        opt.setAutoLinking(value.autoLinking);
         this.optionsChanged.emit(opt);
       }
     });

@@ -9,7 +9,15 @@ import { ProviderOptionsComponent } from './provider-options.component';
 
 @NgModule({
   declarations: [ProviderOptionsComponent],
-  imports: [CommonModule, MatCheckboxModule, MatSelectModule, FormsModule, InfoSectionModule, ReactiveFormsModule, TranslateModule],
+  imports: [
+    CommonModule,
+    MatCheckboxModule,
+    MatSelectModule,
+    FormsModule,
+    InfoSectionModule,
+    ReactiveFormsModule,
+    TranslateModule,
+  ],
   exports: [ProviderOptionsComponent],
 })
 export class ProviderOptionsModule {}
