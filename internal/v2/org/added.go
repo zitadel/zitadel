@@ -12,50 +12,71 @@ import (
 var uniqueOrgName = "org_name"
 
 var (
-	_ eventstore.Command = (*AddedEvent)(nil)
 	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	Added *AddedEvent
+	Added AddedEvent
 )
 
-type AddedEvent struct {
+type addedPayload struct {
 	Name string `json:"name"`
-
-	creator string
 }
 
-func NewAddedEvent(ctx context.Context, name string) (*AddedEvent, error) {
+type AddedEvent addedEvent
+type addedEvent = eventstore.Event[addedPayload]
+
+func AddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*AddedEvent, error) {
+	event, err := eventstore.EventFromStorage[addedEvent](e)
+	if err != nil {
+		return nil, err
+	}
+	return (*AddedEvent)(event), nil
+}
+
+func (e AddedEvent) IsType(typ string) bool {
+	return typ == "org.added"
+}
+
+var _ eventstore.Command = (*AddedCommand)(nil)
+
+type AddedCommand struct {
+	creator string
+	addedPayload
+}
+
+func NewAddedCommand(ctx context.Context, name string) (*AddedCommand, error) {
 	if name = strings.TrimSpace(name); name == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")
 	}
-	return &AddedEvent{
-		Name:    name,
+	return &AddedCommand{
 		creator: authz.GetCtxData(ctx).UserID,
+		addedPayload: addedPayload{
+			Name: name,
+		},
 	}, nil
 }
 
-// Creator implements [eventstore.action].
-func (a *AddedEvent) Creator() string {
+// Creator implements eventstore.Command.
+func (a *AddedCommand) Creator() string {
 	return a.creator
 }
 
-// Payload implements [eventstore.Command].
-func (a *AddedEvent) Payload() any {
-	return a
+// Payload implements eventstore.Command.
+func (a *AddedCommand) Payload() any {
+	return a.addedPayload
 }
 
 // Revision implements [eventstore.action].
-func (*AddedEvent) Revision() uint16 {
+func (*AddedCommand) Revision() uint16 {
 	return 1
 }
 
 // UniqueConstraints implements [eventstore.Command].
-func (e *AddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (e *AddedCommand) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{
 		eventstore.NewAddEventUniqueConstraint(uniqueOrgName, e.Name, "Errors.Org.AlreadyExists"),
 	}
 }
 
 // Type implements [eventstore.action].
-func (*AddedEvent) Type() string {
+func (*AddedCommand) Type() string {
 	return "org.added"
 }

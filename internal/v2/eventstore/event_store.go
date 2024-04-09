@@ -2,22 +2,17 @@ package eventstore
 
 import (
 	"context"
-	"time"
 )
 
-var (
-	querier Querier
-	pusher  Pusher
-)
-
-func InitEventStore(push Pusher, query Querier) {
-	pusher = push
-	querier = query
+func NewEventstore(querier Querier, pusher Pusher) *EventStore {
+	return &EventStore{
+		Pusher:  pusher,
+		Querier: querier,
+	}
 }
 
-func InitEvenStoreFromOne(o one) {
-	pusher = o
-	querier = o
+func NewEventstoreFromOne(o one) *EventStore {
+	return NewEventstore(o, o)
 }
 
 type EventStore struct {
@@ -45,29 +40,6 @@ type Pusher interface {
 type Querier interface {
 	healther
 	Query(ctx context.Context, query *Query) (eventCount int, err error)
-}
-
-type Aggregate struct {
-	ID       string
-	Type     string
-	Instance string
-	Owner    string
-}
-
-func (agg *Aggregate) Equals(aggregate *Aggregate) bool {
-	if aggregate.ID != "" && aggregate.ID != agg.ID {
-		return false
-	}
-	if aggregate.Type != "" && aggregate.Type != agg.Type {
-		return false
-	}
-	if aggregate.Instance != "" && aggregate.Instance != agg.Instance {
-		return false
-	}
-	if aggregate.Owner != "" && aggregate.Owner != agg.Owner {
-		return false
-	}
-	return true
 }
 
 type PushIntent interface {
@@ -103,37 +75,9 @@ type Command interface {
 	UniqueConstraints() []*UniqueConstraint
 }
 
-func Unmarshal[T any](event Event) (*T, error) {
-	value := new(T)
-
-	if err := event.Unmarshal(value); err != nil {
-		return nil, err
-	}
-
-	return value, nil
-}
-
 type GlobalPosition struct {
 	Position        float64
 	InPositionOrder uint32
-}
-
-type Event interface {
-	action
-
-	// Aggregate represents the object the event lives in
-	Aggregate() *Aggregate
-	// Sequence of the event in the aggregate
-	Sequence() uint32
-	// CreatedAt is the time the event was created at
-	CreatedAt() time.Time
-	// Position is the global position of the event
-	Position() GlobalPosition
-
-	// Unmarshal parses the payload and stores the result
-	// in the value pointed to by ptr. If ptr is nil or not a pointer,
-	// Unmarshal returns an error
-	Unmarshal(ptr any) error
 }
 
 type action interface {
@@ -146,7 +90,7 @@ type action interface {
 }
 
 type Reducer interface {
-	Reduce(events ...Event) error
+	Reduce(events ...*Event[StoragePayload]) error
 }
 
-type Reduce func(events ...Event) error
+type Reduce func(events ...*Event[StoragePayload]) error

@@ -48,12 +48,12 @@ func (p *InstanceCreatedMilestone) Filter() []*eventstore.Filter {
 	}
 }
 
-func (p *InstanceCreatedMilestone) Reduce(events ...eventstore.Event) error {
+func (p *InstanceCreatedMilestone) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
 	for _, event := range events {
-		if event.Type() != "instance.added" {
+		if event.Type != "instance.added" {
 			continue
 		}
-		p.reachedAt = event.CreatedAt()
+		p.reachedAt = event.CreatedAt
 	}
 	return nil
 }
@@ -90,13 +90,13 @@ func (p *InstanceRemovedMilestone) Filter() []*eventstore.Filter {
 	}
 }
 
-func (p *InstanceRemovedMilestone) Reduce(events ...eventstore.Event) error {
+func (p *InstanceRemovedMilestone) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
 	for _, event := range events {
-		if event.Type() != "instance.removed" {
+		if event.Type != "instance.removed" {
 			continue
 		}
 
-		p.reachedAt = event.CreatedAt()
+		p.reachedAt = event.CreatedAt
 	}
 	return nil
 }
@@ -133,13 +133,13 @@ func (p *AuthOnInstanceMilestone) Filter() []*eventstore.Filter {
 	}
 }
 
-func (p *AuthOnInstanceMilestone) Reduce(events ...eventstore.Event) error {
+func (p *AuthOnInstanceMilestone) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
 	for _, event := range events {
-		if event.Type() != "user.token.added" {
+		if event.Type != "user.token.added" {
 			continue
 		}
 
-		p.reachedAt = event.CreatedAt()
+		p.reachedAt = event.CreatedAt
 	}
 	return nil
 }
@@ -181,22 +181,22 @@ func (p *AuthOnAppMilestone) Filter() []*eventstore.Filter {
 	}
 }
 
-func (p *AuthOnAppMilestone) Reduce(events ...eventstore.Event) error {
+func (p *AuthOnAppMilestone) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
 	for _, event := range events {
-		if event.Type() != "user.token.added" {
+		if event.Type != "user.token.added" {
 			continue
 		}
-		tokenAdded, err := eventstore.Unmarshal[user.TokenAdded](event)
+		tokenAdded, err := user.TokenAddedEventFromStorage(event)
 		if err != nil {
 			return err
 		}
 
-		p.position = event.Position()
+		p.position = event.Position
 
-		if tokenAdded.ApplicationID == p.consoleAppID {
+		if tokenAdded.Payload.ApplicationID == p.consoleAppID {
 			continue
 		}
-		p.reachedAt = event.CreatedAt()
+		p.reachedAt = event.CreatedAt
 	}
 	return nil
 }
@@ -234,13 +234,13 @@ func (p *ProjectCreatedMilestone) Filter() []*eventstore.Filter {
 	}
 }
 
-func (p *ProjectCreatedMilestone) Reduce(events ...eventstore.Event) error {
+func (p *ProjectCreatedMilestone) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
 	for _, event := range events {
-		if event.Type() != "project.added" {
+		if event.Type != "project.added" {
 			continue
 		}
 
-		p.reachedAt = event.CreatedAt()
+		p.reachedAt = event.CreatedAt
 	}
 	return nil
 }
@@ -278,13 +278,13 @@ func (p *AppCreatedMilestone) Filter() []*eventstore.Filter {
 	}
 }
 
-func (p *AppCreatedMilestone) Reduce(events ...eventstore.Event) error {
+func (p *AppCreatedMilestone) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
 	for _, event := range events {
-		if event.Type() != "project.application.added" {
+		if event.Type != "project.application.added" {
 			continue
 		}
 
-		p.reachedAt = event.CreatedAt()
+		p.reachedAt = event.CreatedAt
 	}
 	return nil
 }

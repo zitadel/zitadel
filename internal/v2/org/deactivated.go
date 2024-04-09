@@ -3,40 +3,20 @@ package org
 import "github.com/zitadel/zitadel/internal/v2/eventstore"
 
 var (
-	_ eventstore.Command = (*DeactivatedEvent)(nil)
-	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	Deactivated *DeactivatedEvent
+	Deactivated DeactivatedEvent
 )
 
-type DeactivatedEvent struct {
-	creator string
+type DeactivatedEvent deactivatedEvent
+type deactivatedEvent = eventstore.Event[struct{}]
+
+func DeactivatedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DeactivatedEvent, error) {
+	event, err := eventstore.EventFromStorage[deactivatedEvent](e)
+	if err != nil {
+		return nil, err
+	}
+	return (*DeactivatedEvent)(event), nil
 }
 
-func NewDeactivatedEvent() *DeactivatedEvent {
-	return new(DeactivatedEvent)
-}
-
-// Creator implements [eventstore.action].
-func (e *DeactivatedEvent) Creator() string {
-	return e.creator
-}
-
-// Payload implements [eventstore.Command].
-func (*DeactivatedEvent) Payload() any {
-	return nil
-}
-
-// Revision implements [eventstore.action].
-func (*DeactivatedEvent) Revision() uint16 {
-	return 1
-}
-
-// UniqueConstraints implements [eventstore.Command].
-func (*DeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	panic("unimplemented")
-}
-
-// Type implements [eventstore.action].
-func (*DeactivatedEvent) Type() string {
-	return "org.deactivated"
+func (e DeactivatedEvent) IsType(typ string) bool {
+	return typ == "org.deactivated"
 }

@@ -691,7 +691,7 @@ func Test_writeQuery(t *testing.T) {
 						eventstore.NewFilter(
 							eventstore.AppendAggregateFilter(
 								"user",
-								eventstore.AggregateIDList(database.NewListContains("a", "b")),
+								eventstore.AggregateIDs("a", "b"),
 							),
 						),
 					),
@@ -712,7 +712,7 @@ func Test_writeQuery(t *testing.T) {
 						eventstore.NewFilter(
 							eventstore.AppendAggregateFilter(
 								"user",
-								eventstore.AggregateIDList(database.NewListContains("a", "b")),
+								eventstore.AggregateIDs("a", "b"),
 							),
 						),
 						eventstore.NewFilter(
@@ -858,7 +858,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 					eventstore.AppendFilter(
 						eventstore.AppendAggregateFilter(
 							"agg1",
-							eventstore.AggregateIDList(database.NewListContains("1", "2")),
+							eventstore.AggregateIDs("1", "2"),
 						),
 						eventstore.AppendAggregateFilter(
 							"agg2",

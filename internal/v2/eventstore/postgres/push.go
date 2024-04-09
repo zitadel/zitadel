@@ -140,9 +140,20 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) (err error) {
 
 	stmt.WriteString(`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES `)
 	for i, cmd := range commands {
-		cmd.event.position.InPositionOrder = uint32(i)
+		cmd.Position.InPositionOrder = uint32(i)
 		stmt.WriteString(`(`)
-		stmt.WriteArgs(cmd.aggregate.Instance, cmd.aggregate.Owner, cmd.aggregate.Type, cmd.aggregate.ID, cmd.revision, cmd.creator, cmd.typ, cmd.payload, cmd.sequence, i)
+		stmt.WriteArgs(
+			cmd.Aggregate.Instance,
+			cmd.Aggregate.Owner,
+			cmd.Aggregate.Type,
+			cmd.Aggregate.ID,
+			cmd.Revision,
+			cmd.Creator,
+			cmd.Type,
+			cmd.Payload,
+			cmd.Sequence,
+			i,
+		)
 		stmt.WriteString(", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())")
 		stmt.WriteString(`)`)
 		if i < len(commands)-1 {
@@ -161,8 +172,8 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) (err error) {
 		defer func() { i++ }()
 
 		err := scan(
-			&commands[i].event.createdAt,
-			&commands[i].event.position.Position,
+			&commands[i].CreatedAt,
+			&commands[i].Position.Position,
 		)
 		if err != nil {
 			return err
@@ -171,7 +182,7 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) (err error) {
 		if !ok {
 			return nil
 		}
-		return reducer.Reduce(commands[i].event)
+		return reducer.Reduce(commands[i].Event)
 	})
 }
 
@@ -187,7 +198,7 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (er
 		}
 		for _, constraint := range cmd.uniqueConstraints {
 			stmt.Reset()
-			instance := cmd.aggregate.Instance
+			instance := cmd.Aggregate.Instance
 			if constraint.IsGlobal {
 				instance = ""
 			}

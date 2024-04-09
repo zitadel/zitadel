@@ -1,7 +1,6 @@
 package eventstore
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"time"
@@ -15,12 +14,7 @@ type Query struct {
 	tx         *sql.Tx
 	pagination *Pagination
 	reducer    Reducer
-	querier    Querier
 	// TODO: await push
-}
-
-func (q *Query) Execute(ctx context.Context) (eventCount int, err error) {
-	return q.querier.Query(ctx, q)
 }
 
 func (q *Query) Instance() string {
@@ -40,7 +34,7 @@ func (q *Query) Pagination() *Pagination {
 	return q.pagination
 }
 
-func (q *Query) Reduce(events ...Event) error {
+func (q *Query) Reduce(events ...*Event[StoragePayload]) error {
 	return q.reducer.Reduce(events...)
 }
 
@@ -48,7 +42,6 @@ func NewQuery(instance string, reducer Reducer, opts ...QueryOpt) *Query {
 	query := &Query{
 		instance: instance,
 		reducer:  reducer,
-		querier:  querier,
 	}
 
 	for _, opt := range opts {
@@ -63,12 +56,6 @@ type QueryOpt func(query *Query)
 func QueryTx(tx *sql.Tx) QueryOpt {
 	return func(query *Query) {
 		query.tx = tx
-	}
-}
-
-func QueryExecuter(q Querier) QueryOpt {
-	return func(query *Query) {
-		query.querier = q
 	}
 }
 
@@ -187,7 +174,7 @@ func NewAggregateFilter(typ string, opts ...AggregateFilterOpt) *AggregateFilter
 
 type AggregateFilter struct {
 	typ    string
-	id     string
+	ids    []string
 	events []*EventFilter
 }
 
@@ -195,8 +182,15 @@ func (f *AggregateFilter) Type() database.TextFilter[string] {
 	return database.NewTextEqual(f.typ)
 }
 
-func (f *AggregateFilter) ID() database.TextFilter[string] {
-	return database.NewTextEqual(f.id)
+func (f *AggregateFilter) ID() database.Condition {
+	if len(f.ids) == 0 {
+		return nil
+	}
+	if len(f.ids) == 1 {
+		return database.NewTextEqual(f.ids[0])
+	}
+
+	return database.NewListContains(f.ids...)
 }
 
 func (f *AggregateFilter) Events() []*EventFilter {
@@ -207,7 +201,20 @@ type AggregateFilterOpt func(f *AggregateFilter)
 
 func AggregateID(id string) AggregateFilterOpt {
 	return func(filter *AggregateFilter) {
-		filter.id = id
+		filter.ids = []string{id}
+	}
+}
+
+func AppendAggregateIDs(ids ...string) AggregateFilterOpt {
+	return func(f *AggregateFilter) {
+		f.ids = append(f.ids, ids...)
+	}
+}
+
+// AggregateIDs sets the given ids as search param
+func AggregateIDs(ids ...string) AggregateFilterOpt {
+	return func(f *AggregateFilter) {
+		f.ids = append(f.ids, ids...)
 	}
 }
 

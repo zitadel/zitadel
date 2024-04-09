@@ -158,11 +158,12 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
-	es_v4.InitEvenStoreFromOne(postgres.New(esPusherDBClient))
+	es := es_v4.NewEventstoreFromOne(postgres.New(esPusherDBClient))
 
 	queries, err := query.StartQueries(
 		ctx,
 		eventstoreClient,
+		es,
 		queryDBClient,
 		projectionDBClient,
 		config.Projections,

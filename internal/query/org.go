@@ -96,11 +96,14 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	defer func() { span.EndWithError(err) }()
 
 	foundOrg := readmodel.NewOrg(id)
-	eventCount, err := eventstore.NewQuery(
-		authz.GetInstance(ctx).InstanceID(),
-		foundOrg,
-		eventstore.AppendFilters(foundOrg.Filter()...),
-	).Execute(ctx)
+	eventCount, err := q.es.Query(
+		ctx,
+		eventstore.NewQuery(
+			authz.GetInstance(ctx).InstanceID(),
+			foundOrg,
+			eventstore.AppendFilters(foundOrg.Filter()...),
+		),
+	)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
 	}

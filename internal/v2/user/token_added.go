@@ -8,11 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
-var (
-	_ eventstore.Command = (*TokenAdded)(nil)
-)
-
-type TokenAdded struct {
+type tokenAddedPayload struct {
 	TokenID           string       `json:"tokenId"`
 	ApplicationID     string       `json:"applicationId"`
 	UserAgentID       string       `json:"userAgentId"`
@@ -21,31 +17,15 @@ type TokenAdded struct {
 	Scopes            []string     `json:"scopes"`
 	Expiration        time.Time    `json:"expiration"`
 	PreferredLanguage language.Tag `json:"preferredLanguage"`
-
-	creator string
 }
 
-// Creator implements [eventstore.Command].
-func (t *TokenAdded) Creator() string {
-	return t.creator
-}
+type TokenAddedEvent tokenAddedEvent
+type tokenAddedEvent = eventstore.Event[tokenAddedPayload]
 
-// Payload implements [eventstore.Command].
-func (t *TokenAdded) Payload() any {
-	return t
-}
-
-// Revision implements [eventstore.Command].
-func (t *TokenAdded) Revision() uint16 {
-	return 1
-}
-
-// Type implements [eventstore.Command].
-func (t *TokenAdded) Type() string {
-	return "user.token.added"
-}
-
-// UniqueConstraints implements [eventstore.Command].
-func (t *TokenAdded) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+func TokenAddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*TokenAddedEvent, error) {
+	event, err := eventstore.EventFromStorage[tokenAddedEvent](e)
+	if err != nil {
+		return nil, err
+	}
+	return (*TokenAddedEvent)(event), nil
 }

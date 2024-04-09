@@ -40,30 +40,28 @@ func executeQuery(ctx context.Context, tx querier, stmt *database.Statement, red
 	}
 
 	err = database.MapRowsToObject(rows, func(scan func(dest ...any) error) error {
-		e := &event{
-			aggregate: &eventstore.Aggregate{},
-		}
+		e := new(eventstore.Event[eventstore.StoragePayload])
 
 		var payload sql.Null[[]byte]
 
 		err := scan(
-			&e.createdAt,
-			&e.typ,
-			&e.sequence,
-			&e.position.Position,
-			&e.position.InPositionOrder,
+			&e.CreatedAt,
+			&e.Type,
+			&e.Sequence,
+			&e.Position.Position,
+			&e.Position.InPositionOrder,
 			&payload,
-			&e.creator,
-			&e.aggregate.Owner,
-			&e.aggregate.Instance,
-			&e.aggregate.Type,
-			&e.aggregate.ID,
-			&e.revision,
+			&e.Creator,
+			&e.Aggregate.Owner,
+			&e.Aggregate.Instance,
+			&e.Aggregate.Type,
+			&e.Aggregate.ID,
+			&e.Revision,
 		)
 		if err != nil {
 			return err
 		}
-		e.payload = payload.V
+		e.Payload = unmarshalPayload(payload.V)
 		eventCount++
 
 		return reducer.Reduce(e)

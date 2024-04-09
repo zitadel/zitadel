@@ -1,44 +1,26 @@
 package domain
 
 import (
-	"context"
 	"strings"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/zerrors"
+	"github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
-type PrimarySetEvent struct {
+type primarySetPayload struct {
 	Name string `json:"domain"`
-
-	creator string
 }
 
-func NewSetPrimaryEvent(ctx context.Context, name string) (*PrimarySetEvent, error) {
-	if name = strings.TrimSpace(name); name == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "DOMAI-6ofTB", "Errors.Invalid.Argument")
+type PrimarySetEvent primarySetEvent
+type primarySetEvent = eventstore.Event[primarySetPayload]
+
+func PrimarySetEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*PrimarySetEvent, error) {
+	event, err := eventstore.EventFromStorage[primarySetEvent](e)
+	if err != nil {
+		return nil, err
 	}
-	return &PrimarySetEvent{
-		Name:    name,
-		creator: authz.GetCtxData(ctx).UserID,
-	}, nil
+	return (*PrimarySetEvent)(event), nil
 }
 
-// Creator implements [eventstore.action].
-func (a *PrimarySetEvent) Creator() string {
-	return a.creator
-}
-
-// Payload implements [eventstore.Command].
-func (a *PrimarySetEvent) Payload() any {
-	return a
-}
-
-// Revision implements [eventstore.action].
-func (*PrimarySetEvent) Revision() uint16 {
-	return 1
-}
-
-func (*PrimarySetEvent) Type() string {
-	return "domain.primary.set"
+func (e *PrimarySetEvent) HasTypeSuffix(typ string) bool {
+	return strings.HasSuffix(typ, "domain.primary.set")
 }

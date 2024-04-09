@@ -3,42 +3,25 @@ package org
 import "github.com/zitadel/zitadel/internal/v2/eventstore"
 
 var (
-	_ eventstore.Command = (*ChangedEvent)(nil)
 	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	Changed *ChangedEvent
+	Changed ChangedEvent
 )
 
-type ChangedEvent struct {
-	creator string
-
+type changedPayload struct {
 	Name *string `json:"name,omitempty"`
 }
 
-func NewChangedEvent() *ChangedEvent {
-	return new(ChangedEvent)
+type ChangedEvent changedEvent
+type changedEvent = eventstore.Event[changedPayload]
+
+func ChangedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*ChangedEvent, error) {
+	event, err := eventstore.EventFromStorage[changedEvent](e)
+	if err != nil {
+		return nil, err
+	}
+	return (*ChangedEvent)(event), nil
 }
 
-// Creator implements [eventstore.action].
-func (e *ChangedEvent) Creator() string {
-	return e.creator
-}
-
-// Payload implements [eventstore.Command].
-func (*ChangedEvent) Payload() any {
-	panic("unimplemented")
-}
-
-// Revision implements [eventstore.action].
-func (*ChangedEvent) Revision() uint16 {
-	return 1
-}
-
-// UniqueConstraints implements [eventstore.Command].
-func (*ChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	panic("unimplemented")
-}
-
-// UniqueConstraints implements [eventstore.action].
-func (*ChangedEvent) Type() string {
-	return "org.changed"
+func (e ChangedEvent) IsType(typ string) bool {
+	return typ == "org.changed"
 }

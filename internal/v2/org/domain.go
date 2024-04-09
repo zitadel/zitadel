@@ -1,7 +1,7 @@
 package org
 
 import (
-	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/v2/domain"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -10,87 +10,70 @@ import (
 var uniqueOrgDomain = "org_domain"
 
 var (
-	_ eventstore.Command = (*DomainAddedEvent)(nil)
 	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	DomainAdded *DomainAddedEvent
+	DomainAdded DomainAddedEvent
 )
 
 type DomainAddedEvent struct {
 	*domain.AddedEvent
 }
 
-func NewDomainAddedEvent(ctx context.Context, name string) (*DomainAddedEvent, error) {
-	event, err := domain.NewAddedEvent(ctx, name)
+func DomainAddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainAddedEvent, error) {
+	event, err := domain.AddedEventFromStorage(e)
 	if err != nil {
 		return nil, err
 	}
-	return &DomainAddedEvent{AddedEvent: event}, nil
+	return &DomainAddedEvent{
+		AddedEvent: event,
+	}, nil
 }
 
-// Type implements [eventstore.action].
-func (e *DomainAddedEvent) Type() string {
-	return string(append([]byte(eventTypePrefix), new(domain.AddedEvent).Type()...))
-}
-
-// UniqueConstraints implements [eventstore.Command].
-func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+func (e DomainAddedEvent) IsType(typ string) bool {
+	return strings.HasPrefix(typ, "org") && e.AddedEvent.HasTypeSuffix(typ)
 }
 
 var (
-	_ eventstore.Command = (*DomainVerifiedEvent)(nil)
 	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	DomainVerified *DomainVerifiedEvent
+	DomainVerified DomainVerifiedEvent
 )
 
 type DomainVerifiedEvent struct {
 	*domain.VerifiedEvent
 }
 
-func NewDomainVerifiedEvent(ctx context.Context, name string) (*DomainVerifiedEvent, error) {
-	event, err := domain.NewVerifiedEvent(ctx, name)
+func DomainVerifiedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainVerifiedEvent, error) {
+	event, err := domain.VerifiedEventFromStorage(e)
 	if err != nil {
 		return nil, err
 	}
-	return &DomainVerifiedEvent{VerifiedEvent: event}, nil
+	return &DomainVerifiedEvent{
+		VerifiedEvent: event,
+	}, nil
 }
 
-// Type implements [eventstore.action].
-func (e *DomainVerifiedEvent) Type() string {
-	return string(append([]byte(eventTypePrefix), new(domain.VerifiedEvent).Type()...))
-}
-
-// UniqueConstraints implements [eventstore.Command].
-func (e *DomainVerifiedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{
-		eventstore.NewAddEventUniqueConstraint(uniqueOrgDomain, e.Name, "Errors.Org.Domain.AlreadyExists"),
-	}
+func (e DomainVerifiedEvent) IsType(typ string) bool {
+	return strings.HasPrefix(typ, "org") && e.VerifiedEvent.HasTypeSuffix(typ)
 }
 
 var (
-	_ eventstore.Command = (*SetDomainPrimaryEvent)(nil)
 	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	DomainSetPrimary *SetDomainPrimaryEvent
+	DomainPrimarySet DomainPrimarySetEvent
 )
 
-type SetDomainPrimaryEvent struct {
+type DomainPrimarySetEvent struct {
 	*domain.PrimarySetEvent
 }
 
-func NewSetDomainPrimaryEvent(ctx context.Context, name string) (*SetDomainPrimaryEvent, error) {
-	event, err := domain.NewSetPrimaryEvent(ctx, name)
+func DomainPrimarySetEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainPrimarySetEvent, error) {
+	event, err := domain.PrimarySetEventFromStorage(e)
 	if err != nil {
 		return nil, err
 	}
-	return &SetDomainPrimaryEvent{PrimarySetEvent: event}, nil
+	return &DomainPrimarySetEvent{
+		PrimarySetEvent: event,
+	}, nil
 }
 
-// Type implements [eventstore.action].
-func (e *SetDomainPrimaryEvent) Type() string {
-	return string(append([]byte(eventTypePrefix), new(domain.PrimarySetEvent).Type()...))
-}
-
-// UniqueConstraints implements [eventstore.Command].
-func (*SetDomainPrimaryEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+func (e DomainPrimarySetEvent) IsType(typ string) bool {
+	return strings.HasPrefix(typ, "org") && e.PrimarySetEvent.HasTypeSuffix(typ)
 }

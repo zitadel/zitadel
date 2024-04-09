@@ -31,41 +31,41 @@ func (p *OrgState) Filter() []*eventstore.Filter {
 				org.AggregateType,
 				eventstore.AggregateID(p.id),
 				eventstore.AppendEvent(
-					eventstore.EventType(org.Added.Type()),
+					eventstore.EventType("org.added"),
 				),
 				eventstore.AppendEvent(
-					eventstore.EventType(org.Deactivated.Type()),
+					eventstore.EventType("org.deactivated"),
 				),
 				eventstore.AppendEvent(
-					eventstore.EventType(org.Reactivated.Type()),
+					eventstore.EventType("org.reactivated"),
 				),
 				eventstore.AppendEvent(
-					eventstore.EventType(org.Removed.Type()),
+					eventstore.EventType("org.removed"),
 				),
 			),
 		),
 	}
 }
 
-func (p *OrgState) Reduce(events ...eventstore.Event) error {
+func (p *OrgState) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
 	for _, event := range events {
 		if !p.shouldReduce(event) {
 			continue
 		}
 
-		switch event.Type() {
-		case org.Added.Type():
+		switch {
+		case org.Added.IsType(event.Type):
 			p.State = org.ActiveState
-		case org.Deactivated.Type():
+		case org.Deactivated.IsType(event.Type):
 			p.State = org.InactiveState
-		case org.Reactivated.Type():
+		case org.Reactivated.IsType(event.Type):
 			p.State = org.ActiveState
-		case org.Removed.Type():
+		case org.Removed.IsType(event.Type):
 			p.State = org.RemovedState
 		default:
 			continue
 		}
-		p.position = event.Position()
+		p.position = event.Position
 	}
 
 	// TODO: if more than x events store state

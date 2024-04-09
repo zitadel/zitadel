@@ -40,7 +40,7 @@ func (rm *Milestone) Filter(ctx context.Context) []*eventstore.Filter {
 	)
 }
 
-func (rm *Milestone) Reduce(events ...eventstore.Event) error {
+func (rm *Milestone) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
 	for _, event := range events {
 		if err := rm.InstanceCreatedMilestone.Reduce(event); err != nil {
 			return err
@@ -66,7 +66,7 @@ func (rm *Milestone) Reduce(events ...eventstore.Event) error {
 			return err
 		}
 
-		rm.position = event.Position()
+		rm.position = event.Position
 	}
 
 	return nil
