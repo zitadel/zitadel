@@ -274,13 +274,13 @@ func TestServer_SAMLACS(t *testing.T) {
 			// can't fail as covered in other tests
 			require.NoError(t, err)
 
-			//parse returned Endpoint to continue flow to callback with the same intentID==RelayState
+			//parse returned URL to continue flow to callback with the same intentID==RelayState
 			authURL, err := url.Parse(got.GetAuthUrl())
 			require.NoError(t, err)
 			samlRequest := &http.Request{Method: http.MethodGet, URL: authURL}
 			assert.NotEmpty(t, authURL)
 
-			//generate necessary information to create request to callback Endpoint
+			//generate necessary information to create request to callback URL
 			relayState := authURL.Query().Get("RelayState")
 			//test purposes, use defined intentID
 			if tt.args.intentID != "" {

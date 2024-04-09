@@ -15,13 +15,13 @@ import (
 )
 
 // ChangeUserEmail sets a user's email address, generates a code
-// and triggers a notification e-mail with the default confirmation Endpoint format.
+// and triggers a notification e-mail with the default confirmation URL format.
 func (c *Commands) ChangeUserEmail(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
 	return c.changeUserEmailWithCode(ctx, userID, email, alg, false, "")
 }
 
 // ChangeUserEmailURLTemplate sets a user's email address, generates a code
-// and triggers a notification e-mail with the confirmation Endpoint rendered from the passed urlTmpl.
+// and triggers a notification e-mail with the confirmation URL rendered from the passed urlTmpl.
 // urlTmpl must be a valid [tmpl.Template].
 func (c *Commands) ChangeUserEmailURLTemplate(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm, urlTmpl string) (*domain.Email, error) {
 	if err := domain.RenderConfirmURLTemplate(io.Discard, urlTmpl, userID, "code", "orgID"); err != nil {
@@ -37,13 +37,13 @@ func (c *Commands) ChangeUserEmailReturnCode(ctx context.Context, userID, email 
 }
 
 // ResendUserEmailCode generates a new code if there is a code existing
-// and triggers a notification e-mail with the default confirmation Endpoint format.
+// and triggers a notification e-mail with the default confirmation URL format.
 func (c *Commands) ResendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm) (*domain.Email, error) {
 	return c.resendUserEmailCode(ctx, userID, alg, false, "")
 }
 
 // ResendUserEmailCodeURLTemplate generates a new code if there is a code existing
-// and triggers a notification e-mail with the confirmation Endpoint rendered from the passed urlTmpl.
+// and triggers a notification e-mail with the confirmation URL rendered from the passed urlTmpl.
 // urlTmpl must be a valid [tmpl.Template].
 func (c *Commands) ResendUserEmailCodeURLTemplate(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, urlTmpl string) (*domain.Email, error) {
 	if err := domain.RenderConfirmURLTemplate(io.Discard, urlTmpl, userID, "code", "orgID"); err != nil {
@@ -96,7 +96,7 @@ func (c *Commands) resendUserEmailCode(ctx context.Context, userID string, alg c
 // changeUserEmailWithGenerator set a user's email address.
 // returnCode controls if the plain text version of the code will be set in the return object.
 // When the plain text code is returned, no notification e-mail will be send to the user.
-// urlTmpl allows changing the target Endpoint that is used by the e-mail and should be a validated Go template, if used.
+// urlTmpl allows changing the target URL that is used by the e-mail and should be a validated Go template, if used.
 func (c *Commands) changeUserEmailWithGenerator(ctx context.Context, userID, email string, gen crypto.Generator, returnCode bool, urlTmpl string) (*domain.Email, error) {
 	cmd, err := c.changeUserEmailWithGeneratorEvents(ctx, userID, email, gen, returnCode, urlTmpl)
 	if err != nil {

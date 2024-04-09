@@ -78,7 +78,7 @@ type externalSAMLIDPCallbackData struct {
 	RelayState string
 }
 
-// CallbackURL generates the instance specific Endpoint to the IDP callback handler
+// CallbackURL generates the instance specific URL to the IDP callback handler
 func CallbackURL(externalSecure bool) func(ctx context.Context) string {
 	return func(ctx context.Context) string {
 		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix + callbackPath

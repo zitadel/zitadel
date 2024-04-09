@@ -1149,7 +1149,7 @@ func TestCommands_changeUserEmailWithGenerator(t *testing.T) {
 			},
 		},
 		{
-			name: "email changed, Endpoint template",
+			name: "email changed, URL template",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1452,7 +1452,7 @@ func TestCommands_resendUserEmailCodeWithGeneratorEvents(t *testing.T) {
 			},
 		},
 		{
-			name: "resend code, Endpoint template",
+			name: "resend code, URL template",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,

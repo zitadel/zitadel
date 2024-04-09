@@ -77,7 +77,7 @@ func (l *Login) renderDeviceAuthDone(w http.ResponseWriter, r *http.Request, aut
 }
 
 // handleDeviceUserCode serves the Device Authorization user code submission form.
-// The "user_code" may be submitted by Endpoint (GET) or form (POST).
+// The "user_code" may be submitted by URL (GET) or form (POST).
 // When a "user_code" is received and found through query,
 // handleDeviceAuthUserCode will create a new AuthRequest in the repository.
 // The user is then redirected to the /login endpoint to complete authentication.
@@ -178,7 +178,7 @@ func (l *Login) handleDeviceAuthAction(w http.ResponseWriter, r *http.Request) {
 	l.renderDeviceAuthDone(w, r, authReq, action)
 }
 
-// deviceAuthCallbackURL creates the callback Endpoint with which the user
+// deviceAuthCallbackURL creates the callback URL with which the user
 // is redirected back to the device authorization flow.
 func (l *Login) deviceAuthCallbackURL(authRequestID string) string {
 	return l.renderer.pathPrefix + EndpointDeviceAuthAction + "?authRequestID=" + authRequestID
@@ -186,7 +186,7 @@ func (l *Login) deviceAuthCallbackURL(authRequestID string) string {
 
 // RedirectDeviceAuthToPrefix allows users to use https://domain.com/device without the /ui/login prefix
 // and redirects them to the prefixed endpoint.
-// [rfc 8628](https://www.rfc-editor.org/rfc/rfc8628#section-3.2) recommends the Endpoint to be as short as possible.
+// [rfc 8628](https://www.rfc-editor.org/rfc/rfc8628#section-3.2) recommends the URL to be as short as possible.
 func RedirectDeviceAuthToPrefix(w http.ResponseWriter, r *http.Request) {
 	target := gu.PtrCopy(r.URL)
 	target.Path = HandlerPrefix + EndpointDeviceAuth
