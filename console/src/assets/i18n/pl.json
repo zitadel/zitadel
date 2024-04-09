@@ -1588,6 +1588,7 @@
         "initPasswordText": "Inicjalizacja hasła",
         "initializeDoneText": "Inicjalizacja użytkownika zakończona",
         "initializeUserText": "Inicjalizacja użytkownika",
+        "linkingUserPromptText": "Komunikat o łączeniu użytkowników",
         "linkingUserDoneText": "Łączenie użytkownika zakończone",
         "loginText": "Zaloguj się",
         "logoutText": "Wyloguj się",

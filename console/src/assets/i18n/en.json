@@ -1589,6 +1589,7 @@
         "initPasswordText": "Initialize password",
         "initializeDoneText": "Initialize user done",
         "initializeUserText": "Initialize user",
+        "linkingUserPromptText": "Linking user prompt",
         "linkingUserDoneText": "Linking user done",
         "loginText": "Login",
         "logoutText": "Logout",

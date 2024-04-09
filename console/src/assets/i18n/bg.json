@@ -1582,6 +1582,7 @@
         "initPasswordText": "Инициализиране на парола",
         "initializeDoneText": "Инициализирането на потребителя е готово",
         "initializeUserText": "Инициализирайте потребителя",
+        "linkingUserPromptText": "Потребителският промпт за свързване",
         "linkingUserDoneText": "Свързването на потребителя е готово",
         "loginText": "Влизам",
         "logoutText": "Излез от профила си",

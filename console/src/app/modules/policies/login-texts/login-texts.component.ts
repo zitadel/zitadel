@@ -41,6 +41,7 @@ const KeyNamesArray = [
   'initPasswordText',
   'initializeDoneText',
   'initializeUserText',
+  'linkingUserPromptText',
   'linkingUserDoneText',
   'loginText',
   'logoutText',

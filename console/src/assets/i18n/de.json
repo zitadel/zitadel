@@ -1588,6 +1588,7 @@
         "initPasswordText": "Passwort Initialisierung",
         "initializeDoneText": "Benutzereinrichtung erfolgreich",
         "initializeUserText": "Benutzereinrichtung",
+        "linkingUserPromptText": "Aufforderung zur Benutzerverlinkung",
         "linkingUserDoneText": "Benutzerverlinkung erfolgreich",
         "loginText": "Anmelden",
         "logoutText": "Abmelden",

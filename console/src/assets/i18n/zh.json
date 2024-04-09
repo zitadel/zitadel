@@ -1587,6 +1587,7 @@
         "initPasswordText": "初始化密码",
         "initializeDoneText": "初始化用户完成",
         "initializeUserText": "初始化用户",
+        "linkingUserPromptText": "用户链接提示",
         "linkingUserDoneText": "链接用户完成",
         "loginText": "登录",
         "logoutText": "登出",

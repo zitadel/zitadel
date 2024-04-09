@@ -1656,6 +1656,7 @@
         "initPasswordText": "Инициализировать пароль",
         "initializeDoneText": "Инициализация пользователя выполнена",
         "initializeUserText": "Инициализировать пользователя",
+        "linkingUserPromptText": "Текст приглашения к привязке пользователя",
         "linkingUserDoneText": "Привязка пользователя выполнена",
         "loginText": "Вход",
         "logoutText": "Выход",

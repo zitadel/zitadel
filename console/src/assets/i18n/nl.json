@@ -1589,6 +1589,7 @@
         "initPasswordText": "Initialiseer wachtwoord",
         "initializeDoneText": "Gebruiker initialisatie voltooid",
         "initializeUserText": "Initialiseer gebruiker",
+        "linkingUserPromptText": "Gebruiker koppelingsprompt",
         "linkingUserDoneText": "Gebruiker koppeling voltooid",
         "loginText": "Login",
         "logoutText": "Uitloggen",

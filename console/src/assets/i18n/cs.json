@@ -1589,6 +1589,7 @@
         "initPasswordText": "Inicializace hesla",
         "initializeDoneText": "Inicializace uživatele dokončena",
         "initializeUserText": "Inicializace uživatele",
+        "linkingUserPromptText": "Uživatelský propojovací text",
         "linkingUserDoneText": "Propojení uživatele dokončeno",
         "loginText": "Přihlášení",
         "logoutText": "Odhlášení",
