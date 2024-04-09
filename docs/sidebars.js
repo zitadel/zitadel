@@ -803,6 +803,14 @@ module.exports = {
       ],
     },
     {
+      type: "category",
+      label: "Actions V2",
+      collapsed: false,
+      items: [
+        "apis/actionsv2/introduction",
+      ],
+    },
+    {
       type: "doc",
       label: "gRPC Status Codes",
       id: "apis/statuscodes",
