@@ -1460,7 +1460,15 @@
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Spouštěče projekcí introspekce OIDC",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Povolit spouštěče projekcí během požadavku na introspekci. To může sloužit jako obcházení, pokud existují zjevné problémy s konzistencí v odpovědi na introspekci, ale může to mít vliv na výkon. Plánujeme odstranit spouštěče pro požadavky na introspekci v budoucnosti.",
       "USERSCHEMA": "Schéma uživatele",
-      "USERSCHEMA_DESCRIPTION": "Schémata uživatelů umožňují spravovat datová schémata uživatelů. Pokud je příznak povolen, budete moci používat nové API a jeho funkce."
+      "USERSCHEMA_DESCRIPTION": "Schémata uživatelů umožňují spravovat datová schémata uživatelů. Pokud je příznak povolen, budete moci používat nové API a jeho funkce.",
+      "SOURCE": {
+        "2": "System",
+        "3": "Instance",
+        "4": "Organization",
+        "5": "Project",
+        "6": "App",
+        "7": "User"
+      }
     },
     "DIALOG": {
       "RESET": {

@@ -1459,7 +1459,15 @@
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC 触发内省投影",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "在内省请求期间启用投影触发器。如果内省响应中存在明显的一致性问题，这可以作为一个解决方法，但可能会影响性能。我们计划在未来删除内省请求的触发器。",
       "USERSCHEMA": "用户架构",
-      "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。"
+      "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。",
+      "SOURCE": {
+        "2": "System",
+        "3": "Instance",
+        "4": "Organization",
+        "5": "Project",
+        "6": "App",
+        "7": "User"
+      }
     },
     "DIALOG": {
       "RESET": {

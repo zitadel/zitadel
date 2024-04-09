@@ -12,89 +12,126 @@
   </div>
   <p class="events-desc cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.FEATURES.DESCRIPTION' | translate }}</p>
 
+  <ng-template cnslHasRole [hasRole]="['iam.restrictions.write']">
+    <button matTooltip="{{ 'POLICY.RESET' | translate }}" color="warn" (click)="resetSettings()" mat-stroked-button>
+      {{ 'POLICY.RESET' | translate }}
+    </button>
+  </ng-template>
+
   <cnsl-card *ngIf="featureData">
     <div class="features">
       <div class="feature-row" *ngIf="featureData.loginDefaultOrg">
-        <mat-checkbox
-          class="slide-toggle"
-          color="primary"
-          name="hasNumber"
-          ngDefaultControl
-          [(ngModel)]="featureData.loginDefaultOrg.enabled"
-          [disabled]="(['policy.write'] | hasRole | async) === false"
-        >
-          <div class="slide-toggle-row">
-            <span class="left-desc">{{ 'SETTING.FEATURES.LOGINDEFAULTORG' | translate }}</span>
-          </div>
-        </mat-checkbox>
+        <div class="row">
+          <mat-checkbox
+            class="slide-toggle"
+            color="primary"
+            name="hasNumber"
+            ngDefaultControl
+            [(ngModel)]="featureData.loginDefaultOrg.enabled"
+            [disabled]="(['policy.write'] | hasRole | async) === false"
+          >
+            <div class="slide-toggle-row">
+              <span class="left-desc">{{ 'SETTING.FEATURES.LOGINDEFAULTORG' | translate }}</span>
+            </div>
+          </mat-checkbox>
+          <template
+            [ngTemplateOutlet]="sourceLabel"
+            [ngTemplateOutletContext]="{ source: featureData.loginDefaultOrg.source }"
+          ></template>
+        </div>
+
         <cnsl-info-section class="feature-info">{{
           'SETTING.FEATURES.LOGINDEFAULTORG_DESCRIPTION' | translate
         }}</cnsl-info-section>
       </div>
       <div class="feature-row" *ngIf="featureData.oidcLegacyIntrospection">
-        <mat-checkbox
-          class="slide-toggle"
-          color="primary"
-          name="hasNumber"
-          ngDefaultControl
-          [(ngModel)]="featureData.oidcLegacyIntrospection.enabled"
-          [disabled]="(['policy.write'] | hasRole | async) === false"
-        >
-          <div class="slide-toggle-row">
-            <span class="left-desc">{{ 'SETTING.FEATURES.OIDCLEGACYINTROSPECTION' | translate }}</span>
-          </div>
-        </mat-checkbox>
+        <div class="row">
+          <mat-checkbox
+            class="slide-toggle"
+            color="primary"
+            name="hasNumber"
+            ngDefaultControl
+            [(ngModel)]="featureData.oidcLegacyIntrospection.enabled"
+            [disabled]="(['policy.write'] | hasRole | async) === false"
+          >
+            <div class="slide-toggle-row">
+              <span class="left-desc">{{ 'SETTING.FEATURES.OIDCLEGACYINTROSPECTION' | translate }}</span>
+            </div>
+          </mat-checkbox>
+          <template
+            [ngTemplateOutlet]="sourceLabel"
+            [ngTemplateOutletContext]="{ source: featureData.oidcLegacyIntrospection.source }"
+          ></template>
+        </div>
         <cnsl-info-section class="feature-info">{{
           'SETTING.FEATURES.OIDCLEGACYINTROSPECTION_DESCRIPTION' | translate
         }}</cnsl-info-section>
       </div>
       <div class="feature-row" *ngIf="featureData.oidcTokenExchange">
-        <mat-checkbox
-          class="slide-toggle"
-          color="primary"
-          name="hasNumber"
-          ngDefaultControl
-          [(ngModel)]="featureData.oidcTokenExchange.enabled"
-          [disabled]="(['policy.write'] | hasRole | async) === false"
-        >
-          <div class="slide-toggle-row">
-            <span class="left-desc">{{ 'SETTING.FEATURES.OIDCTOKENEXCHANGE' | translate }}</span>
-          </div>
-        </mat-checkbox>
+        <div class="row">
+          <mat-checkbox
+            class="slide-toggle"
+            color="primary"
+            name="hasNumber"
+            ngDefaultControl
+            [(ngModel)]="featureData.oidcTokenExchange.enabled"
+            [disabled]="(['policy.write'] | hasRole | async) === false"
+          >
+            <div class="slide-toggle-row">
+              <span class="left-desc">{{ 'SETTING.FEATURES.OIDCTOKENEXCHANGE' | translate }}</span>
+            </div>
+          </mat-checkbox>
+          <template
+            [ngTemplateOutlet]="sourceLabel"
+            [ngTemplateOutletContext]="{ source: featureData.oidcTokenExchange.source }"
+          ></template>
+        </div>
         <cnsl-info-section class="feature-info">{{
           'SETTING.FEATURES.OIDCTOKENEXCHANGE_DESCRIPTION' | translate
         }}</cnsl-info-section>
       </div>
       <div class="feature-row" *ngIf="featureData.oidcTriggerIntrospectionProjections">
-        <mat-checkbox
-          class="slide-toggle"
-          color="primary"
-          name="hasNumber"
-          ngDefaultControl
-          [(ngModel)]="featureData.oidcTriggerIntrospectionProjections.enabled"
-          [disabled]="(['policy.write'] | hasRole | async) === false"
-        >
-          <div class="slide-toggle-row">
-            <span class="left-desc">{{ 'SETTING.FEATURES.OIDCTRIGGERINTROSPECTIONPROJECTIONS' | translate }}</span>
-          </div>
-        </mat-checkbox>
+        <div class="row">
+          <mat-checkbox
+            class="slide-toggle"
+            color="primary"
+            name="hasNumber"
+            ngDefaultControl
+            [(ngModel)]="featureData.oidcTriggerIntrospectionProjections.enabled"
+            [disabled]="(['policy.write'] | hasRole | async) === false"
+          >
+            <div class="slide-toggle-row">
+              <span class="left-desc">{{ 'SETTING.FEATURES.OIDCTRIGGERINTROSPECTIONPROJECTIONS' | translate }}</span>
+            </div>
+          </mat-checkbox>
+          <template
+            [ngTemplateOutlet]="sourceLabel"
+            [ngTemplateOutletContext]="{ source: featureData.oidcTriggerIntrospectionProjections.source }"
+          ></template>
+        </div>
         <cnsl-info-section class="feature-info">{{
           'SETTING.FEATURES.OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION' | translate
         }}</cnsl-info-section>
       </div>
       <div class="feature-row" *ngIf="featureData.userSchema">
-        <mat-checkbox
-          class="slide-toggle"
-          color="primary"
-          name="hasNumber"
-          ngDefaultControl
-          [(ngModel)]="featureData.userSchema.enabled"
-          [disabled]="(['policy.write'] | hasRole | async) === false"
-        >
-          <div class="slide-toggle-row">
-            <span class="left-desc">{{ 'SETTING.FEATURES.USERSCHEMA' | translate }}</span>
-          </div>
-        </mat-checkbox>
+        <div class="row">
+          <mat-checkbox
+            class="slide-toggle"
+            color="primary"
+            name="hasNumber"
+            ngDefaultControl
+            [(ngModel)]="featureData.userSchema.enabled"
+            [disabled]="(['policy.write'] | hasRole | async) === false"
+          >
+            <div class="slide-toggle-row">
+              <span class="left-desc">{{ 'SETTING.FEATURES.USERSCHEMA' | translate }}</span>
+            </div>
+          </mat-checkbox>
+          <template
+            [ngTemplateOutlet]="sourceLabel"
+            [ngTemplateOutletContext]="{ source: featureData.userSchema.source }"
+          ></template>
+        </div>
         <cnsl-info-section class="feature-info">{{
           'SETTING.FEATURES.USERSCHEMA_DESCRIPTION' | translate
         }}</cnsl-info-section>
@@ -113,3 +150,9 @@
     </button>
   </div>
 </div>
+
+<ng-template #sourceLabel let-source="source" let-last="last">
+  <span class="state" *ngIf="source === Source.SOURCE_SYSTEM">
+    {{ 'SETTING.FEATURES.SOURCE.' + source | translate }}
+  </span>
+</ng-template>

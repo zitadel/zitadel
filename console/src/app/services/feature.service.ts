@@ -4,6 +4,7 @@ import { GrpcService } from './grpc.service';
 import {
   GetInstanceFeaturesRequest,
   GetInstanceFeaturesResponse,
+  ResetInstanceFeaturesRequest,
   SetInstanceFeaturesRequest,
   SetInstanceFeaturesResponse,
 } from '../proto/generated/zitadel/feature/v2beta/instance_pb';
@@ -28,6 +29,11 @@ export class FeatureService {
 
   public setInstanceFeatures(req: SetInstanceFeaturesRequest): Promise<SetInstanceFeaturesResponse> {
     return this.grpcService.feature.setInstanceFeatures(req, null);
+  }
+
+  public resetInstanceFeatures(): Promise<SetInstanceFeaturesResponse> {
+    const req = new ResetInstanceFeaturesRequest();
+    return this.grpcService.feature.resetInstanceFeatures(req, null);
   }
 
   public getOrganizationFeatures(orgId: string, inheritance: boolean): Promise<GetOrganizationFeaturesResponse> {

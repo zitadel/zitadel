@@ -1460,7 +1460,15 @@
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC-triggers voor introspectieprojecties",
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Schakel projectietriggers in tijdens een introspectieverzoek. Dit kan dienen als een tijdelijke oplossing als er merkbare consistentieproblemen optreden in het introspectieantwoord, maar het kan wel prestaties beïnvloeden. We zijn van plan om triggers voor introspectieverzoeken in de toekomst te verwijderen.",
       "USERSCHEMA": "Gebruikerschema",
-      "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken."
+      "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
+      "SOURCE": {
+        "2": "System",
+        "3": "Instance",
+        "4": "Organization",
+        "5": "Project",
+        "6": "App",
+        "7": "User"
+      }
     },
     "DIALOG": {
       "RESET": {

@@ -8,8 +8,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { HasRoleDirective } from 'src/app/directives/has-role/has-role.directive';
+import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
@@ -18,6 +21,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { ListEventsRequest, ListEventsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 import { FeatureServiceClient } from 'src/app/proto/generated/zitadel/feature/v2beta/Feature_serviceServiceClientPb';
+import { Source } from 'src/app/proto/generated/zitadel/feature/v2beta/feature_pb';
 import {
   GetInstanceFeaturesResponse,
   SetInstanceFeaturesRequest,
@@ -38,6 +42,8 @@ import { ToastService } from 'src/app/services/toast.service';
     MatButtonModule,
     MatCheckboxModule,
     InfoSectionModule,
+    MatTooltipModule,
+    HasRoleModule,
   ],
   standalone: true,
   selector: 'cnsl-features',
@@ -49,7 +55,7 @@ export class FeaturesComponent implements OnDestroy {
 
   public _loading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public featureData: GetInstanceFeaturesResponse.AsObject | undefined = undefined;
-
+  public Source: any = Source;
   constructor(
     private featureService: FeatureService,
     private breadcrumbService: BreadcrumbService,
@@ -86,6 +92,17 @@ export class FeaturesComponent implements OnDestroy {
     this.featureService.getInstanceFeatures(inheritance).then((instanceFeaturesResponse) => {
       this.featureData = instanceFeaturesResponse.toObject();
     });
+  }
+
+  public resetSettings(): void {
+    this.featureService
+      .resetInstanceFeatures()
+      .then(() => {
+        this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public saveFeatures(): void {
