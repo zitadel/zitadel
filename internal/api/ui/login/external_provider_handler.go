@@ -449,40 +449,55 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback(w, r, authReq)
 }
 
+// checkAutoLinking checks if a user with the provided information (username or email) already exists within ZITADEL.
+// The decision, which information will be checked is based on the IdP template option.
+// The function returns a boolean whether a user was found or not.
 func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
 	queries := make([]query.SearchQuery, 0, 2)
 	var user *query.NotifyUser
-	var err error
 	switch provider.AutoLinking {
+	case domain.AutoLinkingOptionUnspecified:
+		// is auto linking is disable, we shouldn't even get here, but in case we do we can directly return
+		return false
 	case domain.AutoLinkingOptionUsername:
-		user, err = l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
+		// if we're checking for usernames there are to options:
+		//
+		// If no specific org has been requested (by id or domain scope), we'll check the provided username against
+		// all existing loginnames and directly use that result to either prompt or continue with other idp options.
+		if authReq.RequestedOrgID == "" {
+			user, err := l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
+			if err != nil {
+				return false
+			}
+			l.renderLinkingUserPrompt(w, r, authReq, user, nil)
+			return true
+		}
+		// If a specific org has been requested, we'll check the provided username against usernames (of that org).
+		usernameQuery, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEqualsIgnoreCase)
 		if err != nil {
 			return false
 		}
-		if authReq.RequestedOrgID != "" && user.ResourceOwner != authReq.RequestedOrgID {
-			return false
-		}
+		queries = append(queries, usernameQuery)
 	case domain.AutoLinkingOptionEmail:
+		// Email will always be checked against verified email addresses.
 		emailQuery, err := query.NewUserVerifiedEmailSearchQuery(string(externalUser.Email))
 		if err != nil {
 			return false
 		}
 		queries = append(queries, emailQuery)
-		if authReq.RequestedOrgID != "" {
-			resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(authReq.RequestedOrgID, query.TextEquals)
-			if err != nil {
-				return false
-			}
-			queries = append(queries, resourceOwnerQuery)
-		}
-		user, err = l.query.GetNotifyUser(r.Context(), false, queries...)
+	}
+	// restrict the possible organization if needed (for email and usernames)
+	if authReq.RequestedOrgID != "" {
+		resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(authReq.RequestedOrgID, query.TextEquals)
 		if err != nil {
 			return false
 		}
-	case domain.AutoLinkingOptionUnspecified:
+		queries = append(queries, resourceOwnerQuery)
+	}
+	user, err := l.query.GetNotifyUser(r.Context(), false, queries...)
+	if err != nil {
 		return false
 	}
-
 	l.renderLinkingUserPrompt(w, r, authReq, user, nil)
 	return true
 }

@@ -30,7 +30,8 @@ func (l *Login) renderLinkingUserPrompt(w http.ResponseWriter, r *http.Request, 
 	}
 	translator := l.getTranslator(r.Context(), authReq)
 	identification := user.PreferredLoginName
-	if authReq.LabelPolicy != nil && authReq.LabelPolicy.HideLoginNameSuffix {
+	// hide the suffix in case the option is set and the auth request has been started with the primary domain scope
+	if authReq.RequestedOrgDomain && authReq.LabelPolicy != nil && authReq.LabelPolicy.HideLoginNameSuffix {
 		identification = user.Username
 	}
 	data := &linkingUserPromptData{
