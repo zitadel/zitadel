@@ -12,12 +12,16 @@ import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
+import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { ListEventsRequest, ListEventsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
 import { FeatureServiceClient } from 'src/app/proto/generated/zitadel/feature/v2beta/Feature_serviceServiceClientPb';
-import { GetInstanceFeaturesResponse } from 'src/app/proto/generated/zitadel/feature/v2beta/instance_pb';
+import {
+  GetInstanceFeaturesResponse,
+  SetInstanceFeaturesRequest,
+} from 'src/app/proto/generated/zitadel/feature/v2beta/instance_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { FeatureService } from 'src/app/services/feature.service';
@@ -33,6 +37,7 @@ import { ToastService } from 'src/app/services/toast.service';
     TranslateModule,
     MatButtonModule,
     MatCheckboxModule,
+    InfoSectionModule,
   ],
   standalone: true,
   selector: 'cnsl-features',
@@ -81,5 +86,25 @@ export class FeaturesComponent implements OnDestroy {
     this.featureService.getInstanceFeatures(inheritance).then((instanceFeaturesResponse) => {
       this.featureData = instanceFeaturesResponse.toObject();
     });
+  }
+
+  public saveFeatures(): void {
+    if (this.featureData) {
+      const req = new SetInstanceFeaturesRequest();
+      req.setLoginDefaultOrg(!!this.featureData.loginDefaultOrg?.enabled);
+      req.setOidcLegacyIntrospection(!!this.featureData.oidcLegacyIntrospection?.enabled);
+      req.setOidcTokenExchange(!!this.featureData.oidcTokenExchange?.enabled);
+      req.setOidcTriggerIntrospectionProjections(!!this.featureData.oidcTriggerIntrospectionProjections?.enabled);
+      req.setUserSchema(!!this.featureData.userSchema?.enabled);
+
+      this.featureService
+        .setInstanceFeatures(req)
+        .then(() => {
+          this.toast.showInfo('POLICY.TOAST.SET', true);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
   }
 }
