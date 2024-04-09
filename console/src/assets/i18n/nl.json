@@ -1451,16 +1451,16 @@
       "IMPERSONATIONDESCRIPTION": "Deze instelling maakt het in principe mogelijk om imitatie te gebruiken. Houd er rekening mee dat aan de imitator ook de juiste `*_IMPERSONATOR` rollen moeten worden toegewezen."
     },
     "FEATURES": {
-      "LOGINDEFAULTORG": "Login Default Org",
-      "LOGINDEFAULTORG_DESCRIPTION": "The login UI will use the settings of the default org (and not from the instance) if no organization context is set",
-      "OIDCLEGACYINTROSPECTION": "OIDC Legacy introspection",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise.",
-      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Enable the experimental urn:ietf:params:oauth:grant-type:token-exchange grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger introspection Projections",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future.",
-      "USERSCHEMA": "User Schema",
-      "USERSCHEMA_DESCRIPTION": "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features."
+      "LOGINDEFAULTORG": "Standaard inlogorganisatie",
+      "LOGINDEFAULTORG_DESCRIPTION": "Als er geen organisatiecontext is ingesteld, gebruikt de inlog-UI de instellingen van de standaardorganisatie (en niet van de instantie)",
+      "OIDCLEGACYINTROSPECTION": "Oude OIDC-introspectie",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "We hebben onlangs het introspectie-endpoint opnieuw gefactoreerd omwille van de prestaties. Deze functie kan worden gebruikt om terug te keren naar de oude implementatie als er onverwachte bugs optreden.",
+      "OIDCTOKENEXCHANGE": "OIDC-tokenuitwisseling",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Schakel het experimentele type verlening urn:ietf:params:oauth:grant-type:token-exchange in voor het OIDC-tokenendpoint. Tokenuitwisseling kan worden gebruikt om tokens met een kleinere scope op te vragen of om zich voor te doen als andere gebruikers. Raadpleeg het beveiligingsbeleid om impersonation op een instantie toe te staan.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC-triggers voor introspectieprojecties",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Schakel projectietriggers in tijdens een introspectieverzoek. Dit kan dienen als een tijdelijke oplossing als er merkbare consistentieproblemen optreden in het introspectieantwoord, maar het kan wel prestaties beïnvloeden. We zijn van plan om triggers voor introspectieverzoeken in de toekomst te verwijderen.",
+      "USERSCHEMA": "Gebruikerschema",
+      "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken."
     },
     "DIALOG": {
       "RESET": {

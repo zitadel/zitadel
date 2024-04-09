@@ -1451,16 +1451,16 @@
       "IMPERSONATIONDESCRIPTION": "Toto nastavení v zásadě umožňuje používat zosobnění. Všimněte si, že imitátor potřebuje také přiřazené příslušné role `*_IMPERSONATOR`."
     },
     "FEATURES": {
-      "LOGINDEFAULTORG": "Login Default Org",
-      "LOGINDEFAULTORG_DESCRIPTION": "The login UI will use the settings of the default org (and not from the instance) if no organization context is set",
-      "OIDCLEGACYINTROSPECTION": "OIDC Legacy introspection",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise.",
-      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Enable the experimental urn:ietf:params:oauth:grant-type:token-exchange grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger introspection Projections",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future.",
-      "USERSCHEMA": "User Schema",
-      "USERSCHEMA_DESCRIPTION": "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features."
+      "LOGINDEFAULTORG": "Výchozí organizace pro přihlášení",
+      "LOGINDEFAULTORG_DESCRIPTION": "Přihlašovací rozhraní použije nastavení výchozí organizace (a ne z instance), pokud není nastaven žádný kontext organizace.",
+      "OIDCLEGACYINTROSPECTION": "Dědictví OIDC introspekce",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nedávno jsme přepracovali bod introspekce z výkonnostních důvodů. Tato funkce lze použít k rollbacku na dědickou implementaci, pokud se objeví neočekávané chyby.",
+      "OIDCTOKENEXCHANGE": "Výměna tokenů OIDC",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Povolit experimentální typ udělení urn:ietf:params:oauth:grant-type:token-exchange pro bod tokenového bodu OIDC. Výměna tokenů lze použít k žádosti o tokeny s menším rozsahem nebo k impersonaci jiných uživatelů. Podívejte se na bezpečnostní politiku, abyste umožnili impersonaci na instanci.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Spouštěče projekcí introspekce OIDC",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Povolit spouštěče projekcí během požadavku na introspekci. To může sloužit jako obcházení, pokud existují zjevné problémy s konzistencí v odpovědi na introspekci, ale může to mít vliv na výkon. Plánujeme odstranit spouštěče pro požadavky na introspekci v budoucnosti.",
+      "USERSCHEMA": "Schéma uživatele",
+      "USERSCHEMA_DESCRIPTION": "Schémata uživatelů umožňují spravovat datová schémata uživatelů. Pokud je příznak povolen, budete moci používat nové API a jeho funkce."
     },
     "DIALOG": {
       "RESET": {

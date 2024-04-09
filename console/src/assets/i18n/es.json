@@ -1452,16 +1452,16 @@
       "IMPERSONATIONDESCRIPTION": "Esta configuración permite utilizar la suplantación en principio. Tenga en cuenta que el imitador también necesita que se le asignen los roles `*_IMPERSONATOR` apropiados."
     },
     "FEATURES": {
-      "LOGINDEFAULTORG": "Login Default Org",
-      "LOGINDEFAULTORG_DESCRIPTION": "The login UI will use the settings of the default org (and not from the instance) if no organization context is set",
-      "OIDCLEGACYINTROSPECTION": "OIDC Legacy introspection",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise.",
-      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Enable the experimental urn:ietf:params:oauth:grant-type:token-exchange grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger introspection Projections",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future.",
-      "USERSCHEMA": "User Schema",
-      "USERSCHEMA_DESCRIPTION": "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features."
+      "LOGINDEFAULTORG": "Organización predeterminada de inicio de sesión",
+      "LOGINDEFAULTORG_DESCRIPTION": "La interfaz de inicio de sesión utilizará la configuración de la organización predeterminada (y no de la instancia) si no se establece ningún contexto de organización.",
+      "OIDCLEGACYINTROSPECTION": "Introspección heredada OIDC",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Recientemente hemos refactorizado el punto de introspección por razones de rendimiento. Esta función se puede utilizar para volver a la implementación heredada si surgen errores inesperados.",
+      "OIDCTOKENEXCHANGE": "Intercambio de tokens OIDC",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Habilita el tipo de concesión experimental urn:ietf:params:oauth:grant-type:token-exchange para el punto de extremo de token OIDC. El intercambio de tokens se puede utilizar para solicitar tokens con un alcance menor o suplantar a otros usuarios. Consulta la política de seguridad para permitir la suplantación en una instancia.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Desencadenadores de proyecciones de introspección OIDC",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Habilita los desencadenadores de proyección durante una solicitud de introspección. Esto puede actuar como un mecanismo alternativo si hay problemas de coherencia perceptibles en la respuesta a la introspección, pero puede afectar al rendimiento. Estamos planeando eliminar los desencadenadores para las solicitudes de introspección en el futuro.",
+      "USERSCHEMA": "Esquema de usuario",
+      "USERSCHEMA_DESCRIPTION": "Los esquemas de usuario permiten gestionar los esquemas de datos de los usuarios. Si se activa la bandera, podrás utilizar la nueva API y sus funciones."
     },
     "DIALOG": {
       "RESET": {

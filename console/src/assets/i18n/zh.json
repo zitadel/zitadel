@@ -1450,16 +1450,16 @@
       "IMPERSONATIONDESCRIPTION": "此设置原则上允许使用模拟。请注意，模拟者还需要分配适当的 `*_IMPERSONATOR` 角色。"
     },
     "FEATURES": {
-      "LOGINDEFAULTORG": "Login Default Org",
-      "LOGINDEFAULTORG_DESCRIPTION": "The login UI will use the settings of the default org (and not from the instance) if no organization context is set",
-      "OIDCLEGACYINTROSPECTION": "OIDC Legacy introspection",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise.",
-      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Enable the experimental urn:ietf:params:oauth:grant-type:token-exchange grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger introspection Projections",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future.",
-      "USERSCHEMA": "User Schema",
-      "USERSCHEMA_DESCRIPTION": "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features."
+      "LOGINDEFAULTORG": "登录默认组织",
+      "LOGINDEFAULTORG_DESCRIPTION": "如果没有设置组织上下文，登录界面将使用默认组织的设置（而不是实例的设置）",
+      "OIDCLEGACYINTROSPECTION": "OIDC 传统内省",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "我们最近出于性能原因重构了内省端点。如果出现意外错误，可以使用此功能回滚到传统实现。",
+      "OIDCTOKENEXCHANGE": "OIDC 令牌交换",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "启用 OIDC 令牌端点的实验性 urn:ietf:params:oauth:grant-type:token-exchange 授权类型。令牌交换可用于请求具有较少范围的令牌或模拟其他用户。请参阅安全策略以允许在实例上模拟。",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC 触发内省投影",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "在内省请求期间启用投影触发器。如果内省响应中存在明显的一致性问题，这可以作为一个解决方法，但可能会影响性能。我们计划在未来删除内省请求的触发器。",
+      "USERSCHEMA": "用户架构",
+      "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。"
     },
     "DIALOG": {
       "RESET": {
