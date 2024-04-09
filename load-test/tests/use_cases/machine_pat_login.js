@@ -4,7 +4,7 @@ import { createMachine, addMachinePat } from '../user.js';
 import { removeOrg } from '../teardown.js';
 import { userinfo } from '../oidc.js';
 import { Trend } from 'k6/metrics';
-import { Config } from '../config.js';
+import { Config, MaxVUs } from '../config.js';
 
 export async function setup() {
   const tokens = loginByUsernamePassword(Config.admin);
@@ -13,7 +13,7 @@ export async function setup() {
   const org = await createOrg(tokens.accessToken);
   console.info(`setup: org (${org.organizationId}) created`);
 
-  let machines = Array.from({length: __ENV.MAX_VUS || 1}, (_, i) => {
+  let machines = Array.from({length: MaxVUs()}, (_, i) => {
     return createMachine(`zitachine-${i}`, org, tokens.accessToken);
   });
   machines = await Promise.all(machines);

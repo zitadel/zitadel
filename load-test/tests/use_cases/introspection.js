@@ -3,7 +3,7 @@ import { createOrg, createProject, createAPI, createAppKey } from '../setup.js';
 import { removeOrg } from '../teardown.js';
 import { introspect } from '../oidc.js';
 import { Trend } from 'k6/metrics';
-import { Config } from '../config.js';
+import { Config, MaxVUs } from '../config.js';
 import { b64decode } from 'k6/encoding';
 import zitadel from 'k6/x/zitadel';
 
@@ -14,7 +14,7 @@ export async function setup() {
   const org = await createOrg(adminTokens.accessToken);
   console.info(`setup: org (${org.organizationId}) created`);
 
-  let projects = Array.from({length: __ENV.MAX_VUS || 1}, (_, i) => {
+  let projects = Array.from({length: MaxVUs()}, (_, i) => {
      return createProject(`project-${i}`, org, adminTokens.accessToken);
   });
   projects = await Promise.all(projects);

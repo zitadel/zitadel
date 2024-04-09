@@ -1,6 +1,7 @@
 import { Trend } from "k6/metrics";
 import http from 'k6/http';
 import url from './url.js';
+import { check } from "k6";
 
 
 const createHumanTrend = new Trend('setup_create_human_duration', true);
@@ -40,10 +41,10 @@ export function createHuman(username, org, accessToken){
             check(res, {
                 "create user is status ok": (r) => r.status === 201
             }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
-        
             createHumanTrend.add(res.timings.duration);
         
-            resolve(http.get(
+            console.log('create ',JSON.stringify(res.json()));
+            const user = http.get(
                 url(`/v2beta/users/${res.json().userId}`), 
                 {
                     headers: {
@@ -52,8 +53,12 @@ export function createHuman(username, org, accessToken){
                         'x-zitadel-orgid': org.organizationId
                     }
                 }
-            ).json().user);
-        })
+            );
+            console.log('get by id ', JSON.stringify(user));
+            resolve(user.json().user);
+        }).catch((reason) => {
+            reject(reason);
+        });
     })
 }
 
@@ -72,16 +77,15 @@ export function updateHuman(payload = {}, userId, org, accessToken) {
                 }
             }
         );
-
+        
         response.then((res) => {
             check(res, {
                 "update user is status ok": (r) => r.status === 201
             });
-            resolve(res.json());
+            updateHumanTrend.add(res.timings.duration);
+            resolve(res);
         }).catch((reason) => {
             reject(reason);
-        }).finally(() => {
-            updateHumanTrend.add(response.timings.duration);
         });
     });
 }
@@ -106,11 +110,10 @@ export function lockUser(userId, org, accessToken) {
             check(res, {
                 "update user is status ok": (r) => r.status === 201
             });
-            resolve(res.json());
+            lockUserTrend.add(res.timings.duration);
+            resolve(res);
         }).catch((reason) => {
             reject(reason);
-        }).finally(() => {
-            lockUserTrend.add(response.timings.duration);
         });
     });
 }
@@ -135,11 +138,10 @@ export function deleteUser(userId, org, accessToken) {
             check(res, {
                 "update user is status ok": (r) => r.status === 201
             });
-            resolve(res.json());
+            deleteUserTrend.add(res.timings.duration);
+            resolve(res);
         }).catch((reason) => {
             reject(reason);
-        }).finally(() => {
-            deleteHumanTrend.add(response.timings.duration);
         });
     });
 }

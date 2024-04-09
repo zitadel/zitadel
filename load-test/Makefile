@@ -17,6 +17,10 @@ machine_pat_login:
 user_info:
 	k6 run tests/use_cases/user_info.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
 
+.PHONY: manipulate_user
+manipulate_user:
+	k6 run tests/use_cases/manipulate_user.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
+
 .PHONY: introspect
 introspect: ensure_modules
 	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.

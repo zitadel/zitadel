@@ -4,7 +4,7 @@ import { createHuman } from '../user.js';
 import { removeOrg } from '../teardown.js';
 import { userinfo } from '../oidc.js';
 import { Trend } from 'k6/metrics';
-import { Config } from '../config.js';
+import { Config, MaxVUs } from '../config.js';
 
 export async function setup() {
   const tokens = loginByUsernamePassword(Config.admin);
@@ -13,7 +13,7 @@ export async function setup() {
   const org = await createOrg(tokens.accessToken);
   console.log(`setup: org (${org.organizationId}) created`);
 
-  let humans = Array.from({length: __ENV.MAX_VUS || 1}, (_, i) => {
+  let humans = Array.from({length: MaxVUs()}, (_, i) => {
     return createHuman(`zitizen-${i}`, org, tokens.accessToken);
   });
   humans = await Promise.all(humans);

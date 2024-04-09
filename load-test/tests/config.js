@@ -3,6 +3,7 @@ import crypto from 'k6/crypto';
 import http from 'k6/http';
 
 import url from './url.js';
+import execution from 'k6/execution';
 
 export const Config = {
   host: __ENV.ZITADEL_HOST || 'http://localhost:8080',
@@ -30,4 +31,30 @@ export function Client() {
   }
   client.client_id = http.get(url('/ui/console/assets/environment.json')).json().clientid;
   return client
+}
+
+let maxVUs;
+export function MaxVUs() {
+  if (maxVUs != undefined) {
+    return maxVUs;
+  }
+
+  let max = 1;
+  if (execution.test.options.stages != undefined) {
+    max = execution.test.options.stages.reduce((acc, value) => {
+      if (acc <= value.target) {
+        return;
+      }
+      acc = value.target;
+    });
+  }
+
+  new Map(Object.entries(execution.test.options.scenarios)).forEach((value) => {
+    if (max < value.vus) {
+      max = value.vus;
+    }
+  })
+
+  maxVUs = max;
+  return maxVUs;
 }
