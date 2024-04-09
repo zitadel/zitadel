@@ -1,6 +1,7 @@
 {
   "instance_id": "230690539048009730",
   "app_id": "236646457053020162",
+  "state": 1,
   "client_id": "236646457053085698@tests",
   "client_secret": null,
   "redirect_uris": ["http://localhost:9999/auth/callback"],
@@ -17,7 +18,7 @@
   "clock_skew": 0,
   "additional_origins": null,
   "project_id": "236645808328409090",
-  "state": 1,
+  "project_role_assertion": true,
   "project_role_keys": ["role1", "role2"],
   "public_keys": null,
   "settings": {
