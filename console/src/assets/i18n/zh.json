@@ -86,6 +86,10 @@
         "TITLE": "组织设置",
         "DESCRIPTION": "自定义您的组织设置。"
       },
+      "FEATURES": {
+        "TITLE": "功能设置",
+        "DESCRIPTION": "解锁您的实例的功能。"
+      },
       "IDPS": {
         "TITLE": "身份提供商",
         "DESCRIPTION": "创建并激活外部身份提供商。选择一个知名提供商或根据您的选择配置任何其他兼容OIDC、OAuth或SAML的提供商。您甚至可以通过配置JWT身份提供商，使用您现有的JWT令牌作为联合身份。",
@@ -1314,6 +1318,7 @@
     },
     "LIST": {
       "ORGS": "组织",
+      "FEATURESETTINGS": "功能设置",
       "LANGUAGES": "语言",
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",

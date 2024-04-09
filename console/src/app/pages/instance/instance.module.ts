@@ -30,6 +30,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 import { IamRoutingModule } from './instance-routing.module';
 import { InstanceComponent } from './instance.component';
 import { SettingsListModule } from 'src/app/modules/settings-list/settings-list.module';
+import { FeaturesComponent } from 'src/app/components/features/features.component';
 
 @NgModule({
   declarations: [InstanceComponent],
@@ -48,6 +49,7 @@ import { SettingsListModule } from 'src/app/modules/settings-list/settings-list.
     TopViewModule,
     MatTableModule,
     InfoRowModule,
+    FeaturesComponent,
     InputModule,
     MatSortModule,
     MatTooltipModule,

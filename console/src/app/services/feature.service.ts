@@ -45,26 +45,36 @@ import {
 } from '../proto/generated/zitadel/feature/v2beta/organization_pb';
 import { GetUserFeaturesRequest, GetUserFeaturesResponse } from '../proto/generated/zitadel/feature/v2beta/user_pb';
 import { GetSystemFeaturesRequest, GetSystemFeaturesResponse } from '../proto/generated/zitadel/feature/v2beta/system_pb';
+import { inherits } from 'util';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AdminService {
+export class FeatureService {
   constructor(private readonly grpcService: GrpcService) {}
 
-  public getInstanceFeatures(req: GetInstanceFeaturesRequest): Promise<GetInstanceFeaturesResponse> {
+  public getInstanceFeatures(inheritance: boolean): Promise<GetInstanceFeaturesResponse> {
+    const req = new GetInstanceFeaturesRequest();
+    req.setInheritance(inheritance);
     return this.grpcService.feature.getInstanceFeatures(req, null).then((resp) => resp);
   }
 
-  public getOrganizationFeatures(req: GetOrganizationFeaturesRequest): Promise<GetOrganizationFeaturesResponse> {
+  public getOrganizationFeatures(orgId: string, inheritance: boolean): Promise<GetOrganizationFeaturesResponse> {
+    const req = new GetOrganizationFeaturesRequest();
+    req.setOrganizationId(orgId);
+    req.setInheritance(inheritance);
     return this.grpcService.feature.getOrganizationFeatures(req, null).then((resp) => resp);
   }
 
-  public getSystemFeatures(req: GetSystemFeaturesRequest): Promise<GetSystemFeaturesResponse> {
+  public getSystemFeatures(): Promise<GetSystemFeaturesResponse> {
+    const req = new GetSystemFeaturesRequest();
     return this.grpcService.feature.getSystemFeatures(req, null).then((resp) => resp);
   }
 
-  public getUserFeatures(req: GetUserFeaturesRequest): Promise<GetUserFeaturesResponse> {
+  public getUserFeatures(userId: string, inheritance: boolean): Promise<GetUserFeaturesResponse> {
+    const req = new GetUserFeaturesRequest();
+    req.setInheritance(inheritance);
+    req.setUserId(userId);
     return this.grpcService.feature.getUserFeatures(req, null).then((resp) => resp);
   }
 }

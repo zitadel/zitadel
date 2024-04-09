@@ -86,6 +86,10 @@
         "TITLE": "Ustawienia organizacji",
         "DESCRIPTION": "Dostosuj ustawienia swojej organizacji."
       },
+      "FEATURES": {
+        "TITLE": "Ustawienia funkcji",
+        "DESCRIPTION": "Odblokuj funkcje swojej instancji."
+      },
       "IDPS": {
         "TITLE": "Dostawcy tożsamości",
         "DESCRIPTION": "Utwórz i aktywuj zewnętrznych dostawców tożsamości. Wybierz znanego dostawcę lub skonfiguruj dowolnego innego dostawcę zgodnego z OIDC, OAuth lub SAML według własnego wyboru. Możesz nawet użyć istniejących tokenów JWT jako tożsamości federacyjnych, konfigurując dostawcę tożsamości JWT.",
@@ -1314,6 +1318,7 @@
     },
     "LIST": {
       "ORGS": "Organizacje",
+      "FEATURESETTINGS": "Ustawienia funkcji",
       "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",

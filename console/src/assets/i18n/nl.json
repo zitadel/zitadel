@@ -86,6 +86,10 @@
         "TITLE": "Organisatie-instellingen",
         "DESCRIPTION": "Pas de instellingen van je organisatie aan."
       },
+      "FEATURES": {
+        "TITLE": "Functie-instellingen",
+        "DESCRIPTION": "Ontgrendel functies voor uw exemplaar."
+      },
       "IDPS": {
         "TITLE": "Identiteitsproviders",
         "DESCRIPTION": "Maak en activeer externe identiteitsproviders. Kies een bekende provider of configureer een andere OIDC, OAuth of SAML compatibele provider naar keuze. Je kunt zelfs je bestaande JWT-tokens gebruiken als gefedereerde identiteiten door een JWT-identiteitsprovider te configureren.",
@@ -1315,6 +1319,7 @@
     },
     "LIST": {
       "ORGS": "Organisaties",
+      "FEATURESETTINGS": "Functie-instellingen",
       "LANGUAGES": "Talen",
       "LOGIN": "Login Gedrag en Beveiliging",
       "LOCKOUT": "Lockout",

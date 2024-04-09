@@ -86,6 +86,10 @@
         "TITLE": "Organization Settings",
         "DESCRIPTION": "Customize the settings of your organization."
       },
+      "FEATURES": {
+        "TITLE": "Feature Settings",
+        "DESCRIPTION": "Unlock features for your instance."
+      },
       "IDPS": {
         "TITLE": "Identity Providers",
         "DESCRIPTION": "Create and activate external identity providers. Choose a well-known provider or configure any other OIDC, OAuth or SAML compatible provider of your choice. You can even use your existing JWT tokens as federated identities by configuring a JWT identity provider.",
@@ -1315,6 +1319,7 @@
     },
     "LIST": {
       "ORGS": "Organizations",
+      "FEATURESETTINGS": "Features",
       "LANGUAGES": "Languages",
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",

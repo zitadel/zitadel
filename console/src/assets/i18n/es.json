@@ -86,6 +86,10 @@
         "TITLE": "Configuración de la Organización",
         "DESCRIPTION": "Personaliza la configuración de tu organización."
       },
+      "FEATURES": {
+        "TITLE": "Configuración de funciones",
+        "DESCRIPTION": "Desbloquee funciones para su instancia."
+      },
       "IDPS": {
         "TITLE": "Proveedores de Identidad",
         "DESCRIPTION": "Crea y activa proveedores de identidad externos. Elige un proveedor conocido o configura cualquier otro proveedor compatible con OIDC, OAuth o SAML de tu elección. Incluso puedes usar tus tokens JWT existentes como identidades federadas configurando un proveedor de identidad JWT.",
@@ -1316,6 +1320,7 @@
     },
     "LIST": {
       "ORGS": "Organizaciones",
+      "FEATURESETTINGS": "Ajustes de funcionalidades",
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamiento del inicio de sesión y de la seguridad",
       "LOCKOUT": "Bloqueo",

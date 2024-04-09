@@ -12,10 +12,10 @@ export const ORGANIZATIONS: SidenavSetting = {
 
 export const FEATURESETTINGS: SidenavSetting = {
   id: 'features',
-  i18nKey: 'SETTINGS.LIST.FEATURES',
+  i18nKey: 'SETTINGS.LIST.FEATURESETTINGS',
   groupI18nKey: 'SETTINGS.GROUPS.GENERAL',
   requiredRoles: {
-    [PolicyComponentServiceType.ADMIN]: ['events.read'],
+    [PolicyComponentServiceType.ADMIN]: ['ìam.read'], // iam.restrictions.read
   },
 };
 

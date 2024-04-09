@@ -86,6 +86,10 @@
         "TITLE": "Nastavení organizace",
         "DESCRIPTION": "Přizpůsobte nastavení vaší organizace."
       },
+      "FEATURES": {
+        "TITLE": "Nastavení funkcí",
+        "DESCRIPTION": "Odemkněte funkce pro vaši instanci."
+      },
       "IDPS": {
         "TITLE": "Poskytovatelé identity",
         "DESCRIPTION": "Vytvořte a aktivujte externí poskytovatele identity. Vyberte známého poskytovatele nebo nakonfigurujte jakýkoliv jiný OIDC, OAuth nebo SAML kompatibilní poskytovatel podle vašeho výběru. Můžete dokonce použít vaše stávající JWT tokeny jako federované identity konfigurací JWT poskytovatele identity.",
@@ -1315,6 +1319,7 @@
     },
     "LIST": {
       "ORGS": "Organizace",
+      "FEATURESETTINGS": "Nastavení funkcí",
       "LANGUAGES": "Jazyky",
       "LOGIN": "Chování při přihlášení a bezpečnost",
       "LOCKOUT": "Blokování",

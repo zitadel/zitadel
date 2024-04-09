@@ -86,6 +86,10 @@
         "TITLE": "Organisationseinstellungen",
         "DESCRIPTION": "Passe die Einstellungen deiner Organisation an."
       },
+      "FEATURES": {
+        "TITLE": "Funktionseinstellungen",
+        "DESCRIPTION": "Schalten Sie Funktionen für Ihre Instanz frei."
+      },
       "IDPS": {
         "TITLE": "Identitätsanbieter",
         "DESCRIPTION": "Erstelle und aktiviere externe Identitätsanbieter. Wähle einen bekannten Anbieter aus oder konfiguriere einen anderen OIDC-, OAuth- oder SAML-kompatiblen Anbieter deiner Wahl. Du kannst sogar deine vorhandenen JWT-Tokens als föderierte Identitäten verwenden, indem du einen JWT-Identitätsanbieter konfigurierst.",
@@ -1314,6 +1318,7 @@
     },
     "LIST": {
       "ORGS": "Organisationen",
+      "FEATURESETTINGS": "Features",
       "LANGUAGES": "Sprachen",
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",

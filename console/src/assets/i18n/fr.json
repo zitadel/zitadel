@@ -86,6 +86,10 @@
         "TITLE": "Paramètres de l'Organisation",
         "DESCRIPTION": "Personnalise les paramètres de ton organisation."
       },
+      "FEATURES": {
+        "TITLE": "Paramètres des fonctionnalités",
+        "DESCRIPTION": "Débloquez des fonctionnalités pour votre instance."
+      },
       "IDPS": {
         "TITLE": "Fournisseurs d'Identité",
         "DESCRIPTION": "Crée et active des fournisseurs d'identité externes. Choisis un fournisseur bien connu ou configure tout autre fournisseur compatible OIDC, OAuth ou SAML de ton choix. Tu peux même utiliser tes tokens JWT existants comme identités fédérées en configurant un fournisseur d'identité JWT.",
@@ -1314,6 +1318,7 @@
     },
     "LIST": {
       "ORGS": "Organisations",
+      "FEATURESETTINGS": "Paramètres de fonctionnalité",
       "LANGUAGES": "Langues",
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",

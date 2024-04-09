@@ -1,0 +1,87 @@
+<div class="events-title-row">
+  <h2>{{ 'DESCRIPTIONS.SETTINGS.FEATURES.TITLE' | translate }}</h2>
+  <a mat-icon-button href="https://zitadel.com/docs/concepts/features/audit-trail" rel="noreferrer" target="_blank">
+    <mat-icon class="icon">info_outline</mat-icon>
+  </a>
+</div>
+<p class="events-desc cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.FEATURES.DESCRIPTION' | translate }}</p>
+
+<cnsl-card *ngIf="featureData">
+  <div class="complexity-content">
+    <div class="row">
+      <mat-checkbox
+        class="slide-toggle"
+        color="primary"
+        name="hasNumber"
+        ngDefaultControl
+        [(ngModel)]="featureData.loginDefaultOrg"
+        [disabled]="(['policy.write'] | hasRole | async) === false"
+      >
+        <div class="slide-toggle-row">
+          <mat-icon class="icon" svgIcon="mdi_numeric"></mat-icon>
+          <span class="left-desc">{{ 'POLICY.DATA.HASNUMBER' | translate }}</span>
+        </div>
+      </mat-checkbox>
+    </div>
+    <div class="row">
+      <mat-checkbox
+        class="slide-toggle"
+        color="primary"
+        name="hasNumber"
+        ngDefaultControl
+        [(ngModel)]="featureData.oidcLegacyIntrospection"
+        [disabled]="(['policy.write'] | hasRole | async) === false"
+      >
+        <div class="slide-toggle-row">
+          <mat-icon class="icon" svgIcon="mdi_numeric"></mat-icon>
+          <span class="left-desc">{{ 'POLICY.DATA.HASNUMBER' | translate }}</span>
+        </div>
+      </mat-checkbox>
+    </div>
+    <div class="row">
+      <mat-checkbox
+        class="slide-toggle"
+        color="primary"
+        name="hasNumber"
+        ngDefaultControl
+        [(ngModel)]="featureData.oidcTokenExchange"
+        [disabled]="(['policy.write'] | hasRole | async) === false"
+      >
+        <div class="slide-toggle-row">
+          <mat-icon class="icon" svgIcon="mdi_numeric"></mat-icon>
+          <span class="left-desc">{{ 'POLICY.DATA.HASNUMBER' | translate }}</span>
+        </div>
+      </mat-checkbox>
+    </div>
+    <div class="row">
+      <mat-checkbox
+        class="slide-toggle"
+        color="primary"
+        name="hasNumber"
+        ngDefaultControl
+        [(ngModel)]="featureData.oidcTriggerIntrospectionProjections"
+        [disabled]="(['policy.write'] | hasRole | async) === false"
+      >
+        <div class="slide-toggle-row">
+          <mat-icon class="icon" svgIcon="mdi_numeric"></mat-icon>
+          <span class="left-desc">{{ 'POLICY.DATA.HASNUMBER' | translate }}</span>
+        </div>
+      </mat-checkbox>
+    </div>
+    <div class="row">
+      <mat-checkbox
+        class="slide-toggle"
+        color="primary"
+        name="hasNumber"
+        ngDefaultControl
+        [(ngModel)]="featureData.userSchema"
+        [disabled]="(['policy.write'] | hasRole | async) === false"
+      >
+        <div class="slide-toggle-row">
+          <mat-icon class="icon" svgIcon="mdi_numeric"></mat-icon>
+          <span class="left-desc">{{ 'POLICY.DATA.HASNUMBER' | translate }}</span>
+        </div>
+      </mat-checkbox>
+    </div>
+  </div>
+</cnsl-card>
