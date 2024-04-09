@@ -15,7 +15,7 @@ export const FEATURESETTINGS: SidenavSetting = {
   i18nKey: 'SETTINGS.LIST.FEATURESETTINGS',
   groupI18nKey: 'SETTINGS.GROUPS.GENERAL',
   requiredRoles: {
-    [PolicyComponentServiceType.ADMIN]: ['iam.read'], // iam.restrictions.read
+    [PolicyComponentServiceType.ADMIN]: ['iam.restrictions.read'],
   },
 };
 
