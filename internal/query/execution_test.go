@@ -8,44 +8,40 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
+	exec "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
-	prepareExecutionsStmt = `SELECT projections.executions.id,` +
-		` projections.executions.change_date,` +
-		` projections.executions.resource_owner,` +
-		` projections.executions.sequence,` +
-		` projections.executions.targets,` +
-		` projections.executions.includes,` +
+	prepareExecutionsStmt = `SELECT projections.executions1.id,` +
+		` projections.executions1.change_date,` +
+		` projections.executions1.resource_owner,` +
+		` projections.executions1.sequence,` +
+		` projections.executions1.targets,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.executions`
+		` FROM projections.executions1`
 	prepareExecutionsCols = []string{
 		"id",
 		"change_date",
 		"resource_owner",
 		"sequence",
 		"targets",
-		"includes",
 		"count",
 	}
 
-	prepareExecutionStmt = `SELECT projections.executions.id,` +
-		` projections.executions.change_date,` +
-		` projections.executions.resource_owner,` +
-		` projections.executions.sequence,` +
-		` projections.executions.targets,` +
-		` projections.executions.includes` +
-		` FROM projections.executions`
+	prepareExecutionStmt = `SELECT projections.executions1.id,` +
+		` projections.executions1.change_date,` +
+		` projections.executions1.resource_owner,` +
+		` projections.executions1.sequence,` +
+		` projections.executions1.targets` +
+		` FROM projections.executions1`
 	prepareExecutionCols = []string{
 		"id",
 		"change_date",
 		"resource_owner",
 		"sequence",
 		"targets",
-		"includes",
 	}
 )
 
@@ -85,8 +81,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 							testNow,
 							"ro",
 							uint64(20211109),
-							database.TextArray[string]{"target"},
-							database.TextArray[string]{"include"},
+							[]byte(`[{"type":1,"target":"include"}]`),
 						},
 					},
 				),
@@ -103,8 +98,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 							ResourceOwner: "ro",
 							Sequence:      20211109,
 						},
-						Targets:  database.TextArray[string]{"target"},
-						Includes: database.TextArray[string]{"include"},
+						Targets: []*exec.Target{{Type: domain.ExecutionTargetTypeInclude, Target: "include"}},
 					},
 				},
 			},
@@ -122,16 +116,14 @@ func Test_ExecutionPrepares(t *testing.T) {
 							testNow,
 							"ro",
 							uint64(20211109),
-							database.TextArray[string]{"target1"},
-							database.TextArray[string]{"include1"},
+							[]byte(`[{"type":2,"target":"target"}]`),
 						},
 						{
 							"id-2",
 							testNow,
 							"ro",
 							uint64(20211110),
-							database.TextArray[string]{"target2"},
-							database.TextArray[string]{"include2"},
+							[]byte(`[{"type":1,"target":"include"}]`),
 						},
 					},
 				),
@@ -148,8 +140,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 							ResourceOwner: "ro",
 							Sequence:      20211109,
 						},
-						Targets:  database.TextArray[string]{"target1"},
-						Includes: database.TextArray[string]{"include1"},
+						Targets: []*exec.Target{{Type: domain.ExecutionTargetTypeTarget, Target: "target"}},
 					},
 					{
 						ID: "id-2",
@@ -158,8 +149,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 							ResourceOwner: "ro",
 							Sequence:      20211110,
 						},
-						Targets:  database.TextArray[string]{"target2"},
-						Includes: database.TextArray[string]{"include2"},
+						Targets: []*exec.Target{{Type: domain.ExecutionTargetTypeInclude, Target: "include"}},
 					},
 				},
 			},
@@ -211,8 +201,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 						testNow,
 						"ro",
 						uint64(20211109),
-						database.TextArray[string]{"target"},
-						database.TextArray[string]{"include"},
+						[]byte(`[{"type":2,"target":"target"}]`),
 					},
 				),
 			},
@@ -223,8 +212,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 					ResourceOwner: "ro",
 					Sequence:      20211109,
 				},
-				Targets:  database.TextArray[string]{"target"},
-				Includes: database.TextArray[string]{"include"},
+				Targets: []*exec.Target{{Type: domain.ExecutionTargetTypeTarget, Target: "target"}},
 			},
 		},
 		{

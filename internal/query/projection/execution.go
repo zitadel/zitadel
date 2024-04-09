@@ -2,6 +2,7 @@ package projection
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
@@ -11,7 +12,7 @@ import (
 )
 
 const (
-	ExecutionTable            = "projections.executions"
+	ExecutionTable            = "projections.executions1"
 	ExecutionIDCol            = "id"
 	ExecutionCreationDateCol  = "creation_date"
 	ExecutionChangeDateCol    = "change_date"
@@ -19,7 +20,6 @@ const (
 	ExecutionInstanceIDCol    = "instance_id"
 	ExecutionSequenceCol      = "sequence"
 	ExecutionTargetsCol       = "targets"
-	ExecutionIncludesCol      = "includes"
 )
 
 type executionProjection struct{}
@@ -41,8 +41,7 @@ func (*executionProjection) Init() *old_handler.Check {
 			handler.NewColumn(ExecutionResourceOwnerCol, handler.ColumnTypeText),
 			handler.NewColumn(ExecutionInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(ExecutionSequenceCol, handler.ColumnTypeInt64),
-			handler.NewColumn(ExecutionTargetsCol, handler.ColumnTypeTextArray, handler.Nullable()),
-			handler.NewColumn(ExecutionIncludesCol, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(ExecutionTargetsCol, handler.ColumnTypeJSONB, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(ExecutionInstanceIDCol, ExecutionIDCol),
 		),
@@ -81,6 +80,12 @@ func (p *executionProjection) reduceExecutionSet(event eventstore.Event) (*handl
 	if err != nil {
 		return nil, err
 	}
+
+	jsonValue, err := json.Marshal(e.Targets)
+	if err != nil {
+		return nil, err
+	}
+
 	columns := []handler.Column{
 		handler.NewCol(ExecutionInstanceIDCol, e.Aggregate().InstanceID),
 		handler.NewCol(ExecutionIDCol, e.Aggregate().ID),
@@ -88,8 +93,7 @@ func (p *executionProjection) reduceExecutionSet(event eventstore.Event) (*handl
 		handler.NewCol(ExecutionCreationDateCol, handler.OnlySetValueOnInsert(ExecutionTable, e.CreationDate())),
 		handler.NewCol(ExecutionChangeDateCol, e.CreationDate()),
 		handler.NewCol(ExecutionSequenceCol, e.Sequence()),
-		handler.NewCol(ExecutionTargetsCol, e.Targets),
-		handler.NewCol(ExecutionIncludesCol, e.Includes),
+		handler.NewCol(ExecutionTargetsCol, jsonValue),
 	}
 	return handler.NewUpsertStatement(e, columns[0:2], columns), nil
 }

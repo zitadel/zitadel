@@ -83,16 +83,16 @@ func TestCommands_AddTarget(t *testing.T) {
 			},
 		},
 		{
-			"no url, error",
+			"no Endpoint, error",
 			fields{
 				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
 				add: &AddTarget{
-					Name:    "name",
-					Timeout: time.Second,
-					URL:     "",
+					Name:     "name",
+					Timeout:  time.Second,
+					Endpoint: "",
 				},
 				resourceOwner: "instance",
 			},
@@ -101,16 +101,16 @@ func TestCommands_AddTarget(t *testing.T) {
 			},
 		},
 		{
-			"no parsable url, error",
+			"no parsable Endpoint, error",
 			fields{
 				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
 				add: &AddTarget{
-					Name:    "name",
-					Timeout: time.Second,
-					URL:     "://",
+					Name:     "name",
+					Timeout:  time.Second,
+					Endpoint: "://",
 				},
 				resourceOwner: "instance",
 			},
@@ -141,7 +141,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				ctx: context.Background(),
 				add: &AddTarget{
 					Name:       "name",
-					URL:        "https://example.com",
+					Endpoint:   "https://example.com",
 					Timeout:    time.Second,
 					TargetType: domain.TargetTypeWebhook,
 				},
@@ -156,7 +156,9 @@ func TestCommands_AddTarget(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
-						targetAddEvent("target", "instance"),
+						eventFromEventPusher(
+							targetAddEvent("target", "instance"),
+						),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id1"),
@@ -167,7 +169,7 @@ func TestCommands_AddTarget(t *testing.T) {
 					Name:       "name",
 					TargetType: domain.TargetTypeWebhook,
 					Timeout:    time.Second,
-					URL:        "https://example.com",
+					Endpoint:   "https://example.com",
 				},
 				resourceOwner: "instance",
 			},
@@ -181,7 +183,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
-						targetAddEvent("target", "instance"),
+						targetAddEvent("id1", "instance"),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id1"),
@@ -192,7 +194,7 @@ func TestCommands_AddTarget(t *testing.T) {
 					Name:       "name",
 					TargetType: domain.TargetTypeWebhook,
 					Timeout:    time.Second,
-					URL:        "https://example.com",
+					Endpoint:   "https://example.com",
 				},
 				resourceOwner: "instance",
 			},
@@ -209,7 +211,11 @@ func TestCommands_AddTarget(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
-						targetAddEvent("target", "instance"),
+						func() eventstore.Command {
+							event := targetAddEvent("id1", "instance")
+							event.InterruptOnError = true
+							return event
+						}(),
 					),
 				),
 				idGenerator: mock.ExpectID(t, "id1"),
@@ -219,9 +225,8 @@ func TestCommands_AddTarget(t *testing.T) {
 				add: &AddTarget{
 					Name:             "name",
 					TargetType:       domain.TargetTypeWebhook,
-					URL:              "https://example.com",
+					Endpoint:         "https://example.com",
 					Timeout:          time.Second,
-					Async:            true,
 					InterruptOnError: true,
 				},
 				resourceOwner: "instance",
@@ -335,14 +340,14 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			},
 		},
 		{
-			"url empty, error",
+			"Endpoint empty, error",
 			fields{
 				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
 				change: &ChangeTarget{
-					URL: gu.Ptr(""),
+					Endpoint: gu.Ptr(""),
 				},
 				resourceOwner: "instance",
 			},
@@ -351,14 +356,14 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			},
 		},
 		{
-			"url not parsable, error",
+			"Endpoint not parsable, error",
 			fields{
 				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
 				change: &ChangeTarget{
-					URL: gu.Ptr("://"),
+					Endpoint: gu.Ptr("://"),
 				},
 				resourceOwner: "instance",
 			},
@@ -392,7 +397,9 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
-						targetAddEvent("target", "instance"),
+						eventFromEventPusher(
+							targetAddEvent("target", "instance"),
+						),
 					),
 				),
 			},
@@ -417,7 +424,9 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
-						targetAddEvent("target", "instance"),
+						eventFromEventPusher(
+							targetAddEvent("target", "instance"),
+						),
 					),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
@@ -449,7 +458,9 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
-						targetAddEvent("target", "instance"),
+						eventFromEventPusher(
+							targetAddEvent("id1", "instance"),
+						),
 					),
 					expectPush(
 						target.NewChangedEvent(context.Background(),
@@ -482,7 +493,9 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
-						targetAddEvent("target", "instance"),
+						eventFromEventPusher(
+							targetAddEvent("id1", "instance"),
+						),
 					),
 					expectPush(
 						target.NewChangedEvent(context.Background(),
@@ -491,7 +504,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 								target.ChangeName("name", "name2"),
 								target.ChangeEndpoint("https://example2.com"),
 								target.ChangeTargetType(domain.TargetTypeCall),
-								target.ChangeTimeout(time.Second),
+								target.ChangeTimeout(10 * time.Second),
 								target.ChangeInterruptOnError(true),
 							},
 						),
@@ -505,10 +518,9 @@ func TestCommands_ChangeTarget(t *testing.T) {
 						AggregateID: "id1",
 					},
 					Name:             gu.Ptr("name2"),
-					URL:              gu.Ptr("https://example2.com"),
+					Endpoint:         gu.Ptr("https://example2.com"),
 					TargetType:       gu.Ptr(domain.TargetTypeCall),
-					Timeout:          gu.Ptr(time.Second),
-					Async:            gu.Ptr(true),
+					Timeout:          gu.Ptr(10 * time.Second),
 					InterruptOnError: gu.Ptr(true),
 				},
 				resourceOwner: "instance",
@@ -593,7 +605,9 @@ func TestCommands_DeleteTarget(t *testing.T) {
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
-						targetAddEvent("target", "instance"),
+						eventFromEventPusher(
+							targetAddEvent("id1", "instance"),
+						),
 					),
 					expectPush(
 						target.NewRemovedEvent(context.Background(),

@@ -28,7 +28,6 @@ SELECT e.instance_id,
        t.target_type,
        t.url,
        t.timeout,
-       t.async,
        t.interrupt_on_error
 FROM ((SELECT instance_id, id, unnest(targets) AS target
        FROM rel_tree

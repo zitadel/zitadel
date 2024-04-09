@@ -15,6 +15,14 @@ import (
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
+func executionTargetsSingleTarget(id string) []*execution.ExecutionTargetType {
+	return []*execution.ExecutionTargetType{{Type: &execution.ExecutionTargetType_Target{Target: id}}}
+}
+
+func executionTargetsSingleInclude(include string) []*execution.ExecutionTargetType {
+	return []*execution.ExecutionTargetType{{Type: &execution.ExecutionTargetType_Include{Include: include}}}
+}
+
 func TestServer_SetExecution_Request(t *testing.T) {
 	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
@@ -48,7 +56,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						Request: &execution.RequestExecution{},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -65,7 +73,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -82,7 +90,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -104,7 +112,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -121,7 +129,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -143,7 +151,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -184,8 +192,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 				},
 			},
 		},
-		[]string{targetResp.GetId()},
-		[]string{},
+		executionTargetsSingleTarget(targetResp.GetId()),
 	)
 
 	tests := []struct {
@@ -208,7 +215,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Includes: []string{executionCond},
+				Targets: executionTargetsSingleInclude(executionCond),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -230,7 +237,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Includes: []string{executionCond},
+				Targets: executionTargetsSingleInclude(executionCond),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -252,7 +259,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Includes: []string{executionCond},
+				Targets: executionTargetsSingleInclude(executionCond),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -336,7 +343,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 			name: "method, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &execution.DeleteExecutionRequest{
@@ -377,7 +384,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 			name: "service, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &execution.DeleteExecutionRequest{
@@ -402,7 +409,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 			name: "all, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &execution.DeleteExecutionRequest{
@@ -476,7 +483,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						Response: &execution.ResponseExecution{},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -493,7 +500,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -510,7 +517,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -532,7 +539,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -549,7 +556,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -571,7 +578,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -657,7 +664,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 			name: "method, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &execution.DeleteExecutionRequest{
@@ -698,7 +705,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 			name: "service, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &execution.DeleteExecutionRequest{
@@ -723,7 +730,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 			name: "all, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &execution.DeleteExecutionRequest{
@@ -799,7 +806,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						Event: &execution.EventExecution{},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -837,7 +844,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -880,7 +887,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -902,7 +909,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -991,7 +998,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 			name: "event, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &execution.DeleteExecutionRequest{
@@ -1032,7 +1039,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 			name: "group, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &execution.DeleteExecutionRequest{
@@ -1073,7 +1080,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 			name: "all, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &execution.DeleteExecutionRequest{
@@ -1147,7 +1154,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Response: &execution.ResponseExecution{},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -1157,10 +1164,10 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			req: &execution.SetExecutionRequest{
 				Condition: &execution.Condition{
 					ConditionType: &execution.Condition_Function{
-						Function: "xxx",
+						Function: &execution.FunctionExecution{Name: "xxx"},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -1170,10 +1177,10 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			req: &execution.SetExecutionRequest{
 				Condition: &execution.Condition{
 					ConditionType: &execution.Condition_Function{
-						Function: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication",
+						Function: &execution.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &execution.SetExecutionResponse{
 				Details: &object.Details{
@@ -1245,7 +1252,7 @@ func TestServer_DeleteExecution_Function(t *testing.T) {
 			req: &execution.DeleteExecutionRequest{
 				Condition: &execution.Condition{
 					ConditionType: &execution.Condition_Function{
-						Function: "xxx",
+						Function: &execution.FunctionExecution{Name: "xxx"},
 					},
 				},
 			},
@@ -1255,13 +1262,13 @@ func TestServer_DeleteExecution_Function(t *testing.T) {
 			name: "function, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *execution.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &execution.DeleteExecutionRequest{
 				Condition: &execution.Condition{
 					ConditionType: &execution.Condition_Function{
-						Function: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication",
+						Function: &execution.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
 					},
 				},
 			},

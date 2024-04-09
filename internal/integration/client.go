@@ -552,11 +552,10 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, endpoint 
 	return target
 }
 
-func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.Condition, targets []string, includes []string) *execution.SetExecutionResponse {
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.Condition, targets []*execution.ExecutionTargetType) *execution.SetExecutionResponse {
 	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
-		Includes:  includes,
 	})
 	require.NoError(t, err)
 	return target

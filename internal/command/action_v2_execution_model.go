@@ -10,12 +10,11 @@ import (
 type ExecutionWriteModel struct {
 	eventstore.WriteModel
 
-	Targets  []string
-	Includes []string
+	Targets []*execution.Target
 }
 
 func (e *ExecutionWriteModel) Exists() bool {
-	return len(e.Targets) > 0 || len(e.Includes) > 0
+	return len(e.Targets) > 0
 }
 
 func NewExecutionWriteModel(id string, resourceOwner string) *ExecutionWriteModel {
@@ -33,10 +32,8 @@ func (wm *ExecutionWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *execution.SetEvent:
 			wm.Targets = e.Targets
-			wm.Includes = e.Includes
 		case *execution.RemovedEvent:
 			wm.Targets = nil
-			wm.Includes = nil
 		}
 	}
 	return wm.WriteModel.Reduce()

@@ -23,23 +23,19 @@ type mockExecutionTarget struct {
 	ExecutionID      string
 	TargetID         string
 	TargetType       domain.TargetType
-	URL              string
+	Endpoint         string
 	Timeout          time.Duration
-	Async            bool
 	InterruptOnError bool
 }
 
-func (e *mockExecutionTarget) SetURL(url string) {
-	e.URL = url
+func (e *mockExecutionTarget) SetEndpoint(endpoint string) {
+	e.Endpoint = endpoint
 }
 func (e *mockExecutionTarget) IsInterruptOnError() bool {
 	return e.InterruptOnError
 }
-func (e *mockExecutionTarget) IsAsync() bool {
-	return e.Async
-}
-func (e *mockExecutionTarget) GetURL() string {
-	return e.URL
+func (e *mockExecutionTarget) GetEndpoint() string {
+	return e.Endpoint
 }
 func (e *mockExecutionTarget) GetTargetType() domain.TargetType {
 	return e.TargetType
@@ -303,9 +299,8 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						InstanceID:  "instance",
 						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
 						TargetID:    "target",
-						TargetType:  domain.TargetTypeCall,
+						TargetType:  domain.TargetTypeAsync,
 						Timeout:     time.Second,
-						Async:       true,
 					},
 				},
 				targets: []target{
@@ -332,9 +327,8 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 						InstanceID:  "instance",
 						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
 						TargetID:    "target",
-						TargetType:  domain.TargetTypeCall,
+						TargetType:  domain.TargetTypeAsync,
 						Timeout:     time.Minute,
-						Async:       true,
 					},
 				},
 				targets: []target{
@@ -569,7 +563,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				)
 
 				et := tt.args.executionTargets[i].(*mockExecutionTarget)
-				et.SetURL(url)
+				et.SetEndpoint(url)
 				closeFuncs[i] = closeF
 			}
 
@@ -736,7 +730,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				)
 
 				et := tt.args.executionTargets[i].(*mockExecutionTarget)
-				et.SetURL(url)
+				et.SetEndpoint(url)
 				closeFuncs[i] = closeF
 			}
 

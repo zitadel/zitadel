@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
+	exec "github.com/zitadel/zitadel/internal/repository/execution"
 	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 )
 
@@ -29,9 +30,18 @@ func (s *Server) ListExecutionServices(_ context.Context, _ *execution.ListExecu
 }
 
 func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRequest) (*execution.SetExecutionResponse, error) {
+	var targets []*exec.Target
+	for _, target := range req.Targets {
+		switch t := target.GetType().(type) {
+		case *execution.ExecutionTargetType_Include:
+			targets = append(targets, &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: t.Include})
+		case *execution.ExecutionTargetType_Target:
+			targets = append(targets, &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: t.Target})
+		}
+	}
+
 	set := &command.SetExecution{
-		Targets:  req.GetTargets(),
-		Includes: req.GetIncludes(),
+		Targets: targets,
 	}
 
 	var err error
@@ -68,7 +78,7 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 			return nil, err
 		}
 	case *execution.Condition_Function:
-		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function), set, authz.GetInstance(ctx).InstanceID())
+		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function.GetName()), set, authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err
 		}
@@ -113,7 +123,7 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 			return nil, err
 		}
 	case *execution.Condition_Function:
-		details, err = s.command.DeleteExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function), authz.GetInstance(ctx).InstanceID())
+		details, err = s.command.DeleteExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function.GetName()), authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err
 		}

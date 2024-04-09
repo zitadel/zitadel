@@ -22,9 +22,8 @@ type mockTarget struct {
 	ExecutionID      string
 	TargetID         string
 	TargetType       domain.TargetType
-	URL              string
+	Endpoint         string
 	Timeout          time.Duration
-	Async            bool
 	InterruptOnError bool
 }
 
@@ -34,11 +33,8 @@ func (e *mockTarget) GetTargetID() string {
 func (e *mockTarget) IsInterruptOnError() bool {
 	return e.InterruptOnError
 }
-func (e *mockTarget) IsAsync() bool {
-	return e.Async
-}
-func (e *mockTarget) GetURL() string {
-	return e.URL
+func (e *mockTarget) GetEndpoint() string {
+	return e.Endpoint
 }
 func (e *mockTarget) GetTargetType() domain.TargetType {
 	return e.TargetType
@@ -144,12 +140,8 @@ func testCallTarget(ctx context.Context,
 	info ContextInfoRequest,
 ) func(string) ([]byte, error) {
 	return func(url string) (r []byte, err error) {
-		target.URL = url
-		callf, err := CallTargetFunc(target)
-		if err != nil {
-			return nil, err
-		}
-		return callf(ctx, info)
+		target.Endpoint = url
+		return CallTarget(ctx, target, info)
 	}
 }
 
@@ -240,14 +232,14 @@ func Test_CallTarget(t *testing.T) {
 		res  res
 	}{
 		{
-			" error",
+			"unknown targettype, error",
 			args{
 				ctx:    context.Background(),
 				sleep:  time.Second,
 				method: http.MethodPost,
 				info:   newMockContextInfoRequest("content1"),
 				target: &mockTarget{
-					TargetType: 3,
+					TargetType: 4,
 				},
 				body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
 				respBody:   []byte("{\"request\":\"content2\"}"),

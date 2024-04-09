@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"strings"
 	"time"
@@ -11,9 +12,9 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	exec "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -51,10 +52,6 @@ var (
 		name:  projection.ExecutionTargetsCol,
 		table: executionTable,
 	}
-	ExecutionColumnIncludes = Column{
-		name:  projection.ExecutionIncludesCol,
-		table: executionTable,
-	}
 )
 
 var (
@@ -77,8 +74,7 @@ type Execution struct {
 	ID string
 	domain.ObjectDetails
 
-	Targets  database.TextArray[string]
-	Includes database.TextArray[string]
+	Targets []*exec.Target
 }
 
 type ExecutionSearchQueries struct {
@@ -117,14 +113,6 @@ func NewExecutionInIDsSearchQuery(values []string) (SearchQuery, error) {
 
 func NewExecutionTypeSearchQuery(t domain.ExecutionType) (SearchQuery, error) {
 	return NewTextQuery(ExecutionColumnID, t.String(), TextStartsWith)
-}
-
-func NewExecutionTargetSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(ExecutionColumnTargets, value, TextListContains)
-}
-
-func NewExecutionIncludeSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(ExecutionColumnIncludes, value, TextListContains)
 }
 
 // ExecutionTargets: provide IDs to select all target information,
@@ -178,7 +166,6 @@ func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			ExecutionColumnResourceOwner.identifier(),
 			ExecutionColumnSequence.identifier(),
 			ExecutionColumnTargets.identifier(),
-			ExecutionColumnIncludes.identifier(),
 			countColumn.identifier(),
 		).From(executionTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
@@ -187,17 +174,22 @@ func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			var count uint64
 			for rows.Next() {
 				execution := new(Execution)
+				targets := make([]byte, 0)
 				err := rows.Scan(
 					&execution.ID,
 					&execution.EventDate,
 					&execution.ResourceOwner,
 					&execution.Sequence,
-					&execution.Targets,
-					&execution.Includes,
+					&targets,
 					&count,
 				)
 				if err != nil {
 					return nil, err
+				}
+				if len(targets) > 0 {
+					if err := json.Unmarshal(targets, &execution.Targets); err != nil {
+						return nil, err
+					}
 				}
 				executions = append(executions, execution)
 			}
@@ -222,24 +214,28 @@ func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			ExecutionColumnResourceOwner.identifier(),
 			ExecutionColumnSequence.identifier(),
 			ExecutionColumnTargets.identifier(),
-			ExecutionColumnIncludes.identifier(),
 		).From(executionTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Execution, error) {
 			execution := new(Execution)
+			targets := make([]byte, 0)
 			err := row.Scan(
 				&execution.ID,
 				&execution.EventDate,
 				&execution.ResourceOwner,
 				&execution.Sequence,
-				&execution.Targets,
-				&execution.Includes,
+				&targets,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
 					return nil, zerrors.ThrowNotFound(err, "QUERY-qzn1xycesh", "Errors.Execution.NotFound")
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-f8sjvm4tb8", "Errors.Internal")
+			}
+			if len(targets) > 0 {
+				if err := json.Unmarshal(targets, &execution.Targets); err != nil {
+					return nil, err
+				}
 			}
 			return execution, nil
 		}
@@ -250,9 +246,8 @@ type ExecutionTarget struct {
 	ExecutionID      string
 	TargetID         string
 	TargetType       domain.TargetType
-	URL              string
+	Endpoint         string
 	Timeout          time.Duration
-	Async            bool
 	InterruptOnError bool
 }
 
@@ -265,11 +260,8 @@ func (e *ExecutionTarget) GetTargetID() string {
 func (e *ExecutionTarget) IsInterruptOnError() bool {
 	return e.InterruptOnError
 }
-func (e *ExecutionTarget) IsAsync() bool {
-	return e.Async
-}
-func (e *ExecutionTarget) GetURL() string {
-	return e.URL
+func (e *ExecutionTarget) GetEndpoint() string {
+	return e.Endpoint
 }
 func (e *ExecutionTarget) GetTargetType() domain.TargetType {
 	return e.TargetType
@@ -288,9 +280,8 @@ func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 			executionID      = &sql.NullString{}
 			targetID         = &sql.NullString{}
 			targetType       = &sql.NullInt32{}
-			url              = &sql.NullString{}
+			endpoint         = &sql.NullString{}
 			timeout          = &sql.NullInt64{}
-			async            = &sql.NullBool{}
 			interruptOnError = &sql.NullBool{}
 		)
 
@@ -299,9 +290,8 @@ func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 			executionID,
 			targetID,
 			targetType,
-			url,
+			endpoint,
 			timeout,
-			async,
 			interruptOnError,
 		)
 
@@ -313,9 +303,8 @@ func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 		target.ExecutionID = executionID.String
 		target.TargetID = targetID.String
 		target.TargetType = domain.TargetType(targetType.Int32)
-		target.URL = url.String
+		target.Endpoint = endpoint.String
 		target.Timeout = time.Duration(timeout.Int64)
-		target.Async = async.Bool
 		target.InterruptOnError = interruptOnError.Bool
 
 		targets = append(targets, target)

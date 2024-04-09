@@ -188,10 +188,6 @@ func executionQueryToQuery(searchQuery *execution.SearchQuery) (query.SearchQuer
 		return inConditionsQueryToQuery(q.InConditionsQuery)
 	case *execution.SearchQuery_ExecutionTypeQuery:
 		return executionTypeToQuery(q.ExecutionTypeQuery)
-	case *execution.SearchQuery_TargetQuery:
-		return query.NewExecutionTargetSearchQuery(q.TargetQuery.GetTargetId())
-	case *execution.SearchQuery_IncludeQuery:
-		return query.NewExecutionIncludeSearchQuery(q.IncludeQuery.GetInclude())
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
@@ -250,7 +246,7 @@ func conditionToID(q *execution.Condition) (string, error) {
 		}
 		return cond.ID(), nil
 	case *execution.Condition_Function:
-		return t.Function, nil
+		return t.Function.GetName(), nil
 	default:
 		return "", zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
@@ -265,17 +261,21 @@ func executionsToPb(executions []*query.Execution) []*execution.Execution {
 }
 
 func executionToPb(e *query.Execution) *execution.Execution {
-	var targets, includes []string
-	if len(e.Targets) > 0 {
-		targets = e.Targets
+	targets := make([]*execution.ExecutionTargetType, len(e.Targets))
+	for i := range e.Targets {
+		switch e.Targets[i].Type {
+		case domain.ExecutionTargetTypeInclude:
+			targets[i].Type = &execution.ExecutionTargetType_Include{Include: e.Targets[i].Target}
+		case domain.ExecutionTargetTypeTarget:
+			targets[i].Type = &execution.ExecutionTargetType_Target{Target: e.Targets[i].Target}
+		default:
+			continue
+		}
 	}
-	if len(e.Includes) > 0 {
-		includes = e.Includes
-	}
+
 	return &execution.Execution{
 		Details:     object.DomainToDetailsPb(&e.ObjectDetails),
 		ExecutionId: e.ID,
 		Targets:     targets,
-		Includes:    includes,
 	}
 }

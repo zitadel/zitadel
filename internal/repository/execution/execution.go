@@ -3,6 +3,7 @@ package execution
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -15,8 +16,7 @@ const (
 type SetEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	Targets  []string `json:"targets"`
-	Includes []string `json:"includes"`
+	Targets []*Target `json:"targets"`
 }
 
 func (e *SetEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -31,18 +31,21 @@ func (e *SetEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
+type Target struct {
+	Type   domain.ExecutionTargetType `json:"type"`
+	Target string                     `json:"target"`
+}
+
 func NewSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	targets []string,
-	includes []string,
+	targets []*Target,
 ) *SetEvent {
 	return &SetEvent{
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx, aggregate, SetEventType,
 		),
-		Targets:  targets,
-		Includes: includes,
+		Targets: targets,
 	}
 }
 

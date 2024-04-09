@@ -512,7 +512,7 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 			args: args{
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.ListExecutionsRequest, response *execution.ListExecutionsResponse) error {
-					resp := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[0], []string{targetResp.GetId()}, []string{})
+					resp := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[0], executionTargetsSingleTarget(targetResp.GetId()))
 
 					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
 					response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
@@ -550,7 +550,7 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
 						ExecutionId: "request./zitadel.session.v2beta.SessionService/GetSession",
-						Targets:     []string{targetResp.GetId()},
+						Targets:     executionTargetsSingleTarget(targetResp.GetId()),
 					},
 				},
 			},
@@ -577,14 +577,14 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 								},
 							},
 						},
-					}, []string{target.GetId()}, []string{})
+					}, executionTargetsSingleTarget(target.GetId()))
 
 					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
 					response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
 
 					response.Result[0].Details.ChangeDate = resp.GetDetails().GetChangeDate()
 					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
-					response.Result[0].Targets[0] = target.GetId()
+					response.Result[0].Targets[0] = &execution.ExecutionTargetType{Type: &execution.ExecutionTargetType_Target{Target: target.GetId()}}
 					return nil
 				},
 				req: &execution.ListExecutionsRequest{
@@ -601,7 +601,7 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
 						ExecutionId: "request./zitadel.management.v1.ManagementService/UpdateAction",
-						Targets:     []string{""},
+						Targets:     executionTargetsSingleTarget(""),
 					},
 				},
 			},
@@ -618,7 +618,8 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 								},
 							},
 						},
-					}, []string{targetResp.GetId()}, []string{})
+					}, executionTargetsSingleTarget(targetResp.GetId()))
+
 					resp2 := Tester.SetExecution(ctx, t, &execution.Condition{
 						ConditionType: &execution.Condition_Request{
 							Request: &execution.RequestExecution{
@@ -627,7 +628,7 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 								},
 							},
 						},
-					}, []string{}, []string{"request./zitadel.management.v1.ManagementService/GetAction"})
+					}, executionTargetsSingleInclude("request./zitadel.management.v1.ManagementService/GetAction"))
 
 					response.Details.Timestamp = resp2.GetDetails().GetChangeDate()
 					response.Details.ProcessedSequence = resp2.GetDetails().GetSequence()
@@ -654,7 +655,7 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
 						ExecutionId: "request./zitadel.management.v1.ManagementService/ListActions",
-						Includes:    []string{"request./zitadel.management.v1.ManagementService/GetAction"},
+						Targets:     executionTargetsSingleInclude("request./zitadel.management.v1.ManagementService/GetAction"),
 					},
 				},
 			},
@@ -665,15 +666,15 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 				ctx: CTX,
 				dep: func(ctx context.Context, request *execution.ListExecutionsRequest, response *execution.ListExecutionsResponse) error {
 
-					resp1 := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[0], []string{targetResp.GetId()}, []string{})
+					resp1 := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[0], executionTargetsSingleTarget(targetResp.GetId()))
 					response.Result[0].Details.ChangeDate = resp1.GetDetails().GetChangeDate()
 					response.Result[0].Details.Sequence = resp1.GetDetails().GetSequence()
 
-					resp2 := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[1], []string{targetResp.GetId()}, []string{})
+					resp2 := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[1], executionTargetsSingleTarget(targetResp.GetId()))
 					response.Result[1].Details.ChangeDate = resp2.GetDetails().GetChangeDate()
 					response.Result[1].Details.Sequence = resp2.GetDetails().GetSequence()
 
-					resp3 := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[2], []string{targetResp.GetId()}, []string{})
+					resp3 := Tester.SetExecution(ctx, t, request.Queries[0].GetInConditionsQuery().GetConditions()[2], executionTargetsSingleTarget(targetResp.GetId()))
 					response.Details.Timestamp = resp3.GetDetails().GetChangeDate()
 					response.Details.ProcessedSequence = resp3.GetDetails().GetSequence()
 					response.Result[2].Details.ChangeDate = resp3.GetDetails().GetChangeDate()
@@ -728,19 +729,19 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
 						ExecutionId: "request./zitadel.session.v2beta.SessionService/GetSession",
-						Targets:     []string{targetResp.GetId()},
+						Targets:     executionTargetsSingleTarget(targetResp.GetId()),
 					}, {
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
 						ExecutionId: "request./zitadel.session.v2beta.SessionService/CreateSession",
-						Targets:     []string{targetResp.GetId()},
+						Targets:     executionTargetsSingleTarget(targetResp.GetId()),
 					}, {
 						Details: &object.Details{
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
 						ExecutionId: "request./zitadel.session.v2beta.SessionService/SetSession",
-						Targets:     []string{targetResp.GetId()},
+						Targets:     executionTargetsSingleTarget(targetResp.GetId()),
 					},
 				},
 			},
