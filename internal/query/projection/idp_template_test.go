@@ -16,11 +16,11 @@ import (
 
 var (
 	idpTemplateInsertStmt = `INSERT INTO projections.idp_templates6` +
-		` (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update)` +
-		` VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`
+		` (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, owner_type, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, auto_linking)` +
+		` VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`
 	idpTemplateUpdateMinimalStmt = `UPDATE projections.idp_templates6 SET (is_creation_allowed, change_date, sequence) = ($1, $2, $3) WHERE (id = $4) AND (instance_id = $5)`
-	idpTemplateUpdateStmt        = `UPDATE projections.idp_templates6 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence)` +
-		` = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)`
+	idpTemplateUpdateStmt        = `UPDATE projections.idp_templates6 SET (name, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, auto_linking, change_date, sequence)` +
+		` = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (id = $9) AND (instance_id = $10)`
 )
 
 func TestIDPTemplateProjection_reducesRemove(t *testing.T) {
@@ -195,7 +195,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.OAuthIDPAddedEventMapper),
 			},
@@ -222,6 +223,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -266,7 +268,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), org.OAuthIDPAddedEventMapper),
 			},
@@ -293,6 +296,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -379,7 +383,8 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.OAuthIDPChangedEventMapper),
 			},
@@ -397,6 +402,7 @@ func TestIDPTemplateProjection_reducesOAuth(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -489,6 +495,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 								false,
 								false,
 								false,
+								domain.AutoLinkingOptionUnspecified,
 							},
 						},
 						{
@@ -529,7 +536,8 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.AzureADIDPAddedEventMapper),
 			},
@@ -556,6 +564,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -596,7 +605,8 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), org.AzureADIDPAddedEventMapper),
 			},
@@ -623,6 +633,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -705,7 +716,8 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.AzureADIDPChangedEventMapper),
 			},
@@ -723,6 +735,7 @@ func TestIDPTemplateProjection_reducesAzureAD(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -791,7 +804,8 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.GitHubIDPAddedEventMapper),
 			},
@@ -818,6 +832,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -854,7 +869,8 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), org.GitHubIDPAddedEventMapper),
 			},
@@ -881,6 +897,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -959,7 +976,8 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.GitHubIDPChangedEventMapper),
 			},
@@ -977,6 +995,7 @@ func TestIDPTemplateProjection_reducesGitHub(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -1046,7 +1065,8 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.GitHubEnterpriseIDPAddedEventMapper),
 			},
@@ -1073,6 +1093,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -1115,7 +1136,8 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), org.GitHubEnterpriseIDPAddedEventMapper),
 			},
@@ -1142,6 +1164,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -1226,7 +1249,8 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.GitHubEnterpriseIDPChangedEventMapper),
 			},
@@ -1244,6 +1268,7 @@ func TestIDPTemplateProjection_reducesGitHubEnterprise(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -1312,7 +1337,8 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.GitLabIDPAddedEventMapper),
 			},
@@ -1339,6 +1365,7 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -1374,7 +1401,8 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), org.GitLabIDPAddedEventMapper),
 			},
@@ -1401,6 +1429,7 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -1479,7 +1508,8 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.GitLabIDPChangedEventMapper),
 			},
@@ -1497,6 +1527,7 @@ func TestIDPTemplateProjection_reducesGitLab(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -1564,7 +1595,8 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.GitLabSelfHostedIDPAddedEventMapper),
 			},
@@ -1591,6 +1623,7 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -1629,7 +1662,8 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), org.GitLabSelfHostedIDPAddedEventMapper),
 			},
@@ -1656,6 +1690,7 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -1736,7 +1771,8 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.GitLabSelfHostedIDPChangedEventMapper),
 			},
@@ -1754,6 +1790,7 @@ func TestIDPTemplateProjection_reducesGitLabSelfHosted(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -1820,7 +1857,8 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.GoogleIDPAddedEventMapper),
 			},
@@ -1847,6 +1885,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -1882,7 +1921,8 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), org.GoogleIDPAddedEventMapper),
 			},
@@ -1909,6 +1949,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -1987,7 +2028,8 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.GoogleIDPChangedEventMapper),
 			},
@@ -2005,6 +2047,7 @@ func TestIDPTemplateProjection_reducesGoogle(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -2090,7 +2133,8 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.LDAPIDPAddedEventMapper),
 			},
@@ -2117,6 +2161,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -2191,7 +2236,8 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), org.LDAPIDPAddedEventMapper),
 			},
@@ -2218,6 +2264,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -2334,7 +2381,8 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.LDAPIDPChangedEventMapper),
 			},
@@ -2352,6 +2400,7 @@ func TestIDPTemplateProjection_reducesLDAP(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -2464,7 +2513,8 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 				), instance.AppleIDPAddedEventMapper),
 			},
@@ -2491,6 +2541,7 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -2529,7 +2580,8 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 				), org.AppleIDPAddedEventMapper),
 			},
@@ -2556,6 +2608,7 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -2636,7 +2689,8 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 			"isCreationAllowed": true,
 			"isLinkingAllowed": true,
 			"isAutoCreation": true,
-			"isAutoUpdate": true
+			"isAutoUpdate": true,
+			"autoLinkingOption": 1
 		}`),
 				), instance.AppleIDPChangedEventMapper),
 			},
@@ -2654,6 +2708,7 @@ func TestIDPTemplateProjection_reducesApple(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -2723,7 +2778,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 				), instance.SAMLIDPAddedEventMapper),
 			},
@@ -2750,6 +2806,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -2789,7 +2846,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 				), org.SAMLIDPAddedEventMapper),
 			},
@@ -2816,6 +2874,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -2896,7 +2955,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 				), instance.SAMLIDPChangedEventMapper),
 			},
@@ -2914,6 +2974,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -3009,7 +3070,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.OIDCIDPAddedEventMapper),
 			},
@@ -3036,6 +3098,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -3075,7 +3138,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), org.OIDCIDPAddedEventMapper),
 			},
@@ -3102,6 +3166,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -3184,7 +3249,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.OIDCIDPChangedEventMapper),
 			},
@@ -3202,6 +3268,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",
@@ -3245,7 +3312,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 				), instance.OIDCIDPMigratedAzureADEventMapper),
 			},
@@ -3256,7 +3324,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates6 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (id = $9) AND (instance_id = $10)",
+							expectedStmt: "UPDATE projections.idp_templates6 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, auto_linking) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (id = $10) AND (instance_id = $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -3266,6 +3334,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								"idp-id",
 								"instance-id",
 							},
@@ -3314,7 +3383,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 				), org.OIDCIDPMigratedAzureADEventMapper),
 			},
@@ -3325,7 +3395,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates6 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (id = $9) AND (instance_id = $10)",
+							expectedStmt: "UPDATE projections.idp_templates6 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, auto_linking) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (id = $10) AND (instance_id = $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -3335,6 +3405,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								"idp-id",
 								"instance-id",
 							},
@@ -3381,7 +3452,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 				), instance.OIDCIDPMigratedGoogleEventMapper),
 			},
@@ -3392,7 +3464,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates6 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (id = $9) AND (instance_id = $10)",
+							expectedStmt: "UPDATE projections.idp_templates6 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, auto_linking) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (id = $10) AND (instance_id = $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -3402,6 +3474,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								"idp-id",
 								"instance-id",
 							},
@@ -3446,7 +3519,8 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 				), org.OIDCIDPMigratedGoogleEventMapper),
 			},
@@ -3457,7 +3531,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates6 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (id = $9) AND (instance_id = $10)",
+							expectedStmt: "UPDATE projections.idp_templates6 SET (change_date, sequence, name, type, is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, auto_linking) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (id = $10) AND (instance_id = $11)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -3467,6 +3541,7 @@ func TestIDPTemplateProjection_reducesOIDC(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								"idp-id",
 								"instance-id",
 							},
@@ -3557,6 +3632,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 								true,
 								true,
 								false,
+								domain.AutoLinkingOptionUnspecified,
 							},
 						},
 					},
@@ -3602,6 +3678,7 @@ func TestIDPTemplateProjection_reducesOldConfig(t *testing.T) {
 								true,
 								true,
 								false,
+								domain.AutoLinkingOptionUnspecified,
 							},
 						},
 					},
@@ -4121,7 +4198,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.JWTIDPAddedEventMapper),
 			},
@@ -4148,6 +4226,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -4181,7 +4260,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), org.JWTIDPAddedEventMapper),
 			},
@@ -4208,6 +4288,7 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 							},
 						},
 						{
@@ -4283,7 +4364,8 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
 	"isAutoCreation": true,
-	"isAutoUpdate": true
+	"isAutoUpdate": true,
+	"autoLinkingOption": 1
 }`),
 					), instance.JWTIDPChangedEventMapper),
 			},
@@ -4294,12 +4376,13 @@ func TestIDPTemplateProjection_reducesJWT(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.idp_templates6 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, change_date, sequence) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.idp_templates6 SET (is_creation_allowed, is_linking_allowed, is_auto_creation, is_auto_update, auto_linking, change_date, sequence) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (instance_id = $9)",
 							expectedArgs: []interface{}{
 								true,
 								true,
 								true,
 								true,
+								domain.AutoLinkingOptionUsername,
 								anyArg{},
 								uint64(15),
 								"idp-id",

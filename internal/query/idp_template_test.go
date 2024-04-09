@@ -29,6 +29,7 @@ var (
 		` projections.idp_templates6.is_linking_allowed,` +
 		` projections.idp_templates6.is_auto_creation,` +
 		` projections.idp_templates6.is_auto_update,` +
+		` projections.idp_templates6.auto_linking,` +
 		// oauth
 		` projections.idp_templates6_oauth2.idp_id,` +
 		` projections.idp_templates6_oauth2.client_id,` +
@@ -153,6 +154,7 @@ var (
 		"is_linking_allowed",
 		"is_auto_creation",
 		"is_auto_update",
+		"auto_linking",
 		// oauth config
 		"idp_id",
 		"client_id",
@@ -263,6 +265,7 @@ var (
 		` projections.idp_templates6.is_linking_allowed,` +
 		` projections.idp_templates6.is_auto_creation,` +
 		` projections.idp_templates6.is_auto_update,` +
+		` projections.idp_templates6.auto_linking,` +
 		// oauth
 		` projections.idp_templates6_oauth2.idp_id,` +
 		` projections.idp_templates6_oauth2.client_id,` +
@@ -388,6 +391,7 @@ var (
 		"is_linking_allowed",
 		"is_auto_creation",
 		"is_auto_update",
+		"auto_linking",
 		// oauth config
 		"idp_id",
 		"client_id",
@@ -538,6 +542,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						"idp-id",
 						"client_id",
@@ -651,6 +656,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 				OAuthIDPTemplate: &OAuthIDPTemplate{
 					IDPID:                 "idp-id",
 					ClientID:              "client_id",
@@ -684,6 +690,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						nil,
 						nil,
@@ -797,6 +804,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 				OIDCIDPTemplate: &OIDCIDPTemplate{
 					IDPID:            "idp-id",
 					Issuer:           "issuer",
@@ -828,6 +836,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						nil,
 						nil,
@@ -941,6 +950,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 				JWTIDPTemplate: &JWTIDPTemplate{
 					IDPID:        "idp-id",
 					Issuer:       "issuer",
@@ -971,6 +981,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						nil,
 						nil,
@@ -1084,6 +1095,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 				GitHubIDPTemplate: &GitHubIDPTemplate{
 					IDPID:        "idp-id",
 					ClientID:     "client_id",
@@ -1113,6 +1125,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						nil,
 						nil,
@@ -1226,6 +1239,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 				GitLabIDPTemplate: &GitLabIDPTemplate{
 					IDPID:        "idp-id",
 					ClientID:     "client_id",
@@ -1255,6 +1269,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						nil,
 						nil,
@@ -1368,6 +1383,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 				GitLabSelfHostedIDPTemplate: &GitLabSelfHostedIDPTemplate{
 					IDPID:        "idp-id",
 					Issuer:       "issuer",
@@ -1398,6 +1414,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						nil,
 						nil,
@@ -1511,6 +1528,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 				GoogleIDPTemplate: &GoogleIDPTemplate{
 					IDPID:        "idp-id",
 					ClientID:     "client_id",
@@ -1540,6 +1558,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						nil,
 						nil,
@@ -1653,6 +1672,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 				SAMLIDPTemplate: &SAMLIDPTemplate{
 					IDPID:             "idp-id",
 					Metadata:          []byte("metadata"),
@@ -1684,6 +1704,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						nil,
 						nil,
@@ -1797,6 +1818,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 				LDAPIDPTemplate: &LDAPIDPTemplate{
 					IDPID:             "idp-id",
 					Servers:           []string{"server"},
@@ -1846,6 +1868,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						nil,
 						nil,
@@ -1959,6 +1982,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 				AppleIDPTemplate: &AppleIDPTemplate{
 					IDPID:      "idp-id",
 					ClientID:   "client_id",
@@ -1990,6 +2014,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
+						domain.AutoLinkingOptionUsername,
 						// oauth
 						nil,
 						nil,
@@ -2103,6 +2128,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsLinkingAllowed:  true,
 				IsAutoCreation:    true,
 				IsAutoUpdate:      true,
+				AutoLinking:       domain.AutoLinkingOptionUsername,
 			},
 		},
 		{
@@ -2162,6 +2188,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							domain.AutoLinkingOptionUsername,
 							// oauth
 							nil,
 							nil,
@@ -2281,6 +2308,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
+						AutoLinking:       domain.AutoLinkingOptionUsername,
 						LDAPIDPTemplate: &LDAPIDPTemplate{
 							IDPID:             "idp-id",
 							Servers:           []string{"server"},
@@ -2333,6 +2361,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							domain.AutoLinkingOptionUsername,
 							// oauth
 							nil,
 							nil,
@@ -2452,6 +2481,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
+						AutoLinking:       domain.AutoLinkingOptionUsername,
 					},
 				},
 			},
@@ -2478,6 +2508,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							domain.AutoLinkingOptionUsername,
 							// oauth
 							nil,
 							nil,
@@ -2589,6 +2620,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							domain.AutoLinkingOptionUsername,
 							// oauth
 							nil,
 							nil,
@@ -2700,6 +2732,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							domain.AutoLinkingOptionUsername,
 							// oauth
 							nil,
 							nil,
@@ -2811,6 +2844,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							domain.AutoLinkingOptionUsername,
 							// oauth
 							"idp-id-oauth",
 							"client_id",
@@ -2922,6 +2956,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							domain.AutoLinkingOptionUsername,
 							// oauth
 							nil,
 							nil,
@@ -3033,6 +3068,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							true,
 							true,
 							true,
+							domain.AutoLinkingOptionUsername,
 							// oauth
 							nil,
 							nil,
@@ -3152,6 +3188,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
+						AutoLinking:       domain.AutoLinkingOptionUsername,
 						LDAPIDPTemplate: &LDAPIDPTemplate{
 							IDPID:             "idp-id-ldap",
 							Servers:           []string{"server"},
@@ -3193,6 +3230,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
+						AutoLinking:       domain.AutoLinkingOptionUsername,
 						SAMLIDPTemplate: &SAMLIDPTemplate{
 							IDPID:             "idp-id-saml",
 							Metadata:          []byte("metadata"),
@@ -3216,6 +3254,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
+						AutoLinking:       domain.AutoLinkingOptionUsername,
 						GoogleIDPTemplate: &GoogleIDPTemplate{
 							IDPID:        "idp-id-google",
 							ClientID:     "client_id",
@@ -3238,6 +3277,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
+						AutoLinking:       domain.AutoLinkingOptionUsername,
 						OAuthIDPTemplate: &OAuthIDPTemplate{
 							IDPID:                 "idp-id-oauth",
 							ClientID:              "client_id",
@@ -3263,6 +3303,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
+						AutoLinking:       domain.AutoLinkingOptionUsername,
 						OIDCIDPTemplate: &OIDCIDPTemplate{
 							IDPID:            "idp-id-oidc",
 							Issuer:           "issuer",
@@ -3286,6 +3327,7 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsLinkingAllowed:  true,
 						IsAutoCreation:    true,
 						IsAutoUpdate:      true,
+						AutoLinking:       domain.AutoLinkingOptionUsername,
 						JWTIDPTemplate: &JWTIDPTemplate{
 							IDPID:        "idp-id-jwt",
 							Issuer:       "issuer",
