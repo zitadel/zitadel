@@ -95,7 +95,7 @@ func prepareRoles(ctx context.Context, projectID string, projectRoleAssertion bo
 		return nil, nil
 	}
 
-	if !slices.Contains(roleAudience, projectID) {
+	if projectID != "" && !slices.Contains(roleAudience, projectID) {
 		roleAudience = append(roleAudience, projectID)
 	}
 	return roleAudience, requestedRoles
