@@ -19,7 +19,9 @@ func oidcError(err error) error {
 	if err == nil {
 		return nil
 	}
-
+	if errors.Is(err, op.ErrInvalidRefreshToken) {
+		err = zerrors.ThrowInvalidArgument(err, "OIDCS-ef2Gi", "Errors.User.RefreshToken.Invalid")
+	}
 	var (
 		sError op.StatusError
 		oError *oidc.Error
