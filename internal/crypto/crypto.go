@@ -121,6 +121,9 @@ func Hash(value []byte, alg HashAlgorithm) (*CryptoValue, error) {
 }
 
 func CompareHash(value *CryptoValue, comparer []byte, alg HashAlgorithm) error {
+	if value == nil {
+		return zerrors.ThrowPreconditionFailed(nil, "CRYPT-Zei4o", "Errors.Project.App.ClientSecretNotSet")
+	}
 	if value.Algorithm != alg.Algorithm() {
 		return zerrors.ThrowInvalidArgument(nil, "CRYPT-HF32f", "value was hashed with a different algorithm")
 	}
