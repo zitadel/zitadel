@@ -43,7 +43,6 @@ export function createHuman(username, org, accessToken){
             }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
             createHumanTrend.add(res.timings.duration);
         
-            console.log('create ',JSON.stringify(res.json()));
             const user = http.get(
                 url(`/v2beta/users/${res.json().userId}`), 
                 {
@@ -54,7 +53,6 @@ export function createHuman(username, org, accessToken){
                     }
                 }
             );
-            console.log('get by id ', JSON.stringify(user));
             resolve(user.json().user);
         }).catch((reason) => {
             reject(reason);
