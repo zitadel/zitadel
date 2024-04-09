@@ -31,7 +31,7 @@ type Hostname struct {
 type Webhook struct {
 	// Try to use webhook when identifying the machine uniquely
 	Enabled bool
-	// The Endpoint of the metadata endpoint to query
+	// The URL of the metadata endpoint to query
 	Url string
 	// (Optional) A JSONPath expression for the data to extract from the response from the metadata endpoint
 	JPath *string
