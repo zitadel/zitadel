@@ -1,9 +1,9 @@
 import { loginByUsernamePassword } from '../login_ui.js';
-import { createOrg, createMachine, addMachinePat } from '../setup.js';
+import { createOrg } from '../setup.js';
+import { createMachine, addMachinePat } from '../user.js';
 import { removeOrg } from '../teardown.js';
 import { userinfo } from '../oidc.js';
 import { Trend } from 'k6/metrics';
-import { sleep } from 'k6';
 import { Config } from '../config.js';
 
 export async function setup() {

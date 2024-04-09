@@ -1,9 +1,8 @@
 import { loginByUsernamePassword } from '../login_ui.js';
-import { createOrg, createMachine, addMachinePat, createProject, createAPI, createAppKey } from '../setup.js';
+import { createOrg, createProject, createAPI, createAppKey } from '../setup.js';
 import { removeOrg } from '../teardown.js';
-import { introspect, userinfo } from '../oidc.js';
+import { introspect } from '../oidc.js';
 import { Trend } from 'k6/metrics';
-import { sleep } from 'k6';
 import { Config } from '../config.js';
 import { b64decode } from 'k6/encoding';
 import zitadel from 'k6/x/zitadel';

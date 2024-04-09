@@ -1,5 +1,6 @@
 import { loginByUsernamePassword } from '../login_ui.js';
-import { createOrg, createHuman } from '../setup.js';
+import { createOrg} from '../setup.js';
+import { createHuman } from '../user.js';
 import { removeOrg } from '../teardown.js';
 import { userinfo } from '../oidc.js';
 import { Trend } from 'k6/metrics';
