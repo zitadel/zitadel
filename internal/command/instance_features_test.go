@@ -150,7 +150,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			},
 		},
 		{
-			name: "set Execution",
+			name: "set Actions",
 			eventstore: expectEventstore(
 				expectFilter(),
 				expectPush(
