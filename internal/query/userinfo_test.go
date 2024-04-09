@@ -341,13 +341,14 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 
 func TestQueries_GetOIDCUserinfoClientByID(t *testing.T) {
 	expQuery := regexp.QuoteMeta(oidcUserinfoClientQuery)
-	cols := []string{"client_id", "project_id", "project_role_assertion"}
+	cols := []string{"project_id", "project_role_assertion"}
 
 	tests := []struct {
-		name    string
-		mock    sqlExpectation
-		want    *OIDCUserInfoClient
-		wantErr error
+		name                     string
+		mock                     sqlExpectation
+		wantProjectID            string
+		wantProjectRoleAssertion bool
+		wantErr                  error
 	}{
 		{
 			name:    "no rows",
@@ -360,13 +361,10 @@ func TestQueries_GetOIDCUserinfoClientByID(t *testing.T) {
 			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-Ais4r", "Errors.Internal"),
 		},
 		{
-			name: "found",
-			mock: mockQuery(expQuery, cols, []driver.Value{"clientID", "projectID", true}, "instanceID", "clientID"),
-			want: &OIDCUserInfoClient{
-				ClientID:             "clientID",
-				ProjectID:            "projectID",
-				ProjectRoleAssertion: true,
-			},
+			name:                     "found",
+			mock:                     mockQuery(expQuery, cols, []driver.Value{"projectID", true}, "instanceID", "clientID"),
+			wantProjectID:            "projectID",
+			wantProjectRoleAssertion: true,
 		},
 	}
 	for _, tt := range tests {
@@ -379,9 +377,10 @@ func TestQueries_GetOIDCUserinfoClientByID(t *testing.T) {
 					},
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
-				got, err := q.GetOIDCUserinfoClientByID(ctx, "clientID")
+				gotProjectID, gotProjectRoleAssertion, err := q.GetOIDCUserinfoClientByID(ctx, "clientID")
 				require.ErrorIs(t, err, tt.wantErr)
-				assert.Equal(t, tt.want, got)
+				assert.Equal(t, tt.wantProjectID, gotProjectID)
+				assert.Equal(t, tt.wantProjectRoleAssertion, gotProjectRoleAssertion)
 			})
 		})
 	}

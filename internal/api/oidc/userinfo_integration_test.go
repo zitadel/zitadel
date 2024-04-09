@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -121,7 +122,6 @@ func testServer_UserInfo(t *testing.T) {
 				},
 			},
 		},
-		/* broken for userinfo legacy
 		{
 			name: "project role assertion",
 			prepare: func(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
@@ -139,6 +139,9 @@ func testServer_UserInfo(t *testing.T) {
 					})
 					require.NoError(t, err)
 				})
+				resp, err := Tester.Client.Mgmt.GetProjectByID(CTX, &management.GetProjectByIDRequest{Id: projectID})
+				require.NoError(t, err)
+				require.True(t, resp.GetProject().GetProjectRoleAssertion(), "project role assertion")
 
 				return getTokens(t, clientID, scope)
 			},
@@ -150,7 +153,6 @@ func testServer_UserInfo(t *testing.T) {
 				},
 			},
 		},
-		*/
 		{
 			name:    "projects roles scope",
 			prepare: getTokens,
@@ -159,6 +161,34 @@ func testServer_UserInfo(t *testing.T) {
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
 					assertProjectRoleClaims(t, projectID, ui.Claims, role)
+				},
+			},
+		},
+		{
+			name: "PAT",
+			prepare: func(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
+				user := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.OrgOwner)
+				return &oidc.Tokens[*oidc.IDTokenClaims]{
+					Token: &oauth2.Token{
+						AccessToken: user.Token,
+						TokenType:   oidc.BearerToken,
+					},
+					IDTokenClaims: &oidc.IDTokenClaims{
+						TokenClaims: oidc.TokenClaims{
+							Subject: user.ID,
+						},
+					},
+				}
+			},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				func(t *testing.T, ui *oidc.UserInfo) {
+					user := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.OrgOwner)
+					assert.Equal(t, user.ID, ui.Subject)
+					assert.Equal(t, user.PreferredLoginName, ui.PreferredUsername)
+					assert.Equal(t, user.Machine.Name, ui.Name)
+					assert.Equal(t, user.ResourceOwner, ui.Claims[oidc_api.ClaimResourceOwnerID])
+					assert.NotEmpty(t, ui.Claims[oidc_api.ClaimResourceOwnerName])
+					assert.NotEmpty(t, ui.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
 				},
 			},
 		},
