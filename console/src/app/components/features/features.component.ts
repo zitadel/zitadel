@@ -103,7 +103,6 @@ export class FeaturesComponent implements OnDestroy {
   }
 
   public validateAndSave() {
-    console.log(this.toggleStates);
     this.featureService
       .resetInstanceFeatures()
       .then(() => {
@@ -143,7 +142,6 @@ export class FeaturesComponent implements OnDestroy {
   private getFeatures(inheritance: boolean) {
     this.featureService.getInstanceFeatures(inheritance).then((instanceFeaturesResponse) => {
       this.featureData = instanceFeaturesResponse.toObject();
-
       this.toggleStates = {
         loginDefaultOrg: {
           source: this.featureData.loginDefaultOrg?.source || Source.SOURCE_SYSTEM,
