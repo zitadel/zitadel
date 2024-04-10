@@ -23,4 +23,12 @@
       <mat-checkbox formControlName="isLinkingAllowed">{{ 'IDP.OPTIONS.ISLINKINGALLOWED' | translate }}</mat-checkbox>
     </div>
   </cnsl-info-section>
+  <cnsl-info-section class="auto-reg-info">
+    <p class="checkbox-desc">{{ 'IDP.OPTIONS.AUTOLINKING_DESC' | translate }}</p>
+    <mat-select formControlName="autoLinking">
+      <mat-option *ngFor="let linkingType of linkingTypes" [value]="linkingType">
+        {{ 'IDP.OPTIONS.AUTOLINKINGTYPE.' + linkingType | translate }}
+      </mat-option>
+    </mat-select>
+  </cnsl-info-section>
 </form>

@@ -324,6 +324,12 @@ LogoutDone:
   Description: Вы успешно вышли из системы.
   LoginButtonText: вход
 
+LinkingUserPrompt:
+  Title: Существующий пользователь найден
+  Description: "Хотите ли вы связать существующую учетную запись:"
+  LinkButtonText: Связь
+  OtherButtonText: Другие варианты
+
 LinkingUsersDone:
   Title: Привязка пользователя
   Description: Привязка пользователя выполнена.
