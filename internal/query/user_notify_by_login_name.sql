@@ -4,7 +4,7 @@ WITH found_users AS (
     , u.instance_id
     , u.resource_owner
     , u.user_name
-    , IFNULL(p_custom.must_be_domain, p_default.must_be_domain) as must_be_domain
+    , COALESCE(p_custom.must_be_domain, p_default.must_be_domain) as must_be_domain
   FROM
     projections.login_names3_users u
     LEFT JOIN projections.login_names3_policies p_custom
@@ -14,15 +14,15 @@ WITH found_users AS (
       ON  u.instance_id = p_default.instance_id
       AND p_default.instance_id = $4 AND p_default.is_default IS TRUE
       AND (
-          (IFNULL(p_custom.must_be_domain, p_default.must_be_domain) IS TRUE AND u.user_name_lower = $1)
-          OR (IFNULL(p_custom.must_be_domain, p_default.must_be_domain) IS FALSE AND u.user_name_lower = $3)
+          (COALESCE(p_custom.must_be_domain, p_default.must_be_domain) IS TRUE AND u.user_name_lower = $1)
+          OR (COALESCE(p_custom.must_be_domain, p_default.must_be_domain) IS FALSE AND u.user_name_lower = $3)
       )
   JOIN
     projections.login_names3_domains d
     ON
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
-      AND CASE WHEN IFNULL(p_custom.must_be_domain, p_default.must_be_domain) THEN d.name_lower = $2 ELSE TRUE END
+      AND CASE WHEN COALESCE(p_custom.must_be_domain, p_default.must_be_domain) THEN d.name_lower = $2 ELSE TRUE END
   WHERE
     u.instance_id = $4
     AND u.user_name_lower IN (
