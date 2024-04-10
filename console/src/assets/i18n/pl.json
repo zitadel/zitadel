@@ -86,6 +86,10 @@
         "TITLE": "Ustawienia organizacji",
         "DESCRIPTION": "Dostosuj ustawienia swojej organizacji."
       },
+      "FEATURES": {
+        "TITLE": "Ustawienia funkcji",
+        "DESCRIPTION": "Odblokuj funkcje swojej instancji."
+      },
       "IDPS": {
         "TITLE": "Dostawcy tożsamości",
         "DESCRIPTION": "Utwórz i aktywuj zewnętrznych dostawców tożsamości. Wybierz znanego dostawcę lub skonfiguruj dowolnego innego dostawcę zgodnego z OIDC, OAuth lub SAML według własnego wyboru. Możesz nawet użyć istniejących tokenów JWT jako tożsamości federacyjnych, konfigurując dostawcę tożsamości JWT.",
@@ -1314,6 +1318,7 @@
     },
     "LIST": {
       "ORGS": "Organizacje",
+      "FEATURESETTINGS": "Ustawienia funkcji",
       "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",
@@ -1443,6 +1448,27 @@
       "IMPERSONATIONTITLE": "Podszywanie się",
       "IMPERSONATIONENABLED": "Zezwalaj na podszywanie się",
       "IMPERSONATIONDESCRIPTION": "To ustawienie pozwala w zasadzie na użycie personifikacji. Należy pamiętać, że osoba personifikująca potrzebuje również przypisanych odpowiednich ról `*_IMPERSONATOR`."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Domyślna Organizacja Logowania",
+      "LOGINDEFAULTORG_DESCRIPTION": "Jeśli nie ustawiono kontekstu organizacji, interfejs logowania będzie używać ustawień domyślnej organizacji (a nie instancji)",
+      "OIDCLEGACYINTROSPECTION": "Starsza Introspekcja OIDC",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Ostatnio przeprojektowaliśmy punkt końcowy introspekcji ze względów wydajnościowych. Ta funkcja może być używana do cofnięcia do starszej implementacji, jeśli wystąpią nieoczekiwane błędy.",
+      "OIDCTOKENEXCHANGE": "Wymiana Tokenów OIDC",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Włącz eksperymentalny typ grantu urn:ietf:params:oauth:grant-type:token-exchange dla punktu końcowego tokena OIDC. Wymiana tokenów może być używana do żądania tokenów o mniejszym zakresie lub podszywania się za innych użytkowników. Aby zezwolić na podszywanie się na instancji, zapoznaj się z polityką bezpieczeństwa.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Projekcje Introspekcji Wyzwalane przez OIDC",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Włącz wyzwalacze projekcji podczas żądania introspekcji. Może to stanowić obejście, jeśli w odpowiedzi introspekcji występują zauważalne problemy z spójnością, ale może mieć wpływ na wydajność. Planujemy w przyszłości usunąć wyzwalacze dla żądań introspekcji.",
+      "USERSCHEMA": "Schemat Użytkownika",
+      "USERSCHEMA_DESCRIPTION": "Schematy użytkowników umożliwiają zarządzanie schematami danych użytkowników. Jeśli flaga jest włączona, będziesz mógł korzystać z nowego interfejsu API i jego funkcji.",
+      "ACTIONS": "Akcje",
+      "ACTIONS_DESCRIPTION": "Akcje v2 umożliwiają zarządzanie wykonaniami danych i celami. Jeżeli flaga jest włączona, będziesz mógł korzystać z nowego interfejsu API i jego funkcji.",
+      "STATES": {
+        "INHERITED": "Dziedziczony",
+        "ENABLED": "Włączony",
+        "DISABLED": "Wyłączony"
+      },
+      "INHERITED_DESCRIPTION": "To ustawienie przypisuje wartość do wartości domyślnej systemu.",
+      "RESET": "Ustaw wszystko na dziedziczone"
     },
     "DIALOG": {
       "RESET": {

@@ -1,0 +1,347 @@
+<div class="feature-settings-wrapper">
+  <div class="feature-title-row">
+    <h2>{{ 'DESCRIPTIONS.SETTINGS.FEATURES.TITLE' | translate }}</h2>
+    <a
+      mat-icon-button
+      href="https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service"
+      rel="noreferrer"
+      target="_blank"
+    >
+      <mat-icon class="icon">info_outline</mat-icon>
+    </a>
+  </div>
+  <p class="events-desc cnsl-secondary-text">{{ 'DESCRIPTIONS.SETTINGS.FEATURES.DESCRIPTION' | translate }}</p>
+
+  <ng-template cnslHasRole [hasRole]="['iam.restrictions.write']">
+    <button color="warn" (click)="resetSettings()" mat-stroked-button>
+      {{ 'SETTING.FEATURES.RESET' | translate }}
+    </button>
+  </ng-template>
+
+  <cnsl-card *ngIf="toggleStates && featureData">
+    <div class="features">
+      <div class="feature-row" *ngIf="toggleStates.loginDefaultOrg">
+        <span>{{ 'SETTING.FEATURES.LOGINDEFAULTORG' | translate }}</span>
+        <div class="row">
+          <mat-button-toggle-group
+            class="theme-toggle"
+            class="buttongroup"
+            [(ngModel)]="toggleStates.loginDefaultOrg.state"
+            (change)="validateAndSave()"
+            name="displayview"
+            aria-label="Display View"
+          >
+            <mat-button-toggle [value]="ToggleState.INHERITED">
+              <div class="toggle-row">
+                <span>{{ 'SETTING.FEATURES.STATES.INHERITED' | translate }}</span>
+                <i
+                  class="info-i las la-question-circle"
+                  matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
+                ></i>
+                <div
+                  *ngIf="
+                    !!featureData.loginDefaultOrg?.enabled &&
+                    (featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM ||
+                      featureData.loginDefaultOrg?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot enabled"
+                ></div>
+                <div
+                  *ngIf="
+                    !featureData.loginDefaultOrg?.enabled &&
+                    (featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM ||
+                      featureData.loginDefaultOrg?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot disabled"
+                ></div>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.DISABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.ENABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        <cnsl-info-section class="feature-info">{{
+          'SETTING.FEATURES.LOGINDEFAULTORG_DESCRIPTION' | translate
+        }}</cnsl-info-section>
+      </div>
+
+      <div class="feature-row" *ngIf="toggleStates.oidcLegacyIntrospection">
+        <span>{{ 'SETTING.FEATURES.OIDCLEGACYINTROSPECTION' | translate }}</span>
+        <div class="row">
+          <mat-button-toggle-group
+            class="theme-toggle"
+            class="buttongroup"
+            [(ngModel)]="toggleStates.oidcLegacyIntrospection.state"
+            (change)="validateAndSave()"
+            name="displayview"
+            aria-label="Display View"
+          >
+            <mat-button-toggle [value]="ToggleState.INHERITED">
+              <div class="toggle-row">
+                <span>{{ 'SETTING.FEATURES.STATES.INHERITED' | translate }}</span>
+                <i
+                  class="info-i las la-question-circle"
+                  matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
+                ></i>
+                <div
+                  *ngIf="
+                    !!featureData.oidcLegacyIntrospection?.enabled &&
+                    (featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcLegacyIntrospection?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot enabled"
+                ></div>
+                <div
+                  *ngIf="
+                    !featureData.oidcLegacyIntrospection?.enabled &&
+                    (featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcLegacyIntrospection?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot disabled"
+                ></div>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.DISABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.ENABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <cnsl-info-section class="feature-info">{{
+          'SETTING.FEATURES.OIDCLEGACYINTROSPECTION_DESCRIPTION' | translate
+        }}</cnsl-info-section>
+      </div>
+
+      <div class="feature-row" *ngIf="toggleStates.oidcTokenExchange">
+        <span>{{ 'SETTING.FEATURES.OIDCTOKENEXCHANGE' | translate }}</span>
+        <div class="row">
+          <mat-button-toggle-group
+            class="theme-toggle"
+            class="buttongroup"
+            [(ngModel)]="toggleStates.oidcTokenExchange.state"
+            (change)="validateAndSave()"
+            name="displayview"
+            aria-label="Display View"
+          >
+            <mat-button-toggle [value]="ToggleState.INHERITED">
+              <div class="toggle-row">
+                <span>{{ 'SETTING.FEATURES.STATES.INHERITED' | translate }}</span>
+                <i
+                  class="info-i las la-question-circle"
+                  matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
+                ></i>
+                <div
+                  *ngIf="
+                    !!featureData.oidcTokenExchange?.enabled &&
+                    (featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTokenExchange?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot enabled"
+                ></div>
+                <div
+                  *ngIf="
+                    !featureData.oidcTokenExchange?.enabled &&
+                    (featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTokenExchange?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot disabled"
+                ></div>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.DISABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.ENABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <cnsl-info-section class="feature-info">{{
+          'SETTING.FEATURES.OIDCTOKENEXCHANGE_DESCRIPTION' | translate
+        }}</cnsl-info-section>
+      </div>
+
+      <div class="feature-row" *ngIf="toggleStates.oidcTriggerIntrospectionProjections">
+        <span>{{ 'SETTING.FEATURES.OIDCTRIGGERINTROSPECTIONPROJECTIONS' | translate }}</span>
+        <div class="row">
+          <mat-button-toggle-group
+            class="theme-toggle"
+            class="buttongroup"
+            [(ngModel)]="toggleStates.oidcTriggerIntrospectionProjections.state"
+            (change)="validateAndSave()"
+            name="displayview"
+            aria-label="Display View"
+          >
+            <mat-button-toggle [value]="ToggleState.INHERITED">
+              <div class="toggle-row">
+                <span>{{ 'SETTING.FEATURES.STATES.INHERITED' | translate }}</span>
+                <i
+                  class="info-i las la-question-circle"
+                  matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
+                ></i>
+                <div
+                  *ngIf="
+                    !!featureData.oidcTriggerIntrospectionProjections?.enabled &&
+                    (featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot enabled"
+                ></div>
+                <div
+                  *ngIf="
+                    !featureData.oidcTriggerIntrospectionProjections?.enabled &&
+                    (featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot disabled"
+                ></div>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.DISABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.ENABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <cnsl-info-section class="feature-info">{{
+          'SETTING.FEATURES.OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION' | translate
+        }}</cnsl-info-section>
+      </div>
+
+      <div class="feature-row" *ngIf="toggleStates.userSchema">
+        <span>{{ 'SETTING.FEATURES.USERSCHEMA' | translate }}</span>
+        <div class="row">
+          <mat-button-toggle-group
+            class="theme-toggle"
+            class="buttongroup"
+            [(ngModel)]="toggleStates.userSchema.state"
+            (change)="validateAndSave()"
+            name="displayview"
+            aria-label="Display View"
+          >
+            <mat-button-toggle [value]="ToggleState.INHERITED">
+              <div class="toggle-row">
+                <span>{{ 'SETTING.FEATURES.STATES.INHERITED' | translate }}</span>
+                <i
+                  class="info-i las la-question-circle"
+                  matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
+                ></i>
+                <div
+                  *ngIf="
+                    !!featureData.userSchema?.enabled &&
+                    (featureData.userSchema?.source === Source.SOURCE_SYSTEM ||
+                      featureData.userSchema?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot enabled"
+                ></div>
+                <div
+                  *ngIf="
+                    !featureData.userSchema?.enabled &&
+                    (featureData.userSchema?.source === Source.SOURCE_SYSTEM ||
+                      featureData.userSchema?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot disabled"
+                ></div>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.DISABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.ENABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <cnsl-info-section class="feature-info">{{
+          'SETTING.FEATURES.USERSCHEMA_DESCRIPTION' | translate
+        }}</cnsl-info-section>
+      </div>
+
+      <div class="feature-row" *ngIf="toggleStates.actions">
+        <span>{{ 'SETTING.FEATURES.ACTIONS' | translate }}</span>
+        <div class="row">
+          <mat-button-toggle-group
+            class="theme-toggle"
+            class="buttongroup"
+            [(ngModel)]="toggleStates.actions.state"
+            (change)="validateAndSave()"
+            name="displayview"
+            aria-label="Display View"
+          >
+            <mat-button-toggle [value]="ToggleState.INHERITED">
+              <div class="toggle-row">
+                <span>{{ 'SETTING.FEATURES.STATES.INHERITED' | translate }}</span>
+                <i
+                  class="info-i las la-question-circle"
+                  matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
+                ></i>
+                <div
+                  *ngIf="
+                    !!featureData.actions?.enabled &&
+                    (featureData.actions?.source === Source.SOURCE_SYSTEM ||
+                      featureData.actions?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot enabled"
+                ></div>
+                <div
+                  *ngIf="
+                    !featureData.actions?.enabled &&
+                    (featureData.actions?.source === Source.SOURCE_SYSTEM ||
+                      featureData.actions?.source === Source.SOURCE_UNSPECIFIED)
+                  "
+                  class="current-dot disabled"
+                ></div>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.DISABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+            <mat-button-toggle [value]="ToggleState.ENABLED">
+              <div class="toggle-row">
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+              </div>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <cnsl-info-section class="feature-info">{{ 'SETTING.FEATURES.ACTIONS_DESCRIPTION' | translate }}</cnsl-info-section>
+      </div>
+    </div>
+  </cnsl-card>
+</div>
+
+<ng-template #sourceLabel let-source="source" let-last="last">
+  <span class="state" *ngIf="source === Source.SOURCE_SYSTEM">
+    {{ 'SETTING.FEATURES.SOURCE.' + source | translate }}
+  </span>
+</ng-template>
