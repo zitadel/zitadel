@@ -1,6 +1,7 @@
 {
   "instance_id": "239520764275982338",
   "app_id": "239520764276441090",
+  "state": 1,
   "client_id": "239520764779364354@zitadel",
   "client_secret": null,
   "redirect_uris": [
@@ -23,7 +24,7 @@
   "clock_skew": 0,
   "additional_origins": null,
   "project_id": "239520764276178946",
-  "state": 1,
+  "project_role_assertion": false,
   "project_role_keys": null,
   "public_keys": null,
   "settings": null

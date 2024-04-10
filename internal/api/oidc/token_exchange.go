@@ -216,7 +216,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	)
 	if slices.Contains(scopes, oidc.ScopeOpenID) || tokenType == oidc.JWTTokenType || tokenType == oidc.IDTokenType {
 		projectID := client.client.ProjectID
-		userInfo, err = s.userInfo(ctx, subjectToken.userID, projectID, scopes, []string{projectID})
+		userInfo, err = s.userInfo(ctx, subjectToken.userID, projectID, client.client.ProjectRoleAssertion, scopes, []string{projectID})
 		if err != nil {
 			return nil, err
 		}

@@ -61,6 +61,10 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemActionsEventType, true,
+					)),
 				),
 			),
 			want: &SystemFeatures{
@@ -83,6 +87,10 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					Level: feature.LevelSystem,
 					Value: false,
 				},
+				Actions: FeatureSource[bool]{
+					Level: feature.LevelSystem,
+					Value: true,
+				},
 			},
 		},
 		{
@@ -104,6 +112,10 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					eventFromEventPusher(feature_v2.NewSetEvent[bool](
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
+					)),
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemActionsEventType, false,
 					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						context.Background(), aggregate,
@@ -132,6 +144,10 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					Value: false,
 				},
 				UserSchema: FeatureSource[bool]{
+					Level: feature.LevelUnspecified,
+					Value: false,
+				},
+				Actions: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},
@@ -157,6 +173,10 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemUserSchemaEventType, false,
 					)),
+					eventFromEventPusher(feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemActionsEventType, false,
+					)),
 					eventFromEventPusher(feature_v2.NewResetEvent(
 						context.Background(), aggregate,
 						feature_v2.SystemResetEventType,
@@ -184,6 +204,10 @@ func TestQueries_GetSystemFeatures(t *testing.T) {
 					Value: false,
 				},
 				UserSchema: FeatureSource[bool]{
+					Level: feature.LevelUnspecified,
+					Value: false,
+				},
+				Actions: FeatureSource[bool]{
 					Level: feature.LevelUnspecified,
 					Value: false,
 				},

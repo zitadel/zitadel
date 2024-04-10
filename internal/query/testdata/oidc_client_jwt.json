@@ -1,6 +1,7 @@
 {
   "instance_id": "230690539048009730",
   "app_id": "236647088211886082",
+  "state": 1,
   "client_id": "236647088211951618@tests",
   "client_secret": null,
   "redirect_uris": ["http://localhost:9999/auth/callback"],
@@ -17,7 +18,7 @@
   "clock_skew": 1000000000,
   "additional_origins": ["https://example.com"],
   "project_id": "236645808328409090",
-  "state": 1,
+  "project_role_assertion": true,
   "project_role_keys": ["role1", "role2"],
   "public_keys": {
     "236647201860747266": "LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tCk1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFB\nT0NBUThBTUlJQkNnS0NBUUVBMnVmQUwxYjcyYkl5MWFyK1dzNmIKR29oSkpRRkI3ZGZSYXBEcWVx\nTThVa3A2Q1ZkUHpxL3BPejF2aUFxNTB5eldaSnJ5Risyd3NoRkFLR0Y5QTIvQgoyWWY5YkpYUFov\nS2JrRnJZVDNOVHZZRGt2bGFTVGw5bU1uenJVMjlzNDhGMVBUV0tmQitDM2FNc09FRzFCdWZWCnM2\nM3FGNG5yRVBqU2JobGpJY285RlpxNFhwcEl6aE1RMGZEZEEvK1h5Z0NKcXZ1YUwwTGliTTFLcmxV\nZG51NzEKWWVraFNKakVQbnZPaXNYSWs0SVh5d29HSU93dGp4a0R2Tkl0UXZhTVZsZHI0L2tiNnV2\nYmdkV3dxNUV3QlpYcQpsb3cya3lKb3YzOFY0VWsySThrdVhwTGNucnB3NVRpbzJvb2lVRTI3YjB2\nSFpxQktPZWk5VW84OHFDcm4zRUt4CjZRSURBUUFCCi0tLS0tRU5EIFJTQSBQVUJMSUMgS0VZLS0t\nLS0K"

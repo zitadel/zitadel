@@ -10,6 +10,7 @@ const (
 	KeyLegacyIntrospection
 	KeyUserSchema
 	KeyTokenExchange
+	KeyActions
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -31,4 +32,5 @@ type Features struct {
 	LegacyIntrospection             bool `json:"legacy_introspection,omitempty"`
 	UserSchema                      bool `json:"user_schema,omitempty"`
 	TokenExchange                   bool `json:"token_exchange,omitempty"`
+	Actions                         bool `json:"actions,omitempty"`
 }

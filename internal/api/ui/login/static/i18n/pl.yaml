@@ -325,6 +325,12 @@ LogoutDone:
   Description: Wylogowano pomyślnie.
   LoginButtonText: Zaloguj się
 
+LinkingUserPrompt:
+  Title: Znaleziono istniejącego użytkownika
+  Description: "Czy chcesz połączyć swoje istniejące konto:"
+  LinkButtonText: Połączyć
+  OtherButtonText: Inne opcje
+
 LinkingUsersDone:
   Title: Łączenie użytkowników
   Description: Łączenie użytkowników zakończone pomyślnie.

@@ -156,6 +156,10 @@ func (p *Provider) GetSP() (*samlsp.Middleware, error) {
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "SAML-qee09ffuq5", "Errors.Intent.IDPInvalid")
 	}
+	// the library uses transient as default, which we currently can't handle (https://github.com/zitadel/zitadel/discussions/7421)
+	// for the moment we'll use persistent (for those who actually use it from the saml request) and add an option
+	// later on to specify on the provider: https://github.com/zitadel/zitadel/issues/7743
+	sp.ServiceProvider.AuthnNameIDFormat = saml.PersistentNameIDFormat
 	if p.requestTracker != nil {
 		sp.RequestTracker = p.requestTracker
 	}
