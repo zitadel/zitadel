@@ -1461,14 +1461,15 @@
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "イントロスペクション要求中にプロジェクショントリガーを有効にします。これは、イントロスペクションレスポンスに顕著な整合性問題がある場合の回避策として機能しますが、パフォーマンスに影響を与える可能性があります。今後、イントロスペクション要求のトリガーを削除する予定です。",
       "USERSCHEMA": "ユーザー スキーマ",
       "USERSCHEMA_DESCRIPTION": "ユーザー スキーマを使用すると、ユーザーのデータスキーマを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
-      "SOURCE": {
-        "2": "System",
-        "3": "Instance",
-        "4": "Organization",
-        "5": "Project",
-        "6": "App",
-        "7": "User"
-      }
+      "ACTIONS": "アクション",
+      "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "STATES": {
+        "INHERITED": "継承",
+        "ENABLED": "有効",
+        "DISABLED": "無効"
+      },
+      "INHERITED_DESCRIPTION": "この設定は、値をシステムのデフォルト値に設定します。",
+      "RESET": "すべて継承に設定"
     },
     "DIALOG": {
       "RESET": {

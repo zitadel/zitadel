@@ -1460,14 +1460,15 @@
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Aktivieren Sie Projektionstrigger während einer Introspektionsanfrage. Dies kann als Workaround fungieren, wenn bemerkbare Konsistenzprobleme in der Introspektionsantwort auftreten, kann sich jedoch auf die Leistung auswirken. Wir planen, Trigger für Introspektionsanfragen in Zukunft zu entfernen.",
       "USERSCHEMA": "Benutzerschema",
       "USERSCHEMA_DESCRIPTION": "Benutzerschemata ermöglichen das Verwalten von Datenschemata von Benutzern. Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
-      "SOURCE": {
-        "2": "System",
-        "3": "Instance",
-        "4": "Organization",
-        "5": "Project",
-        "6": "App",
-        "7": "User"
-      }
+      "ACTIONS": "Aktionen",
+      "ACTIONS_DESCRIPTION": "Aktionen v2 ermöglichen die Verwaltung von Datenausführungen und Zielen. Wenn das Flag aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
+      "STATES": {
+        "INHERITED": "Erben",
+        "ENABLED": "Aktiviert",
+        "DISABLED": "Deaktiviert"
+      },
+      "INHERITED_DESCRIPTION": "Diese Einstellung setzt den Wert auf den Standardwert des Systems.",
+      "RESET": "Alle auf Erben setzen"
     },
     "DIALOG": {
       "RESET": {

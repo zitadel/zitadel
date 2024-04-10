@@ -1462,14 +1462,15 @@
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Habilita gatilhos de projeção durante uma solicitação de introspecção. Isso pode funcionar como uma solução alternativa se houver problemas de consistência perceptíveis na resposta de introspecção, mas pode impactar o desempenho. Planejamos remover gatilhos para solicitações de introspecção no futuro.",
       "USERSCHEMA": "Esquema de Usuário",
       "USERSCHEMAS_DESCRIPTION": "Esquemas de Usuário permitem gerenciar esquemas de dados do usuário. Se o sinalizador estiver ativado, você poderá usar a nova API e seus recursos.",
-      "SOURCE": {
-        "2": "System",
-        "3": "Instance",
-        "4": "Organization",
-        "5": "Project",
-        "6": "App",
-        "7": "User"
-      }
+      "ACTIONS": "Ações",
+      "ACTIONS_DESCRIPTION": "Actions v2 permitem gerenciar execuções e destinos de dados. Se a flag estiver habilitada, você poderá usar a nova API e seus recursos.",
+      "STATES": {
+        "INHERITED": "Herdade",
+        "ENABLED": "Habilitado",
+        "DISABLED": "Desabilitado"
+      },
+      "INHERITED_DESCRIPTION": "Essa configuração define o valor para o padrão do sistema.",
+      "RESET": "Definir tudo para herdar"
     },
     "DIALOG": {
       "RESET": {

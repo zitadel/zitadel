@@ -24,6 +24,22 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { FeatureService } from 'src/app/services/feature.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+enum ToggleState {
+  ENABLED = 'ENABLED',
+  DISABLED = 'DISABLED',
+  INHERITED = 'INHERITED',
+}
+
+type FeatureState = { source: Source; state: ToggleState };
+type ToggleStates = {
+  loginDefaultOrg?: FeatureState;
+  oidcTriggerIntrospectionProjections?: FeatureState;
+  oidcLegacyIntrospection?: FeatureState;
+  userSchema?: FeatureState;
+  oidcTokenExchange?: FeatureState;
+  actions?: FeatureState;
+};
+
 @Component({
   imports: [
     CommonModule,
@@ -49,7 +65,11 @@ export class FeaturesComponent implements OnDestroy {
 
   public _loading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public featureData: GetInstanceFeaturesResponse.AsObject | undefined = undefined;
+
+  public toggleStates: ToggleStates | undefined = undefined;
   public Source: any = Source;
+  public ToggleState: any = ToggleState;
+
   constructor(
     private featureService: FeatureService,
     private breadcrumbService: BreadcrumbService,
@@ -82,9 +102,104 @@ export class FeaturesComponent implements OnDestroy {
     });
   }
 
+  public validateAndSave() {
+    console.log(this.toggleStates);
+    this.featureService
+      .resetInstanceFeatures()
+      .then(() => {
+        const req = new SetInstanceFeaturesRequest();
+
+        if (this.toggleStates?.loginDefaultOrg?.state !== ToggleState.INHERITED) {
+          req.setLoginDefaultOrg(this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED);
+        }
+        if (this.toggleStates?.oidcTriggerIntrospectionProjections?.state !== ToggleState.INHERITED) {
+          req.setOidcTriggerIntrospectionProjections(
+            this.toggleStates?.oidcTriggerIntrospectionProjections?.state === ToggleState.ENABLED,
+          );
+        }
+        if (this.toggleStates?.oidcLegacyIntrospection?.state !== ToggleState.INHERITED) {
+          req.setOidcLegacyIntrospection(this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED);
+        }
+        if (this.toggleStates?.userSchema?.state !== ToggleState.INHERITED) {
+          req.setUserSchema(this.toggleStates?.userSchema?.state === ToggleState.ENABLED);
+        }
+        if (this.toggleStates?.oidcTokenExchange?.state !== ToggleState.INHERITED) {
+          req.setOidcTokenExchange(this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED);
+        }
+        if (this.toggleStates?.actions?.state !== ToggleState.INHERITED) {
+          req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
+        }
+
+        return this.featureService.setInstanceFeatures(req);
+      })
+      .then(() => {
+        this.toast.showInfo('POLICY.TOAST.SET', true);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
   private getFeatures(inheritance: boolean) {
     this.featureService.getInstanceFeatures(inheritance).then((instanceFeaturesResponse) => {
       this.featureData = instanceFeaturesResponse.toObject();
+
+      this.toggleStates = {
+        loginDefaultOrg: {
+          source: this.featureData.loginDefaultOrg?.source || Source.SOURCE_SYSTEM,
+          state:
+            this.featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM
+              ? ToggleState.INHERITED
+              : !!this.featureData.loginDefaultOrg?.enabled
+                ? ToggleState.ENABLED
+                : ToggleState.DISABLED,
+        },
+        oidcTriggerIntrospectionProjections: {
+          source: this.featureData.oidcTriggerIntrospectionProjections?.source || Source.SOURCE_SYSTEM,
+          state:
+            this.featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM
+              ? ToggleState.INHERITED
+              : !!this.featureData.oidcTriggerIntrospectionProjections?.enabled
+                ? ToggleState.ENABLED
+                : ToggleState.DISABLED,
+        },
+        oidcLegacyIntrospection: {
+          source: this.featureData.oidcLegacyIntrospection?.source || Source.SOURCE_SYSTEM,
+          state:
+            this.featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM
+              ? ToggleState.INHERITED
+              : !!this.featureData.oidcLegacyIntrospection?.enabled
+                ? ToggleState.ENABLED
+                : ToggleState.DISABLED,
+        },
+        userSchema: {
+          source: this.featureData.userSchema?.source || Source.SOURCE_SYSTEM,
+          state:
+            this.featureData.userSchema?.source === Source.SOURCE_SYSTEM
+              ? ToggleState.INHERITED
+              : !!this.featureData.userSchema?.enabled
+                ? ToggleState.ENABLED
+                : ToggleState.DISABLED,
+        },
+        oidcTokenExchange: {
+          source: this.featureData.oidcTokenExchange?.source || Source.SOURCE_SYSTEM,
+          state:
+            this.featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM
+              ? ToggleState.INHERITED
+              : !!this.featureData.oidcTokenExchange?.enabled
+                ? ToggleState.ENABLED
+                : ToggleState.DISABLED,
+        },
+        actions: {
+          source: Source.SOURCE_SYSTEM,
+          state:
+            this.featureData.actions?.source === Source.SOURCE_SYSTEM
+              ? ToggleState.INHERITED
+              : !!this.featureData.actions?.enabled
+                ? ToggleState.ENABLED
+                : ToggleState.DISABLED,
+        },
+      };
     });
   }
 

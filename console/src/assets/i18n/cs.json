@@ -1461,14 +1461,15 @@
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Povolit spouštěče projekcí během požadavku na introspekci. To může sloužit jako obcházení, pokud existují zjevné problémy s konzistencí v odpovědi na introspekci, ale může to mít vliv na výkon. Plánujeme odstranit spouštěče pro požadavky na introspekci v budoucnosti.",
       "USERSCHEMA": "Schéma uživatele",
       "USERSCHEMA_DESCRIPTION": "Schémata uživatelů umožňují spravovat datová schémata uživatelů. Pokud je příznak povolen, budete moci používat nové API a jeho funkce.",
-      "SOURCE": {
-        "2": "System",
-        "3": "Instance",
-        "4": "Organization",
-        "5": "Project",
-        "6": "App",
-        "7": "User"
-      }
+      "ACTIONS": "Akce",
+      "ACTIONS_DESCRIPTION": "Akce v2 umožňují správu datových provedení a cílů. Pokud je tento příznak povolen, budete moci používat nové API a jeho funkce.",
+      "STATES": {
+        "INHERITED": "Děděno",
+        "ENABLED": "Povoleno",
+        "DISABLED": "Zakázáno"
+      },
+      "INHERITED_DESCRIPTION": "Toto nastavení nastaví hodnotu na výchozí hodnotu systému.",
+      "RESET": "Nastavit vše na děděné"
     },
     "DIALOG": {
       "RESET": {

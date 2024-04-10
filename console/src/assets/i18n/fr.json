@@ -1460,14 +1460,15 @@
       "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Activez les déclencheurs de projection lors d'une demande d'introspection. Cela peut agir comme un contournement s'il existe des problèmes de cohérence perceptibles dans la réponse à l'introspection, mais cela peut avoir un impact sur les performances. Nous prévoyons de supprimer les déclencheurs pour les demandes d'introspection à l'avenir.",
       "USERSCHEMA": "Schéma utilisateur",
       "USERSCHEMA_DESCRIPTION": "Les schémas utilisateur permettent de gérer les schémas de données des utilisateurs. Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
-      "SOURCE": {
-        "2": "System",
-        "3": "Instance",
-        "4": "Organization",
-        "5": "Project",
-        "6": "App",
-        "7": "User"
-      }
+      "ACTIONS": "Actions",
+      "ACTIONS_DESCRIPTION": "Les actions v2 permettent de gérer les exécutions et les cibles de données. Si l'indicateur est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
+      "STATES": {
+        "INHERITED": "Hérité",
+        "ENABLED": "Activé",
+        "DISABLED": "Désactivé"
+      },
+      "INHERITED_DESCRIPTION": "Ce paramètre définit la valeur par défaut du système.",
+      "RESET": "Réinitialiser tout sur hérité"
     },
     "DIALOG": {
       "RESET": {
