@@ -73,6 +73,8 @@
 @import 'src/app/modules/create-layout/create-layout.component.scss';
 @import 'src/app/modules/domains/domain-verification/domain-verification.component.scss';
 @import './styles/codemirror.scss';
+@import 'src/app/components/copy-row/copy-row.component.scss';
+@import 'src/app/modules/providers/provider-next/provider-next.component.scss';
 
 @mixin component-themes($theme) {
   @include cnsl-color-theme($theme);
@@ -149,4 +151,6 @@
   @include contact-theme($theme);
   @include app-integrate-theme($theme);
   @include domain-verification-theme($theme);
+  @include copy-row-theme($theme);
+  @include provider-next-theme($theme);
 }

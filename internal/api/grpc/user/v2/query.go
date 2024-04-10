@@ -101,6 +101,7 @@ func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
 			Phone:      string(userQ.Phone),
 			IsVerified: userQ.IsPhoneVerified,
 		},
+		PasswordChangeRequired: userQ.PasswordChangeRequired,
 	}
 }
 
@@ -108,7 +109,7 @@ func machineToPb(userQ *query.Machine) *user.MachineUser {
 	return &user.MachineUser{
 		Name:            userQ.Name,
 		Description:     userQ.Description,
-		HasSecret:       userQ.Secret != nil,
+		HasSecret:       userQ.EncodedSecret != "",
 		AccessTokenType: accessTokenTypeToPb(userQ.AccessTokenType),
 	}
 }

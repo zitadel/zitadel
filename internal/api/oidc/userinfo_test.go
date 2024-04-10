@@ -17,9 +17,10 @@ import (
 
 func Test_prepareRoles(t *testing.T) {
 	type args struct {
-		projectID    string
-		scope        []string
-		roleAudience []string
+		projectID            string
+		projectRoleAssertion bool
+		scope                []string
+		roleAudience         []string
 	}
 	tests := []struct {
 		name               string
@@ -30,19 +31,32 @@ func Test_prepareRoles(t *testing.T) {
 		{
 			name: "empty scope and roleAudience",
 			args: args{
-				projectID:    "projID",
-				scope:        nil,
-				roleAudience: nil,
+				projectID:            "projID",
+				projectRoleAssertion: false,
+				scope:                nil,
+				roleAudience:         nil,
 			},
 			wantRa:             nil,
 			wantRequestedRoles: nil,
 		},
 		{
+			name: "project role assertion",
+			args: args{
+				projectID:            "projID",
+				projectRoleAssertion: true,
+				scope:                nil,
+				roleAudience:         nil,
+			},
+			wantRa:             []string{"projID"},
+			wantRequestedRoles: []string{},
+		},
+		{
 			name: "some scope and roleAudience",
 			args: args{
-				projectID:    "projID",
-				scope:        []string{"openid", "profile"},
-				roleAudience: []string{"project2"},
+				projectID:            "projID",
+				projectRoleAssertion: false,
+				scope:                []string{"openid", "profile"},
+				roleAudience:         []string{"project2"},
 			},
 			wantRa:             []string{"project2", "projID"},
 			wantRequestedRoles: []string{},
@@ -50,9 +64,10 @@ func Test_prepareRoles(t *testing.T) {
 		{
 			name: "scope projects roles",
 			args: args{
-				projectID:    "projID",
-				scope:        []string{ScopeProjectsRoles, domain.ProjectIDScope + "project2" + domain.AudSuffix},
-				roleAudience: nil,
+				projectID:            "projID",
+				projectRoleAssertion: false,
+				scope:                []string{ScopeProjectsRoles, domain.ProjectIDScope + "project2" + domain.AudSuffix},
+				roleAudience:         nil,
 			},
 			wantRa:             []string{"project2", "projID"},
 			wantRequestedRoles: []string{},
@@ -60,9 +75,10 @@ func Test_prepareRoles(t *testing.T) {
 		{
 			name: "scope project role prefix",
 			args: args{
-				projectID:    "projID",
-				scope:        []string{"openid", "profile", ScopeProjectRolePrefix + "foo", ScopeProjectRolePrefix + "bar"},
-				roleAudience: nil,
+				projectID:            "projID",
+				projectRoleAssertion: false,
+				scope:                []string{"openid", "profile", ScopeProjectRolePrefix + "foo", ScopeProjectRolePrefix + "bar"},
+				roleAudience:         nil,
 			},
 			wantRa:             []string{"projID"},
 			wantRequestedRoles: []string{"foo", "bar"},
@@ -70,7 +86,7 @@ func Test_prepareRoles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRa, gotRequestedRoles := prepareRoles(context.Background(), tt.args.projectID, tt.args.scope, tt.args.roleAudience)
+			gotRa, gotRequestedRoles := prepareRoles(context.Background(), tt.args.projectID, tt.args.projectRoleAssertion, tt.args.scope, tt.args.roleAudience)
 			assert.Equal(t, tt.wantRa, gotRa, "roleAudience")
 			assert.Equal(t, tt.wantRequestedRoles, gotRequestedRoles, "requestedRoles")
 		})

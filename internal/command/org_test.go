@@ -1260,7 +1260,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 	type fields struct {
 		eventstore   func(t *testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
-		newCode      cryptoCodeFunc
+		newCode      encrypedCodeFunc
 		keyAlgorithm crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -1437,7 +1437,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID"),
-				newCode:     mockCode("userinit", time.Hour),
+				newCode:     mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
@@ -1616,7 +1616,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID", "tokenID"),
-				newCode:      mockCode("userinit", time.Hour),
+				newCode:      mockEncryptedCode("userinit", time.Hour),
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -1669,10 +1669,10 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:   tt.fields.eventstore(t),
-				idGenerator:  tt.fields.idGenerator,
-				newCode:      tt.fields.newCode,
-				keyAlgorithm: tt.fields.keyAlgorithm,
+				eventstore:       tt.fields.eventstore(t),
+				idGenerator:      tt.fields.idGenerator,
+				newEncryptedCode: tt.fields.newCode,
+				keyAlgorithm:     tt.fields.keyAlgorithm,
 				zitadelRoles: []authz.RoleMapping{
 					{
 						Role: domain.RoleOrgOwner,

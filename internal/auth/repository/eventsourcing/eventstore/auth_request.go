@@ -75,7 +75,7 @@ type loginPolicyViewProvider interface {
 }
 
 type lockoutPolicyViewProvider interface {
-	LockoutPolicyByOrg(context.Context, bool, string, bool) (*query.LockoutPolicy, error)
+	LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error)
 }
 
 type idpProviderViewProvider interface {
@@ -366,6 +366,7 @@ func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
 		},
 		Default:             policy.IsDefault,
 		MaxPasswordAttempts: policy.MaxPasswordAttempts,
+		MaxOTPAttempts:      policy.MaxOTPAttempts,
 		ShowLockOutFailures: policy.ShowFailures,
 	}
 }
@@ -912,11 +913,11 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 		IgnoreUnknownUsernames:     policy.IgnoreUnknownUsernames,
 		AllowDomainDiscovery:       policy.AllowDomainDiscovery,
 		DefaultRedirectURI:         policy.DefaultRedirectURI,
-		PasswordCheckLifetime:      policy.PasswordCheckLifetime,
-		ExternalLoginCheckLifetime: policy.ExternalLoginCheckLifetime,
-		MFAInitSkipLifetime:        policy.MFAInitSkipLifetime,
-		SecondFactorCheckLifetime:  policy.SecondFactorCheckLifetime,
-		MultiFactorCheckLifetime:   policy.MultiFactorCheckLifetime,
+		PasswordCheckLifetime:      time.Duration(policy.PasswordCheckLifetime),
+		ExternalLoginCheckLifetime: time.Duration(policy.ExternalLoginCheckLifetime),
+		MFAInitSkipLifetime:        time.Duration(policy.MFAInitSkipLifetime),
+		SecondFactorCheckLifetime:  time.Duration(policy.SecondFactorCheckLifetime),
+		MultiFactorCheckLifetime:   time.Duration(policy.MultiFactorCheckLifetime),
 		DisableLoginWithEmail:      policy.DisableLoginWithEmail,
 		DisableLoginWithPhone:      policy.DisableLoginWithPhone,
 	}
@@ -1281,7 +1282,7 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 }
 
 func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*query.LockoutPolicy, error) {
-	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID, false)
+	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
 	}

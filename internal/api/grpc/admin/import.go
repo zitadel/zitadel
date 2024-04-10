@@ -292,7 +292,7 @@ func getFileFromGCS(ctx context.Context, input *admin_pb.ImportDataRequest_GCSIn
 	return ioutil.ReadAll(reader)
 }
 
-func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, ctxData authz.CtxData, org *admin_pb.DataOrg, success *admin_pb.ImportDataSuccess, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator crypto.Generator) error {
+func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, ctxData authz.CtxData, org *admin_pb.DataOrg, success *admin_pb.ImportDataSuccess, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator) error {
 	_, err := s.command.AddOrgWithID(ctx, org.GetOrg().GetName(), ctxData.UserID, ctxData.ResourceOwner, org.GetOrgId(), []string{})
 	if err != nil {
 		*errors = append(*errors, &admin_pb.ImportDataError{Type: "org", Id: org.GetOrgId(), Message: err.Error()})
@@ -325,7 +325,7 @@ func importOrg1(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataEr
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "domain_policy", Id: org.GetOrgId(), Message: err.Error()})
 		}
 	}
-	return importResources(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator)
+	return importResources(ctx, s, errors, successOrg, org, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 }
 
 func importLabelPolicy(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, org *admin_pb.DataOrg) error {
@@ -584,13 +584,13 @@ func importProjects(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	return nil
 }
 
-func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, appSecretGenerator crypto.Generator) error {
+func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
 	if org.OidcApps == nil {
 		return nil
 	}
 	for _, app := range org.GetOidcApps() {
 		logging.Debugf("import oidcapplication: %s", app.GetAppId())
-		_, err := s.command.AddOIDCApplicationWithID(ctx, management.AddOIDCAppRequestToDomain(app.App), org.GetOrgId(), app.GetAppId(), appSecretGenerator)
+		_, err := s.command.AddOIDCApplicationWithID(ctx, management.AddOIDCAppRequestToDomain(app.App), org.GetOrgId(), app.GetAppId())
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "oidc_app", Id: app.GetAppId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -605,13 +605,13 @@ func importOIDCApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDa
 	return nil
 }
 
-func importAPIApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, appSecretGenerator crypto.Generator) error {
+func importAPIApps(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts) error {
 	if org.ApiApps == nil {
 		return nil
 	}
 	for _, app := range org.GetApiApps() {
 		logging.Debugf("import apiapplication: %s", app.GetAppId())
-		_, err := s.command.AddAPIApplicationWithID(ctx, management.AddAPIAppRequestToDomain(app.GetApp()), org.GetOrgId(), app.GetAppId(), appSecretGenerator)
+		_, err := s.command.AddAPIApplicationWithID(ctx, management.AddAPIAppRequestToDomain(app.GetApp()), org.GetOrgId(), app.GetAppId())
 		if err != nil {
 			*errors = append(*errors, &admin_pb.ImportDataError{Type: "api_app", Id: app.GetAppId(), Message: err.Error()})
 			if isCtxTimeout(ctx) {
@@ -700,7 +700,7 @@ func importProjectRoles(ctx context.Context, s *Server, errors *[]*admin_pb.Impo
 	return nil
 }
 
-func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator crypto.Generator) error {
+func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportDataError, successOrg *admin_pb.ImportDataSuccessOrg, org *admin_pb.DataOrg, count *counts, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode crypto.Generator) error {
 	if err := importOrgDomains(ctx, s, errors, successOrg, org); err != nil {
 		return err
 	}
@@ -742,10 +742,10 @@ func importResources(ctx context.Context, s *Server, errors *[]*admin_pb.ImportD
 	if err := importProjects(ctx, s, errors, successOrg, org, count); err != nil {
 		return err
 	}
-	if err := importOIDCApps(ctx, s, errors, successOrg, org, count, appSecretGenerator); err != nil {
+	if err := importOIDCApps(ctx, s, errors, successOrg, org, count); err != nil {
 		return err
 	}
-	if err := importAPIApps(ctx, s, errors, successOrg, org, count, appSecretGenerator); err != nil {
+	if err := importAPIApps(ctx, s, errors, successOrg, org, count); err != nil {
 		return err
 	}
 	if err := importAppKeys(ctx, s, errors, successOrg, org, count); err != nil {
@@ -1023,10 +1023,6 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 	success := &admin_pb.ImportDataSuccess{}
 	count := &counts{}
 
-	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
-	if err != nil {
-		return nil, nil, err
-	}
 	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, s.userCodeAlg)
 	if err != nil {
 		return nil, nil, err
@@ -1064,7 +1060,7 @@ func (s *Server) importData(ctx context.Context, orgs []*admin_pb.DataOrg) (*adm
 		count.appKeysCount += len(org.GetAppKeys())
 	}
 	for _, org := range orgs {
-		if err = importOrg1(ctx, s, &errors, ctxData, org, success, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode, appSecretGenerator); err != nil {
+		if err = importOrg1(ctx, s, &errors, ctxData, org, success, count, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessInitCode); err != nil {
 			return &admin_pb.ImportDataResponse{Errors: errors, Success: success}, count, err
 		}
 	}
@@ -1153,11 +1149,11 @@ func (s *Server) dataOrgsV1ToDataOrgs(ctx context.Context, dataOrgs *v1_pb.Impor
 			if err != nil {
 				return nil, err
 			}
-			org.LoginPolicy.ExternalLoginCheckLifetime = durationpb.New(defaultLoginPolicy.ExternalLoginCheckLifetime)
-			org.LoginPolicy.MultiFactorCheckLifetime = durationpb.New(defaultLoginPolicy.MultiFactorCheckLifetime)
-			org.LoginPolicy.SecondFactorCheckLifetime = durationpb.New(defaultLoginPolicy.SecondFactorCheckLifetime)
-			org.LoginPolicy.PasswordCheckLifetime = durationpb.New(defaultLoginPolicy.PasswordCheckLifetime)
-			org.LoginPolicy.MfaInitSkipLifetime = durationpb.New(defaultLoginPolicy.MFAInitSkipLifetime)
+			org.LoginPolicy.ExternalLoginCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.ExternalLoginCheckLifetime))
+			org.LoginPolicy.MultiFactorCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.MultiFactorCheckLifetime))
+			org.LoginPolicy.SecondFactorCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.SecondFactorCheckLifetime))
+			org.LoginPolicy.PasswordCheckLifetime = durationpb.New(time.Duration(defaultLoginPolicy.PasswordCheckLifetime))
+			org.LoginPolicy.MfaInitSkipLifetime = durationpb.New(time.Duration(defaultLoginPolicy.MFAInitSkipLifetime))
 
 			if orgV1.SecondFactors != nil {
 				org.LoginPolicy.SecondFactors = make([]policy.SecondFactorType, len(orgV1.SecondFactors))
