@@ -200,6 +200,10 @@ func executionQueryToQuery(searchQuery *action.SearchQuery) (query.SearchQuery, 
 		return inConditionsQueryToQuery(q.InConditionsQuery)
 	case *action.SearchQuery_ExecutionTypeQuery:
 		return executionTypeToQuery(q.ExecutionTypeQuery)
+	case *action.SearchQuery_IncludeQuery:
+		return query.NewIncludeSearchQuery(q.IncludeQuery.GetInclude())
+	case *action.SearchQuery_TargetQuery:
+		return query.NewTargetSearchQuery(q.TargetQuery.GetTargetId())
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
@@ -277,9 +281,9 @@ func executionToPb(e *query.Execution) *action.Execution {
 	for i := range e.Targets {
 		switch e.Targets[i].Type {
 		case domain.ExecutionTargetTypeInclude:
-			targets[i].Type = &action.ExecutionTargetType_Include{Include: e.Targets[i].Target}
+			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Include{Include: e.Targets[i].Target}}
 		case domain.ExecutionTargetTypeTarget:
-			targets[i].Type = &action.ExecutionTargetType_Target{Target: e.Targets[i].Target}
+			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Target{Target: e.Targets[i].Target}}
 		default:
 			continue
 		}

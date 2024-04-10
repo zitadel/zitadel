@@ -115,6 +115,27 @@ func NewExecutionTypeSearchQuery(t domain.ExecutionType) (SearchQuery, error) {
 	return NewTextQuery(ExecutionColumnID, t.String(), TextStartsWith)
 }
 
+func NewTargetSearchQuery(target string) (SearchQuery, error) {
+	data, err := targetItemJSONB(domain.ExecutionTargetTypeTarget, target)
+	if err != nil {
+		return nil, err
+	}
+	return NewListContains(ExecutionColumnTargets, data)
+}
+
+func NewIncludeSearchQuery(include string) (SearchQuery, error) {
+	data, err := targetItemJSONB(domain.ExecutionTargetTypeInclude, include)
+	if err != nil {
+		return nil, err
+	}
+	return NewListContains(ExecutionColumnTargets, data)
+}
+
+func targetItemJSONB(t domain.ExecutionTargetType, target string) ([]byte, error) {
+	targets := []*exec.Target{{Type: t, Target: target}}
+	return json.Marshal(targets)
+}
+
 // ExecutionTargets: provide IDs to select all target information,
 func (q *Queries) ExecutionTargets(ctx context.Context, ids []string) (execution []*ExecutionTarget, err error) {
 	ctx, span := tracing.NewSpan(ctx)
