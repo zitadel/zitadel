@@ -1643,6 +1643,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				},
 				lockoutPolicy: &domain.LockoutPolicy{
 					MaxPasswordAttempts: 1,
+					MaxOTPAttempts:      1,
 				},
 			},
 			res: res{
