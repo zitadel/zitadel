@@ -12,39 +12,52 @@ V3 also offers more flexibility over the V2 API in these points:
 
 **Note**: V3 is currently in [Preview](/support/software-release-cycles-support#preview) and not yet generally available (breaking changes possible). Check individual services for availability.
 
-- Resources:
-    - Instances (including domains)
-    - Organizations (including domains)
-    - LoginPolicy [^1] (including token lifetimes, lockout, password complexity etc.)
-    - NotificationPolicy [^1]
-    - MessageTexts [^1]
-    - Metadata [^1] (including API foreign keys like privacy policy, login texts, external IDP allowed etc.)
-    - Restrictions [^1]
-    - Features [^1]
-    - Actions [^2]
-    - User Schemas [^2]
-    - Authenticators [^2]
-    - IDPs [^2]
-    - Grants [^2] (added target types project and user)
-    - Memberships [^2]
-    - Apps [^2]
-    - SMTP Providers [^2] (only target types system and instance)
-    - SMS Providers [^2]
-    - Limits
+- Standalone Resources [^1]
+  - Instances (including domains)
+  - Organizations (including domains)
+  - Projects
     - Projects
-    - Sessions
+    - Grants
+    - Apps
+  - Sessions
+  - Users
     - Users
+    - Grants
+- Multitenancy Enabled Resources [^2]
+  - Actions
+    - Executions
+    - Targets
+    - Actions
+  - Authenticators
+  - IDPs
+  - Memberships
+  - SMTP Providers (only target types system and instance)
+  - SMS Providers
+  - Schemas
+- Multitenancy Enabled Settings [^3]
+  - Login (including token lifetimes, lockout, password complexity etc.)
+  - Notifications
+  - Restrictions
+  - Limits (only system level)
+  - MessageTexts
+  - Metadata (including API irrelevant keys like privacy policy links, login texts, wether external IDP are allowed etc.)
+  - Features
 
-[^1]: Hierarchical Resource
-    - Instance level resource if no context is given
-    - System level resource if system context is given
-    - Org level resource if org context is given
-    - Effective resource returned on GET requests with all resolved values from the hierarchy (defaults) for the given context
+[^1] : Standalone Resources
+    - Resources are specific to a context level (system, instance, org, ...).
 
-[^2]: Linked Resources
-    - Resources that are linked to other resources (e.g. user schema linked to an organization)
-    - Linked resources have a context level as target type (e.g. org, instance, system)
-    - Linked resources can be self-disabled and enabled in sub-contexts by patching the enabled property
-    - GET requests on a linked resource return the enabled / disabled status of the resource in the given context
+[^2]: Multitenancy Enabled Resources
+    - Resources can be assigned to different context levels (system, instance, org, ...)
+    - Lower-level contexts can reuse the resources from higher-level contexts but not modify them.
+    - Lower-level contexts can self-disable and enable resources from higher-level contexts. This affects their context and their sub-level contexts. For example, if a system level context is disabled on the instance level, it is also disabled on the org level.
+    - Disabled resources are only returned for queries within the context-level where they have been disabled or higher-level contexts but not for lower-level contexts.
+
+[^3]: Multitenancy Enabled Settings
+    - Instance level settings if no context is given
+    - System level settings if system context is given
+    - Org level settings if orgid context is give
+    - All settings properties can be partially updated
+    - All settings properties can be partially reset, so their value defaults to the higher-level contexts property value. For a boolean value, the property must support *true*, *false*, *inherit* and *undefined (no change)* in proto that would be an optional oneof *true*, *false*, *inherit*
+    - All settings properties returned by queries contain the value as well as the context where the value is inherited from.
 
 <DocCardList />
