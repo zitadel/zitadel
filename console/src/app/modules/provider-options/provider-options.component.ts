@@ -18,7 +18,7 @@ export class ProviderOptionsComponent implements OnChanges, OnDestroy {
     isAutoUpdate: new FormControl(false, []),
     isCreationAllowed: new FormControl(true, []),
     isLinkingAllowed: new FormControl(true, []),
-    autoLinking: new FormControl(true, []),
+    autoLinking: new FormControl(AutoLinkingOption.AUTO_LINKING_OPTION_UNSPECIFIED, []),
   });
 
   public linkingTypes: AutoLinkingOption[] = [
