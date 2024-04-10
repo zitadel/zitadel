@@ -326,15 +326,8 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Configure Identity Providers",
-          link: {
-            type: "generated-index",
-            title:
-              "Let Users Login with Preferred Identity Provider in ZITADEL",
-            slug: "/guides/integrate/identity-providers",
-            description:
-              "In the following guides you will learn how to configure and setup your preferred external identity provider in ZITADEL.",
-          },
+          label: "Login users with SSO",
+          link: { type: "doc", id: "guides/integrate/identity-providers/introduction" },
           collapsed: true,
           items: [
             "guides/integrate/identity-providers/google",
@@ -350,7 +343,7 @@ module.exports = {
             "guides/integrate/identity-providers/keycloak",
             "guides/integrate/identity-providers/linkedin-oauth",
             "guides/integrate/identity-providers/mocksaml",
-            "guides/integrate/identity-providers/jwt-idp",
+            "guides/integrate/identity-providers/jwt_idp",
             "guides/integrate/identity-providers/migrate",
             "guides/integrate/identity-providers/additional-information",
           ],
@@ -739,17 +732,17 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Execution Lifecycle (Preview)",
+              label: "Action Lifecycle (Preview)",
               link: {
                 type: "generated-index",
-                title: "Execution Service API (Preview)",
-                slug: "/apis/resources/execution_service_v3",
+                title: "Action Service API (Preview)",
+                slug: "/apis/resources/action_service_v3",
                 description:
-                  "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.\n" +
+                  "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
                   "\n" +
                   "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
               },
-              items: require("./docs/apis/resources/execution_service_v3/sidebar.js"),
+              items: require("./docs/apis/resources/action_service_v3/sidebar.js"),
             },
           ],
         },
@@ -800,6 +793,14 @@ module.exports = {
         "apis/actions/complement-token",
         "apis/actions/customize-samlresponse",
         "apis/actions/objects",
+      ],
+    },
+    {
+      type: "category",
+      label: "Actions V2",
+      collapsed: false,
+      items: [
+        "apis/actionsv2/introduction",
       ],
     },
     {

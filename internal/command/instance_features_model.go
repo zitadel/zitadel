@@ -56,6 +56,7 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceLegacyIntrospectionEventType,
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
+			feature_v2.InstanceActionsEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -66,6 +67,7 @@ func (m *InstanceFeaturesWriteModel) reduceReset() {
 	m.LegacyIntrospection = nil
 	m.UserSchema = nil
 	m.TokenExchange = nil
+	m.Actions = nil
 }
 
 func (m *InstanceFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {
@@ -86,6 +88,8 @@ func (m *InstanceFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEven
 		m.TokenExchange = &event.Value
 	case feature.KeyUserSchema:
 		m.UserSchema = &event.Value
+	case feature.KeyActions:
+		m.Actions = &event.Value
 	}
 	return nil
 }
@@ -98,5 +102,6 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.LegacyIntrospection, f.LegacyIntrospection, feature_v2.InstanceLegacyIntrospectionEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.InstanceTokenExchangeEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.InstanceUserSchemaEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.Actions, f.Actions, feature_v2.InstanceActionsEventType)
 	return cmds
 }

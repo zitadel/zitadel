@@ -4,32 +4,25 @@ WITH found_users AS (
     , u.instance_id
     , u.resource_owner
     , u.user_name
+    , COALESCE(p_custom.must_be_domain, p_default.must_be_domain) as must_be_domain
   FROM 
     projections.login_names3_users u
-  JOIN lateral (
-    SELECT 
-      p.must_be_domain 
-    FROM 
-      projections.login_names3_policies p
-    WHERE
-      u.instance_id = p.instance_id
+    LEFT JOIN projections.login_names3_policies p_custom
+      ON  u.instance_id = p_custom.instance_id
+        AND p_custom.instance_id = $4 AND p_custom.resource_owner = u.resource_owner
+    LEFT JOIN projections.login_names3_policies p_default
+      ON  u.instance_id = p_default.instance_id
+      AND p_default.instance_id = $4 AND p_default.is_default IS TRUE
       AND (
-        (p.is_default IS TRUE AND p.instance_id = $4)
-        OR (p.instance_id = $4 AND p.resource_owner = u.resource_owner)
+        (COALESCE(p_custom.must_be_domain, p_default.must_be_domain) IS TRUE AND u.user_name_lower = $1)
+         OR (COALESCE(p_custom.must_be_domain, p_default.must_be_domain) IS FALSE AND u.user_name_lower = $3)
       )
-      AND (
-        (p.must_be_domain IS TRUE AND user_name_lower = $1)
-        OR (p.must_be_domain IS FALSE AND user_name_lower = $3)
-      )
-    ORDER BY is_default
-    LIMIT 1
-  ) p ON TRUE
   JOIN 
     projections.login_names3_domains d
     ON 
       u.instance_id = d.instance_id
       AND u.resource_owner = d.resource_owner
-      AND CASE WHEN p.must_be_domain THEN d.name_lower = $2 ELSE TRUE END
+      AND CASE WHEN COALESCE(p_custom.must_be_domain, p_default.must_be_domain) THEN d.name_lower = $2 ELSE TRUE END
   WHERE 
     u.instance_id = $4
     AND u.user_name_lower IN (
@@ -44,27 +37,13 @@ login_names AS (SELECT
   , fu.user_name
   , d.name domain_name
   , d.is_primary
-  , p.must_be_domain
-  , CASE WHEN p.must_be_domain 
+  , fu.must_be_domain
+  , CASE WHEN fu.must_be_domain
       THEN concat(fu.user_name, '@', d.name)
       ELSE fu.user_name
     END login_name
   FROM 
     found_users fu
-  JOIN lateral (
-    SELECT 
-      p.must_be_domain 
-    FROM 
-      projections.login_names3_policies p
-    WHERE
-      fu.instance_id = p.instance_id
-      AND (
-        (p.is_default IS TRUE AND p.instance_id = $4)
-        OR (p.instance_id = $4 AND p.resource_owner = fu.resource_owner)
-      )
-    ORDER BY is_default
-    LIMIT 1
-  ) p ON TRUE
   JOIN 
     projections.login_names3_domains d
     ON 
@@ -94,6 +73,7 @@ SELECT
   , h.is_email_verified
   , h.phone
   , h.is_phone_verified
+  , h.password_change_required
   , m.user_id
   , m.name
   , m.description
@@ -102,17 +82,17 @@ SELECT
   , count(*) OVER ()
 FROM found_users fu
 JOIN
-  projections.users10 u
+  projections.users12 u
   ON
     fu.id = u.id
     AND fu.instance_id = u.instance_id
 LEFT JOIN
-  projections.users10_humans h
+  projections.users12_humans h
   ON
     fu.id = h.user_id
     AND fu.instance_id = h.instance_id
 LEFT JOIN
-  projections.users10_machines m
+  projections.users12_machines m
   ON
     fu.id = m.user_id
     AND fu.instance_id = m.instance_id

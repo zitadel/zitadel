@@ -23,7 +23,7 @@ import (
 func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 		checkPermission    domain.PermissionCheck
 	}
 	type args struct {
@@ -270,7 +270,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
 		userEncryption     crypto.EncryptionAlgorithm
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -598,7 +598,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 
 func TestCommandSide_ChangePassword(t *testing.T) {
 	type fields struct {
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -1202,7 +1202,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 func TestCommandSide_CheckPassword(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -1643,6 +1643,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				},
 				lockoutPolicy: &domain.LockoutPolicy{
 					MaxPasswordAttempts: 1,
+					MaxOTPAttempts:      1,
 				},
 			},
 			res: res{

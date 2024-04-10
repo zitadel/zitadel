@@ -38,17 +38,20 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 			return nil, err
 		}
 	}
-	info, err := rp.Userinfo[*oidc.UserInfo](ctx,
-		s.Tokens.AccessToken,
-		s.Tokens.TokenType,
-		s.Tokens.IDTokenClaims.GetSubject(),
-		s.Provider.RelyingParty,
-	)
-	if err != nil {
-		return nil, err
-	}
+
+	var info *oidc.UserInfo
 	if s.Provider.useIDToken {
 		info = s.Tokens.IDTokenClaims.GetUserInfo()
+	} else {
+		info, err = rp.Userinfo[*oidc.UserInfo](ctx,
+			s.Tokens.AccessToken,
+			s.Tokens.TokenType,
+			s.Tokens.IDTokenClaims.GetSubject(),
+			s.Provider.RelyingParty,
+		)
+		if err != nil {
+			return nil, err
+		}
 	}
 	u := s.Provider.userInfoMapper(info)
 	return u, nil

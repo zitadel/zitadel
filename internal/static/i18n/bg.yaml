@@ -643,6 +643,7 @@ EventTypes:
         removed: Ключът е премахнат
       secret:
         set: Секретен комплект
+        updated: Тайният хеш е актуализиран
         removed: Тайната е премахната
         check:
           succeeded: Тайната проверка е успешна
@@ -1019,6 +1020,11 @@ EventTypes:
           check:
             succeeded: Проверката на OIDC Client Secret е успешна
             failed: Проверката на OIDC Client Secret е неуспешна
+      api:
+        secret:
+          check:
+            succeeded: Тайната проверка на API е успешна
+            failed: Тайната проверка на API е неуспешна
         key:
           added: Добавен ключ за приложение
           removed: Ключът на приложението е премахнат
@@ -1031,11 +1037,13 @@ EventTypes:
           changed: Конфигурацията на OIDC е променена
           secret:
             changed: Тайната на OIDC е променена
+            updated: Тайният хеш на OIDC е актуализиран
         api:
           added: Добавена е конфигурация на API
           changed: Променена конфигурация на API
           secret:
             changed: Тайната на API е променена
+            updated: Тайният хеш на API е актуализиран
   policy:
     password:
       complexity:

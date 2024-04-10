@@ -101,7 +101,8 @@ type InstanceSetup struct {
 		ThemeMode           domain.LabelPolicyThemeMode
 	}
 	LockoutPolicy struct {
-		MaxAttempts              uint64
+		MaxPasswordAttempts      uint64
+		MaxOTPAttempts           uint64
 		ShouldShowLockoutFailure bool
 	}
 	EmailTemplate     []byte
@@ -126,7 +127,6 @@ type SetQuotas struct {
 }
 
 type SecretGenerators struct {
-	PasswordSaltCost         uint
 	ClientSecret             *crypto.GeneratorConfig
 	InitializeUserCode       *crypto.GeneratorConfig
 	EmailVerificationCode    *crypto.GeneratorConfig
@@ -272,7 +272,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink, setup.PrivacyPolicy.SupportEmail),
 		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
-		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
+		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxPasswordAttempts, setup.LockoutPolicy.MaxOTPAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
 		prepareAddDefaultLabelPolicy(
 			instanceAgg,
@@ -457,7 +457,6 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
 		commands.AddAPIAppCommand(
@@ -469,7 +468,6 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
 		commands.AddAPIAppCommand(
@@ -481,10 +479,9 @@ func setupMinimalInterfaces(commands *Commands, validations *[]preparation.Valid
 				},
 				AuthMethodType: domain.APIAuthMethodTypePrivateKeyJWT,
 			},
-			nil,
 		),
 
-		commands.AddOIDCAppCommand(cnsl, nil),
+		commands.AddOIDCAppCommand(cnsl),
 		SetIAMConsoleID(instanceAgg, &cnsl.ClientID, &ids.consoleAppID),
 	)
 }

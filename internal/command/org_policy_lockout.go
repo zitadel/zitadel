@@ -21,7 +21,13 @@ func (c *Commands) AddLockoutPolicy(ctx context.Context, resourceOwner string, p
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, org.NewLockoutPolicyAddedEvent(ctx, orgAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewLockoutPolicyAddedEvent(
+		ctx,
+		orgAgg,
+		policy.MaxPasswordAttempts,
+		policy.MaxOTPAttempts,
+		policy.ShowLockOutFailures,
+	))
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +51,7 @@ func (c *Commands) ChangeLockoutPolicy(ctx context.Context, resourceOwner string
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LockoutPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.MaxPasswordAttempts, policy.MaxOTPAttempts, policy.ShowLockOutFailures)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "ORG-0JFSr", "Errors.Org.LockoutPolicy.NotChanged")
 	}
@@ -104,5 +110,22 @@ func (c *Commands) orgLockoutPolicyWriteModelByID(ctx context.Context, orgID str
 	if err != nil {
 		return nil, err
 	}
+	return policy, nil
+}
+
+func (c *Commands) getLockoutPolicy(ctx context.Context, orgID string) (*domain.LockoutPolicy, error) {
+	orgWm, err := c.orgLockoutPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if orgWm.State == domain.PolicyStateActive {
+		return writeModelToLockoutPolicy(&orgWm.LockoutPolicyWriteModel), nil
+	}
+	instanceWm, err := c.defaultLockoutPolicyWriteModelByID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	policy := writeModelToLockoutPolicy(&instanceWm.LockoutPolicyWriteModel)
+	policy.Default = true
 	return policy, nil
 }

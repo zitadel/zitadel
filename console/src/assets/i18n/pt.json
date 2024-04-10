@@ -88,7 +88,32 @@
       },
       "IDPS": {
         "TITLE": "Provedores de Identidade",
-        "DESCRIPTION": "Crie e ative provedores de identidade externos. Escolha um provedor conhecido ou configure qualquer outro provedor compatível com OIDC, OAuth ou SAML de sua escolha. Você pode até usar seus tokens JWT existentes como identidades federadas configurando um provedor de identidade JWT."
+        "DESCRIPTION": "Crie e ative provedores de identidade externos. Escolha um provedor conhecido ou configure qualquer outro provedor compatível com OIDC, OAuth ou SAML de sua escolha. Você pode até usar seus tokens JWT existentes como identidades federadas configurando um provedor de identidade JWT.",
+        "NEXT": "E agora?",
+        "SAML": {
+          "TITLE": "Configure seu Provedor de Identidade SAML",
+          "DESCRIPTION": "O ZITADEL está configurado. Agora, seu Provedor de Identidade SAML precisa de alguma configuração. A maioria dos provedores permite que você simplesmente faça o upload do XML de metadados do ZITADEL completo. Outros provedores pedem que você forneça apenas alguns URLs específicos, como por exemplo a ID da entidade (URL de metadados), a URL do Serviço de Consumidor de Afirmação (ACS) ou a URL de Logout Único."
+        },
+        "CALLBACK": {
+          "TITLE": "Configure seu {{ provider }} Provedor de Identidade",
+          "DESCRIPTION": "Antes de poder configurar o ZITADEL, passe este URL para o seu Provedor de Identidade para permitir o redirecionamento do navegador de volta para o ZITADEL após a autenticação."
+        },
+        "JWT": {
+          "TITLE": "Use JWTs como Identidades Federadas",
+          "DESCRIPTION": "O Provedor de Identidade JWT permite que você use seus tokens JWT existentes como identidades federadas. Este recurso é útil se você já tem um emissor para JWTs. Com um IdP JWT, você pode usar esses JWTs para criar e atualizar usuários no ZITADEL em tempo real."
+        },
+        "LDAP": {
+          "TITLE": "Configure o ZITADEL para conectar ao seu Provedor de Identidade LDAP",
+          "DESCRIPTION": "Forneça os detalhes de conexão para o seu servidor LDAP e configure o mapeamento dos seus atributos LDAP para atributos do ZITADEL."
+        },
+        "AUTOFILL": {
+          "TITLE": "Preenchimento automático de dados do usuário",
+          "DESCRIPTION": "Use uma ação para melhorar a experiência dos seus usuários. Você pode pré-preencher o formulário de registro do ZITADEL com valores do provedor de identidade."
+        },
+        "ACTIVATE": {
+          "TITLE": "Ative o IdP",
+          "DESCRIPTION": "Seu IdP ainda não está ativo. Ative-o para permitir que seus usuários façam login."
+        }
       },
       "PW_COMPLEXITY": {
         "TITLE": "Complexidade da Senha",
@@ -467,7 +492,8 @@
     },
     "TABLE": {
       "SHOWUSER": "Mostrar usuário {{value}}"
-    }
+    },
+    "DOWNLOAD": "Baixar"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Tem controle sobre toda a instância, incluindo todas as organizações",
@@ -1507,7 +1533,8 @@
       "DESCRIPTIONCREATEADMIN": "Os usuários podem escolher entre os provedores de identidade disponíveis abaixo.",
       "DESCRIPTIONCREATEMGMT": "Os usuários podem escolher entre os provedores de identidade disponíveis abaixo. Observação: você também pode usar provedores definidos pelo sistema e provedores definidos apenas para sua organização.",
       "LIFETIME_INVALID": "O formulário contém valores inválidos.",
-      "SAVED": "Salvo com sucesso!"
+      "SAVED": "Salvo com sucesso!",
+      "PROVIDER_ADDED": "Provedor de identidade ativado."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Defina os links para a sua Política de Privacidade e Termos de Serviço",
@@ -1634,7 +1661,8 @@
       "HASLOWERCASE": "tem letra minúscula",
       "HASUPPERCASE": "tem letra maiúscula",
       "SHOWLOCKOUTFAILURES": "mostrar falhas de bloqueio",
-      "MAXATTEMPTS": "Máximo de tentativas de senha",
+      "MAXPASSWORDATTEMPTS": "Máximo de tentativas de senha",
+      "MAXOTPATTEMPTS": "Máximo de tentativas de OTP",
       "EXPIREWARNDAYS": "Aviso de expiração após dias",
       "MAXAGEDAYS": "Idade máxima em dias",
       "USERLOGINMUSTBEDOMAIN": "Adicionar domínio da organização como sufixo aos nomes de login",

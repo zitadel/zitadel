@@ -3,11 +3,13 @@ package assets
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 
@@ -134,10 +136,21 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			err = file.Close()
 			logging.OnError(err).Warn("could not close file")
 		}()
-		contentType := handler.Header.Get("content-type")
+
+		mimeType, err := mimetype.DetectReader(file)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		_, err = file.Seek(0, io.SeekStart)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		size := handler.Size
-		if !uploader.ContentTypeAllowed(contentType) {
-			s.ErrorHandler()(w, r, fmt.Errorf("invalid content-type: %s", contentType), http.StatusBadRequest)
+		if !uploader.ContentTypeAllowed(mimeType.String()) {
+			s.ErrorHandler()(w, r, fmt.Errorf("invalid content-type: %s", mimeType), http.StatusBadRequest)
 			return
 		}
 		if size > uploader.MaxFileSize() {
@@ -154,7 +167,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 		uploadInfo := &command.AssetUpload{
 			ResourceOwner: resourceOwner,
 			ObjectName:    objectName,
-			ContentType:   contentType,
+			ContentType:   mimeType.String(),
 			ObjectType:    uploader.ObjectType(),
 			File:          file,
 			Size:          size,

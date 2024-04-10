@@ -7,8 +7,28 @@
       <img class="idp-logo apple dark" src="./assets/images/idp/apple-dark.svg" alt="apple" />
       <img class="idp-logo apple light" src="./assets/images/idp/apple.svg" alt="apple" />
       <h1>{{ 'IDP.CREATE.APPLE.TITLE' | translate }}</h1>
+      <ng-container *ngIf="exists$ | async">
+        <div
+          *ngIf="{ isNotActive: (activateLink$ | async) } as idp"
+          class="cnsl-state-dot"
+          [matTooltip]="(idp.isNotActive ? 'IDP.STATES.2' : 'IDP.STATES.1') | translate"
+          [ngClass]="{ active: !idp.isNotActive, inactive: !!idp.isNotActive }"
+        ></div>
+      </ng-container>
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
+
+    <cnsl-provider-next
+      [configureProvider]="(justCreated$ | async) === ''"
+      [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE' | translate: { provider: 'Apple' }"
+      [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION' | translate: { provider: 'Apple' }"
+      configureLink="https://zitadel.com/docs/guides/integrate/identity-providers/apple#apple-configuration"
+      [autofillLink]="autofillLink$ | async"
+      [activateLink]="activateLink$ | async"
+      [copyUrls]="copyUrls$ | async"
+      [expanded]="!!(expandWhatNow$ | async)"
+      (activate)="activate()"
+    ></cnsl-provider-next>
 
     <p class="identity-provider-desc cnsl-secondary-text">
       {{ !provider ? ('IDP.CREATE.APPLE.DESCRIPTION' | translate) : ('IDP.DETAIL.DESCRIPTION' | translate) }}
@@ -131,8 +151,9 @@
           [disabled]="form.invalid || form.disabled"
           type="submit"
         >
-          <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
-          <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
+          <span *ngIf="{ exists: (exists$ | async) } as idp">{{
+            (!!idp.exists ? 'ACTIONS.SAVE' : 'ACTIONS.CREATE') | translate
+          }}</span>
         </button>
       </div>
     </form>

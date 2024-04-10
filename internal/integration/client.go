@@ -25,9 +25,9 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -53,7 +53,7 @@ type Client struct {
 	OIDCv2       oidc_pb.OIDCServiceClient
 	OrgV2        organisation.OrganizationServiceClient
 	System       system.SystemServiceClient
-	ExecutionV3  execution.ExecutionServiceClient
+	ActionV3     action.ActionServiceClient
 	FeatureV2    feature.FeatureServiceClient
 	UserSchemaV3 schema.UserSchemaServiceClient
 }
@@ -70,7 +70,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		OIDCv2:       oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2:        organisation.NewOrganizationServiceClient(cc),
 		System:       system.NewSystemServiceClient(cc),
-		ExecutionV3:  execution.NewExecutionServiceClient(cc),
+		ActionV3:     action.NewActionServiceClient(cc),
 		FeatureV2:    feature.NewFeatureServiceClient(cc),
 		UserSchemaV3: schema.NewUserSchemaServiceClient(cc),
 	}
@@ -277,10 +277,13 @@ func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user u2f")
 }
 
-func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
+func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) {
 	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
-		UserId:      userID,
-		NewPassword: &user.Password{Password: password},
+		UserId: userID,
+		NewPassword: &user.Password{
+			Password:       password,
+			ChangeRequired: changeRequired,
+		},
 	})
 	logging.OnError(err).Fatal("set user password")
 }
@@ -519,41 +522,41 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 	require.NoError(t, err)
 }
 
-func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *execution.CreateTargetResponse {
+func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
 	nameSet := fmt.Sprint(time.Now().UnixNano() + 1)
 	if name != "" {
 		nameSet = name
 	}
-	req := &execution.CreateTargetRequest{
+	req := &action.CreateTargetRequest{
 		Name:     nameSet,
 		Endpoint: endpoint,
 		Timeout:  durationpb.New(10 * time.Second),
 	}
 	switch ty {
 	case domain.TargetTypeWebhook:
-		req.TargetType = &execution.CreateTargetRequest_RestWebhook{
-			RestWebhook: &execution.SetRESTWebhook{
+		req.TargetType = &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.SetRESTWebhook{
 				InterruptOnError: interrupt,
 			},
 		}
 	case domain.TargetTypeCall:
-		req.TargetType = &execution.CreateTargetRequest_RestWebhook{
-			RestWebhook: &execution.SetRESTWebhook{
+		req.TargetType = &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.SetRESTWebhook{
 				InterruptOnError: interrupt,
 			},
 		}
 	case domain.TargetTypeAsync:
-		req.TargetType = &execution.CreateTargetRequest_RestAsync{
-			RestAsync: &execution.SetRESTAsync{},
+		req.TargetType = &action.CreateTargetRequest_RestAsync{
+			RestAsync: &action.SetRESTAsync{},
 		}
 	}
-	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
+	target, err := s.Client.ActionV3.CreateTarget(ctx, req)
 	require.NoError(t, err)
 	return target
 }
 
-func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.Condition, targets []*execution.ExecutionTargetType) *execution.SetExecutionResponse {
-	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
+	target, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
 	})
@@ -561,8 +564,8 @@ func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution
 	return target
 }
 
-func (s *Tester) DeleteExecution(ctx context.Context, t *testing.T, cond *execution.Condition) {
-	_, err := s.Client.ExecutionV3.DeleteExecution(ctx, &execution.DeleteExecutionRequest{
+func (s *Tester) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
+	_, err := s.Client.ActionV3.DeleteExecution(ctx, &action.DeleteExecutionRequest{
 		Condition: cond,
 	})
 	require.NoError(t, err)
