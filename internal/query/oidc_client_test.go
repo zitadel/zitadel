@@ -80,6 +80,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				ClockSkew:                1000000000,
 				AdditionalOrigins:        []string{"https://example.com"},
 				ProjectID:                "236645808328409090",
+				ProjectRoleAssertion:     true,
 				PublicKeys:               map[string][]byte{"236647201860747266": []byte(pubkey)},
 				ProjectRoleKeys:          []string{"role1", "role2"},
 				Settings: &OIDCSettings{
@@ -112,6 +113,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				AdditionalOrigins:        nil,
 				PublicKeys:               nil,
 				ProjectID:                "236645808328409090",
+				ProjectRoleAssertion:     true,
 				ProjectRoleKeys:          []string{"role1", "role2"},
 				Settings: &OIDCSettings{
 					AccessTokenLifetime: 43200000000000,
@@ -143,6 +145,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				AdditionalOrigins:        nil,
 				PublicKeys:               nil,
 				ProjectID:                "236645808328409090",
+				ProjectRoleAssertion:     false,
 				ProjectRoleKeys:          []string{"role1", "role2"},
 				Settings: &OIDCSettings{
 					AccessTokenLifetime: 43200000000000,
@@ -179,6 +182,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				AdditionalOrigins:        nil,
 				PublicKeys:               nil,
 				ProjectID:                "239520764276178946",
+				ProjectRoleAssertion:     false,
 				ProjectRoleKeys:          nil,
 				Settings:                 nil,
 			},
