@@ -1072,12 +1072,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 					},
 				},
 			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
+			wantErr: true,
 		},
 		{
 			name: "all, ok",
