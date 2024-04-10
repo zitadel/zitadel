@@ -1616,6 +1616,7 @@
         "initPasswordText": "Inicialização de senha",
         "initializeDoneText": "Inicialização de usuário concluída",
         "initializeUserText": "Inicializaçãode usuário",
+        "linkingUserPromptText": "Prompt de usuário para vinculação",
         "linkingUserDoneText": "Vinculação de usuário concluída",
         "loginText": "Login",
         "logoutText": "Logout",
@@ -2047,7 +2048,13 @@
       "ISCREATIONALLOWED": "Criação de Conta Permitida",
       "ISCREATIONALLOWED_DESC": "Determina se as contas podem ser criadas.",
       "ISLINKINGALLOWED": "Vinculação de Conta Permitida",
-      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada a uma conta existente."
+      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada a uma conta existente.",
+      "AUTOLINKING_DESC": "Determina se uma identidade será solicitada a ser vinculada a uma conta existente.",
+      "AUTOLINKINGTYPE": {
+        "0": "Desativado",
+        "1": "Verificar nome de usuário existente",
+        "2": "Verificar e-mail existente"
+      }
     },
     "OWNERTYPES": {
       "0": "desconhecido",

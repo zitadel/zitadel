@@ -40,13 +40,17 @@
                 ></i>
                 <div
                   *ngIf="
-                    !!featureData.loginDefaultOrg?.enabled && featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM
+                    !!featureData.loginDefaultOrg?.enabled &&
+                    (featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM ||
+                      featureData.loginDefaultOrg?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot enabled"
                 ></div>
                 <div
                   *ngIf="
-                    !featureData.loginDefaultOrg?.enabled && featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM
+                    !featureData.loginDefaultOrg?.enabled &&
+                    (featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM ||
+                      featureData.loginDefaultOrg?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot disabled"
                 ></div>
@@ -54,12 +58,12 @@
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.DISABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.ENABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
           </mat-button-toggle-group>
@@ -91,14 +95,16 @@
                 <div
                   *ngIf="
                     !!featureData.oidcLegacyIntrospection?.enabled &&
-                    featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM
+                    (featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcLegacyIntrospection?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot enabled"
                 ></div>
                 <div
                   *ngIf="
                     !featureData.oidcLegacyIntrospection?.enabled &&
-                    featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM
+                    (featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcLegacyIntrospection?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot disabled"
                 ></div>
@@ -106,12 +112,12 @@
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.DISABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.ENABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
           </mat-button-toggle-group>
@@ -142,13 +148,16 @@
                 <div
                   *ngIf="
                     !!featureData.oidcTokenExchange?.enabled &&
-                    featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM
+                    (featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTokenExchange?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot enabled"
                 ></div>
                 <div
                   *ngIf="
-                    !featureData.oidcTokenExchange?.enabled && featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM
+                    !featureData.oidcTokenExchange?.enabled &&
+                    (featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTokenExchange?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot disabled"
                 ></div>
@@ -156,12 +165,12 @@
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.DISABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.ENABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
           </mat-button-toggle-group>
@@ -192,14 +201,16 @@
                 <div
                   *ngIf="
                     !!featureData.oidcTriggerIntrospectionProjections?.enabled &&
-                    featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM
+                    (featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot enabled"
                 ></div>
                 <div
                   *ngIf="
                     !featureData.oidcTriggerIntrospectionProjections?.enabled &&
-                    featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM
+                    (featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot disabled"
                 ></div>
@@ -207,12 +218,12 @@
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.DISABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.ENABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
           </mat-button-toggle-group>
@@ -241,23 +252,31 @@
                   matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
                 ></i>
                 <div
-                  *ngIf="!!featureData.userSchema?.enabled && featureData.userSchema?.source === Source.SOURCE_SYSTEM"
+                  *ngIf="
+                    !!featureData.userSchema?.enabled &&
+                    (featureData.userSchema?.source === Source.SOURCE_SYSTEM ||
+                      featureData.userSchema?.source === Source.SOURCE_UNSPECIFIED)
+                  "
                   class="current-dot enabled"
                 ></div>
                 <div
-                  *ngIf="!featureData.userSchema?.enabled && featureData.userSchema?.source === Source.SOURCE_SYSTEM"
+                  *ngIf="
+                    !featureData.userSchema?.enabled &&
+                    (featureData.userSchema?.source === Source.SOURCE_SYSTEM ||
+                      featureData.userSchema?.source === Source.SOURCE_UNSPECIFIED)
+                  "
                   class="current-dot disabled"
                 ></div>
               </div>
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.DISABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.ENABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
           </mat-button-toggle-group>
@@ -286,23 +305,31 @@
                   matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
                 ></i>
                 <div
-                  *ngIf="!!featureData.actions?.enabled && featureData.actions?.source === Source.SOURCE_SYSTEM"
+                  *ngIf="
+                    !!featureData.actions?.enabled &&
+                    (featureData.actions?.source === Source.SOURCE_SYSTEM ||
+                      featureData.actions?.source === Source.SOURCE_UNSPECIFIED)
+                  "
                   class="current-dot enabled"
                 ></div>
                 <div
-                  *ngIf="!featureData.actions?.enabled && featureData.actions?.source === Source.SOURCE_SYSTEM"
+                  *ngIf="
+                    !featureData.actions?.enabled &&
+                    (featureData.actions?.source === Source.SOURCE_SYSTEM ||
+                      featureData.actions?.source === Source.SOURCE_UNSPECIFIED)
+                  "
                   class="current-dot disabled"
                 ></div>
               </div>
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.DISABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
             <mat-button-toggle [value]="ToggleState.ENABLED">
               <div class="toggle-row">
-                <span> {{ 'SETTING.FEATURES.STATES.DISABLED' | translate }}</span>
+                <span> {{ 'SETTING.FEATURES.STATES.ENABLED' | translate }}</span>
               </div>
             </mat-button-toggle>
           </mat-button-toggle-group>

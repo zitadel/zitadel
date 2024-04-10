@@ -325,6 +325,12 @@ LogoutDone:
   Description: Cerraste la sesión con éxito.
   LoginButtonText: iniciar sesión
 
+LinkingUserPrompt:
+  Title: Usuario existente encontrado
+  Description: "¿Quieres vincular tu cuenta existente?"
+  LinkButtonText: Vincular
+  OtherButtonText: Otras opciones
+
 LinkingUsersDone:
   Title: Vinculación de usuario
   Description: usuario vinculado con éxito.

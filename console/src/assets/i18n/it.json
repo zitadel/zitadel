@@ -1614,6 +1614,7 @@
         "initPasswordText": "Inizializzazione della password",
         "initializeDoneText": "Inizializzazione utente finita",
         "initializeUserText": "Inizializzazione utente",
+        "linkingUserPromptText": "Testo di promemoria per collegare l'utente",
         "linkingUserDoneText": "Collegamento dell'utente finito",
         "loginText": "Accesso",
         "logoutText": "Logout",
@@ -2045,7 +2046,13 @@
       "ISCREATIONALLOWED": "Creazione consentita",
       "ISCREATIONALLOWED_DESC": "Determina se i conti possono essere creati.",
       "ISLINKINGALLOWED": "Collegamento consentito",
-      "ISLINKINGALLOWED_DESC": "Determina se un'identità può essere collegata a un account esistente."
+      "ISLINKINGALLOWED_DESC": "Determina se un'identità può essere collegata a un account esistente.",
+      "AUTOLINKING_DESC": "Determina se un'identità verrà invitata a essere collegata a un account esistente.",
+      "AUTOLINKINGTYPE": {
+        "0": "Disabilitato",
+        "1": "Verifica dell'esistenza del nome utente",
+        "2": "Verifica dell'esistenza dell'email"
+      }
     },
     "OWNERTYPES": {
       "0": "sconosciuto",

@@ -1,6 +1,6 @@
 import { Component, Injector, Type } from '@angular/core';
 import { Location } from '@angular/common';
-import { Options, Provider, SAMLBinding } from '../../../proto/generated/zitadel/idp_pb';
+import { AutoLinkingOption, Options, Provider, SAMLBinding } from '../../../proto/generated/zitadel/idp_pb';
 import { AbstractControl, FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 import { ManagementService } from '../../../services/mgmt.service';
@@ -37,7 +37,10 @@ export class ProviderSamlSpComponent {
   public provider?: Provider.AsObject;
   public form!: FormGroup;
   public showOptional: boolean = false;
-  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  public options: Options = new Options()
+    .setIsCreationAllowed(true)
+    .setIsLinkingAllowed(true)
+    .setAutoLinking(AutoLinkingOption.AUTO_LINKING_OPTION_UNSPECIFIED);
   // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   // DEPRECATED: use service$ instead

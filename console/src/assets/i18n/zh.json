@@ -1613,6 +1613,7 @@
         "initPasswordText": "初始化密码",
         "initializeDoneText": "初始化用户完成",
         "initializeUserText": "初始化用户",
+        "linkingUserPromptText": "用户链接提示",
         "linkingUserDoneText": "链接用户完成",
         "loginText": "登录",
         "logoutText": "登出",
@@ -2044,7 +2045,13 @@
       "ISCREATIONALLOWED": "是否允许创作",
       "ISCREATIONALLOWED_DESC": "确定是否可以创建账户。",
       "ISLINKINGALLOWED": "是否允许连接",
-      "ISLINKINGALLOWED_DESC": "确定一个身份是否可以与一个现有的账户相联系。"
+      "ISLINKINGALLOWED_DESC": "确定一个身份是否可以与一个现有的账户相联系。",
+      "AUTOLINKING_DESC": "确定是否提示将身份链接到现有帐户。",
+      "AUTOLINKINGTYPE": {
+        "0": "已禁用",
+        "1": "检查现有用户名",
+        "2": "检查现有电子邮件"
+      }
     },
     "OWNERTYPES": {
       "0": "未知",
