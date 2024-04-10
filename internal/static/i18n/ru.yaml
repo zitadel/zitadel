@@ -120,7 +120,7 @@ Errors:
     WrongType: Запрещено для данного типа пользователя
     NotAllowedToLink: У пользователя нет разрешения на связь с внешним провайдером входа в систему
     Username:
-      AlreadyExists:  Имя пользователя занято
+      AlreadyExists: Имя пользователя занято
       Reserved: Имя пользователя уже занято
     Code:
       Empty: Код не заполнен
@@ -570,6 +570,15 @@ AggregateTypes:
   target: мишень
   execution: Исполнение
   user_schema: Пользовательская схема
+  auth_request: Запрос на аутентификацию
+  device_auth: Аутентификация устройства
+  idpintent: Намерение IDP
+  limits: Ограничения
+  milestone: Веха
+  oidc_session: Сеанс OIDC
+  restrictions: Ограничения
+  system: Система
+  session: Сеанс
 
 EventTypes:
   execution:
@@ -714,7 +723,7 @@ EventTypes:
               login: Проверка мультифактора U2F начата
             check:
               succeeded: Проверка мультифактора U2F прошла успешно
-              failed:  Проверка мультифактора U2F U2F не удалась
+              failed: Проверка мультифактора U2F U2F не удалась
             signcount:
               changed: Контрольная сумма токена мультифактора U2F изменена
         init:
@@ -876,7 +885,7 @@ EventTypes:
           added: Второй фактор добавлен в политику входа в систему
           removed: Второй фактор удалён из политики входа в систему
         multifactor:
-          added:  Мультифактор добавлен в политику входа в систему
+          added: Мультифактор добавлен в политику входа в систему
           removed: Мультифактор удалён из политики входа в систему
       password:
         complexity:
