@@ -103,51 +103,63 @@ export class FeaturesComponent implements OnDestroy {
   }
 
   public validateAndSave() {
-    this.featureService
-      .resetInstanceFeatures()
-      .then(() => {
-        const req = new SetInstanceFeaturesRequest();
+    this.featureService.resetInstanceFeatures().then(() => {
+      const req = new SetInstanceFeaturesRequest();
+      let changed = false;
 
-        if (this.toggleStates?.loginDefaultOrg?.state !== ToggleState.INHERITED) {
-          req.setLoginDefaultOrg(this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED);
-        }
-        if (this.toggleStates?.oidcTriggerIntrospectionProjections?.state !== ToggleState.INHERITED) {
-          req.setOidcTriggerIntrospectionProjections(
-            this.toggleStates?.oidcTriggerIntrospectionProjections?.state === ToggleState.ENABLED,
-          );
-        }
-        if (this.toggleStates?.oidcLegacyIntrospection?.state !== ToggleState.INHERITED) {
-          req.setOidcLegacyIntrospection(this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED);
-        }
-        if (this.toggleStates?.userSchema?.state !== ToggleState.INHERITED) {
-          req.setUserSchema(this.toggleStates?.userSchema?.state === ToggleState.ENABLED);
-        }
-        if (this.toggleStates?.oidcTokenExchange?.state !== ToggleState.INHERITED) {
-          req.setOidcTokenExchange(this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED);
-        }
-        if (this.toggleStates?.actions?.state !== ToggleState.INHERITED) {
-          req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
-        }
+      console.log(this.toggleStates);
 
-        return this.featureService.setInstanceFeatures(req);
-      })
-      .then(() => {
-        this.toast.showInfo('POLICY.TOAST.SET', true);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+      if (this.toggleStates?.loginDefaultOrg?.state !== ToggleState.INHERITED) {
+        req.setLoginDefaultOrg(this.toggleStates?.loginDefaultOrg?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      if (this.toggleStates?.oidcTriggerIntrospectionProjections?.state !== ToggleState.INHERITED) {
+        req.setOidcTriggerIntrospectionProjections(
+          this.toggleStates?.oidcTriggerIntrospectionProjections?.state === ToggleState.ENABLED,
+        );
+        changed = true;
+      }
+      if (this.toggleStates?.oidcLegacyIntrospection?.state !== ToggleState.INHERITED) {
+        req.setOidcLegacyIntrospection(this.toggleStates?.oidcLegacyIntrospection?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      if (this.toggleStates?.userSchema?.state !== ToggleState.INHERITED) {
+        req.setUserSchema(this.toggleStates?.userSchema?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      if (this.toggleStates?.oidcTokenExchange?.state !== ToggleState.INHERITED) {
+        req.setOidcTokenExchange(this.toggleStates?.oidcTokenExchange?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+      if (this.toggleStates?.actions?.state !== ToggleState.INHERITED) {
+        req.setActions(this.toggleStates?.actions?.state === ToggleState.ENABLED);
+        changed = true;
+      }
+
+      if (changed) {
+        this.featureService
+          .setInstanceFeatures(req)
+          .then(() => {
+            this.toast.showInfo('POLICY.TOAST.SET', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
   }
 
   private getFeatures(inheritance: boolean) {
     this.featureService.getInstanceFeatures(inheritance).then((instanceFeaturesResponse) => {
       this.featureData = instanceFeaturesResponse.toObject();
+      console.log(this.featureData);
 
       this.toggleStates = {
         loginDefaultOrg: {
           source: this.featureData.loginDefaultOrg?.source || Source.SOURCE_SYSTEM,
           state:
-            this.featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM
+            this.featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM ||
+            this.featureData.loginDefaultOrg?.source === Source.SOURCE_UNSPECIFIED
               ? ToggleState.INHERITED
               : !!this.featureData.loginDefaultOrg?.enabled
                 ? ToggleState.ENABLED
@@ -156,7 +168,8 @@ export class FeaturesComponent implements OnDestroy {
         oidcTriggerIntrospectionProjections: {
           source: this.featureData.oidcTriggerIntrospectionProjections?.source || Source.SOURCE_SYSTEM,
           state:
-            this.featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM
+            this.featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM ||
+            this.featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_UNSPECIFIED
               ? ToggleState.INHERITED
               : !!this.featureData.oidcTriggerIntrospectionProjections?.enabled
                 ? ToggleState.ENABLED
@@ -165,7 +178,8 @@ export class FeaturesComponent implements OnDestroy {
         oidcLegacyIntrospection: {
           source: this.featureData.oidcLegacyIntrospection?.source || Source.SOURCE_SYSTEM,
           state:
-            this.featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM
+            this.featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM ||
+            this.featureData.oidcLegacyIntrospection?.source === Source.SOURCE_UNSPECIFIED
               ? ToggleState.INHERITED
               : !!this.featureData.oidcLegacyIntrospection?.enabled
                 ? ToggleState.ENABLED
@@ -174,7 +188,8 @@ export class FeaturesComponent implements OnDestroy {
         userSchema: {
           source: this.featureData.userSchema?.source || Source.SOURCE_SYSTEM,
           state:
-            this.featureData.userSchema?.source === Source.SOURCE_SYSTEM
+            this.featureData.userSchema?.source === Source.SOURCE_SYSTEM ||
+            this.featureData.userSchema?.source === Source.SOURCE_UNSPECIFIED
               ? ToggleState.INHERITED
               : !!this.featureData.userSchema?.enabled
                 ? ToggleState.ENABLED
@@ -183,7 +198,8 @@ export class FeaturesComponent implements OnDestroy {
         oidcTokenExchange: {
           source: this.featureData.oidcTokenExchange?.source || Source.SOURCE_SYSTEM,
           state:
-            this.featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM
+            this.featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM ||
+            this.featureData.oidcTokenExchange?.source === Source.SOURCE_UNSPECIFIED
               ? ToggleState.INHERITED
               : !!this.featureData.oidcTokenExchange?.enabled
                 ? ToggleState.ENABLED
@@ -192,7 +208,8 @@ export class FeaturesComponent implements OnDestroy {
         actions: {
           source: Source.SOURCE_SYSTEM,
           state:
-            this.featureData.actions?.source === Source.SOURCE_SYSTEM
+            this.featureData.actions?.source === Source.SOURCE_SYSTEM ||
+            this.featureData.actions?.source === Source.SOURCE_UNSPECIFIED
               ? ToggleState.INHERITED
               : !!this.featureData.actions?.enabled
                 ? ToggleState.ENABLED

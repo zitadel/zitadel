@@ -40,13 +40,17 @@
                 ></i>
                 <div
                   *ngIf="
-                    !!featureData.loginDefaultOrg?.enabled && featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM
+                    !!featureData.loginDefaultOrg?.enabled &&
+                    (featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM ||
+                      featureData.loginDefaultOrg?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot enabled"
                 ></div>
                 <div
                   *ngIf="
-                    !featureData.loginDefaultOrg?.enabled && featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM
+                    !featureData.loginDefaultOrg?.enabled &&
+                    (featureData.loginDefaultOrg?.source === Source.SOURCE_SYSTEM ||
+                      featureData.loginDefaultOrg?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot disabled"
                 ></div>
@@ -91,14 +95,16 @@
                 <div
                   *ngIf="
                     !!featureData.oidcLegacyIntrospection?.enabled &&
-                    featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM
+                    (featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcLegacyIntrospection?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot enabled"
                 ></div>
                 <div
                   *ngIf="
                     !featureData.oidcLegacyIntrospection?.enabled &&
-                    featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM
+                    (featureData.oidcLegacyIntrospection?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcLegacyIntrospection?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot disabled"
                 ></div>
@@ -142,13 +148,16 @@
                 <div
                   *ngIf="
                     !!featureData.oidcTokenExchange?.enabled &&
-                    featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM
+                    (featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTokenExchange?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot enabled"
                 ></div>
                 <div
                   *ngIf="
-                    !featureData.oidcTokenExchange?.enabled && featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM
+                    !featureData.oidcTokenExchange?.enabled &&
+                    (featureData.oidcTokenExchange?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTokenExchange?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot disabled"
                 ></div>
@@ -192,14 +201,16 @@
                 <div
                   *ngIf="
                     !!featureData.oidcTriggerIntrospectionProjections?.enabled &&
-                    featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM
+                    (featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot enabled"
                 ></div>
                 <div
                   *ngIf="
                     !featureData.oidcTriggerIntrospectionProjections?.enabled &&
-                    featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM
+                    (featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_SYSTEM ||
+                      featureData.oidcTriggerIntrospectionProjections?.source === Source.SOURCE_UNSPECIFIED)
                   "
                   class="current-dot disabled"
                 ></div>
@@ -241,11 +252,19 @@
                   matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
                 ></i>
                 <div
-                  *ngIf="!!featureData.userSchema?.enabled && featureData.userSchema?.source === Source.SOURCE_SYSTEM"
+                  *ngIf="
+                    !!featureData.userSchema?.enabled &&
+                    (featureData.userSchema?.source === Source.SOURCE_SYSTEM ||
+                      featureData.userSchema?.source === Source.SOURCE_UNSPECIFIED)
+                  "
                   class="current-dot enabled"
                 ></div>
                 <div
-                  *ngIf="!featureData.userSchema?.enabled && featureData.userSchema?.source === Source.SOURCE_SYSTEM"
+                  *ngIf="
+                    !featureData.userSchema?.enabled &&
+                    (featureData.userSchema?.source === Source.SOURCE_SYSTEM ||
+                      featureData.userSchema?.source === Source.SOURCE_UNSPECIFIED)
+                  "
                   class="current-dot disabled"
                 ></div>
               </div>
@@ -286,11 +305,19 @@
                   matTooltip="{{ 'SETTING.FEATURES.INHERITED_DESCRIPTION' | translate }}"
                 ></i>
                 <div
-                  *ngIf="!!featureData.actions?.enabled && featureData.actions?.source === Source.SOURCE_SYSTEM"
+                  *ngIf="
+                    !!featureData.actions?.enabled &&
+                    (featureData.actions?.source === Source.SOURCE_SYSTEM ||
+                      featureData.actions?.source === Source.SOURCE_UNSPECIFIED)
+                  "
                   class="current-dot enabled"
                 ></div>
                 <div
-                  *ngIf="!featureData.actions?.enabled && featureData.actions?.source === Source.SOURCE_SYSTEM"
+                  *ngIf="
+                    !featureData.actions?.enabled &&
+                    (featureData.actions?.source === Source.SOURCE_SYSTEM ||
+                      featureData.actions?.source === Source.SOURCE_UNSPECIFIED)
+                  "
                   class="current-dot disabled"
                 ></div>
               </div>
