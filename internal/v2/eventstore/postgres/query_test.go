@@ -891,7 +891,6 @@ func Test_writeQueryUse_examples(t *testing.T) {
 					"instance",
 					nil,
 					eventstore.AppendFilters(
-
 						eventstore.NewFilter(
 							eventstore.AppendAggregateFilter(
 								"instance",
@@ -1156,6 +1155,10 @@ func Test_writeQueryUse_examples(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var stmt database.Statement
 			writeQuery(&stmt, tt.args.query)
+			if tt.name == "milestones" {
+				t.Log(stmt.Debug())
+				t.FailNow()
+			}
 			assertQuery(t, &stmt, tt.want)
 		})
 	}
