@@ -50,6 +50,7 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemLegacyIntrospectionEventType,
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemTokenExchangeEventType,
+			feature_v2.SystemActionsEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -78,6 +79,8 @@ func (m *SystemFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent[b
 		dst = &m.system.UserSchema
 	case feature.KeyTokenExchange:
 		dst = &m.system.TokenExchange
+	case feature.KeyActions:
+		dst = &m.system.Actions
 	}
 
 	*dst = FeatureSource[bool]{

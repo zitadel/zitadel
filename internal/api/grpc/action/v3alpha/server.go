@@ -1,19 +1,22 @@
-package execution
+package action
 
 import (
+	"context"
+
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 )
 
-var _ execution.ExecutionServiceServer = (*Server)(nil)
+var _ action.ActionServiceServer = (*Server)(nil)
 
 type Server struct {
-	execution.UnimplementedExecutionServiceServer
+	action.UnimplementedActionServiceServer
 	command             *command.Commands
 	query               *query.Queries
 	ListActionFunctions func() []string
@@ -40,21 +43,28 @@ func CreateServer(
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	execution.RegisterExecutionServiceServer(grpcServer, s)
+	action.RegisterActionServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
-	return execution.ExecutionService_ServiceDesc.ServiceName
+	return action.ActionService_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return execution.ExecutionService_ServiceDesc.ServiceName
+	return action.ActionService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return execution.ExecutionService_AuthMethods
+	return action.ActionService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return execution.RegisterExecutionServiceHandler
+	return action.RegisterActionServiceHandler
+}
+
+func checkExecutionEnabled(ctx context.Context) error {
+	if authz.GetInstance(ctx).Features().Actions {
+		return nil
+	}
+	return zerrors.ThrowPreconditionFailed(nil, "SCHEMA-141bwx3lef", "Errors.action.NotEnabled")
 }

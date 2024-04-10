@@ -1,4 +1,4 @@
-package execution
+package action
 
 import (
 	"context"
@@ -10,10 +10,14 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 )
 
-func (s *Server) ListTargets(ctx context.Context, req *execution.ListTargetsRequest) (*execution.ListTargetsResponse, error) {
+func (s *Server) ListTargets(ctx context.Context, req *action.ListTargetsRequest) (*action.ListTargetsResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	queries, err := listTargetsRequestToModel(req)
 	if err != nil {
 		return nil, err
@@ -22,13 +26,13 @@ func (s *Server) ListTargets(ctx context.Context, req *execution.ListTargetsRequ
 	if err != nil {
 		return nil, err
 	}
-	return &execution.ListTargetsResponse{
+	return &action.ListTargetsResponse{
 		Result:  targetsToPb(resp.Targets),
 		Details: object.ToListDetails(resp.SearchResponse),
 	}, nil
 }
 
-func listTargetsRequestToModel(req *execution.ListTargetsRequest) (*query.TargetSearchQueries, error) {
+func listTargetsRequestToModel(req *action.ListTargetsRequest) (*query.TargetSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToQuery(req.Query)
 	queries, err := targetQueriesToQuery(req.Queries)
 	if err != nil {
@@ -45,34 +49,34 @@ func listTargetsRequestToModel(req *execution.ListTargetsRequest) (*query.Target
 	}, nil
 }
 
-func targetFieldNameToSortingColumn(field execution.TargetFieldName) query.Column {
+func targetFieldNameToSortingColumn(field action.TargetFieldName) query.Column {
 	switch field {
-	case execution.TargetFieldName_FIELD_NAME_UNSPECIFIED:
+	case action.TargetFieldName_FIELD_NAME_UNSPECIFIED:
 		return query.TargetColumnID
-	case execution.TargetFieldName_FIELD_NAME_ID:
+	case action.TargetFieldName_FIELD_NAME_ID:
 		return query.TargetColumnID
-	case execution.TargetFieldName_FIELD_NAME_CREATION_DATE:
+	case action.TargetFieldName_FIELD_NAME_CREATION_DATE:
 		return query.TargetColumnCreationDate
-	case execution.TargetFieldName_FIELD_NAME_CHANGE_DATE:
+	case action.TargetFieldName_FIELD_NAME_CHANGE_DATE:
 		return query.TargetColumnChangeDate
-	case execution.TargetFieldName_FIELD_NAME_NAME:
+	case action.TargetFieldName_FIELD_NAME_NAME:
 		return query.TargetColumnName
-	case execution.TargetFieldName_FIELD_NAME_TARGET_TYPE:
+	case action.TargetFieldName_FIELD_NAME_TARGET_TYPE:
 		return query.TargetColumnTargetType
-	case execution.TargetFieldName_FIELD_NAME_URL:
+	case action.TargetFieldName_FIELD_NAME_URL:
 		return query.TargetColumnURL
-	case execution.TargetFieldName_FIELD_NAME_TIMEOUT:
+	case action.TargetFieldName_FIELD_NAME_TIMEOUT:
 		return query.TargetColumnTimeout
-	case execution.TargetFieldName_FIELD_NAME_ASYNC:
+	case action.TargetFieldName_FIELD_NAME_ASYNC:
 		return query.TargetColumnAsync
-	case execution.TargetFieldName_FIELD_NAME_INTERRUPT_ON_ERROR:
+	case action.TargetFieldName_FIELD_NAME_INTERRUPT_ON_ERROR:
 		return query.TargetColumnInterruptOnError
 	default:
 		return query.TargetColumnID
 	}
 }
 
-func targetQueriesToQuery(queries []*execution.TargetSearchQuery) (_ []query.SearchQuery, err error) {
+func targetQueriesToQuery(queries []*action.TargetSearchQuery) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
 		q[i], err = targetQueryToQuery(query)
@@ -83,69 +87,77 @@ func targetQueriesToQuery(queries []*execution.TargetSearchQuery) (_ []query.Sea
 	return q, nil
 }
 
-func targetQueryToQuery(query *execution.TargetSearchQuery) (query.SearchQuery, error) {
+func targetQueryToQuery(query *action.TargetSearchQuery) (query.SearchQuery, error) {
 	switch q := query.Query.(type) {
-	case *execution.TargetSearchQuery_TargetNameQuery:
+	case *action.TargetSearchQuery_TargetNameQuery:
 		return targetNameQueryToQuery(q.TargetNameQuery)
-	case *execution.TargetSearchQuery_InTargetIdsQuery:
+	case *action.TargetSearchQuery_InTargetIdsQuery:
 		return targetInTargetIdsQueryToQuery(q.InTargetIdsQuery)
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
 }
 
-func targetNameQueryToQuery(q *execution.TargetNameQuery) (query.SearchQuery, error) {
+func targetNameQueryToQuery(q *action.TargetNameQuery) (query.SearchQuery, error) {
 	return query.NewTargetNameSearchQuery(object.TextMethodToQuery(q.Method), q.GetTargetName())
 }
 
-func targetInTargetIdsQueryToQuery(q *execution.InTargetIDsQuery) (query.SearchQuery, error) {
+func targetInTargetIdsQueryToQuery(q *action.InTargetIDsQuery) (query.SearchQuery, error) {
 	return query.NewTargetInIDsSearchQuery(q.GetTargetIds())
 }
 
-func (s *Server) GetTargetByID(ctx context.Context, req *execution.GetTargetByIDRequest) (_ *execution.GetTargetByIDResponse, err error) {
+func (s *Server) GetTargetByID(ctx context.Context, req *action.GetTargetByIDRequest) (_ *action.GetTargetByIDResponse, err error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	resp, err := s.query.GetTargetByID(ctx, req.GetTargetId())
 	if err != nil {
 		return nil, err
 	}
-	return &execution.GetTargetByIDResponse{
+	return &action.GetTargetByIDResponse{
 		Target: targetToPb(resp),
 	}, nil
 }
 
-func targetsToPb(targets []*query.Target) []*execution.Target {
-	t := make([]*execution.Target, len(targets))
+func targetsToPb(targets []*query.Target) []*action.Target {
+	t := make([]*action.Target, len(targets))
 	for i, target := range targets {
 		t[i] = targetToPb(target)
 	}
 	return t
 }
 
-func targetToPb(t *query.Target) *execution.Target {
-	target := &execution.Target{
+func targetToPb(t *query.Target) *action.Target {
+	target := &action.Target{
 		Details:  object.DomainToDetailsPb(&t.ObjectDetails),
 		TargetId: t.ID,
 		Name:     t.Name,
 		Timeout:  durationpb.New(t.Timeout),
 	}
 	if t.Async {
-		target.ExecutionType = &execution.Target_IsAsync{IsAsync: t.Async}
+		target.ExecutionType = &action.Target_IsAsync{IsAsync: t.Async}
 	}
 	if t.InterruptOnError {
-		target.ExecutionType = &execution.Target_InterruptOnError{InterruptOnError: t.InterruptOnError}
+		target.ExecutionType = &action.Target_InterruptOnError{InterruptOnError: t.InterruptOnError}
 	}
 
 	switch t.TargetType {
 	case domain.TargetTypeWebhook:
-		target.TargetType = &execution.Target_RestWebhook{RestWebhook: &execution.SetRESTWebhook{Url: t.URL}}
+		target.TargetType = &action.Target_RestWebhook{RestWebhook: &action.SetRESTWebhook{Url: t.URL}}
 	case domain.TargetTypeRequestResponse:
-		target.TargetType = &execution.Target_RestRequestResponse{RestRequestResponse: &execution.SetRESTRequestResponse{Url: t.URL}}
+		target.TargetType = &action.Target_RestRequestResponse{RestRequestResponse: &action.SetRESTRequestResponse{Url: t.URL}}
 	default:
 		target.TargetType = nil
 	}
 	return target
 }
 
-func (s *Server) ListExecutions(ctx context.Context, req *execution.ListExecutionsRequest) (*execution.ListExecutionsResponse, error) {
+func (s *Server) ListExecutions(ctx context.Context, req *action.ListExecutionsRequest) (*action.ListExecutionsResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	queries, err := listExecutionsRequestToModel(req)
 	if err != nil {
 		return nil, err
@@ -154,13 +166,13 @@ func (s *Server) ListExecutions(ctx context.Context, req *execution.ListExecutio
 	if err != nil {
 		return nil, err
 	}
-	return &execution.ListExecutionsResponse{
+	return &action.ListExecutionsResponse{
 		Result:  executionsToPb(resp.Executions),
 		Details: object.ToListDetails(resp.SearchResponse),
 	}, nil
 }
 
-func listExecutionsRequestToModel(req *execution.ListExecutionsRequest) (*query.ExecutionSearchQueries, error) {
+func listExecutionsRequestToModel(req *action.ListExecutionsRequest) (*query.ExecutionSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToQuery(req.Query)
 	queries, err := executionQueriesToQuery(req.Queries)
 	if err != nil {
@@ -176,7 +188,7 @@ func listExecutionsRequestToModel(req *execution.ListExecutionsRequest) (*query.
 	}, nil
 }
 
-func executionQueriesToQuery(queries []*execution.SearchQuery) (_ []query.SearchQuery, err error) {
+func executionQueriesToQuery(queries []*action.SearchQuery) (_ []query.SearchQuery, err error) {
 	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
 		q[i], err = executionQueryToQuery(query)
@@ -187,39 +199,39 @@ func executionQueriesToQuery(queries []*execution.SearchQuery) (_ []query.Search
 	return q, nil
 }
 
-func executionQueryToQuery(searchQuery *execution.SearchQuery) (query.SearchQuery, error) {
+func executionQueryToQuery(searchQuery *action.SearchQuery) (query.SearchQuery, error) {
 	switch q := searchQuery.Query.(type) {
-	case *execution.SearchQuery_InConditionsQuery:
+	case *action.SearchQuery_InConditionsQuery:
 		return inConditionsQueryToQuery(q.InConditionsQuery)
-	case *execution.SearchQuery_ExecutionTypeQuery:
+	case *action.SearchQuery_ExecutionTypeQuery:
 		return executionTypeToQuery(q.ExecutionTypeQuery)
-	case *execution.SearchQuery_TargetQuery:
+	case *action.SearchQuery_TargetQuery:
 		return query.NewExecutionTargetSearchQuery(q.TargetQuery.GetTargetId())
-	case *execution.SearchQuery_IncludeQuery:
+	case *action.SearchQuery_IncludeQuery:
 		return query.NewExecutionIncludeSearchQuery(q.IncludeQuery.GetInclude())
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
 }
 
-func executionTypeToQuery(q *execution.ExecutionTypeQuery) (query.SearchQuery, error) {
+func executionTypeToQuery(q *action.ExecutionTypeQuery) (query.SearchQuery, error) {
 	switch q.ExecutionType {
-	case execution.ExecutionType_EXECUTION_TYPE_UNSPECIFIED:
+	case action.ExecutionType_EXECUTION_TYPE_UNSPECIFIED:
 		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeUnspecified)
-	case execution.ExecutionType_EXECUTION_TYPE_REQUEST:
+	case action.ExecutionType_EXECUTION_TYPE_REQUEST:
 		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeRequest)
-	case execution.ExecutionType_EXECUTION_TYPE_RESPONSE:
+	case action.ExecutionType_EXECUTION_TYPE_RESPONSE:
 		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeResponse)
-	case execution.ExecutionType_EXECUTION_TYPE_EVENT:
+	case action.ExecutionType_EXECUTION_TYPE_EVENT:
 		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeEvent)
-	case execution.ExecutionType_EXECUTION_TYPE_FUNCTION:
+	case action.ExecutionType_EXECUTION_TYPE_FUNCTION:
 		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeFunction)
 	default:
 		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeUnspecified)
 	}
 }
 
-func inConditionsQueryToQuery(q *execution.InConditionsQuery) (query.SearchQuery, error) {
+func inConditionsQueryToQuery(q *action.InConditionsQuery) (query.SearchQuery, error) {
 	values := make([]string, len(q.GetConditions()))
 	for i, condition := range q.GetConditions() {
 		id, err := conditionToID(condition)
@@ -231,45 +243,45 @@ func inConditionsQueryToQuery(q *execution.InConditionsQuery) (query.SearchQuery
 	return query.NewExecutionInIDsSearchQuery(values)
 }
 
-func conditionToID(q *execution.Condition) (string, error) {
+func conditionToID(q *action.Condition) (string, error) {
 	switch t := q.GetConditionType().(type) {
-	case *execution.Condition_Request:
+	case *action.Condition_Request:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Request.GetMethod(),
 			Service: t.Request.GetService(),
 			All:     t.Request.GetAll(),
 		}
 		return cond.ID(domain.ExecutionTypeRequest), nil
-	case *execution.Condition_Response:
+	case *action.Condition_Response:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Response.GetMethod(),
 			Service: t.Response.GetService(),
 			All:     t.Response.GetAll(),
 		}
 		return cond.ID(domain.ExecutionTypeResponse), nil
-	case *execution.Condition_Event:
+	case *action.Condition_Event:
 		cond := &command.ExecutionEventCondition{
 			Event: t.Event.GetEvent(),
 			Group: t.Event.GetGroup(),
 			All:   t.Event.GetAll(),
 		}
 		return cond.ID(), nil
-	case *execution.Condition_Function:
+	case *action.Condition_Function:
 		return t.Function, nil
 	default:
 		return "", zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
 }
 
-func executionsToPb(executions []*query.Execution) []*execution.Execution {
-	e := make([]*execution.Execution, len(executions))
+func executionsToPb(executions []*query.Execution) []*action.Execution {
+	e := make([]*action.Execution, len(executions))
 	for i, execution := range executions {
 		e[i] = executionToPb(execution)
 	}
 	return e
 }
 
-func executionToPb(e *query.Execution) *execution.Execution {
+func executionToPb(e *query.Execution) *action.Execution {
 	var targets, includes []string
 	if len(e.Targets) > 0 {
 		targets = e.Targets
@@ -277,7 +289,7 @@ func executionToPb(e *query.Execution) *execution.Execution {
 	if len(e.Includes) > 0 {
 		includes = e.Includes
 	}
-	return &execution.Execution{
+	return &action.Execution{
 		Details:     object.DomainToDetailsPb(&e.ObjectDetails),
 		ExecutionId: e.ID,
 		Targets:     targets,
