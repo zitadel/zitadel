@@ -37,7 +37,7 @@ func (s *SetRestrictions) Validate(defaultLanguage language.Tag) error {
 	return nil
 }
 
-// SetRestrictions creates new restrictions or updates existing restrictions.
+// SetInstanceRestrictions creates new restrictions or updates existing restrictions.
 func (c *Commands) SetInstanceRestrictions(
 	ctx context.Context,
 	setRestrictions *SetRestrictions,

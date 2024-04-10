@@ -624,6 +624,7 @@ EventTypes:
         removed: Clé supprimée
       secret:
         set: Secret défini
+        updated: Hachage secret mis à jour
         removed: Secret supprimée
         check:
           succeeded: La vérification de Secret réussie
@@ -961,6 +962,11 @@ EventTypes:
           verified:
             check: Vérification du secret du client OIDC réussie
             failed: La vérification du secret du client OIDC a échoué
+      api:
+        secret:
+          check:
+            succeeded: La vérification du secret de l'API a réussi
+            failed: La vérification du secret de l'API a échoué
         key:
           added: Clé d'application ajoutée
           removed: Clé d'application supprimée
@@ -973,11 +979,13 @@ EventTypes:
           changed: Modification de la configuration de l'OIDC
           secret:
             changed: Le secret de l'OIDC a été modifié
+            updated: Hachage secret OIDC mis à jour
         api:
           added: Configuration API ajoutée
           changed: La configuration de l'API a été modifiée
           secret:
             changed: Le secret de l'API a été modifié
+            updated: Hachage secret de l'API mis à jour
   policy:
     password:
       complexity:

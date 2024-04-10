@@ -53,7 +53,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
 	}
 
-	err = crypto.VerifyCodeWithAlgorithm(wm.CodeCreationDate, wm.CodeExpiry, wm.Code, code, c.userEncryption)
+	err = crypto.VerifyCode(wm.CodeCreationDate, wm.CodeExpiry, wm.Code, code, c.userEncryption)
 	if err != nil {
 		return nil, err
 	}
