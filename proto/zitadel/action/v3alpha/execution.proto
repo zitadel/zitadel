@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.execution.v3alpha;
+package zitadel.action.v3alpha;
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -11,7 +11,7 @@ import "validate/validate.proto";
 import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha;execution";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha;action";
 
 message Execution {
   string execution_id = 1 [

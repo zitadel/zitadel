@@ -1614,6 +1614,7 @@
         "initPasswordText": "Passwort Initialisierung",
         "initializeDoneText": "Benutzereinrichtung erfolgreich",
         "initializeUserText": "Benutzereinrichtung",
+        "linkingUserPromptText": "Aufforderung zur Benutzerverlinkung",
         "linkingUserDoneText": "Benutzerverlinkung erfolgreich",
         "loginText": "Anmelden",
         "logoutText": "Abmelden",
@@ -1685,7 +1686,8 @@
       "HASLOWERCASE": "erfordert Kleinbuchstaben",
       "HASUPPERCASE": "erfordert Grossbuchstaben",
       "SHOWLOCKOUTFAILURES": "Zeige Anzahl Anmeldeversuche",
-      "MAXATTEMPTS": "Maximale Anzahl an Versuchen",
+      "MAXPASSWORDATTEMPTS": "Maximale Anzahl an Passwort Versuchen",
+      "MAXOTPATTEMPTS": "Maximale Anzahl an OTP Versuchen",
       "EXPIREWARNDAYS": "Ablauf Warnung nach Tagen",
       "MAXAGEDAYS": "Maximale Gültigkeit in Tagen",
       "USERLOGINMUSTBEDOMAIN": "Organisationsdomain dem Loginname hinzufügen",
@@ -2040,7 +2042,13 @@
       "ISCREATIONALLOWED": "Account erstellen erlaubt",
       "ISCREATIONALLOWED_DESC": "Legt fest, ob Konten erstellt werden können.",
       "ISLINKINGALLOWED": "Account linking erlaubt",
-      "ISLINKINGALLOWED_DESC": "Legt fest, ob eine Identität mit einem bestehenden Konto verknüpft werden kann."
+      "ISLINKINGALLOWED_DESC": "Legt fest, ob eine Identität mit einem bestehenden Konto verknüpft werden kann.",
+      "AUTOLINKING_DESC": "Legt fest, ob eine Identität aufgefordert wird, mit einem vorhandenen Konto verknüpft zu werden.",
+      "AUTOLINKINGTYPE": {
+        "0": "Deaktiviert",
+        "1": "Überprüfung auf vorhandenen Benutzernamen",
+        "2": "Überprüfung auf vorhandene E-Mail"
+      }
     },
     "OWNERTYPES": {
       "0": "unknown",

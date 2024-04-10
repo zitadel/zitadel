@@ -1,4 +1,4 @@
-package execution
+package action
 
 import (
 	"testing"
@@ -10,12 +10,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 )
 
 func Test_createTargetToCommand(t *testing.T) {
 	type args struct {
-		req *execution.CreateTargetRequest
+		req *action.CreateTargetRequest
 	}
 	tests := []struct {
 		name string
@@ -35,15 +35,15 @@ func Test_createTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (async webhook)",
-			args: args{&execution.CreateTargetRequest{
+			args: args{&action.CreateTargetRequest{
 				Name: "target 1",
-				TargetType: &execution.CreateTargetRequest_RestWebhook{
-					RestWebhook: &execution.SetRESTWebhook{
+				TargetType: &action.CreateTargetRequest_RestWebhook{
+					RestWebhook: &action.SetRESTWebhook{
 						Url: "https://example.com/hooks/1",
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
-				ExecutionType: &execution.CreateTargetRequest_IsAsync{
+				ExecutionType: &action.CreateTargetRequest_IsAsync{
 					IsAsync: true,
 				},
 			}},
@@ -58,15 +58,15 @@ func Test_createTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (interrupting response)",
-			args: args{&execution.CreateTargetRequest{
+			args: args{&action.CreateTargetRequest{
 				Name: "target 1",
-				TargetType: &execution.CreateTargetRequest_RestRequestResponse{
-					RestRequestResponse: &execution.SetRESTRequestResponse{
+				TargetType: &action.CreateTargetRequest_RestRequestResponse{
+					RestRequestResponse: &action.SetRESTRequestResponse{
 						Url: "https://example.com/hooks/1",
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
-				ExecutionType: &execution.CreateTargetRequest_InterruptOnError{
+				ExecutionType: &action.CreateTargetRequest_InterruptOnError{
 					InterruptOnError: true,
 				},
 			}},
@@ -90,7 +90,7 @@ func Test_createTargetToCommand(t *testing.T) {
 
 func Test_updateTargetToCommand(t *testing.T) {
 	type args struct {
-		req *execution.UpdateTargetRequest
+		req *action.UpdateTargetRequest
 	}
 	tests := []struct {
 		name string
@@ -104,7 +104,7 @@ func Test_updateTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields nil",
-			args: args{&execution.UpdateTargetRequest{
+			args: args{&action.UpdateTargetRequest{
 				Name:          nil,
 				TargetType:    nil,
 				Timeout:       nil,
@@ -121,7 +121,7 @@ func Test_updateTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields empty",
-			args: args{&execution.UpdateTargetRequest{
+			args: args{&action.UpdateTargetRequest{
 				Name:          gu.Ptr(""),
 				TargetType:    nil,
 				Timeout:       durationpb.New(0),
@@ -138,15 +138,15 @@ func Test_updateTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (async webhook)",
-			args: args{&execution.UpdateTargetRequest{
+			args: args{&action.UpdateTargetRequest{
 				Name: gu.Ptr("target 1"),
-				TargetType: &execution.UpdateTargetRequest_RestWebhook{
-					RestWebhook: &execution.SetRESTWebhook{
+				TargetType: &action.UpdateTargetRequest_RestWebhook{
+					RestWebhook: &action.SetRESTWebhook{
 						Url: "https://example.com/hooks/1",
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
-				ExecutionType: &execution.UpdateTargetRequest_IsAsync{
+				ExecutionType: &action.UpdateTargetRequest_IsAsync{
 					IsAsync: true,
 				},
 			}},
@@ -161,15 +161,15 @@ func Test_updateTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (interrupting response)",
-			args: args{&execution.UpdateTargetRequest{
+			args: args{&action.UpdateTargetRequest{
 				Name: gu.Ptr("target 1"),
-				TargetType: &execution.UpdateTargetRequest_RestRequestResponse{
-					RestRequestResponse: &execution.SetRESTRequestResponse{
+				TargetType: &action.UpdateTargetRequest_RestRequestResponse{
+					RestRequestResponse: &action.SetRESTRequestResponse{
 						Url: "https://example.com/hooks/1",
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
-				ExecutionType: &execution.UpdateTargetRequest_InterruptOnError{
+				ExecutionType: &action.UpdateTargetRequest_InterruptOnError{
 					InterruptOnError: true,
 				},
 			}},

@@ -1614,6 +1614,7 @@
         "initPasswordText": "Inicjalizacja hasła",
         "initializeDoneText": "Inicjalizacja użytkownika zakończona",
         "initializeUserText": "Inicjalizacja użytkownika",
+        "linkingUserPromptText": "Komunikat o łączeniu użytkowników",
         "linkingUserDoneText": "Łączenie użytkownika zakończone",
         "loginText": "Zaloguj się",
         "logoutText": "Wyloguj się",
@@ -1685,7 +1686,8 @@
       "HASLOWERCASE": "zawiera małe litery",
       "HASUPPERCASE": "zawiera duże litery",
       "SHOWLOCKOUTFAILURES": "pokaż blokady nieudanych prób",
-      "MAXATTEMPTS": "Maksymalna liczba prób wprowadzenia hasła",
+      "MAXPASSWORDATTEMPTS": "Maksymalna liczba prób wprowadzenia hasła",
+      "MAXOTPATTEMPTS": "Maksymalna liczba prób OTP",
       "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniu",
       "MAXAGEDAYS": "Maksymalny wiek w dniach",
       "USERLOGINMUSTBEDOMAIN": "Dodaj domenę organizacji jako przyrostek do nazw logowania",
@@ -2044,7 +2046,13 @@
       "ISCREATIONALLOWED": "tworzenie dozwolone",
       "ISCREATIONALLOWED_DESC": "Określa, czy można tworzyć konta.",
       "ISLINKINGALLOWED": "dozwolone łączenie rachunków",
-      "ISLINKINGALLOWED_DESC": "Określa, czy tożsamość może być powiązana z istniejącym kontem."
+      "ISLINKINGALLOWED_DESC": "Określa, czy tożsamość może być powiązana z istniejącym kontem.",
+      "AUTOLINKING_DESC": "Określa, czy tożsamość będzie proszona o połączenie z istniejącym kontem.",
+      "AUTOLINKINGTYPE": {
+        "0": "Wyłączone",
+        "1": "Sprawdź istniejącą nazwę użytkownika",
+        "2": "Sprawdź istniejący adres e-mail"
+      }
     },
     "OWNERTYPES": {
       "0": "nieznany",

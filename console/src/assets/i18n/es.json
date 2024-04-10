@@ -1616,6 +1616,7 @@
         "initPasswordText": "Inicializar contraseña",
         "initializeDoneText": "Inicializar usuario, hecho",
         "initializeUserText": "Inicializar usuario",
+        "linkingUserPromptText": "Mensaje de enlace de usuario",
         "linkingUserDoneText": "Vinculación de usuario, hecho",
         "loginText": "Iniciar sesión",
         "logoutText": "Cerrar sesión",
@@ -1687,7 +1688,8 @@
       "HASLOWERCASE": "tiene minúsculas",
       "HASUPPERCASE": "tiene mayúsculas",
       "SHOWLOCKOUTFAILURES": "mostrar fallos de bloqueo",
-      "MAXATTEMPTS": "Intentos máximos",
+      "MAXPASSWORDATTEMPTS": "Intentos máximos de contraseña",
+      "MAXOTPATTEMPTS": "Intentos máximos de OTP",
       "EXPIREWARNDAYS": "Aviso de expiración después de estos días: ",
       "MAXAGEDAYS": "Antigüedad máxima en días",
       "USERLOGINMUSTBEDOMAIN": "Añadir el dominio de la organización como sufijo de los nombres de inicio de sesión",
@@ -2046,7 +2048,13 @@
       "ISCREATIONALLOWED": "Creación de cuentas permitida",
       "ISCREATIONALLOWED_DESC": "Determina si se pueden crear cuentas.",
       "ISLINKINGALLOWED": "Permitida la vinculación de cuentas",
-      "ISLINKINGALLOWED_DESC": "Determina si una identidad puede vincularse a una cuenta existente."
+      "ISLINKINGALLOWED_DESC": "Determina si una identidad puede vincularse a una cuenta existente.",
+      "AUTOLINKING_DESC": "Determina si se pedirá a una identidad que se vincule a una cuenta existente.",
+      "AUTOLINKINGTYPE": {
+        "0": "Desactivado",
+        "1": "Comprobar nombre de usuario existente",
+        "2": "Comprobar correo electrónico existente"
+      }
     },
     "OWNERTYPES": {
       "0": "desconocido",

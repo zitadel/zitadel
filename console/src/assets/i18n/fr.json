@@ -1614,6 +1614,7 @@
         "initPasswordText": "Initialiser le mot de passe",
         "initializeDoneText": "Initialiser l'utilisateur terminé",
         "initializeUserText": "Initialiser l'utilisateur",
+        "linkingUserPromptText": "Message de liaison utilisateur",
         "linkingUserDoneText": "Lier l'utilisateur fait",
         "loginText": "Connexion",
         "logoutText": "Déconnexion",
@@ -1685,7 +1686,8 @@
       "HASLOWERCASE": "a minuscule",
       "HASUPPERCASE": "a majuscule",
       "SHOWLOCKOUTFAILURES": "montrer les échecs de verrouillage",
-      "MAXATTEMPTS": "Mot de passe maximum Tentatives",
+      "MAXPASSWORDATTEMPTS": "Mot de passe maximum tentatives",
+      "MAXOTPATTEMPTS": "Maximal de tentatives OTP",
       "EXPIREWARNDAYS": "Expiration Avertissement après le jour",
       "MAXAGEDAYS": "Âge maximum en jours",
       "USERLOGINMUSTBEDOMAIN": "Le nom de connexion de l'utilisateur doit contenir le nom de domaine de l'organisation",
@@ -2044,7 +2046,13 @@
       "ISCREATIONALLOWED": "la création est-elle autorisée",
       "ISCREATIONALLOWED_DESC": "Détermine si des comptes peuvent être créés.",
       "ISLINKINGALLOWED": "la liaison est-elle autorisée",
-      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant."
+      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant.",
+      "AUTOLINKING_DESC": "Détermine si une identité sera invitée à être liée à un compte existant.",
+      "AUTOLINKINGTYPE": {
+        "0": "Désactivé",
+        "1": "Vérification de l'existence du nom d'utilisateur",
+        "2": "Vérification de l'existence de l'e-mail"
+      }
     },
     "OWNERTYPES": {
       "0": "inconnu",
