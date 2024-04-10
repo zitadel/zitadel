@@ -35,6 +35,7 @@ type IDPTemplate struct {
 	IsLinkingAllowed  bool
 	IsAutoCreation    bool
 	IsAutoUpdate      bool
+	AutoLinking       domain.AutoLinkingOption
 	*OAuthIDPTemplate
 	*OIDCIDPTemplate
 	*JWTIDPTemplate
@@ -225,6 +226,10 @@ var (
 	}
 	IDPTemplateIsAutoUpdateCol = Column{
 		name:  projection.IDPTemplateIsAutoUpdateCol,
+		table: idpTemplateTable,
+	}
+	IDPTemplateAutoLinkingCol = Column{
+		name:  projection.IDPTemplateAutoLinkingCol,
 		table: idpTemplateTable,
 	}
 )
@@ -812,6 +817,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			IDPTemplateAutoLinkingCol.identifier(),
 			// oauth
 			OAuthIDCol.identifier(),
 			OAuthClientIDCol.identifier(),
@@ -1037,6 +1043,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&idpTemplate.IsLinkingAllowed,
 				&idpTemplate.IsAutoCreation,
 				&idpTemplate.IsAutoUpdate,
+				&idpTemplate.AutoLinking,
 				// oauth
 				&oauthID,
 				&oauthClientID,
@@ -1297,6 +1304,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			IDPTemplateIsLinkingAllowedCol.identifier(),
 			IDPTemplateIsAutoCreationCol.identifier(),
 			IDPTemplateIsAutoUpdateCol.identifier(),
+			IDPTemplateAutoLinkingCol.identifier(),
 			// oauth
 			OAuthIDCol.identifier(),
 			OAuthClientIDCol.identifier(),
@@ -1527,6 +1535,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&idpTemplate.IsLinkingAllowed,
 					&idpTemplate.IsAutoCreation,
 					&idpTemplate.IsAutoUpdate,
+					&idpTemplate.AutoLinking,
 					// oauth
 					&oauthID,
 					&oauthClientID,

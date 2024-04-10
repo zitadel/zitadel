@@ -325,6 +325,12 @@ LogoutDone:
   Description: Ti sei disconnesso con successo.
   LoginButtonText: Accedi
 
+LinkingUserPrompt:
+  Title: Utente esistente trovato
+  Description: "Desideri collegare il tuo account esistente:"
+  LinkButtonText: Collegare
+  OtherButtonText: Altre opzioni
+
 LinkingUsersDone:
   Title: Collegamento utente
   Description: Collegamento fatto.

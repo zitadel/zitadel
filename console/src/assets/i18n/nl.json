@@ -1589,6 +1589,7 @@
         "initPasswordText": "Initialiseer wachtwoord",
         "initializeDoneText": "Gebruiker initialisatie voltooid",
         "initializeUserText": "Initialiseer gebruiker",
+        "linkingUserPromptText": "Gebruiker koppelingsprompt",
         "linkingUserDoneText": "Gebruiker koppeling voltooid",
         "loginText": "Login",
         "logoutText": "Uitloggen",
@@ -1660,7 +1661,8 @@
       "HASLOWERCASE": "heeft kleine letters",
       "HASUPPERCASE": "heeft hoofdletters",
       "SHOWLOCKOUTFAILURES": "toon lockout mislukkingen",
-      "MAXATTEMPTS": "Maximum pogingen voor wachtwoord",
+      "MAXPASSWORDATTEMPTS": "Maximum pogingen voor wachtwoord",
+      "MAXOTPATTEMPTS": "Maximale OTP-pogingen",
       "EXPIREWARNDAYS": "Vervaldatum Waarschuwing na dag",
       "MAXAGEDAYS": "Maximale Leeftijd in dagen",
       "USERLOGINMUSTBEDOMAIN": "Voeg organisatie domein toe als achtervoegsel aan inlognamen",
@@ -2027,7 +2029,13 @@
       "ISCREATIONALLOWED": "Account creatie toegestaan",
       "ISCREATIONALLOWED_DESC": "Bepaalt of accounts kunnen worden aangemaakt.",
       "ISLINKINGALLOWED": "Account koppeling toegestaan",
-      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit kan worden gekoppeld aan een bestaand account."
+      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit kan worden gekoppeld aan een bestaand account.",
+      "AUTOLINKING_DESC": "Bepaalt of een identiteit wordt gevraagd om te worden gekoppeld aan een bestaand account.",
+      "AUTOLINKINGTYPE": {
+        "0": "Uitgeschakeld",
+        "1": "Controleren op bestaande gebruikersnaam",
+        "2": "Controleren op bestaand e-mailadres"
+      }
     },
     "OWNERTYPES": {
       "0": "onbekend",

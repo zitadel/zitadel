@@ -1589,6 +1589,7 @@
         "initPasswordText": "Inicializace hesla",
         "initializeDoneText": "Inicializace uživatele dokončena",
         "initializeUserText": "Inicializace uživatele",
+        "linkingUserPromptText": "Uživatelský propojovací text",
         "linkingUserDoneText": "Propojení uživatele dokončeno",
         "loginText": "Přihlášení",
         "logoutText": "Odhlášení",
@@ -1660,7 +1661,8 @@
       "HASLOWERCASE": "obsahuje malá písmena",
       "HASUPPERCASE": "obsahuje velká písmena",
       "SHOWLOCKOUTFAILURES": "zobrazit neúspěšné pokusy o uzamčení",
-      "MAXATTEMPTS": "Maximální počet pokusů o heslo",
+      "MAXPASSWORDATTEMPTS": "Maximální počet pokusů o heslo",
+      "MAXOTPATTEMPTS": "Maximální počet pokusů o OTP",
       "EXPIREWARNDAYS": "Upozornění na expiraci po dni",
       "MAXAGEDAYS": "Maximální stáří v dnech",
       "USERLOGINMUSTBEDOMAIN": "Přidat doménu organizace jako příponu k přihlašovacím jménům",
@@ -2024,7 +2026,13 @@
       "ISCREATIONALLOWED": "Je povoleno vytváření účtu",
       "ISCREATIONALLOWED_DESC": "Určuje, zda lze vytvářet účty.",
       "ISLINKINGALLOWED": "Je povoleno propojení účtů",
-      "ISLINKINGALLOWED_DESC": "Určuje, zda lze identitu propojit s existujícím účtem."
+      "ISLINKINGALLOWED_DESC": "Určuje, zda lze identitu propojit s existujícím účtem.",
+      "AUTOLINKING_DESC": "Určuje, zda se bude identita vyzývat k propojení se stávajícím účtem.",
+      "AUTOLINKINGTYPE": {
+        "0": "Vypnuto",
+        "1": "Kontrola existence uživatelského jména",
+        "2": "Kontrola existence e-mailu"
+      }
     },
     "OWNERTYPES": {
       "0": "neznámý",

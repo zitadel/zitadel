@@ -1,4 +1,4 @@
-package execution
+package action
 
 import (
 	"context"
@@ -7,28 +7,32 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 )
 
-func (s *Server) ListExecutionFunctions(_ context.Context, _ *execution.ListExecutionFunctionsRequest) (*execution.ListExecutionFunctionsResponse, error) {
-	return &execution.ListExecutionFunctionsResponse{
+func (s *Server) ListExecutionFunctions(_ context.Context, _ *action.ListExecutionFunctionsRequest) (*action.ListExecutionFunctionsResponse, error) {
+	return &action.ListExecutionFunctionsResponse{
 		Functions: s.ListActionFunctions(),
 	}, nil
 }
 
-func (s *Server) ListExecutionMethods(_ context.Context, _ *execution.ListExecutionMethodsRequest) (*execution.ListExecutionMethodsResponse, error) {
-	return &execution.ListExecutionMethodsResponse{
+func (s *Server) ListExecutionMethods(_ context.Context, _ *action.ListExecutionMethodsRequest) (*action.ListExecutionMethodsResponse, error) {
+	return &action.ListExecutionMethodsResponse{
 		Methods: s.ListGRPCMethods(),
 	}, nil
 }
 
-func (s *Server) ListExecutionServices(_ context.Context, _ *execution.ListExecutionServicesRequest) (*execution.ListExecutionServicesResponse, error) {
-	return &execution.ListExecutionServicesResponse{
+func (s *Server) ListExecutionServices(_ context.Context, _ *action.ListExecutionServicesRequest) (*action.ListExecutionServicesResponse, error) {
+	return &action.ListExecutionServicesResponse{
 		Services: s.ListGRPCServices(),
 	}, nil
 }
 
-func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRequest) (*execution.SetExecutionResponse, error) {
+func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionRequest) (*action.SetExecutionResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	set := &command.SetExecution{
 		Targets:  req.GetTargets(),
 		Includes: req.GetIncludes(),
@@ -37,7 +41,7 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 	var err error
 	var details *domain.ObjectDetails
 	switch t := req.GetCondition().GetConditionType().(type) {
-	case *execution.Condition_Request:
+	case *action.Condition_Request:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Request.GetMethod(),
 			Service: t.Request.GetService(),
@@ -47,7 +51,7 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 		if err != nil {
 			return nil, err
 		}
-	case *execution.Condition_Response:
+	case *action.Condition_Response:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Response.GetMethod(),
 			Service: t.Response.GetService(),
@@ -57,7 +61,7 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 		if err != nil {
 			return nil, err
 		}
-	case *execution.Condition_Event:
+	case *action.Condition_Event:
 		cond := &command.ExecutionEventCondition{
 			Event: t.Event.GetEvent(),
 			Group: t.Event.GetGroup(),
@@ -67,22 +71,26 @@ func (s *Server) SetExecution(ctx context.Context, req *execution.SetExecutionRe
 		if err != nil {
 			return nil, err
 		}
-	case *execution.Condition_Function:
+	case *action.Condition_Function:
 		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function), set, authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err
 		}
 	}
-	return &execution.SetExecutionResponse{
+	return &action.SetExecutionResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecutionRequest) (*execution.DeleteExecutionResponse, error) {
+func (s *Server) DeleteExecution(ctx context.Context, req *action.DeleteExecutionRequest) (*action.DeleteExecutionResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	var err error
 	var details *domain.ObjectDetails
 	switch t := req.GetCondition().GetConditionType().(type) {
-	case *execution.Condition_Request:
+	case *action.Condition_Request:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Request.GetMethod(),
 			Service: t.Request.GetService(),
@@ -92,7 +100,7 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 		if err != nil {
 			return nil, err
 		}
-	case *execution.Condition_Response:
+	case *action.Condition_Response:
 		cond := &command.ExecutionAPICondition{
 			Method:  t.Response.GetMethod(),
 			Service: t.Response.GetService(),
@@ -102,7 +110,7 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 		if err != nil {
 			return nil, err
 		}
-	case *execution.Condition_Event:
+	case *action.Condition_Event:
 		cond := &command.ExecutionEventCondition{
 			Event: t.Event.GetEvent(),
 			Group: t.Event.GetGroup(),
@@ -112,13 +120,13 @@ func (s *Server) DeleteExecution(ctx context.Context, req *execution.DeleteExecu
 		if err != nil {
 			return nil, err
 		}
-	case *execution.Condition_Function:
+	case *action.Condition_Function:
 		details, err = s.command.DeleteExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function), authz.GetInstance(ctx).InstanceID())
 		if err != nil {
 			return nil, err
 		}
 	}
-	return &execution.DeleteExecutionResponse{
+	return &action.DeleteExecutionResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }

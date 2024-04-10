@@ -1589,6 +1589,7 @@
         "initPasswordText": "Initialize password",
         "initializeDoneText": "Initialize user done",
         "initializeUserText": "Initialize user",
+        "linkingUserPromptText": "Linking user prompt",
         "linkingUserDoneText": "Linking user done",
         "loginText": "Login",
         "logoutText": "Logout",
@@ -1660,7 +1661,8 @@
       "HASLOWERCASE": "must include a lowercase letter",
       "HASUPPERCASE": "must include an uppercase letter",
       "SHOWLOCKOUTFAILURES": "show lockout failures",
-      "MAXATTEMPTS": "Password maximum Attempts",
+      "MAXPASSWORDATTEMPTS": "Password maximum attempts",
+      "MAXOTPATTEMPTS": "OTP maximum attempts",
       "EXPIREWARNDAYS": "Expiration Warning after day",
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
@@ -2027,7 +2029,13 @@
       "ISCREATIONALLOWED": "Account creation allowed",
       "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
       "ISLINKINGALLOWED": "Account linking allowed",
-      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
+      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account.",
+      "AUTOLINKING_DESC": "Determines whether an identity will be prompted to be linked to an existing account.",
+      "AUTOLINKINGTYPE": {
+        "0": "Disabled",
+        "1": "Check for existing Username",
+        "2": "Check for existing Email"
+      }
     },
     "OWNERTYPES": {
       "0": "unknown",
