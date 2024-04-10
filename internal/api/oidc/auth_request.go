@@ -41,12 +41,12 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	return o.createAuthRequest(ctx, req, userID)
 }
 
-func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, req *oidc.AuthRequest) (scope, audience []string, err error) {
-	project, err := o.query.ProjectByClientID(ctx, req.ClientID)
+func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, clientID string, reqScope []string) (scope, audience []string, err error) {
+	project, err := o.query.ProjectByClientID(ctx, clientID)
 	if err != nil {
 		return nil, nil, err
 	}
-	scope, err = o.assertProjectRoleScopesByProject(ctx, project, req.Scopes)
+	scope, err = o.assertProjectRoleScopesByProject(ctx, project, reqScope)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -59,7 +59,7 @@ func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, req *
 }
 
 func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.AuthRequest, hintUserID, loginClient string) (op.AuthRequest, error) {
-	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req)
+	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (o *OPStorage) createAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if !ok {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
-	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req)
+	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
 	if err != nil {
 		return nil, err
 	}

@@ -3,10 +3,9 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
-
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
@@ -16,7 +15,7 @@ type APIApplicationWriteModel struct {
 	AppID              string
 	AppName            string
 	ClientID           string
-	ClientSecret       *crypto.CryptoValue
+	HashedSecret       string
 	ClientSecretString string
 	AuthMethodType     domain.APIAuthMethodType
 	State              domain.AppState
@@ -84,6 +83,11 @@ func (wm *APIApplicationWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
+		case *project.APIConfigSecretHashUpdatedEvent:
+			if e.AppID != wm.AppID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
 		case *project.ProjectRemovedEvent:
 			wm.WriteModel.AppendEvents(e)
 		}
@@ -115,7 +119,9 @@ func (wm *APIApplicationWriteModel) Reduce() error {
 		case *project.APIConfigChangedEvent:
 			wm.appendChangeAPIEvent(e)
 		case *project.APIConfigSecretChangedEvent:
-			wm.ClientSecret = e.ClientSecret
+			wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
+		case *project.APIConfigSecretHashUpdatedEvent:
+			wm.HashedSecret = e.HashedSecret
 		case *project.ProjectRemovedEvent:
 			wm.State = domain.AppStateRemoved
 		}
@@ -126,7 +132,7 @@ func (wm *APIApplicationWriteModel) Reduce() error {
 func (wm *APIApplicationWriteModel) appendAddAPIEvent(e *project.APIConfigAddedEvent) {
 	wm.api = true
 	wm.ClientID = e.ClientID
-	wm.ClientSecret = e.ClientSecret
+	wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 	wm.AuthMethodType = e.AuthMethodType
 }
 
@@ -151,8 +157,9 @@ func (wm *APIApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.APIConfigAddedType,
 			project.APIConfigChangedType,
 			project.APIConfigSecretChangedType,
-			project.ProjectRemovedType).
-		Builder()
+			project.APIConfigSecretHashUpdatedType,
+			project.ProjectRemovedType,
+		).Builder()
 }
 
 func (wm *APIApplicationWriteModel) NewChangedEvent(

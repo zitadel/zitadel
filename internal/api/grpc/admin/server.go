@@ -30,7 +30,6 @@ type Server struct {
 	query             *query.Queries
 	assetsAPIDomain   func(context.Context) string
 	userCodeAlg       crypto.EncryptionAlgorithm
-	passwordHashAlg   crypto.HashAlgorithm
 	auditLogRetention time.Duration
 }
 
@@ -53,7 +52,6 @@ func CreateServer(
 		query:             query,
 		assetsAPIDomain:   assets.AssetAPI(externalSecure),
 		userCodeAlg:       userCodeAlg,
-		passwordHashAlg:   crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
 		auditLogRetention: auditLogRetention,
 	}
 }

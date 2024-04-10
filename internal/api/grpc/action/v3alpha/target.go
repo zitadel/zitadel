@@ -1,4 +1,4 @@
-package execution
+package action
 
 import (
 	"context"
@@ -10,49 +10,61 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 )
 
-func (s *Server) CreateTarget(ctx context.Context, req *execution.CreateTargetRequest) (*execution.CreateTargetResponse, error) {
+func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetRequest) (*action.CreateTargetResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	add := createTargetToCommand(req)
 	details, err := s.command.AddTarget(ctx, add, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
-	return &execution.CreateTargetResponse{
+	return &action.CreateTargetResponse{
 		Id:      add.AggregateID,
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) UpdateTarget(ctx context.Context, req *execution.UpdateTargetRequest) (*execution.UpdateTargetResponse, error) {
+func (s *Server) UpdateTarget(ctx context.Context, req *action.UpdateTargetRequest) (*action.UpdateTargetResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	details, err := s.command.ChangeTarget(ctx, updateTargetToCommand(req), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
-	return &execution.UpdateTargetResponse{
+	return &action.UpdateTargetResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) DeleteTarget(ctx context.Context, req *execution.DeleteTargetRequest) (*execution.DeleteTargetResponse, error) {
+func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetRequest) (*action.DeleteTargetResponse, error) {
+	if err := checkExecutionEnabled(ctx); err != nil {
+		return nil, err
+	}
+
 	details, err := s.command.DeleteTarget(ctx, req.GetTargetId(), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
-	return &execution.DeleteTargetResponse{
+	return &action.DeleteTargetResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func createTargetToCommand(req *execution.CreateTargetRequest) *command.AddTarget {
+func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 	var targetType domain.TargetType
 	var url string
 	switch t := req.GetTargetType().(type) {
-	case *execution.CreateTargetRequest_RestWebhook:
+	case *action.CreateTargetRequest_RestWebhook:
 		targetType = domain.TargetTypeWebhook
 		url = t.RestWebhook.GetUrl()
-	case *execution.CreateTargetRequest_RestRequestResponse:
+	case *action.CreateTargetRequest_RestRequestResponse:
 		targetType = domain.TargetTypeRequestResponse
 		url = t.RestRequestResponse.GetUrl()
 	}
@@ -66,7 +78,7 @@ func createTargetToCommand(req *execution.CreateTargetRequest) *command.AddTarge
 	}
 }
 
-func updateTargetToCommand(req *execution.UpdateTargetRequest) *command.ChangeTarget {
+func updateTargetToCommand(req *action.UpdateTargetRequest) *command.ChangeTarget {
 	if req == nil {
 		return nil
 	}
@@ -77,10 +89,10 @@ func updateTargetToCommand(req *execution.UpdateTargetRequest) *command.ChangeTa
 		Name: req.Name,
 	}
 	switch t := req.GetTargetType().(type) {
-	case *execution.UpdateTargetRequest_RestWebhook:
+	case *action.UpdateTargetRequest_RestWebhook:
 		target.TargetType = gu.Ptr(domain.TargetTypeWebhook)
 		target.URL = gu.Ptr(t.RestWebhook.GetUrl())
-	case *execution.UpdateTargetRequest_RestRequestResponse:
+	case *action.UpdateTargetRequest_RestRequestResponse:
 		target.TargetType = gu.Ptr(domain.TargetTypeRequestResponse)
 		target.URL = gu.Ptr(t.RestRequestResponse.GetUrl())
 	}

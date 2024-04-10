@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -35,7 +36,10 @@ type accessToken struct {
 
 var ErrInvalidTokenFormat = errors.New("invalid token format")
 
-func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (*accessToken, error) {
+func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (_ *accessToken, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	var tokenID, subject string
 
 	if tokenIDSubject, err := s.Provider().Crypto().Decrypt(tkn); err == nil {

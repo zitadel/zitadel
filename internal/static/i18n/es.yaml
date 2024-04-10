@@ -627,6 +627,7 @@ EventTypes:
         removed: Clave eliminada
       secret:
         set: Secreto establecido
+        updated: Hash secreto actualizado
         removed: Secreto eliminado
         check:
           succeeded: Comprobación exitosa del secreto
@@ -1001,6 +1002,11 @@ EventTypes:
           check:
             succeeded: Comprobación con éxito del secreto del cliente OIDC
             failed: Comprobación fallida del secreto del cliente OIDC
+      api:
+        secret:
+          check:
+            succeeded: La verificación del secreto de API fue exitosa
+            failed: Error en la comprobación del secreto de API
         key:
           added: Clave de aplicación añadida
           removed: Clave de aplicación eliminada
@@ -1013,11 +1019,13 @@ EventTypes:
           changed: Configuracion OIDC modificada
           secret:
             changed: Secreto OIDC modificado
+            updated: Hash secreto OIDC actualizado
         api:
           added: Configuración API añadida
           changed: Configuración API modificada
           secret:
             changed: Configuración de secreto API modificada
+            updated: Hash secreto de API actualizado
   policy:
     password:
       complexity:

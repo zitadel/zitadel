@@ -9,6 +9,7 @@ module.exports = {
     [
       "@semantic-release/github",
       {
+        draftRelease: true,
         successComment: false,
         assets: [
           {

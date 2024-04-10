@@ -625,6 +625,7 @@ EventTypes:
         removed: Klíč odstraněn
       secret:
         set: Tajemství nastaveno
+        updated: Tajný hash aktualizován
         removed: Tajemství odstraněno
         check:
           succeeded: Kontrola tajemství byla úspěšná
@@ -999,6 +1000,11 @@ EventTypes:
           check:
             succeeded: Kontrola tajného klíče OIDC klienta byla úspěšná
             failed: Kontrola tajného klíče OIDC klienta selhala
+      api:
+        secret:
+          check:
+            succeeded: Tajná kontrola API byla úspěšná
+            failed: Tajná kontrola API se nezdařila
         key:
           added: Klíč aplikace přidán
           removed: Klíč aplikace odstraněn
@@ -1011,11 +1017,13 @@ EventTypes:
           changed: Konfigurace OIDC změněna
           secret:
             changed: Tajný klíč OIDC změněn
+            updated: Tajný hash OIDC byl aktualizován
         api:
           added: Konfigurace API přidána
           changed: Konfigurace API změněna
           secret:
             changed: Tajný klíč API změněn
+            updated: Tajný hash API byl aktualizován
   policy:
     password:
       complexity:
