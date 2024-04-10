@@ -178,17 +178,6 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) getInstanceIDPConfigByID(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
-	config, err := c.instanceIDPConfigWriteModelByID(ctx, idpID)
-	if err != nil {
-		return nil, err
-	}
-	if !config.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "INSTANCE-p0pFF", "Errors.IDPConfig.NotExisting")
-	}
-	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
-}
-
 func (c *Commands) instanceIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *InstanceIDPConfigWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
