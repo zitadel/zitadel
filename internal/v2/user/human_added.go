@@ -9,8 +9,7 @@ import (
 )
 
 type humanAddedPayload struct {
-	UserName              string `json:"userName"`
-	userLoginMustBeDomain bool
+	UserName string `json:"userName"`
 
 	FirstName         string        `json:"firstName,omitempty"`
 	LastName          string        `json:"lastName,omitempty"`
