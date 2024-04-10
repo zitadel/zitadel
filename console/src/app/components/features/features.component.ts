@@ -1,32 +1,25 @@
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, ViewChild, signal } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSort, Sort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { HasRoleDirective } from 'src/app/directives/has-role/has-role.directive';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { DisplayJsonDialogComponent } from 'src/app/modules/display-json-dialog/display-json-dialog.component';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
-import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
-import { ListEventsRequest, ListEventsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
 import { Event } from 'src/app/proto/generated/zitadel/event_pb';
-import { FeatureServiceClient } from 'src/app/proto/generated/zitadel/feature/v2beta/Feature_serviceServiceClientPb';
 import { Source } from 'src/app/proto/generated/zitadel/feature/v2beta/feature_pb';
 import {
   GetInstanceFeaturesResponse,
   SetInstanceFeaturesRequest,
 } from 'src/app/proto/generated/zitadel/feature/v2beta/instance_pb';
-import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { FeatureService } from 'src/app/services/feature.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -35,6 +28,7 @@ import { ToastService } from 'src/app/services/toast.service';
   imports: [
     CommonModule,
     FormsModule,
+    MatButtonToggleModule,
     HasRolePipeModule,
     MatIconModule,
     CardModule,
@@ -99,6 +93,9 @@ export class FeaturesComponent implements OnDestroy {
       .resetInstanceFeatures()
       .then(() => {
         this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+        setTimeout(() => {
+          this.getFeatures(true);
+        }, 1000);
       })
       .catch((error) => {
         this.toast.showError(error);
