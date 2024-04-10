@@ -23,7 +23,7 @@ V3 also offers more flexibility over the V2 API in these points:
     - Features [^1]
     - Actions [^2]
     - User Schemas [^2]
-    - Auth Factors [^2]
+    - Authenticators [^2]
     - IDPs [^2]
     - Grants [^2] (added target types project and user)
     - Memberships [^2]
@@ -42,9 +42,9 @@ V3 also offers more flexibility over the V2 API in these points:
     - Effective resource returned on GET requests with all resolved values from the hierarchy (defaults) for the given context
 
 [^2]: Linked Resources
-   - Resources that are linked to other resources (e.g. user schema linked to an organization)
-   - Linked resources have a context level as target type (e.g. org, instance, system)
-   - Linked resources can be self-disabled and enabled in sub-contexts by patching the enabled property
-   - GET requests on a linked resource return the enabled / disabled status of the resource in the given context
+    - Resources that are linked to other resources (e.g. user schema linked to an organization)
+    - Linked resources have a context level as target type (e.g. org, instance, system)
+    - Linked resources can be self-disabled and enabled in sub-contexts by patching the enabled property
+    - GET requests on a linked resource return the enabled / disabled status of the resource in the given context
 
 <DocCardList />
