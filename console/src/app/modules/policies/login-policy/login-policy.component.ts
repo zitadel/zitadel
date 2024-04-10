@@ -174,13 +174,13 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
   }
 
   private async updateData(): Promise<any> {
-    const calls: Observable<any>[] = [];
+    const calls: Promise<any>[] = [];
 
     if (this.loginData) {
       switch (this.serviceType) {
         case PolicyComponentServiceType.MGMT:
           if (this.isDefault) {
-            calls.push(from(this.loginPolicySvc.createCustomLoginPolicy(this.service as ManagementService, this.loginData)));
+            calls.push(this.loginPolicySvc.createCustomLoginPolicy(this.service as ManagementService, this.loginData));
             break;
           } else {
             const mgmtreq = new UpdateCustomLoginPolicyRequest();
@@ -213,7 +213,7 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
             mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
             mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-            calls.push(from((this.service as ManagementService).updateCustomLoginPolicy(mgmtreq)));
+            calls.push((this.service as ManagementService).updateCustomLoginPolicy(mgmtreq));
             break;
           }
         case PolicyComponentServiceType.ADMIN:
@@ -246,21 +246,19 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
           adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
           adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
 
-          calls.push(from((this.service as AdminService).setRestrictions(!this.allowOrgRegistration)));
-          calls.push(from((this.service as AdminService).updateLoginPolicy(adminreq)));
+          calls.push((this.service as AdminService).setRestrictions(!this.allowOrgRegistration));
+          calls.push((this.service as AdminService).updateLoginPolicy(adminreq));
           break;
       }
     } else {
-      calls.push(from(Promise.reject()));
+      calls.push(Promise.reject());
     }
-    return firstValueFrom(
-      forkJoin(calls).pipe(
-        catchError((error, caught) => {
-          // We just ignore the policy not changed error!
-          return (error as { message: string }).message.includes('INSTANCE-5M9vdd') ? of(true) : caught;
-        }),
-      ),
-    );
+    return Promise.all(calls).catch(err => {
+      if (err?.message?.includes('INSTANCE-5M9vdd')) {
+        return true
+      }
+      throw err;
+    });
   }
 
   public savePolicy(): void {
