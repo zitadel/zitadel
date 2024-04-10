@@ -27,8 +27,8 @@ import { SettingsListComponent } from './settings-list.component';
 import FailedEventsModule from '../failed-events/failed-events.module';
 import IamViewsModule from '../iam-views/iam-views.module';
 import EventsModule from '../events/events.module';
-import OrgListModule from 'src/app/pages/org-list/org-list.module';
 import { OrgTableModule } from '../org-table/org-table.module';
+import { FeaturesComponent } from 'src/app/components/features/features.component';
 
 @NgModule({
   declarations: [SettingsListComponent],
@@ -53,6 +53,7 @@ import { OrgTableModule } from '../org-table/org-table.module';
     DomainPolicyModule,
     TranslateModule,
     HasRolePipeModule,
+    FeaturesComponent,
     NotificationSMTPProviderModule,
     NotificationSMSProviderModule,
     OIDCConfigurationModule,

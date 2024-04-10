@@ -86,10 +86,13 @@
         "TITLE": "組織設定",
         "DESCRIPTION": "組織の設定をカスタマイズします。"
       },
+      "FEATURES": {
+        "TITLE": "機能設定",
+        "DESCRIPTION": "インスタンスの機能のロックを解除します。"
+      },
       "IDPS": {
         "TITLE": "IDプロバイダー",
         "DESCRIPTION": "外部IDプロバイダーを作成してアクティブにします。よく知られたプロバイダーを選択するか、他のOIDC、OAuth、SAML互換プロバイダーを設定します。既存のJWTトークンを連合アイデンティティとして使用するために、JWT IDプロバイダーを設定することもできます。",
-        "DESCRIPTION": "外部IDプロバイダーを作成して有効化します。よく知られているプロバイダーを選択するか、あるいはOIDC、OAuth、SAML互換の他のプロバイダーを自由に設定してください。既存のJWTトークンを、JWT IDプロバイダーを設定することで、フェデレーテッドアイデンティティとして使用することもできます。",
         "NEXT": "次は？",
         "SAML": {
           "TITLE": "SAML IDプロバイダーを設定する",
@@ -1316,6 +1319,7 @@
     },
     "LIST": {
       "ORGS": "組織",
+      "FEATURESETTINGS": "機能設定",
       "LANGUAGES": "一般設定",
       "LOGIN": "ログイン動作とセキュリティ",
       "LOCKOUT": "ロックアウト",
@@ -1445,6 +1449,27 @@
       "IMPERSONATIONTITLE": "偽装",
       "IMPERSONATIONENABLED": "偽装を許可します",
       "IMPERSONATIONDESCRIPTION": "この設定では、原則として偽装を使用できます。偽装者には、適切な `*_IMPERSONATOR` ロールも割り当てられている必要があることに注意してください。"
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "ログイン時の既定組織",
+      "LOGINDEFAULTORG_DESCRIPTION": "組織コンテキストが設定されていない場合、ログイン UI は既定の組織の設定を使用します (インスタンスの設定ではなく)",
+      "OIDCLEGACYINTROSPECTION": "OIDC レガシーイントロスペクション",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "パフォーマンス上の理由から最近イントロスペクション エンドポイントをリファクタリングしました。この機能は、予期しないバグが発生した場合にレガシー実装にロールバックするために使用できます。",
+      "OIDCTOKENEXCHANGE": "OIDC トークン交換",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "OIDC トークン エンドポイント用に実験的な urn:ietf:params:oauth:grant-type:token-exchange 付与タイプを有効にします。トークン交換は、より少ないスコープを持つトークンを要求するか、他のユーザーになりすますために使用できます。インスタンスでのなりすましを許可するには、セキュリティポリシーを参照してください。",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC トリガーイントロスペクションプロジェクション",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "イントロスペクション要求中にプロジェクショントリガーを有効にします。これは、イントロスペクションレスポンスに顕著な整合性問題がある場合の回避策として機能しますが、パフォーマンスに影響を与える可能性があります。今後、イントロスペクション要求のトリガーを削除する予定です。",
+      "USERSCHEMA": "ユーザー スキーマ",
+      "USERSCHEMA_DESCRIPTION": "ユーザー スキーマを使用すると、ユーザーのデータスキーマを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "ACTIONS": "アクション",
+      "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "STATES": {
+        "INHERITED": "継承",
+        "ENABLED": "有効",
+        "DISABLED": "無効"
+      },
+      "INHERITED_DESCRIPTION": "この設定は、値をシステムのデフォルト値に設定します。",
+      "RESET": "すべて継承に設定"
     },
     "DIALOG": {
       "RESET": {
