@@ -253,9 +253,9 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
     } else {
       calls.push(Promise.reject());
     }
-    return Promise.all(calls).catch(err => {
+    return Promise.all(calls).catch((err) => {
       if (err?.message?.includes('INSTANCE-5M9vdd')) {
-        return true
+        return true;
       }
       throw err;
     });
