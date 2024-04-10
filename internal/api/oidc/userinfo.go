@@ -61,6 +61,9 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 }
 
 func (s *Server) userInfo(ctx context.Context, userID, projectID string, projectRoleAssertion bool, scope, roleAudience []string) (_ *oidc.UserInfo, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	roleAudience, requestedRoles := prepareRoles(ctx, projectID, projectRoleAssertion, scope, roleAudience)
 	qu, err := s.query.GetOIDCUserInfo(ctx, userID, roleAudience)
 	if err != nil {
@@ -211,7 +214,10 @@ func setUserInfoRoleClaims(userInfo *oidc.UserInfo, roles *projectsRoles) {
 	}
 }
 
-func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo) error {
+func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, userInfo *oidc.UserInfo) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	queriedActions, err := s.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeCustomiseToken, domain.TriggerTypePreUserinfoCreation, qu.User.ResourceOwner)
 	if err != nil {
 		return err
