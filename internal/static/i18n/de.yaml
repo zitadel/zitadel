@@ -581,6 +581,15 @@ AggregateTypes:
   target: Ziel
   execution: Ausführung
   user_schema: Benutzerschema
+  auth_request: Authentifizierungsanfrage
+  device_auth: Geräteauthentifizierung
+  idpintent: IDP Intent
+  limits: Limits
+  milestone: Milestone
+  oidc_session: OIDC Sitzung
+  restrictions: Restriktionen
+  system: System
+  session: Session
 
 EventTypes:
   execution:

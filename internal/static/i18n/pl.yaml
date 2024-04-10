@@ -581,6 +581,15 @@ AggregateTypes:
   target: Cel
   execution: Wykonanie
   user_schema: Schemat użytkownika
+  auth_request: Auth Request
+  device_auth: Uwierzytelnianie urządzenia
+  idpintent: Intencja IDP
+  limits: Limit
+  milestone: Kamień milowy
+  oidc_session: Sesja OIDC
+  restrictions: Ograniczenia
+  system: System
+  session: Sesja
 
 EventTypes:
   execution:

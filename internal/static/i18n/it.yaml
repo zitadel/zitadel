@@ -582,6 +582,15 @@ AggregateTypes:
   target: Bersaglio
   execution: Esecuzione
   user_schema: Schema utente
+  auth_request: Richiesta di autenticazione
+  device_auth: Autenticazione su dispositivo
+  idpintent: IDP Intent
+  limits: Limiti
+  milestone: Milestone
+  oidc_session: OIDC Session
+  restrictions: Restrizioni
+  system: Sistema
+  session: Sessione
 
 EventTypes:
   execution:

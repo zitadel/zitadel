@@ -570,6 +570,15 @@ AggregateTypes:
   target: 目標
   execution: 実行
   user_schema: ユーザースキーマ
+  auth_request: 認証リクエスト
+  device_auth: デバイス認証
+  idpintent: IDPインテント
+  limits: 制限
+  milestone: マイルストーン
+  oidc_session: OIDCセッション
+  restrictions: 制限
+  system: システム
+  session: セッション
 
 EventTypes:
   execution:

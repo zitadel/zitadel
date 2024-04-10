@@ -598,6 +598,15 @@ AggregateTypes:
   target: Целта
   execution: Екзекуция
   user_schema: Потребителска схема
+  auth_request: Заявка за удостоверяване
+  device_auth: Устройство за удостоверяване
+  idpintent: IDP Intent
+  limits: Ограничения
+  milestone: Етап
+  oidc_session: OIDC сесия
+  restrictions: Ограничения
+  system: Система
+  session: Сесия
 
 EventTypes:
   execution:
