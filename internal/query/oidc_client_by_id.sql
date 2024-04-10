@@ -1,14 +1,12 @@
---deallocate q;
---prepare q(text, text, boolean) as
-
 with client as (
 	select c.instance_id,
-		c.app_id, c.client_id, c.client_secret, c.redirect_uris, c.response_types, c.grant_types,
+		c.app_id, a.state, c.client_id, c.client_secret, c.redirect_uris, c.response_types, c.grant_types,
 		c.application_type, c.auth_method_type, c.post_logout_redirect_uris, c.is_dev_mode,
 		c.access_token_type, c.access_token_role_assertion, c.id_token_role_assertion,
-		c.id_token_userinfo_assertion, c.clock_skew, c.additional_origins, a.project_id, a.state
+		c.id_token_userinfo_assertion, c.clock_skew, c.additional_origins, a.project_id, p.project_role_assertion
 	from projections.apps7_oidc_configs c
 	join projections.apps7 a on a.id = c.app_id and a.instance_id = c.instance_id
+	join projections.projects4 p on p.id = a.project_id and p.instance_id = a.instance_id
 	where c.instance_id = $1
 		and c.client_id = $2
 ),
@@ -45,7 +43,5 @@ select row_to_json(r) as client from (
 	from client c
 	left join roles r on r.project_id = c.project_id
 	left join keys k on k.client_id = c.client_id
-	left join settings s on s.instance_id = s.instance_id
+	left join settings s on s.instance_id = c.instance_id
 ) r;
-
---execute q('230690539048009730', '236647088211951618@tests', true);

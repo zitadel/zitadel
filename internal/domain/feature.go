@@ -1,5 +1,3 @@
-//go:generate enumer -type Feature
-
 package domain
 
 type Feature int
