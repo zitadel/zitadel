@@ -85,7 +85,7 @@ func (email *Email) HandleMessage(message channels.Message) error {
 }
 
 func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err error) {
-	host, port, err := net.SplitHostPort(smtpConfig.Host)
+	host, _, err := net.SplitHostPort(smtpConfig.Host)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EMAIL-spR56", "could not split host and port for connect to smtp")
 	}
@@ -99,7 +99,7 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 		return nil, err
 	}
 
-	err = smtpConfig.smtpAuth(client, host, port)
+	err = smtpConfig.smtpAuth(client, host)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (smtpConfig SMTP) getSMTPClientWithStartTls(host string) (*smtp.Client, err
 	return client, nil
 }
 
-func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host, port string) error {
+func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 	if !smtpConfig.HasAuth() {
 		return nil
 	}
