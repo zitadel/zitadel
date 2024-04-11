@@ -28,6 +28,7 @@ import {
   MailjetDefaultSettings,
   PostmarkDefaultSettings,
   ProviderDefaultSettings,
+  OutlookDefaultSettings,
   SendgridDefaultSettings,
 } from './known-smtp-providers-settings';
 
@@ -55,6 +56,8 @@ export class SMTPProviderComponent {
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
   public firstFormGroup!: UntypedFormGroup;
   public secondFormGroup!: UntypedFormGroup;
+
+  public senderEmailPlaceholder = 'sender@example.com';
 
   constructor(
     private service: AdminService,
@@ -91,6 +94,9 @@ export class SMTPProviderComponent {
         case 'brevo':
           this.providerDefaultSetting = BrevoDefaultSettings;
           break;
+        case 'outlook':
+          this.providerDefaultSetting = OutlookDefaultSettings;
+          break;
       }
 
       this.firstFormGroup = this.fb.group({
@@ -105,6 +111,8 @@ export class SMTPProviderComponent {
         user: [this.providerDefaultSetting?.user.value || ''],
         password: [this.providerDefaultSetting?.password.value || ''],
       });
+
+      this.senderEmailPlaceholder = this.providerDefaultSetting?.senderEmailPlaceholder || 'sender@example.com';
 
       this.secondFormGroup = this.fb.group({
         senderAddress: ['', [requiredValidator]],
