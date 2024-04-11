@@ -56,6 +56,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP configuration not found
     AlreadyExists: SMTP configuration already exists
+    AlreadyDeactivated: SMTP configuration already deactivated
     SenderAdressNotCustomDomain: The sender address must be configured as custom domain on the instance.
   Notification:
     NoDomain: No Domain found for message
@@ -787,7 +788,7 @@ EventTypes:
       code:
         added: Phone number code generated
         sent: Phone number code sent
-      removed: Phone number removed
+
     profile:
       changed: User profile changed
     address:
@@ -1128,6 +1129,9 @@ EventTypes:
       config:
         added: SMTP configuration added
         changed: SMTP configuration changed
+        activated: SMTP configuration activated
+        deactivated: SMTP configuration deactivated
+        removed: SMTP configuration removed
         password:
           changed: SMTP configuration secret changed
     sms:
@@ -1273,6 +1277,8 @@ EventTypes:
       config:
         added: SMTP configuration added
         changed: SMTP configuration changed
+        activated: SMTP configuration activated
+        deactivated: SMTP configuration deactivated
         password:
           changed: Password of SMTP configuration changed
         removed: SMTP configuration removed
