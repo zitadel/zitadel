@@ -25,9 +25,9 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
 	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -53,7 +53,7 @@ type Client struct {
 	OIDCv2       oidc_pb.OIDCServiceClient
 	OrgV2        organisation.OrganizationServiceClient
 	System       system.SystemServiceClient
-	ExecutionV3  execution.ExecutionServiceClient
+	ActionV3     action.ActionServiceClient
 	FeatureV2    feature.FeatureServiceClient
 	UserSchemaV3 schema.UserSchemaServiceClient
 }
@@ -70,7 +70,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		OIDCv2:       oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2:        organisation.NewOrganizationServiceClient(cc),
 		System:       system.NewSystemServiceClient(cc),
-		ExecutionV3:  execution.NewExecutionServiceClient(cc),
+		ActionV3:     action.NewActionServiceClient(cc),
 		FeatureV2:    feature.NewFeatureServiceClient(cc),
 		UserSchemaV3: schema.NewUserSchemaServiceClient(cc),
 	}
@@ -522,48 +522,48 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 	require.NoError(t, err)
 }
 
-func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.CreateTargetResponse {
-	req := &execution.CreateTargetRequest{
+func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *action.CreateTargetResponse {
+	req := &action.CreateTargetRequest{
 		Name: fmt.Sprint(time.Now().UnixNano() + 1),
-		TargetType: &execution.CreateTargetRequest_RestWebhook{
-			RestWebhook: &execution.SetRESTWebhook{
+		TargetType: &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.SetRESTWebhook{
 				Url: "https://example.com",
 			},
 		},
 		Timeout: durationpb.New(10 * time.Second),
 	}
-	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
+	target, err := s.Client.ActionV3.CreateTarget(ctx, req)
 	require.NoError(t, err)
 	return target
 }
 
-func (s *Tester) CreateTargetWithNameAndType(ctx context.Context, t *testing.T, name string, async bool, interrupt bool) *execution.CreateTargetResponse {
-	req := &execution.CreateTargetRequest{
+func (s *Tester) CreateTargetWithNameAndType(ctx context.Context, t *testing.T, name string, async bool, interrupt bool) *action.CreateTargetResponse {
+	req := &action.CreateTargetRequest{
 		Name: name,
-		TargetType: &execution.CreateTargetRequest_RestWebhook{
-			RestWebhook: &execution.SetRESTWebhook{
+		TargetType: &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.SetRESTWebhook{
 				Url: "https://example.com",
 			},
 		},
 		Timeout: durationpb.New(10 * time.Second),
 	}
 	if async {
-		req.ExecutionType = &execution.CreateTargetRequest_IsAsync{
+		req.ExecutionType = &action.CreateTargetRequest_IsAsync{
 			IsAsync: true,
 		}
 	}
 	if interrupt {
-		req.ExecutionType = &execution.CreateTargetRequest_InterruptOnError{
+		req.ExecutionType = &action.CreateTargetRequest_InterruptOnError{
 			InterruptOnError: true,
 		}
 	}
-	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
+	target, err := s.Client.ActionV3.CreateTarget(ctx, req)
 	require.NoError(t, err)
 	return target
 }
 
-func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.Condition, targets []string, includes []string) *execution.SetExecutionResponse {
-	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []string, includes []string) *action.SetExecutionResponse {
+	target, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
 		Includes:  includes,

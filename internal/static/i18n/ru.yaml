@@ -571,6 +571,15 @@ AggregateTypes:
   target: мишень
   execution: Исполнение
   user_schema: Пользовательская схема
+  auth_request: Запрос на аутентификацию
+  device_auth: Аутентификация устройства
+  idpintent: Намерение IDP
+  limits: Ограничения
+  milestone: Веха
+  oidc_session: Сеанс OIDC
+  restrictions: Ограничения
+  system: Система
+  session: Сеанс
 
 EventTypes:
   execution:
@@ -616,6 +625,7 @@ EventTypes:
         removed: Ключ удалён
       secret:
         set: Ключ установлен
+        updated: Секретный хеш обновлен.
         removed: Ключ удалён
         check:
           succeeded: Проверка ключа прошла успешно
@@ -990,6 +1000,11 @@ EventTypes:
           check:
             succeeded: Проверка клиентского ключа OIDC прошла успешно
             failed: Проверки клиентского ключа OIDC не удалась
+      api:
+        secret:
+          check:
+            succeeded: Проверка секретности API прошла успешно
+            failed: Проверка секретности API не удалась
         key:
           added: Ключ приложения добавлен
           removed: Ключ приложения удалён
@@ -1002,11 +1017,13 @@ EventTypes:
           changed: Конфигурация OIDC изменена
           secret:
             changed: Ключ OIDC изменён
+            updated: Секретный хеш OIDC обновлен.
         api:
           added: Конфигурация API добавлена
           changed: Конфигурация API изменена
           secret:
             changed: Ключ API изменён
+            updated: Секретный хэш API обновлен.
   policy:
     password:
       complexity:

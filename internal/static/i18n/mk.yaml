@@ -581,6 +581,15 @@ AggregateTypes:
   target: Цел
   execution: Извршување
   user_schema: Корисничка шема
+  auth_request: Барање за автентикација
+  device_auth: Уред за автентикација
+  idpintent: Намера на IDP
+  limits: Ограничувања
+  milestone: Милениум
+  oidc_session: OIDC сесија
+  restrictions: Ограничувања
+  system: Систем
+  session: Сесија
 
 EventTypes:
   execution:
@@ -626,6 +635,7 @@ EventTypes:
         removed: Клучот е отстранет
       secret:
         set: Тајната е додадена
+        updated: Тајниот хаш е ажуриран
         removed: Тајната е отстрането
         check:
           succeeded: Проверката на тајната е успешна
@@ -1000,6 +1010,11 @@ EventTypes:
           check:
             succeeded: Проверката на OIDC клиентска тајна е успешна
             failed: Проверката на OIDC клиентска тајна е неуспешна
+      api:
+        secret:
+          check:
+            succeeded: Проверката на тајната на API беше успешна
+            failed: Проверката на тајната на API не успеа
         key:
           added: Додаден клуч за апликацијата
           removed: Отстранет клуч за апликацијата
@@ -1012,11 +1027,13 @@ EventTypes:
           changed: Променета OIDC конфигурација
           secret:
             changed: Променета OIDC тајна
+            updated: Тајниот хаш на OIDC е ажуриран
         api:
           added: Додадена API конфигурација
           changed: Променета API конфигурација
           secret:
             changed: Променета API тајна
+            updated: Тајниот хаш на API е ажуриран
   policy:
     password:
       complexity:

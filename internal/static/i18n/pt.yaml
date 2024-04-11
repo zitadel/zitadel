@@ -576,6 +576,15 @@ AggregateTypes:
   target: Objetivo
   execution: Execução
   user_schema: Esquema do usuário
+  auth_request: Solicitação de autenticação
+  device_auth: Autenticação de dispositivo
+  idpintent: Intenção de IDP
+  limits: Limites
+  milestone: Marco
+  oidc_session: Sessão OIDC
+  restrictions: Restrições
+  system: Sistema
+  session: Sessão
 
 EventTypes:
   execution:
@@ -621,6 +630,7 @@ EventTypes:
         removed: Chave removida
       secret:
         set: Segredo definido
+        updated: Hash secreto atualizado
         removed: Segredo removido
         check:
           succeeded: Verificação de segredo bem-sucedida
@@ -995,6 +1005,11 @@ EventTypes:
           check:
             succeeded: Verificação de segredo do cliente OIDC bem-sucedida
             failed: Verificação de segredo do cliente OIDC falhou
+      api:
+        secret:
+          check:
+            succeeded: Verificação secreta da API bem-sucedida
+            failed: Falha na verificação do segredo da API
         key:
           added: Chave do aplicativo adicionada
           removed: Chave do aplicativo removida
@@ -1007,11 +1022,13 @@ EventTypes:
           changed: Configuração OIDC alterada
           secret:
             changed: Segredo OIDC alterado
+            updated: Hash secreto do OIDC atualizado
         api:
           added: Configuração de API adicionada
           changed: Configuração de API alterada
           secret:
             changed: Segredo da API alterado
+            updated: Hash secreto da API atualizado
   policy:
     password:
       complexity:

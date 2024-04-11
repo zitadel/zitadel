@@ -325,6 +325,12 @@ LogoutDone:
   Description: 您已成功退出登录。
   LoginButtonText: 登录
 
+LinkingUserPrompt:
+  Title: 已找到现有用户
+  Description: "您想关联您现有的帐户吗:"
+  LinkButtonText: 关联
+  OtherButtonText: 其他选项
+
 LinkingUsersDone:
   Title: 用户链接
   Description: 用户链接完成。

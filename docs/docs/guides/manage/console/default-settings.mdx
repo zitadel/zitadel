@@ -20,7 +20,7 @@ When you configure your default settings, you can set the following:
 - [**Login Behavior and Access**](#login-behavior-and-access): Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavour for the login interface.
 - [**Identity Providers**](#identity-providers): Define IDPs which are available for all organizations
 - [**Password Complexity**](#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
-- [**Lockout**](#lockout): Set the maximum attempts a user can try to enter the password. When the number is exceeded, the user gets locked out and has to be unlocked.
+- [**Lockout**](#lockout): Set the maximum attempts a user can try to enter the password or any (T)OTP method. When the number is exceeded, the user gets locked out and has to be unlocked.
 - [**Domain settings**](#domain-settings): Whether users use their email or the generated username to login. Other Validation, SMTP settings
 - [**Branding**](#branding): Appearance of the login interface.
 - [**Message Texts**](#message-texts): Text and internationalization for emails
@@ -197,6 +197,7 @@ Define when an account should be locked.
 The following settings are available:
 
 - Maximum Password Attempts: When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger.
+- Maximum OTP Attempts: When the user has reached the maximum (T)OTP attempts the account will be locked, If this is set to 0 the lockout will not trigger.
 
 If an account is locked, the administrator has to unlock it in the ZITADEL console
 

@@ -86,6 +86,10 @@
         "TITLE": "Paramètres de l'Organisation",
         "DESCRIPTION": "Personnalise les paramètres de ton organisation."
       },
+      "FEATURES": {
+        "TITLE": "Paramètres des fonctionnalités",
+        "DESCRIPTION": "Débloquez des fonctionnalités pour votre instance."
+      },
       "IDPS": {
         "TITLE": "Fournisseurs d'Identité",
         "DESCRIPTION": "Crée et active des fournisseurs d'identité externes. Choisis un fournisseur bien connu ou configure tout autre fournisseur compatible OIDC, OAuth ou SAML de ton choix. Tu peux même utiliser tes tokens JWT existants comme identités fédérées en configurant un fournisseur d'identité JWT.",
@@ -1314,6 +1318,7 @@
     },
     "LIST": {
       "ORGS": "Organisations",
+      "FEATURESETTINGS": "Paramètres de fonctionnalité",
       "LANGUAGES": "Langues",
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",
@@ -1446,6 +1451,27 @@
       "IMPERSONATIONTITLE": "Usuration d'identité",
       "IMPERSONATIONENABLED": "Autoriser l'usurpation d'identité",
       "IMPERSONATIONDESCRIPTION": "Ce paramètre permet en principe d'utiliser l'usurpation d'identité. Notez que l'usurpateur d'identité doit également recevoir les rôles `*_IMPERSONATOR` appropriés."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Organisation par défaut de connexion",
+      "LOGINDEFAULTORG_DESCRIPTION": "L'interface de connexion utilisera les paramètres de l'organisation par défaut (et non de l'instance) si aucun contexte d'organisation n'est défini.",
+      "OIDCLEGACYINTROSPECTION": "Introspection héritée OIDC",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nous avons récemment refondu le point d'introspection pour des raisons de performances. Cette fonctionnalité peut être utilisée pour revenir à l'implémentation héritée en cas de bogues inattendus.",
+      "OIDCTOKENEXCHANGE": "Échange de jetons OIDC",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Activez le type de subvention expérimentale urn:ietf:params:oauth:grant-type:token-exchange pour le point de terminaison de jeton OIDC. L'échange de jetons peut être utilisé pour demander des jetons avec une portée moindre ou pour usurper d'autres utilisateurs. Consultez la politique de sécurité pour autoriser l'usurpation sur une instance.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Déclencheurs de projections d'introspection OIDC",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Activez les déclencheurs de projection lors d'une demande d'introspection. Cela peut agir comme un contournement s'il existe des problèmes de cohérence perceptibles dans la réponse à l'introspection, mais cela peut avoir un impact sur les performances. Nous prévoyons de supprimer les déclencheurs pour les demandes d'introspection à l'avenir.",
+      "USERSCHEMA": "Schéma utilisateur",
+      "USERSCHEMA_DESCRIPTION": "Les schémas utilisateur permettent de gérer les schémas de données des utilisateurs. Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
+      "ACTIONS": "Actions",
+      "ACTIONS_DESCRIPTION": "Les actions v2 permettent de gérer les exécutions et les cibles de données. Si l'indicateur est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
+      "STATES": {
+        "INHERITED": "Hérité",
+        "ENABLED": "Activé",
+        "DISABLED": "Désactivé"
+      },
+      "INHERITED_DESCRIPTION": "Ce paramètre définit la valeur par défaut du système.",
+      "RESET": "Réinitialiser tout sur hérité"
     },
     "DIALOG": {
       "RESET": {
@@ -1591,6 +1617,7 @@
         "initPasswordText": "Initialiser le mot de passe",
         "initializeDoneText": "Initialiser l'utilisateur terminé",
         "initializeUserText": "Initialiser l'utilisateur",
+        "linkingUserPromptText": "Message de liaison utilisateur",
         "linkingUserDoneText": "Lier l'utilisateur fait",
         "loginText": "Connexion",
         "logoutText": "Déconnexion",
@@ -1662,7 +1689,8 @@
       "HASLOWERCASE": "a minuscule",
       "HASUPPERCASE": "a majuscule",
       "SHOWLOCKOUTFAILURES": "montrer les échecs de verrouillage",
-      "MAXATTEMPTS": "Mot de passe maximum Tentatives",
+      "MAXPASSWORDATTEMPTS": "Mot de passe maximum tentatives",
+      "MAXOTPATTEMPTS": "Maximal de tentatives OTP",
       "EXPIREWARNDAYS": "Expiration Avertissement après le jour",
       "MAXAGEDAYS": "Âge maximum en jours",
       "USERLOGINMUSTBEDOMAIN": "Le nom de connexion de l'utilisateur doit contenir le nom de domaine de l'organisation",
@@ -2021,7 +2049,13 @@
       "ISCREATIONALLOWED": "la création est-elle autorisée",
       "ISCREATIONALLOWED_DESC": "Détermine si des comptes peuvent être créés.",
       "ISLINKINGALLOWED": "la liaison est-elle autorisée",
-      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant."
+      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant.",
+      "AUTOLINKING_DESC": "Détermine si une identité sera invitée à être liée à un compte existant.",
+      "AUTOLINKINGTYPE": {
+        "0": "Désactivé",
+        "1": "Vérification de l'existence du nom d'utilisateur",
+        "2": "Vérification de l'existence de l'e-mail"
+      }
     },
     "OWNERTYPES": {
       "0": "inconnu",

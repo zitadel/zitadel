@@ -582,6 +582,15 @@ AggregateTypes:
   target: Target
   execution: Execution
   user_schema: User Schema
+  auth_request: Auth Request
+  device_auth: Device Auth
+  idpintent: IDP Intent
+  limits: Limits
+  milestone: Milestone
+  oidc_session: OIDC Session
+  restrictions: Restrictions
+  system: System
+  session: Session
 
 EventTypes:
   execution:
@@ -627,6 +636,7 @@ EventTypes:
         removed: Key removed
       secret:
         set: Secret set
+        updated: Secret hash updated
         removed: Secret removed
         check:
           succeeded: Secret check succeeded
@@ -1001,6 +1011,11 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret check succeeded
             failed: OIDC Client Secret check failed
+      api:
+        secret:
+          check:
+            succeeded: API secret check succeeded
+            failed: API secret check failed
         key:
           added: Application key added
           removed: Application key removed
@@ -1013,11 +1028,13 @@ EventTypes:
           changed: OIDC Configuration changed
           secret:
             changed: OIDC secret changed
+            updated: OIDC secret hash updated
         api:
           added: API Configuration added
           changed: API Configuration changed
           secret:
             changed: API secret changed
+            updated: API secret hash updated
   policy:
     password:
       complexity:

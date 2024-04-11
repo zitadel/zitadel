@@ -582,6 +582,15 @@ AggregateTypes:
   target: Bersaglio
   execution: Esecuzione
   user_schema: Schema utente
+  auth_request: Richiesta di autenticazione
+  device_auth: Autenticazione su dispositivo
+  idpintent: IDP Intent
+  limits: Limiti
+  milestone: Milestone
+  oidc_session: OIDC Session
+  restrictions: Restrizioni
+  system: Sistema
+  session: Sessione
 
 EventTypes:
   execution:
@@ -626,6 +635,7 @@ EventTypes:
         removed: Chiave rimossa
       secret:
         set: Secret set
+        updated: Hash segreto aggiornato
         removed: Secret rimosso
         check:
           succeeded: Controllo della Secret riuscito
@@ -1003,6 +1013,11 @@ EventTypes:
         key:
           added: Chiave di applicazione aggiunta
           removed: Chiave di applicazione rimossa
+      api:
+        secret:
+          check:
+            succeeded: Il controllo del segreto API è riuscito
+            failed: Il controllo del segreto API non è riuscito
       config:
         saml:
           added: Configurazione SAML aggiunta
@@ -1012,11 +1027,13 @@ EventTypes:
           changed: Configurazione OIDC modificata
           secret:
             changed: Segreto OIDC cambiato
+            updated: Hash segreto OIDC aggiornato
         api:
           added: Configurazione API aggiunta
           changed: Configurazione API modificata
           secret:
             changed: Segreto API cambiato
+            updated: Hash segreto API aggiornato
   policy:
     password:
       complexity:
