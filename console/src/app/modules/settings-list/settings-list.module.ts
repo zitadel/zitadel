@@ -29,6 +29,7 @@ import EventsModule from '../events/events.module';
 import { OrgTableModule } from '../org-table/org-table.module';
 import { NotificationSMTPProviderModule } from '../policies/notification-smtp-provider/notification-smtp-provider.module';
 import { FeaturesComponent } from 'src/app/components/features/features.component';
+import OrgListModule from 'src/app/pages/org-list/org-list.module';
 
 @NgModule({
   declarations: [SettingsListComponent],
