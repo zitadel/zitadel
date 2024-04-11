@@ -86,6 +86,10 @@
         "TITLE": "Configuración de la Organización",
         "DESCRIPTION": "Personaliza la configuración de tu organización."
       },
+      "FEATURES": {
+        "TITLE": "Configuración de funciones",
+        "DESCRIPTION": "Desbloquee funciones para su instancia."
+      },
       "IDPS": {
         "TITLE": "Proveedores de Identidad",
         "DESCRIPTION": "Crea y activa proveedores de identidad externos. Elige un proveedor conocido o configura cualquier otro proveedor compatible con OIDC, OAuth o SAML de tu elección. Incluso puedes usar tus tokens JWT existentes como identidades federadas configurando un proveedor de identidad JWT.",
@@ -1316,6 +1320,7 @@
     },
     "LIST": {
       "ORGS": "Organizaciones",
+      "FEATURESETTINGS": "Ajustes de funcionalidades",
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamiento del inicio de sesión y de la seguridad",
       "LOCKOUT": "Bloqueo",
@@ -1377,6 +1382,8 @@
       }
     },
     "SMTP": {
+      "TITLE": "Ajustes SMTP",
+      "DESCRIPTION": "Descripción",
       "SENDERADDRESS": "Dirección email del emisor",
       "SENDERNAME": "Nombre del emisor",
       "REPLYTOADDRESS": "Dirección Reply-To",
@@ -1387,6 +1394,7 @@
       "PASSWORDSET": "La contraseña SMTP se estableció con éxito.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "¡Se guardó con éxito!",
+      "NOCHANGES": "¡Sin cambios!",
       "REQUIREDWARN": "Para enviar notificaciones para tu dominio, debes introducir tus datos SMTP."
     },
     "SMS": {
@@ -1445,6 +1453,27 @@
       "IMPERSONATIONTITLE": "Suplantación",
       "IMPERSONATIONENABLED": "Permitir suplantación",
       "IMPERSONATIONDESCRIPTION": "Esta configuración permite utilizar la suplantación en principio. Tenga en cuenta que el imitador también necesita que se le asignen los roles `*_IMPERSONATOR` apropiados."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Organización predeterminada de inicio de sesión",
+      "LOGINDEFAULTORG_DESCRIPTION": "La interfaz de inicio de sesión utilizará la configuración de la organización predeterminada (y no de la instancia) si no se establece ningún contexto de organización.",
+      "OIDCLEGACYINTROSPECTION": "Introspección heredada OIDC",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Recientemente hemos refactorizado el punto de introspección por razones de rendimiento. Esta función se puede utilizar para volver a la implementación heredada si surgen errores inesperados.",
+      "OIDCTOKENEXCHANGE": "Intercambio de tokens OIDC",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Habilita el tipo de concesión experimental urn:ietf:params:oauth:grant-type:token-exchange para el punto de extremo de token OIDC. El intercambio de tokens se puede utilizar para solicitar tokens con un alcance menor o suplantar a otros usuarios. Consulta la política de seguridad para permitir la suplantación en una instancia.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Desencadenadores de proyecciones de introspección OIDC",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Habilita los desencadenadores de proyección durante una solicitud de introspección. Esto puede actuar como un mecanismo alternativo si hay problemas de coherencia perceptibles en la respuesta a la introspección, pero puede afectar al rendimiento. Estamos planeando eliminar los desencadenadores para las solicitudes de introspección en el futuro.",
+      "USERSCHEMA": "Esquema de usuario",
+      "USERSCHEMA_DESCRIPTION": "Los esquemas de usuario permiten gestionar los esquemas de datos de los usuarios. Si se activa la bandera, podrás utilizar la nueva API y sus funciones.",
+      "ACTIONS": "Acciones",
+      "ACTIONS_DESCRIPTION": "Acciones v2 permite administrar las ejecuciones y objetivos de datos. Si la bandera está habilitada, podrá utilizar la nueva API y sus funciones.",
+      "STATES": {
+        "INHERITED": "Heredado",
+        "ENABLED": "Habilitado",
+        "DISABLED": "Deshabilitado"
+      },
+      "INHERITED_DESCRIPTION": "Esta configuración establece el valor al valor predeterminado del sistema.",
+      "RESET": "Establecer todo a heredado"
     },
     "DIALOG": {
       "RESET": {
@@ -1590,6 +1619,7 @@
         "initPasswordText": "Inicializar contraseña",
         "initializeDoneText": "Inicializar usuario, hecho",
         "initializeUserText": "Inicializar usuario",
+        "linkingUserPromptText": "Mensaje de enlace de usuario",
         "linkingUserDoneText": "Vinculación de usuario, hecho",
         "loginText": "Iniciar sesión",
         "logoutText": "Cerrar sesión",
@@ -1661,7 +1691,8 @@
       "HASLOWERCASE": "tiene minúsculas",
       "HASUPPERCASE": "tiene mayúsculas",
       "SHOWLOCKOUTFAILURES": "mostrar fallos de bloqueo",
-      "MAXATTEMPTS": "Intentos máximos",
+      "MAXPASSWORDATTEMPTS": "Intentos máximos de contraseña",
+      "MAXOTPATTEMPTS": "Intentos máximos de OTP",
       "EXPIREWARNDAYS": "Aviso de expiración después de estos días: ",
       "MAXAGEDAYS": "Antigüedad máxima en días",
       "USERLOGINMUSTBEDOMAIN": "Añadir el dominio de la organización como sufijo de los nombres de inicio de sesión",
@@ -2020,7 +2051,13 @@
       "ISCREATIONALLOWED": "Creación de cuentas permitida",
       "ISCREATIONALLOWED_DESC": "Determina si se pueden crear cuentas.",
       "ISLINKINGALLOWED": "Permitida la vinculación de cuentas",
-      "ISLINKINGALLOWED_DESC": "Determina si una identidad puede vincularse a una cuenta existente."
+      "ISLINKINGALLOWED_DESC": "Determina si una identidad puede vincularse a una cuenta existente.",
+      "AUTOLINKING_DESC": "Determina si se pedirá a una identidad que se vincule a una cuenta existente.",
+      "AUTOLINKINGTYPE": {
+        "0": "Desactivado",
+        "1": "Comprobar nombre de usuario existente",
+        "2": "Comprobar correo electrónico existente"
+      }
     },
     "OWNERTYPES": {
       "0": "desconocido",
@@ -2179,6 +2216,48 @@
     "PASSWORDLESSTYPE": {
       "0": "No permitido",
       "1": "Permitido"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Proveedor SMTP",
+      "DESCRIPTION": "Estos son los proveedores SMTP para tu instancia de Zitadel. Activa el que quieras utilizar para enviar notificaciones a tus usuarios.",
+      "EMPTY": "No hay ningún proveedor SMTP disponible",
+      "ACTIVATED": "Activado",
+      "ACTIVATE": "Activar proveedor",
+      "DEACTIVATE": "Desactivar proveedor",
+      "TYPE": "Tipo",
+      "DIALOG": {
+        "ACTIVATED": "Tu configuración SMTP ha sido activada",
+        "ACTIVATE_WARN_TITLE": "Activar configuración SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Estás a punto de activar una configuración SMTP. Primero desactivaremos la configuración de tu proveedor actual y después activaremos esta configuración. ¿Estás seguro?",
+        "DEACTIVATE_WARN_TITLE": "Desactivar configuración SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Estás a punto de desactivar una configuración SMTP. ¿Está seguro?",
+        "DEACTIVATED": "La configuración SMTP ha sido desactivada",
+        "DELETE_TITLE": "Eliminar configuración SMTP",
+        "DELETE_DESCRIPTION": "Estás a punto de eliminar una configuración. Confirma esta acción escribiendo el nombre del remitente",
+        "DELETED": "La configuración SMTP ha sido eliminada",
+        "SENDER": "Escribe {{ value }} para eliminar esta configuración SMTP."
+      }
+    },
+    "CREATE": {
+      "TITLE": "Agrega un proveedor SMTP",
+      "DESCRIPTION": "Selecciona uno o más de los siguientes proveedores.",
+      "STEPS": {
+        "TITLE": "Agrega un proveedor SMTP {{ value }} ",
+        "CREATE_DESC_TITLE": "Introduce tu configuración SMTP de {{ value }} paso a paso",
+        "CURRENT_DESC_TITLE": "Estas son tus configuraciones SMTP",
+        "PROVIDER_SETTINGS": "Configuración del proveedor SMTP",
+        "SENDER_SETTINGS": "Configuración del remitente",
+        "TEST_SETTINGS": "Probar la configuración SMTP"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Configuración del proveedor SMTP"
+    },
+    "EMPTY": "No hay ningún proveedor SMTP disponible",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {

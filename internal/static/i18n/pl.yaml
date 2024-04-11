@@ -56,6 +56,7 @@ Errors:
   SMTPConfig:
     NotFound: Konfiguracja SMTP nie znaleziona
     AlreadyExists: Konfiguracja SMTP już istnieje
+    AlreadyDeactivated: Konfiguracja SMTP jest już dezaktywowana
     SenderAdressNotCustomDomain: Adres nadawcy musi być skonfigurowany jako domena niestandardowa na instancji.
   Notification:
     NoDomain: Nie znaleziono domeny dla wiadomości
@@ -581,6 +582,15 @@ AggregateTypes:
   target: Cel
   execution: Wykonanie
   user_schema: Schemat użytkownika
+  auth_request: Auth Request
+  device_auth: Uwierzytelnianie urządzenia
+  idpintent: Intencja IDP
+  limits: Limit
+  milestone: Kamień milowy
+  oidc_session: Sesja OIDC
+  restrictions: Ograniczenia
+  system: System
+  session: Sesja
 
 EventTypes:
   execution:
@@ -626,6 +636,7 @@ EventTypes:
         removed: Usunięto klucz
       secret:
         set: Sekret ustawiony
+        updated: Zaktualizowano tajny skrót
         removed: Sekret usunięty
         check:
           succeeded: Sprawdzenie sekretu powiodło się
@@ -1000,6 +1011,11 @@ EventTypes:
           check:
             succeeded: Sprawdzenie sekretu OIDC Klienta powiodło się
             failed: Sprawdzenie sekretu OIDC Klienta nie powiodło się
+      api:
+        secret:
+          check:
+            succeeded: Sprawdzenie tajnego interfejsu API powiodło się
+            failed: Sprawdzanie tajnego interfejsu API nie powiodło się
         key:
           added: Dodano klucz aplikacji
           removed: Usunięto klucz aplikacji
@@ -1012,11 +1028,13 @@ EventTypes:
           changed: Zmieniono konfigurację OIDC
           secret:
             changed: Zmieniono sekret OIDC
+            updated: Zaktualizowano tajny skrót OIDC
         api:
           added: Dodano konfigurację API
           changed: Zmieniono konfigurację API
           secret:
             changed: Zmieniono sekret API
+            updated: Zaktualizowano tajny skrót API
   policy:
     password:
       complexity:
@@ -1111,6 +1129,9 @@ EventTypes:
       config:
         added: Dodano konfigurację SMTP
         changed: Zmieniono konfigurację SMTP
+        activated: Konfiguracja SMTP została aktywowana
+        deactivated: Konfiguracja SMTP dezaktywowana
+        removed: Konfiguracja SMTP została usunięta
         password:
           changed: Zmieniono sekret konfiguracji SMTP
     sms:
@@ -1256,6 +1277,8 @@ EventTypes:
       config:
         added: Konfiguracja SMTP dodana
         changed: Konfiguracja SMTP zmieniona
+        activated: Konfiguracja SMTP została aktywowana
+        deactivated: Konfiguracja SMTP dezaktywowana
         password:
           changed: Hasło konfiguracji SMTP zmienione
         removed: Konfiguracja SMTP usunięta

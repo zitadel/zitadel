@@ -317,6 +317,12 @@ LogoutDone:
   Description: 正常にログアウトしました。
   LoginButtonText: ログイン
 
+LinkingUserPrompt:
+  Title: 既存のユーザーが見つかりました
+  Description: "既存のアカウントをリンクしますか:"
+  LinkButtonText: リンク
+  OtherButtonText: その他のオプション
+
 LinkingUsersDone:
   Title: ユーザーリンク
   Description: ユーザーリンクが完了しました。

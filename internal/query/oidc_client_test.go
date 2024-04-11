@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -66,7 +65,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				AppID:                    "236647088211886082",
 				State:                    domain.AppStateActive,
 				ClientID:                 "236647088211951618@tests",
-				ClientSecret:             nil,
+				HashedSecret:             "",
 				RedirectURIs:             []string{"http://localhost:9999/auth/callback"},
 				ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 				GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode, domain.OIDCGrantTypeRefreshToken},
@@ -81,6 +80,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				ClockSkew:                1000000000,
 				AdditionalOrigins:        []string{"https://example.com"},
 				ProjectID:                "236645808328409090",
+				ProjectRoleAssertion:     true,
 				PublicKeys:               map[string][]byte{"236647201860747266": []byte(pubkey)},
 				ProjectRoleKeys:          []string{"role1", "role2"},
 				Settings: &OIDCSettings{
@@ -97,7 +97,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				AppID:                    "236646457053020162",
 				State:                    domain.AppStateActive,
 				ClientID:                 "236646457053085698@tests",
-				ClientSecret:             nil,
+				HashedSecret:             "",
 				RedirectURIs:             []string{"http://localhost:9999/auth/callback"},
 				ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 				GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -113,6 +113,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				AdditionalOrigins:        nil,
 				PublicKeys:               nil,
 				ProjectID:                "236645808328409090",
+				ProjectRoleAssertion:     true,
 				ProjectRoleKeys:          []string{"role1", "role2"},
 				Settings: &OIDCSettings{
 					AccessTokenLifetime: 43200000000000,
@@ -124,15 +125,11 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 			name: "secret client",
 			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientSecret}, "instanceID", "clientID", true),
 			want: &OIDCClient{
-				InstanceID: "230690539048009730",
-				AppID:      "236646858984783874",
-				State:      domain.AppStateActive,
-				ClientID:   "236646858984849410@tests",
-				ClientSecret: &crypto.CryptoValue{
-					CryptoType: crypto.TypeHash,
-					Algorithm:  "bcrypt",
-					Crypted:    []byte(`$2a$14$OzZ0XEZZEtD13py/EPba2evsS6WcKZ5orVMj9pWHEGEHmLu2h3PFq`),
-				},
+				InstanceID:               "230690539048009730",
+				AppID:                    "236646858984783874",
+				State:                    domain.AppStateActive,
+				ClientID:                 "236646858984849410@tests",
+				HashedSecret:             "$2a$14$OzZ0XEZZEtD13py/EPba2evsS6WcKZ5orVMj9pWHEGEHmLu2h3PFq",
 				RedirectURIs:             []string{"http://localhost:9999/auth/callback"},
 				ResponseTypes:            []domain.OIDCResponseType{0},
 				GrantTypes:               []domain.OIDCGrantType{0},
@@ -148,6 +145,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				AdditionalOrigins:        nil,
 				PublicKeys:               nil,
 				ProjectID:                "236645808328409090",
+				ProjectRoleAssertion:     false,
 				ProjectRoleKeys:          []string{"role1", "role2"},
 				Settings: &OIDCSettings{
 					AccessTokenLifetime: 43200000000000,
@@ -163,7 +161,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				AppID:        "239520764276441090",
 				State:        domain.AppStateActive,
 				ClientID:     "239520764779364354@zitadel",
-				ClientSecret: nil,
+				HashedSecret: "",
 				RedirectURIs: []string{
 					"http://test2-qucuh5.localhost:9000/ui/console/auth/callback",
 					"http://test.localhost.com:9000/ui/console/auth/callback"},
@@ -184,6 +182,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				AdditionalOrigins:        nil,
 				PublicKeys:               nil,
 				ProjectID:                "239520764276178946",
+				ProjectRoleAssertion:     false,
 				ProjectRoleKeys:          nil,
 				Settings:                 nil,
 			},

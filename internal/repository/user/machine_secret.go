@@ -11,6 +11,7 @@ import (
 const (
 	machineSecretPrefix             = machineEventPrefix + "secret."
 	MachineSecretSetType            = machineSecretPrefix + "set"
+	MachineSecretHashUpdatedType    = machineSecretPrefix + "updated"
 	MachineSecretRemovedType        = machineSecretPrefix + "removed"
 	MachineSecretCheckSucceededType = machineSecretPrefix + "check.succeeded"
 	MachineSecretCheckFailedType    = machineSecretPrefix + "check.failed"
@@ -19,7 +20,10 @@ const (
 type MachineSecretSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
+	// New events only use EncodedHash. However, the ClientSecret field
+	// is preserved to handle events older than the switch to Passwap.
 	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
 }
 
 func (e *MachineSecretSetEvent) Payload() interface{} {
@@ -33,7 +37,7 @@ func (e *MachineSecretSetEvent) UniqueConstraints() []*eventstore.UniqueConstrai
 func NewMachineSecretSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	clientSecret *crypto.CryptoValue,
+	hashedSecret string,
 ) *MachineSecretSetEvent {
 	return &MachineSecretSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -41,7 +45,7 @@ func NewMachineSecretSetEvent(
 			aggregate,
 			MachineSecretSetType,
 		),
-		ClientSecret: clientSecret,
+		HashedSecret: hashedSecret,
 	}
 }
 
@@ -166,4 +170,36 @@ func MachineSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.Eve
 	}
 
 	return check, nil
+}
+
+type MachineSecretHashUpdatedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+	HashedSecret          string `json:"hashedSecret,omitempty"`
+}
+
+func NewMachineSecretHashUpdatedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	encoded string,
+) *MachineSecretHashUpdatedEvent {
+	return &MachineSecretHashUpdatedEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			MachineSecretHashUpdatedType,
+		),
+		HashedSecret: encoded,
+	}
+}
+
+func (e *MachineSecretHashUpdatedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
+func (e *MachineSecretHashUpdatedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *MachineSecretHashUpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
 }

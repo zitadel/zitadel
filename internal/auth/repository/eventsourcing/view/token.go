@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -87,6 +88,9 @@ func (v *View) DeleteOrgTokens(event eventstore.Event) error {
 }
 
 func (v *View) GetLatestTokenSequence(ctx context.Context, instanceID string) (_ *query.CurrentState, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	q := &query.CurrentStateSearchQueries{
 		Queries: make([]query.SearchQuery, 2),
 	}

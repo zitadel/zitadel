@@ -316,6 +316,11 @@ LogoutDone:
   Title: Излязъл
   Description: Вие излязохте успешно.
   LoginButtonText: Влизам
+LinkingUserPrompt:
+  Title: Намерен съществуващ потребител
+  Description: „Искате ли да свържете съществуващия си акаунт:“
+  LinkButtonText: Връзка
+  OtherButtonText: Други възможности
 LinkingUsersDone:
   Title: Свързване с потребители
   Description: Свързването с потребители е готово.
