@@ -56,6 +56,7 @@ Errors:
   SMTPConfig:
     NotFound: Configuração de SMTP não encontrada
     AlreadyExists: Configuração de SMTP já existe
+    AlreadyDeactivated: Configuração SMTP já desativada
     SenderAdressNotCustomDomain: O endereço do remetente deve ser configurado como um domínio personalizado na instância.
   Notification:
     NoDomain: Nenhum domínio encontrado para a mensagem
@@ -576,6 +577,15 @@ AggregateTypes:
   target: Objetivo
   execution: Execução
   user_schema: Esquema do usuário
+  auth_request: Solicitação de autenticação
+  device_auth: Autenticação de dispositivo
+  idpintent: Intenção de IDP
+  limits: Limites
+  milestone: Marco
+  oidc_session: Sessão OIDC
+  restrictions: Restrições
+  system: Sistema
+  session: Sessão
 
 EventTypes:
   execution:
@@ -1114,6 +1124,9 @@ EventTypes:
       config:
         added: Configuração SMTP adicionada
         changed: Configuração SMTP alterada
+        activated: Configuração SMTP ativada
+        deactivated: Configuração SMTP desativada
+        removed: Configuração SMTP removida
         password:
           changed: Segredo da configuração SMTP alterado
     sms:
@@ -1259,6 +1272,8 @@ EventTypes:
       config:
         added: Configuração SMTP adicionada
         changed: Configuração SMTP alterada
+        activated: Configuração SMTP ativada
+        deactivated: Configuração SMTP desativada
         password:
           changed: Senha da configuração SMTP alterada
         removed: Configuração SMTP removida

@@ -582,6 +582,15 @@ AggregateTypes:
   target: Doel
   execution: Executie
   user_schema: Gebruikersschema
+  auth_request: Auth Verzoek
+  device_auth: Apparaatverificatie
+  idpintent: IDP Intentie
+  limits: Limieten
+  milestone: Mijlpaal
+  oidc_session: OIDC Sessie
+  restrictions: Beperkingen
+  system: Systeem
+  session: Sessie
 
 EventTypes:
   execution:

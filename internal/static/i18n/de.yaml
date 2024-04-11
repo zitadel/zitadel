@@ -56,6 +56,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP Konfiguration nicht gefunden
     AlreadyExists: SMTP Konfiguration existiert bereits
+    AlreadyDeactivated: SMTP-Konfiguration bereits deaktiviert
     SenderAdressNotCustomDomain: Die Sender Adresse muss als Custom Domain auf der Instanz registriert sein.
   Notification:
     NoDomain: Keine Domäne für Nachricht gefunden
@@ -582,6 +583,15 @@ AggregateTypes:
   target: Ziel
   execution: Ausführung
   user_schema: Benutzerschema
+  auth_request: Authentifizierungsanfrage
+  device_auth: Geräteauthentifizierung
+  idpintent: IDP Intent
+  limits: Limits
+  milestone: Milestone
+  oidc_session: OIDC Sitzung
+  restrictions: Restriktionen
+  system: System
+  session: Session
 
 EventTypes:
   execution:
@@ -1120,6 +1130,9 @@ EventTypes:
       config:
         added: SMTP Konfiguration hinzugefügt
         changed: SMTP Konfiguration geändert
+        activated: SMTP Konfiguration aktiviert
+        deactivated: SMTP Konfiguration deaktiviert
+        removed: SMTP Konfiguration entfernt
         password:
           changed: SMTP Konfigurations Passwort geändert
     sms:
@@ -1265,6 +1278,8 @@ EventTypes:
       config:
         added: SMTP Konfiguration hinzugefügt
         changed: SMTP Konfiguration geändert
+        activated: SMTP Konfiguration aktiviert
+        deactivated: SMTP Konfiguration deaktiviert
         password:
           changed: Passwort von SMTP Konfiguration geändert
         removed: SMTP Konfiguration gelöscht
