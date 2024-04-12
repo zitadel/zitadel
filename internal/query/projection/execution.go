@@ -2,8 +2,8 @@ package projection
 
 import (
 	"context"
-	"encoding/json"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -12,14 +12,19 @@ import (
 )
 
 const (
-	ExecutionTable            = "projections.executions1"
-	ExecutionIDCol            = "id"
-	ExecutionCreationDateCol  = "creation_date"
-	ExecutionChangeDateCol    = "change_date"
-	ExecutionResourceOwnerCol = "resource_owner"
-	ExecutionInstanceIDCol    = "instance_id"
-	ExecutionSequenceCol      = "sequence"
-	ExecutionTargetsCol       = "targets"
+	ExecutionTable           = "projections.executions1"
+	ExecutionIDCol           = "id"
+	ExecutionCreationDateCol = "creation_date"
+	ExecutionChangeDateCol   = "change_date"
+	ExecutionInstanceIDCol   = "instance_id"
+	ExecutionSequenceCol     = "sequence"
+
+	ExecutionTargetSuffix         = "targets"
+	ExecutionTargetExecutionIDCol = "execution_id"
+	ExecutionTargetInstanceIDCol  = "instance_id"
+	ExecutionTargetPositionCol    = "position"
+	ExecutionTargetTargetIDCol    = "target_id"
+	ExecutionTargetIncludeCol     = "include"
 )
 
 type executionProjection struct{}
@@ -33,17 +38,30 @@ func (*executionProjection) Name() string {
 }
 
 func (*executionProjection) Init() *old_handler.Check {
-	return handler.NewTableCheck(
+	return handler.NewMultiTableCheck(
 		handler.NewTable([]*handler.InitColumn{
 			handler.NewColumn(ExecutionIDCol, handler.ColumnTypeText),
 			handler.NewColumn(ExecutionCreationDateCol, handler.ColumnTypeTimestamp),
 			handler.NewColumn(ExecutionChangeDateCol, handler.ColumnTypeTimestamp),
-			handler.NewColumn(ExecutionResourceOwnerCol, handler.ColumnTypeText),
-			handler.NewColumn(ExecutionInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(ExecutionSequenceCol, handler.ColumnTypeInt64),
-			handler.NewColumn(ExecutionTargetsCol, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(ExecutionInstanceIDCol, handler.ColumnTypeText),
 		},
 			handler.NewPrimaryKey(ExecutionInstanceIDCol, ExecutionIDCol),
+		),
+		handler.NewSuffixedTable([]*handler.InitColumn{
+			handler.NewColumn(ExecutionTargetInstanceIDCol, handler.ColumnTypeText),
+			handler.NewColumn(ExecutionTargetExecutionIDCol, handler.ColumnTypeText),
+			handler.NewColumn(ExecutionTargetPositionCol, handler.ColumnTypeInt64),
+			handler.NewColumn(ExecutionTargetIncludeCol, handler.ColumnTypeText, handler.Nullable()),
+			handler.NewColumn(ExecutionTargetTargetIDCol, handler.ColumnTypeText, handler.Nullable()),
+		},
+			handler.NewPrimaryKey(ExecutionTargetInstanceIDCol, ExecutionTargetExecutionIDCol, ExecutionTargetPositionCol),
+			ExecutionTargetSuffix,
+			//handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
+			handler.WithForeignKey(handler.NewForeignKey("execution", []string{ExecutionTargetInstanceIDCol, ExecutionTargetExecutionIDCol}, []string{ExecutionInstanceIDCol, ExecutionIDCol})),
+			// handler.WithForeignKey(handler.NewForeignKey("target", []string{ExecutionTargetInstanceIDCol, ExecutionTargetTargetIDCol}, []string{TargetInstanceIDCol, TargetIDCol})),
+			// handler.WithForeignKey(handler.NewForeignKey("include", []string{ExecutionTargetInstanceIDCol, ExecutionTargetIncludeCol}, []string{ExecutionInstanceIDCol, ExecutionIDCol})),
+			handler.WithIndex(handler.NewIndex("execution", []string{ExecutionTargetInstanceIDCol, ExecutionTargetExecutionIDCol})),
 		),
 	)
 }
@@ -81,21 +99,58 @@ func (p *executionProjection) reduceExecutionSet(event eventstore.Event) (*handl
 		return nil, err
 	}
 
-	jsonValue, err := json.Marshal(e.Targets)
-	if err != nil {
-		return nil, err
+	stmts := []func(eventstore.Event) handler.Exec{
+		handler.AddUpsertStatement(
+			[]handler.Column{
+				handler.NewCol(ExecutionInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(ExecutionIDCol, e.Aggregate().ID),
+			},
+			[]handler.Column{
+				handler.NewCol(ExecutionInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCol(ExecutionIDCol, e.Aggregate().ID),
+				handler.NewCol(ExecutionCreationDateCol, handler.OnlySetValueOnInsert(ExecutionTable, e.CreationDate())),
+				handler.NewCol(ExecutionChangeDateCol, e.CreationDate()),
+				handler.NewCol(ExecutionSequenceCol, e.Sequence()),
+			},
+		),
+		// cleanup execution targets to re-insert them
+		handler.AddDeleteStatement(
+			[]handler.Condition{
+				handler.NewCond(ExecutionTargetInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCond(ExecutionTargetExecutionIDCol, e.Aggregate().ID),
+			},
+			handler.WithTableSuffix(ExecutionTargetSuffix),
+		),
 	}
 
-	columns := []handler.Column{
-		handler.NewCol(ExecutionInstanceIDCol, e.Aggregate().InstanceID),
-		handler.NewCol(ExecutionIDCol, e.Aggregate().ID),
-		handler.NewCol(ExecutionResourceOwnerCol, e.Aggregate().ResourceOwner),
-		handler.NewCol(ExecutionCreationDateCol, handler.OnlySetValueOnInsert(ExecutionTable, e.CreationDate())),
-		handler.NewCol(ExecutionChangeDateCol, e.CreationDate()),
-		handler.NewCol(ExecutionSequenceCol, e.Sequence()),
-		handler.NewCol(ExecutionTargetsCol, jsonValue),
+	if len(e.Targets) > 0 {
+		for i, target := range e.Targets {
+			var targetStr, includeStr string
+			switch target.Type {
+			case domain.ExecutionTargetTypeTarget:
+				targetStr = target.Target
+			case domain.ExecutionTargetTypeInclude:
+				includeStr = target.Target
+			}
+
+			stmts = append(stmts,
+				handler.AddCreateStatement(
+					[]handler.Column{
+						handler.NewCol(ExecutionTargetInstanceIDCol, e.Aggregate().InstanceID),
+						handler.NewCol(ExecutionTargetExecutionIDCol, e.Aggregate().ID),
+						handler.NewCol(ExecutionTargetPositionCol, i+1),
+						handler.NewCol(ExecutionTargetIncludeCol, includeStr),
+						handler.NewCol(ExecutionTargetTargetIDCol, targetStr),
+					},
+					handler.WithTableSuffix(ExecutionTargetSuffix),
+				),
+			)
+		}
 	}
-	return handler.NewUpsertStatement(e, columns[0:2], columns), nil
+
+	return handler.NewMultiStatement(e,
+		stmts...,
+	), nil
 }
 
 func (p *executionProjection) reduceExecutionRemoved(event eventstore.Event) (*handler.Statement, error) {
@@ -103,8 +158,8 @@ func (p *executionProjection) reduceExecutionRemoved(event eventstore.Event) (*h
 	if err != nil {
 		return nil, err
 	}
-	return handler.NewDeleteStatement(
-		e,
+
+	return handler.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(ExecutionInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCond(ExecutionIDCol, e.Aggregate().ID),

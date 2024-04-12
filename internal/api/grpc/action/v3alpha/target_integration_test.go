@@ -92,15 +92,15 @@ func TestServer_CreateTarget(t *testing.T) {
 		{
 			name: "async, ok",
 			ctx:  CTX,
-			req: &execution.CreateTargetRequest{
+			req: &action.CreateTargetRequest{
 				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
 				Endpoint: "https://example.com",
-				TargetType: &execution.CreateTargetRequest_RestAsync{
-					RestAsync: &execution.SetRESTAsync{},
+				TargetType: &action.CreateTargetRequest_RestAsync{
+					RestAsync: &action.SetRESTAsync{},
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &execution.CreateTargetResponse{
+			want: &action.CreateTargetResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
@@ -160,7 +160,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &execution.CreateTargetResponse{
+			want: &action.CreateTargetResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Tester.Instance.InstanceID(),
@@ -171,11 +171,11 @@ func TestServer_CreateTarget(t *testing.T) {
 		{
 			name: "call, interruptOnError, ok",
 			ctx:  CTX,
-			req: &execution.CreateTargetRequest{
+			req: &action.CreateTargetRequest{
 				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
 				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestCall{
-					RestCall: &execution.SetRESTCall{
+					RestCall: &action.SetRESTCall{
 						InterruptOnError: true,
 					},
 				},
@@ -341,7 +341,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 				ctx: CTX,
 				req: &action.UpdateTargetRequest{
 					TargetType: &action.UpdateTargetRequest_RestAsync{
-						RestAsync: &execution.SetRESTAsync{},
+						RestAsync: &action.SetRESTAsync{},
 					},
 				},
 			},

@@ -15,12 +15,12 @@ import (
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
-func executionTargetsSingleTarget(id string) []*execution.ExecutionTargetType {
-	return []*execution.ExecutionTargetType{{Type: &execution.ExecutionTargetType_Target{Target: id}}}
+func executionTargetsSingleTarget(id string) []*action.ExecutionTargetType {
+	return []*action.ExecutionTargetType{{Type: &action.ExecutionTargetType_Target{Target: id}}}
 }
 
-func executionTargetsSingleInclude(include string) []*execution.ExecutionTargetType {
-	return []*execution.ExecutionTargetType{{Type: &execution.ExecutionTargetType_Include{Include: include}}}
+func executionTargetsSingleInclude(include string) []*action.ExecutionTargetType {
+	return []*action.ExecutionTargetType{{Type: &action.ExecutionTargetType_Include{Include: include}}}
 }
 
 func TestServer_SetExecution_Request(t *testing.T) {
@@ -1176,7 +1176,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
-						Function: &execution.FunctionExecution{Name: "xxx"},
+						Function: &action.FunctionExecution{Name: "xxx"},
 					},
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
@@ -1189,7 +1189,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
-						Function: &execution.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
+						Function: &action.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
 					},
 				},
 				Targets: executionTargetsSingleTarget(targetResp.GetId()),
@@ -1265,7 +1265,7 @@ func TestServer_DeleteExecution_Function(t *testing.T) {
 			req: &action.DeleteExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
-						Function: &execution.FunctionExecution{Name: "xxx"},
+						Function: &action.FunctionExecution{Name: "xxx"},
 					},
 				},
 			},
@@ -1281,7 +1281,7 @@ func TestServer_DeleteExecution_Function(t *testing.T) {
 			req: &action.DeleteExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
-						Function: &execution.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
+						Function: &action.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
 					},
 				},
 			},

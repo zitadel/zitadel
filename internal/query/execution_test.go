@@ -14,32 +14,48 @@ import (
 )
 
 var (
-	prepareExecutionsStmt = `SELECT projections.executions1.id,` +
+	prepareExecutionsStmt = `SELECT projections.executions1.instance_id,` +
+		` projections.executions1.id,` +
 		` projections.executions1.change_date,` +
-		` projections.executions1.resource_owner,` +
 		` projections.executions1.sequence,` +
-		` projections.executions1.targets,` +
+		` execution_targets.targets,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.executions1`
+		` FROM projections.executions1` +
+		` JOIN (` +
+		`SELECT instance_id, execution_id, JSON_AGG( JSON_BUILD_OBJECT( 'position', position, 'include', include, 'target', target_id ) ) as targets` +
+		` FROM projections.executions1_targets` +
+		` GROUP BY instance_id, execution_id` +
+		`)` +
+		` AS execution_targets` +
+		` ON execution_targets.instance_id = projections.executions1.instance_id` +
+		` AND execution_targets.execution_id = projections.executions1.id`
 	prepareExecutionsCols = []string{
+		"instance_id",
 		"id",
 		"change_date",
-		"resource_owner",
 		"sequence",
 		"targets",
 		"count",
 	}
 
-	prepareExecutionStmt = `SELECT projections.executions1.id,` +
+	prepareExecutionStmt = `SELECT projections.executions1.instance_id,` +
+		` projections.executions1.id,` +
 		` projections.executions1.change_date,` +
-		` projections.executions1.resource_owner,` +
 		` projections.executions1.sequence,` +
-		` projections.executions1.targets` +
-		` FROM projections.executions1`
+		` execution_targets.targets` +
+		` FROM projections.executions1` +
+		` JOIN (` +
+		`SELECT instance_id, execution_id, JSON_AGG( JSON_BUILD_OBJECT( 'position', position, 'include', include, 'target', target_id ) ) as targets` +
+		` FROM projections.executions1_targets` +
+		` GROUP BY instance_id, execution_id` +
+		`)` +
+		` AS execution_targets` +
+		` ON execution_targets.instance_id = projections.executions1.instance_id` +
+		` AND execution_targets.execution_id = projections.executions1.id`
 	prepareExecutionCols = []string{
+		"instance_id",
 		"id",
 		"change_date",
-		"resource_owner",
 		"sequence",
 		"targets",
 	}
@@ -77,11 +93,11 @@ func Test_ExecutionPrepares(t *testing.T) {
 					prepareExecutionsCols,
 					[][]driver.Value{
 						{
+							"ro",
 							"id",
 							testNow,
-							"ro",
 							uint64(20211109),
-							[]byte(`[{"type":1,"target":"include"}]`),
+							[]byte(`[{"position" : 1, "target" : "target"}, {"position" : 2, "include" : "include"}]`),
 						},
 					},
 				),
@@ -98,7 +114,10 @@ func Test_ExecutionPrepares(t *testing.T) {
 							ResourceOwner: "ro",
 							Sequence:      20211109,
 						},
-						Targets: []*exec.Target{{Type: domain.ExecutionTargetTypeInclude, Target: "include"}},
+						Targets: []*exec.Target{
+							{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+							{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+						},
 					},
 				},
 			},
@@ -112,18 +131,18 @@ func Test_ExecutionPrepares(t *testing.T) {
 					prepareExecutionsCols,
 					[][]driver.Value{
 						{
+							"ro",
 							"id-1",
 							testNow,
-							"ro",
 							uint64(20211109),
-							[]byte(`[{"type":2,"target":"target"}]`),
+							[]byte(`[{"position" : 1, "target" : "target"}, {"position" : 2, "include" : "include"}]`),
 						},
 						{
+							"ro",
 							"id-2",
 							testNow,
-							"ro",
 							uint64(20211110),
-							[]byte(`[{"type":1,"target":"include"}]`),
+							[]byte(`[{"position" : 2, "target" : "target"}, {"position" : 1, "include" : "include"}]`),
 						},
 					},
 				),
@@ -140,7 +159,10 @@ func Test_ExecutionPrepares(t *testing.T) {
 							ResourceOwner: "ro",
 							Sequence:      20211109,
 						},
-						Targets: []*exec.Target{{Type: domain.ExecutionTargetTypeTarget, Target: "target"}},
+						Targets: []*exec.Target{
+							{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+							{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+						},
 					},
 					{
 						ID: "id-2",
@@ -149,7 +171,10 @@ func Test_ExecutionPrepares(t *testing.T) {
 							ResourceOwner: "ro",
 							Sequence:      20211110,
 						},
-						Targets: []*exec.Target{{Type: domain.ExecutionTargetTypeInclude, Target: "include"}},
+						Targets: []*exec.Target{
+							{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+							{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+						},
 					},
 				},
 			},
@@ -197,11 +222,11 @@ func Test_ExecutionPrepares(t *testing.T) {
 					regexp.QuoteMeta(prepareExecutionStmt),
 					prepareExecutionCols,
 					[]driver.Value{
+						"ro",
 						"id",
 						testNow,
-						"ro",
 						uint64(20211109),
-						[]byte(`[{"type":2,"target":"target"}]`),
+						[]byte(`[{"position" : 1, "target" : "target"}, {"position" : 2, "include" : "include"}]`),
 					},
 				),
 			},
@@ -212,7 +237,10 @@ func Test_ExecutionPrepares(t *testing.T) {
 					ResourceOwner: "ro",
 					Sequence:      20211109,
 				},
-				Targets: []*exec.Target{{Type: domain.ExecutionTargetTypeTarget, Target: "target"}},
+				Targets: []*exec.Target{
+					{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+					{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+				},
 			},
 		},
 		{

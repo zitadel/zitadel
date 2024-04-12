@@ -94,16 +94,16 @@ func TestServer_GetTargetByID(t *testing.T) {
 					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
 					return nil
 				},
-				req: &execution.GetTargetByIDRequest{},
+				req: &action.GetTargetByIDRequest{},
 			},
-			want: &execution.GetTargetByIDResponse{
-				Target: &execution.Target{
+			want: &action.GetTargetByIDResponse{
+				Target: &action.Target{
 					Details: &object.Details{
 						ResourceOwner: Tester.Instance.InstanceID(),
 					},
 					Endpoint: "https://example.com",
-					TargetType: &execution.Target_RestAsync{
-						RestAsync: &execution.SetRESTAsync{},
+					TargetType: &action.Target_RestAsync{
+						RestAsync: &action.SetRESTAsync{},
 					},
 					Timeout: durationpb.New(10 * time.Second),
 				},
@@ -113,7 +113,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 			name: "get, webhook interruptOnError, ok",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
+				dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, true)
 					request.TargetId = resp.GetId()
@@ -167,7 +167,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 					},
 					Endpoint: "https://example.com",
 					TargetType: &action.Target_RestCall{
-						RestCall: &execution.SetRESTCall{
+						RestCall: &action.SetRESTCall{
 							InterruptOnError: false,
 						},
 					},
@@ -179,7 +179,7 @@ func TestServer_GetTargetByID(t *testing.T) {
 			name: "get, call interruptOnError, ok",
 			args: args{
 				ctx: CTX,
-				dep: func(ctx context.Context, request *execution.GetTargetByIDRequest, response *execution.GetTargetByIDResponse) error {
+				dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, true)
 					request.TargetId = resp.GetId()
@@ -191,16 +191,16 @@ func TestServer_GetTargetByID(t *testing.T) {
 					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
 					return nil
 				},
-				req: &execution.GetTargetByIDRequest{},
+				req: &action.GetTargetByIDRequest{},
 			},
-			want: &execution.GetTargetByIDResponse{
+			want: &action.GetTargetByIDResponse{
 				Target: &action.Target{
 					Details: &object.Details{
 						ResourceOwner: Tester.Instance.InstanceID(),
 					},
 					Endpoint: "https://example.com",
-					TargetType: &execution.Target_RestCall{
-						RestCall: &execution.SetRESTCall{
+					TargetType: &action.Target_RestCall{
+						RestCall: &action.SetRESTCall{
 							InterruptOnError: true,
 						},
 					},
@@ -587,7 +587,7 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 
 					response.Result[0].Details.ChangeDate = resp.GetDetails().GetChangeDate()
 					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
-					response.Result[0].Targets[0] = &execution.ExecutionTargetType{Type: &execution.ExecutionTargetType_Target{Target: target.GetId()}}
+					response.Result[0].Targets[0] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Target{Target: target.GetId()}}
 					return nil
 				},
 				req: &action.ListExecutionsRequest{

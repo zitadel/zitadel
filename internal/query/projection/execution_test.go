@@ -39,15 +39,40 @@ func TestExecutionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.executions1 (instance_id, id, resource_owner, creation_date, change_date, sequence, targets) VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (instance_id, id) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, targets) = (EXCLUDED.resource_owner, projections.executions1.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.targets)",
+							expectedStmt: "INSERT INTO projections.executions1 (instance_id, id, creation_date, change_date, sequence) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (instance_id, id) DO UPDATE SET (creation_date, change_date, sequence) = (projections.executions1.creation_date, EXCLUDED.change_date, EXCLUDED.sequence)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
-								"ro-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
-								[]byte(`[{"type":2,"target":"target"},{"type":1,"target":"include"}]`),
+							},
+						},
+						{
+							expectedStmt: "DELETE FROM projections.executions1_targets WHERE (instance_id = $1) AND (execution_id = $2)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.executions1_targets (instance_id, execution_id, position, include, target_id) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
+								1,
+								"",
+								"target",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.executions1_targets (instance_id, execution_id, position, include, target_id) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
+								2,
+								"include",
+								"",
 							},
 						},
 					},

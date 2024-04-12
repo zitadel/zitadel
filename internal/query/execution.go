@@ -28,16 +28,8 @@ var (
 		name:  projection.ExecutionIDCol,
 		table: executionTable,
 	}
-	ExecutionColumnCreationDate = Column{
-		name:  projection.ExecutionCreationDateCol,
-		table: executionTable,
-	}
 	ExecutionColumnChangeDate = Column{
 		name:  projection.ExecutionChangeDateCol,
-		table: executionTable,
-	}
-	ExecutionColumnResourceOwner = Column{
-		name:  projection.ExecutionResourceOwnerCol,
 		table: executionTable,
 	}
 	ExecutionColumnInstanceID = Column{
@@ -48,13 +40,29 @@ var (
 		name:  projection.ExecutionSequenceCol,
 		table: executionTable,
 	}
-	ExecutionColumnTargets = Column{
-		name:  projection.ExecutionTargetsCol,
-		table: executionTable,
+
+	executionTargetsTable = table{
+		name:          projection.ExecutionTable + "_" + projection.ExecutionTargetSuffix,
+		instanceIDCol: projection.ExecutionTargetInstanceIDCol,
+	}
+	executionTargetsTableAlias       = executionTargetsTable.setAlias("execution_targets")
+	ExecutionTargetsColumnInstanceID = Column{
+		name:  projection.ExecutionTargetInstanceIDCol,
+		table: executionTargetsTableAlias,
+	}
+	ExecutionTargetsColumnExecutionID = Column{
+		name:  projection.ExecutionTargetExecutionIDCol,
+		table: executionTargetsTableAlias,
+	}
+	executionTargetsListCol = Column{
+		name:  "targets",
+		table: executionTargetsTableAlias,
 	}
 )
 
 var (
+	//go:embed execution_targets_join.sql
+	executionTargetsJoinQuery string
 	//go:embed execution_targets.sql
 	executionTargetsQuery string
 	//go:embed execution_targets_combined.sql
@@ -120,7 +128,7 @@ func NewTargetSearchQuery(target string) (SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewListContains(ExecutionColumnTargets, data)
+	return NewListContains(executionTargetsListCol, data)
 }
 
 func NewIncludeSearchQuery(include string) (SearchQuery, error) {
@@ -128,11 +136,18 @@ func NewIncludeSearchQuery(include string) (SearchQuery, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewListContains(ExecutionColumnTargets, data)
+	return NewListContains(executionTargetsListCol, data)
 }
 
+// marshall executionTargets into the same JSONB structure as in the SQL queries
 func targetItemJSONB(t domain.ExecutionTargetType, target string) ([]byte, error) {
-	targets := []*exec.Target{{Type: t, Target: target}}
+	targets := make([]*executionTarget, 0)
+	switch t {
+	case domain.ExecutionTargetTypeTarget:
+		targets = append(targets, &executionTarget{Target: target})
+	case domain.ExecutionTargetTypeInclude:
+		targets = append(targets, &executionTarget{Include: target})
+	}
 	return json.Marshal(targets)
 }
 
@@ -180,86 +195,143 @@ func (q *Queries) ExecutionTargetsCombined(ctx context.Context, ids1, ids2 []str
 	return execution, err
 }
 
-func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
-	return sq.Select(
-			ExecutionColumnID.identifier(),
-			ExecutionColumnChangeDate.identifier(),
-			ExecutionColumnResourceOwner.identifier(),
-			ExecutionColumnSequence.identifier(),
-			ExecutionColumnTargets.identifier(),
-			countColumn.identifier(),
-		).From(executionTable.identifier()).
-			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*Executions, error) {
-			executions := make([]*Execution, 0)
-			var count uint64
-			for rows.Next() {
-				execution := new(Execution)
-				targets := make([]byte, 0)
-				err := rows.Scan(
-					&execution.ID,
-					&execution.EventDate,
-					&execution.ResourceOwner,
-					&execution.Sequence,
-					&targets,
-					&count,
-				)
-				if err != nil {
-					return nil, err
-				}
-				if len(targets) > 0 {
-					if err := json.Unmarshal(targets, &execution.Targets); err != nil {
-						return nil, err
-					}
-				}
-				executions = append(executions, execution)
-			}
-
-			if err := rows.Close(); err != nil {
-				return nil, zerrors.ThrowInternal(err, "QUERY-72xfx5jlj7", "Errors.Query.CloseRows")
-			}
-
-			return &Executions{
-				Executions: executions,
-				SearchResponse: SearchResponse{
-					Count: count,
-				},
-			}, nil
-		}
-}
-
 func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Execution, error)) {
 	return sq.Select(
+			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
 			ExecutionColumnChangeDate.identifier(),
-			ExecutionColumnResourceOwner.identifier(),
 			ExecutionColumnSequence.identifier(),
-			ExecutionColumnTargets.identifier(),
+			executionTargetsListCol.identifier(),
 		).From(executionTable.identifier()).
+			Join("(" + executionTargetsJoinQuery + ") AS " + executionTargetsTableAlias.alias + " ON " +
+				ExecutionTargetsColumnInstanceID.identifier() + " = " + ExecutionColumnInstanceID.identifier() + " AND " +
+				ExecutionTargetsColumnExecutionID.identifier() + " = " + ExecutionColumnID.identifier(),
+			).
 			PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Execution, error) {
-			execution := new(Execution)
-			targets := make([]byte, 0)
-			err := row.Scan(
-				&execution.ID,
-				&execution.EventDate,
-				&execution.ResourceOwner,
-				&execution.Sequence,
-				&targets,
-			)
-			if err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return nil, zerrors.ThrowNotFound(err, "QUERY-qzn1xycesh", "Errors.Execution.NotFound")
-				}
-				return nil, zerrors.ThrowInternal(err, "QUERY-f8sjvm4tb8", "Errors.Internal")
-			}
-			if len(targets) > 0 {
-				if err := json.Unmarshal(targets, &execution.Targets); err != nil {
-					return nil, err
-				}
-			}
-			return execution, nil
+		scanExecution
+}
+
+func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
+	return sq.Select(
+			ExecutionColumnInstanceID.identifier(),
+			ExecutionColumnID.identifier(),
+			ExecutionColumnChangeDate.identifier(),
+			ExecutionColumnSequence.identifier(),
+			executionTargetsListCol.identifier(),
+			countColumn.identifier(),
+		).From(executionTable.identifier()).
+			Join("(" + executionTargetsJoinQuery + ") AS " + executionTargetsTableAlias.alias + " ON " +
+				ExecutionTargetsColumnInstanceID.identifier() + " = " + ExecutionColumnInstanceID.identifier() + " AND " +
+				ExecutionTargetsColumnExecutionID.identifier() + " = " + ExecutionColumnID.identifier(),
+			).
+			PlaceholderFormat(sq.Dollar),
+		scanExecutions
+}
+
+type executionTarget struct {
+	Position int    `json:"position,omitempty"`
+	Include  string `json:"include,omitempty"`
+	Target   string `json:"target,omitempty"`
+}
+
+func scanExecution(row *sql.Row) (*Execution, error) {
+	execution := new(Execution)
+
+	var (
+		targets = make([]byte, 0)
+	)
+
+	err := row.Scan(
+		&execution.ResourceOwner,
+		&execution.ID,
+		&execution.EventDate,
+		&execution.Sequence,
+		&targets,
+	)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, zerrors.ThrowNotFound(err, "QUERY-qzn1xycesh", "Errors.Execution.NotFound")
 		}
+		return nil, zerrors.ThrowInternal(err, "QUERY-f8sjvm4tb8", "Errors.Internal")
+	}
+
+	ets := make([]*executionTarget, 0)
+	if err := json.Unmarshal(targets, &ets); err != nil {
+		return nil, err
+	}
+
+	execution.Targets = make([]*exec.Target, len(ets))
+	for i := range ets {
+		if ets[i].Target != "" {
+			execution.Targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: ets[i].Target}
+		}
+		if ets[i].Include != "" {
+			execution.Targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: ets[i].Include}
+		}
+	}
+
+	return execution, nil
+}
+
+func executionTargetsUnmarshal(executionTargets []byte) ([]*exec.Target, error) {
+	ets := make([]*executionTarget, 0)
+	if err := json.Unmarshal(executionTargets, &ets); err != nil {
+		return nil, err
+	}
+
+	targets := make([]*exec.Target, len(ets))
+	// position starts with 1
+	for _, et := range ets {
+		if et.Target != "" {
+			targets[et.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: et.Target}
+		}
+		if et.Include != "" {
+			targets[et.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: et.Include}
+		}
+	}
+	return targets, nil
+}
+
+func scanExecutions(rows *sql.Rows) (*Executions, error) {
+	executions := make([]*Execution, 0)
+	var count uint64
+
+	for rows.Next() {
+		execution := new(Execution)
+		targets := make([]byte, 0)
+
+		err := rows.Scan(
+			&execution.ResourceOwner,
+			&execution.ID,
+			&execution.EventDate,
+			&execution.Sequence,
+			&targets,
+			&count,
+		)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return nil, zerrors.ThrowNotFound(err, "QUERY-tbrmno85vp", "Errors.Execution.NotFound")
+			}
+			return nil, zerrors.ThrowInternal(err, "QUERY-tyw2ydsj84", "Errors.Internal")
+		}
+
+		execution.Targets, err = executionTargetsUnmarshal(targets)
+		if err != nil {
+			return nil, err
+		}
+		executions = append(executions, execution)
+	}
+
+	if err := rows.Close(); err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-yhka3fs3mw", "Errors.Query.CloseRows")
+	}
+
+	return &Executions{
+		Executions: executions,
+		SearchResponse: SearchResponse{
+			Count: count,
+		},
+	}, nil
 }
 
 type ExecutionTarget struct {
