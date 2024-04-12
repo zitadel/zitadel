@@ -1,4 +1,9 @@
-import { server, deleteSession } from "#/lib/zitadel";
+import {
+  server,
+  deleteSession,
+  getUserById,
+  listHumanAuthFactors,
+} from "#/lib/zitadel";
 import {
   SessionCookie,
   getMostRecentSessionCookie,
@@ -100,12 +105,23 @@ export async function PUT(request: NextRequest) {
           challenges,
           undefined,
           authRequestId
-        ).then((session) => {
-          console.log(session);
+        ).then(async (session) => {
+          // if password, check if user has MFA methods
+          let authFactors;
+          if (password && session.factors?.user?.id) {
+            const response = await listHumanAuthFactors(
+              server,
+              session.factors?.user?.id
+            );
+            if (response.result && response.result.length) {
+              authFactors = response.result;
+            }
+          }
           return NextResponse.json({
             sessionId: session.id,
             factors: session.factors,
             challenges: session.challenges,
+            authFactors,
           });
         });
       })

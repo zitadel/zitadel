@@ -9,8 +9,8 @@ export default function Page() {
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1>Password</h1>
-      <p className="ztdl-p mb-6 block">Enter your password.</p>
+      <h1>Second Factor</h1>
+      <p className="ztdl-p mb-6 block">Please select a second factor.</p>
 
       <UserAvatar
         showDropdown

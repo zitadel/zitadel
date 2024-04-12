@@ -89,7 +89,7 @@ export default function PasswordForm({
         let continueWithMfa = undefined;
         if (
           loginSettings?.forceMfa &&
-          loginSettings.secondFactors?.length >= 1 // TODO replace with user methods - if forceMFA is set and no user methods prompt to add method (/mfa/add)
+          resp.authFactors?.length >= 1 // TODO if forceMFA is set and no user methods prompt to add method (/mfa/add)
         ) {
           if (loginSettings.secondFactors?.length === 1) {
             continueWithMfa = loginSettings.secondFactors[0];
@@ -97,6 +97,23 @@ export default function PasswordForm({
             // continueWithMfa = loginSettings.secondFactors[0];
             // render selection page for mfa (/mfa/select)
           }
+        } else if (loginSettings?.forceMfa && resp.authFactors?.length === 0) {
+          const params = new URLSearchParams(
+            authRequestId
+              ? {
+                  loginName: resp.factors.user.loginName,
+                  authRequestId,
+                }
+              : {
+                  loginName: resp.factors.user.loginName,
+                }
+          );
+
+          if (organization) {
+            params.append("organization", organization);
+          }
+
+          return router.push(`/mfa/set?` + params);
         }
         // OIDC flows
         if (authRequestId && resp && resp.sessionId) {

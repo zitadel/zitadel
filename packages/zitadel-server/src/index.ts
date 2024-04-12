@@ -68,6 +68,7 @@ export { TextQueryMethod } from "./proto/server/zitadel/object/v2beta/object";
 export {
   AddHumanUserResponse,
   AddHumanUserRequest,
+  GetUserByIDResponse,
   VerifyEmailResponse,
   VerifyPasskeyRegistrationRequest,
   VerifyPasskeyRegistrationResponse,
@@ -89,6 +90,7 @@ export {
   SetHumanPasswordResponse,
   SetHumanPasswordRequest,
   GetOrgByDomainGlobalResponse,
+  ListHumanAuthFactorsResponse,
 } from "./proto/server/zitadel/management";
 export * from "./proto/server/zitadel/idp";
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2beta/legal_settings";

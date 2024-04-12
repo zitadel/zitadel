@@ -1,4 +1,6 @@
 import {
+  LegalAndSupportSettings,
+  PasswordComplexitySettings,
   ZitadelServer,
   ZitadelServerOptions,
   user,
@@ -15,8 +17,6 @@ import {
   AddHumanUserResponse,
   BrandingSettings,
   ListSessionsResponse,
-  LegalAndSupportSettings,
-  PasswordComplexitySettings,
   GetSessionResponse,
   VerifyEmailResponse,
   Checks,
@@ -40,6 +40,7 @@ import {
   CreateCallbackResponse,
   RequestChallenges,
   TextQueryMethod,
+  ListHumanAuthFactorsResponse,
   AddHumanUserRequest,
 } from "@zitadel/server";
 
@@ -255,6 +256,14 @@ export async function addHumanUser(
       : payload,
     {}
   );
+}
+
+export async function listHumanAuthFactors(
+  server: ZitadelServer,
+  userId: string
+): Promise<ListHumanAuthFactorsResponse> {
+  const managementService = management.getManagement(server);
+  return managementService.listHumanAuthFactors({ userId }, {});
 }
 
 export async function listUsers(
