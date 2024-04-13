@@ -7,6 +7,7 @@ This package contains code for load testing specific endpoints of ZITADEL using 
 * [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 * [k6](https://k6.io/docs/get-started/installation/)
 * [go](https://go.dev/doc/install)
+* running ZITADEL
 
 ## Structure
 
