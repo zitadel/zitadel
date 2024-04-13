@@ -9,7 +9,7 @@ import url from './url';
 
 export const Config = {
   host: __ENV.ZITADEL_HOST || 'http://localhost:8080',
-  orgId: __ENV.ZITADEL_ORG_ID || '',
+  orgId: '',
   codeVerifier: __ENV.CODE_VERIFIER || randomString(10),
   admin: {
     loginName: __ENV.ADMIN_LOGIN_NAME || 'zitadel-admin@zitadel.localhost',

@@ -1,7 +1,6 @@
 VUS ?= 20
 DURATION ?= "200s"
 ZITADEL_HOST ?=
-ZITADEL_ORG_ID ?=
 ADMIN_LOGIN_NAME ?=
 ADMIN_PASSWORD ?=
 
@@ -23,6 +22,7 @@ manipulate_user: bundle
 
 .PHONY: introspect
 introspect: ensure_modules bundle
+	go install go.k6.io/xk6/cmd/xk6@latest
 	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
 	./../../xk6-modules/k6 run dist/introspection.js --vus ${VUS} --duration ${DURATION}
 
@@ -33,11 +33,6 @@ ifeq (,$(wildcard $(PWD)/../../xk6-modules))
 	cd ../.. && git clone git@github.com:zitadel/xk6-modules.git
 endif
 	cd ../../xk6-modules && git pull
-
-.PHONY: transpile
-transpile:
-	npm i
-	npm run bundle
 
 .PHONY: bundle
 bundle:
