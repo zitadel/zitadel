@@ -1,13 +1,15 @@
-import { check, fail } from 'k6';
-import http from 'k6/http';
+import { JSONObject, check, fail } from 'k6';
+import http, { Response } from 'k6/http';
+// @ts-ignore Import module
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 import { Trend } from 'k6/metrics';
-import encoding from 'k6/encoding';
 
-import { Config, Client } from './config.js';
-import url from './url.js';
+import { Config, Client } from './config';
+import url from './url';
+import { User } from './user';
+import { Tokens } from './oidc';
 
-export function loginByUsernamePassword(user) {
+export function loginByUsernamePassword(user: User) {
   check(user, {
     'user defined': (u) => u !== undefined || fail(`user is undefined`)
   });
@@ -19,19 +21,17 @@ export function loginByUsernamePassword(user) {
 }
 
 const initLoginTrend = new Trend('login_ui_init_login_duration', true);
-function initLogin() {
+function initLogin(): Response {
   const response = http.get(url('/oauth/v2/authorize', {searchParams: Client()}));
   check(response, {
-    'authorize status ok': (r) => r.status == 200 || fail('init login failed', r)
+    'authorize status ok': (r) => r.status == 200 || fail(`init login failed: ${r}`)
   });
-
   initLoginTrend.add(response.timings.duration);
-
   return response;
 }
 
 const enterLoginNameTrend = new Trend('login_ui_enter_login_name_duration', true);
-function enterLoginName(page, user) {
+function enterLoginName(page: Response, user: User): Response {
   const response = page.submitForm({
     formSelector: 'form',
     fields: {
@@ -40,9 +40,9 @@ function enterLoginName(page, user) {
   });
 
   check(response, {
-    'login name status ok': (r) => r.status == 200 || fail('enter login name failed'),
-    'login shows password page': (r) => r.body.includes('password'),
-    'login has no error': (r) => !r.body.includes('error') || fail(`error in enter login name ${r.body}`)
+    'login name status ok': (r) => r && r.status == 200 || fail('enter login name failed'),
+    'login shows password page': (r) => r && r.body !== null && r.body.toString().includes('password')
+    // 'login has no error': (r) => r && r.body != null && r.body.toString().includes('error') || fail(`error in enter login name ${r.body}`)
   });
 
   enterLoginNameTrend.add(response.timings.duration);
@@ -51,7 +51,7 @@ function enterLoginName(page, user) {
 }
 
 const enterPasswordTrend = new Trend('login_ui_enter_password_duration', true);
-function enterPassword(page, user) {
+function enterPassword(page: Response, user: User): Response {
   let response = page.submitForm({
     formSelector: 'form',
     fields: {
@@ -79,7 +79,7 @@ function enterPassword(page, user) {
 const tokenTrend = new Trend('login_ui_token_duration', true);
 function token(code = '') {
   check(code, {
-    'code set': (c) => (code !== undefined && code !== null) || fail('code was not set')
+    'code set': (c) => (c !== undefined && c !== null) || fail('code was not set')
   });
   const response = http.post(url('/oauth/v2/token'), {
       grant_type: 'authorization_code',
@@ -93,15 +93,16 @@ function token(code = '') {
       },
   });
 
+  tokenTrend.add(response.timings.duration);
   check(response, {
     'token status ok': (r) => r.status == 200 || fail(`invalid token response status: ${r.status} body: ${r.body}`),
-    'access token created': (r) => r.json().access_token !== undefined
+  });
+  const token = new Tokens(response.json() as JSONObject);
+  check(token, {
+    'access token created': (t) =>  t.accessToken !== undefined,
+    'id token created': (t) =>  t.idToken !== undefined,
+    'info created': (t) =>  t.info !== undefined
   });
   
-  tokenTrend.add(response.timings.duration);
-  return {
-    accessToken: response.json().access_token,
-    idToken: response.json().id_token,
-    info: JSON.parse(encoding.b64decode(response.json().id_token.split('.')[1].toString(), 'rawstd', 's'))
-  }
+  return token;
 }

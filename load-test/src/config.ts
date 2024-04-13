@@ -1,9 +1,11 @@
+// @ts-ignore Import module
 import { randomString } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 import crypto from 'k6/crypto';
 import http from 'k6/http';
-
-import url from './url.js';
 import execution from 'k6/execution';
+import { Stage } from 'k6/options';
+
+import url from './url';
 
 export const Config = {
   host: __ENV.ZITADEL_HOST || 'http://localhost:8080',
@@ -29,31 +31,37 @@ export function Client() {
   if (client.client_id) {
     return client;
   }
-  client.client_id = http.get(url('/ui/console/assets/environment.json')).json().clientid;
+  const env = http.get(url('/ui/console/assets/environment.json'));
+  
+  client.client_id = env.json("clientid")? env.json("clientid")?.toString()! : ''
+  
   return client
 }
 
-let maxVUs;
+let maxVUs: number;
 export function MaxVUs() {
-  if (maxVUs != undefined) {
-    return maxVUs;
-  }
-
-  let max = 1;
-  if (execution.test.options.stages != undefined) {
-    max = execution.test.options.stages.reduce((acc, value) => {
-      if (acc <= value.target) {
-        return;
-      }
-      acc = value.target;
-    });
-  }
-
-  new Map(Object.entries(execution.test.options.scenarios)).forEach((value) => {
-    if (max < value.vus) {
-      max = value.vus;
+    if (maxVUs != undefined) {
+        return maxVUs;
     }
-  })
+
+    let max: number = execution.test.options.stages? execution.test.options.stages.
+        map((value: Stage): number => (value.target)).
+        reduce((acc: number, value: number): number => {
+            return acc <= value? acc : value;
+        }) 
+        : 1;
+    
+
+    if (execution.test.options.scenarios) {
+        new Map(Object.entries(execution.test.options.scenarios)).
+        forEach((value) => {
+            if ('vus' in value) {
+                max = value.vus && max < value.vus? value.vus : max;
+            } else if ('maxVUs' in value) {
+                max = value.maxVUs && max < value.maxVUs? value.maxVUs : max;
+            }
+        })
+    }
 
   maxVUs = max;
   return maxVUs;

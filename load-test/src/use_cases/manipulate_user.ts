@@ -1,23 +1,21 @@
-import { loginByUsernamePassword } from '../login_ui.js';
-import { createOrg } from '../setup.js';
-import { createHuman, updateHuman, lockUser, deleteUser } from '../user.js';
-import { removeOrg } from '../teardown.js';
-import { Config } from '../config.js';
-import { check, fail } from 'k6';
+import { loginByUsernamePassword } from '../login_ui';
+import { createOrg, removeOrg } from '../org';
+import { createHuman, updateHuman, lockUser, deleteUser, User } from '../user';
+import { Config } from '../config';
+import { check } from 'k6';
 
 export async function setup() {
-  const tokens = loginByUsernamePassword(Config.admin);
+  const tokens = loginByUsernamePassword(Config.admin as User);
   console.info("setup: admin signed in");
 
-  const org = await createOrg(tokens.accessToken);
+  const org = await createOrg(tokens.accessToken!);
   console.info(`setup: org (${org.organizationId}) created`);
 
   return {tokens, org};
 }
 
-export default async function(data) {
+export default async function(data: any) {
     const human = await createHuman(`vu-${__VU}`, data.org, data.tokens.accessToken);
-    console.log(human.userId);
     const updateRes = await updateHuman(
         {
             profile: {
@@ -43,7 +41,7 @@ export default async function(data) {
     });
 }
 
-export function teardown(data) {
+export function teardown(data: any) {
     removeOrg(data.org, data.tokens.accessToken);
     console.info('teardown: org removed')
 }

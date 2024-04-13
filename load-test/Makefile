@@ -6,25 +6,25 @@ ADMIN_LOGIN_NAME ?=
 ADMIN_PASSWORD ?=
 
 .PHONY: human_password_login
-human_password_login:
-	k6 run tests/use_cases/human_password_login.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
+human_password_login: bundle
+	k6 run dist/human_password_login.js --vus ${VUS} --duration ${DURATION}
 
 .PHONY: machine_pat_login
-machine_pat_login:
-	k6 run tests/use_cases/machine_pat_login.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
+machine_pat_login: bundle
+	k6 run dist/machine_pat_login.js --vus ${VUS} --duration ${DURATION}
 
 .PHONY: user_info
-user_info:
-	k6 run tests/use_cases/user_info.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
+user_info: bundle
+	k6 run dist/user_info.js --vus ${VUS} --duration ${DURATION}
 
 .PHONY: manipulate_user
-manipulate_user:
-	k6 run tests/use_cases/manipulate_user.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
+manipulate_user: bundle
+	k6 run dist/manipulate_user.js --vus ${VUS} --duration ${DURATION}
 
 .PHONY: introspect
-introspect: ensure_modules
+introspect: ensure_modules bundle
 	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
-	./../../xk6-modules/k6 run tests/use_cases/introspection.js --vus ${VUS} --duration ${DURATION} --env MAX_VUS=${VUS}
+	./../../xk6-modules/k6 run dist/introspection.js --vus ${VUS} --duration ${DURATION}
 
 .PHONY: ensure_modules
 ensure_modules:
@@ -36,5 +36,10 @@ endif
 
 .PHONY: transpile
 transpile:
+	npm i
+	npm run bundle
+
+.PHONY: bundle
+bundle:
 	npm i
 	npm run bundle
