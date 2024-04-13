@@ -20,4 +20,10 @@ message LockoutSettings {
       description: "resource_owner_type returns if the settings is managed on the organization or on the instance";
     }
   ];
+  uint64 max_otp_attempts = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Maximum failed attempts for a single OTP type (TOTP, SMS, Email) before the account gets locked. Attempts are reset as soon as the OTP is entered correctly. If set to 0 the account will never be locked."
+      example: "\"10\""
+    }
+  ];
 }

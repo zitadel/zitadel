@@ -109,7 +109,7 @@ func machineToPb(userQ *query.Machine) *user.MachineUser {
 	return &user.MachineUser{
 		Name:            userQ.Name,
 		Description:     userQ.Description,
-		HasSecret:       userQ.Secret != nil,
+		HasSecret:       userQ.EncodedSecret != "",
 		AccessTokenType: accessTokenTypeToPb(userQ.AccessTokenType),
 	}
 }

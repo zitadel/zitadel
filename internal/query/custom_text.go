@@ -409,8 +409,11 @@ func CustomTextsToLoginDomain(instanceID, aggregateID, lang string, texts *Custo
 		if strings.HasPrefix(text.Key, domain.LoginKeyRegistrationOrg) {
 			registrationOrgKeyToDomain(text, result)
 		}
+		if strings.HasPrefix(text.Key, domain.LoginKeyLinkingUserPrompt) {
+			linkingUserPromptKeyToDomain(text, result)
+		}
 		if strings.HasPrefix(text.Key, domain.LoginKeyLinkingUserDone) {
-			linkingUserKeyToDomain(text, result)
+			linkingUserDoneKeyToDomain(text, result)
 		}
 		if strings.HasPrefix(text.Key, domain.LoginKeyExternalNotFound) {
 			externalUserNotFoundKeyToDomain(text, result)
@@ -1100,7 +1103,22 @@ func registrationOrgKeyToDomain(text *CustomText, result *domain.CustomLoginText
 	}
 }
 
-func linkingUserKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
+func linkingUserPromptKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
+	if text.Key == domain.LoginKeyLinkingUserPromptTitle {
+		result.LinkingUserPrompt.Title = text.Text
+	}
+	if text.Key == domain.LoginKeyLinkingUserPromptDescription {
+		result.LinkingUserPrompt.Description = text.Text
+	}
+	if text.Key == domain.LoginKeyLinkingUserPromptLinkButtonText {
+		result.LinkingUserPrompt.LinkButtonText = text.Text
+	}
+	if text.Key == domain.LoginKeyLinkingUserPromptOtherButtonText {
+		result.LinkingUserPrompt.OtherButtonText = text.Text
+	}
+}
+
+func linkingUserDoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyLinkingUserDoneTitle {
 		result.LinkingUsersDone.Title = text.Text
 	}

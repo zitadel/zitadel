@@ -279,8 +279,8 @@ func (h plainHasher) Verify(encoded, password string) (verifier.Result, error) {
 //
 // With `x` set to "foo", the following encoded string would be produced by Hash:
 // $plain$foo$password
-func mockPasswordHasher(x string) *crypto.PasswordHasher {
-	return &crypto.PasswordHasher{
+func mockPasswordHasher(x string) *crypto.Hasher {
+	return &crypto.Hasher{
 		Swapper:  passwap.NewSwapper(plainHasher{x: x}),
 		Prefixes: []string{"$plain$"},
 	}

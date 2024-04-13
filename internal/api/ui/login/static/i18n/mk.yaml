@@ -325,6 +325,12 @@ LogoutDone:
   Description: Успешно сте одјавени.
   LoginButtonText: најава
 
+LinkingUserPrompt:
+  Title: Пронајден е постоечки корисник
+  Description: "Дали сакате да ја поврзете вашата постоечка сметка:"
+  LinkButtonText: Bрска
+  OtherButtonText: Други опции
+
 LinkingUsersDone:
   Title: Поврзување на корисници
   Description: Поврзувањето на корисници е завршено.

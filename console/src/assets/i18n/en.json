@@ -86,6 +86,10 @@
         "TITLE": "Organization Settings",
         "DESCRIPTION": "Customize the settings of your organization."
       },
+      "FEATURES": {
+        "TITLE": "Feature Settings",
+        "DESCRIPTION": "Unlock features for your instance."
+      },
       "IDPS": {
         "TITLE": "Identity Providers",
         "DESCRIPTION": "Create and activate external identity providers. Choose a well-known provider or configure any other OIDC, OAuth or SAML compatible provider of your choice. You can even use your existing JWT tokens as federated identities by configuring a JWT identity provider.",
@@ -1315,6 +1319,7 @@
     },
     "LIST": {
       "ORGS": "Organizations",
+      "FEATURESETTINGS": "Features",
       "LANGUAGES": "Languages",
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
@@ -1376,6 +1381,8 @@
       }
     },
     "SMTP": {
+      "TITLE": "SMTP Provider",
+      "DESCRIPTION": "Description",
       "SENDERADDRESS": "Sender Email Address",
       "SENDERNAME": "Sender Name",
       "REPLYTOADDRESS": "Reply-to Address",
@@ -1386,6 +1393,7 @@
       "PASSWORDSET": "SMTP Password was set successfully.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Saved successfully!",
+      "NOCHANGES": "No changes!",
       "REQUIREDWARN": "To send notifications from your domain, you have to enter your SMTP data."
     },
     "SMS": {
@@ -1444,6 +1452,27 @@
       "IMPERSONATIONTITLE": "Impersonation",
       "IMPERSONATIONENABLED": "Allow Impersonation",
       "IMPERSONATIONDESCRIPTION": "This setting allows to use impersonation in principle. Note that the impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Login Default Org",
+      "LOGINDEFAULTORG_DESCRIPTION": "The login UI will use the settings of the default org (and not from the instance) if no organization context is set",
+      "OIDCLEGACYINTROSPECTION": "OIDC Legacy introspection",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise.",
+      "OIDCTOKENEXCHANGE": "OIDC Token Exchange",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Enable the experimental urn:ietf:params:oauth:grant-type:token-exchange grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger introspection Projections",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future.",
+      "USERSCHEMA": "User Schema",
+      "USERSCHEMA_DESCRIPTION": "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features.",
+      "ACTIONS": "Actions",
+      "ACTIONS_DESCRIPTION": "Actions v2 allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features.",
+      "STATES": {
+        "INHERITED": "Inherit",
+        "ENABLED": "Enabled",
+        "DISABLED": "Disabled"
+      },
+      "INHERITED_DESCRIPTION": "This sets the value to the default value of the system.",
+      "RESET": "Set all to inherit"
     },
     "DIALOG": {
       "RESET": {
@@ -1589,6 +1618,7 @@
         "initPasswordText": "Initialize password",
         "initializeDoneText": "Initialize user done",
         "initializeUserText": "Initialize user",
+        "linkingUserPromptText": "Linking user prompt",
         "linkingUserDoneText": "Linking user done",
         "loginText": "Login",
         "logoutText": "Logout",
@@ -1660,7 +1690,8 @@
       "HASLOWERCASE": "must include a lowercase letter",
       "HASUPPERCASE": "must include an uppercase letter",
       "SHOWLOCKOUTFAILURES": "show lockout failures",
-      "MAXATTEMPTS": "Password maximum Attempts",
+      "MAXPASSWORDATTEMPTS": "Password maximum attempts",
+      "MAXOTPATTEMPTS": "OTP maximum attempts",
       "EXPIREWARNDAYS": "Expiration Warning after day",
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
@@ -2027,7 +2058,13 @@
       "ISCREATIONALLOWED": "Account creation allowed",
       "ISCREATIONALLOWED_DESC": "Determines whether accounts can be created.",
       "ISLINKINGALLOWED": "Account linking allowed",
-      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account."
+      "ISLINKINGALLOWED_DESC": "Determines whether an identity can be linked to an existing account.",
+      "AUTOLINKING_DESC": "Determines whether an identity will be prompted to be linked to an existing account.",
+      "AUTOLINKINGTYPE": {
+        "0": "Disabled",
+        "1": "Check for existing Username",
+        "2": "Check for existing Email"
+      }
     },
     "OWNERTYPES": {
       "0": "unknown",
@@ -2200,6 +2237,48 @@
     "PASSWORDLESSTYPE": {
       "0": "Not allowed",
       "1": "Allowed"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP Provider",
+      "DESCRIPTION": "These are the SMTP providers for your Zitadel instance. Activate the one you want to use to send notifications to your users.",
+      "EMPTY": "No SMTP Provider available",
+      "ACTIVATED": "Activated",
+      "ACTIVATE": "Activate provider",
+      "DEACTIVATE": "Deactivate provider",
+      "TYPE": "Type",
+      "DIALOG": {
+        "ACTIVATED": "SMTP config has been activated",
+        "ACTIVATE_WARN_TITLE": "Activate SMTP config",
+        "ACTIVATE_WARN_DESCRIPTION": "You are about to activate an SMTP configuration. First we'll deactivate the current active provider and then activate this configuration. Are you sure?",
+        "DEACTIVATE_WARN_TITLE": "Deactivate SMTP config",
+        "DEACTIVATE_WARN_DESCRIPTION": "You are about to deactivate an SMTP configuration. Are you sure?",
+        "DEACTIVATED": "SMTP config has been deactivated",
+        "DELETE_TITLE": "Delete SMTP config",
+        "DELETE_DESCRIPTION": "You are about to delete a configuration. Confirm this action typing the sender name",
+        "DELETED": "SMTP config has been deleted",
+        "SENDER": "Type {{value}}, to delete this SMTP configuration."
+      }
+    },
+    "CREATE": {
+      "TITLE": "Add SMTP provider",
+      "DESCRIPTION": "Select one ore more of the following providers.",
+      "STEPS": {
+        "TITLE": "Add {{ value }} SMTP Provider",
+        "CREATE_DESC_TITLE": "Enter your {{ value }} SMTP settings step by step",
+        "CURRENT_DESC_TITLE": "These are your SMTP settings",
+        "PROVIDER_SETTINGS": "SMTP Provider Settings",
+        "SENDER_SETTINGS": "Sender Settings",
+        "TEST_SETTINGS": "Test SMTP Settings"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP Provider Settings"
+    },
+    "EMPTY": "No SMTP provider available",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {

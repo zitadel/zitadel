@@ -120,7 +120,7 @@ func CheckOTPSMS(code string) SessionCommand {
 		if challenge == nil {
 			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3tv", "Errors.User.Code.NotFound")
 		}
-		err = crypto.VerifyCodeWithAlgorithm(challenge.CreationDate, challenge.Expiry, challenge.Code, code, cmd.otpAlg)
+		err = crypto.VerifyCode(challenge.CreationDate, challenge.Expiry, challenge.Code, code, cmd.otpAlg)
 		if err != nil {
 			return err
 		}
@@ -138,7 +138,7 @@ func CheckOTPEmail(code string) SessionCommand {
 		if challenge == nil {
 			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-zF3g3", "Errors.User.Code.NotFound")
 		}
-		err = crypto.VerifyCodeWithAlgorithm(challenge.CreationDate, challenge.Expiry, challenge.Code, code, cmd.otpAlg)
+		err = crypto.VerifyCode(challenge.CreationDate, challenge.Expiry, challenge.Code, code, cmd.otpAlg)
 		if err != nil {
 			return err
 		}

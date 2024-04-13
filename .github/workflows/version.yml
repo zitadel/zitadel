@@ -43,6 +43,7 @@ jobs:
         semantic_version: ${{ inputs.semantic_version }}
         extra_plugins: |
           @semantic-release/exec@6.0.3
+          @semantic-release/github@10.0.2
     -
       name: output
       id: output

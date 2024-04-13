@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package zitadel.action.v3alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha;action";
+
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/object/v2beta/object.proto";
+import "zitadel/action/v3alpha/execution.proto";
+
+message SearchQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    InConditionsQuery in_conditions_query = 1;
+    ExecutionTypeQuery execution_type_query = 2;
+    TargetQuery target_query = 3;
+    IncludeQuery include_query = 4;
+  }
+}
+
+message InConditionsQuery {
+  // Defines the conditions to query for.
+  repeated Condition conditions = 1;
+}
+
+message ExecutionTypeQuery {
+  // Defines the type to query for.
+  ExecutionType execution_type = 1;
+}
+
+message TargetQuery {
+  // Defines the id to query for.
+  string target_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the id of the targets to include"
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message IncludeQuery {
+  // Defines the include to query for.
+  string include = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the id of the include"
+      example: "\"request.zitadel.session.v2beta.SessionService\"";
+    }
+  ];
+}
+
+message TargetSearchQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    TargetNameQuery target_name_query = 1;
+    InTargetIDsQuery in_target_ids_query = 2;
+  }
+}
+
+message TargetNameQuery {
+  // Defines the name of the target to query for.
+  string target_name = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 200;
+      example: "\"ip_allow_list\"";
+    }
+  ];
+  // Defines which text comparison method used for the name query.
+  zitadel.object.v2beta.TextQueryMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}
+
+message InTargetIDsQuery {
+  // Defines the ids to query for.
+  repeated string target_ids = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the ids of the targets to include"
+      example: "[\"69629023906488334\",\"69622366012355662\"]";
+    }
+  ];
+}
+
+enum ExecutionType {
+  EXECUTION_TYPE_UNSPECIFIED = 0;
+  EXECUTION_TYPE_REQUEST = 1;
+  EXECUTION_TYPE_RESPONSE = 2;
+  EXECUTION_TYPE_EVENT = 3;
+  EXECUTION_TYPE_FUNCTION = 4;
+}
+
+enum TargetFieldName {
+  FIELD_NAME_UNSPECIFIED = 0;
+  FIELD_NAME_ID = 1;
+  FIELD_NAME_CREATION_DATE = 2;
+  FIELD_NAME_CHANGE_DATE = 3;
+  FIELD_NAME_NAME = 4;
+  FIELD_NAME_TARGET_TYPE = 5;
+  FIELD_NAME_URL = 6;
+  FIELD_NAME_TIMEOUT = 7;
+  FIELD_NAME_ASYNC = 8;
+  FIELD_NAME_INTERRUPT_ON_ERROR = 9;
+}

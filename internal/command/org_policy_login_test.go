@@ -266,8 +266,9 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
-					expectFilter(),
-					expectFilter(),
+					expectFilter(), // reduce login policy
+					expectFilter(), // check if is org idp
+					expectFilter(), // check if is instance idp
 				),
 			},
 			args: args{
@@ -304,10 +305,11 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 			},
 		},
 		{
-			name: "add policy idp, ok",
+			name: "add policy instance idp, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -374,6 +376,88 @@ func TestCommandSide_AddLoginPolicy(t *testing.T) {
 					IDPProviders: []*AddLoginPolicyIDP{
 						{
 							Type:     domain.IdentityProviderTypeSystem,
+							ConfigID: "config1",
+						},
+					},
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
+		{
+			name: "add policy org idp, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("ORG").Aggregate,
+								"config1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								true,
+							),
+						),
+					),
+					expectPush(
+						org.NewLoginPolicyAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							true,
+							true,
+							true,
+							true,
+							true,
+							true,
+							true,
+							true,
+							true,
+							true,
+							domain.PasswordlessTypeAllowed,
+							"https://example.com/redirect",
+							time.Hour*1,
+							time.Hour*2,
+							time.Hour*3,
+							time.Hour*4,
+							time.Hour*5,
+						),
+						org.NewIdentityProviderAddedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"config1",
+							domain.IdentityProviderTypeOrg,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				policy: &AddLoginPolicy{
+					AllowRegister:              true,
+					AllowUsernamePassword:      true,
+					AllowExternalIDP:           true,
+					ForceMFA:                   true,
+					ForceMFALocalOnly:          true,
+					HidePasswordReset:          true,
+					IgnoreUnknownUsernames:     true,
+					AllowDomainDiscovery:       true,
+					DisableLoginWithEmail:      true,
+					DisableLoginWithPhone:      true,
+					PasswordlessType:           domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:         "https://example.com/redirect",
+					PasswordCheckLifetime:      time.Hour * 1,
+					ExternalLoginCheckLifetime: time.Hour * 2,
+					MFAInitSkipLifetime:        time.Hour * 3,
+					SecondFactorCheckLifetime:  time.Hour * 4,
+					MultiFactorCheckLifetime:   time.Hour * 5,
+					IDPProviders: []*AddLoginPolicyIDP{
+						{
+							Type:     domain.IdentityProviderTypeOrg,
 							ConfigID: "config1",
 						},
 					},

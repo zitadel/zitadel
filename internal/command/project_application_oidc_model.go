@@ -17,7 +17,7 @@ type OIDCApplicationWriteModel struct {
 	AppID                    string
 	AppName                  string
 	ClientID                 string
-	ClientSecret             *crypto.CryptoValue
+	HashedSecret             string
 	ClientSecretString       string
 	RedirectUris             []string
 	ResponseTypes            []domain.OIDCResponseType
@@ -100,6 +100,11 @@ func (wm *OIDCApplicationWriteModel) AppendEvents(events ...eventstore.Event) {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
+		case *project.OIDCConfigSecretHashUpdatedEvent:
+			if e.AppID != wm.AppID {
+				continue
+			}
+			wm.WriteModel.AppendEvents(e)
 		case *project.ProjectRemovedEvent:
 			wm.WriteModel.AppendEvents(e)
 		}
@@ -131,7 +136,9 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 		case *project.OIDCConfigChangedEvent:
 			wm.appendChangeOIDCEvent(e)
 		case *project.OIDCConfigSecretChangedEvent:
-			wm.ClientSecret = e.ClientSecret
+			wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
+		case *project.OIDCConfigSecretHashUpdatedEvent:
+			wm.HashedSecret = e.HashedSecret
 		case *project.ProjectRemovedEvent:
 			wm.State = domain.AppStateRemoved
 		}
@@ -142,7 +149,7 @@ func (wm *OIDCApplicationWriteModel) Reduce() error {
 func (wm *OIDCApplicationWriteModel) appendAddOIDCEvent(e *project.OIDCConfigAddedEvent) {
 	wm.oidc = true
 	wm.ClientID = e.ClientID
-	wm.ClientSecret = e.ClientSecret
+	wm.HashedSecret = crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)
 	wm.RedirectUris = e.RedirectUris
 	wm.ResponseTypes = e.ResponseTypes
 	wm.GrantTypes = e.GrantTypes
@@ -223,8 +230,9 @@ func (wm *OIDCApplicationWriteModel) Query() *eventstore.SearchQueryBuilder {
 			project.OIDCConfigAddedType,
 			project.OIDCConfigChangedType,
 			project.OIDCConfigSecretChangedType,
-			project.ProjectRemovedType).
-		Builder()
+			project.OIDCConfigSecretHashUpdatedType,
+			project.ProjectRemovedType,
+		).Builder()
 }
 
 func (wm *OIDCApplicationWriteModel) NewChangedEvent(
