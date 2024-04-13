@@ -207,7 +207,7 @@ func (c *Commands) getResourceOwnerOfSessionUser(ctx context.Context, userID, in
 func (c *Commands) decryptRefreshToken(refreshToken string) (refreshTokenID string, err error) {
 	decoded, err := base64.RawURLEncoding.DecodeString(refreshToken)
 	if err != nil {
-		return "", err
+		return "", zerrors.ThrowInvalidArgument(err, "OIDCS-Cux9a", "Errors.User.RefreshToken.Invalid")
 	}
 	decrypted, err := c.keyAlgorithm.DecryptString(decoded, c.keyAlgorithm.EncryptionKeyID())
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"fmt"
 	"math/big"
 	"net/http"
 	"strconv"
@@ -33,9 +34,10 @@ type Commands struct {
 
 	jobs sync.WaitGroup
 
-	checkPermission    domain.PermissionCheck
-	newCode            cryptoCodeFunc
-	newCodeWithDefault cryptoCodeWithDefaultFunc
+	checkPermission             domain.PermissionCheck
+	newEncryptedCode            encrypedCodeFunc
+	newEncryptedCodeWithDefault encryptedCodeWithDefaultFunc
+	newHashedSecret             hashedSecretFunc
 
 	eventstore     *eventstore.Eventstore
 	static         static.Storage
@@ -49,8 +51,8 @@ type Commands struct {
 	smtpEncryption                  crypto.EncryptionAlgorithm
 	smsEncryption                   crypto.EncryptionAlgorithm
 	userEncryption                  crypto.EncryptionAlgorithm
-	userPasswordHasher              *crypto.PasswordHasher
-	codeAlg                         crypto.HashAlgorithm
+	userPasswordHasher              *crypto.Hasher
+	secretHasher                    *crypto.Hasher
 	machineKeySize                  int
 	applicationKeySize              int
 	domainVerificationAlg           crypto.EncryptionAlgorithm
@@ -106,6 +108,15 @@ func StartCommands(
 	idGenerator := id.SonyFlakeGenerator()
 	// reuse the oidcEncryption to be able to handle both tokens in the interceptor later on
 	sessionAlg := oidcEncryption
+
+	secretHasher, err := defaults.SecretHasher.NewHasher()
+	if err != nil {
+		return nil, fmt.Errorf("secret hasher: %w", err)
+	}
+	userPasswordHasher, err := defaults.PasswordHasher.NewHasher()
+	if err != nil {
+		return nil, fmt.Errorf("password hasher: %w", err)
+	}
 	repo = &Commands{
 		eventstore:                      es,
 		static:                          staticStore,
@@ -123,14 +134,20 @@ func StartCommands(
 		smtpEncryption:                  smtpEncryption,
 		smsEncryption:                   smsEncryption,
 		userEncryption:                  userEncryption,
+		userPasswordHasher:              userPasswordHasher,
+		secretHasher:                    secretHasher,
+		machineKeySize:                  int(defaults.SecretGenerators.MachineKeySize),
+		applicationKeySize:              int(defaults.SecretGenerators.ApplicationKeySize),
 		domainVerificationAlg:           domainVerificationEncryption,
+		domainVerificationGenerator:     crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, domainVerificationEncryption),
+		domainVerificationValidator:     api_http.ValidateDomain,
 		keyAlgorithm:                    oidcEncryption,
 		certificateAlgorithm:            samlEncryption,
 		webauthnConfig:                  webAuthN,
 		httpClient:                      httpClient,
 		checkPermission:                 permissionCheck,
-		newCode:                         newCryptoCode,
-		newCodeWithDefault:              newCryptoCodeWithDefaultConfig,
+		newEncryptedCode:                newEncryptedCode,
+		newEncryptedCodeWithDefault:     newEncryptedCodeWithDefaultConfig,
 		sessionTokenCreator:             sessionTokenCreator(idGenerator, sessionAlg),
 		sessionTokenVerifier:            sessionTokenVerifier,
 		defaultAccessTokenLifetime:      defaultAccessTokenLifetime,
@@ -145,25 +162,17 @@ func StartCommands(
 		GrpcServiceExisting:    func(service string) bool { return false },
 		GrpcMethodExisting:     func(method string) bool { return false },
 		ActionFunctionExisting: domain.FunctionExists(),
-	}
-
-	repo.codeAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
-	repo.userPasswordHasher, err = defaults.PasswordHasher.PasswordHasher()
-	if err != nil {
-		return nil, err
-	}
-	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
-	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
-
-	repo.multifactors = domain.MultifactorConfigs{
-		OTP: domain.OTPConfig{
-			CryptoMFA: otpEncryption,
-			Issuer:    defaults.Multifactors.OTP.Issuer,
+		multifactors: domain.MultifactorConfigs{
+			OTP: domain.OTPConfig{
+				CryptoMFA: otpEncryption,
+				Issuer:    defaults.Multifactors.OTP.Issuer,
+			},
 		},
 	}
 
-	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
-	repo.domainVerificationValidator = api_http.ValidateDomain
+	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {
+		repo.newHashedSecret = newHashedSecretWithDefault(secretHasher, defaultSecretGenerators.ClientSecret)
+	}
 	return repo, nil
 }
 
