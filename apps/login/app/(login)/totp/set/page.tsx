@@ -1,35 +1,44 @@
-import { getBrandingSettings, getLoginSettings, server } from "#/lib/zitadel";
+import {
+  addMyAuthFactorOTP,
+  getBrandingSettings,
+  getLoginSettings,
+  getSession,
+  server,
+} from "#/lib/zitadel";
 import DynamicTheme from "#/ui/DynamicTheme";
-import TOTPForm from "#/ui/TOTPForm";
+import TOTPRegister from "#/ui/TOTPRegister";
+import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, authRequestId, sessionId, organization, code, submit } =
-    searchParams;
+  const { loginName, organization } = searchParams;
 
   const branding = await getBrandingSettings(server, organization);
-  const loginSettings = await getLoginSettings(server, organization);
+  const auth = await getMostRecentCookieWithLoginname(
+    loginName,
+    organization
+  ).then((cookie) => {
+    if (cookie) {
+      return addMyAuthFactorOTP(cookie.token);
+    } else {
+      throw new Error("No cookie found");
+    }
+  });
 
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Verify 2-Factor</h1>
-        <p className="ztdl-p">Enter the code from your authenticator app. </p>
+        <h1>Register TOTP</h1>
+        <p className="ztdl-p">
+          Scan the QR Code or navigate to the URL manually.
+        </p>
 
         <div>
-          {loginSettings?.secondFactors.map((factor) => {
-            return (
-              <div>
-                {factor === 1 && <div>TOTP</div>}
-                {factor === 2 && <div>U2F</div>}
-                {factor === 3 && <div>OTP Email</div>}
-                {factor === 4 && <div>OTP Sms</div>}
-              </div>
-            );
-          })}
+          {auth && <div>{auth.url}</div>}
+          <TOTPRegister></TOTPRegister>
         </div>
       </div>
     </DynamicTheme>

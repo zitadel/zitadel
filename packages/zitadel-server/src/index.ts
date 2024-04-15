@@ -3,6 +3,7 @@ import * as session from "./v2/session";
 import * as user from "./v2/user";
 import * as oidc from "./v2/oidc";
 import * as management from "./management";
+import * as auth from "./auth";
 
 import * as login from "./proto/server/zitadel/settings/v2beta/login_settings";
 import * as password from "./proto/server/zitadel/settings/v2beta/password_settings";
@@ -96,7 +97,10 @@ export * from "./proto/server/zitadel/idp";
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2beta/legal_settings";
 export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2beta/password_settings";
 export { type ResourceOwnerType } from "./proto/server/zitadel/settings/v2beta/settings";
-
+export {
+  type VerifyMyAuthFactorOTPResponse,
+  AddMyAuthFactorOTPResponse,
+} from "./proto/server/zitadel/auth";
 import {
   getServers,
   initializeServer,
@@ -118,4 +122,5 @@ export {
   password,
   legal,
   oidc,
+  auth,
 };

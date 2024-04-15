@@ -2,17 +2,20 @@ import {
   LegalAndSupportSettings,
   PasswordComplexitySettings,
   ZitadelServer,
+  VerifyMyAuthFactorOTPResponse,
   ZitadelServerOptions,
   user,
   oidc,
   settings,
   getServers,
+  auth,
   initializeServer,
   session,
   GetGeneralSettingsResponse,
   CreateSessionResponse,
   GetBrandingSettingsResponse,
   GetPasswordComplexitySettingsResponse,
+  AddMyAuthFactorOTPResponse,
   GetLegalAndSupportSettingsResponse,
   AddHumanUserResponse,
   BrandingSettings,
@@ -78,6 +81,28 @@ export async function getLoginSettings(
   return settingsService
     .getLoginSettings({ ctx: orgId ? { orgId } : { instance: true } }, {})
     .then((resp: GetLoginSettingsResponse) => resp.settings);
+}
+
+export async function verifyMyAuthFactorOTP(
+  code: string
+): Promise<VerifyMyAuthFactorOTPResponse> {
+  const authService = auth.getAuth(server);
+  return authService.verifyMyAuthFactorOTP({ code }, {});
+}
+
+export async function addMyAuthFactorOTP(
+  token: string
+): Promise<AddMyAuthFactorOTPResponse> {
+  const zitadelConfig: ZitadelServerOptions = {
+    name: "zitadel login",
+    apiUrl: process.env.ZITADEL_API_URL ?? "",
+    token: token,
+  };
+
+  const server: ZitadelServer = initializeServer(zitadelConfig);
+
+  const authService = auth.getAuth(server);
+  return authService.addMyAuthFactorOTP({}, {});
 }
 
 export async function getGeneralSettings(
