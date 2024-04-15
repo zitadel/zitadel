@@ -133,6 +133,7 @@ func SecretGeneratorTypeToDomain(generatorType settings_pb.SecretGeneratorType) 
 
 func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.Config {
 	return &smtp.Config{
+		Description:    req.Description,
 		Tls:            req.Tls,
 		From:           req.SenderAddress,
 		FromName:       req.SenderName,
@@ -147,26 +148,30 @@ func AddSMTPToConfig(req *admin_pb.AddSMTPConfigRequest) *smtp.Config {
 
 func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.Config {
 	return &smtp.Config{
+		Description:    req.Description,
 		Tls:            req.Tls,
 		From:           req.SenderAddress,
 		FromName:       req.SenderName,
 		ReplyToAddress: req.ReplyToAddress,
 		SMTP: smtp.SMTP{
-			Host: req.Host,
-			User: req.User,
+			Host:     req.Host,
+			User:     req.User,
+			Password: req.Password,
 		},
 	}
 }
 
 func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 	mapped := &settings_pb.SMTPConfig{
+		Description:    smtp.Description,
 		Tls:            smtp.TLS,
 		SenderAddress:  smtp.SenderAddress,
 		SenderName:     smtp.SenderName,
 		ReplyToAddress: smtp.ReplyToAddress,
 		Host:           smtp.Host,
 		User:           smtp.User,
-		Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.AggregateID),
+		Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.ResourceOwner),
+		Id:             smtp.ID,
 	}
 	return mapped
 }
