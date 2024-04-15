@@ -38,7 +38,11 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 	for _, target := range req.Targets {
 		switch t := target.GetType().(type) {
 		case *action.ExecutionTargetType_Include:
-			targets = append(targets, &execution.Target{Type: domain.ExecutionTargetTypeInclude, Target: t.Include})
+			include, err := conditionToInclude(t.Include)
+			if err != nil {
+				return nil, err
+			}
+			targets = append(targets, &execution.Target{Type: domain.ExecutionTargetTypeInclude, Target: include})
 		case *action.ExecutionTargetType_Target:
 			targets = append(targets, &execution.Target{Type: domain.ExecutionTargetTypeTarget, Target: t.Target})
 		}
@@ -89,6 +93,48 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 	return &action.SetExecutionResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
+}
+
+func conditionToInclude(cond *action.Condition) (string, error) {
+	switch t := cond.GetConditionType().(type) {
+	case *action.Condition_Request:
+		cond := &command.ExecutionAPICondition{
+			Method:  t.Request.GetMethod(),
+			Service: t.Request.GetService(),
+			All:     t.Request.GetAll(),
+		}
+		if err := cond.IsValid(); err != nil {
+			return "", err
+		}
+		return cond.ID(domain.ExecutionTypeRequest), nil
+	case *action.Condition_Response:
+		cond := &command.ExecutionAPICondition{
+			Method:  t.Response.GetMethod(),
+			Service: t.Response.GetService(),
+			All:     t.Response.GetAll(),
+		}
+		if err := cond.IsValid(); err != nil {
+			return "", err
+		}
+		return cond.ID(domain.ExecutionTypeRequest), nil
+	case *action.Condition_Event:
+		cond := &command.ExecutionEventCondition{
+			Event: t.Event.GetEvent(),
+			Group: t.Event.GetGroup(),
+			All:   t.Event.GetAll(),
+		}
+		if err := cond.IsValid(); err != nil {
+			return "", err
+		}
+		return cond.ID(), nil
+	case *action.Condition_Function:
+		cond := command.ExecutionFunctionCondition(t.Function.GetName())
+		if err := cond.IsValid(); err != nil {
+			return "", err
+		}
+		return cond.ID(), nil
+	}
+	return "", nil
 }
 
 func (s *Server) DeleteExecution(ctx context.Context, req *action.DeleteExecutionRequest) (*action.DeleteExecutionResponse, error) {

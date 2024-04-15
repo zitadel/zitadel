@@ -37,7 +37,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) (func(), error) {
 
-				fullMethod := "/zitadel.action.v3alpha.ExecutionService/GetTargetByID"
+				fullMethod := "/zitadel.action.v3alpha.ActionService/GetTargetByID"
 				instanceID := Tester.Instance.InstanceID()
 				orgID := Tester.Organisation.ID
 				projectID := ""
@@ -188,7 +188,7 @@ func testServerCall(
 			http.Error(w, "error, read body: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-
+		fmt.Println("request: " + string(sentBody))
 		if !reflect.DeepEqual(data, sentBody) {
 			http.Error(w, "error, equal:\n"+string(data)+"\nsent:\n"+string(sentBody), http.StatusInternalServerError)
 			return

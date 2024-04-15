@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -16,10 +17,7 @@ import (
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		requestTargets, responseTargets, err := queryTargets(ctx, queries, info.FullMethod)
-		if err != nil {
-			return nil, err
-		}
+		requestTargets, responseTargets := queryTargets(ctx, queries, info.FullMethod)
 
 		// call targets otherwise return req
 		handledReq, err := executeTargetsForRequest(ctx, requestTargets, info.FullMethod, req)
@@ -94,17 +92,18 @@ func queryTargets(
 	ctx context.Context,
 	queries ExecutionQueries,
 	fullMethod string,
-) ([]execution.Target, []execution.Target, error) {
+) ([]execution.Target, []execution.Target) {
+	requestTargets := make([]execution.Target, 0)
+	responseTargets := make([]execution.Target, 0)
 	targets, err := queries.ExecutionTargetsCombined(ctx,
 		idsForFullMethod(fullMethod, domain.ExecutionTypeRequest),
 		idsForFullMethod(fullMethod, domain.ExecutionTypeResponse),
 	)
 	if err != nil {
-		return nil, nil, err
+		logging.WithFields("fullMethod", fullMethod).OnError(err).Info(err)
+		return requestTargets, responseTargets
 	}
 
-	requestTargets := make([]execution.Target, 0)
-	responseTargets := make([]execution.Target, 0)
 	for _, target := range targets {
 		if strings.HasPrefix(target.GetExecutionID(), exec_repo.IDAll(domain.ExecutionTypeRequest)) {
 			requestTargets = append(requestTargets, target)
@@ -113,7 +112,7 @@ func queryTargets(
 		}
 	}
 
-	return requestTargets, responseTargets, nil
+	return requestTargets, responseTargets
 }
 
 func idsForFullMethod(fullMethod string, executionType domain.ExecutionType) []string {

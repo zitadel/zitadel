@@ -12,6 +12,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	exec "github.com/zitadel/zitadel/internal/repository/execution"
@@ -147,6 +148,10 @@ func targetItemJSONB(t domain.ExecutionTargetType, target string) ([]byte, error
 		targets = append(targets, &executionTarget{Target: target})
 	case domain.ExecutionTargetTypeInclude:
 		targets = append(targets, &executionTarget{Include: target})
+	case domain.ExecutionTargetTypeUnspecified:
+		return nil, nil
+	default:
+		return nil, nil
 	}
 	return json.Marshal(targets)
 }
@@ -189,8 +194,8 @@ func (q *Queries) ExecutionTargetsCombined(ctx context.Context, ids1, ids2 []str
 		},
 		executionTargetsCombinedQuery,
 		instanceID,
-		strings.Join(ids1, ","),
-		strings.Join(ids2, ","),
+		database.TextArray[string](ids1),
+		database.TextArray[string](ids2),
 	)
 	return execution, err
 }
@@ -379,8 +384,8 @@ func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
 		)
 
 		err := rows.Scan(
-			instanceID,
 			executionID,
+			instanceID,
 			targetID,
 			targetType,
 			endpoint,

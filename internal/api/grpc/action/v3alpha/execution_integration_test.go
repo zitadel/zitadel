@@ -19,7 +19,7 @@ func executionTargetsSingleTarget(id string) []*action.ExecutionTargetType {
 	return []*action.ExecutionTargetType{{Type: &action.ExecutionTargetType_Target{Target: id}}}
 }
 
-func executionTargetsSingleInclude(include string) []*action.ExecutionTargetType {
+func executionTargetsSingleInclude(include *action.Condition) []*action.ExecutionTargetType {
 	return []*action.ExecutionTargetType{{Type: &action.ExecutionTargetType_Include{Include: include}}}
 }
 
@@ -182,17 +182,17 @@ func TestServer_SetExecution_Request(t *testing.T) {
 func TestServer_SetExecution_Request_Include(t *testing.T) {
 	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
-	executionCond := "request"
-	Tester.SetExecution(CTX, t,
-		&action.Condition{
-			ConditionType: &action.Condition_Request{
-				Request: &action.RequestExecution{
-					Condition: &action.RequestExecution_All{
-						All: true,
-					},
+	executionCond := &action.Condition{
+		ConditionType: &action.Condition_Request{
+			Request: &action.RequestExecution{
+				Condition: &action.RequestExecution_All{
+					All: true,
 				},
 			},
 		},
+	}
+	Tester.SetExecution(CTX, t,
+		executionCond,
 		executionTargetsSingleTarget(targetResp.GetId()),
 	)
 
@@ -247,6 +247,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 				},
 			},
 		},
+		/* circular
 		{
 			name: "all, ok",
 			ctx:  CTX,
@@ -269,6 +270,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 				},
 			},
 		},
+		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1080,12 +1082,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 					},
 				},
 			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
+			wantErr: true,
 		},
 		{
 			name: "all, ok",

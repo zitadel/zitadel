@@ -57,7 +57,6 @@ func (*executionProjection) Init() *old_handler.Check {
 		},
 			handler.NewPrimaryKey(ExecutionTargetInstanceIDCol, ExecutionTargetExecutionIDCol, ExecutionTargetPositionCol),
 			ExecutionTargetSuffix,
-			//handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 			handler.WithForeignKey(handler.NewForeignKey("execution", []string{ExecutionTargetInstanceIDCol, ExecutionTargetExecutionIDCol}, []string{ExecutionInstanceIDCol, ExecutionIDCol})),
 			// handler.WithForeignKey(handler.NewForeignKey("target", []string{ExecutionTargetInstanceIDCol, ExecutionTargetTargetIDCol}, []string{TargetInstanceIDCol, TargetIDCol})),
 			// handler.WithForeignKey(handler.NewForeignKey("include", []string{ExecutionTargetInstanceIDCol, ExecutionTargetIncludeCol}, []string{ExecutionInstanceIDCol, ExecutionIDCol})),
@@ -131,6 +130,10 @@ func (p *executionProjection) reduceExecutionSet(event eventstore.Event) (*handl
 				targetStr = target.Target
 			case domain.ExecutionTargetTypeInclude:
 				includeStr = target.Target
+			case domain.ExecutionTargetTypeUnspecified:
+				continue
+			default:
+				continue
 			}
 
 			stmts = append(stmts,

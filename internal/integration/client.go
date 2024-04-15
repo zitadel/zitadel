@@ -540,8 +540,8 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, endpoint 
 			},
 		}
 	case domain.TargetTypeCall:
-		req.TargetType = &action.CreateTargetRequest_RestWebhook{
-			RestWebhook: &action.SetRESTWebhook{
+		req.TargetType = &action.CreateTargetRequest_RestCall{
+			RestCall: &action.SetRESTCall{
 				InterruptOnError: interrupt,
 			},
 		}

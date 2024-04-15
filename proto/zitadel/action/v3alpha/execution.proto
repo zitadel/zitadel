@@ -14,11 +14,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha;action";
 
 message Execution {
-  string execution_id = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"request.zitadel.session.v2beta.SessionService\"";
-    }
-  ];
+  Condition Condition = 1;
   // Details provide some base information (such as the last change date) of the target.
   zitadel.object.v2beta.Details details = 2;
   // List of ordered list of targets/includes called during the execution.
@@ -30,7 +26,7 @@ message ExecutionTargetType {
     // Unique identifier of existing target to call.
     string target = 1;
     // Unique identifier of existing execution to include targets of.
-    string include = 2;
+    Condition include = 2;
   }
 }
 

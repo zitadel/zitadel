@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -134,6 +135,10 @@ func (e *ExecutionEventCondition) ID() string {
 		return execution.ID(domain.ExecutionTypeEvent, e.Event)
 	}
 	if e.Group != "" {
+		group := e.Group
+		if !strings.HasSuffix(e.Group, ".*") {
+			group = group + ".*"
+		}
 		return execution.ID(domain.ExecutionTypeEvent, e.Group)
 	}
 	if e.All {

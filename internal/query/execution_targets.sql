@@ -1,46 +1,40 @@
 WITH RECURSIVE
-    dissolved_execution_targets(execution_id, resource_owner, instance_id, position, "include", "target")
+    dissolved_execution_targets(execution_id, instance_id, position, "include", "target_id")
         AS (SELECT execution_id
-                 , resource_owner
                  , instance_id
                  , ARRAY [position]
                  , "include"
-                 , "target"
+                 , "target_id"
             FROM matched_targets_and_includes
             UNION ALL
             SELECT e.execution_id
-                 , resource_owner
                  , p.instance_id
                  , e.position || p.position
                  , p."include"
-                 , p."target"
+                 , p."target_id"
             FROM dissolved_execution_targets e
                      JOIN projections.executions1_targets p
                           ON e.instance_id = p.instance_id
-                              AND e.resource_owner = p.resource_owner
                               AND e.include IS NOT NULL
                               AND e.include = p.execution_id),
     matched AS (SELECT *
-                FROM projections.executions1
-                WHERE instance_id = $1
-                  AND resource_owner = $2
-                  AND id @> $3
-                ORDER BY id DESC
-                LIMIT 1),
+                 FROM projections.executions1
+                 WHERE instance_id = $1
+                   AND id = ANY($2)
+                 ORDER BY id DESC
+                 LIMIT 1),
     matched_targets_and_includes AS (SELECT pos.*
-                          FROM matched m
-                                   JOIN
-                               projections.executions1_targets pos
-                               ON m.id = pos.execution_id
-                                   AND m.resource_owner = pos.resource_owner
-                                   AND m.instance_id = pos.instance_id
-                          ORDER BY execution_id,
-                                   position)
-select *
+                                     FROM matched m
+                                              JOIN
+                                          projections.executions1_targets pos
+                                          ON m.id = pos.execution_id
+                                              AND m.instance_id = pos.instance_id
+                                     ORDER BY execution_id,
+                                              position)
+select e.execution_id, e.instance_id, e.target_id, t.target_type, t.endpoint, t.timeout, t.interrupt_on_error
 FROM dissolved_execution_targets e
-         JOIN projections.targets t
+         JOIN projections.targets1 t
               ON e.instance_id = t.instance_id
-                  AND e.resource_owner = t.resource_owner
-                  AND e.target = t.id
-WHERE "include" IS NULL
+                  AND e.target_id = t.id
+WHERE "include" = ''
 ORDER BY position DESC;
