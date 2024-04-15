@@ -9,7 +9,7 @@ import (
 )
 
 type Query struct {
-	instance   string
+	instances  []string
 	filters    []*Filter
 	tx         *sql.Tx
 	pagination *Pagination
@@ -17,8 +17,11 @@ type Query struct {
 	// TODO: await push
 }
 
-func (q *Query) Instance() string {
-	return q.instance
+func (q *Query) Instance() database.Condition {
+	if len(q.instances) == 1 {
+		return database.NewTextEqual(q.instances[0])
+	}
+	return database.NewListContains(q.instances...)
 }
 
 func (q *Query) Filters() []*Filter {
@@ -40,8 +43,8 @@ func (q *Query) Reduce(events ...*Event[StoragePayload]) error {
 
 func NewQuery(instance string, reducer Reducer, opts ...QueryOpt) *Query {
 	query := &Query{
-		instance: instance,
-		reducer:  reducer,
+		instances: []string{instance},
+		reducer:   reducer,
 	}
 
 	for _, opt := range opts {
@@ -108,6 +111,10 @@ type Filter struct {
 	pagination *Pagination
 
 	aggregateFilters []*AggregateFilter
+}
+
+func (f *Filter) Parent() *Query {
+	return f.parent
 }
 
 func (f *Filter) Pagination() *Pagination {
@@ -239,68 +246,296 @@ func NewEventFilter(opts ...EventFilterOpt) *EventFilter {
 }
 
 type EventFilter struct {
-	typ       database.TextFilter[string]
-	revision  database.NumberFilter[uint16]
-	createdAt database.NumberFilter[time.Time]
-	sequence  database.NumberFilter[uint32]
-	creator   database.Condition
+	types     []string
+	revision  *filter[uint16]
+	createdAt *filter[time.Time]
+	sequence  *filter[uint32]
+	creators  *filter[[]string]
 }
 
-func (f *EventFilter) Type() database.TextFilter[string] {
-	return f.typ
+type filter[T any] struct {
+	condition database.Condition
+	min, max  T
 }
 
-func (f *EventFilter) Revision() database.NumberFilter[uint16] {
-	return f.revision
+func (f *EventFilter) Type() database.Condition {
+	switch len(f.types) {
+	case 0:
+		return nil
+	case 1:
+		return database.NewTextEqual(f.types[0])
+	default:
+		return database.NewListContains(f.types...)
+	}
 }
 
-func (f *EventFilter) CreatedAt() database.NumberFilter[time.Time] {
-	return f.createdAt
+func (f *EventFilter) Revision() database.Condition {
+	if f.revision == nil {
+		return nil
+	}
+	return f.revision.condition
 }
 
-func (f *EventFilter) Sequence() database.NumberFilter[uint32] {
-	return f.sequence
+func (f *EventFilter) CreatedAt() database.Condition {
+	if f.createdAt == nil {
+		return nil
+	}
+	return f.createdAt.condition
 }
 
-func (f *EventFilter) Creator() database.Condition {
-	return f.creator
+func (f *EventFilter) Sequence() database.Condition {
+	if f.sequence == nil {
+		return nil
+	}
+	return f.sequence.condition
+}
+
+func (f *EventFilter) Creator() database.TextFilter[string] {
+	if f.creators == nil {
+		return nil
+	}
+	return f.creators.condition
 }
 
 type EventFilterOpt func(f *EventFilter)
 
 func EventType(typ string) EventFilterOpt {
 	return func(filter *EventFilter) {
-		filter.typ = database.NewTextEqual(typ)
+		filter.types = []string{typ}
 	}
 }
 
-func EventRevision(revision database.NumberFilter[uint16]) EventFilterOpt {
+// EventTypes overwrites the currently set types
+func EventTypes(types ...string) EventFilterOpt {
 	return func(filter *EventFilter) {
-		filter.revision = revision
+		filter.types = types
 	}
 }
 
-func EventCreatedAt(createdAt database.NumberFilter[time.Time]) EventFilterOpt {
+// AppendEventTypes appends the types the currently set types
+func AppendEventTypes(types ...string) EventFilterOpt {
 	return func(filter *EventFilter) {
-		filter.createdAt = createdAt
+		filter.types = append(filter.types, types...)
 	}
 }
 
-func EventSequence(sequence database.NumberFilter[uint32]) EventFilterOpt {
-	return func(filter *EventFilter) {
-		filter.sequence = sequence
+func EventRevisionEquals(revision uint16) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.revision = &filter[uint16]{
+			condition: database.NewNumberEquals(revision),
+			min:       revision,
+		}
 	}
 }
 
-func EventCreator(creator string) EventFilterOpt {
-	return func(filter *EventFilter) {
-		filter.creator = database.NewTextEqual(creator)
+func EventRevisionAtLeast(revision uint16) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.revision = &filter[uint16]{
+			condition: database.NewNumberAtLeast(revision),
+			min:       revision,
+		}
 	}
 }
 
-func EventCreatorList(cond *database.ListFilter[string]) EventFilterOpt {
-	return func(filter *EventFilter) {
-		filter.creator = cond
+func EventRevisionGreater(revision uint16) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.revision = &filter[uint16]{
+			condition: database.NewNumberGreater(revision),
+			min:       revision,
+		}
+	}
+}
+
+func EventRevisionAtMost(revision uint16) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.revision = &filter[uint16]{
+			condition: database.NewNumberAtMost(revision),
+			min:       revision,
+		}
+	}
+}
+
+func EventRevisionLess(revision uint16) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.revision = &filter[uint16]{
+			condition: database.NewNumberLess(revision),
+			min:       revision,
+		}
+	}
+}
+
+func EventRevisionBetween(min, max uint16) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.revision = &filter[uint16]{
+			condition: database.NewNumberBetween(min, max),
+			min:       min,
+			max:       max,
+		}
+	}
+}
+
+func EventCreatedAtEquals(createdAt time.Time) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.createdAt = &filter[time.Time]{
+			condition: database.NewNumberEquals(createdAt),
+			min:       createdAt,
+		}
+	}
+}
+
+func EventCreatedAtAtLeast(createdAt time.Time) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.createdAt = &filter[time.Time]{
+			condition: database.NewNumberAtLeast(createdAt),
+			min:       createdAt,
+		}
+	}
+}
+
+func EventCreatedAtGreater(createdAt time.Time) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.createdAt = &filter[time.Time]{
+			condition: database.NewNumberGreater(createdAt),
+			min:       createdAt,
+		}
+	}
+}
+
+func EventCreatedAtAtMost(createdAt time.Time) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.createdAt = &filter[time.Time]{
+			condition: database.NewNumberAtMost(createdAt),
+			min:       createdAt,
+		}
+	}
+}
+
+func EventCreatedAtLess(createdAt time.Time) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.createdAt = &filter[time.Time]{
+			condition: database.NewNumberLess(createdAt),
+			min:       createdAt,
+		}
+	}
+}
+
+func EventCreatedAtBetween(min, max time.Time) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.createdAt = &filter[time.Time]{
+			condition: database.NewNumberBetween(min, max),
+			min:       min,
+			max:       max,
+		}
+	}
+}
+
+func EventSequenceEquals(sequence uint32) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.sequence = &filter[uint32]{
+			condition: database.NewNumberEquals(sequence),
+			min:       sequence,
+		}
+	}
+}
+
+func EventSequenceAtLeast(sequence uint32) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.sequence = &filter[uint32]{
+			condition: database.NewNumberAtLeast(sequence),
+			min:       sequence,
+		}
+	}
+}
+
+func EventSequenceGreater(sequence uint32) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.sequence = &filter[uint32]{
+			condition: database.NewNumberGreater(sequence),
+			min:       sequence,
+		}
+	}
+}
+
+func EventSequenceAtMost(sequence uint32) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.sequence = &filter[uint32]{
+			condition: database.NewNumberAtMost(sequence),
+			min:       sequence,
+		}
+	}
+}
+
+func EventSequenceLess(sequence uint32) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.sequence = &filter[uint32]{
+			condition: database.NewNumberLess(sequence),
+			min:       sequence,
+		}
+	}
+}
+
+func EventSequenceBetween(min, max uint32) EventFilterOpt {
+	return func(f *EventFilter) {
+		f.sequence = &filter[uint32]{
+			condition: database.NewNumberBetween(min, max),
+			min:       min,
+			max:       max,
+		}
+	}
+}
+
+func EventCreatorsEqual(creators ...string) EventFilterOpt {
+	return func(f *EventFilter) {
+		var cond database.Condition
+		switch len(creators) {
+		case 0:
+			return
+		case 1:
+			cond = database.NewTextEqual(creators[0])
+		default:
+			cond = database.NewListContains(creators...)
+		}
+		f.creators = &filter[[]string]{
+			condition: cond,
+			min:       creators,
+		}
+	}
+}
+
+func EventCreatorsContains(creators ...string) EventFilterOpt {
+	return func(f *EventFilter) {
+		var cond database.Condition
+		switch len(creators) {
+		case 0:
+			return
+		case 1:
+			cond = database.NewTextEqual(creators[0])
+		default:
+			cond = database.NewListContains(creators...)
+		}
+
+		f.creators = &filter[[]string]{
+			condition: cond,
+			min:       creators,
+		}
+	}
+}
+
+func EventCreatorsNotContains(creators ...string) EventFilterOpt {
+	return func(f *EventFilter) {
+		var cond database.Condition
+		switch len(creators) {
+		case 0:
+			return
+		case 1:
+			cond = database.NewTextUnequal(creators[0])
+		default:
+			cond = database.NewListNotContains(creators...)
+		}
+		f.creators = &filter[[]string]{
+			condition: cond,
+			min:       creators,
+		}
 	}
 }
 

@@ -3,7 +3,6 @@ package eventstore_test
 import (
 	"testing"
 
-	"github.com/zitadel/zitadel/internal/v2/database"
 	. "github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
@@ -47,7 +46,7 @@ func TestNewFilter(t *testing.T) {
 							"instance",
 							AppendEvent(
 								EventType("instance.domain.primary.set"),
-								EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+								EventCreatorsNotContains("", "SYSTEM"),
 							),
 						),
 						FilterPagination(
@@ -59,7 +58,7 @@ func TestNewFilter(t *testing.T) {
 							"project",
 							AppendEvent(
 								EventType("project.added"),
-								EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+								EventCreatorsNotContains("", "SYSTEM"),
 							),
 						),
 					),
@@ -67,7 +66,7 @@ func TestNewFilter(t *testing.T) {
 						AppendAggregateFilter(
 							"project",
 							AppendEvent(
-								EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+								EventCreatorsNotContains("", "SYSTEM"),
 								EventType("project.application.added"),
 							),
 						),
@@ -88,85 +87,41 @@ func TestNewFilter(t *testing.T) {
 						AppendAggregateFilter(
 							"instance",
 							AppendEvent(
-								EventType("instance.idp.config.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.oauth.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.oidc.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.jwt.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.azure.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.github.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.github.enterprise.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.gitlab.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.gitlab.selfhosted.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.google.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.ldap.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.config.apple.added"),
-							),
-							AppendEvent(
-								EventType("instance.idp.saml.added"),
+								AppendEventTypes(
+									"instance.idp.config.added",
+									"instance.idp.oauth.added",
+									"instance.idp.oidc.added",
+									"instance.idp.jwt.added",
+									"instance.idp.azure.added",
+									"instance.idp.github.added",
+									"instance.idp.github.enterprise.added",
+									"instance.idp.gitlab.added",
+									"instance.idp.gitlab.selfhosted.added",
+									"instance.idp.google.added",
+									"instance.idp.ldap.added",
+									"instance.idp.config.apple.added",
+									"instance.idp.saml.added",
+								),
 							),
 						),
 						AppendAggregateFilter(
 							"org",
 							AppendEvent(
-								EventType("org.idp.config.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.oauth.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.oidc.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.jwt.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.azure.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.github.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.github.enterprise.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.gitlab.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.gitlab.selfhosted.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.google.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.ldap.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.config.apple.added"),
-							),
-							AppendEvent(
-								EventType("org.idp.saml.added"),
+								AppendEventTypes(
+									"org.idp.config.added",
+									"org.idp.oauth.added",
+									"org.idp.oidc.added",
+									"org.idp.jwt.added",
+									"org.idp.azure.added",
+									"org.idp.github.added",
+									"org.idp.github.enterprise.added",
+									"org.idp.gitlab.added",
+									"org.idp.gitlab.selfhosted.added",
+									"org.idp.google.added",
+									"org.idp.ldap.added",
+									"org.idp.config.apple.added",
+									"org.idp.saml.added",
+								),
 							),
 						),
 						FilterPagination(
@@ -195,7 +150,7 @@ func TestNewFilter(t *testing.T) {
 							"instance",
 							AppendEvent(
 								EventType("instance.smtp.config.added"),
-								EventCreatorList(database.NewListNotContains("", "SYSTEM", "<SYSTEM-USER>")),
+								EventCreatorsNotContains("", "SYSTEM", "<SYSTEM-USER>"),
 							),
 						),
 						FilterPagination(

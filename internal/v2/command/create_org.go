@@ -42,10 +42,10 @@ func (c *CreateOrg) ToPushIntent(ctx context.Context) (eventstore.PushIntent, er
 	}
 
 	for _, err := range []error{
-		c.appendCommand(org.NewAddedEvent(ctx, c.Name)),
-		c.appendCommand(org.NewDomainAddedEvent(ctx, c.Domain)),
-		c.appendCommand(org.NewDomainVerifiedEvent(ctx, c.Domain)),
-		c.appendCommand(org.NewSetDomainPrimaryEvent(ctx, c.Domain)),
+		c.appendCommand(org.NewAddedCommand(ctx, c.Name)),
+		c.appendCommand(org.NewDomainAddedCommand(ctx, c.Domain)),
+		c.appendCommand(org.NewDomainVerifiedCommand(ctx, c.Domain)),
+		c.appendCommand(org.NewSetDomainPrimaryCommand(ctx, c.Domain)),
 	} {
 		if err != nil {
 			return nil, err

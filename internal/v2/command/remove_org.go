@@ -69,7 +69,7 @@ func (i *RemoveOrg) ToPushIntent(ctx context.Context) (eventstore.PushIntent, er
 		return nil, nil
 	}
 
-	i.commands = append(i.commands, org.NewRemovedEvent(ctx))
+	i.commands = append(i.commands, org.NewRemovedCommand(ctx))
 
 	return i, nil
 }
@@ -90,7 +90,7 @@ func (i *RemoveOrg) CurrentSequence() eventstore.CurrentSequence {
 }
 
 // Reduce implements [eventstore.Reducer].
-func (i *RemoveOrg) Reduce(events ...eventstore.Event) error {
-	i.sequence = events[len(events)-1].Sequence()
+func (i *RemoveOrg) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
+	i.sequence = events[len(events)-1].Sequence
 	return i.state.Reduce(events...)
 }

@@ -26,11 +26,7 @@ func (s *Storage) Query(ctx context.Context, query *eventstore.Query) (eventCoun
 	return executeQuery(ctx, s.client.DB, &stmt, query)
 }
 
-type querier interface {
-	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
-}
-
-func executeQuery(ctx context.Context, tx querier, stmt *database.Statement, reducer eventstore.Reducer) (eventCount int, err error) {
+func executeQuery(ctx context.Context, tx database.Querier, stmt *database.Statement, reducer eventstore.Reducer) (eventCount int, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -71,13 +67,14 @@ func executeQuery(ctx context.Context, tx querier, stmt *database.Statement, red
 }
 
 var (
-	selectColumns       = `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision`
-	instancePlaceholder = database.Placeholder("@instance_id")
+	selectColumns = `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision`
+	// TODO: condition must know if it's args are named parameters or not
+	// instancePlaceholder = database.Placeholder("@instance_id")
 )
 
 func writeQuery(stmt *database.Statement, query *eventstore.Query) {
 	stmt.WriteString(selectColumns)
-	stmt.SetNamedArg(instancePlaceholder, query.Instance())
+	// stmt.SetNamedArg(instancePlaceholder, query.Instance())
 
 	stmt.WriteString(" FROM (")
 	writeFilters(stmt, query.Filters())
@@ -108,7 +105,7 @@ func writeFilters(stmt *database.Statement, filters []*eventstore.Filter) {
 
 func writeFilter(stmt *database.Statement, filter *eventstore.Filter) {
 	stmt.WriteString(" WHERE ")
-	database.NewTextEqual(instancePlaceholder).Write(stmt, "instance_id")
+	filter.Parent().Instance().Write(stmt, "instance_id")
 
 	writeAggregateFilters(stmt, filter.AggregateFilters())
 	writePagination(stmt, filter.Pagination())

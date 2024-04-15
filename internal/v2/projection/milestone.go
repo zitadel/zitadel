@@ -4,7 +4,6 @@ import (
 	"time"
 
 	ms "github.com/zitadel/zitadel/internal/repository/milestone"
-	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/instance"
 	"github.com/zitadel/zitadel/internal/v2/user"
@@ -224,7 +223,7 @@ func (p *ProjectCreatedMilestone) Filter() []*eventstore.Filter {
 				"project",
 				eventstore.AppendEvent(
 					eventstore.EventType("project.added"),
-					eventstore.EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+					eventstore.EventCreatorsNotContains("", "SYSTEM"),
 				),
 			),
 			eventstore.FilterPagination(
@@ -267,7 +266,7 @@ func (p *AppCreatedMilestone) Filter() []*eventstore.Filter {
 			eventstore.AppendAggregateFilter(
 				"project",
 				eventstore.AppendEvent(
-					eventstore.EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+					eventstore.EventCreatorsNotContains("", "SYSTEM"),
 					eventstore.EventType("project.application.added"),
 				),
 			),

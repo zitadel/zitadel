@@ -141,9 +141,7 @@ func Test_writeEventFilter(t *testing.T) {
 			name: "created_at",
 			args: args{
 				filter: eventstore.NewEventFilter(
-					eventstore.EventCreatedAt(
-						database.NewNumberEquals(now),
-					),
+					eventstore.EventCreatedAtEquals(now),
 				),
 			},
 			want: wantQuery{
@@ -155,9 +153,7 @@ func Test_writeEventFilter(t *testing.T) {
 			name: "created_at between",
 			args: args{
 				filter: eventstore.NewEventFilter(
-					eventstore.EventCreatedAt(
-						database.NewNumberBetween(now, now.Add(time.Second)),
-					),
+					eventstore.EventCreatedAtBetween(now, now.Add(time.Second)),
 				),
 			},
 			want: wantQuery{
@@ -169,49 +165,43 @@ func Test_writeEventFilter(t *testing.T) {
 			name: "sequence",
 			args: args{
 				filter: eventstore.NewEventFilter(
-					eventstore.EventSequence(
-						database.NewNumberEquals(100),
-					),
+					eventstore.EventSequenceEquals(100),
 				),
 			},
 			want: wantQuery{
 				query: "sequence = $1",
-				args:  []any{100},
+				args:  []any{uint32(100)},
 			},
 		},
 		{
 			name: "sequence between",
 			args: args{
 				filter: eventstore.NewEventFilter(
-					eventstore.EventSequence(
-						database.NewNumberBetween(0, 10),
-					),
+					eventstore.EventSequenceBetween(0, 10),
 				),
 			},
 			want: wantQuery{
 				query: "sequence >= $1 AND sequence <= $2",
-				args:  []any{0, 10},
+				args:  []any{uint32(0), uint32(10)},
 			},
 		},
 		{
 			name: "revision",
 			args: args{
 				filter: eventstore.NewEventFilter(
-					eventstore.EventRevision(
-						database.NewNumberAtLeast(2),
-					),
+					eventstore.EventRevisionAtLeast(2),
 				),
 			},
 			want: wantQuery{
 				query: "revision >= $1",
-				args:  []any{2},
+				args:  []any{uint16(2)},
 			},
 		},
 		{
 			name: "creator",
 			args: args{
 				filter: eventstore.NewEventFilter(
-					eventstore.EventCreator("user-123"),
+					eventstore.EventCreatorsEqual("user-123"),
 				),
 			},
 			want: wantQuery{
@@ -224,15 +214,15 @@ func Test_writeEventFilter(t *testing.T) {
 			args: args{
 				filter: eventstore.NewEventFilter(
 					eventstore.EventType("user.added"),
-					eventstore.EventCreatedAt(database.NewNumberAtLeast(now)),
-					eventstore.EventSequence(database.NewNumberGreater(10)),
-					eventstore.EventRevision(database.NewNumberEquals(1)),
-					eventstore.EventCreator("user-123"),
+					eventstore.EventCreatedAtAtLeast(now),
+					eventstore.EventSequenceGreater(10),
+					eventstore.EventRevisionEquals(1),
+					eventstore.EventCreatorsEqual("user-123"),
 				),
 			},
 			want: wantQuery{
 				query: "(event_type = $1 AND created_at >= $2 AND sequence > $3 AND revision = $4 AND creator = $5)",
-				args:  []any{"user.added", now, 10, 1, "user-123"},
+				args:  []any{"user.added", now, uint32(10), uint16(1), "user-123"},
 			},
 		},
 	}
@@ -285,13 +275,13 @@ func Test_writeEventFilters(t *testing.T) {
 					),
 					eventstore.NewEventFilter(
 						eventstore.EventType("org.added"),
-						eventstore.EventSequence(database.NewNumberGreater(4)),
+						eventstore.EventSequenceGreater(4),
 					),
 				},
 			},
 			want: wantQuery{
 				query: " AND (event_type = $1 OR (event_type = $2 AND sequence > $3))",
-				args:  []any{"user.added", "org.added", 4},
+				args:  []any{"user.added", "org.added", uint32(4)},
 			},
 		},
 	}
@@ -377,13 +367,13 @@ func Test_writeAggregateFilter(t *testing.T) {
 					eventstore.AggregateID("123"),
 					eventstore.AppendEvent(
 						eventstore.EventType("user.added"),
-						eventstore.EventSequence(database.NewNumberGreater(1)),
+						eventstore.EventSequenceGreater(1),
 					),
 				),
 			},
 			want: wantQuery{
 				query: "(aggregate_type = $1 AND aggregate_id = $2 AND (event_type = $3 AND sequence > $4))",
-				args:  []any{"user", "123", "user.added", 1},
+				args:  []any{"user", "123", "user.added", uint32(1)},
 			},
 		},
 		{
@@ -396,13 +386,13 @@ func Test_writeAggregateFilter(t *testing.T) {
 						eventstore.EventType("user.added"),
 					),
 					eventstore.AppendEvent(
-						eventstore.EventSequence(database.NewNumberGreater(1)),
+						eventstore.EventSequenceGreater(1),
 					),
 				),
 			},
 			want: wantQuery{
 				query: "(aggregate_type = $1 AND aggregate_id = $2 AND (event_type = $3 OR sequence > $4))",
-				args:  []any{"user", "123", "user.added", 1},
+				args:  []any{"user", "123", "user.added", uint32(1)},
 			},
 		},
 		{
@@ -414,18 +404,18 @@ func Test_writeAggregateFilter(t *testing.T) {
 					eventstore.AppendEvents(
 						eventstore.NewEventFilter(
 							eventstore.EventType("user.added"),
-							eventstore.EventSequence(database.NewNumberGreater(1)),
+							eventstore.EventSequenceGreater(1),
 						),
 					),
 					eventstore.AppendEvent(
 						eventstore.EventType("user.changed"),
-						eventstore.EventSequence(database.NewNumberGreater(4)),
+						eventstore.EventSequenceGreater(4),
 					),
 				),
 			},
 			want: wantQuery{
 				query: "(aggregate_type = $1 AND aggregate_id = $2 AND ((event_type = $3 AND sequence > $4) OR (event_type = $5 AND sequence > $6)))",
-				args:  []any{"user", "123", "user.added", 1, "user.changed", 4},
+				args:  []any{"user", "123", "user.added", uint32(1), "user.changed", uint32(4)},
 			},
 		},
 	}
@@ -646,9 +636,7 @@ func Test_writeFilter(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var stmt database.Statement
-			stmt.SetNamedArg(instancePlaceholder, "i1")
-			// ensure a parent is set on the filter
-			eventstore.NewQuery("instance", nil, eventstore.AppendFilters(tt.args.filter))
+			eventstore.NewQuery("i1", nil, eventstore.AppendFilters(tt.args.filter))
 
 			writeFilter(&stmt, tt.args.filter)
 			assertQuery(t, &stmt, tt.want)
@@ -727,8 +715,8 @@ func Test_writeQuery(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND aggregate_id = ANY($3)) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $4 AND event_type = $5) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
-				args:  []any{"i1", "user", []string{"a", "b"}, "org", "org.added"},
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND aggregate_id = ANY($3)) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $4 AND (aggregate_type = $5 AND event_type = $6) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
+				args:  []any{"i1", "user", []string{"a", "b"}, "i1", "org", "org.added"},
 			},
 		},
 	}
@@ -811,10 +799,11 @@ func Test_writeQueryUse_examples(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $3 OR aggregate_type = $4) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $3 AND (aggregate_type = $4 OR aggregate_type = $5) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
 				args: []any{
 					"instance",
 					"agg1",
+					"instance",
 					"agg2",
 					"agg3",
 				},
@@ -838,11 +827,12 @@ func Test_writeQueryUse_examples(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND aggregate_id = $3) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND ((aggregate_type = $4 AND aggregate_id = $5) OR aggregate_type = $6) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND aggregate_id = $3) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $4 AND ((aggregate_type = $5 AND aggregate_id = $6) OR aggregate_type = $7) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
 				args: []any{
 					"instance",
 					"agg1",
 					"id",
+					"instance",
 					"agg2",
 					"id2",
 					"agg3",
@@ -918,7 +908,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 								"instance",
 								eventstore.AppendEvent(
 									eventstore.EventType("instance.domain.primary.set"),
-									eventstore.EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+									eventstore.EventCreatorsNotContains("", "SYSTEM"),
 								),
 							),
 							eventstore.FilterPagination(
@@ -930,7 +920,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 								"project",
 								eventstore.AppendEvent(
 									eventstore.EventType("project.added"),
-									eventstore.EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+									eventstore.EventCreatorsNotContains("", "SYSTEM"),
 								),
 							),
 							eventstore.FilterPagination(
@@ -941,7 +931,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"project",
 								eventstore.AppendEvent(
-									eventstore.EventCreatorList(database.NewListNotContains("", "SYSTEM")),
+									eventstore.EventCreatorsNotContains("", "SYSTEM"),
 									eventstore.EventType("project.application.added"),
 								),
 							),
@@ -965,85 +955,41 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"instance",
 								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.config.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.oauth.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.oidc.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.jwt.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.azure.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.github.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.github.enterprise.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.gitlab.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.gitlab.selfhosted.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.google.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.ldap.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.config.apple.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("instance.idp.saml.added"),
+									eventstore.EventTypes(
+										"instance.idp.config.added",
+										"instance.idp.oauth.added",
+										"instance.idp.oidc.added",
+										"instance.idp.jwt.added",
+										"instance.idp.azure.added",
+										"instance.idp.github.added",
+										"instance.idp.github.enterprise.added",
+										"instance.idp.gitlab.added",
+										"instance.idp.gitlab.selfhosted.added",
+										"instance.idp.google.added",
+										"instance.idp.ldap.added",
+										"instance.idp.config.apple.added",
+										"instance.idp.saml.added",
+									),
 								),
 							),
 							eventstore.AppendAggregateFilter(
 								"org",
 								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.config.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.oauth.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.oidc.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.jwt.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.azure.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.github.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.github.enterprise.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.gitlab.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.gitlab.selfhosted.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.google.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.ldap.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.config.apple.added"),
-								),
-								eventstore.AppendEvent(
-									eventstore.EventType("org.idp.saml.added"),
+									eventstore.EventTypes(
+										"org.idp.config.added",
+										"org.idp.oauth.added",
+										"org.idp.oidc.added",
+										"org.idp.jwt.added",
+										"org.idp.azure.added",
+										"org.idp.github.added",
+										"org.idp.github.enterprise.added",
+										"org.idp.gitlab.added",
+										"org.idp.gitlab.selfhosted.added",
+										"org.idp.google.added",
+										"org.idp.ldap.added",
+										"org.idp.config.apple.added",
+										"org.idp.saml.added",
+									),
 								),
 							),
 							eventstore.FilterPagination(
@@ -1072,7 +1018,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 								"instance",
 								eventstore.AppendEvent(
 									eventstore.EventType("instance.smtp.config.added"),
-									eventstore.EventCreatorList(database.NewListNotContains("", "SYSTEM", "<SYSTEM-USER>")),
+									eventstore.EventCreatorsNotContains("", "SYSTEM", "<SYSTEM-USER>"),
 								),
 							),
 							eventstore.FilterPagination(
@@ -1083,66 +1029,50 @@ func Test_writeQueryUse_examples(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND event_type = $3) ORDER BY position, in_tx_order LIMIT $4) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $5 AND event_type = $6) ORDER BY position, in_tx_order LIMIT $7) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $8 AND (event_type = $9 AND NOT(creator = ANY($10)))) ORDER BY position, in_tx_order LIMIT $11) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $12 AND (event_type = $13 AND NOT(creator = ANY($14)))) ORDER BY position, in_tx_order LIMIT $15) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $16 AND (event_type = $17 AND NOT(creator = ANY($18)))) ORDER BY position, in_tx_order LIMIT $19) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $20 AND event_type = $21) AND ((position = $22 AND in_tx_order > $23) OR position > $24) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND ((aggregate_type = $25 AND (event_type = $26 OR event_type = $27 OR event_type = $28 OR event_type = $29 OR event_type = $30 OR event_type = $31 OR event_type = $32 OR event_type = $33 OR event_type = $34 OR event_type = $35 OR event_type = $36 OR event_type = $37 OR event_type = $38)) OR (aggregate_type = $39 AND (event_type = $40 OR event_type = $41 OR event_type = $42 OR event_type = $43 OR event_type = $44 OR event_type = $45 OR event_type = $46 OR event_type = $47 OR event_type = $48 OR event_type = $49 OR event_type = $50 OR event_type = $51 OR event_type = $52))) ORDER BY position, in_tx_order LIMIT $53) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND ((aggregate_type = $54 AND event_type = $55) OR (aggregate_type = $56 AND event_type = $57)) ORDER BY position, in_tx_order LIMIT $58) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $59 AND (event_type = $60 AND NOT(creator = ANY($61)))) ORDER BY position, in_tx_order LIMIT $62)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND event_type = $3) ORDER BY position, in_tx_order LIMIT $4) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $5 AND (aggregate_type = $6 AND event_type = $7) ORDER BY position, in_tx_order LIMIT $8) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $9 AND (aggregate_type = $10 AND (event_type = $11 AND NOT(creator = ANY($12)))) ORDER BY position, in_tx_order LIMIT $13) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $14 AND (aggregate_type = $15 AND (event_type = $16 AND NOT(creator = ANY($17)))) ORDER BY position, in_tx_order LIMIT $18) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $19 AND (aggregate_type = $20 AND (event_type = $21 AND NOT(creator = ANY($22)))) ORDER BY position, in_tx_order LIMIT $23) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $24 AND (aggregate_type = $25 AND event_type = $26) AND ((position = $27 AND in_tx_order > $28) OR position > $29) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $30 AND ((aggregate_type = $31 AND event_type = ANY($32)) OR (aggregate_type = $33 AND event_type = ANY($34))) ORDER BY position, in_tx_order LIMIT $35) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $36 AND ((aggregate_type = $37 AND event_type = $38) OR (aggregate_type = $39 AND event_type = $40)) ORDER BY position, in_tx_order LIMIT $41) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $42 AND (aggregate_type = $43 AND (event_type = $44 AND NOT(creator = ANY($45)))) ORDER BY position, in_tx_order LIMIT $46)) ORDER BY position, in_tx_order`,
 				args: []any{
 					"instance",
 					"instance",
 					"instance.added",
 					uint32(1),
 					"instance",
+					"instance",
 					"instance.removed",
 					uint32(1),
+					"instance",
 					"instance",
 					"instance.domain.primary.set",
 					[]string{"", "SYSTEM"},
 					uint32(1),
+					"instance",
 					"project",
 					"project.added",
 					[]string{"", "SYSTEM"},
 					uint32(1),
+					"instance",
 					"project",
 					"project.application.added",
 					[]string{"", "SYSTEM"},
 					uint32(1),
+					"instance",
 					"user",
 					"user.token.added",
 					float64(12),
 					uint32(4),
 					float64(12),
 					"instance",
-					"instance.idp.config.added",
-					"instance.idp.oauth.added",
-					"instance.idp.oidc.added",
-					"instance.idp.jwt.added",
-					"instance.idp.azure.added",
-					"instance.idp.github.added",
-					"instance.idp.github.enterprise.added",
-					"instance.idp.gitlab.added",
-					"instance.idp.gitlab.selfhosted.added",
-					"instance.idp.google.added",
-					"instance.idp.ldap.added",
-					"instance.idp.config.apple.added",
-					"instance.idp.saml.added",
+					"instance",
+					[]string{"instance.idp.config.added", "instance.idp.oauth.added", "instance.idp.oidc.added", "instance.idp.jwt.added", "instance.idp.azure.added", "instance.idp.github.added", "instance.idp.github.enterprise.added", "instance.idp.gitlab.added", "instance.idp.gitlab.selfhosted.added", "instance.idp.google.added", "instance.idp.ldap.added", "instance.idp.config.apple.added", "instance.idp.saml.added"},
 					"org",
-					"org.idp.config.added",
-					"org.idp.oauth.added",
-					"org.idp.oidc.added",
-					"org.idp.jwt.added",
-					"org.idp.azure.added",
-					"org.idp.github.added",
-					"org.idp.github.enterprise.added",
-					"org.idp.gitlab.added",
-					"org.idp.gitlab.selfhosted.added",
-					"org.idp.google.added",
-					"org.idp.ldap.added",
-					"org.idp.config.apple.added",
-					"org.idp.saml.added",
+					[]string{"org.idp.config.added", "org.idp.oauth.added", "org.idp.oidc.added", "org.idp.jwt.added", "org.idp.azure.added", "org.idp.github.added", "org.idp.github.enterprise.added", "org.idp.gitlab.added", "org.idp.gitlab.selfhosted.added", "org.idp.google.added", "org.idp.ldap.added", "org.idp.config.apple.added", "org.idp.saml.added"},
 					uint32(1),
+					"instance",
 					"instance",
 					"instance.login.policy.idp.added",
 					"org",
 					"org.login.policy.idp.added",
 					uint32(1),
+					"instance",
 					"instance",
 					"instance.smtp.config.added",
 					[]string{"", "SYSTEM", "<SYSTEM-USER>"},
@@ -1155,10 +1085,6 @@ func Test_writeQueryUse_examples(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var stmt database.Statement
 			writeQuery(&stmt, tt.args.query)
-			if tt.name == "milestones" {
-				t.Log(stmt.Debug())
-				t.FailNow()
-			}
 			assertQuery(t, &stmt, tt.want)
 		})
 	}
