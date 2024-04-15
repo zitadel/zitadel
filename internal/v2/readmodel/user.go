@@ -38,13 +38,19 @@ func NewUser(id string) *User {
 	}
 }
 
-func (u *User) Query(ctx context.Context, querier eventstore.Querier) error {
+func (u *User) Query(ctx context.Context, querier eventstore.Querier, opts ...QueryOpt) error {
+	queryOpts := make([]eventstore.QueryOpt, 0, len(opts)+1)
+	queryOpts = append(queryOpts, eventstore.AppendFilters(u.Filter()...))
+	for _, opt := range opts {
+		queryOpts = opt(queryOpts)
+	}
+
 	eventCount, err := querier.Query(
 		ctx,
 		eventstore.NewQuery(
 			authz.GetInstance(ctx).InstanceID(),
 			u,
-			eventstore.AppendFilters(u.Filter()...),
+			queryOpts...,
 		),
 	)
 	if err != nil {
@@ -55,12 +61,18 @@ func (u *User) Query(ctx context.Context, querier eventstore.Querier) error {
 	}
 	u.LoginNames = projection.NewLoginNamesWithOwner(u.ID, u.Instance, u.Owner)
 
+	queryOpts = make([]eventstore.QueryOpt, 0, len(opts)+1)
+	queryOpts = append(queryOpts, eventstore.AppendFilters(u.LoginNames.Filter()...))
+	for _, opt := range opts {
+		queryOpts = opt(queryOpts)
+	}
+
 	_, err = querier.Query(
 		ctx,
 		eventstore.NewQuery(
 			authz.GetInstance(ctx).InstanceID(),
 			u.LoginNames,
-			eventstore.AppendFilters(u.LoginNames.Filter()...),
+			queryOpts...,
 		),
 	)
 

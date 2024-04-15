@@ -9,6 +9,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -357,7 +358,19 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	defer func() { span.EndWithError(err) }()
 
 	foundUser := readmodel.NewUser(userID)
-	if err = foundUser.Query(ctx, q.es.Querier); err != nil {
+	tx, err := q.client.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
+	if err != nil {
+		logging.WithError(err).Debug("unable to create tx")
+		return nil, zerrors.ThrowInternal(err, "QUERY-MU4S8", "Errors.Internal")
+	}
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+		}
+		_ = tx.Commit()
+	}()
+
+	if err = foundUser.Query(ctx, q.es.Querier, readmodel.WithTx(tx)); err != nil {
 		return nil, err
 	}
 	return userFromV2(foundUser), nil
