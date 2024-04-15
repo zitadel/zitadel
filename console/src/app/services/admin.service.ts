@@ -6,6 +6,8 @@ import {
   ActivateLabelPolicyResponse,
   ActivateSMSProviderRequest,
   ActivateSMSProviderResponse,
+  ActivateSMTPConfigRequest,
+  ActivateSMTPConfigResponse,
   AddAppleProviderRequest,
   AddAppleProviderResponse,
   AddAzureADProviderRequest,
@@ -52,6 +54,8 @@ import {
   DeactivateIDPResponse,
   DeactivateSMSProviderRequest,
   DeactivateSMSProviderResponse,
+  DeactivateSMTPConfigRequest,
+  DeactivateSMTPConfigResponse,
   DeleteProviderRequest,
   DeleteProviderResponse,
   GetAllowedLanguagesRequest,
@@ -135,6 +139,8 @@ import {
   GetSecurityPolicyResponse,
   GetSMSProviderRequest,
   GetSMSProviderResponse,
+  GetSMTPConfigByIdRequest,
+  GetSMTPConfigByIdResponse,
   GetSMTPConfigRequest,
   GetSMTPConfigResponse,
   GetSupportedLanguagesRequest,
@@ -167,6 +173,8 @@ import {
   ListSecretGeneratorsResponse,
   ListSMSProvidersRequest,
   ListSMSProvidersResponse,
+  ListSMTPConfigsRequest,
+  ListSMTPConfigsResponse,
   ListViewsRequest,
   ListViewsResponse,
   ReactivateIDPRequest,
@@ -193,6 +201,8 @@ import {
   RemoveSecondFactorFromLoginPolicyResponse,
   RemoveSMSProviderRequest,
   RemoveSMSProviderResponse,
+  RemoveSMTPConfigRequest,
+  RemoveSMTPConfigResponse,
   ResetCustomDomainPolicyToDefaultRequest,
   ResetCustomDomainPolicyToDefaultResponse,
   ResetCustomLoginTextsToDefaultRequest,
@@ -894,6 +904,17 @@ export class AdminService {
     return this.grpcService.admin.getSMTPConfig(req, null).then((resp) => resp.toObject());
   }
 
+  public getSMTPConfigById(id: string): Promise<GetSMTPConfigByIdResponse.AsObject> {
+    const req = new GetSMTPConfigByIdRequest();
+    req.setId(id);
+    return this.grpcService.admin.getSMTPConfigById(req, null).then((resp) => resp.toObject());
+  }
+
+  public listSMTPConfigs(): Promise<ListSMTPConfigsResponse.AsObject> {
+    const req = new ListSMTPConfigsRequest();
+    return this.grpcService.admin.listSMTPConfigs(req, null).then((resp) => resp.toObject());
+  }
+
   public addSMTPConfig(req: AddSMTPConfigRequest): Promise<AddSMTPConfigResponse.AsObject> {
     return this.grpcService.admin.addSMTPConfig(req, null).then((resp) => resp.toObject());
   }
@@ -904,6 +925,24 @@ export class AdminService {
 
   public updateSMTPConfigPassword(req: UpdateSMTPConfigPasswordRequest): Promise<UpdateSMTPConfigPasswordResponse.AsObject> {
     return this.grpcService.admin.updateSMTPConfigPassword(req, null).then((resp) => resp.toObject());
+  }
+
+  public activateSMTPConfig(id: string): Promise<ActivateSMTPConfigResponse.AsObject> {
+    const req = new ActivateSMTPConfigRequest();
+    req.setId(id);
+    return this.grpcService.admin.activateSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public deactivateSMTPConfig(id: string): Promise<DeactivateSMTPConfigResponse.AsObject> {
+    const req = new DeactivateSMTPConfigRequest();
+    req.setId(id);
+    return this.grpcService.admin.deactivateSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeSMTPConfig(id: string): Promise<RemoveSMTPConfigResponse.AsObject> {
+    const req = new RemoveSMTPConfigRequest();
+    req.setId(id);
+    return this.grpcService.admin.removeSMTPConfig(req, null).then((resp) => resp.toObject());
   }
 
   /* sms */
@@ -957,9 +996,13 @@ export class AdminService {
     return this.grpcService.admin.getLockoutPolicy(req, null).then((resp) => resp.toObject());
   }
 
-  public updateLockoutPolicy(maxAttempts: number): Promise<UpdateLockoutPolicyResponse.AsObject> {
+  public updateLockoutPolicy(
+    maxPasswordAttempts: number,
+    maxOTPAttempts: number,
+  ): Promise<UpdateLockoutPolicyResponse.AsObject> {
     const req = new UpdateLockoutPolicyRequest();
-    req.setMaxPasswordAttempts(maxAttempts);
+    req.setMaxPasswordAttempts(maxPasswordAttempts);
+    req.setMaxOtpAttempts(maxOTPAttempts);
 
     return this.grpcService.admin.updateLockoutPolicy(req, null).then((resp) => resp.toObject());
   }

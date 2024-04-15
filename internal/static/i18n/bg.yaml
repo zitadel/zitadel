@@ -56,6 +56,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP конфигурацията не е намерена
     AlreadyExists: SMTP конфигурация вече съществува
+    AlreadyDeactivated: SMTP конфигурацията вече е деактивирана
     SenderAdressNotCustomDomain: >-
       Адресът на изпращача трябва да бъде конфигуриран като персонализиран
       домейн в екземпляра.
@@ -599,6 +600,15 @@ AggregateTypes:
   target: Целта
   execution: Екзекуция
   user_schema: Потребителска схема
+  auth_request: Заявка за удостоверяване
+  device_auth: Устройство за удостоверяване
+  idpintent: IDP Intent
+  limits: Ограничения
+  milestone: Етап
+  oidc_session: OIDC сесия
+  restrictions: Ограничения
+  system: Система
+  session: Сесия
 
 EventTypes:
   execution:
@@ -644,6 +654,7 @@ EventTypes:
         removed: Ключът е премахнат
       secret:
         set: Секретен комплект
+        updated: Тайният хеш е актуализиран
         removed: Тайната е премахната
         check:
           succeeded: Тайната проверка е успешна
@@ -1020,6 +1031,11 @@ EventTypes:
           check:
             succeeded: Проверката на OIDC Client Secret е успешна
             failed: Проверката на OIDC Client Secret е неуспешна
+      api:
+        secret:
+          check:
+            succeeded: Тайната проверка на API е успешна
+            failed: Тайната проверка на API е неуспешна
         key:
           added: Добавен ключ за приложение
           removed: Ключът на приложението е премахнат
@@ -1032,11 +1048,13 @@ EventTypes:
           changed: Конфигурацията на OIDC е променена
           secret:
             changed: Тайната на OIDC е променена
+            updated: Тайният хеш на OIDC е актуализиран
         api:
           added: Добавена е конфигурация на API
           changed: Променена конфигурация на API
           secret:
             changed: Тайната на API е променена
+            updated: Тайният хеш на API е актуализиран
   policy:
     password:
       complexity:
@@ -1135,6 +1153,9 @@ EventTypes:
       config:
         added: Добавена е SMTP конфигурация
         changed: SMTP конфигурацията е променена
+        activated: SMTP конфигурацията е активирана
+        deactivated: SMTP конфигурацията е деактивирана
+        removed: Премахната SMTP конфигурация
         password:
           changed: Тайната на конфигурацията на SMTP е променена
     sms:
@@ -1289,6 +1310,8 @@ EventTypes:
       config:
         added: Добавена е SMTP конфигурация
         changed: SMTP конфигурацията е променена
+        activated: SMTP конфигурацията е активирана
+        deactivated: SMTP конфигурацията е деактивирана
         password:
           changed: Паролата на SMTP конфигурацията е променена
         removed: Премахната SMTP конфигурация

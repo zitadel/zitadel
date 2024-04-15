@@ -56,6 +56,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP configuration not found
     AlreadyExists: SMTP configuration already exists
+    AlreadyDeactivated: SMTP configuration already deactivated
     SenderAdressNotCustomDomain: The sender address must be configured as custom domain on the instance.
   Notification:
     NoDomain: No Domain found for message
@@ -582,6 +583,15 @@ AggregateTypes:
   target: Target
   execution: Execution
   user_schema: User Schema
+  auth_request: Auth Request
+  device_auth: Device Auth
+  idpintent: IDP Intent
+  limits: Limits
+  milestone: Milestone
+  oidc_session: OIDC Session
+  restrictions: Restrictions
+  system: System
+  session: Session
 
 EventTypes:
   execution:
@@ -627,6 +637,7 @@ EventTypes:
         removed: Key removed
       secret:
         set: Secret set
+        updated: Secret hash updated
         removed: Secret removed
         check:
           succeeded: Secret check succeeded
@@ -778,7 +789,7 @@ EventTypes:
       code:
         added: Phone number code generated
         sent: Phone number code sent
-      removed: Phone number removed
+
     profile:
       changed: User profile changed
     address:
@@ -1001,6 +1012,11 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret check succeeded
             failed: OIDC Client Secret check failed
+      api:
+        secret:
+          check:
+            succeeded: API secret check succeeded
+            failed: API secret check failed
         key:
           added: Application key added
           removed: Application key removed
@@ -1013,11 +1029,13 @@ EventTypes:
           changed: OIDC Configuration changed
           secret:
             changed: OIDC secret changed
+            updated: OIDC secret hash updated
         api:
           added: API Configuration added
           changed: API Configuration changed
           secret:
             changed: API secret changed
+            updated: API secret hash updated
   policy:
     password:
       complexity:
@@ -1112,6 +1130,9 @@ EventTypes:
       config:
         added: SMTP configuration added
         changed: SMTP configuration changed
+        activated: SMTP configuration activated
+        deactivated: SMTP configuration deactivated
+        removed: SMTP configuration removed
         password:
           changed: SMTP configuration secret changed
     sms:
@@ -1257,6 +1278,8 @@ EventTypes:
       config:
         added: SMTP configuration added
         changed: SMTP configuration changed
+        activated: SMTP configuration activated
+        deactivated: SMTP configuration deactivated
         password:
           changed: Password of SMTP configuration changed
         removed: SMTP configuration removed

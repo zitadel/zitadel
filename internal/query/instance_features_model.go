@@ -62,6 +62,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceLegacyIntrospectionEventType,
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
+			feature_v2.InstanceActionsEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -75,6 +76,7 @@ func (m *InstanceFeaturesReadModel) reduceReset() {
 	m.instance.LegacyIntrospection = FeatureSource[bool]{}
 	m.instance.UserSchema = FeatureSource[bool]{}
 	m.instance.TokenExchange = FeatureSource[bool]{}
+	m.instance.Actions = FeatureSource[bool]{}
 }
 
 func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
@@ -86,6 +88,7 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.LegacyIntrospection = m.system.LegacyIntrospection
 	m.instance.UserSchema = m.system.UserSchema
 	m.instance.TokenExchange = m.system.TokenExchange
+	m.instance.Actions = m.system.Actions
 	return true
 }
 
@@ -109,6 +112,8 @@ func (m *InstanceFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent
 		dst = &m.instance.UserSchema
 	case feature.KeyTokenExchange:
 		dst = &m.instance.TokenExchange
+	case feature.KeyActions:
+		dst = &m.instance.Actions
 	}
 	*dst = FeatureSource[bool]{
 		Level: level,

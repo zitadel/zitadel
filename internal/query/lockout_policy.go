@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -28,6 +27,7 @@ type LockoutPolicy struct {
 	State         domain.PolicyState
 
 	MaxPasswordAttempts uint64
+	MaxOTPAttempts      uint64
 	ShowFailures        bool
 
 	IsDefault bool
@@ -70,6 +70,10 @@ var (
 		name:  projection.LockoutPolicyMaxPasswordAttemptsCol,
 		table: lockoutTable,
 	}
+	LockoutColMaxOTPAttempts = Column{
+		name:  projection.LockoutPolicyMaxOTPAttemptsCol,
+		table: lockoutTable,
+	}
 	LockoutColIsDefault = Column{
 		name:  projection.LockoutPolicyIsDefaultCol,
 		table: lockoutTable,
@@ -78,13 +82,9 @@ var (
 		name:  projection.LockoutPolicyStateCol,
 		table: lockoutTable,
 	}
-	LockoutPolicyOwnerRemoved = Column{
-		name:  projection.LockoutPolicyOwnerRemovedCol,
-		table: lockoutTable,
-	}
 )
 
-func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string, withOwnerRemoved bool) (policy *LockoutPolicy, err error) {
+func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool, orgID string) (policy *LockoutPolicy, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -96,9 +96,6 @@ func (q *Queries) LockoutPolicyByOrg(ctx context.Context, shouldTriggerBulk bool
 	}
 	eq := sq.Eq{
 		LockoutColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
-	}
-	if !withOwnerRemoved {
-		eq[LockoutPolicyOwnerRemoved.identifier()] = false
 	}
 
 	stmt, scan := prepareLockoutPolicyQuery(ctx, q.client)
@@ -154,6 +151,7 @@ func prepareLockoutPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 			LockoutColResourceOwner.identifier(),
 			LockoutColShowFailures.identifier(),
 			LockoutColMaxPasswordAttempts.identifier(),
+			LockoutColMaxOTPAttempts.identifier(),
 			LockoutColIsDefault.identifier(),
 			LockoutColState.identifier(),
 		).
@@ -169,6 +167,7 @@ func prepareLockoutPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Sele
 				&policy.ResourceOwner,
 				&policy.ShowFailures,
 				&policy.MaxPasswordAttempts,
+				&policy.MaxOTPAttempts,
 				&policy.IsDefault,
 				&policy.State,
 			)

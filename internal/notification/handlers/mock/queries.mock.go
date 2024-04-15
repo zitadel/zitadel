@@ -5,6 +5,7 @@
 //
 //	mockgen -package mock -destination ./mock/queries.mock.go github.com/zitadel/zitadel/internal/notification/handlers Queries
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -180,19 +181,19 @@ func (mr *MockQueriesMockRecorder) SMSProviderConfig(arg0 any, arg1 ...any) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SMSProviderConfig", reflect.TypeOf((*MockQueries)(nil).SMSProviderConfig), varargs...)
 }
 
-// SMTPConfigByAggregateID mocks base method.
-func (m *MockQueries) SMTPConfigByAggregateID(arg0 context.Context, arg1 string) (*query.SMTPConfig, error) {
+// SMTPConfigActive mocks base method.
+func (m *MockQueries) SMTPConfigActive(arg0 context.Context, arg1 string) (*query.SMTPConfig, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SMTPConfigByAggregateID", arg0, arg1)
+	ret := m.ctrl.Call(m, "SMTPConfigActive", arg0, arg1)
 	ret0, _ := ret[0].(*query.SMTPConfig)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// SMTPConfigByAggregateID indicates an expected call of SMTPConfigByAggregateID.
-func (mr *MockQueriesMockRecorder) SMTPConfigByAggregateID(arg0, arg1 any) *gomock.Call {
+// SMTPConfigActive indicates an expected call of SMTPConfigActive.
+func (mr *MockQueriesMockRecorder) SMTPConfigActive(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SMTPConfigByAggregateID", reflect.TypeOf((*MockQueries)(nil).SMTPConfigByAggregateID), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SMTPConfigActive", reflect.TypeOf((*MockQueries)(nil).SMTPConfigActive), arg0, arg1)
 }
 
 // SearchInstanceDomains mocks base method.
