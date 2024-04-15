@@ -37,4 +37,4 @@ In some use cases, external user grants are a simple way to allow users access t
 
 * [API reference for user grants](/docs/category/apis/resources/mgmt/user-grants)
 * [How to manage user grants through ZITADEL's console](/docs/guides/manage/console/roles#authorizations)
-* [More about multi-tenancy with ZITADEL](/blog/multi-tenancy-with-organizations)
+* [More about multi-tenancy with ZITADEL](https://zitadel.com/blog/multi-tenancy-with-organizations)
