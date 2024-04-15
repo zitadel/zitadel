@@ -1,81 +1,110 @@
 package readmodel
 
 import (
-	"time"
+	"context"
 
-	"golang.org/x/text/language"
-
-	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/v2/projection"
 	"github.com/zitadel/zitadel/internal/v2/user"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type User struct {
-	ID                 string
-	CreationDate       time.Time
-	ChangeDate         time.Time
-	ResourceOwner      string
-	Sequence           uint64
-	State              domain.UserState
-	Type               domain.UserType
-	Username           string
-	LoginNames         database.TextArray[string]
-	PreferredLoginName string
-	Human              *Human
-	Machine            *Machine
+	readModel
+	projection.User
+	LoginNames *projection.LoginNames
+	Human      *projection.Human
+	Machine    *projection.Machine
+}
+
+func (u *User) PreferredLoginName() string {
+	if u.LoginNames == nil {
+		return ""
+	}
+	for _, loginName := range u.LoginNames.LoginNames {
+		if loginName.IsPrimary {
+			return loginName.Name
+		}
+	}
+
+	return ""
 }
 
 func NewUser(id string) *User {
 	return &User{
-		ID: id,
+		User: *projection.NewUserProjection(id),
 	}
 }
 
-func (rm *User) Filter() []*eventstore.Filter {
+func (u *User) Query(ctx context.Context, querier eventstore.Querier) error {
+	eventCount, err := querier.Query(
+		ctx,
+		eventstore.NewQuery(
+			authz.GetInstance(ctx).InstanceID(),
+			u,
+			eventstore.AppendFilters(u.Filter()...),
+		),
+	)
+	if err != nil {
+		return err
+	}
+	if eventCount == 0 {
+		return zerrors.ThrowNotFound(nil, "READM-TWPSk", "Errors.User.NotFound")
+	}
+	u.LoginNames = projection.NewLoginNamesWithOwner(u.ID, u.Instance, u.Owner)
+
+	_, err = querier.Query(
+		ctx,
+		eventstore.NewQuery(
+			authz.GetInstance(ctx).InstanceID(),
+			u.LoginNames,
+			eventstore.AppendFilters(u.LoginNames.Filter()...),
+		),
+	)
+
+	if err != nil {
+		return err
+	}
+
+	u.LoginNames.Generate()
+	return nil
+}
+
+func (u *User) Filter() []*eventstore.Filter {
 	return []*eventstore.Filter{
 		eventstore.NewFilter(
 			eventstore.AppendAggregateFilter(
 				user.AggregateType,
-				eventstore.AggregateID(rm.ID),
+				eventstore.AggregateID(u.ID),
 			),
 		),
 	}
 }
 
-func (rm *User) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
+func (u *User) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) (err error) {
+
+eventLoop:
 	for _, event := range events {
 		switch event.Type {
-		case "user.human.added", "user.added":
-			added, err := user.A
-			if err != nil {
-				return err
-			}
-			rm.Name = added.Payload.Name
-			rm.Owner = event.Aggregate.Owner
-			rm.CreationDate = event.CreatedAt
+		case "user.human.added", "user.added", "user.human.selfregistered":
+			u.Human = projection.NewHumanProjection(u.ID)
+			break eventLoop
+		case "user.machine.added":
+			u.Machine = projection.NewMachineProjection(u.ID)
+			break eventLoop
 		}
 	}
-}
+	if err = u.User.Reduce(events...); err != nil {
+		return err
+	}
+	u.reduce(events[len(events)-1])
+	if u.Type == domain.UserTypeHuman {
+		err = u.Human.Reduce(events...)
+	} else if u.Type == domain.UserTypeMachine {
+		err = u.Machine.Reduce(events...)
+	}
 
-type Human struct {
-	FirstName              string
-	LastName               string
-	NickName               string
-	DisplayName            string
-	AvatarKey              string
-	PreferredLanguage      language.Tag
-	Gender                 domain.Gender
-	Email                  domain.EmailAddress
-	IsEmailVerified        bool
-	Phone                  domain.PhoneNumber
-	IsPhoneVerified        bool
-	PasswordChangeRequired bool
-}
-
-type Machine struct {
-	Name            string
-	Description     string
-	EncodedSecret   string
-	AccessTokenType domain.OIDCTokenType
+	return err
 }

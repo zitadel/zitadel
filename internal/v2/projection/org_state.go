@@ -31,16 +31,12 @@ func (p *OrgState) Filter() []*eventstore.Filter {
 				org.AggregateType,
 				eventstore.AggregateID(p.id),
 				eventstore.AppendEvent(
-					eventstore.EventType("org.added"),
-				),
-				eventstore.AppendEvent(
-					eventstore.EventType("org.deactivated"),
-				),
-				eventstore.AppendEvent(
-					eventstore.EventType("org.reactivated"),
-				),
-				eventstore.AppendEvent(
-					eventstore.EventType("org.removed"),
+					eventstore.EventTypes(
+						"org.added",
+						"org.deactivated",
+						"org.reactivated",
+						"org.removed",
+					),
 				),
 			),
 		),

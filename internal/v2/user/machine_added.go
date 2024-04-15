@@ -6,6 +6,7 @@ import (
 )
 
 type machineAddedPayload struct {
+	Username        string               `json:"userName"`
 	Name            string               `json:"name,omitempty"`
 	Description     string               `json:"description,omitempty"`
 	AccessTokenType domain.OIDCTokenType `json:"accessTokenType,omitempty"`

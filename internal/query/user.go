@@ -17,6 +17,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	v2_projection "github.com/zitadel/zitadel/internal/v2/projection"
+	"github.com/zitadel/zitadel/internal/v2/readmodel"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -354,20 +356,97 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if shouldTriggerBulk {
-		triggerUserProjections(ctx)
+	foundUser := readmodel.NewUser(userID)
+	if err = foundUser.Query(ctx, q.es.Querier); err != nil {
+		return nil, err
+	}
+	return userFromV2(foundUser), nil
+
+	// if shouldTriggerBulk {
+	// 	triggerUserProjections(ctx)
+	// }
+
+	// err = q.client.QueryRowContext(ctx,
+	// 	func(row *sql.Row) error {
+	// 		user, err = scanUser(row)
+	// 		return err
+	// 	},
+	// 	userByIDQuery,
+	// 	userID,
+	// 	authz.GetInstance(ctx).InstanceID(),
+	// )
+	// return user, err
+}
+
+func userFromV2(user *readmodel.User) *User {
+	return &User{
+		ID:                 user.ID,
+		CreationDate:       user.CreationDate,
+		ChangeDate:         user.ChangeDate,
+		ResourceOwner:      user.Owner,
+		Sequence:           uint64(user.Sequence),
+		State:              user.State,
+		Type:               user.Type,
+		Username:           user.Username,
+		LoginNames:         loginNamesFromV2(user.LoginNames),
+		PreferredLoginName: user.PreferredLoginName(),
+		Human:              humanFromV2(user.Human),
+		Machine:            machineFromV2(user.Machine),
+	}
+}
+
+func loginNamesFromV2(loginNames *v2_projection.LoginNames) database.TextArray[string] {
+	res := make(database.TextArray[string], len(loginNames.LoginNames))
+
+	for i, loginName := range loginNames.LoginNames {
+		res[i] = loginName.Name
 	}
 
-	err = q.client.QueryRowContext(ctx,
-		func(row *sql.Row) error {
-			user, err = scanUser(row)
-			return err
-		},
-		userByIDQuery,
-		userID,
-		authz.GetInstance(ctx).InstanceID(),
-	)
-	return user, err
+	return res
+}
+
+func machineFromV2(machine *v2_projection.Machine) *Machine {
+	if machine == nil {
+		return nil
+	}
+	var secret string
+	if machine.Secret != nil {
+		secret = *machine.Secret
+	}
+	return &Machine{
+		Name:            machine.Name,
+		Description:     machine.Description,
+		EncodedSecret:   secret,
+		AccessTokenType: machine.AccessTokenType,
+	}
+}
+
+func humanFromV2(human *v2_projection.Human) *Human {
+	if human == nil {
+		return nil
+	}
+
+	res := &Human{
+		FirstName:              human.FirstName,
+		LastName:               human.LastName,
+		NickName:               human.NickName,
+		DisplayName:            human.DisplayName,
+		PreferredLanguage:      human.PreferredLanguage,
+		Gender:                 human.Gender,
+		Email:                  human.Email.Address,
+		IsEmailVerified:        human.Email.IsVerified,
+		PasswordChangeRequired: human.PasswordChangeRequired,
+	}
+
+	if human.AvatarKey != nil {
+		res.AvatarKey = *human.AvatarKey
+	}
+	if human.Phone != nil {
+		res.Phone = human.Phone.Number
+		res.IsPhoneVerified = human.Phone.IsVerified
+	}
+
+	return res
 }
 
 //go:embed user_by_login_name.sql

@@ -3,12 +3,13 @@ package user
 import (
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
 type humanRegisteredPayload struct {
-	UserName          string              `json:"userName"`
+	Username          string              `json:"userName"`
 	FirstName         string              `json:"firstName,omitempty"`
 	LastName          string              `json:"lastName,omitempty"`
 	NickName          string              `json:"nickName,omitempty"`
@@ -22,6 +23,12 @@ type humanRegisteredPayload struct {
 	PostalCode        string              `json:"postalCode,omitempty"`
 	Region            string              `json:"region,omitempty"`
 	StreetAddress     string              `json:"streetAddress,omitempty"`
+
+	// New events only use EncodedHash. However, the secret field
+	// is preserved to handle events older than the switch to Passwap.
+	Secret                 *crypto.CryptoValue `json:"secret,omitempty"` // legacy
+	EncodedHash            string              `json:"encodedHash,omitempty"`
+	PasswordChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
 type HumanRegisteredEvent humanRegisteredEvent

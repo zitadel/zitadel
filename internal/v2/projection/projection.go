@@ -5,7 +5,13 @@ import "github.com/zitadel/zitadel/internal/v2/eventstore"
 type projection struct {
 	instance string
 	position eventstore.GlobalPosition
-	sequence uint32
+}
+
+func (p *projection) reduce(event *eventstore.Event[eventstore.StoragePayload]) {
+	if p.instance == "" {
+		p.instance = event.Aggregate.Instance
+	}
+	p.position = event.Position
 }
 
 func (p projection) shouldReduce(event *eventstore.Event[eventstore.StoragePayload]) bool {

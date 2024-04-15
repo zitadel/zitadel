@@ -51,8 +51,7 @@ func (p *OrgPrimaryDomain) Reduce(events ...*eventstore.Event[eventstore.Storage
 		}
 
 		p.Domain = e.Payload.Name
-		p.position = event.Position
-		p.sequence = event.Sequence
+		p.projection.reduce(event)
 	}
 
 	return nil

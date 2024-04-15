@@ -77,3 +77,26 @@ func DomainPrimarySetEventFromStorage(e *eventstore.Event[eventstore.StoragePayl
 func (e DomainPrimarySetEvent) IsType(typ string) bool {
 	return strings.HasPrefix(typ, "org") && e.PrimarySetEvent.HasTypeSuffix(typ)
 }
+
+var (
+	// TODO: use same logic as in [strings.Builder] to get rid of the following line
+	DomainRemoved DomainRemovedEvent
+)
+
+type DomainRemovedEvent struct {
+	*domain.RemovedEvent
+}
+
+func DomainRemovedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainRemovedEvent, error) {
+	event, err := domain.RemovedEventFromStorage(e)
+	if err != nil {
+		return nil, err
+	}
+	return &DomainRemovedEvent{
+		RemovedEvent: event,
+	}, nil
+}
+
+func (e DomainRemovedEvent) IsType(typ string) bool {
+	return strings.HasPrefix(typ, "org") && e.RemovedEvent.HasTypeSuffix(typ)
+}

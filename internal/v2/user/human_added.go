@@ -9,7 +9,7 @@ import (
 )
 
 type humanAddedPayload struct {
-	UserName string `json:"userName"`
+	Username string `json:"userName"`
 
 	FirstName         string        `json:"firstName,omitempty"`
 	LastName          string        `json:"lastName,omitempty"`
@@ -30,9 +30,9 @@ type humanAddedPayload struct {
 
 	// New events only use EncodedHash. However, the secret field
 	// is preserved to handle events older than the switch to Passwap.
-	Secret         *crypto.CryptoValue `json:"secret,omitempty"`
-	EncodedHash    string              `json:"encodedHash,omitempty"`
-	ChangeRequired bool                `json:"changeRequired,omitempty"`
+	Secret                 *crypto.CryptoValue `json:"secret,omitempty"`
+	EncodedHash            string              `json:"encodedHash,omitempty"`
+	PasswordChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
 type HumanAddedEvent humanAddedEvent
