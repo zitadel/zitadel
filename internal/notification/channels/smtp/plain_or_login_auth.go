@@ -2,10 +2,10 @@ package smtp
 
 import (
 	"bytes"
-	"errors"
-	"fmt"
 	"net/smtp"
 	"slices"
+
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // golang net/smtp SMTP AUTH LOGIN or PLAIN Auth Handler
@@ -24,7 +24,7 @@ type plainOrLoginAuth struct {
 
 func (a *plainOrLoginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
 	if server.Name != a.host {
-		return "", nil, errors.New("wrong host name")
+		return "", nil, zerrors.ThrowInternal(nil, "SMTP-RRi75", "wrong host name")
 	}
 	if !slices.Contains(server.Auth, "PLAIN") {
 		a.authMethod = "LOGIN"
@@ -43,7 +43,7 @@ func (a *plainOrLoginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 
 	if a.authMethod == "PLAIN" {
 		// We've already sent everything.
-		return nil, errors.New("unexpected server challenge")
+		return nil, zerrors.ThrowInternal(nil, "SMTP-AAf43", "unexpected server challenge for PLAIN auth method")
 	}
 
 	switch {
@@ -52,6 +52,6 @@ func (a *plainOrLoginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	case bytes.Equal(fromServer, []byte("Password:")):
 		return []byte(a.password), nil
 	default:
-		return nil, fmt.Errorf("unexpected server challenge: %s", fromServer)
+		return nil, zerrors.ThrowInternal(nil, "SMTP-HjW21", "unexpected server challenge")
 	}
 }
