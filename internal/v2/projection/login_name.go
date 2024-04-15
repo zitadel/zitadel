@@ -2,6 +2,7 @@ package projection
 
 import (
 	"slices"
+	"strings"
 
 	"github.com/zitadel/logging"
 
@@ -197,14 +198,15 @@ func (ln *LoginNames) Generate() {
 	}
 	if !mustBeDomain {
 		ln.LoginNames = append(ln.LoginNames, &LoginName{
-			Name: ln.username,
+			Name:      ln.username,
+			IsPrimary: true,
 		})
-		// return
+		return
 	}
 
 	for _, domain := range ln.domains {
 		ln.LoginNames = append(ln.LoginNames, &LoginName{
-			Name:      ln.username + "@" + domain.name,
+			Name:      strings.Join([]string{ln.username, domain.name}, "@"),
 			IsPrimary: domain.isPrimary,
 		})
 	}

@@ -361,21 +361,6 @@ func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userI
 		return nil, err
 	}
 	return userFromV2(foundUser), nil
-
-	// if shouldTriggerBulk {
-	// 	triggerUserProjections(ctx)
-	// }
-
-	// err = q.client.QueryRowContext(ctx,
-	// 	func(row *sql.Row) error {
-	// 		user, err = scanUser(row)
-	// 		return err
-	// 	},
-	// 	userByIDQuery,
-	// 	userID,
-	// 	authz.GetInstance(ctx).InstanceID(),
-	// )
-	// return user, err
 }
 
 func userFromV2(user *readmodel.User) *User {
