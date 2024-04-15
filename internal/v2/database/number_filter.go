@@ -103,5 +103,7 @@ func (c numberCompare) String() string {
 }
 
 type number interface {
-	constraints.Integer | constraints.Float | time.Time | placeholder
+	constraints.Integer | constraints.Float | time.Time
+	// TODO: condition must know if it's args are named parameters or not
+	// constraints.Integer | constraints.Float | time.Time | placeholder
 }

@@ -1,15 +1,11 @@
 package database
 
 import (
-	"bytes"
-	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 	"unsafe"
-
-	"github.com/zitadel/logging"
 )
 
 type Statement struct {
@@ -18,7 +14,8 @@ type Statement struct {
 
 	args []any
 	// key is the name of the arg and value is the placeholder
-	namedArgs map[placeholder]string
+	// TODO: condition must know if it's args are named parameters or not
+	// namedArgs map[placeholder]string
 }
 
 func (stmt *Statement) Args() []any {
@@ -34,17 +31,18 @@ func (stmt *Statement) Reset() {
 	stmt.args = nil
 }
 
+// TODO: condition must know if it's args are named parameters or not
 // SetNamedArg sets the arg and makes it available for query construction
-func (stmt *Statement) SetNamedArg(name placeholder, value any) (placeholder string) {
-	stmt.copyCheck()
-	stmt.args = append(stmt.args, value)
-	placeholder = fmt.Sprintf("$%d", len(stmt.args))
-	if !strings.HasPrefix(name.string, "@") {
-		name.string = "@" + name.string
-	}
-	stmt.namedArgs[name] = placeholder
-	return placeholder
-}
+// func (stmt *Statement) SetNamedArg(name placeholder, value any) (placeholder string) {
+// 	stmt.copyCheck()
+// 	stmt.args = append(stmt.args, value)
+// 	placeholder = fmt.Sprintf("$%d", len(stmt.args))
+// 	if !strings.HasPrefix(name.string, "@") {
+// 		name.string = "@" + name.string
+// 	}
+// 	stmt.namedArgs[name] = placeholder
+// 	return placeholder
+// }
 
 // AppendArgs appends the args without writing it to Builder
 // if any arg is a [placeholder] it's replaced with the placeholders parameter
@@ -60,20 +58,23 @@ func (stmt *Statement) AppendArgs(args ...any) {
 func (stmt *Statement) AppendArg(arg any) {
 	stmt.copyCheck()
 
-	if namedArg, ok := arg.(sql.NamedArg); ok {
-		stmt.SetNamedArg(placeholder{namedArg.Name}, namedArg.Value)
-		return
-	}
+	// TODO: condition must know if it's args are named parameters or not
+	// if namedArg, ok := arg.(sql.NamedArg); ok {
+	// 	stmt.SetNamedArg(placeholder{namedArg.Name}, namedArg.Value)
+	// 	return
+	// }
 	stmt.args = append(stmt.args, arg)
 }
 
-func Placeholder(name string) placeholder {
-	return placeholder{name}
-}
+// TODO: condition must know if it's args are named parameters or not
+// func Placeholder(name string) placeholder {
+// 	return placeholder{name}
+// }
 
-type placeholder struct {
-	string
-}
+// TODO: condition must know if it's args are named parameters or not
+// type placeholder struct {
+// 	string
+// }
 
 // WriteArgs appends the args and adds the placeholders comma separated to [stmt.Builder]
 // if any arg is a [placeholder] it's replaced with the placeholders parameter
@@ -91,10 +92,11 @@ func (stmt *Statement) WriteArgs(args ...any) {
 // if the arg is a [placeholder] it's replaced with the placeholders parameter
 func (stmt *Statement) WriteArg(arg any) {
 	stmt.copyCheck()
-	if namedPlaceholder, ok := arg.(placeholder); ok {
-		stmt.writeNamedPlaceholder(namedPlaceholder)
-		return
-	}
+	// TODO: condition must know if it's args are named parameters or not
+	// if namedPlaceholder, ok := arg.(placeholder); ok {
+	// 	stmt.writeNamedPlaceholder(namedPlaceholder)
+	// 	return
+	// }
 	stmt.args = append(stmt.args, arg)
 	stmt.Builder.WriteString("$")
 	stmt.Builder.WriteString(strconv.Itoa(len(stmt.args)))
@@ -103,18 +105,20 @@ func (stmt *Statement) WriteArg(arg any) {
 // WriteString extends [strings.Builder.WriteString]
 // it replaces named args with the previously provided named args
 func (stmt *Statement) WriteString(s string) {
-	for name, placeholder := range stmt.namedArgs {
-		s = strings.ReplaceAll(s, name.string, placeholder)
-	}
+	// TODO: condition must know if it's args are named parameters or not
+	// for name, placeholder := range stmt.namedArgs {
+	// 	s = strings.ReplaceAll(s, name.string, placeholder)
+	// }
 	stmt.Builder.WriteString(s)
 }
 
 // Write extends [strings.Builder.Write]
 // it replaces named args with the previously provided named args
 func (stmt *Statement) Write(b []byte) {
-	for name, placeholder := range stmt.namedArgs {
-		bytes.ReplaceAll(b, []byte(name.string), []byte(placeholder))
-	}
+	// TODO: condition must know if it's args are named parameters or not
+	// for name, placeholder := range stmt.namedArgs {
+	// 	bytes.ReplaceAll(b, []byte(name.string), []byte(placeholder))
+	// }
 	stmt.Builder.Write(b)
 }
 
@@ -153,13 +157,14 @@ func (stmt *Statement) Debug() string {
 	return query
 }
 
-func (stmt *Statement) writeNamedPlaceholder(arg placeholder) {
-	placeholder, ok := stmt.namedArgs[arg]
-	if !ok {
-		logging.WithFields("named_placeholder", arg).Fatal("named placeholder not defined")
-	}
-	stmt.Builder.WriteString(placeholder)
-}
+// TODO: condition must know if it's args are named parameters or not
+// func (stmt *Statement) writeNamedPlaceholder(arg placeholder) {
+// 	placeholder, ok := stmt.namedArgs[arg]
+// 	if !ok {
+// 		logging.WithFields("named_placeholder", arg).Fatal("named placeholder not defined")
+// 	}
+// 	stmt.Builder.WriteString(placeholder)
+// }
 
 // copyCheck allows uninitialized usage of stmt
 func (stmt *Statement) copyCheck() {
@@ -170,7 +175,8 @@ func (stmt *Statement) copyCheck() {
 		// TODO: once issue 7921 is fixed, this should be reverted to
 		// just "stmt.addr = stmt".
 		stmt.addr = (*Statement)(noescape(unsafe.Pointer(stmt)))
-		stmt.namedArgs = make(map[placeholder]string)
+		// TODO: condition must know if it's args are named parameters or not
+		// stmt.namedArgs = make(map[placeholder]string)
 	} else if stmt.addr != stmt {
 		panic("statement: illegal use of non-zero Builder copied by value")
 	}

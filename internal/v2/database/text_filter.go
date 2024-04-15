@@ -19,8 +19,16 @@ func NewTextEqual[T text](t T) *TextCondition[T] {
 	return newTextFilter(textEqual, t)
 }
 
+func NewTextUnequal[T text](t T) *TextCondition[T] {
+	return newTextFilter(textUnequal, t)
+}
+
 func NewTextEqualInsensitive[T text](t T) *TextCondition[T] {
 	return newTextFilter(textEqualInsensitive, t)
+}
+
+func NewTextUnequalInsensitive[T text](t T) *TextCondition[T] {
+	return newTextFilter(textUnequalInsensitive, t)
 }
 
 func NewTextStartsWith[T text](t T) *TextCondition[T] {
@@ -73,13 +81,14 @@ func (f *TextCondition[T]) writeCaseInsensitive(stmt *Statement, columnName stri
 }
 
 func (f *TextCondition[T]) writeArg(stmt *Statement) {
-	var v any = f.value
+	// TODO: condition must know if it's args are named parameters or not
+	// var v any = f.value
 	// workaround for placeholder
-	if placeholder, ok := v.(placeholder); ok {
-		stmt.Builder.WriteString(" LOWER(")
-		stmt.WriteArg(placeholder)
-		stmt.Builder.WriteString(")")
-	}
+	// if placeholder, ok := v.(placeholder); ok {
+	// 	stmt.Builder.WriteString(" LOWER(")
+	// 	stmt.WriteArg(placeholder)
+	// 	stmt.Builder.WriteString(")")
+	// }
 	stmt.WriteArg(strings.ToLower(fmt.Sprint(f.value)))
 }
 
@@ -87,7 +96,9 @@ type textCompare uint8
 
 const (
 	textEqual textCompare = iota
+	textUnequal
 	textEqualInsensitive
+	textUnequalInsensitive
 	textStartsWith
 	textStartsWithInsensitive
 	textEndsWith
@@ -100,6 +111,8 @@ func (c textCompare) String() string {
 	switch c {
 	case textEqual, textEqualInsensitive:
 		return "="
+	case textUnequal, textUnequalInsensitive:
+		return "<>"
 	case textStartsWith, textStartsWithInsensitive, textEndsWith, textEndsWithInsensitive, textContains, textContainsInsensitive:
 		return "LIKE"
 	default:
@@ -116,5 +129,7 @@ func (c textCompare) isInsensitive() bool {
 }
 
 type text interface {
-	~string | placeholder
+	~string
+	// TODO: condition must know if it's args are named parameters or not
+	// ~string | placeholder
 }

@@ -27,5 +27,7 @@ type compare interface {
 }
 
 type value interface {
-	number | text | placeholder
+	number | text
+	// TODO: condition must know if it's args are named parameters or not
+	// number | text | placeholder
 }

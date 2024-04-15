@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+)
 
 func CloseTx(tx *sql.Tx, err error) error {
 	if err != nil {
@@ -46,4 +49,8 @@ func MapRowsToObject(rows *sql.Rows, mapper func(scan func(dest ...any) error) e
 		}
 	}
 	return nil
+}
+
+type Querier interface {
+	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
 }
