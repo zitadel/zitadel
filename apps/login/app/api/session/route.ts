@@ -1,9 +1,4 @@
-import {
-  server,
-  deleteSession,
-  getUserById,
-  listHumanAuthFactors,
-} from "#/lib/zitadel";
+import { server, deleteSession, listHumanAuthFactors } from "#/lib/zitadel";
 import {
   SessionCookie,
   getMostRecentSessionCookie,
