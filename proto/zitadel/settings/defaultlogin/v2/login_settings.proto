@@ -9,49 +9,41 @@ import "zitadel/settings/v2beta/settings.proto";
 import "google/protobuf/duration.proto";
 
 message LoginSettings {
-  // DEPRECATED: use custom settings instead
   bool allow_username_password = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if a user is allowed to log in with username and password";
     }
   ];
-  // DEPRECATED: use custom settings instead
   bool allow_register = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if a person is allowed to register a user on this organization";
     }
   ];
-  // DEPRECATED: use custom settings instead
   bool allow_external_idp = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if a user is allowed to add a defined identity provider. E.g. Google auth";
     }
   ];
-  // DEPRECATED: use custom settings instead
   bool force_mfa = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if a user MUST use a multi-factor to log in";
     }
   ];
-  // DEPRECATED: use custom settings instead
   PasskeysType passkeys_type = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if passkeys are allowed for users"
     }
   ];
-  // DEPRECATED: use custom settings instead
   bool hide_password_reset = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if password reset link should be shown in the login screen"
     }
   ];
-  // DEPRECATED: use custom settings instead
   bool ignore_unknown_usernames = 7 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if unknown username on login screen directly returns an error or always displays the password screen"
     }
   ];
-  // TODO: do we need this?
   string default_redirect_uri = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)";
@@ -88,36 +80,28 @@ message LoginSettings {
       example: "\"43200s\"";
     }
   ];
-  // DEPRECATED: use authenticators instead
   repeated SecondFactorType second_factors = 14;
-  // DEPRECATED: use authenticators instead
   repeated MultiFactorType multi_factors = 15;
-  // TODO: we still need this, right?
-  // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success.
   bool allow_domain_discovery = 16 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success."
     }
   ];
-  // TODO: we still need this, right?
   bool disable_login_with_email = 17 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if the user can additionally (to the login name) be identified by their verified email address"
     }
   ];
-  // TODO: we still need this, right?
   bool disable_login_with_phone = 18 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
     }
   ];
-  // resource_owner_type returns if the settings is managed on the organization or on the instance
   ResourceOwnerType resource_owner_type = 19 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "resource_owner_type returns if the settings is managed on the organization or on the instance";
     }
   ];
-  // TODO: do we need this?
   bool force_mfa_local_only = 22 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."

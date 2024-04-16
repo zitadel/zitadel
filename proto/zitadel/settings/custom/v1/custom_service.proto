@@ -11,7 +11,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Custom Settings Service";
     version: "1.0";
-    description: "This API is intended to manage custom settings for ZITADEL. It can be enabled using the feature flag \"multitenancy_settings\". Custom settings are inherited through the context hierarchy system -> instance -> org. They can be used for multi tenancy use cases that ZITADEL does not cover out of the box. Custom settings are especially useful together with the session API or with actions.";
+    description: "This API is intended to manage custom settings for ZITADEL. It can be enabled using the feature flag \"multitenancy_settings\". Like all settings, custom settings are inherited through the context hierarchy system -> instance -> org. They can be used for multi tenancy use cases that ZITADEL does not cover out of the box. Custom settings are especially useful together with the session API or with actions.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"

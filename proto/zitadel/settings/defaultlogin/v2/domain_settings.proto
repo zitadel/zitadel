@@ -19,12 +19,14 @@ message DomainSettings {
     }
   ];
 
-  // DEPRECATED: use whatever smtp sender you want
+  // We just remove this
+  /*
   bool smtp_sender_address_matches_instance_domain = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if the SMTP sender address domain should match an existing domain on the instance"
     }
   ];
+   */
   // resource_owner_type returns if the setting is managed on the organization or on the instance
   ResourceOwnerType resource_owner_type = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

@@ -6,30 +6,35 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta;setting
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/settings/v2beta/settings.proto";
+import "validate/validate.proto";
 
-message DomainSettings {
-  bool login_name_includes_domain = 1 [
+message LegalAndSupportSettings {
+  string tos_link = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "the username has to end with the domain of its organization"
+      example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
     }
   ];
-  bool require_org_domain_verification = 2 [
+  string privacy_policy_link = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines if organization domains should be verified upon creation, otherwise will be created already verified"
+      example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
     }
   ];
-
-  // DEPRECATED: use whatever smtp sender you want
-  bool smtp_sender_address_matches_instance_domain = 3 [
+  string help_link = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines if the SMTP sender address domain should match an existing domain on the instance"
+      example: "\"https://zitadel.com/docs/manuals/introduction\"";
+    }
+  ];
+  string support_email = 4 [
+    (validate.rules).string = {ignore_empty: true, max_len: 320, email: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"support-email@test.com\"";
+      description: "help / support email address."
     }
   ];
   // resource_owner_type returns if the setting is managed on the organization or on the instance
-  ResourceOwnerType resource_owner_type = 6 [
+  ResourceOwnerType resource_owner_type = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "resource_owner_type returns if the setting is managed on the organization or on the instance";
     }
   ];
 }
-
