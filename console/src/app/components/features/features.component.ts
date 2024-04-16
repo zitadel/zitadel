@@ -23,6 +23,14 @@ import {
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { FeatureService } from 'src/app/services/feature.service';
 import { ToastService } from 'src/app/services/toast.service';
+import {InstanceContext, RequestContext} from "../../proto/generated/zitadel/object/v2/object_pb";
+import {
+  GetFeaturesRequest,
+  SetFeature,
+  SetFeaturesRequest
+} from "../../proto/generated/zitadel/settings/feature/v2/feature_pb";
+import {GrpcService} from "../../services/grpc.service";
+import {SetCustomSettingsRequest} from "../../proto/generated/zitadel/settings/custom/v1/custom_pb";
 
 enum ToggleState {
   ENABLED = 'ENABLED',
@@ -75,6 +83,7 @@ export class FeaturesComponent implements OnDestroy {
     private breadcrumbService: BreadcrumbService,
     private toast: ToastService,
     private dialog: MatDialog,
+    private grpcService: GrpcService,
   ) {
     const breadcrumbs = [
       new Breadcrumb({
@@ -149,8 +158,35 @@ export class FeaturesComponent implements OnDestroy {
     });
   }
 
-  private getFeatures(inheritance: boolean) {
+  private async getFeatures(inheritance: boolean) {
+
     this.featureService.getInstanceFeatures(inheritance).then((instanceFeaturesResponse) => {
+
+      // Check if settings v2 api is enabled
+      if (false) {
+        const ctx = new RequestContext().setInstance(
+          new InstanceContext().setInstanceDomain('test')
+        );
+        this.grpcService.featurev2.get(new GetFeaturesRequest().setContext(ctx)).then((response) => {
+/*
+            this.featureData.actions?.enabled = response.getActions()?.getEnabled() || false;
+            this.featureData.actions?.source = response.getActions()?.getResourceOwnerType().toString();
+ */
+        })
+        this.grpcService.featurev2.set(new SetFeaturesRequest().setContext(ctx).setActions(new SetFeature().setInherited(true))).then(console.log)
+        this.grpcService.customSettings.get(new GetFeaturesRequest().setContext(ctx)).then((response) => {
+          response.getSettingsMap().forEach((value, key) => {
+            console.log(key, value.getValue(), value.getResourceOwnerType());
+          })
+        })
+        const req = new SetCustomSettingsRequest().setContext(ctx)
+        const map = req.getSettingsMap()
+        map.set("external IDP allowed", "true")
+        map.set("external IDPs allowed", "[google]")
+        map.del("inherit this key")
+        this.grpcService.customSettings.set(req).then(console.log)
+      }
+
       this.featureData = instanceFeaturesResponse.toObject();
       console.log(this.featureData);
 

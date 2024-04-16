@@ -1,13 +1,11 @@
 syntax = "proto3";
 
 package zitadel.settings.custom.v1;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/custom/v1;custom";
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-
 import "zitadel/settings/custom/v1/custom.proto";
-
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/custom/v1;custom";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {

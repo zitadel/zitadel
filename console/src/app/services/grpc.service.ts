@@ -18,6 +18,8 @@ import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { OrgInterceptor } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
 import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2beta/Feature_serviceServiceClientPb';
+import { FeatureServiceClient as FeatureServiceClientV2 } from '../proto/generated/zitadel/settings/feature/v2/Feature_serviceServiceClientPb';
+import {CustomSettingsServiceClient} from "../proto/generated/zitadel/settings/custom/v1/Custom_serviceServiceClientPb";
 
 @Injectable({
   providedIn: 'root',
@@ -27,6 +29,8 @@ export class GrpcService {
   public mgmt!: ManagementServiceClient;
   public admin!: AdminServiceClient;
   public feature!: FeatureServiceClient;
+  public featurev2!: FeatureServiceClientV2;
+  public customSettings!: CustomSettingsServiceClient;
 
   constructor(
     private envService: EnvironmentService,
@@ -79,6 +83,18 @@ export class GrpcService {
             interceptors,
           );
           this.feature = new FeatureServiceClient(
+            env.api,
+            null,
+            // @ts-ignore
+            interceptors,
+          );
+          this.featurev2 = new FeatureServiceClientV2(
+            env.api,
+            null,
+            // @ts-ignore
+            interceptors,
+          );
+          this.customSettings = new CustomSettingsServiceClient(
             env.api,
             null,
             // @ts-ignore
