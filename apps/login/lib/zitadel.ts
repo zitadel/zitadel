@@ -190,10 +190,8 @@ export async function setSession(
   server: ZitadelServer,
   sessionId: string,
   sessionToken: string,
-  password: string | undefined,
-  totpCode: string | undefined,
-  webAuthN: { credentialAssertionData: any } | undefined,
-  challenges: RequestChallenges | undefined
+  challenges: RequestChallenges | undefined,
+  checks: Checks
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
 
@@ -205,16 +203,8 @@ export async function setSession(
     metadata: {},
   };
 
-  if (password && payload.checks) {
-    payload.checks.password = { password };
-  }
-
-  if (totpCode && payload.checks) {
-    payload.checks.totp = { code: totpCode };
-  }
-
-  if (webAuthN && payload.checks) {
-    payload.checks.webAuthN = webAuthN;
+  if (checks && payload.checks) {
+    payload.checks = checks;
   }
 
   return sessionService.setSession(payload, {});

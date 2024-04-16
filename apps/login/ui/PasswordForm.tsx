@@ -69,7 +69,27 @@ export default function PasswordForm({
 
   function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
     return submitPassword(value).then((resp: any) => {
-      if (
+      // if user has mfa -> /totp
+      // if mfa is forced -> /mfa/set
+      // if no passwordless -> /passkey/add
+      if (resp.authFactors?.length >= 1) {
+        const params = new URLSearchParams(
+          authRequestId
+            ? {
+                loginName: resp.factors.user.loginName,
+                authRequestId,
+              }
+            : {
+                loginName: resp.factors.user.loginName,
+              }
+        );
+
+        if (organization) {
+          params.append("organization", organization);
+        }
+
+        return router.push(`/mfa/set?` + params);
+      } else if (
         resp.factors &&
         !resp.factors.passwordless && // if session was not verified with a passkey
         promptPasswordless && // if explicitly prompted due policy
@@ -85,67 +105,35 @@ export default function PasswordForm({
         }
 
         return router.push(`/passkey/add?` + params);
+      } else if (authRequestId && resp && resp.sessionId) {
+        const params = new URLSearchParams({
+          sessionId: resp.sessionId,
+          authRequest: authRequestId,
+        });
+
+        if (organization) {
+          params.append("organization", organization);
+        }
+
+        return router.push(`/login?` + params);
       } else {
-        let continueWithMfa = undefined;
-        if (
-          loginSettings?.forceMfa &&
-          resp.authFactors?.length >= 1 // TODO if forceMFA is set and no user methods prompt to add method (/mfa/add)
-        ) {
-          if (loginSettings.secondFactors?.length === 1) {
-            continueWithMfa = loginSettings.secondFactors[0];
-          } else {
-            // continueWithMfa = loginSettings.secondFactors[0];
-            // render selection page for mfa (/mfa/select)
-          }
-        } else if (loginSettings?.forceMfa && resp.authFactors?.length === 0) {
-          const params = new URLSearchParams(
-            authRequestId
-              ? {
-                  loginName: resp.factors.user.loginName,
-                  authRequestId,
-                }
-              : {
-                  loginName: resp.factors.user.loginName,
-                }
-          );
+        // without OIDC flow
+        const params = new URLSearchParams(
+          authRequestId
+            ? {
+                loginName: resp.factors.user.loginName,
+                authRequestId,
+              }
+            : {
+                loginName: resp.factors.user.loginName,
+              }
+        );
 
-          if (organization) {
-            params.append("organization", organization);
-          }
-
-          return router.push(`/mfa/set?` + params);
+        if (organization) {
+          params.append("organization", organization);
         }
-        // OIDC flows
-        if (authRequestId && resp && resp.sessionId) {
-          const params = new URLSearchParams({
-            sessionId: resp.sessionId,
-            authRequest: authRequestId,
-          });
 
-          if (organization) {
-            params.append("organization", organization);
-          }
-
-          return router.push(`/login?` + params);
-        } else {
-          // without OIDC flow
-          const params = new URLSearchParams(
-            authRequestId
-              ? {
-                  loginName: resp.factors.user.loginName,
-                  authRequestId,
-                }
-              : {
-                  loginName: resp.factors.user.loginName,
-                }
-          );
-
-          if (organization) {
-            params.append("organization", organization);
-          }
-
-          return router.push(`/signedin?` + params);
-        }
+        return router.push(`/signedin?` + params);
       }
     });
   }

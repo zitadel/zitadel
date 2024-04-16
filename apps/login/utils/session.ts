@@ -12,7 +12,12 @@ import {
   addSessionToCookie,
   updateSessionCookie,
 } from "./cookies";
-import { Session, Challenges, RequestChallenges } from "@zitadel/server";
+import {
+  Session,
+  Challenges,
+  RequestChallenges,
+  Checks,
+} from "@zitadel/server";
 
 export async function createSessionAndUpdateCookie(
   loginName: string,
@@ -189,14 +194,24 @@ export async function setSessionAndUpdateCookie(
   totpCode: string | undefined,
   authRequestId: string | undefined
 ): Promise<SessionWithChallenges> {
+  const checks: Checks = {};
+
+  if (password) {
+    checks.password = { password };
+  }
+  if (webAuthN) {
+    checks.webAuthN = webAuthN;
+  }
+  if (totpCode) {
+    checks.totp = { code: totpCode };
+  }
+
   return setSession(
     server,
     recentCookie.id,
     recentCookie.token,
-    password,
-    totpCode,
-    webAuthN,
-    challenges
+    challenges,
+    checks
   ).then((updatedSession) => {
     if (updatedSession) {
       const sessionCookie: SessionCookie = {
