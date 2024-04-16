@@ -1,6 +1,7 @@
 package object
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 
@@ -75,6 +76,21 @@ func UserMetadataListFromSlice(c *actions.FieldConfig, metadata []query.UserMeta
 	}
 
 	return c.Runtime.ToValue(result)
+}
+
+func GetOrganizationMetadata(ctx context.Context, queries *query.Queries, c *actions.FieldConfig, organizationID string) goja.Value {
+	metadata, err := queries.SearchOrgMetadata(
+		ctx,
+		true,
+		organizationID,
+		&query.OrgMetadataSearchQueries{},
+		false,
+	)
+	if err != nil {
+		logging.WithError(err).Info("unable to get org metadata in action")
+		panic(err)
+	}
+	return OrgMetadataListFromQuery(c, metadata)
 }
 
 func metadataByteArrayToValue(val []byte, runtime *goja.Runtime) goja.Value {

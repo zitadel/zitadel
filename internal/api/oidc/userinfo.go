@@ -252,24 +252,13 @@ func (s *Server) userinfoFlows(ctx context.Context, qu *query.OIDCUserInfo, user
 					}
 				}),
 				actions.SetFields("grants", func(c *actions.FieldConfig) interface{} {
-					return object.UserGrantsFromSlice(c, qu.UserGrants)
+					return object.UserGrantsFromSlice(ctx, s.query, c, qu.UserGrants)
 				}),
 			),
 			actions.SetFields("org",
 				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
 					return func(goja.FunctionCall) goja.Value {
-						metadata, err := s.query.SearchOrgMetadata(
-							ctx,
-							true,
-							qu.User.ResourceOwner,
-							&query.OrgMetadataSearchQueries{},
-							false,
-						)
-						if err != nil {
-							logging.WithError(err).Info("unable to get org metadata in action")
-							panic(err)
-						}
-						return object.OrgMetadataListFromQuery(c, metadata)
+						return object.GetOrganizationMetadata(ctx, s.query, c, qu.User.ResourceOwner)
 					}
 				}),
 			),
