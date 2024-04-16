@@ -88,10 +88,6 @@ func (er *eventsReducer) convertEvents(ctx context.Context, events []eventstore.
 }
 
 func (er *eventsReducer) convertEvent(ctx context.Context, event eventstore.Event) *Event {
-	ctx, span := tracing.NewSpan(ctx)
-	var err error
-	defer func() { span.EndWithError(err) }()
-
 	editor, ok := er.editors[event.Creator()]
 	if !ok {
 		editor = er.q.editorUserByID(ctx, event.Creator())
