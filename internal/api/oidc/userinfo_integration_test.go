@@ -15,6 +15,7 @@ import (
 	"golang.org/x/oauth2"
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
@@ -66,20 +67,13 @@ func TestServer_UserInfo(t *testing.T) {
 // testServer_UserInfo is the actual userinfo integration test,
 // which calls the userinfo endpoint with different client configurations, roles and token scopes.
 func testServer_UserInfo(t *testing.T) {
-	const role = "testUserRole"
+	const (
+		roleFoo = "foo"
+		roleBar = "bar"
+	)
+
 	clientID, projectID := createClient(t)
-	_, err := Tester.Client.Mgmt.AddProjectRole(CTX, &management.AddProjectRoleRequest{
-		ProjectId:   projectID,
-		RoleKey:     role,
-		DisplayName: "test",
-	})
-	require.NoError(t, err)
-	_, err = Tester.Client.Mgmt.AddUserGrant(CTX, &management.AddUserGrantRequest{
-		UserId:    User.GetUserId(),
-		ProjectId: projectID,
-		RoleKeys:  []string{role},
-	})
-	require.NoError(t, err)
+	addProjectRolesGrants(t, User.GetUserId(), projectID, roleFoo, roleBar)
 
 	tests := []struct {
 		name       string
@@ -149,18 +143,34 @@ func testServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, role)
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, roleFoo, roleBar)
 				},
 			},
 		},
 		{
-			name:    "projects roles scope",
+			name:    "project role scope",
 			prepare: getTokens,
-			scope:   []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess, oidc_api.ScopeProjectRolePrefix + role},
+			scope: []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
+				oidc_api.ScopeProjectRolePrefix + roleFoo,
+			},
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, role)
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, roleFoo)
+				},
+			},
+		},
+		{
+			name:    "project role and audience scope",
+			prepare: getTokens,
+			scope: []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
+				oidc_api.ScopeProjectRolePrefix + roleFoo,
+				domain.ProjectIDScope + projectID + domain.AudSuffix,
+			},
+			assertions: []func(*testing.T, *oidc.UserInfo){
+				assertUserinfo,
+				func(t *testing.T, ui *oidc.UserInfo) {
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, roleFoo)
 				},
 			},
 		},
@@ -211,6 +221,57 @@ func testServer_UserInfo(t *testing.T) {
 	}
 }
 
+// https://github.com/zitadel/zitadel/issues/6662
+func TestServer_UserInfo_Issue6662(t *testing.T) {
+	const (
+		roleFoo = "foo"
+		roleBar = "bar"
+	)
+
+	project, err := Tester.CreateProject(CTX)
+	projectID := project.GetId()
+	require.NoError(t, err)
+	userID, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
+	require.NoError(t, err)
+	addProjectRolesGrants(t, userID, projectID, roleFoo, roleBar)
+
+	scope := []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
+		oidc_api.ScopeProjectRolePrefix + roleFoo,
+		domain.ProjectIDScope + projectID + domain.AudSuffix,
+	}
+
+	provider, err := rp.NewRelyingPartyOIDC(CTX, Tester.OIDCIssuer(), clientID, clientSecret, redirectURI, scope)
+	require.NoError(t, err)
+	tokens, err := rp.ClientCredentials(CTX, provider, nil)
+	require.NoError(t, err)
+
+	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, userID, provider)
+	require.NoError(t, err)
+	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, roleFoo)
+}
+
+func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...string) {
+	t.Helper()
+	bulkRoles := make([]*management.BulkAddProjectRolesRequest_Role, len(roles))
+	for i, role := range roles {
+		bulkRoles[i] = &management.BulkAddProjectRolesRequest_Role{
+			Key:         role,
+			DisplayName: role,
+		}
+	}
+	_, err := Tester.Client.Mgmt.BulkAddProjectRoles(CTX, &management.BulkAddProjectRolesRequest{
+		ProjectId: projectID,
+		Roles:     bulkRoles,
+	})
+	require.NoError(t, err)
+	_, err = Tester.Client.Mgmt.AddUserGrant(CTX, &management.AddUserGrantRequest{
+		UserId:    userID,
+		ProjectId: projectID,
+		RoleKeys:  roles,
+	})
+	require.NoError(t, err)
+}
+
 func getTokens(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
 	authRequestID := createAuthRequest(t, clientID, redirectURI, scope...)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
@@ -255,10 +316,13 @@ func assertNoReservedScopes(t *testing.T, claims map[string]any) {
 	}
 }
 
-func assertProjectRoleClaims(t *testing.T, projectID string, claims map[string]any, roles ...string) {
+func assertProjectRoleClaims(t *testing.T, projectID string, claims map[string]any, claimProjectRole bool, roles ...string) {
 	t.Helper()
-	projectIDRoleClaim := fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, projectID)
-	for _, claim := range []string{oidc_api.ClaimProjectRoles, projectIDRoleClaim} {
+	projectRoleClaims := []string{fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, projectID)}
+	if claimProjectRole {
+		projectRoleClaims = append(projectRoleClaims, oidc_api.ClaimProjectRoles)
+	}
+	for _, claim := range projectRoleClaims {
 		roleMap, ok := claims[claim].(map[string]any)
 		require.Truef(t, ok, "claim %s not found or wrong type %T", claim, claims[claim])
 		for _, roleKey := range roles {

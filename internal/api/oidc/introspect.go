@@ -99,7 +99,7 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	if err = validateIntrospectionAudience(token.audience, client.clientID, client.projectID); err != nil {
 		return nil, err
 	}
-	userInfo, err := s.userInfo(ctx, token.userID, client.projectID, client.projectRoleAssertion, token.scope, []string{client.projectID})
+	userInfo, err := s.userInfo(ctx, token.userID, token.scope, client.projectID, client.projectRoleAssertion, true)
 	if err != nil {
 		return nil, err
 	}
