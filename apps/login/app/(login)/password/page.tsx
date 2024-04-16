@@ -1,4 +1,9 @@
-import { getBrandingSettings, getSession, server } from "#/lib/zitadel";
+import {
+  getBrandingSettings,
+  getLoginSettings,
+  getSession,
+  server,
+} from "#/lib/zitadel";
 import Alert from "#/ui/Alert";
 import DynamicTheme from "#/ui/DynamicTheme";
 import PasswordForm from "#/ui/PasswordForm";
@@ -28,6 +33,7 @@ export default async function Page({
   }
 
   const branding = await getBrandingSettings(server, organization);
+  const loginSettings = await getLoginSettings(server, organization);
 
   return (
     <DynamicTheme branding={branding}>
@@ -56,6 +62,7 @@ export default async function Page({
           loginName={loginName}
           authRequestId={authRequestId}
           organization={organization}
+          loginSettings={loginSettings}
           promptPasswordless={promptPasswordless === "true"}
           isAlternative={alt === "true"}
         />
