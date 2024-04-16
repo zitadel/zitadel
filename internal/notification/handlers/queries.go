@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -21,7 +22,7 @@ type Queries interface {
 	SearchMilestones(ctx context.Context, instanceIDs []string, queries *query.MilestonesSearchQueries) (*query.Milestones, error)
 	NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (*query.DebugNotificationProvider, error)
 	SMSProviderConfig(ctx context.Context, queries ...query.SearchQuery) (*query.SMSConfig, error)
-	SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (*query.SMTPConfig, error)
+	SMTPConfigActive(ctx context.Context, resourceOwner string) (*query.SMTPConfig, error)
 	GetDefaultLanguage(ctx context.Context) language.Tag
 	GetInstanceRestrictions(ctx context.Context) (restrictions query.Restrictions, err error)
 }

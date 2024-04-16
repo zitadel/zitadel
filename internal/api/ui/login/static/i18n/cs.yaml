@@ -325,6 +325,12 @@ LogoutDone:
   Description: Byli jste úspěšně odhlášeni.
   LoginButtonText: Přihlásit se
 
+LinkingUserPrompt:
+  Title: Nalezen stávající uživatel
+  Description: "Chcete propojit svůj stávající účet:"
+  LinkButtonText: Odkaz
+  OtherButtonText: Jiné možnosti
+
 LinkingUsersDone:
   Title: Propojení uživatele
   Description: Uživatel propojen.

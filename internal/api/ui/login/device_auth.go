@@ -76,7 +76,7 @@ func (l *Login) renderDeviceAuthDone(w http.ResponseWriter, r *http.Request, aut
 	}
 }
 
-// handleDeviceUserCode serves the Device Authorization user code submission form.
+// handleDeviceAuthUserCode serves the Device Authorization user code submission form.
 // The "user_code" may be submitted by URL (GET) or form (POST).
 // When a "user_code" is received and found through query,
 // handleDeviceAuthUserCode will create a new AuthRequest in the repository.

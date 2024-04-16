@@ -15,6 +15,7 @@ import {
   InitPasswordDoneScreenText,
   InitPasswordScreenText,
   LinkingUserDoneScreenText,
+  LinkingUserPromptScreenText,
   LoginScreenText,
   LogoutDoneScreenText,
   MFAProvidersText,
@@ -374,6 +375,13 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
   r34.setTosLinkText(map.externalRegistrationUserOverviewText?.tosLinkText ?? '');
   r34.setUsernameLabel(map.externalRegistrationUserOverviewText?.usernameLabel ?? '');
   req.setExternalRegistrationUserOverviewText(r34);
+
+  const r35 = new LinkingUserPromptScreenText();
+  r35.setTitle(map.linkingUserPromptText?.title ?? '');
+  r35.setDescription(map.linkingUserPromptText?.description ?? '');
+  r35.setLinkButtonText(map.linkingUserPromptText?.linkButtonText ?? '');
+  r35.setOtherButtonText(map.linkingUserPromptText?.otherButtonText ?? '');
+  req.setLinkingUserPromptText(r35);
 
   return req;
 }

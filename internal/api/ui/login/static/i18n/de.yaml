@@ -324,6 +324,12 @@ LogoutDone:
   Description: Du wurdest erfolgreich abgemeldet.
   LoginButtonText: Anmelden
 
+LinkingUserPrompt:
+  Title: Vorhandener Benutzer gefunden
+  Description: "Möchten Sie Ihr bestehendes Konto verknüpfen:"
+  LinkButtonText: Verknüpfen
+  OtherButtonText: Andere Optionen
+
 LinkingUsersDone:
   Title: Benutzerkonto verknpüfen
   Description: Benuzterkonto verknpüft.
