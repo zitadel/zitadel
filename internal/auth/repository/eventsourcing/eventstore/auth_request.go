@@ -200,6 +200,7 @@ func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string)
 	if err != nil {
 		return nil, err
 	}
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	steps, err := repo.nextSteps(ctx, request, true)
 	if err != nil {
 		return nil, err
@@ -625,6 +626,7 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	if err != nil {
 		return nil, err
 	}
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return request, nil
 }
 
@@ -656,39 +658,51 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		}
 	}
 
-	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
-	if err != nil {
-		return err
+	if request.LoginPolicy == nil || len(request.AllowedExternalIDPs) == 0 {
+		loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
+		if idpProviders != nil {
+			request.AllowedExternalIDPs = idpProviders
+		}
 	}
-	request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
-	if idpProviders != nil {
-		request.AllowedExternalIDPs = idpProviders
+	if request.LockoutPolicy == nil {
+		lockoutPolicy, err := repo.getLockoutPolicy(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.LockoutPolicy = lockoutPolicyToDomain(lockoutPolicy)
 	}
-	lockoutPolicy, err := repo.getLockoutPolicy(ctx, orgID)
-	if err != nil {
-		return err
+	if request.PrivacyPolicy == nil {
+		privacyPolicy, err := repo.GetPrivacyPolicy(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.PrivacyPolicy = privacyPolicy
 	}
-	request.LockoutPolicy = lockoutPolicyToDomain(lockoutPolicy)
-	privacyPolicy, err := repo.GetPrivacyPolicy(ctx, orgID)
-	if err != nil {
-		return err
+	if request.LabelPolicy == nil {
+		labelPolicy, err := repo.getLabelPolicy(ctx, request.PrivateLabelingOrgID(orgID))
+		if err != nil {
+			return err
+		}
+		request.LabelPolicy = labelPolicy
 	}
-	request.PrivacyPolicy = privacyPolicy
-	labelPolicy, err := repo.getLabelPolicy(ctx, request.PrivateLabelingOrgID(orgID))
-	if err != nil {
-		return err
+	if len(request.DefaultTranslations) == 0 {
+		defaultLoginTranslations, err := repo.getLoginTexts(ctx, instance.InstanceID())
+		if err != nil {
+			return err
+		}
+		request.DefaultTranslations = defaultLoginTranslations
 	}
-	request.LabelPolicy = labelPolicy
-	defaultLoginTranslations, err := repo.getLoginTexts(ctx, instance.InstanceID())
-	if err != nil {
-		return err
+	if len(request.OrgTranslations) == 0 {
+		orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.OrgTranslations = orgLoginTranslations
 	}
-	request.DefaultTranslations = defaultLoginTranslations
-	orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
-	if err != nil {
-		return err
-	}
-	request.OrgTranslations = orgLoginTranslations
 	return nil
 }
 
@@ -799,6 +813,7 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 	if err = repo.fillPolicies(ctx, request); err != nil {
 		return false, err
 	}
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	request.LoginHint = loginName
 	request.Prompt = append(request.Prompt, domain.PromptCreate) // to trigger registration
 	return true, nil
@@ -1125,6 +1140,7 @@ func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.
 		if err = repo.fillPolicies(ctx, request); err != nil {
 			return nil, err
 		}
+		repo.AuthRequests.CacheAuthRequest(ctx, request)
 		if err = repo.AuthRequests.UpdateAuthRequest(ctx, request); err != nil {
 			return nil, err
 		}
