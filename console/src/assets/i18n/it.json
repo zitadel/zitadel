@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Link Esterni",
-        "DESCRIPTION": "Guida i tuoi utenti verso risorse esterne personalizzate mostrate nella pagina di login. Gli utenti devono accettare i Termini di Servizio e la Politica sulla Privacy prima che possano iscriversi."
+        "DESCRIPTION": "Guida i tuoi utenti alle risorse esterne personalizzate mostrate nella pagina di accesso. Gli utenti devono accettare i Termini di servizio e l'Informativa sulla privacy prima di potersi registrare. Cambia il collegamento alla tua documentazione o imposta una stringa vuota per nascondere il pulsante della documentazione dalla console. Aggiungi un collegamento esterno personalizzato e un testo personalizzato per quel collegamento nella console oppure impostali vuoti per nascondere quel pulsante."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Impostazioni SMTP",
@@ -1569,6 +1569,9 @@
       "POLICYLINK": "Link all'informativa sulla privacy",
       "HELPLINK": "link per l'aiuto",
       "SUPPORTEMAIL": "e-mail di supporto",
+      "DOCSLINK": "Collegamento a Documenti (Console)",
+      "CUSTOMLINK": "Collegamento personalizzato (Console)",
+      "CUSTOMLINKTEXT": "Testo del collegamento personalizzato (Console)",
       "SAVED": "Salvato con successo!",
       "RESET_TITLE": "Ripristina i valori predefiniti",
       "RESET_DESCRIPTION": "Stai per ripristinare i link predefiniti per i TOS e l'informativa sulla privacy. Vuoi davvero continuare?"

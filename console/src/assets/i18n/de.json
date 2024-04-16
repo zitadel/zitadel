@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externe Links",
-        "DESCRIPTION": "Leite deine Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Allgemeinen Geschäftsbedingungen und die Datenschutzrichtlinie akzeptieren, bevor sie sich anmelden können."
+        "DESCRIPTION": "Leiten Sie Ihre Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Nutzungsbedingungen und Datenschutzrichtlinien akzeptieren, bevor sie sich anmelden können. Ändern Sie den Link zu Ihrer Dokumentation oder legen Sie eine leere Zeichenfolge fest, um die Dokumentationsschaltfläche in der Konsole auszublenden. Fügen Sie in der Konsole einen benutzerdefinierten externen Link und einen benutzerdefinierten Text für diesen Link hinzu oder setzen Sie sie leer, um diese Schaltfläche auszublenden."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP-Einstellungen",
@@ -1569,6 +1569,9 @@
       "POLICYLINK": "Link zur den Datenschutzrichtlinien",
       "HELPLINK": "Link zur Hilfestellung",
       "SUPPORTEMAIL": "Support E-Mail",
+      "DOCSLINK": "Link zu Dokumenten (Console)",
+      "CUSTOMLINK": "Benutzerdefinierter Link (Console)",
+      "CUSTOMLINKTEXT": "Benutzerdefinierter Linktext (Console)",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Standardwerte wiederherstellen",
       "RESET_DESCRIPTION": "Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"

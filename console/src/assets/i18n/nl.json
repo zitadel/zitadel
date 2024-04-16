@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externe links",
-        "DESCRIPTION": "Leid je gebruikers naar aangepaste externe bronnen die worden getoond op de inlogpagina. Gebruikers moeten de Algemene Voorwaarden en het Privacybeleid accepteren voordat ze zich kunnen aanmelden."
+        "DESCRIPTION": "Leid uw gebruikers naar aangepaste externe bronnen die op de inlogpagina worden weergegeven. Gebruikers moeten de Servicevoorwaarden en het Privacybeleid accepteren voordat ze zich kunnen aanmelden. Wijzig de link naar uw documentatie of stel een lege string in om de documentatieknop voor de console te verbergen. Voeg een aangepaste externe link en een aangepaste tekst voor die link toe in de console, of stel ze leeg om die knop te verbergen."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP-instellingen",
@@ -1570,6 +1570,9 @@
       "POLICYLINK": "Link naar Privacybeleid",
       "HELPLINK": "Link naar Help",
       "SUPPORTEMAIL": "Ondersteuning Email",
+      "DOCSLINK": "Documentenlink (Console)",
+      "CUSTOMLINK": "Aangepaste link (Console)",
+      "CUSTOMLINKTEXT": "Aangepaste linktekst (Console)",
       "SAVED": "Succesvol opgeslagen!",
       "RESET_TITLE": "Herstel Standaard Waarden",
       "RESET_DESCRIPTION": "U staat op het punt de standaard Links voor TOS en Privacybeleid te herstellen. Weet u zeker dat u wilt doorgaan?"

@@ -12,9 +12,9 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacyLink, helpLink string, supportEmail domain.EmailAddress) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, tosLink, privacyLink, helpLink string, supportEmail domain.EmailAddress, docsLink, customLink, customLinkText string) (*domain.ObjectDetails, error) {
 	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPrivacyPolicy(instanceAgg, tosLink, privacyLink, helpLink, supportEmail))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddDefaultPrivacyPolicy(instanceAgg, tosLink, privacyLink, helpLink, supportEmail, docsLink, customLink, customLinkText))
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domai
 	}
 
 	instanceAgg := InstanceAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink, policy.SupportEmail)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, instanceAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink, policy.SupportEmail, policy.DocsLink, policy.CustomLink, policy.CustomLinkText)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-9jJfs", "Errors.IAM.PrivacyPolicy.NotChanged")
 	}
@@ -89,6 +89,7 @@ func prepareAddDefaultPrivacyPolicy(
 	privacyLink,
 	helpLink string,
 	supportEmail domain.EmailAddress,
+	docsLink, customLink, customLinkText string,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if supportEmail != "" {
@@ -111,7 +112,7 @@ func prepareAddDefaultPrivacyPolicy(
 				return nil, zerrors.ThrowAlreadyExists(nil, "INSTANCE-M00rJ", "Errors.Instance.PrivacyPolicy.AlreadyExists")
 			}
 			return []eventstore.Command{
-				instance.NewPrivacyPolicyAddedEvent(ctx, &a.Aggregate, tosLink, privacyLink, helpLink, supportEmail),
+				instance.NewPrivacyPolicyAddedEvent(ctx, &a.Aggregate, tosLink, privacyLink, helpLink, supportEmail, docsLink, customLink, customLinkText),
 			}, nil
 		}, nil
 	}

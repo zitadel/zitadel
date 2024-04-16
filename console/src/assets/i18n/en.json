@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "External Links",
-        "DESCRIPTION": "Guide your users to custom external resources shown on the login page. Users need to accept the Terms of Service and Privacy Policy before they can sign up."
+        "DESCRIPTION": "Guide your users to custom external resources shown on the login page. Users need to accept the Terms of Service and Privacy Policy before they can sign up. Change the link to your documentation or set an empty string to hide the documentation button from the console. Add a custom external link and a custom text for that link in the console, or set them empty to hide that button."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP Settings",
@@ -1334,7 +1334,7 @@
       "DOMAIN": "Domain settings",
       "LOGINTEXTS": "Login Interface Texts",
       "BRANDING": "Branding",
-      "PRIVACYPOLICY": "Privacy Policy",
+      "PRIVACYPOLICY": "External links",
       "OIDC": "OIDC Token lifetime and expiration",
       "SECRETS": "Secret Generator",
       "SECURITY": "Security settings",
@@ -1570,6 +1570,9 @@
       "POLICYLINK": "Link to Privacy Policy",
       "HELPLINK": "Link to Help",
       "SUPPORTEMAIL": "Support Email",
+      "DOCSLINK": "Docs Link (Console)",
+      "CUSTOMLINK": "Custom Link (Console)",
+      "CUSTOMLINKTEXT": "Custom Link Text (Console)",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"
