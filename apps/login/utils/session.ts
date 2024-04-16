@@ -188,24 +188,10 @@ export type SessionWithChallenges = Session & {
 
 export async function setSessionAndUpdateCookie(
   recentCookie: SessionCookie,
-  password: string | undefined,
-  webAuthN: { credentialAssertionData: any } | undefined,
+  checks: Checks,
   challenges: RequestChallenges | undefined,
-  totpCode: string | undefined,
   authRequestId: string | undefined
 ): Promise<SessionWithChallenges> {
-  const checks: Checks = {};
-
-  if (password) {
-    checks.password = { password };
-  }
-  if (webAuthN) {
-    checks.webAuthN = webAuthN;
-  }
-  if (totpCode) {
-    checks.totp = { code: totpCode };
-  }
-
   return setSession(
     server,
     recentCookie.id,

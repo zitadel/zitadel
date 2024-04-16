@@ -5,13 +5,15 @@ import {
   getSessionCookieByLoginName,
 } from "#/utils/cookies";
 import { setSessionAndUpdateCookie } from "#/utils/session";
+import { Checks } from "@zitadel/server";
 import { NextRequest, NextResponse, userAgent } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
   if (body) {
-    const { loginName, sessionId, organization, authRequestId, code } = body;
+    const { loginName, sessionId, organization, authRequestId, code, method } =
+      body;
 
     const recentPromise: Promise<SessionCookie> = sessionId
       ? getSessionCookieById(sessionId).catch((error) => {
@@ -27,12 +29,26 @@ export async function POST(request: NextRequest) {
 
     return recentPromise
       .then((recent) => {
+        const checks: Checks = {};
+
+        if (method === "time-based") {
+          checks.totp = {
+            code,
+          };
+        } else if (method === "sms") {
+          checks.otpSms = {
+            code,
+          };
+        } else if (method === "email") {
+          checks.otpEmail = {
+            code,
+          };
+        }
+
         return setSessionAndUpdateCookie(
           recent,
+          checks,
           undefined,
-          undefined,
-          undefined,
-          code,
           authRequestId
         ).then((session) => {
           return NextResponse.json({

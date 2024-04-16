@@ -11,7 +11,7 @@ import {
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "#/utils/session";
-import { RequestChallenges } from "@zitadel/server";
+import { Checks, RequestChallenges } from "@zitadel/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -93,12 +93,20 @@ export async function PUT(request: NextRequest) {
 
     return recentPromise
       .then((recent) => {
+        const checks: Checks = {};
+        if (password) {
+          checks.password = {
+            password,
+          };
+        }
+        if (webAuthN) {
+          checks.webAuthN = webAuthN;
+        }
+
         return setSessionAndUpdateCookie(
           recent,
-          password,
-          webAuthN,
+          checks,
           challenges,
-          undefined,
           authRequestId
         ).then(async (session) => {
           // if password, check if user has MFA methods

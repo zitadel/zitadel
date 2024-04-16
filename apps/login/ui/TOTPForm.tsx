@@ -16,6 +16,7 @@ type Props = {
   loginName: string | undefined;
   sessionId: string | undefined;
   code: string | undefined;
+  method: string;
   authRequestId?: string;
   organization?: string;
   submit: boolean;
@@ -24,6 +25,7 @@ type Props = {
 export default function TOTPForm({
   loginName,
   code,
+  method,
   authRequestId,
   organization,
   submit,
@@ -45,6 +47,7 @@ export default function TOTPForm({
 
     let body: any = {
       code: values.code,
+      method,
     };
 
     if (organization) {
@@ -55,7 +58,7 @@ export default function TOTPForm({
       body.authRequestId = authRequestId;
     }
 
-    const res = await fetch("/api/totp/verify", {
+    const res = await fetch("/api/otp/verify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

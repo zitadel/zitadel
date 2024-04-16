@@ -1,3 +1,4 @@
+import { RegisterTOTPResponse } from "@zitadel/server";
 import {
   LegalAndSupportSettings,
   PasswordComplexitySettings,
@@ -45,6 +46,8 @@ import {
   TextQueryMethod,
   ListHumanAuthFactorsResponse,
   AddHumanUserRequest,
+  AddOTPEmailResponse,
+  AddOTPSMSResponse,
 } from "@zitadel/server";
 
 export const zitadelConfig: ZitadelServerOptions = {
@@ -90,19 +93,45 @@ export async function verifyMyAuthFactorOTP(
   return authService.verifyMyAuthFactorOTP({ code }, {});
 }
 
-export async function addMyAuthFactorOTP(
-  token: string
-): Promise<AddMyAuthFactorOTPResponse> {
-  const zitadelConfig: ZitadelServerOptions = {
-    name: "zitadel login",
-    apiUrl: process.env.ZITADEL_API_URL ?? "",
-    token: token,
-  };
+export async function addOTPEmail(
+  userId: string
+): Promise<AddOTPEmailResponse | undefined> {
+  const userService = user.getUser(server);
+  return userService.addOTPEmail(
+    {
+      userId,
+    },
+    {}
+  );
+}
 
-  const server: ZitadelServer = initializeServer(zitadelConfig);
+export async function addOTPSMS(
+  userId: string
+): Promise<AddOTPSMSResponse | undefined> {
+  const userService = user.getUser(server);
+  return userService.addOTPSMS({ userId }, {});
+}
 
-  const authService = auth.getAuth(server);
-  return authService.addMyAuthFactorOTP({}, {});
+export async function registerTOTP(
+  userId: string,
+  token?: string
+): Promise<RegisterTOTPResponse | undefined> {
+  let userService;
+  if (token) {
+    const authConfig: ZitadelServerOptions = {
+      name: "zitadel login",
+      apiUrl: process.env.ZITADEL_API_URL ?? "",
+      token: token,
+    };
+
+    console.log(token);
+
+    const sessionUser = initializeServer(authConfig);
+    userService = user.getUser(sessionUser);
+  } else {
+    userService = user.getUser(server);
+  }
+  return userService.registerTOTP({ userId }, {});
 }
 
 export async function getGeneralSettings(

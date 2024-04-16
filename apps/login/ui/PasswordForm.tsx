@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { LoginSettings } from "@zitadel/server";
+import { LoginSettings, AuthFactor } from "@zitadel/server";
 
 type Inputs = {
   password: string;
@@ -68,11 +68,11 @@ export default function PasswordForm({
   }
 
   function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
-    return submitPassword(value).then((resp: any) => {
+    return submitPassword(value).then((resp) => {
       // if user has mfa -> /totp
       // if mfa is forced -> /mfa/set
       // if no passwordless -> /passkey/add
-      if (resp.authFactors?.length >= 1) {
+      if (resp.authFactors?.length == 1) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
         });
@@ -85,7 +85,32 @@ export default function PasswordForm({
           params.append("organization", organization);
         }
 
-        return router.push(`/mfa/set?` + params);
+        let method;
+        if ((resp.authFactors as AuthFactor[])[0].otp) {
+          method = "time-based";
+        } else if ((resp.authFactors as AuthFactor[])[0].otpSms) {
+          method = "sms";
+        } else if ((resp.authFactors as AuthFactor[])[0].otpEmail) {
+          method = "email";
+        } else if ((resp.authFactors as AuthFactor[])[0].u2f) {
+          method = "u2f";
+        }
+
+        return router.push(`/otp/${method}?` + params);
+      } else if (resp.authFactors?.length >= 1) {
+        const params = new URLSearchParams({
+          loginName: resp.factors.user.loginName,
+        });
+
+        if (authRequestId) {
+          params.append("authRequest", authRequestId);
+        }
+
+        if (organization) {
+          params.append("organization", organization);
+        }
+
+        return router.push(`/mfa?` + params);
       } else if (
         resp.factors &&
         !resp.factors.passwordless && // if session was not verified with a passkey

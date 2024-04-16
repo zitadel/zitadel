@@ -86,13 +86,23 @@ export {
   RetrieveIdentityProviderIntentResponse,
   ListUsersRequest,
   ListUsersResponse,
+  AddOTPEmailResponse,
+  AddOTPEmailRequest,
+  AddOTPSMSResponse,
+  AddOTPSMSRequest,
+  RegisterTOTPRequest,
+  RegisterTOTPResponse,
 } from "./proto/server/zitadel/user/v2beta/user_service";
+
+export { AuthFactor } from "./proto/server/zitadel/user";
+
 export {
   SetHumanPasswordResponse,
   SetHumanPasswordRequest,
   GetOrgByDomainGlobalResponse,
   ListHumanAuthFactorsResponse,
 } from "./proto/server/zitadel/management";
+
 export * from "./proto/server/zitadel/idp";
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2beta/legal_settings";
 export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2beta/password_settings";
