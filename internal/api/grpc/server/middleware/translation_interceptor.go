@@ -41,5 +41,5 @@ func getTranslator(ctx context.Context) (*i18n.Translator, error) {
 	if err != nil {
 		logging.New().WithError(err).Error("could not load translator")
 	}
-	return translator, nil
+	return translator, err
 }
