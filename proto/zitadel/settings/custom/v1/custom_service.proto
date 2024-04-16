@@ -1,19 +1,19 @@
 syntax = "proto3";
 
-package zitadel.settings.feature.v2;
+package zitadel.settings.custom.v1;
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-import "zitadel/settings/feature/v2/feature.proto";
+import "zitadel/settings/custom/v1/custom.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/feature/v2;feature";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/custom/v1;custom";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "Feature Service";
-    version: "2.0";
-    description: "This API is intended to manage features for ZITADEL. It is itself behind the feature flag \"multitenancy_settings\". Features are settings, and are therefore inherited through the context hierarchy system -> instance -> org. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op. This service is in beta state. It can AND WILL continue breaking until a stable version is released.";
+    title: "Custom Settings Service";
+    version: "1.0";
+    description: "This API is intended to manage custom settings for ZITADEL. It can be enabled using the feature flag \"multitenancy_settings\". Custom settings are inherited through the context hierarchy system -> instance -> org. They can be used for multi tenancy use cases that ZITADEL does not cover out of the box. Custom settings are especially useful together with the session API or with actions.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -85,24 +85,22 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-// FeatureService is intended to manage features for ZITADEL.
-// It is itself behind the feature flag \"settings_api\".
+// CustomSettingsService is intended to manage custom settings for ZITADEL.
+// It can be enabled using the feature flag \"multitenancy_settings\".
 //
-// Features can be experimental where ZITADEL will assume a sane default, such as disabled.
-// When over time confidence in such a feature grows, ZITADEL can default to enabling the feature.
-// As a final step we might choose to always enable a feature and remove the setting from this API,
-// reserving the proto field number. Such removal is not considered a breaking change.
-// Setting a removed field will effectively result in a no-op.
-service FeatureService {
-  rpc Set (SetFeaturesRequest) returns (SetFeaturesResponse) {
+// Custom settings are inherited through the context hierarchy system -> instance -> org.
+// They can be used for multi tenancy use cases that ZITADEL does not cover out of the box.
+// Custom settings are especially useful together with the session API or with actions.
+service CustomSettingsService {
+  rpc Set (SetCustomSettingsRequest) returns (SetCustomSettingsResponse) {
     option (google.api.http) = {
-      patch: "/settings/v2/features"
+      patch: "/settings/v1/custom"
       body: "*"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Set features for a given context";
-      description: "Configure and set features for a given context. Only fields present in the request are set or unset."
+      summary: "Set custom settings for a given context";
+      description: "Set custom key-value pairs for a given context. Only fields present in the request are set or unset."
       responses: {
         key: "200"
         value: {
@@ -112,14 +110,14 @@ service FeatureService {
     };
   };
 
-  rpc Get (GetFeaturesRequest) returns (GetFeaturesResponse) {
+  rpc Get (GetCustomSettingsRequest) returns (GetCustomSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/features"
+      get: "/settings/v1/custom"
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the features in the given context";
-      description: "Returns all configured and inherited features for the given context."
+      summary: "Get the custom settings in the given context";
+      description: "Returns all configured and inherited custom settings for the given context."
       responses: {
         key: "200"
         value: {
