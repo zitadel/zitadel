@@ -1291,6 +1291,7 @@
       "MEMBERCHANGED": "管理者以改变。",
       "SETPRIMARY": "已设为主域名。",
       "DELETED": "成功删除的组织",
+      "DEFAULTORGNOTFOUND": "未找到默认组织",
       "ORG_WAS_DELETED": "组织被删除"
     },
     "DIALOG": {

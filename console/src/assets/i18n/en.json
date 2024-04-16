@@ -1291,8 +1291,9 @@
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
       "SETPRIMARY": "Primary domain set.",
-      "DELETED": "Organisation deleted successfully",
-      "ORG_WAS_DELETED": "Organisation has been deleted."
+      "DELETED": "Organization deleted successfully",
+      "DEFAULTORGNOTFOUND": "The default organization was not found",
+      "ORG_WAS_DELETED": "Organization has been deleted."
     },
     "DIALOG": {
       "DEACTIVATE": {
