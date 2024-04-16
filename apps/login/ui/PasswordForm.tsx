@@ -73,16 +73,13 @@ export default function PasswordForm({
       // if mfa is forced -> /mfa/set
       // if no passwordless -> /passkey/add
       if (resp.authFactors?.length >= 1) {
-        const params = new URLSearchParams(
-          authRequestId
-            ? {
-                loginName: resp.factors.user.loginName,
-                authRequestId,
-              }
-            : {
-                loginName: resp.factors.user.loginName,
-              }
-        );
+        const params = new URLSearchParams({
+          loginName: resp.factors.user.loginName,
+        });
+
+        if (authRequestId) {
+          params.append("authRequest", authRequestId);
+        }
 
         if (organization) {
           params.append("organization", organization);
@@ -99,6 +96,10 @@ export default function PasswordForm({
           loginName: resp.factors.user.loginName,
           promptPasswordless: "true",
         });
+
+        if (authRequestId) {
+          params.append("authRequest", authRequestId);
+        }
 
         if (organization) {
           params.append("organization", organization);
