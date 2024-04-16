@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+package zitadel.settings.feature.v2;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "zitadel/settings/feature/v2/feature.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/feature/v2gamma;feature";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Feature Service";
+    version: "2.0";
+    description: "This API is intended to manage features for ZITADEL. It is itself behind the feature flag \"settings_api_v2\". Features are settings, and are therefore inherited through the context hierarchy system -> instance -> org. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op. This service is in beta state. It can AND WILL continue breaking until a stable version is released.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+  consumes: "application/grpc-web+proto";
+
+  produces: "application/json";
+  produces: "application/grpc";
+  produces: "application/grpc-web+proto";
+
+  host: "$ZITADEL_DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
+        token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource in the given context.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+// FeatureService is intended to manage features for ZITADEL.
+// It is itself behind the feature flag \"settings_api\".
+//
+// Features can be experimental where ZITADEL will assume a sane default, such as disabled.
+// When over time confidence in such a feature grows, ZITADEL can default to enabling the feature.
+// As a final step we might choose to always enable a feature and remove the setting from this API,
+// reserving the proto field number. Such removal is not considered a breaking change.
+// Setting a removed field will effectively result in a no-op.
+service FeatureService {
+  rpc SetFeatures (SetFeaturesRequest) returns (SetFeaturesResponse) {
+    option (google.api.http) = {
+      patch: "/settings/v2/features"
+      body: "*"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Set features for a given context";
+      description: "Configure and set features for a given context. Only fields present in the request are set or unset."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  };
+
+  rpc GetFeatures (GetFeaturesRequest) returns (GetFeaturesResponse) {
+    option (google.api.http) = {
+      get: "/settings/v2/features"
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the features in the given context";
+      description: "Returns all configured and inherited features for the given context."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  };
+}
