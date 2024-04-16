@@ -169,15 +169,15 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 
 const (
 	expectedDeviceAuthQueryC = `SELECT` +
-		` projections.device_auth_requests1.client_id,` +
-		` projections.device_auth_requests1.device_code,` +
-		` projections.device_auth_requests1.user_code,` +
-		` projections.device_auth_requests1.scopes,` +
-		` projections.device_auth_requests1.audience` +
-		` FROM projections.device_auth_requests1`
+		` projections.device_auth_requests2.client_id,` +
+		` projections.device_auth_requests2.device_code,` +
+		` projections.device_auth_requests2.user_code,` +
+		` projections.device_auth_requests2.scopes,` +
+		` projections.device_auth_requests2.audience` +
+		` FROM projections.device_auth_requests2`
 	expectedDeviceAuthWhereUserCodeQueryC = expectedDeviceAuthQueryC +
-		` WHERE projections.device_auth_requests1.instance_id = $1` +
-		` AND projections.device_auth_requests1.user_code = $2`
+		` WHERE projections.device_auth_requests2.instance_id = $1` +
+		` AND projections.device_auth_requests2.user_code = $2`
 )
 
 var (
