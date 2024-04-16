@@ -96,14 +96,14 @@ var ErrFilterMerge = errors.New("merge failed")
 
 type FilterCreator func() []*Filter
 
-func MergeFilters(creators ...FilterCreator) []*Filter {
-	filters := make([]*Filter, 0, len(creators))
+func MergeFilters(filters ...[]*Filter) []*Filter {
+	res := make([]*Filter, 0, len(filters))
 
-	for _, creator := range creators {
-		filters = append(filters, creator()...)
+	for _, creator := range filters {
+		res = append(res, creator...)
 	}
 
-	return filters
+	return res
 }
 
 type Filter struct {

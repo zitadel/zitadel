@@ -31,12 +31,12 @@ func NewMilestone(instance string) *Milestone {
 
 func (rm *Milestone) Filter(ctx context.Context) []*eventstore.Filter {
 	return eventstore.MergeFilters(
-		rm.InstanceCreatedMilestone.Filter,
-		rm.InstanceRemovedMilestone.Filter,
-		rm.AuthOnInstanceMilestone.Filter,
-		rm.AuthOnAppMilestone.Filter,
-		rm.ProjectCreatedMilestone.Filter,
-		rm.AppCreatedMilestone.Filter,
+		rm.InstanceCreatedMilestone.Filter(),
+		rm.InstanceRemovedMilestone.Filter(),
+		rm.AuthOnInstanceMilestone.Filter(),
+		rm.AuthOnAppMilestone.Filter(),
+		rm.ProjectCreatedMilestone.Filter(),
+		rm.AppCreatedMilestone.Filter(),
 	)
 }
 

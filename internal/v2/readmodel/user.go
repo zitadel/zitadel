@@ -7,7 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/projection"
-	"github.com/zitadel/zitadel/internal/v2/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -34,13 +33,15 @@ func (u *User) PreferredLoginName() string {
 
 func NewUser(id string) *User {
 	return &User{
-		User: *projection.NewUserProjection(id),
+		User:    *projection.NewUserProjection(id),
+		Human:   projection.NewHumanProjection(id),
+		Machine: projection.NewMachineProjection(id),
 	}
 }
 
 func (u *User) Query(ctx context.Context, querier eventstore.Querier, opts ...QueryOpt) error {
 	queryOpts := make([]eventstore.QueryOpt, 0, len(opts)+1)
-	queryOpts = append(queryOpts, eventstore.AppendFilters(u.Filter()...))
+	queryOpts = append(queryOpts, eventstore.AppendFilters(u.User.Filter()...), eventstore.AppendFilters(u.Human.Filter()...), eventstore.AppendFilters(u.Machine.Filter()...))
 	for _, opt := range opts {
 		queryOpts = opt(queryOpts)
 	}
@@ -84,27 +85,16 @@ func (u *User) Query(ctx context.Context, querier eventstore.Querier, opts ...Qu
 	return nil
 }
 
-func (u *User) Filter() []*eventstore.Filter {
-	return []*eventstore.Filter{
-		eventstore.NewFilter(
-			eventstore.AppendAggregateFilter(
-				user.AggregateType,
-				eventstore.AggregateID(u.ID),
-			),
-		),
-	}
-}
-
 func (u *User) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) (err error) {
 
 eventLoop:
 	for _, event := range events {
 		switch event.Type {
 		case "user.human.added", "user.added", "user.human.selfregistered":
-			u.Human = projection.NewHumanProjection(u.ID)
+			u.Machine = nil
 			break eventLoop
 		case "user.machine.added":
-			u.Machine = projection.NewMachineProjection(u.ID)
+			u.Human = nil
 			break eventLoop
 		}
 	}
