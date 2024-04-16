@@ -3,6 +3,8 @@ package i18n
 import (
 	"encoding/json"
 	"io"
+	"io/fs"
+	"net/http"
 	"path/filepath"
 	"strings"
 
@@ -24,34 +26,8 @@ var translationMessages = map[Namespace]map[language.Tag]*i18n.MessageFile{
 }
 
 func init() {
-	unmarshaler := map[string]i18n.UnmarshalFunc{
-		"yaml": func(data []byte, v interface{}) error { return yaml.Unmarshal(data, v) },
-		"json": json.Unmarshal,
-		"toml": toml.Unmarshal,
-	}
 	for ns := range translationMessages {
-		dir := LoadFilesystem(ns)
-		i18nDir, err := dir.Open(i18nPath)
-		logging.WithFields("namespace", ns).OnError(err).Panic("unable to open translation files")
-		defer i18nDir.Close()
-		files, err := i18nDir.Readdir(0)
-		logging.WithFields("namespace", ns).OnError(err).Panic("unable to read translation files")
-		for _, file := range files {
-			f, err := dir.Open("/i18n/" + file.Name())
-			logging.WithFields("namespace", ns, "file", file.Name()).OnError(err).Panic("unable to open translation file")
-			defer f.Close()
-
-			content, err := io.ReadAll(f)
-			logging.WithFields("namespace", ns, "file", file.Name()).OnError(err).Panic("unable to read translation file")
-
-			messageFile, err := i18n.ParseMessageFileBytes(content, file.Name(), unmarshaler)
-			logging.WithFields("namespace", ns, "file", file.Name()).OnError(err).Panic("unable to parse translation file")
-
-			fileLang, _ := strings.CutSuffix(file.Name(), filepath.Ext(file.Name()))
-			lang := language.Make(fileLang)
-
-			translationMessages[ns][lang] = messageFile
-		}
+		loadTranslationsFromNamespace(ns)
 	}
 }
 
@@ -66,4 +42,39 @@ func newBundle(ns Namespace, defaultLanguage language.Tag, allowedLanguages []la
 	}
 
 	return bundle, nil
+}
+
+func loadTranslationsFromNamespace(ns Namespace) {
+	dir := LoadFilesystem(ns)
+	i18nDir, err := dir.Open(i18nPath)
+	logging.WithFields("namespace", ns).OnError(err).Panic("unable to open translation files")
+	defer i18nDir.Close()
+	files, err := i18nDir.Readdir(0)
+	logging.WithFields("namespace", ns).OnError(err).Panic("unable to read translation files")
+	for _, file := range files {
+		loadTranslationsFromFile(ns, file, dir)
+	}
+}
+
+func loadTranslationsFromFile(ns Namespace, fileInfo fs.FileInfo, dir http.FileSystem) {
+	file, err := dir.Open("/i18n/" + fileInfo.Name())
+	logging.WithFields("namespace", ns, "file", fileInfo.Name()).OnError(err).Panic("unable to open translation file")
+	defer file.Close()
+
+	content, err := io.ReadAll(file)
+	logging.WithFields("namespace", ns, "file", fileInfo.Name()).OnError(err).Panic("unable to read translation file")
+
+	unmarshaler := map[string]i18n.UnmarshalFunc{
+		"yaml": func(data []byte, v interface{}) error { return yaml.Unmarshal(data, v) },
+		"json": json.Unmarshal,
+		"toml": toml.Unmarshal,
+	}
+
+	messageFile, err := i18n.ParseMessageFileBytes(content, fileInfo.Name(), unmarshaler)
+	logging.WithFields("namespace", ns, "file", fileInfo.Name()).OnError(err).Panic("unable to parse translation file")
+
+	fileLang, _ := strings.CutSuffix(fileInfo.Name(), filepath.Ext(fileInfo.Name()))
+	lang := language.Make(fileLang)
+
+	translationMessages[ns][lang] = messageFile
 }
