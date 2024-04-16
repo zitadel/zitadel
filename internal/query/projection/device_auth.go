@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	DeviceAuthRequestProjectionTable = "projections.device_auth_requests1"
+	DeviceAuthRequestProjectionTable = "projections.device_auth_requests2"
 
 	DeviceAuthRequestColumnClientID     = "client_id"
 	DeviceAuthRequestColumnDeviceCode   = "device_code"
@@ -44,8 +44,8 @@ func (*deviceAuthRequestProjection) Init() *old_handler.Check {
 			handler.NewColumn(DeviceAuthRequestColumnClientID, handler.ColumnTypeText),
 			handler.NewColumn(DeviceAuthRequestColumnDeviceCode, handler.ColumnTypeText),
 			handler.NewColumn(DeviceAuthRequestColumnUserCode, handler.ColumnTypeText),
-			handler.NewColumn(DeviceAuthRequestColumnScopes, handler.ColumnTypeTextArray),
-			handler.NewColumn(DeviceAuthRequestColumnAudience, handler.ColumnTypeTextArray),
+			handler.NewColumn(DeviceAuthRequestColumnScopes, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(DeviceAuthRequestColumnAudience, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(DeviceAuthRequestColumnCreationDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(DeviceAuthRequestColumnChangeDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(DeviceAuthRequestColumnSequence, handler.ColumnTypeInt64),
