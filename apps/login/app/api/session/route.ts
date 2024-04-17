@@ -3,6 +3,7 @@ import {
   deleteSession,
   listHumanAuthFactors,
   getSession,
+  getUserByID,
 } from "#/lib/zitadel";
 import {
   SessionCookie,
@@ -16,7 +17,7 @@ import {
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "#/utils/session";
-import { Checks, RequestChallenges } from "@zitadel/server";
+import { Challenges, Checks, RequestChallenges } from "@zitadel/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -91,12 +92,37 @@ export async function PUT(request: NextRequest) {
 
     const domain: string = request.nextUrl.hostname;
 
-    if (challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
-      challenges.webAuthN.domain = domain;
-    }
-
     return recentPromise
-      .then((recent) => {
+      .then(async (recent) => {
+        if (
+          challenges &&
+          (challenges.otpEmail === "" || challenges.otpSms === "")
+        ) {
+          const sessionResponse = await getSession(
+            server,
+            recent.id,
+            recent.token
+          );
+          if (sessionResponse && sessionResponse.session?.factors?.user?.id) {
+            const userResponse = await getUserByID(
+              sessionResponse.session.factors.user.id
+            );
+            if (
+              challenges.otpEmail === "" &&
+              userResponse.user?.human?.email?.email
+            ) {
+              challenges.otpEmail = userResponse.user?.human?.email?.email;
+            }
+
+            if (
+              challenges.otpSms === "" &&
+              userResponse.user?.human?.phone?.phone
+            ) {
+              challenges.otpSms = userResponse.user?.human?.phone?.phone;
+            }
+          }
+        }
+
         return setSessionAndUpdateCookie(
           recent,
           checks,
@@ -106,6 +132,15 @@ export async function PUT(request: NextRequest) {
           // if password, check if user has MFA methods
           let authFactors;
           if (checks && checks.password && session.factors?.user?.id) {
+            const response = await listHumanAuthFactors(
+              server,
+              session.factors?.user?.id
+            );
+            if (response.result && response.result.length) {
+              authFactors = response.result;
+            }
+          }
+          if (challenges && challenges.o && session.factors?.user?.id) {
             const response = await listHumanAuthFactors(
               server,
               session.factors?.user?.id

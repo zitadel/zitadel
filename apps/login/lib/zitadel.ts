@@ -1,4 +1,4 @@
-import { RegisterTOTPResponse } from "@zitadel/server";
+import { GetUserByIDResponse, RegisterTOTPResponse } from "@zitadel/server";
 import {
   LegalAndSupportSettings,
   PasswordComplexitySettings,
@@ -300,6 +300,14 @@ export async function addHumanUser(
       : payload,
     {}
   );
+}
+
+export async function getUserByID(
+  userId: string
+): Promise<GetUserByIDResponse> {
+  const userService = user.getUser(server);
+
+  return userService.getUserByID({ userId }, {});
 }
 
 export async function listHumanAuthFactors(

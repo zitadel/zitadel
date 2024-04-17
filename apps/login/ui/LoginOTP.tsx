@@ -66,7 +66,7 @@ export default function LoginOTP({
     const challenges: Challenges = {};
 
     if (method === "email") {
-      challenges.otpEmail = "peintnerm@gmail.com";
+      challenges.otpEmail = "";
     }
 
     if (method === "sms") {
