@@ -140,6 +140,8 @@ func NewServer(
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
 		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
+		encAlg:                     encryptionAlg,
+		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
 		assetAPIPrefix:             assets.AssetAPI(externalSecure),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}

@@ -21,3 +21,8 @@ const (
 	OIDCErrorReasonRequestURINotSupported
 	OIDCErrorReasonRegistrationNotSupported
 )
+
+func OIDCErrorReasonFromError(err error) OIDCErrorReason {
+	// TODO!
+	return OIDCErrorReasonUnspecified
+}

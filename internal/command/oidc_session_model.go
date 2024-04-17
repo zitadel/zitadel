@@ -19,6 +19,7 @@ type OIDCSessionWriteModel struct {
 	Scope                      []string
 	AuthMethods                []domain.UserAuthMethodType
 	AuthTime                   time.Time
+	UserAgent                  *domain.UserAgent
 	State                      domain.OIDCSessionState
 	AccessTokenID              string
 	AccessTokenCreation        time.Time
@@ -91,6 +92,7 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.Scope = e.Scope
 	wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
+	wm.UserAgent = e.UserAgent
 	wm.State = domain.OIDCSessionStateActive
 	// the write model might be initialized without resource owner,
 	// so update the aggregate

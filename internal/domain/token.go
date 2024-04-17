@@ -14,6 +14,7 @@ type Token struct {
 
 	TokenID           string
 	ApplicationID     string
+	UserID            string
 	UserAgentID       string
 	RefreshTokenID    string
 	Audience          []string

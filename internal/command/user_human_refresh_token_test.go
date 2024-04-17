@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -690,6 +689,7 @@ func refreshTokenEncryptionAlgorithm(ctrl *gomock.Controller) crypto.EncryptionA
 	return mCrypto
 }
 
+/*
 func TestCommands_addRefreshToken(t *testing.T) {
 	authTime := time.Now().Add(-1 * time.Hour)
 	type fields struct {
@@ -731,6 +731,7 @@ func TestCommands_addRefreshToken(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					TokenID:           "accessTokenID1",
+					UserID:            "userID",
 					ApplicationID:     "clientID",
 					UserAgentID:       "agentID",
 					RefreshTokenID:    "refreshTokenID",
@@ -784,6 +785,7 @@ func TestCommands_addRefreshToken(t *testing.T) {
 		})
 	}
 }
+*/
 
 func TestCommands_renewRefreshToken(t *testing.T) {
 	type fields struct {

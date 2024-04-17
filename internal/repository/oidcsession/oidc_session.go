@@ -28,6 +28,7 @@ type AddedEvent struct {
 	Scope       []string                    `json:"scope"`
 	AuthMethods []domain.UserAuthMethodType `json:"authMethods"`
 	AuthTime    time.Time                   `json:"authTime"`
+	UserAgent   *domain.UserAgent           `json:"userAgent,omitempty"`
 }
 
 func (e *AddedEvent) Payload() interface{} {
@@ -51,6 +52,7 @@ func NewAddedEvent(ctx context.Context,
 	scope []string,
 	authMethods []domain.UserAuthMethodType,
 	authTime time.Time,
+	userAgent *domain.UserAgent,
 ) *AddedEvent {
 	return &AddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -65,6 +67,7 @@ func NewAddedEvent(ctx context.Context,
 		Scope:       scope,
 		AuthMethods: authMethods,
 		AuthTime:    authTime,
+		UserAgent:   userAgent,
 	}
 }
 

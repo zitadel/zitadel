@@ -148,6 +148,7 @@ func (c *Commands) AddAuthRequestCode(ctx context.Context, authRequestID, code s
 		&authrequest.NewAggregate(writeModel.AggregateID, authz.GetInstance(ctx).InstanceID()).Aggregate))
 }
 
+/*
 func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authRequest *CurrentAuthRequest, err error) {
 	if code == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.AuthRequest.InvalidCode")
@@ -166,6 +167,7 @@ func (c *Commands) ExchangeAuthCode(ctx context.Context, code string) (authReque
 	}
 	return authRequestWriteModelToCurrentAuthRequest(writeModel), nil
 }
+*/
 
 func authRequestWriteModelToCurrentAuthRequest(writeModel *AuthRequestWriteModel) (_ *CurrentAuthRequest) {
 	return &CurrentAuthRequest{

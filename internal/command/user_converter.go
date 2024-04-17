@@ -108,6 +108,7 @@ func personalTokenWriteModelToToken(wm *PersonalAccessTokenWriteModel, algorithm
 	return &domain.Token{
 		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
 		TokenID:    wm.TokenID,
+		UserID:     wm.AggregateID,
 		Expiration: wm.ExpirationDate,
 	}, base64.RawURLEncoding.EncodeToString(encrypted), nil
 }

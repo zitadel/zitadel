@@ -321,6 +321,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 		},
 		TokenID:           tokenID,
 		UserAgentID:       agentID,
+		UserID:            userAgg.ID,
 		ApplicationID:     clientID,
 		RefreshTokenID:    refreshTokenID,
 		Audience:          audience,
