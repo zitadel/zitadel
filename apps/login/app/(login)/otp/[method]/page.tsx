@@ -1,6 +1,6 @@
 import { getBrandingSettings, getLoginSettings, server } from "#/lib/zitadel";
 import DynamicTheme from "#/ui/DynamicTheme";
-import TOTPForm from "#/ui/TOTPForm";
+import LoginOTP from "#/ui/LoginOTP";
 import VerifyU2F from "#/ui/VerifyU2F";
 
 export default async function Page({
@@ -14,8 +14,6 @@ export default async function Page({
     searchParams;
 
   const { method } = params;
-
-  console.log(method);
 
   const branding = await getBrandingSettings(server, organization);
 
@@ -37,15 +35,13 @@ export default async function Page({
         )}
 
         {method && ["time-based", "sms", "email"].includes(method) ? (
-          <TOTPForm
+          <LoginOTP
             loginName={loginName}
             sessionId={sessionId}
-            code={code}
-            method={method}
             authRequestId={authRequestId}
             organization={organization}
-            submit={submit === "true"}
-          />
+            method={method}
+          ></LoginOTP>
         ) : (
           <VerifyU2F
             loginName={loginName}

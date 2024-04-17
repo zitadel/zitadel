@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { LoginSettings, AuthFactor } from "@zitadel/server";
+import { LoginSettings, AuthFactor, Checks } from "@zitadel/server";
 
 type Inputs = {
   password: string;
@@ -52,7 +52,9 @@ export default function PasswordForm({
       body: JSON.stringify({
         loginName,
         organization,
-        password: values.password,
+        checks: {
+          password: { password: values.password },
+        } as Checks,
         authRequestId,
       }),
     });

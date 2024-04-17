@@ -1,4 +1,9 @@
-import { server, deleteSession, listHumanAuthFactors } from "#/lib/zitadel";
+import {
+  server,
+  deleteSession,
+  listHumanAuthFactors,
+  getSession,
+} from "#/lib/zitadel";
 import {
   SessionCookie,
   getMostRecentSessionCookie,
@@ -67,11 +72,10 @@ export async function PUT(request: NextRequest) {
       loginName,
       sessionId,
       organization,
-      password,
-      webAuthN,
+      checks,
       authRequestId,
+      challenges,
     } = body;
-    const challenges: RequestChallenges = body.challenges;
 
     const recentPromise: Promise<SessionCookie> = sessionId
       ? getSessionCookieById(sessionId).catch((error) => {
@@ -93,16 +97,6 @@ export async function PUT(request: NextRequest) {
 
     return recentPromise
       .then((recent) => {
-        const checks: Checks = {};
-        if (password) {
-          checks.password = {
-            password,
-          };
-        }
-        if (webAuthN) {
-          checks.webAuthN = webAuthN;
-        }
-
         return setSessionAndUpdateCookie(
           recent,
           checks,
@@ -111,7 +105,7 @@ export async function PUT(request: NextRequest) {
         ).then(async (session) => {
           // if password, check if user has MFA methods
           let authFactors;
-          if (password && session.factors?.user?.id) {
+          if (checks.password && session.factors?.user?.id) {
             const response = await listHumanAuthFactors(
               server,
               session.factors?.user?.id
