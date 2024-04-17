@@ -92,6 +92,10 @@ export async function PUT(request: NextRequest) {
 
     const domain: string = request.nextUrl.hostname;
 
+    if (challenges && challenges.webAuthN && !challenges.webAuthN.domain) {
+      challenges.webAuthN.domain = domain;
+    }
+
     return recentPromise
       .then(async (recent) => {
         if (
@@ -140,15 +144,7 @@ export async function PUT(request: NextRequest) {
               authFactors = response.result;
             }
           }
-          if (challenges && challenges.o && session.factors?.user?.id) {
-            const response = await listHumanAuthFactors(
-              server,
-              session.factors?.user?.id
-            );
-            if (response.result && response.result.length) {
-              authFactors = response.result;
-            }
-          }
+
           return NextResponse.json({
             sessionId: session.id,
             factors: session.factors,

@@ -48,7 +48,6 @@ export default async function Page({
             sessionId={sessionId}
             authRequestId={authRequestId}
             organization={organization}
-            submit={submit === "true"}
           ></VerifyU2F>
         )}
       </div>
