@@ -38,14 +38,15 @@ type initPasswordData struct {
 	HasSymbol    string
 }
 
-func InitPasswordLink(origin, userID, code, orgID string) string {
-	return fmt.Sprintf("%s%s?userID=%s&code=%s&orgID=%s", externalLink(origin), EndpointInitPassword, userID, code, orgID)
+func InitPasswordLink(origin, userID, code, orgID, authRequestID string) string {
+	return fmt.Sprintf("%s%s?userID=%s&code=%s&orgID=%s&%s=%s", externalLink(origin), EndpointInitPassword, userID, code, orgID, QueryAuthRequestID, authRequestID)
 }
 
 func (l *Login) handleInitPassword(w http.ResponseWriter, r *http.Request) {
+	authReq := l.checkOptionalAuthRequestOfEmailLinks(r)
 	userID := r.FormValue(queryInitPWUserID)
 	code := r.FormValue(queryInitPWCode)
-	l.renderInitPassword(w, r, nil, userID, code, nil)
+	l.renderInitPassword(w, r, authReq, userID, code, nil)
 }
 
 func (l *Login) handleInitPasswordCheck(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +95,7 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitPassword(w, r, authReq, userID, "", err)
 		return
 	}
-	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), userID, userOrg, domain.NotificationTypeEmail, passwordCodeGenerator)
+	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), userID, userOrg, domain.NotificationTypeEmail, passwordCodeGenerator, authReq.ID)
 	l.renderInitPassword(w, r, authReq, userID, "", err)
 }
 

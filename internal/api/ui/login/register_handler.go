@@ -2,11 +2,13 @@ package login
 
 import (
 	"net/http"
+	"strings"
 
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -67,21 +69,21 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	if authRequest != nil && authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != resourceOwner {
 		resourceOwner = authRequest.RequestedOrgID
 	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegister(w, r, authRequest, data, err)
-		return
-	}
-	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegister(w, r, authRequest, data, err)
-		return
-	}
-	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegister(w, r, authRequest, data, err)
-		return
-	}
+	//initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
+	//if err != nil {
+	//	l.renderRegister(w, r, authRequest, data, err)
+	//	return
+	//}
+	//emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
+	//if err != nil {
+	//	l.renderRegister(w, r, authRequest, data, err)
+	//	return
+	//}
+	//phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
+	//if err != nil {
+	//	l.renderRegister(w, r, authRequest, data, err)
+	//	return
+	//}
 
 	// For consistency with the external authentication flow,
 	// the setMetadata() function is provided on the pre creation hook, for now,
@@ -96,22 +98,25 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	user, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, nil, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
+
+	human := humanToCommand(user, metadatas, authRequest)
+	//user, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, nil, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
+	err = l.command.AddUserHuman(setContext(r.Context(), resourceOwner), resourceOwner, human, true, l.userCodeAlg)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
+	//
+	//if len(metadatas) > 0 {
+	//	_, err = l.command.BulkSetUserMetadata(r.Context(), user.AggregateID, resourceOwner, metadatas...)
+	//	if err != nil {
+	//		// TODO: What if action is configured to be allowed to fail? Same question for external registration.
+	//		l.renderRegister(w, r, authRequest, data, err)
+	//		return
+	//	}
+	//}
 
-	if len(metadatas) > 0 {
-		_, err = l.command.BulkSetUserMetadata(r.Context(), user.AggregateID, resourceOwner, metadatas...)
-		if err != nil {
-			// TODO: What if action is configured to be allowed to fail? Same question for external registration.
-			l.renderRegister(w, r, authRequest, data, err)
-			return
-		}
-	}
-
-	userGrants, err := l.runPostCreationActions(user.AggregateID, authRequest, r, resourceOwner, domain.FlowTypeInternalAuthentication)
+	userGrants, err := l.runPostCreationActions(human.ID, authRequest, r, resourceOwner, domain.FlowTypeInternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authRequest, err)
 		return
@@ -128,12 +133,53 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, user.AggregateID, userAgentID)
+	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, human.ID, userAgentID)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
 	l.renderNextStep(w, r, authRequest)
+}
+
+func humanToCommand(user *domain.Human, metadatas []*domain.Metadata, authRequest *domain.AuthRequest) *command.AddHuman {
+	addMetadata := make([]*command.AddMetadataEntry, len(metadatas))
+	for i, metadata := range metadatas {
+		addMetadata[i] = &command.AddMetadataEntry{
+			Key:   metadata.Key,
+			Value: metadata.Value,
+		}
+	}
+	human := new(command.AddHuman)
+	if user.Profile != nil {
+		human.Username = user.Username
+		human.FirstName = user.FirstName
+		human.LastName = user.LastName
+		human.NickName = user.NickName
+		human.DisplayName = user.DisplayName
+		human.PreferredLanguage = user.PreferredLanguage
+		human.Gender = user.Gender
+		human.Password = user.Password.SecretString
+		human.Register = true
+		human.Metadata = addMetadata
+		human.UserAgentID = authRequest.AgentID
+		human.AuthRequestID = authRequest.ID
+	}
+	if user.Email != nil {
+		human.Email = command.Email{
+			Address:  user.EmailAddress,
+			Verified: user.IsEmailVerified,
+		}
+	}
+	if user.Phone != nil {
+		human.Phone = command.Phone{
+			Number:   user.Phone.PhoneNumber,
+			Verified: user.Phone.IsPhoneVerified,
+		}
+	}
+	if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
+		human.Username = string(human.Email.Address)
+	}
+	return human
 }
 
 func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerFormData, err error) {

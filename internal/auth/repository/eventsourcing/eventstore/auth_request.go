@@ -543,23 +543,60 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if err != nil {
 		return err
 	}
-	initCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, repo.UserCodeAlg)
+	//initCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, repo.UserCodeAlg)
+	//if err != nil {
+	//	return err
+	//}
+	//emailCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, repo.UserCodeAlg)
+	//if err != nil {
+	//	return err
+	//}
+	//phoneCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, repo.UserCodeAlg)
+	//if err != nil {
+	//	return err
+	//}
+
+	addMetadata := make([]*command.AddMetadataEntry, len(metadatas))
+	for i, metadata := range metadatas {
+		addMetadata[i] = &command.AddMetadataEntry{
+			Key:   metadata.Key,
+			Value: metadata.Value,
+		}
+	}
+	human := &command.AddHuman{
+		Username:    registerUser.Username,
+		FirstName:   registerUser.FirstName,
+		LastName:    registerUser.LastName,
+		NickName:    registerUser.NickName,
+		DisplayName: registerUser.DisplayName,
+		Email: command.Email{
+			Address:  registerUser.EmailAddress,
+			Verified: registerUser.IsEmailVerified,
+		},
+		PreferredLanguage: registerUser.PreferredLanguage,
+		Gender:            registerUser.Gender,
+		Phone: command.Phone{
+			Number:   registerUser.PhoneNumber,
+			Verified: registerUser.IsPhoneVerified,
+		},
+		Password:    registerUser.Password.SecretString,
+		Register:    true,
+		UserAgentID: userAgentID,
+		Metadata:    addMetadata,
+		Links: []*command.AddLink{
+			{
+				IDPID:         externalIDP.IDPConfigID,
+				DisplayName:   externalIDP.DisplayName,
+				IDPExternalID: externalIDP.ExternalUserID,
+			},
+		},
+	}
+	err = repo.Command.AddUserHuman(ctx, resourceOwner, human, true, repo.UserCodeAlg)
+	//human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return err
 	}
-	emailCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, repo.UserCodeAlg)
-	if err != nil {
-		return err
-	}
-	phoneCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, repo.UserCodeAlg)
-	if err != nil {
-		return err
-	}
-	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
-	if err != nil {
-		return err
-	}
-	request.SetUserInfo(human.AggregateID, human.Username, human.PreferredLoginName, human.DisplayName, "", human.ResourceOwner)
+	request.SetUserInfo(human.ID, human.Username, human.Username, human.DisplayName, "", resourceOwner)
 	request.SelectedIDPConfigID = externalIDP.IDPConfigID
 	request.LinkingUsers = nil
 	err = repo.Command.UserIDPLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))

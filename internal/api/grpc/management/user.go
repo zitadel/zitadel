@@ -473,7 +473,7 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.ResendInitialMail(ctx, req.UserId, domain.EmailAddress(req.Email), authz.GetCtxData(ctx).OrgID, initCodeGenerator)
+	details, err := s.command.ResendInitialMail(ctx, req.UserId, domain.EmailAddress(req.Email), authz.GetCtxData(ctx).OrgID, initCodeGenerator, "")
 	if err != nil {
 		return nil, err
 	}
@@ -487,7 +487,7 @@ func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, emailCodeGenerator)
+	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, emailCodeGenerator, "")
 	if err != nil {
 		return nil, err
 	}
@@ -590,7 +590,7 @@ func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mg
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type), passwordCodeGenerator)
+	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type), passwordCodeGenerator, "")
 	if err != nil {
 		return nil, err
 	}

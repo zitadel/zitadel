@@ -160,6 +160,10 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 					Event:  user.UserRemovedType,
 					Reduce: s.Reduce,
 				},
+				{
+					Event:  user.HumanRegisteredType,
+					Reduce: s.Reduce,
+				},
 			},
 		},
 		{
@@ -234,6 +238,8 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 				handler.NewCol("multi_factor_verification_type", domain.MFALevelNotSetUp),
 				handler.NewCol("external_login_verification", time.Time{}),
 				handler.NewCol("state", domain.UserSessionStateTerminated),
+				handler.NewCol("change_date", event.CreatedAt()),
+				handler.NewCol("sequence", event.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond("instance_id", event.Aggregate().InstanceID),
@@ -247,16 +253,30 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpdateStatement(event,
-			[]handler.Column{
-				handler.NewCol("password_verification", time.Time{}),
-			},
-			[]handler.Condition{
-				handler.NewCond("instance_id", event.Aggregate().InstanceID),
-				handler.NewCond("user_id", event.Aggregate().ID),
-				handler.Not(handler.NewCond("user_agent_id", userAgent)),
-				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
-			},
+		return handler.NewMultiStatement(event,
+			handler.AddUpdateStatement(
+				[]handler.Column{
+					handler.NewCol("password_verification", event.CreatedAt()),
+					handler.NewCol("change_date", event.CreatedAt()),
+					handler.NewCol("sequence", event.Sequence()),
+				},
+				[]handler.Condition{
+					handler.NewCond("instance_id", event.Aggregate().InstanceID),
+					handler.NewCond("user_id", event.Aggregate().ID),
+					handler.NewCond("user_agent_id", userAgent),
+				}),
+			handler.AddUpdateStatement(
+				[]handler.Column{
+					handler.NewCol("password_verification", time.Time{}),
+					handler.NewCol("change_date", event.CreatedAt()),
+					handler.NewCol("sequence", event.Sequence()),
+				},
+				[]handler.Condition{
+					handler.NewCond("instance_id", event.Aggregate().InstanceID),
+					handler.NewCond("user_id", event.Aggregate().ID),
+					handler.Not(handler.NewCond("user_agent_id", userAgent)),
+					handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
+				}),
 		), nil
 	case user.UserV1MFAOTPRemovedType,
 		user.HumanMFAOTPRemovedType,
@@ -264,6 +284,8 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
 				handler.NewCol("second_factor_verification", time.Time{}),
+				handler.NewCol("change_date", event.CreatedAt()),
+				handler.NewCol("sequence", event.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond("instance_id", event.Aggregate().InstanceID),
@@ -277,6 +299,8 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			[]handler.Column{
 				handler.NewCol("external_login_verification", time.Time{}),
 				handler.NewCol("selected_idp_config_id", ""),
+				handler.NewCol("change_date", event.CreatedAt()),
+				handler.NewCol("sequence", event.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond("instance_id", event.Aggregate().InstanceID),
@@ -289,6 +313,8 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			[]handler.Column{
 				handler.NewCol("passwordless_verification", time.Time{}),
 				handler.NewCol("multi_factor_verification", time.Time{}),
+				handler.NewCol("change_date", event.CreatedAt()),
+				handler.NewCol("sequence", event.Sequence()),
 			},
 			[]handler.Condition{
 				handler.NewCond("instance_id", event.Aggregate().InstanceID),
@@ -299,6 +325,23 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 	case user.UserRemovedType:
 		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
 			return u.view.DeleteUserSessions(event.Aggregate().ID, event.Aggregate().InstanceID)
+		}), nil
+	case user.HumanRegisteredType:
+		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+			eventData, err := view_model.UserSessionFromEvent(event)
+			if err != nil {
+				return err
+			}
+			session := &view_model.UserSessionView{
+				CreationDate:         event.CreatedAt(),
+				ResourceOwner:        event.Aggregate().ResourceOwner,
+				UserAgentID:          eventData.UserAgentID,
+				UserID:               event.Aggregate().ID,
+				State:                int32(domain.UserSessionStateActive),
+				InstanceID:           event.Aggregate().InstanceID,
+				PasswordVerification: event.CreatedAt(),
+			}
+			return u.updateSession(session, event)
 		}), nil
 	case instance.InstanceRemovedEventType:
 		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
