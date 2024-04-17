@@ -267,7 +267,7 @@ func conditionToID(q *action.Condition) (string, error) {
 		}
 		return cond.ID(), nil
 	case *action.Condition_Function:
-		return t.Function.GetName(), nil
+		return command.ExecutionFunctionCondition(t.Function.GetName()).ID(), nil
 	default:
 		return "", zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}

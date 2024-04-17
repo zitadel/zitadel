@@ -143,7 +143,7 @@ func (e *ExecutionEventCondition) ID() string {
 		if !strings.HasSuffix(e.Group, EventGroupSuffix) {
 			group += EventGroupSuffix
 		}
-		return execution.ID(domain.ExecutionTypeEvent, e.Group)
+		return execution.ID(domain.ExecutionTypeEvent, group)
 	}
 	if e.All {
 		return execution.IDAll(domain.ExecutionTypeEvent)

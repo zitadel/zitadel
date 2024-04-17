@@ -775,7 +775,7 @@ func TestServer_ListExecutions(t *testing.T) {
 			},
 		},
 		{
-			name: "list multiple conditions",
+			name: "list multiple conditions all types",
 			args: args{
 				ctx: CTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) error {
@@ -856,6 +856,8 @@ func TestServer_ListExecutions(t *testing.T) {
 				if listErr != nil {
 					return
 				}
+				fmt.Println("result")
+				fmt.Println(got.Result)
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
