@@ -208,45 +208,13 @@ export default function VerifyU2F({
         </div>
       )}
       <div className="mt-8 flex w-full flex-row items-center">
-        {altPassword ? (
-          <Button
-            type="button"
-            variant={ButtonVariants.Secondary}
-            onClick={() => {
-              const params: any = { alt: "true" };
-
-              if (loginName) {
-                params.loginName = loginName;
-              }
-
-              if (sessionId) {
-                params.sessionId = sessionId;
-              }
-
-              if (authRequestId) {
-                params.authRequestId = authRequestId;
-              }
-
-              if (organization) {
-                params.organization = organization;
-              }
-
-              return router.push(
-                "/password?" + new URLSearchParams(params) // alt is set because password is requested as alternative auth method, so passwordless prompt can be escaped
-              );
-            }}
-          >
-            use password
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            variant={ButtonVariants.Secondary}
-            onClick={() => router.back()}
-          >
-            back
-          </Button>
-        )}
+        <Button
+          type="button"
+          variant={ButtonVariants.Secondary}
+          onClick={() => router.back()}
+        >
+          back
+        </Button>
 
         <span className="flex-grow"></span>
         <Button
