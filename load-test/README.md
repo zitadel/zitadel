@@ -17,16 +17,18 @@ The use cases under tests are defined in `src/use_cases`. The implementation of 
 
 ### Env vars
 
-`VUS`: Amount of parallel processes execute the test (default is 20)
-`DURATION`: Defines how long the tests are executed (default is `200s`)
-`ZITADEL_HOST`: URL of ZITADEL (default is `http://localhost:8080`)
+- `VUS`: Amount of parallel processes execute the test (default is 20)
+- `DURATION`: Defines how long the tests are executed (default is `200s`)
+- `ZITADEL_HOST`: URL of ZITADEL (default is `http://localhost:8080`)
 
 To setup the tests we use the credentials of console and log in using an admin. The user must be able to create organizations and all resources inside organizations.
 
-`ADMIN_LOGIN_NAME`: `zitadel-admin@zitadel.localhost`
-`ADMIN_PASSWORD`: `Password1!`
+- `ADMIN_LOGIN_NAME`: `zitadel-admin@zitadel.localhost`
+- `ADMIN_PASSWORD`: `Password1!`
 
 ### Test
+
+Before you run the tests you need an initialized user. The tests don't implement the change password screen during login.
 
 * `make human_password_login`  
   setup: creates human users  

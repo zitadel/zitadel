@@ -11,7 +11,7 @@ import { Tokens } from './oidc';
 
 export function loginByUsernamePassword(user: User) {
   check(user, {
-    'user defined': (u) => u !== undefined || fail(`user is undefined`)
+    'user defined': (u) => u !== undefined || fail(`user is undefined`),
   });
 
   const loginUI = initLogin();
@@ -22,9 +22,9 @@ export function loginByUsernamePassword(user: User) {
 
 const initLoginTrend = new Trend('login_ui_init_login_duration', true);
 function initLogin(): Response {
-  const response = http.get(url('/oauth/v2/authorize', {searchParams: Client()}));
+  const response = http.get(url('/oauth/v2/authorize', { searchParams: Client() }));
   check(response, {
-    'authorize status ok': (r) => r.status == 200 || fail(`init login failed: ${r}`)
+    'authorize status ok': (r) => r.status == 200 || fail(`init login failed: ${r}`),
   });
   initLoginTrend.add(response.timings.duration);
   return response;
@@ -35,13 +35,13 @@ function enterLoginName(page: Response, user: User): Response {
   const response = page.submitForm({
     formSelector: 'form',
     fields: {
-      'loginName': user.loginName
-    }
+      loginName: user.loginName,
+    },
   });
 
   check(response, {
-    'login name status ok': (r) => r && r.status == 200 || fail('enter login name failed'),
-    'login shows password page': (r) => r && r.body !== null && r.body.toString().includes('password')
+    'login name status ok': (r) => (r && r.status == 200) || fail('enter login name failed'),
+    'login shows password page': (r) => r && r.body !== null && r.body.toString().includes('password'),
     // 'login has no error': (r) => r && r.body != null && r.body.toString().includes('error') || fail(`error in enter login name ${r.body}`)
   });
 
@@ -55,8 +55,8 @@ function enterPassword(page: Response, user: User): Response {
   let response = page.submitForm({
     formSelector: 'form',
     fields: {
-      'password': user.password
-    }
+      password: user.password,
+    },
   });
   enterPasswordTrend.add(response.timings.duration);
 
@@ -64,13 +64,14 @@ function enterPassword(page: Response, user: User): Response {
   if (response.url.endsWith('/password')) {
     response = response.submitForm({
       formSelector: 'form',
-      submitSelector: '[name="skip"]'
-    });;
+      submitSelector: '[name="skip"]',
+    });
   }
 
   check(response, {
     'password status ok': (r) => r.status == 200 || fail('enter password failed'),
-    'password callback': (r) => r.url.startsWith(url('/ui/console/auth/callback?code='))  || fail(`wrong password callback: ${r.url}`)
+    'password callback': (r) =>
+      r.url.startsWith(url('/ui/console/auth/callback?code=')) || fail(`wrong password callback: ${r.url}`),
   });
 
   return response;
@@ -79,19 +80,23 @@ function enterPassword(page: Response, user: User): Response {
 const tokenTrend = new Trend('login_ui_token_duration', true);
 function token(code = '') {
   check(code, {
-    'code set': (c) => (c !== undefined && c !== null) || fail('code was not set')
+    'code set': (c) => (c !== undefined && c !== null) || fail('code was not set'),
   });
-  const response = http.post(url('/oauth/v2/token'), {
+  const response = http.post(
+    url('/oauth/v2/token'),
+    {
       grant_type: 'authorization_code',
       code: code,
       redirect_uri: Client().redirect_uri,
       code_verifier: Config.codeVerifier,
-      client_id: Client().client_id
-  }, {
+      client_id: Client().client_id,
+    },
+    {
       headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-  });
+    },
+  );
 
   tokenTrend.add(response.timings.duration);
   check(response, {
@@ -99,10 +104,10 @@ function token(code = '') {
   });
   const token = new Tokens(response.json() as JSONObject);
   check(token, {
-    'access token created': (t) =>  t.accessToken !== undefined,
-    'id token created': (t) =>  t.idToken !== undefined,
-    'info created': (t) =>  t.info !== undefined
+    'access token created': (t) => t.accessToken !== undefined,
+    'id token created': (t) => t.idToken !== undefined,
+    'info created': (t) => t.info !== undefined,
   });
-  
+
   return token;
 }

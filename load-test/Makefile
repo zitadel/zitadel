@@ -26,11 +26,16 @@ introspect: ensure_modules bundle
 	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
 	./../../xk6-modules/k6 run dist/introspection.js --vus ${VUS} --duration ${DURATION}
 
+.PHONY: lint
+lint:
+	npm i
+	npm run lint:fix
+
 .PHONY: ensure_modules
 ensure_modules:
 ifeq (,$(wildcard $(PWD)/../../xk6-modules))
 	@echo "cloning xk6-modules"
-	cd ../.. && git clone git@github.com:zitadel/xk6-modules.git
+	cd ../.. && git clone https://github.com/zitadel/xk6-modules.git
 endif
 	cd ../../xk6-modules && git pull
 

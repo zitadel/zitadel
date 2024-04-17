@@ -6,7 +6,7 @@ import { createOrg, removeOrg } from '../org';
 
 export async function setup() {
   const adminTokens = loginByUsernamePassword(Config.admin as User);
-  console.info("setup: admin signed in");
+  console.info('setup: admin signed in');
 
   const org = await createOrg(adminTokens.accessToken!);
   console.info(`setup: org (${org.organizationId}) created`);
@@ -14,7 +14,7 @@ export async function setup() {
   const user = await createHuman('gigi', org, adminTokens.accessToken!);
   console.info(`setup: user (${user.userId}) created`);
 
-  return {org, tokens: loginByUsernamePassword({loginName: user.loginNames[0], password: 'Password1!'} as User)};
+  return { org, tokens: loginByUsernamePassword({ loginName: user.loginNames[0], password: 'Password1!' } as User) };
 }
 
 export default function (data: any) {
@@ -23,5 +23,5 @@ export default function (data: any) {
 
 export function teardown(data: any) {
   removeOrg(data.org, data.tokens.accessToken);
-  console.info('teardown: org removed')
+  console.info('teardown: org removed');
 }

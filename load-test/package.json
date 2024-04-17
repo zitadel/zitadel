@@ -21,9 +21,13 @@
       "typescript": "5.4.5",
       "webpack": "5.89.0",
       "webpack-cli": "5.1.4",
-      "webpack-glob-entries": "^1.0.1"
+      "webpack-glob-entries": "^1.0.1",
+      "prettier": "^3.1.1",
+      "prettier-plugin-organize-imports": "^3.2.4"
     },
     "scripts": {
-      "bundle": "webpack"
+      "bundle": "webpack",
+      "lint": "prettier --check src",
+      "lint:fix": "prettier --write src"
     }
   }
