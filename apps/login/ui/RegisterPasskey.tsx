@@ -200,14 +200,17 @@ export default function RegisterPasskey({
             onClick={() => {
               const params = new URLSearchParams();
               if (authRequestId) {
-                params.set("authRequestId", authRequestId);
+                params.set("authRequest", authRequestId);
+              }
+              if (sessionId) {
+                params.set("sessionId", sessionId);
               }
 
               if (organization) {
                 params.set("organization", organization);
               }
 
-              router.push("/accounts?" + params);
+              router.push("/login?" + params);
             }}
           >
             skip
