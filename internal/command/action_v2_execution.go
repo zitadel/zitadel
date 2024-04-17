@@ -10,6 +10,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+const (
+	EventGroupSuffix = ".*"
+)
+
 type ExecutionAPICondition struct {
 	Method  string
 	Service string
@@ -136,8 +140,8 @@ func (e *ExecutionEventCondition) ID() string {
 	}
 	if e.Group != "" {
 		group := e.Group
-		if !strings.HasSuffix(e.Group, ".*") {
-			group = group + ".*"
+		if !strings.HasSuffix(e.Group, EventGroupSuffix) {
+			group += EventGroupSuffix
 		}
 		return execution.ID(domain.ExecutionTypeEvent, e.Group)
 	}

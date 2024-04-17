@@ -512,7 +512,7 @@ func TestServer_ListExecutions(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "list single condition",
+			name: "list request single condition",
 			args: args{
 				ctx: CTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) error {
@@ -570,7 +570,7 @@ func TestServer_ListExecutions(t *testing.T) {
 			},
 		},
 		{
-			name: "list single target",
+			name: "list request single target",
 			args: args{
 				ctx: CTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) error {
@@ -623,7 +623,7 @@ func TestServer_ListExecutions(t *testing.T) {
 				},
 			},
 		}, {
-			name: "list single include",
+			name: "list request single include",
 			args: args{
 				ctx: CTX,
 				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) error {
@@ -771,6 +771,65 @@ func TestServer_ListExecutions(t *testing.T) {
 							ResourceOwner: Tester.Instance.InstanceID(),
 						},
 					},
+				},
+			},
+		},
+		{
+			name: "list multiple conditions",
+			args: args{
+				ctx: CTX,
+				dep: func(ctx context.Context, request *action.ListExecutionsRequest, response *action.ListExecutionsResponse) error {
+					targets := executionTargetsSingleTarget(targetResp.GetId())
+					for i, cond := range request.Queries[0].GetInConditionsQuery().GetConditions() {
+						resp := Tester.SetExecution(ctx, t, cond, targets)
+						response.Result[i].Details.ChangeDate = resp.GetDetails().GetChangeDate()
+						response.Result[i].Details.Sequence = resp.GetDetails().GetSequence()
+						response.Result[i].Condition = cond
+						response.Result[i].Targets = targets
+
+						// filled with info of last sequence
+						response.Details.Timestamp = resp.GetDetails().GetChangeDate()
+						response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
+					}
+
+					return nil
+				},
+				req: &action.ListExecutionsRequest{
+					Queries: []*action.SearchQuery{{
+						Query: &action.SearchQuery_InConditionsQuery{
+							InConditionsQuery: &action.InConditionsQuery{
+								Conditions: []*action.Condition{
+									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Method{Method: "/zitadel.session.v2beta.SessionService/GetSession"}}}},
+									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Service{Service: "zitadel.session.v2beta.SessionService"}}}},
+									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_All{All: true}}}},
+									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Method{Method: "/zitadel.session.v2beta.SessionService/GetSession"}}}},
+									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Service{Service: "zitadel.session.v2beta.SessionService"}}}},
+									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_All{All: true}}}},
+									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Event{Event: "user.added"}}}},
+									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: "user"}}}},
+									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_All{All: true}}}},
+									{ConditionType: &action.Condition_Function{Function: &action.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"}}},
+								},
+							},
+						},
+					}},
+				},
+			},
+			want: &action.ListExecutionsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 10,
+				},
+				Result: []*action.Execution{
+					{Details: &object.Details{ResourceOwner: Tester.Instance.InstanceID()}},
+					{Details: &object.Details{ResourceOwner: Tester.Instance.InstanceID()}},
+					{Details: &object.Details{ResourceOwner: Tester.Instance.InstanceID()}},
+					{Details: &object.Details{ResourceOwner: Tester.Instance.InstanceID()}},
+					{Details: &object.Details{ResourceOwner: Tester.Instance.InstanceID()}},
+					{Details: &object.Details{ResourceOwner: Tester.Instance.InstanceID()}},
+					{Details: &object.Details{ResourceOwner: Tester.Instance.InstanceID()}},
+					{Details: &object.Details{ResourceOwner: Tester.Instance.InstanceID()}},
+					{Details: &object.Details{ResourceOwner: Tester.Instance.InstanceID()}},
+					{Details: &object.Details{ResourceOwner: Tester.Instance.InstanceID()}},
 				},
 			},
 		},

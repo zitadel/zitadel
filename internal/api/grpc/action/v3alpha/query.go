@@ -289,6 +289,8 @@ func executionToPb(e *query.Execution) *action.Execution {
 			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Include{Include: executionIDToCondition(e.Targets[i].Target)}}
 		case domain.ExecutionTargetTypeTarget:
 			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Target{Target: e.Targets[i].Target}}
+		case domain.ExecutionTargetTypeUnspecified:
+			continue
 		default:
 			continue
 		}
@@ -325,8 +327,9 @@ func includeRequestToCondition(id string) *action.Condition {
 		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Service{Service: id}}}}
 	case 0:
 		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_All{All: true}}}}
+	default:
+		return nil
 	}
-	return nil
 }
 func includeResponseToCondition(id string) *action.Condition {
 	switch strings.Count(id, "/") {
@@ -336,20 +339,24 @@ func includeResponseToCondition(id string) *action.Condition {
 		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Service{Service: id}}}}
 	case 0:
 		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_All{All: true}}}}
+	default:
+		return nil
 	}
-	return nil
 }
 
 func includeEventToCondition(id string) *action.Condition {
 	switch strings.Count(id, "/") {
-	case 2:
-		return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Event{Event: id}}}}
 	case 1:
-		return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: id}}}}
+		if strings.HasSuffix(id, command.EventGroupSuffix) {
+			return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: strings.TrimSuffix(id, command.EventGroupSuffix)}}}}
+		} else {
+			return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Event{Event: id}}}}
+		}
 	case 0:
 		return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_All{All: true}}}}
+	default:
+		return nil
 	}
-	return nil
 }
 
 func includeFunctionToCondition(id string) *action.Condition {
