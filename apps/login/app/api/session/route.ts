@@ -105,7 +105,7 @@ export async function PUT(request: NextRequest) {
         ).then(async (session) => {
           // if password, check if user has MFA methods
           let authFactors;
-          if (checks.password && session.factors?.user?.id) {
+          if (checks && checks.password && session.factors?.user?.id) {
             const response = await listHumanAuthFactors(
               server,
               session.factors?.user?.id
@@ -123,6 +123,7 @@ export async function PUT(request: NextRequest) {
         });
       })
       .catch((error) => {
+        console.error(error);
         return NextResponse.json({ details: error }, { status: 500 });
       });
   } else {

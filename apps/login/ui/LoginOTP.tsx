@@ -9,6 +9,7 @@ import { Spinner } from "./Spinner";
 import { Checks } from "@zitadel/server";
 import { useForm } from "react-hook-form";
 import { TextInput } from "./Input";
+import { Challenges } from "@zitadel/server";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -16,7 +17,7 @@ type Props = {
   sessionId?: string;
   authRequestId?: string;
   organization?: string;
-  method?: string;
+  method: string;
   code?: string;
 };
 
@@ -47,22 +48,30 @@ export default function LoginOTP({
   });
 
   useEffect(() => {
-    if (!initialized.current) {
+    if (!initialized.current && ["email", "sms"].includes(method)) {
       initialized.current = true;
       setLoading(true);
-      updateSessionForOTPChallenge();
-      // .then((response) => {
-
-      //   setLoading(false);
-      // })
-      // .catch((error) => {
-      //   setError(error);
-      //   setLoading(false);
-      // });
+      updateSessionForOTPChallenge()
+        .then((response) => {
+          setLoading(false);
+        })
+        .catch((error) => {
+          setError(error);
+          setLoading(false);
+        });
     }
   }, []);
 
   async function updateSessionForOTPChallenge() {
+    const challenges: Challenges = {};
+
+    if (method === "email") {
+      challenges.otpEmail = "peintnerm@gmail.com";
+    }
+
+    if (method === "sms") {
+      challenges.otpSms = "";
+    }
     setLoading(true);
     const res = await fetch("/api/session", {
       method: "PUT",
@@ -73,14 +82,7 @@ export default function LoginOTP({
         loginName,
         sessionId,
         organization,
-        challenges:
-          method === "email"
-            ? {
-                otpEmail: true,
-              }
-            : method === "sms"
-            ? { otpSms: true }
-            : {},
+        challenges,
         authRequestId,
       }),
     });
