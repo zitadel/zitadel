@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package zitadel.settings.defaultlogin.v2;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2;defaultlogin";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/object/v2/object.proto";
+
+message GetGeneralSettings {
+  zitadel.object.v2.ResolvedString default_org_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "default organization for the current context"
+    }
+  ];
+  zitadel.object.v2.ResolvedString default_language = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "default language for the current context"
+      example: "\"en\""
+    }
+  ];
+  zitadel.object.v2.ResolvedStrings supported_languages = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[\"en\", \"de\", \"it\"]"
+    }
+  ];
+}

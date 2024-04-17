@@ -1,22 +1,22 @@
 syntax = "proto3";
 
-package zitadel.settings.v2beta;
+package zitadel.settings.defaultlogin.v2;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2;defaultlogin";
 
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/object/v2beta/object.proto";
-import "zitadel/settings/v2beta/branding_settings.proto";
-import "zitadel/settings/v2beta/domain_settings.proto";
-import "zitadel/settings/v2beta/legal_settings.proto";
-import "zitadel/settings/v2beta/lockout_settings.proto";
-import "zitadel/settings/v2beta/login_settings.proto";
-import "zitadel/settings/v2beta/password_settings.proto";
-import "zitadel/settings/v2beta/security_settings.proto";
+import "zitadel/object/v2/object.proto";
+import "zitadel/settings/defaultlogin/v2/branding_settings.proto";
+import "zitadel/settings/defaultlogin/v2/domain_settings.proto";
+import "zitadel/settings/defaultlogin/v2/legal_settings.proto";
+import "zitadel/settings/defaultlogin/v2/lockout_settings.proto";
+import "zitadel/settings/defaultlogin/v2/login_settings.proto";
+import "zitadel/settings/defaultlogin/v2/password_settings.proto";
+import "zitadel/settings/defaultlogin/v2/security_settings.proto";
+import "zitadel/settings/defaultlogin/v2/general_settings.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta;settings";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -95,7 +95,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service SettingsService {
+service DefaultLoginUISettingsService {
 
   // Get basic information about the instance
   rpc GetGeneralSettings (GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {
@@ -124,25 +124,6 @@ service SettingsService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Get the login settings";
       description: "Return the settings for the requested context"
-      responses: {
-        key: "200"
-        value: {
-          description: "OK";
-        }
-      };
-    };
-  }
-
-  // Get the current active identity providers
-  rpc GetActiveIdentityProviders (GetActiveIdentityProvidersRequest) returns (GetActiveIdentityProvidersResponse) {
-    option (google.api.http) = {
-      get: "/settings/v2/login/idps"
-    };
-
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the current active identity providers";
-      description: "Return the current active identity providers for the requested context"
       responses: {
         key: "200"
         value: {
@@ -258,7 +239,7 @@ service SettingsService {
 // Set the security settings
   rpc SetSecuritySettings(SetSecuritySettingsRequest) returns (SetSecuritySettingsResponse) {
     option (google.api.http) = {
-      put: "/settings/v2/security";
+      patch: "/settings/v2/security";
       body: "*"
     };
 
@@ -271,106 +252,86 @@ service SettingsService {
 }
 
 message GetLoginSettingsRequest {
-  zitadel.object.v2beta.RequestContext ctx = 1;
+  zitadel.object.v2.RequestContext ctx = 1;
 }
 
 message GetLoginSettingsResponse {
-  zitadel.object.v2beta.Details details = 1;
-  zitadel.settings.v2beta.LoginSettings settings = 2;
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.defaultlogin.v2.GetLoginSettings settings = 2;
 }
 
 message GetPasswordComplexitySettingsRequest {
-  zitadel.object.v2beta.RequestContext ctx = 1;
+  zitadel.object.v2.RequestContext ctx = 1;
 }
 
 message GetPasswordComplexitySettingsResponse {
-  zitadel.object.v2beta.Details details = 1;
-  zitadel.settings.v2beta.PasswordComplexitySettings settings = 2;
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.defaultlogin.v2.GetPasswordComplexitySettings settings = 2;
 }
 
 message GetBrandingSettingsRequest {
-  zitadel.object.v2beta.RequestContext ctx = 1;
+  zitadel.object.v2.RequestContext ctx = 1;
 }
 
 message GetBrandingSettingsResponse {
-  zitadel.object.v2beta.Details details = 1;
-  zitadel.settings.v2beta.BrandingSettings settings = 2;
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.defaultlogin.v2.GetBrandingSettings settings = 2;
 }
 
 message GetDomainSettingsRequest {
-  zitadel.object.v2beta.RequestContext ctx = 1;
+  zitadel.object.v2.RequestContext ctx = 1;
 }
 
 message GetDomainSettingsResponse {
-  zitadel.object.v2beta.Details details = 1;
-  zitadel.settings.v2beta.DomainSettings settings = 2;
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.defaultlogin.v2.GetDomainSettings settings = 2;
 }
 
 message GetLegalAndSupportSettingsRequest {
-  zitadel.object.v2beta.RequestContext ctx = 1;
+  zitadel.object.v2.RequestContext ctx = 1;
 }
 
 message GetLegalAndSupportSettingsResponse {
-  zitadel.object.v2beta.Details details = 1;
-  zitadel.settings.v2beta.LegalAndSupportSettings settings = 2;
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.defaultlogin.v2.GetLegalAndSupportSettings settings = 2;
 }
 
 message GetLockoutSettingsRequest {
-  zitadel.object.v2beta.RequestContext ctx = 1;
+  zitadel.object.v2.RequestContext ctx = 1;
 }
 
 message GetLockoutSettingsResponse {
-  zitadel.object.v2beta.Details details = 1;
-  zitadel.settings.v2beta.LockoutSettings settings = 2;
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.defaultlogin.v2.GetLockoutSettings settings = 2;
 }
 
-message GetActiveIdentityProvidersRequest {
-  zitadel.object.v2beta.RequestContext ctx = 1;
+message GetGeneralSettingsRequest {
+  // Only System and Instance Contexts are allowed
+  zitadel.object.v2.RequestContext ctx = 1;
+  zitadel.settings.defaultlogin.v2.GetGeneralSettings settings = 2;
 }
-
-message GetActiveIdentityProvidersResponse {
-  zitadel.object.v2beta.ListDetails details = 1;
-  repeated zitadel.settings.v2beta.IdentityProvider identity_providers = 2;
-}
-
-message GetGeneralSettingsRequest {}
 
 message GetGeneralSettingsResponse {
-  string default_org_id = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "default organization for the current context"
-    }
-  ];
-  string default_language = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "default language for the current context"
-      example: "\"en\""
-    }
-  ];
-  repeated string supported_languages = 3 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "[\"en\", \"de\", \"it\"]"
-    }
-  ];
+  zitadel.object.v2.Details details = 1;
+  zitadel.settings.defaultlogin.v2.GetLockoutSettings settings = 2;
 }
 
-// This is an empty request
-message GetSecuritySettingsRequest{}
+message GetSecuritySettingsRequest{
+  // Only System and Instance Contexts are allowed
+  zitadel.object.v2.RequestContext ctx = 1;
+}
 
 message GetSecuritySettingsResponse{
-  zitadel.object.v2beta.Details details = 1;
-  SecuritySettings settings = 2;
+  zitadel.object.v2.Details details = 1;
+  GetSecuritySettings settings = 2;
 }
 
 message SetSecuritySettingsRequest{
-  EmbeddedIframeSettings embedded_iframe = 1;
-  bool enable_impersonation = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "allows users to impersonate other users. The impersonator needs the appropriate `*_IMPERSONATOR` roles assigned as well"
-    }
-  ];
+  // Only System and Instance Contexts are allowed
+  zitadel.object.v2.RequestContext ctx = 1;
+  SetSecuritySettings settings = 2;
 }
 
 message SetSecuritySettingsResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }

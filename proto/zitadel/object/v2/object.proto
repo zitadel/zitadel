@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package zitadel.object.v2;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/object/v2beta;object";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/object/v2;object";
 
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
@@ -127,4 +127,101 @@ enum ResourceOwnerType {
   RESOURCE_OWNER_TYPE_SYSTEM = 1; // TODO: move the source of truth from the defaults.yaml into the database
   RESOURCE_OWNER_TYPE_INSTANCE = 2;
   RESOURCE_OWNER_TYPE_ORG = 3;
+}
+
+message ResolvedBool {
+  bool value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "false";
+      description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
+    }
+  ];
+  zitadel.object.v2.ResourceOwnerType resource_owner_type = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The resource owner type where the setting of the feature was defined. The resource owner type may be equivalent to the given context or to a higher-level context.";
+    }
+  ];
+}
+
+message SetBool {
+  optional bool value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "If the optional value is not set, the value is removed from the given contexts settings. Further get requests will return the inherited value from a higher-level context.";
+    }
+  ];
+}
+
+message ResolvedString {
+  string value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "a resolved string";
+      description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
+    }
+  ];
+  zitadel.object.v2.ResourceOwnerType resource_owner_type = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The resource owner type where the setting of the feature was defined. The resource owner type may be equivalent to the given context or to a higher-level context.";
+    }
+  ];
+}
+
+message SetString {
+  optional string value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "set this string";
+      description: "If the optional value is not set, the value is removed from the given contexts settings. Further get requests will return the inherited value from a higher-level context. Beware that an empty string is treated as a valid string";
+    }
+  ];
+}
+
+
+message ResolvedStrings {
+  repeated string value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "a resolved string";
+      description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
+    }
+  ];
+  zitadel.object.v2.ResourceOwnerType resource_owner_type = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The resource owner type where the setting of the feature was defined. The resource owner type may be equivalent to the given context or to a higher-level context.";
+    }
+  ];
+}
+
+message SetStrings {
+  optional SetStringsValue value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "set these strings";
+      description: "If the optional value is not set, the value is removed from the given contexts settings. Further get requests will return the inherited value from a higher-level context. Beware that an empty string list is treated as a valid list with no entries";
+    }
+  ];
+}
+
+message SetStringsValue {
+  repeated string value = 1;
+}
+
+message ResolvedUInt64 {
+  uint64 value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "1000";
+      description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
+    }
+  ];
+  zitadel.object.v2.ResourceOwnerType resource_owner_type = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The resource owner type where the setting of the feature was defined. The resource owner type may be equivalent to the given context or to a higher-level context.";
+    }
+  ];
+}
+
+message SetUInt64 {
+  optional uint64 value = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "2000";
+      description: "If the optional value is not set, the value is removed from the given contexts settings. Further get requests will return the inherited value from a higher-level context. Beware that 0 is treated as a valid uint64";
+    }
+  ];
 }

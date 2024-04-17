@@ -1,15 +1,19 @@
 syntax = "proto3";
 
-package zitadel.settings.v2beta;
-
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta;settings";
+package zitadel.settings.defaultlogin.v2;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2;defaultlogin";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/object/v2/object.proto";
 
-// TODO: Is this only relevant for the default login?
-message SecuritySettings {
-  EmbeddedIframeSettings embedded_iframe = 1;
-  bool enable_impersonation = 2 [
+message GetSecuritySettings {
+  zitadel.object.v2.ResolvedStrings allowed_embedded_iframe_origins = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "origins allowed loading ZITADEL in an iframe."
+      example: "[\"foo.bar.com\", \"localhost:8080\"]"
+    }
+  ];
+  zitadel.object.v2.ResolvedBool enable_impersonation = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "default language for the current context"
       example: "\"en\""
@@ -17,16 +21,17 @@ message SecuritySettings {
   ];
 }
 
-message EmbeddedIframeSettings{
-  bool enabled = 1 [
+message SetSecuritySettings {
+  zitadel.object.v2.SetStrings allowed_embedded_iframe_origins = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "states if iframe embedding is enabled or disabled"
+      description: "origins allowed loading ZITADEL in an iframe."
+      example: "[\"foo.bar.com\", \"localhost:8080\"]"
     }
   ];
-  repeated string allowed_origins = 2 [
+  zitadel.object.v2.SetBool enable_impersonation = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "origins allowed loading ZITADEL in an iframe if enabled."
-      example: "[\"foo.bar.com\", \"localhost:8080\"]"
+      description: "default language for the current context"
+      example: "\"en\""
     }
   ];
 }
