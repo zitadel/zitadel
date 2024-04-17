@@ -5,6 +5,7 @@ package action_test
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -487,7 +488,7 @@ func TestServer_ListTargets(t *testing.T) {
 	}
 }
 
-func TestServer_ListExecutions_Request(t *testing.T) {
+func TestServer_ListExecutions(t *testing.T) {
 	ensureFeatureEnabled(t)
 	targetResp := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 
@@ -796,17 +797,26 @@ func TestServer_ListExecutions_Request(t *testing.T) {
 				if listErr != nil {
 					return
 				}
-				fmt.Println("execs: ")
-				fmt.Println(got)
-				fmt.Println("want: ")
-				fmt.Println(tt.want)
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
-					assert.Contains(ttt, got.Result, tt.want.Result[i])
+					// as not sorted, all elements have to be checked
+					// workaround as oneof elements can only be checked with assert.EqualExportedValues()
+					if j, found := containExecution(got.Result, tt.want.Result[i]); found {
+						assert.EqualExportedValues(ttt, got.Result[j], tt.want.Result[i])
+					}
 				}
 				integration.AssertListDetails(t, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
 		})
 	}
+}
+
+func containExecution(executionList []*action.Execution, execution *action.Execution) (int, bool) {
+	for i, exec := range executionList {
+		if reflect.DeepEqual(exec.Details, execution.Details) {
+			return i, true
+		}
+	}
+	return 0, false
 }
