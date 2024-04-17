@@ -159,7 +159,7 @@ func (s *Server) getUserInfoAndSignerOnce(ctx context.Context, userID, projectID
 		ctx, span := tracing.NewSpan(ctx)
 		defer func() { span.EndWithError(err) }()
 
-		userInfo, err = s.userInfo(ctx, userID, projectID, projectRoleAssertion, scope, []string{projectID})
+		userInfo, err = s.userInfo(ctx, userID, scope, projectID, projectRoleAssertion, false)
 		if err != nil {
 			return
 		}
