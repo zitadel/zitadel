@@ -5,7 +5,6 @@ import (
 	"slices"
 	"time"
 
-	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
@@ -226,12 +225,12 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 
 	switch tokenType {
 	case oidc.AccessTokenType, "":
-		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeAccessToken(ctx, client, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeAccessToken(ctx, client, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.AccessTokenType
 
 	case oidc.JWTTokenType:
-		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeJWT(ctx, client, getUserInfoAndSigningKey, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeJWT(ctx, client, getUserInfoAndSigningKey, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.JWTTokenType
 
@@ -239,6 +238,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		resp.AccessToken, resp.ExpiresIn, err = s.createIDToken(ctx, client, getUserInfoAndSigningKey, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, actor)
 		resp.TokenType = TokenTypeNA
 		resp.IssuedTokenType = oidc.IDTokenType
+
 	case oidc.RefreshTokenType, UserIDTokenType:
 		fallthrough
 	default:
@@ -258,61 +258,29 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	return resp, nil
 }
 
-func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {
+func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, userID, resourceOwner string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	tokenInfo, refreshToken, err := s.createAccessTokenCommands(ctx, client, resourceOwner, userID, audience, scopes, authMethods, authTime, reason, actor)
+	session, err := s.command.CreateOIDCSession(ctx, userID, resourceOwner, client.client.ClientID, audience, scope, authMethods, authTime, nil, reason, actor)
 	if err != nil {
 		return "", "", 0, err
 	}
-	accessToken, err = op.CreateBearerToken(tokenInfo.TokenID, userID, s.Provider().Crypto())
+	accessToken, err = op.CreateBearerToken(session.TokenID, userID, s.opCrypto)
 	if err != nil {
 		return "", "", 0, err
 	}
-	return accessToken, refreshToken, timeToOIDCExpiresIn(tokenInfo.Expiration), nil
+	return accessToken, refreshToken, timeToOIDCExpiresIn(session.Expiration), nil
 }
 
-func (s *Server) createExchangeJWT(ctx context.Context, client *Client, getUserInfoAndSigningKey userInfoAndSignerFunc, resourceOwner string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {
-	userInfo, signer, _, err := getUserInfoAndSigningKey(ctx)
+func (s *Server) createExchangeJWT(ctx context.Context, client *Client, getUserInfoAndSigningKey userInfoAndSignerFunc, userID, resourceOwner string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	session, err := s.command.CreateOIDCSession(ctx, userID, resourceOwner, client.client.ClientID, audience, scope, authMethods, authTime, nil, reason, actor)
+	accessToken, err = s.createJWT(ctx, client, session, getUserInfoAndSigningKey)
 	if err != nil {
 		return "", "", 0, err
 	}
-
-	tokenInfo, refreshToken, err := s.createAccessTokenCommands(ctx, client, resourceOwner, userInfo.Subject, audience, scopes, authMethods, authTime, reason, actor)
-	if err != nil {
-		return "", "", 0, err
-	}
-
-	expTime := tokenInfo.Expiration.Add(client.ClockSkew())
-	claims := oidc.NewAccessTokenClaims(op.IssuerFromContext(ctx), userInfo.Subject, tokenInfo.Audience, expTime, tokenInfo.TokenID, client.GetID(), client.ClockSkew())
-	claims.Actor = actorDomainToClaims(tokenInfo.Actor)
-	claims.Claims = userInfo.Claims
-
-	accessToken, err = crypto.Sign(claims, signer)
-	if err != nil {
-		return "", "", 0, nil
-	}
-	return accessToken, refreshToken, timeToOIDCExpiresIn(expTime), nil
-}
-
-func timeToOIDCExpiresIn(exp time.Time) uint64 {
-	return uint64(time.Until(exp) / time.Second)
-}
-
-func (s *Server) createAccessTokenCommands(ctx context.Context, client *Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (tokenInfo *domain.Token, refreshToken string, err error) {
-	settings := client.client.Settings
-	if slices.Contains(scopes, oidc.ScopeOfflineAccess) {
-		return s.command.AddAccessAndRefreshToken(
-			ctx, resourceOwner, "", client.GetID(), userID, "", audience, scopes, AuthMethodTypesToAMR(authMethods),
-			settings.AccessTokenLifetime, settings.RefreshTokenIdleExpiration, settings.RefreshTokenExpiration,
-			authTime, reason, actor,
-		)
-	}
-	tokenInfo, err = s.command.AddUserToken(
-		ctx, resourceOwner, "", client.GetID(), userID, audience, scopes, AuthMethodTypesToAMR(authMethods),
-		settings.AccessTokenLifetime,
-		authTime, reason, actor,
-	)
-	return tokenInfo, "", err
+	return accessToken, session.RefreshToken, timeToOIDCExpiresIn(session.Expiration), nil
 }
