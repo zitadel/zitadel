@@ -65,16 +65,14 @@ func (c *AuthRequestCache) GetAuthRequestByCode(ctx context.Context, code string
 }
 
 func (c *AuthRequestCache) SaveAuthRequest(ctx context.Context, request *domain.AuthRequest) error {
-	c.CacheAuthRequest(ctx, request)
-	return c.saveAuthRequest(request, "INSERT INTO auth.auth_requests (id, request, instance_id, creation_date, change_date, request_type) VALUES($1, $2, $3, $4, $4, $5)", request.CreationDate, request.Request.Type())
+	return c.saveAuthRequest(ctx, request, "INSERT INTO auth.auth_requests (id, request, instance_id, creation_date, change_date, request_type) VALUES($1, $2, $3, $4, $4, $5)", request.CreationDate, request.Request.Type())
 }
 
 func (c *AuthRequestCache) UpdateAuthRequest(ctx context.Context, request *domain.AuthRequest) error {
 	if request.ChangeDate.IsZero() {
 		request.ChangeDate = time.Now()
 	}
-	c.CacheAuthRequest(ctx, request)
-	return c.saveAuthRequest(request, "UPDATE auth.auth_requests SET request = $2, instance_id = $3, change_date = $4, code = $5 WHERE id = $1", request.ChangeDate, request.Code)
+	return c.saveAuthRequest(ctx, request, "UPDATE auth.auth_requests SET request = $2, instance_id = $3, change_date = $4, code = $5 WHERE id = $1", request.ChangeDate, request.Code)
 }
 
 func (c *AuthRequestCache) DeleteAuthRequest(ctx context.Context, id string) error {
@@ -113,7 +111,7 @@ func (c *AuthRequestCache) getAuthRequest(ctx context.Context, key, value, insta
 	return request, nil
 }
 
-func (c *AuthRequestCache) saveAuthRequest(request *domain.AuthRequest, query string, date time.Time, param interface{}) error {
+func (c *AuthRequestCache) saveAuthRequest(ctx context.Context, request *domain.AuthRequest, query string, date time.Time, param interface{}) error {
 	b, err := json.Marshal(request)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "CACHE-os0GH", "Errors.Internal")
@@ -122,6 +120,7 @@ func (c *AuthRequestCache) saveAuthRequest(request *domain.AuthRequest, query st
 	if err != nil {
 		return zerrors.ThrowInternal(err, "CACHE-su3GK", "Errors.Internal")
 	}
+	c.CacheAuthRequest(ctx, request)
 	return nil
 }
 
