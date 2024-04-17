@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -39,9 +40,7 @@ type OIDCSession struct {
 	UserAgent         *domain.UserAgent
 	Reason            domain.TokenReason // Move also?
 	Actor             *domain.TokenActor // Move also?
-
-	State        string
-	RefreshToken string
+	RefreshToken      string
 }
 
 type AuthRequestComplianceChecker func(context.Context, *AuthRequestWriteModel) error
@@ -50,6 +49,9 @@ type AuthRequestComplianceChecker func(context.Context, *AuthRequestWriteModel) 
 // It returns the access token id, expiration and the refresh token.
 // If the underlying [AuthRequest] is a OIDC Auth Code Flow, it will set the code as exchanged.
 func (c *Commands) CreateOIDCSessionFromCodeExchange(ctx context.Context, code string, complianceCheck AuthRequestComplianceChecker) (session *OIDCSession, state string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if code == "" {
 		return nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.AuthRequest.InvalidCode")
 	}
@@ -104,6 +106,9 @@ func (c *Commands) CreateOIDCSessionFromCodeExchange(ctx context.Context, code s
 }
 
 func (c *Commands) CreateOIDCSession(ctx context.Context, userID, resourceOwner, clientID string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, userAgent *domain.UserAgent, reason domain.TokenReason, actor *domain.TokenActor) (session *OIDCSession, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	cmd, err := c.newOIDCSessionAddEvents(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -120,29 +125,36 @@ func (c *Commands) CreateOIDCSession(ctx context.Context, userID, resourceOwner,
 	return cmd.PushEvents(ctx)
 }
 
+type RefreshTokenComplianceChecker func(context.Context, *OIDCSessionWriteModel) error
+
 // ExchangeOIDCSessionRefreshAndAccessToken updates an existing OIDC Session, creates a new access and refresh token.
 // It returns the access token id and expiration and the new refresh token.
-func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context, oidcSessionID, refreshToken string, scope []string) (tokenID, newRefreshToken string, tokenExpiration time.Time, err error) {
-	cmd, err := c.newOIDCSessionUpdateEvents(ctx, oidcSessionID, refreshToken)
+func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context, refreshToken string, scope []string, complianceCheck RefreshTokenComplianceChecker) (_ *OIDCSession, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	cmd, err := c.newOIDCSessionUpdateEvents(ctx, refreshToken)
 	if err != nil {
-		return "", "", time.Time{}, err
+		return nil, err
+	}
+	if err = complianceCheck(ctx, cmd.oidcSessionWriteModel); err != nil {
+		return nil, err
 	}
 	if err = cmd.AddAccessToken(ctx, scope, domain.TokenReasonRefresh, nil); err != nil {
-		return "", "", time.Time{}, err
+		return nil, err
 	}
 	if err = cmd.RenewRefreshToken(ctx); err != nil {
-		return "", "", time.Time{}, err
+		return nil, err
 	}
-	session, err := cmd.PushEvents(ctx)
-	if err != nil {
-		return "", "", time.Time{}, err
-	}
-	return session.TokenID, session.RefreshToken, session.Expiration, nil
+	return cmd.PushEvents(ctx)
 }
 
 // OIDCSessionByRefreshToken computes the current state of an existing OIDCSession by a refresh_token (to start a Refresh Token Grant).
 // If either the session is not active, the token is invalid or expired (incl. idle expiration) an invalid refresh token error will be returned.
-func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken string) (*OIDCSessionWriteModel, error) {
+func (c *Commands) OIDCSessionByRefreshToken(ctx context.Context, refreshToken string) (_ *OIDCSessionWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	oidcSessionID, refreshTokenID, err := parseRefreshToken(refreshToken)
 	if err != nil {
 		return nil, err
@@ -228,17 +240,16 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, resourceOwner st
 	}, nil
 }
 
-func (c *Commands) decryptRefreshToken(refreshToken string) (refreshTokenID string, err error) {
+func (c *Commands) decryptRefreshToken(refreshToken string) (sessionID, refreshTokenID string, err error) {
 	decoded, err := base64.RawURLEncoding.DecodeString(refreshToken)
 	if err != nil {
-		return "", zerrors.ThrowInvalidArgument(err, "OIDCS-Cux9a", "Errors.User.RefreshToken.Invalid")
+		return "", "", zerrors.ThrowInvalidArgument(err, "OIDCS-Cux9a", "Errors.User.RefreshToken.Invalid")
 	}
 	decrypted, err := c.keyAlgorithm.DecryptString(decoded, c.keyAlgorithm.EncryptionKeyID())
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	_, refreshTokenID, err = parseRefreshToken(decrypted)
-	return refreshTokenID, err
+	return parseRefreshToken(decrypted)
 }
 
 func parseRefreshToken(refreshToken string) (oidcSessionID, refreshTokenID string, err error) {
@@ -251,8 +262,8 @@ func parseRefreshToken(refreshToken string) (oidcSessionID, refreshTokenID strin
 	return split[0], strings.Split(split[1], oidcTokenSubjectDelimiter)[0], nil
 }
 
-func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, oidcSessionID, refreshToken string) (*OIDCSessionEvents, error) {
-	refreshTokenID, err := c.decryptRefreshToken(refreshToken)
+func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken string) (*OIDCSessionEvents, error) {
+	oidcSessionID, refreshTokenID, err := c.decryptRefreshToken(refreshToken)
 	if err != nil {
 		return nil, err
 	}
@@ -391,7 +402,7 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 		Expiration:        c.oidcSessionWriteModel.AccessTokenExpiration,
 		PreferredLanguage: "", // ??
 		UserAgent:         c.oidcSessionWriteModel.UserAgent,
-		Reason:            domain.TokenReasonAuthRequest,
+		Reason:            c.oidcSessionWriteModel.AccessTokenReason,
 		RefreshToken:      c.refreshToken,
 	}, nil
 }

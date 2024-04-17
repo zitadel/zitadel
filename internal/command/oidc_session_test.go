@@ -325,6 +325,12 @@ func TestCommands_CreateOIDCSessionFromCodeExchange(t *testing.T) {
 	}
 }
 
+func mockRefreshTokenComplianceChecker(returnErr error) RefreshTokenComplianceChecker {
+	return func(context.Context, *OIDCSessionWriteModel) error {
+		return returnErr
+	}
+}
+
 func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 	type fields struct {
 		eventstore                      func(*testing.T) *eventstore.Eventstore
@@ -335,16 +341,14 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 		keyAlgorithm                    crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx           context.Context
-		oidcSessionID string
-		refreshToken  string
-		scope         []string
+		ctx             context.Context
+		refreshToken    string
+		scope           []string
+		complianceCheck RefreshTokenComplianceChecker
 	}
 	type res struct {
-		id           string
-		refreshToken string
-		expiration   time.Time
-		err          error
+		session *OIDCSession
+		err     error
 	}
 	tests := []struct {
 		name   string
@@ -359,9 +363,9 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
-				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
-				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "aW52YWxpZA", // invalid
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				refreshToken:    "aW52YWxpZA", // invalid
+				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
 				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-JOI23", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -376,9 +380,9 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
-				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
-				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
 				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-s3hjk", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -405,9 +409,9 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
-				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
-				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
 				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-28ubl", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -438,9 +442,9 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
-				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
-				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
 				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -482,15 +486,22 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
-				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
-				oidcSessionID: "V2_oidcSessionID",
-				refreshToken:  "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
-				scope:         []string{"openid", "offline_access"},
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				scope:           []string{"openid", "offline_access"},
+				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
-				id:           "V2_oidcSessionID-at_accessTokenID",
-				refreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDI6dXNlcklE", // V2_oidcSessionID-rt_refreshTokenID2:userID%
-				expiration:   time.Time{}.Add(time.Hour),
+				session: &OIDCSession{
+					TokenID:      "V2_oidcSessionID-at_accessTokenID",
+					ClientID:     "clientID",
+					UserID:       "userID",
+					Audience:     []string{"audience"},
+					RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDI6dXNlcklE", // V2_oidcSessionID-rt_refreshTokenID2:userID%
+					Expiration:   time.Time{}.Add(time.Hour),
+					UserAgent:    &domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
+					Reason:       domain.TokenReasonRefresh,
+				},
 			},
 		},
 	}
@@ -504,10 +515,8 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
-			gotID, gotRefreshToken, gotExpiration, err := c.ExchangeOIDCSessionRefreshAndAccessToken(tt.args.ctx, tt.args.oidcSessionID, tt.args.refreshToken, tt.args.scope)
-			assert.Equal(t, tt.res.id, gotID)
-			assert.Equal(t, tt.res.refreshToken, gotRefreshToken)
-			assert.Equal(t, tt.res.expiration, gotExpiration)
+			got, err := c.ExchangeOIDCSessionRefreshAndAccessToken(tt.args.ctx, tt.args.refreshToken, tt.args.scope, tt.args.complianceCheck)
+			assert.Equal(t, tt.res.session, got)
 			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}

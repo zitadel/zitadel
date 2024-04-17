@@ -156,13 +156,6 @@ func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oi
 	return s.LegacyServer.DeviceAuthorization(ctx, r)
 }
 
-func (s *Server) RefreshToken(ctx context.Context, r *op.ClientRequest[oidc.RefreshTokenRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.RefreshToken(ctx, r)
-}
-
 func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGrantRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -227,4 +220,11 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		UILocalesSupported:                                 supportedUILocales,
 		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
 	}
+}
+
+func response[T any](resp T, err error) (*op.Response, error) {
+	if err != nil {
+		return nil, oidcError(err)
+	}
+	return op.NewResponse(resp), nil
 }

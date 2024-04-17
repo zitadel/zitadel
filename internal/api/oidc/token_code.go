@@ -2,9 +2,7 @@ package oidc
 
 import (
 	"context"
-	"slices"
 	"strings"
-	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
@@ -23,8 +21,7 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 
 	client, ok := r.Client.(*Client)
 	if !ok {
-		// not supposed to happen, but just preventing a panic if it does.
-		return nil, zerrors.ThrowInternal(nil, "OIDC-eShi5", "Error.Internal")
+		return nil, zerrors.ThrowInternal(nil, "OIDC-Pe4th", "Error.Internal")
 	}
 
 	plainCode, err := s.decryptCode(ctx, r.Data.Code)
@@ -46,38 +43,7 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 	if err != nil {
 		return nil, err
 	}
-
-	accessToken, idToken, err := s.createTokensFromSession(ctx, client, session)
-	if err != nil {
-		return nil, err
-	}
-	return op.NewResponse(&oidc.AccessTokenResponse{
-		AccessToken:  accessToken,
-		TokenType:    oidc.BearerToken,
-		RefreshToken: session.RefreshToken,
-		ExpiresIn:    timeToOIDCExpiresIn(session.Expiration),
-		IDToken:      idToken,
-		State:        state,
-	}), nil
-}
-
-func (s *Server) createTokensFromSession(ctx context.Context, client *Client, session *command.OIDCSession) (accessToken, idToken string, err error) {
-	getUserInfoAndSigner := s.getUserInfoAndSignerOnce(ctx, session.UserID, client.client.ProjectID, client.client.ProjectRoleAssertion, session.Scopes)
-
-	if client.AccessTokenType() == op.AccessTokenTypeJWT {
-		accessToken, err = s.createJWT(ctx, client, session, getUserInfoAndSigner)
-	} else {
-		accessToken, err = op.CreateBearerToken(session.TokenID, session.UserID, s.opCrypto)
-	}
-	if err != nil {
-		return "", "", err
-	}
-
-	if slices.Contains(session.Scopes, oidc.ScopeOpenID) {
-		idToken, _, err = s.createIDToken(ctx, client, getUserInfoAndSigner, accessToken, session.Audience, nil, time.Time{}, nil) // TODO: authmethods, authTime
-	}
-
-	return accessToken, idToken, err
+	return response(s.accessTokenResponseFromSession(ctx, client, session, state))
 }
 
 // codeExchangeV1 creates a v2 token from a v1 auth request.

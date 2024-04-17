@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"encoding/base64"
+	"slices"
 	"sync"
 	"time"
 
@@ -25,8 +26,32 @@ For each grant-type, tokens creation follows the same rough logical steps:
 4. Use the OIDC session to encrypt and / or sign the requested tokens
 
 In some cases step 1 till 3 are completely implemented in the command package,
-for example the v2 code exchange.
+for example the v2 code exchange and refresh token.
 */
+
+func (s *Server) accessTokenResponseFromSession(ctx context.Context, client *Client, session *command.OIDCSession, state string) (_ *oidc.AccessTokenResponse, err error) {
+	getUserInfoAndSigner := s.getUserInfoAndSignerOnce(ctx, session.UserID, client.client.ProjectID, client.client.ProjectRoleAssertion, session.Scopes)
+	resp := &oidc.AccessTokenResponse{
+		TokenType:    oidc.BearerToken,
+		RefreshToken: session.RefreshToken,
+		ExpiresIn:    timeToOIDCExpiresIn(session.Expiration),
+		State:        state,
+	}
+
+	if client.AccessTokenType() == op.AccessTokenTypeJWT {
+		resp.AccessToken, err = s.createJWT(ctx, client, session, getUserInfoAndSigner)
+	} else {
+		resp.AccessToken, err = op.CreateBearerToken(session.TokenID, session.UserID, s.opCrypto)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if slices.Contains(session.Scopes, oidc.ScopeOpenID) {
+		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfoAndSigner, resp.AccessToken, session.Audience, nil, time.Time{}, nil) // TODO: authmethods, authTime
+	}
+	return resp, err
+}
 
 // userInfoAndSignerFunc is a getter function that allows add-hoc retrieval of userinfo and signer,
 // when a JWT token needs to be created in the token endpoint.
