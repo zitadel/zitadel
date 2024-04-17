@@ -237,7 +237,7 @@ func AddMachineKeyRequestToCommand(req *mgmt_pb.AddMachineKeyRequest, resourceOw
 		},
 		ExpirationDate: expDate,
 		Type:           authn.KeyTypeToDomain(req.Type),
-		PublicKey:      req.Pubkey,
+		PublicKey:      req.PublicKey,
 	}
 }
 
