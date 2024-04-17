@@ -4,16 +4,17 @@ package zitadel.settings.defaultlogin.v2;
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2;defaultlogin";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "zitadel/object/v2/object.proto";
+
+import "zitadel/settings/field/v1/field.proto";
 
 message GetSecuritySettings {
-  zitadel.object.v2.ResolvedStrings allowed_embedded_iframe_origins = 1 [
+  zitadel.settings.field.v1.ResolvedStrings allowed_embedded_iframe_origins = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "origins allowed loading ZITADEL in an iframe."
       example: "[\"foo.bar.com\", \"localhost:8080\"]"
     }
   ];
-  zitadel.object.v2.ResolvedBool enable_impersonation = 2 [
+  zitadel.settings.field.v1.ResolvedBool enable_impersonation = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "default language for the current context"
       example: "\"en\""
@@ -22,13 +23,13 @@ message GetSecuritySettings {
 }
 
 message SetSecuritySettings {
-  zitadel.object.v2.SetStrings allowed_embedded_iframe_origins = 1 [
+  zitadel.settings.field.v1.SetStrings allowed_embedded_iframe_origins = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "origins allowed loading ZITADEL in an iframe."
       example: "[\"foo.bar.com\", \"localhost:8080\"]"
     }
   ];
-  zitadel.object.v2.SetBool enable_impersonation = 2 [
+  zitadel.settings.field.v1.SetBool enable_impersonation = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "default language for the current context"
       example: "\"en\""

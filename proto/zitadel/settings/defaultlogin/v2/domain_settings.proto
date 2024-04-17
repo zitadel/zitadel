@@ -4,15 +4,15 @@ package zitadel.settings.defaultlogin.v2;
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2;defaultlogin";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "zitadel/object/v2/object.proto";
+import "zitadel/settings/field/v1/field.proto";
 
 message GetDomainSettings {
-  zitadel.object.v2.ResolvedBool login_name_includes_domain = 1 [
+  zitadel.settings.field.v1.ResolvedBool login_name_includes_domain = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "the username has to end with the domain of its organization"
     }
   ];
-  zitadel.object.v2.ResolvedBool require_org_domain_verification = 2 [
+  zitadel.settings.field.v1.ResolvedBool require_org_domain_verification = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if organization domains should be verified upon creation, otherwise will be created already verified"
     }

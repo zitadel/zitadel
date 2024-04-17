@@ -5,26 +5,25 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2/object.proto";
+import "zitadel/settings/field/v1/field.proto";
 
 message GetLegalAndSupportSettings {
-  zitadel.object.v2.ResolvedString tos_link = 1 [
+  zitadel.settings.field.v1.ResolvedString tos_link = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
     }
   ];
-  zitadel.object.v2.ResolvedString privacy_policy_link = 2 [
+  zitadel.settings.field.v1.ResolvedString privacy_policy_link = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
     }
   ];
-  zitadel.object.v2.ResolvedString help_link = 3 [
+  zitadel.settings.field.v1.ResolvedString help_link = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://zitadel.com/docs/manuals/introduction\"";
     }
   ];
-  zitadel.object.v2.ResolvedString support_email = 4 [
-    (validate.rules).string = {ignore_empty: true, max_len: 320, email: true},
+  zitadel.settings.field.v1.ResolvedString support_email = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"support-email@test.com\"";
       description: "help / support email address."

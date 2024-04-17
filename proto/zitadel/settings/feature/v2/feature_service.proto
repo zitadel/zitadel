@@ -5,6 +5,8 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/feature/v2;fea
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "zitadel/object/v2/object.proto";
 import "zitadel/settings/feature/v2/feature.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -92,7 +94,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 // reserving the proto field number. Such removal is not considered a breaking change.
 // Setting a removed field will effectively result in a no-op.
 service FeatureService {
-  rpc Set (SetFeaturesRequest) returns (SetFeaturesResponse) {
+  rpc SetFeatures (SetFeatureSettingsRequest) returns (SetFeatureSettingsResponse) {
     option (google.api.http) = {
       patch: "/settings/v2/features"
       body: "*"
@@ -110,7 +112,7 @@ service FeatureService {
     };
   };
 
-  rpc Get (GetFeaturesRequest) returns (GetFeaturesResponse) {
+  rpc GetFeatures (GetFeatureSettingsRequest) returns (GetFeatureSettingsResponse) {
     option (google.api.http) = {
       get: "/settings/v2/features"
     };
@@ -126,4 +128,24 @@ service FeatureService {
       };
     };
   };
+}
+
+message GetFeatureSettingsRequest{
+  // Only System and Instance Contexts are allowed
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message GetFeatureSettingsResponse{
+  zitadel.object.v2.Details details = 1;
+  GetFeatureSettings settings = 2;
+}
+
+message SetFeatureSettingsRequest{
+  // Only System and Instance Contexts are allowed
+  zitadel.object.v2.RequestContext ctx = 1;
+  SetFeatureSettings settings = 2;
+}
+
+message SetFeatureSettingsResponse{
+  zitadel.object.v2.Details details = 1;
 }
