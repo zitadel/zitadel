@@ -1141,7 +1141,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					),
 					expectPush(
 						execution.NewSetEvent(context.Background(),
-							execution.NewAggregate("event/group", "instance"),
+							execution.NewAggregate("event/group.*", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
 							},
@@ -2132,7 +2132,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 					),
 					expectPush(
 						execution.NewRemovedEvent(context.Background(),
-							execution.NewAggregate("event/group", "instance"),
+							execution.NewAggregate("event/group.*", "instance"),
 						),
 					),
 				),
