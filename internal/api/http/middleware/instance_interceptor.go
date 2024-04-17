@@ -61,7 +61,6 @@ func (a *instanceInterceptor) handleInstance(w http.ResponseWriter, r *http.Requ
 		zErr := new(zerrors.ZitadelError)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(a.translator.LocalizeFromRequest(r, zErr.GetMessage(), nil))
-			zErr.Parent = err
 			http.Error(w, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, a.externalDomain, zErr), http.StatusNotFound)
 			return
 		}
