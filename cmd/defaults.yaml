@@ -906,7 +906,7 @@ AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 
 InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:
-  # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.read", "iam.write"]}]'
+  # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.write"]}, {"role": "ORG_OWNER", "permissions": ["org.write"]}]'
   # Beware that if you configure the RolePermissionMappings by environment variable, all the default RolePermissionMappings are lost.
   RolePermissionMappings:
     - Role: "SYSTEM_OWNER"

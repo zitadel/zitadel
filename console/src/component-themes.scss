@@ -72,6 +72,9 @@
 @import 'src/app/modules/info-overlay/info-overlay.component.scss';
 @import 'src/app/modules/create-layout/create-layout.component.scss';
 @import 'src/app/modules/domains/domain-verification/domain-verification.component.scss';
+@import 'src/app/modules/smtp-table/smtp-table.component.scss';
+@import 'src/app/modules/smtp-provider/smtp-provider.scss';
+@import 'src/app/modules/policies/notification-smtp-provider/notification-smtp-provider.component.scss';
 @import './styles/codemirror.scss';
 @import 'src/app/components/copy-row/copy-row.component.scss';
 @import 'src/app/modules/providers/provider-next/provider-next.component.scss';
@@ -85,6 +88,8 @@
   @include header-theme($theme);
   @include app-type-radio-theme($theme);
   @include idp-table-theme($theme);
+  @include smtp-table-theme($theme);
+  @include smtp-provider-theme($theme);
   @include events-theme($theme);
   @include projects-theme($theme);
   @include grants-theme($theme);
@@ -153,4 +158,5 @@
   @include domain-verification-theme($theme);
   @include copy-row-theme($theme);
   @include provider-next-theme($theme);
+  @include smtp-settings-theme($theme);
 }
