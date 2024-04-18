@@ -71,8 +71,8 @@ export default function PasswordForm({
 
   function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
     return submitPassword(value).then((resp) => {
-      // if user has mfa -> /totp
-      // if mfa is forced -> /mfa/set
+      // if user has mfa -> /otp/[method] or /u2f
+      // if mfa is forced and user has no mfa -> /mfa/set
       // if no passwordless -> /passkey/add
       if (resp.authFactors?.length == 1) {
         const params = new URLSearchParams({
@@ -88,17 +88,20 @@ export default function PasswordForm({
         }
 
         let method;
-        if ((resp.authFactors as AuthFactor[])[0].otp) {
+        const factor = (resp.authFactors as AuthFactor[])[0];
+        if (factor.otp) {
           method = "time-based";
-        } else if ((resp.authFactors as AuthFactor[])[0].otpSms) {
+          return router.push(`/otp/${method}?` + params);
+        } else if (factor.otpSms) {
           method = "sms";
-        } else if ((resp.authFactors as AuthFactor[])[0].otpEmail) {
+          return router.push(`/otp/${method}?` + params);
+        } else if (factor.otpEmail) {
           method = "email";
-        } else if ((resp.authFactors as AuthFactor[])[0].u2f) {
+          return router.push(`/otp/${method}?` + params);
+        } else if (factor.u2f) {
           method = "u2f";
+          return router.push(`/u2f?` + params);
         }
-
-        return router.push(`/otp/${method}?` + params);
       } else if (resp.authFactors?.length >= 1) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
@@ -113,6 +116,20 @@ export default function PasswordForm({
         }
 
         return router.push(`/mfa?` + params);
+      } else if (loginSettings?.forceMfa && !resp.authFactors?.length) {
+        const params = new URLSearchParams({
+          loginName: resp.factors.user.loginName,
+        });
+
+        if (authRequestId) {
+          params.append("authRequest", authRequestId);
+        }
+
+        if (organization) {
+          params.append("organization", organization);
+        }
+
+        return router.push(`/mfa/set?` + params);
       } else if (
         resp.factors &&
         !resp.factors.passwordless && // if session was not verified with a passkey
