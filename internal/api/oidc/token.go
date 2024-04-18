@@ -29,8 +29,8 @@ In some cases step 1 till 3 are completely implemented in the command package,
 for example the v2 code exchange and refresh token.
 */
 
-func (s *Server) accessTokenResponseFromSession(ctx context.Context, client *Client, session *command.OIDCSession, state string) (_ *oidc.AccessTokenResponse, err error) {
-	getUserInfoAndSigner := s.getUserInfoAndSignerOnce(ctx, session.UserID, client.client.ProjectID, client.client.ProjectRoleAssertion, session.Scopes)
+func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.Client, session *command.OIDCSession, state, projectID string, projectRoleAssertion bool) (_ *oidc.AccessTokenResponse, err error) {
+	getUserInfoAndSigner := s.getUserInfoAndSignerOnce(ctx, session.UserID, projectID, projectRoleAssertion, session.Scopes)
 	resp := &oidc.AccessTokenResponse{
 		TokenType:    oidc.BearerToken,
 		RefreshToken: session.RefreshToken,
@@ -92,7 +92,7 @@ func (s *Server) getUserInfoAndSignerOnce(ctx context.Context, userID, projectID
 	}
 }
 
-func (*Server) createIDToken(ctx context.Context, client *Client, getUserInfoAndSigningKey userInfoAndSignerFunc, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
+func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfoAndSigningKey userInfoAndSignerFunc, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -130,7 +130,7 @@ func timeToOIDCExpiresIn(exp time.Time) uint64 {
 	return uint64(time.Until(exp) / time.Second)
 }
 
-func (*Server) createJWT(ctx context.Context, client *Client, session *command.OIDCSession, getUserInfoAndSigningKey userInfoAndSignerFunc) (_ string, err error) {
+func (*Server) createJWT(ctx context.Context, client op.Client, session *command.OIDCSession, getUserInfoAndSigningKey userInfoAndSignerFunc) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

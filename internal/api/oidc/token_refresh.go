@@ -24,7 +24,7 @@ func (s *Server) RefreshToken(ctx context.Context, r *op.ClientRequest[oidc.Refr
 	if err != nil {
 		return nil, err
 	}
-	return response(s.accessTokenResponseFromSession(ctx, client, session, ""))
+	return response(s.accessTokenResponseFromSession(ctx, client, session, "", client.client.ProjectID, client.client.ProjectRoleAssertion))
 }
 
 // validateRefreshTokenScopes validates that the requested scope is a subset of the original auth request scope.
