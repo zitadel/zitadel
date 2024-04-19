@@ -7,16 +7,16 @@ import (
 )
 
 type intent struct {
-	eventstore.PushIntent
+	*eventstore.PushAggregate
 
 	sequence uint32
 }
 
-func makeIntents(pushIntents []eventstore.PushIntent) []*intent {
-	res := make([]*intent, len(pushIntents))
+func makeIntents(pushIntent *eventstore.PushIntent) []*intent {
+	res := make([]*intent, len(pushIntent.Aggregates()))
 
-	for i, pushIntent := range pushIntents {
-		res[i] = &intent{PushIntent: pushIntent}
+	for i, aggregate := range pushIntent.Aggregates() {
+		res[i] = &intent{PushAggregate: aggregate}
 	}
 
 	return res
@@ -24,7 +24,7 @@ func makeIntents(pushIntents []eventstore.PushIntent) []*intent {
 
 func intentByAggregate(intents []*intent, aggregate *eventstore.Aggregate) *intent {
 	for _, intent := range intents {
-		if intent.Aggregate().Equals(aggregate) {
+		if intent.PushAggregate.Aggregate().Equals(aggregate) {
 			return intent
 		}
 	}
@@ -34,7 +34,7 @@ func intentByAggregate(intents []*intent, aggregate *eventstore.Aggregate) *inte
 
 func checkSequences(intents []*intent) bool {
 	for _, intent := range intents {
-		if !eventstore.CheckSequence(intent.sequence, intent.CurrentSequence()) {
+		if !eventstore.CheckSequence(intent.sequence, intent.PushAggregate.CurrentSequence()) {
 			return false
 		}
 	}

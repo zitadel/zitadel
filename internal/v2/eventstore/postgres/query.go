@@ -136,11 +136,11 @@ func writePosition(stmt *database.Statement, position *eventstore.PositionCondit
 			stmt.WriteString("((")
 			database.NewNumberEquals(max.Position).Write(stmt, "position")
 			stmt.WriteString(" AND ")
-			database.NewNumberGreater(max.InPositionOrder).Write(stmt, "in_tx_order")
+			database.NewNumberLess(max.InPositionOrder).Write(stmt, "in_tx_order")
 			stmt.WriteRune(')')
 			stmt.WriteString(" OR ")
 		}
-		database.NewNumberGreater(max.Position).Write(stmt, "position")
+		database.NewNumberLess(max.Position).Write(stmt, "position")
 		if max.InPositionOrder > 0 {
 			stmt.WriteRune(')')
 		}
@@ -155,11 +155,11 @@ func writePosition(stmt *database.Statement, position *eventstore.PositionCondit
 			stmt.WriteString("((")
 			database.NewNumberEquals(min.Position).Write(stmt, "position")
 			stmt.WriteString(" AND ")
-			database.NewNumberLess(min.InPositionOrder).Write(stmt, "in_tx_order")
+			database.NewNumberGreater(min.InPositionOrder).Write(stmt, "in_tx_order")
 			stmt.WriteRune(')')
 			stmt.WriteString(" OR ")
 		}
-		database.NewNumberLess(min.Position).Write(stmt, "position")
+		database.NewNumberGreater(min.Position).Write(stmt, "position")
 		if min.InPositionOrder > 0 {
 			stmt.WriteRune(')')
 		}

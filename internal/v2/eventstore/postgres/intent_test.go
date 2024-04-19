@@ -21,9 +21,10 @@ func Test_checkSequences(t *testing.T) {
 				intents: []*intent{
 					{
 						sequence: 1,
-						PushIntent: &testIntent{
-							currentSequence: eventstore.SequenceIgnore(),
-						},
+						PushAggregate: eventstore.NewPushAggregate(
+							"", "", "",
+							eventstore.IgnoreCurrentSequence(),
+						),
 					},
 				},
 			},
@@ -35,15 +36,16 @@ func Test_checkSequences(t *testing.T) {
 				intents: []*intent{
 					{
 						sequence: 1,
-						PushIntent: &testIntent{
-							currentSequence: eventstore.SequenceIgnore(),
-						},
+						PushAggregate: eventstore.NewPushAggregate(
+							"", "", "",
+							eventstore.IgnoreCurrentSequence(),
+						),
 					},
 					{
 						sequence: 1,
-						PushIntent: &testIntent{
-							currentSequence: nil,
-						},
+						PushAggregate: eventstore.NewPushAggregate(
+							"", "", "",
+						),
 					},
 				},
 			},
@@ -55,9 +57,10 @@ func Test_checkSequences(t *testing.T) {
 				intents: []*intent{
 					{
 						sequence: 0,
-						PushIntent: &testIntent{
-							currentSequence: eventstore.SequenceMatches(0),
-						},
+						PushAggregate: eventstore.NewPushAggregate(
+							"", "", "",
+							eventstore.CurrentSequenceMatches(0),
+						),
 					},
 				},
 			},
@@ -69,9 +72,10 @@ func Test_checkSequences(t *testing.T) {
 				intents: []*intent{
 					{
 						sequence: 1,
-						PushIntent: &testIntent{
-							currentSequence: eventstore.SequenceMatches(2),
-						},
+						PushAggregate: eventstore.NewPushAggregate(
+							"", "", "",
+							eventstore.CurrentSequenceMatches(2),
+						),
 					},
 				},
 			},
@@ -83,9 +87,10 @@ func Test_checkSequences(t *testing.T) {
 				intents: []*intent{
 					{
 						sequence: 10,
-						PushIntent: &testIntent{
-							currentSequence: eventstore.SequenceAtLeast(0),
-						},
+						PushAggregate: eventstore.NewPushAggregate(
+							"", "", "",
+							eventstore.CurrentSequenceAtLeast(0),
+						),
 					},
 				},
 			},
@@ -97,9 +102,10 @@ func Test_checkSequences(t *testing.T) {
 				intents: []*intent{
 					{
 						sequence: 1,
-						PushIntent: &testIntent{
-							currentSequence: eventstore.SequenceAtLeast(2),
-						},
+						PushAggregate: eventstore.NewPushAggregate(
+							"", "", "",
+							eventstore.CurrentSequenceAtLeast(2),
+						),
 					},
 				},
 			},

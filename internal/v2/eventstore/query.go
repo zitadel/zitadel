@@ -1,12 +1,18 @@
 package eventstore
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/v2/database"
 )
+
+type Querier interface {
+	healther
+	Query(ctx context.Context, query *Query) (eventCount int, err error)
+}
 
 type Query struct {
 	instances  *filter[[]string]
@@ -43,7 +49,7 @@ func NewQuery(instance string, reducer Reducer, opts ...QueryOpt) *Query {
 		reducer: reducer,
 	}
 
-	for _, opt := range append([]QueryOpt{Instance(instance)}, opts...) {
+	for _, opt := range append([]QueryOpt{SetInstance(instance)}, opts...) {
 		opt(query)
 	}
 
@@ -52,7 +58,7 @@ func NewQuery(instance string, reducer Reducer, opts ...QueryOpt) *Query {
 
 type QueryOpt func(q *Query)
 
-func Instance(instance string) QueryOpt {
+func SetInstance(instance string) QueryOpt {
 	return func(q *Query) {
 		q.instances = &filter[[]string]{
 			condition: database.NewTextEqual(instance),
@@ -116,7 +122,7 @@ func InstancesNotContains(instances ...string) QueryOpt {
 	}
 }
 
-func QueryTx(tx *sql.Tx) QueryOpt {
+func SetQueryTx(tx *sql.Tx) QueryOpt {
 	return func(query *Query) {
 		query.tx = tx
 	}
@@ -148,7 +154,7 @@ func AppendFilters(filters ...*Filter) QueryOpt {
 	}
 }
 
-func Filters(filters ...*Filter) QueryOpt {
+func SetFilters(filters ...*Filter) QueryOpt {
 	return func(query *Query) {
 		for _, filter := range filters {
 			filter.parent = query
@@ -219,7 +225,7 @@ func AppendAggregateFilters(filters ...*AggregateFilter) FilterOpt {
 	}
 }
 
-func AggregateFilters(filters ...*AggregateFilter) FilterOpt {
+func SetAggregateFilters(filters ...*AggregateFilter) FilterOpt {
 	return func(mf *Filter) {
 		mf.aggregateFilters = filters
 	}
@@ -281,7 +287,7 @@ func (f *AggregateFilter) Events() []*EventFilter {
 
 type AggregateFilterOpt func(f *AggregateFilter)
 
-func AggregateID(id string) AggregateFilterOpt {
+func SetAggregateID(id string) AggregateFilterOpt {
 	return func(filter *AggregateFilter) {
 		filter.ids = []string{id}
 	}
@@ -310,7 +316,7 @@ func AppendEvents(events ...*EventFilter) AggregateFilterOpt {
 	}
 }
 
-func Events(events ...*EventFilter) AggregateFilterOpt {
+func SetEvents(events ...*EventFilter) AggregateFilterOpt {
 	return func(filter *AggregateFilter) {
 		filter.events = events
 	}
@@ -380,14 +386,14 @@ func (f *EventFilter) Creators() database.Condition {
 
 type EventFilterOpt func(f *EventFilter)
 
-func EventType(typ string) EventFilterOpt {
+func SetEventType(typ string) EventFilterOpt {
 	return func(filter *EventFilter) {
 		filter.types = []string{typ}
 	}
 }
 
-// EventTypes overwrites the currently set types
-func EventTypes(types ...string) EventFilterOpt {
+// SetEventTypes overwrites the currently set types
+func SetEventTypes(types ...string) EventFilterOpt {
 	return func(filter *EventFilter) {
 		filter.types = types
 	}

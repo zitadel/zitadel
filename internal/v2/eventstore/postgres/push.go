@@ -6,7 +6,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -15,24 +14,27 @@ import (
 
 // TODO: option to pass tx
 // Push implements eventstore.Pusher.
-func (s *Storage) Push(ctx context.Context, pushIntents ...eventstore.PushIntent) (err error) {
+func (s *Storage) Push(ctx context.Context, intent *eventstore.PushIntent) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	tx, err := s.client.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable, ReadOnly: false})
-	if err != nil {
-		return err
+	tx := intent.Tx()
+	if tx == nil {
+		tx, err = s.client.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable, ReadOnly: false})
+		if err != nil {
+			return err
+		}
+		defer func() {
+			err = database.CloseTx(tx, err)
+		}()
 	}
-	defer func() {
-		err = database.CloseTx(tx, err)
-	}()
 
 	// allows smaller wait times on query side for instances which are not actively writing
-	if err := setAppName(ctx, tx, "es_pusher_"+authz.GetInstance(ctx).InstanceID()); err != nil {
+	if err := setAppName(ctx, tx, "es_pusher_"+intent.Instance()); err != nil {
 		return err
 	}
 
-	intents, err := lockAggregates(ctx, tx, pushIntents)
+	intents, err := lockAggregates(ctx, tx, intent)
 	if err != nil {
 		return err
 	}
@@ -55,7 +57,7 @@ func (s *Storage) Push(ctx context.Context, pushIntents ...eventstore.PushIntent
 		return err
 	}
 
-	return push(ctx, tx, commands)
+	return push(ctx, tx, intent, commands)
 }
 
 // setAppName for the the current transaction
@@ -69,25 +71,25 @@ func setAppName(ctx context.Context, tx *sql.Tx, name string) error {
 	return nil
 }
 
-func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.PushIntent) (_ []*intent, err error) {
+func lockAggregates(ctx context.Context, tx *sql.Tx, intent *eventstore.PushIntent) (_ []*intent, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	var stmt database.Statement
 
 	stmt.WriteString("WITH existing AS (")
-	for i, intent := range pushIntents {
+	for i, aggregate := range intent.Aggregates() {
 		if i > 0 {
 			stmt.WriteString(" UNION ALL ")
 		}
 		stmt.WriteString(`(SELECT instance_id, aggregate_type, aggregate_id, "sequence" FROM eventstore.events2 WHERE instance_id = `)
-		stmt.WriteArgs(intent.Aggregate().Instance)
+		stmt.WriteArgs(intent.Instance())
 		stmt.WriteString(` AND aggregate_type = `)
-		stmt.WriteArgs(intent.Aggregate().Type)
+		stmt.WriteArgs(aggregate.Type())
 		stmt.WriteString(` AND aggregate_id = `)
-		stmt.WriteArgs(intent.Aggregate().ID)
+		stmt.WriteArgs(aggregate.ID())
 		stmt.WriteString(` AND owner = `)
-		stmt.WriteArgs(intent.Aggregate().Owner)
+		stmt.WriteArgs(aggregate.Owner())
 		stmt.WriteString(` ORDER BY "sequence" DESC LIMIT 1)`)
 	}
 	stmt.WriteString(") SELECT e.instance_id, e.owner, e.aggregate_type, e.aggregate_id, e.sequence FROM eventstore.events2 e JOIN existing ON e.instance_id = existing.instance_id AND e.aggregate_type = existing.aggregate_type AND e.aggregate_id = existing.aggregate_id AND e.sequence = existing.sequence FOR UPDATE")
@@ -99,7 +101,7 @@ func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.Pu
 		return nil, err
 	}
 
-	res := makeIntents(pushIntents)
+	res := makeIntents(intent)
 
 	err = database.MapRowsToObject(rows, func(scan func(dest ...any) error) error {
 		var sequence sql.Null[uint32]
@@ -127,7 +129,7 @@ func lockAggregates(ctx context.Context, tx *sql.Tx, pushIntents []eventstore.Pu
 	return res, nil
 }
 
-func push(ctx context.Context, tx *sql.Tx, commands []*command) (err error) {
+func push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands []*command) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -175,10 +177,6 @@ func push(ctx context.Context, tx *sql.Tx, commands []*command) (err error) {
 		)
 		if err != nil {
 			return err
-		}
-		reducer, ok := commands[i].intent.PushIntent.(eventstore.PushIntentReducer)
-		if !ok {
-			return nil
 		}
 		return reducer.Reduce(commands[i].Event)
 	})

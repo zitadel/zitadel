@@ -133,7 +133,7 @@ func Test_writeEventFilter(t *testing.T) {
 			name: "event_type",
 			args: args{
 				filter: eventstore.NewEventFilter(
-					eventstore.EventType("user.added"),
+					eventstore.SetEventType("user.added"),
 				),
 			},
 			want: wantQuery{
@@ -217,7 +217,7 @@ func Test_writeEventFilter(t *testing.T) {
 			name: "all",
 			args: args{
 				filter: eventstore.NewEventFilter(
-					eventstore.EventType("user.added"),
+					eventstore.SetEventType("user.added"),
 					eventstore.EventCreatedAtAtLeast(now),
 					eventstore.EventSequenceGreater(10),
 					eventstore.EventRevisionEquals(1),
@@ -261,7 +261,7 @@ func Test_writeEventFilters(t *testing.T) {
 			args: args{
 				filters: []*eventstore.EventFilter{
 					eventstore.NewEventFilter(
-						eventstore.EventType("user.added"),
+						eventstore.SetEventType("user.added"),
 					),
 				},
 			},
@@ -275,10 +275,10 @@ func Test_writeEventFilters(t *testing.T) {
 			args: args{
 				filters: []*eventstore.EventFilter{
 					eventstore.NewEventFilter(
-						eventstore.EventType("user.added"),
+						eventstore.SetEventType("user.added"),
 					),
 					eventstore.NewEventFilter(
-						eventstore.EventType("org.added"),
+						eventstore.SetEventType("org.added"),
 						eventstore.EventSequenceGreater(4),
 					),
 				},
@@ -324,7 +324,7 @@ func Test_writeAggregateFilter(t *testing.T) {
 			args: args{
 				filter: eventstore.NewAggregateFilter(
 					"user",
-					eventstore.AggregateID("234"),
+					eventstore.SetAggregateID("234"),
 				),
 			},
 			want: wantQuery{
@@ -338,7 +338,7 @@ func Test_writeAggregateFilter(t *testing.T) {
 				filter: eventstore.NewAggregateFilter(
 					"user",
 					eventstore.AppendEvent(
-						eventstore.EventType("user.added"),
+						eventstore.SetEventType("user.added"),
 					),
 				),
 			},
@@ -352,9 +352,9 @@ func Test_writeAggregateFilter(t *testing.T) {
 			args: args{
 				filter: eventstore.NewAggregateFilter(
 					"user",
-					eventstore.AggregateID("123"),
+					eventstore.SetAggregateID("123"),
 					eventstore.AppendEvent(
-						eventstore.EventType("user.added"),
+						eventstore.SetEventType("user.added"),
 					),
 				),
 			},
@@ -368,9 +368,9 @@ func Test_writeAggregateFilter(t *testing.T) {
 			args: args{
 				filter: eventstore.NewAggregateFilter(
 					"user",
-					eventstore.AggregateID("123"),
+					eventstore.SetAggregateID("123"),
 					eventstore.AppendEvent(
-						eventstore.EventType("user.added"),
+						eventstore.SetEventType("user.added"),
 						eventstore.EventSequenceGreater(1),
 					),
 				),
@@ -385,9 +385,9 @@ func Test_writeAggregateFilter(t *testing.T) {
 			args: args{
 				filter: eventstore.NewAggregateFilter(
 					"user",
-					eventstore.AggregateID("123"),
+					eventstore.SetAggregateID("123"),
 					eventstore.AppendEvent(
-						eventstore.EventType("user.added"),
+						eventstore.SetEventType("user.added"),
 					),
 					eventstore.AppendEvent(
 						eventstore.EventSequenceGreater(1),
@@ -404,15 +404,15 @@ func Test_writeAggregateFilter(t *testing.T) {
 			args: args{
 				filter: eventstore.NewAggregateFilter(
 					"user",
-					eventstore.AggregateID("123"),
+					eventstore.SetAggregateID("123"),
 					eventstore.AppendEvents(
 						eventstore.NewEventFilter(
-							eventstore.EventType("user.added"),
+							eventstore.SetEventType("user.added"),
 							eventstore.EventSequenceGreater(1),
 						),
 					),
 					eventstore.AppendEvent(
-						eventstore.EventType("user.changed"),
+						eventstore.SetEventType("user.changed"),
 						eventstore.EventSequenceGreater(4),
 					),
 				),
@@ -468,7 +468,7 @@ func Test_writeAggregateFilters(t *testing.T) {
 					eventstore.NewAggregateFilter("user"),
 					eventstore.NewAggregateFilter("org",
 						eventstore.AppendEvent(
-							eventstore.EventType("org.added"),
+							eventstore.SetEventType("org.added"),
 						),
 					),
 				},
@@ -555,14 +555,18 @@ func Test_writeFilter(t *testing.T) {
 			args: args{
 				filter: eventstore.NewFilter(
 					eventstore.FilterPagination(
-						eventstore.PositionGreater(123.4, 0),
-						eventstore.PositionLess(125.4, 10),
+						// 	eventstore.PositionGreater(123.4, 0),
+						// 	eventstore.PositionLess(125.4, 10),
+						eventstore.PositionBetween(
+							&eventstore.GlobalPosition{Position: 123.4},
+							&eventstore.GlobalPosition{Position: 125.4, InPositionOrder: 10},
+						),
 					),
 				),
 			},
 			want: wantQuery{
-				query: " WHERE instance_id = $1 AND position > $2 AND ((position = $3 AND in_tx_order < $4) OR position < $5) ORDER BY position, in_tx_order",
-				args:  []any{"i1", 123.4, 125.4, uint32(10), 125.4},
+				query: " WHERE instance_id = $1 AND ((position = $2 AND in_tx_order < $3) OR position < $4) AND position > $5 ORDER BY position, in_tx_order",
+				args:  []any{"i1", 125.4, uint32(10), 125.4, 123.4},
 				// TODO: (adlerhurst) would require some refactoring to reuse existing args
 				// query: " WHERE instance_id = $1 AND position > $2 AND ((position = $3 AND in_tx_order < $4) OR position < $3) ORDER BY position, in_tx_order",
 				// args:  []any{"i1", 123.4, 125.4, uint32(10)},
@@ -627,7 +631,7 @@ func Test_writeFilter(t *testing.T) {
 					eventstore.AppendAggregateFilter("user"),
 					eventstore.AppendAggregateFilter(
 						"org",
-						eventstore.AggregateID("o1"),
+						eventstore.SetAggregateID("o1"),
 					),
 				),
 			},
@@ -711,7 +715,7 @@ func Test_writeQuery(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"org",
 								eventstore.AppendEvent(
-									eventstore.EventType("org.added"),
+									eventstore.SetEventType("org.added"),
 								),
 							),
 						),
@@ -821,10 +825,10 @@ func Test_writeQueryUse_examples(t *testing.T) {
 					nil,
 					eventstore.AppendFilters(
 						eventstore.NewFilter(
-							eventstore.AppendAggregateFilter("agg1", eventstore.AggregateID("id")),
+							eventstore.AppendAggregateFilter("agg1", eventstore.SetAggregateID("id")),
 						),
 						eventstore.NewFilter(
-							eventstore.AppendAggregateFilter("agg2", eventstore.AggregateID("id2")),
+							eventstore.AppendAggregateFilter("agg2", eventstore.SetAggregateID("id2")),
 							eventstore.AppendAggregateFilter("agg3"),
 						),
 					),
@@ -856,11 +860,11 @@ func Test_writeQueryUse_examples(t *testing.T) {
 						),
 						eventstore.AppendAggregateFilter(
 							"agg2",
-							eventstore.AggregateID("3"),
+							eventstore.SetAggregateID("3"),
 						),
 						eventstore.AppendAggregateFilter(
 							"agg3",
-							eventstore.AggregateID("3"),
+							eventstore.SetAggregateID("3"),
 						),
 					),
 				),
@@ -889,7 +893,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"instance",
 								eventstore.AppendEvent(
-									eventstore.EventType("instance.added"),
+									eventstore.SetEventType("instance.added"),
 								),
 							),
 							eventstore.FilterPagination(
@@ -900,7 +904,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"instance",
 								eventstore.AppendEvent(
-									eventstore.EventType("instance.removed"),
+									eventstore.SetEventType("instance.removed"),
 								),
 							),
 							eventstore.FilterPagination(
@@ -911,7 +915,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"instance",
 								eventstore.AppendEvent(
-									eventstore.EventType("instance.domain.primary.set"),
+									eventstore.SetEventType("instance.domain.primary.set"),
 									eventstore.EventCreatorsNotContains("", "SYSTEM"),
 								),
 							),
@@ -923,7 +927,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"project",
 								eventstore.AppendEvent(
-									eventstore.EventType("project.added"),
+									eventstore.SetEventType("project.added"),
 									eventstore.EventCreatorsNotContains("", "SYSTEM"),
 								),
 							),
@@ -936,7 +940,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 								"project",
 								eventstore.AppendEvent(
 									eventstore.EventCreatorsNotContains("", "SYSTEM"),
-									eventstore.EventType("project.application.added"),
+									eventstore.SetEventType("project.application.added"),
 								),
 							),
 							eventstore.FilterPagination(
@@ -947,7 +951,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"user",
 								eventstore.AppendEvent(
-									eventstore.EventType("user.token.added"),
+									eventstore.SetEventType("user.token.added"),
 								),
 							),
 							eventstore.FilterPagination(
@@ -959,7 +963,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"instance",
 								eventstore.AppendEvent(
-									eventstore.EventTypes(
+									eventstore.SetEventTypes(
 										"instance.idp.config.added",
 										"instance.idp.oauth.added",
 										"instance.idp.oidc.added",
@@ -979,7 +983,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"org",
 								eventstore.AppendEvent(
-									eventstore.EventTypes(
+									eventstore.SetEventTypes(
 										"org.idp.config.added",
 										"org.idp.oauth.added",
 										"org.idp.oidc.added",
@@ -1004,13 +1008,13 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"instance",
 								eventstore.AppendEvent(
-									eventstore.EventType("instance.login.policy.idp.added"),
+									eventstore.SetEventType("instance.login.policy.idp.added"),
 								),
 							),
 							eventstore.AppendAggregateFilter(
 								"org",
 								eventstore.AppendEvent(
-									eventstore.EventType("org.login.policy.idp.added"),
+									eventstore.SetEventType("org.login.policy.idp.added"),
 								),
 							),
 							eventstore.FilterPagination(
@@ -1021,7 +1025,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 							eventstore.AppendAggregateFilter(
 								"instance",
 								eventstore.AppendEvent(
-									eventstore.EventType("instance.smtp.config.added"),
+									eventstore.SetEventType("instance.smtp.config.added"),
 									eventstore.EventCreatorsNotContains("", "SYSTEM", "<SYSTEM-USER>"),
 								),
 							),
@@ -1140,6 +1144,9 @@ type testReducer struct {
 
 // Reduce implements eventstore.Reducer.
 func (r *testReducer) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
+	if r == nil {
+		return nil
+	}
 	r.reduceCount++
 	if r.shouldErr {
 		return errReduce

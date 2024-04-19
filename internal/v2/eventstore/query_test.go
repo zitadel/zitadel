@@ -199,8 +199,8 @@ func TestEventFilterOpt(t *testing.T) {
 			name: "EventType",
 			args: args{
 				opts: []EventFilterOpt{
-					EventType("test"),
-					EventType("test2"),
+					SetEventType("test"),
+					SetEventType("test2"),
 				},
 			},
 			want: &EventFilter{
@@ -211,8 +211,8 @@ func TestEventFilterOpt(t *testing.T) {
 			name: "EventTypes",
 			args: args{
 				opts: []EventFilterOpt{
-					EventTypes("a", "s"),
-					EventTypes("d", "f"),
+					SetEventTypes("a", "s"),
+					SetEventTypes("d", "f"),
 				},
 			},
 			want: &EventFilter{
@@ -634,7 +634,7 @@ func TestAggregateFilter(t *testing.T) {
 			name: "AggregateID",
 			args: args{
 				opts: []AggregateFilterOpt{
-					AggregateID("asdf"),
+					SetAggregateID("asdf"),
 				},
 			},
 			want: &AggregateFilter{
@@ -693,8 +693,8 @@ func TestAggregateFilter(t *testing.T) {
 			name: "Events",
 			args: args{
 				opts: []AggregateFilterOpt{
-					Events(NewEventFilter()),
-					Events(NewEventFilter()),
+					SetEvents(NewEventFilter()),
+					SetEvents(NewEventFilter()),
 				},
 			},
 			want: &AggregateFilter{
@@ -775,8 +775,8 @@ func TestFilterOpt(t *testing.T) {
 			name: "AggregateFilters",
 			args: args{
 				opts: []FilterOpt{
-					AggregateFilters(NewAggregateFilter("typ")),
-					AggregateFilters(NewAggregateFilter("typ2")),
+					SetAggregateFilters(NewAggregateFilter("typ")),
+					SetAggregateFilters(NewAggregateFilter("typ2")),
 				},
 			},
 			want: &Filter{
@@ -835,7 +835,7 @@ func TestQueryOpt(t *testing.T) {
 			name: "with tx",
 			args: args{
 				opts: []QueryOpt{
-					QueryTx(&tx),
+					SetQueryTx(&tx),
 				},
 			},
 			want: &Query{
@@ -850,7 +850,7 @@ func TestQueryOpt(t *testing.T) {
 			name: "instance",
 			args: args{
 				opts: []QueryOpt{
-					Instance("instance2"),
+					SetInstance("instance2"),
 				},
 			},
 			want: &Query{
@@ -1025,8 +1025,8 @@ func TestQueryOpt(t *testing.T) {
 			name: "Filter",
 			args: args{
 				opts: []QueryOpt{
-					Filters(NewFilter()),
-					Filters(NewFilter()),
+					SetFilters(NewFilter()),
+					SetFilters(NewFilter()),
 				},
 			},
 			want: &Query{
