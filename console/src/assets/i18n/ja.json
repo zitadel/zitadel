@@ -595,6 +595,7 @@
     "INVALID_FORMAT": "不正なフォーマットです",
     "NOTANEMAIL": "入力された値がメールアドレスではありません。",
     "MINLENGTH": "{{requiredLength}} 文字以上の文字列が必要です。",
+    "MAXLENGTH": "{{requiredLength}}文字以下でなければなりません.",
     "UPPERCASEMISSING": "大文字を含める必要があります。",
     "LOWERCASEMISSING": "小文字を含める必要があります。",
     "SYMBOLERROR": "記号を含める必要があります。",
@@ -880,7 +881,8 @@
       "SET": "新しいパスワードを設定する",
       "RESENDNOTIFICATION": "パスワードリセットのリンクを送信する",
       "REQUIRED": "一部の必須項目が不足しています。",
-      "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。"
+      "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。",
+      "MAXLENGTHERROR": "{{value}}文字以下でなければなりません"
     },
     "ID": "id",
     "EMAIL": "Eメール",

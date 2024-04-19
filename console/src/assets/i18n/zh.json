@@ -594,6 +594,7 @@
     "INVALID_FORMAT": "格式是无效的。",
     "NOTANEMAIL": "给定的值不是合法电子邮件地址。",
     "MINLENGTH": "长度必须至少是{{requiredLength}}字符。",
+    "MAXLENGTH": "必须少于{{requiredLength}}个字符.",
     "UPPERCASEMISSING": "密码必须包含大写字符。",
     "LOWERCASEMISSING": "密码必须包含小写字符。",
     "SYMBOLERROR": "密码必须包含符号或标点符号。",
@@ -879,7 +880,9 @@
       "SET": "设置新密码",
       "RESENDNOTIFICATION": "发送重置密码链接",
       "REQUIRED": "缺少必填字段。",
-      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。"
+      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
+      "MAXLENGTHERROR": "必须少于{{value}}个字符"
+      
     },
     "ID": "ID",
     "EMAIL": "电子邮件",

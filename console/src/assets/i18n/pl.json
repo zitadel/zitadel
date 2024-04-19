@@ -594,6 +594,7 @@
     "INVALID_FORMAT": "Format jest nieprawidłowy.",
     "NOTANEMAIL": "Podana wartość nie jest adresem e-mail.",
     "MINLENGTH": "Musi mieć co najmniej {{requiredLength}} znaków.",
+    "MAXLENGTH": "Musi zawierać mniej niż {{requiredLength}} znaków.",
     "UPPERCASEMISSING": "Musi zawierać wielką literę.",
     "LOWERCASEMISSING": "Musi zawierać małą literę.",
     "SYMBOLERROR": "Musi zawierać symbol lub znak interpunkcyjny.",
@@ -879,7 +880,8 @@
       "SET": "Ustaw nowe hasło",
       "RESENDNOTIFICATION": "Wyślij link resetowania hasła",
       "REQUIRED": "Brakuje niektórych wymaganych pól.",
-      "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków."
+      "MINLENGTHERROR": "Musi mieć co najmniej {{value}} znaków.",
+      "MAXLENGTHERROR": "Musi zawierać mniej niż {{value}} znaków"
     },
     "ID": "ID",
     "EMAIL": "E-mail",
