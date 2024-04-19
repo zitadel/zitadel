@@ -7,7 +7,7 @@ spec:
   template:
     metadata:
       annotations:
-        client.knative.dev/user-image: ghcr.io/zitadel/zitadel:stable
+        client.knative.dev/user-image: ghcr.io/zitadel/zitadel:latest
       creationTimestamp: null
     spec:
       containerConcurrency: 0
@@ -28,7 +28,7 @@ spec:
           value: "80"
         - name: ZITADEL_EXTERNALDOMAIN
           value: zitadel.default.127.0.0.1.sslip.io
-        image: ghcr.io/zitadel/zitadel:stable
+        image: ghcr.io/zitadel/zitadel:latest
         name: user-container
         ports:
         - containerPort: 8080
