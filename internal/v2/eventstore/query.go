@@ -9,7 +9,7 @@ import (
 )
 
 type Query struct {
-	instances  []string
+	instances  *filter[[]string]
 	filters    []*Filter
 	tx         *sql.Tx
 	pagination *Pagination
@@ -18,10 +18,7 @@ type Query struct {
 }
 
 func (q *Query) Instance() database.Condition {
-	if len(q.instances) == 1 {
-		return database.NewTextEqual(q.instances[0])
-	}
-	return database.NewListContains(q.instances...)
+	return q.instances.condition
 }
 
 func (q *Query) Filters() []*Filter {
@@ -43,18 +40,81 @@ func (q *Query) Reduce(events ...*Event[StoragePayload]) error {
 
 func NewQuery(instance string, reducer Reducer, opts ...QueryOpt) *Query {
 	query := &Query{
-		instances: []string{instance},
-		reducer:   reducer,
+		reducer: reducer,
 	}
 
-	for _, opt := range opts {
+	for _, opt := range append([]QueryOpt{Instance(instance)}, opts...) {
 		opt(query)
 	}
 
 	return query
 }
 
-type QueryOpt func(query *Query)
+type QueryOpt func(q *Query)
+
+func Instance(instance string) QueryOpt {
+	return func(q *Query) {
+		q.instances = &filter[[]string]{
+			condition: database.NewTextEqual(instance),
+			min:       []string{instance},
+		}
+	}
+}
+
+func InstancesEqual(instances ...string) QueryOpt {
+	return func(q *Query) {
+		var cond database.Condition
+		switch len(instances) {
+		case 0:
+			return
+		case 1:
+			cond = database.NewTextEqual(instances[0])
+		default:
+			cond = database.NewListEquals(instances...)
+		}
+		q.instances = &filter[[]string]{
+			condition: cond,
+			min:       instances,
+		}
+	}
+}
+
+func InstancesContains(instances ...string) QueryOpt {
+	return func(f *Query) {
+		var cond database.Condition
+		switch len(instances) {
+		case 0:
+			return
+		case 1:
+			cond = database.NewTextEqual(instances[0])
+		default:
+			cond = database.NewListContains(instances...)
+		}
+
+		f.instances = &filter[[]string]{
+			condition: cond,
+			min:       instances,
+		}
+	}
+}
+
+func InstancesNotContains(instances ...string) QueryOpt {
+	return func(f *Query) {
+		var cond database.Condition
+		switch len(instances) {
+		case 0:
+			return
+		case 1:
+			cond = database.NewTextUnequal(instances[0])
+		default:
+			cond = database.NewListNotContains(instances...)
+		}
+		f.instances = &filter[[]string]{
+			condition: cond,
+			min:       instances,
+		}
+	}
+}
 
 func QueryTx(tx *sql.Tx) QueryOpt {
 	return func(query *Query) {
@@ -85,6 +145,15 @@ func AppendFilters(filters ...*Filter) QueryOpt {
 			filter.parent = query
 		}
 		query.filters = append(query.filters, filters...)
+	}
+}
+
+func Filters(filters ...*Filter) QueryOpt {
+	return func(query *Query) {
+		for _, filter := range filters {
+			filter.parent = query
+		}
+		query.filters = filters
 	}
 }
 
@@ -150,6 +219,12 @@ func AppendAggregateFilters(filters ...*AggregateFilter) FilterOpt {
 	}
 }
 
+func AggregateFilters(filters ...*AggregateFilter) FilterOpt {
+	return func(mf *Filter) {
+		mf.aggregateFilters = filters
+	}
+}
+
 func FilterPagination(opts ...paginationOpt) FilterOpt {
 	return func(filter *Filter) {
 		filter.ensurePagination()
@@ -189,7 +264,7 @@ func (f *AggregateFilter) Type() *database.TextFilter[string] {
 	return database.NewTextEqual(f.typ)
 }
 
-func (f *AggregateFilter) ID() database.Condition {
+func (f *AggregateFilter) IDs() database.Condition {
 	if len(f.ids) == 0 {
 		return nil
 	}
@@ -221,7 +296,7 @@ func AppendAggregateIDs(ids ...string) AggregateFilterOpt {
 // AggregateIDs sets the given ids as search param
 func AggregateIDs(ids ...string) AggregateFilterOpt {
 	return func(f *AggregateFilter) {
-		f.ids = append(f.ids, ids...)
+		f.ids = ids
 	}
 }
 
@@ -232,6 +307,12 @@ func AppendEvent(opts ...EventFilterOpt) AggregateFilterOpt {
 func AppendEvents(events ...*EventFilter) AggregateFilterOpt {
 	return func(filter *AggregateFilter) {
 		filter.events = append(filter.events, events...)
+	}
+}
+
+func Events(events ...*EventFilter) AggregateFilterOpt {
+	return func(filter *AggregateFilter) {
+		filter.events = events
 	}
 }
 
@@ -258,7 +339,7 @@ type filter[T any] struct {
 	min, max  T
 }
 
-func (f *EventFilter) Type() database.Condition {
+func (f *EventFilter) Types() database.Condition {
 	switch len(f.types) {
 	case 0:
 		return nil
@@ -290,7 +371,7 @@ func (f *EventFilter) Sequence() database.Condition {
 	return f.sequence.condition
 }
 
-func (f *EventFilter) Creator() database.Condition {
+func (f *EventFilter) Creators() database.Condition {
 	if f.creators == nil {
 		return nil
 	}
@@ -493,7 +574,7 @@ func EventCreatorsEqual(creators ...string) EventFilterOpt {
 		case 1:
 			cond = database.NewTextEqual(creators[0])
 		default:
-			cond = database.NewListContains(creators...)
+			cond = database.NewListEquals(creators...)
 		}
 		f.creators = &filter[[]string]{
 			condition: cond,
@@ -581,7 +662,7 @@ func (pc *PositionCondition) Min() *GlobalPosition {
 func PositionGreater(position float64, inPositionOrder uint32) paginationOpt {
 	return func(p *Pagination) {
 		p.ensurePosition()
-		p.position.max = &GlobalPosition{
+		p.position.min = &GlobalPosition{
 			Position:        position,
 			InPositionOrder: inPositionOrder,
 		}
@@ -601,7 +682,7 @@ func GlobalPositionGreater(position *GlobalPosition) paginationOpt {
 func PositionLess(position float64, inPositionOrder uint32) paginationOpt {
 	return func(p *Pagination) {
 		p.ensurePosition()
-		p.position.min = &GlobalPosition{
+		p.position.max = &GlobalPosition{
 			Position:        position,
 			InPositionOrder: inPositionOrder,
 		}
@@ -619,7 +700,7 @@ func PositionBetween(min, max *GlobalPosition) paginationOpt {
 // if inPositionOrder is set: position = AND in_tx_order > OR or position >
 // if inPositionOrder is NOT set: position >
 func GlobalPositionLess(position *GlobalPosition) paginationOpt {
-	return PositionGreater(position.Position, position.InPositionOrder)
+	return PositionLess(position.Position, position.InPositionOrder)
 }
 
 type Pagination struct {

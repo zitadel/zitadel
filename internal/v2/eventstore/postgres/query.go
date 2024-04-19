@@ -189,7 +189,7 @@ func writeAggregateFilters(stmt *database.Statement, filters []*eventstore.Aggre
 func writeAggregateFilter(stmt *database.Statement, filter *eventstore.AggregateFilter) {
 	conditions := definedConditions([]*condition{
 		{column: "aggregate_type", condition: filter.Type()},
-		{column: "aggregate_id", condition: filter.ID()},
+		{column: "aggregate_id", condition: filter.IDs()},
 	})
 
 	if len(conditions) > 1 || len(filter.Events()) > 0 {
@@ -232,11 +232,11 @@ func writeEventFilters(stmt *database.Statement, filters []*eventstore.EventFilt
 
 func writeEventFilter(stmt *database.Statement, filter *eventstore.EventFilter) {
 	conditions := definedConditions([]*condition{
-		{column: "event_type", condition: filter.Type()},
+		{column: "event_type", condition: filter.Types()},
 		{column: "created_at", condition: filter.CreatedAt()},
 		{column: "sequence", condition: filter.Sequence()},
 		{column: "revision", condition: filter.Revision()},
-		{column: "creator", condition: filter.Creator()},
+		{column: "creator", condition: filter.Creators()},
 	})
 
 	if len(conditions) > 1 {
