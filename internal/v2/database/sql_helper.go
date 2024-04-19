@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/zitadel/logging"
 )
@@ -70,5 +71,5 @@ func MapRowsToObject(rows Rows, mapper func(scan func(dest ...any) error) error)
 }
 
 type Querier interface {
-	QueryContext(context.Context, string, ...any) (Rows, error)
+	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
 }
