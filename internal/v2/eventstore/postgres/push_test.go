@@ -888,6 +888,9 @@ func Test_push(t *testing.T) {
 		{
 			name: "1 aggregate 1 command",
 			args: args{
+				reducer: &testReducer{
+					expectedReduces: 1,
+				},
 				commands: []*command{
 					{
 						intent: &intent{
@@ -948,6 +951,9 @@ func Test_push(t *testing.T) {
 		{
 			name: "1 aggregate 2 commands",
 			args: args{
+				reducer: &testReducer{
+					expectedReduces: 2,
+				},
 				commands: []*command{
 					{
 						intent: &intent{
@@ -1040,6 +1046,9 @@ func Test_push(t *testing.T) {
 		{
 			name: "1 command per aggregate 2 aggregates",
 			args: args{
+				reducer: &testReducer{
+					expectedReduces: 2,
+				},
 				commands: []*command{
 					{
 						intent: &intent{
@@ -1134,6 +1143,9 @@ func Test_push(t *testing.T) {
 		{
 			name: "1 aggregate 1 command with payload",
 			args: args{
+				reducer: &testReducer{
+					expectedReduces: 1,
+				},
 				commands: []*command{
 					{
 						intent: &intent{
@@ -1192,242 +1204,260 @@ func Test_push(t *testing.T) {
 				},
 			},
 		},
-		// {
-		// 	name: "command reducer",
-		// 	args: args{
-		// 		commands: []*command{
-		// 			{
-		// 				intent: &intent{
-		// 					PushIntent: &testIntentReducer{
-		// 						expectedReduceCount: 1,
-		// 					},
-		// 				},
-		// 				Event: &eventstore.Event[eventstore.StoragePayload]{
-		// 					Aggregate: eventstore.NewPushIntent(
-		// 						"instance",
-		// 						eventstore.AppendAggregate("owner", "testType", "testID"),
-		// 					).Aggregates()[0].Aggregate(),
-		// 					Creator:  "gigi",
-		// 					Revision: 1,
-		// 					Type:     "test.type",
-		// 					Sequence: 1,
-		// 				},
-		// 			},
-		// 		},
-		// 		expectations: []mock.Expectation{
-		// 			mock.ExpectQuery(
-		// 				`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())) RETURNING created_at, "position"`,
-		// 				mock.WithQueryArgs(
-		// 					"instance",
-		// 					"owner",
-		// 					"testType",
-		// 					"testID",
-		// 					uint16(1),
-		// 					"gigi",
-		// 					"test.type",
-		// 					nil,
-		// 					uint32(1),
-		// 					0,
-		// 				),
-		// 				mock.WithQueryResult(
-		// 					[]string{"created_at", "position"},
-		// 					[][]driver.Value{
-		// 						{
-		// 							time.Now(),
-		// 							float64(123),
-		// 						},
-		// 					},
-		// 				),
-		// 			),
-		// 		},
-		// 	},
-		// 	want: want{
-		// 		assertErr: func(t *testing.T, err error) bool {
-		// 			is := err == nil
-		// 			if !is {
-		// 				t.Errorf("no error expected got: %v", err)
-		// 			}
-		// 			return is
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	name: "command reducer err",
-		// 	args: args{
-		// 		commands: []*command{
-		// 			{
-		// 				intent: &intent{
-		// 					PushIntent: &testIntentReducer{
-		// 						expectedReduceCount: 1,
-		// 						reduceErr:           true,
-		// 					},
-		// 				},
-		// 				Event: &eventstore.Event[eventstore.StoragePayload]{
-		// 					Aggregate: eventstore.NewPushIntent(
-		// 						"instance",
-		// 						eventstore.AppendAggregate("owner", "testType", "testID"),
-		// 					).Aggregates()[0].Aggregate(),
-		// 					Creator:  "gigi",
-		// 					Revision: 1,
-		// 					Type:     "test.type",
-		// 					Sequence: 1,
-		// 				},
-		// 			},
-		// 			{
-		// 				intent: &intent{
-		// 					PushIntent: &testIntentReducer{
-		// 						expectedReduceCount: 0,
-		// 					},
-		// 				},
-		// 				Event: &eventstore.Event[eventstore.StoragePayload]{
-		// 					Aggregate: eventstore.NewPushIntent(
-		// 						"instance",
-		// 						eventstore.AppendAggregate("owner", "testType", "testID"),
-		// 					).Aggregates()[0].Aggregate(),
-		// 					Creator:  "gigi",
-		// 					Revision: 1,
-		// 					Type:     "test.type2",
-		// 					Sequence: 2,
-		// 				},
-		// 			},
-		// 		},
-		// 		expectations: []mock.Expectation{
-		// 			mock.ExpectQuery(
-		// 				`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())), ($11, $12, $13, $14, $15, $16, $17, $18, $19, $20, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())) RETURNING created_at, "position"`,
-		// 				mock.WithQueryArgs(
-		// 					"instance",
-		// 					"owner",
-		// 					"testType",
-		// 					"testID",
-		// 					uint16(1),
-		// 					"gigi",
-		// 					"test.type",
-		// 					nil,
-		// 					uint32(1),
-		// 					0,
-		// 					"instance",
-		// 					"owner",
-		// 					"testType",
-		// 					"testID",
-		// 					uint16(1),
-		// 					"gigi",
-		// 					"test.type2",
-		// 					nil,
-		// 					uint32(2),
-		// 					1,
-		// 				),
-		// 				mock.WithQueryResult(
-		// 					[]string{"created_at", "position"},
-		// 					[][]driver.Value{
-		// 						{
-		// 							time.Now(),
-		// 							float64(123),
-		// 						},
-		// 						{
-		// 							time.Now(),
-		// 							float64(123.1),
-		// 						},
-		// 					},
-		// 				),
-		// 			),
-		// 		},
-		// 	},
-		// 	want: want{
-		// 		assertErr: func(t *testing.T, err error) bool {
-		// 			is := errors.Is(err, errReduce)
-		// 			if !is {
-		// 				t.Errorf("no error expected got: %v", err)
-		// 			}
-		// 			return is
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	name: "1 aggregate 2 commands",
-		// 	args: args{
-		// 		commands: []*command{
-		// 			{
-		// 				intent: &intent{
-		// 					PushIntent: new(testIntent),
-		// 				},
-		// 				Event: &eventstore.Event[eventstore.StoragePayload]{
-		// 					Aggregate: eventstore.NewPushIntent(
-		// 						"instance",
-		// 						eventstore.AppendAggregate("owner", "testType", "testID"),
-		// 					).Aggregates()[0].Aggregate(),
-		// 					Creator:  "gigi",
-		// 					Revision: 1,
-		// 					Type:     "test.type",
-		// 					Sequence: 1,
-		// 				},
-		// 			},
-		// 			{
-		// 				intent: &intent{
-		// 					PushIntent: new(testIntent),
-		// 				},
-		// 				Event: &eventstore.Event[eventstore.StoragePayload]{
-		// 					Aggregate: eventstore.NewPushIntent(
-		// 						"instance",
-		// 						eventstore.AppendAggregate("owner", "testType", "testID"),
-		// 					).Aggregates()[0].Aggregate(),
-		// 					Creator:  "gigi",
-		// 					Revision: 1,
-		// 					Type:     "test.type2",
-		// 					Sequence: 2,
-		// 				},
-		// 			},
-		// 		},
-		// 		expectations: []mock.Expectation{
-		// 			mock.ExpectQuery(
-		// 				`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())), ($11, $12, $13, $14, $15, $16, $17, $18, $19, $20, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())) RETURNING created_at, "position"`,
-		// 				mock.WithQueryArgs(
-		// 					"instance",
-		// 					"owner",
-		// 					"testType",
-		// 					"testID",
-		// 					uint16(1),
-		// 					"gigi",
-		// 					"test.type",
-		// 					nil,
-		// 					uint32(1),
-		// 					0,
-		// 					"instance",
-		// 					"owner",
-		// 					"testType",
-		// 					"testID",
-		// 					uint16(1),
-		// 					"gigi",
-		// 					"test.type2",
-		// 					nil,
-		// 					uint32(2),
-		// 					1,
-		// 				),
-		// 				mock.WithQueryResult(
-		// 					[]string{"created_at", "position"},
-		// 					[][]driver.Value{
-		// 						{
-		// 							time.Now(),
-		// 							float64(123),
-		// 						},
-		// 						{
-		// 							time.Now(),
-		// 							float64(123.1),
-		// 						},
-		// 					},
-		// 				),
-		// 			),
-		// 		},
-		// 	},
-		// 	want: want{
-		// 		assertErr: func(t *testing.T, err error) bool {
-		// 			is := err == nil
-		// 			if !is {
-		// 				t.Errorf("no error expected got: %v", err)
-		// 			}
-		// 			return is
-		// 		},
-		// 	},
-		// },
+		{
+			name: "command reducer",
+			args: args{
+				reducer: &testReducer{
+					expectedReduces: 1,
+				},
+				commands: []*command{
+					{
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("owner", "testType", "testID"),
+							).Aggregates()[0],
+						},
+						Event: &eventstore.Event[eventstore.StoragePayload]{
+							Aggregate: *eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("owner", "testType", "testID"),
+							).Aggregates()[0].Aggregate(),
+							Creator:  "gigi",
+							Revision: 1,
+							Type:     "test.type",
+							Sequence: 1,
+						},
+					},
+				},
+				expectations: []mock.Expectation{
+					mock.ExpectQuery(
+						`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())) RETURNING created_at, "position"`,
+						mock.WithQueryArgs(
+							"instance",
+							"owner",
+							"testType",
+							"testID",
+							uint16(1),
+							"gigi",
+							"test.type",
+							nil,
+							uint32(1),
+							0,
+						),
+						mock.WithQueryResult(
+							[]string{"created_at", "position"},
+							[][]driver.Value{
+								{
+									time.Now(),
+									float64(123),
+								},
+							},
+						),
+					),
+				},
+			},
+			want: want{
+				assertErr: func(t *testing.T, err error) bool {
+					is := err == nil
+					if !is {
+						t.Errorf("no error expected got: %v", err)
+					}
+					return is
+				},
+			},
+		},
+		{
+			name: "command reducer err",
+			args: args{
+				reducer: &testReducer{
+					expectedReduces: 1,
+					shouldErr:       true,
+				},
+				commands: []*command{
+					{
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("owner", "testType", "testID"),
+							).Aggregates()[0],
+						},
+						Event: &eventstore.Event[eventstore.StoragePayload]{
+							Aggregate: *eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("owner", "testType", "testID"),
+							).Aggregates()[0].Aggregate(),
+							Creator:  "gigi",
+							Revision: 1,
+							Type:     "test.type",
+							Sequence: 1,
+						},
+					},
+					{
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("owner", "testType", "testID"),
+							).Aggregates()[0],
+						},
+						Event: &eventstore.Event[eventstore.StoragePayload]{
+							Aggregate: *eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("owner", "testType", "testID"),
+							).Aggregates()[0].Aggregate(),
+							Creator:  "gigi",
+							Revision: 1,
+							Type:     "test.type2",
+							Sequence: 2,
+						},
+					},
+				},
+				expectations: []mock.Expectation{
+					mock.ExpectQuery(
+						`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())), ($11, $12, $13, $14, $15, $16, $17, $18, $19, $20, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())) RETURNING created_at, "position"`,
+						mock.WithQueryArgs(
+							"instance",
+							"owner",
+							"testType",
+							"testID",
+							uint16(1),
+							"gigi",
+							"test.type",
+							nil,
+							uint32(1),
+							0,
+							"instance",
+							"owner",
+							"testType",
+							"testID",
+							uint16(1),
+							"gigi",
+							"test.type2",
+							nil,
+							uint32(2),
+							1,
+						),
+						mock.WithQueryResult(
+							[]string{"created_at", "position"},
+							[][]driver.Value{
+								{
+									time.Now(),
+									float64(123),
+								},
+								{
+									time.Now(),
+									float64(123.1),
+								},
+							},
+						),
+					),
+				},
+			},
+			want: want{
+				assertErr: func(t *testing.T, err error) bool {
+					is := errors.Is(err, errReduce)
+					if !is {
+						t.Errorf("no error expected got: %v", err)
+					}
+					return is
+				},
+			},
+		},
+		{
+			name: "1 aggregate 2 commands",
+			args: args{
+				reducer: &testReducer{
+					expectedReduces: 2,
+				},
+				commands: []*command{
+					{
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("owner", "testType", "testID"),
+							).Aggregates()[0],
+						},
+						Event: &eventstore.Event[eventstore.StoragePayload]{
+							Aggregate: *eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("owner", "testType", "testID"),
+							).Aggregates()[0].Aggregate(),
+							Creator:  "gigi",
+							Revision: 1,
+							Type:     "test.type",
+							Sequence: 1,
+						},
+					},
+					{
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("owner", "testType", "testID"),
+							).Aggregates()[0],
+						},
+						Event: &eventstore.Event[eventstore.StoragePayload]{
+							Aggregate: *eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("owner", "testType", "testID"),
+							).Aggregates()[0].Aggregate(),
+							Creator:  "gigi",
+							Revision: 1,
+							Type:     "test.type2",
+							Sequence: 2,
+						},
+					},
+				},
+				expectations: []mock.Expectation{
+					mock.ExpectQuery(
+						`INSERT INTO eventstore.events2 (instance_id, "owner", aggregate_type, aggregate_id, revision, creator, event_type, payload, "sequence", in_tx_order, created_at, "position") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())), ($11, $12, $13, $14, $15, $16, $17, $18, $19, $20, statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())) RETURNING created_at, "position"`,
+						mock.WithQueryArgs(
+							"instance",
+							"owner",
+							"testType",
+							"testID",
+							uint16(1),
+							"gigi",
+							"test.type",
+							nil,
+							uint32(1),
+							0,
+							"instance",
+							"owner",
+							"testType",
+							"testID",
+							uint16(1),
+							"gigi",
+							"test.type2",
+							nil,
+							uint32(2),
+							1,
+						),
+						mock.WithQueryResult(
+							[]string{"created_at", "position"},
+							[][]driver.Value{
+								{
+									time.Now(),
+									float64(123),
+								},
+								{
+									time.Now(),
+									float64(123.1),
+								},
+							},
+						),
+					),
+				},
+			},
+			want: want{
+				assertErr: func(t *testing.T, err error) bool {
+					is := err == nil
+					if !is {
+						t.Errorf("no error expected got: %v", err)
+					}
+					return is
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
