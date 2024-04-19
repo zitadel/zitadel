@@ -156,13 +156,6 @@ func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oi
 	return s.LegacyServer.DeviceAuthorization(ctx, r)
 }
 
-func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGrantRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.JWTProfile(ctx, r)
-}
-
 func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.DeviceAccessTokenRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

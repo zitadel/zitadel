@@ -30,7 +30,9 @@ for example the v2 code exchange and refresh token.
 */
 
 func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.Client, session *command.OIDCSession, state, projectID string, projectRoleAssertion bool) (_ *oidc.AccessTokenResponse, err error) {
-	getUserInfoAndSigner := s.getUserInfoAndSignerOnce(ctx, session.UserID, projectID, projectRoleAssertion, session.Scopes)
+	getUserInfo := s.getUserInfoOnce(session.UserID, projectID, projectRoleAssertion, session.Scopes)
+	getSigner := s.getSignerOnce()
+
 	resp := &oidc.AccessTokenResponse{
 		TokenType:    oidc.BearerToken,
 		RefreshToken: session.RefreshToken,
@@ -39,7 +41,7 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 	}
 
 	if client.AccessTokenType() == op.AccessTokenTypeJWT {
-		resp.AccessToken, err = s.createJWT(ctx, client, session, getUserInfoAndSigner)
+		resp.AccessToken, err = s.createJWT(ctx, client, session, getUserInfo, getSigner)
 	} else {
 		resp.AccessToken, err = op.CreateBearerToken(session.TokenID, session.UserID, s.opCrypto)
 	}
@@ -48,55 +50,75 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 	}
 
 	if slices.Contains(session.Scopes, oidc.ScopeOpenID) {
-		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfoAndSigner, resp.AccessToken, session.Audience, nil, time.Time{}, nil) // TODO: authmethods, authTime
+		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, session.Audience, nil, time.Time{}, nil) // TODO: authmethods, authTime
 	}
 	return resp, err
 }
 
-// userInfoAndSignerFunc is a getter function that allows add-hoc retrieval of userinfo and signer,
-// when a JWT token needs to be created in the token endpoint.
-type userInfoAndSignerFunc func(ctx context.Context) (*oidc.UserInfo, jose.Signer, jose.SignatureAlgorithm, error)
+// signerFunc is a getter function that allows add-hoc retrieval of the instance's signer.
+type signerFunc func(ctx context.Context) (jose.Signer, jose.SignatureAlgorithm, error)
 
-// getUserInfoAndSignerOnce returns a function which retrieves the userinfo and signer from the database once.
+// getSignerOnce returns a function which retrieves the instance's signer from the database once.
 // Repeated calls of the returned function return the same results.
-func (s *Server) getUserInfoAndSignerOnce(ctx context.Context, userID, projectID string, projectRoleAssertion bool, scope []string) userInfoAndSignerFunc {
+func (s *Server) getSignerOnce() signerFunc {
 	var (
-		userInfo *oidc.UserInfo
-		signer   jose.Signer
-		signAlg  jose.SignatureAlgorithm
-		err      error
+		once    sync.Once
+		signer  jose.Signer
+		signAlg jose.SignatureAlgorithm
+		err     error
 	)
-	call := sync.OnceFunc(func() {
-		ctx, span := tracing.NewSpan(ctx)
-		defer func() { span.EndWithError(err) }()
+	return func(ctx context.Context) (jose.Signer, jose.SignatureAlgorithm, error) {
+		once.Do(func() {
+			ctx, span := tracing.NewSpan(ctx)
+			defer func() { span.EndWithError(err) }()
 
-		userInfo, err = s.userInfo(ctx, userID, scope, projectID, projectRoleAssertion, false)
-		if err != nil {
-			return
-		}
-		var signingKey op.SigningKey
-		signingKey, err = s.Provider().Storage().SigningKey(ctx)
-		if err != nil {
-			return
-		}
-		signAlg = signingKey.SignatureAlgorithm()
+			var signingKey op.SigningKey
+			signingKey, err = s.Provider().Storage().SigningKey(ctx)
+			if err != nil {
+				return
+			}
+			signAlg = signingKey.SignatureAlgorithm()
 
-		signer, err = op.SignerFromKey(signingKey)
-		if err != nil {
-			return
-		}
-	})
-	return func(ctx context.Context) (*oidc.UserInfo, jose.Signer, jose.SignatureAlgorithm, error) {
-		call()
-		return userInfo, signer, signAlg, err
+			signer, err = op.SignerFromKey(signingKey)
+			if err != nil {
+				return
+			}
+		})
+		return signer, signAlg, err
 	}
 }
 
-func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfoAndSigningKey userInfoAndSignerFunc, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
+// userInfoFunc is a getter function that allows add-hoc retrieval of a user.
+type userInfoFunc func(ctx context.Context) (*oidc.UserInfo, error)
+
+// getUserInfoOnce returns a function which retrieves userinfo from the database once.
+// Repeated calls of the returned function return the same results.
+func (s *Server) getUserInfoOnce(userID, projectID string, projectRoleAssertion bool, scope []string) userInfoFunc {
+	var (
+		once     sync.Once
+		userInfo *oidc.UserInfo
+		err      error
+	)
+	return func(ctx context.Context) (*oidc.UserInfo, error) {
+		once.Do(func() {
+			ctx, span := tracing.NewSpan(ctx)
+			defer func() { span.EndWithError(err) }()
+			userInfo, err = s.userInfo(ctx, userID, scope, projectID, projectRoleAssertion, false)
+		})
+		return userInfo, err
+	}
+}
+
+func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo userInfoFunc, getSigningKey signerFunc, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	userInfo, signer, signAlg, err := getUserInfoAndSigningKey(ctx)
+	userInfo, err := getUserInfo(ctx)
+	if err != nil {
+		return "", 0, err
+	}
+
+	signer, signAlg, err := getSigningKey(ctx)
 	if err != nil {
 		return "", 0, err
 	}
@@ -130,11 +152,15 @@ func timeToOIDCExpiresIn(exp time.Time) uint64 {
 	return uint64(time.Until(exp) / time.Second)
 }
 
-func (*Server) createJWT(ctx context.Context, client op.Client, session *command.OIDCSession, getUserInfoAndSigningKey userInfoAndSignerFunc) (_ string, err error) {
+func (*Server) createJWT(ctx context.Context, client op.Client, session *command.OIDCSession, getUserInfo userInfoFunc, getSigner signerFunc) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	userInfo, signer, _, err := getUserInfoAndSigningKey(ctx)
+	userInfo, err := getUserInfo(ctx)
+	if err != nil {
+		return "", err
+	}
+	signer, _, err := getSigner(ctx)
 	if err != nil {
 		return "", err
 	}

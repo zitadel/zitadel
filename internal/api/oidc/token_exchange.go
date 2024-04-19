@@ -209,8 +209,8 @@ func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudi
 // Both tokens may point to the same object (subjectToken) in case of a regular Token Exchange.
 // When the subject and actor Tokens point to different objects, the new tokens will be for impersonation / delegation.
 func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client *Client, subjectToken, actorToken *exchangeToken, audience, scopes []string) (_ *oidc.TokenExchangeResponse, err error) {
-	projectID := client.client.ProjectID
-	getUserInfoAndSigningKey := s.getUserInfoAndSignerOnce(ctx, subjectToken.userID, projectID, client.client.ProjectRoleAssertion, scopes)
+	getUserInfo := s.getUserInfoOnce(subjectToken.userID, client.client.ProjectID, client.client.ProjectRoleAssertion, scopes)
+	getSigner := s.getSignerOnce()
 
 	resp := &oidc.TokenExchangeResponse{
 		Scopes: scopes,
@@ -230,12 +230,12 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		resp.IssuedTokenType = oidc.AccessTokenType
 
 	case oidc.JWTTokenType:
-		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeJWT(ctx, client, getUserInfoAndSigningKey, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeJWT(ctx, client, getUserInfo, getSigner, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.JWTTokenType
 
 	case oidc.IDTokenType:
-		resp.AccessToken, resp.ExpiresIn, err = s.createIDToken(ctx, client, getUserInfoAndSigningKey, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, actor)
+		resp.AccessToken, resp.ExpiresIn, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, actor)
 		resp.TokenType = TokenTypeNA
 		resp.IssuedTokenType = oidc.IDTokenType
 
@@ -249,7 +249,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	}
 
 	if slices.Contains(scopes, oidc.ScopeOpenID) && tokenType != oidc.IDTokenType {
-		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfoAndSigningKey, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, actor)
+		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, actor)
 		if err != nil {
 			return nil, err
 		}
@@ -273,12 +273,12 @@ func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, 
 	return accessToken, refreshToken, timeToOIDCExpiresIn(session.Expiration), nil
 }
 
-func (s *Server) createExchangeJWT(ctx context.Context, client *Client, getUserInfoAndSigningKey userInfoAndSignerFunc, userID, resourceOwner string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {
+func (s *Server) createExchangeJWT(ctx context.Context, client *Client, getUserInfo userInfoFunc, getSigner signerFunc, userID, resourceOwner string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	session, err := s.command.CreateOIDCSession(ctx, userID, resourceOwner, client.client.ClientID, audience, scope, authMethods, authTime, nil, reason, actor)
-	accessToken, err = s.createJWT(ctx, client, session, getUserInfoAndSigningKey)
+	accessToken, err = s.createJWT(ctx, client, session, getUserInfo, getSigner)
 	if err != nil {
 		return "", "", 0, err
 	}
