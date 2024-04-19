@@ -229,10 +229,6 @@ func TestServer_GetTargetByID(t *testing.T) {
 				} else {
 					assert.NoError(ttt, getErr)
 				}
-				if getErr != nil {
-					fmt.Println("Error: " + getErr.Error())
-					return
-				}
 
 				integration.AssertDetails(t, tt.want.GetTarget(), got.GetTarget())
 
@@ -856,8 +852,6 @@ func TestServer_ListExecutions(t *testing.T) {
 				if listErr != nil {
 					return
 				}
-				fmt.Println("result")
-				fmt.Println(got.Result)
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {

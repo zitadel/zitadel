@@ -129,10 +129,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			}
 
 			got, err := Client.GetTargetByID(tt.ctx, tt.req)
-			if err != nil {
-				fmt.Println("error")
-				fmt.Println(err.Error())
-			}
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -188,7 +184,6 @@ func testServerCall(
 			http.Error(w, "error, read body: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		fmt.Println("request: " + string(sentBody))
 		if !reflect.DeepEqual(data, sentBody) {
 			http.Error(w, "error, equal:\n"+string(data)+"\nsent:\n"+string(sentBody), http.StatusInternalServerError)
 			return
