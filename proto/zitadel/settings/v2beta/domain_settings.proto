@@ -18,8 +18,6 @@ message DomainSettings {
       description: "defines if organization domains should be verified upon creation, otherwise will be created already verified"
     }
   ];
-
-  // DEPRECATED: use whatever smtp sender you want
   bool smtp_sender_address_matches_instance_domain = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if the SMTP sender address domain should match an existing domain on the instance"

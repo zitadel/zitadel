@@ -8,7 +8,6 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/settings/v2beta/settings.proto";
 import "validate/validate.proto";
 
-// DEPRECATED: use custom settings instead
 message LegalAndSupportSettings {
   string tos_link = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

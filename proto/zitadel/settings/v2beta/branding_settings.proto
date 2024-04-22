@@ -7,7 +7,6 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta;setting
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/settings/v2beta/settings.proto";
 
-// DEPRECATED: use custom settings instead
 message BrandingSettings {
   Theme light_theme = 1;
   Theme dark_theme = 2;
