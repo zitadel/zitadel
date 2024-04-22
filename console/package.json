@@ -27,7 +27,7 @@
     "@ctrl/ngx-codemirror": "^6.1.0",
     "@fortawesome/angular-fontawesome": "^0.13.0",
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
-    "@fortawesome/free-brands-svg-icons": "^6.4.2",
+    "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@grpc/grpc-js": "^1.9.3",
     "@netlify/framework-info": "^9.8.10",
     "@ngx-translate/core": "^15.0.0",
