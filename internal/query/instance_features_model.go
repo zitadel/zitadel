@@ -63,6 +63,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceActionsEventType,
+			feature_v2.InstanceImprovedOrgByIDEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -77,6 +78,7 @@ func (m *InstanceFeaturesReadModel) reduceReset() {
 	m.instance.UserSchema = FeatureSource[bool]{}
 	m.instance.TokenExchange = FeatureSource[bool]{}
 	m.instance.Actions = FeatureSource[bool]{}
+	m.instance.ImprovedOrgByID = FeatureSource[bool]{}
 }
 
 func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
@@ -89,6 +91,7 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.UserSchema = m.system.UserSchema
 	m.instance.TokenExchange = m.system.TokenExchange
 	m.instance.Actions = m.system.Actions
+	m.instance.ImprovedOrgByID = m.system.ImprovedOrgByID
 	return true
 }
 
@@ -114,6 +117,8 @@ func (m *InstanceFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent
 		dst = &m.instance.TokenExchange
 	case feature.KeyActions:
 		dst = &m.instance.Actions
+	case feature.KeyImprovedOrgByID:
+		dst = &m.instance.ImprovedOrgByID
 	}
 	*dst = FeatureSource[bool]{
 		Level: level,

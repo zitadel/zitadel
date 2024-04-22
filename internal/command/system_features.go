@@ -15,6 +15,7 @@ type SystemFeatures struct {
 	TokenExchange                   *bool
 	UserSchema                      *bool
 	Actions                         *bool
+	ImprovedOrgByID                 *bool
 }
 
 func (m *SystemFeatures) isEmpty() bool {
@@ -23,7 +24,8 @@ func (m *SystemFeatures) isEmpty() bool {
 		m.LegacyIntrospection == nil &&
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
-		m.Actions == nil
+		m.Actions == nil &&
+		m.ImprovedOrgByID == nil
 }
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {

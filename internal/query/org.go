@@ -7,10 +7,12 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -95,6 +97,10 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	if !authz.GetInstance(ctx).Features().ImprovedOrgByID {
+		return q.oldOrgByID(ctx, shouldTriggerBulk, id)
+	}
+
 	foundOrg := readmodel.NewOrg(id)
 	eventCount, err := q.eventStore.Query(
 		ctx,
@@ -122,6 +128,33 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 		Name:          foundOrg.Name,
 		Domain:        foundOrg.PrimaryDomain.Domain,
 	}, nil
+}
+
+func (q *Queries) oldOrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if shouldTriggerBulk {
+		_, traceSpan := tracing.NewNamedSpan(ctx, "TriggerOrgProjection")
+		ctx, err = projection.OrgProjection.Trigger(ctx, handler.WithAwaitRunning())
+		logging.OnError(err).Debug("trigger failed")
+		traceSpan.EndWithError(err)
+	}
+
+	stmt, scan := prepareOrgQuery(ctx, q.client)
+	query, args, err := stmt.Where(sq.Eq{
+		OrgColumnID.identifier():         id,
+		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+	}).ToSql()
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
+	}
+
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		org, err = scan(row)
+		return err
+	}, query, args...)
+	return org, err
 }
 
 func (q *Queries) OrgByPrimaryDomain(ctx context.Context, domain string) (org *Org, err error) {

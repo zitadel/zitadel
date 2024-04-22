@@ -46,11 +46,17 @@ message SetSystemFeaturesRequest{
     }
   ];
 
-
   optional bool actions = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Actions allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  optional bool improved_org_by_id = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Changes execution path of org by id queries to improve performance.";
     }
   ];
 }
@@ -108,6 +114,13 @@ message GetSystemFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Actions v2 allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  FeatureFlag improved_org_by_id = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Changes execution path of org by id queries to improve performance.";
     }
   ];
 }
