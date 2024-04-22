@@ -200,7 +200,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       metadataXml: [{ value: '', disabled: true }],
     });
 
-    this.samlForm.valueChanges.subscribe((next) => {
+    this.samlForm.valueChanges.subscribe(() => {
       if (!this.app) {
         this.app = new App().toObject();
       }
@@ -216,7 +216,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           : '';
 
       if (!minimalMetadata && !this.metadataUrl?.value) {
-        return
+        return;
       }
 
       if (!this.app.samlConfig) {
