@@ -428,12 +428,14 @@
                 [innerHtml]="'APP.OIDC.WELLKNOWN' | translate: { url: issuer + '/.well-known/openid-configuration' }"
               ></div>
             </cnsl-info-section>
-            <cnsl-copy-row
-              labelMinWidth="220px"
-              *ngFor="let apiUrl of apiMap$ | async | keyvalue"
-              [label]="apiUrl.key"
-              [value]="apiUrl.value"
-            ></cnsl-copy-row>
+            <ng-container *ngIf="app?.apiConfig && apiMap$ | async | keyvalue as apiMap">
+              <cnsl-copy-row
+                labelMinWidth="220px"
+                *ngFor="let apiUrl of apiMap"
+                [label]="apiUrl.key"
+                [value]="apiUrl.value"
+              ></cnsl-copy-row>
+            </ng-container>
             <ng-container *ngIf="app?.samlConfig && samlMap$ | async as samlMap">
               <cnsl-copy-row
                 labelMinWidth="220px"
@@ -456,8 +458,8 @@
                 [value]="url"
               ></cnsl-copy-row>
             </ng-container>
-            <ng-container *ngIf="!app?.samlConfig">
-              <ng-container *ngFor="let wellknown of wellknownMap$ | async | keyvalue">
+            <ng-container *ngIf="app?.oidcConfig && wellknownMap$ | async | keyvalue as wellKnownMap">
+              <ng-container *ngFor="let wellknown of wellKnownMap">
                 <cnsl-copy-row
                   labelMinWidth="220px"
                   *ngIf="wellknown.key.endsWith('endpoint') || wellknown.key.toString() === 'jwks_uri'"
