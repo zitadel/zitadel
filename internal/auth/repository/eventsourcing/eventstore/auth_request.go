@@ -550,34 +550,7 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 			Value: metadata.Value,
 		}
 	}
-	human := &command.AddHuman{
-		Username:    registerUser.Username,
-		FirstName:   registerUser.FirstName,
-		LastName:    registerUser.LastName,
-		NickName:    registerUser.NickName,
-		DisplayName: registerUser.DisplayName,
-		Email: command.Email{
-			Address:  registerUser.EmailAddress,
-			Verified: registerUser.IsEmailVerified,
-		},
-		PreferredLanguage: registerUser.PreferredLanguage,
-		Gender:            registerUser.Gender,
-		Phone: command.Phone{
-			Number:   registerUser.PhoneNumber,
-			Verified: registerUser.IsPhoneVerified,
-		},
-		Password:    registerUser.Password.SecretString,
-		Register:    true,
-		UserAgentID: userAgentID,
-		Metadata:    addMetadata,
-		Links: []*command.AddLink{
-			{
-				IDPID:         externalIDP.IDPConfigID,
-				DisplayName:   externalIDP.DisplayName,
-				IDPExternalID: externalIDP.ExternalUserID,
-			},
-		},
-	}
+	human := command.AddHumanFromDomain(registerUser, metadatas, request, externalIDP)
 	err = repo.Command.AddUserHuman(ctx, resourceOwner, human, true, repo.UserCodeAlg)
 	if err != nil {
 		return err

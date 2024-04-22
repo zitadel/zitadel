@@ -2,7 +2,6 @@ package login
 
 import (
 	"net/http"
-	"strings"
 
 	"golang.org/x/text/language"
 
@@ -83,7 +82,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	human := humanToCommand(user, metadatas, authRequest)
+	human := command.AddHumanFromDomain(user, metadatas, authRequest, nil)
 	err = l.command.AddUserHuman(setContext(r.Context(), resourceOwner), resourceOwner, human, true, l.userCodeAlg)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
@@ -112,47 +111,6 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	l.renderNextStep(w, r, authRequest)
-}
-
-func humanToCommand(user *domain.Human, metadatas []*domain.Metadata, authRequest *domain.AuthRequest) *command.AddHuman {
-	addMetadata := make([]*command.AddMetadataEntry, len(metadatas))
-	for i, metadata := range metadatas {
-		addMetadata[i] = &command.AddMetadataEntry{
-			Key:   metadata.Key,
-			Value: metadata.Value,
-		}
-	}
-	human := new(command.AddHuman)
-	if user.Profile != nil {
-		human.Username = user.Username
-		human.FirstName = user.FirstName
-		human.LastName = user.LastName
-		human.NickName = user.NickName
-		human.DisplayName = user.DisplayName
-		human.PreferredLanguage = user.PreferredLanguage
-		human.Gender = user.Gender
-		human.Password = user.Password.SecretString
-		human.Register = true
-		human.Metadata = addMetadata
-		human.UserAgentID = authRequest.AgentID
-		human.AuthRequestID = authRequest.ID
-	}
-	if user.Email != nil {
-		human.Email = command.Email{
-			Address:  user.EmailAddress,
-			Verified: user.IsEmailVerified,
-		}
-	}
-	if user.Phone != nil {
-		human.Phone = command.Phone{
-			Number:   user.Phone.PhoneNumber,
-			Verified: user.Phone.IsPhoneVerified,
-		}
-	}
-	if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
-		human.Username = string(human.Email.Address)
-	}
-	return human
 }
 
 func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authRequest *domain.AuthRequest, formData *registerFormData, err error) {

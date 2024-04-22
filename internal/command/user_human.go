@@ -671,3 +671,53 @@ func humanWriteModelByID(ctx context.Context, filter preparation.FilterToQueryRe
 	err = humanWriteModel.Reduce()
 	return humanWriteModel, err
 }
+
+func AddHumanFromDomain(user *domain.Human, metadataList []*domain.Metadata, authRequest *domain.AuthRequest, idp *domain.UserIDPLink) *AddHuman {
+	addMetadata := make([]*AddMetadataEntry, len(metadataList))
+	for i, metadata := range metadataList {
+		addMetadata[i] = &AddMetadataEntry{
+			Key:   metadata.Key,
+			Value: metadata.Value,
+		}
+	}
+	human := new(AddHuman)
+	if user.Profile != nil {
+		human.Username = user.Username
+		human.FirstName = user.FirstName
+		human.LastName = user.LastName
+		human.NickName = user.NickName
+		human.DisplayName = user.DisplayName
+		human.PreferredLanguage = user.PreferredLanguage
+		human.Gender = user.Gender
+		human.Password = user.Password.SecretString
+		human.Register = true
+		human.Metadata = addMetadata
+		human.UserAgentID = authRequest.AgentID
+		human.AuthRequestID = authRequest.ID
+	}
+	if user.Email != nil {
+		human.Email = Email{
+			Address:  user.EmailAddress,
+			Verified: user.IsEmailVerified,
+		}
+	}
+	if user.Phone != nil {
+		human.Phone = Phone{
+			Number:   user.Phone.PhoneNumber,
+			Verified: user.Phone.IsPhoneVerified,
+		}
+	}
+	if idp != nil {
+		human.Links = []*AddLink{
+			{
+				IDPID:         idp.IDPConfigID,
+				DisplayName:   idp.DisplayName,
+				IDPExternalID: idp.ExternalUserID,
+			},
+		}
+	}
+	if human.Username = strings.TrimSpace(human.Username); human.Username == "" {
+		human.Username = string(human.Email.Address)
+	}
+	return human
+}
