@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -29,13 +28,10 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
 		sequences []*latestSequence
-		once      sync.Once
 	)
 
 	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
-		once.Do(func() {
-			sequences, err = latestSequences(ctx, tx, commands)
-		})
+		sequences, err = latestSequences(ctx, tx, commands)
 		if err != nil {
 			return err
 		}
