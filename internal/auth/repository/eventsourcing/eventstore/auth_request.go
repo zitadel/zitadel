@@ -543,19 +543,6 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if err != nil {
 		return err
 	}
-	//initCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, repo.UserCodeAlg)
-	//if err != nil {
-	//	return err
-	//}
-	//emailCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, repo.UserCodeAlg)
-	//if err != nil {
-	//	return err
-	//}
-	//phoneCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, repo.UserCodeAlg)
-	//if err != nil {
-	//	return err
-	//}
-
 	addMetadata := make([]*command.AddMetadataEntry, len(metadatas))
 	for i, metadata := range metadatas {
 		addMetadata[i] = &command.AddMetadataEntry{
@@ -592,7 +579,6 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 		},
 	}
 	err = repo.Command.AddUserHuman(ctx, resourceOwner, human, true, repo.UserCodeAlg)
-	//human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return err
 	}

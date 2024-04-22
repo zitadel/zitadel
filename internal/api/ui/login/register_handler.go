@@ -69,22 +69,6 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	if authRequest != nil && authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != resourceOwner {
 		resourceOwner = authRequest.RequestedOrgID
 	}
-	//initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
-	//if err != nil {
-	//	l.renderRegister(w, r, authRequest, data, err)
-	//	return
-	//}
-	//emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
-	//if err != nil {
-	//	l.renderRegister(w, r, authRequest, data, err)
-	//	return
-	//}
-	//phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
-	//if err != nil {
-	//	l.renderRegister(w, r, authRequest, data, err)
-	//	return
-	//}
-
 	// For consistency with the external authentication flow,
 	// the setMetadata() function is provided on the pre creation hook, for now,
 	// like for the ExternalAuthentication flow.
@@ -100,22 +84,11 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	human := humanToCommand(user, metadatas, authRequest)
-	//user, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, nil, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
 	err = l.command.AddUserHuman(setContext(r.Context(), resourceOwner), resourceOwner, human, true, l.userCodeAlg)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	//
-	//if len(metadatas) > 0 {
-	//	_, err = l.command.BulkSetUserMetadata(r.Context(), user.AggregateID, resourceOwner, metadatas...)
-	//	if err != nil {
-	//		// TODO: What if action is configured to be allowed to fail? Same question for external registration.
-	//		l.renderRegister(w, r, authRequest, data, err)
-	//		return
-	//	}
-	//}
-
 	userGrants, err := l.runPostCreationActions(human.ID, authRequest, r, resourceOwner, domain.FlowTypeInternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authRequest, err)

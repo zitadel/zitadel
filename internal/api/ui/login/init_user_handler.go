@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/zitadel/logging"
-
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -70,20 +68,6 @@ func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {
 	l.renderInitUser(w, r, authReq, userID, loginName, code, passwordSet, nil)
 }
 
-func (l *Login) checkOptionalAuthRequestOfEmailLinks(r *http.Request) *domain.AuthRequest {
-	authReq, err := l.getAuthRequest(r)
-	if err == nil {
-		return authReq
-	}
-	logging.WithError(err).Info("authrequest could not be found on email verification")
-	queries := r.URL.Query()
-	queries.Del(QueryAuthRequestID)
-	r.URL.RawQuery = queries.Encode()
-	r.RequestURI = r.URL.RequestURI()
-	r.Form.Del(QueryAuthRequestID)
-	r.PostForm.Del(QueryAuthRequestID)
-	return nil
-}
 func (l *Login) handleInitUserCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(initUserFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, data)
