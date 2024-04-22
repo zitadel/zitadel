@@ -74,10 +74,10 @@ For Request and Response there are 3 levels the condition can be defined:
 
 Replace the current Actions with the following flows:
 
-- [Internal Authentication](./internal-authentication)
-- [External Authentication](./external-authentication)
-- [Complement Token](./complement-token)
-- [Customize SAML Response](./customize-samlresponse)
+- [Internal Authentication](../actions/internal-authentication)
+- [External Authentication](../actions/external-authentication)
+- [Complement Token](../actions/complement-token)
+- [Customize SAML Response](../actions/customize-samlresponse)
 
 ### Condition for Events
 
