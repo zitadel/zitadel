@@ -10,14 +10,17 @@ import (
 
 type DeviceAuthWriteModel struct {
 	eventstore.WriteModel
+	aggregate *eventstore.Aggregate
 
 	ClientID        string
 	DeviceCode      string
 	UserCode        string
 	Expires         time.Time
 	Scopes          []string
+	Audience        []string
 	State           domain.DeviceAuthState
-	Subject         string
+	UserID          string
+	UserOrgID       string
 	UserAuthMethods []domain.UserAuthMethodType
 	AuthTime        time.Time
 }
@@ -28,6 +31,7 @@ func NewDeviceAuthWriteModel(deviceCode, resourceOwner string) *DeviceAuthWriteM
 			AggregateID:   deviceCode,
 			ResourceOwner: resourceOwner,
 		},
+		aggregate: deviceauth.NewAggregate(deviceCode, resourceOwner),
 	}
 }
 
@@ -40,14 +44,18 @@ func (m *DeviceAuthWriteModel) Reduce() error {
 			m.UserCode = e.UserCode
 			m.Expires = e.Expires
 			m.Scopes = e.Scopes
+			m.Audience = e.Audience
 			m.State = e.State
 		case *deviceauth.ApprovedEvent:
 			m.State = domain.DeviceAuthStateApproved
-			m.Subject = e.Subject
+			m.UserID = e.UserID
+			m.UserOrgID = e.UserOrgID
 			m.UserAuthMethods = e.UserAuthMethods
 			m.AuthTime = e.AuthTime
 		case *deviceauth.CanceledEvent:
 			m.State = e.Reason.State()
+		case *deviceauth.DoneEvent:
+			m.State = domain.DeviceAuthStateDone
 		}
 	}
 

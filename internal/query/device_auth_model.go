@@ -33,11 +33,14 @@ func (m *DeviceAuthReadModel) Reduce() error {
 			m.State = e.State
 		case *deviceauth.ApprovedEvent:
 			m.State = domain.DeviceAuthStateApproved
-			m.Subject = e.Subject
+			m.UserID = e.UserID
+			m.UserOrgID = e.UserOrgID
 			m.UserAuthMethods = e.UserAuthMethods
 			m.AuthTime = e.AuthTime
 		case *deviceauth.CanceledEvent:
 			m.State = e.Reason.State()
+		case *deviceauth.DoneEvent:
+			m.State = domain.DeviceAuthStateDone
 		}
 	}
 

@@ -117,7 +117,8 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 	type args struct {
 		ctx         context.Context
 		id          string
-		subject     string
+		userID      string
+		userOrgID   string
 		authMethods []domain.UserAuthMethodType
 		authTime    time.Time
 	}
@@ -136,7 +137,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx, "123", "subj",
+				ctx, "123", "subj", "orgID",
 				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				time.Unix(123, 456),
 			},
@@ -158,7 +159,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 					)),
 					expectPushFailed(pushErr,
 						deviceauth.NewApprovedEvent(
-							ctx, deviceauth.NewAggregate("123", "instance1"), "subj",
+							ctx, deviceauth.NewAggregate("123", "instance1"), "subj", "orgID",
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 							time.Unix(123, 456),
 						),
@@ -166,7 +167,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx, "123", "subj",
+				ctx, "123", "subj", "orgID",
 				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				time.Unix(123, 456),
 			},
@@ -188,7 +189,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 					)),
 					expectPush(
 						deviceauth.NewApprovedEvent(
-							ctx, deviceauth.NewAggregate("123", "instance1"), "subj",
+							ctx, deviceauth.NewAggregate("123", "instance1"), "subj", "orgID",
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 							time.Unix(123, 456),
 						),
@@ -196,7 +197,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx, "123", "subj",
+				ctx, "123", "subj", "orgID",
 				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				time.Unix(123, 456),
 			},
@@ -210,7 +211,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.subject, tt.args.authMethods, tt.args.authTime)
+			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.userID, tt.args.userOrgID, tt.args.authMethods, tt.args.authTime)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, gotDetails, tt.wantDetails)
 		})

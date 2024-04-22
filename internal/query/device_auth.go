@@ -67,7 +67,8 @@ type DeviceAuth struct {
 	Scopes          []string
 	Audience        []string
 	State           domain.DeviceAuthState
-	Subject         string
+	UserID          string
+	UserOrgID       string
 	UserAuthMethods []domain.UserAuthMethodType
 	AuthTime        time.Time
 }

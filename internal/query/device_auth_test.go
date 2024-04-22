@@ -82,7 +82,8 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 					eventFromEventPusher(deviceauth.NewApprovedEvent(
 						ctx,
 						deviceauth.NewAggregate("device1", "instance1"),
-						"user1", []domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
+						"user1", "orgID",
+						[]domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
 						timestamp,
 					)),
 				),
@@ -95,7 +96,7 @@ func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
 				Scopes:          []string{"foo", "bar"},
 				Audience:        []string{"projectID", "clientID"},
 				State:           domain.DeviceAuthStateApproved,
-				Subject:         "user1",
+				UserID:          "user1",
 				UserAuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
 				AuthTime:        timestamp,
 			},

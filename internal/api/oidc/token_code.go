@@ -14,14 +14,11 @@ import (
 
 func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.AccessTokenRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() {
-		err = oidcError(err)
-		span.EndWithError(err)
-	}()
+	defer func() { span.EndWithError(err) }()
 
 	client, ok := r.Client.(*Client)
 	if !ok {
-		return nil, zerrors.ThrowInternal(nil, "OIDC-Pe4th", "Error.Internal")
+		return nil, zerrors.ThrowInternal(nil, "OIDC-Ae2ph", "Error.Internal")
 	}
 
 	plainCode, err := s.decryptCode(ctx, r.Data.Code)

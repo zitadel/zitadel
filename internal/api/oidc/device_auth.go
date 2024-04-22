@@ -96,7 +96,7 @@ func newDeviceAuthorizationState(d *query.DeviceAuth) *op.DeviceAuthorizationSta
 		Expires:  d.Expires,
 		Done:     d.State.Done(),
 		Denied:   d.State.Denied(),
-		Subject:  d.Subject,
+		Subject:  d.UserID,
 		AMR:      AuthMethodTypesToAMR(d.UserAuthMethods),
 		AuthTime: d.AuthTime,
 	}
@@ -107,7 +107,7 @@ func newDeviceAuthorizationState(d *query.DeviceAuth) *op.DeviceAuthorizationSta
 // are polling until they successfully receive a token or we indicate a denied or expired state.
 // As generated user codes are of low entropy, this implementation also takes care or
 // device authorization request cleanup, when it has been Approved, Denied or Expired.
-func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, deviceCode string) (state *op.DeviceAuthorizationState, err error) {
+func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, _, deviceCode string) (state *op.DeviceAuthorizationState, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		err = oidcError(err)
@@ -121,7 +121,7 @@ func (o *OPStorage) GetDeviceAuthorizatonState(ctx context.Context, clientID, de
 	logging.WithFields(
 		"device_code", deviceCode,
 		"expires", deviceAuth.Expires, "scopes", deviceAuth.Scopes,
-		"subject", deviceAuth.Subject, "state", deviceAuth.State,
+		"subject", deviceAuth.UserID, "state", deviceAuth.State,
 	).Debug("device authorization state")
 
 	// Cancel the request if it is expired, only if it wasn't Done meanwhile
