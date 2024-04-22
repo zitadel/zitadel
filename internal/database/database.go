@@ -40,7 +40,7 @@ func (db *DB) Query(scan func(*sql.Rows) error, query string, args ...any) error
 
 func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) (err error) {
 	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
 	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return err
