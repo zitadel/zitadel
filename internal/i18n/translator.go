@@ -51,7 +51,7 @@ func newTranslator(ns Namespace, defaultLanguage language.Tag, allowedLanguages 
 	if len(t.allowedLanguages) == 0 {
 		t.allowedLanguages = SupportedLanguages()
 	}
-	t.bundle, err = newBundle(LoadFilesystem(ns), defaultLanguage, t.allowedLanguages)
+	t.bundle, err = newBundle(ns, defaultLanguage, t.allowedLanguages)
 	if err != nil {
 		return nil, err
 	}
