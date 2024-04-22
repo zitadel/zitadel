@@ -12,6 +12,9 @@ on:
       core_cache_path:
         required: true
         type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: true
 
 jobs:
   postgres:
