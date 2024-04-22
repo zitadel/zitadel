@@ -95,47 +95,6 @@ export default function LoginOTP({
     return res.json();
   }
 
-  // async function submitLogin(inputs: Inputs) {
-  //   setLoading(true);
-
-  //   const checks: Checks = {};
-
-  //   if (method === "email") {
-  //     checks.otpEmail = {
-  //       code: inputs.code,
-  //     };
-  //   }
-
-  //   if (method === "sms") {
-  //     checks.otpSms = {
-  //       code: inputs.code,
-  //     };
-  //   }
-
-  //   const res = await fetch("/api/session", {
-  //     method: "PUT",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       loginName,
-  //       sessionId,
-  //       organization,
-  //       authRequestId,
-  //       checks,
-  //     }),
-  //   });
-
-  //   const response = await res.json();
-
-  //   setLoading(false);
-  //   if (!res.ok) {
-  //     setError(response.details);
-  //     return Promise.reject(response.details);
-  //   }
-  //   return response;
-  // }
-
   async function submitCode(values: Inputs, organization?: string) {
     setLoading(true);
 

@@ -17,7 +17,7 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, organization } = searchParams;
+  const { loginName, organization, sessionId, authRequestId } = searchParams;
   const { method } = params;
 
   const branding = await getBrandingSettings(server, organization);
@@ -67,6 +67,10 @@ export default async function Page({
               <TOTPRegister
                 uri={totpResponse.uri as string}
                 secret={totpResponse.secret as string}
+                loginName={loginName}
+                sessionId={sessionId}
+                authRequestId={authRequestId}
+                organization={organization}
               ></TOTPRegister>
             )}
         </div>

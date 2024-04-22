@@ -1,4 +1,8 @@
-import { GetUserByIDResponse, RegisterTOTPResponse } from "@zitadel/server";
+import {
+  GetUserByIDResponse,
+  RegisterTOTPResponse,
+  VerifyTOTPRegistrationResponse,
+} from "@zitadel/server";
 import {
   LegalAndSupportSettings,
   PasswordComplexitySettings,
@@ -49,6 +53,8 @@ import {
   AddOTPEmailResponse,
   AddOTPSMSResponse,
 } from "@zitadel/server";
+
+const SESSION_LIFETIME_S = 3000;
 
 export const zitadelConfig: ZitadelServerOptions = {
   name: "zitadel login",
@@ -124,8 +130,6 @@ export async function registerTOTP(
       token: token,
     };
 
-    console.log(token);
-
     const sessionUser = initializeServer(authConfig);
     userService = user.getUser(sessionUser);
   } else {
@@ -185,7 +189,7 @@ export async function createSessionFromChecks(
       checks: checks,
       challenges,
       lifetime: {
-        seconds: 300,
+        seconds: SESSION_LIFETIME_S,
         nanos: 0,
       },
     },
@@ -300,6 +304,27 @@ export async function addHumanUser(
       : payload,
     {}
   );
+}
+
+export async function verifyTOTPRegistration(
+  code: string,
+  userId: string,
+  token?: string
+): Promise<VerifyTOTPRegistrationResponse> {
+  let userService;
+  if (token) {
+    const authConfig: ZitadelServerOptions = {
+      name: "zitadel login",
+      apiUrl: process.env.ZITADEL_API_URL ?? "",
+      token: token,
+    };
+
+    const sessionUser = initializeServer(authConfig);
+    userService = user.getUser(sessionUser);
+  } else {
+    userService = user.getUser(server);
+  }
+  return userService.verifyTOTPRegistration({ code, userId }, {});
 }
 
 export async function getUserByID(

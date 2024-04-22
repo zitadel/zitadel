@@ -92,6 +92,8 @@ export {
   AddOTPSMSRequest,
   RegisterTOTPRequest,
   RegisterTOTPResponse,
+  VerifyTOTPRegistrationRequest,
+  VerifyTOTPRegistrationResponse,
 } from "./proto/server/zitadel/user/v2beta/user_service";
 
 export { AuthFactor } from "./proto/server/zitadel/user";
