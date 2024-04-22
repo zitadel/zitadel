@@ -80,19 +80,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public appId: string = '';
   public app?: App.AsObject;
 
-  public environmentMap$ = this.envSvc.env.pipe(
-    map((env) => {
-      return {
-        issuer: env.issuer,
-        adminServiceUrl: `${env.api}/admin/v1`,
-        mgmtServiceUrl: `${env.api}/management/v1`,
-        authServiceUrl: `${env.api}/auth/v1`,
-        samlCertificateURL: `${env.issuer}/saml/v2/certificate`,
-        samlSSO: `${env.issuer}/saml/v2/SSO`,
-        samlSLO: `${env.issuer}/saml/v2/SLO`,
-      };
-    }),
-  );
   public apiMap$ = this.envSvc.env.pipe(
     map((env) => {
       return {
