@@ -1,20 +1,20 @@
 syntax = "proto3";
 
-package zitadel.settings.feature.v2;
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/feature/v2;feature";
+package zitadel.settings.language.v2;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/language/v2;language";
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 import "zitadel/object/v2/object.proto";
-import "zitadel/settings/feature/v2/feature.proto";
+import "zitadel/settings/language/v2/language.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "Feature Service";
+    title: "Language Service";
     version: "2.0";
-    description: "This API is intended to manage features for ZITADEL. It is itself behind the feature flag \"multitenancy_settings\". Features are settings, and are therefore inherited through the context hierarchy system -> instance -> org. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op. This service is in beta state. It can AND WILL continue breaking until a stable version is released.";
+    description: "Language Service is intended to manage languages for ZITADEL. Enable the feature flag \"multitenancy_settings\" in order to activate it. Languages are settings, and are therefore inherited through the context hierarchy system -> instance -> org.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -86,18 +86,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-// FeatureService is intended to manage features for ZITADEL.
-// It is itself behind the feature flag \"settings_api\".
-//
-// Features can be experimental where ZITADEL will assume a sane default, such as disabled.
-// When over time confidence in such a feature grows, ZITADEL can default to enabling the feature.
-// As a final step we might choose to always enable a feature and remove the setting from this API,
-// reserving the proto field number. Such removal is not considered a breaking change.
-// Setting a removed field will effectively result in a no-op.
-service FeatureService {
-  rpc SetFeatures (SetFeatureSettingsRequest) returns (SetFeatureSettingsResponse) {
+// Language Service is intended to manage languages for ZITADEL.
+// Enable the feature flag \"multitenancy_settings\" in order to activate it.
+// Languages are settings, and are therefore inherited through the context hierarchy system -> instance -> org.
+service LanguageService {
+  rpc SetLanguages (SetLanguageSettingsRequest) returns (SetLanguageSettingsResponse) {
     option (google.api.http) = {
-      patch: "/settings/v2/features"
+      patch: "/settings/v2/languages"
       body: "*"
     };
 
@@ -108,8 +103,8 @@ service FeatureService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Set features for a given context";
-      description: "Configure and set features for a given context. Only fields present in the request are set or unset."
+      summary: "Set languages for a given context";
+      description: "Configure and set languages for a given context. Only fields present in the request are set or unset."
       responses: {
         key: "200"
         value: {
@@ -119,9 +114,9 @@ service FeatureService {
     };
   };
 
-  rpc ResolveFeatures (ResolveFeatureSettingsRequest) returns (ResolveFeatureSettingsResponse) {
+  rpc ResolveLanguages (ResolveLanguageSettingsRequest) returns (ResolveLanguageSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/features"
+      get: "/settings/v2/languages"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -131,8 +126,8 @@ service FeatureService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the features in the given context";
-      description: "Returns all configured and inherited features for the given context."
+      summary: "Get the languages in the given context";
+      description: "Returns all configured and inherited languages for the given context."
       responses: {
         key: "200"
         value: {
@@ -143,22 +138,20 @@ service FeatureService {
   };
 }
 
-message ResolveFeatureSettingsRequest{
-  // Only System and Instance Contexts are allowed for now
+message SetLanguageSettingsRequest{
+  zitadel.object.v2.RequestContext ctx = 1;
+  SetLanguageSettings settings = 2;
+}
+
+message SetLanguageSettingsResponse{
+  zitadel.object.v2.Details details = 1;
+}
+
+message ResolveLanguageSettingsRequest{
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
-message ResolveFeatureSettingsResponse{
+message ResolveLanguageSettingsResponse{
   zitadel.object.v2.Details details = 1;
-  ResolvedFeatureSettings settings = 2;
-}
-
-message SetFeatureSettingsRequest{
-  // Only System and Instance Contexts are allowed for now
-  zitadel.object.v2.RequestContext ctx = 1;
-  SetFeatureSettings settings = 2;
-}
-
-message SetFeatureSettingsResponse{
-  zitadel.object.v2.Details details = 1;
+  ResolvedLanguageSettings settings = 2;
 }

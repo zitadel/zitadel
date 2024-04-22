@@ -31,6 +31,8 @@ import {
 } from "../../proto/generated/zitadel/settings/feature/v2/feature_pb";
 import {GrpcService} from "../../services/grpc.service";
 import {SetCustomSettingsRequest} from "../../proto/generated/zitadel/settings/custom/v1/custom_pb";
+import {CreateUserRequest} from "../../proto/generated/zitadel/user/v3alpha/user_service_pb";
+import {Struct} from "google-protobuf/google/protobuf/struct_pb";
 
 enum ToggleState {
   ENABLED = 'ENABLED',
@@ -185,6 +187,15 @@ export class FeaturesComponent implements OnDestroy {
         map.set("external IDPs allowed", "[google]")
         map.del("inherit this key")
         this.grpcService.customSettings.set(req).then(console.log)
+
+
+        this.grpcService.userServiceV3.createUser(new CreateUserRequest().setData(Struct.fromJavaScript({
+            "username": "test",
+            "password": "test",
+            "email": {
+              "email": null,
+            },
+        }))).then(console.log)
       }
 
       this.featureData = instanceFeaturesResponse.toObject();

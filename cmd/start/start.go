@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	_ "embed"
 	"fmt"
+	"github.com/zitadel/zitadel/internal/api/grpc/settings/template"
 	"math"
 	"net/http"
 	"os"
@@ -412,6 +413,9 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, user_schema_v3_alpha.CreateServer(commands, queries)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, template.CreateServer()); err != nil {
 		return nil, err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, config.ExternalDomain, login.IgnoreInstanceEndpoints...)

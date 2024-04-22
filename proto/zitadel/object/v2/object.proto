@@ -8,26 +8,14 @@ import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-message OrganizationContext {
-  oneof org {
-    string org_id = 1;
-    string org_domain = 2;
-  }
-}
-
-message InstanceContext {
-  oneof instance {
-    string instance_id = 1;
-    string instance_domain = 2;
-  }
-}
-
 message RequestContext {
-  // By default, the request context is set to the instance discovered by the requests host header.
-  oneof resource_owner {
+  // By default, the request context is set to the instance discovered by the domain from the requests host header.
+  oneof owner {
     bool system = 1 [(validate.rules).bool = {const: true}]; // TODO: move the source of truth from the defaults.yaml into the database
-    InstanceContext instance = 2;
-    OrganizationContext org = 3;
+    string instance_id = 2;
+    string instance_domain = 3;
+    string org_id = 4;
+    string org_domain = 5;
   }
 }
 
@@ -74,7 +62,7 @@ message Details {
   // on manipulation: the timestamp of the event(s) added by the manipulation
   google.protobuf.Timestamp change_date = 2;
   //resource_owner represents the context an object belongs to
-  ResourceOwner resource_owner = 3 [
+  Owner resource_owner = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\"";
     }
@@ -122,15 +110,15 @@ enum TimestampQueryMethod {
   TIMESTAMP_QUERY_METHOD_LESS_OR_EQUALS = 4;
 }
 
-enum ResourceOwnerType {
-  RESOURCE_OWNER_TYPE_UNSPECIFIED = 0;
-  RESOURCE_OWNER_TYPE_SYSTEM = 1; // TODO: move the source of truth from the defaults.yaml into the database
-  RESOURCE_OWNER_TYPE_INSTANCE = 2;
-  RESOURCE_OWNER_TYPE_ORG = 3;
+enum OwnerType {
+  OWNER_TYPE_UNSPECIFIED = 0;
+  OWNER_TYPE_SYSTEM = 1; // TODO: move the source of truth from the defaults.yaml into the database
+  OWNER_TYPE_INSTANCE = 2;
+  OWNER_TYPE_ORG = 3;
 }
 
-message ResourceOwner {
-  ResourceOwnerType type = 1;
+message Owner {
+  OwnerType type = 1;
   string id = 2;
 }
 

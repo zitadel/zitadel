@@ -7,23 +7,54 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/settings/field/v1/field.proto";
 
-message GetLegalAndSupportSettings {
-  zitadel.settings.field.v1.ResolvedString tos_link = 1 [
+message ResolvedLegalSettings {
+  // The resolved custom settings that take effect in requested current.
+  // optional google.protobuf.Struct resolved_custom_settings = 1;
+  // The custom settings that are overwritten in the requested context.
+  // optional google.protobuf.Struct overwritten_custom_settings = 2;
+  reserved 1 to 2;
+  zitadel.settings.field.v1.ResolvedString tos_link = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
     }
   ];
-  zitadel.settings.field.v1.ResolvedString privacy_policy_link = 2 [
+  zitadel.settings.field.v1.ResolvedString privacy_policy_link = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
     }
   ];
-  zitadel.settings.field.v1.ResolvedString help_link = 3 [
+  zitadel.settings.field.v1.ResolvedString help_link = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://zitadel.com/docs/manuals/introduction\"";
     }
   ];
-  zitadel.settings.field.v1.ResolvedString support_email = 4 [
+  zitadel.settings.field.v1.ResolvedString support_email = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"support-email@test.com\"";
+      description: "help / support email address."
+    }
+  ];
+}
+
+message SetLegalSettings {
+  // optional google.protobuf.Struct custom_settings = 1;
+  reserved 1;
+  optional zitadel.settings.field.v1.SetString tos_link = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
+    }
+  ];
+  optional zitadel.settings.field.v1.SetString privacy_policy_link = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
+    }
+  ];
+  optional zitadel.settings.field.v1.SetString help_link = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://zitadel.com/docs/manuals/introduction\"";
+    }
+  ];
+  optional zitadel.settings.field.v1.SetString support_email = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"support-email@test.com\"";
       description: "help / support email address."

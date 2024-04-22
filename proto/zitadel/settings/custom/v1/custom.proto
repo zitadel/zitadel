@@ -3,39 +3,16 @@ syntax = "proto3";
 package zitadel.settings.custom.v1;
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/custom/v1;custom";
 
-import "validate/validate.proto";
+import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "google/protobuf/field_mask.proto";
-
-import "zitadel/object/v2/object.proto";
 
 message GetCustomSettings {
   // The resolved labels that are used for the current context.
-  string resolved_yaml = 2;
+  google.protobuf.Struct resolved = 1;
   // The labels that are overwritten in the current context.
-  string overwritten_yaml = 3;
+  google.protobuf.Struct overwritten = 2;
 }
 
 message SetCustomSettings {
-  string yaml = 1;
-}
-
-message SetCustomSettingsRequest{
-  optional zitadel.object.v2.RequestContext context = 1;
-  SetCustomSettings settings = 2;
-}
-
-message SetCustomSettingsResponse {
-  zitadel.object.v2.Details details = 1;
-}
-
-message GetCustomSettingsRequest {
-  optional zitadel.object.v2.RequestContext context = 1;
-  // If you want to get only specific fields of the settings, you can specify them here.
-  optional google.protobuf.FieldMask mask = 2;
-}
-
-message GetCustomSettingsResponse {
-  zitadel.object.v2.Details details = 1;
-  GetCustomSettings settings = 2;
+  google.protobuf.Struct overwrite = 1;
 }

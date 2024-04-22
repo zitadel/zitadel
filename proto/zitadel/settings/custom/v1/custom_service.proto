@@ -4,8 +4,12 @@ package zitadel.settings.custom.v1;
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/custom/v1;custom";
 
 import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
+
 import "zitadel/settings/custom/v1/custom.proto";
+import "zitadel/object/v2/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -96,6 +100,12 @@ service CustomSettingsService {
       body: "*"
     };
 
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Set custom settings for a given context";
       description: "Set custom key-value pairs for a given context. Only fields present in the request are set or unset."
@@ -113,6 +123,12 @@ service CustomSettingsService {
       get: "/settings/v1/custom"
     };
 
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Get the custom settings in the given context";
       description: "Returns all configured and inherited custom settings for the given context."
@@ -124,4 +140,24 @@ service CustomSettingsService {
       };
     };
   };
+}
+
+message SetCustomSettingsRequest{
+  optional zitadel.object.v2.RequestContext context = 1;
+  SetCustomSettings settings = 2;
+}
+
+message SetCustomSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message GetCustomSettingsRequest {
+  optional zitadel.object.v2.RequestContext context = 1;
+  // If you want to get only specific fields of the settings, you can specify them here.
+  optional google.protobuf.FieldMask mask = 2;
+}
+
+message GetCustomSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  GetCustomSettings settings = 2;
 }

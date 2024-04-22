@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package zitadel.settings.template.v2;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/template/v2;template";
+
+enum HTMLTemplateType {
+  HTML_TEMPLATE_TYPE_UNSPECIFIED                     = 0;
+  HTML_TEMPLATE_TYPE_EMAIL_INIT_CODE                 = 1;
+  HTML_TEMPLATE_TYPE_EMAIL_PASSWORD_RESET            = 2;
+  HTML_TEMPLATE_TYPE_EMAIL_VERIFY_EMAIL_ADDRESS      = 3;
+  HTML_TEMPLATE_TYPE_EMAIL_VERIFY_OTP                = 4;
+  HTML_TEMPLATE_TYPE_EMAIL_DOMAIN_CLAIMED            = 5;
+  HTML_TEMPLATE_TYPE_EMAIL_PASSWORDLESS_REGISTRATION = 6;
+  HTML_TEMPLATE_TYPE_EMAIL_PASSWORD_CHANGE           = 7;
+}
+
+enum TextTemplateType {
+  TEXT_TEMPLATE_TYPE_UNSPECIFIED                     = 0;
+  TEXT_TEMPLATE_TYPE_SMS_VERIFY_PHONE_NUMBER         = 1;
+  TEXT_TEMPLATE_TYPE_SMS_VERIFY_OTP                  = 2;
+}

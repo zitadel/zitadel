@@ -20,6 +20,7 @@ import { StorageService } from './storage.service';
 import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2beta/Feature_serviceServiceClientPb';
 import { FeatureServiceClient as FeatureServiceClientV2 } from '../proto/generated/zitadel/settings/feature/v2/Feature_serviceServiceClientPb';
 import {CustomSettingsServiceClient} from "../proto/generated/zitadel/settings/custom/v1/Custom_serviceServiceClientPb";
+import {UserServiceClient} from "../proto/generated/zitadel/user/v3alpha/User_serviceServiceClientPb";
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +32,7 @@ export class GrpcService {
   public feature!: FeatureServiceClient;
   public featurev2!: FeatureServiceClientV2;
   public customSettings!: CustomSettingsServiceClient;
+  public userServiceV3!: UserServiceClient;
 
   constructor(
     private envService: EnvironmentService,

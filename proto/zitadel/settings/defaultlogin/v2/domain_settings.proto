@@ -6,20 +6,47 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/settings/field/v1/field.proto";
 
-message GetDomainSettings {
-  zitadel.settings.field.v1.ResolvedBool login_name_includes_domain = 1 [
+message ResolvedDomainSettings {
+  // The resolved custom settings that take effect in requested current.
+  // optional google.protobuf.Struct resolved_custom_settings = 1;
+  // The custom settings that are overwritten in the requested context.
+  // optional google.protobuf.Struct overwritten_custom_settings = 2;
+  reserved 1 to 2;
+  zitadel.settings.field.v1.ResolvedBool login_name_includes_domain = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "the username has to end with the domain of its organization"
     }
   ];
-  zitadel.settings.field.v1.ResolvedBool require_org_domain_verification = 2 [
+  zitadel.settings.field.v1.ResolvedBool require_org_domain_verification = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if organization domains should be verified upon creation, otherwise will be created already verified"
     }
   ];
 
-  // We just remove this
-  /*
+  /* We discard this
+  bool smtp_sender_address_matches_instance_domain = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if the SMTP sender address domain should match an existing domain on the instance"
+    }
+  ];
+   */
+}
+
+message SetDomainSettings {
+  // optional google.protobuf.Struct custom_settings = 1;
+  reserved 1;
+  optional zitadel.settings.field.v1.SetBool login_name_includes_domain = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "the username has to end with the domain of its organization"
+    }
+  ];
+  optional zitadel.settings.field.v1.SetBool require_org_domain_verification = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if organization domains should be verified upon creation, otherwise will be created already verified"
+    }
+  ];
+
+  /* We discard this
   bool smtp_sender_address_matches_instance_domain = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if the SMTP sender address domain should match an existing domain on the instance"
@@ -27,4 +54,5 @@ message GetDomainSettings {
   ];
    */
 }
+
 

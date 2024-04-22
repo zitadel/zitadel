@@ -4,21 +4,19 @@ package zitadel.settings.defaultlogin.v2;
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2;defaultlogin";
 
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "google/api/field_behavior.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "validate/validate.proto";
-
 import "zitadel/object/v2/object.proto";
+import "zitadel/settings/field/v1/field.proto";
+import "google/protobuf/field_mask.proto";
+
 import "zitadel/settings/defaultlogin/v2/branding_settings.proto";
 import "zitadel/settings/defaultlogin/v2/domain_settings.proto";
 import "zitadel/settings/defaultlogin/v2/legal_settings.proto";
 import "zitadel/settings/defaultlogin/v2/lockout_settings.proto";
 import "zitadel/settings/defaultlogin/v2/login_settings.proto";
 import "zitadel/settings/defaultlogin/v2/password_settings.proto";
-import "zitadel/settings/defaultlogin/v2/security_settings.proto";
-import "zitadel/settings/defaultlogin/v2/general_settings.proto";
-import "zitadel/settings/defaultlogin/v2/label_settings.proto";
+import "zitadel/settings/defaultlogin/v2/text_settings.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -98,15 +96,22 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service DefaultLoginUISettingsService {
-  // Get basic information about the instance
-  rpc GetGeneralSettings (GetGeneralSettingsRequest) returns (GetGeneralSettingsResponse) {
+  // Set the login settings
+  rpc SetLoginSettings (SetLoginSettingsRequest) returns (SetLoginSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/general"
+      patch: "/settings/v2/defaultlogin/login"
+      body: "settings"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get basic information over the instance";
-      description: "Return the basic information of the instance for the requested context"
+      summary: "Set the login settings";
+      description: "Set the properties for the requested context"
       responses: {
         key: "200"
         value: {
@@ -115,15 +120,22 @@ service DefaultLoginUISettingsService {
       };
     };
   }
+
   // Get the login settings
-  rpc GetLoginSettings (GetLoginSettingsRequest) returns (GetLoginSettingsResponse) {
+  rpc ResolveLoginSettings (ResolveLoginSettingsRequest) returns (ResolveLoginSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/login"
+      get: "/settings/v2/defaultlogin/login"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Get the login settings";
-      description: "Return the settings for the requested context"
+      description: "Return the resolved settings for the requested context"
       responses: {
         key: "200"
         value: {
@@ -132,15 +144,23 @@ service DefaultLoginUISettingsService {
       };
     };
   }
-  // Get the password complexity settings
-  rpc GetPasswordComplexitySettings (GetPasswordComplexitySettingsRequest) returns (GetPasswordComplexitySettingsResponse) {
+
+  // Set the password settings
+  rpc SetPasswordSettings (SetPasswordSettingsRequest) returns (SetPasswordSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/password/complexity"
+      patch: "/settings/v2/defaultlogin/password"
+      body: "settings"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the password complexity settings";
-      description: "Return the password complexity settings for the requested context"
+      summary: "Set the password settings";
+      description: "Set the properties for the requested context"
       responses: {
         key: "200"
         value: {
@@ -149,15 +169,22 @@ service DefaultLoginUISettingsService {
       };
     };
   }
-  // Get the current active branding settings
-  rpc GetBrandingSettings (GetBrandingSettingsRequest) returns (GetBrandingSettingsResponse) {
+
+  // Get the password settings
+  rpc ResolvePasswordSettings (ResolvePasswordSettingsRequest) returns (ResolvePasswordSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/branding"
+      get: "/settings/v2/defaultlogin/password"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the current active branding settings";
-      description: "Return the current active branding settings for the requested context"
+      summary: "Get the password settings";
+      description: "Return the resolved settings for the requested context"
       responses: {
         key: "200"
         value: {
@@ -166,15 +193,23 @@ service DefaultLoginUISettingsService {
       };
     };
   }
-  // Get the domain settings
-  rpc GetDomainSettings (GetDomainSettingsRequest) returns (GetDomainSettingsResponse) {
+
+  // Set the branding settings
+  rpc SetBrandingSettings (SetBrandingSettingsRequest) returns (SetBrandingSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/domain"
+      patch: "/settings/v2/defaultlogin/branding"
+      body: "settings"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the domain settings";
-      description: "Return the domain settings for the requested context"
+      summary: "Set the branding settings";
+      description: "Set the properties for the requested context"
       responses: {
         key: "200"
         value: {
@@ -183,15 +218,22 @@ service DefaultLoginUISettingsService {
       };
     };
   }
-  // Get the legal and support settings
-  rpc GetLegalAndSupportSettings (GetLegalAndSupportSettingsRequest) returns (GetLegalAndSupportSettingsResponse) {
+
+  // Get the branding settings
+  rpc ResolveBrandingSettings (ResolveBrandingSettingsRequest) returns (ResolveBrandingSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/legal_support"
+      get: "/settings/v2/defaultlogin/branding"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the legal and support settings";
-      description: "Return the legal settings for the requested context"
+      summary: "Get the branding settings";
+      description: "Return the resolved settings for the requested context"
       responses: {
         key: "200"
         value: {
@@ -200,15 +242,24 @@ service DefaultLoginUISettingsService {
       };
     };
   }
-  // Get the lockout settings
-  rpc GetLockoutSettings (GetLockoutSettingsRequest) returns (GetLockoutSettingsResponse) {
+
+
+  // Set the texts shown in the login UI
+  rpc SetTextSettings (SetTextSettingsRequest) returns (SetTextSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/lockout"
+      patch: "/settings/v2/defaultlogin/texts"
+      body: "settings"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the lockout settings";
-      description: "Return the lockout settings for the requested context, which define when a user will be locked"
+      summary: "Set the texts";
+      description: "Set the properties for the requested context"
       responses: {
         key: "200"
         value: {
@@ -217,159 +268,156 @@ service DefaultLoginUISettingsService {
       };
     };
   }
-  // Get the security settings
-  rpc GetSecuritySettings(GetSecuritySettingsRequest) returns (GetSecuritySettingsResponse) {
+
+  // Get the branding settings
+  rpc ResolveTextSettings (ResolveTextSettingsRequest) returns (ResolveTextSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/security";
+      get: "/settings/v2/defaultlogin/texts"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Settings";
-      summary: "Get Security Settings";
-      description: "Returns the security settings of the ZITADEL instance."
-    };
-  }
-  // Set the security settings
-  rpc SetSecuritySettings(SetSecuritySettingsRequest) returns (SetSecuritySettingsResponse) {
-    option (google.api.http) = {
-      patch: "/settings/v2/security";
-      body: "*"
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Settings";
-      summary: "Set Security Settings";
-      description: "Set the security settings of the ZITADEL instance."
-    };
-  }
-  // Get the label settings
-  rpc GetLabelSettings(GetLabelSettingsRequest) returns (GetLabelSettingsResponse) {
-    option (google.api.http) = {
-      get: "/settings/v2/label";
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Settings";
-      summary: "Get Label Settings";
-      description: "Returns the labels for the default login UI."
-    };
-  }
-  // Set the label settings
-  rpc SetLabelSettings(SetLabelSettingsRequest) returns (SetLabelSettingsResponse) {
-    option (google.api.http) = {
-      patch: "/settings/v2/label";
-      body: "*"
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Settings";
-      summary: "Set Label Settings";
-      description: "Set the labels for the default login UI."
+      summary: "Get the texts";
+      description: "Return the resolved texts for the requested context"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
     };
   }
 }
 
-message GetLoginSettingsRequest {
+message SetLoginSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
+  SetLoginSettings settings = 2;
 }
 
-message GetLoginSettingsResponse {
-  zitadel.object.v2.Details details = 1;
-  zitadel.settings.defaultlogin.v2.GetLoginSettings settings = 2;
-}
-
-message GetPasswordComplexitySettingsRequest {
+message SetPasswordSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
+  SetPasswordSettings settings = 2;
 }
 
-message GetPasswordComplexitySettingsResponse {
-  zitadel.object.v2.Details details = 1;
-  zitadel.settings.defaultlogin.v2.GetPasswordComplexitySettings settings = 2;
-}
-
-message GetBrandingSettingsRequest {
+message SetBrandingSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
+  SetBrandingSettings settings = 2;
 }
 
-message GetBrandingSettingsResponse {
-  zitadel.object.v2.Details details = 1;
-  zitadel.settings.defaultlogin.v2.GetBrandingSettings settings = 2;
-}
-
-message GetDomainSettingsRequest {
+message SetDomainSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
+  SetDomainSettings settings = 2;
 }
 
-message GetDomainSettingsResponse {
-  zitadel.object.v2.Details details = 1;
-  zitadel.settings.defaultlogin.v2.GetDomainSettings settings = 2;
-}
-
-message GetLegalAndSupportSettingsRequest {
+message SetLegalSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
+  SetLegalSettings settings = 2;
 }
 
-message GetLegalAndSupportSettingsResponse {
-  zitadel.object.v2.Details details = 1;
-  zitadel.settings.defaultlogin.v2.GetLegalAndSupportSettings settings = 2;
-}
-
-message GetLockoutSettingsRequest {
+message SetLockoutSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
+  SetLockoutSettings settings = 2;
 }
 
-message GetLockoutSettingsResponse {
-  zitadel.object.v2.Details details = 1;
-  zitadel.settings.defaultlogin.v2.GetLockoutSettings settings = 2;
-}
-
-message GetGeneralSettingsRequest {
-  // Only System and Instance Contexts are allowed
+message SetTextSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
-  zitadel.settings.defaultlogin.v2.GetGeneralSettings settings = 2;
+  optional settings.field.v1.Language language = 2;
+  SetTextSettings settings = 3;
 }
 
-message GetGeneralSettingsResponse {
-  zitadel.object.v2.Details details = 1;
-  zitadel.settings.defaultlogin.v2.GetLockoutSettings settings = 2;
-}
-
-message GetSecuritySettingsRequest{
-  // Only System and Instance Contexts are allowed
-  zitadel.object.v2.RequestContext ctx = 1;
-}
-
-message GetSecuritySettingsResponse{
-  zitadel.object.v2.Details details = 1;
-  GetSecuritySettings settings = 2;
-}
-
-message SetSecuritySettingsRequest{
-  // Only System and Instance Contexts are allowed
-  zitadel.object.v2.RequestContext ctx = 1;
-  SetSecuritySettings settings = 2;
-}
-
-message SetSecuritySettingsResponse{
+message SetLoginSettingsResponse {
   zitadel.object.v2.Details details = 1;
 }
 
-message GetLabelSettingsRequest{
-  // Only System and Instance Contexts are allowed
+message SetPasswordSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message SetBrandingSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message SetDomainSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message SetLegalSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message SetLockoutSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message SetTextSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message ResolveLoginSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
 }
 
-message GetLabelSettingsResponse{
-  zitadel.object.v2.Details details = 1;
-  GetLabelSettings settings = 2;
-}
-
-message SetLabelSettingsRequest{
-  // Only System and Instance Contexts are allowed
+message ResolvePasswordSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
-  SetLabelSettings settings = 2;
 }
 
-message SetLabelSettingsResponse{
+message ResolveBrandingSettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message ResolveDomainSettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message ResolveLegalSettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message ResolveLockoutSettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+}
+
+message ResolveTextSettingsRequest {
+  zitadel.object.v2.RequestContext ctx = 1;
+  optional settings.field.v1.Language language = 2;
+}
+
+message ResolveLoginSettingsResponse {
   zitadel.object.v2.Details details = 1;
+  ResolvedLoginSettings settings = 3;
+}
+
+message ResolvePasswordSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  ResolvedPasswordSettings settings = 3;
+}
+
+message ResolveBrandingSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  ResolvedBrandingSettings settings = 3;
+}
+
+message ResolveDomainSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  ResolvedDomainSettings settings = 3;
+}
+
+message ResolveLegalSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  ResolvedLegalSettings settings = 3;
+}
+
+message ResolveLockoutSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  ResolvedLockoutSettings settings = 3;
+}
+
+message ResolveTextSettingsResponse {
+  zitadel.object.v2.Details details = 1;
+  ResolvedLockoutSettings settings = 3;
 }
