@@ -200,12 +200,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       metadataXml: [{ value: '', disabled: true }],
     });
 
-    this.samlForm.valueChanges.subscribe(() => {
+    this.samlForm.valueChanges.subscribe((next) => {
       if (!this.app) {
         this.app = new App().toObject();
-      }
-      if (!this.app.samlConfig) {
-        this.app.samlConfig = new SAMLConfig().toObject();
       }
 
       let minimalMetadata =
@@ -217,6 +214,14 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     </md:SPSSODescriptor>
 </md:EntityDescriptor>`
           : '';
+
+      if (!minimalMetadata && !this.metadataUrl?.value) {
+        return
+      }
+
+      if (!this.app.samlConfig) {
+        this.app.samlConfig = new SAMLConfig().toObject();
+      }
 
       if (minimalMetadata) {
         const base64 = Buffer.from(minimalMetadata, 'utf-8').toString('base64');
