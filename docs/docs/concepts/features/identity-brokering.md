@@ -45,6 +45,10 @@ Typically SSO describes an authentication scheme that allows users to log in onc
 
 Identity brokering describes an authentication scheme where users can login with external identity providers that have a established trust with an identity provider which facilitates the authentication for the requested applications.
 
+The connection between the two lies in how SSO can be implemented as part of an identity brokering solution.
+In such cases, the identity broker uses SSO to enable seamless access across multiple systems, handling the complexities of different authentication protocols and standards behind the scenes.
+This allows users to log in once and gain access to multiple systems that the broker facilitates.
+
 ## Multitenancy and identity brokering
 
 In a multi-tenancy application, you want to be able to configure an external identity provider per tenant.
