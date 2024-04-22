@@ -47,12 +47,13 @@ There are different types of Targets:
 - RequestResponse, the call handles the status code and response, can be InterruptOnError
 - Async, the call handles neither status code nor response, but can be called in parallel with other Targets
 
-InterruptOnError means that the list of Targets gets interrupted if any of the calls return with a status code >= 500.
+InterruptOnError means that the list of Targets gets interrupted if any of the calls return with a status code >= 400.
 
 ## Execution
 
 ZITADEL decides on specific conditions if one or more Target have to be called.
-The Execution resource contains 3 parts, first the condition, second the targets and the other included executions.
+The Execution resource contains 2 parts, the condition and the called targets, which can either be targets specificly 
+or include to add the targets of another defined execution.
 
 The condition can be defined for 4 types of processes:
 

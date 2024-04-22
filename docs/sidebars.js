@@ -801,6 +801,7 @@ module.exports = {
       collapsed: false,
       items: [
         "apis/actionsv2/introduction",
+        "apis/actionsv2/execution-local",
       ],
     },
     {
