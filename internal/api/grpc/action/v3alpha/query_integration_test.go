@@ -228,11 +228,11 @@ func TestServer_GetTargetByID(t *testing.T) {
 					assert.Error(ttt, getErr, "Error: "+getErr.Error())
 				} else {
 					assert.NoError(ttt, getErr)
+
+					integration.AssertDetails(t, tt.want.GetTarget(), got.GetTarget())
+
+					assert.Equal(t, tt.want.Target, got.Target)
 				}
-
-				integration.AssertDetails(t, tt.want.GetTarget(), got.GetTarget())
-
-				assert.Equal(t, tt.want.Target, got.Target)
 
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
 		})
@@ -845,20 +845,20 @@ func TestServer_ListExecutions(t *testing.T) {
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, listErr := Client.ListExecutions(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assert.Error(ttt, listErr, "Error: "+listErr.Error())
+					assert.Error(t, listErr, "Error: "+listErr.Error())
 				} else {
-					assert.NoError(ttt, listErr)
+					assert.NoError(t, listErr)
 				}
 				if listErr != nil {
 					return
 				}
 				// always first check length, otherwise its failed anyway
-				assert.Len(ttt, got.Result, len(tt.want.Result))
+				assert.Len(t, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
 					// as not sorted, all elements have to be checked
 					// workaround as oneof elements can only be checked with assert.EqualExportedValues()
 					if j, found := containExecution(got.Result, tt.want.Result[i]); found {
-						assert.EqualExportedValues(ttt, got.Result[j], tt.want.Result[i])
+						assert.EqualExportedValues(t, tt.want.Result[i], got.Result[j])
 					}
 				}
 				integration.AssertListDetails(t, tt.want, got)
