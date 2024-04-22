@@ -689,7 +689,7 @@ func prepareSAMLAppQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			AppSAMLConfigColumnMetadata.identifier(),
 			AppSAMLConfigColumnMetadataURL.identifier(),
 		).From(appsTable.identifier()).
-			Join(join(AppSAMLConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
+			Join(join(AppSAMLConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
 
 			app := new(App)
@@ -764,7 +764,7 @@ func prepareProjectByOIDCAppQuery(ctx context.Context, db prepareDatabase) (sq.S
 			ProjectColumnPrivateLabelingSetting.identifier(),
 		).From(projectsTable.identifier()).
 			Join(join(AppColumnProjectID, ProjectColumnID)).
-			Join(join(AppOIDCConfigColumnAppID, AppColumnID) + db.Timetravel(call.Took(ctx))).
+			Join(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
