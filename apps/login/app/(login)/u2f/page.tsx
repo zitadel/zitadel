@@ -1,6 +1,7 @@
 import { getBrandingSettings, getLoginSettings, server } from "#/lib/zitadel";
 import DynamicTheme from "#/ui/DynamicTheme";
 import LoginOTP from "#/ui/LoginOTP";
+import LoginPasskey from "#/ui/LoginPasskey";
 import VerifyU2F from "#/ui/VerifyU2F";
 
 export default async function Page({
@@ -22,12 +23,13 @@ export default async function Page({
 
         <p className="ztdl-p">Verify your account with your device.</p>
 
-        <VerifyU2F
+        <LoginPasskey
           loginName={loginName}
           sessionId={sessionId}
           authRequestId={authRequestId}
           organization={organization}
-        ></VerifyU2F>
+          altPassword={false}
+        ></LoginPasskey>
       </div>
     </DynamicTheme>
   );

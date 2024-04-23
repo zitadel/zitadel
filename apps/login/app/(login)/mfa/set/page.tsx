@@ -2,6 +2,8 @@ import {
   getBrandingSettings,
   getLoginSettings,
   getSession,
+  getUserByID,
+  listAuthenticationMethodTypes,
   server,
 } from "#/lib/zitadel";
 import Alert from "#/ui/Alert";
@@ -34,8 +36,15 @@ export default async function Page({
       organization
     );
     return getSession(server, recent.id, recent.token).then((response) => {
-      if (response?.session) {
-        return response.session;
+      if (response?.session && response.session.factors?.user?.id) {
+        return listAuthenticationMethodTypes(
+          response.session.factors.user.id
+        ).then((methods) => {
+          return {
+            factors: response.session?.factors,
+            authMethods: methods.authMethodTypes ?? [],
+          };
+        });
       }
     });
   }
@@ -43,8 +52,15 @@ export default async function Page({
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById(sessionId, organization);
     return getSession(server, recent.id, recent.token).then((response) => {
-      if (response?.session) {
-        return response.session;
+      if (response?.session && response.session.factors?.user?.id) {
+        return listAuthenticationMethodTypes(
+          response.session.factors.user.id
+        ).then((methods) => {
+          return {
+            factors: response.session?.factors,
+            authMethods: methods.authMethodTypes ?? [],
+          };
+        });
       }
     });
   }
@@ -67,19 +83,18 @@ export default async function Page({
           ></UserAvatar>
         )}
 
-        {!sessionFactors && <div className="py-4"></div>}
-
         {!(loginName || sessionId) && (
           <Alert>Provide your active session as loginName param</Alert>
         )}
 
-        {loginSettings ? (
+        {loginSettings && sessionFactors ? (
           <ChooseSecondFactorToSetup
             loginName={loginName}
             sessionId={sessionId}
             authRequestId={authRequestId}
             organization={organization}
             loginSettings={loginSettings}
+            userMethods={sessionFactors.authMethods ?? []}
           ></ChooseSecondFactorToSetup>
         ) : (
           <Alert>No second factors available to setup.</Alert>
