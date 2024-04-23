@@ -10,7 +10,6 @@ type LockoutPolicyWriteModel struct {
 	eventstore.WriteModel
 
 	MaxPasswordAttempts uint64
-	MaxOTPAttempts      uint64
 	ShowLockOutFailures bool
 	State               domain.PolicyState
 }
@@ -20,15 +19,11 @@ func (wm *LockoutPolicyWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *policy.LockoutPolicyAddedEvent:
 			wm.MaxPasswordAttempts = e.MaxPasswordAttempts
-			wm.MaxOTPAttempts = e.MaxOTPAttempts
 			wm.ShowLockOutFailures = e.ShowLockOutFailures
 			wm.State = domain.PolicyStateActive
 		case *policy.LockoutPolicyChangedEvent:
 			if e.MaxPasswordAttempts != nil {
 				wm.MaxPasswordAttempts = *e.MaxPasswordAttempts
-			}
-			if e.MaxOTPAttempts != nil {
-				wm.MaxOTPAttempts = *e.MaxOTPAttempts
 			}
 			if e.ShowLockOutFailures != nil {
 				wm.ShowLockOutFailures = *e.ShowLockOutFailures

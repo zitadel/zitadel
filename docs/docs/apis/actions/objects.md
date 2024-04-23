@@ -202,13 +202,8 @@ This object represents a list of user grant stored in ZITADEL.
   - `sequence` *Number*
   - `userId` *string*
   - `roles` Array of *string*
-  - `userResourceOwner` *string*  
-    The id of the organization of the user
-  - `userGrantResourceOwner` *string*  
-    The id of the organization, where the user was granted
-  - `userGrantResourceOwnerName` *string*  
-    The name of the organization, where the user was granted
+  - `userResourceOwner` *string*
+  - `userGrantResourceOwner` *string*
+  - `userGrantResourceOwnerName` *string*
   - `projectId` *string*
   - `projectName` *string*
-  - `getOrgMetadata()` [*metadataResult*](#metadata-result)  
-    Get the metadata of the organization where the user was granted

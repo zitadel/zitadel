@@ -10,14 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateAzureADProviderRequest as AdminUpdateAzureADProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import {
-  AutoLinkingOption,
-  AzureADTenant,
-  AzureADTenantType,
-  IDPOwnerType,
-  Options,
-  Provider,
-} from 'src/app/proto/generated/zitadel/idp_pb';
+import { AzureADTenant, AzureADTenantType, IDPOwnerType, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddAzureADProviderRequest as MgmtAddAzureADProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -39,10 +32,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 })
 export class ProviderAzureADComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options()
-    .setIsCreationAllowed(true)
-    .setIsLinkingAllowed(true)
-    .setAutoLinking(AutoLinkingOption.AUTO_LINKING_OPTION_UNSPECIFIED);
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   // DEPRECATED: use id$ instead
   public id: string | null = '';
   // DEPRECATED: assert service$ instead

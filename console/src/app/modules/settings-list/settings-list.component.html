@@ -12,9 +12,6 @@
 
     <cnsl-org-table></cnsl-org-table>
   </ng-container>
-  <ng-container *ngIf="currentSetting === 'features'">
-    <cnsl-features></cnsl-features>
-  </ng-container>
   <ng-container *ngIf="currentSetting === 'complexity'">
     <cnsl-password-complexity-policy [serviceType]="serviceType"></cnsl-password-complexity-policy>
   </ng-container>

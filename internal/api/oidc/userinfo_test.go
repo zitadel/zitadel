@@ -17,149 +17,62 @@ import (
 
 func Test_prepareRoles(t *testing.T) {
 	type args struct {
-		projectID            string
-		scope                []string
-		projectRoleAssertion bool
-		currentProjectOnly   bool
+		projectID    string
+		scope        []string
+		roleAudience []string
 	}
 	tests := []struct {
 		name               string
 		args               args
-		wantRoleAudience   []string
+		wantRa             []string
 		wantRequestedRoles []string
 	}{
 		{
-			name: "empty scope",
+			name: "empty scope and roleAudience",
 			args: args{
-				projectID:            "projID",
-				scope:                nil,
-				projectRoleAssertion: false,
-				currentProjectOnly:   false,
+				projectID:    "projID",
+				scope:        nil,
+				roleAudience: nil,
 			},
-			wantRoleAudience:   nil,
+			wantRa:             nil,
 			wantRequestedRoles: nil,
 		},
 		{
-			name: "project role assertion",
+			name: "some scope and roleAudience",
 			args: args{
-				projectID:            "projID",
-				projectRoleAssertion: true,
-				scope:                nil,
-				currentProjectOnly:   false,
+				projectID:    "projID",
+				scope:        []string{"openid", "profile"},
+				roleAudience: []string{"project2"},
 			},
-			wantRoleAudience:   []string{"projID"},
-			wantRequestedRoles: nil,
-		},
-		{
-			name: "some scope, current project only",
-			args: args{
-				projectID:            "projID",
-				projectRoleAssertion: false,
-				scope:                []string{"openid", "profile"},
-				currentProjectOnly:   true,
-			},
-			wantRoleAudience:   []string{"projID"},
-			wantRequestedRoles: nil,
+			wantRa:             []string{"project2", "projID"},
+			wantRequestedRoles: []string{},
 		},
 		{
 			name: "scope projects roles",
 			args: args{
-				projectID:            "projID",
-				projectRoleAssertion: false,
-				scope: []string{
-					"openid", "profile",
-					ScopeProjectsRoles,
-					domain.ProjectIDScope + "project2" + domain.AudSuffix,
-				},
-				currentProjectOnly: false,
+				projectID:    "projID",
+				scope:        []string{ScopeProjectsRoles, domain.ProjectIDScope + "project2" + domain.AudSuffix},
+				roleAudience: nil,
 			},
-			wantRoleAudience:   []string{"project2", "projID"},
-			wantRequestedRoles: nil,
-		},
-		{
-			name: "scope projects roles ignored, current project only",
-			args: args{
-				projectID:            "projID",
-				projectRoleAssertion: false,
-				scope: []string{
-					"openid", "profile",
-					ScopeProjectsRoles,
-					domain.ProjectIDScope + "project2" + domain.AudSuffix,
-				},
-				currentProjectOnly: true,
-			},
-			wantRoleAudience:   []string{"projID"},
-			wantRequestedRoles: nil,
+			wantRa:             []string{"project2", "projID"},
+			wantRequestedRoles: []string{},
 		},
 		{
 			name: "scope project role prefix",
 			args: args{
-				projectID:            "projID",
-				projectRoleAssertion: false,
-				scope: []string{
-					"openid", "profile",
-					ScopeProjectRolePrefix + "foo",
-					ScopeProjectRolePrefix + "bar",
-				},
-				currentProjectOnly: false,
+				projectID:    "projID",
+				scope:        []string{"openid", "profile", ScopeProjectRolePrefix + "foo", ScopeProjectRolePrefix + "bar"},
+				roleAudience: nil,
 			},
-			wantRoleAudience:   []string{"projID"},
-			wantRequestedRoles: []string{"foo", "bar"},
-		},
-		{
-			name: "scope project role prefix and audience",
-			args: args{
-				projectID:            "projID",
-				projectRoleAssertion: false,
-				scope: []string{
-					"openid", "profile",
-					ScopeProjectRolePrefix + "foo",
-					ScopeProjectRolePrefix + "bar",
-					domain.ProjectIDScope + "project2" + domain.AudSuffix,
-				},
-				currentProjectOnly: false,
-			},
-			wantRoleAudience:   []string{"projID", "project2"},
-			wantRequestedRoles: []string{"foo", "bar"},
-		},
-		{
-			name: "scope project role prefix and audience ignored, current project only",
-			args: args{
-				projectID:            "projID",
-				projectRoleAssertion: false,
-				scope: []string{
-					"openid", "profile",
-					ScopeProjectRolePrefix + "foo",
-					ScopeProjectRolePrefix + "bar",
-					domain.ProjectIDScope + "project2" + domain.AudSuffix,
-				},
-				currentProjectOnly: true,
-			},
-			wantRoleAudience:   []string{"projID"},
-			wantRequestedRoles: []string{"foo", "bar"},
-		},
-		{
-			name: "no projectID, scope project role prefix and audience",
-			args: args{
-				projectID:            "",
-				projectRoleAssertion: false,
-				scope: []string{
-					"openid", "profile",
-					ScopeProjectRolePrefix + "foo",
-					ScopeProjectRolePrefix + "bar",
-					domain.ProjectIDScope + "project2" + domain.AudSuffix,
-				},
-				currentProjectOnly: false,
-			},
-			wantRoleAudience:   []string{"project2"},
+			wantRa:             []string{"projID"},
 			wantRequestedRoles: []string{"foo", "bar"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRoleAudience, gotRequestedRoles := prepareRoles(context.Background(), tt.args.scope, tt.args.projectID, tt.args.projectRoleAssertion, tt.args.currentProjectOnly)
-			assert.ElementsMatch(t, tt.wantRoleAudience, gotRoleAudience, "roleAudience")
-			assert.ElementsMatch(t, tt.wantRequestedRoles, gotRequestedRoles, "requestedRoles")
+			gotRa, gotRequestedRoles := prepareRoles(context.Background(), tt.args.projectID, tt.args.scope, tt.args.roleAudience)
+			assert.Equal(t, tt.wantRa, gotRa, "roleAudience")
+			assert.Equal(t, tt.wantRequestedRoles, gotRequestedRoles, "requestedRoles")
 		})
 	}
 }

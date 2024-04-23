@@ -25,8 +25,6 @@ var introspectionTriggerHandlers = sync.OnceValue(func() []*handler.Handler {
 	)
 })
 
-// TriggerIntrospectionProjections triggers all projections
-// relevant to introspection queries concurrently.
 func TriggerIntrospectionProjections(ctx context.Context) {
 	triggerBatch(ctx, introspectionTriggerHandlers()...)
 }
@@ -39,17 +37,16 @@ const (
 )
 
 type IntrospectionClient struct {
-	AppID                string
-	ClientID             string
-	HashedSecret         string
-	AppType              AppType
-	ProjectID            string
-	ResourceOwner        string
-	ProjectRoleAssertion bool
-	PublicKeys           database.Map[[]byte]
+	AppID         string
+	ClientID      string
+	HashedSecret  string
+	AppType       AppType
+	ProjectID     string
+	ResourceOwner string
+	PublicKeys    database.Map[[]byte]
 }
 
-//go:embed introspection_client_by_id.sql
+//go:embed embed/introspection_client_by_id.sql
 var introspectionClientByIDQuery string
 
 func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID string, getKeys bool) (_ *IntrospectionClient, err error) {
@@ -69,7 +66,6 @@ func (q *Queries) GetIntrospectionClientByID(ctx context.Context, clientID strin
 			&client.AppType,
 			&client.ProjectID,
 			&client.ResourceOwner,
-			&client.ProjectRoleAssertion,
 			&client.PublicKeys,
 		)
 	},

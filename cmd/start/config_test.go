@@ -223,52 +223,6 @@ Actions:
 				Greeting:        "bar",
 			}})
 		},
-	}, {
-		name: "roles ok",
-		args: args{yaml: `
-InternalAuthZ:
-  RolePermissionMappings:
-  - Role: IAM_OWNER
-    Permissions:
-    - iam.write
-  - Role: ORG_OWNER
-    Permissions:
-    - org.write
-    - org.read
-Log:
-  Level: info
-Actions:
-  HTTP:
-    DenyList: []
-`},
-		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.InternalAuthZ, authz.Config{
-				RolePermissionMappings: []authz.RoleMapping{
-					{Role: "IAM_OWNER", Permissions: []string{"iam.write"}},
-					{Role: "ORG_OWNER", Permissions: []string{"org.write", "org.read"}},
-				},
-			})
-		},
-	}, {
-		name: "roles string ok",
-		args: args{yaml: `
-InternalAuthZ:
-  RolePermissionMappings: >
-    [{"role": "IAM_OWNER", "permissions": ["iam.write"]}, {"role": "ORG_OWNER", "permissions": ["org.write", "org.read"]}]
-Log:
-  Level: info
-Actions:
-  HTTP:
-    DenyList: []
-`},
-		want: func(t *testing.T, config *Config) {
-			assert.Equal(t, config.InternalAuthZ, authz.Config{
-				RolePermissionMappings: []authz.RoleMapping{
-					{Role: "IAM_OWNER", Permissions: []string{"iam.write"}},
-					{Role: "ORG_OWNER", Permissions: []string{"org.write", "org.read"}},
-				},
-			})
-		},
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -9,7 +9,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateJWTProviderRequest as AdminUpdateJWTProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { AutoLinkingOption, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddJWTProviderRequest as MgmtAddJWTProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -32,10 +32,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 })
 export class ProviderJWTComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options()
-    .setIsCreationAllowed(true)
-    .setIsLinkingAllowed(true)
-    .setAutoLinking(AutoLinkingOption.AUTO_LINKING_OPTION_UNSPECIFIED);
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
 
   // DEPRECATED: use id$ instead
   public id: string | null = '';

@@ -55,15 +55,11 @@ func (wm *OrgLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *OrgLockoutPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	maxPasswordAttempts,
-	maxOTPAttempts uint64,
+	maxAttempts uint64,
 	showLockoutFailure bool) (*org.LockoutPolicyChangedEvent, bool) {
 	changes := make([]policy.LockoutPolicyChanges, 0)
-	if wm.MaxPasswordAttempts != maxPasswordAttempts {
-		changes = append(changes, policy.ChangeMaxPasswordAttempts(maxPasswordAttempts))
-	}
-	if wm.MaxOTPAttempts != maxOTPAttempts {
-		changes = append(changes, policy.ChangeMaxOTPAttempts(maxOTPAttempts))
+	if wm.MaxPasswordAttempts != maxAttempts {
+		changes = append(changes, policy.ChangeMaxAttempts(maxAttempts))
 	}
 	if wm.ShowLockOutFailures != showLockoutFailure {
 		changes = append(changes, policy.ChangeShowLockOutFailures(showLockoutFailure))

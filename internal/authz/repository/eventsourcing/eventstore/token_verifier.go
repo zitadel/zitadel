@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-jose/go-jose/v4"
+	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"

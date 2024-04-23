@@ -10,7 +10,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateAppleProviderRequest as AdminUpdateAppleProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { AutoLinkingOption, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddAppleProviderRequest as MgmtAddAppleProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -34,10 +34,7 @@ const MAX_ALLOWED_SIZE = 5 * 1024;
 })
 export class ProviderAppleComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options()
-    .setIsCreationAllowed(true)
-    .setIsLinkingAllowed(true)
-    .setAutoLinking(AutoLinkingOption.AUTO_LINKING_OPTION_UNSPECIFIED);
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   // DEPRECATED: use id$ instead
   public id: string | null = '';
   // DEPRECATED: assert service$ instead

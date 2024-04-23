@@ -5,7 +5,7 @@ import (
 	"encoding/pem"
 	"time"
 
-	"github.com/go-jose/go-jose/v4"
+	"github.com/go-jose/go-jose/v3"
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 

@@ -296,7 +296,7 @@ func (c *Commands) asyncPush(ctx context.Context, cmds ...eventstore.Command) {
 		_, err := c.eventstore.Push(localCtx, cmds...)
 		if err != nil {
 			for _, cmd := range cmds {
-				logging.WithError(err).Warnf("could not push event %q", cmd.Type())
+				logging.WithError(err).Errorf("could not push event %q", cmd.Type())
 			}
 		}
 

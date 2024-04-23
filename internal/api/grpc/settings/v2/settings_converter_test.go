@@ -339,12 +339,10 @@ func Test_legalSettingsToPb(t *testing.T) {
 func Test_lockoutSettingsToPb(t *testing.T) {
 	arg := &query.LockoutPolicy{
 		MaxPasswordAttempts: 22,
-		MaxOTPAttempts:      22,
 		IsDefault:           true,
 	}
 	want := &settings.LockoutSettings{
 		MaxPasswordAttempts: 22,
-		MaxOtpAttempts:      22,
 		ResourceOwnerType:   settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
 	}
 	got := lockoutSettingsToPb(arg)

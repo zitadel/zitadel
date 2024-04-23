@@ -91,9 +91,9 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 	}
 
 	if !tlsRequired {
-		client, err = smtpConfig.getSMTPClient()
+		client, err = smtpConfig.getSMPTClient()
 	} else {
-		client, err = smtpConfig.getSMTPClientWithTls(host)
+		client, err = smtpConfig.getSMPTClientWithTls(host)
 	}
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 	return client, nil
 }
 
-func (smtpConfig SMTP) getSMTPClient() (*smtp.Client, error) {
+func (smtpConfig SMTP) getSMPTClient() (*smtp.Client, error) {
 	client, err := smtp.Dial(smtpConfig.Host)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EMAIL-skwos", "could not make smtp dial")
@@ -114,12 +114,12 @@ func (smtpConfig SMTP) getSMTPClient() (*smtp.Client, error) {
 	return client, nil
 }
 
-func (smtpConfig SMTP) getSMTPClientWithTls(host string) (*smtp.Client, error) {
+func (smtpConfig SMTP) getSMPTClientWithTls(host string) (*smtp.Client, error) {
 	conn, err := tls.Dial("tcp", smtpConfig.Host, &tls.Config{})
 
 	if errors.As(err, &tls.RecordHeaderError{}) {
 		logging.Log("MAIN-xKIzT").OnError(err).Warn("could not connect using normal tls. trying starttls instead...")
-		return smtpConfig.getSMTPClientWithStartTls(host)
+		return smtpConfig.getSMPTClientWithStartTls(host)
 	}
 
 	if err != nil {
@@ -133,8 +133,8 @@ func (smtpConfig SMTP) getSMTPClientWithTls(host string) (*smtp.Client, error) {
 	return client, err
 }
 
-func (smtpConfig SMTP) getSMTPClientWithStartTls(host string) (*smtp.Client, error) {
-	client, err := smtpConfig.getSMTPClient()
+func (smtpConfig SMTP) getSMPTClientWithStartTls(host string) (*smtp.Client, error) {
+	client, err := smtpConfig.getSMPTClient()
 	if err != nil {
 		return nil, err
 	}

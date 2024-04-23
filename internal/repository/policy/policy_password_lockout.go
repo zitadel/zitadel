@@ -15,7 +15,6 @@ type LockoutPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	MaxPasswordAttempts uint64 `json:"maxPasswordAttempts,omitempty"`
-	MaxOTPAttempts      uint64 `json:"maxOTPAttempts,omitempty"`
 	ShowLockOutFailures bool   `json:"showLockOutFailures,omitempty"`
 }
 
@@ -29,15 +28,13 @@ func (e *LockoutPolicyAddedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 
 func NewLockoutPolicyAddedEvent(
 	base *eventstore.BaseEvent,
-	maxPasswordAttempts,
-	maxOTPAttempts uint64,
+	maxAttempts uint64,
 	showLockOutFailures bool,
 ) *LockoutPolicyAddedEvent {
 
 	return &LockoutPolicyAddedEvent{
 		BaseEvent:           *base,
-		MaxPasswordAttempts: maxPasswordAttempts,
-		MaxOTPAttempts:      maxOTPAttempts,
+		MaxPasswordAttempts: maxAttempts,
 		ShowLockOutFailures: showLockOutFailures,
 	}
 }
@@ -59,7 +56,6 @@ type LockoutPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	MaxPasswordAttempts *uint64 `json:"maxPasswordAttempts,omitempty"`
-	MaxOTPAttempts      *uint64 `json:"maxOTPAttempts,omitempty"`
 	ShowLockOutFailures *bool   `json:"showLockOutFailures,omitempty"`
 }
 
@@ -89,15 +85,9 @@ func NewLockoutPolicyChangedEvent(
 
 type LockoutPolicyChanges func(*LockoutPolicyChangedEvent)
 
-func ChangeMaxPasswordAttempts(maxAttempts uint64) func(*LockoutPolicyChangedEvent) {
+func ChangeMaxAttempts(maxAttempts uint64) func(*LockoutPolicyChangedEvent) {
 	return func(e *LockoutPolicyChangedEvent) {
 		e.MaxPasswordAttempts = &maxAttempts
-	}
-}
-
-func ChangeMaxOTPAttempts(maxAttempts uint64) func(*LockoutPolicyChangedEvent) {
-	return func(e *LockoutPolicyChangedEvent) {
-		e.MaxOTPAttempts = &maxAttempts
 	}
 }
 

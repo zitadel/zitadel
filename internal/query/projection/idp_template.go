@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	IDPTemplateTable                 = "projections.idp_templates6"
+	IDPTemplateTable                 = "projections.idp_templates5"
 	IDPTemplateOAuthTable            = IDPTemplateTable + "_" + IDPTemplateOAuthSuffix
 	IDPTemplateOIDCTable             = IDPTemplateTable + "_" + IDPTemplateOIDCSuffix
 	IDPTemplateJWTTable              = IDPTemplateTable + "_" + IDPTemplateJWTSuffix
@@ -59,7 +59,6 @@ const (
 	IDPTemplateIsLinkingAllowedCol  = "is_linking_allowed"
 	IDPTemplateIsAutoCreationCol    = "is_auto_creation"
 	IDPTemplateIsAutoUpdateCol      = "is_auto_update"
-	IDPTemplateAutoLinkingCol       = "auto_linking"
 
 	OAuthIDCol                    = "idp_id"
 	OAuthInstanceIDCol            = "instance_id"
@@ -198,7 +197,6 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(IDPTemplateIsLinkingAllowedCol, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(IDPTemplateIsAutoCreationCol, handler.ColumnTypeBool, handler.Default(false)),
 			handler.NewColumn(IDPTemplateIsAutoUpdateCol, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(IDPTemplateAutoLinkingCol, handler.ColumnTypeEnum, handler.Default(0)),
 		},
 			handler.NewPrimaryKey(IDPTemplateInstanceIDCol, IDPTemplateIDCol),
 			handler.WithIndex(handler.NewIndex("resource_owner", []string{IDPTemplateResourceOwnerCol})),
@@ -702,7 +700,6 @@ func (p *idpTemplateProjection) reduceOAuthIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -795,7 +792,6 @@ func (p *idpTemplateProjection) reduceOIDCIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -877,7 +873,6 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedAzureAD(event eventstore.Ev
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -929,7 +924,6 @@ func (p *idpTemplateProjection) reduceOIDCIDPMigratedGoogle(event eventstore.Eve
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPTemplateIDCol, idpEvent.ID),
@@ -988,7 +982,6 @@ func (p *idpTemplateProjection) reduceJWTIDPAdded(event eventstore.Event) (*hand
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -1077,7 +1070,6 @@ func (p *idpTemplateProjection) reduceOldConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(IDPTemplateIsLinkingAllowedCol, true),
 			handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.AutoRegister),
 			handler.NewCol(IDPTemplateIsAutoUpdateCol, false),
-			handler.NewCol(IDPTemplateAutoLinkingCol, domain.AutoLinkingOptionUnspecified),
 		},
 	), nil
 }
@@ -1336,7 +1328,6 @@ func (p *idpTemplateProjection) reduceAzureADIDPAdded(event eventstore.Event) (*
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -1427,7 +1418,6 @@ func (p *idpTemplateProjection) reduceGitHubIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -1475,7 +1465,6 @@ func (p *idpTemplateProjection) reduceGitHubEnterpriseIDPAdded(event eventstore.
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -1608,7 +1597,6 @@ func (p *idpTemplateProjection) reduceGitLabIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -1697,7 +1685,6 @@ func (p *idpTemplateProjection) reduceGitLabSelfHostedIDPAdded(event eventstore.
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -1787,7 +1774,6 @@ func (p *idpTemplateProjection) reduceGoogleIDPAdded(event eventstore.Event) (*h
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -1876,7 +1862,6 @@ func (p *idpTemplateProjection) reduceLDAPIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -1985,7 +1970,6 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -2077,7 +2061,6 @@ func (p *idpTemplateProjection) reduceAppleIDPAdded(event eventstore.Event) (*ha
 				handler.NewCol(IDPTemplateIsLinkingAllowedCol, idpEvent.IsLinkingAllowed),
 				handler.NewCol(IDPTemplateIsAutoCreationCol, idpEvent.IsAutoCreation),
 				handler.NewCol(IDPTemplateIsAutoUpdateCol, idpEvent.IsAutoUpdate),
-				handler.NewCol(IDPTemplateAutoLinkingCol, idpEvent.AutoLinkingOption),
 			},
 		),
 		handler.AddCreateStatement(
@@ -2207,9 +2190,6 @@ func reduceIDPChangedTemplateColumns(name *string, creationDate time.Time, seque
 	}
 	if optionChanges.IsAutoUpdate != nil {
 		cols = append(cols, handler.NewCol(IDPTemplateIsAutoUpdateCol, *optionChanges.IsAutoUpdate))
-	}
-	if optionChanges.AutoLinkingOption != nil {
-		cols = append(cols, handler.NewCol(IDPTemplateAutoLinkingCol, *optionChanges.AutoLinkingOption))
 	}
 	return append(cols,
 		handler.NewCol(IDPTemplateChangeDateCol, creationDate),

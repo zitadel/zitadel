@@ -475,8 +475,11 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 			return scopes, nil
 		}
 	}
-
-	project, err := o.query.ProjectByOIDCClientID(ctx, clientID)
+	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID)
+	if err != nil {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
+	}
+	project, err := o.query.ProjectByID(ctx, false, projectID)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
 	}

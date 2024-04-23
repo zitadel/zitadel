@@ -96,7 +96,7 @@ Yet it offers everything you need for a customer identity ([CIAM](https://zitade
 
 - [API-first approach](https://zitadel.com/docs/apis/introduction)
 - [Multi-tenancy](https://zitadel.com/docs/guides/solution-scenarios/b2b) authentication and access management
-- [Strong audit trail](https://zitadel.com/docs/concepts/features/audit-trail) thanks to [event sourcing](https://zitadel.com/docs/concepts/eventstore/overview) as storage pattern
+- Strong audit trail thanks to [event sourcing](https://zitadel.com/docs/concepts/eventstore/overview) as storage pattern
 - [Actions](https://zitadel.com/docs/apis/actions/introduction) to react on events with custom code and extended ZITADEL for you needs
 - [Branding](https://zitadel.com/docs/guides/manage/customize/branding) for a uniform user experience across multiple organizations
 - [Self-service](https://zitadel.com/docs/concepts/features/selfservice) for end-users, business customers, and administrators
@@ -107,17 +107,16 @@ Yet it offers everything you need for a customer identity ([CIAM](https://zitade
 Authentication
 
 - Single Sign On (SSO)
-- [Passkeys support (FIDO2 / WebAuthN)](https://zitadel.com/docs/concepts/features/passkeys)
+- Passkeys support (FIDO2 / WebAuthN)
 - Username / Password
 - Multifactor authentication with OTP, U2F, Email OTP, SMS OTP
-- [LDAP](https://zitadel.com/docs/guides/integrate/identity-providers/ldap)
-- [External enterprise identity providers  and social logins](https://zitadel.com/docs/guides/integrate/identity-providers/introduction)
+- LDAP
+- External enterprise identity providers and social logins
 - [Device authorization](https://zitadel.com/docs/guides/solution-scenarios/device-authorization)
 - [OpenID Connect certified](https://openid.net/certification/#OPs) => [OIDC Endpoints](https://zitadel.com/docs/apis/openidoauth/endpoints)
 - [SAML 2.0](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html) => [SAML Endpoints](https://zitadel.com/docs/apis/saml/endpoints)
 - [Custom sessions](https://zitadel.com/docs/guides/integrate/login-ui/username-password) if you need to go beyond OIDC or SAML 
-- [Machine-to-machine](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
-- [Token exchange and impersonation](https://zitadel.com/docs/guides/integrate/token-exchange)
+- [Machine-to-machine](https://zitadel.com/docs/guides/integrate/serviceusers) with JWT profile, Personal Access Tokens (PAT), and Client Credentials
 
 Multi-Tenancy
 
@@ -131,10 +130,6 @@ Integration
 - [GRPC and REST APIs](https://zitadel.com/docs/apis/introduction) for every functionality and resource
 - [Actions](https://zitadel.com/docs/apis/actions/introduction) to call any API, send webhooks, adjust workflows, or customize tokens
 - [Role Based Access Control (RBAC)](https://zitadel.com/docs/guides/integrate/retrieve-user-roles)
-- [Examples and SDKs](https://zitadel.com/docs/sdk-examples/introduction)
-- [Audit Log and SOC/SIEM](https://zitadel.com/docs/guides/integrate/external-audit-log)
-- [User registration and onboarding](https://zitadel.com/docs/guides/integrate/onboarding)
-- [Hosted and custom login user interface](https://zitadel.com/docs/guides/integrate/login-ui)
 
 Self-Service
 - [Self-registration](https://zitadel.com/docs/concepts/features/selfservice#registration) including verification

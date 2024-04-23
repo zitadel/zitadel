@@ -86,10 +86,6 @@
         "TITLE": "Ustawienia organizacji",
         "DESCRIPTION": "Dostosuj ustawienia swojej organizacji."
       },
-      "FEATURES": {
-        "TITLE": "Ustawienia funkcji",
-        "DESCRIPTION": "Odblokuj funkcje swojej instancji."
-      },
       "IDPS": {
         "TITLE": "Dostawcy tożsamości",
         "DESCRIPTION": "Utwórz i aktywuj zewnętrznych dostawców tożsamości. Wybierz znanego dostawcę lub skonfiguruj dowolnego innego dostawcę zgodnego z OIDC, OAuth lub SAML według własnego wyboru. Możesz nawet użyć istniejących tokenów JWT jako tożsamości federacyjnych, konfigurując dostawcę tożsamości JWT.",
@@ -1318,7 +1314,6 @@
     },
     "LIST": {
       "ORGS": "Organizacje",
-      "FEATURESETTINGS": "Ustawienia funkcji",
       "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",
@@ -1380,8 +1375,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "Ustawienia SMTP",
-      "DESCRIPTION": "Opis",
       "SENDERADDRESS": "Adres e-mail nadawcy",
       "SENDERNAME": "Nazwa nadawcy",
       "REPLYTOADDRESS": "Adres Reply-to",
@@ -1392,7 +1385,6 @@
       "PASSWORDSET": "Hasło SMTP zostało pomyślnie ustawione.",
       "TLS": "Bezpieczeństwo warstwy transportu (TLS)",
       "SAVED": "Pomyślnie zapisano!",
-      "NOCHANGES": "Bez zmian!",
       "REQUIREDWARN": "Aby wysyłać powiadomienia z twojej domeny, musisz podać dane SMTP."
     },
     "SMS": {
@@ -1451,27 +1443,6 @@
       "IMPERSONATIONTITLE": "Podszywanie się",
       "IMPERSONATIONENABLED": "Zezwalaj na podszywanie się",
       "IMPERSONATIONDESCRIPTION": "To ustawienie pozwala w zasadzie na użycie personifikacji. Należy pamiętać, że osoba personifikująca potrzebuje również przypisanych odpowiednich ról `*_IMPERSONATOR`."
-    },
-    "FEATURES": {
-      "LOGINDEFAULTORG": "Domyślna Organizacja Logowania",
-      "LOGINDEFAULTORG_DESCRIPTION": "Jeśli nie ustawiono kontekstu organizacji, interfejs logowania będzie używać ustawień domyślnej organizacji (a nie instancji)",
-      "OIDCLEGACYINTROSPECTION": "Starsza Introspekcja OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Ostatnio przeprojektowaliśmy punkt końcowy introspekcji ze względów wydajnościowych. Ta funkcja może być używana do cofnięcia do starszej implementacji, jeśli wystąpią nieoczekiwane błędy.",
-      "OIDCTOKENEXCHANGE": "Wymiana Tokenów OIDC",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Włącz eksperymentalny typ grantu urn:ietf:params:oauth:grant-type:token-exchange dla punktu końcowego tokena OIDC. Wymiana tokenów może być używana do żądania tokenów o mniejszym zakresie lub podszywania się za innych użytkowników. Aby zezwolić na podszywanie się na instancji, zapoznaj się z polityką bezpieczeństwa.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Projekcje Introspekcji Wyzwalane przez OIDC",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Włącz wyzwalacze projekcji podczas żądania introspekcji. Może to stanowić obejście, jeśli w odpowiedzi introspekcji występują zauważalne problemy z spójnością, ale może mieć wpływ na wydajność. Planujemy w przyszłości usunąć wyzwalacze dla żądań introspekcji.",
-      "USERSCHEMA": "Schemat Użytkownika",
-      "USERSCHEMA_DESCRIPTION": "Schematy użytkowników umożliwiają zarządzanie schematami danych użytkowników. Jeśli flaga jest włączona, będziesz mógł korzystać z nowego interfejsu API i jego funkcji.",
-      "ACTIONS": "Akcje",
-      "ACTIONS_DESCRIPTION": "Akcje v2 umożliwiają zarządzanie wykonaniami danych i celami. Jeżeli flaga jest włączona, będziesz mógł korzystać z nowego interfejsu API i jego funkcji.",
-      "STATES": {
-        "INHERITED": "Dziedziczony",
-        "ENABLED": "Włączony",
-        "DISABLED": "Wyłączony"
-      },
-      "INHERITED_DESCRIPTION": "To ustawienie przypisuje wartość do wartości domyślnej systemu.",
-      "RESET": "Ustaw wszystko na dziedziczone"
     },
     "DIALOG": {
       "RESET": {
@@ -1617,7 +1588,6 @@
         "initPasswordText": "Inicjalizacja hasła",
         "initializeDoneText": "Inicjalizacja użytkownika zakończona",
         "initializeUserText": "Inicjalizacja użytkownika",
-        "linkingUserPromptText": "Komunikat o łączeniu użytkowników",
         "linkingUserDoneText": "Łączenie użytkownika zakończone",
         "loginText": "Zaloguj się",
         "logoutText": "Wyloguj się",
@@ -1689,8 +1659,7 @@
       "HASLOWERCASE": "zawiera małe litery",
       "HASUPPERCASE": "zawiera duże litery",
       "SHOWLOCKOUTFAILURES": "pokaż blokady nieudanych prób",
-      "MAXPASSWORDATTEMPTS": "Maksymalna liczba prób wprowadzenia hasła",
-      "MAXOTPATTEMPTS": "Maksymalna liczba prób OTP",
+      "MAXATTEMPTS": "Maksymalna liczba prób wprowadzenia hasła",
       "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniu",
       "MAXAGEDAYS": "Maksymalny wiek w dniach",
       "USERLOGINMUSTBEDOMAIN": "Dodaj domenę organizacji jako przyrostek do nazw logowania",
@@ -2049,13 +2018,7 @@
       "ISCREATIONALLOWED": "tworzenie dozwolone",
       "ISCREATIONALLOWED_DESC": "Określa, czy można tworzyć konta.",
       "ISLINKINGALLOWED": "dozwolone łączenie rachunków",
-      "ISLINKINGALLOWED_DESC": "Określa, czy tożsamość może być powiązana z istniejącym kontem.",
-      "AUTOLINKING_DESC": "Określa, czy tożsamość będzie proszona o połączenie z istniejącym kontem.",
-      "AUTOLINKINGTYPE": {
-        "0": "Wyłączone",
-        "1": "Sprawdź istniejącą nazwę użytkownika",
-        "2": "Sprawdź istniejący adres e-mail"
-      }
+      "ISLINKINGALLOWED_DESC": "Określa, czy tożsamość może być powiązana z istniejącym kontem."
     },
     "OWNERTYPES": {
       "0": "nieznany",
@@ -2219,48 +2182,6 @@
     "PASSWORDLESSTYPE": {
       "0": "Niedozwolone",
       "1": "Dozwolone"
-    }
-  },
-  "SMTP": {
-    "LIST": {
-      "TITLE": "Dostawca SMTP",
-      "DESCRIPTION": "To są dostawcy SMTP dla Twojej instancji Zitadel. Aktywuj ten, którego chcesz używać do wysyłania powiadomień do użytkowników.",
-      "EMPTY": "Brak dostępnego dostawcy SMTP",
-      "ACTIVATED": "Aktywowany",
-      "ACTIVATE": "Aktywuj dostawcę",
-      "DEACTIVATE": "Dezaktywuj dostawcę",
-      "TYPE": "Typ",
-      "DIALOG": {
-        "ACTIVATED": "Konfiguracja SMTP została aktywowana",
-        "ACTIVATE_WARN_TITLE": "Aktywuj konfigurację SMTP",
-        "ACTIVATE_WARN_DESCRIPTION": "Zamierzasz aktywować konfigurację SMTP. Najpierw dezaktywujemy bieżącego aktywnego dostawcę, a następnie aktywujemy tę konfigurację. Jesteś pewny?",
-        "DEACTIVATE_WARN_TITLE": "Dezaktywuj konfigurację SMTP",
-        "DEACTIVATE_WARN_DESCRIPTION": "Zamierzasz dezaktywować konfigurację SMTP. Jesteś pewny?",
-        "DEACTIVATED": "Konfiguracja SMTP została dezaktywowana",
-        "DELETE_TITLE": "Usuń konfigurację SMTP",
-        "DELETE_DESCRIPTION": "Zamierzasz usunąć konfigurację. Potwierdź tę czynność, wpisując nazwę nadawcy",
-        "DELETED": "Konfiguracja SMTP została usunięta",
-        "SENDER": "Wpisz {{ value }}, aby usunąć tę konfigurację SMTP."
-      }
-    },
-    "CREATE": {
-      "TITLE": "Dodaj dostawcę SMTP",
-      "DESCRIPTION": "Wybierz jednego lub więcej z poniższych dostawców.",
-      "STEPS": {
-        "TITLE": "Dodaj {{ value }} dostawcę SMTP",
-        "CREATE_DESC_TITLE": "Wprowadź krok po kroku ustawienia SMTP {{ value }}",
-        "CURRENT_DESC_TITLE": "To są Twoje ustawienia SMTP",
-        "PROVIDER_SETTINGS": "Ustawienia dostawcy SMTP",
-        "SENDER_SETTINGS": "Ustawienia nadawcy",
-        "TEST_SETTINGS": "Przetestuj ustawienia SMTP"
-      }
-    },
-    "DETAIL": {
-      "TITLE": "Ustawienia dostawcy SMTP"
-    },
-    "EMPTY": "Brak dostępnego dostawcy SMTP",
-    "STEPS": {
-      "SENDGRID": {}
     }
   },
   "APP": {

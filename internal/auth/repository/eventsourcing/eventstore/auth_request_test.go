@@ -184,7 +184,7 @@ type mockLockoutPolicy struct {
 	policy *query.LockoutPolicy
 }
 
-func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error) {
+func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string, bool) (*query.LockoutPolicy, error) {
 	return m.policy, nil
 }
 
@@ -486,7 +486,6 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				AuthRequests: func() cache.AuthRequestCache {
 					m := mock.NewMockAuthRequestCache(gomock.NewController(t))
 					m.EXPECT().UpdateAuthRequest(gomock.Any(), gomock.Any())
-					m.EXPECT().CacheAuthRequest(gomock.Any(), gomock.Any())
 					return m
 				}(),
 				userSessionViewProvider: &mockViewUserSession{

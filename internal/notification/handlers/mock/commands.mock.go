@@ -5,7 +5,6 @@
 //
 //	mockgen -package mock -destination ./mock/commands.mock.go github.com/zitadel/zitadel/internal/notification/handlers Commands
 //
-
 // Package mock is a generated GoMock package.
 package mock
 

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NotificationSMTPProviderComponent } from './notification-smtp-provider.component';
 
-describe('IdpSettingsComponent', () => {
+describe('NotificationSMTPProviderComponent', () => {
   let component: NotificationSMTPProviderComponent;
   let fixture: ComponentFixture<NotificationSMTPProviderComponent>;
 

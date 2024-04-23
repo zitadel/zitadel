@@ -86,10 +86,6 @@
         "TITLE": "Organisationseinstellungen",
         "DESCRIPTION": "Passe die Einstellungen deiner Organisation an."
       },
-      "FEATURES": {
-        "TITLE": "Funktionseinstellungen",
-        "DESCRIPTION": "Schalten Sie Funktionen für Ihre Instanz frei."
-      },
       "IDPS": {
         "TITLE": "Identitätsanbieter",
         "DESCRIPTION": "Erstelle und aktiviere externe Identitätsanbieter. Wähle einen bekannten Anbieter aus oder konfiguriere einen anderen OIDC-, OAuth- oder SAML-kompatiblen Anbieter deiner Wahl. Du kannst sogar deine vorhandenen JWT-Tokens als föderierte Identitäten verwenden, indem du einen JWT-Identitätsanbieter konfigurierst.",
@@ -1318,7 +1314,6 @@
     },
     "LIST": {
       "ORGS": "Organisationen",
-      "FEATURESETTINGS": "Features",
       "LANGUAGES": "Sprachen",
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",
@@ -1380,8 +1375,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "SMTP Einstellungen",
-      "DESCRIPTION": "Beschreibung",
       "SENDERADDRESS": "Sender Email-Adresse",
       "SENDERNAME": "Sender Name",
       "REPLYTOADDRESS": "Reply-to-Adresse",
@@ -1392,7 +1385,6 @@
       "PASSWORDSET": "SMTP Passwort erfolgreich gesetzt.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Erfolgreich gespeichert.",
-      "NOCHANGES": "Keine Änderungen!",
       "REQUIREDWARN": "Damit Mails von Ihrer Domain verschickt werden können, müssen Sie Ihre SMTP Einstellungen konfigurieren."
     },
     "SMS": {
@@ -1451,27 +1443,6 @@
       "IMPERSONATIONTITLE": "Identitätswechsel",
       "IMPERSONATIONENABLED": "Identitätswechsel zulassen",
       "IMPERSONATIONDESCRIPTION": "Diese Einstellung ermöglicht grundsätzlich die Verwendung von Identitätswechseln. Beachten Sie, dass dem Imitator auch die entsprechenden `*_IMPERSONATOR`-Rollen zugewiesen werden müssen."
-    },
-    "FEATURES": {
-      "LOGINDEFAULTORG": "Standardorganisation für die Anmeldung",
-      "LOGINDEFAULTORG_DESCRIPTION": "Die Anmelde-Benutzeroberfläche verwendet die Einstellungen der Standardorganisation (und nicht von der Instanz), wenn kein Organisationskontext festgelegt ist.",
-      "OIDCLEGACYINTROSPECTION": "OIDC Legacy-Introspektion",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Wir haben kürzlich den Introspektionsendpunkt aus Leistungsgründen neu strukturiert. Mit diesem Feature können Sie zur alten Implementierung zurückkehren, falls unerwartete Fehler auftreten.",
-      "OIDCTOKENEXCHANGE": "OIDC Token-Austausch",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Aktivieren Sie den experimentellen urn:ietf:params:oauth:grant-type:token-exchange-Grant-Typ für den OIDC-Token-Endpunkt. Der Token-Austausch kann verwendet werden, um Token mit einem geringeren Umfang anzufordern oder andere Benutzer zu impersonieren. Siehe die Sicherheitsrichtlinie, um die Impersonation auf einer Instanz zu erlauben.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC Trigger-Introspektionsprojektionen",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Aktivieren Sie Projektionstrigger während einer Introspektionsanfrage. Dies kann als Workaround fungieren, wenn bemerkbare Konsistenzprobleme in der Introspektionsantwort auftreten, kann sich jedoch auf die Leistung auswirken. Wir planen, Trigger für Introspektionsanfragen in Zukunft zu entfernen.",
-      "USERSCHEMA": "Benutzerschema",
-      "USERSCHEMA_DESCRIPTION": "Benutzerschemata ermöglichen das Verwalten von Datenschemata von Benutzern. Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
-      "ACTIONS": "Aktionen",
-      "ACTIONS_DESCRIPTION": "Aktionen v2 ermöglichen die Verwaltung von Datenausführungen und Zielen. Wenn das Flag aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
-      "STATES": {
-        "INHERITED": "Erben",
-        "ENABLED": "Aktiviert",
-        "DISABLED": "Deaktiviert"
-      },
-      "INHERITED_DESCRIPTION": "Diese Einstellung setzt den Wert auf den Standardwert des Systems.",
-      "RESET": "Alle auf Erben setzen"
     },
     "DIALOG": {
       "RESET": {
@@ -1617,7 +1588,6 @@
         "initPasswordText": "Passwort Initialisierung",
         "initializeDoneText": "Benutzereinrichtung erfolgreich",
         "initializeUserText": "Benutzereinrichtung",
-        "linkingUserPromptText": "Aufforderung zur Benutzerverlinkung",
         "linkingUserDoneText": "Benutzerverlinkung erfolgreich",
         "loginText": "Anmelden",
         "logoutText": "Abmelden",
@@ -1689,8 +1659,7 @@
       "HASLOWERCASE": "erfordert Kleinbuchstaben",
       "HASUPPERCASE": "erfordert Grossbuchstaben",
       "SHOWLOCKOUTFAILURES": "Zeige Anzahl Anmeldeversuche",
-      "MAXPASSWORDATTEMPTS": "Maximale Anzahl an Passwort Versuchen",
-      "MAXOTPATTEMPTS": "Maximale Anzahl an OTP Versuchen",
+      "MAXATTEMPTS": "Maximale Anzahl an Versuchen",
       "EXPIREWARNDAYS": "Ablauf Warnung nach Tagen",
       "MAXAGEDAYS": "Maximale Gültigkeit in Tagen",
       "USERLOGINMUSTBEDOMAIN": "Organisationsdomain dem Loginname hinzufügen",
@@ -2045,13 +2014,7 @@
       "ISCREATIONALLOWED": "Account erstellen erlaubt",
       "ISCREATIONALLOWED_DESC": "Legt fest, ob Konten erstellt werden können.",
       "ISLINKINGALLOWED": "Account linking erlaubt",
-      "ISLINKINGALLOWED_DESC": "Legt fest, ob eine Identität mit einem bestehenden Konto verknüpft werden kann.",
-      "AUTOLINKING_DESC": "Legt fest, ob eine Identität aufgefordert wird, mit einem vorhandenen Konto verknüpft zu werden.",
-      "AUTOLINKINGTYPE": {
-        "0": "Deaktiviert",
-        "1": "Überprüfung auf vorhandenen Benutzernamen",
-        "2": "Überprüfung auf vorhandene E-Mail"
-      }
+      "ISLINKINGALLOWED_DESC": "Legt fest, ob eine Identität mit einem bestehenden Konto verknüpft werden kann."
     },
     "OWNERTYPES": {
       "0": "unknown",
@@ -2218,48 +2181,6 @@
     "PASSWORDLESSTYPE": {
       "0": "Nicht erlaubt",
       "1": "Erlaubt"
-    }
-  },
-  "SMTP": {
-    "LIST": {
-      "TITLE": "SMTP-Anbieter",
-      "DESCRIPTION": "Dies sind die SMTP-Anbieter für Ihre Zitadel-Instanz. Aktivieren Sie diejenige, die Sie zum Senden von Benachrichtigungen an Ihre Benutzer verwenden möchten.",
-      "EMPTY": "Kein SMTP-Anbieter verfügbar",
-      "ACTIVATED": "Aktiviert",
-      "ACTIVATE": "Anbieter aktivieren",
-      "DEACTIVATE": "Anbieter deaktivieren",
-      "TYPE": "Typ",
-      "DIALOG": {
-        "ACTIVATED": "Die SMTP-Konfiguration wurde aktiviert",
-        "ACTIVATE_WARN_TITLE": "Aktivieren Sie die SMTP-Konfiguration",
-        "ACTIVATE_WARN_DESCRIPTION": "Sie sind dabei, eine SMTP-Konfiguration zu aktivieren. Zuerst deaktivieren wir den aktuell aktiven Anbieter und aktivieren dann diese Konfiguration. Bist du sicher?",
-        "DEACTIVATE_WARN_TITLE": "Deaktivieren Sie die SMTP-Konfiguration",
-        "DEACTIVATE_WARN_DESCRIPTION": "Sie sind dabei, eine SMTP-Konfiguration zu deaktivieren. Bist du sicher?",
-        "DEACTIVATED": "Die SMTP-Konfiguration wurde deaktiviert",
-        "DELETE_TITLE": "SMTP-Konfiguration löschen",
-        "DELETE_DESCRIPTION": "Sie sind dabei, eine Konfiguration zu löschen. Bestätigen Sie diese Aktion, indem Sie den Absendernamen eingeben",
-        "DELETED": "SMTP-Konfiguration wurde gelöscht",
-        "SENDER": "Geben Sie {{ value }} ein, um diese SMTP-Konfiguration zu löschen."
-      }
-    },
-    "CREATE": {
-      "TITLE": "SMTP-Anbieter hinzufügen",
-      "DESCRIPTION": "Wählen Sie einen oder mehrere der folgenden Anbieter aus.",
-      "STEPS": {
-        "TITLE": "Fügen Sie {{ value }} SMTP-Anbieter hinzu",
-        "CREATE_DESC_TITLE": "Geben Sie Schritt für Schritt Ihre {{ value }} SMTP-Einstellungen ein",
-        "CURRENT_DESC_TITLE": "Dies sind Ihre SMTP-Einstellungen",
-        "PROVIDER_SETTINGS": "SMTP-Anbietereinstellungen",
-        "SENDER_SETTINGS": "Absendereinstellungen",
-        "TEST_SETTINGS": "Testen Sie die SMTP-Einstellungen"
-      }
-    },
-    "DETAIL": {
-      "TITLE": "SMTP-Anbietereinstellungen"
-    },
-    "EMPTY": "Kein SMTP-Anbieter verfügbar",
-    "STEPS": {
-      "SENDGRID": {}
     }
   },
   "APP": {

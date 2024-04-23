@@ -14,8 +14,6 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, SecretGeneratorRemovedEventType, SecretGeneratorRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SMTPConfigAddedEventType, SMTPConfigAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SMTPConfigChangedEventType, SMTPConfigChangedEventMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, SMTPConfigActivatedEventType, SMTPConfigActivatedEventMapper)
-	eventstore.RegisterFilterEventMapper(AggregateType, SMTPConfigDeactivatedEventType, SMTPConfigDeactivatedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SMTPConfigPasswordChangedEventType, SMTPConfigPasswordChangedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SMTPConfigRemovedEventType, SMTPConfigRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, SMSConfigTwilioAddedEventType, SMSConfigTwilioAddedEventMapper)

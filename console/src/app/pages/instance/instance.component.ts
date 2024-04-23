@@ -32,7 +32,6 @@ import {
   FAILEDEVENTS,
   EVENTS,
   ORGANIZATIONS,
-  FEATURESETTINGS,
 } from '../../modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -54,7 +53,6 @@ export class InstanceComponent implements OnInit, OnDestroy {
   public id: string = '';
   public defaultSettingsList: SidenavSetting[] = [
     ORGANIZATIONS,
-    FEATURESETTINGS,
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,

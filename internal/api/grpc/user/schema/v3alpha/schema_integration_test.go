@@ -75,8 +75,6 @@ func ensureFeatureEnabled(t *testing.T) {
 }
 
 func TestServer_CreateUserSchema(t *testing.T) {
-	ensureFeatureEnabled(t)
-
 	tests := []struct {
 		name    string
 		ctx     context.Context
@@ -317,6 +315,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
 			got, err := Client.CreateUserSchema(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -331,8 +330,6 @@ func TestServer_CreateUserSchema(t *testing.T) {
 }
 
 func TestServer_UpdateUserSchema(t *testing.T) {
-	ensureFeatureEnabled(t)
-
 	type args struct {
 		ctx context.Context
 		req *schema.UpdateUserSchemaRequest
@@ -575,6 +572,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
 			err := tt.prepare(tt.args.req)
 			require.NoError(t, err)
 
@@ -590,8 +588,6 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 }
 
 func TestServer_DeactivateUserSchema(t *testing.T) {
-	ensureFeatureEnabled(t)
-
 	type args struct {
 		ctx     context.Context
 		req     *schema.DeactivateUserSchemaRequest
@@ -651,6 +647,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 
@@ -666,8 +663,6 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 }
 
 func TestServer_ReactivateUserSchema(t *testing.T) {
-	ensureFeatureEnabled(t)
-
 	type args struct {
 		ctx     context.Context
 		req     *schema.ReactivateUserSchemaRequest
@@ -727,6 +722,7 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 
@@ -742,8 +738,6 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 }
 
 func TestServer_DeleteUserSchema(t *testing.T) {
-	ensureFeatureEnabled(t)
-
 	type args struct {
 		ctx     context.Context
 		req     *schema.DeleteUserSchemaRequest
@@ -803,6 +797,7 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ensureFeatureEnabled(t)
 			err := tt.args.prepare(tt.args.req)
 			require.NoError(t, err)
 

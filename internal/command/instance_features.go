@@ -17,7 +17,6 @@ type InstanceFeatures struct {
 	LegacyIntrospection             *bool
 	UserSchema                      *bool
 	TokenExchange                   *bool
-	Actions                         *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
@@ -25,8 +24,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.TriggerIntrospectionProjections == nil &&
 		m.LegacyIntrospection == nil &&
 		m.UserSchema == nil &&
-		m.TokenExchange == nil &&
-		m.Actions == nil
+		m.TokenExchange == nil
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {

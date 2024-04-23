@@ -13,7 +13,6 @@ type InstanceFeatures struct {
 	LegacyIntrospection             FeatureSource[bool]
 	UserSchema                      FeatureSource[bool]
 	TokenExchange                   FeatureSource[bool]
-	Actions                         FeatureSource[bool]
 }
 
 func (q *Queries) GetInstanceFeatures(ctx context.Context, cascade bool) (_ *InstanceFeatures, err error) {

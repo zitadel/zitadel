@@ -91,27 +91,15 @@ export class PasswordLockoutPolicyComponent implements OnInit {
     }
   }
 
-  public incrementPasswordMaxAttempts(): void {
+  public incrementMaxAttempts(): void {
     if (this.lockoutData?.maxPasswordAttempts !== undefined) {
       this.lockoutData.maxPasswordAttempts++;
     }
   }
 
-  public decrementPasswordMaxAttempts(): void {
+  public decrementMaxAttempts(): void {
     if (this.lockoutData?.maxPasswordAttempts && this.lockoutData?.maxPasswordAttempts > 0) {
       this.lockoutData.maxPasswordAttempts--;
-    }
-  }
-
-  public incrementOTPMaxAttempts(): void {
-    if (this.lockoutData?.maxOtpAttempts !== undefined) {
-      this.lockoutData.maxOtpAttempts++;
-    }
-  }
-
-  public decrementOTPMaxAttempts(): void {
-    if (this.lockoutData?.maxOtpAttempts && this.lockoutData?.maxOtpAttempts > 0) {
-      this.lockoutData.maxOtpAttempts--;
     }
   }
 
@@ -120,7 +108,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
     if (this.lockoutData) {
       if (this.service instanceof AdminService) {
         promise = this.service
-          .updateLockoutPolicy(this.lockoutData.maxPasswordAttempts, this.lockoutData.maxOtpAttempts)
+          .updateLockoutPolicy(this.lockoutData.maxPasswordAttempts)
           .then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
             this.fetchData();
@@ -131,7 +119,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
       } else {
         if ((this.lockoutData as LockoutPolicy.AsObject).isDefault) {
           promise = (this.service as ManagementService)
-            .addCustomLockoutPolicy(this.lockoutData.maxPasswordAttempts, this.lockoutData.maxOtpAttempts)
+            .addCustomLockoutPolicy(this.lockoutData.maxPasswordAttempts)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
               this.fetchData();
@@ -141,7 +129,7 @@ export class PasswordLockoutPolicyComponent implements OnInit {
             });
         } else {
           promise = (this.service as ManagementService)
-            .updateCustomLockoutPolicy(this.lockoutData.maxPasswordAttempts, this.lockoutData.maxOtpAttempts)
+            .updateCustomLockoutPolicy(this.lockoutData.maxPasswordAttempts)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
               this.fetchData();

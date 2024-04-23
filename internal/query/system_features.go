@@ -20,7 +20,6 @@ type SystemFeatures struct {
 	LegacyIntrospection             FeatureSource[bool]
 	UserSchema                      FeatureSource[bool]
 	TokenExchange                   FeatureSource[bool]
-	Actions                         FeatureSource[bool]
 }
 
 func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {

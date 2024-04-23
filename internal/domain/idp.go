@@ -126,11 +126,3 @@ func (s IDPIntentState) Valid() bool {
 func (s IDPIntentState) Exists() bool {
 	return s != IDPIntentStateUnspecified && s != IDPIntentStateFailed //TODO: ?
 }
-
-type AutoLinkingOption uint8
-
-const (
-	AutoLinkingOptionUnspecified AutoLinkingOption = iota
-	AutoLinkingOptionUsername
-	AutoLinkingOptionEmail
-)

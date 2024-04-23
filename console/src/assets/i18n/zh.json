@@ -86,10 +86,6 @@
         "TITLE": "组织设置",
         "DESCRIPTION": "自定义您的组织设置。"
       },
-      "FEATURES": {
-        "TITLE": "功能设置",
-        "DESCRIPTION": "解锁您的实例的功能。"
-      },
       "IDPS": {
         "TITLE": "身份提供商",
         "DESCRIPTION": "创建并激活外部身份提供商。选择一个知名提供商或根据您的选择配置任何其他兼容OIDC、OAuth或SAML的提供商。您甚至可以通过配置JWT身份提供商，使用您现有的JWT令牌作为联合身份。",
@@ -1318,7 +1314,6 @@
     },
     "LIST": {
       "ORGS": "组织",
-      "FEATURESETTINGS": "功能设置",
       "LANGUAGES": "语言",
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
@@ -1380,8 +1375,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "SMTP 设置",
-      "DESCRIPTION": "描述",
       "SENDERADDRESS": "发件人地址",
       "SENDERNAME": "发件人名称",
       "REPLYTOADDRESS": "Reply-to 地址",
@@ -1392,7 +1385,6 @@
       "PASSWORDSET": "SMTP 密码设置成功。",
       "TLS": "使用安全传输层 (TLS)",
       "SAVED": "保存成功！",
-      "NOCHANGES": "没有变化！",
       "REQUIREDWARN": "要从您的域发送通知，您必须输入您的 SMTP 数据。"
     },
     "SMS": {
@@ -1451,27 +1443,6 @@
       "IMPERSONATIONTITLE": "冒充",
       "IMPERSONATIONENABLED": "允许模拟",
       "IMPERSONATIONDESCRIPTION": "此设置原则上允许使用模拟。请注意，模拟者还需要分配适当的 `*_IMPERSONATOR` 角色。"
-    },
-    "FEATURES": {
-      "LOGINDEFAULTORG": "登录默认组织",
-      "LOGINDEFAULTORG_DESCRIPTION": "如果没有设置组织上下文，登录界面将使用默认组织的设置（而不是实例的设置）",
-      "OIDCLEGACYINTROSPECTION": "OIDC 传统内省",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "我们最近出于性能原因重构了内省端点。如果出现意外错误，可以使用此功能回滚到传统实现。",
-      "OIDCTOKENEXCHANGE": "OIDC 令牌交换",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "启用 OIDC 令牌端点的实验性 urn:ietf:params:oauth:grant-type:token-exchange 授权类型。令牌交换可用于请求具有较少范围的令牌或模拟其他用户。请参阅安全策略以允许在实例上模拟。",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC 触发内省投影",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "在内省请求期间启用投影触发器。如果内省响应中存在明显的一致性问题，这可以作为一个解决方法，但可能会影响性能。我们计划在未来删除内省请求的触发器。",
-      "USERSCHEMA": "用户架构",
-      "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。",
-      "ACTIONS": "操作",
-      "ACTIONS_DESCRIPTION": "Actions v2 可以管理数据执行和目标。如果启用此标志，您将可以使用新的 API 及其功能。",
-      "STATES": {
-        "INHERITED": "继承",
-        "ENABLED": "已启用",
-        "DISABLED": "已禁用"
-      },
-      "INHERITED_DESCRIPTION": "此设置将值设置为系统默认值。",
-      "RESET": "全部设置为继承"
     },
     "DIALOG": {
       "RESET": {
@@ -1616,7 +1587,6 @@
         "initPasswordText": "初始化密码",
         "initializeDoneText": "初始化用户完成",
         "initializeUserText": "初始化用户",
-        "linkingUserPromptText": "用户链接提示",
         "linkingUserDoneText": "链接用户完成",
         "loginText": "登录",
         "logoutText": "登出",
@@ -1688,8 +1658,7 @@
       "HASLOWERCASE": "包含小写字母",
       "HASUPPERCASE": "包含大写字母",
       "SHOWLOCKOUTFAILURES": "显示锁定失败",
-      "MAXPASSWORDATTEMPTS": "密码最大尝试次数",
-      "MAXOTPATTEMPTS": "最多尝试 OTP 次数",
+      "MAXATTEMPTS": "密码最大尝试次数",
       "EXPIREWARNDAYS": "密码过期警告",
       "MAXAGEDAYS": "Max Age in days",
       "USERLOGINMUSTBEDOMAIN": "用户名必须包含组织域名",
@@ -2048,13 +2017,7 @@
       "ISCREATIONALLOWED": "是否允许创作",
       "ISCREATIONALLOWED_DESC": "确定是否可以创建账户。",
       "ISLINKINGALLOWED": "是否允许连接",
-      "ISLINKINGALLOWED_DESC": "确定一个身份是否可以与一个现有的账户相联系。",
-      "AUTOLINKING_DESC": "确定是否提示将身份链接到现有帐户。",
-      "AUTOLINKINGTYPE": {
-        "0": "已禁用",
-        "1": "检查现有用户名",
-        "2": "检查现有电子邮件"
-      }
+      "ISLINKINGALLOWED_DESC": "确定一个身份是否可以与一个现有的账户相联系。"
     },
     "OWNERTYPES": {
       "0": "未知",
@@ -2218,48 +2181,6 @@
     "PASSWORDLESSTYPE": {
       "0": "不允许",
       "1": "允许"
-    }
-  },
-  "SMTP": {
-    "LIST": {
-      "TITLE": "SMTP 提供商",
-      "DESCRIPTION": "这些是您的 Zitadel 实例的 SMTP 提供商。激活您想要用来向用户发送通知的通知。",
-      "EMPTY": "没有可用的 SMTP 提供商",
-      "ACTIVATED": "活性",
-      "ACTIVATE": "激活提供商",
-      "DEACTIVATE": "停用提供商",
-      "TYPE": "类型",
-      "DIALOG": {
-        "ACTIVATED": "SMTP 配置已激活",
-        "ACTIVATE_WARN_TITLE": "激活 SMTP 配置",
-        "ACTIVATE_WARN_DESCRIPTION": "您即将激活 SMTP 配置。首先，我们将停用当前活动的提供程序，然后激活此配置。你确定吗？",
-        "DEACTIVATE_WARN_TITLE": "停用 SMTP 配置",
-        "DEACTIVATE_WARN_DESCRIPTION": "您即将停用 SMTP 配置。你确定吗？",
-        "DEACTIVATED": "SMTP 配置已停用",
-        "DELETE_TITLE": "删除 SMTP 配置",
-        "DELETE_DESCRIPTION": "您将要删除一个配置。输入发件人姓名确认此操作",
-        "DELETED": "SMTP 配置已被删除",
-        "SENDER": "输入 {{ value }}，删除此 SMTP 配置。"
-      }
-    },
-    "CREATE": {
-      "TITLE": "添加 SMTP 提供商",
-      "DESCRIPTION": "选择以下一个或多个提供商。",
-      "STEPS": {
-        "TITLE": "添加 {{ value }} SMTP 提供商",
-        "CREATE_DESC_TITLE": "逐步输入您的 {{ value }} SMTP 设置",
-        "CURRENT_DESC_TITLE": "这些是您的 SMTP 设置",
-        "PROVIDER_SETTINGS": "SMTP 提供商设置",
-        "SENDER_SETTINGS": "发件人设置",
-        "TEST_SETTINGS": "测试 SMTP 设置"
-      }
-    },
-    "DETAIL": {
-      "TITLE": "SMTP 提供商设置"
-    },
-    "EMPTY": "没有可用的 SMTP 提供商",
-    "STEPS": {
-      "SENDGRID": {}
     }
   },
   "APP": {

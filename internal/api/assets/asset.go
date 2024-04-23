@@ -2,7 +2,6 @@ package assets
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,17 +12,14 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -77,29 +73,19 @@ type Downloader interface {
 
 type ErrorHandler func(w http.ResponseWriter, r *http.Request, err error, defaultCode int)
 
-func DefaultErrorHandler(translator *i18n.Translator) func(w http.ResponseWriter, r *http.Request, err error, defaultCode int) {
-	return func(w http.ResponseWriter, r *http.Request, err error, defaultCode int) {
-		logging.WithFields("uri", r.RequestURI).WithError(err).Warn("error occurred on asset api")
-		code, ok := http_util.ZitadelErrorToHTTPStatusCode(err)
-		if !ok {
-			code = defaultCode
-		}
-		zErr := new(zerrors.ZitadelError)
-		if errors.As(err, &zErr) {
-			zErr.SetMessage(translator.LocalizeFromCtx(r.Context(), zErr.GetMessage(), nil))
-			zErr.Parent = nil // ensuring we don't leak any unwanted information
-			err = zErr
-		}
-		http.Error(w, err.Error(), code)
+func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, defaultCode int) {
+	logging.WithFields("uri", r.RequestURI).WithError(err).Warn("error occurred on asset api")
+	code, ok := http_util.ZitadelErrorToHTTPStatusCode(err)
+	if !ok {
+		code = defaultCode
 	}
+	http.Error(w, err.Error(), code)
 }
 
 func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
-	translator, err := i18n.NewZitadelTranslator(language.English)
-	logging.OnError(err).Panic("unable to get translator")
 	h := &Handler{
 		commands:        commands,
-		errorHandler:    DefaultErrorHandler(translator),
+		errorHandler:    DefaultErrorHandler,
 		authInterceptor: http_mw.AuthorizationInterceptor(verifier, authConfig),
 		idGenerator:     idGenerator,
 		storage:         storage,

@@ -90,7 +90,7 @@ func (s *Server) GetLegalAndSupportSettings(ctx context.Context, req *settings.G
 }
 
 func (s *Server) GetLockoutSettings(ctx context.Context, req *settings.GetLockoutSettingsRequest) (*settings.GetLockoutSettingsResponse, error) {
-	current, err := s.query.LockoutPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()))
+	current, err := s.query.LockoutPolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
 	if err != nil {
 		return nil, err
 	}

@@ -17,9 +17,8 @@ import (
 )
 
 type Config struct {
-	SearchLimit                uint64
-	Spooler                    auth_handler.Config
-	AmountOfCachedAuthRequests uint16
+	SearchLimit uint64
+	Spooler     auth_handler.Config
 }
 
 type EsRepository struct {
@@ -40,7 +39,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 	auth_handler.Register(ctx, conf.Spooler, view, queries)
 	auth_handler.Start(ctx)
 
-	authReq := cache.Start(dbClient, conf.AmountOfCachedAuthRequests)
+	authReq := cache.Start(dbClient)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,

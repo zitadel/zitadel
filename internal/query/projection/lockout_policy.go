@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	LockoutPolicyTable = "projections.lockout_policies3"
+	LockoutPolicyTable = "projections.lockout_policies2"
 
 	LockoutPolicyIDCol                  = "id"
 	LockoutPolicyCreationDateCol        = "creation_date"
@@ -25,8 +25,8 @@ const (
 	LockoutPolicyResourceOwnerCol       = "resource_owner"
 	LockoutPolicyInstanceIDCol          = "instance_id"
 	LockoutPolicyMaxPasswordAttemptsCol = "max_password_attempts"
-	LockoutPolicyMaxOTPAttemptsCol      = "max_otp_attempts"
 	LockoutPolicyShowLockOutFailuresCol = "show_failure"
+	LockoutPolicyOwnerRemovedCol        = "owner_removed"
 )
 
 type lockoutPolicyProjection struct{}
@@ -51,10 +51,11 @@ func (*lockoutPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(LockoutPolicyResourceOwnerCol, handler.ColumnTypeText),
 			handler.NewColumn(LockoutPolicyInstanceIDCol, handler.ColumnTypeText),
 			handler.NewColumn(LockoutPolicyMaxPasswordAttemptsCol, handler.ColumnTypeInt64),
-			handler.NewColumn(LockoutPolicyMaxOTPAttemptsCol, handler.ColumnTypeInt64, handler.Default(0)),
 			handler.NewColumn(LockoutPolicyShowLockOutFailuresCol, handler.ColumnTypeBool),
+			handler.NewColumn(LockoutPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(LockoutPolicyInstanceIDCol, LockoutPolicyIDCol),
+			handler.WithIndex(handler.NewIndex("owner_removed", []string{LockoutPolicyOwnerRemovedCol})),
 		),
 	)
 }
@@ -124,7 +125,6 @@ func (p *lockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 			handler.NewCol(LockoutPolicyIDCol, policyEvent.Aggregate().ID),
 			handler.NewCol(LockoutPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(LockoutPolicyMaxPasswordAttemptsCol, policyEvent.MaxPasswordAttempts),
-			handler.NewCol(LockoutPolicyMaxOTPAttemptsCol, policyEvent.MaxOTPAttempts),
 			handler.NewCol(LockoutPolicyShowLockOutFailuresCol, policyEvent.ShowLockOutFailures),
 			handler.NewCol(LockoutPolicyIsDefaultCol, isDefault),
 			handler.NewCol(LockoutPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
@@ -148,9 +148,6 @@ func (p *lockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	}
 	if policyEvent.MaxPasswordAttempts != nil {
 		cols = append(cols, handler.NewCol(LockoutPolicyMaxPasswordAttemptsCol, *policyEvent.MaxPasswordAttempts))
-	}
-	if policyEvent.MaxOTPAttempts != nil {
-		cols = append(cols, handler.NewCol(LockoutPolicyMaxOTPAttemptsCol, *policyEvent.MaxOTPAttempts))
 	}
 	if policyEvent.ShowLockOutFailures != nil {
 		cols = append(cols, handler.NewCol(LockoutPolicyShowLockOutFailuresCol, *policyEvent.ShowLockOutFailures))

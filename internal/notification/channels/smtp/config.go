@@ -1,7 +1,6 @@
 package smtp
 
 type Config struct {
-	Description    string
 	SMTP           SMTP
 	Tls            bool
 	From           string

@@ -86,10 +86,6 @@
         "TITLE": "Paramètres de l'Organisation",
         "DESCRIPTION": "Personnalise les paramètres de ton organisation."
       },
-      "FEATURES": {
-        "TITLE": "Paramètres des fonctionnalités",
-        "DESCRIPTION": "Débloquez des fonctionnalités pour votre instance."
-      },
       "IDPS": {
         "TITLE": "Fournisseurs d'Identité",
         "DESCRIPTION": "Crée et active des fournisseurs d'identité externes. Choisis un fournisseur bien connu ou configure tout autre fournisseur compatible OIDC, OAuth ou SAML de ton choix. Tu peux même utiliser tes tokens JWT existants comme identités fédérées en configurant un fournisseur d'identité JWT.",
@@ -1318,7 +1314,6 @@
     },
     "LIST": {
       "ORGS": "Organisations",
-      "FEATURESETTINGS": "Paramètres de fonctionnalité",
       "LANGUAGES": "Langues",
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",
@@ -1380,8 +1375,6 @@
       }
     },
     "SMTP": {
-      "TITLE": "Paramètres SMTP",
-      "DESCRIPTION": "Description",
       "SENDERADDRESS": "Adresse e-mail de l'expéditeur",
       "SENDERNAME": "Nom de l'expéditeur",
       "REPLYTOADDRESS": "Adresse Reply-to",
@@ -1392,7 +1385,6 @@
       "PASSWORDSET": "Le mot de passe SMTP a été défini avec succès.",
       "TLS": "Sécurité de la couche de transport (TLS)",
       "SAVED": "Enregistré avec succès!",
-      "NOCHANGES": "Aucun changement!",
       "REQUIREDWARN": "Pour envoyer des notifications depuis votre domaine, vous devez entrer vos données SMTP."
     },
     "SMS": {
@@ -1451,27 +1443,6 @@
       "IMPERSONATIONTITLE": "Usuration d'identité",
       "IMPERSONATIONENABLED": "Autoriser l'usurpation d'identité",
       "IMPERSONATIONDESCRIPTION": "Ce paramètre permet en principe d'utiliser l'usurpation d'identité. Notez que l'usurpateur d'identité doit également recevoir les rôles `*_IMPERSONATOR` appropriés."
-    },
-    "FEATURES": {
-      "LOGINDEFAULTORG": "Organisation par défaut de connexion",
-      "LOGINDEFAULTORG_DESCRIPTION": "L'interface de connexion utilisera les paramètres de l'organisation par défaut (et non de l'instance) si aucun contexte d'organisation n'est défini.",
-      "OIDCLEGACYINTROSPECTION": "Introspection héritée OIDC",
-      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nous avons récemment refondu le point d'introspection pour des raisons de performances. Cette fonctionnalité peut être utilisée pour revenir à l'implémentation héritée en cas de bogues inattendus.",
-      "OIDCTOKENEXCHANGE": "Échange de jetons OIDC",
-      "OIDCTOKENEXCHANGE_DESCRIPTION": "Activez le type de subvention expérimentale urn:ietf:params:oauth:grant-type:token-exchange pour le point de terminaison de jeton OIDC. L'échange de jetons peut être utilisé pour demander des jetons avec une portée moindre ou pour usurper d'autres utilisateurs. Consultez la politique de sécurité pour autoriser l'usurpation sur une instance.",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Déclencheurs de projections d'introspection OIDC",
-      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Activez les déclencheurs de projection lors d'une demande d'introspection. Cela peut agir comme un contournement s'il existe des problèmes de cohérence perceptibles dans la réponse à l'introspection, mais cela peut avoir un impact sur les performances. Nous prévoyons de supprimer les déclencheurs pour les demandes d'introspection à l'avenir.",
-      "USERSCHEMA": "Schéma utilisateur",
-      "USERSCHEMA_DESCRIPTION": "Les schémas utilisateur permettent de gérer les schémas de données des utilisateurs. Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
-      "ACTIONS": "Actions",
-      "ACTIONS_DESCRIPTION": "Les actions v2 permettent de gérer les exécutions et les cibles de données. Si l'indicateur est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
-      "STATES": {
-        "INHERITED": "Hérité",
-        "ENABLED": "Activé",
-        "DISABLED": "Désactivé"
-      },
-      "INHERITED_DESCRIPTION": "Ce paramètre définit la valeur par défaut du système.",
-      "RESET": "Réinitialiser tout sur hérité"
     },
     "DIALOG": {
       "RESET": {
@@ -1617,7 +1588,6 @@
         "initPasswordText": "Initialiser le mot de passe",
         "initializeDoneText": "Initialiser l'utilisateur terminé",
         "initializeUserText": "Initialiser l'utilisateur",
-        "linkingUserPromptText": "Message de liaison utilisateur",
         "linkingUserDoneText": "Lier l'utilisateur fait",
         "loginText": "Connexion",
         "logoutText": "Déconnexion",
@@ -1689,8 +1659,7 @@
       "HASLOWERCASE": "a minuscule",
       "HASUPPERCASE": "a majuscule",
       "SHOWLOCKOUTFAILURES": "montrer les échecs de verrouillage",
-      "MAXPASSWORDATTEMPTS": "Mot de passe maximum tentatives",
-      "MAXOTPATTEMPTS": "Maximal de tentatives OTP",
+      "MAXATTEMPTS": "Mot de passe maximum Tentatives",
       "EXPIREWARNDAYS": "Expiration Avertissement après le jour",
       "MAXAGEDAYS": "Âge maximum en jours",
       "USERLOGINMUSTBEDOMAIN": "Le nom de connexion de l'utilisateur doit contenir le nom de domaine de l'organisation",
@@ -2049,13 +2018,7 @@
       "ISCREATIONALLOWED": "la création est-elle autorisée",
       "ISCREATIONALLOWED_DESC": "Détermine si des comptes peuvent être créés.",
       "ISLINKINGALLOWED": "la liaison est-elle autorisée",
-      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant.",
-      "AUTOLINKING_DESC": "Détermine si une identité sera invitée à être liée à un compte existant.",
-      "AUTOLINKINGTYPE": {
-        "0": "Désactivé",
-        "1": "Vérification de l'existence du nom d'utilisateur",
-        "2": "Vérification de l'existence de l'e-mail"
-      }
+      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant."
     },
     "OWNERTYPES": {
       "0": "inconnu",
@@ -2219,48 +2182,6 @@
     "PASSWORDLESSTYPE": {
       "0": "Non autorisé",
       "1": "Autorisée"
-    }
-  },
-  "SMTP": {
-    "LIST": {
-      "TITLE": "Fournisseur SMTP",
-      "DESCRIPTION": "Ce sont les fournisseurs SMTP de votre instance Zitadel. Activez celui que vous souhaitez utiliser pour envoyer des notifications à vos utilisateurs.",
-      "EMPTY": "Aucun fournisseur SMTP disponible",
-      "ACTIVATED": "Activé",
-      "ACTIVATE": "Activer le fournisseur",
-      "DEACTIVATE": "Désactiver le fournisseur",
-      "TYPE": "Taper",
-      "DIALOG": {
-        "ACTIVATED": "La configuration SMTP a été activée",
-        "ACTIVATE_WARN_TITLE": "Activer la configuration SMTP",
-        "ACTIVATE_WARN_DESCRIPTION": "Vous êtes sur le point d'activer une configuration SMTP. Nous allons d’abord désactiver le fournisseur actif actuel, puis activer cette configuration. Es-tu sûr?",
-        "DEACTIVATE_WARN_TITLE": "Désactiver la configuration SMTP",
-        "DEACTIVATE_WARN_DESCRIPTION": "Vous êtes sur le point de désactiver une configuration SMTP. Es-tu sûr?",
-        "DEACTIVATED": "La configuration SMTP a été désactivée",
-        "DELETE_TITLE": "Supprimer la configuration SMTP",
-        "DELETE_DESCRIPTION": "Vous êtes sur le point de supprimer une configuration. Confirmez cette action en tapant le nom de l'expéditeur",
-        "DELETED": "La configuration SMTP a été supprimée",
-        "SENDER": "Tapez {{ value }} pour supprimer cette configuration SMTP."
-      }
-    },
-    "CREATE": {
-      "TITLE": "Ajouter un fournisseur SMTP",
-      "DESCRIPTION": "Sélectionnez un ou plusieurs des fournisseurs suivants.",
-      "STEPS": {
-        "TITLE": "Ajouter {{ value }} fournisseur SMTP",
-        "CREATE_DESC_TITLE": "Entrez vos paramètres SMTP {{ value }} étape par étape",
-        "CURRENT_DESC_TITLE": "Ce sont vos paramètres SMTP",
-        "PROVIDER_SETTINGS": "Paramètres du fournisseur SMTP",
-        "SENDER_SETTINGS": "Paramètres de l'expéditeur",
-        "TEST_SETTINGS": "Tester les paramètres SMTP"
-      }
-    },
-    "DETAIL": {
-      "TITLE": "Paramètres du fournisseur SMTP"
-    },
-    "EMPTY": "Aucun fournisseur SMTP disponible",
-    "STEPS": {
-      "SENDGRID": {}
     }
   },
   "APP": {

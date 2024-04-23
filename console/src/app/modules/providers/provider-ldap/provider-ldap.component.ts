@@ -9,7 +9,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateLDAPProviderRequest as AdminUpdateLDAPProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { AutoLinkingOption, LDAPAttributes, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { LDAPAttributes, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddLDAPProviderRequest as MgmtAddLDAPProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -32,10 +32,7 @@ import { ProviderNextService } from '../provider-next/provider-next.service';
 export class ProviderLDAPComponent {
   public updateBindPassword: boolean = false;
   public showOptional: boolean = false;
-  public options: Options = new Options()
-    .setIsCreationAllowed(true)
-    .setIsLinkingAllowed(true)
-    .setAutoLinking(AutoLinkingOption.AUTO_LINKING_OPTION_UNSPECIFIED);
+  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
   public attributes: LDAPAttributes = new LDAPAttributes();
   // DEPRECATED: use id$ instead
   public id: string | null = '';

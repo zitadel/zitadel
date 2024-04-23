@@ -774,22 +774,13 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 
 func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRequest) (*mgmt_pb.AddMachineKeyResponse, error) {
 	machineKey := AddMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
-	// If there is no pubkey supplied, then AddUserMachineKey will generate a new one
-	pubkeySupplied := len(machineKey.PublicKey) > 0
 	details, err := s.command.AddUserMachineKey(ctx, machineKey)
 	if err != nil {
 		return nil, err
 	}
-
-	// Return key details only if the pubkey wasn't supplied, otherwise the user already has
-	// private key locally
-	var keyDetails []byte
-	if !pubkeySupplied {
-		var err error
-		keyDetails, err = machineKey.Detail()
-		if err != nil {
-			return nil, err
-		}
+	keyDetails, err := machineKey.Detail()
+	if err != nil {
+		return nil, err
 	}
 	return &mgmt_pb.AddMachineKeyResponse{
 		KeyId:      machineKey.KeyID,

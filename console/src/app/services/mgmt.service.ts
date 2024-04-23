@@ -1587,13 +1587,9 @@ export class ManagementService {
     return this.grpcService.mgmt.getLockoutPolicy(req, null).then((resp) => resp.toObject());
   }
 
-  public addCustomLockoutPolicy(
-    maxPasswordAttempts: number,
-    maxOTPAttempts: number,
-  ): Promise<AddCustomLockoutPolicyResponse.AsObject> {
+  public addCustomLockoutPolicy(maxAttempts: number): Promise<AddCustomLockoutPolicyResponse.AsObject> {
     const req = new AddCustomLockoutPolicyRequest();
-    req.setMaxPasswordAttempts(maxPasswordAttempts);
-    req.setMaxOtpAttempts(maxOTPAttempts);
+    req.setMaxPasswordAttempts(maxAttempts);
 
     return this.grpcService.mgmt.addCustomLockoutPolicy(req, null).then((resp) => resp.toObject());
   }
@@ -1603,13 +1599,9 @@ export class ManagementService {
     return this.grpcService.mgmt.resetLockoutPolicyToDefault(req, null).then((resp) => resp.toObject());
   }
 
-  public updateCustomLockoutPolicy(
-    maxPasswordAttempts: number,
-    maxOTPAttempts: number,
-  ): Promise<UpdateCustomLockoutPolicyResponse.AsObject> {
+  public updateCustomLockoutPolicy(maxAttempts: number): Promise<UpdateCustomLockoutPolicyResponse.AsObject> {
     const req = new UpdateCustomLockoutPolicyRequest();
-    req.setMaxPasswordAttempts(maxPasswordAttempts);
-    req.setMaxOtpAttempts(maxOTPAttempts);
+    req.setMaxPasswordAttempts(maxAttempts);
 
     return this.grpcService.mgmt.updateCustomLockoutPolicy(req, null).then((resp) => resp.toObject());
   }

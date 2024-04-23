@@ -262,11 +262,6 @@ type CustomLoginTextReadModel struct {
 	RegisterOrgPrivacyLinkText      string
 	RegisterOrgSaveButtonText       string
 
-	LinkingUserPromptTitle           string
-	LinkingUserPromptDescription     string
-	LinkingUserPromptLinkButtonText  string
-	LinkingUserPromptOtherButtonText string
-
 	LinkingUserDoneTitle            string
 	LinkingUserDoneDescription      string
 	LinkingUserDoneCancelButtonText string
@@ -421,10 +416,6 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				wm.handleRegistrationOrgScreenSetEvent(e)
 				continue
 			}
-			if strings.HasPrefix(e.Key, domain.LoginKeyLinkingUserPrompt) {
-				wm.handleLinkingUserPromptScreenSetEvent(e)
-				continue
-			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyLinkingUserDone) {
 				wm.handleLinkingUserDoneScreenSetEvent(e)
 				continue
@@ -563,10 +554,6 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyRegistrationOrg) {
 				wm.handleRegistrationOrgScreenRemoveEvent(e)
-				continue
-			}
-			if strings.HasPrefix(e.Key, domain.LoginKeyLinkingUserPrompt) {
-				wm.handleLinkingUserPromptRemoveEvent(e)
 				continue
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyLinkingUserDone) {
@@ -2336,25 +2323,6 @@ func (wm *CustomLoginTextReadModel) handleRegistrationOrgScreenRemoveEvent(e *po
 	}
 }
 
-func (wm *CustomLoginTextReadModel) handleLinkingUserPromptScreenSetEvent(e *policy.CustomTextSetEvent) {
-	if e.Key == domain.LoginKeyLinkingUserPromptTitle {
-		wm.LinkingUserPromptTitle = e.Text
-		return
-	}
-	if e.Key == domain.LoginKeyLinkingUserPromptDescription {
-		wm.LinkingUserPromptDescription = e.Text
-		return
-	}
-	if e.Key == domain.LoginKeyLinkingUserPromptLinkButtonText {
-		wm.LinkingUserPromptLinkButtonText = e.Text
-		return
-	}
-	if e.Key == domain.LoginKeyLinkingUserPromptOtherButtonText {
-		wm.LinkingUserPromptOtherButtonText = e.Text
-		return
-	}
-}
-
 func (wm *CustomLoginTextReadModel) handleLinkingUserDoneScreenSetEvent(e *policy.CustomTextSetEvent) {
 	if e.Key == domain.LoginKeyLinkingUserDoneTitle {
 		wm.LinkingUserDoneTitle = e.Text
@@ -2370,25 +2338,6 @@ func (wm *CustomLoginTextReadModel) handleLinkingUserDoneScreenSetEvent(e *polic
 	}
 	if e.Key == domain.LoginKeyLinkingUserDoneNextButtonText {
 		wm.LinkingUserDoneNextButtonText = e.Text
-		return
-	}
-}
-
-func (wm *CustomLoginTextReadModel) handleLinkingUserPromptRemoveEvent(e *policy.CustomTextRemovedEvent) {
-	if e.Key == domain.LoginKeyLinkingUserPromptTitle {
-		wm.LinkingUserPromptTitle = ""
-		return
-	}
-	if e.Key == domain.LoginKeyLinkingUserPromptDescription {
-		wm.LinkingUserPromptDescription = ""
-		return
-	}
-	if e.Key == domain.LoginKeyLinkingUserPromptLinkButtonText {
-		wm.LinkingUserPromptLinkButtonText = ""
-		return
-	}
-	if e.Key == domain.LoginKeyLinkingUserPromptOtherButtonText {
-		wm.LinkingUserPromptOtherButtonText = ""
 		return
 	}
 }

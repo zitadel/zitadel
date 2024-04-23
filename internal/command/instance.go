@@ -101,8 +101,7 @@ type InstanceSetup struct {
 		ThemeMode           domain.LabelPolicyThemeMode
 	}
 	LockoutPolicy struct {
-		MaxPasswordAttempts      uint64
-		MaxOTPAttempts           uint64
+		MaxAttempts              uint64
 		ShouldShowLockoutFailure bool
 	}
 	EmailTemplate     []byte
@@ -272,7 +271,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink, setup.PrivacyPolicy.SupportEmail),
 		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
-		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxPasswordAttempts, setup.LockoutPolicy.MaxOTPAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
+		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
 		prepareAddDefaultLabelPolicy(
 			instanceAgg,
@@ -391,7 +390,6 @@ func setupSMTPSettings(commands *Commands, validations *[]preparation.Validation
 	*validations = append(*validations,
 		commands.prepareAddSMTPConfig(
 			instanceAgg,
-			smtpConfig.Description,
 			smtpConfig.From,
 			smtpConfig.FromName,
 			smtpConfig.ReplyToAddress,

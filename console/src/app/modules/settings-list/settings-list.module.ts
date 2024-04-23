@@ -14,6 +14,7 @@ import { LoginTextsPolicyModule } from '../policies/login-texts/login-texts.modu
 import { MessageTextsPolicyModule } from '../policies/message-texts/message-texts.module';
 import { NotificationPolicyModule } from '../policies/notification-policy/notification-policy.module';
 import { NotificationSMSProviderModule } from '../policies/notification-sms-provider/notification-sms-provider.module';
+import { NotificationSMTPProviderModule } from '../policies/notification-smtp-provider/notification-smtp-provider.module';
 import { OIDCConfigurationModule } from '../policies/oidc-configuration/oidc-configuration.module';
 import { PasswordComplexityPolicyModule } from '../policies/password-complexity-policy/password-complexity-policy.module';
 import { PasswordLockoutPolicyModule } from '../policies/password-lockout-policy/password-lockout-policy.module';
@@ -26,10 +27,8 @@ import { SettingsListComponent } from './settings-list.component';
 import FailedEventsModule from '../failed-events/failed-events.module';
 import IamViewsModule from '../iam-views/iam-views.module';
 import EventsModule from '../events/events.module';
-import { OrgTableModule } from '../org-table/org-table.module';
-import { NotificationSMTPProviderModule } from '../policies/notification-smtp-provider/notification-smtp-provider.module';
-import { FeaturesComponent } from 'src/app/components/features/features.component';
 import OrgListModule from 'src/app/pages/org-list/org-list.module';
+import { OrgTableModule } from '../org-table/org-table.module';
 
 @NgModule({
   declarations: [SettingsListComponent],
@@ -45,18 +44,15 @@ import OrgListModule from 'src/app/pages/org-list/org-list.module';
     LanguageSettingsModule,
     NotificationPolicyModule,
     IdpSettingsModule,
-    NotificationSMTPProviderModule,
     PrivacyPolicyModule,
     MessageTextsPolicyModule,
     SecurityPolicyModule,
     DomainsModule,
     LoginTextsPolicyModule,
     OrgTableModule,
-    OrgListModule,
     DomainPolicyModule,
     TranslateModule,
     HasRolePipeModule,
-    FeaturesComponent,
     NotificationSMTPProviderModule,
     NotificationSMSProviderModule,
     OIDCConfigurationModule,

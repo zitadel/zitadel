@@ -10,7 +10,7 @@ import {
 import { SMSProvider, TwilioConfig } from 'src/app/proto/generated/zitadel/settings_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { PasswordDialogSMSProviderComponent } from '../password-dialog-sms-provider/password-dialog-sms-provider.component';
+import { PasswordDialogComponent } from '../password-dialog/password-dialog.component';
 
 enum SMSProviderType {
   Twilio = 1,
@@ -73,7 +73,7 @@ export class DialogAddSMSProviderComponent {
   }
 
   public changeToken(): void {
-    const dialogRef = this.dialog.open(PasswordDialogSMSProviderComponent, {
+    const dialogRef = this.dialog.open(PasswordDialogComponent, {
       width: '400px',
       data: {
         i18nTitle: 'SETTING.SMS.TWILIO.SETTOKEN',

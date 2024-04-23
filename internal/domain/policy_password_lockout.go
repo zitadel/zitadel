@@ -9,6 +9,5 @@ type LockoutPolicy struct {
 
 	Default             bool
 	MaxPasswordAttempts uint64
-	MaxOTPAttempts      uint64
 	ShowLockOutFailures bool
 }

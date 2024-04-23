@@ -21,10 +21,7 @@ type TokenRepo struct {
 	View       *view.View
 }
 
-func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (_ *usr_model.TokenView, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
+func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (*usr_model.TokenView, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 
 	// always load the latest sequence first, so in case the token was not found by id,
@@ -71,10 +68,7 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 	return model.TokenViewToModel(token), nil
 }
 
-func (r *TokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, changeDate time.Time, eventTypes []eventstore.EventType) (_ []eventstore.Event, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
+func (r *TokenRepo) getUserEvents(ctx context.Context, userID, instanceID string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error) {
 	query, err := usr_view.UserByIDQuery(userID, instanceID, changeDate, eventTypes)
 	if err != nil {
 		return nil, err

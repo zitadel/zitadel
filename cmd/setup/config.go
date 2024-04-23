@@ -69,7 +69,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hook.EnumHookFunc(authz.MemberTypeString),
 			actions.HTTPConfigDecodeHook,
 			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
-			hooks.SliceTypeStringDecode[authz.RoleMapping],
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")

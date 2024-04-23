@@ -12,10 +12,8 @@ import (
 type HumanTOTPWriteModel struct {
 	eventstore.WriteModel
 
-	State            domain.MFAState
-	Secret           *crypto.CryptoValue
-	CheckFailedCount uint64
-	UserLocked       bool
+	State  domain.MFAState
+	Secret *crypto.CryptoValue
 }
 
 func NewHumanTOTPWriteModel(userID, resourceOwner string) *HumanTOTPWriteModel {
@@ -35,16 +33,6 @@ func (wm *HumanTOTPWriteModel) Reduce() error {
 			wm.State = domain.MFAStateNotReady
 		case *user.HumanOTPVerifiedEvent:
 			wm.State = domain.MFAStateReady
-			wm.CheckFailedCount = 0
-		case *user.HumanOTPCheckSucceededEvent:
-			wm.CheckFailedCount = 0
-		case *user.HumanOTPCheckFailedEvent:
-			wm.CheckFailedCount++
-		case *user.UserLockedEvent:
-			wm.UserLocked = true
-		case *user.UserUnlockedEvent:
-			wm.CheckFailedCount = 0
-			wm.UserLocked = false
 		case *user.HumanOTPRemovedEvent:
 			wm.State = domain.MFAStateRemoved
 		case *user.UserRemovedEvent:
@@ -62,10 +50,6 @@ func (wm *HumanTOTPWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(user.HumanMFAOTPAddedType,
 			user.HumanMFAOTPVerifiedType,
 			user.HumanMFAOTPRemovedType,
-			user.HumanMFAOTPCheckSucceededType,
-			user.HumanMFAOTPCheckFailedType,
-			user.UserLockedType,
-			user.UserUnlockedType,
 			user.UserRemovedType,
 			user.UserV1MFAOTPAddedType,
 			user.UserV1MFAOTPVerifiedType,
@@ -88,9 +72,6 @@ type OTPCodeWriteModel interface {
 	CodeCreationDate() time.Time
 	CodeExpiry() time.Duration
 	Code() *crypto.CryptoValue
-	CheckFailedCount() uint64
-	UserLocked() bool
-	eventstore.QueryReducer
 }
 
 type HumanOTPSMSWriteModel struct {
@@ -160,9 +141,6 @@ type HumanOTPSMSCodeWriteModel struct {
 	code             *crypto.CryptoValue
 	codeCreationDate time.Time
 	codeExpiry       time.Duration
-
-	checkFailedCount uint64
-	userLocked       bool
 }
 
 func (wm *HumanOTPSMSCodeWriteModel) CodeCreationDate() time.Time {
@@ -177,14 +155,6 @@ func (wm *HumanOTPSMSCodeWriteModel) Code() *crypto.CryptoValue {
 	return wm.code
 }
 
-func (wm *HumanOTPSMSCodeWriteModel) CheckFailedCount() uint64 {
-	return wm.checkFailedCount
-}
-
-func (wm *HumanOTPSMSCodeWriteModel) UserLocked() bool {
-	return wm.userLocked
-}
-
 func NewHumanOTPSMSCodeWriteModel(userID, resourceOwner string) *HumanOTPSMSCodeWriteModel {
 	return &HumanOTPSMSCodeWriteModel{
 		HumanOTPSMSWriteModel: NewHumanOTPSMSWriteModel(userID, resourceOwner),
@@ -193,20 +163,10 @@ func NewHumanOTPSMSCodeWriteModel(userID, resourceOwner string) *HumanOTPSMSCode
 
 func (wm *HumanOTPSMSCodeWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		switch e := event.(type) {
-		case *user.HumanOTPSMSCodeAddedEvent:
+		if e, ok := event.(*user.HumanOTPSMSCodeAddedEvent); ok {
 			wm.code = e.Code
 			wm.codeCreationDate = e.CreationDate()
 			wm.codeExpiry = e.Expiry
-		case *user.HumanOTPSMSCheckSucceededEvent:
-			wm.checkFailedCount = 0
-		case *user.HumanOTPSMSCheckFailedEvent:
-			wm.checkFailedCount++
-		case *user.UserLockedEvent:
-			wm.userLocked = true
-		case *user.UserUnlockedEvent:
-			wm.checkFailedCount = 0
-			wm.userLocked = false
 		}
 	}
 	return wm.HumanOTPSMSWriteModel.Reduce()
@@ -219,10 +179,6 @@ func (wm *HumanOTPSMSCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			user.HumanOTPSMSCodeAddedType,
-			user.HumanOTPSMSCheckSucceededType,
-			user.HumanOTPSMSCheckFailedType,
-			user.UserLockedType,
-			user.UserUnlockedType,
 			user.HumanPhoneVerifiedType,
 			user.HumanOTPSMSAddedType,
 			user.HumanOTPSMSRemovedType,
@@ -303,9 +259,6 @@ type HumanOTPEmailCodeWriteModel struct {
 	code             *crypto.CryptoValue
 	codeCreationDate time.Time
 	codeExpiry       time.Duration
-
-	checkFailedCount uint64
-	userLocked       bool
 }
 
 func (wm *HumanOTPEmailCodeWriteModel) CodeCreationDate() time.Time {
@@ -320,14 +273,6 @@ func (wm *HumanOTPEmailCodeWriteModel) Code() *crypto.CryptoValue {
 	return wm.code
 }
 
-func (wm *HumanOTPEmailCodeWriteModel) CheckFailedCount() uint64 {
-	return wm.checkFailedCount
-}
-
-func (wm *HumanOTPEmailCodeWriteModel) UserLocked() bool {
-	return wm.userLocked
-}
-
 func NewHumanOTPEmailCodeWriteModel(userID, resourceOwner string) *HumanOTPEmailCodeWriteModel {
 	return &HumanOTPEmailCodeWriteModel{
 		HumanOTPEmailWriteModel: NewHumanOTPEmailWriteModel(userID, resourceOwner),
@@ -336,20 +281,10 @@ func NewHumanOTPEmailCodeWriteModel(userID, resourceOwner string) *HumanOTPEmail
 
 func (wm *HumanOTPEmailCodeWriteModel) Reduce() error {
 	for _, event := range wm.Events {
-		switch e := event.(type) {
-		case *user.HumanOTPEmailCodeAddedEvent:
+		if e, ok := event.(*user.HumanOTPEmailCodeAddedEvent); ok {
 			wm.code = e.Code
 			wm.codeCreationDate = e.CreationDate()
 			wm.codeExpiry = e.Expiry
-		case *user.HumanOTPEmailCheckSucceededEvent:
-			wm.checkFailedCount = 0
-		case *user.HumanOTPEmailCheckFailedEvent:
-			wm.checkFailedCount++
-		case *user.UserLockedEvent:
-			wm.userLocked = true
-		case *user.UserUnlockedEvent:
-			wm.checkFailedCount = 0
-			wm.userLocked = false
 		}
 	}
 	return wm.HumanOTPEmailWriteModel.Reduce()
@@ -362,10 +297,6 @@ func (wm *HumanOTPEmailCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			user.HumanOTPEmailCodeAddedType,
-			user.HumanOTPEmailCheckSucceededType,
-			user.HumanOTPEmailCheckFailedType,
-			user.UserLockedType,
-			user.UserUnlockedType,
 			user.HumanEmailVerifiedType,
 			user.HumanOTPEmailAddedType,
 			user.HumanOTPEmailRemovedType,

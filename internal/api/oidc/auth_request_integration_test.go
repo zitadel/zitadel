@@ -28,14 +28,14 @@ var (
 )
 
 func TestOPStorage_CreateAuthRequest(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 
 	id := createAuthRequest(t, clientID, redirectURI)
 	require.Contains(t, id, command.IDPrefixV2)
 }
 
 func TestOPStorage_CreateAccessToken_code(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -124,7 +124,7 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 }
 
 func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -147,7 +147,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 }
 
 func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
@@ -183,7 +183,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 }
 
 func TestOPStorage_RevokeToken_access_token(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
@@ -226,7 +226,7 @@ func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 }
 
 func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
@@ -263,7 +263,7 @@ func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T
 }
 
 func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
@@ -306,7 +306,7 @@ func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
 }
 
 func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
@@ -343,7 +343,7 @@ func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.
 }
 
 func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
@@ -365,7 +365,7 @@ func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
 
 	// simulate second client (not part of the audience) trying to revoke the token
-	otherClientID, _ := createClient(t)
+	otherClientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(CTX, otherClientID, redirectURI)
 	require.NoError(t, err)
 	err = rp.RevokeToken(CTX, provider, tokens.AccessToken, "")
@@ -373,7 +373,7 @@ func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
 }
 
 func TestOPStorage_TerminateSession(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI)
@@ -410,7 +410,7 @@ func TestOPStorage_TerminateSession(t *testing.T) {
 }
 
 func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
@@ -454,7 +454,7 @@ func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 }
 
 func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
-	clientID, _ := createClient(t)
+	clientID := createClient(t)
 	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 	authRequestID := createAuthRequest(t, clientID, redirectURI)

@@ -41,7 +41,7 @@ func (a *AuthRequest) checkLoginClient(ctx context.Context) error {
 	return nil
 }
 
-//go:embed auth_request_by_id.sql
+//go:embed embed/auth_request_by_id.sql
 var authRequestByIDQuery string
 
 func (q *Queries) authRequestByIDQuery(ctx context.Context) string {

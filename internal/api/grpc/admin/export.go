@@ -491,14 +491,13 @@ func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (_ *managem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID)
+	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID, false)
 	if err != nil {
 		return nil, err
 	}
 	if !queriedLockout.IsDefault {
 		return &management_pb.AddCustomLockoutPolicyRequest{
 			MaxPasswordAttempts: uint32(queriedLockout.MaxPasswordAttempts),
-			MaxOtpAttempts:      uint32(queriedLockout.MaxOTPAttempts),
 		}, nil
 	}
 	return nil, nil
@@ -1060,7 +1059,6 @@ func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages 
 				RegistrationUserText:                 text_grpc.RegistrationUserScreenTextToPb(text.RegistrationUser),
 				ExternalRegistrationUserOverviewText: text_grpc.ExternalRegistrationUserOverviewScreenTextToPb(text.ExternalRegistrationUserOverview),
 				RegistrationOrgText:                  text_grpc.RegistrationOrgScreenTextToPb(text.RegistrationOrg),
-				LinkingUserPromptText:                text_grpc.LinkingUserPromptScreenTextToPb(text.LinkingUserPrompt),
 				LinkingUserDoneText:                  text_grpc.LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
 				ExternalUserNotFoundText:             text_grpc.ExternalUserNotFoundScreenTextToPb(text.ExternalNotFound),
 				SuccessLoginText:                     text_grpc.SuccessLoginScreenTextToPb(text.LoginSuccess),
