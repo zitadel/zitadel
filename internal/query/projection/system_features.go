@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -77,7 +78,7 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 			},
 			{
 				Event:  feature_v2.SystemImprovedPerformanceEventType,
-				Reduce: reduceSystemSetFeature[[]int32],
+				Reduce: reduceSystemSetFeature[[]feature.ImprovedPerformanceType],
 			},
 		},
 	}}

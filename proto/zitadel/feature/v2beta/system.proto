@@ -53,7 +53,7 @@ message SetSystemFeaturesRequest{
     }
   ];
 
-  repeated ImprovedPerformance performance_improvements = 7 [
+  repeated ImprovedPerformance improved_performance = 7 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[1]";
       description: "Improves performance of specified execution paths.";
@@ -117,7 +117,7 @@ message GetSystemFeaturesResponse {
     }
   ];
 
-  ImprovedPerformanceFeatureFlag performance_improvements = 8 [
+  ImprovedPerformanceFeatureFlag improved_performance = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[1]";
       description: "Improves performance of specified execution paths.";

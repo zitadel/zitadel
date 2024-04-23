@@ -36,13 +36,14 @@ func (m *InstanceFeaturesReadModel) Reduce() (err error) {
 		case *feature_v2.ResetEvent:
 			m.reduceReset()
 		case *feature_v1.SetEvent[feature_v1.Boolean]:
-			err = m.reduceBoolFeature(
+			err = reduceInstanceFeatureSet(
+				m.instance,
 				feature_v1.DefaultLoginInstanceEventToV2(e),
 			)
 		case *feature_v2.SetEvent[bool]:
-			err = m.reduceBoolFeature(e)
-		case *feature_v2.SetEvent[[]int32]:
-			err = m.reduceEnumListFeature(e)
+			err = reduceInstanceFeatureSet(m.instance, e)
+		case *feature_v2.SetEvent[[]feature.ImprovedPerformanceType]:
+			err = reduceInstanceFeatureSet(m.instance, e)
 		}
 		if err != nil {
 			return err
@@ -74,7 +75,8 @@ func (m *InstanceFeaturesReadModel) reduceReset() {
 	if m.populateFromSystem() {
 		return
 	}
-	m.instance = &InstanceFeatures{}
+	m.instance = nil
+	m.instance = new(InstanceFeatures)
 }
 
 func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
@@ -91,53 +93,28 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	return true
 }
 
-func (m *InstanceFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {
+func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_v2.SetEvent[T]) error {
 	level, key, err := event.FeatureInfo()
 	if err != nil {
 		return err
 	}
-	var dst *FeatureSource[bool]
-
 	switch key {
 	case feature.KeyUnspecified:
 		return nil
 	case feature.KeyLoginDefaultOrg:
-		dst = &m.instance.LoginDefaultOrg
+		features.LoginDefaultOrg.set(level, event.Value)
 	case feature.KeyTriggerIntrospectionProjections:
-		dst = &m.instance.TriggerIntrospectionProjections
+		features.TriggerIntrospectionProjections.set(level, event.Value)
 	case feature.KeyLegacyIntrospection:
-		dst = &m.instance.LegacyIntrospection
+		features.LegacyIntrospection.set(level, event.Value)
 	case feature.KeyUserSchema:
-		dst = &m.instance.UserSchema
+		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:
-		dst = &m.instance.TokenExchange
+		features.TokenExchange.set(level, event.Value)
 	case feature.KeyActions:
-		dst = &m.instance.Actions
-	}
-	*dst = FeatureSource[bool]{
-		Level: level,
-		Value: event.Value,
-	}
-	return nil
-}
-
-func (m *InstanceFeaturesReadModel) reduceEnumListFeature(event *feature_v2.SetEvent[[]int32]) error {
-	level, key, err := event.FeatureInfo()
-	if err != nil {
-		return err
-	}
-	var dst *FeatureSource[[]int32]
-
-	switch key {
-	case feature.KeyUnspecified:
-		return nil
+		features.Actions.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
-		dst = &m.instance.ImprovedPerformance
-	}
-
-	*dst = FeatureSource[[]int32]{
-		Level: level,
-		Value: event.Value,
+		features.ImprovedPerformance.set(level, event.Value)
 	}
 	return nil
 }

@@ -28,12 +28,12 @@ func (m *SystemFeaturesReadModel) Reduce() error {
 		case *feature_v2.ResetEvent:
 			m.reduceReset()
 		case *feature_v2.SetEvent[bool]:
-			err := m.reduceBoolFeature(e)
+			err := reduceSystemFeatureSet(m.system, e)
 			if err != nil {
 				return err
 			}
-		case *feature_v2.SetEvent[[]int32]:
-			err := m.reduceEnumListFeature(e)
+		case *feature_v2.SetEvent[[]feature.ImprovedPerformanceType]:
+			err := reduceSystemFeatureSet(m.system, e)
 			if err != nil {
 				return err
 			}
@@ -62,10 +62,11 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func (m *SystemFeaturesReadModel) reduceReset() {
+	m.system = nil
 	m.system = new(SystemFeatures)
 }
 
-func reduceFeatureV2[T any](features *SystemFeatures, event *feature_v2.SetEvent[T]) error {
+func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.SetEvent[T]) error {
 	level, key, err := event.FeatureInfo()
 	if err != nil {
 		return err
@@ -74,75 +75,19 @@ func reduceFeatureV2[T any](features *SystemFeatures, event *feature_v2.SetEvent
 	case feature.KeyUnspecified:
 		return nil
 	case feature.KeyLoginDefaultOrg:
-		setSource(level, &features.LoginDefaultOrg, any(event.Value).(bool))
+		features.LoginDefaultOrg.set(level, event.Value)
 	case feature.KeyTriggerIntrospectionProjections:
-		dst = &features.TriggerIntrospectionProjections
+		features.TriggerIntrospectionProjections.set(level, event.Value)
 	case feature.KeyLegacyIntrospection:
-		dst = &features.LegacyIntrospection
+		features.LegacyIntrospection.set(level, event.Value)
 	case feature.KeyUserSchema:
-		dst = &features.UserSchema
+		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:
-		dst = &features.TokenExchange
+		features.TokenExchange.set(level, event.Value)
 	case feature.KeyActions:
-		dst = &features.Actions
+		features.Actions.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
-		dst = &features.ImprovedPerformance
-	}
-}
-
-func setSource[T any](level feature.Level, source *FeatureSource[T], value T) {
-	source.Level = level
-	source.Value = value
-}
-
-func (m *SystemFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {
-	level, key, err := event.FeatureInfo()
-	if err != nil {
-		return err
-	}
-	var dst *FeatureSource[bool]
-
-	switch key {
-	case feature.KeyUnspecified:
-		return nil
-	case feature.KeyLoginDefaultOrg:
-		dst = &m.system.LoginDefaultOrg
-	case feature.KeyTriggerIntrospectionProjections:
-		dst = &m.system.TriggerIntrospectionProjections
-	case feature.KeyLegacyIntrospection:
-		dst = &m.system.LegacyIntrospection
-	case feature.KeyUserSchema:
-		dst = &m.system.UserSchema
-	case feature.KeyTokenExchange:
-		dst = &m.system.TokenExchange
-	case feature.KeyActions:
-		dst = &m.system.Actions
-	}
-
-	*dst = FeatureSource[bool]{
-		Level: level,
-		Value: event.Value,
-	}
-	return nil
-}
-
-func (m *SystemFeaturesReadModel) reduceEnumListFeature(event *feature_v2.SetEvent[[]int32]) error {
-	level, key, err := event.FeatureInfo()
-	if err != nil {
-		return err
-	}
-	var dst *FeatureSource[[]int32]
-
-	switch key {
-	case feature.KeyUnspecified:
-		return nil
-	case feature.KeyImprovedPerformance:
-		dst = &m.system.ImprovedPerformance
-	}
-
-	*dst = FeatureSource[[]int32]{
-		Level: level,
-		Value: event.Value,
+		features.ImprovedPerformance.set(level, event.Value)
 	}
 	return nil
 }

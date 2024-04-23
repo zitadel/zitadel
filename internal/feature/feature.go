@@ -28,11 +28,27 @@ const (
 )
 
 type Features struct {
-	LoginDefaultOrg                 bool `json:"login_default_org,omitempty"`
-	TriggerIntrospectionProjections bool `json:"trigger_introspection_projections,omitempty"`
-	LegacyIntrospection             bool `json:"legacy_introspection,omitempty"`
-	UserSchema                      bool `json:"user_schema,omitempty"`
-	TokenExchange                   bool `json:"token_exchange,omitempty"`
-	Actions                         bool `json:"actions,omitempty"`
-	ImprovedOrgByID                 bool `json:"improved_performance,omitempty"`
+	LoginDefaultOrg                 bool                      `json:"login_default_org,omitempty"`
+	TriggerIntrospectionProjections bool                      `json:"trigger_introspection_projections,omitempty"`
+	LegacyIntrospection             bool                      `json:"legacy_introspection,omitempty"`
+	UserSchema                      bool                      `json:"user_schema,omitempty"`
+	TokenExchange                   bool                      `json:"token_exchange,omitempty"`
+	Actions                         bool                      `json:"actions,omitempty"`
+	ImprovedPerformance             []ImprovedPerformanceType `json:"improved_performance,omitempty"`
+}
+
+type ImprovedPerformanceType int32
+
+const (
+	ImprovedPerformanceTypeUnknown = iota
+	ImprovedPerformanceTypeOrgByID
+)
+
+func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool {
+	for _, improvedType := range f.ImprovedPerformance {
+		if improvedType == typ {
+			return true
+		}
+	}
+	return false
 }
