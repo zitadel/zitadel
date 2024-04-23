@@ -38,6 +38,8 @@ func (wm *ExecutionWriteModel) Reduce() error {
 		case *execution.SetEventV2:
 			wm.ExecutionTargets = e.Targets
 		case *execution.RemovedEvent:
+			wm.Targets = nil
+			wm.Includes = nil
 			wm.ExecutionTargets = nil
 		}
 	}
