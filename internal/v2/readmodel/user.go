@@ -16,6 +16,7 @@ type User struct {
 	LoginNames *projection.LoginNames
 	Human      *projection.Human
 	Machine    *projection.Machine
+	Notify     *projection.NotifyUser
 }
 
 func (u *User) PreferredLoginName() string {
@@ -36,12 +37,19 @@ func NewUser(id string) *User {
 		User:    *projection.NewUserProjection(id),
 		Human:   projection.NewHumanProjection(id),
 		Machine: projection.NewMachineProjection(id),
+		Notify:  projection.NewNotifyUser(id),
 	}
 }
 
 func (u *User) Query(ctx context.Context, querier eventstore.Querier, opts ...QueryOpt) error {
 	queryOpts := make([]eventstore.QueryOpt, 0, len(opts)+1)
-	queryOpts = append(queryOpts, eventstore.AppendFilters(u.User.Filter()...), eventstore.AppendFilters(u.Human.Filter()...), eventstore.AppendFilters(u.Machine.Filter()...))
+	queryOpts = append(queryOpts,
+		eventstore.AppendFilters(u.User.Filter()...),
+		eventstore.AppendFilters(u.Human.Filter()...),
+		eventstore.AppendFilters(u.Machine.Filter()...),
+		//TODO: adlerhurst we need to merge the queries because we double the events for humans at the moment
+		// eventstore.AppendFilters(u.Notify.Filter()...),
+	)
 	for _, opt := range opts {
 		queryOpts = opt(queryOpts)
 	}
@@ -95,6 +103,7 @@ eventLoop:
 			break eventLoop
 		case "user.machine.added":
 			u.Human = nil
+			u.Notify = nil
 			break eventLoop
 		}
 	}
@@ -103,7 +112,10 @@ eventLoop:
 	}
 	u.reduce(events[len(events)-1])
 	if u.Type == domain.UserTypeHuman {
-		err = u.Human.Reduce(events...)
+		if err = u.Human.Reduce(events...); err != nil {
+			return err
+		}
+		err = u.Notify.Reduce(events...)
 	} else if u.Type == domain.UserTypeMachine {
 		err = u.Machine.Reduce(events...)
 	}
