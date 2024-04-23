@@ -54,6 +54,8 @@ message SetSystemFeaturesRequest{
   ];
 
   repeated ImprovedPerformance improved_performance = 7 [
+    (validate.rules).repeated.unique = true,
+    (validate.rules).repeated.items.enum = {defined_only:  true, not_in: [0]},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[1]";
       description: "Improves performance of specified execution paths.";

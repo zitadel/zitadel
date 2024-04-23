@@ -51,5 +51,7 @@ message ImprovedPerformanceFeatureFlag {
 
 enum ImprovedPerformance {
   IMPROVED_PERFORMANCE_UNSPECIFIED = 0;
+  // Uses the eventstore to query the org by id
+  // instead of the sql table.
   IMPROVED_PERFORMANCE_ORG_BY_ID = 1;
 }

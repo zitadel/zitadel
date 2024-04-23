@@ -29,7 +29,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
 		m.Actions == nil &&
-		m.ImprovedPerformance == nil
+		len(m.ImprovedPerformance) == 0
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {
