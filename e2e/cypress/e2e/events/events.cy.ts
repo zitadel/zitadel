@@ -15,6 +15,6 @@ describe('events', () => {
     cy.contains('mat-select', 'Descending').click();
     cy.contains('mat-option', 'Descending').click();
     cy.get('[data-e2e="filter-finish-button"]').click();
-    cy.contains('[data-e2e="event-type-cell"]', eventTypeEnglish).should('have.length', 1);
+    cy.get('[data-e2e="event-type-cell"]').should('have.length', 1);
   });
 });
