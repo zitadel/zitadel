@@ -4,7 +4,7 @@ package zitadel.settings.defaultlogin.v2;
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2;defaultlogin";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "zitadel/settings/field/v1/field.proto";
+import "zitadel/settings/object/v1/field.proto";
 import "google/protobuf/struct.proto";
 
 message ResolvedTextSettings {
@@ -89,663 +89,663 @@ message SetTextSettings {
 }
 
 message SetAccountScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString title_linking_process = 3;
-  optional zitadel.settings.field.v1.SetStringLong description_linking_process = 4;
-  optional zitadel.settings.field.v1.SetStringLong other_user = 5;
-  optional zitadel.settings.field.v1.SetStringShort session_state_active = 6;
-  optional zitadel.settings.field.v1.SetStringShort session_state_inactive = 7;
-  optional zitadel.settings.field.v1.SetStringLong user_must_be_member_of_org = 8;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString title_linking_process = 3;
+  optional zitadel.settings.object.v1.SetStringLong description_linking_process = 4;
+  optional zitadel.settings.object.v1.SetStringLong other_user = 5;
+  optional zitadel.settings.object.v1.SetStringShort session_state_active = 6;
+  optional zitadel.settings.object.v1.SetStringShort session_state_inactive = 7;
+  optional zitadel.settings.object.v1.SetStringLong user_must_be_member_of_org = 8;
 }
 
 message SetLoginScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString title_linking_process = 3;
-  optional zitadel.settings.field.v1.SetStringLong description_linking_process = 4;
-  optional zitadel.settings.field.v1.SetStringLong user_must_be_member_of_org = 5;
-  optional zitadel.settings.field.v1.SetString login_name_label = 6;
-  optional zitadel.settings.field.v1.SetStringShort register_button_text = 7;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 8;
-  optional zitadel.settings.field.v1.SetStringLong external_user_description = 9;
-  optional zitadel.settings.field.v1.SetString user_name_placeholder = 10;
-  optional zitadel.settings.field.v1.SetString login_name_placeholder = 11;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString title_linking_process = 3;
+  optional zitadel.settings.object.v1.SetStringLong description_linking_process = 4;
+  optional zitadel.settings.object.v1.SetStringLong user_must_be_member_of_org = 5;
+  optional zitadel.settings.object.v1.SetString login_name_label = 6;
+  optional zitadel.settings.object.v1.SetStringShort register_button_text = 7;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 8;
+  optional zitadel.settings.object.v1.SetStringLong external_user_description = 9;
+  optional zitadel.settings.object.v1.SetString user_name_placeholder = 10;
+  optional zitadel.settings.object.v1.SetString login_name_placeholder = 11;
 }
 
 message SetPasswordScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString password_label = 3;
-  optional zitadel.settings.field.v1.SetStringShort reset_link_text = 4;
-  optional zitadel.settings.field.v1.SetStringShort back_button_text = 5;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 6;
-  optional zitadel.settings.field.v1.SetStringShort min_length = 7;
-  optional zitadel.settings.field.v1.SetStringShort has_uppercase = 8;
-  optional zitadel.settings.field.v1.SetStringShort has_lowercase = 9;
-  optional zitadel.settings.field.v1.SetStringShort has_number = 10;
-  optional zitadel.settings.field.v1.SetStringShort has_symbol = 11;
-  optional zitadel.settings.field.v1.SetStringShort confirmation = 12;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString password_label = 3;
+  optional zitadel.settings.object.v1.SetStringShort reset_link_text = 4;
+  optional zitadel.settings.object.v1.SetStringShort back_button_text = 5;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 6;
+  optional zitadel.settings.object.v1.SetStringShort min_length = 7;
+  optional zitadel.settings.object.v1.SetStringShort has_uppercase = 8;
+  optional zitadel.settings.object.v1.SetStringShort has_lowercase = 9;
+  optional zitadel.settings.object.v1.SetStringShort has_number = 10;
+  optional zitadel.settings.object.v1.SetStringShort has_symbol = 11;
+  optional zitadel.settings.object.v1.SetStringShort confirmation = 12;
 }
 
 message SetUsernameChangeScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString username_label = 3;
-  optional zitadel.settings.field.v1.SetStringShort cancel_button_text = 4;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 5;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString username_label = 3;
+  optional zitadel.settings.object.v1.SetStringShort cancel_button_text = 4;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 5;
 }
 
 message SetUsernameChangeDoneScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 3;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 3;
 }
 
 message SetInitPasswordScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString code_label = 3;
-  optional zitadel.settings.field.v1.SetString new_password_label = 4;
-  optional zitadel.settings.field.v1.SetString new_password_confirm_label = 5;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 6;
-  optional zitadel.settings.field.v1.SetStringShort resend_button_text = 7;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString code_label = 3;
+  optional zitadel.settings.object.v1.SetString new_password_label = 4;
+  optional zitadel.settings.object.v1.SetString new_password_confirm_label = 5;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 6;
+  optional zitadel.settings.object.v1.SetStringShort resend_button_text = 7;
 }
 
 message SetInitPasswordDoneScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 3;
-  optional zitadel.settings.field.v1.SetStringShort cancel_button_text = 4;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 3;
+  optional zitadel.settings.object.v1.SetStringShort cancel_button_text = 4;
 }
 
 message SetEmailVerificationScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString code_label = 3;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 4;
-  optional zitadel.settings.field.v1.SetStringShort resend_button_text = 5;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString code_label = 3;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 4;
+  optional zitadel.settings.object.v1.SetStringShort resend_button_text = 5;
 }
 
 message SetEmailVerificationDoneScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 3;
-  optional zitadel.settings.field.v1.SetStringShort cancel_button_text = 4;
-  optional zitadel.settings.field.v1.SetStringShort login_button_text = 5;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 3;
+  optional zitadel.settings.object.v1.SetStringShort cancel_button_text = 4;
+  optional zitadel.settings.object.v1.SetStringShort login_button_text = 5;
 }
 
 message SetInitializeUserScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString code_label = 3;
-  optional zitadel.settings.field.v1.SetString new_password_label = 4;
-  optional zitadel.settings.field.v1.SetString new_password_confirm_label = 5;
-  optional zitadel.settings.field.v1.SetStringShort resend_button_text = 6;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 7;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString code_label = 3;
+  optional zitadel.settings.object.v1.SetString new_password_label = 4;
+  optional zitadel.settings.object.v1.SetString new_password_confirm_label = 5;
+  optional zitadel.settings.object.v1.SetStringShort resend_button_text = 6;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 7;
 }
 
 message SetInitializeUserDoneScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort cancel_button_text = 3;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 4;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort cancel_button_text = 3;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 4;
 }
 
 message SetInitMFAPromptScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString otp_option = 3;
-  optional zitadel.settings.field.v1.SetString u2f_option = 4;
-  optional zitadel.settings.field.v1.SetStringShort skip_button_text = 5;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 6;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString otp_option = 3;
+  optional zitadel.settings.object.v1.SetString u2f_option = 4;
+  optional zitadel.settings.object.v1.SetStringShort skip_button_text = 5;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 6;
 }
 
 message SetInitMFAOTPScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringLong description_otp = 3;
-  optional zitadel.settings.field.v1.SetString secret_label = 4;
-  optional zitadel.settings.field.v1.SetString code_label = 5;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 6;
-  optional zitadel.settings.field.v1.SetStringShort cancel_button_text = 7;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringLong description_otp = 3;
+  optional zitadel.settings.object.v1.SetString secret_label = 4;
+  optional zitadel.settings.object.v1.SetString code_label = 5;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 6;
+  optional zitadel.settings.object.v1.SetStringShort cancel_button_text = 7;
 }
 
 message SetInitMFAU2FScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString token_name_label = 3;
-  optional zitadel.settings.field.v1.SetStringLong not_supported = 4;
-  optional zitadel.settings.field.v1.SetStringShort register_token_button_text = 5;
-  optional zitadel.settings.field.v1.SetStringLong error_retry = 6;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString token_name_label = 3;
+  optional zitadel.settings.object.v1.SetStringLong not_supported = 4;
+  optional zitadel.settings.object.v1.SetStringShort register_token_button_text = 5;
+  optional zitadel.settings.object.v1.SetStringLong error_retry = 6;
 }
 
 message SetInitMFADoneScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort cancel_button_text = 3;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 4;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort cancel_button_text = 3;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 4;
 }
 
 message SetMFAProvidersText {
-  optional zitadel.settings.field.v1.SetStringLong choose_other = 1;
-  optional zitadel.settings.field.v1.SetString otp = 2;
-  optional zitadel.settings.field.v1.SetString u2f = 3;
+  optional zitadel.settings.object.v1.SetStringLong choose_other = 1;
+  optional zitadel.settings.object.v1.SetString otp = 2;
+  optional zitadel.settings.object.v1.SetString u2f = 3;
 }
 
 message SetVerifyMFAOTPScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString code_label = 3;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 4;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString code_label = 3;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 4;
 }
 
 message SetVerifyMFAU2FScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringLong validate_token_text = 3;
-  optional zitadel.settings.field.v1.SetStringLong not_supported = 4;
-  optional zitadel.settings.field.v1.SetStringLong error_retry = 5;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringLong validate_token_text = 3;
+  optional zitadel.settings.object.v1.SetStringLong not_supported = 4;
+  optional zitadel.settings.object.v1.SetStringLong error_retry = 5;
 }
 
 message SetPasswordlessScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort login_with_pw_button_text = 3;
-  optional zitadel.settings.field.v1.SetStringShort validate_token_button_text = 4;
-  optional zitadel.settings.field.v1.SetStringLong not_supported = 5;
-  optional zitadel.settings.field.v1.SetStringLong error_retry = 6;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort login_with_pw_button_text = 3;
+  optional zitadel.settings.object.v1.SetStringShort validate_token_button_text = 4;
+  optional zitadel.settings.object.v1.SetStringLong not_supported = 5;
+  optional zitadel.settings.object.v1.SetStringLong error_retry = 6;
 }
 
 message SetPasswordChangeScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString old_password_label = 3;
-  optional zitadel.settings.field.v1.SetString new_password_label = 4;
-  optional zitadel.settings.field.v1.SetString new_password_confirm_label = 5;
-  optional zitadel.settings.field.v1.SetStringShort cancel_button_text = 6;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 7;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString old_password_label = 3;
+  optional zitadel.settings.object.v1.SetString new_password_label = 4;
+  optional zitadel.settings.object.v1.SetString new_password_confirm_label = 5;
+  optional zitadel.settings.object.v1.SetStringShort cancel_button_text = 6;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 7;
 }
 
 message SetPasswordChangeDoneScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 3;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 3;
 }
 
 message SetPasswordResetDoneScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 3;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 3;
 }
 
 message SetRegistrationOptionScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort user_name_button_text = 3;
-  optional zitadel.settings.field.v1.SetStringLong external_login_description = 4;
-  optional zitadel.settings.field.v1.SetStringShort login_button_text = 5;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort user_name_button_text = 3;
+  optional zitadel.settings.object.v1.SetStringLong external_login_description = 4;
+  optional zitadel.settings.object.v1.SetStringShort login_button_text = 5;
 }
 
 message SetRegistrationUserScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringLong description_org_register = 3;
-  optional zitadel.settings.field.v1.SetString firstname_label = 4;
-  optional zitadel.settings.field.v1.SetString lastname_label = 5;
-  optional zitadel.settings.field.v1.SetString email_label = 6;
-  optional zitadel.settings.field.v1.SetString username_label = 7;
-  optional zitadel.settings.field.v1.SetString language_label = 8;
-  optional zitadel.settings.field.v1.SetString gender_label = 9;
-  optional zitadel.settings.field.v1.SetString password_label = 10;
-  optional zitadel.settings.field.v1.SetString password_confirm_label = 11;
-  optional zitadel.settings.field.v1.SetString tos_and_privacy_label = 12;
-  optional zitadel.settings.field.v1.SetString tos_confirm = 13;
-  optional zitadel.settings.field.v1.SetString tos_link_text = 14;
-  optional zitadel.settings.field.v1.SetString privacy_confirm = 15;
-  optional zitadel.settings.field.v1.SetString privacy_link_text = 16;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 17;
-  optional zitadel.settings.field.v1.SetStringShort back_button_text = 18;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringLong description_org_register = 3;
+  optional zitadel.settings.object.v1.SetString firstname_label = 4;
+  optional zitadel.settings.object.v1.SetString lastname_label = 5;
+  optional zitadel.settings.object.v1.SetString email_label = 6;
+  optional zitadel.settings.object.v1.SetString username_label = 7;
+  optional zitadel.settings.object.v1.SetString language_label = 8;
+  optional zitadel.settings.object.v1.SetString gender_label = 9;
+  optional zitadel.settings.object.v1.SetString password_label = 10;
+  optional zitadel.settings.object.v1.SetString password_confirm_label = 11;
+  optional zitadel.settings.object.v1.SetString tos_and_privacy_label = 12;
+  optional zitadel.settings.object.v1.SetString tos_confirm = 13;
+  optional zitadel.settings.object.v1.SetString tos_link_text = 14;
+  optional zitadel.settings.object.v1.SetString privacy_confirm = 15;
+  optional zitadel.settings.object.v1.SetString privacy_link_text = 16;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 17;
+  optional zitadel.settings.object.v1.SetStringShort back_button_text = 18;
 }
 
 message SetExternalRegistrationUserOverviewScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString email_label = 3;
-  optional zitadel.settings.field.v1.SetString username_label = 4;
-  optional zitadel.settings.field.v1.SetString firstname_label = 5;
-  optional zitadel.settings.field.v1.SetString lastname_label = 6;
-  optional zitadel.settings.field.v1.SetString nickname_label = 7;
-  optional zitadel.settings.field.v1.SetString language_label = 8;
-  optional zitadel.settings.field.v1.SetString phone_label = 9;
-  optional zitadel.settings.field.v1.SetString tos_and_privacy_label = 10;
-  optional zitadel.settings.field.v1.SetString tos_confirm = 11;
-  optional zitadel.settings.field.v1.SetString tos_link_text = 12;
-  optional zitadel.settings.field.v1.SetString privacy_link_text = 13;
-  optional zitadel.settings.field.v1.SetStringShort back_button_text = 14;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 15;
-  optional zitadel.settings.field.v1.SetString privacy_confirm = 16;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString email_label = 3;
+  optional zitadel.settings.object.v1.SetString username_label = 4;
+  optional zitadel.settings.object.v1.SetString firstname_label = 5;
+  optional zitadel.settings.object.v1.SetString lastname_label = 6;
+  optional zitadel.settings.object.v1.SetString nickname_label = 7;
+  optional zitadel.settings.object.v1.SetString language_label = 8;
+  optional zitadel.settings.object.v1.SetString phone_label = 9;
+  optional zitadel.settings.object.v1.SetString tos_and_privacy_label = 10;
+  optional zitadel.settings.object.v1.SetString tos_confirm = 11;
+  optional zitadel.settings.object.v1.SetString tos_link_text = 12;
+  optional zitadel.settings.object.v1.SetString privacy_link_text = 13;
+  optional zitadel.settings.object.v1.SetStringShort back_button_text = 14;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 15;
+  optional zitadel.settings.object.v1.SetString privacy_confirm = 16;
 }
 
 message SetRegistrationOrgScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString orgname_label = 3;
-  optional zitadel.settings.field.v1.SetString firstname_label = 4;
-  optional zitadel.settings.field.v1.SetString lastname_label = 5;
-  optional zitadel.settings.field.v1.SetString username_label = 6;
-  optional zitadel.settings.field.v1.SetString email_label = 7;
-  optional zitadel.settings.field.v1.SetString password_label = 8;
-  optional zitadel.settings.field.v1.SetString password_confirm_label = 9;
-  optional zitadel.settings.field.v1.SetString tos_and_privacy_label = 10;
-  optional zitadel.settings.field.v1.SetString tos_confirm = 11;
-  optional zitadel.settings.field.v1.SetString tos_link_text = 12;
-  optional zitadel.settings.field.v1.SetString privacy_confirm = 13;
-  optional zitadel.settings.field.v1.SetString privacy_link_text = 14;
-  optional zitadel.settings.field.v1.SetStringShort save_button_text = 15;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString orgname_label = 3;
+  optional zitadel.settings.object.v1.SetString firstname_label = 4;
+  optional zitadel.settings.object.v1.SetString lastname_label = 5;
+  optional zitadel.settings.object.v1.SetString username_label = 6;
+  optional zitadel.settings.object.v1.SetString email_label = 7;
+  optional zitadel.settings.object.v1.SetString password_label = 8;
+  optional zitadel.settings.object.v1.SetString password_confirm_label = 9;
+  optional zitadel.settings.object.v1.SetString tos_and_privacy_label = 10;
+  optional zitadel.settings.object.v1.SetString tos_confirm = 11;
+  optional zitadel.settings.object.v1.SetString tos_link_text = 12;
+  optional zitadel.settings.object.v1.SetString privacy_confirm = 13;
+  optional zitadel.settings.object.v1.SetString privacy_link_text = 14;
+  optional zitadel.settings.object.v1.SetStringShort save_button_text = 15;
 }
 
 message SetLinkingUserPromptScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort link_button_text = 3;
-  optional zitadel.settings.field.v1.SetStringShort other_button_text = 4;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort link_button_text = 3;
+  optional zitadel.settings.object.v1.SetStringShort other_button_text = 4;
 }
 
 message SetLinkingUserDoneScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort cancel_button_text = 3;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 4;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort cancel_button_text = 3;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 4;
 }
 
 message SetExternalUserNotFoundScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort link_button_text = 3;
-  optional zitadel.settings.field.v1.SetStringShort auto_register_button_text = 4;
-  optional zitadel.settings.field.v1.SetString tos_and_privacy_label = 5;
-  optional zitadel.settings.field.v1.SetString tos_confirm = 6;
-  optional zitadel.settings.field.v1.SetString tos_link_text = 7;
-  optional zitadel.settings.field.v1.SetString privacy_link_text = 8;
-  optional zitadel.settings.field.v1.SetString privacy_confirm = 9;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort link_button_text = 3;
+  optional zitadel.settings.object.v1.SetStringShort auto_register_button_text = 4;
+  optional zitadel.settings.object.v1.SetString tos_and_privacy_label = 5;
+  optional zitadel.settings.object.v1.SetString tos_confirm = 6;
+  optional zitadel.settings.object.v1.SetString tos_link_text = 7;
+  optional zitadel.settings.object.v1.SetString privacy_link_text = 8;
+  optional zitadel.settings.object.v1.SetString privacy_confirm = 9;
 }
 
 message SetSuccessLoginScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetString title = 1;
   // Text to describe that auto-redirect should happen after successful login
-  optional zitadel.settings.field.v1.SetStringLong auto_redirect_description = 2;
+  optional zitadel.settings.object.v1.SetStringLong auto_redirect_description = 2;
   // Text to describe that the window can be closed after redirect
-  optional zitadel.settings.field.v1.SetStringShort redirected_description = 3;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 4;
+  optional zitadel.settings.object.v1.SetStringShort redirected_description = 3;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 4;
 }
 
 message SetLogoutDoneScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort login_button_text = 3;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort login_button_text = 3;
 }
 
 message SetFooterText {
-  optional zitadel.settings.field.v1.SetString tos = 1;
-  optional zitadel.settings.field.v1.SetString privacy_policy = 2;
-  optional zitadel.settings.field.v1.SetString help = 3;
-  optional zitadel.settings.field.v1.SetString support_email = 4;
+  optional zitadel.settings.object.v1.SetString tos = 1;
+  optional zitadel.settings.object.v1.SetString privacy_policy = 2;
+  optional zitadel.settings.object.v1.SetString help = 3;
+  optional zitadel.settings.object.v1.SetString support_email = 4;
 }
 
 message SetPasswordlessPromptScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringLong description_init = 3;
-  optional zitadel.settings.field.v1.SetStringShort passwordless_button_text = 4;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 5;
-  optional zitadel.settings.field.v1.SetStringShort skip_button_text = 6;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringLong description_init = 3;
+  optional zitadel.settings.object.v1.SetStringShort passwordless_button_text = 4;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 5;
+  optional zitadel.settings.object.v1.SetStringShort skip_button_text = 6;
 }
 
 message SetPasswordlessRegistrationScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetString token_name_label = 3;
-  optional zitadel.settings.field.v1.SetStringLong not_supported = 4;
-  optional zitadel.settings.field.v1.SetStringShort register_token_button_text = 5;
-  optional zitadel.settings.field.v1.SetStringLong error_retry = 6;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetString token_name_label = 3;
+  optional zitadel.settings.object.v1.SetStringLong not_supported = 4;
+  optional zitadel.settings.object.v1.SetStringShort register_token_button_text = 5;
+  optional zitadel.settings.object.v1.SetStringLong error_retry = 6;
 }
 
 message SetPasswordlessRegistrationDoneScreenText {
-  optional zitadel.settings.field.v1.SetString title = 1;
-  optional zitadel.settings.field.v1.SetStringLong description = 2;
-  optional zitadel.settings.field.v1.SetStringShort next_button_text = 3;
-  optional zitadel.settings.field.v1.SetStringShort cancel_button_text = 4;
-  optional zitadel.settings.field.v1.SetStringShort description_close = 5;
+  optional zitadel.settings.object.v1.SetString title = 1;
+  optional zitadel.settings.object.v1.SetStringLong description = 2;
+  optional zitadel.settings.object.v1.SetStringShort next_button_text = 3;
+  optional zitadel.settings.object.v1.SetStringShort cancel_button_text = 4;
+  optional zitadel.settings.object.v1.SetStringShort description_close = 5;
 }
 
 message ResolvedAccountScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString title_linking_process = 3;
-  optional zitadel.settings.field.v1.ResolvedString description_linking_process = 4;
-  optional zitadel.settings.field.v1.ResolvedString other_user = 5;
-  optional zitadel.settings.field.v1.ResolvedString session_state_active = 6;
-  optional zitadel.settings.field.v1.ResolvedString session_state_inactive = 7;
-  optional zitadel.settings.field.v1.ResolvedString user_must_be_member_of_org = 8;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString title_linking_process = 3;
+  optional zitadel.settings.object.v1.ResolvedString description_linking_process = 4;
+  optional zitadel.settings.object.v1.ResolvedString other_user = 5;
+  optional zitadel.settings.object.v1.ResolvedString session_state_active = 6;
+  optional zitadel.settings.object.v1.ResolvedString session_state_inactive = 7;
+  optional zitadel.settings.object.v1.ResolvedString user_must_be_member_of_org = 8;
 }
 
 message ResolvedLoginScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString title_linking_process = 3;
-  optional zitadel.settings.field.v1.ResolvedString description_linking_process = 4;
-  optional zitadel.settings.field.v1.ResolvedString user_must_be_member_of_org = 5;
-  optional zitadel.settings.field.v1.ResolvedString login_name_label = 6;
-  optional zitadel.settings.field.v1.ResolvedString register_button_text = 7;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 8;
-  optional zitadel.settings.field.v1.ResolvedString external_user_description = 9;
-  optional zitadel.settings.field.v1.ResolvedString user_name_placeholder = 10;
-  optional zitadel.settings.field.v1.ResolvedString login_name_placeholder = 11;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString title_linking_process = 3;
+  optional zitadel.settings.object.v1.ResolvedString description_linking_process = 4;
+  optional zitadel.settings.object.v1.ResolvedString user_must_be_member_of_org = 5;
+  optional zitadel.settings.object.v1.ResolvedString login_name_label = 6;
+  optional zitadel.settings.object.v1.ResolvedString register_button_text = 7;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 8;
+  optional zitadel.settings.object.v1.ResolvedString external_user_description = 9;
+  optional zitadel.settings.object.v1.ResolvedString user_name_placeholder = 10;
+  optional zitadel.settings.object.v1.ResolvedString login_name_placeholder = 11;
 }
 
 message ResolvedPasswordScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString password_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString reset_link_text = 4;
-  optional zitadel.settings.field.v1.ResolvedString back_button_text = 5;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 6;
-  optional zitadel.settings.field.v1.ResolvedString min_length = 7;
-  optional zitadel.settings.field.v1.ResolvedString has_uppercase = 8;
-  optional zitadel.settings.field.v1.ResolvedString has_lowercase = 9;
-  optional zitadel.settings.field.v1.ResolvedString has_number = 10;
-  optional zitadel.settings.field.v1.ResolvedString has_symbol = 11;
-  optional zitadel.settings.field.v1.ResolvedString confirmation = 12;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString password_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString reset_link_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString back_button_text = 5;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 6;
+  optional zitadel.settings.object.v1.ResolvedString min_length = 7;
+  optional zitadel.settings.object.v1.ResolvedString has_uppercase = 8;
+  optional zitadel.settings.object.v1.ResolvedString has_lowercase = 9;
+  optional zitadel.settings.object.v1.ResolvedString has_number = 10;
+  optional zitadel.settings.object.v1.ResolvedString has_symbol = 11;
+  optional zitadel.settings.object.v1.ResolvedString confirmation = 12;
 }
 
 message ResolvedUsernameChangeScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString username_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString cancel_button_text = 4;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 5;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString username_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString cancel_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 5;
 }
 
 message ResolvedUsernameChangeDoneScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 3;
 }
 
 message ResolvedInitPasswordScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString code_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString new_password_label = 4;
-  optional zitadel.settings.field.v1.ResolvedString new_password_confirm_label = 5;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 6;
-  optional zitadel.settings.field.v1.ResolvedString resend_button_text = 7;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString code_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString new_password_label = 4;
+  optional zitadel.settings.object.v1.ResolvedString new_password_confirm_label = 5;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 6;
+  optional zitadel.settings.object.v1.ResolvedString resend_button_text = 7;
 }
 
 message ResolvedInitPasswordDoneScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString cancel_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString cancel_button_text = 4;
 }
 
 message ResolvedEmailVerificationScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString code_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 4;
-  optional zitadel.settings.field.v1.ResolvedString resend_button_text = 5;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString code_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString resend_button_text = 5;
 }
 
 message ResolvedEmailVerificationDoneScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString cancel_button_text = 4;
-  optional zitadel.settings.field.v1.ResolvedString login_button_text = 5;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString cancel_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString login_button_text = 5;
 }
 
 message ResolvedInitializeUserScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString code_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString new_password_label = 4;
-  optional zitadel.settings.field.v1.ResolvedString new_password_confirm_label = 5;
-  optional zitadel.settings.field.v1.ResolvedString resend_button_text = 6;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 7;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString code_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString new_password_label = 4;
+  optional zitadel.settings.object.v1.ResolvedString new_password_confirm_label = 5;
+  optional zitadel.settings.object.v1.ResolvedString resend_button_text = 6;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 7;
 }
 
 message ResolvedInitializeUserDoneScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString cancel_button_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString cancel_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 4;
 }
 
 message ResolvedInitMFAPromptScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString otp_option = 3;
-  optional zitadel.settings.field.v1.ResolvedString u2f_option = 4;
-  optional zitadel.settings.field.v1.ResolvedString skip_button_text = 5;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 6;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString otp_option = 3;
+  optional zitadel.settings.object.v1.ResolvedString u2f_option = 4;
+  optional zitadel.settings.object.v1.ResolvedString skip_button_text = 5;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 6;
 }
 
 message ResolvedInitMFAOTPScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString description_otp = 3;
-  optional zitadel.settings.field.v1.ResolvedString secret_label = 4;
-  optional zitadel.settings.field.v1.ResolvedString code_label = 5;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 6;
-  optional zitadel.settings.field.v1.ResolvedString cancel_button_text = 7;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString description_otp = 3;
+  optional zitadel.settings.object.v1.ResolvedString secret_label = 4;
+  optional zitadel.settings.object.v1.ResolvedString code_label = 5;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 6;
+  optional zitadel.settings.object.v1.ResolvedString cancel_button_text = 7;
 }
 
 message ResolvedInitMFAU2FScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString token_name_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString not_supported = 4;
-  optional zitadel.settings.field.v1.ResolvedString register_token_button_text = 5;
-  optional zitadel.settings.field.v1.ResolvedString error_retry = 6;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString token_name_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString not_supported = 4;
+  optional zitadel.settings.object.v1.ResolvedString register_token_button_text = 5;
+  optional zitadel.settings.object.v1.ResolvedString error_retry = 6;
 }
 
 message ResolvedInitMFADoneScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString cancel_button_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString cancel_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 4;
 }
 
 message ResolvedMFAProvidersText {
-  optional zitadel.settings.field.v1.ResolvedString choose_other = 1;
-  optional zitadel.settings.field.v1.ResolvedString otp = 2;
-  optional zitadel.settings.field.v1.ResolvedString u2f = 3;
+  optional zitadel.settings.object.v1.ResolvedString choose_other = 1;
+  optional zitadel.settings.object.v1.ResolvedString otp = 2;
+  optional zitadel.settings.object.v1.ResolvedString u2f = 3;
 }
 
 message ResolvedVerifyMFAOTPScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString code_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString code_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 4;
 }
 
 message ResolvedVerifyMFAU2FScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString validate_token_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString not_supported = 4;
-  optional zitadel.settings.field.v1.ResolvedString error_retry = 5;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString validate_token_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString not_supported = 4;
+  optional zitadel.settings.object.v1.ResolvedString error_retry = 5;
 }
 
 message ResolvedPasswordlessScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString login_with_pw_button_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString validate_token_button_text = 4;
-  optional zitadel.settings.field.v1.ResolvedString not_supported = 5;
-  optional zitadel.settings.field.v1.ResolvedString error_retry = 6;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString login_with_pw_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString validate_token_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString not_supported = 5;
+  optional zitadel.settings.object.v1.ResolvedString error_retry = 6;
 }
 
 message ResolvedPasswordChangeScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString old_password_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString new_password_label = 4;
-  optional zitadel.settings.field.v1.ResolvedString new_password_confirm_label = 5;
-  optional zitadel.settings.field.v1.ResolvedString cancel_button_text = 6;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 7;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString old_password_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString new_password_label = 4;
+  optional zitadel.settings.object.v1.ResolvedString new_password_confirm_label = 5;
+  optional zitadel.settings.object.v1.ResolvedString cancel_button_text = 6;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 7;
 }
 
 message ResolvedPasswordChangeDoneScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 3;
 }
 
 message ResolvedPasswordResetDoneScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 3;
 }
 
 message ResolvedRegistrationOptionScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString user_name_button_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString external_login_description = 4;
-  optional zitadel.settings.field.v1.ResolvedString login_button_text = 5;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString user_name_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString external_login_description = 4;
+  optional zitadel.settings.object.v1.ResolvedString login_button_text = 5;
 }
 
 message ResolvedRegistrationUserScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString description_org_register = 3;
-  optional zitadel.settings.field.v1.ResolvedString firstname_label = 4;
-  optional zitadel.settings.field.v1.ResolvedString lastname_label = 5;
-  optional zitadel.settings.field.v1.ResolvedString email_label = 6;
-  optional zitadel.settings.field.v1.ResolvedString username_label = 7;
-  optional zitadel.settings.field.v1.ResolvedString language_label = 8;
-  optional zitadel.settings.field.v1.ResolvedString gender_label = 9;
-  optional zitadel.settings.field.v1.ResolvedString password_label = 10;
-  optional zitadel.settings.field.v1.ResolvedString password_confirm_label = 11;
-  optional zitadel.settings.field.v1.ResolvedString tos_and_privacy_label = 12;
-  optional zitadel.settings.field.v1.ResolvedString tos_confirm = 13;
-  optional zitadel.settings.field.v1.ResolvedString tos_link_text = 14;
-  optional zitadel.settings.field.v1.ResolvedString privacy_confirm = 15;
-  optional zitadel.settings.field.v1.ResolvedString privacy_link_text = 16;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 17;
-  optional zitadel.settings.field.v1.ResolvedString back_button_text = 18;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString description_org_register = 3;
+  optional zitadel.settings.object.v1.ResolvedString firstname_label = 4;
+  optional zitadel.settings.object.v1.ResolvedString lastname_label = 5;
+  optional zitadel.settings.object.v1.ResolvedString email_label = 6;
+  optional zitadel.settings.object.v1.ResolvedString username_label = 7;
+  optional zitadel.settings.object.v1.ResolvedString language_label = 8;
+  optional zitadel.settings.object.v1.ResolvedString gender_label = 9;
+  optional zitadel.settings.object.v1.ResolvedString password_label = 10;
+  optional zitadel.settings.object.v1.ResolvedString password_confirm_label = 11;
+  optional zitadel.settings.object.v1.ResolvedString tos_and_privacy_label = 12;
+  optional zitadel.settings.object.v1.ResolvedString tos_confirm = 13;
+  optional zitadel.settings.object.v1.ResolvedString tos_link_text = 14;
+  optional zitadel.settings.object.v1.ResolvedString privacy_confirm = 15;
+  optional zitadel.settings.object.v1.ResolvedString privacy_link_text = 16;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 17;
+  optional zitadel.settings.object.v1.ResolvedString back_button_text = 18;
 }
 
 message ResolvedExternalRegistrationUserOverviewScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString email_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString username_label = 4;
-  optional zitadel.settings.field.v1.ResolvedString firstname_label = 5;
-  optional zitadel.settings.field.v1.ResolvedString lastname_label = 6;
-  optional zitadel.settings.field.v1.ResolvedString nickname_label = 7;
-  optional zitadel.settings.field.v1.ResolvedString language_label = 8;
-  optional zitadel.settings.field.v1.ResolvedString phone_label = 9;
-  optional zitadel.settings.field.v1.ResolvedString tos_and_privacy_label = 10;
-  optional zitadel.settings.field.v1.ResolvedString tos_confirm = 11;
-  optional zitadel.settings.field.v1.ResolvedString tos_link_text = 12;
-  optional zitadel.settings.field.v1.ResolvedString privacy_link_text = 13;
-  optional zitadel.settings.field.v1.ResolvedString back_button_text = 14;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 15;
-  optional zitadel.settings.field.v1.ResolvedString privacy_confirm = 16;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString email_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString username_label = 4;
+  optional zitadel.settings.object.v1.ResolvedString firstname_label = 5;
+  optional zitadel.settings.object.v1.ResolvedString lastname_label = 6;
+  optional zitadel.settings.object.v1.ResolvedString nickname_label = 7;
+  optional zitadel.settings.object.v1.ResolvedString language_label = 8;
+  optional zitadel.settings.object.v1.ResolvedString phone_label = 9;
+  optional zitadel.settings.object.v1.ResolvedString tos_and_privacy_label = 10;
+  optional zitadel.settings.object.v1.ResolvedString tos_confirm = 11;
+  optional zitadel.settings.object.v1.ResolvedString tos_link_text = 12;
+  optional zitadel.settings.object.v1.ResolvedString privacy_link_text = 13;
+  optional zitadel.settings.object.v1.ResolvedString back_button_text = 14;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 15;
+  optional zitadel.settings.object.v1.ResolvedString privacy_confirm = 16;
 }
 
 message ResolvedRegistrationOrgScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString orgname_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString firstname_label = 4;
-  optional zitadel.settings.field.v1.ResolvedString lastname_label = 5;
-  optional zitadel.settings.field.v1.ResolvedString username_label = 6;
-  optional zitadel.settings.field.v1.ResolvedString email_label = 7;
-  optional zitadel.settings.field.v1.ResolvedString password_label = 8;
-  optional zitadel.settings.field.v1.ResolvedString password_confirm_label = 9;
-  optional zitadel.settings.field.v1.ResolvedString tos_and_privacy_label = 10;
-  optional zitadel.settings.field.v1.ResolvedString tos_confirm = 11;
-  optional zitadel.settings.field.v1.ResolvedString tos_link_text = 12;
-  optional zitadel.settings.field.v1.ResolvedString privacy_confirm = 13;
-  optional zitadel.settings.field.v1.ResolvedString privacy_link_text = 14;
-  optional zitadel.settings.field.v1.ResolvedString save_button_text = 15;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString orgname_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString firstname_label = 4;
+  optional zitadel.settings.object.v1.ResolvedString lastname_label = 5;
+  optional zitadel.settings.object.v1.ResolvedString username_label = 6;
+  optional zitadel.settings.object.v1.ResolvedString email_label = 7;
+  optional zitadel.settings.object.v1.ResolvedString password_label = 8;
+  optional zitadel.settings.object.v1.ResolvedString password_confirm_label = 9;
+  optional zitadel.settings.object.v1.ResolvedString tos_and_privacy_label = 10;
+  optional zitadel.settings.object.v1.ResolvedString tos_confirm = 11;
+  optional zitadel.settings.object.v1.ResolvedString tos_link_text = 12;
+  optional zitadel.settings.object.v1.ResolvedString privacy_confirm = 13;
+  optional zitadel.settings.object.v1.ResolvedString privacy_link_text = 14;
+  optional zitadel.settings.object.v1.ResolvedString save_button_text = 15;
 }
 
 message ResolvedLinkingUserPromptScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString link_button_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString other_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString link_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString other_button_text = 4;
 }
 
 message ResolvedLinkingUserDoneScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString cancel_button_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString cancel_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 4;
 }
 
 message ResolvedExternalUserNotFoundScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString link_button_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString auto_register_button_text = 4;
-  optional zitadel.settings.field.v1.ResolvedString tos_and_privacy_label = 5;
-  optional zitadel.settings.field.v1.ResolvedString tos_confirm = 6;
-  optional zitadel.settings.field.v1.ResolvedString tos_link_text = 7;
-  optional zitadel.settings.field.v1.ResolvedString privacy_link_text = 8;
-  optional zitadel.settings.field.v1.ResolvedString privacy_confirm = 9;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString link_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString auto_register_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString tos_and_privacy_label = 5;
+  optional zitadel.settings.object.v1.ResolvedString tos_confirm = 6;
+  optional zitadel.settings.object.v1.ResolvedString tos_link_text = 7;
+  optional zitadel.settings.object.v1.ResolvedString privacy_link_text = 8;
+  optional zitadel.settings.object.v1.ResolvedString privacy_confirm = 9;
 }
 
 message ResolvedSuccessLoginScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
   // Text to describe that auto-redirect should happen after successful login
-  optional zitadel.settings.field.v1.ResolvedString auto_redirect_description = 2;
+  optional zitadel.settings.object.v1.ResolvedString auto_redirect_description = 2;
   // Text to describe that the window can be closed after redirect
-  optional zitadel.settings.field.v1.ResolvedString redirected_description = 3;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString redirected_description = 3;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 4;
 }
 
 message ResolvedLogoutDoneScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString login_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString login_button_text = 3;
 }
 
 message ResolvedFooterText {
-  optional zitadel.settings.field.v1.ResolvedString tos = 1;
-  optional zitadel.settings.field.v1.ResolvedString privacy_policy = 2;
-  optional zitadel.settings.field.v1.ResolvedString help = 3;
-  optional zitadel.settings.field.v1.ResolvedString support_email = 4;
+  optional zitadel.settings.object.v1.ResolvedString tos = 1;
+  optional zitadel.settings.object.v1.ResolvedString privacy_policy = 2;
+  optional zitadel.settings.object.v1.ResolvedString help = 3;
+  optional zitadel.settings.object.v1.ResolvedString support_email = 4;
 }
 
 message ResolvedPasswordlessPromptScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString description_init = 3;
-  optional zitadel.settings.field.v1.ResolvedString passwordless_button_text = 4;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 5;
-  optional zitadel.settings.field.v1.ResolvedString skip_button_text = 6;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString description_init = 3;
+  optional zitadel.settings.object.v1.ResolvedString passwordless_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 5;
+  optional zitadel.settings.object.v1.ResolvedString skip_button_text = 6;
 }
 
 message ResolvedPasswordlessRegistrationScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString token_name_label = 3;
-  optional zitadel.settings.field.v1.ResolvedString not_supported = 4;
-  optional zitadel.settings.field.v1.ResolvedString register_token_button_text = 5;
-  optional zitadel.settings.field.v1.ResolvedString error_retry = 6;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString token_name_label = 3;
+  optional zitadel.settings.object.v1.ResolvedString not_supported = 4;
+  optional zitadel.settings.object.v1.ResolvedString register_token_button_text = 5;
+  optional zitadel.settings.object.v1.ResolvedString error_retry = 6;
 }
 
 message ResolvedPasswordlessRegistrationDoneScreenText {
-  optional zitadel.settings.field.v1.ResolvedString title = 1;
-  optional zitadel.settings.field.v1.ResolvedString description = 2;
-  optional zitadel.settings.field.v1.ResolvedString next_button_text = 3;
-  optional zitadel.settings.field.v1.ResolvedString cancel_button_text = 4;
-  optional zitadel.settings.field.v1.ResolvedString description_close = 5;
+  optional zitadel.settings.object.v1.ResolvedString title = 1;
+  optional zitadel.settings.object.v1.ResolvedString description = 2;
+  optional zitadel.settings.object.v1.ResolvedString next_button_text = 3;
+  optional zitadel.settings.object.v1.ResolvedString cancel_button_text = 4;
+  optional zitadel.settings.object.v1.ResolvedString description_close = 5;
 }

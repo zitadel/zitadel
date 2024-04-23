@@ -8,7 +8,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 import "zitadel/object/v2/object.proto";
 import "zitadel/settings/template/v2/template.proto";
-import "zitadel/settings/field/v1/field.proto";
+import "zitadel/settings/object/v1/field.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -189,9 +189,9 @@ service TemplateService {
 
 message SetHTMLTemplateRequest{
   optional zitadel.object.v2.RequestContext ctx = 1;
-  optional settings.field.v1.Language language = 2;
+  optional settings.object.v1.Language language = 2;
   HTMLTemplateType type = 3;
-  settings.field.v1.SetString template = 4;
+  settings.object.v1.SetString template = 4;
 }
 
 message SetHTMLTemplateResponse{
@@ -200,20 +200,20 @@ message SetHTMLTemplateResponse{
 
 message ResolveHTMLTemplateRequest{
   optional zitadel.object.v2.RequestContext ctx = 1;
-  optional settings.field.v1.Language language = 2;
+  optional settings.object.v1.Language language = 2;
   HTMLTemplateType type = 3;
 }
 
 message ResolveHTMLTemplateResponse{
   zitadel.object.v2.Details details = 1;
-  settings.field.v1.ResolvedString template = 2;
+  settings.object.v1.ResolvedString template = 2;
 }
 
 message SetTextTemplateRequest{
   optional zitadel.object.v2.RequestContext ctx = 1;
-  optional settings.field.v1.Language language = 2;
+  optional settings.object.v1.Language language = 2;
   TextTemplateType type = 3;
-  settings.field.v1.SetString template = 4;
+  settings.object.v1.SetString template = 4;
 }
 
 message SetTextTemplateResponse{
@@ -222,11 +222,11 @@ message SetTextTemplateResponse{
 
 message ResolveTextTemplateRequest{
   optional zitadel.object.v2.RequestContext ctx = 1;
-  optional settings.field.v1.Language language = 2;
+  optional settings.object.v1.Language language = 2;
   TextTemplateType type = 3;
 }
 
 message ResolveTextTemplateResponse{
   zitadel.object.v2.Details details = 1;
-  settings.field.v1.ResolvedString template = 2;
+  settings.object.v1.ResolvedString template = 2;
 }

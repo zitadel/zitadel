@@ -7,7 +7,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/object/v2/object.proto";
-import "zitadel/settings/field/v1/field.proto";
+import "zitadel/settings/object/v1/field.proto";
 import "google/protobuf/field_mask.proto";
 
 import "zitadel/settings/defaultlogin/v2/branding_settings.proto";
@@ -326,7 +326,7 @@ message SetLockoutSettingsRequest {
 
 message SetTextSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
-  optional settings.field.v1.Language language = 2;
+  optional zitadel.settings.object.v1.Language language = 2;
   SetTextSettings settings = 3;
 }
 
@@ -384,7 +384,7 @@ message ResolveLockoutSettingsRequest {
 
 message ResolveTextSettingsRequest {
   zitadel.object.v2.RequestContext ctx = 1;
-  optional settings.field.v1.Language language = 2;
+  optional zitadel.settings.object.v1.Language language = 2;
 }
 
 message ResolveLoginSettingsResponse {

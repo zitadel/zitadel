@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.settings.field.v1;
+package zitadel.settings.object.v1;
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/field/v1;field";
 
