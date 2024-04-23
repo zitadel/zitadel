@@ -200,7 +200,6 @@ func (repo *AuthRequestRepo) AuthRequestByCode(ctx context.Context, code string)
 	if err != nil {
 		return nil, err
 	}
-	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	steps, err := repo.nextSteps(ctx, request, true)
 	if err != nil {
 		return nil, err
@@ -626,7 +625,6 @@ func (repo *AuthRequestRepo) getAuthRequest(ctx context.Context, id, userAgentID
 	if err != nil {
 		return nil, err
 	}
-	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return request, nil
 }
 
@@ -664,7 +662,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 			return err
 		}
 		request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
-		if idpProviders != nil {
+		if len(idpProviders) > 0 {
 			request.AllowedExternalIDPs = idpProviders
 		}
 	}
@@ -703,6 +701,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		}
 		request.OrgTranslations = orgLoginTranslations
 	}
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return nil
 }
 
@@ -813,9 +812,9 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 	if err = repo.fillPolicies(ctx, request); err != nil {
 		return false, err
 	}
-	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	request.LoginHint = loginName
 	request.Prompt = append(request.Prompt, domain.PromptCreate) // to trigger registration
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return true, nil
 }
 
@@ -887,22 +886,28 @@ func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(ctx context.Con
 	return nil, err
 }
 
-func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, resourceOwner string) error {
-	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, resourceOwner)
-	if err != nil {
-		return err
+func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, resourceOwner string) (err error) {
+	var identityProviders []*domain.IDPProvider
+
+	if request.LoginPolicy == nil {
+		loginPolicy, idps, err := repo.getLoginPolicyAndIDPProviders(ctx, resourceOwner)
+		if err != nil {
+			return err
+		}
+		request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
+		identityProviders = idps
 	}
-	if len(request.LinkingUsers) != 0 && !loginPolicy.AllowExternalIDPs {
+	if len(request.LinkingUsers) != 0 && !request.LoginPolicy.AllowExternalIDP {
 		return zerrors.ThrowInvalidArgument(nil, "LOGIN-s9sio", "Errors.User.NotAllowedToLink")
 	}
 	if len(request.LinkingUsers) != 0 {
-		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, idpProviders)
+		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, identityProviders)
 		if !exists {
 			return zerrors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
 		}
 	}
-	request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
-	request.AllowedExternalIDPs = idpProviders
+	request.AllowedExternalIDPs = identityProviders
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return nil
 }
 
@@ -1140,7 +1145,6 @@ func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.
 		if err = repo.fillPolicies(ctx, request); err != nil {
 			return nil, err
 		}
-		repo.AuthRequests.CacheAuthRequest(ctx, request)
 		if err = repo.AuthRequests.UpdateAuthRequest(ctx, request); err != nil {
 			return nil, err
 		}
