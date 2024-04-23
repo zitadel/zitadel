@@ -25,11 +25,11 @@ func TestExecutionProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						exec.SetEventType,
+						exec.SetEventV2Type,
 						exec.AggregateType,
 						[]byte(`{"targets": [{"type":2,"target":"target"},{"type":1,"target":"include"}]}`),
 					),
-					eventstore.GenericEventMapper[exec.SetEvent],
+					eventstore.GenericEventMapper[exec.SetEventV2],
 				),
 			},
 			reduce: (&executionProjection{}).reduceExecutionSet,

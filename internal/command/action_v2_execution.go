@@ -233,7 +233,7 @@ func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resource
 		return nil, err
 	}
 
-	if err := c.pushAppendAndReduce(ctx, wm, execution.NewSetEvent(
+	if err := c.pushAppendAndReduce(ctx, wm, execution.NewSetEventV2(
 		ctx,
 		ExecutionAggregateFromWriteModel(&wm.WriteModel),
 		set.Targets,

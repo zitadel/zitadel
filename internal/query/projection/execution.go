@@ -71,7 +71,7 @@ func (p *executionProjection) Reducers() []handler.AggregateReducer {
 			Aggregate: exec.AggregateType,
 			EventReducers: []handler.EventReducer{
 				{
-					Event:  exec.SetEventType,
+					Event:  exec.SetEventV2Type,
 					Reduce: p.reduceExecutionSet,
 				},
 				{
@@ -93,7 +93,7 @@ func (p *executionProjection) Reducers() []handler.AggregateReducer {
 }
 
 func (p *executionProjection) reduceExecutionSet(event eventstore.Event) (*handler.Statement, error) {
-	e, err := assertEvent[*exec.SetEvent](event)
+	e, err := assertEvent[*exec.SetEventV2](event)
 	if err != nil {
 		return nil, err
 	}

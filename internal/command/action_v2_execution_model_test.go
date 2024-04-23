@@ -33,7 +33,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -56,7 +56,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -70,7 +70,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -98,7 +98,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -121,7 +121,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -149,7 +149,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -158,7 +158,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -167,7 +167,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -191,7 +191,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -200,7 +200,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -214,7 +214,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -237,7 +237,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -246,7 +246,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -260,7 +260,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -283,7 +283,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -292,7 +292,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -301,7 +301,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -334,7 +334,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -343,7 +343,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -352,7 +352,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -375,7 +375,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -389,7 +389,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -398,7 +398,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -432,7 +432,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -446,7 +446,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -455,7 +455,7 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},

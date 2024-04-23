@@ -195,7 +195,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("request/method", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -242,7 +242,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("request/service", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -289,7 +289,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("request", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -350,7 +350,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("request/include", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -359,7 +359,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("request/method", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeInclude, Target: "request/include"},
@@ -421,7 +421,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("request/include", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -430,7 +430,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("request/service", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeInclude, Target: "request/include"},
@@ -491,7 +491,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("request/include", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -500,7 +500,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("request", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeInclude, Target: "request/include"},
@@ -678,7 +678,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("response/valid", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -771,7 +771,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("response/method", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -809,7 +809,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 						targetAddEvent("target", "instance"),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("response/service", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -847,7 +847,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 						targetAddEvent("target", "instance"),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("response", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1018,7 +1018,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("event/valid", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1102,7 +1102,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 						targetAddEvent("target", "instance"),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("event/event", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1140,7 +1140,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 						targetAddEvent("target", "instance"),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("event/group.*", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1178,7 +1178,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 						targetAddEvent("target", "instance"),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("event", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1322,7 +1322,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 					),
 					expectPushFailed(
 						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("function/function", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1395,7 +1395,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 						targetAddEvent("target", "instance"),
 					),
 					expectPush(
-						execution.NewSetEvent(context.Background(),
+						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("function/function", "instance"),
 							[]*execution.Target{
 								{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1513,7 +1513,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("request/valid", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1568,7 +1568,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("request/method", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1604,7 +1604,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("request/service", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1640,7 +1640,7 @@ func TestCommands_DeleteExecutionRequest(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("request", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1761,7 +1761,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("response/valid", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1816,7 +1816,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("response/method", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1852,7 +1852,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("response/service", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1888,7 +1888,7 @@ func TestCommands_DeleteExecutionResponse(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("response", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -1991,7 +1991,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("event/valid", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -2066,7 +2066,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("event/valid", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -2122,7 +2122,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("event/group", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -2178,7 +2178,7 @@ func TestCommands_DeleteExecutionEvent(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("event", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -2281,7 +2281,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("function/function", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -2328,7 +2328,7 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("function/function", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
