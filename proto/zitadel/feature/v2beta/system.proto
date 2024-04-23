@@ -53,10 +53,10 @@ message SetSystemFeaturesRequest{
     }
   ];
 
-  optional bool improved_org_by_id = 7 [
+  repeated ImprovedPerformance performance_improvements = 7 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Changes execution path of org by id queries to improve performance.";
+      example: "[1]";
+      description: "Improves performance of specified execution paths.";
     }
   ];
 }
@@ -117,10 +117,10 @@ message GetSystemFeaturesResponse {
     }
   ];
 
-  FeatureFlag improved_org_by_id = 8 [
+  ImprovedPerformanceFeatureFlag performance_improvements = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "true";
-      description: "Changes execution path of org by id queries to improve performance.";
+      example: "[1]";
+      description: "Improves performance of specified execution paths.";
     }
   ];
 }

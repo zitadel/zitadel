@@ -14,7 +14,7 @@ type InstanceFeatures struct {
 	UserSchema                      FeatureSource[bool]
 	TokenExchange                   FeatureSource[bool]
 	Actions                         FeatureSource[bool]
-	ImprovedOrgByID                 FeatureSource[bool]
+	ImprovedPerformance             FeatureSource[[]int32]
 }
 
 func (q *Queries) GetInstanceFeatures(ctx context.Context, cascade bool) (_ *InstanceFeatures, err error) {

@@ -52,7 +52,7 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemActionsEventType,
-			feature_v2.SystemImprovedOrgByIDEventType,
+			feature_v2.SystemImprovedPerformanceEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -81,7 +81,7 @@ func (m *SystemFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[
 		m.TokenExchange = &event.Value
 	case feature.KeyActions:
 		m.Actions = &event.Value
-	case feature.KeyImprovedOrgByID:
+	case feature.KeyImprovedPerformance:
 		m.ImprovedOrgByID = &event.Value
 	}
 	return nil
@@ -96,7 +96,7 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.SystemUserSchemaEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.SystemTokenExchangeEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.Actions, f.Actions, feature_v2.SystemActionsEventType)
-	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ImprovedOrgByID, f.ImprovedOrgByID, feature_v2.SystemImprovedOrgByIDEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.ImprovedOrgByID, f.ImprovedOrgByID, feature_v2.SystemImprovedPerformanceEventType)
 	return cmds
 }
 

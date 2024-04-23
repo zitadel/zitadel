@@ -21,7 +21,7 @@ type SystemFeatures struct {
 	UserSchema                      FeatureSource[bool]
 	TokenExchange                   FeatureSource[bool]
 	Actions                         FeatureSource[bool]
-	ImprovedOrgByID                 FeatureSource[bool]
+	ImprovedPerformance             FeatureSource[[]int32]
 }
 
 func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {

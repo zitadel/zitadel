@@ -11,7 +11,7 @@ const (
 	KeyUserSchema
 	KeyTokenExchange
 	KeyActions
-	KeyImprovedOrgByID
+	KeyImprovedPerformance
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -34,5 +34,5 @@ type Features struct {
 	UserSchema                      bool `json:"user_schema,omitempty"`
 	TokenExchange                   bool `json:"token_exchange,omitempty"`
 	Actions                         bool `json:"actions,omitempty"`
-	ImprovedOrgByID                 bool `json:"improved_org_by_id,omitempty"`
+	ImprovedOrgByID                 bool `json:"improved_performance,omitempty"`
 }

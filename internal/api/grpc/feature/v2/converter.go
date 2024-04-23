@@ -29,7 +29,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 		Actions:                             featureSourceToFlagPb(&f.Actions),
-		ImprovedOrgById:                     featureSourceToFlagPb(&f.ImprovedOrgByID),
+		ImprovedOrgById:                     featureSourceToFlagPb(&f.ImprovedPerformance),
 	}
 }
 
@@ -54,7 +54,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 		Actions:                             featureSourceToFlagPb(&f.Actions),
-		ImprovedOrgById:                     featureSourceToFlagPb(&f.ImprovedOrgByID),
+		ImprovedOrgById:                     featureSourceToFlagPb(&f.ImprovedPerformance),
 	}
 }
 

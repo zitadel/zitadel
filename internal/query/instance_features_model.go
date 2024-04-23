@@ -41,6 +41,8 @@ func (m *InstanceFeaturesReadModel) Reduce() (err error) {
 			)
 		case *feature_v2.SetEvent[bool]:
 			err = m.reduceBoolFeature(e)
+		case *feature_v2.SetEvent[[]int32]:
+			err = m.reduceEnumListFeature(e)
 		}
 		if err != nil {
 			return err
@@ -63,7 +65,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceActionsEventType,
-			feature_v2.InstanceImprovedOrgByIDEventType,
+			feature_v2.InstanceImprovedPerformanceEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -72,13 +74,7 @@ func (m *InstanceFeaturesReadModel) reduceReset() {
 	if m.populateFromSystem() {
 		return
 	}
-	m.instance.LoginDefaultOrg = FeatureSource[bool]{}
-	m.instance.TriggerIntrospectionProjections = FeatureSource[bool]{}
-	m.instance.LegacyIntrospection = FeatureSource[bool]{}
-	m.instance.UserSchema = FeatureSource[bool]{}
-	m.instance.TokenExchange = FeatureSource[bool]{}
-	m.instance.Actions = FeatureSource[bool]{}
-	m.instance.ImprovedOrgByID = FeatureSource[bool]{}
+	m.instance = &InstanceFeatures{}
 }
 
 func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
@@ -91,7 +87,7 @@ func (m *InstanceFeaturesReadModel) populateFromSystem() bool {
 	m.instance.UserSchema = m.system.UserSchema
 	m.instance.TokenExchange = m.system.TokenExchange
 	m.instance.Actions = m.system.Actions
-	m.instance.ImprovedOrgByID = m.system.ImprovedOrgByID
+	m.instance.ImprovedPerformance = m.system.ImprovedPerformance
 	return true
 }
 
@@ -117,10 +113,29 @@ func (m *InstanceFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent
 		dst = &m.instance.TokenExchange
 	case feature.KeyActions:
 		dst = &m.instance.Actions
-	case feature.KeyImprovedOrgByID:
-		dst = &m.instance.ImprovedOrgByID
 	}
 	*dst = FeatureSource[bool]{
+		Level: level,
+		Value: event.Value,
+	}
+	return nil
+}
+
+func (m *InstanceFeaturesReadModel) reduceEnumListFeature(event *feature_v2.SetEvent[[]int32]) error {
+	level, key, err := event.FeatureInfo()
+	if err != nil {
+		return err
+	}
+	var dst *FeatureSource[[]int32]
+
+	switch key {
+	case feature.KeyUnspecified:
+		return nil
+	case feature.KeyImprovedPerformance:
+		dst = &m.instance.ImprovedPerformance
+	}
+
+	*dst = FeatureSource[[]int32]{
 		Level: level,
 		Value: event.Value,
 	}

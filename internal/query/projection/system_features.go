@@ -76,8 +76,8 @@ func (*systemFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceSystemSetFeature[bool],
 			},
 			{
-				Event:  feature_v2.SystemImprovedOrgByIDEventType,
-				Reduce: reduceSystemSetFeature[bool],
+				Event:  feature_v2.SystemImprovedPerformanceEventType,
+				Reduce: reduceSystemSetFeature[[]int32],
 			},
 		},
 	}}
