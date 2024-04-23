@@ -26,7 +26,8 @@ func (m *SystemFeatures) isEmpty() bool {
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
 		m.Actions == nil &&
-		len(m.ImprovedPerformance) == 0
+		// nil check to allow unset improvements
+		m.ImprovedPerformance == nil
 }
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {

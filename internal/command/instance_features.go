@@ -29,7 +29,8 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
 		m.Actions == nil &&
-		len(m.ImprovedPerformance) == 0
+		// nil check to allow unset improvements
+		m.ImprovedPerformance == nil
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {
