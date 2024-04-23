@@ -219,5 +219,6 @@ func (stmt *Statement) copyCheck() {
 //go:nocheckptr
 func noescape(p unsafe.Pointer) unsafe.Pointer {
 	x := uintptr(p)
+	//nolint: staticcheck
 	return unsafe.Pointer(x ^ 0)
 }
