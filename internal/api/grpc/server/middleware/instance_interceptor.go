@@ -62,14 +62,15 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 	}
 	instance, err := verifier.InstanceByHost(interceptorCtx, host)
 	if err != nil {
-		err = fmt.Errorf("unable to set instance using origin %s (ExternalDomain is %s): %w", zitadel_http.ComposedOrigin(ctx), externalDomain, err)
+		origin := zitadel_http.ComposedOrigin(ctx)
+		logging.WithFields("origin", origin, "externalDomain", externalDomain).WithError(err).Error("unable to set instance")
 		zErr := new(zerrors.ZitadelError)
 		if errors.As(err, &zErr) {
 			zErr.SetMessage(translator.LocalizeFromCtx(ctx, zErr.GetMessage(), nil))
 			zErr.Parent = err
-			err = zErr
+			return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s): %s", origin, externalDomain, zErr))
 		}
-		return nil, status.Error(codes.NotFound, err.Error())
+		return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}
 	span.End()
 	return handler(authz.WithInstance(ctx, instance), req)
