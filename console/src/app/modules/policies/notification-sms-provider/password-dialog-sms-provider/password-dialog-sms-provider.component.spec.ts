@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { PasswordDialogComponent } from './password-dialog.component';
+import { PasswordDialogComponent } from './password-dialog-sms-provider.component';
 
 describe('PasswordDialogComponent', () => {
   let component: PasswordDialogComponent;

@@ -486,6 +486,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				AuthRequests: func() cache.AuthRequestCache {
 					m := mock.NewMockAuthRequestCache(gomock.NewController(t))
 					m.EXPECT().UpdateAuthRequest(gomock.Any(), gomock.Any())
+					m.EXPECT().CacheAuthRequest(gomock.Any(), gomock.Any())
 					return m
 				}(),
 				userSessionViewProvider: &mockViewUserSession{

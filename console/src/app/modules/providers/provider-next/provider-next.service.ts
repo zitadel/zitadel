@@ -8,7 +8,7 @@ import { AdminService } from '../../../services/admin.service';
 import { IDPOwnerType } from '../../../proto/generated/zitadel/idp_pb';
 import { ToastService } from '../../../services/toast.service';
 import { Data, ParamMap } from '@angular/router';
-import { ActivateIdpService } from '../../../services/activate-idp.service';
+import { LoginPolicyService } from '../../../services/login-policy.service';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
 
 @Injectable({
@@ -18,7 +18,7 @@ export class ProviderNextService {
   constructor(
     private env: EnvironmentService,
     private toast: ToastService,
-    private addIdpSvc: ActivateIdpService,
+    private loginPolicySvc: LoginPolicyService,
     private injector: Injector,
   ) {}
 
@@ -117,7 +117,7 @@ export class ProviderNextService {
           if (!id) {
             throw new Error('No ID');
           }
-          return this.addIdpSvc.activateIdp(
+          return this.loginPolicySvc.activateIdp(
             service,
             id,
             service instanceof AdminService ? IDPOwnerType.IDP_OWNER_TYPE_SYSTEM : IDPOwnerType.IDP_OWNER_TYPE_ORG,

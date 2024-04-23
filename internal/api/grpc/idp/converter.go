@@ -274,6 +274,20 @@ func OptionsToCommand(options *idp_pb.Options) idp.Options {
 		IsLinkingAllowed:  options.IsLinkingAllowed,
 		IsAutoCreation:    options.IsAutoCreation,
 		IsAutoUpdate:      options.IsAutoUpdate,
+		AutoLinkingOption: autoLinkingOptionToCommand(options.AutoLinking),
+	}
+}
+
+func autoLinkingOptionToCommand(linking idp_pb.AutoLinkingOption) domain.AutoLinkingOption {
+	switch linking {
+	case idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME:
+		return domain.AutoLinkingOptionUsername
+	case idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL:
+		return domain.AutoLinkingOptionEmail
+	case idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_UNSPECIFIED:
+		return domain.AutoLinkingOptionUnspecified
+	default:
+		return domain.AutoLinkingOptionUnspecified
 	}
 }
 
@@ -398,6 +412,7 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 			IsCreationAllowed: config.IsCreationAllowed,
 			IsAutoCreation:    config.IsAutoCreation,
 			IsAutoUpdate:      config.IsAutoUpdate,
+			AutoLinking:       autoLinkingOptionToPb(config.AutoLinking),
 		},
 	}
 	if config.OAuthIDPTemplate != nil {
@@ -449,6 +464,19 @@ func configToPb(config *query.IDPTemplate) *idp_pb.ProviderConfig {
 		return providerConfig
 	}
 	return providerConfig
+}
+
+func autoLinkingOptionToPb(linking domain.AutoLinkingOption) idp_pb.AutoLinkingOption {
+	switch linking {
+	case domain.AutoLinkingOptionUnspecified:
+		return idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_UNSPECIFIED
+	case domain.AutoLinkingOptionUsername:
+		return idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME
+	case domain.AutoLinkingOptionEmail:
+		return idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_EMAIL
+	default:
+		return idp_pb.AutoLinkingOption_AUTO_LINKING_OPTION_UNSPECIFIED
+	}
 }
 
 func oauthConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.OAuthIDPTemplate) {

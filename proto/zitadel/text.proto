@@ -92,6 +92,7 @@ message LoginCustomText {
     PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
     ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
     bool is_default = 36;
+    LinkingUserPromptScreenText linking_user_prompt_text = 37;
 }
 
 message SelectAccountScreenText {
@@ -355,6 +356,13 @@ message RegistrationOrgScreenText {
     string privacy_confirm = 15 [(validate.rules).string = {max_len: 200}];
     string privacy_link_text = 17 [(validate.rules).string = {max_len: 200}];
     string save_button_text = 19 [(validate.rules).string = {max_len: 200}];
+}
+
+message LinkingUserPromptScreenText {
+    string title = 1 [(validate.rules).string = {max_len: 200}];
+    string description = 2 [(validate.rules).string = {max_len: 500}];
+    string link_button_text = 3 [(validate.rules).string = {max_len: 100}];
+    string other_button_text = 4 [(validate.rules).string = {max_len: 100}];
 }
 
 message LinkingUserDoneScreenText {

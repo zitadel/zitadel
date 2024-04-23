@@ -274,6 +274,9 @@ Auth:
     # from HandleActiveInstances duration in the past until the projections current time
     # If set to 0 (default), every instance is always considered active
     HandleActiveInstances: 0s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
+  # Defines the amount of auth requests stored in the LRU caches.
+  # There are two caches implemented one for id and one for code
+  AmountOfCachedAuthRequests: 128 #ZITADEL_AUTH_AMOUNTOFCACHEDAUTHREQUESTS
 
 Admin:
   # See Projections.BulkLimit
@@ -906,7 +909,7 @@ AuditLogRetention: 0s # ZITADEL_AUDITLOGRETENTION
 
 InternalAuthZ:
   # Configure the RolePermissionMappings by environment variable using JSON notation:
-  # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.read", "iam.write"]}]'
+  # ZITADEL_INTERNALAUTHZ_ROLEPERMISSIONMAPPINGS='[{"role": "IAM_OWNER", "permissions": ["iam.write"]}, {"role": "ORG_OWNER", "permissions": ["org.write"]}]'
   # Beware that if you configure the RolePermissionMappings by environment variable, all the default RolePermissionMappings are lost.
   RolePermissionMappings:
     - Role: "SYSTEM_OWNER"

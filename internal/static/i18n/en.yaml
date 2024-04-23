@@ -56,6 +56,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP configuration not found
     AlreadyExists: SMTP configuration already exists
+    AlreadyDeactivated: SMTP configuration already deactivated
     SenderAdressNotCustomDomain: The sender address must be configured as custom domain on the instance.
   Notification:
     NoDomain: No Domain found for message
@@ -108,6 +109,7 @@ Errors:
       Key:
         NotFound: Machine key not found
         AlreadyExisting: Machine key already existing
+        Invalid: Public key is not a valid RSA public key in PKIX format with PEM encoding
       Secret:
         NotExisting: Secret doesn't exist
         Invalid: Secret is invalid
@@ -581,6 +583,15 @@ AggregateTypes:
   target: Target
   execution: Execution
   user_schema: User Schema
+  auth_request: Auth Request
+  device_auth: Device Auth
+  idpintent: IDP Intent
+  limits: Limits
+  milestone: Milestone
+  oidc_session: OIDC Session
+  restrictions: Restrictions
+  system: System
+  session: Session
 
 EventTypes:
   execution:
@@ -778,7 +789,7 @@ EventTypes:
       code:
         added: Phone number code generated
         sent: Phone number code sent
-      removed: Phone number removed
+
     profile:
       changed: User profile changed
     address:
@@ -1119,6 +1130,9 @@ EventTypes:
       config:
         added: SMTP configuration added
         changed: SMTP configuration changed
+        activated: SMTP configuration activated
+        deactivated: SMTP configuration deactivated
+        removed: SMTP configuration removed
         password:
           changed: SMTP configuration secret changed
     sms:
@@ -1264,6 +1278,8 @@ EventTypes:
       config:
         added: SMTP configuration added
         changed: SMTP configuration changed
+        activated: SMTP configuration activated
+        deactivated: SMTP configuration deactivated
         password:
           changed: Password of SMTP configuration changed
         removed: SMTP configuration removed

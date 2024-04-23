@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/jonboulle/clockwork"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
