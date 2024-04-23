@@ -56,6 +56,7 @@ Errors:
   SMTPConfig:
     NotFound: SMTP конфигурацијата не е пронајдена
     AlreadyExists: SMTP конфигурацијата веќе постои
+    AlreadyDeactivated: SMTP конфигурацијата е веќе деактивирана
     SenderAdressNotCustomDomain: Адресата на испраќачот мора да биде конфигурирана како прилагоден домен на инстанцата.
   Notification:
     NoDomain: Не е пронајден домен за пораката
@@ -108,6 +109,7 @@ Errors:
       Key:
         NotFound: Machine key не е пронајден
         AlreadyExisting: Machine key веќе постои
+        Invalid: Јавниот клуч не е валиден јавен клуч RSA во формат PKIX со PEM кодирање
       Secret:
         NotExisting: Тајната не постои
         Invalid: Тајната е невалидна
@@ -580,6 +582,15 @@ AggregateTypes:
   target: Цел
   execution: Извршување
   user_schema: Корисничка шема
+  auth_request: Барање за автентикација
+  device_auth: Уред за автентикација
+  idpintent: Намера на IDP
+  limits: Ограничувања
+  milestone: Милениум
+  oidc_session: OIDC сесија
+  restrictions: Ограничувања
+  system: Систем
+  session: Сесија
 
 EventTypes:
   execution:
@@ -1118,6 +1129,9 @@ EventTypes:
       config:
         added: Додадена SMTP конфигурација
         changed: Променета SMTP конфигурација
+        activated: SMTP конфигурацијата е активирана
+        deactivated: SMTP конфигурацијата е деактивирана
+        removed: SMTP конфигурацијата е отстранета
         password:
           changed: Променена тајна на SMTP конфигурација
     sms:
@@ -1262,6 +1276,8 @@ EventTypes:
       config:
         added: Додадена SMTP конфигурација
         changed: Променета SMTP конфигурација
+        activated: SMTP конфигурацијата е активирана
+        deactivated: SMTP конфигурацијата е деактивирана
         password:
           changed: Променета лозинка на SMTP конфигурацијата
         removed: Отстранета SMTP конфигурација

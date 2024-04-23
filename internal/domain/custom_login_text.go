@@ -264,6 +264,12 @@ const (
 	LoginKeyRegisterOrgSaveButtonText       = LoginKeyRegistrationOrg + "SaveButtonText"
 	LoginKeyRegisterOrgBackButtonText       = LoginKeyRegistrationOrg + "BackButtonText"
 
+	LoginKeyLinkingUserPrompt                = "LinkingUserPrompt."
+	LoginKeyLinkingUserPromptTitle           = LoginKeyLinkingUserPrompt + "Title"
+	LoginKeyLinkingUserPromptDescription     = LoginKeyLinkingUserPrompt + "Description"
+	LoginKeyLinkingUserPromptLinkButtonText  = LoginKeyLinkingUserPrompt + "LinkButtonText"
+	LoginKeyLinkingUserPromptOtherButtonText = LoginKeyLinkingUserPrompt + "OtherButtonText"
+
 	LoginKeyLinkingUserDone                 = "LinkingUsersDone."
 	LoginKeyLinkingUserDoneTitle            = LoginKeyLinkingUserDone + "Title"
 	LoginKeyLinkingUserDoneDescription      = LoginKeyLinkingUserDone + "Description"
@@ -336,6 +342,7 @@ type CustomLoginText struct {
 	RegistrationUser                 RegistrationUserScreenText
 	ExternalRegistrationUserOverview ExternalRegistrationUserOverviewScreenText
 	RegistrationOrg                  RegistrationOrgScreenText
+	LinkingUserPrompt                LinkingUserPromptScreenText
 	LinkingUsersDone                 LinkingUserDoneScreenText
 	ExternalNotFound                 ExternalUserNotFoundScreenText
 	LoginSuccess                     SuccessLoginScreenText
@@ -605,6 +612,13 @@ type RegistrationOrgScreenText struct {
 	PrivacyConfirm       string
 	PrivacyLinkText      string
 	SaveButtonText       string
+}
+
+type LinkingUserPromptScreenText struct {
+	Title           string
+	Description     string
+	LinkButtonText  string
+	OtherButtonText string
 }
 
 type LinkingUserDoneScreenText struct {

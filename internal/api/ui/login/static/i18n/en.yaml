@@ -325,6 +325,12 @@ LogoutDone:
   Description: You have logged out successfully.
   LoginButtonText: Login
 
+LinkingUserPrompt:
+  Title: Existing User Found
+  Description: "Do you want to link your existing account:"
+  LinkButtonText: Link
+  OtherButtonText: Other options
+
 LinkingUsersDone:
   Title: Linking User
   Description: User linked.

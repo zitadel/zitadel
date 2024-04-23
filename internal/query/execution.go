@@ -3,7 +3,10 @@ package query
 import (
 	"context"
 	"database/sql"
+	_ "embed"
 	"errors"
+	"strings"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -11,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -51,6 +55,13 @@ var (
 		name:  projection.ExecutionIncludesCol,
 		table: executionTable,
 	}
+)
+
+var (
+	//go:embed execution_targets.sql
+	executionTargetsQuery string
+	//go:embed execution_targets_combined.sql
+	executionTargetsCombinedQuery string
 )
 
 type Executions struct {
@@ -114,6 +125,50 @@ func NewExecutionTargetSearchQuery(value string) (SearchQuery, error) {
 
 func NewExecutionIncludeSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ExecutionColumnIncludes, value, TextListContains)
+}
+
+// ExecutionTargets: provide IDs to select all target information,
+func (q *Queries) ExecutionTargets(ctx context.Context, ids []string) (execution []*ExecutionTarget, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	if instanceID == "" {
+		return nil, nil
+	}
+
+	err = q.client.QueryContext(ctx,
+		func(rows *sql.Rows) error {
+			execution, err = scanExecutionTargets(rows)
+			return err
+		},
+		executionTargetsQuery,
+		instanceID,
+		strings.Join(ids, ","),
+	)
+	return execution, err
+}
+
+func (q *Queries) ExecutionTargetsCombined(ctx context.Context, ids1, ids2 []string) (execution []*ExecutionTarget, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.End() }()
+
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	if instanceID == "" {
+		return nil, nil
+	}
+
+	err = q.client.QueryContext(ctx,
+		func(rows *sql.Rows) error {
+			execution, err = scanExecutionTargets(rows)
+			return err
+		},
+		executionTargetsCombinedQuery,
+		instanceID,
+		strings.Join(ids1, ","),
+		strings.Join(ids2, ","),
+	)
+	return execution, err
 }
 
 func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
@@ -188,4 +243,87 @@ func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			}
 			return execution, nil
 		}
+}
+
+type ExecutionTarget struct {
+	InstanceID       string
+	ExecutionID      string
+	TargetID         string
+	TargetType       domain.TargetType
+	URL              string
+	Timeout          time.Duration
+	Async            bool
+	InterruptOnError bool
+}
+
+func (e *ExecutionTarget) GetExecutionID() string {
+	return e.ExecutionID
+}
+func (e *ExecutionTarget) GetTargetID() string {
+	return e.TargetID
+}
+func (e *ExecutionTarget) IsInterruptOnError() bool {
+	return e.InterruptOnError
+}
+func (e *ExecutionTarget) IsAsync() bool {
+	return e.Async
+}
+func (e *ExecutionTarget) GetURL() string {
+	return e.URL
+}
+func (e *ExecutionTarget) GetTargetType() domain.TargetType {
+	return e.TargetType
+}
+func (e *ExecutionTarget) GetTimeout() time.Duration {
+	return e.Timeout
+}
+
+func scanExecutionTargets(rows *sql.Rows) ([]*ExecutionTarget, error) {
+	targets := make([]*ExecutionTarget, 0)
+	for rows.Next() {
+		target := new(ExecutionTarget)
+
+		var (
+			instanceID       = &sql.NullString{}
+			executionID      = &sql.NullString{}
+			targetID         = &sql.NullString{}
+			targetType       = &sql.NullInt32{}
+			url              = &sql.NullString{}
+			timeout          = &sql.NullInt64{}
+			async            = &sql.NullBool{}
+			interruptOnError = &sql.NullBool{}
+		)
+
+		err := rows.Scan(
+			instanceID,
+			executionID,
+			targetID,
+			targetType,
+			url,
+			timeout,
+			async,
+			interruptOnError,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		target.InstanceID = instanceID.String
+		target.ExecutionID = executionID.String
+		target.TargetID = targetID.String
+		target.TargetType = domain.TargetType(targetType.Int32)
+		target.URL = url.String
+		target.Timeout = time.Duration(timeout.Int64)
+		target.Async = async.Bool
+		target.InterruptOnError = interruptOnError.Bool
+
+		targets = append(targets, target)
+	}
+
+	if err := rows.Close(); err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-37ardr0pki", "Errors.Query.CloseRows")
+	}
+
+	return targets, nil
 }

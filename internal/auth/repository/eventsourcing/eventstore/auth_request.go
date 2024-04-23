@@ -75,7 +75,7 @@ type loginPolicyViewProvider interface {
 }
 
 type lockoutPolicyViewProvider interface {
-	LockoutPolicyByOrg(context.Context, bool, string, bool) (*query.LockoutPolicy, error)
+	LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error)
 }
 
 type idpProviderViewProvider interface {
@@ -304,10 +304,10 @@ func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAgentID string) (err error) {
+func (repo *AuthRequestRepo) SelectUser(ctx context.Context, authReqID, userID, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, id, userAgentID)
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -366,6 +366,7 @@ func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
 		},
 		Default:             policy.IsDefault,
 		MaxPasswordAttempts: policy.MaxPasswordAttempts,
+		MaxOTPAttempts:      policy.MaxOTPAttempts,
 		ShowLockOutFailures: policy.ShowFailures,
 	}
 }
@@ -655,39 +656,52 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		}
 	}
 
-	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
-	if err != nil {
-		return err
+	if request.LoginPolicy == nil || len(request.AllowedExternalIDPs) == 0 {
+		loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
+		if len(idpProviders) > 0 {
+			request.AllowedExternalIDPs = idpProviders
+		}
 	}
-	request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
-	if idpProviders != nil {
-		request.AllowedExternalIDPs = idpProviders
+	if request.LockoutPolicy == nil {
+		lockoutPolicy, err := repo.getLockoutPolicy(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.LockoutPolicy = lockoutPolicyToDomain(lockoutPolicy)
 	}
-	lockoutPolicy, err := repo.getLockoutPolicy(ctx, orgID)
-	if err != nil {
-		return err
+	if request.PrivacyPolicy == nil {
+		privacyPolicy, err := repo.GetPrivacyPolicy(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.PrivacyPolicy = privacyPolicy
 	}
-	request.LockoutPolicy = lockoutPolicyToDomain(lockoutPolicy)
-	privacyPolicy, err := repo.GetPrivacyPolicy(ctx, orgID)
-	if err != nil {
-		return err
+	if request.LabelPolicy == nil {
+		labelPolicy, err := repo.getLabelPolicy(ctx, request.PrivateLabelingOrgID(orgID))
+		if err != nil {
+			return err
+		}
+		request.LabelPolicy = labelPolicy
 	}
-	request.PrivacyPolicy = privacyPolicy
-	labelPolicy, err := repo.getLabelPolicy(ctx, request.PrivateLabelingOrgID(orgID))
-	if err != nil {
-		return err
+	if len(request.DefaultTranslations) == 0 {
+		defaultLoginTranslations, err := repo.getLoginTexts(ctx, instance.InstanceID())
+		if err != nil {
+			return err
+		}
+		request.DefaultTranslations = defaultLoginTranslations
 	}
-	request.LabelPolicy = labelPolicy
-	defaultLoginTranslations, err := repo.getLoginTexts(ctx, instance.InstanceID())
-	if err != nil {
-		return err
+	if len(request.OrgTranslations) == 0 {
+		orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.OrgTranslations = orgLoginTranslations
 	}
-	request.DefaultTranslations = defaultLoginTranslations
-	orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
-	if err != nil {
-		return err
-	}
-	request.OrgTranslations = orgLoginTranslations
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return nil
 }
 
@@ -800,6 +814,7 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 	}
 	request.LoginHint = loginName
 	request.Prompt = append(request.Prompt, domain.PromptCreate) // to trigger registration
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return true, nil
 }
 
@@ -871,22 +886,25 @@ func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(ctx context.Con
 	return nil, err
 }
 
-func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, resourceOwner string) error {
-	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, resourceOwner)
-	if err != nil {
-		return err
+func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, resourceOwner string) (err error) {
+	if request.LoginPolicy == nil {
+		loginPolicy, idps, err := repo.getLoginPolicyAndIDPProviders(ctx, resourceOwner)
+		if err != nil {
+			return err
+		}
+		request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
+		request.AllowedExternalIDPs = idps
 	}
-	if len(request.LinkingUsers) != 0 && !loginPolicy.AllowExternalIDPs {
+	if len(request.LinkingUsers) != 0 && !request.LoginPolicy.AllowExternalIDP {
 		return zerrors.ThrowInvalidArgument(nil, "LOGIN-s9sio", "Errors.User.NotAllowedToLink")
 	}
 	if len(request.LinkingUsers) != 0 {
-		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, idpProviders)
+		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, request.AllowedExternalIDPs)
 		if !exists {
 			return zerrors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
 		}
 	}
-	request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
-	request.AllowedExternalIDPs = idpProviders
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return nil
 }
 
@@ -1281,7 +1299,7 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 }
 
 func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*query.LockoutPolicy, error) {
-	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID, false)
+	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
 	}

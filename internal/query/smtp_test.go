@@ -9,26 +9,28 @@ import (
 	"testing"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var (
-	prepareSMTPConfigStmt = `SELECT projections.smtp_configs1.aggregate_id,` +
-		` projections.smtp_configs1.creation_date,` +
-		` projections.smtp_configs1.change_date,` +
-		` projections.smtp_configs1.resource_owner,` +
-		` projections.smtp_configs1.sequence,` +
-		` projections.smtp_configs1.tls,` +
-		` projections.smtp_configs1.sender_address,` +
-		` projections.smtp_configs1.sender_name,` +
-		` projections.smtp_configs1.reply_to_address,` +
-		` projections.smtp_configs1.host,` +
-		` projections.smtp_configs1.username,` +
-		` projections.smtp_configs1.password` +
-		` FROM projections.smtp_configs1` +
+	prepareSMTPConfigStmt = `SELECT projections.smtp_configs2.creation_date,` +
+		` projections.smtp_configs2.change_date,` +
+		` projections.smtp_configs2.resource_owner,` +
+		` projections.smtp_configs2.sequence,` +
+		` projections.smtp_configs2.tls,` +
+		` projections.smtp_configs2.sender_address,` +
+		` projections.smtp_configs2.sender_name,` +
+		` projections.smtp_configs2.reply_to_address,` +
+		` projections.smtp_configs2.host,` +
+		` projections.smtp_configs2.username,` +
+		` projections.smtp_configs2.password,` +
+		` projections.smtp_configs2.id,` +
+		` projections.smtp_configs2.state,` +
+		` projections.smtp_configs2.description` +
+		` FROM projections.smtp_configs2` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareSMTPConfigCols = []string{
-		"aggregate_id",
 		"creation_date",
 		"change_date",
 		"resource_owner",
@@ -40,6 +42,9 @@ var (
 		"smtp_host",
 		"smtp_user",
 		"smtp_password",
+		"id",
+		"state",
+		"description",
 	}
 )
 
@@ -80,7 +85,6 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 					regexp.QuoteMeta(prepareSMTPConfigStmt),
 					prepareSMTPConfigCols,
 					[]driver.Value{
-						"agg-id",
 						testNow,
 						testNow,
 						"ro",
@@ -92,11 +96,13 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						"host",
 						"user",
 						&crypto.CryptoValue{},
+						"2232323",
+						domain.SMTPConfigStateActive,
+						"test",
 					},
 				),
 			},
 			object: &SMTPConfig{
-				AggregateID:    "agg-id",
 				CreationDate:   testNow,
 				ChangeDate:     testNow,
 				ResourceOwner:  "ro",
@@ -108,6 +114,93 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 				Host:           "host",
 				User:           "user",
 				Password:       &crypto.CryptoValue{},
+				ID:             "2232323",
+				State:          domain.SMTPConfigStateActive,
+				Description:    "test",
+			},
+		},
+		{
+			name:    "prepareSMTPConfigQuery another config found",
+			prepare: prepareSMTPConfigQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(prepareSMTPConfigStmt),
+					prepareSMTPConfigCols,
+					[]driver.Value{
+						testNow,
+						testNow,
+						"ro",
+						uint64(20211109),
+						true,
+						"sender2",
+						"name2",
+						"reply-to2",
+						"host2",
+						"user2",
+						&crypto.CryptoValue{},
+						"44442323",
+						domain.SMTPConfigStateInactive,
+						"test2",
+					},
+				),
+			},
+			object: &SMTPConfig{
+				CreationDate:   testNow,
+				ChangeDate:     testNow,
+				ResourceOwner:  "ro",
+				Sequence:       20211109,
+				TLS:            true,
+				SenderAddress:  "sender2",
+				SenderName:     "name2",
+				ReplyToAddress: "reply-to2",
+				Host:           "host2",
+				User:           "user2",
+				Password:       &crypto.CryptoValue{},
+				ID:             "44442323",
+				State:          domain.SMTPConfigStateInactive,
+				Description:    "test2",
+			},
+		},
+		{
+			name:    "prepareSMTPConfigQuery yet another config found",
+			prepare: prepareSMTPConfigQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(prepareSMTPConfigStmt),
+					prepareSMTPConfigCols,
+					[]driver.Value{
+						testNow,
+						testNow,
+						"ro",
+						uint64(20211109),
+						true,
+						"sender3",
+						"name3",
+						"reply-to3",
+						"host3",
+						"user3",
+						&crypto.CryptoValue{},
+						"23234444",
+						domain.SMTPConfigStateInactive,
+						"test3",
+					},
+				),
+			},
+			object: &SMTPConfig{
+				CreationDate:   testNow,
+				ChangeDate:     testNow,
+				ResourceOwner:  "ro",
+				Sequence:       20211109,
+				TLS:            true,
+				SenderAddress:  "sender3",
+				SenderName:     "name3",
+				ReplyToAddress: "reply-to3",
+				Host:           "host3",
+				User:           "user3",
+				Password:       &crypto.CryptoValue{},
+				ID:             "23234444",
+				State:          domain.SMTPConfigStateInactive,
+				Description:    "test3",
 			},
 		},
 		{

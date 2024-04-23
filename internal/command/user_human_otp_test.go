@@ -1671,6 +1671,15 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // recheck
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(ctx,
+								&org.NewAggregate("orgID").Aggregate,
+								3, 3, true,
+							),
+						),
+					),
 					expectPush(
 						user.NewHumanOTPSMSCheckFailedEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1683,6 +1692,86 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 									RemoteIP:       net.IP{192, 0, 2, 1},
 								},
 							},
+						),
+					),
+				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
+			},
+		},
+		{
+			name: "invalid code, max attempts reached, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPSMSCodeAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("other-code"),
+								},
+								time.Hour,
+								&user.AuthRequestInfo{
+									ID:          "authRequestID",
+									UserAgentID: "userAgentID",
+									BrowserInfo: &user.BrowserInfo{
+										UserAgent:      "user-agent",
+										AcceptLanguage: "en",
+										RemoteIP:       net.IP{192, 0, 2, 1},
+									},
+								},
+							),
+						),
+					),
+					expectFilter(), // recheck
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(ctx,
+								&org.NewAggregate("orgID").Aggregate,
+								1, 1, true,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPSMSCheckFailedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+						user.NewUserLockedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
 						),
 					),
 				),
@@ -1739,6 +1828,7 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // recheck
 					expectPush(
 						user.NewHumanOTPSMSCheckSucceededEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1775,6 +1865,65 @@ func TestCommandSide_HumanCheckOTPSMS(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
+			},
+		},
+		{
+			name: "code ok, locked in the meantime",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPSMSAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPSMSCodeAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								&user.AuthRequestInfo{
+									ID:          "authRequestID",
+									UserAgentID: "userAgentID",
+									BrowserInfo: &user.BrowserInfo{
+										UserAgent:      "user-agent",
+										AcceptLanguage: "en",
+										RemoteIP:       net.IP{192, 0, 2, 1},
+									},
+								},
+							),
+						),
+					),
+					expectFilter( // recheck
+						user.NewUserLockedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked"),
 			},
 		},
 	}
@@ -2616,6 +2765,15 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // recheck
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(ctx,
+								&org.NewAggregate("orgID").Aggregate,
+								3, 3, true,
+							),
+						),
+					),
 					expectPush(
 						user.NewHumanOTPEmailCheckFailedEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -2628,6 +2786,86 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 									RemoteIP:       net.IP{192, 0, 2, 1},
 								},
 							},
+						),
+					),
+				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				err: zerrors.ThrowInvalidArgument(nil, "CODE-woT0xc", "Errors.User.Code.Invalid"),
+			},
+		},
+		{
+			name: "invalid code, max attempts reached, error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPEmailCodeAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("other-code"),
+								},
+								time.Hour,
+								&user.AuthRequestInfo{
+									ID:          "authRequestID",
+									UserAgentID: "userAgentID",
+									BrowserInfo: &user.BrowserInfo{
+										UserAgent:      "user-agent",
+										AcceptLanguage: "en",
+										RemoteIP:       net.IP{192, 0, 2, 1},
+									},
+								},
+							),
+						),
+					),
+					expectFilter(), // recheck
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(ctx,
+								&org.NewAggregate("orgID").Aggregate,
+								1, 1, true,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanOTPEmailCheckFailedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&user.AuthRequestInfo{
+								ID:          "authRequestID",
+								UserAgentID: "userAgentID",
+								BrowserInfo: &user.BrowserInfo{
+									UserAgent:      "user-agent",
+									AcceptLanguage: "en",
+									RemoteIP:       net.IP{192, 0, 2, 1},
+								},
+							},
+						),
+						user.NewUserLockedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
 						),
 					),
 				),
@@ -2684,6 +2922,7 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(), // recheck
 					expectPush(
 						user.NewHumanOTPEmailCheckSucceededEvent(ctx,
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -2720,6 +2959,65 @@ func TestCommandSide_HumanCheckOTPEmail(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
+			},
+		},
+		{
+			name: "code ok, locked in the meantime",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPEmailAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanOTPEmailCodeAddedEvent(ctx,
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour,
+								&user.AuthRequestInfo{
+									ID:          "authRequestID",
+									UserAgentID: "userAgentID",
+									BrowserInfo: &user.BrowserInfo{
+										UserAgent:      "user-agent",
+										AcceptLanguage: "en",
+										RemoteIP:       net.IP{192, 0, 2, 1},
+									},
+								},
+							),
+						),
+					),
+					expectFilter( // recheck
+						user.NewUserLockedEvent(ctx,
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+				userEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           ctx,
+				userID:        "user1",
+				code:          "code",
+				resourceOwner: "org1",
+				authRequest: &domain.AuthRequest{
+					ID:      "authRequestID",
+					AgentID: "userAgentID",
+					BrowserInfo: &domain.BrowserInfo{
+						UserAgent:      "user-agent",
+						AcceptLanguage: "en",
+						RemoteIP:       net.IP{192, 0, 2, 1},
+					},
+				},
+			},
+			res: res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked"),
 			},
 		},
 	}

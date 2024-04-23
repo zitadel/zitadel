@@ -42,7 +42,8 @@ func (c *Commands) createAllLoginTextEvents(ctx context.Context, agg *eventstore
 	events = append(events, c.createRegistrationUserEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createExternalRegistrationUserOverviewEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createRegistrationOrgEvents(ctx, agg, existingText, text, defaultText)...)
-	events = append(events, c.createLinkingUserEvents(ctx, agg, existingText, text, defaultText)...)
+	events = append(events, c.createLinkingUserPromptEvents(ctx, agg, existingText, text, defaultText)...)
+	events = append(events, c.createLinkingUserDoneEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createExternalUserNotFoundEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createSuccessLoginEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createLogoutDoneEvents(ctx, agg, existingText, text, defaultText)...)
@@ -979,7 +980,28 @@ func (c *Commands) createRegistrationOrgEvents(ctx context.Context, agg *eventst
 	return events
 }
 
-func (c *Commands) createLinkingUserEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+func (c *Commands) createLinkingUserPromptEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
+	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLinkingUserPromptTitle, existingText.LinkingUserPromptTitle, text.LinkingUserPrompt.Title, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLinkingUserPromptDescription, existingText.LinkingUserPromptDescription, text.LinkingUserPrompt.Description, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLinkingUserPromptLinkButtonText, existingText.LinkingUserPromptLinkButtonText, text.LinkingUserPrompt.LinkButtonText, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLinkingUserPromptOtherButtonText, existingText.LinkingUserPromptOtherButtonText, text.LinkingUserPrompt.OtherButtonText, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
+	return events
+}
+
+func (c *Commands) createLinkingUserDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
 	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLinkingUserDoneTitle, existingText.LinkingUserDoneTitle, text.LinkingUsersDone.Title, text.Language, defaultText)
 	if event != nil {
