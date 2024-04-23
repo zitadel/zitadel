@@ -23,11 +23,11 @@ type AuthRequestCache struct {
 	codeCache *lru.Cache[string, *domain.AuthRequest]
 }
 
-func Start(dbClient *database.DB) *AuthRequestCache {
-	idCache, err := lru.New[string, *domain.AuthRequest](1024)
-	logging.OnError(err).Panic("unable to start id cache")
-	codeCache, err := lru.New[string, *domain.AuthRequest](1024)
-	logging.OnError(err).Panic("unable to start id cache")
+func Start(dbClient *database.DB, amountOfCachedAuthRequests uint16) *AuthRequestCache {
+	idCache, err := lru.New[string, *domain.AuthRequest](int(amountOfCachedAuthRequests))
+	logging.OnError(err).Info("auth request cache disabled")
+	codeCache, err := lru.New[string, *domain.AuthRequest](int(amountOfCachedAuthRequests))
+	logging.OnError(err).Info("auth request cache disabled")
 
 	return &AuthRequestCache{
 		client:    dbClient,
@@ -41,7 +41,7 @@ func (c *AuthRequestCache) Health(ctx context.Context) error {
 }
 
 func (c *AuthRequestCache) GetAuthRequestByID(ctx context.Context, id string) (*domain.AuthRequest, error) {
-	if authRequest, ok := c.idCache.Get(cacheKey(ctx, id)); ok {
+	if authRequest, ok := c.getCachedByID(ctx, id); ok {
 		return authRequest, nil
 	}
 	request, err := c.getAuthRequest(ctx, "id", id, authz.GetInstance(ctx).InstanceID())
@@ -53,7 +53,7 @@ func (c *AuthRequestCache) GetAuthRequestByID(ctx context.Context, id string) (*
 }
 
 func (c *AuthRequestCache) GetAuthRequestByCode(ctx context.Context, code string) (*domain.AuthRequest, error) {
-	if authRequest, ok := c.codeCache.Get(cacheKey(ctx, code)); ok {
+	if authRequest, ok := c.getCachedByCode(ctx, code); ok {
 		return authRequest, nil
 	}
 	request, err := c.getAuthRequest(ctx, "code", code, authz.GetInstance(ctx).InstanceID())
@@ -124,7 +124,28 @@ func (c *AuthRequestCache) saveAuthRequest(ctx context.Context, request *domain.
 	return nil
 }
 
+func (c *AuthRequestCache) getCachedByID(ctx context.Context, id string) (*domain.AuthRequest, bool) {
+	if c.idCache == nil {
+		return nil, false
+	}
+	authRequest, ok := c.idCache.Get(cacheKey(ctx, id))
+	logging.WithFields("hit", ok, "type", "id").Info("get from auth request cache")
+	return authRequest, ok
+}
+
+func (c *AuthRequestCache) getCachedByCode(ctx context.Context, code string) (*domain.AuthRequest, bool) {
+	if c.codeCache == nil {
+		return nil, false
+	}
+	authRequest, ok := c.codeCache.Get(cacheKey(ctx, code))
+	logging.WithFields("hit", ok, "type", "code").Info("get from auth request cache")
+	return authRequest, ok
+}
+
 func (c *AuthRequestCache) CacheAuthRequest(ctx context.Context, request *domain.AuthRequest) {
+	if c.idCache == nil {
+		return
+	}
 	c.idCache.Add(cacheKey(ctx, request.ID), request)
 	if request.Code != "" {
 		c.codeCache.Add(cacheKey(ctx, request.Code), request)
@@ -136,6 +157,9 @@ func cacheKey(ctx context.Context, value string) string {
 }
 
 func (c *AuthRequestCache) deleteFromCache(ctx context.Context, id string) {
+	if c.idCache == nil {
+		return
+	}
 	idKey := cacheKey(ctx, id)
 	request, ok := c.idCache.Get(idKey)
 	if !ok {
