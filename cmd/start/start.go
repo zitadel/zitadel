@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	_ "embed"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/api/grpc/settings/template"
 	"math"
 	"net/http"
 	"os"
@@ -42,7 +41,9 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/org/v2"
+	actions_v2 "github.com/zitadel/zitadel/internal/api/grpc/resources/actions"
 	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
+	"github.com/zitadel/zitadel/internal/api/grpc/settings/template"
 	"github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
 	user_schema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/user/schema/v3alpha"
@@ -416,6 +417,9 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, template.CreateServer()); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, actions_v2.CreateServer()); err != nil {
 		return nil, err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, config.ExternalDomain, login.IgnoreInstanceEndpoints...)
