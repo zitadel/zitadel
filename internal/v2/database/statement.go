@@ -129,7 +129,7 @@ func (stmt *Statement) WriteRune(r rune) {
 
 // WriteByte extends [strings.Builder.WriteByte]
 //
-//nolint:stdmethods
+//nolint: stdmethods
 func (stmt *Statement) WriteByte(b byte) {
 	// TODO: condition must know if it's args are named parameters or not
 	// for name, placeholder := range stmt.namedArgs {
