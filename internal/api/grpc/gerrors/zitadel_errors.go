@@ -2,6 +2,7 @@ package gerrors
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/codes"
@@ -34,6 +35,9 @@ func ZITADELToGRPCError(err error) error {
 func ExtractZITADELError(err error) (c codes.Code, msg, id string, ok bool) {
 	if err == nil {
 		return codes.OK, "", "", false
+	}
+	if strings.Contains(err.Error(), "failed to connect to") { // version of pgx does not yet export the error type
+		return codes.Internal, "db connection error", "", true
 	}
 	zitadelErr := new(zerrors.ZitadelError)
 	if ok := errors.As(err, &zitadelErr); !ok {
