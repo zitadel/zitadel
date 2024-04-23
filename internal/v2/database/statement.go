@@ -128,8 +128,6 @@ func (stmt *Statement) WriteRune(r rune) {
 }
 
 // WriteByte extends [strings.Builder.WriteByte]
-//
-//nolint:stdmethods
 func (stmt *Statement) WriteByte(b byte) {
 	// TODO: condition must know if it's args are named parameters or not
 	// for name, placeholder := range stmt.namedArgs {
@@ -219,5 +217,6 @@ func (stmt *Statement) copyCheck() {
 //go:nocheckptr
 func noescape(p unsafe.Pointer) unsafe.Pointer {
 	x := uintptr(p)
+	//nolint: staticcheck
 	return unsafe.Pointer(x ^ 0)
 }
