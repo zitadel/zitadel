@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Machine key не е пронајден
         AlreadyExisting: Machine key веќе постои
+        Invalid: Јавниот клуч не е валиден јавен клуч RSA во формат PKIX со PEM кодирање
       Secret:
         NotExisting: Тајната не постои
         Invalid: Тајната е невалидна
