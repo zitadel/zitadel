@@ -11,9 +11,10 @@ export enum BadgeState {
 export type StateBadgeProps = {
   state: BadgeState;
   children: ReactNode;
+  evenPadding?: boolean;
 };
 
-const getBadgeClasses = (state: BadgeState) =>
+const getBadgeClasses = (state: BadgeState, evenPadding: boolean) =>
   clsx({
     "w-fit border-box h-18.5px flex flex-row items-center whitespace-nowrap tracking-wider leading-4 items-center justify-center px-2 py-2px text-12px rounded-full shadow-sm":
       true,
@@ -25,11 +26,15 @@ const getBadgeClasses = (state: BadgeState) =>
       state === BadgeState.Error,
     "bg-state-alert-light-background text-state-alert-light-color dark:bg-state-alert-dark-background dark:text-state-alert-dark-color":
       state === BadgeState.Alert,
+    "p-[2px]": evenPadding,
   });
 
 export function StateBadge({
   state = BadgeState.Success,
+  evenPadding = false,
   children,
 }: StateBadgeProps) {
-  return <span className={`${getBadgeClasses(state)}`}>{children}</span>;
+  return (
+    <span className={`${getBadgeClasses(state, evenPadding)}`}>{children}</span>
+  );
 }

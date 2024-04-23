@@ -4,6 +4,7 @@ import { AuthenticationMethodType, LoginSettings } from "@zitadel/server";
 import Link from "next/link";
 import { BadgeState, StateBadge } from "./StateBadge";
 import clsx from "clsx";
+import { CheckIcon } from "@heroicons/react/24/outline";
 
 type Props = {
   loginName?: string;
@@ -24,8 +25,8 @@ export default function ChooseSecondFactorToSetup({
 }: Props) {
   const cardClasses = (alreadyAdded: boolean) =>
     clsx(
-      "bg-background-light-400 dark:bg-background-dark-400 group block space-y-1.5 rounded-md px-5 py-3  border border-divider-light dark:border-divider-dark transition-all ",
-      alreadyAdded ? "opacity-50" : "hover:shadow-lg hover:dark:bg-white/10"
+      "relative bg-background-light-400 dark:bg-background-dark-400 group block space-y-1.5 rounded-md px-5 py-3  border border-divider-light dark:border-divider-dark transition-all ",
+      alreadyAdded ? "" : "hover:shadow-lg hover:dark:bg-white/10"
     );
 
   const TOTP = (alreadyAdded: boolean) => {
@@ -34,7 +35,12 @@ export default function ChooseSecondFactorToSetup({
         href={userMethods.includes(4) ? "" : "/otp/time-based/set"}
         className={cardClasses(alreadyAdded)}
       >
-        <div className="font-medium flex items-center">
+        <div
+          className={clsx(
+            "font-medium flex items-center",
+            alreadyAdded ? "opacity-50" : ""
+          )}
+        >
           <svg
             className="h-9 w-9 transform -translate-x-[2px] mr-4"
             version="1.1"
@@ -77,13 +83,12 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
             />
           </svg>{" "}
           <span>Authenticator App</span>
-          {alreadyAdded && (
-            <>
-              <span className="flex-1"></span>
-              <Setup />
-            </>
-          )}
         </div>
+        {alreadyAdded && (
+          <>
+            <Setup />
+          </>
+        )}
       </Link>
     );
   };
@@ -91,7 +96,12 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
   const U2F = (alreadyAdded: boolean) => {
     return (
       <Link href="/u2f/set" className={cardClasses(alreadyAdded)}>
-        <div className="font-medium flex items-center">
+        <div
+          className={clsx(
+            "font-medium flex items-center",
+            alreadyAdded ? "" : ""
+          )}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -107,13 +117,12 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
             />
           </svg>
           <span>Universal Second Factor</span>
-          {alreadyAdded && (
-            <>
-              <span className="flex-1"></span>
-              <Setup />
-            </>
-          )}
         </div>
+        {alreadyAdded && (
+          <>
+            <Setup />
+          </>
+        )}
       </Link>
     );
   };
@@ -121,7 +130,12 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
   const EMAIL = (alreadyAdded: boolean) => {
     return (
       <Link href="/otp/email/set" className={cardClasses(alreadyAdded)}>
-        <div className="font-medium flex items-center">
+        <div
+          className={clsx(
+            "font-medium flex items-center",
+            alreadyAdded ? "" : ""
+          )}
+        >
           <svg
             className="w-8 h-8 mr-4"
             xmlns="http://www.w3.org/2000/svg"
@@ -138,13 +152,12 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
           </svg>
 
           <span>Code via Email</span>
-          {alreadyAdded && (
-            <>
-              <span className="flex-1"></span>
-              <Setup />
-            </>
-          )}
         </div>
+        {alreadyAdded && (
+          <>
+            <Setup />
+          </>
+        )}
       </Link>
     );
   };
@@ -152,7 +165,12 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
   const SMS = (alreadyAdded: boolean) => {
     return (
       <Link href="/otp/sms/set" className={cardClasses(alreadyAdded)}>
-        <div className="font-medium flex items-center">
+        <div
+          className={clsx(
+            "font-medium flex items-center",
+            alreadyAdded ? "" : ""
+          )}
+        >
           <svg
             className="w-8 h-8 mr-4"
             xmlns="http://www.w3.org/2000/svg"
@@ -168,13 +186,12 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
             />
           </svg>
           <span>Code via SMS</span>
-          {alreadyAdded && (
-            <>
-              <span className="flex-1"></span>
-              <Setup />
-            </>
-          )}
         </div>
+        {alreadyAdded && (
+          <>
+            <Setup />
+          </>
+        )}
       </Link>
     );
   };
@@ -196,5 +213,11 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
 }
 
 function Setup() {
-  return <StateBadge state={BadgeState.Success}>Setup</StateBadge>;
+  return (
+    <div className="transform  absolute right-2 top-0">
+      <StateBadge evenPadding={true} state={BadgeState.Success}>
+        <CheckIcon className="w-4 h-4" />
+      </StateBadge>
+    </div>
+  );
 }
