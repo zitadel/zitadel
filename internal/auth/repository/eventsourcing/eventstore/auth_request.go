@@ -887,26 +887,23 @@ func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(ctx context.Con
 }
 
 func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, resourceOwner string) (err error) {
-	var identityProviders []*domain.IDPProvider
-
 	if request.LoginPolicy == nil {
 		loginPolicy, idps, err := repo.getLoginPolicyAndIDPProviders(ctx, resourceOwner)
 		if err != nil {
 			return err
 		}
 		request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
-		identityProviders = idps
+		request.AllowedExternalIDPs = idps
 	}
 	if len(request.LinkingUsers) != 0 && !request.LoginPolicy.AllowExternalIDP {
 		return zerrors.ThrowInvalidArgument(nil, "LOGIN-s9sio", "Errors.User.NotAllowedToLink")
 	}
 	if len(request.LinkingUsers) != 0 {
-		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, identityProviders)
+		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, request.AllowedExternalIDPs)
 		if !exists {
 			return zerrors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
 		}
 	}
-	request.AllowedExternalIDPs = identityProviders
 	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return nil
 }
