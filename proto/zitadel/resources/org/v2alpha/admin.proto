@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package zitadel.resources.org.v2alpha;
+
+import "zitadel/resources/user/v3alpha/user_service.proto";
+import "zitadel/resources/user/v3alpha/user.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/org/v2alpha;org";
+
+message AddAdmin {
+  oneof admin {
+    string user_id = 1;
+    zitadel.resources.user.v3alpha.CreateUserRequest create_admin = 2;
+  }
+  // specify Org Member Roles for the provided user (default is ORG_OWNER if roles are empty)
+  repeated string roles = 3;
+}
+
+message AddedAdmin {
+  oneof admin {
+    zitadel.resources.user.v3alpha.GetUser user = 1;
+    zitadel.resources.user.v3alpha.CreateUserRequest created_admin = 2;
+  }
+}

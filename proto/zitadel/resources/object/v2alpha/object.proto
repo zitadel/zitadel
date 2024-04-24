@@ -10,6 +10,13 @@ import "validate/validate.proto";
 
 import "zitadel/object/v2alpha/object.proto";
 
+message Organization {
+  oneof org {
+    string org_id = 1;
+    string org_domain = 2;
+  }
+}
+
 message Details {
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

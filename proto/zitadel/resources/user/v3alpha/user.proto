@@ -11,7 +11,7 @@ import "zitadel/resources/object/v2alpha/object.proto";
 import "zitadel/resources/user/v3alpha/authenticator.proto";
 import "zitadel/resources/user/v3alpha/communication.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
 
 message GetUser {
   // Details provide some base information (such as the last change date) of the user.

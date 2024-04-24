@@ -10,7 +10,7 @@ import "validate/validate.proto";
 
 import "zitadel/resources/object/v2alpha/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
 
 message Authenticators {
   // All of the user's usernames, which will be used for identification during authentication.

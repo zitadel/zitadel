@@ -1,12 +1,11 @@
 syntax = "proto3";
 
-package zitadel.session.v2beta;
+package zitadel.resources.session.v2alpha;
 
-
-import "zitadel/object/v2beta/object.proto";
+import "zitadel/resources/object/v2alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/session/v2beta/challenge.proto";
-import "zitadel/session/v2beta/session.proto";
+import "zitadel/resources/session/v2alpha/challenge.proto";
+import "zitadel/resources/session/v2alpha/session.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";
@@ -14,7 +13,7 @@ import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2beta;session";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/session/v2alpha;session";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -246,13 +245,13 @@ service SessionService {
 }
 
 message ListSessionsRequest{
-  zitadel.object.v2beta.ListQuery query = 1;
+  zitadel.resources.object.v2alpha.ListQuery query = 1;
   repeated SearchQuery queries = 2;
-  zitadel.session.v2beta.SessionFieldName sorting_column = 3;
+  SessionFieldName sorting_column = 3;
 }
 
 message ListSessionsResponse{
-  zitadel.object.v2beta.ListDetails details = 1;
+  zitadel.resources.object.v2alpha.ListDetails details = 1;
   repeated Session sessions = 2;
 }
 
@@ -287,7 +286,7 @@ message CreateSessionRequest{
 }
 
 message CreateSessionResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.resources.object.v2alpha.Details details = 1;
   string session_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"id of the session\"";
@@ -341,7 +340,7 @@ message SetSessionRequest{
 }
 
 message SetSessionResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.resources.object.v2alpha.Details details = 1;
   string session_token = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"The current token of the session, which is required for further updates of the session or to request other resources.\"";
@@ -368,7 +367,7 @@ message DeleteSessionRequest{
 }
 
 message DeleteSessionResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.resources.object.v2alpha.Details details = 1;
 }
 
 message Checks {

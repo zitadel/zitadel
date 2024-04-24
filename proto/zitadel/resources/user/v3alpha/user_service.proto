@@ -8,7 +8,6 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2beta/object.proto";
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/resources/object/v2alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
@@ -17,7 +16,7 @@ import "zitadel/resources/user/v3alpha/communication.proto";
 import "zitadel/resources/user/v3alpha/query.proto";
 import "zitadel/resources/user/v3alpha/user.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -1038,16 +1037,17 @@ service UserService {
 }
 
 message SearchUsersRequest {
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
   // list limitations and ordering.
-  zitadel.resources.object.v2alpha.ListQuery query = 1;
+  zitadel.resources.object.v2alpha.ListQuery query = 2;
   // the field the result is sorted.
-  zitadel.resources.user.v3alpha.FieldName sorting_column = 2 [
+  zitadel.resources.user.v3alpha.FieldName sorting_column = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"FIELD_NAME_SCHEMA_TYPE\""
     }
   ];
   // Define the criteria to query for.
-  repeated zitadel.resources.user.v3alpha.SearchQuery queries = 3;
+  repeated zitadel.resources.user.v3alpha.SearchQuery queries = 4;
 }
 
 message SearchUsersResponse {
@@ -1087,7 +1087,7 @@ message CreateUserRequest {
     }
   ];
   // Set the organization the user belongs to.
-  zitadel.object.v2beta.Organization organization = 2 [
+  zitadel.resources.object.v2alpha.Organization organization = 2 [
     (validate.rules).message = {required: true},
     (google.api.field_behavior) = REQUIRED
   ];
