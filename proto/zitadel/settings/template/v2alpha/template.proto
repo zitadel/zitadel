@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package zitadel.settings.template.v2beta_mt;
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/template/v2beta_mt;template";
+package zitadel.settings.template.v2alpha;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/template/v2alpha;template";
 
 enum HTMLTemplateType {
   HTML_TEMPLATE_TYPE_UNSPECIFIED                     = 0;

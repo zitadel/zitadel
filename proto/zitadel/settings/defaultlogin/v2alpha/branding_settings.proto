@@ -1,33 +1,33 @@
 syntax = "proto3";
 
-package zitadel.settings.defaultlogin.v2beta_mt;
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2beta_mt;defaultlogin";
+package zitadel.settings.defaultlogin.v2alpha;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2alpha;defaultlogin";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "zitadel/object/v2beta_mt/object.proto";
-import "zitadel/settings/object/v2beta_mt/field.proto";
+import "zitadel/object/v2alpha/object.proto";
+import "zitadel/settings/object/v2alpha/field.proto";
 import "google/protobuf/struct.proto";
 
 message ResolvedBrandingSettings {
   // The resolved settings that take effect in requested current.
-  map<string, zitadel.settings.object.v2beta_mt.ResolvedString>  resolved_custom_settings = 1;
+  map<string, zitadel.settings.object.v2alpha.ResolvedString>  resolved_custom_settings = 1;
   // The settings that are overwritten in the requested context.
-  map<string, zitadel.settings.object.v2beta_mt.ResolvedString>  overwritten_custom_settings = 2;
+  map<string, zitadel.settings.object.v2alpha.ResolvedString>  overwritten_custom_settings = 2;
   ResolvedTheme light_theme = 3;
   ResolvedTheme dark_theme = 4;
-  zitadel.settings.object.v2beta_mt.ResolvedString font_url = 5 [
+  zitadel.settings.object.v2alpha.ResolvedString font_url = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "url to the font used";
       example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/font-180950243237405441\"";
     }
   ];
   // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set
-  zitadel.settings.object.v2beta_mt.ResolvedBool hide_login_name_suffix = 6 [
+  zitadel.settings.object.v2alpha.ResolvedBool hide_login_name_suffix = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set";
     }
   ];
-  zitadel.settings.object.v2beta_mt.ResolvedBool disable_watermark = 7 [
+  zitadel.settings.object.v2alpha.ResolvedBool disable_watermark = 7 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "boolean to disable the watermark";
     }
@@ -40,22 +40,22 @@ message ResolvedBrandingSettings {
 }
 
 message SetBrandingSettings {
-  map<string, zitadel.settings.object.v2beta_mt.SetStringLong> custom_settings = 1;
+  map<string, zitadel.settings.object.v2alpha.SetStringLong> custom_settings = 1;
   optional SetTheme light_theme = 2;
   optional SetTheme dark_theme = 3;
-  optional zitadel.settings.object.v2beta_mt.SetString font_url = 4 [
+  optional zitadel.settings.object.v2alpha.SetString font_url = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "url to the font used";
       example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/font-180950243237405441\"";
     }
   ];
   // hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set
-  optional zitadel.settings.object.v2beta_mt.SetBool hide_login_name_suffix = 5 [
+  optional zitadel.settings.object.v2alpha.SetBool hide_login_name_suffix = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "hides the org suffix on the login form if the scope \"urn:zitadel:iam:org:domain:primary:{domainname}\" is set";
     }
   ];
-  optional zitadel.settings.object.v2beta_mt.SetBool disable_watermark = 6 [
+  optional zitadel.settings.object.v2alpha.SetBool disable_watermark = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "boolean to disable the watermark";
     }
@@ -70,42 +70,42 @@ message SetBrandingSettings {
 
 message ResolvedTheme {
   // hex value for primary color
-  zitadel.settings.object.v2beta_mt.ResolvedString primary_color = 1 [
+  zitadel.settings.object.v2alpha.ResolvedString primary_color = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "hex value for primary color";
       example: "\"#5469d4\"";
     }
   ];
   // hex value for background color
-  zitadel.settings.object.v2beta_mt.ResolvedString background_color = 2 [
+  zitadel.settings.object.v2alpha.ResolvedString background_color = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "hex value for background color";
       example: "\"#FAFAFA\"";
     }
   ];
   // hex value for warning color
-  zitadel.settings.object.v2beta_mt.ResolvedString warn_color = 3 [
+  zitadel.settings.object.v2alpha.ResolvedString warn_color = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "hex value for warn color";
       example: "\"#CD3D56\"";
     }
   ];
   // hex value for font color
-  zitadel.settings.object.v2beta_mt.ResolvedString font_color = 4 [
+  zitadel.settings.object.v2alpha.ResolvedString font_color = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "hex value for font color";
       example: "\"#000000\"";
     }
   ];
   // url where the logo is served
-  zitadel.settings.object.v2beta_mt.ResolvedString logo_url = 5 [
+  zitadel.settings.object.v2alpha.ResolvedString logo_url = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "url to the logo";
       example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/logo-180950416321494657\"";
     }
   ];
   // url where the icon is served
-  zitadel.settings.object.v2beta_mt.ResolvedString icon_url = 6 [
+  zitadel.settings.object.v2alpha.ResolvedString icon_url = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "url to the icon";
       example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/icon-180950498874178817\"";
@@ -116,42 +116,42 @@ message ResolvedTheme {
 
 message SetTheme {
   // hex value for primary color
-  optional zitadel.settings.object.v2beta_mt.SetString primary_color = 1 [
+  optional zitadel.settings.object.v2alpha.SetString primary_color = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "hex value for primary color";
       example: "\"#5469d4\"";
     }
   ];
   // hex value for background color
-  optional zitadel.settings.object.v2beta_mt.SetString background_color = 2 [
+  optional zitadel.settings.object.v2alpha.SetString background_color = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "hex value for background color";
       example: "\"#FAFAFA\"";
     }
   ];
   // hex value for warning color
-  optional zitadel.settings.object.v2beta_mt.SetString warn_color = 3 [
+  optional zitadel.settings.object.v2alpha.SetString warn_color = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "hex value for warn color";
       example: "\"#CD3D56\"";
     }
   ];
   // hex value for font color
-  optional zitadel.settings.object.v2beta_mt.SetString font_color = 4 [
+  optional zitadel.settings.object.v2alpha.SetString font_color = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "hex value for font color";
       example: "\"#000000\"";
     }
   ];
   // url where the logo is served
-  optional zitadel.settings.object.v2beta_mt.SetString logo_url = 5 [
+  optional zitadel.settings.object.v2alpha.SetString logo_url = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "url to the logo";
       example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/logo-180950416321494657\"";
     }
   ];
   // url where the icon is served
-  optional zitadel.settings.object.v2beta_mt.SetString icon_url = 6 [
+  optional zitadel.settings.object.v2alpha.SetString icon_url = 6 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "url to the icon";
       example: "\"https://acme.com/assets/v1/165617850692654601/policy/label/icon-180950498874178817\"";
@@ -168,7 +168,7 @@ enum ThemeMode {
 
 message ResolvedThemeMode {
   optional ThemeMode theme_mode = 1;
-  optional zitadel.object.v2beta_mt.Owner owner = 2;
+  optional zitadel.object.v2alpha.Owner owner = 2;
 }
 
 message SetThemeMode {

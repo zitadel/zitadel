@@ -12,7 +12,7 @@ import "zitadel/resources/action/v3alpha/target.proto";
 import "zitadel/resources/action/v3alpha/execution.proto";
 import "zitadel/resources/action/v3alpha/query.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/object/v2beta_mt/object.proto";
+import "zitadel/object/v2alpha/object.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
@@ -408,7 +408,7 @@ service ActionService {
 }
 
 message CreateTargetRequest {
-  // optional zitadel.object.v2beta_mt.RequestContext ctx = 1;
+  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
   reserved 1;
   // Unique name of the target.
   string name = 2 [
@@ -447,7 +447,7 @@ message CreateTargetResponse {
   // ID is the read-only unique identifier of the target.
   string id = 1;
   // Details provide some base information (such as the last change date) of the target.
-  zitadel.object.v2beta_mt.Details details = 2;
+  zitadel.object.v2alpha.Details details = 2;
 }
 
 message UpdateTargetRequest {
@@ -493,7 +493,7 @@ message UpdateTargetRequest {
 
 message UpdateTargetResponse {
   // Details provide some base information (such as the last change date) of the target.
-  zitadel.object.v2beta_mt.Details details = 1;
+  zitadel.object.v2alpha.Details details = 1;
 }
 
 message DeleteTargetRequest {
@@ -511,14 +511,14 @@ message DeleteTargetRequest {
 
 message DeleteTargetResponse {
   // Details provide some base information (such as the last change date) of the target.
-  zitadel.object.v2beta_mt.Details details = 1;
+  zitadel.object.v2alpha.Details details = 1;
 }
 
 message ListTargetsRequest {
-  // optional zitadel.object.v2beta_mt.RequestContext ctx = 1;
+  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
   reserved 1;
   // list limitations and ordering.
-  zitadel.object.v2beta_mt.ListQuery query = 2;
+  zitadel.object.v2alpha.ListQuery query = 2;
   // the field the result is sorted.
   zitadel.resources.action.v3alpha.TargetFieldName sorting_column = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -531,7 +531,7 @@ message ListTargetsRequest {
 
 message ListTargetsResponse {
   // Details provides information about the returned result including total amount found.
-  zitadel.object.v2beta_mt.ListDetails details = 1;
+  zitadel.object.v2alpha.ListDetails details = 1;
   // States by which field the results are sorted.
   zitadel.resources.action.v3alpha.TargetFieldName sorting_column = 2;
   // The result contains the user schemas, which matched the queries.
@@ -566,7 +566,7 @@ message SetExecutionRequest {
 
 message SetExecutionResponse {
   // Details provide some base information (such as the last change date) of the execution.
-  zitadel.object.v2beta_mt.Details details = 2;
+  zitadel.object.v2alpha.Details details = 2;
 }
 
 message DeleteExecutionRequest {
@@ -576,19 +576,19 @@ message DeleteExecutionRequest {
 
 message DeleteExecutionResponse {
   // Details provide some base information (such as the last change date) of the execution.
-  zitadel.object.v2beta_mt.Details details = 1;
+  zitadel.object.v2alpha.Details details = 1;
 }
 
 message ListExecutionsRequest {
   // list limitations and ordering.
-  zitadel.object.v2beta_mt.ListQuery query = 1;
+  zitadel.object.v2alpha.ListQuery query = 1;
   // Define the criteria to query for.
   repeated zitadel.resources.action.v3alpha.SearchQuery queries = 2;
 }
 
 message ListExecutionsResponse {
   // Details provides information about the returned result including total amount found.
-  zitadel.object.v2beta_mt.ListDetails details = 1;
+  zitadel.object.v2alpha.ListDetails details = 1;
   // The result contains the executions, which matched the queries.
   repeated zitadel.resources.action.v3alpha.Execution result = 2;
 }

@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package zitadel.settings.object.v2beta_mt;
+package zitadel.settings.object.v2alpha;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/field/v2beta_mt;field";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/field/v2alpha;field";
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/duration.proto";
 import "validate/validate.proto";
 
-import "zitadel/object/v2beta_mt/object.proto";
+import "zitadel/object/v2alpha/object.proto";
 
 message ResolvedBool {
   bool value = 1 [
@@ -17,7 +17,7 @@ message ResolvedBool {
       description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
     }
   ];
-  optional zitadel.object.v2beta_mt.Owner owner = 2 [
+  optional zitadel.object.v2alpha.Owner owner = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "If the value is inherited, the value is inherited from this owner.";
     }
@@ -40,7 +40,7 @@ message ResolvedString {
       description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
     }
   ];
-  optional zitadel.object.v2beta_mt.Owner owner = 2 [
+  optional zitadel.object.v2alpha.Owner owner = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "If the value is inherited, the value is inherited from this owner.";
     }
@@ -98,7 +98,7 @@ message ResolvedStrings {
       description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
     }
   ];
-  optional zitadel.object.v2beta_mt.Owner owner = 2 [
+  optional zitadel.object.v2alpha.Owner owner = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "If the value is inherited, the value is inherited from this owner.";
     }
@@ -125,7 +125,7 @@ message ResolvedUInt64 {
       description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
     }
   ];
-  optional zitadel.object.v2beta_mt.Owner owner = 2 [
+  optional zitadel.object.v2alpha.Owner owner = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "If the value is inherited, the value is inherited from this owner.";
     }
@@ -149,7 +149,7 @@ message ResolvedDuration {
       description: "The resolved value is valid for the given context. Either the value was explicitly set for the given context or it is inherited from a higher-level context.";
     }
   ];
-  optional zitadel.object.v2beta_mt.Owner owner = 2 [
+  optional zitadel.object.v2alpha.Owner owner = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "If the value is inherited, the value is inherited from this owner.";
     }

@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package zitadel.settings.template.v2beta_mt;
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/template/v2beta_mt;template";
+package zitadel.settings.template.v2alpha;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/template/v2alpha;template";
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-import "zitadel/object/v2beta_mt/object.proto";
-import "zitadel/settings/template/v2beta_mt/template.proto";
-import "zitadel/settings/object/v2beta_mt/field.proto";
+import "zitadel/object/v2alpha/object.proto";
+import "zitadel/settings/template/v2alpha/template.proto";
+import "zitadel/settings/object/v2alpha/field.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -188,45 +188,45 @@ service TemplateService {
 }
 
 message SetHTMLTemplateRequest{
-  optional zitadel.object.v2beta_mt.RequestContext ctx = 1;
-  optional settings.object.v2beta_mt.Language language = 2;
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
+  optional settings.object.v2alpha.Language language = 2;
   HTMLTemplateType type = 3;
-  settings.object.v2beta_mt.SetString template = 4;
+  settings.object.v2alpha.SetString template = 4;
 }
 
 message SetHTMLTemplateResponse{
-  zitadel.object.v2beta_mt.Details details = 1;
+  zitadel.object.v2alpha.Details details = 1;
 }
 
 message ResolveHTMLTemplateRequest{
-  optional zitadel.object.v2beta_mt.RequestContext ctx = 1;
-  optional settings.object.v2beta_mt.Language language = 2;
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
+  optional settings.object.v2alpha.Language language = 2;
   HTMLTemplateType type = 3;
 }
 
 message ResolveHTMLTemplateResponse{
-  zitadel.object.v2beta_mt.Details details = 1;
-  settings.object.v2beta_mt.ResolvedString template = 2;
+  zitadel.object.v2alpha.Details details = 1;
+  settings.object.v2alpha.ResolvedString template = 2;
 }
 
 message SetTextTemplateRequest{
-  optional zitadel.object.v2beta_mt.RequestContext ctx = 1;
-  optional settings.object.v2beta_mt.Language language = 2;
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
+  optional settings.object.v2alpha.Language language = 2;
   TextTemplateType type = 3;
-  settings.object.v2beta_mt.SetString template = 4;
+  settings.object.v2alpha.SetString template = 4;
 }
 
 message SetTextTemplateResponse{
-  zitadel.object.v2beta_mt.Details details = 1;
+  zitadel.object.v2alpha.Details details = 1;
 }
 
 message ResolveTextTemplateRequest{
-  optional zitadel.object.v2beta_mt.RequestContext ctx = 1;
-  optional settings.object.v2beta_mt.Language language = 2;
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
+  optional settings.object.v2alpha.Language language = 2;
   TextTemplateType type = 3;
 }
 
 message ResolveTextTemplateResponse{
-  zitadel.object.v2beta_mt.Details details = 1;
-  settings.object.v2beta_mt.ResolvedString template = 2;
+  zitadel.object.v2alpha.Details details = 1;
+  settings.object.v2alpha.ResolvedString template = 2;
 }

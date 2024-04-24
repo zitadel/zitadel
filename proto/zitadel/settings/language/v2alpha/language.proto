@@ -1,16 +1,16 @@
 syntax = "proto3";
 
-package zitadel.settings.language.v2beta_mt;
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/language/v2beta_mt;language";
+package zitadel.settings.language.v2alpha;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/language/v2alpha;language";
 
 import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-import "zitadel/settings/object/v2beta_mt/field.proto";
-import "zitadel/object/v2beta_mt/object.proto";
+import "zitadel/settings/object/v2alpha/field.proto";
+import "zitadel/object/v2alpha/object.proto";
 
 message SetLanguageSettings {
-  optional zitadel.settings.object.v2beta_mt.Language default_language = 1 [
+  optional zitadel.settings.object.v2alpha.Language default_language = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "default language for the current context"
       example: "\"en\""
@@ -25,7 +25,7 @@ message SetLanguageSettings {
 }
 
 message ResolvedLanguageSettings {
-  zitadel.settings.object.v2beta_mt.ResolvedString default_language = 1 [
+  zitadel.settings.object.v2alpha.ResolvedString default_language = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "default language for the current context"
       example: "\"en\""
@@ -46,7 +46,7 @@ message ResolvedLanguageSettings {
 }
 
 message SetLanguages {
-  repeated zitadel.settings.object.v2beta_mt.Language languages = 1 [
+  repeated zitadel.settings.object.v2alpha.Language languages = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "List of languages to set"
       example: "[\"en\", \"de\"]"
@@ -55,13 +55,13 @@ message SetLanguages {
 }
 
 message ResolvedLanguages {
-  repeated zitadel.settings.object.v2beta_mt.Language value = 1[
+  repeated zitadel.settings.object.v2alpha.Language value = 1[
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "List of languages"
       example: "[\"en\", \"de\"]"
     }
   ];
-  optional zitadel.object.v2beta_mt.Owner owner = 2 [
+  optional zitadel.object.v2alpha.Owner owner = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "If the value is inherited, the value is inherited from this owner.";
     }

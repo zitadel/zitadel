@@ -1,20 +1,20 @@
 syntax = "proto3";
 
-package zitadel.settings.language.v2beta_mt;
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/language/v2beta_mt;language";
+package zitadel.settings.instance.v2alpha;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/instance/v2alpha;instance";
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-import "zitadel/object/v2beta_mt/object.proto";
-import "zitadel/settings/language/v2beta_mt/language.proto";
+import "zitadel/object/v2alpha/object.proto";
+import "zitadel/settings/instance/v2alpha/instance.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "Language Service";
+    title: "Instance Service";
     version: "2.0";
-    description: "Language Service is intended to manage languages for ZITADEL. Enable the feature flag \"multitenancy_settings\" in order to activate it. Languages are settings, and are therefore inherited through the context hierarchy system -> instance -> org.";
+    description: "Instance Service is intended to manage system and instance-level settings for ZITADEL. Enable the feature flag \"multitenancy_settings\" in order to activate it. Instances are settings and therefore inherited, but only from system level to instance level.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -86,13 +86,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-// Language Service is intended to manage languages for ZITADEL.
+// Instance Service is intended to manage instances for ZITADEL.
 // Enable the feature flag \"multitenancy_settings\" in order to activate it.
-// Languages are settings, and are therefore inherited through the context hierarchy system -> instance -> org.
-service LanguageService {
-  rpc SetLanguages (SetLanguageSettingsRequest) returns (SetLanguageSettingsResponse) {
+// Instances are settings, and are therefore inherited through the context hierarchy system -> instance -> org.
+service InstanceService {
+  rpc SetInstanceSetting (SetInstanceSettingsRequest) returns (SetInstanceSettingsResponse) {
     option (google.api.http) = {
-      patch: "/settings/v2/languages"
+      patch: "/settings/v2/instances"
       body: "*"
     };
 
@@ -103,8 +103,8 @@ service LanguageService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Set languages for a given context";
-      description: "Configure and set languages for a given context. Only fields present in the request are set or unset."
+      summary: "Set instances for a given context";
+      description: "Configure and set instances for a given context. Only fields present in the request are set or unset."
       responses: {
         key: "200"
         value: {
@@ -114,9 +114,9 @@ service LanguageService {
     };
   };
 
-  rpc ResolveLanguages (ResolveLanguageSettingsRequest) returns (ResolveLanguageSettingsResponse) {
+  rpc GetInstanceSetting (ResolveInstanceSettingsRequest) returns (ResolveInstanceSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/languages"
+      get: "/settings/v2/instances"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -126,8 +126,8 @@ service LanguageService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Get the languages in the given context";
-      description: "Returns all configured and inherited languages for the given context."
+      summary: "Get the instances in the given context";
+      description: "Returns all configured and inherited instances for the given context."
       responses: {
         key: "200"
         value: {
@@ -138,20 +138,20 @@ service LanguageService {
   };
 }
 
-message SetLanguageSettingsRequest{
-  zitadel.object.v2beta_mt.RequestContext ctx = 1;
-  SetLanguageSettings settings = 2;
+message SetInstanceSettingsRequest{
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
+  SetInstanceSettings settings = 2;
 }
 
-message SetLanguageSettingsResponse{
-  zitadel.object.v2beta_mt.Details details = 1;
+message SetInstanceSettingsResponse {
+  zitadel.object.v2alpha.Details details = 1;
 }
 
-message ResolveLanguageSettingsRequest{
-  zitadel.object.v2beta_mt.RequestContext ctx = 1;
+message ResolveInstanceSettingsRequest{
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
-message ResolveLanguageSettingsResponse{
-  zitadel.object.v2beta_mt.Details details = 1;
-  ResolvedLanguageSettings settings = 2;
+message ResolveInstanceSettingsResponse{
+  zitadel.object.v2alpha.Details details = 1;
+  ResolvedInstanceSettings settings = 2;
 }

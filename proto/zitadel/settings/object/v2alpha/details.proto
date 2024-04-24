@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package zitadel.settings.object.v2beta_mt;
+package zitadel.settings.object.v2alpha;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/field/v2beta_mt;field";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/field/v2alpha;field";
 
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-import "zitadel/object/v2beta_mt/object.proto";
+import "zitadel/object/v2alpha/object.proto";
 
 message Details {
   //sequence represents the order of events. It's always counting
@@ -28,7 +28,7 @@ message Details {
   // on manipulation: the timestamp of the event(s) added by the manipulation
   google.protobuf.Timestamp change_date = 2;
   //resource_owner represents the context an object belongs to
-  zitadel.object.v2beta_mt.Owner resource_owner = 3 [
+  zitadel.object.v2alpha.Owner resource_owner = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\"";
     }

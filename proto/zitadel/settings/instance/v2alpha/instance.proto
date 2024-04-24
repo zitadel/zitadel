@@ -1,21 +1,21 @@
 syntax = "proto3";
 
-package zitadel.settings.instance.v2beta_mt;
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/instance/v2beta_mt;instance";
+package zitadel.settings.instance.v2alpha;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/instance/v2alpha;instance";
 
 import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-import "zitadel/settings/object/v2beta_mt/field.proto";
+import "zitadel/settings/object/v2alpha/field.proto";
 
 message SetInstanceSettings {
-  optional zitadel.settings.object.v2beta_mt.SetStrings allowed_embedded_iframe_origins = 1 [
+  optional zitadel.settings.object.v2alpha.SetStrings allowed_embedded_iframe_origins = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "origins allowed loading ZITADEL in an iframe."
       example: "[\"foo.bar.com\", \"localhost:8080\"]"
     }
   ];
-  optional zitadel.settings.object.v2beta_mt.SetBool disallow_public_org_registration = 2 [
+  optional zitadel.settings.object.v2alpha.SetBool disallow_public_org_registration = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
     }
@@ -23,13 +23,13 @@ message SetInstanceSettings {
 }
 
 message ResolvedInstanceSettings {
-  zitadel.settings.object.v2beta_mt.ResolvedStrings allowed_embedded_iframe_origins = 1 [
+  zitadel.settings.object.v2alpha.ResolvedStrings allowed_embedded_iframe_origins = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "origins allowed loading ZITADEL in an iframe."
       example: "[\"foo.bar.com\", \"localhost:8080\"]"
     }
   ];
-  zitadel.settings.object.v2beta_mt.ResolvedBool disallow_public_org_registration = 2 [
+  zitadel.settings.object.v2alpha.ResolvedBool disallow_public_org_registration = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if ZITADEL should expose the endpoint /ui/login/register/org. If it is true, the org registration endpoint returns the HTTP status 404 on GET requests, and 409 on POST requests.";
     }

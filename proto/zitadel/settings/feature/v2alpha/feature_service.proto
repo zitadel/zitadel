@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package zitadel.settings.feature.v2beta_mt;
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/feature/v2beta_mt;feature";
+package zitadel.settings.feature.v2alpha;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/feature/v2alpha;feature";
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-import "zitadel/object/v2beta_mt/object.proto";
-import "zitadel/settings/feature/v2beta_mt/feature.proto";
+import "zitadel/object/v2alpha/object.proto";
+import "zitadel/settings/feature/v2alpha/feature.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -145,20 +145,20 @@ service FeatureService {
 
 message ResolveFeatureSettingsRequest{
   // Only System and Instance Contexts are allowed for now
-  zitadel.object.v2beta_mt.RequestContext ctx = 1;
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
 }
 
 message ResolveFeatureSettingsResponse{
-  zitadel.object.v2beta_mt.Details details = 1;
+  zitadel.object.v2alpha.Details details = 1;
   ResolvedFeatureSettings settings = 2;
 }
 
 message SetFeatureSettingsRequest{
   // Only System and Instance Contexts are allowed for now
-  zitadel.object.v2beta_mt.RequestContext ctx = 1;
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
   SetFeatureSettings settings = 2;
 }
 
 message SetFeatureSettingsResponse{
-  zitadel.object.v2beta_mt.Details details = 1;
+  zitadel.object.v2alpha.Details details = 1;
 }
