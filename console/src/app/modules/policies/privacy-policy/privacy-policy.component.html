@@ -9,6 +9,7 @@
       color="warn"
       (click)="resetDefault()"
       mat-stroked-button
+      data-e2e="reset-button"
     >
       {{ 'POLICY.RESET' | translate }}
     </button>
@@ -69,6 +70,7 @@
     color="primary"
     type="submit"
     mat-raised-button
+    data-e2e="save-button"
   >
     {{ 'ACTIONS.SAVE' | translate }}
   </button>
