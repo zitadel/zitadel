@@ -1,8 +1,8 @@
 package login
 
 import (
-	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -45,18 +45,14 @@ type initUserData struct {
 }
 
 func InitUserLink(origin, userID, loginName, code, orgID string, passwordSet bool, authRequestID string) string {
-	return fmt.Sprintf(
-		"%s%s?userID=%s&loginname=%s&code=%s&orgID=%s&passwordset=%t&%s=%s",
-		externalLink(origin),
-		EndpointInitUser,
-		userID,
-		loginName,
-		code,
-		orgID,
-		passwordSet,
-		QueryAuthRequestID,
-		authRequestID,
-	)
+	v := url.Values{}
+	v.Set(queryInitUserUserID, userID)
+	v.Set(queryInitUserLoginName, loginName)
+	v.Set(queryInitUserCode, code)
+	v.Set(queryOrgID, orgID)
+	v.Set(queryInitUserPassword, strconv.FormatBool(passwordSet))
+	v.Set(QueryAuthRequestID, authRequestID)
+	return externalLink(origin) + EndpointInitUser + "?" + v.Encode()
 }
 
 func (l *Login) handleInitUser(w http.ResponseWriter, r *http.Request) {

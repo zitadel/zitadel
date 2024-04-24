@@ -1,8 +1,8 @@
 package login
 
 import (
-	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -28,7 +28,12 @@ type mailVerificationData struct {
 }
 
 func MailVerificationLink(origin, userID, code, orgID, authRequestID string) string {
-	return fmt.Sprintf("%s%s?userID=%s&code=%s&orgID=%s&%s=%s", externalLink(origin), EndpointMailVerification, userID, code, orgID, QueryAuthRequestID, authRequestID)
+	v := url.Values{}
+	v.Set(queryUserID, userID)
+	v.Set(queryCode, code)
+	v.Set(queryOrgID, orgID)
+	v.Set(QueryAuthRequestID, authRequestID)
+	return externalLink(origin) + EndpointMailVerification + "?" + v.Encode()
 }
 
 func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
