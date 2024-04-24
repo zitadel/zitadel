@@ -84,25 +84,21 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     mergeMap((env) =>
       this.wellknownURLs$.pipe(
         map((wellknown) => {
-          return [[
-            "Issuer", env.issuer,
-          ], [
-            "Admin Service URL", `${env.api}/admin/v1`,
-          ], [
-            "Management Service URL", `${env.api}/management/v1`,
-          ], [
-            "Auth Service URL", `${env.api}/auth/v1`,
-          ],
-            ...wellknown.filter(([k, v]) => k === 'Revocation Endpoint' || k === 'JKWS URI' || k === 'Introspection Endpoint'),
+          return [
+            ['Issuer', env.issuer],
+            ['Admin Service URL', `${env.api}/admin/v1`],
+            ['Management Service URL', `${env.api}/management/v1`],
+            ['Auth Service URL', `${env.api}/auth/v1`],
+            ...wellknown.filter(
+              ([k, v]) => k === 'Revocation Endpoint' || k === 'JKWS URI' || k === 'Introspection Endpoint',
+            ),
           ];
         }),
       ),
     ),
   );
 
-  public issuer$ = this.apiURLs$.pipe(
-    map((urls) => urls.find(([k, v]) => k === 'Issuer')?.[1]),
-  );
+  public issuer$ = this.apiURLs$.pipe(map((urls) => urls.find(([k, v]) => k === 'Issuer')?.[1]));
 
   public samlURLs$ = this.envSvc.env.pipe(
     map((env) => {
@@ -116,23 +112,16 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public wellknownURLs$ = this.envSvc.wellknown.pipe(
     map((wellknown) => {
-      return [[
-        'Authorization Endpoint', wellknown.authorization_endpoint,
-      ], [
-        'Device Authorization Endpoint', wellknown.device_authorization_endpoint,
-      ], [
-        'End Session Endpoint', wellknown.end_session_endpoint,
-      ], [
-        'Introspection Endpoint', wellknown.introspection_endpoint,
-      ], [
-        'JKWS URI', wellknown.jwks_uri,
-      ], [
-        'Revocation Endpoint', wellknown.revocation_endpoint,
-      ], [
-        'Token Endpoint', wellknown.token_endpoint,
-      ], [
-        'Userinfo Endpoint', wellknown.userinfo_endpoint,
-      ]]
+      return [
+        ['Authorization Endpoint', wellknown.authorization_endpoint],
+        ['Device Authorization Endpoint', wellknown.device_authorization_endpoint],
+        ['End Session Endpoint', wellknown.end_session_endpoint],
+        ['Introspection Endpoint', wellknown.introspection_endpoint],
+        ['JKWS URI', wellknown.jwks_uri],
+        ['Revocation Endpoint', wellknown.revocation_endpoint],
+        ['Token Endpoint', wellknown.token_endpoint],
+        ['Userinfo Endpoint', wellknown.userinfo_endpoint],
+      ];
     }),
   );
 
