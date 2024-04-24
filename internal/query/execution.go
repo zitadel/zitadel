@@ -141,19 +141,19 @@ func NewIncludeSearchQuery(include string) (SearchQuery, error) {
 }
 
 // marshall executionTargets into the same JSONB structure as in the SQL queries
-func targetItemJSONB(t domain.ExecutionTargetType, target string) ([]byte, error) {
-	targets := make([]*executionTarget, 0)
+func targetItemJSONB(t domain.ExecutionTargetType, targetItem string) ([]byte, error) {
+	var target *executionTarget
 	switch t {
 	case domain.ExecutionTargetTypeTarget:
-		targets = append(targets, &executionTarget{Target: target})
+		target = &executionTarget{Target: targetItem}
 	case domain.ExecutionTargetTypeInclude:
-		targets = append(targets, &executionTarget{Include: target})
+		target = &executionTarget{Include: targetItem}
 	case domain.ExecutionTargetTypeUnspecified:
 		return nil, nil
 	default:
 		return nil, nil
 	}
-	return json.Marshal(targets)
+	return json.Marshal([]*executionTarget{target})
 }
 
 // ExecutionTargets: provide IDs to select all target information,
@@ -241,10 +241,7 @@ type executionTarget struct {
 
 func scanExecution(row *sql.Row) (*Execution, error) {
 	execution := new(Execution)
-
-	var (
-		targets = make([]byte, 0)
-	)
+	targets := make([]byte, 0)
 
 	err := row.Scan(
 		&execution.ResourceOwner,
@@ -260,38 +257,38 @@ func scanExecution(row *sql.Row) (*Execution, error) {
 		return nil, zerrors.ThrowInternal(err, "QUERY-f8sjvm4tb8", "Errors.Internal")
 	}
 
-	ets := make([]*executionTarget, 0)
-	if err := json.Unmarshal(targets, &ets); err != nil {
+	executionTargets := make([]*executionTarget, 0)
+	if err := json.Unmarshal(targets, &executionTargets); err != nil {
 		return nil, err
 	}
 
-	execution.Targets = make([]*exec.Target, len(ets))
-	for i := range ets {
-		if ets[i].Target != "" {
-			execution.Targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: ets[i].Target}
+	execution.Targets = make([]*exec.Target, len(executionTargets))
+	for i := range executionTargets {
+		if executionTargets[i].Target != "" {
+			execution.Targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: executionTargets[i].Target}
 		}
-		if ets[i].Include != "" {
-			execution.Targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: ets[i].Include}
+		if executionTargets[i].Include != "" {
+			execution.Targets[i] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: executionTargets[i].Include}
 		}
 	}
 
 	return execution, nil
 }
 
-func executionTargetsUnmarshal(executionTargets []byte) ([]*exec.Target, error) {
-	ets := make([]*executionTarget, 0)
-	if err := json.Unmarshal(executionTargets, &ets); err != nil {
+func executionTargetsUnmarshal(data []byte) ([]*exec.Target, error) {
+	executionTargets := make([]*executionTarget, 0)
+	if err := json.Unmarshal(data, &executionTargets); err != nil {
 		return nil, err
 	}
 
-	targets := make([]*exec.Target, len(ets))
+	targets := make([]*exec.Target, len(executionTargets))
 	// position starts with 1
-	for _, et := range ets {
-		if et.Target != "" {
-			targets[et.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: et.Target}
+	for _, item := range executionTargets {
+		if item.Target != "" {
+			targets[item.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeTarget, Target: item.Target}
 		}
-		if et.Include != "" {
-			targets[et.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: et.Include}
+		if item.Include != "" {
+			targets[item.Position-1] = &exec.Target{Type: domain.ExecutionTargetTypeInclude, Target: item.Include}
 		}
 	}
 	return targets, nil

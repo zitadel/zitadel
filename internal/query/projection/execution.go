@@ -58,8 +58,6 @@ func (*executionProjection) Init() *old_handler.Check {
 			handler.NewPrimaryKey(ExecutionTargetInstanceIDCol, ExecutionTargetExecutionIDCol, ExecutionTargetPositionCol),
 			ExecutionTargetSuffix,
 			handler.WithForeignKey(handler.NewForeignKey("execution", []string{ExecutionTargetInstanceIDCol, ExecutionTargetExecutionIDCol}, []string{ExecutionInstanceIDCol, ExecutionIDCol})),
-			// handler.WithForeignKey(handler.NewForeignKey("target", []string{ExecutionTargetInstanceIDCol, ExecutionTargetTargetIDCol}, []string{TargetInstanceIDCol, TargetIDCol})),
-			// handler.WithForeignKey(handler.NewForeignKey("include", []string{ExecutionTargetInstanceIDCol, ExecutionTargetIncludeCol}, []string{ExecutionInstanceIDCol, ExecutionIDCol})),
 			handler.WithIndex(handler.NewIndex("execution", []string{ExecutionTargetInstanceIDCol, ExecutionTargetExecutionIDCol})),
 		),
 	)
@@ -151,9 +149,7 @@ func (p *executionProjection) reduceExecutionSet(event eventstore.Event) (*handl
 		}
 	}
 
-	return handler.NewMultiStatement(e,
-		stmts...,
-	), nil
+	return handler.NewMultiStatement(e, stmts...), nil
 }
 
 func (p *executionProjection) reduceExecutionRemoved(event eventstore.Event) (*handler.Statement, error) {

@@ -58,8 +58,10 @@ func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetReque
 }
 
 func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
-	var targetType domain.TargetType
-	var interruptOnError bool
+	var (
+		targetType       domain.TargetType
+		interruptOnError bool
+	)
 	switch t := req.GetTargetType().(type) {
 	case *action.CreateTargetRequest_RestWebhook:
 		targetType = domain.TargetTypeWebhook
