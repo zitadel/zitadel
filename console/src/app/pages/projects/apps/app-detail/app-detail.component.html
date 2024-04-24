@@ -422,7 +422,7 @@
         </ng-container>
         <ng-container *ngIf="currentSetting === 'urls'">
           <cnsl-card title=" {{ 'APP.URLS' | translate }}">
-            <cnsl-info-section *ngIf="(apiMap$ | async)?.issuer as issuer">
+            <cnsl-info-section *ngIf="(apiMap$ | async)?.Issuer as issuer">
               <div
                 class="link"
                 [innerHtml]="'APP.OIDC.WELLKNOWN' | translate: { url: issuer + '/.well-known/openid-configuration' }"
@@ -460,12 +460,7 @@
             </ng-container>
             <ng-container *ngIf="app?.oidcConfig && wellknownMap$ | async | keyvalue as wellKnownMap">
               <ng-container *ngFor="let wellknown of wellKnownMap">
-                <cnsl-copy-row
-                  labelMinWidth="220px"
-                  *ngIf="wellknown.key.endsWith('endpoint') || wellknown.key.toString() === 'jwks_uri'"
-                  [label]="wellknown.key"
-                  [value]="wellknown.value"
-                ></cnsl-copy-row>
+                <cnsl-copy-row labelMinWidth="220px" [label]="wellknown.key" [value]="wellknown.value"></cnsl-copy-row>
               </ng-container>
             </ng-container>
           </cnsl-card>

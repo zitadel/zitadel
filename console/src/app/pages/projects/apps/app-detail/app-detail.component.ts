@@ -8,7 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Buffer } from 'buffer';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { Subject, Subscription } from 'rxjs';
+import { mergeMap, Subject, Subscription } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
@@ -81,14 +81,21 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public app?: App.AsObject;
 
   public apiMap$ = this.envSvc.env.pipe(
-    map((env) => {
-      return {
-        issuer: env.issuer,
-        adminServiceUrl: `${env.api}/admin/v1`,
-        mgmtServiceUrl: `${env.api}/management/v1`,
-        authServiceUrl: `${env.api}/auth/v1`,
-      };
-    }),
+    mergeMap((env) =>
+      this.wellknownMap$.pipe(
+        map((wellknown) => {
+          return {
+            Issuer: env.issuer,
+            'Admin Service URL': `${env.api}/admin/v1`,
+            'Management Service URL': `${env.api}/management/v1`,
+            'Auth Service URL': `${env.api}/auth/v1`,
+            'Revocation Endpoint': wellknown['Revocation Endpoint'],
+            'JKWS URI': wellknown['JKWS URI'],
+            'Introspection Endpoint': wellknown['Introspection Endpoint'],
+          };
+        }),
+      ),
+    ),
   );
   public samlMap$ = this.envSvc.env.pipe(
     map((env) => {
@@ -99,7 +106,18 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       };
     }),
   );
-  public wellknownMap$ = this.envSvc.wellknown;
+  public wellknownMap$ = this.envSvc.wellknown.pipe(
+    map((wellknown) => ({
+      'Authorization Endpoint': wellknown.authorization_endpoint,
+      'Device Authorization Endpoint': wellknown.device_authorization_endpoint,
+      'End Session Endpoint': wellknown.end_session_endpoint,
+      'Introspection Endpoint': wellknown.introspection_endpoint,
+      'JKWS URI': wellknown.jwks_uri,
+      'Revocation Endpoint': wellknown.revocation_endpoint,
+      'Token Endpoint': wellknown.token_endpoint,
+      'Userinfo Endpoint': wellknown.userinfo_endpoint,
+    })),
+  );
 
   public oidcResponseTypes: OIDCResponseType[] = [
     OIDCResponseType.OIDC_RESPONSE_TYPE_CODE,
