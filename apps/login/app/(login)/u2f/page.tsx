@@ -1,8 +1,6 @@
 import { getBrandingSettings, getLoginSettings, server } from "#/lib/zitadel";
 import DynamicTheme from "#/ui/DynamicTheme";
-import LoginOTP from "#/ui/LoginOTP";
 import LoginPasskey from "#/ui/LoginPasskey";
-import VerifyU2F from "#/ui/VerifyU2F";
 
 export default async function Page({
   searchParams,
