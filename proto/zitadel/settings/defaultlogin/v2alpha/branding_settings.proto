@@ -5,7 +5,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v
 
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/object/v2alpha/object.proto";
-import "zitadel/settings/object/v2alpha/field.proto";
+import "zitadel/settings/object/v2alpha/object.proto";
 import "google/protobuf/struct.proto";
 
 message ResolvedBrandingSettings {

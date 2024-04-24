@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 import "zitadel/object/v2alpha/object.proto";
+import "zitadel/settings/object/v2alpha/object.proto";
 import "zitadel/settings/feature/v2alpha/feature.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
@@ -149,7 +150,7 @@ message ResolveFeatureSettingsRequest{
 }
 
 message ResolveFeatureSettingsResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   ResolvedFeatureSettings settings = 2;
 }
 
@@ -160,5 +161,5 @@ message SetFeatureSettingsRequest{
 }
 
 message SetFeatureSettingsResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }

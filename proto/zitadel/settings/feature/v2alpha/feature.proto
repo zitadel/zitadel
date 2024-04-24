@@ -6,7 +6,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/feature/v2alph
 import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-import "zitadel/settings/object/v2alpha/field.proto";
+import "zitadel/settings/object/v2alpha/object.proto";
 
 message SetFeatureSettings {
   /* We discard this feature

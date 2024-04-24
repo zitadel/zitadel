@@ -8,7 +8,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 import "zitadel/object/v2alpha/object.proto";
 import "zitadel/settings/template/v2alpha/template.proto";
-import "zitadel/settings/object/v2alpha/field.proto";
+import "zitadel/settings/object/v2alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -195,7 +195,7 @@ message SetHTMLTemplateRequest{
 }
 
 message SetHTMLTemplateResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message ResolveHTMLTemplateRequest{
@@ -205,7 +205,7 @@ message ResolveHTMLTemplateRequest{
 }
 
 message ResolveHTMLTemplateResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   settings.object.v2alpha.ResolvedString template = 2;
 }
 
@@ -217,7 +217,7 @@ message SetTextTemplateRequest{
 }
 
 message SetTextTemplateResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message ResolveTextTemplateRequest{
@@ -227,6 +227,6 @@ message ResolveTextTemplateRequest{
 }
 
 message ResolveTextTemplateResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   settings.object.v2alpha.ResolvedString template = 2;
 }

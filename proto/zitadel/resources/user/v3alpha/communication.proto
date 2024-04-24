@@ -106,4 +106,20 @@ message SendPhoneVerificationCode {}
 
 message ReturnPhoneVerificationCode {}
 
+message ResendContactEmailVerification {
+  oneof verification {
+    // Let ZITADEL send the link to the user via email.
+    SendEmailVerificationCode send_code = 2;
+    // Get the code back to provide it to the user in your preferred mechanism.
+    ReturnEmailVerificationCode return_code = 3;
+  }
+}
 
+message ResendContactPhoneCodeVerification {
+  oneof verification {
+    // Let ZITADEL send the link to the user via SMS.
+    SendPhoneVerificationCode send_code = 2;
+    // Get the code back to provide it to the user in your preferred mechanism.
+    ReturnPhoneVerificationCode return_code = 3;
+  }
+}

@@ -7,7 +7,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/object/v2alpha/object.proto";
-import "zitadel/settings/object/v2alpha/field.proto";
+import "zitadel/settings/object/v2alpha/object.proto";
 
 import "zitadel/settings/defaultlogin/v2alpha/branding_settings.proto";
 import "zitadel/settings/defaultlogin/v2alpha/domain_settings.proto";
@@ -330,31 +330,31 @@ message SetTextSettingsRequest {
 }
 
 message SetLoginSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message SetPasswordSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message SetBrandingSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message SetDomainSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message SetLegalSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message SetLockoutSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message SetTextSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message ResolveLoginSettingsRequest {
@@ -387,36 +387,36 @@ message ResolveTextSettingsRequest {
 }
 
 message ResolveLoginSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   ResolvedTextSettings settings = 3;
 }
 
 message ResolvePasswordSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   ResolvedPasswordSettings settings = 3;
 }
 
 message ResolveBrandingSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   ResolvedBrandingSettings settings = 3;
 }
 
 message ResolveDomainSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   ResolvedDomainSettings settings = 3;
 }
 
 message ResolveLegalSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   ResolvedLegalSettings settings = 3;
 }
 
 message ResolveLockoutSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   ResolvedLockoutSettings settings = 3;
 }
 
 message ResolveTextSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   ResolvedLockoutSettings settings = 3;
 }

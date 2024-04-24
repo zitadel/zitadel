@@ -8,7 +8,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2alpha/object.proto";
+import "zitadel/resources/object/v2alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
@@ -40,18 +40,12 @@ message Target {
 }
 
 message GetTarget {
-  // ID is the read-only unique identifier of the target.
-  string id = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629012906488334\"";
-    }
-  ];
   // Details provide some base information (such as the last change date) of the target.
-  zitadel.object.v2alpha.Details details = 2;
+  zitadel.resources.object.v2alpha.Details details = 2;
   Target target = 3;
 }
 
-message SetTarget {
+message PatchTarget {
   // Unique name of the target.
   optional string name = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

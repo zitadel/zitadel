@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 import "zitadel/object/v2alpha/object.proto";
+import "zitadel/settings/object/v2alpha/object.proto";
 import "zitadel/settings/language/v2alpha/language.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
@@ -144,7 +145,7 @@ message SetLanguageSettingsRequest{
 }
 
 message SetLanguageSettingsResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message ResolveLanguageSettingsRequest{
@@ -152,6 +153,6 @@ message ResolveLanguageSettingsRequest{
 }
 
 message ResolveLanguageSettingsResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   ResolvedLanguageSettings settings = 2;
 }

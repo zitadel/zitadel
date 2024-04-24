@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 import "zitadel/object/v2alpha/object.proto";
+import "zitadel/settings/object/v2alpha/object.proto";
 import "zitadel/settings/instance/v2alpha/instance.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
@@ -144,7 +145,7 @@ message SetInstanceSettingsRequest{
 }
 
 message SetInstanceSettingsResponse {
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
 }
 
 message ResolveInstanceSettingsRequest{
@@ -152,6 +153,6 @@ message ResolveInstanceSettingsRequest{
 }
 
 message ResolveInstanceSettingsResponse{
-  zitadel.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v2alpha.Details details = 1;
   ResolvedInstanceSettings settings = 2;
 }
