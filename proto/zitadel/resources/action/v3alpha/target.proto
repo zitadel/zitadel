@@ -41,7 +41,7 @@ message Target {
 
 message GetTarget {
   // ID is the read-only unique identifier of the target.
-  string target_id = 1 [
+  string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629012906488334\"";
     }

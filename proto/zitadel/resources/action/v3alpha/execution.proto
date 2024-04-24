@@ -14,17 +14,30 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
 message Execution {
-  string execution_id = 1 [
+  Condition condition = 1;
+  // Targets which are called in the defined conditions.
+  repeated string targets = 2;
+  // Included executions with the same condition-types.
+  repeated string includes = 3;
+}
+
+message SetExecution {
+  optional Condition condition = 1;
+  // Targets which are called in the defined conditions.
+  repeated string targets = 2;
+  // Included executions with the same condition-types.
+  repeated string includes = 3;
+}
+
+message GetExecution {
+  string id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"request.zitadel.session.v2beta.SessionService\"";
+      example: "\"69629012906488334\"";
     }
   ];
   // Details provide some base information (such as the last change date) of the target.
-  zitadel.object.v2alpha.Details details = 2;
-  // Targets which are called in the defined conditions.
-  repeated string targets = 3;
-  // Included executions with the same condition-types.
-  repeated string includes = 4;
+  zitadel.object.v2alpha.Details details = 3;
+  Execution execution = 4;
 }
 
 message Condition {
