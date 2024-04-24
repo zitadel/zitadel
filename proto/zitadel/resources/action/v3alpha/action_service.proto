@@ -14,7 +14,7 @@ import "zitadel/resources/action/v3alpha/query.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/object/v2beta_mt/object.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resouces/action/v3alpha;action";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
