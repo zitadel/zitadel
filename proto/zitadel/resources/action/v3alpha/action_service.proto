@@ -112,7 +112,7 @@ service ActionService {
   rpc CreateTarget (CreateTargetRequest) returns (CreateTargetResponse) {
     option (google.api.http) = {
       post: "/v2/targets"
-      body: "*"
+      body: "target"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -145,7 +145,7 @@ service ActionService {
   rpc UpdateTarget (UpdateTargetRequest) returns (UpdateTargetResponse) {
     option (google.api.http) = {
       patch: "/v2/targets/{target_id}"
-      body: "*"
+      body: "target"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -411,36 +411,7 @@ message CreateTargetRequest {
   // optional zitadel.object.v2alpha.RequestContext ctx = 1;
   reserved 1;
   // Unique name of the target.
-  string name = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
-      example: "\"ip_allow_list\"";
-    }
-  ];
-  // Defines the target type and how the response of the target is treated.
-  oneof target_type {
-    option (validate.required) = true;
-
-    SetRESTWebhook rest_webhook = 3;
-    SetRESTRequestResponse rest_request_response = 4;
-  }
-  // Timeout defines the duration until ZITADEL cancels the execution.
-  google.protobuf.Duration timeout = 5 [
-    (validate.rules).duration = {gt: {seconds: 0}, required: true},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"10s\"";
-    }
-  ];
-  oneof execution_type {
-    // Set the execution to run asynchronously.
-    bool is_async = 6;
-    // Define if any error stops the whole execution. By default the process continues as normal.
-    bool interrupt_on_error = 7;
-  }
+  Target target = 2;
 }
 
 message CreateTargetResponse {
@@ -461,34 +432,7 @@ message UpdateTargetRequest {
       example: "\"69629026806489455\"";
     }
   ];
-  // Optionally change the unique name of the target.
-  optional string name = 2 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
-      example: "\"ip_allow_list\"";
-    }
-  ];
-  // Optionally change the target type and how the response of the target is treated,
-  // or its target URL.
-  oneof target_type {
-    SetRESTWebhook rest_webhook = 3;
-    SetRESTRequestResponse rest_request_response = 4;
-  }
-  // Optionally change the timeout, which defines the duration until ZITADEL cancels the execution.
-  optional google.protobuf.Duration timeout = 5 [
-    (validate.rules).duration = {gt: {seconds: 0}},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"10s\"";
-    }
-  ];
-  oneof execution_type {
-    // Set the execution to run asynchronously.
-    bool is_async = 6;
-    // Define if any error stops the whole execution. By default the process continues as normal.
-    bool interrupt_on_error = 7;
-  }
+  SetTarget target = 2;
 }
 
 message UpdateTargetResponse {
@@ -535,7 +479,7 @@ message ListTargetsResponse {
   // States by which field the results are sorted.
   zitadel.resources.action.v3alpha.TargetFieldName sorting_column = 2;
   // The result contains the user schemas, which matched the queries.
-  repeated zitadel.resources.action.v3alpha.Target result = 3;
+  repeated zitadel.resources.action.v3alpha.GetTarget result = 3;
 }
 
 message GetTargetByIDRequest {
@@ -552,7 +496,7 @@ message GetTargetByIDRequest {
 }
 
 message GetTargetByIDResponse {
-  zitadel.resources.action.v3alpha.Target target = 1;
+  zitadel.resources.action.v3alpha.GetTarget target = 1;
 }
 
 message SetExecutionRequest {
