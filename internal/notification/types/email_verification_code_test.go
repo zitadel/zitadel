@@ -40,7 +40,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 				authRequestID: "authRequestID",
 			},
 			want: &notifyResult{
-				url:                                "https://example.com/ui/login/mail/verification?userID=user1&code=123&orgID=org1&authRequestID=authRequestID",
+				url:                                "https://example.com/ui/login/mail/verification?authRequestID=authRequestID&code=123&orgID=org1&userID=user1",
 				args:                               map[string]interface{}{"Code": "123"},
 				messageType:                        domain.VerifyEmailMessageType,
 				allowUnverifiedNotificationChannel: true,
