@@ -24,16 +24,20 @@ type AuthRequestCache struct {
 }
 
 func Start(dbClient *database.DB, amountOfCachedAuthRequests uint16) *AuthRequestCache {
+	cache := &AuthRequestCache{
+		client: dbClient,
+	}
 	idCache, err := lru.New[string, *domain.AuthRequest](int(amountOfCachedAuthRequests))
 	logging.OnError(err).Info("auth request cache disabled")
+	if err == nil {
+		cache.idCache = idCache
+	}
 	codeCache, err := lru.New[string, *domain.AuthRequest](int(amountOfCachedAuthRequests))
 	logging.OnError(err).Info("auth request cache disabled")
-
-	return &AuthRequestCache{
-		client:    dbClient,
-		idCache:   idCache,
-		codeCache: codeCache,
+	if err == nil {
+		cache.codeCache = codeCache
 	}
+	return cache
 }
 
 func (c *AuthRequestCache) Health(ctx context.Context) error {

@@ -656,7 +656,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		}
 	}
 
-	if request.LoginPolicy == nil || len(request.AllowedExternalIDPs) == 0 {
+	if request.LoginPolicy == nil || len(request.AllowedExternalIDPs) == 0 || request.PolicyOrgID() != orgID {
 		loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
 		if err != nil {
 			return err
@@ -666,21 +666,21 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 			request.AllowedExternalIDPs = idpProviders
 		}
 	}
-	if request.LockoutPolicy == nil {
+	if request.LockoutPolicy == nil || request.PolicyOrgID() != orgID {
 		lockoutPolicy, err := repo.getLockoutPolicy(ctx, orgID)
 		if err != nil {
 			return err
 		}
 		request.LockoutPolicy = lockoutPolicyToDomain(lockoutPolicy)
 	}
-	if request.PrivacyPolicy == nil {
+	if request.PrivacyPolicy == nil || request.PolicyOrgID() != orgID {
 		privacyPolicy, err := repo.GetPrivacyPolicy(ctx, orgID)
 		if err != nil {
 			return err
 		}
 		request.PrivacyPolicy = privacyPolicy
 	}
-	if request.LabelPolicy == nil {
+	if request.LabelPolicy == nil || request.PolicyOrgID() != orgID {
 		labelPolicy, err := repo.getLabelPolicy(ctx, request.PrivateLabelingOrgID(orgID))
 		if err != nil {
 			return err
@@ -694,13 +694,14 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		}
 		request.DefaultTranslations = defaultLoginTranslations
 	}
-	if len(request.OrgTranslations) == 0 {
+	if len(request.OrgTranslations) == 0 || request.PolicyOrgID() != orgID {
 		orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
 		if err != nil {
 			return err
 		}
 		request.OrgTranslations = orgLoginTranslations
 	}
+	request.SetPolicyOrgID(orgID)
 	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return nil
 }
@@ -887,7 +888,7 @@ func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(ctx context.Con
 }
 
 func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, resourceOwner string) (err error) {
-	if request.LoginPolicy == nil {
+	if request.LoginPolicy == nil || request.PolicyOrgID() != resourceOwner {
 		loginPolicy, idps, err := repo.getLoginPolicyAndIDPProviders(ctx, resourceOwner)
 		if err != nil {
 			return err
