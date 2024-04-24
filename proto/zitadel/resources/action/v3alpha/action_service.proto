@@ -19,7 +19,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alph
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Action Service";
-    version: "2.0";
+    version: "2.0-alpha";
     description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. It is behind the feature flag \"multitenancy_resources_api\". It can AND will continue breaking until the services provide the same functionality as the current actions.";
     contact:{
       name: "ZITADEL"
@@ -44,7 +44,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/grpc-web+proto";
 
   host: "$ZITADEL_DOMAIN";
-  base_path: "/";
+  base_path: "/resources/v3alpha";
 
   external_docs: {
     description: "Detailed information about ZITADEL",
@@ -111,7 +111,7 @@ service ActionService {
   // Create a new target, which can be used in executions.
   rpc CreateTarget (CreateTargetRequest) returns (CreateTargetResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/targets"
+      post: "/targets"
       body: "target"
     };
 
@@ -144,7 +144,7 @@ service ActionService {
   // Patch an existing target.
   rpc PatchTarget (PatchTargetRequest) returns (PatchTargetResponse) {
     option (google.api.http) = {
-      patch: "/resources/v3alpha/targets/{id}"
+      patch: "/targets/{id}"
       body: "target"
     };
 
@@ -169,7 +169,7 @@ service ActionService {
   // Delete an existing target. This will remove it from any configured execution as well.
   rpc DeleteTarget (DeleteTargetRequest) returns (DeleteTargetResponse) {
     option (google.api.http) = {
-      delete: "/resources/v3alpha/targets/{id}"
+      delete: "/targets/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -194,7 +194,7 @@ service ActionService {
   // Make sure to include a limit and sorting for pagination.
   rpc SearchTargets (SearchTargetsRequest) returns (SearchTargetsResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/targets/_search",
+      post: "/targets/_search",
       body: "queries"
     };
 
@@ -230,7 +230,7 @@ service ActionService {
   // Returns the target identified by the requested ID.
   rpc GetTargetByID (GetTargetByIDRequest) returns (GetTargetByIDResponse) {
     option (google.api.http) = {
-      get: "/resources/v3alpha/targets/{id}"
+      get: "/targets/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -254,7 +254,7 @@ service ActionService {
   // Create an execution to call a previously defined target or include the targets of a previously defined execution.
   rpc CreateExecution (CreateExecutionRequest) returns (CreateExecutionResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/executions"
+      post: "/executions"
       body: "execution"
     };
 
@@ -286,7 +286,7 @@ service ActionService {
   // Patch an existing execution to call a previously defined target or include the targets of a previously defined execution.
   rpc PatchExecution (PatchExecutionRequest) returns (PatchExecutionResponse) {
     option (google.api.http) = {
-      patch: "/resources/v3alpha/executions/{id}"
+      patch: "/executions/{id}"
       body: "execution"
     };
 
@@ -311,7 +311,7 @@ service ActionService {
   // Delete an existing execution.
   rpc DeleteExecution (DeleteExecutionRequest) returns (DeleteExecutionResponse) {
     option (google.api.http) = {
-      delete: "/resources/v3alpha/executions/{id}"
+      delete: "/executions/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -336,7 +336,7 @@ service ActionService {
   // Make sure to include a limit and sorting for pagination.
   rpc SearchExecutions (SearchExecutionsRequest) returns (SearchExecutionsResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/executions/_search"
+      post: "/executions/_search"
       body: "queries"
     };
 
@@ -372,7 +372,7 @@ service ActionService {
   // List all available functions which can be used as condition for executions.
   rpc ListExecutionFunctions (ListExecutionFunctionsRequest) returns (ListExecutionFunctionsResponse) {
     option (google.api.http) = {
-      get: "/resources/v3alpha/executions/functions"
+      get: "/executions/functions"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -395,7 +395,7 @@ service ActionService {
   // List all available methods which can be used as condition for executions.
   rpc ListExecutionMethods (ListExecutionMethodsRequest) returns (ListExecutionMethodsResponse) {
     option (google.api.http) = {
-      get: "/resources/v3alpha/executions/methods"
+      get: "/executions/methods"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -418,7 +418,7 @@ service ActionService {
   // List all available services which can be used as condition for executions.
   rpc ListExecutionServices (ListExecutionServicesRequest) returns (ListExecutionServicesResponse) {
     option (google.api.http) = {
-      get: "/resources/v3alpha/executions/services"
+      get: "/executions/services"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {

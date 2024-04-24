@@ -22,7 +22,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
-    version: "3.0-preview";
+    version: "3.0-alpha";
     description: "This API is intended to manage users with your own data schema in a ZITADEL instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
     contact:{
       name: "ZITADEL"
@@ -47,7 +47,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/grpc-web+proto";
 
   host: "$ZITADEL_DOMAIN";
-  base_path: "/";
+  base_path: "/resources/v3alpha";
 
   external_docs: {
     description: "Detailed information about ZITADEL",
@@ -115,7 +115,7 @@ service UserService {
   // Make sure to include a limit and sorting for pagination.
   rpc SearchUsers (SearchUsersRequest) returns (SearchUsersResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/_search"
+      post: "/users/_search"
       body: "queries"
     };
 
@@ -151,7 +151,7 @@ service UserService {
   // Returns the user identified by the requested ID.
   rpc GetUserByID (GetUserByIDRequest) returns (GetUserByIDResponse) {
     option (google.api.http) = {
-      get: "/resources/v3alpha/users/{id}"
+      get: "/users/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -175,7 +175,7 @@ service UserService {
   // Create a new user with an optional data schema.
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users"
+      post: "/users"
       body: "user"
     };
 
@@ -209,7 +209,7 @@ service UserService {
   // Patch an existing user with data based on a user schema.
   rpc PatchUser (PatchUserRequest) returns (PatchUserResponse) {
     option (google.api.http) = {
-      patch: "/resources/v3alpha/users/{id}"
+      patch: "/users/{id}"
       body: "user"
     };
 
@@ -239,7 +239,7 @@ service UserService {
   // The endpoint returns an error if the user is already in the state 'deactivated'.
   rpc DeactivateUser (DeactivateUserRequest) returns (DeactivateUserResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/_deactivate"
+      post: "/users/{id}/_deactivate"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -266,7 +266,7 @@ service UserService {
   // The endpoint returns an error if the user is not in the state 'deactivated'.
   rpc ActivateUser (ActivateUserRequest) returns (ActivateUserResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/_activate"
+      post: "/users/{id}/_activate"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -295,7 +295,7 @@ service UserService {
   // The endpoint returns an error if the user is already in the state 'locked'.
   rpc LockUser (LockUserRequest) returns (LockUserResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/_lock"
+      post: "/users/{id}/_lock"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -322,7 +322,7 @@ service UserService {
   // The endpoint returns an error if the user is not in the state 'locked'.
   rpc UnlockUser (UnlockUserRequest) returns (UnlockUserResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/_unlock"
+      post: "/users/{id}/_unlock"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -347,7 +347,7 @@ service UserService {
   // The user will be able to log in anymore.
   rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
-      delete: "/resources/v3alpha/users/{id}"
+      delete: "/users/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -373,7 +373,7 @@ service UserService {
   // which can be either returned or will be sent to the user by email.
   rpc SetContactEmail (SetContactEmailRequest) returns (SetContactEmailResponse) {
     option (google.api.http) = {
-      put: "/resources/v3alpha/users/{id}/email"
+      put: "/users/{id}/email"
       body: "email"
     };
 
@@ -398,7 +398,7 @@ service UserService {
   // Verify the contact email with the provided code.
   rpc VerifyContactEmail (VerifyContactEmailRequest) returns (VerifyContactEmailResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/email/_verify"
+      post: "/users/{id}/email/_verify"
       body: "verification_code"
     };
 
@@ -423,7 +423,7 @@ service UserService {
   // Resend the email with the verification code for the contact email address.
   rpc ResendContactEmailCode (ResendContactEmailCodeRequest) returns (ResendContactEmailCodeResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/email/_resend"
+      post: "/users/{id}/email/_resend"
       body: "verification"
     };
 
@@ -450,7 +450,7 @@ service UserService {
   // which can be either returned or will be sent to the user by SMS.
   rpc SetContactPhone (SetContactPhoneRequest) returns (SetContactPhoneResponse) {
     option (google.api.http) = {
-      put: "/resources/v3alpha/users/{id}/phone"
+      put: "/users/{id}/phone"
       body: "phone"
     };
 
@@ -475,7 +475,7 @@ service UserService {
   // Verify the contact phone with the provided code.
   rpc VerifyContactPhone (VerifyContactPhoneRequest) returns (VerifyContactPhoneResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/phone/_verify"
+      post: "/users/{id}/phone/_verify"
       body: "verification_code"
     };
 
@@ -500,7 +500,7 @@ service UserService {
   // Resend the phone with the verification code for the contact phone number.
   rpc ResendContactPhoneCode (ResendContactPhoneCodeRequest) returns (ResendContactPhoneCodeResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/phone/_resend"
+      post: "/users/{id}/phone/_resend"
       body: "verification"
     };
 
@@ -525,7 +525,7 @@ service UserService {
   // Add a new unique username to a user. The username will be used to identify the user on authentication.
   rpc AddUsername (AddUsernameRequest) returns (AddUsernameResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/username"
+      post: "/users/{id}/username"
       body: "username"
     };
 
@@ -550,7 +550,7 @@ service UserService {
   // Remove an existing username of a user, so it cannot be used for authentication anymore.
   rpc RemoveUsername (RemoveUsernameRequest) returns (RemoveUsernameResponse) {
     option (google.api.http) = {
-      delete: "/resources/v3alpha/users/{user_id}/username/{username_id}"
+      delete: "/users/{user_id}/username/{username_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -574,7 +574,7 @@ service UserService {
   // Add, update or reset a user's password with either a verification code or the current password.
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/password"
+      post: "/users/{id}/password"
       body: "password"
     };
 
@@ -599,7 +599,7 @@ service UserService {
   // Request a code to be able to set a new password.
   rpc RequestPasswordReset (RequestPasswordResetRequest) returns (RequestPasswordResetResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/password/_reset"
+      post: "/users/{id}/password/_reset"
       body: "medium"
     };
 
@@ -626,7 +626,7 @@ service UserService {
   // which are used to verify the device.
   rpc StartWebAuthNRegistration (StartWebAuthNRegistrationRequest) returns (StartWebAuthNRegistrationResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/webauthn"
+      post: "/users/{id}/webauthn"
       body: "registration"
     };
 
@@ -651,7 +651,7 @@ service UserService {
   // Verify the WebAuthN registration started by StartWebAuthNRegistration with the public key credential.
   rpc VerifyWebAuthNRegistration (VerifyWebAuthNRegistrationRequest) returns (VerifyWebAuthNRegistrationResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{user_id}/webauthn/{web_auth_n_id}/_verify"
+      post: "/users/{user_id}/webauthn/{web_auth_n_id}/_verify"
       body: "registration"
     };
 
@@ -676,7 +676,7 @@ service UserService {
   // The code will allow the user to start a new WebAuthN registration.
   rpc CreateWebAuthNRegistrationLink (CreateWebAuthNRegistrationLinkRequest) returns (CreateWebAuthNRegistrationLinkResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/webauthn/registration_link"
+      post: "/users/{id}/webauthn/registration_link"
       body: "medium"
     };
 
@@ -700,7 +700,7 @@ service UserService {
   // Remove an existing WebAuthN authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveWebAuthNAuthenticator (RemoveWebAuthNAuthenticatorRequest) returns (RemoveWebAuthNAuthenticatorResponse) {
     option (google.api.http) = {
-      delete: "/resources/v3alpha/users/{user_id}/webauthn/{web_auth_n_id}"
+      delete: "/users/{user_id}/webauthn/{web_auth_n_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -724,7 +724,7 @@ service UserService {
   // As a response a secret is returned, which is used to initialize a TOTP app or device.
   rpc StartTOTPRegistration (StartTOTPRegistrationRequest) returns (StartTOTPRegistrationResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/totp"
+      post: "/users/{id}/totp"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -747,7 +747,7 @@ service UserService {
   // Verify the time-based one-time-password (TOTP) registration with the generated code.
   rpc VerifyTOTPRegistration (VerifyTOTPRegistrationRequest) returns (VerifyTOTPRegistrationResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{user_id}/totp/{totp_id}/_verify"
+      post: "/users/{user_id}/totp/{totp_id}/_verify"
       body: "*"
     };
 
@@ -771,7 +771,7 @@ service UserService {
   // Remove an existing time-based one-time-password (TOTP) authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveTOTPAuthenticator (RemoveTOTPAuthenticatorRequest) returns (RemoveTOTPAuthenticatorResponse) {
     option (google.api.http) = {
-      delete: "/resources/v3alpha/users/{user_id}/totp/{totp_id}"
+      delete: "/users/{user_id}/totp/{totp_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -796,7 +796,7 @@ service UserService {
   // which can be either returned or will be sent to the user by SMS.
   rpc AddOTPSMSAuthenticator (AddOTPSMSAuthenticatorRequest) returns (AddOTPSMSAuthenticatorResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/otp_sms"
+      post: "/users/{id}/otp_sms"
       body: "*"
     };
 
@@ -820,7 +820,7 @@ service UserService {
   // Verify the OTP SMS registration with the provided code.
   rpc VerifyOTPSMSRegistration (VerifyOTPSMSRegistrationRequest) returns (VerifyOTPSMSRegistrationResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{user_id}/otp_sms/{otp_sms_id}/_verify"
+      post: "/users/{user_id}/otp_sms/{otp_sms_id}/_verify"
       body: "*"
     };
 
@@ -845,7 +845,7 @@ service UserService {
   // Remove an existing one-time-password (OTP) SMS authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveOTPSMSAuthenticator (RemoveOTPSMSAuthenticatorRequest) returns (RemoveOTPSMSAuthenticatorResponse) {
     option (google.api.http) = {
-      delete: "/resources/v3alpha/users/{user_id}/otp_sms/{otp_sms_id}"
+      delete: "/users/{user_id}/otp_sms/{otp_sms_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -870,7 +870,7 @@ service UserService {
   // which can be either returned or will be sent to the user by email.
   rpc AddOTPEmailAuthenticator (AddOTPEmailAuthenticatorRequest) returns (AddOTPEmailAuthenticatorResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/otp_email"
+      post: "/users/{id}/otp_email"
       body: "*"
     };
 
@@ -894,7 +894,7 @@ service UserService {
   // Verify the OTP Email registration with the provided code.
   rpc VerifyOTPEmailRegistration (VerifyOTPEmailRegistrationRequest) returns (VerifyOTPEmailRegistrationResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{user_id}/otp_email/{otp_email_id}/_verify"
+      post: "/users/{user_id}/otp_email/{otp_email_id}/_verify"
       body: "*"
     };
 
@@ -919,7 +919,7 @@ service UserService {
   // Remove an existing one-time-password (OTP) Email authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveOTPEmailAuthenticator (RemoveOTPEmailAuthenticatorRequest) returns (RemoveOTPEmailAuthenticatorResponse) {
     option (google.api.http) = {
-      delete: "/resources/v3alpha/users/{user_id}/otp_email/{otp_email_id}"
+      delete: "/users/{user_id}/otp_email/{otp_email_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -942,7 +942,7 @@ service UserService {
   // Start a new authentication intent on configured identity provider (IDP) for external login, registration or linking.
   rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/idps/{id}/intent"
+      post: "/idps/{id}/intent"
       body: "*"
     };
 
@@ -967,7 +967,7 @@ service UserService {
   // Retrieve the information returned by the identity provider (IDP) for registration or updating an existing user with new information.
   rpc RetrieveIdentityProviderIntent (RetrieveIdentityProviderIntentRequest) returns (RetrieveIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/idp_intents/{id}"
+      post: "/idp_intents/{id}"
       body: "*"
     };
 
@@ -993,7 +993,7 @@ service UserService {
   // This will allow the user to authenticate with the provided IDP.
   rpc AddIDPAuthenticator (AddIDPAuthenticatorRequest) returns (AddIDPAuthenticatorResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/users/{id}/idps"
+      post: "/users/{id}/idps"
       body: "idp_authenticator"
     };
 
@@ -1018,7 +1018,7 @@ service UserService {
   // Remove an existing identity provider (IDP) authenticator from a user, so it cannot be used for authentication anymore.
   rpc RemoveIDPAuthenticator (RemoveIDPAuthenticatorRequest) returns (RemoveIDPAuthenticatorResponse) {
     option (google.api.http) = {
-      delete: "/resources/v3alpha/users/{user_id}/idps/{idp_id}"
+      delete: "/users/{user_id}/idps/{idp_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1035,7 +1035,6 @@ service UserService {
       };
     };
   }
-
 }
 
 message SearchUsersRequest {
