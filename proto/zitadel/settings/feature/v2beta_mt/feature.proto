@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package zitadel.settings.feature.v2beta_mt;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/feature/v2beta_mt;feature";
+
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "zitadel/settings/object/v2beta_mt/field.proto";
+
+message SetFeatureSettings {
+  /* We discard this feature
+  optional zitadel.settings.object.v2beta_mt.SetBool login_default_org = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "The login UI will use the settings of the default org (and not from the instance) if no organization context is set";
+    }
+  ];
+   */
+  optional zitadel.settings.object.v2beta_mt.SetBool oidc_trigger_introspection_projections = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future. Please raise an issue if you needed to enable this feature.";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool oidc_legacy_introspection = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise. Please raise an issue if you needed to enable this feature.";
+    }
+  ];
+
+  optional zitadel.settings.object.v2beta_mt.SetBool user_schema = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  optional zitadel.settings.object.v2beta_mt.SetBool oidc_token_exchange = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool actions = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Actions allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+}
+
+message ResolvedFeatureSettings {
+  /* We discard this feature
+  zitadel.settings.object.v2beta_mt.ResolvedBool login_default_org = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "The login UI will use the settings of the default org (and not from the instance) if no organization context is set";
+    }
+  ];
+   */
+
+  zitadel.settings.object.v2beta_mt.ResolvedBool oidc_trigger_introspection_projections = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future. Please raise an issue if you needed to enable this feature.";
+    }
+  ];
+
+  zitadel.settings.object.v2beta_mt.ResolvedBool oidc_legacy_introspection = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise. Please raise an issue if you needed to enable this feature.";
+    }
+  ];
+
+  zitadel.settings.object.v2beta_mt.ResolvedBool user_schema = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  zitadel.settings.object.v2beta_mt.ResolvedBool oidc_token_exchange = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
+    }
+  ];
+
+  zitadel.settings.object.v2beta_mt.ResolvedBool actions = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Actions v2 allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+}
+

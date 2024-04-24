@@ -1,0 +1,239 @@
+syntax = "proto3";
+
+package zitadel.settings.defaultlogin.v2beta_mt;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2beta_mt;defaultlogin";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/object/v2beta_mt/object.proto";
+import "zitadel/settings/object/v2beta_mt/field.proto";
+
+message ResolvedLoginSettings {
+  // The resolved settings that take effect in requested current.
+  // map<string, zitadel.settings.object.v2beta_mt.ResolvedString>  resolved_custom_settings = 1;
+  // The settings that are overwritten in the requested context.
+  // map<string, zitadel.settings.object.v2beta_mt.ResolvedString>  overwritten_custom_settings = 2;
+  reserved 1 to 2;
+  zitadel.settings.object.v2beta_mt.ResolvedBool allow_username_password = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a user is allowed to log in with username and password";
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedBool allow_register = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a person is allowed to register a user on this organization";
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedBool allow_external_idp = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a user is allowed to add a defined identity provider. E.g. Google auth";
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedBool force_mfa = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a user MUST use a multi-factor to log in";
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedBool allow_passkeys = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if passkeys are allowed for users"
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedBool hide_password_reset = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if password reset link should be shown in the login screen"
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedBool ignore_unknown_usernames = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if unknown username on login screen directly returns an error or always displays the password screen"
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedString default_redirect_uri = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)";
+      example: "\"https://acme.com/ui/console\"";
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedDuration password_check_lifetime = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how much time the user has to re-authenticate with the password.";
+      example: "\"864000s\"";
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedDuration external_login_check_lifetime = 12 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how much time the user has to re-authenticate with an external provider.";
+      example: "\"864000s\"";
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedDuration mfa_init_skip_lifetime = 13 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how much time the mfa prompt will be shown again.";
+      example: "\"2592000s\"";
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedDuration second_factor_check_lifetime = 14 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how long the second-factor check is valid.";
+      example: "\"64800s\"";
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedDuration multi_factor_check_lifetime = 15 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines how long the multi-factor check is valid.";
+      example: "\"43200s\"";
+    }
+  ];
+  ResolvedSecondFactorTypes second_factors = 16;
+  ResolvedMultiFactorTypes multi_factors = 17;
+  zitadel.settings.object.v2beta_mt.ResolvedBool allow_domain_discovery = 18 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success."
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedBool disable_login_with_email = 19 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if the user can additionally (to the login name) be identified by their verified email address"
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedBool disable_login_with_phone = 20 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
+    }
+  ];
+  zitadel.settings.object.v2beta_mt.ResolvedBool force_mfa_local_only = 21 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
+    }
+  ];
+}
+
+message SetLoginSettings {
+  // map<string, zitadel.settings.object.v2beta_mt.SetString> custom_settings = 1;
+  reserved 1;
+  optional zitadel.settings.object.v2beta_mt.SetBool allow_username_password = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a user is allowed to log in with username and password";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool allow_register = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a person is allowed to register a user on this organization";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool allow_external_idp = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a user is allowed to add a defined identity provider. E.g. Google auth";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool force_mfa = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a user MUST use a multi-factor to log in";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool allow_passkeys = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if passkeys are allowed for users"
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool hide_password_reset = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if password reset link should be shown in the login screen"
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool ignore_unknown_usernames = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if unknown username on login screen directly returns an error or always displays the password screen"
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetString default_redirect_uri = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)";
+      example: "\"https://acme.com/ui/console\"";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetDuration password_check_lifetime = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how much time the user has to re-authenticate with the password.";
+      example: "\"864000s\"";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetDuration external_login_check_lifetime = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how much time the user has to re-authenticate with an external provider.";
+      example: "\"864000s\"";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetDuration mfa_init_skip_lifetime = 12 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how much time the mfa prompt will be shown again.";
+      example: "\"2592000s\"";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetDuration second_factor_check_lifetime = 13 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how long the second-factor check is valid.";
+      example: "\"64800s\"";
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetDuration multi_factor_check_lifetime = 14 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines how long the multi-factor check is valid.";
+      example: "\"43200s\"";
+    }
+  ];
+  optional SetSecondFactorTypes second_factors = 15;
+  optional SetMultiFactorTypes multi_factors = 16;
+  optional zitadel.settings.object.v2beta_mt.SetBool allow_domain_discovery = 17 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success."
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool disable_login_with_email = 18 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if the user can additionally (to the login name) be identified by their verified email address"
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool disable_login_with_phone = 19 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
+    }
+  ];
+  optional zitadel.settings.object.v2beta_mt.SetBool force_mfa_local_only = 20 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
+    }
+  ];
+}
+
+enum SecondFactorType {
+  SECOND_FACTOR_TYPE_UNSPECIFIED = 0;
+  // This is the type for TOTP
+  SECOND_FACTOR_TYPE_OTP = 1;
+  SECOND_FACTOR_TYPE_U2F = 2;
+  SECOND_FACTOR_TYPE_OTP_EMAIL = 3;
+  SECOND_FACTOR_TYPE_OTP_SMS = 4;
+}
+
+message ResolvedSecondFactorTypes {
+  repeated SecondFactorType value = 1;
+  optional zitadel.object.v2beta_mt.Owner owner = 2;
+}
+
+message SetSecondFactorTypes {
+  repeated SecondFactorType value = 1;
+}
+
+enum MultiFactorType {
+  MULTI_FACTOR_TYPE_UNSPECIFIED = 0;
+  MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION = 1;
+}
+
+message ResolvedMultiFactorTypes {
+  repeated MultiFactorType value = 1;
+  optional zitadel.object.v2beta_mt.Owner owner = 2;
+}
+
+message SetMultiFactorTypes {
+  repeated MultiFactorType value = 1;
+}

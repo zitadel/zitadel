@@ -1,0 +1,157 @@
+syntax = "proto3";
+
+package zitadel.settings.instance.v2beta_mt;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/instance/v2beta_mt;instance";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "zitadel/object/v2beta_mt/object.proto";
+import "zitadel/settings/instance/v2beta_mt/instance.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Instance Service";
+    version: "2.0";
+    description: "Instance Service is intended to manage system and instance-level settings for ZITADEL. Enable the feature flag \"multitenancy_settings\" in order to activate it. Instances are settings and therefore inherited, but only from system level to instance level.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+  consumes: "application/grpc-web+proto";
+
+  produces: "application/json";
+  produces: "application/grpc";
+  produces: "application/grpc-web+proto";
+
+  host: "$ZITADEL_DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
+        token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the settings in the given context.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+// Instance Service is intended to manage instances for ZITADEL.
+// Enable the feature flag \"multitenancy_settings\" in order to activate it.
+// Instances are settings, and are therefore inherited through the context hierarchy system -> instance -> org.
+service InstanceService {
+  rpc SetInstanceSetting (SetInstanceSettingsRequest) returns (SetInstanceSettingsResponse) {
+    option (google.api.http) = {
+      patch: "/settings/v2/instances"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Set instances for a given context";
+      description: "Configure and set instances for a given context. Only fields present in the request are set or unset."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  };
+
+  rpc GetInstanceSetting (ResolveInstanceSettingsRequest) returns (ResolveInstanceSettingsResponse) {
+    option (google.api.http) = {
+      get: "/settings/v2/instances"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the instances in the given context";
+      description: "Returns all configured and inherited instances for the given context."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  };
+}
+
+message SetInstanceSettingsRequest{
+  zitadel.object.v2beta_mt.RequestContext ctx = 1;
+  SetInstanceSettings settings = 2;
+}
+
+message SetInstanceSettingsResponse {
+  zitadel.object.v2beta_mt.Details details = 1;
+}
+
+message ResolveInstanceSettingsRequest{
+  zitadel.object.v2beta_mt.RequestContext ctx = 1;
+}
+
+message ResolveInstanceSettingsResponse{
+  zitadel.object.v2beta_mt.Details details = 1;
+  ResolvedInstanceSettings settings = 2;
+}

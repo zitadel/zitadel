@@ -1,0 +1,232 @@
+syntax = "proto3";
+
+package zitadel.settings.template.v2beta_mt;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/template/v2beta_mt;template";
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "zitadel/object/v2beta_mt/object.proto";
+import "zitadel/settings/template/v2beta_mt/template.proto";
+import "zitadel/settings/object/v2beta_mt/field.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Template Service";
+    version: "2.0";
+    description: "Message Service is intended to manage message texts ZITADEL sends. Enable the feature flag \"multitenancy_settings\" in order to activate it. Messages are settings, and are therefore inherited through the context hierarchy system -> instance -> org.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+  consumes: "application/grpc-web+proto";
+
+  produces: "application/json";
+  produces: "application/grpc";
+  produces: "application/grpc-web+proto";
+
+  host: "$ZITADEL_DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$ZITADEL_DOMAIN/oauth/v2/authorize";
+        token_url: "$ZITADEL_DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the settings in the given context.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+// Template Service is intended to manage HTML and text templates in ZITADEL.
+// They are used to compose email and sms messages that are sent by ZITADEL.
+// Enable the feature flag \"multitenancy_settings\" in order to activate it.
+// Templates are settings, and are therefore inherited through the context hierarchy system -> instance -> org.
+service TemplateService {
+  rpc SetHTMLTemplate (SetHTMLTemplateRequest) returns (SetHTMLTemplateResponse) {
+    option (google.api.http) = {
+      patch: "/settings/v2/templates/html/{type}"
+      body: "template"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Set a message for a given context";
+      description: "Configure and set an HTML template for a given context. Only fields present in the request are set or unset."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  };
+
+  rpc ResolveHTMLTemplate (ResolveHTMLTemplateRequest) returns (ResolveHTMLTemplateResponse) {
+    option (google.api.http) = {
+      get: "/settings/v2/templates/html/{type}",
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the messages in the given context";
+      description: "Returns all configured and possibly inherited html templates with the resolved variables for the given context."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  };
+
+  rpc SetTextTemplate (SetTextTemplateRequest) returns (SetTextTemplateResponse) {
+    option (google.api.http) = {
+      patch: "/settings/v2/templates/text/{type}"
+      body: "template"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Set a message for a given context";
+      description: "Configure and set a text template for a given context. Only fields present in the request are set or unset."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  };
+
+  rpc ResolveTextTemplate (ResolveTextTemplateRequest) returns (ResolveTextTemplateResponse) {
+    option (google.api.http) = {
+      get: "/settings/v2/templates/text/{type}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the t in the given context";
+      description: "Returns the configured and possibly inherited html template with the resolved variables for the given context."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  };
+}
+
+message SetHTMLTemplateRequest{
+  optional zitadel.object.v2beta_mt.RequestContext ctx = 1;
+  optional settings.object.v2beta_mt.Language language = 2;
+  HTMLTemplateType type = 3;
+  settings.object.v2beta_mt.SetString template = 4;
+}
+
+message SetHTMLTemplateResponse{
+  zitadel.object.v2beta_mt.Details details = 1;
+}
+
+message ResolveHTMLTemplateRequest{
+  optional zitadel.object.v2beta_mt.RequestContext ctx = 1;
+  optional settings.object.v2beta_mt.Language language = 2;
+  HTMLTemplateType type = 3;
+}
+
+message ResolveHTMLTemplateResponse{
+  zitadel.object.v2beta_mt.Details details = 1;
+  settings.object.v2beta_mt.ResolvedString template = 2;
+}
+
+message SetTextTemplateRequest{
+  optional zitadel.object.v2beta_mt.RequestContext ctx = 1;
+  optional settings.object.v2beta_mt.Language language = 2;
+  TextTemplateType type = 3;
+  settings.object.v2beta_mt.SetString template = 4;
+}
+
+message SetTextTemplateResponse{
+  zitadel.object.v2beta_mt.Details details = 1;
+}
+
+message ResolveTextTemplateRequest{
+  optional zitadel.object.v2beta_mt.RequestContext ctx = 1;
+  optional settings.object.v2beta_mt.Language language = 2;
+  TextTemplateType type = 3;
+}
+
+message ResolveTextTemplateResponse{
+  zitadel.object.v2beta_mt.Details details = 1;
+  settings.object.v2beta_mt.ResolvedString template = 2;
+}

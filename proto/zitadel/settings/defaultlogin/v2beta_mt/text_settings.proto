@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package zitadel.settings.defaultlogin.v2beta_mt;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/defaultlogin/v2beta_mt;defaultlogin";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/settings/object/v2beta_mt/field.proto";
+import "google/protobuf/struct.proto";
+
+message ResolvedTextSettings {
+  // The resolved texts that take effect in requested current.
+  map<string, zitadel.settings.object.v2beta_mt.ResolvedString>  resolved_texts = 1;
+  // The texts that are overwritten in the requested context.
+  map<string, zitadel.settings.object.v2beta_mt.ResolvedString>  overwritten_texts = 2;
+}
+
+message SetTextSettings {
+  map<string, zitadel.settings.object.v2beta_mt.SetStringLong> texts = 1;
+}
