@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Chave de máquina não encontrada
         AlreadyExisting: Chave de máquina já existe
+        Invalid: A chave pública não é uma chave pública RSA válida no formato PKIX com codificação PEM
       Secret:
         NotExisting: Segredo não existe
         Invalid: Segredo é inválido
