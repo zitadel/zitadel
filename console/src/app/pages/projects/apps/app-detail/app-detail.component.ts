@@ -80,24 +80,31 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public appId: string = '';
   public app?: App.AsObject;
 
-  public apiMap$ = this.envSvc.env.pipe(
+  public apiURLs$ = this.envSvc.env.pipe(
     mergeMap((env) =>
-      this.wellknownMap$.pipe(
+      this.wellknownURLs$.pipe(
         map((wellknown) => {
-          return {
-            Issuer: env.issuer,
-            'Admin Service URL': `${env.api}/admin/v1`,
-            'Management Service URL': `${env.api}/management/v1`,
-            'Auth Service URL': `${env.api}/auth/v1`,
-            'Revocation Endpoint': wellknown['Revocation Endpoint'],
-            'JKWS URI': wellknown['JKWS URI'],
-            'Introspection Endpoint': wellknown['Introspection Endpoint'],
-          };
+          return [[
+            "Issuer", env.issuer,
+          ], [
+            "Admin Service URL", `${env.api}/admin/v1`,
+          ], [
+            "Management Service URL", `${env.api}/management/v1`,
+          ], [
+            "Auth Service URL", `${env.api}/auth/v1`,
+          ],
+            ...wellknown.filter(([k, v]) => k === 'Revocation Endpoint' || k === 'JKWS URI' || k === 'Introspection Endpoint'),
+          ];
         }),
       ),
     ),
   );
-  public samlMap$ = this.envSvc.env.pipe(
+
+  public issuer$ = this.apiURLs$.pipe(
+    map((urls) => urls.find(([k, v]) => k === 'Issuer')?.[1]),
+  );
+
+  public samlURLs$ = this.envSvc.env.pipe(
     map((env) => {
       return {
         samlCertificateURL: `${env.issuer}/saml/v2/certificate`,
@@ -106,17 +113,27 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       };
     }),
   );
-  public wellknownMap$ = this.envSvc.wellknown.pipe(
-    map((wellknown) => ({
-      'Authorization Endpoint': wellknown.authorization_endpoint,
-      'Device Authorization Endpoint': wellknown.device_authorization_endpoint,
-      'End Session Endpoint': wellknown.end_session_endpoint,
-      'Introspection Endpoint': wellknown.introspection_endpoint,
-      'JKWS URI': wellknown.jwks_uri,
-      'Revocation Endpoint': wellknown.revocation_endpoint,
-      'Token Endpoint': wellknown.token_endpoint,
-      'Userinfo Endpoint': wellknown.userinfo_endpoint,
-    })),
+
+  public wellknownURLs$ = this.envSvc.wellknown.pipe(
+    map((wellknown) => {
+      return [[
+        'Authorization Endpoint', wellknown.authorization_endpoint,
+      ], [
+        'Device Authorization Endpoint', wellknown.device_authorization_endpoint,
+      ], [
+        'End Session Endpoint', wellknown.end_session_endpoint,
+      ], [
+        'Introspection Endpoint', wellknown.introspection_endpoint,
+      ], [
+        'JKWS URI', wellknown.jwks_uri,
+      ], [
+        'Revocation Endpoint', wellknown.revocation_endpoint,
+      ], [
+        'Token Endpoint', wellknown.token_endpoint,
+      ], [
+        'Userinfo Endpoint', wellknown.userinfo_endpoint,
+      ]]
+    }),
   );
 
   public oidcResponseTypes: OIDCResponseType[] = [
