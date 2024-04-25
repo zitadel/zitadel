@@ -1291,6 +1291,7 @@
       "MEMBERCHANGED": "Manager geändert.",
       "SETPRIMARY": "Primäre Domain gesetzt.",
       "DELETED": "Organisation erfolgreich gelöscht",
+      "DEFAULTORGNOTFOUND": "Die Standardorganisation wurde nicht gefunden",
       "ORG_WAS_DELETED": "Organisation wurde gelöscht."
     },
     "DIALOG": {
