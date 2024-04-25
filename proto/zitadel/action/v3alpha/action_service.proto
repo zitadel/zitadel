@@ -561,7 +561,7 @@ message GetTargetByIDResponse {
 message SetExecutionRequest {
   // Defines the condition type and content of the condition for execution.
   Condition condition = 1;
-  // List of ordered list of targets/includes called during the execution.
+  // Ordered list of targets/includes called during the execution.
   repeated zitadel.action.v3alpha.ExecutionTargetType targets = 2;
 }
 
