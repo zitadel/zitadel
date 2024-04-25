@@ -353,6 +353,7 @@ import {
   RemoveOrgMetadataRequest,
   RemoveOrgMetadataResponse,
   RemoveOrgRequest,
+  RemoveOrgResponse,
   RemovePersonalAccessTokenRequest,
   RemovePersonalAccessTokenResponse,
   RemoveProjectGrantMemberRequest,
@@ -1749,7 +1750,7 @@ export class ManagementService {
     return this.grpcService.mgmt.removeUser(req, null).then((resp) => resp.toObject());
   }
 
-  public removeOrg(): Promise<RemoveUserResponse.AsObject> {
+  public removeOrg(): Promise<RemoveOrgResponse.AsObject> {
     const req = new RemoveOrgRequest();
     return this.grpcService.mgmt.removeOrg(req, null).then((resp) => resp.toObject());
   }

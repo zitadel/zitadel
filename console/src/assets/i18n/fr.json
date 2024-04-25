@@ -1291,6 +1291,7 @@
       "MEMBERCHANGED": "Gestionnaire modifié.",
       "SETPRIMARY": "Domaine primaire défini.",
       "DELETED": "Organisation supprimée avec succès",
+      "DEFAULTORGNOTFOUND": "L'organisation par défaut est introuvable",
       "ORG_WAS_DELETED": "L'organisation a été supprimée"
     },
     "DIALOG": {
