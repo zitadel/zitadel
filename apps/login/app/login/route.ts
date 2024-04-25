@@ -170,11 +170,25 @@ export async function GET(request: NextRequest) {
               sessionId: cookie?.id,
               sessionToken: cookie?.token,
             };
-            const { callbackUrl } = await createCallback(server, {
-              authRequestId,
-              session,
-            });
-            return NextResponse.redirect(callbackUrl);
+            // const { callbackUrl } = await createCallback(server, {
+            //   authRequestId,
+            //   session,
+            // });
+            // return NextResponse.redirect(callbackUrl);
+            try {
+              const { callbackUrl } = await createCallback(server, {
+                authRequestId,
+                session,
+              });
+              if (callbackUrl) {
+                return NextResponse.redirect(callbackUrl);
+              } else {
+                gotoAccounts();
+              }
+            } catch (error) {
+              console.error(error);
+              gotoAccounts();
+            }
           } else {
             return NextResponse.json(
               { error: "No active session found" },
