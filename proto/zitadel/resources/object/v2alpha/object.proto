@@ -48,6 +48,27 @@ message Details {
   ];
 }
 
+enum State {
+  STATE_UNSPECIFIED = 0;
+  STATE_ACTIVE = 1;
+  STATE_INACTIVE = 2;
+}
+
+message StateQuery {
+  // Defines the state to query for.
+  resources.object.v2alpha.State state = 1 [
+    (validate.rules).enum.defined_only = true,
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"STATE_ACTIVE\""
+    }
+  ];
+}
+
+message Parent {
+  zitadel.object.v2alpha.Owner parent = 1;
+  State state = 2;
+}
 
 message ListQuery {
   option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
