@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const gotoAccounts = () => {
+    const gotoAccounts = (): NextResponse<unknown> => {
       const accountsUrl = new URL("/accounts", request.url);
       if (authRequest?.id) {
         accountsUrl.searchParams.set("authRequestId", authRequest?.id);
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
     if (authRequest && sessions.length) {
       // if some accounts are available for selection and select_account is set
       if (authRequest.prompt.includes(Prompt.PROMPT_SELECT_ACCOUNT)) {
-        gotoAccounts();
+        return gotoAccounts();
       } else if (authRequest.prompt.includes(Prompt.PROMPT_LOGIN)) {
         // if prompt is login
         const loginNameUrl = new URL("/loginname", request.url);
@@ -170,25 +170,11 @@ export async function GET(request: NextRequest) {
               sessionId: cookie?.id,
               sessionToken: cookie?.token,
             };
-            // const { callbackUrl } = await createCallback(server, {
-            //   authRequestId,
-            //   session,
-            // });
-            // return NextResponse.redirect(callbackUrl);
-            try {
-              const { callbackUrl } = await createCallback(server, {
-                authRequestId,
-                session,
-              });
-              if (callbackUrl) {
-                return NextResponse.redirect(callbackUrl);
-              } else {
-                gotoAccounts();
-              }
-            } catch (error) {
-              console.error(error);
-              gotoAccounts();
-            }
+            const { callbackUrl } = await createCallback(server, {
+              authRequestId,
+              session,
+            });
+            return NextResponse.redirect(callbackUrl);
           } else {
             return NextResponse.json(
               { error: "No active session found" },
@@ -223,17 +209,17 @@ export async function GET(request: NextRequest) {
               if (callbackUrl) {
                 return NextResponse.redirect(callbackUrl);
               } else {
-                gotoAccounts();
+                return gotoAccounts();
               }
             } catch (error) {
               console.error(error);
-              gotoAccounts();
+              return gotoAccounts();
             }
           } else {
-            gotoAccounts();
+            return gotoAccounts();
           }
         } else {
-          gotoAccounts();
+          return gotoAccounts();
         }
       }
     } else {
