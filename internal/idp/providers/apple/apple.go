@@ -56,8 +56,8 @@ func clientSecretFromPrivateKey(key []byte, teamID, clientID, keyID string) (str
 	if err != nil {
 		return "", err
 	}
-	iat := time.Now()
-	exp := iat.Add(time.Hour)
+	iat := time.Now().Add(-2 * time.Second)
+	exp := iat.Add(5 * time.Minute)
 	return crypto.Sign(&openid.JWTTokenRequest{
 		Issuer:    teamID,
 		Subject:   clientID,
