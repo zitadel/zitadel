@@ -21,42 +21,29 @@ type ContextInfo interface {
 
 type Target interface {
 	GetTargetID() string
-	IsAsync() bool
 	IsInterruptOnError() bool
-	GetURL() string
+	GetEndpoint() string
 	GetTargetType() domain.TargetType
 	GetTimeout() time.Duration
 }
 
-func CallTargets(ctx context.Context,
+// CallTargets call a list of targets in order with handling of error and responses
+func CallTargets(
+	ctx context.Context,
 	targets []Target,
 	info ContextInfo,
 ) (interface{}, error) {
 	for _, target := range targets {
-		// get function to call the type of target
-		callF, err := CallTargetFunc(target)
-		if err != nil {
+		// call the type of target
+		resp, err := CallTarget(ctx, target, info)
+		// handle error if interrupt is set
+		if err != nil && target.IsInterruptOnError() {
 			return nil, err
 		}
-
-		// call target async, ignore response and if error occur
-		if target.IsAsync() {
-			go func(target Target) {
-				if _, err := callF(ctx, info); err != nil {
-					logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
-				}
-			}(target)
-			// else call synchronous, and handle error if interrupt is set
-		} else {
-			resp, err := callF(ctx, info)
-			if err != nil && target.IsInterruptOnError() {
+		if resp != nil {
+			// error in unmarshalling
+			if err := info.SetHTTPResponseBody(resp); err != nil {
 				return nil, err
-			}
-			if resp != nil {
-				// error in unmarshalling
-				if err := info.SetHTTPResponseBody(resp); err != nil {
-					return nil, err
-				}
 			}
 		}
 	}
@@ -67,21 +54,26 @@ type ContextInfoRequest interface {
 	GetHTTPRequestBody() []byte
 }
 
-// CallTargetFunc get function to call the desired type of target
-func CallTargetFunc(
+// CallTarget call the desired type of target with handling of responses
+func CallTarget(
+	ctx context.Context,
 	target Target,
-) (func(ctx context.Context, info ContextInfoRequest) (res []byte, err error), error) {
+	info ContextInfoRequest,
+) (res []byte, err error) {
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
 	case domain.TargetTypeWebhook:
-		return func(ctx context.Context, info ContextInfoRequest) (res []byte, err error) {
-			return nil, webhook(ctx, target.GetURL(), target.GetTimeout(), info.GetHTTPRequestBody())
-		}, nil
+		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
 	// get request, return response and error
-	case domain.TargetTypeRequestResponse:
-		return func(ctx context.Context, info ContextInfoRequest) (res []byte, err error) {
-			return call(ctx, target.GetURL(), target.GetTimeout(), info.GetHTTPRequestBody())
-		}, nil
+	case domain.TargetTypeCall:
+		return call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
+	case domain.TargetTypeAsync:
+		go func(target Target, info ContextInfoRequest) {
+			if _, err := call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody()); err != nil {
+				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
+			}
+		}(target, info)
+		return nil, nil
 	default:
 		return nil, zerrors.ThrowInternal(nil, "EXEC-auqnansr2m", "Errors.Execution.Unknown")
 	}

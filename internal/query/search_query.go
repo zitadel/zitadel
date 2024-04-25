@@ -339,7 +339,7 @@ func (q *textQuery) comp() sq.Sqlizer {
 	case TextContainsIgnoreCase:
 		return sq.ILike{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextListContains:
-		return &listContains{col: q.Column, args: []interface{}{q.Text}}
+		return &ListContains{col: q.Column, args: []interface{}{q.Text}}
 	case textCompareMax:
 		return nil
 	}
@@ -409,7 +409,7 @@ func (q *NumberQuery) comp() sq.Sqlizer {
 	case NumberGreater:
 		return sq.Gt{q.Column.identifier(): q.Number}
 	case NumberListContains:
-		return &listContains{col: q.Column, args: []interface{}{q.Number}}
+		return &ListContains{col: q.Column, args: []interface{}{q.Number}}
 	case numberCompareMax:
 		return nil
 	}
@@ -478,31 +478,31 @@ func (q *SubSelect) comp() sq.Sqlizer {
 	return selectQuery
 }
 
-type ListQuery struct {
+type listQuery struct {
 	Column  Column
 	Data    interface{}
 	Compare ListComparison
 }
 
-func NewListQuery(column Column, value interface{}, compare ListComparison) (*ListQuery, error) {
+func NewListQuery(column Column, value interface{}, compare ListComparison) (*listQuery, error) {
 	if compare < 0 || compare >= listCompareMax {
 		return nil, ErrInvalidCompare
 	}
 	if column.isZero() {
 		return nil, ErrMissingColumn
 	}
-	return &ListQuery{
+	return &listQuery{
 		Column:  column,
 		Data:    value,
 		Compare: compare,
 	}, nil
 }
 
-func (q *ListQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *listQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (q *ListQuery) comp() sq.Sqlizer {
+func (q *listQuery) comp() sq.Sqlizer {
 	if q.Compare != ListIn {
 		return nil
 	}
@@ -517,7 +517,7 @@ func (q *ListQuery) comp() sq.Sqlizer {
 	return sq.Eq{q.Column.identifier(): q.Data}
 }
 
-func (q *ListQuery) Col() Column {
+func (q *listQuery) Col() Column {
 	return q.Column
 }
 
@@ -715,11 +715,30 @@ func join(join, from Column) string {
 	return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier() + " AND " + from.table.InstanceIDIdentifier() + " = " + join.table.InstanceIDIdentifier()
 }
 
-type listContains struct {
+type ListContains struct {
 	col  Column
 	args interface{}
 }
 
-func (q *listContains) ToSql() (string, []interface{}, error) {
+func NewListContains(c Column, value interface{}) (*ListContains, error) {
+	return &ListContains{
+		col:  c,
+		args: value,
+	}, nil
+}
+
+func (q *ListContains) Col() Column {
+	return q.col
+}
+
+func (q *ListContains) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *ListContains) ToSql() (string, []interface{}, error) {
 	return q.col.identifier() + " @> ? ", []interface{}{q.args}, nil
+}
+
+func (q *ListContains) comp() sq.Sqlizer {
+	return q
 }

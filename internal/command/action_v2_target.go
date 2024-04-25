@@ -16,9 +16,8 @@ type AddTarget struct {
 
 	Name             string
 	TargetType       domain.TargetType
-	URL              string
+	Endpoint         string
 	Timeout          time.Duration
-	Async            bool
 	InterruptOnError bool
 }
 
@@ -29,8 +28,8 @@ func (a *AddTarget) IsValid() error {
 	if a.Timeout == 0 {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-39f35d8uri", "Errors.Target.NoTimeout")
 	}
-	_, err := url.Parse(a.URL)
-	if err != nil || a.URL == "" {
+	_, err := url.Parse(a.Endpoint)
+	if err != nil || a.Endpoint == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-1r2k6qo6wg", "Errors.Target.InvalidURL")
 	}
 
@@ -65,9 +64,8 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 		TargetAggregateFromWriteModel(&wm.WriteModel),
 		add.Name,
 		add.TargetType,
-		add.URL,
+		add.Endpoint,
 		add.Timeout,
-		add.Async,
 		add.InterruptOnError,
 	))
 	if err != nil {
@@ -84,9 +82,8 @@ type ChangeTarget struct {
 
 	Name             *string
 	TargetType       *domain.TargetType
-	URL              *string
+	Endpoint         *string
 	Timeout          *time.Duration
-	Async            *bool
 	InterruptOnError *bool
 }
 
@@ -100,9 +97,9 @@ func (a *ChangeTarget) IsValid() error {
 	if a.Timeout != nil && *a.Timeout == 0 {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-08b39vdi57", "Errors.Target.NoTimeout")
 	}
-	if a.URL != nil {
-		_, err := url.Parse(*a.URL)
-		if err != nil || *a.URL == "" {
+	if a.Endpoint != nil {
+		_, err := url.Parse(*a.Endpoint)
+		if err != nil || *a.Endpoint == "" {
 			return zerrors.ThrowInvalidArgument(nil, "COMMAND-jsbaera7b6", "Errors.Target.InvalidURL")
 		}
 	}
@@ -130,9 +127,8 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 		TargetAggregateFromWriteModel(&existing.WriteModel),
 		change.Name,
 		change.TargetType,
-		change.URL,
+		change.Endpoint,
 		change.Timeout,
-		change.Async,
 		change.InterruptOnError)
 	if changedEvent == nil {
 		return writeModelToObjectDetails(&existing.WriteModel), nil

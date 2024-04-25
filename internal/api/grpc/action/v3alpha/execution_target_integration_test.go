@@ -18,6 +18,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 )
@@ -45,15 +46,16 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// create target for target changes
 				targetCreatedName := fmt.Sprint("GetTargetByID", time.Now().UnixNano()+1)
 				targetCreatedURL := "https://nonexistent"
-				targetCreated := Tester.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, true, false, false)
+
+				targetCreated := Tester.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, domain.TargetTypeCall, false)
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instanceID, OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
 				changedRequest := &action.GetTargetByIDRequest{TargetId: targetCreated.GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
-				targetRequest := Tester.CreateTarget(ctx, t, "", urlRequest, true, false, false)
-				Tester.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), []string{targetRequest.GetId()}, []string{})
+				targetRequest := Tester.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, false)
+				Tester.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetId()))
 				// GetTargetByID with used target
 				request.TargetId = targetRequest.GetId()
 
@@ -63,9 +65,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						TargetId: targetCreated.GetId(),
 						Details:  targetCreated.GetDetails(),
 						Name:     targetCreatedName,
-						TargetType: &action.Target_RestRequestResponse{
-							RestRequestResponse: &action.SetRESTRequestResponse{
-								Url: targetCreatedURL,
+						Endpoint: targetCreatedURL,
+						TargetType: &action.Target_RestCall{
+							RestCall: &action.SetRESTCall{
+								InterruptOnError: false,
 							},
 						},
 						Timeout: durationpb.New(10 * time.Second),
@@ -76,9 +79,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					TargetId: targetCreated.GetId(),
 					Details:  targetCreated.GetDetails(),
 					Name:     targetCreatedName,
-					TargetType: &action.Target_RestRequestResponse{
-						RestRequestResponse: &action.SetRESTRequestResponse{
-							Url: targetCreatedURL,
+					TargetType: &action.Target_RestCall{
+						RestCall: &action.SetRESTCall{
+							InterruptOnError: false,
 						},
 					},
 					Timeout: durationpb.New(10 * time.Second),
@@ -105,8 +108,8 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				}
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusOK, changedResponse)
-				targetResponse := Tester.CreateTarget(ctx, t, "", targetResponseURL, true, false, false)
-				Tester.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), []string{targetResponse.GetId()}, []string{})
+				targetResponse := Tester.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, false)
+				Tester.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetId()))
 
 				return func() {
 					closeRequest()
@@ -126,10 +129,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			}
 
 			got, err := Client.GetTargetByID(tt.ctx, tt.req)
-			if err != nil {
-				fmt.Println("error")
-				fmt.Println(err.Error())
-			}
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -185,7 +184,6 @@ func testServerCall(
 			http.Error(w, "error, read body: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-
 		if !reflect.DeepEqual(data, sentBody) {
 			http.Error(w, "error, equal:\n"+string(data)+"\nsent:\n"+string(sentBody), http.StatusInternalServerError)
 			return

@@ -1,6 +1,6 @@
 ---
-title: ZITADEL Actions
-sidebar_label: Actions
+title: ZITADEL Actions v2
+sidebar_label: Actions v2
 ---
 
 By using ZITADEL actions V2, you can manipulate ZITADELs behavior on specific API calls, events or functions.
@@ -36,3 +36,5 @@ Possible conditions for the Execution:
 
 ## Further reading
 
+- [Actions v2 example execution locally](/apis/actionsv2/execution-local)
+- [Actions v2 reference](/apis/actionsv2/introduction#action)

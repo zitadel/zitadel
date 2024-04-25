@@ -1,44 +1,47 @@
-WITH recursive rel_tree AS
-                   (SELECT instance_id                                                            AS instance_id,
-                           id                                                                     AS id,
-                           unnest(CASE WHEN "includes" <> '{}' THEN "includes" ELSE '{null}' END) AS include,
-                           1                                                                      AS level,
-                           array [id]                                                             AS path_info,
-                           targets                                                                AS targets
-                    FROM projections.executions
-                    WHERE includes IS NULL
-                      AND instance_id = $1
-                    GROUP BY instance_id, id, includes, targets
-                    UNION ALL
-                    SELECT c.instance_id                   AS instance_id,
-                           c.id                            AS id,
-                           c.include                       AS include,
-                           p.level + 1                     AS level,
-                           p.path_info || c.id             AS path_info,
-                           array_cat(p.targets, c.targets) AS targets
-                    FROM (SELECT instance_id                                                        AS instance_id,
-                                 id                                                                 AS id,
-                                 unnest(CASE WHEN includes <> '{}' THEN includes ELSE '{null}' END) AS include,
-                                 targets                                                            AS targets
-                          FROM projections.executions) AS c
-                             JOIN rel_tree p ON p.id = c.include AND p.instance_id = c.instance_id)
-SELECT e.instance_id,
-       e.id,
-       target,
-       t.target_type,
-       t.url,
-       t.timeout,
-       t.async,
-       t.interrupt_on_error
-FROM ((SELECT instance_id, id, unnest(targets) AS target
-       FROM rel_tree
-       WHERE id = ANY (string_to_array($2, ','))
-       ORDER BY id DESC
-       LIMIT 1)
-      UNION
-      (SELECT instance_id, id, unnest(targets) AS target
-       FROM rel_tree
-       WHERE id = ANY (string_to_array($3, ','))
-       ORDER BY id DESC
-       LIMIT 1)) e
-         LEFT JOIN projections.targets AS t ON t.instance_id = e.instance_id AND t.id = e.target;
+WITH RECURSIVE
+    dissolved_execution_targets(execution_id, instance_id, position, "include", "target_id")
+        AS (SELECT execution_id
+                 , instance_id
+                 , ARRAY [position]
+                 , "include"
+                 , "target_id"
+            FROM matched_targets_and_includes
+            UNION ALL
+            SELECT e.execution_id
+                 , p.instance_id
+                 , e.position || p.position
+                 , p."include"
+                 , p."target_id"
+            FROM dissolved_execution_targets e
+                     JOIN projections.executions1_targets p
+                          ON e.instance_id = p.instance_id
+                              AND e.include IS NOT NULL
+                              AND e.include = p.execution_id),
+    matched AS ((SELECT *
+                 FROM projections.executions1
+                 WHERE instance_id = $1
+                   AND id = ANY($2)
+                 ORDER BY id DESC
+                 LIMIT 1)
+                UNION ALL
+                (SELECT *
+                 FROM projections.executions1
+                 WHERE instance_id = $1
+                   AND id = ANY($3)
+                 ORDER BY id DESC
+                 LIMIT 1)),
+    matched_targets_and_includes AS (SELECT pos.*
+                                     FROM matched m
+                                              JOIN
+                                          projections.executions1_targets pos
+                                          ON m.id = pos.execution_id
+                                              AND m.instance_id = pos.instance_id
+                                     ORDER BY execution_id,
+                                              position)
+select e.execution_id, e.instance_id, e.target_id, t.target_type, t.endpoint, t.timeout, t.interrupt_on_error
+FROM dissolved_execution_targets e
+         JOIN projections.targets1 t
+              ON e.instance_id = t.instance_id
+                  AND e.target_id = t.id
+WHERE "include" = ''
+ORDER BY position DESC;
