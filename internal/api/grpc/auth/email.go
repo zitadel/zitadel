@@ -65,7 +65,7 @@ func (s *Server) ResendMyEmailVerification(ctx context.Context, _ *auth_pb.Resen
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner, emailCodeGenerator)
+	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner, emailCodeGenerator, "")
 	if err != nil {
 		return nil, err
 	}

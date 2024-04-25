@@ -167,6 +167,7 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								"authRequestID",
 							),
 						),
 					),
@@ -225,6 +226,7 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								"authRequestID",
 							),
 						),
 						eventFromEventPusher(
@@ -280,6 +282,7 @@ func TestCommandSide_userExistsWriteModel(t *testing.T) {
 									Crypted:    []byte("a"),
 								},
 								time.Hour*1,
+								"authRequestID",
 							),
 						),
 						eventFromEventPusher(

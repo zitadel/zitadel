@@ -169,7 +169,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 			return err
 		}
 		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
-			SendUserInitCode(ctx, notifyUser, code)
+			SendUserInitCode(ctx, notifyUser, code, e.AuthRequestID)
 		if err != nil {
 			return err
 		}
@@ -226,7 +226,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
-			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate)
+			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err
 		}
@@ -285,7 +285,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if e.NotificationType == domain.NotificationTypeSms {
 			notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
 		}
-		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate)
+		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err
 		}
