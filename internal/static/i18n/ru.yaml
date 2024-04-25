@@ -110,6 +110,7 @@ Errors:
       Key:
         NotFound: Машинный ключ не найден
         AlreadyExisting: Машинный ключ уже существует
+        Invalid: Открытый ключ не является допустимым открытым ключом RSA в формате PKIX с кодировкой PEM
       Secret:
         NotExisting: Ключ не существует
         Invalid: Ключ недействителен

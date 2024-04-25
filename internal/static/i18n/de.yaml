@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Maschinen Schlüssel nicht gefunden
         AlreadyExisting: Machine Schlüssel exisiert bereits
+        Invalid: Der öffentliche Schlüssel ist kein gültiger öffentlicher RSA-Schlüssel im PKIX-Format mit PEM-Kodierung
       Secret:
         NotExisting: Secret existiert nicht
         Invalid: Secret ist ungültig

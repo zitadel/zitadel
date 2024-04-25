@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -67,22 +68,6 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	if authRequest != nil && authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != resourceOwner {
 		resourceOwner = authRequest.RequestedOrgID
 	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegister(w, r, authRequest, data, err)
-		return
-	}
-	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegister(w, r, authRequest, data, err)
-		return
-	}
-	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
-	if err != nil {
-		l.renderRegister(w, r, authRequest, data, err)
-		return
-	}
-
 	// For consistency with the external authentication flow,
 	// the setMetadata() function is provided on the pre creation hook, for now,
 	// like for the ExternalAuthentication flow.
@@ -96,22 +81,14 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	user, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, nil, nil, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
+
+	human := command.AddHumanFromDomain(user, metadatas, authRequest, nil)
+	err = l.command.AddUserHuman(setContext(r.Context(), resourceOwner), resourceOwner, human, true, l.userCodeAlg)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-
-	if len(metadatas) > 0 {
-		_, err = l.command.BulkSetUserMetadata(r.Context(), user.AggregateID, resourceOwner, metadatas...)
-		if err != nil {
-			// TODO: What if action is configured to be allowed to fail? Same question for external registration.
-			l.renderRegister(w, r, authRequest, data, err)
-			return
-		}
-	}
-
-	userGrants, err := l.runPostCreationActions(user.AggregateID, authRequest, r, resourceOwner, domain.FlowTypeInternalAuthentication)
+	userGrants, err := l.runPostCreationActions(human.ID, authRequest, r, resourceOwner, domain.FlowTypeInternalAuthentication)
 	if err != nil {
 		l.renderError(w, r, authRequest, err)
 		return
@@ -128,7 +105,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, user.AggregateID, userAgentID)
+	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, human.ID, userAgentID)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
