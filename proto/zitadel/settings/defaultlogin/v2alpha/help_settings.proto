@@ -7,7 +7,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/settings/object/v2alpha/object.proto";
 
-message ResolvedLegalSettings {
+message ResolvedHelpSettings {
   // The resolved settings that take effect in requested current.
   // map<string, zitadel.settings.object.v2alpha.ResolvedString>  resolved_custom_settings = 1;
   // The settings that are overwritten in the requested context.
@@ -36,7 +36,7 @@ message ResolvedLegalSettings {
   ];
 }
 
-message SetLegalSettings {
+message SetHelpSettings {
   // map<string, zitadel.settings.object.v2alpha.SetString> custom_settings = 1;
   reserved 1;
   optional zitadel.settings.object.v2alpha.SetString tos_link = 2 [

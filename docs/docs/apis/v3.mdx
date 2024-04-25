@@ -6,9 +6,18 @@ import DocCardList from '@theme/DocCardList';
 
 APIs (V3) organize access by resources (users, settings, etc.), unlike context-specific V1 APIs.
 This simplifies finding the right API, especially for multi-organization resources.
+
 V3 also offers more flexibility over the V2 API in these points:
 - User schema definition for custom user management.
 - Behavior customization (API call manipulation, webhooks).
+
+V3 adheres to the new [API style guide](/API_STYLE_GUIDE.md) and includes these improvements:
+- Improved RESTful API design with query parameters.
+- Patching all resources and settings.
+- Resource reusage with improved activation and deactivation experience.
+- Search resources instance-wide by default.
+- Enforced limits for search queries.
+- Predefined and custom settings with inheritance per property.
 
 **Note**: V3 is currently in [Preview](/support/software-release-cycles-support#preview) and not yet generally available (breaking changes possible). Check individual services for availability.
 

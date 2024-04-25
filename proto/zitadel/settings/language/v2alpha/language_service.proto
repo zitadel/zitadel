@@ -94,7 +94,7 @@ service LanguageService {
   rpc SetLanguages (SetLanguageSettingsRequest) returns (SetLanguageSettingsResponse) {
     option (google.api.http) = {
       patch: "/settings/v2/languages"
-      body: "*"
+      body: "settings"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {

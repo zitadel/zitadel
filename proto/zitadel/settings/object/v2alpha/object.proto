@@ -29,7 +29,7 @@ message Details {
   // on manipulation: the timestamp of the event(s) added by the manipulation
   google.protobuf.Timestamp change_date = 2;
   //resource_owner represents the context an object belongs to
-  zitadel.object.v2alpha.Owner resource_owner = 3 [
+  zitadel.object.v2alpha.Owner owner = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\"";
     }

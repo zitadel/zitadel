@@ -11,7 +11,7 @@ import "zitadel/settings/object/v2alpha/object.proto";
 
 import "zitadel/settings/defaultlogin/v2alpha/branding_settings.proto";
 import "zitadel/settings/defaultlogin/v2alpha/domain_settings.proto";
-import "zitadel/settings/defaultlogin/v2alpha/legal_settings.proto";
+import "zitadel/settings/defaultlogin/v2alpha/help_settings.proto";
 import "zitadel/settings/defaultlogin/v2alpha/lockout_settings.proto";
 import "zitadel/settings/defaultlogin/v2alpha/login_settings.proto";
 import "zitadel/settings/defaultlogin/v2alpha/password_settings.proto";
@@ -315,7 +315,7 @@ message SetDomainSettingsRequest {
 
 message SetLegalSettingsRequest {
   optional zitadel.object.v2alpha.RequestContext ctx = 1;
-  SetLegalSettings settings = 2;
+  SetHelpSettings settings = 2;
 }
 
 message SetLockoutSettingsRequest {
@@ -408,7 +408,7 @@ message ResolveDomainSettingsResponse {
 
 message ResolveLegalSettingsResponse {
   zitadel.settings.object.v2alpha.Details details = 1;
-  ResolvedLegalSettings settings = 3;
+  ResolvedHelpSettings settings = 3;
 }
 
 message ResolveLockoutSettingsResponse {

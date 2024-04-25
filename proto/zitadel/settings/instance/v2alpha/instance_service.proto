@@ -94,7 +94,7 @@ service InstanceService {
   rpc SetInstanceSetting (SetInstanceSettingsRequest) returns (SetInstanceSettingsResponse) {
     option (google.api.http) = {
       patch: "/settings/v2/instances"
-      body: "*"
+      body: "settings"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
