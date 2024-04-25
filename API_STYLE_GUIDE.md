@@ -14,7 +14,7 @@ All resource APIs share the following behavior:
 - Search request results only contain results for which the requesting user has the necessary read permissions.
 - Search requests are limited to 100 by default. The limit can be increased up to 1000.
 - Resource configurations are partially updatable. With HTTP, this is done via PATCH requests. If no changes were made, the response is successful.
-- Status changes or other actions on resources with side effects are done via POST requests. Their HTTP patch ends with the underscore prefixed action name. For example `POST /resources/idps/{id}/_activate`.
+- Status changes or other actions on resources with side effects are done via POST requests. Their HTTP path ends with the underscore prefixed action name. For example `POST /resources/idps/{id}/_activate`.
 
 ## Reusable Resources
 
