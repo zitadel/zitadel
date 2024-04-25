@@ -63,7 +63,8 @@ export default function PasswordForm({
 
     setLoading(false);
     if (!res.ok) {
-      setError(response.details);
+      console.log(response.details.details);
+      setError(response.details?.details ?? "Could not verify password");
       return Promise.reject(response.details);
     }
     return response;
