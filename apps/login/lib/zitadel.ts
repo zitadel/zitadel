@@ -112,9 +112,22 @@ export async function addOTPEmail(
 }
 
 export async function addOTPSMS(
-  userId: string
+  userId: string,
+  token?: string
 ): Promise<AddOTPSMSResponse | undefined> {
-  const userService = user.getUser(server);
+  let userService;
+  if (token) {
+    const authConfig: ZitadelServerOptions = {
+      name: "zitadel login",
+      apiUrl: process.env.ZITADEL_API_URL ?? "",
+      token: token,
+    };
+
+    const sessionUser = initializeServer(authConfig);
+    userService = user.getUser(sessionUser);
+  } else {
+    userService = user.getUser(server);
+  }
   return userService.addOTPSMS({ userId }, {});
 }
 

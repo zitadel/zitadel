@@ -26,10 +26,13 @@ export default async function Page({
     ({ session, token }) => {
       if (session && session.factors?.user?.id) {
         if (method === "time-based") {
+          // inconsistency with token: email works with machine token, totp works with session token
           return registerTOTP(session.factors.user.id, token);
         } else if (method === "sms") {
+          // does not work
           return addOTPSMS(session.factors.user.id);
         } else if (method === "email") {
+          // works
           return addOTPEmail(session.factors.user.id);
         } else {
           throw new Error("Invalid method");
@@ -54,16 +57,15 @@ export default async function Page({
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>Register TOTP</h1>
-        <p className="ztdl-p">
-          Scan the QR Code or navigate to the URL manually.
-        </p>
+        <h1>Register 2-factor</h1>
+        {totpResponse && "uri" in totpResponse && "secret" in totpResponse ? (
+          <>
+            <p className="ztdl-p">
+              Scan the QR Code or navigate to the URL manually.
+            </p>
+            <div>
+              {/* {auth && <div>{auth.to}</div>} */}
 
-        <div>
-          {/* {auth && <div>{auth.to}</div>} */}
-          {totpResponse &&
-            "uri" in totpResponse &&
-            "secret" in totpResponse && (
               <TOTPRegister
                 uri={totpResponse.uri as string}
                 secret={totpResponse.secret as string}
@@ -72,8 +74,17 @@ export default async function Page({
                 authRequestId={authRequestId}
                 organization={organization}
               ></TOTPRegister>
-            )}
-        </div>
+            </div>{" "}
+          </>
+        ) : (
+          <p className="ztdl-p">
+            {method === "email"
+              ? "Code via email was successfully added."
+              : method === "sms"
+              ? "Code via SMS was successfully added."
+              : ""}
+          </p>
+        )}
       </div>
     </DynamicTheme>
   );
