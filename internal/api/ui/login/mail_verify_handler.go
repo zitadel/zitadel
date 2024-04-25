@@ -1,8 +1,8 @@
 package login
 
 import (
-	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/zitadel/zitadel/internal/domain"
 )
@@ -27,18 +27,24 @@ type mailVerificationData struct {
 	UserID string
 }
 
-func MailVerificationLink(origin, userID, code, orgID string) string {
-	return fmt.Sprintf("%s%s?userID=%s&code=%s&orgID=%s", externalLink(origin), EndpointMailVerification, userID, code, orgID)
+func MailVerificationLink(origin, userID, code, orgID, authRequestID string) string {
+	v := url.Values{}
+	v.Set(queryUserID, userID)
+	v.Set(queryCode, code)
+	v.Set(queryOrgID, orgID)
+	v.Set(QueryAuthRequestID, authRequestID)
+	return externalLink(origin) + EndpointMailVerification + "?" + v.Encode()
 }
 
 func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
+	authReq := l.checkOptionalAuthRequestOfEmailLinks(r)
 	userID := r.FormValue(queryUserID)
 	code := r.FormValue(queryCode)
 	if code != "" {
-		l.checkMailCode(w, r, nil, userID, code)
+		l.checkMailCode(w, r, authReq, userID, code)
 		return
 	}
-	l.renderMailVerification(w, r, nil, userID, nil)
+	l.renderMailVerification(w, r, authReq, userID, nil)
 }
 
 func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +67,7 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 		l.checkMailCode(w, r, authReq, data.UserID, data.Code)
 		return
 	}
-	_, err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg, emailCodeGenerator)
+	_, err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg, emailCodeGenerator, authReq.ID)
 	l.renderMailVerification(w, r, authReq, data.UserID, err)
 }
 
