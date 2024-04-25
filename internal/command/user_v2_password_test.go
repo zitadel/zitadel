@@ -10,6 +10,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -69,7 +70,7 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second),
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second, ""),
 						),
 					),
 				),
@@ -167,7 +168,7 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second),
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second, ""),
 						),
 					),
 				),
@@ -279,7 +280,7 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second),
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second, ""),
 						),
 					),
 				),
@@ -390,7 +391,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second),
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second, ""),
 						),
 					),
 				),

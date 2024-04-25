@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
@@ -69,6 +70,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hook.EnumHookFunc(authz.MemberTypeString),
 			actions.HTTPConfigDecodeHook,
 			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
+			hooks.MapTypeStringDecode[string, crypto.HasherConfig],
 			hooks.SliceTypeStringDecode[authz.RoleMapping],
 		)),
 	)
