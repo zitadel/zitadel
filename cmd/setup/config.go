@@ -2,9 +2,7 @@ package setup
 
 import (
 	"bytes"
-	"github.com/zitadel/zitadel/cmd/hooks"
 	"github.com/zitadel/zitadel/internal/actions"
-	"github.com/zitadel/zitadel/internal/domain"
 	"strings"
 	"time"
 
@@ -13,6 +11,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/encryption"
+	"github.com/zitadel/zitadel/cmd/hooks"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -21,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
@@ -67,14 +67,14 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
 			hooks.MapTypeStringDecode[string, crypto.HasherConfig],
 			hooks.MapHTTPHeaderStringDecode,
+			database.DecodeHook,
+			actions.HTTPConfigDecodeHook,
+			hook.EnumHookFunc(internal_authz.MemberTypeString),
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
-			database.DecodeHook,
-			actions.HTTPConfigDecodeHook,
-			hook.EnumHookFunc(internal_authz.MemberTypeString),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
