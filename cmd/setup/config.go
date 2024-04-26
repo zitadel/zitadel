@@ -2,7 +2,6 @@ package setup
 
 import (
 	"bytes"
-	"github.com/zitadel/zitadel/internal/actions"
 	"strings"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/hooks"
+	"github.com/zitadel/zitadel/internal/actions"
 	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
