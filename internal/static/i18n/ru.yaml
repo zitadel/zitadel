@@ -56,7 +56,8 @@ Errors:
   SMTPConfig:
     NotFound: Конфигурация SMTP не найдена
     AlreadyExists: Конфигурация SMTP уже существует
-    SenderAdressNotCustomDomain: Адрес отправителя должен быть настроен как личный домен в экземпляре
+    AlreadyDeactivated: Конфигурация SMTP уже деактивирована
+    SenderAdressNotCustomDomain: Адрес отправителя должен быть настроен как личный домен на экземпляре.
   Notification:
     NoDomain: Домен не найден
   User:
@@ -109,6 +110,7 @@ Errors:
       Key:
         NotFound: Машинный ключ не найден
         AlreadyExisting: Машинный ключ уже существует
+        Invalid: Открытый ключ не является допустимым открытым ключом RSA в формате PKIX с кодировкой PEM
       Secret:
         NotExisting: Ключ не существует
         Invalid: Ключ недействителен
@@ -120,7 +122,7 @@ Errors:
     WrongType: Запрещено для данного типа пользователя
     NotAllowedToLink: У пользователя нет разрешения на связь с внешним провайдером входа в систему
     Username:
-      AlreadyExists:  Имя пользователя занято
+      AlreadyExists: Имя пользователя занято
       Reserved: Имя пользователя уже занято
     Code:
       Empty: Код не заполнен
@@ -471,6 +473,7 @@ Errors:
     CloseRows: SQL-запрос не удалось завершить
     SQLStatement: SQL-запрос не может быть создан
     InvalidRequest: Запрос недействителен
+    TooManyNestingLevels: слишком много уровней вложенности запросов (максимум 20)
   Quota:
     AlreadyExists: Квота для данного объекта уже существует
     NotFound: Квота для данного объекта не найдена
@@ -569,6 +572,15 @@ AggregateTypes:
   target: мишень
   execution: Исполнение
   user_schema: Пользовательская схема
+  auth_request: Запрос на аутентификацию
+  device_auth: Аутентификация устройства
+  idpintent: Намерение IDP
+  limits: Ограничения
+  milestone: Веха
+  oidc_session: Сеанс OIDC
+  restrictions: Ограничения
+  system: Система
+  session: Сеанс
 
 EventTypes:
   execution:
@@ -614,6 +626,7 @@ EventTypes:
         removed: Ключ удалён
       secret:
         set: Ключ установлен
+        updated: Секретный хеш обновлен.
         removed: Ключ удалён
         check:
           succeeded: Проверка ключа прошла успешно
@@ -712,7 +725,7 @@ EventTypes:
               login: Проверка мультифактора U2F начата
             check:
               succeeded: Проверка мультифактора U2F прошла успешно
-              failed:  Проверка мультифактора U2F U2F не удалась
+              failed: Проверка мультифактора U2F U2F не удалась
             signcount:
               changed: Контрольная сумма токена мультифактора U2F изменена
         init:
@@ -874,7 +887,7 @@ EventTypes:
           added: Второй фактор добавлен в политику входа в систему
           removed: Второй фактор удалён из политики входа в систему
         multifactor:
-          added:  Мультифактор добавлен в политику входа в систему
+          added: Мультифактор добавлен в политику входа в систему
           removed: Мультифактор удалён из политики входа в систему
       password:
         complexity:
@@ -988,6 +1001,11 @@ EventTypes:
           check:
             succeeded: Проверка клиентского ключа OIDC прошла успешно
             failed: Проверки клиентского ключа OIDC не удалась
+      api:
+        secret:
+          check:
+            succeeded: Проверка секретности API прошла успешно
+            failed: Проверка секретности API не удалась
         key:
           added: Ключ приложения добавлен
           removed: Ключ приложения удалён
@@ -1000,11 +1018,13 @@ EventTypes:
           changed: Конфигурация OIDC изменена
           secret:
             changed: Ключ OIDC изменён
+            updated: Секретный хеш OIDC обновлен.
         api:
           added: Конфигурация API добавлена
           changed: Конфигурация API изменена
           secret:
             changed: Ключ API изменён
+            updated: Секретный хэш API обновлен.
   policy:
     password:
       complexity:
@@ -1099,6 +1119,9 @@ EventTypes:
       config:
         added: Конфигурация SMTP добавлена
         changed: Конфигурация SMTP изменена
+        activated: Конфигурация SMTP активирована
+        deactivated: Конфигурация SMTP деактивирована
+        removed: Конфигурация SMTP удалена.
         password:
           changed: Ключ конфигурации SMTP изменён
     sms:
@@ -1244,6 +1267,8 @@ EventTypes:
       config:
         added: Конфигурация SMTP добавлена
         changed: Конфигурация SMTP изменена
+        activated: Конфигурация SMTP активирована
+        deactivated: Конфигурация SMTP деактивирована
         password:
           changed: Пароль конфигурации SMTP изменён
         removed: Конфигурация SMTP удалена

@@ -353,6 +353,7 @@ import {
   RemoveOrgMetadataRequest,
   RemoveOrgMetadataResponse,
   RemoveOrgRequest,
+  RemoveOrgResponse,
   RemovePersonalAccessTokenRequest,
   RemovePersonalAccessTokenResponse,
   RemoveProjectGrantMemberRequest,
@@ -1587,9 +1588,13 @@ export class ManagementService {
     return this.grpcService.mgmt.getLockoutPolicy(req, null).then((resp) => resp.toObject());
   }
 
-  public addCustomLockoutPolicy(maxAttempts: number): Promise<AddCustomLockoutPolicyResponse.AsObject> {
+  public addCustomLockoutPolicy(
+    maxPasswordAttempts: number,
+    maxOTPAttempts: number,
+  ): Promise<AddCustomLockoutPolicyResponse.AsObject> {
     const req = new AddCustomLockoutPolicyRequest();
-    req.setMaxPasswordAttempts(maxAttempts);
+    req.setMaxPasswordAttempts(maxPasswordAttempts);
+    req.setMaxOtpAttempts(maxOTPAttempts);
 
     return this.grpcService.mgmt.addCustomLockoutPolicy(req, null).then((resp) => resp.toObject());
   }
@@ -1599,9 +1604,13 @@ export class ManagementService {
     return this.grpcService.mgmt.resetLockoutPolicyToDefault(req, null).then((resp) => resp.toObject());
   }
 
-  public updateCustomLockoutPolicy(maxAttempts: number): Promise<UpdateCustomLockoutPolicyResponse.AsObject> {
+  public updateCustomLockoutPolicy(
+    maxPasswordAttempts: number,
+    maxOTPAttempts: number,
+  ): Promise<UpdateCustomLockoutPolicyResponse.AsObject> {
     const req = new UpdateCustomLockoutPolicyRequest();
-    req.setMaxPasswordAttempts(maxAttempts);
+    req.setMaxPasswordAttempts(maxPasswordAttempts);
+    req.setMaxOtpAttempts(maxOTPAttempts);
 
     return this.grpcService.mgmt.updateCustomLockoutPolicy(req, null).then((resp) => resp.toObject());
   }
@@ -1741,7 +1750,7 @@ export class ManagementService {
     return this.grpcService.mgmt.removeUser(req, null).then((resp) => resp.toObject());
   }
 
-  public removeOrg(): Promise<RemoveUserResponse.AsObject> {
+  public removeOrg(): Promise<RemoveOrgResponse.AsObject> {
     const req = new RemoveOrgRequest();
     return this.grpcService.mgmt.removeOrg(req, null).then((resp) => resp.toObject());
   }

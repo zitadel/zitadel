@@ -19,6 +19,7 @@ type expectation func(m sqlmock.Sqlmock)
 func NewSQLMock(t *testing.T, expectations ...expectation) *SQLMock {
 	db, mock, err := sqlmock.New(
 		sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual),
+		sqlmock.ValueConverterOption(new(TypeConverter)),
 	)
 	if err != nil {
 		t.Fatal("create mock failed", err)
@@ -97,23 +98,23 @@ func ExcpectExec(stmt string, opts ...ExecOpt) expectation {
 	}
 }
 
-type QueryOpt func(e *sqlmock.ExpectedQuery) *sqlmock.ExpectedQuery
+type QueryOpt func(m sqlmock.Sqlmock, e *sqlmock.ExpectedQuery) *sqlmock.ExpectedQuery
 
 func WithQueryArgs(args ...driver.Value) QueryOpt {
-	return func(e *sqlmock.ExpectedQuery) *sqlmock.ExpectedQuery {
+	return func(_ sqlmock.Sqlmock, e *sqlmock.ExpectedQuery) *sqlmock.ExpectedQuery {
 		return e.WithArgs(args...)
 	}
 }
 
 func WithQueryErr(err error) QueryOpt {
-	return func(e *sqlmock.ExpectedQuery) *sqlmock.ExpectedQuery {
+	return func(_ sqlmock.Sqlmock, e *sqlmock.ExpectedQuery) *sqlmock.ExpectedQuery {
 		return e.WillReturnError(err)
 	}
 }
 
 func WithQueryResult(columns []string, rows [][]driver.Value) QueryOpt {
-	return func(e *sqlmock.ExpectedQuery) *sqlmock.ExpectedQuery {
-		mockedRows := sqlmock.NewRows(columns)
+	return func(m sqlmock.Sqlmock, e *sqlmock.ExpectedQuery) *sqlmock.ExpectedQuery {
+		mockedRows := m.NewRows(columns)
 		for _, row := range rows {
 			mockedRows = mockedRows.AddRow(row...)
 		}
@@ -125,7 +126,7 @@ func ExpectQuery(stmt string, opts ...QueryOpt) expectation {
 	return func(m sqlmock.Sqlmock) {
 		e := m.ExpectQuery(stmt)
 		for _, opt := range opts {
-			e = opt(e)
+			e = opt(m, e)
 		}
 	}
 }

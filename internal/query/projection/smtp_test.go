@@ -3,6 +3,7 @@ package projection
 import (
 	"testing"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -27,12 +28,16 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						instance.SMTPConfigChangedEventType,
 						instance.AggregateType,
 						[]byte(`{
+						"description": "test",
 						"tls": true,
 						"senderAddress": "sender",
 						"senderName": "name",
 						"replyToAddress": "reply-to",
 						"host": "host",
-						"user": "user"
+						"user": "user",
+						"id": "44444",
+						"resource_owner": "ro-id",
+						"instance_id": "instance-id"						
 					}`,
 						),
 					), instance.SMTPConfigChangedEventMapper),
@@ -44,7 +49,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.smtp_configs1 SET (change_date, sequence, tls, sender_address, sender_name, reply_to_address, host, username) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9) AND (instance_id = $10)",
+							expectedStmt: "UPDATE projections.smtp_configs2 SET (change_date, sequence, tls, sender_address, sender_name, reply_to_address, host, username, description) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (id = $10) AND (resource_owner = $11) AND (instance_id = $12)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -54,7 +59,9 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 								"reply-to",
 								"host",
 								"user",
-								"agg-id",
+								"test",
+								"44444",
+								"ro-id",
 								"instance-id",
 							},
 						},
@@ -71,6 +78,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						instance.AggregateType,
 						[]byte(`{
 						"tls": true,
+						"id": "id",
+						"description": "test",
 						"senderAddress": "sender",
 						"senderName": "name",
 						"replyToAddress": "reply-to",
@@ -91,14 +100,14 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.smtp_configs1 (aggregate_id, creation_date, change_date, resource_owner, instance_id, sequence, tls, sender_address, sender_name, reply_to_address, host, username, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+							expectedStmt: "INSERT INTO projections.smtp_configs2 (creation_date, change_date, resource_owner, instance_id, sequence, id, tls, sender_address, sender_name, reply_to_address, host, username, password, state, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
 							expectedArgs: []interface{}{
-								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
 								"instance-id",
 								uint64(15),
+								"id",
 								true,
 								"sender",
 								"name",
@@ -106,6 +115,72 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 								"host",
 								"user",
 								anyArg{},
+								domain.SMTPConfigState(3),
+								"test",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceSMTPConfigActivated",
+			args: args{
+				event: getEvent(testEvent(
+					instance.SMTPConfigActivatedEventType,
+					instance.AggregateType,
+					[]byte(`{ 
+						"id": "config-id" 
+					}`),
+				), instance.SMTPConfigActivatedEventMapper),
+			},
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigActivated,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.smtp_configs2 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.SMTPConfigStateActive,
+								"config-id",
+								"ro-id",
+								"instance-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceSMTPConfigDeactivated",
+			args: args{
+				event: getEvent(testEvent(
+					instance.SMTPConfigDeactivatedEventType,
+					instance.AggregateType,
+					[]byte(`{ 
+						"id": "config-id" 
+					}`),
+				), instance.SMTPConfigDeactivatedEventMapper),
+			},
+			reduce: (&smtpConfigProjection{}).reduceSMTPConfigDeactivated,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("instance"),
+				sequence:      15,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.smtp_configs2 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								domain.SMTPConfigStateInactive,
+								"config-id",
+								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -120,6 +195,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 						instance.SMTPConfigPasswordChangedEventType,
 						instance.AggregateType,
 						[]byte(`{
+						"id": "config-id",
 						"password": {
 							"cryptoType": 0,
 							"algorithm": "RSA-265",
@@ -135,12 +211,13 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.smtp_configs1 SET (change_date, sequence, password) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (instance_id = $5)",
+							expectedStmt: "UPDATE projections.smtp_configs2 SET (change_date, sequence, password) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								anyArg{},
-								"agg-id",
+								"config-id",
+								"ro-id",
 								"instance-id",
 							},
 						},
@@ -154,7 +231,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					instance.SMTPConfigRemovedEventType,
 					instance.AggregateType,
-					[]byte(`{}`),
+					[]byte(`{ "id": "config-id"}`),
 				), instance.SMTPConfigRemovedEventMapper),
 			},
 			reduce: (&smtpConfigProjection{}).reduceSMTPConfigRemoved,
@@ -164,9 +241,10 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.smtp_configs1 WHERE (aggregate_id = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.smtp_configs2 WHERE (id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
-								"agg-id",
+								"config-id",
+								"ro-id",
 								"instance-id",
 							},
 						},
@@ -191,7 +269,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.smtp_configs1 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.smtp_configs2 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

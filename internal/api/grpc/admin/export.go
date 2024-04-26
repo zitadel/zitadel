@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"time"
 
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -394,11 +395,11 @@ func (s *Server) getLoginPolicy(ctx context.Context, orgID string, orgIDPs []str
 		return nil, err
 	}
 	if !queriedLogin.IsDefault {
-		pwCheck := durationpb.New(queriedLogin.PasswordCheckLifetime)
-		externalLogin := durationpb.New(queriedLogin.ExternalLoginCheckLifetime)
-		mfaInitSkip := durationpb.New(queriedLogin.MFAInitSkipLifetime)
-		secondFactor := durationpb.New(queriedLogin.SecondFactorCheckLifetime)
-		multiFactor := durationpb.New(queriedLogin.MultiFactorCheckLifetime)
+		pwCheck := durationpb.New(time.Duration(queriedLogin.PasswordCheckLifetime))
+		externalLogin := durationpb.New(time.Duration(queriedLogin.ExternalLoginCheckLifetime))
+		mfaInitSkip := durationpb.New(time.Duration(queriedLogin.MFAInitSkipLifetime))
+		secondFactor := durationpb.New(time.Duration(queriedLogin.SecondFactorCheckLifetime))
+		multiFactor := durationpb.New(time.Duration(queriedLogin.MultiFactorCheckLifetime))
 
 		secondFactors := []policy_pb.SecondFactorType{}
 		for _, factor := range queriedLogin.SecondFactors {
@@ -490,13 +491,14 @@ func (s *Server) getLockoutPolicy(ctx context.Context, orgID string) (_ *managem
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID, false)
+	queriedLockout, err := s.query.LockoutPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
 	}
 	if !queriedLockout.IsDefault {
 		return &management_pb.AddCustomLockoutPolicyRequest{
 			MaxPasswordAttempts: uint32(queriedLockout.MaxPasswordAttempts),
+			MaxOtpAttempts:      uint32(queriedLockout.MaxOTPAttempts),
 		}, nil
 	}
 	return nil, nil
@@ -1058,6 +1060,7 @@ func (s *Server) getCustomLoginTexts(ctx context.Context, org string, languages 
 				RegistrationUserText:                 text_grpc.RegistrationUserScreenTextToPb(text.RegistrationUser),
 				ExternalRegistrationUserOverviewText: text_grpc.ExternalRegistrationUserOverviewScreenTextToPb(text.ExternalRegistrationUserOverview),
 				RegistrationOrgText:                  text_grpc.RegistrationOrgScreenTextToPb(text.RegistrationOrg),
+				LinkingUserPromptText:                text_grpc.LinkingUserPromptScreenTextToPb(text.LinkingUserPrompt),
 				LinkingUserDoneText:                  text_grpc.LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
 				ExternalUserNotFoundText:             text_grpc.ExternalUserNotFoundScreenTextToPb(text.ExternalNotFound),
 				SuccessLoginText:                     text_grpc.SuccessLoginScreenTextToPb(text.LoginSuccess),

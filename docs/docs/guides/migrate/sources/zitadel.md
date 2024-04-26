@@ -36,7 +36,7 @@ You need a PAT from a service user with IAM Owner permissions in both the source
 
 1. Go to your default organization
 2. Create a service user "import_user" with Access Token Type "Bearer"
-3. Create a [personal access token](/docs/guides/integrate/pat)
+3. Create a [personal access token](/docs/guides/integrate/service-users/personal-access-token)
 4. Go to the global instance settings
 5. Add the import_user as [manager](/docs/guides/manage/console/managers) with the role "IAM Owner"
 
@@ -46,7 +46,7 @@ Save the PAT to the environment variabel `PAT_EXPORT_TOKEN` and the source domai
 
 1. Go to your default organization
 2. Create a service user "export_user" with Access Token Type "Bearer"
-3. Create a [personal access token](/docs/guides/integrate/pat)
+3. Create a [personal access token](/docs/guides/integrate/service-users/personal-access-token)
 4. Go to the global instance settings
 5. Add the export_user as [manager](/docs/guides/manage/console/managers) with the role "IAM Owner"
 

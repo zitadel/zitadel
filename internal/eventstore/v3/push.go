@@ -8,31 +8,30 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
+	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := es.client.BeginTx(ctx, nil)
+	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return nil, err
 	}
 	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
 		sequences []*latestSequence
-		once      sync.Once
 	)
 
 	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
-		once.Do(func() {
-			sequences, err = latestSequences(ctx, tx, commands)
-		})
+		sequences, err = latestSequences(ctx, tx, commands)
 		if err != nil {
 			return err
 		}

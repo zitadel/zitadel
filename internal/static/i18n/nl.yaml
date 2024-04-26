@@ -60,7 +60,6 @@ Errors:
   Notification:
     NoDomain: Geen domein gevonden voor bericht
   User:
-    TooManyNestingLevels: Te veel query nesting niveaus (Max 20).
     NotFound: Gebruiker kon niet worden gevonden
     AlreadyExists: Gebruiker bestaat al
     NotFoundOnOrg: Gebruiker kon niet worden gevonden op gekozen organisatie
@@ -109,6 +108,7 @@ Errors:
       Key:
         NotFound: Machine sleutel niet gevonden
         AlreadyExisting: Machine sleutel al bestaand
+        Invalid: De openbare sleutel is geen geldige openbare RSA-sleutel in PKIX-indeling met PEM-codering
       Secret:
         NotExisting: Geheim bestaat niet
         Invalid: Geheim is ongeldig
@@ -479,6 +479,7 @@ Errors:
     CloseRows: SQL Statement kon niet worden voltooid
     SQLStatement: SQL Statement kon niet worden gemaakt
     InvalidRequest: Verzoek is ongeldig
+    TooManyNestingLevels: Te veel query nesting niveaus (Max 20)
   Quota:
     AlreadyExists: Quota bestaat al voor deze eenheid
     NotFound: Quota niet gevonden voor deze eenheid
@@ -581,6 +582,15 @@ AggregateTypes:
   target: Doel
   execution: Executie
   user_schema: Gebruikersschema
+  auth_request: Auth Verzoek
+  device_auth: Apparaatverificatie
+  idpintent: IDP Intentie
+  limits: Limieten
+  milestone: Mijlpaal
+  oidc_session: OIDC Sessie
+  restrictions: Beperkingen
+  system: Systeem
+  session: Sessie
 
 EventTypes:
   execution:
@@ -626,6 +636,7 @@ EventTypes:
         removed: Sleutel verwijderd
       secret:
         set: Geheim ingesteld
+        updated: Geheime hash bijgewerkt
         removed: Geheim verwijderd
         check:
           succeeded: Geheimcontrole geslaagd
@@ -1000,6 +1011,11 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret controle geslaagd
             failed: OIDC Client Secret controle mislukt
+      api:
+        secret:
+          check:
+            succeeded: API-geheimcontrole geslaagd
+            failed: API-geheimcontrole mislukt
         key:
           added: Applicatiesleutel toegevoegd
           removed: Applicatiesleutel verwijderd
@@ -1012,11 +1028,13 @@ EventTypes:
           changed: OIDC Configuratie gewijzigd
           secret:
             changed: OIDC geheim gewijzigd
+            updated: OIDC geheime hash bijgewerkt
         api:
           added: API Configuratie toegevoegd
           changed: API Configuratie gewijzigd
           secret:
             changed: API geheim gewijzigd
+            updated: API-geheime hash bijgewerkt
   policy:
     password:
       complexity:

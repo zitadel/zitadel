@@ -321,6 +321,12 @@ LogoutDone:
   Description: Você fez logout com sucesso.
   LoginButtonText: login
 
+LinkingUserPrompt:
+  Title: Usuário existente encontrado
+  Description: "Deseja vincular sua conta existente:"
+  LinkButtonText: Link
+  OtherButtonText: Outras opções
+
 LinkingUsersDone:
   Title: Vinculação de usuários
   Description: Vinculação de usuários concluída.

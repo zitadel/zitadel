@@ -473,7 +473,7 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.ResendInitialMail(ctx, req.UserId, domain.EmailAddress(req.Email), authz.GetCtxData(ctx).OrgID, initCodeGenerator)
+	details, err := s.command.ResendInitialMail(ctx, req.UserId, domain.EmailAddress(req.Email), authz.GetCtxData(ctx).OrgID, initCodeGenerator, "")
 	if err != nil {
 		return nil, err
 	}
@@ -487,7 +487,7 @@ func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, emailCodeGenerator)
+	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, emailCodeGenerator, "")
 	if err != nil {
 		return nil, err
 	}
@@ -590,7 +590,7 @@ func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mg
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type), passwordCodeGenerator)
+	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type), passwordCodeGenerator, "")
 	if err != nil {
 		return nil, err
 	}
@@ -774,13 +774,22 @@ func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKe
 
 func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRequest) (*mgmt_pb.AddMachineKeyResponse, error) {
 	machineKey := AddMachineKeyRequestToCommand(req, authz.GetCtxData(ctx).OrgID)
+	// If there is no pubkey supplied, then AddUserMachineKey will generate a new one
+	pubkeySupplied := len(machineKey.PublicKey) > 0
 	details, err := s.command.AddUserMachineKey(ctx, machineKey)
 	if err != nil {
 		return nil, err
 	}
-	keyDetails, err := machineKey.Detail()
-	if err != nil {
-		return nil, err
+
+	// Return key details only if the pubkey wasn't supplied, otherwise the user already has
+	// private key locally
+	var keyDetails []byte
+	if !pubkeySupplied {
+		var err error
+		keyDetails, err = machineKey.Detail()
+		if err != nil {
+			return nil, err
+		}
 	}
 	return &mgmt_pb.AddMachineKeyResponse{
 		KeyId:      machineKey.KeyID,
@@ -800,18 +809,13 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 }
 
 func (s *Server) GenerateMachineSecret(ctx context.Context, req *mgmt_pb.GenerateMachineSecretRequest) (*mgmt_pb.GenerateMachineSecretResponse, error) {
-	// use SecretGeneratorTypeAppSecret as the secrets will be used in the client_credentials grant like a client secret
-	secretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.passwordHashAlg)
-	if err != nil {
-		return nil, err
-	}
 	user, err := s.getUserByID(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
 	}
 
 	set := new(command.GenerateMachineSecret)
-	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, secretGenerator, set)
+	details, err := s.command.GenerateMachineSecret(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, set)
 	if err != nil {
 		return nil, err
 	}

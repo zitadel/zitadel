@@ -23,7 +23,7 @@ func RefreshToken(userID, tokenID, token string, algorithm crypto.EncryptionAlgo
 func FromRefreshToken(refreshToken string, algorithm crypto.EncryptionAlgorithm) (userID, tokenID, token string, err error) {
 	decoded, err := base64.RawURLEncoding.DecodeString(refreshToken)
 	if err != nil {
-		return "", "", "", err
+		return "", "", "", zerrors.ThrowInvalidArgument(err, "DOMAIN-BGDhn", "Errors.User.RefreshToken.Invalid")
 	}
 	decrypted, err := algorithm.Decrypt(decoded, algorithm.EncryptionKeyID())
 	if err != nil {

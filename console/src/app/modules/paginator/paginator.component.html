@@ -4,7 +4,7 @@
       <span>{{ length }} </span>{{ 'PAGINATOR.COUNT' | translate }}
     </p>
     <p class="ts cnsl-secondary-text" *ngIf="timestamp" data-e2e="timestamp">
-      {{ timestamp | timestampToDate | localizedDate: 'EEEE dd. MMM YYYY, HH:mm' }}
+      {{ timestamp | timestampToDate | localizedDate: 'EEEE dd. MMM yyyy, HH:mm' }}
     </p>
   </div>
   <span class="fill-space"></span>

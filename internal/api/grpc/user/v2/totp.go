@@ -3,7 +3,6 @@ package user
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
@@ -11,7 +10,7 @@ import (
 
 func (s *Server) RegisterTOTP(ctx context.Context, req *user.RegisterTOTPRequest) (*user.RegisterTOTPResponse, error) {
 	return totpDetailsToPb(
-		s.command.AddUserTOTP(ctx, req.GetUserId(), authz.GetCtxData(ctx).OrgID),
+		s.command.AddUserTOTP(ctx, req.GetUserId(), ""),
 	)
 
 }
@@ -28,7 +27,7 @@ func totpDetailsToPb(totp *domain.TOTP, err error) (*user.RegisterTOTPResponse, 
 }
 
 func (s *Server) VerifyTOTPRegistration(ctx context.Context, req *user.VerifyTOTPRegistrationRequest) (*user.VerifyTOTPRegistrationResponse, error) {
-	objectDetails, err := s.command.CheckUserTOTP(ctx, req.GetUserId(), req.GetCode(), authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.CheckUserTOTP(ctx, req.GetUserId(), req.GetCode(), "")
 	if err != nil {
 		return nil, err
 	}

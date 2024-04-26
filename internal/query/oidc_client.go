@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -20,7 +19,7 @@ type OIDCClient struct {
 	AppID                    string                     `json:"app_id,omitempty"`
 	State                    domain.AppState            `json:"state,omitempty"`
 	ClientID                 string                     `json:"client_id,omitempty"`
-	ClientSecret             *crypto.CryptoValue        `json:"client_secret,omitempty"`
+	HashedSecret             string                     `json:"client_secret,omitempty"`
 	RedirectURIs             []string                   `json:"redirect_uris,omitempty"`
 	ResponseTypes            []domain.OIDCResponseType  `json:"response_types,omitempty"`
 	GrantTypes               []domain.OIDCGrantType     `json:"grant_types,omitempty"`
@@ -36,11 +35,12 @@ type OIDCClient struct {
 	AdditionalOrigins        []string                   `json:"additional_origins,omitempty"`
 	PublicKeys               map[string][]byte          `json:"public_keys,omitempty"`
 	ProjectID                string                     `json:"project_id,omitempty"`
+	ProjectRoleAssertion     bool                       `json:"project_role_assertion,omitempty"`
 	ProjectRoleKeys          []string                   `json:"project_role_keys,omitempty"`
 	Settings                 *OIDCSettings              `json:"settings,omitempty"`
 }
 
-//go:embed embed/oidc_client_by_id.sql
+//go:embed oidc_client_by_id.sql
 var oidcClientQuery string
 
 func (q *Queries) GetOIDCClientByID(ctx context.Context, clientID string, getKeys bool) (client *OIDCClient, err error) {

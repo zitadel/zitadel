@@ -86,9 +86,38 @@
         "TITLE": "組織設定",
         "DESCRIPTION": "組織の設定をカスタマイズします。"
       },
+      "FEATURES": {
+        "TITLE": "機能設定",
+        "DESCRIPTION": "インスタンスの機能のロックを解除します。"
+      },
       "IDPS": {
         "TITLE": "IDプロバイダー",
-        "DESCRIPTION": "外部IDプロバイダーを作成してアクティブにします。よく知られたプロバイダーを選択するか、他のOIDC、OAuth、SAML互換プロバイダーを設定します。既存のJWTトークンを連合アイデンティティとして使用するために、JWT IDプロバイダーを設定することもできます。"
+        "DESCRIPTION": "外部IDプロバイダーを作成してアクティブにします。よく知られたプロバイダーを選択するか、他のOIDC、OAuth、SAML互換プロバイダーを設定します。既存のJWTトークンを連合アイデンティティとして使用するために、JWT IDプロバイダーを設定することもできます。",
+        "NEXT": "次は？",
+        "SAML": {
+          "TITLE": "SAML IDプロバイダーを設定する",
+          "DESCRIPTION": "ZITADELは設定されました。次に、SAML IDプロバイダーの設定が必要です。ほとんどのプロバイダーでは、ZITADELのメタデータXML全体をアップロードするだけで済みます。他のプロバイダーでは、エンティティID（メタデータURL）、Assertion Consumer Service (ACS) URL、またはシングルログアウトURLなど、特定のURLのみを提供するよう求められる場合があります。"
+        },
+        "CALLBACK": {
+          "TITLE": "{{ provider }} IDプロバイダーを設定する",
+          "DESCRIPTION": "ZITADELを設定する前に、このURLをIDプロバイダーに渡して、認証後にブラウザがZITADELにリダイレクトするようにしてください。"
+        },
+        "JWT": {
+          "TITLE": "JWTをフェデレーテッドアイデンティティとして使用する",
+          "DESCRIPTION": "JWT IDプロバイダーを使用すると、既存のJWTトークンをフェデレーテッドアイデンティティとして使用できます。JWTの発行者がすでにある場合に便利な機能です。JWT IdPを使用すると、これらのJWTを使用してZITADELでユーザーを即座に作成および更新できます。"
+        },
+        "LDAP": {
+          "TITLE": "LDAP IDプロバイダーに接続するためにZITADELを設定する",
+          "DESCRIPTION": "LDAPサーバーへの接続詳細を提供し、LDAP属性をZITADEL属性にマッピングする設定を行ってください。"
+        },
+        "AUTOFILL": {
+          "TITLE": "ユーザーデータの自動入力",
+          "DESCRIPTION": "アクションを使用してユーザーの体験を向上させます。IDプロバイダーからの値でZITADELの登録フォームを事前に入力することができます。"
+        },
+        "ACTIVATE": {
+          "TITLE": "IdPを有効にする",
+          "DESCRIPTION": "IdPはまだ有効ではありません。有効にして、ユーザーがログインできるようにしてください。"
+        }
       },
       "PW_COMPLEXITY": {
         "TITLE": "パスワードの複雑さ",
@@ -467,7 +496,8 @@
     },
     "TABLE": {
       "SHOWUSER": "ユーザー {{value}} を表示する"
-    }
+    },
+    "DOWNLOAD": "ダウンロード"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "すべての組織を含むインスタンス全体を管理する権限を持ちます",
@@ -1262,6 +1292,7 @@
       "MEMBERCHANGED": "マネージャーが変更されました。",
       "SETPRIMARY": "プライマリドメインが設定されました。",
       "DELETED": "組織が正常に削除されました。",
+      "DEFAULTORGNOTFOUND": "デフォルトの組織が見つかりませんでした",
       "ORG_WAS_DELETED": "組織が削除されました。"
     },
     "DIALOG": {
@@ -1289,6 +1320,7 @@
     },
     "LIST": {
       "ORGS": "組織",
+      "FEATURESETTINGS": "機能設定",
       "LANGUAGES": "一般設定",
       "LOGIN": "ログイン動作とセキュリティ",
       "LOCKOUT": "ロックアウト",
@@ -1350,6 +1382,8 @@
       }
     },
     "SMTP": {
+      "TITLE": "SMTP設定",
+      "DESCRIPTION": "説明",
       "SENDERADDRESS": "送信者のメールアドレス",
       "SENDERNAME": "送信者名",
       "REPLYTOADDRESS": "返信先アドレス",
@@ -1360,6 +1394,7 @@
       "PASSWORDSET": "SMTPパスワードは正常に設定されました。",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "正常に保存されました！",
+      "NOCHANGES": "変更はありません!",
       "REQUIREDWARN": "ドメインから通知を送信するには、SMTP情報を入力する必要があります。"
     },
     "SMS": {
@@ -1418,6 +1453,27 @@
       "IMPERSONATIONTITLE": "偽装",
       "IMPERSONATIONENABLED": "偽装を許可します",
       "IMPERSONATIONDESCRIPTION": "この設定では、原則として偽装を使用できます。偽装者には、適切な `*_IMPERSONATOR` ロールも割り当てられている必要があることに注意してください。"
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "ログイン時の既定組織",
+      "LOGINDEFAULTORG_DESCRIPTION": "組織コンテキストが設定されていない場合、ログイン UI は既定の組織の設定を使用します (インスタンスの設定ではなく)",
+      "OIDCLEGACYINTROSPECTION": "OIDC レガシーイントロスペクション",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "パフォーマンス上の理由から最近イントロスペクション エンドポイントをリファクタリングしました。この機能は、予期しないバグが発生した場合にレガシー実装にロールバックするために使用できます。",
+      "OIDCTOKENEXCHANGE": "OIDC トークン交換",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "OIDC トークン エンドポイント用に実験的な urn:ietf:params:oauth:grant-type:token-exchange 付与タイプを有効にします。トークン交換は、より少ないスコープを持つトークンを要求するか、他のユーザーになりすますために使用できます。インスタンスでのなりすましを許可するには、セキュリティポリシーを参照してください。",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC トリガーイントロスペクションプロジェクション",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "イントロスペクション要求中にプロジェクショントリガーを有効にします。これは、イントロスペクションレスポンスに顕著な整合性問題がある場合の回避策として機能しますが、パフォーマンスに影響を与える可能性があります。今後、イントロスペクション要求のトリガーを削除する予定です。",
+      "USERSCHEMA": "ユーザー スキーマ",
+      "USERSCHEMA_DESCRIPTION": "ユーザー スキーマを使用すると、ユーザーのデータスキーマを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "ACTIONS": "アクション",
+      "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "STATES": {
+        "INHERITED": "継承",
+        "ENABLED": "有効",
+        "DISABLED": "無効"
+      },
+      "INHERITED_DESCRIPTION": "この設定は、値をシステムのデフォルト値に設定します。",
+      "RESET": "すべて継承に設定"
     },
     "DIALOG": {
       "RESET": {
@@ -1502,7 +1558,8 @@
       "DESCRIPTIONCREATEADMIN": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。",
       "DESCRIPTIONCREATEMGMT": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。注：システムセットプロバイダーと、組織用に設定されたプロバイダーのみを使用できます。",
       "LIFETIME_INVALID": "フォームに無効な値が含まれています。",
-      "SAVED": "正常に保存されました！"
+      "SAVED": "正常に保存されました！",
+      "PROVIDER_ADDED": "IDプロバイダーが有効化されました。"
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "プライバシーポリシーと利用規約リンクを設定します。",
@@ -1557,6 +1614,7 @@
         "initPasswordText": "パスワードを初期化する",
         "initializeDoneText": "ユーザーの初期化が完了しました",
         "initializeUserText": "ユーザーを初期化する",
+        "linkingUserPromptText": "ユーザーのリンクプロンプト",
         "linkingUserDoneText": "ユーザーのリンクが完了しました",
         "loginText": "ログイン",
         "logoutText": "ログアウト",
@@ -1628,7 +1686,8 @@
       "HASLOWERCASE": "小文字を含める",
       "HASUPPERCASE": "大文字を含める",
       "SHOWLOCKOUTFAILURES": "ロックアウトの失敗を表示する",
-      "MAXATTEMPTS": "パスワードの最大試行",
+      "MAXPASSWORDATTEMPTS": "パスワードの最大試行",
+      "MAXOTPATTEMPTS": "最大OTP試行回数",
       "EXPIREWARNDAYS": "有効期限の翌日以降の警告",
       "MAXAGEDAYS": "最大有効期限",
       "USERLOGINMUSTBEDOMAIN": "ログイン名の接尾辞として組織ドメインを追加する",
@@ -1987,7 +2046,13 @@
       "ISCREATIONALLOWED": "アカウント作成を許可",
       "ISCREATIONALLOWED_DESC": "アカウントを作成できるかどうかを決めます。",
       "ISLINKINGALLOWED": "アカウントリンクを許可",
-      "ISLINKINGALLOWED_DESC": "IDを既存のアカウントにリンクできるかどうかを決めます。"
+      "ISLINKINGALLOWED_DESC": "IDを既存のアカウントにリンクできるかどうかを決めます。",
+      "AUTOLINKING_DESC": "アイデンティティが既存のアカウントにリンクされるように促されるかどうかを決定します。",
+      "AUTOLINKINGTYPE": {
+        "0": "無効",
+        "1": "既存のユーザー名のチェック",
+        "2": "既存のメールアドレスのチェック"
+      }
     },
     "OWNERTYPES": {
       "0": "不明",
@@ -2146,6 +2211,48 @@
     "PASSWORDLESSTYPE": {
       "0": "無効",
       "1": "有効"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTPプロバイダー",
+      "DESCRIPTION": "これらは、Zitadel インスタンスの SMTP プロバイダーです。ユーザーに通知を送信するために使用するものをアクティブにします。",
+      "EMPTY": "使用可能な SMTP プロバイダーがありません",
+      "ACTIVATED": "アクティブ化された",
+      "ACTIVATE": "プロバイダーをアクティブ化する",
+      "DEACTIVATE": "プロバイダーを非アクティブ化する",
+      "TYPE": "タイプ",
+      "DIALOG": {
+        "ACTIVATED": "SMTP設定が有効化されました",
+        "ACTIVATE_WARN_TITLE": "SMTP設定を有効にする",
+        "ACTIVATE_WARN_DESCRIPTION": "SMTP 構成をアクティブにしようとしています。まず、現在アクティブなプロバイダーを非アクティブ化してから、この構成をアクティブ化します。本気ですか？",
+        "DEACTIVATE_WARN_TITLE": "SMTP設定を無効にする",
+        "DEACTIVATE_WARN_DESCRIPTION": "SMTP 構成を非アクティブ化しようとしています。本気ですか？",
+        "DEACTIVATED": "SMTP設定が無効化されました",
+        "DELETE_TITLE": "SMTP設定を削除する",
+        "DELETE_DESCRIPTION": "構成を削除しようとしています。送信者名を入力してこのアクションを確認します",
+        "DELETED": "SMTP設定が削除されました",
+        "SENDER": "この SMTP 構成を削除するには、「{{ value }}」と入力します。"
+      }
+    },
+    "CREATE": {
+      "TITLE": "SMTPプロバイダーの追加",
+      "DESCRIPTION": "次のプロバイダーから 1 つ以上を選択します。",
+      "STEPS": {
+        "TITLE": "{{ value }} SMTP プロバイダーを追加",
+        "CREATE_DESC_TITLE": "{{ value }} SMTP 設定をステップごとに入力します",
+        "CURRENT_DESC_TITLE": "これらは SMTP 設定です",
+        "PROVIDER_SETTINGS": "SMTPプロバイダーの設定",
+        "SENDER_SETTINGS": "送信者の設定",
+        "TEST_SETTINGS": "SMTP設定をテストする"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTPプロバイダーの設定"
+    },
+    "EMPTY": "使用可能な SMTP プロバイダーがありません",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {

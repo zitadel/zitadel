@@ -5,10 +5,28 @@
   <div class="identity-provider-create-content">
     <div class="title-row">
       <img class="idp-logo" src="./assets/images/idp/oauth.svg" alt="oauth" />
-
       <h1>{{ 'IDP.CREATE.OAUTH.TITLE' | translate }}</h1>
+      <ng-container *ngIf="exists$ | async">
+        <div
+          *ngIf="{ isNotActive: (activateLink$ | async) } as idp"
+          class="cnsl-state-dot"
+          [matTooltip]="(idp.isNotActive ? 'IDP.STATES.2' : 'IDP.STATES.1') | translate"
+          [ngClass]="{ active: !idp.isNotActive, inactive: !!idp.isNotActive }"
+        ></div>
+      </ng-container>
       <mat-spinner diameter="25" *ngIf="loading" color="primary"></mat-spinner>
     </div>
+
+    <cnsl-provider-next
+      [configureProvider]="(justCreated$ | async) === ''"
+      [configureTitle]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.TITLE' | translate: { provider: 'OAuth' }"
+      [configureDescription]="'DESCRIPTIONS.SETTINGS.IDPS.CALLBACK.DESCRIPTION' | translate: { provider: 'OAuth' }"
+      [copyUrls]="copyUrls$ | async"
+      [autofillLink]="autofillLink$ | async"
+      [activateLink]="activateLink$ | async"
+      [expanded]="!!(expandWhatNow$ | async)"
+      (activate)="activate()"
+    ></cnsl-provider-next>
 
     <p class="identity-provider-desc cnsl-secondary-text">{{ 'IDP.CREATE.OAUTH.DESCRIPTION' | translate }}</p>
 
@@ -107,8 +125,9 @@
           [disabled]="form.invalid || form.disabled"
           type="submit"
         >
-          <span *ngIf="id">{{ 'ACTIONS.SAVE' | translate }}</span>
-          <span *ngIf="!id">{{ 'ACTIONS.CREATE' | translate }}</span>
+          <span *ngIf="{ exists: (exists$ | async) } as idp">{{
+            (!!idp.exists ? 'ACTIONS.SAVE' : 'ACTIONS.CREATE') | translate
+          }}</span>
         </button>
       </div>
     </form>

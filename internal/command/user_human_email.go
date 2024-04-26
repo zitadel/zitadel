@@ -50,7 +50,7 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, em
 		if err != nil {
 			return nil, err
 		}
-		events = append(events, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry))
+		events = append(events, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry, ""))
 	}
 
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
@@ -81,7 +81,7 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, emailCodeGenerator)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, emailCodeGenerator.Alg())
 	if err == nil {
 		pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 		if err != nil {
@@ -99,7 +99,7 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 	return nil, zerrors.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")
 }
 
-func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string, emailCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
+func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string, emailCodeGenerator crypto.Generator, authRequestID string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
@@ -122,7 +122,10 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry))
+	if authRequestID == "" {
+		authRequestID = existingEmail.AuthRequestID
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanEmailCodeAddedEvent(ctx, userAgg, emailCode.Code, emailCode.Expiry, authRequestID))
 	if err != nil {
 		return nil, err
 	}

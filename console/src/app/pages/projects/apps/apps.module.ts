@@ -46,6 +46,7 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
 import { IntegrateAppComponent } from './integrate/integrate.component';
 import { OIDCConfigurationComponent } from 'src/app/components/oidc-configuration/oidc-configuration.component';
 import { FrameworkChangeComponent } from 'src/app/components/framework-change/framework-change.component';
+import { CopyRowComponent } from '../../../components/copy-row/copy-row.component';
 
 @NgModule({
   declarations: [
@@ -99,6 +100,7 @@ import { FrameworkChangeComponent } from 'src/app/components/framework-change/fr
     CodemirrorModule,
     ChangesModule,
     InfoSectionModule,
+    CopyRowComponent,
   ],
   exports: [TranslateModule],
 })

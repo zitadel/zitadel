@@ -65,7 +65,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "231965491734773762", "instanceID", nil),
+			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			wantErr: sql.ErrConnDone,
 		},
 		{
@@ -73,7 +73,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock:    mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoNotFound}, "231965491734773762", "instanceID", nil),
+			mock:    mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoNotFound}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			wantErr: zerrors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound"),
 		},
 		{
@@ -81,7 +81,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoHumanNoMD}, "231965491734773762", "instanceID", nil),
+			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoHumanNoMD}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
@@ -120,7 +120,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoHuman}, "231965491734773762", "instanceID", nil),
+			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoHuman}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
@@ -277,7 +277,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "240707570677841922",
 			},
-			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoMachine}, "240707570677841922", "instanceID", nil),
+			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoMachine}, "240707570677841922", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "240707570677841922",
@@ -334,6 +334,53 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 				got, err := q.GetOIDCUserInfo(ctx, tt.args.userID, tt.args.roleAudience)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)
+			})
+		})
+	}
+}
+
+func TestQueries_GetOIDCUserinfoClientByID(t *testing.T) {
+	expQuery := regexp.QuoteMeta(oidcUserinfoClientQuery)
+	cols := []string{"project_id", "project_role_assertion"}
+
+	tests := []struct {
+		name                     string
+		mock                     sqlExpectation
+		wantProjectID            string
+		wantProjectRoleAssertion bool
+		wantErr                  error
+	}{
+		{
+			name:    "no rows",
+			mock:    mockQueryErr(expQuery, sql.ErrNoRows, "instanceID", "clientID"),
+			wantErr: zerrors.ThrowNotFound(sql.ErrNoRows, "QUERY-beeW8", "Errors.App.NotFound"),
+		},
+		{
+			name:    "internal error",
+			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "instanceID", "clientID"),
+			wantErr: zerrors.ThrowInternal(sql.ErrConnDone, "QUERY-Ais4r", "Errors.Internal"),
+		},
+		{
+			name:                     "found",
+			mock:                     mockQuery(expQuery, cols, []driver.Value{"projectID", true}, "instanceID", "clientID"),
+			wantProjectID:            "projectID",
+			wantProjectRoleAssertion: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			execMock(t, tt.mock, func(db *sql.DB) {
+				q := &Queries{
+					client: &database.DB{
+						DB:       db,
+						Database: &prepareDB{},
+					},
+				}
+				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
+				gotProjectID, gotProjectRoleAssertion, err := q.GetOIDCUserinfoClientByID(ctx, "clientID")
+				require.ErrorIs(t, err, tt.wantErr)
+				assert.Equal(t, tt.wantProjectID, gotProjectID)
+				assert.Equal(t, tt.wantProjectRoleAssertion, gotProjectRoleAssertion)
 			})
 		})
 	}

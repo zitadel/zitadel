@@ -28,13 +28,14 @@ type EventEditor struct {
 }
 
 type eventsReducer struct {
-	ctx    context.Context
-	q      *Queries
-	events []*Event
+	ctx     context.Context
+	q       *Queries
+	events  []*Event
+	editors map[string]*EventEditor
 }
 
 func (r *eventsReducer) AppendEvents(events ...eventstore.Event) {
-	r.events = append(r.events, r.q.convertEvents(r.ctx, events)...)
+	r.events = append(r.events, r.convertEvents(r.ctx, events)...)
 }
 
 func (r *eventsReducer) Reduce() error { return nil }
@@ -49,7 +50,7 @@ func (q *Queries) SearchEvents(ctx context.Context, query *eventstore.SearchQuer
 	if auditLogRetention != 0 {
 		query = filterAuditLogRetention(ctx, auditLogRetention, query)
 	}
-	reducer := &eventsReducer{ctx: ctx, q: q}
+	reducer := &eventsReducer{ctx: ctx, q: q, editors: make(map[string]*EventEditor, query.GetLimit())}
 	if err = q.eventstore.FilterToReducer(ctx, query, reducer); err != nil {
 		return nil, err
 	}
@@ -78,24 +79,19 @@ func (q *Queries) SearchAggregateTypes(ctx context.Context) []string {
 	return q.eventstore.AggregateTypes()
 }
 
-func (q *Queries) convertEvents(ctx context.Context, events []eventstore.Event) []*Event {
+func (er *eventsReducer) convertEvents(ctx context.Context, events []eventstore.Event) []*Event {
 	result := make([]*Event, len(events))
-	users := make(map[string]*EventEditor)
 	for i, event := range events {
-		result[i] = q.convertEvent(ctx, event, users)
+		result[i] = er.convertEvent(ctx, event)
 	}
 	return result
 }
 
-func (q *Queries) convertEvent(ctx context.Context, event eventstore.Event, users map[string]*EventEditor) *Event {
-	ctx, span := tracing.NewSpan(ctx)
-	var err error
-	defer func() { span.EndWithError(err) }()
-
-	editor, ok := users[event.Creator()]
+func (er *eventsReducer) convertEvent(ctx context.Context, event eventstore.Event) *Event {
+	editor, ok := er.editors[event.Creator()]
 	if !ok {
-		editor = q.editorUserByID(ctx, event.Creator())
-		users[event.Creator()] = editor
+		editor = er.q.editorUserByID(ctx, event.Creator())
+		er.editors[event.Creator()] = editor
 	}
 
 	return &Event{

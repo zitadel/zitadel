@@ -86,9 +86,38 @@
         "TITLE": "Nastavení organizace",
         "DESCRIPTION": "Přizpůsobte nastavení vaší organizace."
       },
+      "FEATURES": {
+        "TITLE": "Nastavení funkcí",
+        "DESCRIPTION": "Odemkněte funkce pro vaši instanci."
+      },
       "IDPS": {
         "TITLE": "Poskytovatelé identity",
-        "DESCRIPTION": "Vytvořte a aktivujte externí poskytovatele identity. Vyberte známého poskytovatele nebo nakonfigurujte jakýkoliv jiný OIDC, OAuth nebo SAML kompatibilní poskytovatel podle vašeho výběru. Můžete dokonce použít vaše stávající JWT tokeny jako federované identity konfigurací JWT poskytovatele identity."
+        "DESCRIPTION": "Vytvořte a aktivujte externí poskytovatele identity. Vyberte známého poskytovatele nebo nakonfigurujte jakýkoliv jiný OIDC, OAuth nebo SAML kompatibilní poskytovatel podle vašeho výběru. Můžete dokonce použít vaše stávající JWT tokeny jako federované identity konfigurací JWT poskytovatele identity.",
+        "NEXT": "Co teď?",
+        "SAML": {
+          "TITLE": "Nakonfiguruj svého SAML Identity Provider",
+          "DESCRIPTION": "ZITADEL je nakonfigurován. Nyní je třeba nakonfigurovat tvého SAML Identity Provider. Většina poskytovatelů ti umožní nahrát celý ZITADEL metadata XML. Jiní poskytovatelé požadují, abys poskytl jen některé specifické URL, jako je například entity ID (metadata URL), URL Assertion Consumer Service (ACS) nebo Single Logout URL."
+        },
+        "CALLBACK": {
+          "TITLE": "Nakonfiguruj svého {{ provider }} Identity Provider",
+          "DESCRIPTION": "Před konfigurací ZITADEL, předej tuto URL svému Identity Provider, aby bylo možné povolit přesměrování prohlížeče zpět na ZITADEL po autentizaci."
+        },
+        "JWT": {
+          "TITLE": "Použij JWT jako federované identity",
+          "DESCRIPTION": "Identity Provider JWT ti umožňuje používat existující JWT tokeny jako federované identity. Tato funkce je praktická, pokud již máš vystavitele JWT. S JWT IdP můžeš tyto JWT použít k vytváření a aktualizaci uživatelů v ZITADEL na počkání."
+        },
+        "LDAP": {
+          "TITLE": "Nakonfiguruj ZITADEL pro připojení k tvému LDAP Identity Provider",
+          "DESCRIPTION": "Poskytni údaje pro připojení k tvému LDAP serveru a nakonfiguruj mapování tvých LDAP atributů na atributy ZITADEL."
+        },
+        "AUTOFILL": {
+          "TITLE": "Automatické vyplnění údajů uživatele",
+          "DESCRIPTION": "Vylepši zážitek svých uživatelů pomocí akce. Můžeš automaticky vyplnit registrační formulář ZITADEL hodnotami z identity provider."
+        },
+        "ACTIVATE": {
+          "TITLE": "Aktivuj IdP",
+          "DESCRIPTION": "Tvůj IdP ještě není aktivní. Aktivuj ho, aby tvoji uživatelé mohli přihlásit."
+        }
       },
       "PW_COMPLEXITY": {
         "TITLE": "Složitost hesla",
@@ -467,7 +496,8 @@
     },
     "TABLE": {
       "SHOWUSER": "Zobrazit uživatele {{value}}"
-    }
+    },
+    "DOWNLOAD": "Stáhnout"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Má kontrolu nad celou instancí, včetně všech organizací",
@@ -1262,6 +1292,7 @@
       "MEMBERCHANGED": "Manažer změněn.",
       "SETPRIMARY": "Nastavena primární doména.",
       "DELETED": "Organizace úspěšně smazána",
+      "DEFAULTORGNOTFOUND": "Výchozí organizace nebyla nalezena",
       "ORG_WAS_DELETED": "Organizace byla smazána."
     },
     "DIALOG": {
@@ -1289,6 +1320,7 @@
     },
     "LIST": {
       "ORGS": "Organizace",
+      "FEATURESETTINGS": "Nastavení funkcí",
       "LANGUAGES": "Jazyky",
       "LOGIN": "Chování při přihlášení a bezpečnost",
       "LOCKOUT": "Blokování",
@@ -1350,6 +1382,8 @@
       }
     },
     "SMTP": {
+      "TITLE": "Nastavení SMTP",
+      "DESCRIPTION": "Popis",
       "SENDERADDRESS": "E-mailová adresa odesílatele",
       "SENDERNAME": "Jméno odesílatele",
       "REPLYTOADDRESS": "Adresa pro odpovědi",
@@ -1360,6 +1394,7 @@
       "PASSWORDSET": "SMTP heslo bylo úspěšně nastaveno.",
       "TLS": "Zabezpečení transportní vrstvy (TLS)",
       "SAVED": "Úspěšně uloženo!",
+      "NOCHANGES": "Žádné změny!",
       "REQUIREDWARN": "Pro odesílání oznámení z vaší domény musíte zadat vaše SMTP údaje."
     },
     "SMS": {
@@ -1418,6 +1453,27 @@
       "IMPERSONATIONTITLE": "Předstírání jiné identity",
       "IMPERSONATIONENABLED": "Povolit předstírání jiné identity",
       "IMPERSONATIONDESCRIPTION": "Toto nastavení v zásadě umožňuje používat zosobnění. Všimněte si, že imitátor potřebuje také přiřazené příslušné role `*_IMPERSONATOR`."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Výchozí organizace pro přihlášení",
+      "LOGINDEFAULTORG_DESCRIPTION": "Přihlašovací rozhraní použije nastavení výchozí organizace (a ne z instance), pokud není nastaven žádný kontext organizace.",
+      "OIDCLEGACYINTROSPECTION": "Dědictví OIDC introspekce",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Nedávno jsme přepracovali bod introspekce z výkonnostních důvodů. Tato funkce lze použít k rollbacku na dědickou implementaci, pokud se objeví neočekávané chyby.",
+      "OIDCTOKENEXCHANGE": "Výměna tokenů OIDC",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Povolit experimentální typ udělení urn:ietf:params:oauth:grant-type:token-exchange pro bod tokenového bodu OIDC. Výměna tokenů lze použít k žádosti o tokeny s menším rozsahem nebo k impersonaci jiných uživatelů. Podívejte se na bezpečnostní politiku, abyste umožnili impersonaci na instanci.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Spouštěče projekcí introspekce OIDC",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Povolit spouštěče projekcí během požadavku na introspekci. To může sloužit jako obcházení, pokud existují zjevné problémy s konzistencí v odpovědi na introspekci, ale může to mít vliv na výkon. Plánujeme odstranit spouštěče pro požadavky na introspekci v budoucnosti.",
+      "USERSCHEMA": "Schéma uživatele",
+      "USERSCHEMA_DESCRIPTION": "Schémata uživatelů umožňují spravovat datová schémata uživatelů. Pokud je příznak povolen, budete moci používat nové API a jeho funkce.",
+      "ACTIONS": "Akce",
+      "ACTIONS_DESCRIPTION": "Akce v2 umožňují správu datových provedení a cílů. Pokud je tento příznak povolen, budete moci používat nové API a jeho funkce.",
+      "STATES": {
+        "INHERITED": "Děděno",
+        "ENABLED": "Povoleno",
+        "DISABLED": "Zakázáno"
+      },
+      "INHERITED_DESCRIPTION": "Toto nastavení nastaví hodnotu na výchozí hodnotu systému.",
+      "RESET": "Nastavit vše na děděné"
     },
     "DIALOG": {
       "RESET": {
@@ -1506,7 +1562,8 @@
       "DESCRIPTIONCREATEADMIN": "Uživatelé si mohou vybrat z dostupných poskytovatelů identity níže.",
       "DESCRIPTIONCREATEMGMT": "Uživatelé si mohou vybrat z dostupných poskytovatelů identity níže. Poznámka: Můžete použít poskytovatele nastavené systémem, jakož i poskytovatele nastavené pouze pro vaši organizaci.",
       "LIFETIME_INVALID": "Formulář obsahuje neplatné hodnoty.",
-      "SAVED": "Úspěšně uloženo!"
+      "SAVED": "Úspěšně uloženo!",
+      "PROVIDER_ADDED": "Poskytovatel identity aktivován."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Nastavte odkazy na vaše Zásady ochrany osobních údajů a Podmínky služby",
@@ -1562,6 +1619,7 @@
         "initPasswordText": "Inicializace hesla",
         "initializeDoneText": "Inicializace uživatele dokončena",
         "initializeUserText": "Inicializace uživatele",
+        "linkingUserPromptText": "Uživatelský propojovací text",
         "linkingUserDoneText": "Propojení uživatele dokončeno",
         "loginText": "Přihlášení",
         "logoutText": "Odhlášení",
@@ -1633,7 +1691,8 @@
       "HASLOWERCASE": "obsahuje malá písmena",
       "HASUPPERCASE": "obsahuje velká písmena",
       "SHOWLOCKOUTFAILURES": "zobrazit neúspěšné pokusy o uzamčení",
-      "MAXATTEMPTS": "Maximální počet pokusů o heslo",
+      "MAXPASSWORDATTEMPTS": "Maximální počet pokusů o heslo",
+      "MAXOTPATTEMPTS": "Maximální počet pokusů o OTP",
       "EXPIREWARNDAYS": "Upozornění na expiraci po dni",
       "MAXAGEDAYS": "Maximální stáří v dnech",
       "USERLOGINMUSTBEDOMAIN": "Přidat doménu organizace jako příponu k přihlašovacím jménům",
@@ -1997,7 +2056,13 @@
       "ISCREATIONALLOWED": "Je povoleno vytváření účtu",
       "ISCREATIONALLOWED_DESC": "Určuje, zda lze vytvářet účty.",
       "ISLINKINGALLOWED": "Je povoleno propojení účtů",
-      "ISLINKINGALLOWED_DESC": "Určuje, zda lze identitu propojit s existujícím účtem."
+      "ISLINKINGALLOWED_DESC": "Určuje, zda lze identitu propojit s existujícím účtem.",
+      "AUTOLINKING_DESC": "Určuje, zda se bude identita vyzývat k propojení se stávajícím účtem.",
+      "AUTOLINKINGTYPE": {
+        "0": "Vypnuto",
+        "1": "Kontrola existence uživatelského jména",
+        "2": "Kontrola existence e-mailu"
+      }
     },
     "OWNERTYPES": {
       "0": "neznámý",
@@ -2164,6 +2229,48 @@
     "PASSWORDLESSTYPE": {
       "0": "Nepovoleno",
       "1": "Povoleno"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Poskytovatel SMTP",
+      "DESCRIPTION": "Toto jsou poskytovatelé SMTP pro vaši instanci Zitadel. Aktivujte ten, který chcete používat k odesílání upozornění svým uživatelům.",
+      "EMPTY": "Není k dispozici žádný poskytovatel SMTP",
+      "ACTIVATED": "Aktivováno",
+      "ACTIVATE": "Aktivujte poskytovatele",
+      "DEACTIVATE": "Deaktivovat poskytovatele",
+      "TYPE": "Typ",
+      "DIALOG": {
+        "ACTIVATED": "Konfigurace SMTP byla aktivována",
+        "ACTIVATE_WARN_TITLE": "Aktivujte konfiguraci SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Chystáte se aktivovat konfiguraci SMTP. Nejprve deaktivujeme aktuálního aktivního poskytovatele a poté aktivujeme tuto konfiguraci. Jsi si jistá?",
+        "DEACTIVATE_WARN_TITLE": "Deaktivujte konfiguraci SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Chystáte se deaktivovat konfiguraci SMTP. Jsi si jistá?",
+        "DEACTIVATED": "Konfigurace SMTP byla deaktivována",
+        "DELETE_TITLE": "Smazat konfiguraci SMTP",
+        "DELETE_DESCRIPTION": "Chystáte se smazat konfiguraci. Potvrďte tuto akci zadáním jména odesílatele",
+        "DELETED": "Konfigurace SMTP byla smazána",
+        "SENDER": "Chcete-li smazat tuto konfiguraci SMTP, zadejte {{ value }}."
+      }
+    },
+    "CREATE": {
+      "TITLE": "Přidat poskytovatele SMTP",
+      "DESCRIPTION": "Vyberte jednoho nebo více z následujících poskytovatelů.",
+      "STEPS": {
+        "TITLE": "Přidejte {{ value }} poskytovatele SMTP",
+        "CREATE_DESC_TITLE": "Krok za krokem zadejte nastavení SMTP {{ value }}",
+        "CURRENT_DESC_TITLE": "Toto jsou vaše nastavení SMTP",
+        "PROVIDER_SETTINGS": "Nastavení poskytovatele SMTP",
+        "SENDER_SETTINGS": "Nastavení odesílatele",
+        "TEST_SETTINGS": "Otestujte nastavení SMTP"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Nastavení poskytovatele SMTP"
+    },
+    "EMPTY": "Není k dispozici žádný poskytovatel SMTP",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {
