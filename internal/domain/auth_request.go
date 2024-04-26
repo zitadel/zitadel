@@ -56,6 +56,16 @@ type AuthRequest struct {
 	DefaultTranslations      []*CustomText
 	OrgTranslations          []*CustomText
 	SAMLRequestID            string
+	// orgID the policies were last loaded with
+	policyOrgID string
+}
+
+func (a *AuthRequest) SetPolicyOrgID(id string) {
+	a.policyOrgID = id
+}
+
+func (a *AuthRequest) PolicyOrgID() string {
+	return a.policyOrgID
 }
 
 type ExternalUser struct {

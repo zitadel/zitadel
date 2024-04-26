@@ -281,7 +281,7 @@ func CheckRedirect(req *http.Request) (*url.URL, error) {
 	return resp.Location()
 }
 
-func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (string, string, error) {
+func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (userID, clientID, clientSecret string, err error) {
 	name := gofakeit.Username()
 	user, err := s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
@@ -289,13 +289,13 @@ func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (string, strin
 		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
 	})
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 	secret, err := s.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
 		UserId: user.GetUserId(),
 	})
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
-	return secret.GetClientId(), secret.GetClientSecret(), nil
+	return user.GetUserId(), secret.GetClientId(), secret.GetClientSecret(), nil
 }

@@ -6,7 +6,9 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+
 	"github.com/zitadel/zitadel/internal/database"
+	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 )
 
 type db struct {
@@ -16,7 +18,7 @@ type db struct {
 
 func prepareDB(t *testing.T, expectations ...expectation) db {
 	t.Helper()
-	client, mock, err := sqlmock.New()
+	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {
 		t.Fatalf("unable to create sql mock: %v", err)
 	}
@@ -44,7 +46,7 @@ func expectExec(stmt string, err error, args ...driver.Value) expectation {
 
 func expectQuery(stmt string, err error, columns []string, rows [][]driver.Value, args ...driver.Value) expectation {
 	return func(m sqlmock.Sqlmock) {
-		res := sqlmock.NewRows(columns)
+		res := m.NewRows(columns)
 		for _, row := range rows {
 			res.AddRow(row...)
 		}

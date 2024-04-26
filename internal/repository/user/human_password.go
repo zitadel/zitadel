@@ -87,6 +87,8 @@ type HumanPasswordCodeAddedEvent struct {
 	URLTemplate       string                  `json:"url_template,omitempty"`
 	CodeReturned      bool                    `json:"code_returned,omitempty"`
 	TriggeredAtOrigin string                  `json:"triggerOrigin,omitempty"`
+	// AuthRequest is only used in V1 Login UI
+	AuthRequestID string `json:"authRequestID,omitempty"`
 }
 
 func (e *HumanPasswordCodeAddedEvent) Payload() interface{} {
@@ -107,8 +109,20 @@ func NewHumanPasswordCodeAddedEvent(
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	notificationType domain.NotificationType,
+	authRequestID string,
 ) *HumanPasswordCodeAddedEvent {
-	return NewHumanPasswordCodeAddedEventV2(ctx, aggregate, code, expiry, notificationType, "", false)
+	return &HumanPasswordCodeAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanPasswordCodeAddedType,
+		),
+		Code:              code,
+		Expiry:            expiry,
+		NotificationType:  notificationType,
+		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		AuthRequestID:     authRequestID,
+	}
 }
 
 func NewHumanPasswordCodeAddedEventV2(
@@ -313,13 +327,4 @@ func NewHumanPasswordHashUpdatedEvent(
 		),
 		EncodedHash: encoded,
 	}
-}
-
-// SecretOrEncodedHash returns the legacy *crypto.CryptoValue if it is not nil.
-// orherwise it will returns the encoded hash string.
-func SecretOrEncodedHash(secret *crypto.CryptoValue, encoded string) string {
-	if secret != nil {
-		return string(secret.Crypted)
-	}
-	return encoded
 }

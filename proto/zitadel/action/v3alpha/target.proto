@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package zitadel.action.v3alpha;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/object/v2beta/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha;action";
+
+message SetRESTWebhook {
+  string url = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 1000, uri: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 1000,
+      example: "\"https://example.com/hooks/ip_check\"";
+    }
+  ];
+}
+
+message SetRESTRequestResponse {
+  string url = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 1000, uri: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 1000,
+      example: "\"https://example.com/hooks/ip_check\"";
+    }
+  ];
+}
+
+message Target {
+  // ID is the read-only unique identifier of the target.
+  string target_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629012906488334\"";
+    }
+  ];
+  // Details provide some base information (such as the last change date) of the target.
+  zitadel.object.v2beta.Details details = 2;
+
+  // Unique name of the target.
+  string name = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ip_allow_list\"";
+    }
+  ];
+  // Defines the target type and how the response of the target is treated.
+  oneof target_type {
+    SetRESTWebhook rest_webhook = 4;
+    SetRESTRequestResponse rest_request_response = 5;
+  }
+  // Timeout defines the duration until ZITADEL cancels the execution.
+  google.protobuf.Duration timeout = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"10s\"";
+    }
+  ];
+  oneof execution_type {
+    // Set the execution to run asynchronously.
+    bool is_async = 7;
+    // Define if any error stops the whole execution. By default the process continues as normal.
+    bool interrupt_on_error = 8;
+  }
+}

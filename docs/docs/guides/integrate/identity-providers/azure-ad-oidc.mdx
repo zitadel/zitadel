@@ -12,6 +12,15 @@ import Activate from './_activate.mdx';
 
 <Intro provider="Entra ID (former Azure Active Directory)"/>
 
+## Open the Microsoft Identity Provider Template
+
+<IDPsOverview templates="Microsoft"/>
+
+Click on the ZITADEL Callback URL to copy it to your clipboard.
+You will have to paste it in the Entra ID Client later.
+
+![Azure Provider](/img/guides/zitadel_azure_provider2.png)
+
 ## Entra ID Configuration
 
 You need to have access to an Entra ID Tenant. If you do not yet have one follow [this guide from Microsoft](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-create-new-tenant) to create one for free.
@@ -20,10 +29,9 @@ You need to have access to an Entra ID Tenant. If you do not yet have one follow
 
 1. Browse to the [App registration menus create dialog](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade/quickStartType~/null/isMSAApp~/false) to create a new app.
 2. Give the application a name and choose who should be able to login (Single-Tenant, Multi-Tenant, Personal Accounts, etc.) This setting will also have an impact on how to configure the provider later on in ZITADEL.
-3. Choose "Web" in the redirect uri field and add the URL:
- - {your-domain}/ui/login/login/externalidp/callback
- - Example redirect url for the domain `https://acme-gzoe4x.zitadel.cloud` would look like this: `https://acme-gzoe4x.zitadel.cloud/ui/login/login/externalidp/callback`
-5. Save the Application (client) ID and the Directory (tenant) ID from the detail page
+3. Choose "Web" in the redirect uri field and [paste the ZITADEL Callback URL you copied before](#open-the-microsoft-identity-provider-template).
+4. Save the Application (client) ID and the Directory (tenant) ID from the detail page
+5. Register the application
 
 ![Azure App Registration](/img/guides/azure_app_registration.png)
 
@@ -61,20 +69,11 @@ To be able to get all the information that ZITADEL needs, you have to configure 
 
 ## ZITADEL Configuration
 
-### Add custom login policy
+Go back [to the Microsoft provider template you opened before in ZITADEL](#open-the-microsoft-identity-provider-template).
+Add the [client ID and secret created before on your Entra ID application](#add-client-secret).
 
-<CustomLoginPolicy/>
-
-### Go to the IdP Providers Overview
-
-<IDPsOverview templates="Microsoft"/>
-
-### Create a new Entra ID Provider
-
-The Microsoft template has everything you need preconfigured.
-You only have to add the client ID and secret, you have created in the step before.
-
-You can configure the following settings if you like, a useful default will be filled if you don't change anything:
+You can optionally configure the following settings.
+A useful default will be filled if you don't change anything.
 
 **Scopes**: The scopes define which scopes will be sent to the provider, `openid`, `profile`, and `email` are prefilled.
 This information will be taken to create/update the user within ZITADEL. Make sure to also add `User.Read`. ZITADEL ensures that at least `openid` and `User.Read` scopes are always sent.
@@ -94,13 +93,15 @@ In this case, configure "Accounts in any organizational directory and personal M
 
 <GeneralConfigDescription provider_account="Microsoft account" />
 
-![Azure Provider](/img/guides/zitadel_azure_provider2.png)
-
 ### Activate IdP
 
 <Activate/>
 
 ![Activate Entra ID](/img/guides/zitadel_activate_azure.png)
+
+### Ensure your Login Policy allows External IDPs
+
+<CustomLoginPolicy/>
 
 ## Test the setup
 

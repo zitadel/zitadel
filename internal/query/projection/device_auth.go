@@ -11,12 +11,13 @@ import (
 )
 
 const (
-	DeviceAuthRequestProjectionTable = "projections.device_auth_requests"
+	DeviceAuthRequestProjectionTable = "projections.device_auth_requests2"
 
 	DeviceAuthRequestColumnClientID     = "client_id"
 	DeviceAuthRequestColumnDeviceCode   = "device_code"
 	DeviceAuthRequestColumnUserCode     = "user_code"
 	DeviceAuthRequestColumnScopes       = "scopes"
+	DeviceAuthRequestColumnAudience     = "audience"
 	DeviceAuthRequestColumnCreationDate = "creation_date"
 	DeviceAuthRequestColumnChangeDate   = "change_date"
 	DeviceAuthRequestColumnSequence     = "sequence"
@@ -43,7 +44,8 @@ func (*deviceAuthRequestProjection) Init() *old_handler.Check {
 			handler.NewColumn(DeviceAuthRequestColumnClientID, handler.ColumnTypeText),
 			handler.NewColumn(DeviceAuthRequestColumnDeviceCode, handler.ColumnTypeText),
 			handler.NewColumn(DeviceAuthRequestColumnUserCode, handler.ColumnTypeText),
-			handler.NewColumn(DeviceAuthRequestColumnScopes, handler.ColumnTypeTextArray),
+			handler.NewColumn(DeviceAuthRequestColumnScopes, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(DeviceAuthRequestColumnAudience, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(DeviceAuthRequestColumnCreationDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(DeviceAuthRequestColumnChangeDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(DeviceAuthRequestColumnSequence, handler.ColumnTypeInt64),
@@ -89,6 +91,7 @@ func (p *deviceAuthRequestProjection) reduceAdded(event eventstore.Event) (*hand
 			handler.NewCol(DeviceAuthRequestColumnDeviceCode, e.DeviceCode),
 			handler.NewCol(DeviceAuthRequestColumnUserCode, e.UserCode),
 			handler.NewCol(DeviceAuthRequestColumnScopes, e.Scopes),
+			handler.NewCol(DeviceAuthRequestColumnAudience, e.Audience),
 			handler.NewCol(DeviceAuthRequestColumnCreationDate, e.CreationDate()),
 			handler.NewCol(DeviceAuthRequestColumnChangeDate, e.CreationDate()),
 			handler.NewCol(DeviceAuthRequestColumnSequence, e.Sequence()),

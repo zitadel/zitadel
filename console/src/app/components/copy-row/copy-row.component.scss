@@ -1,0 +1,41 @@
+.cnsl-cr-row {
+  display: flex;
+  align-items: center;
+  .cnsl-cr-right {
+    flex-shrink: 0;
+  }
+}
+
+@mixin copy-row-theme($theme) {
+  $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map-get($theme, foreground);
+  $button-text-color: map-get($foreground, text);
+  $button-disabled-text-color: map-get($foreground, disabled-button);
+
+  .cnsl-cr-copy {
+    flex-grow: 1;
+    text-align: left;
+    transition: opacity 0.15s ease-in-out;
+    background-color: #8795a110;
+    border: 1px solid #8795a160;
+    border-radius: 4px;
+    padding: 0.25rem 1rem;
+    margin: 0.25rem 0rem;
+    color: $button-text-color;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    cursor: copy;
+
+    &[disabled] {
+      color: $button-disabled-text-color;
+    }
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  .right {
+    flex-shrink: 0;
+  }
+}

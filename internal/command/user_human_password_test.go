@@ -22,8 +22,8 @@ import (
 
 func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	type fields struct {
-		eventstore         *eventstore.Eventstore
-		userPasswordHasher *crypto.PasswordHasher
+		eventstore         func(*testing.T) *eventstore.Eventstore
+		userPasswordHasher *crypto.Hasher
 		checkPermission    domain.PermissionCheck
 	}
 	type args struct {
@@ -46,9 +46,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -61,8 +59,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -78,8 +75,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 		{
 			name: "missing permission, error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -121,8 +117,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 		{
 			name: "change password onetime, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -184,8 +179,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 		{
 			name: "change password no one time, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -248,7 +242,7 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				checkPermission:    tt.fields.checkPermission,
 			}
@@ -268,9 +262,9 @@ func TestCommandSide_SetOneTimePassword(t *testing.T) {
 
 func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 	type fields struct {
-		eventstore         *eventstore.Eventstore
+		eventstore         func(*testing.T) *eventstore.Eventstore
 		userEncryption     crypto.EncryptionAlgorithm
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -293,9 +287,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -308,9 +300,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 		{
 			name: "password missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -324,8 +314,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -342,8 +331,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 		{
 			name: "code not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -376,8 +364,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 		{
 			name: "invalid code, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -404,6 +391,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 								},
 								time.Hour*1,
 								domain.NotificationTypeEmail,
+								"",
 							),
 						),
 					),
@@ -424,8 +412,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 		{
 			name: "set password, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -457,6 +444,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 								},
 								time.Hour*1,
 								domain.NotificationTypeEmail,
+								"",
 							),
 						),
 					),
@@ -500,8 +488,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 		{
 			name: "set password with userAgentID, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -533,6 +520,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 								},
 								time.Hour*1,
 								domain.NotificationTypeEmail,
+								"",
 							),
 						),
 					),
@@ -578,7 +566,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				userEncryption:     tt.fields.userEncryption,
 			}
@@ -598,7 +586,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 
 func TestCommandSide_ChangePassword(t *testing.T) {
 	type fields struct {
-		userPasswordHasher *crypto.PasswordHasher
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -915,7 +903,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 
 func TestCommandSide_RequestSetPassword(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx             context.Context
@@ -923,6 +911,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 		resourceOwner   string
 		notifyType      domain.NotificationType
 		secretGenerator crypto.Generator
+		authRequestID   string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -937,9 +926,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -952,8 +939,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -969,8 +955,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 		{
 			name: "user initial, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -990,6 +975,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								nil, time.Hour*1,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -1018,8 +1004,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 		{
 			name: "new code, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1055,6 +1040,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 							},
 							time.Hour*1,
 							domain.NotificationTypeEmail,
+							"",
 						),
 					),
 				),
@@ -1071,13 +1057,70 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "new code with authRequestID, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate)),
+					),
+					expectPush(
+						user.NewHumanPasswordCodeAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("a"),
+							},
+							time.Hour*1,
+							domain.NotificationTypeEmail,
+							"authRequestID",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:             context.Background(),
+				userID:          "user1",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
+				authRequestID:   "authRequestID",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.RequestSetPassword(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.notifyType, tt.args.secretGenerator)
+			got, err := r.RequestSetPassword(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.notifyType, tt.args.secretGenerator, tt.args.authRequestID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1093,7 +1136,7 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 
 func TestCommandSide_PasswordCodeSent(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -1112,9 +1155,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1127,8 +1168,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1144,8 +1184,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 		{
 			name: "code sent, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1186,7 +1225,7 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			err := r.PasswordCodeSent(tt.args.ctx, tt.args.resourceOwner, tt.args.userID)
 			if tt.res.err == nil {
@@ -1201,8 +1240,8 @@ func TestCommandSide_PasswordCodeSent(t *testing.T) {
 
 func TestCommandSide_CheckPassword(t *testing.T) {
 	type fields struct {
-		eventstore         *eventstore.Eventstore
-		userPasswordHasher *crypto.PasswordHasher
+		eventstore         func(*testing.T) *eventstore.Eventstore
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
 		ctx           context.Context
@@ -1224,9 +1263,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1240,9 +1277,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "password missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1256,8 +1291,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "login policy not found, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(),
 				),
@@ -1275,8 +1309,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "login policy login password not allowed, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
@@ -1316,8 +1349,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "user not existing, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
@@ -1358,8 +1390,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "user locked, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
@@ -1420,8 +1451,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "existing password empty, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
@@ -1478,8 +1508,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "password not matching lockout policy not relevant, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
@@ -1562,8 +1591,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "password not matching, max password attempts reached - user locked, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
@@ -1643,6 +1671,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				},
 				lockoutPolicy: &domain.LockoutPolicy{
 					MaxPasswordAttempts: 1,
+					MaxOTPAttempts:      1,
 				},
 			},
 			res: res{
@@ -1652,8 +1681,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "check password, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
@@ -1733,8 +1761,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "check password, ok, updated hash",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
@@ -1819,8 +1846,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "check password ok, locked in the mean time",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
@@ -1899,8 +1925,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		{
 			name: "regression test old version event",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLoginPolicyAddedEvent(context.Background(),
@@ -1995,7 +2020,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:         tt.fields.eventstore,
+				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
 			err := r.HumanCheckPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.authReq, tt.args.lockoutPolicy)

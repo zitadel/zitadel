@@ -49,7 +49,7 @@ func TestPasswordHasher_EncodingSupported(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h := &PasswordHasher{
+			h := &Hasher{
 				Prefixes: []string{bcrypt.Prefix, argon2.Prefix},
 			}
 			got := h.EncodingSupported(tt.encodedHash)
@@ -340,11 +340,11 @@ func TestPasswordHashConfig_PasswordHasher(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &PasswordHashConfig{
+			c := &HashConfig{
 				Verifiers: tt.fields.Verifiers,
 				Hasher:    tt.fields.Hasher,
 			}
-			got, err := c.PasswordHasher()
+			got, err := c.NewHasher()
 			if tt.wantErr {
 				assert.Error(t, err)
 				return

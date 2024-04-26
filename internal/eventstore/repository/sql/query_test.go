@@ -14,6 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/cockroach"
+	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -872,7 +873,7 @@ func (m *dbMock) expectQuery(t *testing.T, expectedQuery string, args []driver.V
 	m.mock.ExpectBegin()
 	query := m.mock.ExpectQuery(expectedQuery).WithArgs(args...)
 	m.mock.ExpectCommit()
-	rows := sqlmock.NewRows([]string{"sequence"})
+	rows := m.mock.NewRows([]string{"sequence"})
 	for _, event := range events {
 		rows = rows.AddRow(event.Seq)
 	}
@@ -884,7 +885,7 @@ func (m *dbMock) expectQueryScanErr(t *testing.T, expectedQuery string, args []d
 	m.mock.ExpectBegin()
 	query := m.mock.ExpectQuery(expectedQuery).WithArgs(args...)
 	m.mock.ExpectRollback()
-	rows := sqlmock.NewRows([]string{"sequence"})
+	rows := m.mock.NewRows([]string{"sequence"})
 	for _, event := range events {
 		rows = rows.AddRow(event.Seq)
 	}
@@ -900,7 +901,7 @@ func (m *dbMock) expectQueryErr(t *testing.T, expectedQuery string, args []drive
 
 func newMockClient(t *testing.T) *dbMock {
 	t.Helper()
-	db, mock, err := sqlmock.New()
+	db, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {
 		t.Errorf("unable to create mock client: %v", err)
 		t.FailNow()

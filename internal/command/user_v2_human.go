@@ -51,7 +51,7 @@ type Password struct {
 	ChangeRequired bool
 }
 
-func (h *ChangeHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
+func (h *ChangeHuman) Validate(hasher *crypto.Hasher) (err error) {
 	if h.Email != nil && h.Email.Address != "" {
 		if err := h.Email.Validate(); err != nil {
 			return err
@@ -72,7 +72,7 @@ func (h *ChangeHuman) Validate(hasher *crypto.PasswordHasher) (err error) {
 	return nil
 }
 
-func (p *Password) Validate(hasher *crypto.PasswordHasher) error {
+func (p *Password) Validate(hasher *crypto.Hasher) error {
 	if p.EncodedPasswordHash != nil {
 		if !hasher.EncodingSupported(*p.EncodedPasswordHash) {
 			return zerrors.ThrowInvalidArgument(nil, "USER-oz74onzvqr", "Errors.User.Password.NotSupported")
@@ -131,8 +131,10 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting")
 	}
 	// check for permission to create user on resourceOwner
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, human.ID); err != nil {
-		return err
+	if !human.Register {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, human.ID); err != nil {
+			return err
+		}
 	}
 	// add resourceowner for the events with the aggregate
 	existingHuman.ResourceOwner = resourceOwner
@@ -159,6 +161,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.Gender,
 			human.Email.Address,
 			domainPolicy.UserLoginMustBeDomain,
+			human.UserAgentID,
 		)
 	} else {
 		createCmd = user.NewHumanAddedEvent(
@@ -373,7 +376,7 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 
 	// Either have a code to set the password
 	if password.PasswordCode != nil {
-		if err := crypto.VerifyCodeWithAlgorithm(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, *password.PasswordCode, alg); err != nil {
+		if err := crypto.VerifyCode(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, *password.PasswordCode, alg); err != nil {
 			return cmds, err
 		}
 	}

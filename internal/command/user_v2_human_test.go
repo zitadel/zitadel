@@ -25,8 +25,8 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
 		idGenerator        id.Generator
-		userPasswordHasher *crypto.PasswordHasher
-		newCode            cryptoCodeFunc
+		userPasswordHasher *crypto.Hasher
+		newCode            encrypedCodeFunc
 		checkPermission    domain.PermissionCheck
 	}
 	type args struct {
@@ -232,6 +232,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							domain.GenderUnspecified,
 							"email@test.ch",
 							true,
+							"userAgentID",
 						),
 						user.NewHumanInitialCodeAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -242,12 +243,13 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							time.Hour*1,
+							"authRequestID",
 						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				newCode:         mockCode("userinit", time.Hour),
+				newCode:         mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -261,6 +263,8 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					},
 					PreferredLanguage: language.English,
 					Register:          true,
+					UserAgentID:       "userAgentID",
+					AuthRequestID:     "authRequestID",
 				},
 				secretGenerator: GetMockSecretGenerator(t),
 				allowInitMail:   true,
@@ -283,7 +287,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				newCode:         mockCode("userinit", time.Hour),
+				newCode:         mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -344,12 +348,13 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							time.Hour*1,
+							"",
 						),
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				newCode:         mockCode("userinit", time.Hour),
+				newCode:         mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -414,13 +419,14 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							1*time.Hour,
+							"",
 						),
 					),
 				),
 				checkPermission:    newMockPermissionCheckAllowed(),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
-				newCode:            mockCode("userinit", time.Hour),
+				newCode:            mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -492,7 +498,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
-				newCode:            mockCode("emailCode", time.Hour),
+				newCode:            mockEncryptedCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -565,7 +571,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
-				newCode:            mockCode("emailCode", time.Hour),
+				newCode:            mockEncryptedCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -974,7 +980,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
-				newCode:            mockCode("phonecode", time.Hour),
+				newCode:            mockEncryptedCode("phonecode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1031,6 +1037,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							1*time.Hour,
+							"",
 						),
 						user.NewHumanPhoneVerifiedEvent(
 							context.Background(),
@@ -1040,7 +1047,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				newCode:         mockCode("userinit", time.Hour),
+				newCode:         mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1116,7 +1123,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				checkPermission:    newMockPermissionCheckAllowed(),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 				userPasswordHasher: mockPasswordHasher("x"),
-				newCode:            mockCode("phoneCode", time.Hour),
+				newCode:            mockEncryptedCode("phoneCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1174,6 +1181,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							1*time.Hour,
+							"",
 						),
 						user.NewMetadataSetEvent(
 							context.Background(),
@@ -1185,7 +1193,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				newCode:         mockCode("userinit", time.Hour),
+				newCode:         mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1223,7 +1231,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				idGenerator:        tt.fields.idGenerator,
-				newCode:            tt.fields.newCode,
+				newEncryptedCode:   tt.fields.newCode,
 				checkPermission:    tt.fields.checkPermission,
 			}
 			err := r.AddUserHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail, tt.args.codeAlg)
@@ -1247,8 +1255,8 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 func TestCommandSide_ChangeUserHuman(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
-		userPasswordHasher *crypto.PasswordHasher
-		newCode            cryptoCodeFunc
+		userPasswordHasher *crypto.Hasher
+		newCode            encrypedCodeFunc
 		checkPermission    domain.PermissionCheck
 	}
 	type args struct {
@@ -1562,7 +1570,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockCode("emailCode", time.Hour),
+				newCode:         mockEncryptedCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1741,7 +1749,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockCode("emailCode", time.Hour),
+				newCode:         mockEncryptedCode("emailCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1791,7 +1799,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockCode("phoneCode", time.Hour),
+				newCode:         mockEncryptedCode("phoneCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1939,7 +1947,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockCode("phoneCode", time.Hour),
+				newCode:         mockEncryptedCode("phoneCode", time.Hour),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1993,6 +2001,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
 								&userAgg.Aggregate,
 								nil, time.Hour*1,
+								"",
 							),
 						),
 					),
@@ -2546,7 +2555,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			r := &Commands{
 				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
-				newCode:            tt.fields.newCode,
+				newEncryptedCode:   tt.fields.newCode,
 				checkPermission:    tt.fields.checkPermission,
 			}
 			err := r.ChangeUserHuman(tt.args.ctx, tt.args.human, tt.args.codeAlg)

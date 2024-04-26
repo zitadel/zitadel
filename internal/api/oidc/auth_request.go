@@ -41,12 +41,12 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	return o.createAuthRequest(ctx, req, userID)
 }
 
-func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, req *oidc.AuthRequest) (scope, audience []string, err error) {
-	project, err := o.query.ProjectByClientID(ctx, req.ClientID)
+func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, clientID string, reqScope []string) (scope, audience []string, err error) {
+	project, err := o.query.ProjectByClientID(ctx, clientID)
 	if err != nil {
 		return nil, nil, err
 	}
-	scope, err = o.assertProjectRoleScopesByProject(ctx, project, req.Scopes)
+	scope, err = o.assertProjectRoleScopesByProject(ctx, project, reqScope)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -59,7 +59,7 @@ func (o *OPStorage) createAuthRequestScopeAndAudience(ctx context.Context, req *
 }
 
 func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.AuthRequest, hintUserID, loginClient string) (op.AuthRequest, error) {
-	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req)
+	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (o *OPStorage) createAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if !ok {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
-	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req)
+	scope, audience, err := o.createAuthRequestScopeAndAudience(ctx, req.ClientID, req.Scopes)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.Au
 
 	plainCode, err := o.decryptGrant(code)
 	if err != nil {
-		return nil, err
+		return nil, zerrors.ThrowInvalidArgument(err, "OIDC-ahLi2", "Errors.User.Code.Invalid")
 	}
 	if strings.HasPrefix(plainCode, command.IDPrefixV2) {
 		authReq, err := o.command.ExchangeAuthCode(ctx, plainCode)
@@ -311,7 +311,7 @@ func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken
 
 	plainToken, err := o.decryptGrant(refreshToken)
 	if err != nil {
-		return nil, err
+		return nil, op.ErrInvalidRefreshToken
 	}
 	if strings.HasPrefix(plainToken, command.IDPrefixV2) {
 		oidcSession, err := o.command.OIDCSessionByRefreshToken(ctx, plainToken)
@@ -475,11 +475,8 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 			return scopes, nil
 		}
 	}
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID)
-	if err != nil {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
-	}
-	project, err := o.query.ProjectByID(ctx, false, projectID)
+
+	project, err := o.query.ProjectByOIDCClientID(ctx, clientID)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
 	}

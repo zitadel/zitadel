@@ -76,7 +76,7 @@ func (c *Commands) ChangeUserEmailVerified(ctx context.Context, userID, email st
 }
 
 func (c *Commands) changeUserEmailWithCode(ctx context.Context, userID, email string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (c *Commands) changeUserEmailWithCode(ctx context.Context, userID, email st
 }
 
 func (c *Commands) resendUserEmailCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, returnCode bool, urlTmpl string) (*domain.Email, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (c *Commands) resendUserEmailCodeWithGeneratorEvents(ctx context.Context, u
 }
 
 func (c *Commands) VerifyUserEmail(ctx context.Context, userID, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode)
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -262,7 +262,7 @@ func (c *UserEmailEvents) VerifyCode(ctx context.Context, code string, gen crypt
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
 	}
 
-	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen)
+	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen.Alg())
 	if err == nil {
 		c.events = append(c.events, user.NewHumanEmailVerifiedEvent(ctx, c.aggregate))
 		return nil
