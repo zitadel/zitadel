@@ -4,13 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/v2/database"
 )
 
 type Querier interface {
-	healther
+	healthier
 	Query(ctx context.Context, query *Query) (eventCount int, err error)
 }
 
@@ -172,13 +173,9 @@ var ErrFilterMerge = errors.New("merge failed")
 type FilterCreator func() []*Filter
 
 func MergeFilters(filters ...[]*Filter) []*Filter {
-	res := make([]*Filter, 0, len(filters))
-
-	for _, creator := range filters {
-		res = append(res, creator...)
-	}
-
-	return res
+	// TODO: improve merge by checking fields of filters and merge filters if possible
+	// this will reduce cost of queries which do multiple filters
+	return slices.Concat(filters...)
 }
 
 type Filter struct {
