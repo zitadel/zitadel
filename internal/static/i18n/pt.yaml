@@ -468,6 +468,7 @@ Errors:
     NotActive: A ação não está ativa
     NotInactive: A ação não está inativa
     MaxAllowed: Não são permitidas ações adicionais ativas
+    NotEnabled: O recurso "Ação" não está ativado
   Flow:
     FlowTypeMissing: O tipo de fluxo está faltando
     Empty: O fluxo já está vazio

@@ -688,6 +688,36 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 			},
 		},
 		{
+			"target, empty response",
+			args{
+				ctx:        context.Background(),
+				fullMethod: "/service/method",
+				executionTargets: []execution.Target{
+					&mockExecutionTarget{
+						InstanceID:       "instance",
+						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						TargetID:         "target",
+						TargetType:       domain.TargetTypeCall,
+						Timeout:          time.Minute,
+						InterruptOnError: true,
+					},
+				},
+				targets: []target{
+					{
+						reqBody:    newMockContextInfoRequest("/service/method", "content"),
+						respBody:   newMockContentRequest(""),
+						sleep:      0,
+						statusCode: http.StatusOK,
+					},
+				},
+				req: []byte{},
+			},
+			res{
+				want:    []byte{},
+				wantErr: true,
+			},
+		},
+		{
 			"target, ok",
 			args{
 				ctx:        context.Background(),

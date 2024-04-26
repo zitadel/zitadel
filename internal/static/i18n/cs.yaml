@@ -470,6 +470,7 @@ Errors:
     NotActive: Akce není aktivní
     NotInactive: Akce není neaktivní
     MaxAllowed: Není dovoleno více aktivních akcí
+    NotEnabled: Funkce "Akce" není povolena
   Flow:
     FlowTypeMissing: Chybí typ toku
     Empty: Tok je již prázdný

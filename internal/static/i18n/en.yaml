@@ -470,6 +470,7 @@ Errors:
     NotActive: Action is not active
     NotInactive: Action is not inactive
     MaxAllowed: No additional active Actions allowed
+    NotEnabled: Feature "Action" is not enabled
   Flow:
     FlowTypeMissing: FlowType missing
     Empty: Flow is already empty

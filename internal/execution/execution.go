@@ -40,7 +40,7 @@ func CallTargets(
 		if err != nil && target.IsInterruptOnError() {
 			return nil, err
 		}
-		if resp != nil {
+		if len(resp) > 0 {
 			// error in unmarshalling
 			if err := info.SetHTTPResponseBody(resp); err != nil {
 				return nil, err
