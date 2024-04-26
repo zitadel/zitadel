@@ -1292,6 +1292,7 @@
       "MEMBERCHANGED": "Beheerder gewijzigd.",
       "SETPRIMARY": "Primaire domein ingesteld.",
       "DELETED": "Organisatie succesvol verwijderd",
+      "DEFAULTORGNOTFOUND": "De standaardorganisatie is niet gevonden",
       "ORG_WAS_DELETED": "Organisatie is verwijderd."
     },
     "DIALOG": {

@@ -6,7 +6,7 @@ import (
 )
 
 type Pusher interface {
-	healther
+	healthier
 	// Push writes the intents to the storage
 	// if an intent implements [PushReducerIntent] [PushReducerIntent.Reduce] is called after
 	// the intent was stored
@@ -80,10 +80,11 @@ func AppendAggregates(aggregates ...*PushAggregate) PushOpt {
 
 type PushAggregate struct {
 	parent *PushIntent
-	// Aggregate describes the object the commands will live in
-	// Aggregate() *Aggregate
-	typ   string
-	id    string
+	// typ of the aggregate
+	typ string
+	// id of the aggregate
+	id string
+	// owner of the aggregate
 	owner string
 	// Commands is an ordered list of changes on the aggregate
 	commands []Command

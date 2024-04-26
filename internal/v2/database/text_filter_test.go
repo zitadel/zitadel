@@ -55,10 +55,36 @@ func TestNewTextEqual(t *testing.T) {
 			},
 		},
 		{
+			name: "NewTextEqualInsensitive check lower",
+			args: args{
+				constructor: NewTextEqualInsensitive[string],
+				t:           "tEXt",
+			},
+			want: &TextFilter[string]{
+				Filter: Filter[textCompare, string]{
+					comp:  textEqualInsensitive,
+					value: "text",
+				},
+			},
+		},
+		{
 			name: "NewTextUnequalInsensitive",
 			args: args{
 				constructor: NewTextUnequalInsensitive[string],
 				t:           "text",
+			},
+			want: &TextFilter[string]{
+				Filter: Filter[textCompare, string]{
+					comp:  textUnequalInsensitive,
+					value: "text",
+				},
+			},
+		},
+		{
+			name: "NewTextUnequalInsensitive check lower",
+			args: args{
+				constructor: NewTextUnequalInsensitive[string],
+				t:           "tEXt",
 			},
 			want: &TextFilter[string]{
 				Filter: Filter[textCompare, string]{
@@ -94,6 +120,19 @@ func TestNewTextEqual(t *testing.T) {
 			},
 		},
 		{
+			name: "NewTextStartsWithInsensitive check lower",
+			args: args{
+				constructor: NewTextStartsWithInsensitive[string],
+				t:           "tEXt",
+			},
+			want: &TextFilter[string]{
+				Filter: Filter[textCompare, string]{
+					comp:  textStartsWithInsensitive,
+					value: "text",
+				},
+			},
+		},
+		{
 			name: "NewTextEndsWith",
 			args: args{
 				constructor: NewTextEndsWith[string],
@@ -120,6 +159,19 @@ func TestNewTextEqual(t *testing.T) {
 			},
 		},
 		{
+			name: "NewTextEndsWithInsensitive check lower",
+			args: args{
+				constructor: NewTextEndsWithInsensitive[string],
+				t:           "tEXt",
+			},
+			want: &TextFilter[string]{
+				Filter: Filter[textCompare, string]{
+					comp:  textEndsWithInsensitive,
+					value: "text",
+				},
+			},
+		},
+		{
 			name: "NewTextContains",
 			args: args{
 				constructor: NewTextContains[string],
@@ -137,6 +189,19 @@ func TestNewTextEqual(t *testing.T) {
 			args: args{
 				constructor: NewTextContainsInsensitive[string],
 				t:           "text",
+			},
+			want: &TextFilter[string]{
+				Filter: Filter[textCompare, string]{
+					comp:  textContainsInsensitive,
+					value: "text",
+				},
+			},
+		},
+		{
+			name: "NewTextContainsInsensitive to lower",
+			args: args{
+				constructor: NewTextContainsInsensitive[string],
+				t:           "tEXt",
 			},
 			want: &TextFilter[string]{
 				Filter: Filter[textCompare, string]{
