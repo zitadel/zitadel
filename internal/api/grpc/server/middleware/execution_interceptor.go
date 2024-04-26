@@ -100,7 +100,7 @@ func queryTargets(
 		idsForFullMethod(fullMethod, domain.ExecutionTypeResponse),
 	)
 	if err != nil {
-		logging.WithFields("fullMethod", fullMethod).OnError(err).Info(err)
+		logging.WithFields("fullMethod", fullMethod).WithError(err).Info("unable to query targets")
 		return requestTargets, responseTargets
 	}
 
