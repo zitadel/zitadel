@@ -123,7 +123,7 @@ export default function LoginOTP({
     }
 
     const res = await fetch("/api/session", {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
