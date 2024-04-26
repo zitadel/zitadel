@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	// _ eventstore.Pusher = (*Storage)(nil)
+	_ eventstore.Pusher  = (*Storage)(nil)
 	_ eventstore.Querier = (*Storage)(nil)
 )
 

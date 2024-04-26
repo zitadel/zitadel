@@ -241,7 +241,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				revision: &filter[uint16]{
 					condition: database.NewNumberEquals[uint16](12),
-					min:       12,
+					value:     toPtr(uint16(12)),
 				},
 			},
 		},
@@ -255,7 +255,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				revision: &filter[uint16]{
 					condition: database.NewNumberAtLeast[uint16](12),
-					min:       12,
+					value:     toPtr(uint16(12)),
 				},
 			},
 		},
@@ -269,7 +269,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				revision: &filter[uint16]{
 					condition: database.NewNumberGreater[uint16](12),
-					min:       12,
+					value:     toPtr(uint16(12)),
 				},
 			},
 		},
@@ -283,7 +283,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				revision: &filter[uint16]{
 					condition: database.NewNumberAtMost[uint16](12),
-					min:       12,
+					value:     toPtr(uint16(12)),
 				},
 			},
 		},
@@ -297,7 +297,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				revision: &filter[uint16]{
 					condition: database.NewNumberLess[uint16](12),
-					min:       12,
+					value:     toPtr(uint16(12)),
 				},
 			},
 		},
@@ -311,8 +311,8 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				revision: &filter[uint16]{
 					condition: database.NewNumberBetween[uint16](12, 20),
-					min:       12,
-					max:       20,
+					min:       toPtr(uint16(12)),
+					max:       toPtr(uint16(20)),
 				},
 			},
 		},
@@ -326,7 +326,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				createdAt: &filter[time.Time]{
 					condition: database.NewNumberEquals(now),
-					min:       now,
+					value:     toPtr(now),
 				},
 			},
 		},
@@ -340,7 +340,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				createdAt: &filter[time.Time]{
 					condition: database.NewNumberAtLeast(now),
-					min:       now,
+					value:     toPtr(now),
 				},
 			},
 		},
@@ -354,7 +354,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				createdAt: &filter[time.Time]{
 					condition: database.NewNumberGreater(now),
-					min:       now,
+					value:     toPtr(now),
 				},
 			},
 		},
@@ -368,7 +368,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				createdAt: &filter[time.Time]{
 					condition: database.NewNumberAtMost(now),
-					min:       now,
+					value:     toPtr(now),
 				},
 			},
 		},
@@ -382,7 +382,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				createdAt: &filter[time.Time]{
 					condition: database.NewNumberLess(now),
-					min:       now,
+					value:     toPtr(now),
 				},
 			},
 		},
@@ -396,8 +396,8 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				createdAt: &filter[time.Time]{
 					condition: database.NewNumberBetween(now, now.Add(1*time.Second)),
-					min:       now,
-					max:       now.Add(1 * time.Second),
+					min:       toPtr(now),
+					max:       toPtr(now.Add(1 * time.Second)),
 				},
 			},
 		},
@@ -411,7 +411,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				sequence: &filter[uint32]{
 					condition: database.NewNumberEquals[uint32](12),
-					min:       12,
+					value:     toPtr(uint32(12)),
 				},
 			},
 		},
@@ -425,7 +425,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				sequence: &filter[uint32]{
 					condition: database.NewNumberAtLeast[uint32](12),
-					min:       12,
+					value:     toPtr(uint32(12)),
 				},
 			},
 		},
@@ -439,7 +439,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				sequence: &filter[uint32]{
 					condition: database.NewNumberGreater[uint32](12),
-					min:       12,
+					value:     toPtr(uint32(12)),
 				},
 			},
 		},
@@ -453,7 +453,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				sequence: &filter[uint32]{
 					condition: database.NewNumberAtMost[uint32](12),
-					min:       12,
+					value:     toPtr(uint32(12)),
 				},
 			},
 		},
@@ -467,7 +467,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				sequence: &filter[uint32]{
 					condition: database.NewNumberLess[uint32](12),
-					min:       12,
+					value:     toPtr(uint32(12)),
 				},
 			},
 		},
@@ -481,8 +481,8 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				sequence: &filter[uint32]{
 					condition: database.NewNumberBetween[uint32](12, 24),
-					min:       12,
-					max:       24,
+					min:       toPtr(uint32(12)),
+					max:       toPtr(uint32(24)),
 				},
 			},
 		},
@@ -496,7 +496,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				creators: &filter[[]string]{
 					condition: database.NewListEquals("cr", "ea", "tor"),
-					min:       []string{"cr", "ea", "tor"},
+					value:     toPtr([]string{"cr", "ea", "tor"}),
 				},
 			},
 		},
@@ -519,7 +519,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				creators: &filter[[]string]{
 					condition: database.NewTextEqual("asdf"),
-					min:       []string{"asdf"},
+					value:     toPtr([]string{"asdf"}),
 				},
 			},
 		},
@@ -533,7 +533,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				creators: &filter[[]string]{
 					condition: database.NewListContains("cr", "ea", "tor"),
-					min:       []string{"cr", "ea", "tor"},
+					value:     toPtr([]string{"cr", "ea", "tor"}),
 				},
 			},
 		},
@@ -556,7 +556,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				creators: &filter[[]string]{
 					condition: database.NewTextEqual("asdf"),
-					min:       []string{"asdf"},
+					value:     toPtr([]string{"asdf"}),
 				},
 			},
 		},
@@ -570,7 +570,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				creators: &filter[[]string]{
 					condition: database.NewListNotContains("cr", "ea", "tor"),
-					min:       []string{"cr", "ea", "tor"},
+					value:     toPtr([]string{"cr", "ea", "tor"}),
 				},
 			},
 		},
@@ -593,7 +593,7 @@ func TestEventFilterOpt(t *testing.T) {
 			want: &EventFilter{
 				creators: &filter[[]string]{
 					condition: database.NewTextUnequal("asdf"),
-					min:       []string{"asdf"},
+					value:     toPtr([]string{"asdf"}),
 				},
 			},
 		},
@@ -822,7 +822,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance"),
-					min:       []string{"instance"},
+					value:     toPtr([]string{"instance"}),
 				},
 				pagination: &Pagination{
 					pagination: &database.Pagination{
@@ -841,7 +841,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance"),
-					min:       []string{"instance"},
+					value:     toPtr([]string{"instance"}),
 				},
 				tx: &tx,
 			},
@@ -856,7 +856,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance2"),
-					min:       []string{"instance2"},
+					value:     toPtr([]string{"instance2"}),
 				},
 			},
 		},
@@ -870,7 +870,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance"),
-					min:       []string{"instance"},
+					value:     toPtr([]string{"instance"}),
 				},
 			},
 		},
@@ -884,7 +884,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance2"),
-					min:       []string{"instance2"},
+					value:     toPtr([]string{"instance2"}),
 				},
 			},
 		},
@@ -899,7 +899,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewListEquals("inst", "ancestor"),
-					min:       []string{"inst", "ancestor"},
+					value:     toPtr([]string{"inst", "ancestor"}),
 				},
 			},
 		},
@@ -913,7 +913,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance"),
-					min:       []string{"instance"},
+					value:     toPtr([]string{"instance"}),
 				},
 			},
 		},
@@ -927,7 +927,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance2"),
-					min:       []string{"instance2"},
+					value:     toPtr([]string{"instance2"}),
 				},
 			},
 		},
@@ -942,7 +942,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewListContains("inst", "ancestor"),
-					min:       []string{"inst", "ancestor"},
+					value:     toPtr([]string{"inst", "ancestor"}),
 				},
 			},
 		},
@@ -956,7 +956,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance"),
-					min:       []string{"instance"},
+					value:     toPtr([]string{"instance"}),
 				},
 			},
 		},
@@ -970,7 +970,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextUnequal("instance2"),
-					min:       []string{"instance2"},
+					value:     toPtr([]string{"instance2"}),
 				},
 			},
 		},
@@ -985,7 +985,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewListNotContains("inst", "ancestor"),
-					min:       []string{"inst", "ancestor"},
+					value:     toPtr([]string{"inst", "ancestor"}),
 				},
 			},
 		},
@@ -1000,7 +1000,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance"),
-					min:       []string{"instance"},
+					value:     toPtr([]string{"instance"}),
 				},
 				filters: make([]*Filter, 2),
 			},
@@ -1016,7 +1016,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance"),
-					min:       []string{"instance"},
+					value:     toPtr([]string{"instance"}),
 				},
 				filters: make([]*Filter, 2),
 			},
@@ -1032,7 +1032,7 @@ func TestQueryOpt(t *testing.T) {
 			want: &Query{
 				instances: &filter[[]string]{
 					condition: database.NewTextEqual("instance"),
-					min:       []string{"instance"},
+					value:     toPtr([]string{"instance"}),
 				},
 				filters: make([]*Filter, 1),
 			},
@@ -1056,4 +1056,8 @@ func TestQueryOpt(t *testing.T) {
 			}
 		})
 	}
+}
+
+func toPtr[T any](value T) *T {
+	return &value
 }

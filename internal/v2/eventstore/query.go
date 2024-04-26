@@ -60,12 +60,7 @@ func NewQuery(instance string, reducer Reducer, opts ...QueryOpt) *Query {
 type QueryOpt func(q *Query)
 
 func SetInstance(instance string) QueryOpt {
-	return func(q *Query) {
-		q.instances = &filter[[]string]{
-			condition: database.NewTextEqual(instance),
-			min:       []string{instance},
-		}
-	}
+	return InstancesEqual(instance)
 }
 
 func InstancesEqual(instances ...string) QueryOpt {
@@ -81,7 +76,7 @@ func InstancesEqual(instances ...string) QueryOpt {
 		}
 		q.instances = &filter[[]string]{
 			condition: cond,
-			min:       instances,
+			value:     &instances,
 		}
 	}
 }
@@ -100,7 +95,7 @@ func InstancesContains(instances ...string) QueryOpt {
 
 		f.instances = &filter[[]string]{
 			condition: cond,
-			min:       instances,
+			value:     &instances,
 		}
 	}
 }
@@ -118,7 +113,7 @@ func InstancesNotContains(instances ...string) QueryOpt {
 		}
 		f.instances = &filter[[]string]{
 			condition: cond,
-			min:       instances,
+			value:     &instances,
 		}
 	}
 }
@@ -339,7 +334,10 @@ type EventFilter struct {
 
 type filter[T any] struct {
 	condition database.Condition
-	min, max  T
+	// the following fields are considered as one of
+	// you can either have value and max or value
+	min, max *T
+	value    *T
 }
 
 func (f *EventFilter) Types() database.Condition {
@@ -407,7 +405,7 @@ func EventRevisionEquals(revision uint16) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.revision = &filter[uint16]{
 			condition: database.NewNumberEquals(revision),
-			min:       revision,
+			value:     &revision,
 		}
 	}
 }
@@ -416,7 +414,7 @@ func EventRevisionAtLeast(revision uint16) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.revision = &filter[uint16]{
 			condition: database.NewNumberAtLeast(revision),
-			min:       revision,
+			value:     &revision,
 		}
 	}
 }
@@ -425,7 +423,7 @@ func EventRevisionGreater(revision uint16) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.revision = &filter[uint16]{
 			condition: database.NewNumberGreater(revision),
-			min:       revision,
+			value:     &revision,
 		}
 	}
 }
@@ -434,7 +432,7 @@ func EventRevisionAtMost(revision uint16) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.revision = &filter[uint16]{
 			condition: database.NewNumberAtMost(revision),
-			min:       revision,
+			value:     &revision,
 		}
 	}
 }
@@ -443,7 +441,7 @@ func EventRevisionLess(revision uint16) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.revision = &filter[uint16]{
 			condition: database.NewNumberLess(revision),
-			min:       revision,
+			value:     &revision,
 		}
 	}
 }
@@ -452,8 +450,8 @@ func EventRevisionBetween(min, max uint16) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.revision = &filter[uint16]{
 			condition: database.NewNumberBetween(min, max),
-			min:       min,
-			max:       max,
+			min:       &min,
+			max:       &max,
 		}
 	}
 }
@@ -462,7 +460,7 @@ func EventCreatedAtEquals(createdAt time.Time) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.createdAt = &filter[time.Time]{
 			condition: database.NewNumberEquals(createdAt),
-			min:       createdAt,
+			value:     &createdAt,
 		}
 	}
 }
@@ -471,7 +469,7 @@ func EventCreatedAtAtLeast(createdAt time.Time) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.createdAt = &filter[time.Time]{
 			condition: database.NewNumberAtLeast(createdAt),
-			min:       createdAt,
+			value:     &createdAt,
 		}
 	}
 }
@@ -480,7 +478,7 @@ func EventCreatedAtGreater(createdAt time.Time) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.createdAt = &filter[time.Time]{
 			condition: database.NewNumberGreater(createdAt),
-			min:       createdAt,
+			value:     &createdAt,
 		}
 	}
 }
@@ -489,7 +487,7 @@ func EventCreatedAtAtMost(createdAt time.Time) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.createdAt = &filter[time.Time]{
 			condition: database.NewNumberAtMost(createdAt),
-			min:       createdAt,
+			value:     &createdAt,
 		}
 	}
 }
@@ -498,7 +496,7 @@ func EventCreatedAtLess(createdAt time.Time) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.createdAt = &filter[time.Time]{
 			condition: database.NewNumberLess(createdAt),
-			min:       createdAt,
+			value:     &createdAt,
 		}
 	}
 }
@@ -507,8 +505,8 @@ func EventCreatedAtBetween(min, max time.Time) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.createdAt = &filter[time.Time]{
 			condition: database.NewNumberBetween(min, max),
-			min:       min,
-			max:       max,
+			min:       &min,
+			max:       &max,
 		}
 	}
 }
@@ -517,7 +515,7 @@ func EventSequenceEquals(sequence uint32) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.sequence = &filter[uint32]{
 			condition: database.NewNumberEquals(sequence),
-			min:       sequence,
+			value:     &sequence,
 		}
 	}
 }
@@ -526,7 +524,7 @@ func EventSequenceAtLeast(sequence uint32) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.sequence = &filter[uint32]{
 			condition: database.NewNumberAtLeast(sequence),
-			min:       sequence,
+			value:     &sequence,
 		}
 	}
 }
@@ -535,7 +533,7 @@ func EventSequenceGreater(sequence uint32) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.sequence = &filter[uint32]{
 			condition: database.NewNumberGreater(sequence),
-			min:       sequence,
+			value:     &sequence,
 		}
 	}
 }
@@ -544,7 +542,7 @@ func EventSequenceAtMost(sequence uint32) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.sequence = &filter[uint32]{
 			condition: database.NewNumberAtMost(sequence),
-			min:       sequence,
+			value:     &sequence,
 		}
 	}
 }
@@ -553,7 +551,7 @@ func EventSequenceLess(sequence uint32) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.sequence = &filter[uint32]{
 			condition: database.NewNumberLess(sequence),
-			min:       sequence,
+			value:     &sequence,
 		}
 	}
 }
@@ -562,8 +560,8 @@ func EventSequenceBetween(min, max uint32) EventFilterOpt {
 	return func(f *EventFilter) {
 		f.sequence = &filter[uint32]{
 			condition: database.NewNumberBetween(min, max),
-			min:       min,
-			max:       max,
+			min:       &min,
+			max:       &max,
 		}
 	}
 }
@@ -581,7 +579,7 @@ func EventCreatorsEqual(creators ...string) EventFilterOpt {
 		}
 		f.creators = &filter[[]string]{
 			condition: cond,
-			min:       creators,
+			value:     &creators,
 		}
 	}
 }
@@ -600,7 +598,7 @@ func EventCreatorsContains(creators ...string) EventFilterOpt {
 
 		f.creators = &filter[[]string]{
 			condition: cond,
-			min:       creators,
+			value:     &creators,
 		}
 	}
 }
@@ -618,7 +616,7 @@ func EventCreatorsNotContains(creators ...string) EventFilterOpt {
 		}
 		f.creators = &filter[[]string]{
 			condition: cond,
-			min:       creators,
+			value:     &creators,
 		}
 	}
 }
