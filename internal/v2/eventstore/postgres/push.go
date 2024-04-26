@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-// TODO: option to pass tx
 // Push implements eventstore.Pusher.
 func (s *Storage) Push(ctx context.Context, intent *eventstore.PushIntent) (err error) {
 	ctx, span := tracing.NewSpan(ctx)

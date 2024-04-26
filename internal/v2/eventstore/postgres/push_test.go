@@ -30,13 +30,7 @@ func Test_uniqueConstraints(t *testing.T) {
 				commands:     []*command{},
 				expectations: []mock.Expectation{},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "command without constraints",
@@ -46,13 +40,7 @@ func Test_uniqueConstraints(t *testing.T) {
 				},
 				expectations: []mock.Expectation{},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "add 1 constraint 1 command",
@@ -77,13 +65,7 @@ func Test_uniqueConstraints(t *testing.T) {
 					),
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "add 1 global constraint 1 command",
@@ -108,13 +90,7 @@ func Test_uniqueConstraints(t *testing.T) {
 					),
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "add 2 constraint 1 command",
@@ -145,13 +121,7 @@ func Test_uniqueConstraints(t *testing.T) {
 					),
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "add 1 constraint per command",
@@ -191,13 +161,7 @@ func Test_uniqueConstraints(t *testing.T) {
 					),
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "remove instance constraints 1 command",
@@ -222,13 +186,7 @@ func Test_uniqueConstraints(t *testing.T) {
 					),
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "remove instance constraints 2 commands",
@@ -268,13 +226,7 @@ func Test_uniqueConstraints(t *testing.T) {
 					),
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "remove 1 constraint 1 command",
@@ -299,13 +251,7 @@ func Test_uniqueConstraints(t *testing.T) {
 					),
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "remove 1 global constraint 1 command",
@@ -330,13 +276,7 @@ func Test_uniqueConstraints(t *testing.T) {
 					),
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "remove 2 constraints 1 command",
@@ -367,13 +307,7 @@ func Test_uniqueConstraints(t *testing.T) {
 					),
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "remove 1 constraints per command",
@@ -413,13 +347,7 @@ func Test_uniqueConstraints(t *testing.T) {
 					),
 				},
 			},
-			assertErr: func(t *testing.T, err error) bool {
-				is := err == nil
-				if !is {
-					t.Errorf("no error expected got: %v", err)
-				}
-				return is
-			},
+			assertErr: expectNoErr,
 		},
 		{
 			name: "exec fails no error specified",
@@ -499,63 +427,7 @@ func Test_uniqueConstraints(t *testing.T) {
 	}
 }
 
-// var _ eventstore.PushIntent = (*testIntent)(nil)
-
-// type testIntent struct {
-// 	aggregate       *eventstore.Aggregate
-// 	commands        []eventstore.Command
-// 	currentSequence eventstore.CurrentSequence
-// }
-
-// Aggregate implements eventstore.PushIntent.
-// func (t *testIntent) Aggregate() *eventstore.Aggregate {
-// 	if t.aggregate != nil {
-// 		return t.aggregate
-// 	}
-// 	return &eventstore.Aggregate{
-// 		ID:       "testID",
-// 		Type:     "testType",
-// 		Instance: "instance",
-// 		Owner:    "owner",
-// 	}
-// }
-
-// // Commands implements eventstore.PushIntent.
-// func (t *testIntent) Commands() []eventstore.Command {
-// 	return t.commands
-// }
-
-// // CurrentSequence implements eventstore.PushIntent.
-// func (t *testIntent) CurrentSequence() eventstore.CurrentSequence {
-// 	return t.currentSequence
-// }
-
-// var _ eventstore.PushIntentReducer = (*testIntentReducer)(nil)
-
 var errReduce = errors.New("reduce err")
-
-// type testIntentReducer struct {
-// 	testIntent
-// 	reduceErr           bool
-// 	reduceCount         int
-// 	expectedReduceCount int
-// }
-
-// Reduce implements eventstore.PushIntentReducer.
-// func (r *testIntentReducer) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
-// 	r.reduceCount++
-// 	if r.reduceErr {
-// 		return errReduce
-// 	}
-// 	return nil
-// }
-
-// func (r *testIntentReducer) assert(t *testing.T) {
-// 	if r.expectedReduceCount == r.reduceCount {
-// 		return
-// 	}
-// 	t.Errorf("expected reduce count %d, got %d", r.expectedReduceCount, r.reduceCount)
-// }
 
 func Test_lockAggregates(t *testing.T) {
 	type args struct {
@@ -607,13 +479,7 @@ func Test_lockAggregates(t *testing.T) {
 						sequence: 42,
 					},
 				},
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 		{
@@ -670,13 +536,7 @@ func Test_lockAggregates(t *testing.T) {
 						sequence: 17,
 					},
 				},
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 		{
@@ -707,13 +567,7 @@ func Test_lockAggregates(t *testing.T) {
 						sequence: 0,
 					},
 				},
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 		{
@@ -755,13 +609,7 @@ func Test_lockAggregates(t *testing.T) {
 						sequence: 0,
 					},
 				},
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 		{
@@ -811,13 +659,7 @@ func Test_lockAggregates(t *testing.T) {
 						sequence: 17,
 					},
 				},
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 	}
@@ -939,13 +781,7 @@ func Test_push(t *testing.T) {
 				},
 			},
 			want: want{
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 		{
@@ -1034,13 +870,7 @@ func Test_push(t *testing.T) {
 				},
 			},
 			want: want{
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 		{
@@ -1131,13 +961,7 @@ func Test_push(t *testing.T) {
 				},
 			},
 			want: want{
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 		{
@@ -1195,13 +1019,7 @@ func Test_push(t *testing.T) {
 				},
 			},
 			want: want{
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 		{
@@ -1258,13 +1076,7 @@ func Test_push(t *testing.T) {
 				},
 			},
 			want: want{
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 		{
@@ -1449,13 +1261,7 @@ func Test_push(t *testing.T) {
 				},
 			},
 			want: want{
-				assertErr: func(t *testing.T, err error) bool {
-					is := err == nil
-					if !is {
-						t.Errorf("no error expected got: %v", err)
-					}
-					return is
-				},
+				assertErr: expectNoErr,
 			},
 		},
 	}
@@ -1475,4 +1281,12 @@ func Test_push(t *testing.T) {
 			}
 		})
 	}
+}
+
+func expectNoErr(t *testing.T, err error) bool {
+	is := err == nil
+	if !is {
+		t.Errorf("no error expected got: %v", err)
+	}
+	return is
 }

@@ -19,36 +19,36 @@ func NewTextUnequal[T text](t T) *TextFilter[T] {
 	return newTextFilter(textUnequal, t)
 }
 
-func NewTextEqualInsensitive[T text](t T) *TextFilter[T] {
-	return newTextFilter(textEqualInsensitive, t)
+func NewTextEqualInsensitive[T text](t T) *TextFilter[string] {
+	return newTextFilter(textEqualInsensitive, strings.ToLower(string(t)))
 }
 
-func NewTextUnequalInsensitive[T text](t T) *TextFilter[T] {
-	return newTextFilter(textUnequalInsensitive, t)
+func NewTextUnequalInsensitive[T text](t T) *TextFilter[string] {
+	return newTextFilter(textUnequalInsensitive, strings.ToLower(string(t)))
 }
 
 func NewTextStartsWith[T text](t T) *TextFilter[T] {
 	return newTextFilter(textStartsWith, t)
 }
 
-func NewTextStartsWithInsensitive[T text](t T) *TextFilter[T] {
-	return newTextFilter(textStartsWithInsensitive, t)
+func NewTextStartsWithInsensitive[T text](t T) *TextFilter[string] {
+	return newTextFilter(textStartsWithInsensitive, strings.ToLower(string(t)))
 }
 
 func NewTextEndsWith[T text](t T) *TextFilter[T] {
 	return newTextFilter(textEndsWith, t)
 }
 
-func NewTextEndsWithInsensitive[T text](t T) *TextFilter[T] {
-	return newTextFilter(textEndsWithInsensitive, t)
+func NewTextEndsWithInsensitive[T text](t T) *TextFilter[string] {
+	return newTextFilter(textEndsWithInsensitive, strings.ToLower(string(t)))
 }
 
 func NewTextContains[T text](t T) *TextFilter[T] {
 	return newTextFilter(textContains, t)
 }
 
-func NewTextContainsInsensitive[T text](t T) *TextFilter[T] {
-	return newTextFilter(textContainsInsensitive, t)
+func NewTextContainsInsensitive[T text](t T) *TextFilter[string] {
+	return newTextFilter(textContainsInsensitive, strings.ToLower(string(t)))
 }
 
 func newTextFilter[T text](comp textCompare, t T) *TextFilter[T] {
@@ -60,7 +60,7 @@ func newTextFilter[T text](comp textCompare, t T) *TextFilter[T] {
 	}
 }
 
-func (f TextFilter[T]) Write(stmt *Statement, columnName string) {
+func (f *TextFilter[T]) Write(stmt *Statement, columnName string) {
 	if f.comp.isInsensitive() {
 		f.writeCaseInsensitive(stmt, columnName)
 		return

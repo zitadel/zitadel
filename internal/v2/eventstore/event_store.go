@@ -25,7 +25,7 @@ type one interface {
 	Querier
 }
 
-type healther interface {
+type healthier interface {
 	Health(ctx context.Context) error
 }
 
