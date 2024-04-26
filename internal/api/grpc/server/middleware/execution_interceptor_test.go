@@ -713,7 +713,6 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				req: []byte{},
 			},
 			res{
-				want:    []byte{},
 				wantErr: true,
 			},
 		},
