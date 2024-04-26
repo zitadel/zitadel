@@ -7,17 +7,14 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "zitadel/settings/object/v2alpha/object.proto";
 
 message ResolvedDomainSettings {
-  // The resolved settings that take effect in requested current.
-  // map<string, zitadel.settings.object.v2alpha.ResolvedString>  resolved_custom_settings = 1;
-  // The settings that are overwritten in the requested context.
-  // map<string, zitadel.settings.object.v2alpha.ResolvedString>  overwritten_custom_settings = 2;
-  reserved 1 to 2;
-  zitadel.settings.object.v2alpha.ResolvedBool login_name_includes_domain = 3 [
+  // map<string, zitadel.settings.object.v2alpha.ResolvedString>  custom_settings = 1;
+  reserved 1;
+  zitadel.settings.object.v2alpha.ResolvedBool login_name_includes_domain = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "the username has to end with the domain of its organization"
     }
   ];
-  zitadel.settings.object.v2alpha.ResolvedBool require_org_domain_verification = 4 [
+  zitadel.settings.object.v2alpha.ResolvedBool require_org_domain_verification = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines if organization domains should be verified upon creation, otherwise will be created already verified"
     }

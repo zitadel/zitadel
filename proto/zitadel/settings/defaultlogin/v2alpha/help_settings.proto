@@ -8,27 +8,24 @@ import "validate/validate.proto";
 import "zitadel/settings/object/v2alpha/object.proto";
 
 message ResolvedHelpSettings {
-  // The resolved settings that take effect in requested current.
-  // map<string, zitadel.settings.object.v2alpha.ResolvedString>  resolved_custom_settings = 1;
-  // The settings that are overwritten in the requested context.
-  // map<string, zitadel.settings.object.v2alpha.ResolvedString>  overwritten_custom_settings = 2;
-  reserved 1 to 2;
-  zitadel.settings.object.v2alpha.ResolvedString tos_link = 3 [
+  // map<string, zitadel.settings.object.v2alpha.ResolvedString>  custom_settings = 1;
+  reserved 1;
+  zitadel.settings.object.v2alpha.ResolvedString tos_link = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://zitadel.com/docs/legal/terms-of-service\"";
     }
   ];
-  zitadel.settings.object.v2alpha.ResolvedString privacy_policy_link = 4 [
+  zitadel.settings.object.v2alpha.ResolvedString privacy_policy_link = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://zitadel.com/docs/legal/privacy-policy\"";
     }
   ];
-  zitadel.settings.object.v2alpha.ResolvedString help_link = 5 [
+  zitadel.settings.object.v2alpha.ResolvedString help_link = 4 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://zitadel.com/docs/manuals/introduction\"";
     }
   ];
-  zitadel.settings.object.v2alpha.ResolvedString support_email = 6 [
+  zitadel.settings.object.v2alpha.ResolvedString support_email = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"support-email@test.com\"";
       description: "help / support email address."

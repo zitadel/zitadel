@@ -9,10 +9,7 @@ import "zitadel/settings/object/v2alpha/object.proto";
 import "google/protobuf/struct.proto";
 
 message ResolvedBrandingSettings {
-  // The resolved settings that take effect in requested current.
-  map<string, zitadel.settings.object.v2alpha.ResolvedString>  resolved_custom_settings = 1;
-  // The settings that are overwritten in the requested context.
-  map<string, zitadel.settings.object.v2alpha.ResolvedString>  overwritten_custom_settings = 2;
+  map<string, zitadel.settings.object.v2alpha.ResolvedString>  custom_settings = 1;
   ResolvedTheme light_theme = 3;
   ResolvedTheme dark_theme = 4;
   zitadel.settings.object.v2alpha.ResolvedString font_url = 5 [

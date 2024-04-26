@@ -8,10 +8,7 @@ import "zitadel/settings/object/v2alpha/object.proto";
 import "google/protobuf/struct.proto";
 
 message ResolvedTextSettings {
-  // The resolved texts that take effect in requested current.
-  map<string, zitadel.settings.object.v2alpha.ResolvedString>  resolved_texts = 1;
-  // The texts that are overwritten in the requested context.
-  map<string, zitadel.settings.object.v2alpha.ResolvedString>  overwritten_texts = 2;
+  map<string, zitadel.settings.object.v2alpha.ResolvedString> texts = 1;
 }
 
 message SetTextSettings {
