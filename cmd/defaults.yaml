@@ -276,7 +276,7 @@ Auth:
     HandleActiveInstances: 0s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
   # Defines the amount of auth requests stored in the LRU caches.
   # There are two caches implemented one for id and one for code
-  AmountOfCachedAuthRequests: 128 #ZITADEL_AUTH_AMOUNTOFCACHEDAUTHREQUESTS
+  AmountOfCachedAuthRequests: 0 #ZITADEL_AUTH_AMOUNTOFCACHEDAUTHREQUESTS
 
 Admin:
   # See Projections.BulkLimit
