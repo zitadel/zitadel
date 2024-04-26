@@ -2,6 +2,9 @@ package setup
 
 import (
 	"bytes"
+	"github.com/zitadel/zitadel/cmd/hooks"
+	"github.com/zitadel/zitadel/internal/actions"
+	"github.com/zitadel/zitadel/internal/domain"
 	"strings"
 	"time"
 
@@ -10,9 +13,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/cmd/encryption"
-	"github.com/zitadel/zitadel/cmd/hooks"
-	"github.com/zitadel/zitadel/internal/actions"
-	"github.com/zitadel/zitadel/internal/api/authz"
+	internal_authz "github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
@@ -30,7 +31,7 @@ import (
 type Config struct {
 	Database        database.Config
 	SystemDefaults  systemdefaults.SystemDefaults
-	InternalAuthZ   authz.Config
+	InternalAuthZ   internal_authz.Config
 	ExternalDomain  string
 	ExternalPort    uint16
 	ExternalSecure  bool
@@ -47,7 +48,7 @@ type Config struct {
 	Login           login.Config
 	WebAuthNName    string
 	Telemetry       *handlers.TelemetryPusherConfig
-	SystemAPIUsers  map[string]*authz.SystemAPIUser
+	SystemAPIUsers  map[string]*internal_authz.SystemAPIUser
 }
 
 type InitProjections struct {
@@ -61,17 +62,19 @@ func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
+			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
+			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
+			hooks.MapTypeStringDecode[string, crypto.HasherConfig],
+			hooks.MapHTTPHeaderStringDecode,
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
 			database.DecodeHook,
-			hook.EnumHookFunc(authz.MemberTypeString),
 			actions.HTTPConfigDecodeHook,
-			hooks.MapTypeStringDecode[string, *authz.SystemAPIUser],
-			hooks.MapTypeStringDecode[string, crypto.HasherConfig],
-			hooks.SliceTypeStringDecode[authz.RoleMapping],
+			hook.EnumHookFunc(internal_authz.MemberTypeString),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")

@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -85,10 +86,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 	err := v.Unmarshal(config,
 		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
-			hooks.SliceTypeStringDecode[*command.SetQuota],
 			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
 			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
-			hooks.MapTypeStringDecode[domain.Feature, any],
+			hooks.MapTypeStringDecode[string, crypto.HasherConfig],
 			hooks.MapHTTPHeaderStringDecode,
 			hook.Base64ToBytesHookFunc(),
 			hook.TagToLanguageHookFunc(),
@@ -98,6 +98,8 @@ func MustNewConfig(v *viper.Viper) *Config {
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,
 			hook.EnumHookFunc(internal_authz.MemberTypeString),
+			hooks.MapTypeStringDecode[domain.Feature, any],
+			hooks.SliceTypeStringDecode[*command.SetQuota],
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read config")
