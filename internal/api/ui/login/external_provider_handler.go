@@ -336,6 +336,10 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 
 	user, err := session.FetchUser(r.Context())
 	if err != nil {
+		logging.WithFields(
+			"instance", authz.GetInstance(r.Context()).InstanceID(),
+			"providerID", identityProvider.ID,
+		).WithError(err).Info("external authentication failed")
 		l.externalAuthFailed(w, r, authReq, tokens(session), user, err)
 		return
 	}
