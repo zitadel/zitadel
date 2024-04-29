@@ -157,6 +157,8 @@ type HumanRegisteredEvent struct {
 	Secret         *crypto.CryptoValue `json:"secret,omitempty"` // legacy
 	EncodedHash    string              `json:"encodedHash,omitempty"`
 	ChangeRequired bool                `json:"changeRequired,omitempty"`
+
+	UserAgentID string `json:"userAgentID,omitempty"`
 }
 
 func (e *HumanRegisteredEvent) Payload() interface{} {
@@ -208,6 +210,7 @@ func NewHumanRegisteredEvent(
 	gender domain.Gender,
 	emailAddress domain.EmailAddress,
 	userLoginMustBeDomain bool,
+	userAgentID string,
 ) *HumanRegisteredEvent {
 	return &HumanRegisteredEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -224,6 +227,7 @@ func NewHumanRegisteredEvent(
 		Gender:                gender,
 		EmailAddress:          emailAddress,
 		userLoginMustBeDomain: userLoginMustBeDomain,
+		UserAgentID:           userAgentID,
 	}
 }
 
@@ -244,6 +248,7 @@ type HumanInitialCodeAddedEvent struct {
 	Code                 *crypto.CryptoValue `json:"code,omitempty"`
 	Expiry               time.Duration       `json:"expiry,omitempty"`
 	TriggeredAtOrigin    string              `json:"triggerOrigin,omitempty"`
+	AuthRequestID        string              `json:"authRequestID,omitempty"`
 }
 
 func (e *HumanInitialCodeAddedEvent) Payload() interface{} {
@@ -263,6 +268,7 @@ func NewHumanInitialCodeAddedEvent(
 	aggregate *eventstore.Aggregate,
 	code *crypto.CryptoValue,
 	expiry time.Duration,
+	authRequestID string,
 ) *HumanInitialCodeAddedEvent {
 	return &HumanInitialCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -273,6 +279,7 @@ func NewHumanInitialCodeAddedEvent(
 		Code:              code,
 		Expiry:            expiry,
 		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		AuthRequestID:     authRequestID,
 	}
 }
 

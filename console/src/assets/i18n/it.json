@@ -1291,6 +1291,7 @@
       "MEMBERCHANGED": "Manager cambiato con successo",
       "SETPRIMARY": "Dominio primario cambiato con successo",
       "DELETED": "Organizzazione eliminata con successo",
+      "DEFAULTORGNOTFOUND": "Impossibile trovare l'organizzazione predefinita",
       "ORG_WAS_DELETED": "Organizzazione è stata eliminata"
     },
     "DIALOG": {

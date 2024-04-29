@@ -1427,6 +1427,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 									Crypted:    []byte("userinit"),
 								},
 								1*time.Hour,
+								"",
 							),
 						),
 						eventFromEventPusher(org.NewMemberAddedEvent(context.Background(),

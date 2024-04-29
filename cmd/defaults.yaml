@@ -274,6 +274,9 @@ Auth:
     # from HandleActiveInstances duration in the past until the projections current time
     # If set to 0 (default), every instance is always considered active
     HandleActiveInstances: 0s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
+  # Defines the amount of auth requests stored in the LRU caches.
+  # There are two caches implemented one for id and one for code
+  AmountOfCachedAuthRequests: 0 #ZITADEL_AUTH_AMOUNTOFCACHEDAUTHREQUESTS
 
 Admin:
   # See Projections.BulkLimit
