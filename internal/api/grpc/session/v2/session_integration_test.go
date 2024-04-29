@@ -439,6 +439,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 	})
 	require.Error(t, err)
 	Tester.CreateUserIDPlink(CTX, User.GetUserId(), idpUserID, idpID, User.GetUserId())
+	intentID, token, _, _ = Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), idpUserID)
 	updateResp, err = Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),

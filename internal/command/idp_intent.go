@@ -67,6 +67,7 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 		return nil, nil, err
 	}
 
+	//nolint: staticcheck
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, resourceOwner, orgID, idpID, successURL, failureURL))
 	if err != nil {
 		return nil, nil, err
