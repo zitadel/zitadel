@@ -441,31 +441,22 @@ SystemDefaults:
     # Configure the Hasher config by environment variable using JSON notation:
     # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER='{"Algorithm":"pbkdf2","Rounds":290000,"Hash":"sha256"}'
     Hasher:
-      Algorithm: "bcrypt"
-      Cost: 14
-
-    # Other supported Hasher configs:
-
-    # Hasher:
-    #   Algorithm: "argon2i"
-    #   Time: 3
-    #   Memory: 32768
-    #   Threads: 4
-
-    # Hasher:
-    #   Algorithm: "argon2id"
-    #   Time: 1
-    #   Memory: 65536
-    #   Threads: 4
-
-    # Hasher:
-    #   Algorithm: "scrypt"
-    #   Cost: 15
-
-    # Hasher:
-    #   Algorithm: "pbkdf2"
-    #   Rounds: 290000
-    #   Hash: "sha256" # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
+      # Depending on the algorithm, different configuration options take effect.
+      Algorithm: bcrypt
+      # Cost takes effect for the algorithms bcrypt and scrypt
+      Cost: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
+      # Time takes effect for the algorithms argon2i and argon2id
+      Time: 3 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_TIME
+      # Memory takes effect for the algorithms argon2i and argon2id
+      Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
+      # Threads takes effect for the algorithms argon2i and argon2id
+      Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
+      # Rounds takes effect for the algorithm pbkdf2
+      Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ROUNDS
+      # Hash takes effect for the algorithm pbkdf2
+      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+      Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
 
     # Verifiers enable the possibility of verifying
     # passwords that are previously hashed using another
@@ -480,7 +471,7 @@ SystemDefaults:
     # https://passlib.readthedocs.io/en/stable/modular_crypt_format.html
     #
     # Supported verifiers: (uncomment to enable)
-    Verifiers:
+    Verifiers: # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_VERIFIERS
     #   - "argon2" # verifier for both argon2i and argon2id.
     #   - "bcrypt"
     #   - "md5"
@@ -488,11 +479,24 @@ SystemDefaults:
     #   - "pbkdf2" # verifier for all pbkdf2 hash modes.
   SecretHasher:
     # Set hasher configuration for machine users, API and OIDC client secrets.
-    # See PasswordHasher for all possible options
     Hasher:
-      Algorithm: "bcrypt" # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_ALGORITHM
+      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
+      # Depending on the algorithm, different configuration options take effect.
+      Algorithm: bcrypt
+      # Cost takes effect for the algorithms bcrypt and scrypt
       Cost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_COST
-    Verifiers:
+      # Time takes effect for the algorithms argon2i and argon2id
+      Time: 3 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_TIME
+      # Memory takes effect for the algorithms argon2i and argon2id
+      Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_MEMORY
+      # Threads takes effect for the algorithms argon2i and argon2id
+      Threads: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_THREADS
+      # Rounds takes effect for the algorithm pbkdf2
+      Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_ROUNDS
+      # Hash takes effect for the algorithm pbkdf2
+      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+      Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_HASH
+    Verifiers: # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_VERIFIERS
   Multifactors:
     OTP:
       # If this is empty, the issuer is the requested domain

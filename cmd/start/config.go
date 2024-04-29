@@ -22,7 +22,6 @@ import (
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/config/network"
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -88,7 +87,6 @@ func MustNewConfig(v *viper.Viper) *Config {
 			hooks.SliceTypeStringDecode[*domain.CustomMessageText],
 			hooks.SliceTypeStringDecode[internal_authz.RoleMapping],
 			hooks.MapTypeStringDecode[string, *internal_authz.SystemAPIUser],
-			hooks.MapTypeStringDecode[string, crypto.HasherConfig],
 			hooks.MapHTTPHeaderStringDecode,
 			database.DecodeHook,
 			actions.HTTPConfigDecodeHook,

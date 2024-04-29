@@ -37,7 +37,6 @@ func New(out io.Writer, in io.Reader, args []string, server chan<- *start.Server
 		},
 		Version: build.Version(),
 	}
-
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix("ZITADEL")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
