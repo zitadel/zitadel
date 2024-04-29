@@ -411,7 +411,8 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 							&domain.TokenActor{
 								UserID: "user2",
 								Issuer: "foo.com",
-							}),
+							},
+						),
 					),
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),

@@ -19,13 +19,14 @@ const (
 type AddedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	ClientID   string
-	DeviceCode string
-	UserCode   string
-	Expires    time.Time
-	Scopes     []string
-	Audience   []string
-	State      domain.DeviceAuthState
+	ClientID         string
+	DeviceCode       string
+	UserCode         string
+	Expires          time.Time
+	Scopes           []string
+	Audience         []string
+	State            domain.DeviceAuthState
+	NeedRefreshToken bool
 }
 
 func (e *AddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -49,12 +50,15 @@ func NewAddedEvent(
 	expires time.Time,
 	scopes []string,
 	audience []string,
+	needRefreshToken bool,
 ) *AddedEvent {
 	return &AddedEvent{
 		eventstore.NewBaseEventForPush(
 			ctx, aggregate, AddedEventType,
 		),
-		clientID, deviceCode, userCode, expires, scopes, audience, domain.DeviceAuthStateInitiated}
+		clientID, deviceCode, userCode, expires, scopes, audience,
+		domain.DeviceAuthStateInitiated, needRefreshToken,
+	}
 }
 
 type ApprovedEvent struct {
@@ -136,5 +140,5 @@ func (e *DoneEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 }
 
 func NewDoneEvent(ctx context.Context, aggregate *eventstore.Aggregate) *DoneEvent {
-	return &DoneEvent{eventstore.NewBaseEventForPush(ctx, aggregate, CanceledEventType)}
+	return &DoneEvent{eventstore.NewBaseEventForPush(ctx, aggregate, DoneEventType)}
 }

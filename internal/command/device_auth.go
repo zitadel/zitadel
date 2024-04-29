@@ -2,7 +2,7 @@ package command
 
 import (
 	"context"
-	"slices"
+	"fmt"
 	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes, audience []string) (*domain.ObjectDetails, error) {
+func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, userCode string, expires time.Time, scopes, audience []string, needRefreshToken bool) (*domain.ObjectDetails, error) {
 	aggr := deviceauth.NewAggregate(deviceCode, authz.GetInstance(ctx).InstanceID())
 	model := NewDeviceAuthWriteModel(deviceCode, aggr.ResourceOwner)
 
@@ -26,6 +26,7 @@ func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, user
 		expires,
 		scopes,
 		audience,
+		needRefreshToken,
 	))
 	if err != nil {
 		return nil, err
@@ -46,9 +47,7 @@ func (c *Commands) ApproveDeviceAuth(ctx context.Context, deviceCode, userID, us
 	if !model.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound")
 	}
-	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
-
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, aggr, userID, userOrgID, authMethods, authTime))
+	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, model.aggregate, userID, userOrgID, authMethods, authTime))
 	if err != nil {
 		return nil, err
 	}
@@ -68,9 +67,7 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 	if !model.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-gee5A", "Errors.DeviceAuth.NotFound")
 	}
-	aggr := deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
-
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewCanceledEvent(ctx, aggr, reason))
+	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewCanceledEvent(ctx, model.aggregate, reason))
 	if err != nil {
 		return nil, err
 	}
@@ -83,20 +80,31 @@ func (c *Commands) CancelDeviceAuth(ctx context.Context, id string, reason domai
 }
 
 func (c *Commands) getDeviceAuthWriteModelByDeviceCode(ctx context.Context, deviceCode string) (*DeviceAuthWriteModel, error) {
-	model := &DeviceAuthWriteModel{WriteModel: eventstore.WriteModel{AggregateID: deviceCode}}
+	model := &DeviceAuthWriteModel{
+		WriteModel: eventstore.WriteModel{AggregateID: deviceCode},
+	}
 	err := c.eventstore.FilterToQueryReducer(ctx, model)
 	if err != nil {
 		return nil, err
 	}
+	model.aggregate = deviceauth.NewAggregate(model.AggregateID, model.InstanceID)
 	return model, nil
 }
 
 type DeviceAuthStateError domain.DeviceAuthState
 
-func (s DeviceAuthStateError) Error() string {
-	return domain.DeviceAuthState(s).String()
+func (e DeviceAuthStateError) Error() string {
+	return fmt.Sprintf("device auth state not approved: %s", domain.DeviceAuthState(e).String())
 }
 
+// CreateOIDCSessionFromDeviceAuth creates a new OIDC session if the device authorization
+// flow is completed (user logged in).
+// A [DeviceAuthStateError] is returned if the device authorization was not approved,
+// containing a [domain.DeviceAuthState] which can be used to inform the client about the state.
+//
+// As devices can poll at various intervals, an explicit state takes precedence over expiry.
+// This is to prevent cases where users might approve or deny the authorization on time, but the next poll
+// happens after expiry.
 func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCode string) (_ *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -105,11 +113,22 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 	if err != nil {
 		return nil, err
 	}
-	if deviceAuthModel.State != domain.DeviceAuthStateApproved {
+
+	switch deviceAuthModel.State {
+	case domain.DeviceAuthStateApproved:
+		break
+	case domain.DeviceAuthStateUndefined:
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ua1Vo", "Errors.DeviceAuth.NotFound")
+
+	case domain.DeviceAuthStateInitiated:
 		if deviceAuthModel.Expires.Before(time.Now()) {
 			c.asyncPush(ctx, deviceauth.NewCanceledEvent(ctx, deviceAuthModel.aggregate, domain.DeviceAuthCanceledExpired))
 			return nil, DeviceAuthStateError(domain.DeviceAuthStateExpired)
 		}
+		fallthrough
+	case domain.DeviceAuthStateDenied, domain.DeviceAuthStateExpired, domain.DeviceAuthStateDone:
+		fallthrough
+	default:
 		return nil, DeviceAuthStateError(deviceAuthModel.State)
 	}
 
@@ -132,7 +151,7 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 		return nil, err
 	}
 
-	if slices.Contains(deviceAuthModel.Scopes, "offline_access") {
+	if deviceAuthModel.NeedRefreshToken {
 		if err = cmd.AddRefreshToken(ctx, deviceAuthModel.UserID); err != nil {
 			return nil, err
 		}
