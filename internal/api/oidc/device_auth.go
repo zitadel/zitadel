@@ -2,9 +2,11 @@ package oidc
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/zitadel/logging"
+	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/ui/login"
@@ -78,7 +80,7 @@ func (o *OPStorage) StoreDeviceAuthorization(ctx context.Context, clientID, devi
 	if err != nil {
 		return err
 	}
-	details, err := o.command.AddDeviceAuth(ctx, clientID, deviceCode, userCode, expires, scope, audience)
+	details, err := o.command.AddDeviceAuth(ctx, clientID, deviceCode, userCode, expires, scope, audience, slices.Contains(scope, oidc.ScopeOfflineAccess))
 	if err == nil {
 		logger.SetFields("details", details).Debug(logMsg)
 	}
