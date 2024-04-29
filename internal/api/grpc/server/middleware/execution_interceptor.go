@@ -107,8 +107,8 @@ func queryTargets(
 		idsForFullMethod(fullMethod, domain.ExecutionTypeRequest),
 		idsForFullMethod(fullMethod, domain.ExecutionTypeResponse),
 	)
-	requestTargets := make([]execution.Target, len(targets))
-	responseTargets := make([]execution.Target, len(targets))
+	requestTargets := make([]execution.Target, 0, len(targets))
+	responseTargets := make([]execution.Target, 0, len(targets))
 	if err != nil {
 		logging.WithFields("fullMethod", fullMethod).WithError(err).Info("unable to query targets")
 		return requestTargets, responseTargets
