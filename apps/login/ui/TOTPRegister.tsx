@@ -44,8 +44,10 @@ export default function TOTPRegister({
   });
 
   async function continueWithCode(values: Inputs) {
+    setLoading(true);
     return verifyTOTP(values.code, loginName, organization)
       .then((response) => {
+        setLoading(false);
         if (authRequestId && sessionId) {
           const params = new URLSearchParams({
             sessionId: sessionId,
@@ -73,6 +75,7 @@ export default function TOTPRegister({
         }
       })
       .catch((e) => {
+        setLoading(false);
         setError(e.message);
       });
   }
