@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/actions"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 )
 
@@ -269,7 +270,54 @@ Actions:
 				},
 			})
 		},
-	}}
+	}, {
+		name: "hasher ok",
+		args: args{yaml: `
+SystemDefaults:
+  PasswordHasher:
+    Hasher:
+      Algorithm: pbkdf2
+      Rounds: 290000
+      Hash: sha256
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+		want: func(t *testing.T, config *Config) {
+			assert.Equal(t, config.SystemDefaults.PasswordHasher, crypto.HasherConfig{
+				Algorithm: "pbkdf2",
+				Params: map[string]interface{}{
+					"Rounds": 290000,
+					"Hash":   "sha256",
+				},
+			})
+		},
+	},
+		{
+			name: "hasher string ok",
+			args: args{yaml: `
+SystemDefaults:
+  PasswordHasher:
+    Hasher: >
+      {"Algorithm":"pbkdf2","Rounds":290000,"Hash":"sha256"}
+Log:
+  Level: info
+Actions:
+  HTTP:
+    DenyList: []
+`},
+			want: func(t *testing.T, config *Config) {
+				assert.Equal(t, config.SystemDefaults.PasswordHasher, crypto.HasherConfig{
+					Algorithm: "pbkdf2",
+					Params: map[string]interface{}{
+						"Rounds": 290000,
+						"Hash":   "sha256",
+					},
+				})
+			},
+		}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			v := viper.New()
