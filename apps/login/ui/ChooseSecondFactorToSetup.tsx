@@ -1,6 +1,10 @@
 "use client";
 
-import { AuthenticationMethodType, LoginSettings } from "@zitadel/server";
+import {
+  AuthenticationMethodType,
+  LoginSettings,
+  login,
+} from "@zitadel/server";
 import Link from "next/link";
 import { BadgeState, StateBadge } from "./StateBadge";
 import clsx from "clsx";
@@ -29,10 +33,25 @@ export default function ChooseSecondFactorToSetup({
       alreadyAdded ? "" : "hover:shadow-lg hover:dark:bg-white/10"
     );
 
+  const params = new URLSearchParams({});
+
+  if (loginName) {
+    params.append("loginName", loginName);
+  }
+  if (sessionId) {
+    params.append("sessionId", sessionId);
+  }
+  if (authRequestId) {
+    params.append("authRequestId", authRequestId);
+  }
+  if (organization) {
+    params.append("organization", organization);
+  }
+
   const TOTP = (alreadyAdded: boolean) => {
     return (
       <Link
-        href={userMethods.includes(4) ? "" : "/otp/time-based/set"}
+        href={userMethods.includes(4) ? "" : "/otp/time-based/set?" + params}
         className={cardClasses(alreadyAdded)}
       >
         <div
@@ -95,7 +114,7 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
 
   const U2F = (alreadyAdded: boolean) => {
     return (
-      <Link href="/u2f/set" className={cardClasses(alreadyAdded)}>
+      <Link href={"/u2f/set?" + params} className={cardClasses(alreadyAdded)}>
         <div
           className={clsx(
             "font-medium flex items-center",
@@ -129,7 +148,10 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
 
   const EMAIL = (alreadyAdded: boolean) => {
     return (
-      <Link href="/otp/email/set" className={cardClasses(alreadyAdded)}>
+      <Link
+        href={"/otp/email/set?" + params}
+        className={cardClasses(alreadyAdded)}
+      >
         <div
           className={clsx(
             "font-medium flex items-center",
@@ -164,7 +186,10 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
 
   const SMS = (alreadyAdded: boolean) => {
     return (
-      <Link href="/otp/sms/set" className={cardClasses(alreadyAdded)}>
+      <Link
+        href={"/otp/sms/set?" + params}
+        className={cardClasses(alreadyAdded)}
+      >
         <div
           className={clsx(
             "font-medium flex items-center",

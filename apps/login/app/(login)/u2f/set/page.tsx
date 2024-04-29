@@ -1,13 +1,5 @@
-import {
-  addOTPEmail,
-  addOTPSMS,
-  getBrandingSettings,
-  getSession,
-  registerTOTP,
-  server,
-} from "#/lib/zitadel";
+import { getBrandingSettings, getSession, server } from "#/lib/zitadel";
 import DynamicTheme from "#/ui/DynamicTheme";
-import TOTPRegister from "#/ui/TOTPRegister";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
 
 export default async function Page({
@@ -21,7 +13,7 @@ export default async function Page({
 
   const branding = await getBrandingSettings(server, organization);
 
-  const totpResponse = await loadSession(loginName, organization).then();
+  const session = await loadSession(loginName, organization);
 
   async function loadSession(loginName?: string, organization?: string) {
     const recent = await getMostRecentCookieWithLoginname(
@@ -41,18 +33,6 @@ export default async function Page({
         <p className="ztdl-p">
           Choose a device to register for 2-Factor Authentication.
         </p>
-
-        <div>
-          {/* {auth && <div>{auth.to}</div>} */}
-          {totpResponse &&
-            "uri" in totpResponse &&
-            "secret" in totpResponse && (
-              <TOTPRegister
-                uri={totpResponse.uri as string}
-                secret={totpResponse.secret as string}
-              ></TOTPRegister>
-            )}
-        </div>
       </div>
     </DynamicTheme>
   );
