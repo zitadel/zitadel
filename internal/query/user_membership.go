@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	"slices"
 	"sync"
 	"time"
 
@@ -357,7 +358,8 @@ func prepareOrgMember(query *MembershipSearchQuery) (string, []interface{}) {
 	).From(orgMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name {
+		if q.Col().table.name == membershipAlias.name &&
+			!slices.Contains([]string{membershipIAMID.name, membershipProjectID.name, membershipGrantID.name}, q.Col().name) {
 			builder = q.toQuery(builder)
 		}
 	}
@@ -380,7 +382,8 @@ func prepareIAMMember(query *MembershipSearchQuery) (string, []interface{}) {
 	).From(instanceMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name {
+		if q.Col().table.name == membershipAlias.name &&
+			!slices.Contains([]string{membershipOrgID.name, membershipProjectID.name, membershipGrantID.name}, q.Col().name) {
 			builder = q.toQuery(builder)
 		}
 	}
@@ -403,7 +406,8 @@ func prepareProjectMember(query *MembershipSearchQuery) (string, []interface{}) 
 	).From(projectMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name {
+		if q.Col().table.name == membershipAlias.name &&
+			!slices.Contains([]string{membershipOrgID.name, membershipIAMID.name, membershipGrantID.name}, q.Col().name) {
 			builder = q.toQuery(builder)
 		}
 	}
@@ -427,7 +431,8 @@ func prepareProjectGrantMember(query *MembershipSearchQuery) (string, []interfac
 	).From(projectGrantMemberTable.identifier())
 
 	for _, q := range query.Queries {
-		if q.Col().table.name == membershipAlias.name {
+		if q.Col().table.name == membershipAlias.name &&
+			!slices.Contains([]string{membershipOrgID.name, membershipIAMID.name}, q.Col().name) {
 			builder = q.toQuery(builder)
 		}
 	}
