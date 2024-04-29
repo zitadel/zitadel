@@ -16,6 +16,11 @@ import { SMTPConfig } from 'src/app/proto/generated/zitadel/settings_pb';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
+import {
+  EditDialogComponent,
+  EditDialogType,
+} from 'src/app/pages/users/user-detail/auth-user-detail/edit-dialog/edit-dialog.component';
+import { SmtpTestDialogComponent } from '../smtp-test-dialog/smtp-test-dialog.component';
 
 @Component({
   selector: 'cnsl-smtp-table',
@@ -132,6 +137,34 @@ export class SMTPTableComponent implements OnInit {
         confirmation: senderName,
       },
       width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.adminService
+          .removeSMTPConfig(id)
+          .then(() => {
+            this.toast.showInfo('SMTP.LIST.DIALOG.DELETED', true);
+            this.refreshPage();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
+  }
+
+  public testSMTPConfig(id: string): void {
+    const dialogRef = this.dialog.open(SmtpTestDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.TEST',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'SMTP.LIST.DIALOG.TEST_TITLE',
+        descriptionKey: 'SMTP.LIST.DIALOG.TEST_DESCRIPTION',
+        emailKey: 'SMTP.LIST.DIALOG.TEST_EMAIL',
+        testResultKey: 'SMTP.LIST.DIALOG.TEST_RESULT',
+      },
+      width: '500px',
     });
 
     dialogRef.afterClosed().subscribe((resp) => {

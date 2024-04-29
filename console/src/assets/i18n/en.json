@@ -486,6 +486,7 @@
     "MORE": "more",
     "STEP": "Step",
     "SETUP": "Setup",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Unsaved changes",
     "UNSAVED": {
       "DIALOG": {
@@ -2248,6 +2249,7 @@
       "ACTIVATED": "Activated",
       "ACTIVATE": "Activate provider",
       "DEACTIVATE": "Deactivate provider",
+      "TEST": "Test provider",
       "TYPE": "Type",
       "DIALOG": {
         "ACTIVATED": "SMTP config has been activated",
@@ -2259,7 +2261,11 @@
         "DELETE_TITLE": "Delete SMTP config",
         "DELETE_DESCRIPTION": "You are about to delete a configuration. Confirm this action typing the sender name",
         "DELETED": "SMTP config has been deleted",
-        "SENDER": "Type {{value}}, to delete this SMTP configuration."
+        "SENDER": "Type {{value}}, to delete this SMTP configuration.",
+        "TEST_TITLE": "Test your SMTP config",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result"
       }
     },
     "CREATE": {

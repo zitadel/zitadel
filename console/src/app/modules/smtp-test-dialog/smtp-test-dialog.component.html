@@ -1,0 +1,43 @@
+<h1 mat-dialog-title>
+  <span>{{ data.titleKey | translate: data.titleParam }}</span>
+</h1>
+
+<div mat-dialog-content>
+  <div class="icon-wrapper" *ngIf="data.icon">
+    <i class="icon {{ data.icon }}"></i>
+  </div>
+  <p class="desc cnsl-secondary-text">{{ data.descriptionKey | translate: data.descriptionParam }}</p>
+
+  <cnsl-info-section *ngIf="data.warnSectionKey" [type]="InfoSectionType.WARN">
+    {{ data.warnSectionKey | translate }}
+  </cnsl-info-section>
+
+  <p *ngIf="data.hintKey" class="desc cnsl-secondary-text">{{ data.hintKey | translate: { value: data.confirmation } }}</p>
+
+  <cnsl-form-field class="formfield">
+    <cnsl-label>{{ data.emailKey | translate }}</cnsl-label>
+    <input cnslInput [(ngModel)]="confirm" data-e2e="email-test-dialog-input" />
+  </cnsl-form-field>
+
+  <cnsl-form-field class="formfield">
+    <cnsl-label>{{ data.testResultKey | translate }}</cnsl-label>
+    <textarea cnslInput class="test-result"></textarea>
+  </cnsl-form-field>
+</div>
+
+<div class="action" mat-dialog-actions>
+  <button *ngIf="data.cancelKey" mat-stroked-button (click)="closeDialog()">
+    {{ data.cancelKey | translate }}
+  </button>
+  <span class="fill-space"></span>
+  <button
+    color="primary"
+    [disabled]="data.confirmation && confirm !== data.confirmation"
+    mat-raised-button
+    class="ok-button"
+    (click)="closeDialogWithSuccess()"
+    data-e2e="confirm-dialog-button"
+  >
+    {{ data.confirmKey | translate }}
+  </button>
+</div>
