@@ -328,6 +328,236 @@ func TestCommands_CreateOIDCSessionFromCodeExchange(t *testing.T) {
 	}
 }
 
+func TestCommands_CreateOIDCSession(t *testing.T) {
+	type fields struct {
+		eventstore                      func(*testing.T) *eventstore.Eventstore
+		idGenerator                     id.Generator
+		defaultAccessTokenLifetime      time.Duration
+		defaultRefreshTokenLifetime     time.Duration
+		defaultRefreshTokenIdleLifetime time.Duration
+		keyAlgorithm                    crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx              context.Context
+		userID           string
+		resourceOwner    string
+		clientID         string
+		audience         []string
+		scope            []string
+		authMethods      []domain.UserAuthMethodType
+		authTime         time.Time
+		userAgent        *domain.UserAgent
+		reason           domain.TokenReason
+		actor            *domain.TokenActor
+		needRefreshToken bool
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *OIDCSession
+		wantErr error
+	}{
+		{
+			name: "filter error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilterError(io.ErrClosedPipe),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "userID",
+				resourceOwner: "orgID",
+				clientID:      "clientID",
+				audience:      []string{"audience"},
+				scope:         []string{"openid", "offline_access"},
+				authMethods:   []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:      testNow,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAuthRequest,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+			},
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "without refresh token",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // token lifetime
+					expectPush(
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+							&domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(),
+							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest,
+							&domain.TokenActor{
+								UserID: "user2",
+								Issuer: "foo.com",
+							}),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "userID",
+				resourceOwner: "org1",
+				clientID:      "clientID",
+				audience:      []string{"audience"},
+				scope:         []string{"openid", "offline_access"},
+				authMethods:   []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:      testNow,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAuthRequest,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+			},
+			want: &OIDCSession{
+				TokenID:    "V2_oidcSessionID-at_accessTokenID",
+				ClientID:   "clientID",
+				UserID:     "userID",
+				Audience:   []string{"audience"},
+				Expiration: time.Time{}.Add(time.Hour),
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				Reason: domain.TokenReasonAuthRequest,
+			},
+		},
+		{
+			name: "with refresh token",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // token lifetime
+					expectPush(
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+							&domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(),
+							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest,
+							&domain.TokenActor{
+								UserID: "user2",
+								Issuer: "foo.com",
+							}),
+						oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID", "refreshTokenID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "userID",
+				resourceOwner: "org1",
+				clientID:      "clientID",
+				audience:      []string{"audience"},
+				scope:         []string{"openid", "offline_access"},
+				authMethods:   []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:      testNow,
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonAuthRequest,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: true,
+			},
+			want: &OIDCSession{
+				TokenID:    "V2_oidcSessionID-at_accessTokenID",
+				ClientID:   "clientID",
+				UserID:     "userID",
+				Audience:   []string{"audience"},
+				Expiration: time.Time{}.Add(time.Hour),
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				Reason:       domain.TokenReasonAuthRequest,
+				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:                      tt.fields.eventstore(t),
+				idGenerator:                     tt.fields.idGenerator,
+				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
+				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
+				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
+				keyAlgorithm:                    tt.fields.keyAlgorithm,
+			}
+			got, err := c.CreateOIDCSession(tt.args.ctx,
+				tt.args.userID,
+				tt.args.resourceOwner,
+				tt.args.clientID,
+				tt.args.scope,
+				tt.args.audience,
+				tt.args.authMethods,
+				tt.args.authTime,
+				tt.args.userAgent,
+				tt.args.reason,
+				tt.args.actor,
+				tt.args.needRefreshToken,
+			)
+			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func mockRefreshTokenComplianceChecker(returnErr error) RefreshTokenComplianceChecker {
 	return func(context.Context, *OIDCSessionWriteModel) error {
 		return returnErr
