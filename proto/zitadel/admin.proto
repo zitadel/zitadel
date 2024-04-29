@@ -503,6 +503,23 @@ service AdminService {
         };
     }
 
+    rpc TestSMTPConfig(TestSMTPConfigRequest) returns (TestSMTPConfigResponse) {
+        option (google.api.http) = {
+            post: "/smtp/{id}/_test";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP Provider";
+            summary: "Test SMTP Provider";
+            description: "Test an SMTP provider. After testing the provider, the users will receive information about the test results."
+        };
+    }
+
     rpc ListSMTPConfigs(ListSMTPConfigsRequest) returns (ListSMTPConfigsResponse) {
         option (google.api.http) = {
             post: "/smtp/_search"
@@ -4251,6 +4268,23 @@ message RemoveSMTPConfigRequest {
 }
 
 message RemoveSMTPConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message TestSMTPConfigRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+    string test_address = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"noreply@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+message TestSMTPConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
