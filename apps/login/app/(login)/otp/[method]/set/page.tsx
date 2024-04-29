@@ -11,6 +11,8 @@ import DynamicTheme from "#/ui/DynamicTheme";
 import TOTPRegister from "#/ui/TOTPRegister";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
+import { RegisterTOTPResponse } from "@zitadel/server";
+import { ClientError } from "nice-grpc";
 
 export default async function Page({
   searchParams,
@@ -25,11 +27,20 @@ export default async function Page({
   const branding = await getBrandingSettings(server, organization);
   const { session, token } = await loadSession(loginName, organization);
 
-  let totpResponse;
+  let totpResponse: RegisterTOTPResponse | undefined,
+    totpError: ClientError | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
       // inconsistency with token: email works with machine token, totp works with session token
-      totpResponse = await registerTOTP(session.factors.user.id, token);
+      await registerTOTP(session.factors.user.id, token)
+        .then((resp) => {
+          if (resp) {
+            totpResponse = resp;
+          }
+        })
+        .catch((error) => {
+          totpError = error;
+        });
     } else if (method === "sms") {
       // does not work
       await addOTPSMS(session.factors.user.id);
@@ -64,6 +75,12 @@ export default async function Page({
               Could not get the context of the user. Make sure to enter the
               username first or provide a loginName as searchParam.
             </Alert>
+          </div>
+        )}
+
+        {totpError && (
+          <div className="py-4">
+            <Alert>{totpError?.details}</Alert>
           </div>
         )}
 
