@@ -30,7 +30,7 @@ func (a *AddTarget) IsValid() error {
 	}
 	_, err := url.Parse(a.Endpoint)
 	if err != nil || a.Endpoint == "" {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-1r2k6qo6wg", "Errors.Target.InvalidURL")
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-1r2k6qo6wg", "Errors.Target.InvalidURL")
 	}
 
 	return nil
@@ -100,7 +100,7 @@ func (a *ChangeTarget) IsValid() error {
 	if a.Endpoint != nil {
 		_, err := url.Parse(*a.Endpoint)
 		if err != nil || *a.Endpoint == "" {
-			return zerrors.ThrowInvalidArgument(nil, "COMMAND-jsbaera7b6", "Errors.Target.InvalidURL")
+			return zerrors.ThrowInvalidArgument(err, "COMMAND-jsbaera7b6", "Errors.Target.InvalidURL")
 		}
 	}
 	return nil

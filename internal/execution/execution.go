@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -32,7 +33,10 @@ func CallTargets(
 	ctx context.Context,
 	targets []Target,
 	info ContextInfo,
-) (interface{}, error) {
+) (_ interface{}, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
+
 	for _, target := range targets {
 		// call the type of target
 		resp, err := CallTarget(ctx, target, info)
@@ -60,6 +64,9 @@ func CallTarget(
 	target Target,
 	info ContextInfoRequest,
 ) (res []byte, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
+
 	switch target.GetTargetType() {
 	// get request, ignore response and return request and error for handling in list of targets
 	case domain.TargetTypeWebhook:
@@ -86,11 +93,15 @@ func webhook(ctx context.Context, url string, timeout time.Duration, body []byte
 }
 
 // call function to do a post HTTP request to a desired url with timeout
-func call(ctx context.Context, url string, timeout time.Duration, body []byte) ([]byte, error) {
-	contextWithCancel, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
+func call(ctx context.Context, url string, timeout time.Duration, body []byte) (_ []byte, err error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() {
+		cancel()
+		span.EndWithError(err)
+	}()
 
-	req, err := http.NewRequestWithContext(contextWithCancel, http.MethodPost, url, bytes.NewBuffer(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}

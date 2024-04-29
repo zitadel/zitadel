@@ -1344,7 +1344,7 @@ func TestTextQuery_comp(t *testing.T) {
 				Compare: TextListContains,
 			},
 			want: want{
-				query: &ListContains{
+				query: &listContains{
 					col:  testCol,
 					args: []interface{}{"Hurst"},
 				},
@@ -1559,7 +1559,7 @@ func TestNumberQuery_comp(t *testing.T) {
 				Compare: NumberListContains,
 			},
 			want: want{
-				query: &ListContains{
+				query: &listContains{
 					col:  testCol,
 					args: []interface{}{42},
 				},

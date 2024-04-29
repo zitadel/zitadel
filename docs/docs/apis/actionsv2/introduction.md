@@ -49,7 +49,7 @@ There are different types of Targets:
 - `Call`, the call handles the status code and response, can be InterruptOnError
 - `Async`, the call handles neither status code nor response, but can be called in parallel with other Targets
 
-`InterruptOnError` means that the list of Targets gets interrupted if any of the calls return with a status code >= 400.
+`InterruptOnError` means that the Execution gets interrupted if any of the calls return with a status code >= 400, and the next Target will not be called anymore.
 
 The API documentation to create a target can be found [here](/apis/resources/action_service_v3/action-service-create-target)
 
@@ -66,6 +66,23 @@ The condition can be defined for 4 types of processes:
 - `Events`, after a specific event happened and was stored in ZITADEL
 
 The API documentation to set an Execution can be found [here](/apis/resources/action_service_v3/action-service-set-execution)
+
+### Condition Best Match
+
+As the conditions can be defined on different levels, ZITADEL tries to find out which Execution is the best match.
+This means that for example if you have an Execution defined on `all requests`, on the service `zitadel.user.v2beta.UserService` and on `/zitadel.user.v2beta.UserService/AddHumanUser`,
+ZITADEL would with a call on the `/zitadel.user.v2beta.UserService/AddHumanUser` use the Executions with the following priority:
+
+1. `/zitadel.user.v2beta.UserService/AddHumanUser`
+2. `zitadel.user.v2beta.UserService`
+3. `all`
+
+If you then have a call on `/zitadel.user.v2beta.UserService/UpdateHumanUser` the following priority would be found:
+
+1. `zitadel.user.v2beta.UserService`
+2. `all`
+
+And if you use a different service, for example `zitadel.session.v2.SessionService`, then the `all` Execution would still be used.
 
 ### Targets and Includes
 

@@ -6,7 +6,6 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
-	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -156,8 +155,11 @@ func targetItemJSONB(t domain.ExecutionTargetType, targetItem string) ([]byte, e
 	return json.Marshal([]*executionTarget{target})
 }
 
-// ExecutionTargets: provide IDs to select all target information,
-func (q *Queries) ExecutionTargets(ctx context.Context, ids []string) (execution []*ExecutionTarget, err error) {
+// TargetsByExecutionID query list of targets for best match of a list of IDs,  for example:
+// [ "request/zitadel.action.v3alpha.ActionService/GetTargetByID",
+// "request/zitadel.action.v3alpha.ActionService",
+// "request" ]
+func (q *Queries) TargetsByExecutionID(ctx context.Context, ids []string) (execution []*ExecutionTarget, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.End() }()
 
@@ -173,12 +175,20 @@ func (q *Queries) ExecutionTargets(ctx context.Context, ids []string) (execution
 		},
 		executionTargetsQuery,
 		instanceID,
-		strings.Join(ids, ","),
+		database.TextArray[string](ids),
 	)
 	return execution, err
 }
 
-func (q *Queries) ExecutionTargetsCombined(ctx context.Context, ids1, ids2 []string) (execution []*ExecutionTarget, err error) {
+// TargetsByExecutionIDs query list of targets for best matches of 2 separate lists of IDs, combined for performance, for example:
+// [ "request/zitadel.action.v3alpha.ActionService/GetTargetByID",
+// "request/zitadel.action.v3alpha.ActionService",
+// "request" ]
+// and
+// [ "response/zitadel.action.v3alpha.ActionService/GetTargetByID",
+// "response/zitadel.action.v3alpha.ActionService",
+// "response" ]
+func (q *Queries) TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string) (execution []*ExecutionTarget, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.End() }()
 

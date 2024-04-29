@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/execution"
 	"github.com/zitadel/zitadel/internal/query"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
@@ -34,7 +35,10 @@ func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
 	}
 }
 
-func executeTargetsForRequest(ctx context.Context, targets []execution.Target, fullMethod string, req interface{}) (interface{}, error) {
+func executeTargetsForRequest(ctx context.Context, targets []execution.Target, fullMethod string, req interface{}) (_ interface{}, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
+
 	// if no targets are found, return without any calls
 	if len(targets) == 0 {
 		return req, nil
@@ -56,10 +60,13 @@ func executeTargetsForRequest(ctx context.Context, targets []execution.Target, f
 		// if an error is returned still return also the original request
 		return req, err
 	}
-	return request, err
+	return request, nil
 }
 
-func executeTargetsForResponse(ctx context.Context, targets []execution.Target, fullMethod string, req, resp interface{}) (interface{}, error) {
+func executeTargetsForResponse(ctx context.Context, targets []execution.Target, fullMethod string, req, resp interface{}) (_ interface{}, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
+
 	// if no targets are found, return without any calls
 	if len(targets) == 0 {
 		return resp, nil
@@ -81,11 +88,11 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 		// if an error is returned still return also the original response
 		return resp, err
 	}
-	return response, err
+	return response, nil
 }
 
 type ExecutionQueries interface {
-	ExecutionTargetsCombined(ctx context.Context, ids1, ids2 []string) (execution []*query.ExecutionTarget, err error)
+	TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string) (execution []*query.ExecutionTarget, err error)
 }
 
 func queryTargets(
@@ -93,12 +100,15 @@ func queryTargets(
 	queries ExecutionQueries,
 	fullMethod string,
 ) ([]execution.Target, []execution.Target) {
-	requestTargets := make([]execution.Target, 0)
-	responseTargets := make([]execution.Target, 0)
-	targets, err := queries.ExecutionTargetsCombined(ctx,
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.End()
+
+	targets, err := queries.TargetsByExecutionIDs(ctx,
 		idsForFullMethod(fullMethod, domain.ExecutionTypeRequest),
 		idsForFullMethod(fullMethod, domain.ExecutionTypeResponse),
 	)
+	requestTargets := make([]execution.Target, len(targets))
+	responseTargets := make([]execution.Target, len(targets))
 	if err != nil {
 		logging.WithFields("fullMethod", fullMethod).WithError(err).Info("unable to query targets")
 		return requestTargets, responseTargets

@@ -339,7 +339,7 @@ func (q *textQuery) comp() sq.Sqlizer {
 	case TextContainsIgnoreCase:
 		return sq.ILike{q.Column.identifier(): "%" + q.Text + "%"}
 	case TextListContains:
-		return &ListContains{col: q.Column, args: []interface{}{q.Text}}
+		return &listContains{col: q.Column, args: []interface{}{q.Text}}
 	case textCompareMax:
 		return nil
 	}
@@ -409,7 +409,7 @@ func (q *NumberQuery) comp() sq.Sqlizer {
 	case NumberGreater:
 		return sq.Gt{q.Column.identifier(): q.Number}
 	case NumberListContains:
-		return &ListContains{col: q.Column, args: []interface{}{q.Number}}
+		return &listContains{col: q.Column, args: []interface{}{q.Number}}
 	case numberCompareMax:
 		return nil
 	}
@@ -715,30 +715,30 @@ func join(join, from Column) string {
 	return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier() + " AND " + from.table.InstanceIDIdentifier() + " = " + join.table.InstanceIDIdentifier()
 }
 
-type ListContains struct {
+type listContains struct {
 	col  Column
 	args interface{}
 }
 
-func NewListContains(c Column, value interface{}) (*ListContains, error) {
-	return &ListContains{
+func NewListContains(c Column, value interface{}) (*listContains, error) {
+	return &listContains{
 		col:  c,
 		args: value,
 	}, nil
 }
 
-func (q *ListContains) Col() Column {
+func (q *listContains) Col() Column {
 	return q.col
 }
 
-func (q *ListContains) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *listContains) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query.Where(q.comp())
 }
 
-func (q *ListContains) ToSql() (string, []interface{}, error) {
+func (q *listContains) ToSql() (string, []interface{}, error) {
 	return q.col.identifier() + " @> ? ", []interface{}{q.args}, nil
 }
 
-func (q *ListContains) comp() sq.Sqlizer {
+func (q *listContains) comp() sq.Sqlizer {
 	return q
 }
