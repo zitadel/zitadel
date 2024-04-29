@@ -1010,9 +1010,9 @@ EventTypes:
           check:
             succeeded: Kontrola tajného klíče OIDC klienta byla úspěšná
             failed: Kontrola tajného klíče OIDC klienta selhala
-          key:
-            added: Přidán klíč k aplikaci OIDC
-            removed: Odstranění klíče aplikace OIDC
+        key:
+          added: Přidán klíč k aplikaci OIDC
+          removed: Odstranění klíče aplikace OIDC
       api:
         secret:
           check:
