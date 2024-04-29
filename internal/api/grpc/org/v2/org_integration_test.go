@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/integration"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
@@ -41,7 +42,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddOrganization(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t, authz.WithInstance(CTX, Tester.Instance))
 
 	tests := []struct {
 		name    string

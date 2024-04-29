@@ -24,6 +24,7 @@ func NewAggregate(id, resourceOwner string) *Aggregate {
 			Version:       AggregateVersion,
 			ID:            id,
 			ResourceOwner: resourceOwner,
+			InstanceID:    resourceOwner,
 		},
 	}
 }

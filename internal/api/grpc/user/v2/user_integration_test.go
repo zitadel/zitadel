@@ -18,6 +18,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -54,7 +55,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddHumanUser(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t, CTX)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -1718,7 +1719,7 @@ func TestServer_DeleteUser(t *testing.T) {
 }
 
 func TestServer_AddIDPLink(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t, CTX)
 	type args struct {
 		ctx context.Context
 		req *user.AddIDPLinkRequest
@@ -1798,11 +1799,11 @@ func TestServer_AddIDPLink(t *testing.T) {
 }
 
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t)
-	orgIdpID := Tester.AddOrgGenericOAuthProvider(t)
-	samlIdpID := Tester.AddSAMLProvider(t)
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t)
-	samlPostIdpID := Tester.AddSAMLPostProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t, CTX)
+	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, CTX, Tester.Organisation.ID)
+	samlIdpID := Tester.AddSAMLProvider(t, CTX)
+	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX)
+	samlPostIdpID := Tester.AddSAMLPostProvider(t, CTX)
 	type args struct {
 		ctx context.Context
 		req *user.StartIdentityProviderIntentRequest
@@ -1866,7 +1867,8 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: orgIdpID,
+					Organization: &object.Organization{Org: &object.Organization_OrgId{OrgId: Tester.Organisation.ID}},
+					IdpId:        orgIdpID,
 					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
@@ -1997,8 +1999,8 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 }
 
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t)
-	intentID := Tester.CreateIntent(t, CTX, idpID)
+	idpID := Tester.AddGenericOAuthProvider(t, CTX)
+	intentID := Tester.CreateIntent(t, CTX, "", idpID)
 	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", "id")
 	successfulWithUserID, WithUsertoken, WithUserchangeDate, WithUsersequence := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "user", "id")
 	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, CTX, idpID, "", "id")
@@ -2039,7 +2041,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 		{
 			name: "retrieve successful intent",
 			args: args{
-				CTX,
+				authz.WithInstance(CTX, Tester.Instance),
 				&user.RetrieveIdentityProviderIntentRequest{
 					IdpIntentId:    successfulID,
 					IdpIntentToken: token,

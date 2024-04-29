@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"net/url"
 
 	"github.com/crewjam/saml"
@@ -47,8 +48,9 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, resource
 			if !exists || err != nil {
 				return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting")
 			}
+			fmt.Println(writeModel)
 			return []eventstore.Command{
-				idpintent.NewStartedEvent(ctx, writeModel.aggregate, successURL, failureURL, idpID),
+				idpintent.NewStartedEvent(ctx, &idpintent.NewAggregate(writeModel.AggregateID, resourceOwner).Aggregate, successURL, failureURL, idpID),
 			}, nil
 		}, nil
 	}
@@ -59,6 +61,7 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 	if err != nil {
 		return nil, nil, err
 	}
+	fmt.Println("owner: " + resourceOwner)
 	writeModel := NewIDPIntentWriteModel(id, resourceOwner)
 	if err != nil {
 		return nil, nil, err
@@ -117,7 +120,7 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 		return nil, err
 	}
 	if intent.State == domain.IDPIntentStateUnspecified {
-		return nil, zerrors.ThrowNotFound(nil, "IDP-Hk38e", "Errors.Intent.NotStarted")
+		return nil, zerrors.ThrowNotFound(nil, "IDP-gy3ctgkqe7", "Errors.Intent.NotStarted")
 	}
 	if intent.State != domain.IDPIntentStateStarted {
 		return nil, zerrors.ThrowInvalidArgument(nil, "IDP-Sfrgs", "Errors.Intent.NotStarted")

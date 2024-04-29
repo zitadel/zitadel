@@ -502,7 +502,7 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-nme4gszsvx", "Errors.Intent.NotSucceeded")
 	}
 	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }

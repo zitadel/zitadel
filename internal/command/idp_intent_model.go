@@ -28,8 +28,7 @@ type IDPIntentWriteModel struct {
 	RequestID string
 	Assertion *crypto.CryptoValue
 
-	State     domain.IDPIntentState
-	aggregate *eventstore.Aggregate
+	State domain.IDPIntentState
 }
 
 func NewIDPIntentWriteModel(id, resourceOwner string) *IDPIntentWriteModel {
@@ -37,8 +36,8 @@ func NewIDPIntentWriteModel(id, resourceOwner string) *IDPIntentWriteModel {
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   id,
 			ResourceOwner: resourceOwner,
+			InstanceID:    resourceOwner,
 		},
-		aggregate: &idpintent.NewAggregate(id, resourceOwner).Aggregate,
 	}
 }
 
