@@ -755,6 +755,7 @@ service UserService {
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
         permission: "authenticated"
+        org_field: "organization"
       }
     };
 
@@ -1566,6 +1567,8 @@ message StartIdentityProviderIntentRequest{
     RedirectURLs urls = 2;
     LDAPCredentials ldap = 3;
   }
+
+  zitadel.object.v2beta.Organization organization = 4;
 }
 
 message StartIdentityProviderIntentResponse{

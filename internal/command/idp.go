@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -129,23 +128,25 @@ type AppleProvider struct {
 	IDPOptions idp.Options
 }
 
-func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id, orgID string) (exists bool, err error) {
-	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
-	events, err := filter(ctx, writeModel.Query())
-	if err != nil {
-		return false, err
-	}
-
-	if len(events) > 0 {
-		writeModel.AppendEvents(events...)
-		if err := writeModel.Reduce(); err != nil {
+func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, instanceID, orgID, id string) (exists bool, err error) {
+	if orgID != "" {
+		writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
+		events, err := filter(ctx, writeModel.Query())
+		if err != nil {
 			return false, err
 		}
-		return writeModel.State.Exists(), nil
+
+		if len(events) > 0 {
+			writeModel.AppendEvents(events...)
+			if err := writeModel.Reduce(); err != nil {
+				return false, err
+			}
+			return writeModel.State.Exists(), nil
+		}
 	}
 
-	instanceWriteModel := NewInstanceIDPRemoveWriteModel(authz.GetInstance(ctx).InstanceID(), id)
-	events, err = filter(ctx, instanceWriteModel.Query())
+	instanceWriteModel := NewInstanceIDPRemoveWriteModel(instanceID, id)
+	events, err := filter(ctx, instanceWriteModel.Query())
 	if err != nil {
 		return false, err
 	}

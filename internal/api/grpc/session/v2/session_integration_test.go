@@ -362,7 +362,6 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 
 func TestServer_CreateSession_successfulIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
-
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -375,7 +374,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0)
 
-	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, idpID, User.GetUserId(), "id")
+	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), "id")
 	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
@@ -393,7 +392,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t)
 
-	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, idpID, User.GetUserId(), "id")
+	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), "id")
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -427,7 +426,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0)
 
 	idpUserID := "id"
-	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", idpUserID)
+	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", idpUserID)
 	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
@@ -469,7 +468,7 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0)
 
-	intentID := Tester.CreateIntent(t, idpID)
+	intentID := Tester.CreateIntent(t, CTX, idpID)
 	_, err = Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),
