@@ -136,7 +136,7 @@ Errors:
       Invalid: Password is invalid
       NotSet: User has not set a password
       NotChanged: New password cannot be the same as your current password
-      NotSupported: Password hash encoding not supported
+      NotSupported: Password hash encoding not supported. Check out https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Password policy not found
       MinLength: Password is too short
