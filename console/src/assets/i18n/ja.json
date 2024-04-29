@@ -1292,6 +1292,7 @@
       "MEMBERCHANGED": "マネージャーが変更されました。",
       "SETPRIMARY": "プライマリドメインが設定されました。",
       "DELETED": "組織が正常に削除されました。",
+      "DEFAULTORGNOTFOUND": "デフォルトの組織が見つかりませんでした",
       "ORG_WAS_DELETED": "組織が削除されました。"
     },
     "DIALOG": {

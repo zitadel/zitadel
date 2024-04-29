@@ -210,3 +210,5 @@ This object represents a list of user grant stored in ZITADEL.
     The name of the organization, where the user was granted
   - `projectId` *string*
   - `projectName` *string*
+  - `getOrgMetadata()` [*metadataResult*](#metadata-result)  
+    Get the metadata of the organization where the user was granted

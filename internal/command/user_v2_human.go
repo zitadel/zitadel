@@ -131,8 +131,10 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-7yiox1isql", "Errors.User.AlreadyExisting")
 	}
 	// check for permission to create user on resourceOwner
-	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, human.ID); err != nil {
-		return err
+	if !human.Register {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, human.ID); err != nil {
+			return err
+		}
 	}
 	// add resourceowner for the events with the aggregate
 	existingHuman.ResourceOwner = resourceOwner
@@ -159,6 +161,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 			human.Gender,
 			human.Email.Address,
 			domainPolicy.UserLoginMustBeDomain,
+			human.UserAgentID,
 		)
 	} else {
 		createCmd = user.NewHumanAddedEvent(

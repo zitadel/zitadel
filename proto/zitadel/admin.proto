@@ -2040,7 +2040,7 @@ service AdminService {
             tags: "Settings";
             tags: "Domain Settings";
             tags: "Organizations";
-            summary: "Get Domain Settings for Organization";
+            summary: "Set a Domain Settings for an Organization";
             description: "Create the domain settings configured on a specific organization. It will overwrite the settings specified on the instance. Domain settings specify how ZITADEL should handle domains, in regards to usernames, emails and validation."
             responses: {
                 key: "200";

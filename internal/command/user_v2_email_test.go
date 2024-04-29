@@ -1838,7 +1838,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 
 func TestCommands_NewUserEmailEvents(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		userID string
@@ -1852,7 +1852,7 @@ func TestCommands_NewUserEmailEvents(t *testing.T) {
 		{
 			name: "missing userID",
 			fields: fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				userID: "",
@@ -1862,7 +1862,7 @@ func TestCommands_NewUserEmailEvents(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t, expectFilter()),
+				eventstore: expectEventstore(expectFilter()),
 			},
 			args: args{
 				userID: "user1",
@@ -1872,8 +1872,7 @@ func TestCommands_NewUserEmailEvents(t *testing.T) {
 		{
 			name: "user not initialized",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1893,6 +1892,7 @@ func TestCommands_NewUserEmailEvents(t *testing.T) {
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								nil, time.Hour*1,
+								"",
 							),
 						),
 					),
@@ -1907,7 +1907,7 @@ func TestCommands_NewUserEmailEvents(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			_, err := c.NewUserEmailEvents(context.Background(), tt.args.userID)
 			require.ErrorIs(t, err, tt.wantErr)

@@ -108,6 +108,7 @@ Errors:
       Key:
         NotFound: Machine sleutel niet gevonden
         AlreadyExisting: Machine sleutel al bestaand
+        Invalid: De openbare sleutel is geen geldige openbare RSA-sleutel in PKIX-indeling met PEM-codering
       Secret:
         NotExisting: Geheim bestaat niet
         Invalid: Geheim is ongeldig

@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Klíč stroje nenalezen
         AlreadyExisting: Klíč stroje již existuje
+        Invalid: Veřejný klíč není platný veřejný klíč RSA ve formátu PKIX s kódováním PEM
       Secret:
         NotExisting: Tajemství neexistuje
         Invalid: Tajemství je neplatné
