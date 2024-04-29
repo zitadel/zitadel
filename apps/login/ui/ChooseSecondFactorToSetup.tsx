@@ -17,6 +17,7 @@ type Props = {
   organization?: string;
   loginSettings: LoginSettings;
   userMethods: AuthenticationMethodType[];
+  checkAfter: boolean;
 };
 
 export default function ChooseSecondFactorToSetup({
@@ -26,6 +27,7 @@ export default function ChooseSecondFactorToSetup({
   organization,
   loginSettings,
   userMethods,
+  checkAfter,
 }: Props) {
   const cardClasses = (alreadyAdded: boolean) =>
     clsx(
@@ -46,6 +48,9 @@ export default function ChooseSecondFactorToSetup({
   }
   if (organization) {
     params.append("organization", organization);
+  }
+  if (checkAfter) {
+    params.append("checkAfter", "true");
   }
 
   const TOTP = (alreadyAdded: boolean) => {

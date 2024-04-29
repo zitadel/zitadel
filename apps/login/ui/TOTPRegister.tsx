@@ -23,6 +23,7 @@ type Props = {
   sessionId?: string;
   authRequestId?: string;
   organization?: string;
+  checkAfter?: boolean;
 };
 export default function TOTPRegister({
   uri,
@@ -31,6 +32,7 @@ export default function TOTPRegister({
   sessionId,
   authRequestId,
   organization,
+  checkAfter,
 }: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -48,22 +50,13 @@ export default function TOTPRegister({
     return verifyTOTP(values.code, loginName, organization)
       .then((response) => {
         setLoading(false);
-        if (authRequestId && sessionId) {
-          const params = new URLSearchParams({
-            sessionId: sessionId,
-            authRequest: authRequestId,
-          });
+        // if attribute is set, validate MFA after it is setup, otherwise proceed as usual (when mfa is enforced to login)
+        if (checkAfter) {
+          const params = new URLSearchParams({});
 
-          if (organization) {
-            params.append("organization", organization);
+          if (loginName) {
+            params.append("loginName", loginName);
           }
-
-          return router.push(`/login?` + params);
-        } else if (loginName) {
-          const params = new URLSearchParams({
-            loginName,
-          });
-
           if (authRequestId) {
             params.append("authRequestId", authRequestId);
           }
@@ -71,7 +64,33 @@ export default function TOTPRegister({
             params.append("organization", organization);
           }
 
-          return router.push(`/signedin?` + params);
+          return router.push(`/otp/time-based?` + params);
+        } else {
+          if (authRequestId && sessionId) {
+            const params = new URLSearchParams({
+              sessionId: sessionId,
+              authRequest: authRequestId,
+            });
+
+            if (organization) {
+              params.append("organization", organization);
+            }
+
+            return router.push(`/login?` + params);
+          } else if (loginName) {
+            const params = new URLSearchParams({
+              loginName,
+            });
+
+            if (authRequestId) {
+              params.append("authRequestId", authRequestId);
+            }
+            if (organization) {
+              params.append("organization", organization);
+            }
+
+            return router.push(`/signedin?` + params);
+          }
         }
       })
       .catch((e) => {

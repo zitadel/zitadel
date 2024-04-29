@@ -20,7 +20,7 @@ export default async function Page({
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, altPassword, authRequestId, organization, sessionId } =
+  const { loginName, checkAfter, authRequestId, organization, sessionId } =
     searchParams;
 
   const sessionFactors = sessionId
@@ -95,6 +95,7 @@ export default async function Page({
             organization={organization}
             loginSettings={loginSettings}
             userMethods={sessionFactors.authMethods ?? []}
+            checkAfter={checkAfter === "true"}
           ></ChooseSecondFactorToSetup>
         ) : (
           <Alert>No second factors available to setup.</Alert>

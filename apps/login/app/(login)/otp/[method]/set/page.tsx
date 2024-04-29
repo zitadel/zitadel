@@ -7,11 +7,14 @@ import {
   server,
 } from "#/lib/zitadel";
 import Alert from "#/ui/Alert";
+import { Button, ButtonVariants } from "#/ui/Button";
 import DynamicTheme from "#/ui/DynamicTheme";
+import { Spinner } from "#/ui/Spinner";
 import TOTPRegister from "#/ui/TOTPRegister";
 import UserAvatar from "#/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "#/utils/cookies";
 import { RegisterTOTPResponse } from "@zitadel/server";
+import Link from "next/link";
 import { ClientError } from "nice-grpc";
 
 export default async function Page({
@@ -21,7 +24,8 @@ export default async function Page({
   searchParams: Record<string | number | symbol, string | undefined>;
   params: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, organization, sessionId, authRequestId } = searchParams;
+  const { loginName, organization, sessionId, authRequestId, checkAfter } =
+    searchParams;
   const { method } = params;
 
   const branding = await getBrandingSettings(server, organization);
@@ -63,6 +67,34 @@ export default async function Page({
     return getSession(server, recent.id, recent.token).then((response) => {
       return { session: response?.session, token: recent.token };
     });
+  }
+
+  const paramsToContinue = new URLSearchParams({});
+  let urlToContinue = "/accounts";
+
+  if (authRequestId && sessionId) {
+    if (sessionId) {
+      paramsToContinue.append("sessionId", sessionId);
+    }
+    if (authRequestId) {
+      paramsToContinue.append("authRequestId", authRequestId);
+    }
+    if (organization) {
+      paramsToContinue.append("organization", organization);
+    }
+    urlToContinue = `/login?` + paramsToContinue;
+  } else if (loginName) {
+    if (loginName) {
+      paramsToContinue.append("loginName", loginName);
+    }
+    if (authRequestId) {
+      paramsToContinue.append("authRequestId", authRequestId);
+    }
+    if (organization) {
+      paramsToContinue.append("organization", organization);
+    }
+
+    urlToContinue = `/signedin?` + paramsToContinue;
   }
 
   return (
@@ -107,17 +139,39 @@ export default async function Page({
                 sessionId={sessionId}
                 authRequestId={authRequestId}
                 organization={organization}
+                checkAfter={checkAfter === "true"}
               ></TOTPRegister>
             </div>{" "}
           </>
         ) : (
-          <p className="ztdl-p">
-            {method === "email"
-              ? "Code via email was successfully added."
-              : method === "sms"
-              ? "Code via SMS was successfully added."
-              : ""}
-          </p>
+          <>
+            <p className="ztdl-p">
+              {method === "email"
+                ? "Code via email was successfully added."
+                : method === "sms"
+                ? "Code via SMS was successfully added."
+                : ""}
+            </p>
+
+            <div className="mt-8 flex w-full flex-row items-center">
+              <span className="flex-grow"></span>
+              <Link
+                href={
+                  checkAfter
+                    ? `/otp/${method}?` + new URLSearchParams()
+                    : urlToContinue
+                }
+              >
+                <Button
+                  type="submit"
+                  className="self-end"
+                  variant={ButtonVariants.Primary}
+                >
+                  continue
+                </Button>
+              </Link>
+            </div>
+          </>
         )}
       </div>
     </DynamicTheme>

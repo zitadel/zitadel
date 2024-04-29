@@ -120,6 +120,7 @@ export default function PasswordForm({
       } else if (loginSettings?.forceMfa && !resp.authFactors?.length) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
+          checkAfter: "true", // this defines if the check is directly made after the setup
         });
 
         if (authRequestId) {
