@@ -12,21 +12,22 @@ import (
 )
 
 type AuthRequest struct {
-	ID            string
-	LoginClient   string
-	ClientID      string
-	RedirectURI   string
-	State         string
-	Nonce         string
-	Scope         []string
-	Audience      []string
-	ResponseType  domain.OIDCResponseType
-	CodeChallenge *domain.OIDCCodeChallenge
-	Prompt        []domain.Prompt
-	UILocales     []string
-	MaxAge        *time.Duration
-	LoginHint     *string
-	HintUserID    *string
+	ID               string
+	LoginClient      string
+	ClientID         string
+	RedirectURI      string
+	State            string
+	Nonce            string
+	Scope            []string
+	Audience         []string
+	ResponseType     domain.OIDCResponseType
+	CodeChallenge    *domain.OIDCCodeChallenge
+	Prompt           []domain.Prompt
+	UILocales        []string
+	MaxAge           *time.Duration
+	LoginHint        *string
+	HintUserID       *string
+	NeedRefreshToken bool
 }
 
 type CurrentAuthRequest struct {
@@ -69,6 +70,7 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 		authRequest.MaxAge,
 		authRequest.LoginHint,
 		authRequest.HintUserID,
+		authRequest.NeedRefreshToken,
 	))
 	if err != nil {
 		return nil, err

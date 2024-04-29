@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -63,12 +64,13 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 	}
 	userAgentID, _, userOrgID, authTime, authMethodsReferences, reason, actor := getInfoFromRequest(authReq)
 
+	scope := authReq.GetScopes()
 	session, err = s.command.CreateOIDCSession(ctx,
 		authReq.GetSubject(),
 		userOrgID,
 		client.client.ClientID,
+		scope,
 		authReq.GetAudience(),
-		authReq.GetScopes(),
 		AMRToAuthMethodTypes(authMethodsReferences),
 		authTime,
 		&domain.UserAgent{
@@ -76,6 +78,7 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		},
 		reason,
 		actor,
+		slices.Contains(scope, oidc.ScopeOfflineAccess),
 	)
 	return session, authReq.GetState(), err
 }

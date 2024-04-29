@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"encoding/base64"
+	"slices"
 	"strings"
 	"time"
 
@@ -64,18 +65,19 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		return nil, err
 	}
 	authRequest := &command.AuthRequest{
-		LoginClient:   loginClient,
-		ClientID:      req.ClientID,
-		RedirectURI:   req.RedirectURI,
-		State:         req.State,
-		Nonce:         req.Nonce,
-		Scope:         scope,
-		Audience:      audience,
-		ResponseType:  ResponseTypeToBusiness(req.ResponseType),
-		CodeChallenge: CodeChallengeToBusiness(req.CodeChallenge, req.CodeChallengeMethod),
-		Prompt:        PromptToBusiness(req.Prompt),
-		UILocales:     UILocalesToBusiness(req.UILocales),
-		MaxAge:        MaxAgeToBusiness(req.MaxAge),
+		LoginClient:      loginClient,
+		ClientID:         req.ClientID,
+		RedirectURI:      req.RedirectURI,
+		State:            req.State,
+		Nonce:            req.Nonce,
+		Scope:            scope,
+		Audience:         audience,
+		NeedRefreshToken: slices.Contains(scope, oidc.ScopeOfflineAccess),
+		ResponseType:     ResponseTypeToBusiness(req.ResponseType),
+		CodeChallenge:    CodeChallengeToBusiness(req.CodeChallenge, req.CodeChallengeMethod),
+		Prompt:           PromptToBusiness(req.Prompt),
+		UILocales:        UILocalesToBusiness(req.UILocales),
+		MaxAge:           MaxAgeToBusiness(req.MaxAge),
 	}
 	if req.LoginHint != "" {
 		authRequest.LoginHint = &req.LoginHint

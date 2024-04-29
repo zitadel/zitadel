@@ -262,7 +262,19 @@ func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	session, err := s.command.CreateOIDCSession(ctx, userID, resourceOwner, client.client.ClientID, audience, scope, authMethods, authTime, nil, reason, actor)
+	session, err := s.command.CreateOIDCSession(ctx,
+		userID,
+		resourceOwner,
+		client.client.ClientID,
+		scope,
+		audience,
+		authMethods,
+		authTime,
+		nil,
+		reason,
+		actor,
+		slices.Contains(scope, oidc.ScopeOfflineAccess),
+	)
 	if err != nil {
 		return "", "", 0, err
 	}
@@ -277,7 +289,19 @@ func (s *Server) createExchangeJWT(ctx context.Context, client *Client, getUserI
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	session, err := s.command.CreateOIDCSession(ctx, userID, resourceOwner, client.client.ClientID, audience, scope, authMethods, authTime, nil, reason, actor)
+	session, err := s.command.CreateOIDCSession(ctx,
+		userID,
+		resourceOwner,
+		client.client.ClientID,
+		scope,
+		audience,
+		authMethods,
+		authTime,
+		nil,
+		reason,
+		actor,
+		slices.Contains(scope, oidc.ScopeOfflineAccess),
+	)
 	accessToken, err = s.createJWT(ctx, client, session, getUserInfo, getSigner)
 	if err != nil {
 		return "", "", 0, err

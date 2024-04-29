@@ -130,6 +130,7 @@ func TestCommands_CreateOIDCSessionFromCodeExchange(t *testing.T) {
 								gu.Ptr(time.Duration(0)),
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
+								true,
 							),
 						),
 						eventFromEventPusher(
@@ -172,6 +173,7 @@ func TestCommands_CreateOIDCSessionFromCodeExchange(t *testing.T) {
 								gu.Ptr(time.Duration(0)),
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
+								true,
 							),
 						),
 						eventFromEventPusher(
@@ -222,6 +224,7 @@ func TestCommands_CreateOIDCSessionFromCodeExchange(t *testing.T) {
 								gu.Ptr(time.Duration(0)),
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
+								true,
 							),
 						),
 						eventFromEventPusher(

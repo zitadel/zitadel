@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -31,13 +32,14 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 		client.user.ID,
 		client.user.ResourceOwner,
 		r.Data.ClientID,
-		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		scope,
+		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, // TBD: or nil?
 		time.Now(),
 		nil,
 		domain.TokenReasonClientCredentials,
 		nil,
+		slices.Contains(scope, oidc.ScopeOfflineAccess),
 	)
 
 	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false))

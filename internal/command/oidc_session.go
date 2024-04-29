@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"slices"
 	"strings"
 	"time"
 
@@ -97,7 +96,7 @@ func (c *Commands) CreateOIDCSessionFromCodeExchange(ctx context.Context, code s
 		return nil, "", err
 	}
 
-	if slices.Contains(authReqModel.Scope, "offline_access") {
+	if authReqModel.NeedRefreshToken {
 		if err = cmd.AddRefreshToken(ctx, sessionModel.UserID); err != nil {
 			return nil, "", err
 		}
@@ -105,7 +104,7 @@ func (c *Commands) CreateOIDCSessionFromCodeExchange(ctx context.Context, code s
 	return // handled in defer
 }
 
-func (c *Commands) CreateOIDCSession(ctx context.Context, userID, resourceOwner, clientID string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, userAgent *domain.UserAgent, reason domain.TokenReason, actor *domain.TokenActor) (session *OIDCSession, err error) {
+func (c *Commands) CreateOIDCSession(ctx context.Context, userID, resourceOwner, clientID string, scope, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, userAgent *domain.UserAgent, reason domain.TokenReason, actor *domain.TokenActor, needRefreshToken bool) (session *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -117,8 +116,8 @@ func (c *Commands) CreateOIDCSession(ctx context.Context, userID, resourceOwner,
 	if err = cmd.AddAccessToken(ctx, scope, reason, actor); err != nil {
 		return nil, err
 	}
-	if slices.Contains(scope, "offline_access") {
-		if err = cmd.AddRefreshToken(ctx, session.UserID); err != nil {
+	if needRefreshToken {
+		if err = cmd.AddRefreshToken(ctx, userID); err != nil {
 			return nil, err
 		}
 	}
