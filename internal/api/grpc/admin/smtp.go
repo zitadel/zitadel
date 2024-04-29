@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/settings"
 )
 
 func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigRequest) (*admin_pb.GetSMTPConfigResponse, error) {
@@ -126,5 +127,25 @@ func (s *Server) DeactivateSMTPConfig(ctx context.Context, req *admin_pb.Deactiv
 	}
 	return &admin_pb.DeactivateSMTPConfigResponse{
 		Details: object.DomainToAddDetailsPb(result),
+	}, nil
+}
+
+func (s *Server) TestSMTPConfigById(ctx context.Context, req *admin_pb.TestSMTPConfigByIdRequest) (*admin_pb.TestSMTPConfigByIdResponse, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	resourceOwner := instanceID // Will be replaced when orgs have smtp configs
+
+	// Get provider config by its id
+	_, err := s.query.SMTPConfigByID(ctx, instanceID, resourceOwner, req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO test smtp config
+
+	return &admin_pb.TestSMTPConfigByIdResponse{
+		TestResults: &settings.SMTPTestResult{
+			Result:  "none so far",
+			Success: true,
+		},
 	}, nil
 }

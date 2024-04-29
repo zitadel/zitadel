@@ -503,7 +503,7 @@ service AdminService {
         };
     }
 
-    rpc TestSMTPConfig(TestSMTPConfigRequest) returns (TestSMTPConfigResponse) {
+    rpc TestSMTPConfigById(TestSMTPConfigByIdRequest) returns (TestSMTPConfigByIdResponse) {
         option (google.api.http) = {
             post: "/smtp/{id}/_test";
             body: "*"
@@ -4271,7 +4271,7 @@ message RemoveSMTPConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message TestSMTPConfigRequest {
+message TestSMTPConfigByIdRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
     string test_address = 2 [
         (validate.rules).string = {min_len: 1, max_len: 200},
@@ -4284,8 +4284,8 @@ message TestSMTPConfigRequest {
     ];
 }
 
-message TestSMTPConfigResponse {
-    zitadel.v1.ObjectDetails details = 1;
+message TestSMTPConfigByIdResponse {
+    zitadel.settings.v1.SMTPTestResult test_results = 1;
 }
 
 message ListSMSProvidersRequest {
