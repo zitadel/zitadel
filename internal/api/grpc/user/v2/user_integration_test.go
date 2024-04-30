@@ -18,7 +18,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
@@ -1801,6 +1800,8 @@ func TestServer_AddIDPLink(t *testing.T) {
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t, CTX)
 	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, CTX, Tester.Organisation.ID)
+	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	notDefaultOrgIdpID := Tester.AddOrgGenericOAuthProvider(t, CTX, orgResp.OrganizationId)
 	samlIdpID := Tester.AddSAMLProvider(t, CTX)
 	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX)
 	samlPostIdpID := Tester.AddSAMLPostProvider(t, CTX)
@@ -1861,6 +1862,53 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersExisting: []string{"state"},
 			},
 			wantErr: false,
+		},
+		{
+			name: "next step oauth auth url, default org",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: orgIdpID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
+				},
+			},
+			want: want{
+				details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+				url: "https://example.com/oauth/v2/authorize",
+				parametersEqual: map[string]string{
+					"client_id":     "clientID",
+					"prompt":        "select_account",
+					"redirect_uri":  "http://" + Tester.Config.ExternalDomain + ":8080/idps/callback",
+					"response_type": "code",
+					"scope":         "openid profile email",
+				},
+				parametersExisting: []string{"state"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "next step oauth auth url, no org",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: notDefaultOrgIdpID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
 			name: "next step oauth auth url org",
@@ -2041,7 +2089,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 		{
 			name: "retrieve successful intent",
 			args: args{
-				authz.WithInstance(CTX, Tester.Instance),
+				CTX,
 				&user.RetrieveIdentityProviderIntentRequest{
 					IdpIntentId:    successfulID,
 					IdpIntentToken: token,
