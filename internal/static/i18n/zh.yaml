@@ -1011,6 +1011,9 @@ EventTypes:
           check:
             succeeded: 检查 OIDC Client Secret 成功
             failed: 检查 OIDC Client Secret 失败
+        key:
+          added: 添加了 OIDC 应用密钥
+          removed: OIDC 应用密钥已删除
       api:
         secret:
           check:

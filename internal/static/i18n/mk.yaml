@@ -1011,6 +1011,9 @@ EventTypes:
           check:
             succeeded: Проверката на OIDC клиентска тајна е успешна
             failed: Проверката на OIDC клиентска тајна е неуспешна
+        key:
+          added: Додаден е OIDC клуч за апликација
+          removed: OIDC клучот за апликација е отстранет
       api:
         secret:
           check:

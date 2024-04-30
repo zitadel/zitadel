@@ -1012,6 +1012,9 @@ EventTypes:
           check:
             succeeded: Sprawdzenie sekretu OIDC Klienta powiodło się
             failed: Sprawdzenie sekretu OIDC Klienta nie powiodło się
+        key:
+          added: Dodano klucz aplikacji OIDC
+          removed: Klucz aplikacji OIDC usunięty
       api:
         secret:
           check:

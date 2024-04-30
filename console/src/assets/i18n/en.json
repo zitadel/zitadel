@@ -1994,7 +1994,7 @@
     },
     "CREATE": {
       "TITLE": "Add provider",
-      "DESCRIPTION": "Select one ore more of the following providers.",
+      "DESCRIPTION": "Select one or more of the following providers.",
       "STEPPERTITLE": "Create Provider",
       "OIDC": {
         "TITLE": "OIDC Provider",
@@ -2264,7 +2264,7 @@
     },
     "CREATE": {
       "TITLE": "Add SMTP provider",
-      "DESCRIPTION": "Select one ore more of the following providers.",
+      "DESCRIPTION": "Select one or more of the following providers.",
       "STEPS": {
         "TITLE": "Add {{ value }} SMTP Provider",
         "CREATE_DESC_TITLE": "Enter your {{ value }} SMTP settings step by step",

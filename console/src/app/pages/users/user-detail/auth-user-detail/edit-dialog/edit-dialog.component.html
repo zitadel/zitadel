@@ -43,7 +43,7 @@
     </div>
 
     <ng-container *ngIf="data.type === EditDialogType.EMAIL && data.isVerifiedTextKey">
-      <mat-checkbox class="verified-checkbox" [(ngModel)]="isVerified">
+      <mat-checkbox class="verified-checkbox" [(ngModel)]="isVerified" [ngModelOptions]="{ standalone: true }">
         {{ data.isVerifiedTextKey | translate }}
       </mat-checkbox>
       <cnsl-info-section class="full-width desc">
