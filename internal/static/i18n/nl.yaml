@@ -1011,6 +1011,9 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret controle geslaagd
             failed: OIDC Client Secret controle mislukt
+        key:
+          added: OIDC app-sleutel toegevoegd
+          removed: OIDC app-sleutel verwijderd
       api:
         secret:
           check:

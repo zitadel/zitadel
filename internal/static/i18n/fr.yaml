@@ -1007,6 +1007,9 @@ EventTypes:
           verified:
             check: Vérification du secret du client OIDC réussie
             failed: La vérification du secret du client OIDC a échoué
+        key:
+          added: Clé d'application de l'OIDC ajoutée
+          removed: Clé d'application de l'OIDC supprimée
       api:
         secret:
           check:
