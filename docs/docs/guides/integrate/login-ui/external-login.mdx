@@ -19,6 +19,9 @@ Send the following two URLs in the request body:
 1. SuccessURL: Page that should be shown when the login was successful
 2. ErrorURL: Page that should be shown when an error happens during the authentication
 
+Be default, the IDP ID lookup happens in the Default organization. You can send an
+optional `x-zitadel-orgid` header for an IDP in a specific organization.
+
 In the response, you will get an authentication URL of the provider you like.
 [Start Identity Provider Intent Documentation](/docs/apis/resources/user_service/user-service-start-identity-provider-intent)
 
@@ -30,6 +33,7 @@ curl --request POST \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
+  --header 'x-zitadel-orgid: '"$ORG_ID"' \
   --data '{
   "idpId": "$IDP_ID",
   "urls": {
@@ -77,6 +81,7 @@ curl --request POST \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
+  --header 'x-zitadel-orgid: '"$ORG_ID"' \
   --data '{
   "idpIntentToken": "k50WQmDaPIazQDJsyKaEPaQPwgsytxqgQ3K1ifQeQtAmeQ"
 }'
