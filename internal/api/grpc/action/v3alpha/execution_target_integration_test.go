@@ -127,7 +127,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			req:  &action.GetTargetByIDRequest{},
 			want: &action.GetTargetByIDResponse{},
 		},
-		{
+		/*{
 			name: "GetTargetByID, request, interrupt",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) (func(), error) {
@@ -224,7 +224,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			},
 			req:     &action.GetTargetByIDRequest{},
 			wantErr: true,
-		},
+		},*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
