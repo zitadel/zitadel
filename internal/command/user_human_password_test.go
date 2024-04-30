@@ -701,6 +701,64 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 			},
 		},
 		{
+			name: "password not matching complexity policy, invalid argument error",
+			fields: fields{
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				oldPassword:   "password-old",
+				newPassword:   "password1",
+				resourceOwner: "org1",
+			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password-old",
+							false,
+							"")),
+				),
+				expectFilter(
+					eventFromEventPusher(
+						org.NewPasswordComplexityPolicyAddedEvent(
+							context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							1,
+							true,
+							true,
+							true,
+							true,
+						),
+					),
+				),
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "password not matching, invalid argument error",
 			fields: fields{
 				userPasswordHasher: mockPasswordHasher("x"),
@@ -788,7 +846,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				expectFilter(
 					eventFromEventPusher(
 						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-							&user.NewAggregate("user1", "org1").Aggregate,
+							&org.NewAggregate("org1").Aggregate,
 							1,
 							false,
 							false,
