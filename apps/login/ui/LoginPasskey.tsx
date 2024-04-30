@@ -14,6 +14,7 @@ type Props = {
   sessionId?: string;
   authRequestId?: string;
   altPassword: boolean;
+  login?: boolean;
   organization?: string;
 };
 
@@ -23,6 +24,7 @@ export default function LoginPasskey({
   authRequestId,
   altPassword,
   organization,
+  login = true,
 }: Props) {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -31,6 +33,7 @@ export default function LoginPasskey({
 
   const initialized = useRef(false);
 
+  // TODO: move this to server side
   useEffect(() => {
     if (!initialized.current) {
       initialized.current = true;
@@ -61,7 +64,9 @@ export default function LoginPasskey({
     }
   }, []);
 
-  async function updateSessionForChallenge() {
+  async function updateSessionForChallenge(
+    userVerificationRequirement: number = login ? 1 : 3
+  ) {
     setLoading(true);
     const res = await fetch("/api/session", {
       method: "PUT",
@@ -75,7 +80,11 @@ export default function LoginPasskey({
         challenges: {
           webAuthN: {
             domain: "",
-            userVerificationRequirement: 1,
+            // USER_VERIFICATION_REQUIREMENT_UNSPECIFIED = 0;
+            // USER_VERIFICATION_REQUIREMENT_REQUIRED = 1; - passkey login
+            // USER_VERIFICATION_REQUIREMENT_PREFERRED = 2;
+            // USER_VERIFICATION_REQUIREMENT_DISCOURAGED = 3; - mfa
+            userVerificationRequirement: userVerificationRequirement,
           },
         },
         authRequestId,

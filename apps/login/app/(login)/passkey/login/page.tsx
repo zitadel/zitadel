@@ -64,8 +64,6 @@ export default async function Page({
         )}
         <p className="ztdl-p mb-6 block">{description}</p>
 
-        {!sessionFactors && <div className="py-4"></div>}
-
         {!(loginName || sessionId) && (
           <Alert>Provide your active session as loginName param</Alert>
         )}

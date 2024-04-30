@@ -16,19 +16,15 @@ type Props = {
   sessionId?: string;
   authRequestId?: string;
   organization?: string;
-  loginSettings: LoginSettings;
   userMethods: AuthenticationMethodType[];
-  checkAfter: boolean;
 };
 
-export default function ChooseSecondFactorToSetup({
+export default function ChooseSecondFactor({
   loginName,
   sessionId,
   authRequestId,
   organization,
-  loginSettings,
   userMethods,
-  checkAfter,
 }: Props) {
   const params = new URLSearchParams({});
 
@@ -44,28 +40,29 @@ export default function ChooseSecondFactorToSetup({
   if (organization) {
     params.append("organization", organization);
   }
-  if (checkAfter) {
-    params.append("checkAfter", "true");
-  }
 
   return (
     <div className="grid grid-cols-1 gap-5 w-full pt-4">
-      {loginSettings.secondFactors.map((factor, i) => {
+      {userMethods.map((method, i) => {
         return (
           <div key={"method-" + i}>
-            {factor === 1 &&
-              TOTP(
-                userMethods.includes(4),
-                userMethods.includes(4) ? "" : "/otp/time-based/set?" + params
-              )}
-            {factor === 2 && U2F(userMethods.includes(5), "/u2f/set?" + params)}
-            {factor === 3 &&
-              EMAIL(userMethods.includes(7), "/otp/email/set?" + params)}
-            {factor === 4 &&
-              SMS(userMethods.includes(6), "/otp/sms/set?" + params)}
+            {method === 4 && TOTP(false, "")}
+            {method === 2 && U2F(false, "")}
+            {method === 3 && EMAIL(false, "")}
+            {method === 4 && SMS(false, "")}
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function Setup() {
+  return (
+    <div className="transform  absolute right-2 top-0">
+      <StateBadge evenPadding={true} state={BadgeState.Success}>
+        <CheckIcon className="w-4 h-4" />
+      </StateBadge>
     </div>
   );
 }

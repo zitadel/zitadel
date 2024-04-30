@@ -1,3 +1,4 @@
+import { VerifyU2FRegistrationRequest } from "@zitadel/server";
 import {
   GetUserByIDResponse,
   RegisterTOTPResponse,
@@ -348,14 +349,6 @@ export async function getUserByID(
   return userService.getUserByID({ userId }, {});
 }
 
-export async function listHumanAuthFactors(
-  server: ZitadelServer,
-  userId: string
-): Promise<ListHumanAuthFactorsResponse> {
-  const managementService = management.getManagement(server);
-  return managementService.listHumanAuthFactors({ userId }, {});
-}
-
 export async function listUsers(
   userName: string,
   organizationId: string
@@ -483,14 +476,61 @@ export async function setEmail(
  * @returns the newly set email
  */
 export async function createPasskeyRegistrationLink(
-  userId: string
+  userId: string,
+  token?: string
 ): Promise<any> {
-  const userservice = user.getUser(server);
+  let userService;
+  if (token) {
+    const authConfig: ZitadelServerOptions = {
+      name: "zitadel login",
+      apiUrl: process.env.ZITADEL_API_URL ?? "",
+      token: token,
+    };
 
-  return userservice.createPasskeyRegistrationLink({
+    const sessionUser = initializeServer(authConfig);
+    userService = user.getUser(sessionUser);
+  } else {
+    userService = user.getUser(server);
+  }
+
+  return userService.createPasskeyRegistrationLink({
     userId,
     returnCode: {},
   });
+}
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @param domain the domain on which the factor is registered
+ * @returns the newly set email
+ */
+export async function registerU2F(
+  userId: string,
+  domain: string
+): Promise<any> {
+  const userservice = user.getUser(server);
+
+  return userservice.registerU2F({
+    userId,
+    domain,
+  });
+}
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @param domain the domain on which the factor is registered
+ * @returns the newly set email
+ */
+export async function verifyU2FRegistration(
+  request: VerifyU2FRegistrationRequest
+): Promise<any> {
+  const userservice = user.getUser(server);
+
+  return userservice.verifyU2FRegistration(request, {});
 }
 
 /**
