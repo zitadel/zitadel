@@ -56,13 +56,3 @@ export default function ChooseSecondFactor({
     </div>
   );
 }
-
-function Setup() {
-  return (
-    <div className="transform  absolute right-2 top-0">
-      <StateBadge evenPadding={true} state={BadgeState.Success}>
-        <CheckIcon className="w-4 h-4" />
-      </StateBadge>
-    </div>
-  );
-}

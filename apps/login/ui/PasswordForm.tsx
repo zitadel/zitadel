@@ -109,7 +109,7 @@ export default function PasswordForm({
         });
 
         if (authRequestId) {
-          params.append("authRequest", authRequestId);
+          params.append("authRequestId", authRequestId);
         }
 
         if (organization) {
