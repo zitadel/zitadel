@@ -26,10 +26,13 @@ import (
 func TestServer_ExecutionTarget(t *testing.T) {
 	ensureFeatureEnabled(t)
 
+	fullMethod := "/zitadel.action.v3alpha.ActionService/GetTargetByID"
+
 	tests := []struct {
 		name    string
 		ctx     context.Context
 		dep     func(context.Context, *action.GetTargetByIDRequest, *action.GetTargetByIDResponse) (func(), error)
+		clean   func(context.Context)
 		req     *action.GetTargetByIDRequest
 		want    *action.GetTargetByIDResponse
 		wantErr bool
@@ -39,7 +42,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) (func(), error) {
 
-				fullMethod := "/zitadel.action.v3alpha.ActionService/GetTargetByID"
 				instanceID := Tester.Instance.InstanceID()
 				orgID := Tester.Organisation.ID
 				projectID := ""
@@ -118,6 +120,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 					closeResponse()
 				}, nil
 			},
+			clean: func(ctx context.Context) {
+				Tester.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
+				Tester.DeleteExecution(ctx, t, conditionResponseFullMethod(fullMethod))
+			},
 			req:  &action.GetTargetByIDRequest{},
 			want: &action.GetTargetByIDResponse{},
 		},
@@ -144,6 +150,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				return func() {
 					closeRequest()
 				}, nil
+			},
+			clean: func(ctx context.Context) {
+				Tester.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
 			},
 			req:     &action.GetTargetByIDRequest{},
 			wantErr: true,
@@ -207,9 +216,11 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				Tester.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetId()))
 
 				return func() {
-					//closeRequest()
 					closeResponse()
 				}, nil
+			},
+			clean: func(ctx context.Context) {
+				Tester.DeleteExecution(ctx, t, conditionResponseFullMethod(fullMethod))
 			},
 			req:     &action.GetTargetByIDRequest{},
 			wantErr: true,
@@ -233,6 +244,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			integration.AssertDetails(t, tt.want.GetTarget(), got.GetTarget())
 
 			assert.Equal(t, tt.want.Target.TargetId, got.Target.TargetId)
+
+			if tt.clean != nil {
+				tt.clean(tt.ctx)
+			}
 		})
 	}
 }
