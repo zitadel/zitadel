@@ -46,10 +46,10 @@ export default function ChooseSecondFactor({
       {userMethods.map((method, i) => {
         return (
           <div key={"method-" + i}>
-            {method === 4 && TOTP(false, "")}
-            {method === 2 && U2F(false, "")}
-            {method === 3 && EMAIL(false, "")}
-            {method === 4 && SMS(false, "")}
+            {method === 4 && TOTP(false, "/otp/time-based?" + params)}
+            {method === 5 && U2F(false, "/u2f?" + params)}
+            {method === 7 && EMAIL(false, "/otp/email?" + params)}
+            {method === 6 && SMS(false, "/otp/sms?" + params)}
           </div>
         );
       })}
