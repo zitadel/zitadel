@@ -54,13 +54,7 @@ func executeTargetsForRequest(ctx context.Context, targets []execution.Target, f
 		Request:    req,
 	}
 
-	request, err := execution.CallTargets(ctx, targets, info)
-	// error gets only returned if InterruptOnError is set, or internal errors occur
-	if err != nil {
-		// if an error is returned still return also the original request, to handle the request correctly
-		return req, err
-	}
-	return request, nil
+	return execution.CallTargets(ctx, targets, info)
 }
 
 func executeTargetsForResponse(ctx context.Context, targets []execution.Target, fullMethod string, req, resp interface{}) (_ interface{}, err error) {
@@ -83,12 +77,7 @@ func executeTargetsForResponse(ctx context.Context, targets []execution.Target, 
 		Response:   resp,
 	}
 
-	response, err := execution.CallTargets(ctx, targets, info)
-	if err != nil {
-		// if an error is returned still return also the original response
-		return resp, err
-	}
-	return response, nil
+	return execution.CallTargets(ctx, targets, info)
 }
 
 type ExecutionQueries interface {

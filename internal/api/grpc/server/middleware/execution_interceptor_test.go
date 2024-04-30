@@ -142,7 +142,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				req:     newMockContentRequest("content"),
 			},
 			res{
-				want:    newMockContentRequest("content"),
 				wantErr: true,
 			},
 		},
@@ -201,7 +200,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				req: newMockContentRequest("content"),
 			},
 			res{
-				want:    newMockContentRequest("content"),
 				wantErr: true,
 			},
 		},
@@ -231,7 +229,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				req: newMockContentRequest("content"),
 			},
 			res{
-				want:    newMockContentRequest("content"),
 				wantErr: true,
 			},
 		},
@@ -256,7 +253,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				req: newMockContentRequest("content"),
 			},
 			res{
-				want:    newMockContentRequest("content"),
 				wantErr: true,
 			},
 		},
@@ -370,7 +366,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				req: newMockContentRequest("content"),
 			},
 			res{
-				want:    newMockContentRequest("content"),
 				wantErr: true,
 			},
 		},
@@ -400,7 +395,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				req: newMockContentRequest("content"),
 			},
 			res{
-				want:    newMockContentRequest("content"),
 				wantErr: true,
 			},
 		},
@@ -488,7 +482,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				req: newMockContentRequest("content"),
 			},
 			res{
-				want:    newMockContentRequest("content1"),
 				wantErr: true,
 			},
 		},
@@ -546,7 +539,6 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				req: newMockContentRequest("content"),
 			},
 			res{
-				want:    newMockContentRequest("content1"),
 				wantErr: true,
 			},
 		},
