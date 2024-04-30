@@ -599,13 +599,16 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				"123",
 			},
 			want: &OIDCSession{
-				TokenID:    "V2_oidcSessionID-at_accessTokenID",
-				ClientID:   "clientID",
-				UserID:     "userID",
-				Audience:   []string{"audience"},
-				Expiration: time.Time{}.Add(time.Hour),
-				UserAgent:  nil,
-				Reason:     domain.TokenReasonAuthRequest,
+				TokenID:     "V2_oidcSessionID-at_accessTokenID",
+				ClientID:    "clientID",
+				UserID:      "userID",
+				Audience:    []string{"audience"},
+				Expiration:  time.Time{}.Add(time.Hour),
+				Scope:       []string{"openid", "offline_access"},
+				AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:    testNow,
+				UserAgent:   nil,
+				Reason:      domain.TokenReasonAuthRequest,
 			},
 		},
 		{
@@ -667,6 +670,9 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				UserID:       "userID",
 				Audience:     []string{"audience"},
 				Expiration:   time.Time{}.Add(time.Hour),
+				Scope:        []string{"openid", "offline_access"},
+				AuthMethods:  []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:     testNow,
 				UserAgent:    nil,
 				Reason:       domain.TokenReasonAuthRequest,
 				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
@@ -687,6 +693,12 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 			c.jobs.Wait()
 
 			require.ErrorIs(t, err, tt.wantErr)
+
+			if got != nil {
+				assert.WithinRange(t, got.AuthTime, tt.want.AuthTime.Add(-time.Second), tt.want.AuthTime.Add(time.Second))
+				got.AuthTime = time.Time{}
+				tt.want.AuthTime = time.Time{}
+			}
 			assert.Equal(t, tt.want, got)
 		})
 	}

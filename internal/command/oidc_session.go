@@ -79,10 +79,11 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 	if err != nil {
 		return nil, "", err
 	}
-	if err = cmd.SetAuthRequestCodeExchanged(ctx, authReqModel); err != nil {
-		return nil, "", err
+	if authReqModel.ResponseType == domain.OIDCResponseTypeCode {
+		if err = cmd.SetAuthRequestCodeExchanged(ctx, authReqModel); err != nil {
+			return nil, "", err
+		}
 	}
-
 	if err = complianceCheck(ctx, authReqModel); err != nil {
 		return nil, "", err
 	}

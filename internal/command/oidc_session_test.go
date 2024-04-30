@@ -262,6 +262,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 					),
 					expectFilter(), // token lifetime
 					expectPush(
+						authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
@@ -292,11 +293,14 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 			},
 			res{
 				session: &OIDCSession{
-					TokenID:    "V2_oidcSessionID-at_accessTokenID",
-					ClientID:   "clientID",
-					UserID:     "userID",
-					Audience:   []string{"audience"},
-					Expiration: time.Time{}.Add(time.Hour),
+					TokenID:     "V2_oidcSessionID-at_accessTokenID",
+					ClientID:    "clientID",
+					UserID:      "userID",
+					Audience:    []string{"audience"},
+					Expiration:  time.Time{}.Add(time.Hour),
+					Scope:       []string{"openid", "offline_access"},
+					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+					AuthTime:    testNow,
 					UserAgent: &domain.UserAgent{
 						FingerprintID: gu.Ptr("fp1"),
 						IP:            net.ParseIP("1.2.3.4"),
@@ -394,9 +398,12 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 			},
 			res{
 				session: &OIDCSession{
-					ClientID: "clientID",
-					UserID:   "userID",
-					Audience: []string{"audience"},
+					ClientID:    "clientID",
+					UserID:      "userID",
+					Audience:    []string{"audience"},
+					Scope:       []string{"openid"},
+					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+					AuthTime:    testNow,
 					UserAgent: &domain.UserAgent{
 						FingerprintID: gu.Ptr("fp1"),
 						IP:            net.ParseIP("1.2.3.4"),
@@ -420,6 +427,12 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 			}
 			gotSession, gotState, err := c.CreateOIDCSessionFromAuthRequest(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck)
 			require.ErrorIs(t, err, tt.res.err)
+
+			if gotSession != nil {
+				assert.WithinRange(t, gotSession.AuthTime, tt.res.session.AuthTime.Add(-time.Second), tt.res.session.AuthTime.Add(time.Second))
+				gotSession.AuthTime = time.Time{}
+				tt.res.session.AuthTime = time.Time{}
+			}
 			assert.Equal(t, tt.res.session, gotSession)
 			assert.Equal(t, tt.res.state, gotState)
 		})
@@ -542,11 +555,14 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				needRefreshToken: false,
 			},
 			want: &OIDCSession{
-				TokenID:    "V2_oidcSessionID-at_accessTokenID",
-				ClientID:   "clientID",
-				UserID:     "userID",
-				Audience:   []string{"audience"},
-				Expiration: time.Time{}.Add(time.Hour),
+				TokenID:     "V2_oidcSessionID-at_accessTokenID",
+				ClientID:    "clientID",
+				UserID:      "userID",
+				Audience:    []string{"audience"},
+				Expiration:  time.Time{}.Add(time.Hour),
+				Scope:       []string{"openid", "offline_access"},
+				AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:    testNow,
 				UserAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -554,6 +570,10 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
 				Reason: domain.TokenReasonAuthRequest,
+				Actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
 			},
 		},
 		{
@@ -612,18 +632,25 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				needRefreshToken: true,
 			},
 			want: &OIDCSession{
-				TokenID:    "V2_oidcSessionID-at_accessTokenID",
-				ClientID:   "clientID",
-				UserID:     "userID",
-				Audience:   []string{"audience"},
-				Expiration: time.Time{}.Add(time.Hour),
+				TokenID:     "V2_oidcSessionID-at_accessTokenID",
+				ClientID:    "clientID",
+				UserID:      "userID",
+				Audience:    []string{"audience"},
+				Expiration:  time.Time{}.Add(time.Hour),
+				Scope:       []string{"openid", "offline_access"},
+				AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:    testNow,
 				UserAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
 					Description:   gu.Ptr("firefox"),
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
-				Reason:       domain.TokenReasonAuthRequest,
+				Reason: domain.TokenReasonAuthRequest,
+				Actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
 				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
 			},
 		},
@@ -652,6 +679,11 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				tt.args.needRefreshToken,
 			)
 			require.ErrorIs(t, err, tt.wantErr)
+			if got != nil {
+				assert.WithinRange(t, got.AuthTime, tt.want.AuthTime.Add(-time.Second), tt.want.AuthTime.Add(time.Second))
+				got.AuthTime = time.Time{}
+				tt.want.AuthTime = time.Time{}
+			}
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -831,6 +863,9 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					Audience:     []string{"audience"},
 					RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDI6dXNlcklE", // V2_oidcSessionID-rt_refreshTokenID2:userID%
 					Expiration:   time.Time{}.Add(time.Hour),
+					Scope:        []string{"openid", "profile", "offline_access"},
+					AuthMethods:  []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+					AuthTime:     testNow,
 					UserAgent:    &domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 					Reason:       domain.TokenReasonRefresh,
 				},
@@ -848,8 +883,13 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
 			got, err := c.ExchangeOIDCSessionRefreshAndAccessToken(tt.args.ctx, tt.args.refreshToken, tt.args.scope, tt.args.complianceCheck)
+			require.ErrorIs(t, err, tt.res.err)
+			if got != nil {
+				assert.WithinRange(t, got.AuthTime, tt.res.session.AuthTime.Add(-time.Second), tt.res.session.AuthTime.Add(time.Second))
+				got.AuthTime = time.Time{}
+				tt.res.session.AuthTime = time.Time{}
+			}
 			assert.Equal(t, tt.res.session, got)
-			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}
 }
