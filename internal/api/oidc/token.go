@@ -30,7 +30,7 @@ for example the v2 code exchange and refresh token.
 */
 
 func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.Client, session *command.OIDCSession, state, projectID string, projectRoleAssertion bool) (_ *oidc.AccessTokenResponse, err error) {
-	getUserInfo := s.getUserInfoOnce(session.UserID, projectID, projectRoleAssertion, session.Scopes)
+	getUserInfo := s.getUserInfoOnce(session.UserID, projectID, projectRoleAssertion, session.Scope)
 	getSigner := s.getSignerOnce()
 
 	resp := &oidc.AccessTokenResponse{
@@ -52,8 +52,8 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 		}
 	}
 
-	if slices.Contains(session.Scopes, oidc.ScopeOpenID) {
-		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, session.Audience, nil, time.Time{}, nil) // TODO: authmethods, authTime
+	if slices.Contains(session.Scope, oidc.ScopeOpenID) {
+		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, session.Audience, session.AuthMethods, session.AuthTime, session.Actor)
 	}
 	return resp, err
 }

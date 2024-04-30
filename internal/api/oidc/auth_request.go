@@ -562,18 +562,6 @@ func setContextUserSystem(ctx context.Context) context.Context {
 	return authz.SetCtxData(ctx, data)
 }
 
-func (o *OPStorage) getOIDCSettings(ctx context.Context) (accessTokenLifetime, idTokenLifetime, refreshTokenIdleExpiration, refreshTokenExpiration time.Duration, _ error) {
-	oidcSettings, err := o.query.OIDCSettingsByAggID(ctx, authz.GetInstance(ctx).InstanceID())
-	if err != nil && !zerrors.IsNotFound(err) {
-		return time.Duration(0), time.Duration(0), time.Duration(0), time.Duration(0), err
-	}
-
-	if oidcSettings != nil {
-		return oidcSettings.AccessTokenLifetime, oidcSettings.IdTokenLifetime, oidcSettings.RefreshTokenIdleExpiration, oidcSettings.RefreshTokenExpiration, nil
-	}
-	return o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, nil
-}
-
 func CreateErrorCallbackURL(authReq op.AuthRequest, reason, description, uri string, authorizer op.Authorizer) (string, error) {
 	e := struct {
 		Error       string `schema:"error"`

@@ -34,11 +34,13 @@ type OIDCSession struct {
 	UserID            string
 	Audience          []string
 	Expiration        time.Time
-	Scopes            []string
+	Scope             []string
+	AuthMethods       []domain.UserAuthMethodType
+	AuthTime          time.Time
 	PreferredLanguage string
 	UserAgent         *domain.UserAgent
-	Reason            domain.TokenReason // Move also?
-	Actor             *domain.TokenActor // Move also?
+	Reason            domain.TokenReason
+	Actor             *domain.TokenActor
 	RefreshToken      string
 }
 
@@ -399,9 +401,13 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 		UserID:            c.oidcSessionWriteModel.UserID,
 		Audience:          c.oidcSessionWriteModel.Audience,
 		Expiration:        c.oidcSessionWriteModel.AccessTokenExpiration,
+		Scope:             c.oidcSessionWriteModel.Scope,
+		AuthMethods:       c.oidcSessionWriteModel.AuthMethods,
+		AuthTime:          c.oidcSessionWriteModel.AuthTime,
 		PreferredLanguage: "", // ??
 		UserAgent:         c.oidcSessionWriteModel.UserAgent,
 		Reason:            c.oidcSessionWriteModel.AccessTokenReason,
+		Actor:             c.oidcSessionWriteModel.AccessTokenActor,
 		RefreshToken:      c.refreshToken,
 	}
 	if c.accessTokenID != "" {
