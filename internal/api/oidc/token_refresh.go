@@ -14,7 +14,11 @@ import (
 
 func (s *Server) RefreshToken(ctx context.Context, r *op.ClientRequest[oidc.RefreshTokenRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		span.EndWithError(err)
+		err = oidcError(err)
+	}()
+
 	client, ok := r.Client.(*Client)
 	if !ok {
 		return nil, zerrors.ThrowInternal(nil, "OIDC-ga0EP", "Error.Internal")

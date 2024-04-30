@@ -15,7 +15,10 @@ import (
 
 func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.DeviceAccessTokenRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
+	defer func() {
+		span.EndWithError(err)
+		err = oidcError(err)
+	}()
 
 	client, ok := r.Client.(*Client)
 	if !ok {
