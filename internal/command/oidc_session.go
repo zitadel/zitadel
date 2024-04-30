@@ -80,16 +80,6 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		return nil, "", err
 	}
 
-	defer func() {
-		state = authReqModel.State
-		if err != nil {
-			cmd.SetAuthRequestFailed(ctx, authReqModel.aggregate, err)
-		} else {
-			cmd.SetAuthRequestSuccessful(ctx, authReqModel.aggregate)
-		}
-		session, err = cmd.PushEvents(ctx)
-	}()
-
 	if err = complianceCheck(ctx, authReqModel); err != nil {
 		return nil, "", err
 	}
@@ -106,7 +96,9 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 			return nil, "", err
 		}
 	}
-	return // handled in defer
+	cmd.SetAuthRequestSuccessful(ctx, authReqModel.aggregate)
+	session, err = cmd.PushEvents(ctx)
+	return session, authReqModel.State, err
 }
 
 func (c *Commands) CreateOIDCSession(ctx context.Context, userID, resourceOwner, clientID string, scope, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, userAgent *domain.UserAgent, reason domain.TokenReason, actor *domain.TokenActor, needRefreshToken bool) (session *OIDCSession, err error) {
