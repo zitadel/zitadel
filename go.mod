@@ -1,9 +1,8 @@
 module github.com/zitadel/zitadel
 
-go 1.22
+go 1.22.2
 
-// https://go.dev/doc/toolchain
-toolchain go1.22.2
+toolchain go1.22.2 // https://go.dev/doc/toolchain
 
 require (
 	cloud.google.com/go/storage v1.40.0
