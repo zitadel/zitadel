@@ -111,6 +111,7 @@ Errors:
       Key:
         NotFound: Машинният ключ не е намерен
         AlreadyExisting: Машинният ключ вече съществува
+        Invalid: Публичният ключ не е валиден RSA публичен ключ във формат PKIX с PEM кодиране
       Secret:
         NotExisting: Тайната не съществува
         Invalid: Тайната е невалидна
@@ -1030,6 +1031,9 @@ EventTypes:
           check:
             succeeded: Проверката на OIDC Client Secret е успешна
             failed: Проверката на OIDC Client Secret е неуспешна
+        key:
+          added: Добавен е ключ за приложение OIDC
+          removed: Отстранен ключ за приложение OIDC
       api:
         secret:
           check:

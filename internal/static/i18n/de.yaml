@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Maschinen Schlüssel nicht gefunden
         AlreadyExisting: Machine Schlüssel exisiert bereits
+        Invalid: Der öffentliche Schlüssel ist kein gültiger öffentlicher RSA-Schlüssel im PKIX-Format mit PEM-Kodierung
       Secret:
         NotExisting: Secret existiert nicht
         Invalid: Secret ist ungültig
@@ -1011,6 +1012,9 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret Validierung erfolgreich
             failed: OIDC Client Secret Validierung fehlgeschlagen
+        key:
+          added: OIDC App Key wurde hinzugefügt
+          removed: OIDC App Key wurde gelöscht
       api:
         secret:
           check:

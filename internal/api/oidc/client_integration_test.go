@@ -348,7 +348,7 @@ func createInvalidKeyData(t testing.TB, client *management.AddOIDCAppResponse) [
 }
 
 func TestServer_CreateAccessToken_ClientCredentials(t *testing.T) {
-	clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
+	_, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 
 	type clientDetails struct {

@@ -1734,7 +1734,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create Key for machine user";
-            description: "A new key is generated and will be returned in the response. Make sure to store the returned key. Machine keys are used to authenticate with jwt profile."
+            description: "If a public key is not supplied, a new key is generated and will be returned in the response. Make sure to store the returned key. If an RSA public key is supplied, the private key is omitted from the response. Machine keys are used to authenticate with jwt profile."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -7857,7 +7857,7 @@ message ImportHumanUserRequest {
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 min_length: 1;
                 max_length: 200;
-                example: "\"idp-config-id\"";
+                example: "\"external-user-id\"";
                 description: "The id of the user in the external identity provider"
             }
         ];
@@ -8502,6 +8502,12 @@ message AddMachineKeyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2519-04-01T08:45:00.000000Z\"";
             description: "The date the key will expire and no logins will be possible";
+        }
+    ];
+    bytes public_key = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+           example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
+           description: "Optionally provide a public key of your own generated RSA private key.";
         }
     ];
 }

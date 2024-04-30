@@ -1797,6 +1797,7 @@ func TestExistsUser(t *testing.T) {
 							domain.GenderFemale,
 							"support@zitadel.com",
 							true,
+							"userAgentID",
 						),
 					}, nil
 				},

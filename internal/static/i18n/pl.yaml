@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Klucz maszyny nie znaleziony
         AlreadyExisting: Klucz maszyny już istnieje
+        Invalid: Klucz publiczny nie jest prawidłowym kluczem publicznym RSA w formacie PKIX z kodowaniem PEM
       Secret:
         NotExisting: Sekret nie istnieje
         Invalid: Sekret jest nieprawidłowy
@@ -1011,6 +1012,9 @@ EventTypes:
           check:
             succeeded: Sprawdzenie sekretu OIDC Klienta powiodło się
             failed: Sprawdzenie sekretu OIDC Klienta nie powiodło się
+        key:
+          added: Dodano klucz aplikacji OIDC
+          removed: Klucz aplikacji OIDC usunięty
       api:
         secret:
           check:

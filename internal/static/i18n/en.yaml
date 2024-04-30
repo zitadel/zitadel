@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Machine key not found
         AlreadyExisting: Machine key already existing
+        Invalid: Public key is not a valid RSA public key in PKIX format with PEM encoding
       Secret:
         NotExisting: Secret doesn't exist
         Invalid: Secret is invalid
@@ -1011,6 +1012,9 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret check succeeded
             failed: OIDC Client Secret check failed
+        key:
+          added: OIDC App Key added
+          removed: OIDC App Key removed
       api:
         secret:
           check:

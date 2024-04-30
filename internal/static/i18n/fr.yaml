@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Clé de la machine non trouvée
         AlreadyExisting: Clé de la machine déjà existante
+        Invalid: La clé publique n'est pas une clé publique RSA valide au format PKIX avec encodage PEM
       Secret:
         NotExisting: Secret n'existe pas
         Invalid: Secret n'est pas valide
@@ -1006,6 +1007,9 @@ EventTypes:
           verified:
             check: Vérification du secret du client OIDC réussie
             failed: La vérification du secret du client OIDC a échoué
+        key:
+          added: Clé d'application de l'OIDC ajoutée
+          removed: Clé d'application de l'OIDC supprimée
       api:
         secret:
           check:
