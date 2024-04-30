@@ -1,9 +1,9 @@
 import {
   server,
   deleteSession,
-  listHumanAuthFactors,
   getSession,
   getUserByID,
+  listAuthenticationMethodTypes,
 } from "#/lib/zitadel";
 import {
   SessionCookie,
@@ -134,14 +134,13 @@ export async function PUT(request: NextRequest) {
           authRequestId
         ).then(async (session) => {
           // if password, check if user has MFA methods
-          let authFactors;
+          let authMethods;
           if (checks && checks.password && session.factors?.user?.id) {
-            const response = await listHumanAuthFactors(
-              server,
+            const response = await listAuthenticationMethodTypes(
               session.factors?.user?.id
             );
-            if (response.result && response.result.length) {
-              authFactors = response.result;
+            if (response.authMethodTypes && response.authMethodTypes.length) {
+              authMethods = response.authMethodTypes;
             }
           }
 
@@ -149,7 +148,7 @@ export async function PUT(request: NextRequest) {
             sessionId: session.id,
             factors: session.factors,
             challenges: session.challenges,
-            authFactors,
+            authMethods,
           });
         });
       })

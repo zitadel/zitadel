@@ -75,7 +75,7 @@ export default function PasswordForm({
       // if user has mfa -> /otp/[method] or /u2f
       // if mfa is forced and user has no mfa -> /mfa/set
       // if no passwordless -> /passkey/add
-      if (resp.authFactors?.length == 1) {
+      if (resp.authMethods?.length == 1) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
         });
@@ -89,7 +89,7 @@ export default function PasswordForm({
         }
 
         let method;
-        const factor = (resp.authFactors as AuthFactor[])[0];
+        const factor = (resp.authMethods as AuthFactor[])[0];
         if (factor.otp) {
           method = "time-based";
           return router.push(`/otp/${method}?` + params);
@@ -103,7 +103,7 @@ export default function PasswordForm({
           method = "u2f";
           return router.push(`/u2f?` + params);
         }
-      } else if (resp.authFactors?.length >= 1) {
+      } else if (resp.authMethods?.length >= 1) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
         });
@@ -117,7 +117,7 @@ export default function PasswordForm({
         }
 
         return router.push(`/mfa?` + params);
-      } else if (loginSettings?.forceMfa && !resp.authFactors?.length) {
+      } else if (loginSettings?.forceMfa && !resp.authMethods?.length) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
           checkAfter: "true", // this defines if the check is directly made after the setup
