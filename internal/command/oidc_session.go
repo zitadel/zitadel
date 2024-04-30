@@ -79,6 +79,9 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 	if err != nil {
 		return nil, "", err
 	}
+	if err = cmd.SetAuthRequestCodeExchanged(ctx, authReqModel); err != nil {
+		return nil, "", err
+	}
 
 	if err = complianceCheck(ctx, authReqModel); err != nil {
 		return nil, "", err
@@ -215,7 +218,7 @@ func (c *Commands) RevokeOIDCSessionToken(ctx context.Context, token, clientID s
 	return c.pushAppendAndReduce(ctx, writeModel, oidcsession.NewAccessTokenRevokedEvent(ctx, writeModel.aggregate))
 }
 
-func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, resourceOwner string) (*OIDCSessionEvents, error) {
+func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, resourceOwner string, pending ...eventstore.Command) (*OIDCSessionEvents, error) {
 	accessTokenLifetime, refreshTokenLifeTime, refreshTokenIdleLifetime, err := c.tokenTokenLifetimes(ctx)
 	if err != nil {
 		return nil, err
@@ -229,6 +232,7 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, resourceOwner st
 		eventstore:               c.eventstore,
 		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
+		events:                   pending,
 		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, resourceOwner),
 		accessTokenLifetime:      accessTokenLifetime,
 		refreshTokenLifeTime:     refreshTokenLifeTime,
@@ -327,6 +331,13 @@ func (c *OIDCSessionEvents) AddSession(
 		authTime,
 		userAgent,
 	))
+}
+
+func (c *OIDCSessionEvents) SetAuthRequestCodeExchanged(ctx context.Context, model *AuthRequestWriteModel) error {
+	event := authrequest.NewCodeExchangedEvent(ctx, model.aggregate)
+	model.AppendEvents(event)
+	c.events = append(c.events, event)
+	return model.Reduce()
 }
 
 func (c *OIDCSessionEvents) SetAuthRequestSuccessful(ctx context.Context, authRequestAggregate *eventstore.Aggregate) {

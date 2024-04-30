@@ -152,30 +152,6 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 }
 
 func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.AuthRequest, err error) {
-	/*
-		ctx, span := tracing.NewSpan(ctx)
-		defer func() {
-			err = oidcError(err)
-			span.EndWithError(err)
-		}()
-
-		plainCode, err := o.decryptGrant(code)
-		if err != nil {
-			return nil, zerrors.ThrowInvalidArgument(err, "OIDC-ahLi2", "Errors.User.Code.Invalid")
-		}
-		if strings.HasPrefix(plainCode, command.IDPrefixV2) {
-			authReq, err := o.command.ExchangeAuthCode(ctx, plainCode)
-			if err != nil {
-				return nil, err
-			}
-			return &AuthRequestV2{authReq}, nil
-		}
-		resp, err := o.repo.AuthRequestByCode(ctx, code)
-		if err != nil {
-			return nil, err
-		}
-		return AuthRequestFromBusiness(resp)
-	*/
 	return nil, err
 }
 
