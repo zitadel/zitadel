@@ -7,7 +7,12 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { LoginSettings, AuthFactor, Checks } from "@zitadel/server";
+import {
+  LoginSettings,
+  AuthFactor,
+  Checks,
+  AuthenticationMethodType,
+} from "@zitadel/server";
 
 type Inputs = {
   password: string;
@@ -75,7 +80,12 @@ export default function PasswordForm({
       // if user has mfa -> /otp/[method] or /u2f
       // if mfa is forced and user has no mfa -> /mfa/set
       // if no passwordless -> /passkey/add
-      if (resp.authMethods?.length == 1) {
+
+      // exclude password
+      const availableSecondFactors = resp.authMethods?.filter(
+        (m: AuthenticationMethodType) => m !== 1
+      );
+      if (availableSecondFactors.length == 1) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
         });
@@ -88,22 +98,17 @@ export default function PasswordForm({
           params.append("organization", organization);
         }
 
-        let method;
-        const factor = (resp.authMethods as AuthFactor[])[0];
-        if (factor.otp) {
-          method = "time-based";
-          return router.push(`/otp/${method}?` + params);
-        } else if (factor.otpSms) {
-          method = "sms";
-          return router.push(`/otp/${method}?` + params);
-        } else if (factor.otpEmail) {
-          method = "email";
-          return router.push(`/otp/${method}?` + params);
-        } else if (factor.u2f) {
-          method = "u2f";
+        const factor = availableSecondFactors[0];
+        if (factor === 4) {
+          return router.push(`/otp/time-based?` + params);
+        } else if (factor === 6) {
+          return router.push(`/otp/sms?` + params);
+        } else if (factor === 7) {
+          return router.push(`/otp/email?` + params);
+        } else if (factor === 5) {
           return router.push(`/u2f?` + params);
         }
-      } else if (resp.authMethods?.length >= 1) {
+      } else if (availableSecondFactors.length >= 1) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
         });
@@ -117,7 +122,7 @@ export default function PasswordForm({
         }
 
         return router.push(`/mfa?` + params);
-      } else if (loginSettings?.forceMfa && !resp.authMethods?.length) {
+      } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
           checkAfter: "true", // this defines if the check is directly made after the setup
@@ -184,8 +189,6 @@ export default function PasswordForm({
       }
     });
   }
-
-  const { errors } = formState;
 
   return (
     <form className="w-full">
