@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"encoding/base64"
+	"net/http"
 	"slices"
 	"strings"
 	"time"
@@ -648,4 +649,103 @@ func implicitFlowComplianceChecker() command.AuthRequestComplianceChecker {
 		}
 		return nil
 	}
+}
+
+func (s *Server) authorizeCallbackHandler(w http.ResponseWriter, r *http.Request) {
+	authorizer := s.Provider()
+
+	func() (err error) {
+		ctx, span := tracing.NewSpan(r.Context())
+		r = r.WithContext(ctx)
+		defer func() { span.EndWithError(err) }()
+
+		id, err := op.ParseAuthorizeCallbackRequest(r)
+		if err != nil {
+			op.AuthRequestError(w, r, nil, err, authorizer)
+			return err
+		}
+		authReq, err := authorizer.Storage().AuthRequestByID(r.Context(), id)
+		if err != nil {
+			op.AuthRequestError(w, r, nil, err, authorizer)
+			return err
+		}
+		if !authReq.Done() {
+			op.AuthRequestError(w, r, authReq,
+				oidc.ErrInteractionRequired().WithDescription("Unfortunately, the user may be not logged in and/or additional interaction is required."),
+				authorizer)
+			return err
+		}
+		return s.authResponse(authReq, authorizer, w, r)
+	}()
+}
+
+func (s *Server) authResponse(authReq op.AuthRequest, authorizer op.Authorizer, w http.ResponseWriter, r *http.Request) (err error) {
+	ctx, span := tracing.NewSpan(r.Context())
+	r = r.WithContext(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	client, err := authorizer.Storage().GetClientByClientID(r.Context(), authReq.GetClientID())
+	if err != nil {
+		op.AuthRequestError(w, r, authReq, err, authorizer)
+		return err
+	}
+	if authReq.GetResponseType() == oidc.ResponseTypeCode {
+		op.AuthResponseCode(w, r, authReq, authorizer)
+		return nil
+	}
+	return s.authResponseToken(authReq, authorizer, client, w, r)
+}
+
+func (s *Server) authResponseToken(authReq op.AuthRequest, authorizer op.Authorizer, opClient op.Client, w http.ResponseWriter, r *http.Request) (err error) {
+	ctx, span := tracing.NewSpan(r.Context())
+	r = r.WithContext(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	client, ok := opClient.(*Client)
+	if !ok {
+		return zerrors.ThrowInternal(nil, "OIDC-waeN6", "Error.Internal")
+	}
+
+	userAgentID, _, userOrgID, authTime, authMethodsReferences, reason, actor := getInfoFromRequest(authReq)
+	scope := authReq.GetScopes()
+	session, err := s.command.CreateOIDCSession(ctx,
+		authReq.GetSubject(),
+		userOrgID,
+		client.client.ClientID,
+		scope,
+		authReq.GetAudience(),
+		AMRToAuthMethodTypes(authMethodsReferences),
+		authTime,
+		&domain.UserAgent{
+			FingerprintID: &userAgentID,
+		},
+		reason,
+		actor,
+		slices.Contains(scope, oidc.ScopeOfflineAccess),
+	)
+	if err != nil {
+		op.AuthRequestError(w, r, authReq, err, authorizer)
+		return err
+	}
+	resp, err := s.accessTokenResponseFromSession(ctx, client, session, authReq.GetState(), client.client.ProjectID, client.client.ProjectRoleAssertion)
+	if err != nil {
+		op.AuthRequestError(w, r, authReq, err, authorizer)
+		return err
+	}
+
+	if authReq.GetResponseMode() == oidc.ResponseModeFormPost {
+		if err = op.AuthResponseFormPost(w, authReq.GetRedirectURI(), resp, authorizer.Encoder()); err != nil {
+			op.AuthRequestError(w, r, authReq, err, authorizer)
+			return err
+		}
+		return nil
+	}
+
+	callback, err := op.AuthResponseURL(authReq.GetRedirectURI(), authReq.GetResponseType(), authReq.GetResponseMode(), resp, authorizer.Encoder())
+	if err != nil {
+		op.AuthRequestError(w, r, authReq, err, authorizer)
+		return err
+	}
+	http.Redirect(w, r, callback, http.StatusFound)
+	return nil
 }
