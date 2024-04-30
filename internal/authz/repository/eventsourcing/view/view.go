@@ -18,7 +18,6 @@ type View struct {
 
 func StartView(sqlClient *database.DB, queries *query.Queries) (*View, error) {
 	gorm, err := gorm.Open("postgres", sqlClient.DB)
-	gorm.LogMode(true)
 	if err != nil {
 		return nil, err
 	}
