@@ -61,12 +61,12 @@ var (
 )
 
 var (
-	//go:embed execution_targets_join.sql
-	executionTargetsJoinQuery string
 	//go:embed execution_targets.sql
 	executionTargetsQuery string
-	//go:embed execution_targets_combined.sql
-	executionTargetsCombinedQuery string
+	//go:embed targets_by_execution_id.sql
+	TargetsByExecutionIDQuery string
+	//go:embed targets_by_execution_ids.sql
+	TargetsByExecutionIDsQuery string
 )
 
 type Executions struct {
@@ -173,7 +173,7 @@ func (q *Queries) TargetsByExecutionID(ctx context.Context, ids []string) (execu
 			execution, err = scanExecutionTargets(rows)
 			return err
 		},
-		executionTargetsQuery,
+		TargetsByExecutionIDQuery,
 		instanceID,
 		database.TextArray[string](ids),
 	)
@@ -202,7 +202,7 @@ func (q *Queries) TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string
 			execution, err = scanExecutionTargets(rows)
 			return err
 		},
-		executionTargetsCombinedQuery,
+		TargetsByExecutionIDsQuery,
 		instanceID,
 		database.TextArray[string](ids1),
 		database.TextArray[string](ids2),
@@ -218,7 +218,7 @@ func prepareExecutionQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			ExecutionColumnSequence.identifier(),
 			executionTargetsListCol.identifier(),
 		).From(executionTable.identifier()).
-			Join("(" + executionTargetsJoinQuery + ") AS " + executionTargetsTableAlias.alias + " ON " +
+			Join("(" + executionTargetsQuery + ") AS " + executionTargetsTableAlias.alias + " ON " +
 				ExecutionTargetsColumnInstanceID.identifier() + " = " + ExecutionColumnInstanceID.identifier() + " AND " +
 				ExecutionTargetsColumnExecutionID.identifier() + " = " + ExecutionColumnID.identifier(),
 			).
@@ -235,7 +235,7 @@ func prepareExecutionsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			executionTargetsListCol.identifier(),
 			countColumn.identifier(),
 		).From(executionTable.identifier()).
-			Join("(" + executionTargetsJoinQuery + ") AS " + executionTargetsTableAlias.alias + " ON " +
+			Join("(" + executionTargetsQuery + ") AS " + executionTargetsTableAlias.alias + " ON " +
 				ExecutionTargetsColumnInstanceID.identifier() + " = " + ExecutionColumnInstanceID.identifier() + " AND " +
 				ExecutionTargetsColumnExecutionID.identifier() + " = " + ExecutionColumnID.identifier(),
 			).

@@ -57,7 +57,7 @@ func executeTargetsForRequest(ctx context.Context, targets []execution.Target, f
 	request, err := execution.CallTargets(ctx, targets, info)
 	// error gets only returned if InterruptOnError is set, or internal errors occur
 	if err != nil {
-		// if an error is returned still return also the original request
+		// if an error is returned still return also the original request, to handle the request correctly
 		return req, err
 	}
 	return request, nil

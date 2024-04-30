@@ -106,33 +106,16 @@ func call(ctx context.Context, url string, timeout time.Duration, body []byte) (
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{
-		Transport: &http.Transport{},
-	}
+
+	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	// Check for success, if redirect has to be done, or return error with statusCode >= 400
+	// Check for success between 200 and 299, redirect 300 to 399 is handled by the client, return error with statusCode >= 400
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
-		return io.ReadAll(resp.Body)
-	} else if resp.StatusCode >= 300 && resp.StatusCode <= 399 {
-		redirectUrl, err := resp.Location()
-		// redirectURL is empty or not parsable
-		if err != nil {
-			return nil, err
-		}
-		req.URL = redirectUrl
-		resp, err = client.Do(req)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != http.StatusOK {
-			return nil, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk9g", "Errors.Execution.Failed")
-		}
 		return io.ReadAll(resp.Body)
 	}
 	return nil, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed")
