@@ -611,19 +611,41 @@ func CreateCodeCallbackURL(ctx context.Context, authReq op.AuthRequest, authoriz
 	return callback, err
 }
 
-func CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest, authorizer op.Authorizer) (string, error) {
-	client, err := authorizer.Storage().GetClientByClientID(ctx, req.GetClientID())
+func (s *Server) CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest) (string, error) {
+	provider := s.Provider()
+	opClient, err := provider.Storage().GetClientByClientID(ctx, req.GetClientID())
 	if err != nil {
 		return "", err
 	}
-	createAccessToken := req.GetResponseType() != oidc.ResponseTypeIDTokenOnly
-	resp, err := op.CreateTokenResponse(ctx, req, client, authorizer, createAccessToken, "", "")
+	client, ok := opClient.(*Client)
+	if !ok {
+		return "", zerrors.ThrowInternal(nil, "OIDC-waeN6", "Error.Internal")
+	}
+
+	session, state, err := s.command.CreateOIDCSessionFromAuthRequest(
+		setContextUserSystem(ctx),
+		req.GetID(),
+		implicitFlowComplianceChecker(),
+	)
 	if err != nil {
 		return "", err
 	}
-	callback, err := op.AuthResponseURL(req.GetRedirectURI(), req.GetResponseType(), req.GetResponseMode(), resp, authorizer.Encoder())
+	resp, err := s.accessTokenResponseFromSession(ctx, client, session, state, client.client.ProjectID, client.client.ProjectRoleAssertion)
+	if err != nil {
+		return "", err
+	}
+	callback, err := op.AuthResponseURL(req.GetRedirectURI(), req.GetResponseType(), req.GetResponseMode(), resp, provider.Encoder())
 	if err != nil {
 		return "", err
 	}
 	return callback, err
+}
+
+func implicitFlowComplianceChecker() command.AuthRequestComplianceChecker {
+	return func(_ context.Context, authReq *command.AuthRequestWriteModel) error {
+		if err := authReq.CheckAuthenticated(); err != nil {
+			return err
+		}
+		return nil
+	}
 }

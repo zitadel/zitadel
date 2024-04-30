@@ -35,7 +35,7 @@ func mockAuthRequestComplianceChecker(returnErr error) AuthRequestComplianceChec
 	}
 }
 
-func TestCommands_CreateOIDCSessionFromCodeExchange(t *testing.T) {
+func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 	type fields struct {
 		eventstore                      func(*testing.T) *eventstore.Eventstore
 		idGenerator                     id.Generator
@@ -103,7 +103,7 @@ func TestCommands_CreateOIDCSessionFromCodeExchange(t *testing.T) {
 				complianceCheck: mockAuthRequestComplianceChecker(nil),
 			},
 			res{
-				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode"),
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Iung5", "Errors.AuthRequest.NoCode"),
 			},
 		},
 		{
@@ -309,6 +309,104 @@ func TestCommands_CreateOIDCSessionFromCodeExchange(t *testing.T) {
 				state: "state",
 			},
 		},
+		{
+			"without ID token only (implicit)",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							authrequest.NewAddedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"loginClient",
+								"clientID",
+								"redirectURI",
+								"state",
+								"nonce",
+								[]string{"openid"},
+								[]string{"audience"},
+								domain.OIDCResponseTypeIDToken,
+								&domain.OIDCCodeChallenge{
+									Challenge: "challenge",
+									Method:    domain.CodeChallengeMethodS256,
+								},
+								[]domain.Prompt{domain.PromptNone},
+								[]string{"en", "de"},
+								gu.Ptr(time.Duration(0)),
+								gu.Ptr("loginHint"),
+								gu.Ptr("hintUserID"),
+								false,
+							),
+						),
+						eventFromEventPusher(
+							authrequest.NewSessionLinkedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
+								"sessionID",
+								"userID",
+								testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							session.NewAddedEvent(context.Background(),
+								&session.NewAggregate("sessionID", "instance1").Aggregate,
+								&domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
+							),
+						),
+						eventFromEventPusher(
+							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
+								"userID", "org1", testNow),
+						),
+						eventFromEventPusher(
+							session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instanceID").Aggregate,
+								testNow),
+						),
+					),
+					expectFilter(), // token lifetime
+					expectPush(
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid"},
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+							&domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						),
+						authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args{
+				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
+				authRequestID:   "V2_authRequestID",
+				complianceCheck: mockAuthRequestComplianceChecker(nil),
+			},
+			res{
+				session: &OIDCSession{
+					ClientID: "clientID",
+					UserID:   "userID",
+					Audience: []string{"audience"},
+					UserAgent: &domain.UserAgent{
+						FingerprintID: gu.Ptr("fp1"),
+						IP:            net.ParseIP("1.2.3.4"),
+						Description:   gu.Ptr("firefox"),
+						Header:        http.Header{"foo": []string{"bar"}},
+					},
+				},
+				state: "state",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -320,7 +418,7 @@ func TestCommands_CreateOIDCSessionFromCodeExchange(t *testing.T) {
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
-			gotSession, gotState, err := c.CreateOIDCSessionFromCodeExchange(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck)
+			gotSession, gotState, err := c.CreateOIDCSessionFromAuthRequest(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.session, gotSession)
 			assert.Equal(t, tt.res.state, gotState)

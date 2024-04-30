@@ -32,8 +32,10 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 		state   string
 	)
 	if strings.HasPrefix(plainCode, command.IDPrefixV2) {
-		session, state, err = s.command.CreateOIDCSessionFromCodeExchange(
-			setContextUserSystem(ctx), plainCode, authRequestComplianceChecker(client, r.Data),
+		session, state, err = s.command.CreateOIDCSessionFromAuthRequest(
+			setContextUserSystem(ctx),
+			plainCode,
+			codeExchangeComplianceChecker(client, r.Data),
 		)
 	} else {
 		session, state, err = s.codeExchangeV1(ctx, client, r.Data, plainCode)
@@ -91,7 +93,7 @@ func (s *Server) getAuthRequestV1ByCode(ctx context.Context, plainCode string) (
 	return AuthRequestFromBusiness(authReq)
 }
 
-func authRequestComplianceChecker(client *Client, req *oidc.AccessTokenRequest) command.AuthRequestComplianceChecker {
+func codeExchangeComplianceChecker(client *Client, req *oidc.AccessTokenRequest) command.AuthRequestComplianceChecker {
 	return func(ctx context.Context, authReq *command.AuthRequestWriteModel) error {
 		if authReq.CodeChallenge != nil || client.AuthMethod() == oidc.AuthMethodNone {
 			err := op.AuthorizeCodeChallenge(req.CodeVerifier, CodeChallengeToOIDC(authReq.CodeChallenge))

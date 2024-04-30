@@ -44,23 +44,24 @@ type OIDCSession struct {
 
 type AuthRequestComplianceChecker func(context.Context, *AuthRequestWriteModel) error
 
-// CreateOIDCSessionFromCodeExchange creates a new OIDC Session, creates an access token and refresh token.
+// CreateOIDCSessionFromAuthRequest creates a new OIDC Session, creates an access token and refresh token.
 // It returns the access token id, expiration and the refresh token.
 // If the underlying [AuthRequest] is a OIDC Auth Code Flow, it will set the code as exchanged.
-func (c *Commands) CreateOIDCSessionFromCodeExchange(ctx context.Context, code string, complianceCheck AuthRequestComplianceChecker) (session *OIDCSession, state string, err error) {
+func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReqId string, complianceCheck AuthRequestComplianceChecker) (session *OIDCSession, state string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if code == "" {
+	if authReqId == "" {
 		return nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.AuthRequest.InvalidCode")
 	}
 
-	authReqModel, err := c.getAuthRequestWriteModel(ctx, code)
+	authReqModel, err := c.getAuthRequestWriteModel(ctx, authReqId)
 	if err != nil {
 		return nil, "", err
 	}
-	if authReqModel.AuthRequestState != domain.AuthRequestStateCodeAdded {
-		return nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode")
+
+	if authReqModel.ResponseType == domain.OIDCResponseTypeCode && authReqModel.AuthRequestState != domain.AuthRequestStateCodeAdded {
+		return nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-Iung5", "Errors.AuthRequest.NoCode")
 	}
 
 	sessionModel := NewSessionWriteModel(authReqModel.SessionID, authz.GetInstance(ctx).InstanceID())
@@ -92,10 +93,12 @@ func (c *Commands) CreateOIDCSessionFromCodeExchange(ctx context.Context, code s
 	}
 
 	cmd.AddSession(ctx, sessionModel.UserID, sessionModel.AggregateID, authReqModel.ClientID, authReqModel.Audience, authReqModel.Scope, authReqModel.AuthMethods, authReqModel.AuthTime, sessionModel.UserAgent)
-	if err = cmd.AddAccessToken(ctx, authReqModel.Scope, domain.TokenReasonAuthRequest, nil); err != nil {
-		return nil, "", err
-	}
 
+	if authReqModel.ResponseType != domain.OIDCResponseTypeIDToken {
+		if err = cmd.AddAccessToken(ctx, authReqModel.Scope, domain.TokenReasonAuthRequest, nil); err != nil {
+			return nil, "", err
+		}
+	}
 	if authReqModel.NeedRefreshToken {
 		if err = cmd.AddRefreshToken(ctx, sessionModel.UserID); err != nil {
 			return nil, "", err
@@ -391,10 +394,7 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 	if err != nil {
 		return nil, err
 	}
-	return &OIDCSession{
-		// prefix the returned id with the oidcSessionID so that we can retrieve it later on
-		// we need to use `-` as a delimiter because the OIDC library uses `:` and will check for a length of 2 parts
-		TokenID:           c.oidcSessionWriteModel.AggregateID + TokenDelimiter + c.accessTokenID,
+	session := &OIDCSession{
 		ClientID:          c.oidcSessionWriteModel.ClientID,
 		UserID:            c.oidcSessionWriteModel.UserID,
 		Audience:          c.oidcSessionWriteModel.Audience,
@@ -403,7 +403,14 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 		UserAgent:         c.oidcSessionWriteModel.UserAgent,
 		Reason:            c.oidcSessionWriteModel.AccessTokenReason,
 		RefreshToken:      c.refreshToken,
-	}, nil
+	}
+	if c.accessTokenID != "" {
+		// prefix the returned id with the oidcSessionID so that we can retrieve it later on
+		// we need to use `-` as a delimiter because the OIDC library uses `:` and will check for a length of 2 parts
+		session.TokenID = c.oidcSessionWriteModel.AggregateID + TokenDelimiter + c.accessTokenID
+	}
+
+	return session, nil
 }
 
 func (c *Commands) tokenTokenLifetimes(ctx context.Context) (accessTokenLifetime time.Duration, refreshTokenLifetime time.Duration, refreshTokenIdleLifetime time.Duration, err error) {

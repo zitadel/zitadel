@@ -40,13 +40,16 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 		State:        state,
 	}
 
-	if client.AccessTokenType() == op.AccessTokenTypeJWT {
-		resp.AccessToken, err = s.createJWT(ctx, client, session, getUserInfo, getSigner)
-	} else {
-		resp.AccessToken, err = op.CreateBearerToken(session.TokenID, session.UserID, s.opCrypto)
-	}
-	if err != nil {
-		return nil, err
+	// If the session does not have a token ID, it is an implicit ID-Token only response.
+	if session.TokenID != "" {
+		if client.AccessTokenType() == op.AccessTokenTypeJWT {
+			resp.AccessToken, err = s.createJWT(ctx, client, session, getUserInfo, getSigner)
+		} else {
+			resp.AccessToken, err = op.CreateBearerToken(session.TokenID, session.UserID, s.opCrypto)
+		}
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if slices.Contains(session.Scopes, oidc.ScopeOpenID) {
