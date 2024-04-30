@@ -1,6 +1,11 @@
 name: ZITADEL CI/CD
 
 on:
+  push:
+    tags-ignore:
+      - "*"
+    branches:
+      - "main"
   pull_request:
   workflow_dispatch:
 
