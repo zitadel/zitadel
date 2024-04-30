@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"net/url"
 
 	"github.com/crewjam/saml"
@@ -48,7 +47,6 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, resource
 			if !exists || err != nil {
 				return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting")
 			}
-			fmt.Println(writeModel)
 			return []eventstore.Command{
 				idpintent.NewStartedEvent(ctx, &idpintent.NewAggregate(writeModel.AggregateID, resourceOwner).Aggregate, successURL, failureURL, idpID),
 			}, nil
@@ -61,7 +59,6 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println("owner: " + resourceOwner)
 	writeModel := NewIDPIntentWriteModel(id, resourceOwner)
 	if err != nil {
 		return nil, nil, err
