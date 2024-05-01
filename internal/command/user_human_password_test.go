@@ -267,12 +267,13 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		code          string
-		resourceOwner string
-		password      string
-		userAgentID   string
+		ctx            context.Context
+		userID         string
+		code           string
+		resourceOwner  string
+		password       string
+		userAgentID    string
+		changeRequired bool
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -562,6 +563,84 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "set password with changeRequired, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanPasswordCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+								domain.NotificationTypeEmail,
+								"",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							true,
+							"",
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				userEncryption:     crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:            context.Background(),
+				userID:         "user1",
+				resourceOwner:  "org1",
+				password:       "password",
+				code:           "a",
+				userAgentID:    "",
+				changeRequired: true,
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -570,7 +649,7 @@ func TestCommandSide_SetPasswordWithVerifyCode(t *testing.T) {
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				userEncryption:     tt.fields.userEncryption,
 			}
-			got, err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.userAgentID)
+			got, err := r.SetPasswordWithVerifyCode(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.code, tt.args.password, tt.args.userAgentID, tt.args.changeRequired)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -589,12 +668,13 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
-		ctx           context.Context
-		userID        string
-		resourceOwner string
-		oldPassword   string
-		newPassword   string
-		userAgentID   string
+		ctx            context.Context
+		userID         string
+		resourceOwner  string
+		oldPassword    string
+		newPassword    string
+		userAgentID    string
+		changeRequired bool
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -938,6 +1018,75 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "change password with changeRequired, ok",
+			fields: fields{
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:            context.Background(),
+				userID:         "user1",
+				resourceOwner:  "org1",
+				oldPassword:    "password",
+				newPassword:    "password1",
+				userAgentID:    "",
+				changeRequired: true,
+			},
+			expect: []expect{
+				expectFilter(
+					eventFromEventPusher(
+						user.NewHumanAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+					eventFromEventPusher(
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							false,
+							"")),
+				),
+				expectFilter(
+					eventFromEventPusher(
+						org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							1,
+							false,
+							false,
+							false,
+							false,
+						),
+					),
+				),
+				expectPush(
+					user.NewHumanPasswordChangedEvent(context.Background(),
+						&user.NewAggregate("user1", "org1").Aggregate,
+						"$plain$x$password1",
+						true,
+						"",
+					),
+				),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -945,7 +1094,7 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 				eventstore:         eventstoreExpect(t, tt.expect...),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword, tt.args.userAgentID)
+			got, err := r.ChangePassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.oldPassword, tt.args.newPassword, tt.args.userAgentID, tt.args.changeRequired)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

@@ -37,7 +37,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 	)
 }
 
-func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, password, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, password, userAgentID string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -57,13 +57,13 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 		password,
 		"",
 		userAgentID,
-		false,
+		changeRequired,
 		c.setPasswordWithVerifyCode(wm.CodeCreationDate, wm.CodeExpiry, wm.Code, code),
 	)
 }
 
 // ChangePassword change password of existing user
-func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPassword, newPassword, userAgentID string, changeRequired bool) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -83,7 +83,7 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 		newPassword,
 		"",
 		userAgentID,
-		false,
+		changeRequired,
 		c.checkCurrentPassword(ctx, newPassword, "", oldPassword, wm.EncodedHash),
 	)
 }
