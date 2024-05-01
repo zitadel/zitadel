@@ -53,6 +53,7 @@ export interface ProviderDefaultSettings {
     value: string;
     placeholder: string;
   };
+  senderEmailPlaceholder?: string;
   image?: string;
   routerLinkElement: string;
 }
@@ -102,6 +103,7 @@ export const MailjetDefaultSettings: ProviderDefaultSettings = {
   user: { value: '', placeholder: 'Your Mailjet API key' },
   password: { value: '', placeholder: 'Your Mailjet Secret key' },
   image: './assets/images/smtp/mailjet.svg',
+  senderEmailPlaceholder: 'An authorized domain or email address',
   routerLinkElement: 'mailjet',
 };
 
@@ -114,6 +116,7 @@ export const PostmarkDefaultSettings: ProviderDefaultSettings = {
   user: { value: '', placeholder: 'Your Server API token' },
   password: { value: '', placeholder: 'Your Server API token' },
   image: './assets/images/smtp/postmark.png',
+  senderEmailPlaceholder: 'An authorized domain or email address',
   routerLinkElement: 'postmark',
 };
 
@@ -138,6 +141,7 @@ export const MailchimpDefaultSettings: ProviderDefaultSettings = {
   user: { value: '', placeholder: 'Your Mailchimp primary contact email' },
   password: { value: '', placeholder: 'Your Mailchimp Transactional API key' },
   image: './assets/images/smtp/mailchimp.svg',
+  senderEmailPlaceholder: 'An authorized domain or email address',
   routerLinkElement: 'mailchimp',
 };
 
@@ -151,6 +155,19 @@ export const BrevoDefaultSettings: ProviderDefaultSettings = {
   password: { value: '', placeholder: 'Your SMTP key' },
   image: './assets/images/smtp/brevo.svg',
   routerLinkElement: 'brevo',
+};
+
+export const OutlookDefaultSettings: ProviderDefaultSettings = {
+  name: 'outlook.com',
+  requiredTls: true,
+  host: 'smtp-mail.outlook.com',
+  unencryptedPort: 587,
+  encryptedPort: 587,
+  user: { value: '', placeholder: 'Your outlook.com email address' },
+  password: { value: '', placeholder: 'Your outlook.com password' },
+  image: './assets/images/smtp/outlook.svg',
+  senderEmailPlaceholder: 'Your outlook.com email address',
+  routerLinkElement: 'outlook',
 };
 
 export const GenericDefaultSettings: ProviderDefaultSettings = {
@@ -170,5 +187,6 @@ export const SMTPKnownProviders = [
   MailjetDefaultSettings,
   PostmarkDefaultSettings,
   SendgridDefaultSettings,
+  OutlookDefaultSettings,
   GenericDefaultSettings,
 ];

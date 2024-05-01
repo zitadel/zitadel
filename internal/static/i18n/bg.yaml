@@ -138,7 +138,7 @@ Errors:
       Invalid: Паролата е невалидна
       NotSet: Потребителят не е задал парола
       NotChanged: Новата парола не може да съвпада с текущата парола
-      NotSupported: Хеш кодирането на паролата не се поддържа
+      NotSupported: Хеш кодирането на паролата не се поддържа. Вижте https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Политиката за парола не е намерена
       MinLength: Паролата е твърде кратка
