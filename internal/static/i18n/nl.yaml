@@ -135,7 +135,7 @@ Errors:
       Invalid: Wachtwoord is ongeldig
       NotSet: Gebruiker heeft geen wachtwoord ingesteld
       NotChanged: Nieuw wachtwoord kan niet hetzelfde zijn als uw huidige wachtwoord
-      NotSupported: Wachtwoord hash codering wordt niet ondersteund
+      NotSupported: Wachtwoord hash codering wordt niet ondersteund. Raadpleeg https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Wachtwoordbeleid niet gevonden
       MinLength: Wachtwoord is te kort
