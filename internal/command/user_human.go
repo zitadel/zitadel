@@ -689,16 +689,17 @@ func AddHumanFromDomain(user *domain.Human, metadataList []*domain.Metadata, aut
 		human.DisplayName = user.DisplayName
 		human.PreferredLanguage = user.PreferredLanguage
 		human.Gender = user.Gender
-		human.Password = user.Password.SecretString
 		human.Register = true
 		human.Metadata = addMetadata
+	}
+	if authRequest != nil {
 		human.UserAgentID = authRequest.AgentID
 		human.AuthRequestID = authRequest.ID
 	}
 	if user.Email != nil {
 		human.Email = Email{
-			Address:  user.EmailAddress,
-			Verified: user.IsEmailVerified,
+			Address:  user.Email.EmailAddress,
+			Verified: user.Email.IsEmailVerified,
 		}
 	}
 	if user.Phone != nil {
@@ -706,6 +707,9 @@ func AddHumanFromDomain(user *domain.Human, metadataList []*domain.Metadata, aut
 			Number:   user.Phone.PhoneNumber,
 			Verified: user.Phone.IsPhoneVerified,
 		}
+	}
+	if user.Password != nil {
+		human.Password = user.Password.SecretString
 	}
 	if idp != nil {
 		human.Links = []*AddLink{

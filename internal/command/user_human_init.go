@@ -83,7 +83,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 		commands = append(commands, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 	}
 	if password != "" {
-		passwordCommand, err := c.setPasswordCommand(ctx, userAgg, domain.UserStateActive, password, userAgentID, false, false)
+		passwordCommand, err := c.setPasswordCommand(ctx, userAgg, domain.UserStateActive, password, "", userAgentID, false, nil)
 		if err != nil {
 			return err
 		}

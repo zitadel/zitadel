@@ -128,7 +128,7 @@ Errors:
       Invalid: 無効なパスワードです
       NotSet: パスワードが未設置です
       NotChanged: 新しいパスワードは現在のパスワードと同じにすることはできません
-      NotSupported: パスワードハッシュエンコードはサポートされていません
+      NotSupported: パスワードハッシュエンコードはサポートされていません。 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets を参照してください。
     PasswordComplexityPolicy:
       NotFound: パスワードポリシーが見つかりません
       MinLength: パスワードが短すぎます
