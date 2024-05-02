@@ -48,13 +48,13 @@
       "TITLE": "Uživatelé",
       "DESCRIPTION": "Uživatel je člověk nebo stroj, který může přistupovat k vašim aplikacím.",
       "HUMANS": {
-        "TITLE": "Lidé",
-        "DESCRIPTION": "Lidé se autentizují interaktivně v prohlížečové relaci s výzvou k přihlášení.",
+        "TITLE": "Uživatelé",
+        "DESCRIPTION": "Uživatelé se autentizují interaktivně v prohlížečové relaci s výzvou k přihlášení.",
         "METADATA": "Přidejte vlastní atributy k uživateli, jako je oddělení. Tyto informace můžete využít ve vašich akcích."
       },
       "MACHINES": {
-        "TITLE": "Stroje",
-        "DESCRIPTION": "Stroje se autentizují neinteraktivně pomocí JWT bearer tokenu podepsaného soukromým klíčem. Mohou také používat osobní přístupový token.",
+        "TITLE": "Uživatelé služby",
+        "DESCRIPTION": "Uživatelé služby se ověřují neinteraktivně pomocí tokenu nosiče JWT podepsaného soukromým klíčem. Mohou také použít osobní přístupový token.",
         "METADATA": "Přidejte vlastní atributy k uživateli, jako je autentizační systém. Tyto informace můžete využít ve vašich akcích."
       },
       "SELF": {
