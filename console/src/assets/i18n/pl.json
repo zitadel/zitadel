@@ -48,13 +48,13 @@
       "TITLE": "Użytkownicy",
       "DESCRIPTION": "Użytkownik to człowiek lub maszyna, która może uzyskać dostęp do twoich aplikacji.",
       "HUMANS": {
-        "TITLE": "Ludzie",
-        "DESCRIPTION": "Ludzie uwierzytelniają się interaktywnie w sesji przeglądarki z monitem logowania.",
+        "TITLE": "Użytkownicy",
+        "DESCRIPTION": "Użytkownicy uwierzytelniają się interaktywnie w sesji przeglądarki z monitem logowania.",
         "METADATA": "Dodaj niestandardowe atrybuty do użytkownika, takie jak dział. Możesz użyć tych informacji w swoich działaniach."
       },
       "MACHINES": {
-        "TITLE": "Maszyny",
-        "DESCRIPTION": "Maszyny uwierzytelniają się nieinteraktywnie, używając tokena JWT podpisanego prywatnym kluczem. Mogą również używać osobistego tokena dostępu.",
+        "TITLE": "Użytkownicy serwisu",
+        "DESCRIPTION": "Użytkownicy usługi uwierzytelniają się w sposób nieinteraktywny przy użyciu tokena okaziciela JWT podpisanego kluczem prywatnym. Mogą także skorzystać z osobistego tokena dostępu.",
         "METADATA": "Dodaj niestandardowe atrybuty do użytkownika, takie jak system uwierzytelniający. Możesz użyć tych informacji w swoich działaniach."
       },
       "SELF": {
