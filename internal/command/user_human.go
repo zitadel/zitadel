@@ -54,7 +54,6 @@ type AddHuman struct {
 	// PasswordChangeRequired is used if the `Password`-field is set
 	PasswordChangeRequired bool
 	Passwordless           bool
-	ExternalIDP            bool
 	Register               bool
 	// UserAgentID is optional and can be passed in case the user registered themselves.
 	// This will be used in the login UI to handle authentication automatically.
@@ -411,7 +410,7 @@ func (h *AddHuman) ensureDisplayName() {
 //     and / or
 //   - have no authentication method (password / passwordless)
 func (h *AddHuman) shouldAddInitCode() bool {
-	return !h.ExternalIDP &&
+	return len(h.Links) == 0 &&
 		!h.Email.Verified ||
 		!h.Passwordless &&
 			h.Password == ""
