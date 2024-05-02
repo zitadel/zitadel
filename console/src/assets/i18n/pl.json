@@ -1291,6 +1291,7 @@
       "MEMBERCHANGED": "Zmieniono managera.",
       "SETPRIMARY": "Ustawiono domenę podstawową.",
       "DELETED": "Organizacja została usunięta pomyślnie",
+      "DEFAULTORGNOTFOUND": "Nie znaleziono organizacji domyślnej",
       "ORG_WAS_DELETED": "Organizacja została usunięta."
     },
     "DIALOG": {

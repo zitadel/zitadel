@@ -1293,6 +1293,7 @@
       "MEMBERCHANGED": "Mánager modificado.",
       "SETPRIMARY": "Dominio primario establecido.",
       "DELETED": "Organización borrada con éxito",
+      "DEFAULTORGNOTFOUND": "No se encontró la organización por defecto",
       "ORG_WAS_DELETED": "La organización ha sido borrada."
     },
     "DIALOG": {

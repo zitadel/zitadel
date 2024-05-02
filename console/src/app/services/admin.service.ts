@@ -90,6 +90,8 @@ import {
   GetDefaultLanguageResponse,
   GetDefaultLoginTextsRequest,
   GetDefaultLoginTextsResponse,
+  GetDefaultOrgRequest,
+  GetDefaultOrgResponse,
   GetDefaultPasswordChangeMessageTextRequest,
   GetDefaultPasswordChangeMessageTextResponse,
   GetDefaultPasswordlessRegistrationMessageTextRequest,
@@ -427,6 +429,11 @@ export class AdminService {
 
     this.hideOnboarding =
       this.storageService.getItem('onboarding-dismissed', StorageLocation.local) === 'true' ? true : false;
+  }
+
+  public getDefaultOrg(): Promise<GetDefaultOrgResponse.AsObject> {
+    const req = new GetDefaultOrgRequest();
+    return this.grpcService.admin.getDefaultOrg(req, null).then((resp) => resp.toObject());
   }
 
   public setDefaultOrg(orgId: string): Promise<SetDefaultOrgResponse.AsObject> {

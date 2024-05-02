@@ -1293,6 +1293,7 @@
       "MEMBERCHANGED": "Gerente alterado.",
       "SETPRIMARY": "Domínio principal definido.",
       "DELETED": "Organização excluída com sucesso",
+      "DEFAULTORGNOTFOUND": "A organização padrão não foi encontrada",
       "ORG_WAS_DELETED": "Organização foi excluída."
     },
     "DIALOG": {

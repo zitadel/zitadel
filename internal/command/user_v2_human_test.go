@@ -232,6 +232,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							domain.GenderUnspecified,
 							"email@test.ch",
 							true,
+							"userAgentID",
 						),
 						user.NewHumanInitialCodeAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -242,6 +243,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							time.Hour*1,
+							"authRequestID",
 						),
 					),
 				),
@@ -261,6 +263,8 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					},
 					PreferredLanguage: language.English,
 					Register:          true,
+					UserAgentID:       "userAgentID",
+					AuthRequestID:     "authRequestID",
 				},
 				secretGenerator: GetMockSecretGenerator(t),
 				allowInitMail:   true,
@@ -344,6 +348,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							time.Hour*1,
+							"",
 						),
 					),
 				),
@@ -414,6 +419,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							1*time.Hour,
+							"",
 						),
 					),
 				),
@@ -1031,6 +1037,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							1*time.Hour,
+							"",
 						),
 						user.NewHumanPhoneVerifiedEvent(
 							context.Background(),
@@ -1174,6 +1181,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							1*time.Hour,
+							"",
 						),
 						user.NewMetadataSetEvent(
 							context.Background(),
@@ -1993,6 +2001,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
 								&userAgg.Aggregate,
 								nil, time.Hour*1,
+								"",
 							),
 						),
 					),
@@ -2005,8 +2014,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						OldPassword:    gu.Ptr("password"),
+						Password:       "password2",
+						OldPassword:    "password",
 						ChangeRequired: true,
 					},
 				},
@@ -2052,8 +2061,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						OldPassword:    gu.Ptr("password"),
+						Password:       "password2",
+						OldPassword:    "password",
 						ChangeRequired: true,
 					},
 				},
@@ -2076,7 +2085,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						OldPassword:    gu.Ptr("password"),
+						OldPassword:    "password",
 						ChangeRequired: true,
 					},
 				},
@@ -2110,7 +2119,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
+						Password:       "password2",
 						ChangeRequired: true,
 					},
 				},
@@ -2164,7 +2173,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
+						Password:       "password2",
 						ChangeRequired: true,
 					},
 				},
@@ -2220,8 +2229,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						OldPassword:    gu.Ptr("password"),
+						Password:       "password2",
+						OldPassword:    "password",
 						ChangeRequired: true,
 					},
 				},
@@ -2257,8 +2266,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						OldPassword:    gu.Ptr("wrong"),
+						Password:       "password2",
+						OldPassword:    "wrong",
 						ChangeRequired: true,
 					},
 				},
@@ -2327,8 +2336,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						PasswordCode:   gu.Ptr("code"),
+						Password:       "password2",
+						PasswordCode:   "code",
 						ChangeRequired: true,
 					},
 				},
@@ -2380,8 +2389,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						PasswordCode:   gu.Ptr("wrong"),
+						Password:       "password2",
+						PasswordCode:   "wrong",
 						ChangeRequired: true,
 					},
 				},
@@ -2394,7 +2403,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "change human password encoded, password code, ok",
+			name: "change human password, password code, not matching policy",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -2427,9 +2436,58 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								1,
-								false,
-								false,
-								false,
+								true,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Password: &Password{
+						Password:       "password2",
+						PasswordCode:   "code",
+						ChangeRequired: true,
+					},
+				},
+				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "change human password encoded, password code, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanPasswordCodeAddedEventV2(context.Background(),
+								&userAgg.Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour*1,
+								domain.NotificationTypeEmail,
+								"",
 								false,
 							),
 						),
@@ -2451,8 +2509,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						EncodedPasswordHash: gu.Ptr("$plain$x$password2"),
-						PasswordCode:        gu.Ptr("code"),
+						EncodedPasswordHash: "$plain$x$password2",
+						PasswordCode:        "code",
 						ChangeRequired:      true,
 					},
 				},
@@ -2524,9 +2582,9 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:            gu.Ptr("passwordnotused"),
-						EncodedPasswordHash: gu.Ptr("$plain$x$password2"),
-						PasswordCode:        gu.Ptr("code"),
+						Password:            "passwordnotused",
+						EncodedPasswordHash: "$plain$x$password2",
+						PasswordCode:        "code",
 						ChangeRequired:      true,
 					},
 				},
@@ -2548,6 +2606,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				newEncryptedCode:   tt.fields.newCode,
 				checkPermission:    tt.fields.checkPermission,
+				userEncryption:     tt.args.codeAlg,
 			}
 			err := r.ChangeUserHuman(tt.args.ctx, tt.args.human, tt.args.codeAlg)
 			if tt.res.err == nil {

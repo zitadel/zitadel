@@ -136,7 +136,7 @@ Errors:
       Invalid: Passwort ungültig
       NotSet: Benutzer hat kein Passwort gesetzt
       NotChanged: Das neue Passwort darf nicht mit deinem aktuellen Passwort übereinstimmen
-      NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt
+      NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt. Siehe https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
@@ -1012,6 +1012,9 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret Validierung erfolgreich
             failed: OIDC Client Secret Validierung fehlgeschlagen
+        key:
+          added: OIDC App Key wurde hinzugefügt
+          removed: OIDC App Key wurde gelöscht
       api:
         secret:
           check:

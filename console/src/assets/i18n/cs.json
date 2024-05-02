@@ -1292,6 +1292,7 @@
       "MEMBERCHANGED": "Manažer změněn.",
       "SETPRIMARY": "Nastavena primární doména.",
       "DELETED": "Organizace úspěšně smazána",
+      "DEFAULTORGNOTFOUND": "Výchozí organizace nebyla nalezena",
       "ORG_WAS_DELETED": "Organizace byla smazána."
     },
     "DIALOG": {
