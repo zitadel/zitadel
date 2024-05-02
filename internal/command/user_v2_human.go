@@ -375,14 +375,14 @@ func (c *Commands) changeUserPassword(ctx context.Context, cmds []eventstore.Com
 	defer func() { span.End() }()
 
 	// if no verification is set, the user must have the permission to change the password
-	verification := c.setPasswordWithPermission(ctx, wm.AggregateID, wm.ResourceOwner)
+	verification := c.setPasswordWithPermission(wm.AggregateID, wm.ResourceOwner)
 	// otherwise check the password code...
 	if password.PasswordCode != "" {
 		verification = c.setPasswordWithVerifyCode(wm.PasswordCodeCreationDate, wm.PasswordCodeExpiry, wm.PasswordCode, password.PasswordCode)
 	}
 	// ...or old password
 	if password.OldPassword != "" {
-		verification = c.checkCurrentPassword(ctx, password.Password, password.EncodedPasswordHash, password.OldPassword, wm.PasswordEncodedHash)
+		verification = c.checkCurrentPassword(password.Password, password.EncodedPasswordHash, password.OldPassword, wm.PasswordEncodedHash)
 	}
 	cmd, err := c.setPasswordCommand(
 		ctx,

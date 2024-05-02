@@ -33,7 +33,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password stri
 		"", // current api implementations never provide an encoded password
 		"",
 		oneTime,
-		c.setPasswordWithPermission(ctx, wm.AggregateID, wm.ResourceOwner),
+		c.setPasswordWithPermission(wm.AggregateID, wm.ResourceOwner),
 	)
 }
 
@@ -84,17 +84,16 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 		"",
 		userAgentID,
 		changeRequired,
-		c.checkCurrentPassword(ctx, newPassword, "", oldPassword, wm.EncodedHash),
+		c.checkCurrentPassword(newPassword, "", oldPassword, wm.EncodedHash),
 	)
 }
 
-type setPasswordVerification func() (newEncodedPassword string, err error)
+type setPasswordVerification func(ctx context.Context) (newEncodedPassword string, err error)
 
 // setPasswordWithPermission returns a permission check as [setPasswordVerification] implementation
-func (c *Commands) setPasswordWithPermission(ctx context.Context, userID, orgID string) setPasswordVerification {
-	return func() (_ string, err error) {
-		err = c.checkPermission(ctx, domain.PermissionUserWrite, orgID, userID)
-		return "", err
+func (c *Commands) setPasswordWithPermission(userID, orgID string) setPasswordVerification {
+	return func(ctx context.Context) (_ string, err error) {
+		return "", c.checkPermission(ctx, domain.PermissionUserWrite, orgID, userID)
 	}
 }
 
@@ -105,24 +104,25 @@ func (c *Commands) setPasswordWithVerifyCode(
 	passwordCode *crypto.CryptoValue,
 	code string,
 ) setPasswordVerification {
-	return func() (_ string, err error) {
+	return func(ctx context.Context) (_ string, err error) {
 		if passwordCode == nil {
 			return "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
 		}
-
-		err = crypto.VerifyCode(passwordCodeCreationDate, passwordCodeExpiry, passwordCode, code, c.userEncryption)
-		return "", err
+		_, spanCrypto := tracing.NewNamedSpan(ctx, "crypto.VerifyCode")
+		defer func() {
+			spanCrypto.EndWithError(err)
+		}()
+		return "", crypto.VerifyCode(passwordCodeCreationDate, passwordCodeExpiry, passwordCode, code, c.userEncryption)
 	}
 }
 
 // checkCurrentPassword returns a password check as [setPasswordVerification] implementation
 func (c *Commands) checkCurrentPassword(
-	ctx context.Context,
 	newPassword, newEncodedPassword, currentPassword, currentEncodePassword string,
 ) setPasswordVerification {
 	// in case the new password is already encoded, we only need to verify the current
 	if newEncodedPassword != "" {
-		return func() (_ string, err error) {
+		return func(ctx context.Context) (_ string, err error) {
 			_, spanPasswap := tracing.NewNamedSpan(ctx, "passwap.Verify")
 			_, err = c.userPasswordHasher.Verify(currentEncodePassword, currentPassword)
 			spanPasswap.EndWithError(err)
@@ -131,7 +131,7 @@ func (c *Commands) checkCurrentPassword(
 	}
 
 	// otherwise let's directly verify and return the new generate hash, so we can reuse it in the event
-	return func() (string, error) {
+	return func(ctx context.Context) (string, error) {
 		return c.verifyAndUpdatePassword(ctx, currentEncodePassword, currentPassword, newPassword)
 	}
 }
@@ -169,7 +169,7 @@ func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggre
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-M9dse", "Errors.User.NotInitialised")
 	}
 	if verificationCheck != nil {
-		newEncodedPassword, err := verificationCheck()
+		newEncodedPassword, err := verificationCheck(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -178,12 +178,15 @@ func (c *Commands) setPasswordCommand(ctx context.Context, agg *eventstore.Aggre
 			encodedPassword = newEncodedPassword
 		}
 	}
+	// If password is provided, let's check if is compliant with the policy.
+	// If only a encodedPassword is passed, we can skip this.
 	if password != "" {
 		if err = c.checkPasswordComplexity(ctx, password, agg.ResourceOwner); err != nil {
 			return nil, err
 		}
 	}
 
+	// In case only a plain password was passed, we need to hash it.
 	if encodedPassword == "" {
 		_, span := tracing.NewNamedSpan(ctx, "passwap.Hash")
 		encodedPassword, err = c.userPasswordHasher.Hash(password)
