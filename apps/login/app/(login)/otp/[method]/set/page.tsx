@@ -121,6 +121,7 @@ export default async function Page({
             loginName={loginName ?? session.factors?.user?.loginName}
             displayName={session.factors?.user?.displayName}
             showDropdown
+            searchParams={searchParams}
           ></UserAvatar>
         )}
 
