@@ -250,7 +250,7 @@ func generateCodeCommand(ctx context.Context, agg *eventstore.Aggregate, gen cry
 		return nil, "", err
 	}
 
-	cmd := user.NewHumanEmailCodeAddedEventV2(ctx, agg, value, gen.Expiry(), urlTmpl, returnCode)
+	cmd := user.NewHumanEmailCodeAddedEventV2(ctx, agg, value, gen.Expiry(), urlTmpl, returnCode, "")
 	if returnCode {
 		return cmd, plain, nil
 	}
