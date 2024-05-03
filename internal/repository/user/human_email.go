@@ -149,17 +149,7 @@ func NewHumanEmailCodeAddedEvent(
 	expiry time.Duration,
 	authRequestID string,
 ) *HumanEmailCodeAddedEvent {
-	return &HumanEmailCodeAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			HumanEmailCodeAddedType,
-		),
-		Code:              code,
-		Expiry:            expiry,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
-		AuthRequestID:     authRequestID,
-	}
+	return NewHumanEmailCodeAddedEventV2(ctx, aggregate, code, expiry, "", false, authRequestID)
 }
 
 func NewHumanEmailCodeAddedEventV2(
@@ -169,6 +159,7 @@ func NewHumanEmailCodeAddedEventV2(
 	expiry time.Duration,
 	urlTemplate string,
 	codeReturned bool,
+	authRequestID string,
 ) *HumanEmailCodeAddedEvent {
 	return &HumanEmailCodeAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -181,6 +172,7 @@ func NewHumanEmailCodeAddedEventV2(
 		URLTemplate:       urlTemplate,
 		CodeReturned:      codeReturned,
 		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		AuthRequestID:     authRequestID,
 	}
 }
 
