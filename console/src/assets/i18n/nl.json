@@ -48,13 +48,13 @@
       "TITLE": "Gebruikers",
       "DESCRIPTION": "Een gebruiker is een mens of een machine die toegang kan krijgen tot je applicaties.",
       "HUMANS": {
-        "TITLE": "Mensen",
-        "DESCRIPTION": "Mensen authenticeren interactief in een browsersessie met een loginprompt.",
+        "TITLE": "Gebruikers",
+        "DESCRIPTION": "Gebruikers authenticeren interactief in een browsersessie met een loginprompt.",
         "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals de afdeling. Je kunt deze informatie gebruiken in je acties."
       },
       "MACHINES": {
-        "TITLE": "Machines",
-        "DESCRIPTION": "Machines authenticeren niet-interactief met een JWT bearer token ondertekend met een privésleutel. Ze kunnen ook een persoonlijke toegangstoken gebruiken.",
+        "TITLE": "Servicegebruikers",
+        "DESCRIPTION": "Servicegebruikers authenticeren niet-interactief met behulp van een JWT-bearertoken ondertekend met een privésleutel. Ze kunnen ook een persoonlijk toegangstoken gebruiken.",
         "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals het authenticatiesysteem. Je kunt deze informatie gebruiken in je acties."
       },
       "SELF": {
