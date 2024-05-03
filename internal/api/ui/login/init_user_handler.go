@@ -104,16 +104,17 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, loginName string, showPassword bool) {
-	userOrgID := ""
+	var userOrgID, authRequestID string
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
+		authRequestID = authReq.ID
 	}
 	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, userID, loginName, "", showPassword, err)
 		return
 	}
-	_, err = l.command.ResendInitialMail(setContext(r.Context(), userOrgID), userID, "", userOrgID, initCodeGenerator, authReq.ID)
+	_, err = l.command.ResendInitialMail(setContext(r.Context(), userOrgID), userID, "", userOrgID, initCodeGenerator, authRequestID)
 	l.renderInitUser(w, r, authReq, userID, loginName, "", showPassword, err)
 }
 

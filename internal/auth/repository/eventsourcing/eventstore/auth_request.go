@@ -551,7 +551,7 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 		}
 	}
 	human := command.AddHumanFromDomain(registerUser, metadatas, request, externalIDP)
-	err = repo.Command.AddUserHuman(ctx, resourceOwner, human, true, repo.UserCodeAlg)
+	err = repo.Command.AddUserHuman(ctx, resourceOwner, human, false, repo.UserCodeAlg)
 	if err != nil {
 		return err
 	}
