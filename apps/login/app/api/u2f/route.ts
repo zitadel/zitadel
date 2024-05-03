@@ -26,13 +26,9 @@ export async function POST(request: NextRequest) {
     const userId = session?.session?.factors?.user?.id;
 
     if (userId) {
-      // TODO: add org context
-      return createPasskeyRegistrationLink(userId, sessionCookie.token)
+      return registerU2F(userId, domain)
         .then((resp) => {
-          const code = resp.code;
-          return registerU2F(userId, domain).then((resp) => {
-            return NextResponse.json(resp);
-          });
+          return NextResponse.json(resp);
         })
         .catch((error) => {
           console.error("error on creating passkey registration link");
