@@ -31,3 +31,17 @@ func (e ExecutionType) String() string {
 	}
 	return ""
 }
+
+type ExecutionTargetType uint
+
+func (s ExecutionTargetType) Valid() bool {
+	return s < executionTargetTypeStateCount
+}
+
+const (
+	ExecutionTargetTypeUnspecified ExecutionTargetType = iota
+	ExecutionTargetTypeInclude
+	ExecutionTargetTypeTarget
+
+	executionTargetTypeStateCount
+)

@@ -469,6 +469,7 @@ Errors:
     NotActive: Actie is niet actief
     NotInactive: Actie is niet inactief
     MaxAllowed: Geen extra actieve acties toegestaan
+    NotEnabled: Functie "Actie" is niet ingeschakeld
   Flow:
     FlowTypeMissing: FlowType ontbreekt
     Empty: Flow is al leeg
