@@ -269,9 +269,9 @@
             "TITLE": "外部ログインが許可",
             "DESCRIPTION": "ユーザーがZITADELユーザーを使用する代わりに外部IDプロバイダーでログインできるようにします。"
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "パスワードリセットが許可",
-            "DESCRIPTION": "ユーザーがパスワードをリセットできるようにします。"
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "パスワードリセットは非表示です",
+            "DESCRIPTION": "ユーザーがパスワードをリセットできないようにしてください。"
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "ドメインディスカバリーが許可",
