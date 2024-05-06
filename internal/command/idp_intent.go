@@ -25,7 +25,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, resourceOwner, orgID, idpID, successURL, failureURL string) preparation.Validation {
+func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, resourceOwner, idpID, successURL, failureURL string) preparation.Validation {
 	return func() (_ preparation.CreateCommands, err error) {
 		if idpID == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-x8j2bk", "Errors.Intent.IDPMissing")
@@ -43,7 +43,7 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, resource
 			if err != nil {
 				return nil, err
 			}
-			exists, err := ExistsIDP(ctx, filter, resourceOwner, orgID, idpID)
+			exists, err := ExistsIDPProvider(ctx, filter, idpID)
 			if !exists || err != nil {
 				return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting")
 			}
@@ -54,7 +54,7 @@ func (c *Commands) prepareCreateIntent(writeModel *IDPIntentWriteModel, resource
 	}
 }
 
-func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner, orgID string) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
+func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureURL, resourceOwner string) (*IDPIntentWriteModel, *domain.ObjectDetails, error) {
 	id, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
@@ -65,7 +65,7 @@ func (c *Commands) CreateIntent(ctx context.Context, idpID, successURL, failureU
 	}
 
 	//nolint: staticcheck
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, resourceOwner, orgID, idpID, successURL, failureURL))
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareCreateIntent(writeModel, resourceOwner, idpID, successURL, failureURL))
 	if err != nil {
 		return nil, nil, err
 	}

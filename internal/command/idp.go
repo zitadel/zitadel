@@ -128,25 +128,24 @@ type AppleProvider struct {
 	IDPOptions idp.Options
 }
 
+// ExistsIDP query first org level IDPs and then instance level IDPs, no check if the IDP is active
 func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, instanceID, orgID, id string) (exists bool, err error) {
-	if orgID != "" {
-		writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
-		events, err := filter(ctx, writeModel.Query())
-		if err != nil {
+	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
+	events, err := filter(ctx, writeModel.Query())
+	if err != nil {
+		return false, err
+	}
+
+	if len(events) > 0 {
+		writeModel.AppendEvents(events...)
+		if err := writeModel.Reduce(); err != nil {
 			return false, err
 		}
-
-		if len(events) > 0 {
-			writeModel.AppendEvents(events...)
-			if err := writeModel.Reduce(); err != nil {
-				return false, err
-			}
-			return writeModel.State.Exists(), nil
-		}
+		return writeModel.State.Exists(), nil
 	}
 
 	instanceWriteModel := NewInstanceIDPRemoveWriteModel(instanceID, id)
-	events, err := filter(ctx, instanceWriteModel.Query())
+	events, err = filter(ctx, instanceWriteModel.Query())
 	if err != nil {
 		return false, err
 	}
@@ -159,6 +158,23 @@ func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, ins
 		return false, err
 	}
 	return instanceWriteModel.State.Exists(), nil
+}
+
+// ExistsIDPProvider query IDPs only with the ID and return true if there is
+func ExistsIDPProvider(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {
+	writeModel := NewIDPTypeWriteModel(id)
+	events, err := filter(ctx, writeModel.Query())
+	if err != nil {
+		return false, err
+	}
+	if len(events) == 0 {
+		return false, nil
+	}
+	writeModel.AppendEvents(events...)
+	if err := writeModel.Reduce(); err != nil {
+		return false, err
+	}
+	return writeModel.State.Exists(), nil
 }
 
 func IDPProviderWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (_ *AllIDPWriteModel, err error) {

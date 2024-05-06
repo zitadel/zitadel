@@ -1895,7 +1895,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "next step oauth auth url, no org",
+			name: "next step oauth auth url, default org",
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
@@ -1908,15 +1908,29 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					},
 				},
 			},
-			wantErr: true,
+			want: want{
+				details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+				url: "https://example.com/oauth/v2/authorize",
+				parametersEqual: map[string]string{
+					"client_id":     "clientID",
+					"prompt":        "select_account",
+					"redirect_uri":  "http://" + Tester.Config.ExternalDomain + ":8080/idps/callback",
+					"response_type": "code",
+					"scope":         "openid profile email",
+				},
+				parametersExisting: []string{"state"},
+			},
+			wantErr: false,
 		},
 		{
 			name: "next step oauth auth url org",
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					Organization: &object.Organization{Org: &object.Organization_OrgId{OrgId: Tester.Organisation.ID}},
-					IdpId:        orgIdpID,
+					IdpId: orgIdpID,
 					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
@@ -2048,7 +2062,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t, CTX)
-	intentID := Tester.CreateIntent(t, CTX, "", idpID)
+	intentID := Tester.CreateIntent(t, CTX, idpID)
 	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", "id")
 	successfulWithUserID, WithUsertoken, WithUserchangeDate, WithUsersequence := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "user", "id")
 	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, CTX, idpID, "", "id")

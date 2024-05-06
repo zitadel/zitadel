@@ -469,7 +469,7 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0)
 
-	intentID := Tester.CreateIntent(t, CTX, "", idpID)
+	intentID := Tester.CreateIntent(t, CTX, idpID)
 	_, err = Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId:    createResp.GetSessionId(),
 		SessionToken: createResp.GetSessionToken(),

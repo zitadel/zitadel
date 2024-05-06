@@ -38,12 +38,11 @@ func TestCommands_CreateIntent(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx           context.Context
-		idpID         string
-		successURL    string
-		failureURL    string
-		instanceID    string
-		resourceOwner string
+		ctx        context.Context
+		idpID      string
+		successURL string
+		failureURL string
+		instanceID string
 	}
 	type res struct {
 		intentID string
@@ -146,17 +145,15 @@ func TestCommands_CreateIntent(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(),
-					expectFilter(),
 				),
 				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
-				ctx:           context.Background(),
-				idpID:         "idp",
-				instanceID:    "instance",
-				resourceOwner: "org",
-				successURL:    "https://success.url",
-				failureURL:    "https://failure.url",
+				ctx:        context.Background(),
+				idpID:      "idp",
+				instanceID: "instance",
+				successURL: "https://success.url",
+				failureURL: "https://failure.url",
 			},
 			res{
 				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting"),
@@ -204,12 +201,11 @@ func TestCommands_CreateIntent(t *testing.T) {
 				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
-				ctx:           context.Background(),
-				instanceID:    "instance",
-				resourceOwner: "org",
-				idpID:         "idp",
-				successURL:    "https://success.url",
-				failureURL:    "https://failure.url",
+				ctx:        context.Background(),
+				instanceID: "instance",
+				idpID:      "idp",
+				successURL: "https://success.url",
+				failureURL: "https://failure.url",
 			},
 			res{
 				intentID: "id",
@@ -220,7 +216,6 @@ func TestCommands_CreateIntent(t *testing.T) {
 			"push, instance",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(),
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
@@ -259,12 +254,11 @@ func TestCommands_CreateIntent(t *testing.T) {
 				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
-				ctx:           context.Background(),
-				instanceID:    "instance",
-				resourceOwner: "org",
-				idpID:         "idp",
-				successURL:    "https://success.url",
-				failureURL:    "https://failure.url",
+				ctx:        context.Background(),
+				instanceID: "instance",
+				idpID:      "idp",
+				successURL: "https://success.url",
+				failureURL: "https://failure.url",
 			},
 			res{
 				intentID: "id",
@@ -313,12 +307,11 @@ func TestCommands_CreateIntent(t *testing.T) {
 				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
-				ctx:           context.Background(),
-				instanceID:    "instance",
-				resourceOwner: "",
-				idpID:         "idp",
-				successURL:    "https://success.url",
-				failureURL:    "https://failure.url",
+				ctx:        context.Background(),
+				instanceID: "instance",
+				idpID:      "idp",
+				successURL: "https://success.url",
+				failureURL: "https://failure.url",
 			},
 			res{
 				intentID: "id",
@@ -332,7 +325,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.instanceID, tt.args.resourceOwner)
+			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.instanceID)
 			require.ErrorIs(t, err, tt.res.err)
 			if intentWriteModel != nil {
 				assert.Equal(t, tt.res.intentID, intentWriteModel.AggregateID)
