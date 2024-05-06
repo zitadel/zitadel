@@ -269,9 +269,9 @@
             "TITLE": "允许外部登录",
             "DESCRIPTION": "允许用户使用外部身份提供者登录，而不是使用ZITADEL用户登录。"
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "允许密码重置",
-            "DESCRIPTION": "允许用户重置他们的密码。"
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "隐藏密码重置",
+            "DESCRIPTION": "不允许用户重置密码。"
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "允许域名发现",
