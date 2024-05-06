@@ -494,7 +494,7 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 }
 
 func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), authz.GetInstance(ctx).InstanceID())
+	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), "")
 	if err != nil {
 		return nil, err
 	}

@@ -660,7 +660,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 								failure, _ := url.Parse("https://failure.url")
 								return idpintent.NewStartedEvent(
 									context.Background(),
-									&idpintent.NewAggregate("id", "ro").Aggregate,
+									&idpintent.NewAggregate("id", "instance").Aggregate,
 									success,
 									failure,
 									"idp",
@@ -672,7 +672,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 						[]eventstore.Command{
 							idpintent.NewSAMLRequestEvent(
 								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
+								&idpintent.NewAggregate("id", "instance").Aggregate,
 								"request",
 							),
 						},
@@ -796,7 +796,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 						func() eventstore.Command {
 							event := idpintent.NewSucceededEvent(
 								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
+								&idpintent.NewAggregate("id", "instance").Aggregate,
 								[]byte(`{"sub":"id","preferred_username":"username"}`),
 								"id",
 								"username",
@@ -816,7 +816,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				idpSession: &openid.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
@@ -898,7 +898,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 					expectPush(
 						idpintent.NewSAMLSucceededEvent(
 							context.Background(),
-							&idpintent.NewAggregate("id", "ro").Aggregate,
+							&idpintent.NewAggregate("id", "instance").Aggregate,
 							[]byte(`{"sub":"id","preferred_username":"username"}`),
 							"id",
 							"username",
@@ -915,7 +915,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				assertion:  &saml.Assertion{ID: "id"},
 				idpUser: openid.NewUser(&oidc.UserInfo{
 					Subject: "id",
@@ -936,7 +936,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 					expectPush(
 						idpintent.NewSAMLSucceededEvent(
 							context.Background(),
-							&idpintent.NewAggregate("id", "ro").Aggregate,
+							&idpintent.NewAggregate("id", "instance").Aggregate,
 							[]byte(`{"sub":"id","preferred_username":"username"}`),
 							"id",
 							"username",
@@ -953,7 +953,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				assertion:  &saml.Assertion{ID: "id"},
 				idpUser: openid.NewUser(&oidc.UserInfo{
 					Subject: "id",
@@ -1006,7 +1006,7 @@ func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 					expectPush(
 						idpintent.NewSAMLRequestEvent(
 							context.Background(),
-							&idpintent.NewAggregate("id", "ro").Aggregate,
+							&idpintent.NewAggregate("id", "instance").Aggregate,
 							"request",
 						),
 					),
@@ -1014,7 +1014,7 @@ func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				request:    "request",
 			},
 			res{},
@@ -1066,7 +1066,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
@@ -1080,7 +1080,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 					expectPush(
 						idpintent.NewLDAPSucceededEvent(
 							context.Background(),
-							&idpintent.NewAggregate("id", "ro").Aggregate,
+							&idpintent.NewAggregate("id", "instance").Aggregate,
 							[]byte(`{"id":"id","preferredUsername":"username","preferredLanguage":"und"}`),
 							"id",
 							"username",
@@ -1092,7 +1092,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				attributes: map[string][]string{"id": {"id"}},
 				idpUser: ldap.NewUser(
 					"id",
@@ -1153,7 +1153,7 @@ func TestCommands_FailIDPIntent(t *testing.T) {
 					expectPush(
 						idpintent.NewFailedEvent(
 							context.Background(),
-							&idpintent.NewAggregate("id", "ro").Aggregate,
+							&idpintent.NewAggregate("id", "instance").Aggregate,
 							"reason",
 						),
 					),
@@ -1161,7 +1161,7 @@ func TestCommands_FailIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				reason:     "reason",
 			},
 			res{

@@ -13,7 +13,7 @@ If you haven’t added a provider yet, have a look at the following guide first:
 ## Start the Provider Flow
 
 ZITADEL will handle as much as possible from the authentication flow with the external provider.
-This requires you to initiate the flow with your desired provider, which should be available within the provided context.
+This requires you to initiate the flow with your desired provider.
 
 Send the following two URLs in the request body:
 1. SuccessURL: Page that should be shown when the login was successful
@@ -24,8 +24,6 @@ In the response, you will get an authentication URL of the provider you like.
 
 ### Request
 
-On an instance context, with a provider existing on the instance:
-
 ```bash
 curl --request POST \
   --url https://$ZITADEL_DOMAIN/v2beta/idp_intents \
@@ -34,26 +32,6 @@ curl --request POST \
   --header 'Content-Type: application/json' \
   --data '{
   "idpId": "$IDP_ID",
-  "urls": {
-    "successUrl": "https://custom.com/login/idp/success",
-    "failureUrl": "https://custom.com/login/idp/fail"
-  }
-}'
-```
-
-On an organization context, with a provider existing on the organization or on the instance the organization belongs to:
-
-```bash
-curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/idp_intents \
-  --header 'Accept: application/json' \
-  --header 'Authorization: Bearer '"$TOKEN"''\
-  --header 'Content-Type: application/json' \
-  --data '{
-  "idpId": "$IDP_ID",
-  "organization": {
-    "orgId": "$ORG_ID"
-  },
   "urls": {
     "successUrl": "https://custom.com/login/idp/success",
     "failureUrl": "https://custom.com/login/idp/fail"

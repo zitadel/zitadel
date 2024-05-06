@@ -2064,7 +2064,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t, CTX)
 	intentID := Tester.CreateIntent(t, CTX, idpID)
 	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", "id")
-	successfulWithUserID, WithUsertoken, WithUserchangeDate, WithUsersequence := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "user", "id")
+	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "user", "id")
 	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, CTX, idpID, "", "id")
 	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence := Tester.CreateSuccessfulLDAPIntent(t, CTX, idpID, "user", "id")
 	samlSuccessfulID, samlToken, samlChangeDate, samlSequence := Tester.CreateSuccessfulSAMLIntent(t, CTX, idpID, "", "id")
@@ -2143,14 +2143,14 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				CTX,
 				&user.RetrieveIdentityProviderIntentRequest{
 					IdpIntentId:    successfulWithUserID,
-					IdpIntentToken: WithUsertoken,
+					IdpIntentToken: withUsertoken,
 				},
 			},
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
-					ChangeDate:    timestamppb.New(WithUserchangeDate),
+					ChangeDate:    timestamppb.New(withUserchangeDate),
 					ResourceOwner: Tester.Instance.InstanceID(),
-					Sequence:      WithUsersequence,
+					Sequence:      withUsersequence,
 				},
 				UserId: "user",
 				IdpInformation: &user.IDPInformation{

@@ -295,7 +295,7 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 }
 
 func addLink(ctx context.Context, filter preparation.FilterToQueryReducer, a *user.Aggregate, link *AddLink) (eventstore.Command, error) {
-	exists, err := ExistsIDP(ctx, filter, authz.GetInstance(ctx).InstanceID(), a.ResourceOwner, link.IDPID)
+	exists, err := ExistsIDPOnOrgOrInstance(ctx, filter, authz.GetInstance(ctx).InstanceID(), a.ResourceOwner, link.IDPID)
 	if !exists || err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39nf2", "Errors.IDPConfig.NotExisting")
 	}

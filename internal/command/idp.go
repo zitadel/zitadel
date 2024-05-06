@@ -128,8 +128,8 @@ type AppleProvider struct {
 	IDPOptions idp.Options
 }
 
-// ExistsIDP query first org level IDPs and then instance level IDPs, no check if the IDP is active
-func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, instanceID, orgID, id string) (exists bool, err error) {
+// ExistsIDPOnOrgOrInstance query first org level IDPs and then instance level IDPs, no check if the IDP is active
+func ExistsIDPOnOrgOrInstance(ctx context.Context, filter preparation.FilterToQueryReducer, instanceID, orgID, id string) (exists bool, err error) {
 	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
@@ -160,8 +160,8 @@ func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, ins
 	return instanceWriteModel.State.Exists(), nil
 }
 
-// ExistsIDPProvider query IDPs only with the ID and return true if there is
-func ExistsIDPProvider(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {
+// ExistsIDP query IDPs only with the ID, no check if the IDP is active
+func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {
 	writeModel := NewIDPTypeWriteModel(id)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {

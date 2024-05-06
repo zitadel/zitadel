@@ -384,12 +384,14 @@ func (s *Tester) AddSAMLPostProvider(t *testing.T, ctx context.Context) string {
 }
 
 func (s *Tester) CreateIntent(t *testing.T, ctx context.Context, idpID string) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	writeModel, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Instance.InstanceID())
 	require.NoError(t, err)
 	return writeModel.AggregateID
 }
 
 func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	intentID := s.CreateIntent(t, ctx, idpID)
 	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
 	require.NoError(t, err)
@@ -415,6 +417,7 @@ func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, ctx context.Context, 
 }
 
 func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	intentID := s.CreateIntent(t, ctx, idpID)
 	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
 	require.NoError(t, err)
@@ -442,6 +445,7 @@ func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, ctx context.Context, i
 }
 
 func (s *Tester) CreateSuccessfulSAMLIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx = authz.WithInstance(context.Background(), s.Instance)
 	intentID := s.CreateIntent(t, ctx, idpID)
 	writeModel, err := s.Server.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
 	require.NoError(t, err)
