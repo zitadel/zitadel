@@ -13,29 +13,20 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha;action";
 
+// Wait for response but response body is ignored, status is checked, call is sent as post.
 message SetRESTWebhook {
-  string url = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 1000, uri: true},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 1000,
-      example: "\"https://example.com/hooks/ip_check\"";
-    }
-  ];
+  // Define if any error stops the whole execution. By default the process continues as normal.
+  bool interrupt_on_error = 1;
 }
 
-message SetRESTRequestResponse {
-  string url = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 1000, uri: true},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 1000,
-      example: "\"https://example.com/hooks/ip_check\"";
-    }
-  ];
+// Wait for response and response body is used, status is checked, call is sent as post.
+message SetRESTCall {
+  // Define if any error stops the whole execution. By default the process continues as normal.
+  bool interrupt_on_error = 1;
 }
+
+// Call is executed in parallel to others, ZITADEL does not wait until the call is finished. The state is ignored, call is sent as post.
+message SetRESTAsync {}
 
 message Target {
   // ID is the read-only unique identifier of the target.
@@ -56,18 +47,19 @@ message Target {
   // Defines the target type and how the response of the target is treated.
   oneof target_type {
     SetRESTWebhook rest_webhook = 4;
-    SetRESTRequestResponse rest_request_response = 5;
+    SetRESTCall rest_call = 5;
+    SetRESTAsync rest_async = 6;
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
-  google.protobuf.Duration timeout = 6 [
+  google.protobuf.Duration timeout = 7 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"10s\"";
     }
   ];
-  oneof execution_type {
-    // Set the execution to run asynchronously.
-    bool is_async = 7;
-    // Define if any error stops the whole execution. By default the process continues as normal.
-    bool interrupt_on_error = 8;
-  }
+
+  string endpoint = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"https://example.com/hooks/ip_check\"";
+    }
+  ];
 }

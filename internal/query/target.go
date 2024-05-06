@@ -52,15 +52,11 @@ var (
 		table: targetTable,
 	}
 	TargetColumnURL = Column{
-		name:  projection.TargetURLCol,
+		name:  projection.TargetEndpointCol,
 		table: targetTable,
 	}
 	TargetColumnTimeout = Column{
 		name:  projection.TargetTimeoutCol,
-		table: targetTable,
-	}
-	TargetColumnAsync = Column{
-		name:  projection.TargetAsyncCol,
 		table: targetTable,
 	}
 	TargetColumnInterruptOnError = Column{
@@ -84,9 +80,8 @@ type Target struct {
 
 	Name             string
 	TargetType       domain.TargetType
-	URL              string
+	Endpoint         string
 	Timeout          time.Duration
-	Async            bool
 	InterruptOnError bool
 }
 
@@ -138,7 +133,6 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			TargetColumnTargetType.identifier(),
 			TargetColumnTimeout.identifier(),
 			TargetColumnURL.identifier(),
-			TargetColumnAsync.identifier(),
 			TargetColumnInterruptOnError.identifier(),
 			countColumn.identifier(),
 		).From(targetTable.identifier()).
@@ -156,8 +150,7 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 					&target.Name,
 					&target.TargetType,
 					&target.Timeout,
-					&target.URL,
-					&target.Async,
+					&target.Endpoint,
 					&target.InterruptOnError,
 					&count,
 				)
@@ -190,7 +183,6 @@ func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			TargetColumnTargetType.identifier(),
 			TargetColumnTimeout.identifier(),
 			TargetColumnURL.identifier(),
-			TargetColumnAsync.identifier(),
 			TargetColumnInterruptOnError.identifier(),
 		).From(targetTable.identifier()).
 			PlaceholderFormat(sq.Dollar),
@@ -204,8 +196,7 @@ func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 				&target.Name,
 				&target.TargetType,
 				&target.Timeout,
-				&target.URL,
-				&target.Async,
+				&target.Endpoint,
 				&target.InterruptOnError,
 			)
 			if err != nil {

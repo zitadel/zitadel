@@ -14,18 +14,17 @@ import (
 )
 
 var (
-	prepareTargetsStmt = `SELECT projections.targets.id,` +
-		` projections.targets.change_date,` +
-		` projections.targets.resource_owner,` +
-		` projections.targets.sequence,` +
-		` projections.targets.name,` +
-		` projections.targets.target_type,` +
-		` projections.targets.timeout,` +
-		` projections.targets.url,` +
-		` projections.targets.async,` +
-		` projections.targets.interrupt_on_error,` +
+	prepareTargetsStmt = `SELECT projections.targets1.id,` +
+		` projections.targets1.change_date,` +
+		` projections.targets1.resource_owner,` +
+		` projections.targets1.sequence,` +
+		` projections.targets1.name,` +
+		` projections.targets1.target_type,` +
+		` projections.targets1.timeout,` +
+		` projections.targets1.endpoint,` +
+		` projections.targets1.interrupt_on_error,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.targets`
+		` FROM projections.targets1`
 	prepareTargetsCols = []string{
 		"id",
 		"change_date",
@@ -34,23 +33,21 @@ var (
 		"name",
 		"target_type",
 		"timeout",
-		"url",
-		"async",
+		"endpoint",
 		"interrupt_on_error",
 		"count",
 	}
 
-	prepareTargetStmt = `SELECT projections.targets.id,` +
-		` projections.targets.change_date,` +
-		` projections.targets.resource_owner,` +
-		` projections.targets.sequence,` +
-		` projections.targets.name,` +
-		` projections.targets.target_type,` +
-		` projections.targets.timeout,` +
-		` projections.targets.url,` +
-		` projections.targets.async,` +
-		` projections.targets.interrupt_on_error` +
-		` FROM projections.targets`
+	prepareTargetStmt = `SELECT projections.targets1.id,` +
+		` projections.targets1.change_date,` +
+		` projections.targets1.resource_owner,` +
+		` projections.targets1.sequence,` +
+		` projections.targets1.name,` +
+		` projections.targets1.target_type,` +
+		` projections.targets1.timeout,` +
+		` projections.targets1.endpoint,` +
+		` projections.targets1.interrupt_on_error` +
+		` FROM projections.targets1`
 	prepareTargetCols = []string{
 		"id",
 		"change_date",
@@ -59,8 +56,7 @@ var (
 		"name",
 		"target_type",
 		"timeout",
-		"url",
-		"async",
+		"endpoint",
 		"interrupt_on_error",
 	}
 )
@@ -106,7 +102,6 @@ func Test_TargetPrepares(t *testing.T) {
 							1 * time.Second,
 							"https://example.com",
 							true,
-							true,
 						},
 					},
 				),
@@ -126,8 +121,7 @@ func Test_TargetPrepares(t *testing.T) {
 						Name:             "target-name",
 						TargetType:       domain.TargetTypeWebhook,
 						Timeout:          1 * time.Second,
-						URL:              "https://example.com",
-						Async:            true,
+						Endpoint:         "https://example.com",
 						InterruptOnError: true,
 					},
 				},
@@ -151,7 +145,6 @@ func Test_TargetPrepares(t *testing.T) {
 							1 * time.Second,
 							"https://example.com",
 							true,
-							false,
 						},
 						{
 							"id-2",
@@ -163,14 +156,24 @@ func Test_TargetPrepares(t *testing.T) {
 							1 * time.Second,
 							"https://example.com",
 							false,
-							true,
+						},
+						{
+							"id-3",
+							testNow,
+							"ro",
+							uint64(20211110),
+							"target-name3",
+							domain.TargetTypeAsync,
+							1 * time.Second,
+							"https://example.com",
+							false,
 						},
 					},
 				),
 			},
 			object: &Targets{
 				SearchResponse: SearchResponse{
-					Count: 2,
+					Count: 3,
 				},
 				Targets: []*Target{
 					{
@@ -183,9 +186,8 @@ func Test_TargetPrepares(t *testing.T) {
 						Name:             "target-name1",
 						TargetType:       domain.TargetTypeWebhook,
 						Timeout:          1 * time.Second,
-						URL:              "https://example.com",
-						Async:            true,
-						InterruptOnError: false,
+						Endpoint:         "https://example.com",
+						InterruptOnError: true,
 					},
 					{
 						ID: "id-2",
@@ -197,9 +199,21 @@ func Test_TargetPrepares(t *testing.T) {
 						Name:             "target-name2",
 						TargetType:       domain.TargetTypeWebhook,
 						Timeout:          1 * time.Second,
-						URL:              "https://example.com",
-						Async:            false,
-						InterruptOnError: true,
+						Endpoint:         "https://example.com",
+						InterruptOnError: false,
+					},
+					{
+						ID: "id-3",
+						ObjectDetails: domain.ObjectDetails{
+							EventDate:     testNow,
+							ResourceOwner: "ro",
+							Sequence:      20211110,
+						},
+						Name:             "target-name3",
+						TargetType:       domain.TargetTypeAsync,
+						Timeout:          1 * time.Second,
+						Endpoint:         "https://example.com",
+						InterruptOnError: false,
 					},
 				},
 			},
@@ -256,7 +270,6 @@ func Test_TargetPrepares(t *testing.T) {
 						1 * time.Second,
 						"https://example.com",
 						true,
-						false,
 					},
 				),
 			},
@@ -270,9 +283,8 @@ func Test_TargetPrepares(t *testing.T) {
 				Name:             "target-name",
 				TargetType:       domain.TargetTypeWebhook,
 				Timeout:          1 * time.Second,
-				URL:              "https://example.com",
-				Async:            true,
-				InterruptOnError: false,
+				Endpoint:         "https://example.com",
+				InterruptOnError: true,
 			},
 		},
 		{
