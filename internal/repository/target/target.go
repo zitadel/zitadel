@@ -20,9 +20,8 @@ type AddedEvent struct {
 
 	Name             string            `json:"name"`
 	TargetType       domain.TargetType `json:"targetType"`
-	URL              string            `json:"url"`
+	Endpoint         string            `json:"endpoint"`
 	Timeout          time.Duration     `json:"timeout"`
-	Async            bool              `json:"async"`
 	InterruptOnError bool              `json:"interruptOnError"`
 }
 
@@ -43,16 +42,15 @@ func NewAddedEvent(
 	aggregate *eventstore.Aggregate,
 	name string,
 	targetType domain.TargetType,
-	url string,
+	endpoint string,
 	timeout time.Duration,
-	async bool,
 	interruptOnError bool,
 ) *AddedEvent {
 	return &AddedEvent{
 		*eventstore.NewBaseEventForPush(
 			ctx, aggregate, AddedEventType,
 		),
-		name, targetType, url, timeout, async, interruptOnError}
+		name, targetType, endpoint, timeout, interruptOnError}
 }
 
 type ChangedEvent struct {
@@ -60,9 +58,8 @@ type ChangedEvent struct {
 
 	Name             *string            `json:"name,omitempty"`
 	TargetType       *domain.TargetType `json:"targetType,omitempty"`
-	URL              *string            `json:"url,omitempty"`
+	Endpoint         *string            `json:"endpoint,omitempty"`
 	Timeout          *time.Duration     `json:"timeout,omitempty"`
-	Async            *bool              `json:"async,omitempty"`
 	InterruptOnError *bool              `json:"interruptOnError,omitempty"`
 
 	oldName string
@@ -119,21 +116,15 @@ func ChangeTargetType(targetType domain.TargetType) func(event *ChangedEvent) {
 	}
 }
 
-func ChangeURL(url string) func(event *ChangedEvent) {
+func ChangeEndpoint(endpoint string) func(event *ChangedEvent) {
 	return func(e *ChangedEvent) {
-		e.URL = &url
+		e.Endpoint = &endpoint
 	}
 }
 
 func ChangeTimeout(timeout time.Duration) func(event *ChangedEvent) {
 	return func(e *ChangedEvent) {
 		e.Timeout = &timeout
-	}
-}
-
-func ChangeAsync(async bool) func(event *ChangedEvent) {
-	return func(e *ChangedEvent) {
-		e.Async = &async
 	}
 }
 
