@@ -35,8 +35,7 @@ export default async function Page({
     totpError: ClientError | undefined;
   if (session && session.factors?.user?.id) {
     if (method === "time-based") {
-      // inconsistency with token: email works with machine token, totp works with session token
-      await registerTOTP(session.factors.user.id, token)
+      await registerTOTP(session.factors.user.id)
         .then((resp) => {
           if (resp) {
             totpResponse = resp;
