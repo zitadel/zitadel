@@ -11,6 +11,8 @@ type Props = {
   loginSettings: LoginSettings;
   userMethods: AuthenticationMethodType[];
   checkAfter: boolean;
+  phoneVerified: boolean;
+  emailVerified: boolean;
 };
 
 export default function ChooseSecondFactorToSetup({
@@ -21,6 +23,8 @@ export default function ChooseSecondFactorToSetup({
   loginSettings,
   userMethods,
   checkAfter,
+  phoneVerified,
+  emailVerified,
 }: Props) {
   const params = new URLSearchParams({});
 
@@ -43,20 +47,15 @@ export default function ChooseSecondFactorToSetup({
   return (
     <div className="grid grid-cols-1 gap-5 w-full pt-4">
       {loginSettings.secondFactors.map((factor, i) => {
-        return (
-          <div key={"method-" + i}>
-            {factor === 1 &&
-              TOTP(
-                userMethods.includes(4),
-                userMethods.includes(4) ? "" : "/otp/time-based/set?" + params
-              )}
-            {factor === 2 && U2F(userMethods.includes(5), "/u2f/set?" + params)}
-            {factor === 3 &&
-              EMAIL(userMethods.includes(7), "/otp/email/set?" + params)}
-            {factor === 4 &&
-              SMS(userMethods.includes(6), "/otp/sms/set?" + params)}
-          </div>
-        );
+        return factor === 1
+          ? TOTP(userMethods.includes(4), "/otp/time-based/set?" + params)
+          : factor === 2
+          ? U2F(userMethods.includes(5), "/u2f/set?" + params)
+          : factor === 3 && emailVerified
+          ? EMAIL(userMethods.includes(7), "/otp/email/set?" + params)
+          : factor === 4 && phoneVerified
+          ? SMS(userMethods.includes(6), "/otp/sms/set?" + params)
+          : null;
       })}
     </div>
   );

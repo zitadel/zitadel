@@ -2,16 +2,37 @@ import clsx from "clsx";
 import Link from "next/link";
 import { BadgeState, StateBadge } from "./StateBadge";
 import { CheckIcon } from "@heroicons/react/24/solid";
+import { ReactNode } from "react";
 
 const cardClasses = (alreadyAdded: boolean) =>
   clsx(
     "relative bg-background-light-400 dark:bg-background-dark-400 group block space-y-1.5 rounded-md px-5 py-3  border border-divider-light dark:border-divider-dark transition-all ",
-    alreadyAdded ? "" : "hover:shadow-lg hover:dark:bg-white/10"
+    alreadyAdded
+      ? "opacity-50 cursor-default"
+      : "hover:shadow-lg hover:dark:bg-white/10"
   );
+
+const LinkWrapper = ({
+  alreadyAdded,
+  children,
+  link,
+}: {
+  alreadyAdded: boolean;
+  children: ReactNode;
+  link: string;
+}) => {
+  return !alreadyAdded ? (
+    <Link href={link} className={cardClasses(alreadyAdded)}>
+      {children}
+    </Link>
+  ) : (
+    <div className={cardClasses(alreadyAdded)}>{children}</div>
+  );
+};
 
 export const TOTP = (alreadyAdded: boolean, link: string) => {
   return (
-    <Link href={link} className={cardClasses(alreadyAdded)}>
+    <LinkWrapper alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",
@@ -66,13 +87,13 @@ C72,238.87917,85.87916,225,102.99997,225H248z"
           <Setup />
         </>
       )}
-    </Link>
+    </LinkWrapper>
   );
 };
 
 export const U2F = (alreadyAdded: boolean, link: string) => {
   return (
-    <Link href={link} className={cardClasses(alreadyAdded)}>
+    <LinkWrapper alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",
@@ -100,13 +121,13 @@ export const U2F = (alreadyAdded: boolean, link: string) => {
           <Setup />
         </>
       )}
-    </Link>
+    </LinkWrapper>
   );
 };
 
 export const EMAIL = (alreadyAdded: boolean, link: string) => {
   return (
-    <Link href={link} className={cardClasses(alreadyAdded)}>
+    <LinkWrapper alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",
@@ -135,13 +156,13 @@ export const EMAIL = (alreadyAdded: boolean, link: string) => {
           <Setup />
         </>
       )}
-    </Link>
+    </LinkWrapper>
   );
 };
 
 export const SMS = (alreadyAdded: boolean, link: string) => {
   return (
-    <Link href={link} className={cardClasses(alreadyAdded)}>
+    <LinkWrapper alreadyAdded={alreadyAdded} link={link}>
       <div
         className={clsx(
           "font-medium flex items-center",
@@ -169,7 +190,7 @@ export const SMS = (alreadyAdded: boolean, link: string) => {
           <Setup />
         </>
       )}
-    </Link>
+    </LinkWrapper>
   );
 };
 

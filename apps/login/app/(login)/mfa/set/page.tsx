@@ -14,6 +14,7 @@ import {
   getMostRecentCookieWithLoginname,
   getSessionCookieById,
 } from "#/utils/cookies";
+import { user } from "@zitadel/server";
 
 export default async function Page({
   searchParams,
@@ -23,7 +24,7 @@ export default async function Page({
   const { loginName, checkAfter, authRequestId, organization, sessionId } =
     searchParams;
 
-  const sessionFactors = sessionId
+  const sessionWithData = sessionId
     ? await loadSessionById(sessionId, organization)
     : await loadSessionByLoginname(loginName, organization);
 
@@ -37,13 +38,16 @@ export default async function Page({
     );
     return getSession(server, recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
-        return listAuthenticationMethodTypes(
-          response.session.factors.user.id
-        ).then((methods) => {
-          return {
-            factors: response.session?.factors,
-            authMethods: methods.authMethodTypes ?? [],
-          };
+        const userId = response.session.factors.user.id;
+        return listAuthenticationMethodTypes(userId).then((methods) => {
+          return getUserByID(userId).then((user) => {
+            return {
+              factors: response.session?.factors,
+              authMethods: methods.authMethodTypes ?? [],
+              phoneVerified: user.user?.human?.phone?.isVerified ?? false,
+              emailVerified: user.user?.human?.email?.isVerified ?? false,
+            };
+          });
         });
       }
     });
@@ -53,13 +57,16 @@ export default async function Page({
     const recent = await getSessionCookieById(sessionId, organization);
     return getSession(server, recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
-        return listAuthenticationMethodTypes(
-          response.session.factors.user.id
-        ).then((methods) => {
-          return {
-            factors: response.session?.factors,
-            authMethods: methods.authMethodTypes ?? [],
-          };
+        const userId = response.session.factors.user.id;
+        return listAuthenticationMethodTypes(userId).then((methods) => {
+          return getUserByID(userId).then((user) => {
+            return {
+              factors: response.session?.factors,
+              authMethods: methods.authMethodTypes ?? [],
+              phoneVerified: user.user?.human?.phone?.isVerified ?? false,
+              emailVerified: user.user?.human?.email?.isVerified ?? false,
+            };
+          });
         });
       }
     });
@@ -75,10 +82,10 @@ export default async function Page({
 
         <p className="ztdl-p">Choose one of the following second factors.</p>
 
-        {sessionFactors && (
+        {sessionWithData && (
           <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
+            loginName={loginName ?? sessionWithData.factors?.user?.loginName}
+            displayName={sessionWithData.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
@@ -88,14 +95,16 @@ export default async function Page({
           <Alert>Provide your active session as loginName param</Alert>
         )}
 
-        {loginSettings && sessionFactors ? (
+        {loginSettings && sessionWithData ? (
           <ChooseSecondFactorToSetup
             loginName={loginName}
             sessionId={sessionId}
             authRequestId={authRequestId}
             organization={organization}
             loginSettings={loginSettings}
-            userMethods={sessionFactors.authMethods ?? []}
+            userMethods={sessionWithData.authMethods ?? []}
+            phoneVerified={sessionWithData.phoneVerified ?? false}
+            emailVerified={sessionWithData.emailVerified ?? false}
             checkAfter={checkAfter === "true"}
           ></ChooseSecondFactorToSetup>
         ) : (
