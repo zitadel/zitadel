@@ -28,8 +28,7 @@ type IDPIntentWriteModel struct {
 	RequestID string
 	Assertion *crypto.CryptoValue
 
-	State     domain.IDPIntentState
-	aggregate *eventstore.Aggregate
+	State domain.IDPIntentState
 }
 
 func NewIDPIntentWriteModel(id, resourceOwner string) *IDPIntentWriteModel {
@@ -38,7 +37,6 @@ func NewIDPIntentWriteModel(id, resourceOwner string) *IDPIntentWriteModel {
 			AggregateID:   id,
 			ResourceOwner: resourceOwner,
 		},
-		aggregate: &idpintent.NewAggregate(id, resourceOwner).Aggregate,
 	}
 }
 
@@ -120,4 +118,14 @@ func (wm *IDPIntentWriteModel) reduceSAMLRequestEvent(e *idpintent.SAMLRequestEv
 
 func (wm *IDPIntentWriteModel) reduceFailedEvent(e *idpintent.FailedEvent) {
 	wm.State = domain.IDPIntentStateFailed
+}
+
+func IDPIntentAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
+	return &eventstore.Aggregate{
+		Type:          idpintent.AggregateType,
+		Version:       idpintent.AggregateVersion,
+		ID:            wm.AggregateID,
+		ResourceOwner: wm.ResourceOwner,
+		InstanceID:    wm.InstanceID,
+	}
 }

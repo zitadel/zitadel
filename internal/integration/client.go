@@ -288,8 +288,8 @@ func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, c
 	logging.OnError(err).Fatal("set user password")
 }
 
-func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
+func (s *Tester) AddGenericOAuthProvider(t *testing.T, ctx context.Context) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	id, _, err := s.Commands.AddInstanceGenericOAuthProvider(ctx, command.GenericOAuthProvider{
 		Name:                  "idp",
 		ClientID:              "clientID",
@@ -310,8 +310,31 @@ func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
 	return id
 }
 
-func (s *Tester) AddSAMLProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
+func (s *Tester) AddOrgGenericOAuthProvider(t *testing.T, ctx context.Context, orgID string) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
+	id, _, err := s.Commands.AddOrgGenericOAuthProvider(ctx, orgID,
+		command.GenericOAuthProvider{
+			Name:                  "idp",
+			ClientID:              "clientID",
+			ClientSecret:          "clientSecret",
+			AuthorizationEndpoint: "https://example.com/oauth/v2/authorize",
+			TokenEndpoint:         "https://example.com/oauth/v2/token",
+			UserEndpoint:          "https://api.example.com/user",
+			Scopes:                []string{"openid", "profile", "email"},
+			IDAttribute:           "id",
+			IDPOptions: idp.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+			},
+		})
+	require.NoError(t, err)
+	return id
+}
+
+func (s *Tester) AddSAMLProvider(t *testing.T, ctx context.Context) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	id, _, err := s.Server.Commands.AddInstanceSAMLProvider(ctx, command.SAMLProvider{
 		Name:     "saml-idp",
 		Metadata: []byte("<EntityDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" validUntil=\"2023-09-16T09:00:32.986Z\" cacheDuration=\"PT48H\" entityID=\"http://localhost:8000/metadata\">\n  <IDPSSODescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n    <KeyDescriptor use=\"signing\">\n      <KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n        <X509Data xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n          <X509Certificate xmlns=\"http://www.w3.org/2000/09/xmldsig#\">MIIDBzCCAe+gAwIBAgIJAPr/Mrlc8EGhMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTAeFw0xNTEyMjgxOTE5NDVaFw0yNTEyMjUxOTE5NDVaMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANDoWzLos4LWxTn8Gyu2lEbl4WcelUbgLN5zYm4ron8Ahs+rvcsu2zkdD/s6jdGJI8WqJKhYK2u61ygnXgAZqC6ggtFPnBpizcDzjgND2g+aucSoUODHt67f0fQuAmupN/zp5MZysJ6IHLJnYLNpfJYk96lRz9ODnO1Mpqtr9PWxm+pz7nzq5F0vRepkgpcRxv6ufQBjlrFytccyEVdXrvFtkjXcnhVVNSR4kHuOOMS6D7pebSJ1mrCmshbD5SX1jXPBKFPAjozYX6PxqLxUx1Y4faFEf4MBBVcInyB4oURNB2s59hEEi2jq9izNE7EbEK6BY5sEhoCPl9m32zE6ljkCAwEAAaNQME4wHQYDVR0OBBYEFB9ZklC1Ork2zl56zg08ei7ss/+iMB8GA1UdIwQYMBaAFB9ZklC1Ork2zl56zg08ei7ss/+iMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAAVoTSQ5pAirw8OR9FZ1bRSuTDhY9uxzl/OL7lUmsv2cMNeCB3BRZqm3mFt+cwN8GsH6f3uvNONIhgFpTGN5LEcXQz89zJEzB+qaHqmbFpHQl/sx2B8ezNgT/882H2IH00dXESEfy/+1gHg2pxjGnhRBN6el/gSaDiySIMKbilDrffuvxiCfbpPN0NRRiPJhd2ay9KuL/RxQRl1gl9cHaWiouWWba1bSBb2ZPhv2rPMUsFo98ntkGCObDX6Y1SpkqmoTbrsbGFsTG2DLxnvr4GdN1BSr0Uu/KV3adj47WkXVPeMYQti/bQmxQB8tRFhrw80qakTLUzreO96WzlBBMtY=</X509Certificate>\n        </X509Data>\n      </KeyInfo>\n    </KeyDescriptor>\n    <KeyDescriptor use=\"encryption\">\n      <KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n        <X509Data xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n          <X509Certificate xmlns=\"http://www.w3.org/2000/09/xmldsig#\">MIIDBzCCAe+gAwIBAgIJAPr/Mrlc8EGhMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTAeFw0xNTEyMjgxOTE5NDVaFw0yNTEyMjUxOTE5NDVaMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANDoWzLos4LWxTn8Gyu2lEbl4WcelUbgLN5zYm4ron8Ahs+rvcsu2zkdD/s6jdGJI8WqJKhYK2u61ygnXgAZqC6ggtFPnBpizcDzjgND2g+aucSoUODHt67f0fQuAmupN/zp5MZysJ6IHLJnYLNpfJYk96lRz9ODnO1Mpqtr9PWxm+pz7nzq5F0vRepkgpcRxv6ufQBjlrFytccyEVdXrvFtkjXcnhVVNSR4kHuOOMS6D7pebSJ1mrCmshbD5SX1jXPBKFPAjozYX6PxqLxUx1Y4faFEf4MBBVcInyB4oURNB2s59hEEi2jq9izNE7EbEK6BY5sEhoCPl9m32zE6ljkCAwEAAaNQME4wHQYDVR0OBBYEFB9ZklC1Ork2zl56zg08ei7ss/+iMB8GA1UdIwQYMBaAFB9ZklC1Ork2zl56zg08ei7ss/+iMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAAVoTSQ5pAirw8OR9FZ1bRSuTDhY9uxzl/OL7lUmsv2cMNeCB3BRZqm3mFt+cwN8GsH6f3uvNONIhgFpTGN5LEcXQz89zJEzB+qaHqmbFpHQl/sx2B8ezNgT/882H2IH00dXESEfy/+1gHg2pxjGnhRBN6el/gSaDiySIMKbilDrffuvxiCfbpPN0NRRiPJhd2ay9KuL/RxQRl1gl9cHaWiouWWba1bSBb2ZPhv2rPMUsFo98ntkGCObDX6Y1SpkqmoTbrsbGFsTG2DLxnvr4GdN1BSr0Uu/KV3adj47WkXVPeMYQti/bQmxQB8tRFhrw80qakTLUzreO96WzlBBMtY=</X509Certificate>\n        </X509Data>\n      </KeyInfo>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes128-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes192-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes256-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p\"></EncryptionMethod>\n    </KeyDescriptor>\n    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>\n    <SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" Location=\"http://localhost:8000/sso\"></SingleSignOnService>\n    <SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"http://localhost:8000/sso\"></SingleSignOnService>\n  </IDPSSODescriptor>\n</EntityDescriptor>"),
@@ -326,8 +349,8 @@ func (s *Tester) AddSAMLProvider(t *testing.T) string {
 	return id
 }
 
-func (s *Tester) AddSAMLRedirectProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
+func (s *Tester) AddSAMLRedirectProvider(t *testing.T, ctx context.Context) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	id, _, err := s.Server.Commands.AddInstanceSAMLProvider(ctx, command.SAMLProvider{
 		Name:     "saml-idp-redirect",
 		Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
@@ -343,8 +366,8 @@ func (s *Tester) AddSAMLRedirectProvider(t *testing.T) string {
 	return id
 }
 
-func (s *Tester) AddSAMLPostProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
+func (s *Tester) AddSAMLPostProvider(t *testing.T, ctx context.Context) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	id, _, err := s.Server.Commands.AddInstanceSAMLProvider(ctx, command.SAMLProvider{
 		Name:     "saml-idp-post",
 		Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
@@ -360,17 +383,17 @@ func (s *Tester) AddSAMLPostProvider(t *testing.T) string {
 	return id
 }
 
-func (s *Tester) CreateIntent(t *testing.T, idpID string) string {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
-	writeModel, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Organisation.ID)
+func (s *Tester) CreateIntent(t *testing.T, ctx context.Context, idpID string) string {
+	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
+	writeModel, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Instance.InstanceID())
 	require.NoError(t, err)
 	return writeModel.AggregateID
 }
 
-func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
-	intentID := s.CreateIntent(t, idpID)
-	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
+func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
+	intentID := s.CreateIntent(t, ctx, idpID)
+	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
 	require.NoError(t, err)
 	idpUser := openid.NewUser(
 		&oidc.UserInfo{
@@ -393,10 +416,10 @@ func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, idpID, userID, idpUse
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
-func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
-	intentID := s.CreateIntent(t, idpID)
-	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
+func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
+	intentID := s.CreateIntent(t, ctx, idpID)
+	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
 	require.NoError(t, err)
 	username := "username"
 	lang := language.Make("en")
@@ -421,10 +444,10 @@ func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, idpID, userID, idpUser
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
-func (s *Tester) CreateSuccessfulSAMLIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
-	intentID := s.CreateIntent(t, idpID)
-	writeModel, err := s.Server.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
+func (s *Tester) CreateSuccessfulSAMLIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
+	intentID := s.CreateIntent(t, ctx, idpID)
+	writeModel, err := s.Server.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
 	require.NoError(t, err)
 
 	idpUser := &saml.UserMapper{
