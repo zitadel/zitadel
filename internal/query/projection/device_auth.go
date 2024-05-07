@@ -74,6 +74,10 @@ func (p *deviceAuthRequestProjection) Reducers() []handler.AggregateReducer {
 					Event:  deviceauth.CanceledEventType,
 					Reduce: p.reduceDoneEvents,
 				},
+				{
+					Event:  deviceauth.DoneEventType,
+					Reduce: p.reduceDoneEvents,
+				},
 			},
 		},
 	}
