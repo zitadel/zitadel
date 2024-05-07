@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -137,7 +138,7 @@ func (c *clientCredentialsClient) RestrictAdditionalAccessTokenScopes() func(sco
 }
 
 func (c *clientCredentialsClient) IsScopeAllowed(scope string) bool {
-	return isScopeAllowed(scope)
+	return isScopeAllowed(scope) || strings.HasPrefix(scope, ScopeProjectRolePrefix)
 }
 
 // IDTokenUserinfoClaimsAssertion returns null false as no id_token is issued
