@@ -217,7 +217,7 @@ func (e *SetExecution) Existing(c *Commands, ctx context.Context, resourceOwner 
 		return zerrors.ThrowNotFound(nil, "COMMAND-slgj0l4cdz", "Errors.Execution.IncludeNotFound")
 	}
 	get, set := createIncludeCacheFunctions()
-	// maxLevels could be configurable, but set as 5 for now
+	// maxLevels could be configurable, but set as 3 for now
 	return checkForIncludeCircular(ctx, e.AggregateID, resourceOwner, includes, c.getExecutionIncludes(get, set), 3)
 }
 
