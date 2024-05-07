@@ -10,12 +10,13 @@ import (
 type ExecutionWriteModel struct {
 	eventstore.WriteModel
 
-	Targets  []string
-	Includes []string
+	Targets          []string
+	Includes         []string
+	ExecutionTargets []*execution.Target
 }
 
 func (e *ExecutionWriteModel) Exists() bool {
-	return len(e.Targets) > 0 || len(e.Includes) > 0
+	return len(e.ExecutionTargets) > 0 || len(e.Includes) > 0 || len(e.Targets) > 0
 }
 
 func NewExecutionWriteModel(id string, resourceOwner string) *ExecutionWriteModel {
@@ -34,9 +35,12 @@ func (wm *ExecutionWriteModel) Reduce() error {
 		case *execution.SetEvent:
 			wm.Targets = e.Targets
 			wm.Includes = e.Includes
+		case *execution.SetEventV2:
+			wm.ExecutionTargets = e.Targets
 		case *execution.RemovedEvent:
 			wm.Targets = nil
 			wm.Includes = nil
+			wm.ExecutionTargets = nil
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -49,6 +53,7 @@ func (wm *ExecutionWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(execution.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(execution.SetEventType,
+			execution.SetEventV2Type,
 			execution.RemovedEventType).
 		Builder()
 }
@@ -91,6 +96,10 @@ func (wm *ExecutionsExistWriteModel) Reduce() error {
 			if !slices.Contains(wm.existingIDs, e.Aggregate().ID) {
 				wm.existingIDs = append(wm.existingIDs, e.Aggregate().ID)
 			}
+		case *execution.SetEventV2:
+			if !slices.Contains(wm.existingIDs, e.Aggregate().ID) {
+				wm.existingIDs = append(wm.existingIDs, e.Aggregate().ID)
+			}
 		case *execution.RemovedEvent:
 			i := slices.Index(wm.existingIDs, e.Aggregate().ID)
 			if i >= 0 {
@@ -108,6 +117,7 @@ func (wm *ExecutionsExistWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(execution.AggregateType).
 		AggregateIDs(wm.ids...).
 		EventTypes(execution.SetEventType,
+			execution.SetEventV2Type,
 			execution.RemovedEventType).
 		Builder()
 }

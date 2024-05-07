@@ -65,7 +65,9 @@ func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
 
 	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
 
-	gotCD := gotDetails.GetTimestamp().AsTime()
-	wantCD := time.Now()
-	assert.WithinRange(t, gotCD, wantCD.Add(-time.Minute), wantCD.Add(time.Minute))
+	if wantDetails.GetTimestamp() != nil {
+		gotCD := gotDetails.GetTimestamp().AsTime()
+		wantCD := time.Now()
+		assert.WithinRange(t, gotCD, wantCD.Add(-time.Minute), wantCD.Add(time.Minute))
+	}
 }

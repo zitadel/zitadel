@@ -9,14 +9,23 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
+func executionTargetsSingleTarget(id string) []*action.ExecutionTargetType {
+	return []*action.ExecutionTargetType{{Type: &action.ExecutionTargetType_Target{Target: id}}}
+}
+
+func executionTargetsSingleInclude(include *action.Condition) []*action.ExecutionTargetType {
+	return []*action.ExecutionTargetType{{Type: &action.ExecutionTargetType_Include{Include: include}}}
+}
+
 func TestServer_SetExecution_Request(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -48,7 +57,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						Request: &action.RequestExecution{},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -65,7 +74,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -82,7 +91,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -104,7 +113,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -121,7 +130,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -143,7 +152,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -163,27 +172,28 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
+
+			// cleanup to not impact other requests
+			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
 	ensureFeatureEnabled(t)
-
-	targetResp := Tester.CreateTarget(CTX, t)
-	executionCond := "request"
-	Tester.SetExecution(CTX, t,
-		&action.Condition{
-			ConditionType: &action.Condition_Request{
-				Request: &action.RequestExecution{
-					Condition: &action.RequestExecution_All{
-						All: true,
-					},
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	executionCond := &action.Condition{
+		ConditionType: &action.Condition_Request{
+			Request: &action.RequestExecution{
+				Condition: &action.RequestExecution_All{
+					All: true,
 				},
 			},
 		},
-		[]string{targetResp.GetId()},
-		[]string{},
+	}
+	Tester.SetExecution(CTX, t,
+		executionCond,
+		executionTargetsSingleTarget(targetResp.GetId()),
 	)
 
 	tests := []struct {
@@ -206,7 +216,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Includes: []string{executionCond},
+				Targets: executionTargetsSingleInclude(executionCond),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -228,7 +238,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Includes: []string{executionCond},
+				Targets: executionTargetsSingleInclude(executionCond),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -237,6 +247,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 				},
 			},
 		},
+		/* circular
 		{
 			name: "all, ok",
 			ctx:  CTX,
@@ -250,7 +261,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Includes: []string{executionCond},
+				Targets: executionTargetsSingleInclude(executionCond),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -259,6 +270,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 				},
 			},
 		},
+		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -270,13 +282,16 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
+
+			// cleanup to not impact other requests
+			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_DeleteExecution_Request(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -332,7 +347,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 			name: "method, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &action.DeleteExecutionRequest{
@@ -373,7 +388,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 			name: "service, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &action.DeleteExecutionRequest{
@@ -398,7 +413,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 			name: "all, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &action.DeleteExecutionRequest{
@@ -441,7 +456,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 
 func TestServer_SetExecution_Response(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -473,7 +488,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						Response: &action.ResponseExecution{},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -490,7 +505,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -507,7 +522,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -529,7 +544,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -546,7 +561,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -568,7 +583,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -588,13 +603,16 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
+
+			// cleanup to not impact other requests
+			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_DeleteExecution_Response(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -652,7 +670,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 			name: "method, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &action.DeleteExecutionRequest{
@@ -693,7 +711,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 			name: "service, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &action.DeleteExecutionRequest{
@@ -718,7 +736,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 			name: "all, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &action.DeleteExecutionRequest{
@@ -761,7 +779,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 
 func TestServer_SetExecution_Event(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -795,7 +813,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						Event: &action.EventExecution{},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -833,7 +851,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -876,7 +894,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -898,7 +916,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -918,13 +936,16 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
+
+			// cleanup to not impact other requests
+			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_DeleteExecution_Event(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -985,7 +1006,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 			name: "event, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &action.DeleteExecutionRequest{
@@ -1026,7 +1047,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 			name: "group, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &action.DeleteExecutionRequest{
@@ -1061,18 +1082,13 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 					},
 				},
 			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
+			wantErr: true,
 		},
 		{
 			name: "all, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &action.DeleteExecutionRequest{
@@ -1115,7 +1131,7 @@ func TestServer_DeleteExecution_Event(t *testing.T) {
 
 func TestServer_SetExecution_Function(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -1147,7 +1163,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Response: &action.ResponseExecution{},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -1157,10 +1173,10 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
-						Function: "xxx",
+						Function: &action.FunctionExecution{Name: "xxx"},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			wantErr: true,
 		},
@@ -1170,10 +1186,10 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
-						Function: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication",
+						Function: &action.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
 					},
 				},
-				Targets: []string{targetResp.GetId()},
+				Targets: executionTargetsSingleTarget(targetResp.GetId()),
 			},
 			want: &action.SetExecutionResponse{
 				Details: &object.Details{
@@ -1193,13 +1209,16 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertDetails(t, tt.want, got)
+
+			// cleanup to not impact other requests
+			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_DeleteExecution_Function(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t)
+	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -1243,7 +1262,7 @@ func TestServer_DeleteExecution_Function(t *testing.T) {
 			req: &action.DeleteExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
-						Function: "xxx",
+						Function: &action.FunctionExecution{Name: "xxx"},
 					},
 				},
 			},
@@ -1253,13 +1272,13 @@ func TestServer_DeleteExecution_Function(t *testing.T) {
 			name: "function, ok",
 			ctx:  CTX,
 			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), []string{targetResp.GetId()}, []string{})
+				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
 				return nil
 			},
 			req: &action.DeleteExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
-						Function: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication",
+						Function: &action.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
 					},
 				},
 			},

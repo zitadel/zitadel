@@ -672,6 +672,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 								time.Hour*1,
 								"",
 								false,
+								"",
 							),
 						),
 					),
@@ -733,6 +734,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 								time.Hour*1,
 								"",
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -791,6 +793,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 								time.Hour*1,
 								"",
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(
@@ -858,6 +861,7 @@ func TestCommandSide_userHumanWriteModel_email(t *testing.T) {
 								time.Hour*1,
 								"",
 								false,
+								"",
 							),
 						),
 						eventFromEventPusher(

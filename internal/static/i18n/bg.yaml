@@ -484,6 +484,7 @@ Errors:
     NotActive: Действието не е активно
     NotInactive: Действието не е неактивно
     MaxAllowed: Не са разрешени допълнителни активни действия
+    NotEnabled: Функцията „Действие“ не е активирана
   Flow:
     FlowTypeMissing: Липсва FlowType
     Empty: Потокът вече е празен

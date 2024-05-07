@@ -27,55 +27,64 @@ func Test_createTargetToCommand(t *testing.T) {
 			args: args{nil},
 			want: &command.AddTarget{
 				Name:             "",
-				URL:              "",
+				Endpoint:         "",
 				Timeout:          0,
-				Async:            false,
 				InterruptOnError: false,
 			},
 		},
 		{
-			name: "all fields (async webhook)",
+			name: "all fields (webhook)",
 			args: args{&action.CreateTargetRequest{
-				Name: "target 1",
+				Name:     "target 1",
+				Endpoint: "https://example.com/hooks/1",
 				TargetType: &action.CreateTargetRequest_RestWebhook{
-					RestWebhook: &action.SetRESTWebhook{
-						Url: "https://example.com/hooks/1",
-					},
+					RestWebhook: &action.SetRESTWebhook{},
 				},
 				Timeout: durationpb.New(10 * time.Second),
-				ExecutionType: &action.CreateTargetRequest_IsAsync{
-					IsAsync: true,
-				},
 			}},
 			want: &command.AddTarget{
 				Name:             "target 1",
 				TargetType:       domain.TargetTypeWebhook,
-				URL:              "https://example.com/hooks/1",
+				Endpoint:         "https://example.com/hooks/1",
 				Timeout:          10 * time.Second,
-				Async:            true,
+				InterruptOnError: false,
+			},
+		},
+		{
+			name: "all fields (async)",
+			args: args{&action.CreateTargetRequest{
+				Name:     "target 1",
+				Endpoint: "https://example.com/hooks/1",
+				TargetType: &action.CreateTargetRequest_RestAsync{
+					RestAsync: &action.SetRESTAsync{},
+				},
+				Timeout: durationpb.New(10 * time.Second),
+			}},
+			want: &command.AddTarget{
+				Name:             "target 1",
+				TargetType:       domain.TargetTypeAsync,
+				Endpoint:         "https://example.com/hooks/1",
+				Timeout:          10 * time.Second,
 				InterruptOnError: false,
 			},
 		},
 		{
 			name: "all fields (interrupting response)",
 			args: args{&action.CreateTargetRequest{
-				Name: "target 1",
-				TargetType: &action.CreateTargetRequest_RestRequestResponse{
-					RestRequestResponse: &action.SetRESTRequestResponse{
-						Url: "https://example.com/hooks/1",
+				Name:     "target 1",
+				Endpoint: "https://example.com/hooks/1",
+				TargetType: &action.CreateTargetRequest_RestCall{
+					RestCall: &action.SetRESTCall{
+						InterruptOnError: true,
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
-				ExecutionType: &action.CreateTargetRequest_InterruptOnError{
-					InterruptOnError: true,
-				},
 			}},
 			want: &command.AddTarget{
 				Name:             "target 1",
-				TargetType:       domain.TargetTypeRequestResponse,
-				URL:              "https://example.com/hooks/1",
+				TargetType:       domain.TargetTypeCall,
+				Endpoint:         "https://example.com/hooks/1",
 				Timeout:          10 * time.Second,
-				Async:            false,
 				InterruptOnError: true,
 			},
 		},
@@ -105,80 +114,108 @@ func Test_updateTargetToCommand(t *testing.T) {
 		{
 			name: "all fields nil",
 			args: args{&action.UpdateTargetRequest{
-				Name:          nil,
-				TargetType:    nil,
-				Timeout:       nil,
-				ExecutionType: nil,
+				Name:       nil,
+				TargetType: nil,
+				Timeout:    nil,
 			}},
 			want: &command.ChangeTarget{
 				Name:             nil,
 				TargetType:       nil,
-				URL:              nil,
+				Endpoint:         nil,
 				Timeout:          nil,
-				Async:            nil,
 				InterruptOnError: nil,
 			},
 		},
 		{
 			name: "all fields empty",
 			args: args{&action.UpdateTargetRequest{
-				Name:          gu.Ptr(""),
-				TargetType:    nil,
-				Timeout:       durationpb.New(0),
-				ExecutionType: nil,
+				Name:       gu.Ptr(""),
+				TargetType: nil,
+				Timeout:    durationpb.New(0),
 			}},
 			want: &command.ChangeTarget{
 				Name:             gu.Ptr(""),
 				TargetType:       nil,
-				URL:              nil,
+				Endpoint:         nil,
 				Timeout:          gu.Ptr(0 * time.Second),
-				Async:            nil,
 				InterruptOnError: nil,
 			},
 		},
 		{
-			name: "all fields (async webhook)",
+			name: "all fields (webhook)",
 			args: args{&action.UpdateTargetRequest{
-				Name: gu.Ptr("target 1"),
+				Name:     gu.Ptr("target 1"),
+				Endpoint: gu.Ptr("https://example.com/hooks/1"),
 				TargetType: &action.UpdateTargetRequest_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{
-						Url: "https://example.com/hooks/1",
+						InterruptOnError: false,
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
-				ExecutionType: &action.UpdateTargetRequest_IsAsync{
-					IsAsync: true,
-				},
 			}},
 			want: &command.ChangeTarget{
 				Name:             gu.Ptr("target 1"),
 				TargetType:       gu.Ptr(domain.TargetTypeWebhook),
-				URL:              gu.Ptr("https://example.com/hooks/1"),
+				Endpoint:         gu.Ptr("https://example.com/hooks/1"),
 				Timeout:          gu.Ptr(10 * time.Second),
-				Async:            gu.Ptr(true),
+				InterruptOnError: gu.Ptr(false),
+			},
+		},
+		{
+			name: "all fields (webhook interrupt)",
+			args: args{&action.UpdateTargetRequest{
+				Name:     gu.Ptr("target 1"),
+				Endpoint: gu.Ptr("https://example.com/hooks/1"),
+				TargetType: &action.UpdateTargetRequest_RestWebhook{
+					RestWebhook: &action.SetRESTWebhook{
+						InterruptOnError: true,
+					},
+				},
+				Timeout: durationpb.New(10 * time.Second),
+			}},
+			want: &command.ChangeTarget{
+				Name:             gu.Ptr("target 1"),
+				TargetType:       gu.Ptr(domain.TargetTypeWebhook),
+				Endpoint:         gu.Ptr("https://example.com/hooks/1"),
+				Timeout:          gu.Ptr(10 * time.Second),
+				InterruptOnError: gu.Ptr(true),
+			},
+		},
+		{
+			name: "all fields (async)",
+			args: args{&action.UpdateTargetRequest{
+				Name:     gu.Ptr("target 1"),
+				Endpoint: gu.Ptr("https://example.com/hooks/1"),
+				TargetType: &action.UpdateTargetRequest_RestAsync{
+					RestAsync: &action.SetRESTAsync{},
+				},
+				Timeout: durationpb.New(10 * time.Second),
+			}},
+			want: &command.ChangeTarget{
+				Name:             gu.Ptr("target 1"),
+				TargetType:       gu.Ptr(domain.TargetTypeAsync),
+				Endpoint:         gu.Ptr("https://example.com/hooks/1"),
+				Timeout:          gu.Ptr(10 * time.Second),
 				InterruptOnError: gu.Ptr(false),
 			},
 		},
 		{
 			name: "all fields (interrupting response)",
 			args: args{&action.UpdateTargetRequest{
-				Name: gu.Ptr("target 1"),
-				TargetType: &action.UpdateTargetRequest_RestRequestResponse{
-					RestRequestResponse: &action.SetRESTRequestResponse{
-						Url: "https://example.com/hooks/1",
+				Name:     gu.Ptr("target 1"),
+				Endpoint: gu.Ptr("https://example.com/hooks/1"),
+				TargetType: &action.UpdateTargetRequest_RestCall{
+					RestCall: &action.SetRESTCall{
+						InterruptOnError: true,
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
-				ExecutionType: &action.UpdateTargetRequest_InterruptOnError{
-					InterruptOnError: true,
-				},
 			}},
 			want: &command.ChangeTarget{
 				Name:             gu.Ptr("target 1"),
-				TargetType:       gu.Ptr(domain.TargetTypeRequestResponse),
-				URL:              gu.Ptr("https://example.com/hooks/1"),
+				TargetType:       gu.Ptr(domain.TargetTypeCall),
+				Endpoint:         gu.Ptr("https://example.com/hooks/1"),
 				Timeout:          gu.Ptr(10 * time.Second),
-				Async:            gu.Ptr(false),
 				InterruptOnError: gu.Ptr(true),
 			},
 		},

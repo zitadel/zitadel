@@ -25,11 +25,11 @@ func TestExecutionProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						exec.SetEventType,
+						exec.SetEventV2Type,
 						exec.AggregateType,
-						[]byte(`{"targets": ["target"], "includes": ["include"]}`),
+						[]byte(`{"targets": [{"type":2,"target":"target"},{"type":1,"target":"include"}]}`),
 					),
-					eventstore.GenericEventMapper[exec.SetEvent],
+					eventstore.GenericEventMapper[exec.SetEventV2],
 				),
 			},
 			reduce: (&executionProjection{}).reduceExecutionSet,
@@ -39,16 +39,40 @@ func TestExecutionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.executions (instance_id, id, resource_owner, creation_date, change_date, sequence, targets, includes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (instance_id, id) DO UPDATE SET (resource_owner, creation_date, change_date, sequence, targets, includes) = (EXCLUDED.resource_owner, projections.executions.creation_date, EXCLUDED.change_date, EXCLUDED.sequence, EXCLUDED.targets, EXCLUDED.includes)",
+							expectedStmt: "INSERT INTO projections.executions1 (instance_id, id, creation_date, change_date, sequence) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (instance_id, id) DO UPDATE SET (creation_date, change_date, sequence) = (projections.executions1.creation_date, EXCLUDED.change_date, EXCLUDED.sequence)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
-								"ro-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
-								[]string{"target"},
-								[]string{"include"},
+							},
+						},
+						{
+							expectedStmt: "DELETE FROM projections.executions1_targets WHERE (instance_id = $1) AND (execution_id = $2)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.executions1_targets (instance_id, execution_id, position, include, target_id) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
+								1,
+								"",
+								"target",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO projections.executions1_targets (instance_id, execution_id, position, include, target_id) VALUES ($1, $2, $3, $4, $5)",
+							expectedArgs: []interface{}{
+								"instance-id",
+								"agg-id",
+								2,
+								"include",
+								"",
 							},
 						},
 					},
@@ -74,7 +98,7 @@ func TestExecutionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.executions WHERE (instance_id = $1) AND (id = $2)",
+							expectedStmt: "DELETE FROM projections.executions1 WHERE (instance_id = $1) AND (id = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
@@ -103,7 +127,7 @@ func TestExecutionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.executions WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.executions1 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

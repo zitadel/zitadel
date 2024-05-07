@@ -29,7 +29,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 					testEvent(
 						target.AddedEventType,
 						target.AggregateType,
-						[]byte(`{"name": "name", "targetType":0, "url":"https://example.com", "timeout": 3000000000, "async": true, "interruptOnError": true}`),
+						[]byte(`{"name": "name", "targetType":0, "endpoint":"https://example.com", "timeout": 3000000000, "async": true, "interruptOnError": true}`),
 					),
 					eventstore.GenericEventMapper[target.AddedEvent],
 				),
@@ -41,7 +41,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.targets (instance_id, resource_owner, id, creation_date, change_date, sequence, name, url, target_type, timeout, async, interrupt_on_error) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.targets1 (instance_id, resource_owner, id, creation_date, change_date, sequence, name, endpoint, target_type, timeout, interrupt_on_error) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"ro-id",
@@ -53,7 +53,6 @@ func TestTargetProjection_reduces(t *testing.T) {
 								"https://example.com",
 								domain.TargetTypeWebhook,
 								3 * time.Second,
-								true,
 								true,
 							},
 						},
@@ -68,7 +67,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 					testEvent(
 						target.ChangedEventType,
 						target.AggregateType,
-						[]byte(`{"name": "name2", "targetType":0, "url":"https://example.com", "timeout": 3000000000, "async": true, "interruptOnError": true}`),
+						[]byte(`{"name": "name2", "targetType":0, "endpoint":"https://example.com", "timeout": 3000000000, "async": true, "interruptOnError": true}`),
 					),
 					eventstore.GenericEventMapper[target.ChangedEvent],
 				),
@@ -80,7 +79,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.targets SET (change_date, sequence, resource_owner, name, target_type, url, timeout, async, interrupt_on_error) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (instance_id = $10) AND (id = $11)",
+							expectedStmt: "UPDATE projections.targets1 SET (change_date, sequence, resource_owner, name, target_type, endpoint, timeout, interrupt_on_error) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (instance_id = $9) AND (id = $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -89,7 +88,6 @@ func TestTargetProjection_reduces(t *testing.T) {
 								domain.TargetTypeWebhook,
 								"https://example.com",
 								3 * time.Second,
-								true,
 								true,
 								"instance-id",
 								"agg-id",
@@ -118,7 +116,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.targets WHERE (instance_id = $1) AND (id = $2)",
+							expectedStmt: "DELETE FROM projections.targets1 WHERE (instance_id = $1) AND (id = $2)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								"agg-id",
@@ -147,7 +145,7 @@ func TestTargetProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.targets WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.targets1 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

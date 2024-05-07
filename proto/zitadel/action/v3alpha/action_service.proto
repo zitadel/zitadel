@@ -423,22 +423,26 @@ message CreateTargetRequest {
     option (validate.required) = true;
 
     SetRESTWebhook rest_webhook = 2;
-    SetRESTRequestResponse rest_request_response = 3;
+    SetRESTCall rest_call = 3;
+    SetRESTAsync rest_async = 4;
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
-  google.protobuf.Duration timeout = 4 [
+  google.protobuf.Duration timeout = 5 [
     (validate.rules).duration = {gt: {seconds: 0}, required: true},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"10s\"";
     }
   ];
-  oneof execution_type {
-    // Set the execution to run asynchronously.
-    bool is_async = 5;
-    // Define if any error stops the whole execution. By default the process continues as normal.
-    bool interrupt_on_error = 6;
-  }
+  string endpoint = 6 [
+    (validate.rules).string = {min_len: 1, max_len: 1000, uri: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 1000,
+      example: "\"https://example.com/hooks/ip_check\"";
+    }
+  ];
 }
 
 message CreateTargetResponse {
@@ -472,21 +476,24 @@ message UpdateTargetRequest {
   // or its target URL.
   oneof target_type {
     SetRESTWebhook rest_webhook = 3;
-    SetRESTRequestResponse rest_request_response = 4;
+    SetRESTCall rest_call = 4;
+    SetRESTAsync rest_async = 5;
   }
   // Optionally change the timeout, which defines the duration until ZITADEL cancels the execution.
-  optional google.protobuf.Duration timeout = 5 [
+  optional google.protobuf.Duration timeout = 6 [
     (validate.rules).duration = {gt: {seconds: 0}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"10s\"";
     }
   ];
-  oneof execution_type {
-    // Set the execution to run asynchronously.
-    bool is_async = 6;
-    // Define if any error stops the whole execution. By default the process continues as normal.
-    bool interrupt_on_error = 7;
-  }
+
+  optional string endpoint = 7 [
+    (validate.rules).string = {max_len: 1000, uri: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      max_length: 1000,
+      example: "\"https://example.com/hooks/ip_check\"";
+    }
+  ];
 }
 
 message UpdateTargetResponse {
@@ -554,10 +561,8 @@ message GetTargetByIDResponse {
 message SetExecutionRequest {
   // Defines the condition type and content of the condition for execution.
   Condition condition = 1;
-  // Defines the execution targets which are defined as a different resource, which are called in the defined conditions.
-  repeated string targets = 2;
-  // Defines other executions as included with the same condition-types.
-  repeated string includes = 3;
+  // Ordered list of targets/includes called during the execution.
+  repeated zitadel.action.v3alpha.ExecutionTargetType targets = 2;
 }
 
 message SetExecutionResponse {
