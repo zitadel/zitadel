@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -288,13 +289,13 @@ func (c *Commands) addHumanCommandEmail(ctx context.Context, filter preparation.
 		if human.Email.ReturnCode {
 			human.EmailCode = &emailCode.Plain
 		}
-		return append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &a.Aggregate, emailCode.Crypted, emailCode.Expiry, human.Email.URLTemplate, human.Email.ReturnCode)), nil
+		return append(cmds, user.NewHumanEmailCodeAddedEventV2(ctx, &a.Aggregate, emailCode.Crypted, emailCode.Expiry, human.Email.URLTemplate, human.Email.ReturnCode, human.AuthRequestID)), nil
 	}
 	return cmds, nil
 }
 
 func addLink(ctx context.Context, filter preparation.FilterToQueryReducer, a *user.Aggregate, link *AddLink) (eventstore.Command, error) {
-	exists, err := ExistsIDP(ctx, filter, link.IDPID, a.ResourceOwner)
+	exists, err := ExistsIDPOnOrgOrInstance(ctx, filter, authz.GetInstance(ctx).InstanceID(), a.ResourceOwner, link.IDPID)
 	if !exists || err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-39nf2", "Errors.IDPConfig.NotExisting")
 	}
@@ -411,10 +412,9 @@ func (h *AddHuman) ensureDisplayName() {
 //     and / or
 //   - have no authentication method (password / passwordless)
 func (h *AddHuman) shouldAddInitCode() bool {
-	return !h.ExternalIDP &&
-		!h.Email.Verified ||
-		!h.Passwordless &&
-			h.Password == ""
+	return len(h.Links) == 0 &&
+		(!h.Email.Verified ||
+			(!h.Passwordless && h.Password == ""))
 }
 
 // Deprecated: use commands.AddUserHuman
@@ -689,16 +689,17 @@ func AddHumanFromDomain(user *domain.Human, metadataList []*domain.Metadata, aut
 		human.DisplayName = user.DisplayName
 		human.PreferredLanguage = user.PreferredLanguage
 		human.Gender = user.Gender
-		human.Password = user.Password.SecretString
 		human.Register = true
 		human.Metadata = addMetadata
+	}
+	if authRequest != nil {
 		human.UserAgentID = authRequest.AgentID
 		human.AuthRequestID = authRequest.ID
 	}
 	if user.Email != nil {
 		human.Email = Email{
-			Address:  user.EmailAddress,
-			Verified: user.IsEmailVerified,
+			Address:  user.Email.EmailAddress,
+			Verified: user.Email.IsEmailVerified,
 		}
 	}
 	if user.Phone != nil {
@@ -706,6 +707,9 @@ func AddHumanFromDomain(user *domain.Human, metadataList []*domain.Metadata, aut
 			Number:   user.Phone.PhoneNumber,
 			Verified: user.Phone.IsPhoneVerified,
 		}
+	}
+	if user.Password != nil {
+		human.Password = user.Password.SecretString
 	}
 	if idp != nil {
 		human.Links = []*AddLink{

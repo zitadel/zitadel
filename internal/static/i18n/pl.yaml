@@ -136,7 +136,7 @@ Errors:
       Invalid: Hasło jest nieprawidłowe
       NotSet: Użytkownik nie ustawił hasła
       NotChanged: Nowe hasło nie może być takie samo jak Twoje obecne hasło
-      NotSupported: Kodowanie skrótu hasła nie jest obsługiwane
+      NotSupported: Kodowanie skrótu hasła nie jest obsługiwane. Sprawdź https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Polityka hasła nie znaleziona
       MinLength: Hasło jest zbyt krótkie
@@ -470,6 +470,7 @@ Errors:
     NotActive: Działanie nie jest aktywne
     NotInactive: Działanie nie jest dezaktywowane
     MaxAllowed: Nie dopuszcza się dodatkowych aktywnych działań.
+    NotEnabled: Funkcja „Akcja” nie jest włączona
   Flow:
     FlowTypeMissing: Typ przepływu brakuje
     Empty: Przepływ jest już pusty

@@ -36,7 +36,9 @@
         <a class="lgn-icon-button lgn-left-action" id="back-button" href="#">
             <i class="lgn-icon-arrow-left-solid"></i>
         </a>
+        {{if hasUsernamePasswordLogin}}
         <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "Login.NextButtonText"}}</button>
+        {{end}}
         <span class="fill-space"></span>
         {{if hasRegistration}}
         <button class="lgn-stroked-button" name="register" value="true" formnovalidate>{{t "Login.RegisterButtonText"}}</button>

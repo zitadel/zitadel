@@ -136,7 +136,7 @@ Errors:
       Invalid: Le mot de passe n'est pas valide
       NotSet: L'utilisateur n'a pas défini de mot de passe
       NotChanged: Le nouveau mot de passe ne peut pas être le même que votre mot de passe actuel
-      NotSupported: Encodage de hachage de mot de passe non pris en charge
+      NotSupported: Encodage de hachage de mot de passe non pris en charge. Consultez https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Politique de mot de passe non trouvée
       MinLength: Le mot de passe est trop court
@@ -470,6 +470,7 @@ Errors:
     NotActive: L'action n'est pas active
     NotInactive: L'action n'est pas inactive
     MaxAllowed: Aucune action active supplémentaire n'est autorisée
+    NotEnabled: La fonctionnalité "Action" n'est pas activée
   Flow:
     FlowTypeMissing: FlowType missing
     Empty: Le flux est déjà vide
