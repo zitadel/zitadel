@@ -11,20 +11,20 @@ jobs:
           script: |
             const content = `Thanks for your contribution! 🎉
 
-Please make sure you check the following points before marking this Pull Request (PR) as ready for review:
-
-  - [ ] I am happy with the code
-  - [ ] Documentation/examples are up-to-date
-  - [ ] Critical changes are tested automatically
-  - [ ] No debug or dead code
-  - [ ] My code has no repetitions
-  - [ ] The PR title adheres to the [conventional commit format](https://www.conventionalcommits.org/en/v1.0.0/)
-  - [ ] The example texts in the PR description are replaced.
-  - [ ] If there are any open TODOs or follow-ups, they are described in issues and link to this PR
-  - [ ] If there are deviations from a user stories acceptance criteria or design, they are agreed upon with the PO and documented.
-  - [ ] All non-functional requirements are met
-  - [ ] Functionality of the acceptance criteria is checked manually on the dev system.
-  `;
+            Please make sure you check the following points before marking this Pull Request (PR) as ready for review:
+            
+              - [ ] I am happy with the code
+              - [ ] Documentation/examples are up-to-date
+              - [ ] Critical changes are tested automatically
+              - [ ] No debug or dead code
+              - [ ] My code has no repetitions
+              - [ ] The PR title adheres to the [conventional commit format](https://www.conventionalcommits.org/en/v1.0.0/)
+              - [ ] The example texts in the PR description are replaced.
+              - [ ] If there are any open TODOs or follow-ups, they are described in issues and link to this PR
+              - [ ] If there are deviations from a user stories acceptance criteria or design, they are agreed upon with the PO and documented.
+              - [ ] All non-functional requirements are met
+              - [ ] Functionality of the acceptance criteria is checked manually on the dev system.
+              `;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
