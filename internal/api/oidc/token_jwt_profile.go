@@ -34,9 +34,10 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 	if err != nil {
 		return nil, err
 	}
-
-	// TODO org scope sanitation?
-	// https://github.com/zitadel/zitadel/blob/150d79af4767d62d7b9f90ab08af4eb26bde0f8b/internal/api/oidc/client.go#L302-L326
+	scope, err = s.checkOrgScopes(ctx, client.user, scope)
+	if err != nil {
+		return nil, err
+	}
 
 	session, err := s.command.CreateOIDCSession(ctx,
 		user.ID,
