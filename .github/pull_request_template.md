@@ -9,7 +9,13 @@ For example:
 Replace this example text with a concise list of changes that this PR introduces.
 For example:
 - Validates if property XY is given and throws an error if not
-- Explicitly describes in the docs that the property XY is mandatory
+
+# Additional Changes
+
+Replace this example text with a concise list of additional changes that this PR introduces, that are not directly solving the initial problem but are related.
+For example:
+- The docs explicitly describe that the property XY is mandatory
+- Adds missing translations for validations.
 
 # Additional Context
 
