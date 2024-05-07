@@ -47,20 +47,6 @@ export default async function Page({
         )}
         <p className="ztdl-p mb-6 block">{description}</p>
 
-        {/* <Alert type={AlertType.INFO}>
-          <span>
-            A passkey is an authentication method on a device like your
-            fingerprint, Apple FaceID or similar.
-            <a
-              className="text-primary-light-500 dark:text-primary-dark-500 hover:text-primary-light-300 hover:dark:text-primary-dark-300"
-              target="_blank"
-              href="https://zitadel.com/docs/guides/manage/user/reg-create-user#with-passwordless"
-            >
-              Passwordless Authentication
-            </a>
-          </span>
-        </Alert> */}
-
         {!sessionFactors && (
           <div className="py-4">
             <Alert>
