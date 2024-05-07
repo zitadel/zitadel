@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { coerceToArrayBuffer, coerceToBase64Url } from "#/utils/base64";
 import { Button, ButtonVariants } from "./Button";
-import Alert from "./Alert";
+import Alert, { AlertType } from "./Alert";
 import { Spinner } from "./Spinner";
 import { Checks } from "@zitadel/server";
 import { useForm } from "react-hook-form";
@@ -140,8 +140,10 @@ export default function LoginOTP({
     if (!res.ok) {
       const response = await res.json();
 
-      setError(response.message ?? "An internal error occurred");
-      return Promise.reject(response.message ?? "An internal error occurred");
+      setError(response.details.details ?? "An internal error occurred");
+      return Promise.reject(
+        response.details.details ?? "An internal error occurred"
+      );
     }
     return res.json();
   }
@@ -184,7 +186,34 @@ export default function LoginOTP({
 
   return (
     <form className="w-full">
-      <div className="">
+      {["email", "sms"].includes(method) && (
+        <Alert type={AlertType.INFO}>
+          <div className="flex flex-row">
+            <span className="flex-1 mr-auto text-left">
+              Did not get the Code?
+            </span>
+            <button
+              aria-label="Resend OTP Code"
+              disabled={loading}
+              className="ml-4 text-primary-light-500 dark:text-primary-dark-500 hover:dark:text-primary-dark-400 hover:text-primary-light-400 cursor-pointer disabled:cursor-default disabled:text-gray-400 dark:disabled:text-gray-700"
+              onClick={() => {
+                setLoading(true);
+                updateSessionForOTPChallenge()
+                  .then((response) => {
+                    setLoading(false);
+                  })
+                  .catch((error) => {
+                    setError(error);
+                    setLoading(false);
+                  });
+              }}
+            >
+              Resend
+            </button>
+          </div>
+        </Alert>
+      )}
+      <div className="mt-4">
         <TextInput
           type="text"
           {...register("code", { required: "This field is required" })}

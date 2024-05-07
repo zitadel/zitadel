@@ -38,7 +38,7 @@ export default function Alert({ children, type = AlertType.ALERT }: Props) {
       {type === AlertType.INFO && (
         <InformationCircleIcon className="flex-shrink-0 h-5 w-5 mr-2 ml-2" />
       )}
-      <span className="text-sm">{children}</span>
+      <span className="text-sm w-full ">{children}</span>
     </div>
   );
 }
