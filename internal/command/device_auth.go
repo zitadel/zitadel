@@ -145,6 +145,7 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 		deviceAuthModel.Scopes,
 		deviceAuthModel.UserAuthMethods,
 		deviceAuthModel.AuthTime,
+		"",
 		nil, // TBD: should we use some kind of device fingerprint as useragent?
 	)
 	if err = cmd.AddAccessToken(ctx, deviceAuthModel.Scopes, domain.TokenReasonAuthRequest, nil); err != nil {

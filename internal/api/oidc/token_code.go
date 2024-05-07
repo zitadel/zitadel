@@ -78,6 +78,7 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		authReq.GetAudience(),
 		AMRToAuthMethodTypes(authMethodsReferences),
 		authTime,
+		authReq.GetNonce(),
 		&domain.UserAgent{
 			FingerprintID: &userAgentID,
 		},
@@ -85,7 +86,10 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		actor,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 	)
-	return session, authReq.GetState(), err
+	if err != nil {
+		return nil, "", err
+	}
+	return session, authReq.GetState(), s.repo.DeleteAuthRequest(ctx, authReq.GetID())
 }
 
 func (s *Server) getAuthRequestV1ByCode(ctx context.Context, plainCode string) (op.AuthRequest, error) {

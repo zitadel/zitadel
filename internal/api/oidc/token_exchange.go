@@ -235,7 +235,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		resp.IssuedTokenType = oidc.JWTTokenType
 
 	case oidc.IDTokenType:
-		resp.AccessToken, resp.ExpiresIn, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, actor)
+		resp.AccessToken, resp.ExpiresIn, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, "", actor)
 		resp.TokenType = TokenTypeNA
 		resp.IssuedTokenType = oidc.IDTokenType
 
@@ -249,7 +249,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	}
 
 	if slices.Contains(scopes, oidc.ScopeOpenID) && tokenType != oidc.IDTokenType {
-		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, actor)
+		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, "", actor)
 		if err != nil {
 			return nil, err
 		}
@@ -270,6 +270,7 @@ func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, 
 		audience,
 		authMethods,
 		authTime,
+		"",
 		nil,
 		reason,
 		actor,
@@ -297,6 +298,7 @@ func (s *Server) createExchangeJWT(ctx context.Context, client *Client, getUserI
 		audience,
 		authMethods,
 		authTime,
+		"",
 		nil,
 		reason,
 		actor,

@@ -577,7 +577,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
-							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, nil,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", nil,
 						),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(),
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -640,7 +640,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
-							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, nil,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", nil,
 						),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(),
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,

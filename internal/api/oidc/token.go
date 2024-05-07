@@ -53,7 +53,7 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 	}
 
 	if slices.Contains(session.Scope, oidc.ScopeOpenID) {
-		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, session.Audience, session.AuthMethods, session.AuthTime, session.Actor)
+		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, session.Audience, session.AuthMethods, session.AuthTime, session.Nonce, session.Actor)
 	}
 	return resp, err
 }
@@ -112,7 +112,7 @@ func (s *Server) getUserInfoOnce(userID, projectID string, projectRoleAssertion 
 	}
 }
 
-func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo userInfoFunc, getSigningKey signerFunc, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
+func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo userInfoFunc, getSigningKey signerFunc, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, nonce string, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -133,7 +133,7 @@ func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo 
 		audience,
 		expTime,
 		authTime,
-		"",
+		nonce,
 		"",
 		AuthMethodTypesToAMR(authMethods),
 		client.GetID(),

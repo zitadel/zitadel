@@ -39,6 +39,7 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, // TBD: or nil?
 		time.Now(),
+		"",
 		nil,
 		domain.TokenReasonClientCredentials,
 		nil,

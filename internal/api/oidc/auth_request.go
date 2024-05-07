@@ -680,6 +680,7 @@ func (s *Server) authResponseToken(authReq op.AuthRequest, authorizer op.Authori
 		authReq.GetAudience(),
 		AMRToAuthMethodTypes(authMethodsReferences),
 		authTime,
+		authReq.GetNonce(),
 		&domain.UserAgent{
 			FingerprintID: &userAgentID,
 		},

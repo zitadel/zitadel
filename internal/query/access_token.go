@@ -24,6 +24,7 @@ type OIDCSessionAccessTokenReadModel struct {
 	Scope                 []string
 	AuthMethods           []domain.UserAuthMethodType
 	AuthTime              time.Time
+	Nonce                 string
 	State                 domain.OIDCSessionState
 	AccessTokenID         string
 	AccessTokenCreation   time.Time
@@ -79,6 +80,7 @@ func (wm *OIDCSessionAccessTokenReadModel) reduceAdded(e *oidcsession.AddedEvent
 	wm.Scope = e.Scope
 	wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
+	wm.Nonce = e.Nonce
 	wm.State = domain.OIDCSessionStateActive
 }
 

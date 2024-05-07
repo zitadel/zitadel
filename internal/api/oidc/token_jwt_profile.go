@@ -47,6 +47,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		nil,
 		time.Now(),
+		"",
 		nil,
 		domain.TokenReasonClientCredentials,
 		nil,

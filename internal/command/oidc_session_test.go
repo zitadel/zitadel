@@ -265,7 +265,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 						authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
-							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 							&domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
 								IP:            net.ParseIP("1.2.3.4"),
@@ -301,6 +301,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 					Scope:       []string{"openid", "offline_access"},
 					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 					AuthTime:    testNow,
+					Nonce:       "nonce",
 					UserAgent: &domain.UserAgent{
 						FingerprintID: gu.Ptr("fp1"),
 						IP:            net.ParseIP("1.2.3.4"),
@@ -374,7 +375,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid"},
-							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 							&domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
 								IP:            net.ParseIP("1.2.3.4"),
@@ -404,6 +405,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 					Scope:       []string{"openid"},
 					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 					AuthTime:    testNow,
+					Nonce:       "nonce",
 					UserAgent: &domain.UserAgent{
 						FingerprintID: gu.Ptr("fp1"),
 						IP:            net.ParseIP("1.2.3.4"),
@@ -457,6 +459,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 		scope            []string
 		authMethods      []domain.UserAuthMethodType
 		authTime         time.Time
+		nonce            string
 		userAgent        *domain.UserAgent
 		reason           domain.TokenReason
 		actor            *domain.TokenActor
@@ -485,6 +488,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				scope:         []string{"openid", "offline_access"},
 				authMethods:   []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				authTime:      testNow,
+				nonce:         "nonce",
 				userAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -508,7 +512,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
-							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 							&domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
 								IP:            net.ParseIP("1.2.3.4"),
@@ -541,6 +545,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				scope:         []string{"openid", "offline_access"},
 				authMethods:   []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				authTime:      testNow,
+				nonce:         "nonce",
 				userAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -563,6 +568,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				Scope:       []string{"openid", "offline_access"},
 				AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				AuthTime:    testNow,
+				Nonce:       "nonce",
 				UserAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -584,7 +590,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
-							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 							&domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
 								IP:            net.ParseIP("1.2.3.4"),
@@ -618,6 +624,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				scope:         []string{"openid", "offline_access"},
 				authMethods:   []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				authTime:      testNow,
+				nonce:         "nonce",
 				userAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -640,6 +647,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				Scope:       []string{"openid", "offline_access"},
 				AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 				AuthTime:    testNow,
+				Nonce:       "nonce",
 				UserAgent: &domain.UserAgent{
 					FingerprintID: gu.Ptr("fp1"),
 					IP:            net.ParseIP("1.2.3.4"),
@@ -673,6 +681,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				tt.args.audience,
 				tt.args.authMethods,
 				tt.args.authTime,
+				tt.args.nonce,
 				tt.args.userAgent,
 				tt.args.reason,
 				tt.args.actor,
@@ -760,7 +769,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -789,7 +798,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -822,7 +831,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -866,6 +875,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					Scope:        []string{"openid", "profile", "offline_access"},
 					AuthMethods:  []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
 					AuthTime:     testNow,
+					Nonce:        "nonce",
 					UserAgent:    &domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 					Reason:       domain.TokenReasonRefresh,
 				},
@@ -955,7 +965,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -983,7 +993,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -1015,7 +1025,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -1130,7 +1140,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -1155,7 +1165,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "otherClientID", []string{"otherClientID"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -1180,7 +1190,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -1216,7 +1226,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -1241,7 +1251,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "otherClientID", []string{"otherClientID"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),
@@ -1266,7 +1276,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow,
+								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
 						),

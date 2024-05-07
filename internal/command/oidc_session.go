@@ -37,6 +37,7 @@ type OIDCSession struct {
 	Scope             []string
 	AuthMethods       []domain.UserAuthMethodType
 	AuthTime          time.Time
+	Nonce             string
 	PreferredLanguage string
 	UserAgent         *domain.UserAgent
 	Reason            domain.TokenReason
@@ -88,7 +89,7 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		return nil, "", err
 	}
 
-	cmd.AddSession(ctx, sessionModel.UserID, sessionModel.AggregateID, authReqModel.ClientID, authReqModel.Audience, authReqModel.Scope, authReqModel.AuthMethods, authReqModel.AuthTime, sessionModel.UserAgent)
+	cmd.AddSession(ctx, sessionModel.UserID, sessionModel.AggregateID, authReqModel.ClientID, authReqModel.Audience, authReqModel.Scope, authReqModel.AuthMethods, authReqModel.AuthTime, authReqModel.Nonce, sessionModel.UserAgent)
 
 	if authReqModel.ResponseType != domain.OIDCResponseTypeIDToken {
 		if err = cmd.AddAccessToken(ctx, authReqModel.Scope, domain.TokenReasonAuthRequest, nil); err != nil {
@@ -105,7 +106,7 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 	return session, authReqModel.State, err
 }
 
-func (c *Commands) CreateOIDCSession(ctx context.Context, userID, resourceOwner, clientID string, scope, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, userAgent *domain.UserAgent, reason domain.TokenReason, actor *domain.TokenActor, needRefreshToken bool) (session *OIDCSession, err error) {
+func (c *Commands) CreateOIDCSession(ctx context.Context, userID, resourceOwner, clientID string, scope, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, nonce string, userAgent *domain.UserAgent, reason domain.TokenReason, actor *domain.TokenActor, needRefreshToken bool) (session *OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -113,7 +114,7 @@ func (c *Commands) CreateOIDCSession(ctx context.Context, userID, resourceOwner,
 	if err != nil {
 		return nil, err
 	}
-	cmd.AddSession(ctx, userID, "", clientID, audience, scope, authMethods, authTime, userAgent)
+	cmd.AddSession(ctx, userID, "", clientID, audience, scope, authMethods, authTime, nonce, userAgent)
 	if err = cmd.AddAccessToken(ctx, scope, reason, actor); err != nil {
 		return nil, err
 	}
@@ -318,6 +319,7 @@ func (c *OIDCSessionEvents) AddSession(
 	scope []string,
 	authMethods []domain.UserAuthMethodType,
 	authTime time.Time,
+	nonce string,
 	userAgent *domain.UserAgent,
 ) {
 	c.events = append(c.events, oidcsession.NewAddedEvent(
@@ -330,6 +332,7 @@ func (c *OIDCSessionEvents) AddSession(
 		scope,
 		authMethods,
 		authTime,
+		nonce,
 		userAgent,
 	))
 }
@@ -408,6 +411,7 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 		Scope:             c.oidcSessionWriteModel.Scope,
 		AuthMethods:       c.oidcSessionWriteModel.AuthMethods,
 		AuthTime:          c.oidcSessionWriteModel.AuthTime,
+		Nonce:             c.oidcSessionWriteModel.Nonce,
 		PreferredLanguage: "", // ??
 		UserAgent:         c.oidcSessionWriteModel.UserAgent,
 		Reason:            c.oidcSessionWriteModel.AccessTokenReason,
