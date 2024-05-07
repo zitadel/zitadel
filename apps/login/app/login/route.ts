@@ -53,6 +53,13 @@ export async function GET(request: NextRequest) {
     sessions = await loadSessions(ids);
   }
 
+  /**
+   * TODO: before automatically redirecting to the callbackUrl, check if the session is still valid
+   * possible scenaio:
+   * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
+   * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
+   **/
+
   if (authRequestId && sessionId) {
     console.log(
       `Login with session: ${sessionId} and authRequest: ${authRequestId}`
