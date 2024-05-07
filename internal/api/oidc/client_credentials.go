@@ -136,9 +136,8 @@ func (c *clientCredentialsClient) RestrictAdditionalAccessTokenScopes() func(sco
 	}
 }
 
-// IsScopeAllowed returns null false as the check is executed during the auth request validation
 func (c *clientCredentialsClient) IsScopeAllowed(scope string) bool {
-	return false
+	return isScopeAllowed(scope)
 }
 
 // IDTokenUserinfoClaimsAssertion returns null false as no id_token is issued
