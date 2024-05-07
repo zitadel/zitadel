@@ -545,39 +545,32 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 	require.NoError(t, err)
 }
 
-func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *action.CreateTargetResponse {
-	req := &action.CreateTargetRequest{
-		Name: fmt.Sprint(time.Now().UnixNano() + 1),
-		TargetType: &action.CreateTargetRequest_RestWebhook{
-			RestWebhook: &action.SetRESTWebhook{
-				Url: "https://example.com",
-			},
-		},
-		Timeout: durationpb.New(10 * time.Second),
+func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+	nameSet := fmt.Sprint(time.Now().UnixNano() + 1)
+	if name != "" {
+		nameSet = name
 	}
-	target, err := s.Client.ActionV3.CreateTarget(ctx, req)
-	require.NoError(t, err)
-	return target
-}
-
-func (s *Tester) CreateTargetWithNameAndType(ctx context.Context, t *testing.T, name string, async bool, interrupt bool) *action.CreateTargetResponse {
 	req := &action.CreateTargetRequest{
-		Name: name,
-		TargetType: &action.CreateTargetRequest_RestWebhook{
-			RestWebhook: &action.SetRESTWebhook{
-				Url: "https://example.com",
-			},
-		},
-		Timeout: durationpb.New(10 * time.Second),
+		Name:     nameSet,
+		Endpoint: endpoint,
+		Timeout:  durationpb.New(10 * time.Second),
 	}
-	if async {
-		req.ExecutionType = &action.CreateTargetRequest_IsAsync{
-			IsAsync: true,
+	switch ty {
+	case domain.TargetTypeWebhook:
+		req.TargetType = &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.SetRESTWebhook{
+				InterruptOnError: interrupt,
+			},
 		}
-	}
-	if interrupt {
-		req.ExecutionType = &action.CreateTargetRequest_InterruptOnError{
-			InterruptOnError: true,
+	case domain.TargetTypeCall:
+		req.TargetType = &action.CreateTargetRequest_RestCall{
+			RestCall: &action.SetRESTCall{
+				InterruptOnError: interrupt,
+			},
+		}
+	case domain.TargetTypeAsync:
+		req.TargetType = &action.CreateTargetRequest_RestAsync{
+			RestAsync: &action.SetRESTAsync{},
 		}
 	}
 	target, err := s.Client.ActionV3.CreateTarget(ctx, req)
@@ -585,14 +578,20 @@ func (s *Tester) CreateTargetWithNameAndType(ctx context.Context, t *testing.T, 
 	return target
 }
 
-func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []string, includes []string) *action.SetExecutionResponse {
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
 	target, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
-		Includes:  includes,
 	})
 	require.NoError(t, err)
 	return target
+}
+
+func (s *Tester) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
+	_, err := s.Client.ActionV3.DeleteExecution(ctx, &action.DeleteExecutionRequest{
+		Condition: cond,
+	})
+	require.NoError(t, err)
 }
 
 func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {

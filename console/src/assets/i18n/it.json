@@ -48,13 +48,13 @@
       "TITLE": "Utenti",
       "DESCRIPTION": "Un utente è un essere umano o una macchina che può accedere alle tue applicazioni.",
       "HUMANS": {
-        "TITLE": "Umani",
-        "DESCRIPTION": "Gli umani si autenticano interattivamente in una sessione del browser con un prompt di login.",
+        "TITLE": "Utenti",
+        "DESCRIPTION": "Gli utenti si autenticano interattivamente in una sessione del browser con un prompt di login.",
         "METADATA": "Aggiungi attributi personalizzati all'utente come il dipartimento. Puoi utilizzare queste informazioni nelle tue azioni."
       },
       "MACHINES": {
-        "TITLE": "Macchine",
-        "DESCRIPTION": "Le macchine si autenticano in modo non interattivo utilizzando un token JWT firmato con una chiave privata. Possono anche utilizzare un token di accesso personale.",
+        "TITLE": "Utenti di servizio",
+        "DESCRIPTION": "Utenti di servizio si autenticano in modo non interattivo utilizzando un token JWT firmato con una chiave privata. Possono anche utilizzare un token di accesso personale.",
         "METADATA": "Aggiungi attributi personalizzati all'utente come il sistema di autenticazione. Puoi utilizzare queste informazioni nelle tue azioni."
       },
       "SELF": {
@@ -269,9 +269,9 @@
             "TITLE": "Login Esterno consentito",
             "DESCRIPTION": "Permetti ai tuoi utenti di accedere con un provider di identità esterno invece di utilizzare l'utente ZITADEL per accedere."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Reset Password consentito",
-            "DESCRIPTION": "Permetti ai tuoi utenti di reimpostare la loro password."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Ripristino password nascosto",
+            "DESCRIPTION": "Non consentire agli utenti di reimpostare la password."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Scoperta Dominio consentita",

@@ -2,6 +2,7 @@ package action
 
 import (
 	"context"
+	"strings"
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
@@ -67,8 +68,6 @@ func targetFieldNameToSortingColumn(field action.TargetFieldName) query.Column {
 		return query.TargetColumnURL
 	case action.TargetFieldName_FIELD_NAME_TIMEOUT:
 		return query.TargetColumnTimeout
-	case action.TargetFieldName_FIELD_NAME_ASYNC:
-		return query.TargetColumnAsync
 	case action.TargetFieldName_FIELD_NAME_INTERRUPT_ON_ERROR:
 		return query.TargetColumnInterruptOnError
 	default:
@@ -134,19 +133,16 @@ func targetToPb(t *query.Target) *action.Target {
 		TargetId: t.ID,
 		Name:     t.Name,
 		Timeout:  durationpb.New(t.Timeout),
-	}
-	if t.Async {
-		target.ExecutionType = &action.Target_IsAsync{IsAsync: t.Async}
-	}
-	if t.InterruptOnError {
-		target.ExecutionType = &action.Target_InterruptOnError{InterruptOnError: t.InterruptOnError}
+		Endpoint: t.Endpoint,
 	}
 
 	switch t.TargetType {
 	case domain.TargetTypeWebhook:
-		target.TargetType = &action.Target_RestWebhook{RestWebhook: &action.SetRESTWebhook{Url: t.URL}}
-	case domain.TargetTypeRequestResponse:
-		target.TargetType = &action.Target_RestRequestResponse{RestRequestResponse: &action.SetRESTRequestResponse{Url: t.URL}}
+		target.TargetType = &action.Target_RestWebhook{RestWebhook: &action.SetRESTWebhook{InterruptOnError: t.InterruptOnError}}
+	case domain.TargetTypeCall:
+		target.TargetType = &action.Target_RestCall{RestCall: &action.SetRESTCall{InterruptOnError: t.InterruptOnError}}
+	case domain.TargetTypeAsync:
+		target.TargetType = &action.Target_RestAsync{RestAsync: &action.SetRESTAsync{}}
 	default:
 		target.TargetType = nil
 	}
@@ -205,10 +201,14 @@ func executionQueryToQuery(searchQuery *action.SearchQuery) (query.SearchQuery, 
 		return inConditionsQueryToQuery(q.InConditionsQuery)
 	case *action.SearchQuery_ExecutionTypeQuery:
 		return executionTypeToQuery(q.ExecutionTypeQuery)
-	case *action.SearchQuery_TargetQuery:
-		return query.NewExecutionTargetSearchQuery(q.TargetQuery.GetTargetId())
 	case *action.SearchQuery_IncludeQuery:
-		return query.NewExecutionIncludeSearchQuery(q.IncludeQuery.GetInclude())
+		include, err := conditionToInclude(q.IncludeQuery.GetInclude())
+		if err != nil {
+			return nil, err
+		}
+		return query.NewIncludeSearchQuery(include)
+	case *action.SearchQuery_TargetQuery:
+		return query.NewTargetSearchQuery(q.TargetQuery.GetTargetId())
 	default:
 		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
@@ -267,7 +267,7 @@ func conditionToID(q *action.Condition) (string, error) {
 		}
 		return cond.ID(), nil
 	case *action.Condition_Function:
-		return t.Function, nil
+		return command.ExecutionFunctionCondition(t.Function.GetName()).ID(), nil
 	default:
 		return "", zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
@@ -282,17 +282,83 @@ func executionsToPb(executions []*query.Execution) []*action.Execution {
 }
 
 func executionToPb(e *query.Execution) *action.Execution {
-	var targets, includes []string
-	if len(e.Targets) > 0 {
-		targets = e.Targets
+	targets := make([]*action.ExecutionTargetType, len(e.Targets))
+	for i := range e.Targets {
+		switch e.Targets[i].Type {
+		case domain.ExecutionTargetTypeInclude:
+			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Include{Include: executionIDToCondition(e.Targets[i].Target)}}
+		case domain.ExecutionTargetTypeTarget:
+			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Target{Target: e.Targets[i].Target}}
+		case domain.ExecutionTargetTypeUnspecified:
+			continue
+		default:
+			continue
+		}
 	}
-	if len(e.Includes) > 0 {
-		includes = e.Includes
-	}
+
 	return &action.Execution{
-		Details:     object.DomainToDetailsPb(&e.ObjectDetails),
-		ExecutionId: e.ID,
-		Targets:     targets,
-		Includes:    includes,
+		Details:   object.DomainToDetailsPb(&e.ObjectDetails),
+		Condition: executionIDToCondition(e.ID),
+		Targets:   targets,
 	}
+}
+
+func executionIDToCondition(include string) *action.Condition {
+	if strings.HasPrefix(include, domain.ExecutionTypeRequest.String()) {
+		return includeRequestToCondition(strings.TrimPrefix(include, domain.ExecutionTypeRequest.String()))
+	}
+	if strings.HasPrefix(include, domain.ExecutionTypeResponse.String()) {
+		return includeResponseToCondition(strings.TrimPrefix(include, domain.ExecutionTypeResponse.String()))
+	}
+	if strings.HasPrefix(include, domain.ExecutionTypeEvent.String()) {
+		return includeEventToCondition(strings.TrimPrefix(include, domain.ExecutionTypeEvent.String()))
+	}
+	if strings.HasPrefix(include, domain.ExecutionTypeFunction.String()) {
+		return includeFunctionToCondition(strings.TrimPrefix(include, domain.ExecutionTypeFunction.String()))
+	}
+	return nil
+}
+
+func includeRequestToCondition(id string) *action.Condition {
+	switch strings.Count(id, "/") {
+	case 2:
+		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Method{Method: id}}}}
+	case 1:
+		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Service{Service: strings.TrimPrefix(id, "/")}}}}
+	case 0:
+		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_All{All: true}}}}
+	default:
+		return nil
+	}
+}
+func includeResponseToCondition(id string) *action.Condition {
+	switch strings.Count(id, "/") {
+	case 2:
+		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Method{Method: id}}}}
+	case 1:
+		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Service{Service: strings.TrimPrefix(id, "/")}}}}
+	case 0:
+		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_All{All: true}}}}
+	default:
+		return nil
+	}
+}
+
+func includeEventToCondition(id string) *action.Condition {
+	switch strings.Count(id, "/") {
+	case 1:
+		if strings.HasSuffix(id, command.EventGroupSuffix) {
+			return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: strings.TrimSuffix(strings.TrimPrefix(id, "/"), command.EventGroupSuffix)}}}}
+		} else {
+			return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Event{Event: strings.TrimPrefix(id, "/")}}}}
+		}
+	case 0:
+		return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_All{All: true}}}}
+	default:
+		return nil
+	}
+}
+
+func includeFunctionToCondition(id string) *action.Condition {
+	return &action.Condition{ConditionType: &action.Condition_Function{Function: &action.FunctionExecution{Name: strings.TrimPrefix(id, "/")}}}
 }

@@ -249,33 +249,12 @@ func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
 	if password == nil {
 		return nil
 	}
-	var changeRequired bool
-	var passwordStr *string
-	if password.GetPassword() != nil {
-		passwordStr = &password.GetPassword().Password
-		changeRequired = password.GetPassword().GetChangeRequired()
-	}
-	var hash *string
-	if password.GetHashedPassword() != nil {
-		hash = &password.GetHashedPassword().Hash
-		changeRequired = password.GetHashedPassword().GetChangeRequired()
-	}
-	var code *string
-	if password.GetVerificationCode() != "" {
-		codeT := password.GetVerificationCode()
-		code = &codeT
-	}
-	var oldPassword *string
-	if password.GetCurrentPassword() != "" {
-		oldPasswordT := password.GetCurrentPassword()
-		oldPassword = &oldPasswordT
-	}
 	return &command.Password{
-		PasswordCode:        code,
-		OldPassword:         oldPassword,
-		Password:            passwordStr,
-		EncodedPasswordHash: hash,
-		ChangeRequired:      changeRequired,
+		PasswordCode:        password.GetVerificationCode(),
+		OldPassword:         password.GetCurrentPassword(),
+		Password:            password.GetPassword().GetPassword(),
+		EncodedPasswordHash: password.GetHashedPassword().GetHash(),
+		ChangeRequired:      password.GetPassword().GetChangeRequired() || password.GetHashedPassword().GetChangeRequired(),
 	}
 }
 
