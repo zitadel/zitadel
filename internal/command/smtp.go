@@ -358,6 +358,11 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, description, from
 					user,
 					smtpPassword,
 				),
+				instance.NewSMTPConfigActivatedEvent(
+					ctx,
+					&a.Aggregate,
+					id,
+				),
 			}, nil
 		}, nil
 	}

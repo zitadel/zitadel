@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	SMTPConfigProjectionTable      = "projections.smtp_configs3"
+	SMTPConfigProjectionTable      = "projections.smtp_configs2"
 	SMTPConfigColumnInstanceID     = "instance_id"
 	SMTPConfigColumnResourceOwner  = "resource_owner"
 	SMTPConfigColumnID             = "id"
@@ -111,7 +111,7 @@ func (p *smtpConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 	// Deal with old and unique SMTP settings (empty ID)
 	id := e.ID
 	description := e.Description
-	state := e.State
+	state := domain.SMTPConfigStateInactive
 	if e.ID == "" {
 		id = e.Aggregate().ResourceOwner
 		description = "generic"

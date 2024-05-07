@@ -56,6 +56,7 @@ func (wm *IAMSMTPConfigWriteModel) AppendEvents(events ...eventstore.Event) {
 		default:
 			wm.WriteModel.AppendEvents(e)
 		}
+
 	}
 }
 
