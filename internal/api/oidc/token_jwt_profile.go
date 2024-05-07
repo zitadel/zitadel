@@ -2,7 +2,6 @@ package oidc
 
 import (
 	"context"
-	"slices"
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
@@ -51,7 +50,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		nil,
 		domain.TokenReasonClientCredentials,
 		nil,
-		slices.Contains(scope, oidc.ScopeOfflineAccess),
+		false,
 	)
 	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false))
 }
