@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
