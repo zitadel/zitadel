@@ -617,30 +617,27 @@ func implicitFlowComplianceChecker() command.AuthRequestComplianceChecker {
 
 func (s *Server) authorizeCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	authorizer := s.Provider()
-
-	func() (err error) {
+	authReq, err := func() (authReq op.AuthRequest, err error) {
 		ctx, span := tracing.NewSpan(r.Context())
 		r = r.WithContext(ctx)
 		defer func() { span.EndWithError(err) }()
 
 		id, err := op.ParseAuthorizeCallbackRequest(r)
 		if err != nil {
-			op.AuthRequestError(w, r, nil, err, authorizer)
-			return err
+			return nil, err
 		}
-		authReq, err := authorizer.Storage().AuthRequestByID(r.Context(), id)
+		authReq, err = authorizer.Storage().AuthRequestByID(r.Context(), id)
 		if err != nil {
-			op.AuthRequestError(w, r, nil, err, authorizer)
-			return err
+			return nil, err
 		}
 		if !authReq.Done() {
-			op.AuthRequestError(w, r, authReq,
-				oidc.ErrInteractionRequired().WithDescription("Unfortunately, the user may be not logged in and/or additional interaction is required."),
-				authorizer)
-			return err
+			return authReq, oidc.ErrInteractionRequired().WithDescription("Unfortunately, the user may be not logged in and/or additional interaction is required.")
 		}
-		return s.authResponse(authReq, authorizer, w, r)
+		return authReq, s.authResponse(authReq, authorizer, w, r)
 	}()
+	if err != nil {
+		op.AuthRequestError(w, r, authReq, err, authorizer)
+	}
 }
 
 func (s *Server) authResponse(authReq op.AuthRequest, authorizer op.Authorizer, w http.ResponseWriter, r *http.Request) (err error) {
