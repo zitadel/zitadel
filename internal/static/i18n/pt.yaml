@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Chave de máquina não encontrada
         AlreadyExisting: Chave de máquina já existe
+        Invalid: A chave pública não é uma chave pública RSA válida no formato PKIX com codificação PEM
       Secret:
         NotExisting: Segredo não existe
         Invalid: Segredo é inválido
@@ -135,6 +136,7 @@ Errors:
       Invalid: Senha é inválida
       NotSet: O usuário não definiu uma senha
       NotChanged: A nova senha não pode ser igual à sua senha atual
+      NotSupported: Codificação hash da senha não suportada. Confira https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Política de complexidade de senha não encontrada
       MinLength: A senha é muito curta
@@ -467,6 +469,7 @@ Errors:
     NotActive: A ação não está ativa
     NotInactive: A ação não está inativa
     MaxAllowed: Não são permitidas ações adicionais ativas
+    NotEnabled: O recurso "Ação" não está ativado
   Flow:
     FlowTypeMissing: O tipo de fluxo está faltando
     Empty: O fluxo já está vazio

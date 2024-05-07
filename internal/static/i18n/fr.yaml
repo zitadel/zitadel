@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Clé de la machine non trouvée
         AlreadyExisting: Clé de la machine déjà existante
+        Invalid: La clé publique n'est pas une clé publique RSA valide au format PKIX avec encodage PEM
       Secret:
         NotExisting: Secret n'existe pas
         Invalid: Secret n'est pas valide
@@ -135,7 +136,7 @@ Errors:
       Invalid: Le mot de passe n'est pas valide
       NotSet: L'utilisateur n'a pas défini de mot de passe
       NotChanged: Le nouveau mot de passe ne peut pas être le même que votre mot de passe actuel
-      NotSupported: Encodage de hachage de mot de passe non pris en charge
+      NotSupported: Encodage de hachage de mot de passe non pris en charge. Consultez https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Politique de mot de passe non trouvée
       MinLength: Le mot de passe est trop court
@@ -469,6 +470,7 @@ Errors:
     NotActive: L'action n'est pas active
     NotInactive: L'action n'est pas inactive
     MaxAllowed: Aucune action active supplémentaire n'est autorisée
+    NotEnabled: La fonctionnalité "Action" n'est pas activée
   Flow:
     FlowTypeMissing: FlowType missing
     Empty: Le flux est déjà vide
@@ -1006,6 +1008,9 @@ EventTypes:
           verified:
             check: Vérification du secret du client OIDC réussie
             failed: La vérification du secret du client OIDC a échoué
+        key:
+          added: Clé d'application de l'OIDC ajoutée
+          removed: Clé d'application de l'OIDC supprimée
       api:
         secret:
           check:

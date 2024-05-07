@@ -18,7 +18,7 @@ import (
 
 func TestCommandSide_LockUserV2(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
 	}
 	type (
@@ -40,9 +40,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
@@ -58,8 +56,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -77,8 +74,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 		{
 			name: "user already locked, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -116,8 +112,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 		{
 			name: "user already locked, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -151,8 +146,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 		{
 			name: "lock user, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -190,8 +184,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 		{
 			name: "lock user, no permission",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -224,8 +217,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 		{
 			name: "lock user machine, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -260,7 +252,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.LockUserV2(tt.args.ctx, tt.args.userID)
@@ -279,7 +271,7 @@ func TestCommandSide_LockUserV2(t *testing.T) {
 
 func TestCommandSide_UnlockUserV2(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
 	}
 	type (
@@ -301,9 +293,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
@@ -319,8 +309,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -338,8 +327,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 		{
 			name: "user already active, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -372,8 +360,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 		{
 			name: "user already active, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						user.NewMachineAddedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -400,8 +387,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 		{
 			name: "unlock user, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -443,8 +429,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 		{
 			name: "unlock user, no permission",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -481,8 +466,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 		{
 			name: "unlock user machine, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -521,7 +505,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.UnlockUserV2(tt.args.ctx, tt.args.userID)
@@ -540,7 +524,7 @@ func TestCommandSide_UnlockUserV2(t *testing.T) {
 
 func TestCommandSide_DeactivateUserV2(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
 	}
 	type (
@@ -562,9 +546,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
@@ -580,8 +562,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -599,8 +580,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 		{
 			name: "user initial, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -620,6 +600,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								nil, time.Hour*1,
+								"",
 							),
 						),
 					),
@@ -639,8 +620,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 		{
 			name: "user already inactive, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -678,8 +658,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 		{
 			name: "deactivate user, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -722,8 +701,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 		{
 			name: "deactivate user, no permission",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -761,8 +739,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 		{
 			name: "user machine already inactive, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -796,8 +773,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 		{
 			name: "deactivate user machine, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -832,7 +808,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.DeactivateUserV2(tt.args.ctx, tt.args.userID)
@@ -851,7 +827,7 @@ func TestCommandSide_DeactivateUserV2(t *testing.T) {
 
 func TestCommandSide_ReactivateUserV2(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
 	}
 	type (
@@ -873,9 +849,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
@@ -891,8 +865,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -910,8 +883,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 		{
 			name: "user already active, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -944,8 +916,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 		{
 			name: "user machine already active, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -974,8 +945,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 		{
 			name: "reactivate user, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1017,8 +987,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 		{
 			name: "reactivate user, no permission",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1055,8 +1024,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 		{
 			name: "reactivate user machine, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -1095,7 +1063,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.ReactivateUserV2(tt.args.ctx, tt.args.userID)
@@ -1114,7 +1082,7 @@ func TestCommandSide_ReactivateUserV2(t *testing.T) {
 
 func TestCommandSide_RemoveUserV2(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
+		eventstore      func(*testing.T) *eventstore.Eventstore
 		checkPermission domain.PermissionCheck
 	}
 	type (
@@ -1138,9 +1106,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
@@ -1156,8 +1122,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
@@ -1175,8 +1140,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		{
 			name: "user removed, notfound error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1217,8 +1181,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		{
 			name: "remove user, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1269,8 +1232,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		{
 			name: "remove user, no permission",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1308,8 +1270,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		{
 			name: "user machine already removed, notfound error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -1346,8 +1307,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 		{
 			name: "remove user machine, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewMachineAddedEvent(context.Background(),
@@ -1395,7 +1355,7 @@ func TestCommandSide_RemoveUserV2(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:      tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
 				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveUserV2(tt.args.ctx, tt.args.userID, tt.args.cascadingMemberships, tt.args.grantIDs...)

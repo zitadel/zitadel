@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: 未找到机器密钥
         AlreadyExisting: 已有的机器钥匙
+        Invalid: 公钥不是采用 PEM 编码的 PKIX 格式的有效 RSA 公钥
       Secret:
         NotExisting: 秘密并不存在
         Invalid: 秘密是无效的
@@ -135,7 +136,7 @@ Errors:
       Invalid: 密码无效
       NotSet: 用户未设置密码
       NotChanged: 新密码不能与您当前的密码相同
-      NotSupported: 不支持密码哈希编码
+      NotSupported: 不支持密码哈希编码。查看 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: 未找到密码策略
       MinLength: 密码太短
@@ -469,6 +470,7 @@ Errors:
     NotActive: 动作不是启用状态
     NotInactive: 动作不是停用状态
     MaxAllowed: 不允许额外的动作
+    NotEnabled: 未启用“操作”功能
   Flow:
     FlowTypeMissing: 缺少身份认证流程类型
     Empty: 身份认证流程为空
@@ -1010,6 +1012,9 @@ EventTypes:
           check:
             succeeded: 检查 OIDC Client Secret 成功
             failed: 检查 OIDC Client Secret 失败
+        key:
+          added: 添加了 OIDC 应用密钥
+          removed: OIDC 应用密钥已删除
       api:
         secret:
           check:

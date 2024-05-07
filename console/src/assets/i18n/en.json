@@ -48,13 +48,13 @@
       "TITLE": "Users",
       "DESCRIPTION": "A user is a human or a machine that can access your applications.",
       "HUMANS": {
-        "TITLE": "Humans",
-        "DESCRIPTION": "Humans authenticate interactively in a browser session with a login prompt.",
+        "TITLE": "Users",
+        "DESCRIPTION": "Users authenticate interactively in a browser session with a login prompt.",
         "METADATA": "Add custom attributes to the user like the department. You can use this information in your actions."
       },
       "MACHINES": {
-        "TITLE": "Machines",
-        "DESCRIPTION": "Machines authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
+        "TITLE": "Service Users",
+        "DESCRIPTION": "Les utilisateurs du service s'authentifient de manière non interactive à l'aide d'un jeton de porteur JWT signé avec une clé privée. Ils peuvent également utiliser un jeton d'accès personnel.",
         "METADATA": "Add custom attributes to the user like the authenticating system. You can use this information in your actions."
       },
       "SELF": {
@@ -269,9 +269,9 @@
             "TITLE": "External Login allowed",
             "DESCRIPTION": "Allow your users to log in with an external identity provider instead of using the ZITADEL user to log in."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Password Reset allowed",
-            "DESCRIPTION": "Allow your users to reset their password."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Password Reset hidden",
+            "DESCRIPTION": "Do not allow your users to reset their password."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Domain Discovery allowed",
@@ -1291,8 +1291,9 @@
       "MEMBERREMOVED": "Manager removed.",
       "MEMBERCHANGED": "Manager changed.",
       "SETPRIMARY": "Primary domain set.",
-      "DELETED": "Organisation deleted successfully",
-      "ORG_WAS_DELETED": "Organisation has been deleted."
+      "DELETED": "Organization deleted successfully",
+      "DEFAULTORGNOTFOUND": "The default organization was not found",
+      "ORG_WAS_DELETED": "Organization has been deleted."
     },
     "DIALOG": {
       "DEACTIVATE": {
@@ -1993,7 +1994,7 @@
     },
     "CREATE": {
       "TITLE": "Add provider",
-      "DESCRIPTION": "Select one ore more of the following providers.",
+      "DESCRIPTION": "Select one or more of the following providers.",
       "STEPPERTITLE": "Create Provider",
       "OIDC": {
         "TITLE": "OIDC Provider",
@@ -2263,7 +2264,7 @@
     },
     "CREATE": {
       "TITLE": "Add SMTP provider",
-      "DESCRIPTION": "Select one ore more of the following providers.",
+      "DESCRIPTION": "Select one or more of the following providers.",
       "STEPS": {
         "TITLE": "Add {{ value }} SMTP Provider",
         "CREATE_DESC_TITLE": "Enter your {{ value }} SMTP settings step by step",

@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Maschinen Schlüssel nicht gefunden
         AlreadyExisting: Machine Schlüssel exisiert bereits
+        Invalid: Der öffentliche Schlüssel ist kein gültiger öffentlicher RSA-Schlüssel im PKIX-Format mit PEM-Kodierung
       Secret:
         NotExisting: Secret existiert nicht
         Invalid: Secret ist ungültig
@@ -135,7 +136,7 @@ Errors:
       Invalid: Passwort ungültig
       NotSet: Benutzer hat kein Passwort gesetzt
       NotChanged: Das neue Passwort darf nicht mit deinem aktuellen Passwort übereinstimmen
-      NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt
+      NotSupported: Passwort-Hash-Kodierung wird nicht unterstützt. Siehe https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
@@ -469,6 +470,7 @@ Errors:
     NotActive: Action ist nicht aktiv
     NotInactive: Action ist nicht inaktiv
     MaxAllowed: Keine weitere aktiven Actions mehr erlaubt
+    NotEnabled: Function "Action" ist nicht aktiviert
   Flow:
     FlowTypeMissing: FlowType fehlt
     Empty: Flow ist bereits leer
@@ -1011,6 +1013,9 @@ EventTypes:
           check:
             succeeded: OIDC Client Secret Validierung erfolgreich
             failed: OIDC Client Secret Validierung fehlgeschlagen
+        key:
+          added: OIDC App Key wurde hinzugefügt
+          removed: OIDC App Key wurde gelöscht
       api:
         secret:
           check:

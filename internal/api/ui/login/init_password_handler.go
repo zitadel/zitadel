@@ -1,8 +1,8 @@
 package login
 
 import (
-	"fmt"
 	"net/http"
+	"net/url"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -38,14 +38,20 @@ type initPasswordData struct {
 	HasSymbol    string
 }
 
-func InitPasswordLink(origin, userID, code, orgID string) string {
-	return fmt.Sprintf("%s%s?userID=%s&code=%s&orgID=%s", externalLink(origin), EndpointInitPassword, userID, code, orgID)
+func InitPasswordLink(origin, userID, code, orgID, authRequestID string) string {
+	v := url.Values{}
+	v.Set(queryInitPWUserID, userID)
+	v.Set(queryInitPWCode, code)
+	v.Set(queryOrgID, orgID)
+	v.Set(QueryAuthRequestID, authRequestID)
+	return externalLink(origin) + EndpointInitPassword + "?" + v.Encode()
 }
 
 func (l *Login) handleInitPassword(w http.ResponseWriter, r *http.Request) {
+	authReq := l.checkOptionalAuthRequestOfEmailLinks(r)
 	userID := r.FormValue(queryInitPWUserID)
 	code := r.FormValue(queryInitPWCode)
-	l.renderInitPassword(w, r, nil, userID, code, nil)
+	l.renderInitPassword(w, r, authReq, userID, code, nil)
 }
 
 func (l *Login) handleInitPasswordCheck(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +80,7 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 		userOrg = authReq.UserOrgID
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	_, err := l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID)
+	_, err := l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID, false)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
@@ -94,7 +100,7 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitPassword(w, r, authReq, userID, "", err)
 		return
 	}
-	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), userID, userOrg, domain.NotificationTypeEmail, passwordCodeGenerator)
+	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), userID, userOrg, domain.NotificationTypeEmail, passwordCodeGenerator, authReq.ID)
 	l.renderInitPassword(w, r, authReq, userID, "", err)
 }
 

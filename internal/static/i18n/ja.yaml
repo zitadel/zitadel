@@ -102,6 +102,7 @@ Errors:
       Key:
         NotFound: マシーンキーが見つかりません
         AlreadyExisting: すでに存在しているマシーンキーです
+        Invalid: 公開キーは、PEM エンコードを使用した PKIX 形式の有効な RSA 公開キーではありません
       Secret:
         NotExisting: シークレットは存在しません
         Invalid: 無効なシークレットです
@@ -127,7 +128,7 @@ Errors:
       Invalid: 無効なパスワードです
       NotSet: パスワードが未設置です
       NotChanged: 新しいパスワードは現在のパスワードと同じにすることはできません
-      NotSupported: パスワードハッシュエンコードはサポートされていません
+      NotSupported: パスワードハッシュエンコードはサポートされていません。 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets を参照してください。
     PasswordComplexityPolicy:
       NotFound: パスワードポリシーが見つかりません
       MinLength: パスワードが短すぎます
@@ -458,6 +459,7 @@ Errors:
     NotActive: アクションはアクティブではありません
     NotInactive: アクションは非アクティブではありません
     MaxAllowed: 追加のアクティブアクションは許可されていません
+    NotEnabled: 機能「アクション」が有効になっていません
   Flow:
     FlowTypeMissing: フロータイプがありません
     Empty: フローはすでに空です

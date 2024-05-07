@@ -48,13 +48,13 @@
       "TITLE": "Usuarios",
       "DESCRIPTION": "Un usuario es un humano o una máquina que puede acceder a tus aplicaciones.",
       "HUMANS": {
-        "TITLE": "Humanos",
-        "DESCRIPTION": "Los humanos se autentican de manera interactiva en una sesión de navegador con una solicitud de inicio de sesión.",
+        "TITLE": "Usuarios",
+        "DESCRIPTION": "Los Usuarios se autentican de manera interactiva en una sesión de navegador con una solicitud de inicio de sesión.",
         "METADATA": "Añade atributos personalizados al usuario como el departamento. Puedes usar esta información en tus acciones."
       },
       "MACHINES": {
-        "TITLE": "Máquinas",
-        "DESCRIPTION": "Las máquinas se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
+        "TITLE": "Usuarios del servicio",
+        "DESCRIPTION": "Los Usuarios del servicio se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
         "METADATA": "Añade atributos personalizados al usuario como el sistema autenticador. Puedes usar esta información en tus acciones."
       },
       "SELF": {
@@ -269,9 +269,9 @@
             "TITLE": "Permitido Inicio de Sesión Externo",
             "DESCRIPTION": "Permite a tus usuarios iniciar sesión con un proveedor de identidad externo en lugar de usar el usuario de ZITADEL para iniciar sesión."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Permitido Restablecimiento de Contraseña",
-            "DESCRIPTION": "Permite a tus usuarios restablecer su contraseña."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Restablecimiento de contraseña oculto",
+            "DESCRIPTION": "No permita que sus usuarios restablezcan su contraseña."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Permitido Descubrimiento de Dominio",
@@ -1293,6 +1293,7 @@
       "MEMBERCHANGED": "Mánager modificado.",
       "SETPRIMARY": "Dominio primario establecido.",
       "DELETED": "Organización borrada con éxito",
+      "DEFAULTORGNOTFOUND": "No se encontró la organización por defecto",
       "ORG_WAS_DELETED": "La organización ha sido borrada."
     },
     "DIALOG": {

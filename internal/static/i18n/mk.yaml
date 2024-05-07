@@ -109,6 +109,7 @@ Errors:
       Key:
         NotFound: Machine key не е пронајден
         AlreadyExisting: Machine key веќе постои
+        Invalid: Јавниот клуч не е валиден јавен клуч RSA во формат PKIX со PEM кодирање
       Secret:
         NotExisting: Тајната не постои
         Invalid: Тајната е невалидна
@@ -134,7 +135,7 @@ Errors:
       Invalid: Невалидна лозинка
       NotSet: Корисникот нема поставено лозинка
       NotChanged: Новата лозинка не може да биде иста со вашата тековна лозинка
-      NotSupported: Не е поддржано хаш-кодирањето на лозинката
+      NotSupported: Не е поддржано хаш-кодирањето на лозинката. Проверете го https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Политиката за комплексност на лозинката не е пронајдена
       MinLength: Лозинката е прекратка
@@ -468,6 +469,7 @@ Errors:
     NotActive: Акцијата не е активна
     NotInactive: Акцијата не е неактивна
     MaxAllowed: Не се дозволени дополнителни активни акции
+    NotEnabled: Функцијата „Акција“ не е овозможена
   Flow:
     FlowTypeMissing: FlowType не е наведен
     Empty: Flow е веќе празен
@@ -1010,6 +1012,9 @@ EventTypes:
           check:
             succeeded: Проверката на OIDC клиентска тајна е успешна
             failed: Проверката на OIDC клиентска тајна е неуспешна
+        key:
+          added: Додаден е OIDC клуч за апликација
+          removed: OIDC клучот за апликација е отстранет
       api:
         secret:
           check:

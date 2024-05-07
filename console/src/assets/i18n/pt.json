@@ -48,13 +48,13 @@
       "TITLE": "Usuários",
       "DESCRIPTION": "Um usuário é um humano ou uma máquina que pode acessar seus aplicativos.",
       "HUMANS": {
-        "TITLE": "Humanos",
-        "DESCRIPTION": "Humanos autenticam interativamente em uma sessão de navegador com um prompt de login.",
+        "TITLE": "Usuários",
+        "DESCRIPTION": "Os usuários são autenticados interativamente em uma sessão do navegador com um prompt de login.",
         "METADATA": "Adicione atributos personalizados ao usuário, como o departamento. Você pode usar essas informações em suas ações."
       },
       "MACHINES": {
-        "TITLE": "Máquinas",
-        "DESCRIPTION": "Máquinas autenticam de forma não interativa usando um token JWT assinado com uma chave privada. Eles também podem usar um token de acesso pessoal.",
+        "TITLE": "Usuários do serviço",
+        "DESCRIPTION": "Os usuários do serviço autenticam-se de forma não interativa usando um token de portador JWT assinado com uma chave privada. Eles também podem usar um token de acesso pessoal.",
         "METADATA": "Adicione atributos personalizados ao usuário, como o sistema de autenticação. Você pode usar essas informações em suas ações."
       },
       "SELF": {
@@ -269,9 +269,9 @@
             "TITLE": "Login Externo permitido",
             "DESCRIPTION": "Permite que seus usuários façam login com um provedor de identidade externo em vez de usar o usuário ZITADEL para fazer login."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Redefinição de Senha permitida",
-            "DESCRIPTION": "Permite que seus usuários redefinam sua senha."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Redefinição de senha oculta",
+            "DESCRIPTION": "Não permita que seus usuários redefinam a senha."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Descoberta de Domínio permitida",
@@ -1293,6 +1293,7 @@
       "MEMBERCHANGED": "Gerente alterado.",
       "SETPRIMARY": "Domínio principal definido.",
       "DELETED": "Organização excluída com sucesso",
+      "DEFAULTORGNOTFOUND": "A organização padrão não foi encontrada",
       "ORG_WAS_DELETED": "Organização foi excluída."
     },
     "DIALOG": {
