@@ -96,6 +96,8 @@ export {
   VerifyTOTPRegistrationResponse,
   VerifyU2FRegistrationRequest,
   VerifyU2FRegistrationResponse,
+  RegisterU2FResponse,
+  RegisterU2FRequest,
 } from "./proto/server/zitadel/user/v2beta/user_service";
 
 export { AuthFactor } from "./proto/server/zitadel/user";

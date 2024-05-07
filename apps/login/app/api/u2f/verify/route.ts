@@ -6,7 +6,7 @@ import { NextRequest, NextResponse, userAgent } from "next/server";
 export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
-    let { passkeyId, passkeyName, publicKeyCredential, sessionId } = body;
+    let { u2fId, passkeyName, publicKeyCredential, sessionId } = body;
 
     if (!!!passkeyName) {
       const { browser, device, os } = userAgent(request);
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (userId) {
       const req: VerifyU2FRegistrationRequest = {
         publicKeyCredential,
-        u2fId: passkeyId,
+        u2fId,
         userId,
         tokenName: passkeyName,
       };

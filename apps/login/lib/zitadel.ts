@@ -21,7 +21,7 @@ import {
   CreateSessionResponse,
   GetBrandingSettingsResponse,
   GetPasswordComplexitySettingsResponse,
-  AddMyAuthFactorOTPResponse,
+  RegisterU2FResponse,
   GetLegalAndSupportSettingsResponse,
   AddHumanUserResponse,
   BrandingSettings,
@@ -509,7 +509,7 @@ export async function createPasskeyRegistrationLink(
 export async function registerU2F(
   userId: string,
   domain: string
-): Promise<any> {
+): Promise<RegisterU2FResponse> {
   const userservice = user.getUser(server);
 
   return userservice.registerU2F({

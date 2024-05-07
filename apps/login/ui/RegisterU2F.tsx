@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { AuthRequest, RegisterPasskeyResponse } from "@zitadel/server";
+import { RegisterU2FResponse } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "#/utils/base64";
 type Inputs = {};
 
@@ -55,7 +55,7 @@ export default function RegisterU2F({
   }
 
   async function submitVerify(
-    passkeyId: string,
+    u2fId: string,
     passkeyName: string,
     publicKeyCredential: any,
     sessionId: string
@@ -67,7 +67,7 @@ export default function RegisterU2F({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        passkeyId,
+        u2fId,
         passkeyName,
         publicKeyCredential,
         sessionId,
@@ -85,8 +85,8 @@ export default function RegisterU2F({
   }
 
   function submitRegisterAndContinue(value: Inputs): Promise<boolean | void> {
-    return submitRegister().then((resp: RegisterPasskeyResponse) => {
-      const passkeyId = resp.passkeyId;
+    return submitRegister().then((resp: RegisterU2FResponse) => {
+      const u2fId = resp.u2fId;
 
       if (
         resp.publicKeyCredentialCreationOptions &&
@@ -145,7 +145,7 @@ export default function RegisterU2F({
                   ),
                 },
               };
-              return submitVerify(passkeyId, "", data, sessionId).then(() => {
+              return submitVerify(u2fId, "", data, sessionId).then(() => {
                 const params = new URLSearchParams();
 
                 if (organization) {
