@@ -269,9 +269,9 @@
             "TITLE": "Connexion externe autorisée",
             "DESCRIPTION": "Autorisez vos utilisateurs à se connecter avec un fournisseur d'identité externe à la place de la connexion avec le nom d'utilisateur ZITADEL."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Réinitialisation du mot de passe autorisée",
-            "DESCRIPTION": "Autorisez vos utilisateurs à réinitialiser leur mot de passe."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Réinitialisation du mot de passe masquée",
+            "DESCRIPTION": "Ne permettez pas à vos utilisateurs de réinitialiser leur mot de passe."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Découverte du domaine autorisée",

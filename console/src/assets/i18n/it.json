@@ -269,9 +269,9 @@
             "TITLE": "Login Esterno consentito",
             "DESCRIPTION": "Permetti ai tuoi utenti di accedere con un provider di identità esterno invece di utilizzare l'utente ZITADEL per accedere."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Reset Password consentito",
-            "DESCRIPTION": "Permetti ai tuoi utenti di reimpostare la loro password."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Ripristino password nascosto",
+            "DESCRIPTION": "Non consentire agli utenti di reimpostare la password."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Scoperta Dominio consentita",

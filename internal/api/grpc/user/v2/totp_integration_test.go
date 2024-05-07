@@ -23,6 +23,11 @@ func TestServer_RegisterTOTP(t *testing.T) {
 	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
 	ctx := Tester.WithAuthorizationToken(CTX, sessionToken)
 
+	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
+	Tester.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	ctxOtherUser := Tester.WithAuthorizationToken(CTX, sessionTokenOtherUser)
+
 	type args struct {
 		ctx context.Context
 		req *user.RegisterTOTPRequest
@@ -44,12 +49,27 @@ func TestServer_RegisterTOTP(t *testing.T) {
 		{
 			name: "user mismatch",
 			args: args{
-				ctx: ctx,
+				ctx: ctxOtherUser,
 				req: &user.RegisterTOTPRequest{
-					UserId: "wrong",
+					UserId: userID,
 				},
 			},
 			wantErr: true,
+		},
+		{
+			name: "admin",
+			args: args{
+				ctx: CTX,
+				req: &user.RegisterTOTPRequest{
+					UserId: userID,
+				},
+			},
+			want: &user.RegisterTOTPResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
 		},
 		{
 			name: "success",
@@ -96,6 +116,18 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 	code, err := totp.GenerateCode(reg.Secret, time.Now())
 	require.NoError(t, err)
 
+	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
+	Tester.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	ctxOtherUser := Tester.WithAuthorizationToken(CTX, sessionTokenOtherUser)
+
+	regOtherUser, err := Client.RegisterTOTP(CTX, &user.RegisterTOTPRequest{
+		UserId: otherUser,
+	})
+	require.NoError(t, err)
+	codeOtherUser, err := totp.GenerateCode(regOtherUser.Secret, time.Now())
+	require.NoError(t, err)
+
 	type args struct {
 		ctx context.Context
 		req *user.VerifyTOTPRegistrationRequest
@@ -109,9 +141,9 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 		{
 			name: "user mismatch",
 			args: args{
-				ctx: ctx,
+				ctx: ctxOtherUser,
 				req: &user.VerifyTOTPRegistrationRequest{
-					UserId: "wrong",
+					UserId: userID,
 				},
 			},
 			wantErr: true,
@@ -134,6 +166,22 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 				req: &user.VerifyTOTPRegistrationRequest{
 					UserId: userID,
 					Code:   code,
+				},
+			},
+			want: &user.VerifyTOTPRegistrationResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ResourceOwner,
+				},
+			},
+		},
+		{
+			name: "success, admin",
+			args: args{
+				ctx: CTX,
+				req: &user.VerifyTOTPRegistrationRequest{
+					UserId: otherUser,
+					Code:   codeOtherUser,
 				},
 			},
 			want: &user.VerifyTOTPRegistrationResponse{

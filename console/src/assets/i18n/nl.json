@@ -269,9 +269,9 @@
             "TITLE": "Extern inloggen toegestaan",
             "DESCRIPTION": "Sta je gebruikers toe om in te loggen met een externe identiteitsprovider in plaats van het gebruik van de ZITADEL gebruiker om in te loggen."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Wachtwoord resetten toegestaan",
-            "DESCRIPTION": "Sta je gebruikers toe om hun wachtwoord te resetten."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Wachtwoord reset verborgen",
+            "DESCRIPTION": "Sta uw gebruikers niet toe hun wachtwoord opnieuw in te stellen."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Domeinontdekking toegestaan",
