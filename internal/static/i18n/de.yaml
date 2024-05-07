@@ -471,6 +471,7 @@ Errors:
     NotActive: Action ist nicht aktiv
     NotInactive: Action ist nicht inaktiv
     MaxAllowed: Keine weitere aktiven Actions mehr erlaubt
+    NotEnabled: Function "Action" ist nicht aktiviert
   Flow:
     FlowTypeMissing: FlowType fehlt
     Empty: Flow ist bereits leer

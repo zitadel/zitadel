@@ -95,7 +95,7 @@ func (l *Login) renderLogin(w http.ResponseWriter, r *http.Request, authReq *dom
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
-	if singleIDPAllowed(authReq) {
+	if err == nil && singleIDPAllowed(authReq) {
 		l.handleIDP(w, r, authReq, authReq.AllowedExternalIDPs[0].IDPConfigID)
 		return
 	}
