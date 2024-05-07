@@ -269,9 +269,9 @@
             "TITLE": "Povoleno externí přihlášení",
             "DESCRIPTION": "Umožni svým uživatelům přihlásit se pomocí externího poskytovatele identity namísto použití ZITADEL uživatele pro přihlášení."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Povoleno resetování hesla",
-            "DESCRIPTION": "Umožni svým uživatelům resetovat jejich heslo."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Obnovení hesla skryté",
+            "DESCRIPTION": "Neumožněte uživatelům resetovat heslo."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Povoleno objevování domén",
