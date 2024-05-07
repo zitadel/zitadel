@@ -283,7 +283,7 @@ func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, 
 	if err != nil {
 		return "", "", 0, err
 	}
-	return accessToken, refreshToken, timeToOIDCExpiresIn(session.Expiration), nil
+	return accessToken, session.RefreshToken, timeToOIDCExpiresIn(session.Expiration), nil
 }
 
 func (s *Server) createExchangeJWT(ctx context.Context, client *Client, getUserInfo userInfoFunc, getSigner signerFunc, userID, resourceOwner string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {

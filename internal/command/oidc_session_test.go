@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/session"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -449,6 +450,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 		defaultRefreshTokenLifetime     time.Duration
 		defaultRefreshTokenIdleLifetime time.Duration
 		keyAlgorithm                    crypto.EncryptionAlgorithm
+		checkPermission                 domain.PermissionCheck
 	}
 	type args struct {
 		ctx              context.Context
@@ -662,6 +664,131 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
 			},
 		},
+		{
+			name: "impersonation not allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // token lifetime
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				checkPermission: domain.PermissionCheck(func(_ context.Context, _, _, _ string) (err error) {
+					return zerrors.ThrowPermissionDenied(nil, "test", "test")
+				}),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "userID",
+				resourceOwner: "org1",
+				clientID:      "clientID",
+				audience:      []string{"audience"},
+				scope:         []string{"openid", "offline_access"},
+				authMethods:   []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:      testNow,
+				nonce:         "nonce",
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonImpersonation,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "test", "test"),
+		},
+		{
+			name: "impersonation allowed",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(), // token lifetime
+					expectPush(
+						user.NewUserImpersonatedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "clientID", &domain.TokenActor{
+							UserID: "user2",
+							Issuer: "foo.com",
+						}),
+						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce",
+							&domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
+						),
+						oidcsession.NewAccessTokenAddedEvent(context.Background(),
+							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
+							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonImpersonation,
+							&domain.TokenActor{
+								UserID: "user2",
+								Issuer: "foo.com",
+							},
+						),
+					),
+				),
+				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
+				defaultAccessTokenLifetime:      time.Hour,
+				defaultRefreshTokenLifetime:     7 * 24 * time.Hour,
+				defaultRefreshTokenIdleLifetime: 24 * time.Hour,
+				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				checkPermission: domain.PermissionCheck(func(_ context.Context, _, _, _ string) (err error) {
+					return nil
+				}),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "userID",
+				resourceOwner: "org1",
+				clientID:      "clientID",
+				audience:      []string{"audience"},
+				scope:         []string{"openid", "offline_access"},
+				authMethods:   []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				authTime:      testNow,
+				nonce:         "nonce",
+				userAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				reason: domain.TokenReasonImpersonation,
+				actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+				needRefreshToken: false,
+			},
+			want: &OIDCSession{
+				TokenID:     "V2_oidcSessionID-at_accessTokenID",
+				ClientID:    "clientID",
+				UserID:      "userID",
+				Audience:    []string{"audience"},
+				Expiration:  time.Time{}.Add(time.Hour),
+				Scope:       []string{"openid", "offline_access"},
+				AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:    testNow,
+				Nonce:       "nonce",
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				Reason: domain.TokenReasonImpersonation,
+				Actor: &domain.TokenActor{
+					UserID: "user2",
+					Issuer: "foo.com",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -672,6 +799,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
+				checkPermission:                 tt.fields.checkPermission,
 			}
 			got, err := c.CreateOIDCSession(tt.args.ctx,
 				tt.args.userID,

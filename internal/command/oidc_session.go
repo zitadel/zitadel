@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -114,6 +115,13 @@ func (c *Commands) CreateOIDCSession(ctx context.Context, userID, resourceOwner,
 	if err != nil {
 		return nil, err
 	}
+	if reason == domain.TokenReasonImpersonation {
+		if err := c.checkPermission(ctx, "impersonation", resourceOwner, userID); err != nil {
+			return nil, err
+		}
+		cmd.UserImpersonated(ctx, userID, resourceOwner, clientID, actor)
+	}
+
 	cmd.AddSession(ctx, userID, "", clientID, audience, scope, authMethods, authTime, nonce, userAgent)
 	if err = cmd.AddAccessToken(ctx, scope, reason, actor); err != nil {
 		return nil, err
@@ -141,7 +149,7 @@ func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context,
 	if err = complianceCheck(ctx, cmd.oidcSessionWriteModel); err != nil {
 		return nil, err
 	}
-	if err = cmd.AddAccessToken(ctx, scope, domain.TokenReasonRefresh, nil); err != nil {
+	if err = cmd.AddAccessToken(ctx, scope, domain.TokenReasonRefresh, cmd.oidcSessionWriteModel.AccessTokenActor); err != nil {
 		return nil, err
 	}
 	if err = cmd.RenewRefreshToken(ctx); err != nil {
@@ -379,6 +387,10 @@ func (c *OIDCSessionEvents) RenewRefreshToken(ctx context.Context) (err error) {
 	}
 	c.events = append(c.events, oidcsession.NewRefreshTokenRenewedEvent(ctx, c.oidcSessionWriteModel.aggregate, refreshTokenID, c.refreshTokenIdleLifetime))
 	return nil
+}
+
+func (c *OIDCSessionEvents) UserImpersonated(ctx context.Context, userID, resourceOwner, clientID string, actor *domain.TokenActor) {
+	c.events = append(c.events, user.NewUserImpersonatedEvent(ctx, &user.NewAggregate(userID, resourceOwner).Aggregate, clientID, actor))
 }
 
 func (c *OIDCSessionEvents) generateRefreshToken(userID string) (refreshTokenID, refreshToken string, err error) {
