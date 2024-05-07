@@ -218,7 +218,7 @@ func (e *SetExecution) Existing(c *Commands, ctx context.Context, resourceOwner 
 	}
 	get, set := createIncludeCacheFunctions()
 	// maxLevels could be configurable, but set as 5 for now
-	return checkForIncludeCircular(ctx, e.AggregateID, resourceOwner, includes, c.getExecutionIncludes(get, set), 5)
+	return checkForIncludeCircular(ctx, e.AggregateID, resourceOwner, includes, c.getExecutionIncludes(get, set), 3)
 }
 
 func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resourceOwner string) (_ *domain.ObjectDetails, err error) {
