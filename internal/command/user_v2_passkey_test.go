@@ -339,7 +339,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 }
 
 func TestCommands_pushUserPasskey(t *testing.T) {
-	ctx := authz.WithRequestedDomain(context.Background(), "example.com")
+	ctx := authz.WithRequestedDomain(authz.NewMockContext("instance1", "org1", "user1"), "example.com")
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
 		ExternalSecure: true,

@@ -64,6 +64,7 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 		RegistrationUserText:                 RegistrationUserScreenTextToPb(text.RegistrationUser),
 		ExternalRegistrationUserOverviewText: ExternalRegistrationUserOverviewScreenTextToPb(text.ExternalRegistrationUserOverview),
 		RegistrationOrgText:                  RegistrationOrgScreenTextToPb(text.RegistrationOrg),
+		LinkingUserPromptText:                LinkingUserPromptScreenTextToPb(text.LinkingUserPrompt),
 		LinkingUserDoneText:                  LinkingUserDoneScreenTextToPb(text.LinkingUsersDone),
 		ExternalUserNotFoundText:             ExternalUserNotFoundScreenTextToPb(text.ExternalNotFound),
 		SuccessLoginText:                     SuccessLoginScreenTextToPb(text.LoginSuccess),
@@ -419,6 +420,15 @@ func LinkingUserDoneScreenTextToPb(text domain.LinkingUserDoneScreenText) *text_
 		Description:      text.Description,
 		CancelButtonText: text.CancelButtonText,
 		NextButtonText:   text.NextButtonText,
+	}
+}
+
+func LinkingUserPromptScreenTextToPb(text domain.LinkingUserPromptScreenText) *text_pb.LinkingUserPromptScreenText {
+	return &text_pb.LinkingUserPromptScreenText{
+		Title:           text.Title,
+		Description:     text.Description,
+		LinkButtonText:  text.LinkButtonText,
+		OtherButtonText: text.OtherButtonText,
 	}
 }
 
@@ -887,6 +897,15 @@ func RegistrationOrgScreenTextPbToDomain(text *text_pb.RegistrationOrgScreenText
 		PrivacyConfirm:       text.PrivacyConfirm,
 		PrivacyLinkText:      text.PrivacyLinkText,
 		SaveButtonText:       text.SaveButtonText,
+	}
+}
+
+func LinkingUserPromptScreenTextPbToDomain(text *text_pb.LinkingUserPromptScreenText) domain.LinkingUserPromptScreenText {
+	return domain.LinkingUserPromptScreenText{
+		Title:           text.GetTitle(),
+		Description:     text.GetDescription(),
+		LinkButtonText:  text.GetLinkButtonText(),
+		OtherButtonText: text.GetOtherButtonText(),
 	}
 }
 

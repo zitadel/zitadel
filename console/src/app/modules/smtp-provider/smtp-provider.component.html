@@ -1,0 +1,150 @@
+<cnsl-create-layout
+  title="{{
+    id ? ('SMTP.DETAIL.TITLE' | translate) : ('SMTP.CREATE.STEPS.TITLE' | translate: { value: providerDefaultSetting.name })
+  }}"
+  [createSteps]="2"
+  [currentCreateStep]="currentCreateStep"
+  (closed)="close()"
+>
+  <div class="wizard-header">
+    <img
+      class="smtp-logo"
+      src="{{ providerDefaultSetting.image }}"
+      alt="{{ providerDefaultSetting.name }}"
+      *ngIf="providerDefaultSetting.name !== 'generic'"
+    />
+    <div class="smtp-icon" *ngIf="providerDefaultSetting.name === 'generic'">
+      <mat-icon class="icon" svgIcon="mdi_smtp" alt="providerDefaultSetting.name" />
+    </div>
+    <h2>
+      {{
+        !id
+          ? ('SMTP.CREATE.STEPS.CREATE_DESC_TITLE' | translate: { value: providerDefaultSetting.name | titlecase })
+          : ('SMTP.CREATE.STEPS.CURRENT_DESC_TITLE' | translate)
+      }}
+    </h2>
+  </div>
+  <mat-progress-bar class="progress-bar" color="primary" *ngIf="smtpLoading" mode="indeterminate"></mat-progress-bar>
+
+  <mat-horizontal-stepper
+    class="stepper {{ 'last-edited-step-' + stepper.selectedIndex }}"
+    linear
+    #stepper
+    labelPosition="bottom"
+    (selectionChange)="changeStep($event)"
+  >
+    <mat-step [editable]="true">
+      <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.PROVIDER_SETTINGS' | translate }}</ng-template>
+      <form [formGroup]="firstFormGroup" autocomplete="off">
+        <mat-checkbox class="smtp-checkbox" formControlName="tls" (change)="toggleTLS($event)" data-e2e="tls-checkbox">
+          {{ 'SETTING.SMTP.TLS' | translate }}
+        </mat-checkbox>
+
+        <cnsl-form-field class="smtp-form-field" *ngIf="providerDefaultSetting.regions">
+          <cnsl-label>{{ providerDefaultSetting.multiHostsLabel }}</cnsl-label>
+          <mat-select formControlName="region">
+            <mat-option *ngFor="let region of providerDefaultSetting.regions | keyvalue" [value]="region.value">
+              {{ region.key }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="Description">
+          <cnsl-label>{{ 'SETTING.SMTP.DESCRIPTION' | translate }}</cnsl-label>
+          <input cnslInput name="description" formControlName="description" placeholder="description" />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="Host And Port">
+          <cnsl-label>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</cnsl-label>
+          <input cnslInput name="hostAndPort" formControlName="hostAndPort" placeholder="host:port" required />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="User">
+          <cnsl-label>{{ 'SETTING.SMTP.USER' | translate }}</cnsl-label>
+          <input
+            id="smtp-user"
+            cnslInput
+            name="smtp-user"
+            autocomplete="smtp-user"
+            formControlName="user"
+            placeholder="{{ providerDefaultSetting.user.placeholder }}"
+            required
+          />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="Password">
+          <cnsl-label>{{ 'SETTING.SMTP.PASSWORD' | translate }}</cnsl-label>
+          <input
+            id="smtp-password"
+            cnslInput
+            name="smtp-password"
+            autocomplete="off webauthn"
+            formControlName="password"
+            placeholder="{{ hasSMTPConfig ? '****************' : providerDefaultSetting.password.placeholder }}"
+            type="password"
+            required="{{ !hasSMTPConfig }}"
+          />
+        </cnsl-form-field>
+      </form>
+
+      <div class="smtp-create-actions">
+        <button
+          mat-raised-button
+          [disabled]="firstFormGroup.invalid"
+          color="primary"
+          matStepperNext
+          data-e2e="continue-button"
+        >
+          {{ 'ACTIONS.CONTINUE' | translate }}
+        </button>
+      </div>
+    </mat-step>
+
+    <mat-step [editable]="true">
+      <form [formGroup]="secondFormGroup">
+        <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.SENDER_SETTINGS' | translate }}</ng-template>
+
+        <cnsl-form-field class="smtp-form-field" label="Sender Address">
+          <cnsl-label>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</cnsl-label>
+          <input
+            cnslInput
+            name="senderAddress"
+            formControlName="senderAddress"
+            placeholder="{{ senderEmailPlaceholder }}"
+            required
+          />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="Sender Name">
+          <cnsl-label>{{ 'SETTING.SMTP.SENDERNAME' | translate }}</cnsl-label>
+          <input cnslInput name="senderName" formControlName="senderName" placeholder="Zitadel" required />
+        </cnsl-form-field>
+
+        <cnsl-form-field class="smtp-form-field" label="Reply-To Address">
+          <cnsl-label>{{ 'SETTING.SMTP.REPLYTOADDRESS' | translate }}</cnsl-label>
+          <input cnslInput name="senderReplyToAddress" formControlName="replyToAddress" placeholder="replyto@example.com" />
+        </cnsl-form-field>
+      </form>
+
+      <div class="smtp-create-actions">
+        <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
+        <button
+          mat-raised-button
+          class="create-button"
+          color="primary"
+          data-e2e="create-button"
+          (click)="savePolicy()"
+          [disabled]="
+            firstFormGroup.invalid || secondFormGroup.invalid || (['iam.policy.write'] | hasRole | async) === false
+          "
+        >
+          {{ !hasSMTPConfig ? ('ACTIONS.CREATE' | translate) : ('ACTIONS.SAVE' | translate) }}
+        </button>
+      </div>
+    </mat-step>
+
+    <ng-template matStepperIcon="edit">
+      <mat-icon>check</mat-icon>
+    </ng-template>
+  </mat-horizontal-stepper>
+</cnsl-create-layout>

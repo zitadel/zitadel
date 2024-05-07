@@ -5,6 +5,7 @@
 //
 //	mockgen -package mock -destination ./mock/repository.mock.go github.com/zitadel/zitadel/internal/auth_request/repository AuthRequestCache
 //
+
 // Package mock is a generated GoMock package.
 package mock
 
@@ -37,6 +38,18 @@ func NewMockAuthRequestCache(ctrl *gomock.Controller) *MockAuthRequestCache {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockAuthRequestCache) EXPECT() *MockAuthRequestCacheMockRecorder {
 	return m.recorder
+}
+
+// CacheAuthRequest mocks base method.
+func (m *MockAuthRequestCache) CacheAuthRequest(arg0 context.Context, arg1 *domain.AuthRequest) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "CacheAuthRequest", arg0, arg1)
+}
+
+// CacheAuthRequest indicates an expected call of CacheAuthRequest.
+func (mr *MockAuthRequestCacheMockRecorder) CacheAuthRequest(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CacheAuthRequest", reflect.TypeOf((*MockAuthRequestCache)(nil).CacheAuthRequest), arg0, arg1)
 }
 
 // DeleteAuthRequest mocks base method.

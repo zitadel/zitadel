@@ -325,6 +325,12 @@ LogoutDone:
   Description: U heeft succesvol uitgelogd.
   LoginButtonText: Inloggen
 
+LinkingUserPrompt:
+  Title: Bestaande gebruiker gevonden
+  Description: "Wilt u uw bestaande account koppelen:"
+  LinkButtonText: Koppeling
+  OtherButtonText: Andere opties
+
 LinkingUsersDone:
   Title: Koppeling Gebruiker
   Description: Gebruiker gekoppeld.

@@ -3,16 +3,12 @@ package command
 import (
 	"context"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
 
 func (c *Commands) RegisterUserU2F(ctx context.Context, userID, resourceOwner, rpID string) (*domain.WebAuthNRegistrationDetails, error) {
-	if err := authz.UserIDInCTX(ctx, userID); err != nil {
-		return nil, err
-	}
 	return c.registerUserU2F(ctx, userID, resourceOwner, rpID)
 }
 

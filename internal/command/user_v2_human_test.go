@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -232,6 +233,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							domain.GenderUnspecified,
 							"email@test.ch",
 							true,
+							"userAgentID",
 						),
 						user.NewHumanInitialCodeAddedEvent(context.Background(),
 							&userAgg.Aggregate,
@@ -242,6 +244,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							time.Hour*1,
+							"authRequestID",
 						),
 					),
 				),
@@ -261,6 +264,8 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					},
 					PreferredLanguage: language.English,
 					Register:          true,
+					UserAgentID:       "userAgentID",
+					AuthRequestID:     "authRequestID",
 				},
 				secretGenerator: GetMockSecretGenerator(t),
 				allowInitMail:   true,
@@ -344,6 +349,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							time.Hour*1,
+							"",
 						),
 					),
 				),
@@ -414,6 +420,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							1*time.Hour,
+							"",
 						),
 					),
 				),
@@ -486,6 +493,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							1*time.Hour,
 							"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}",
 							false,
+							"",
 						),
 					),
 				),
@@ -559,6 +567,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							1*time.Hour,
 							"",
 							true,
+							"",
 						),
 					),
 				),
@@ -1031,6 +1040,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							1*time.Hour,
+							"",
 						),
 						user.NewHumanPhoneVerifiedEvent(
 							context.Background(),
@@ -1174,6 +1184,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 								Crypted:    []byte("userinit"),
 							},
 							1*time.Hour,
+							"",
 						),
 						user.NewMetadataSetEvent(
 							context.Background(),
@@ -1207,6 +1218,173 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				},
 				secretGenerator: GetMockSecretGenerator(t),
 				allowInitMail:   true,
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
+			name: "register human with idp, unverified email, allow init mail, ok (verify mail)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewGoogleIDPAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								"google",
+								"clientID",
+								nil,
+								[]string{"openid"},
+								idp.Options{},
+							),
+						),
+					),
+					expectPush(
+						newRegisterHumanEvent("email@test.ch", "", false, true, "", language.English),
+						user.NewHumanEmailCodeAddedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("mailVerify"),
+							},
+							time.Hour,
+							"authRequestID",
+						),
+						user.NewUserIDPLinkAddedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"idpID",
+							"displayName",
+							"externalID",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				newCode:         mockEncryptedCode("mailVerify", time.Hour),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "email@test.ch",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
+					},
+					PreferredLanguage: language.English,
+					Register:          true,
+					Links: []*AddLink{
+						{
+							IDPID:         "idpID",
+							DisplayName:   "displayName",
+							IDPExternalID: "externalID",
+						},
+					},
+					AuthRequestID: "authRequestID",
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   true,
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
+			name: "register human with idp, verified email, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&userAgg.Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewGoogleIDPAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idpID",
+								"google",
+								"clientID",
+								nil,
+								[]string{"openid"},
+								idp.Options{},
+							),
+						),
+					),
+					expectPush(
+						newRegisterHumanEvent("email@test.ch", "", false, true, "", language.English),
+						user.NewHumanEmailVerifiedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+						),
+						user.NewUserIDPLinkAddedEvent(
+							context.Background(),
+							&userAgg.Aggregate,
+							"idpID",
+							"displayName",
+							"externalID",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				newCode:         mockEncryptedCode("mailVerify", time.Hour),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "email@test.ch",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address:  "email@test.ch",
+						Verified: true,
+					},
+					PreferredLanguage: language.English,
+					Register:          true,
+					Links: []*AddLink{
+						{
+							IDPID:         "idpID",
+							DisplayName:   "displayName",
+							IDPExternalID: "externalID",
+						},
+					},
+					AuthRequestID: "authRequestID",
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   false,
 				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			res: res{
@@ -1558,6 +1736,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							time.Hour,
 							"",
 							false,
+							"",
 						),
 					),
 				),
@@ -1737,6 +1916,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							time.Hour,
 							"",
 							true,
+							"",
 						),
 					),
 				),
@@ -1993,6 +2173,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							user.NewHumanInitialCodeAddedEvent(context.Background(),
 								&userAgg.Aggregate,
 								nil, time.Hour*1,
+								"",
 							),
 						),
 					),
@@ -2005,8 +2186,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						OldPassword:    gu.Ptr("password"),
+						Password:       "password2",
+						OldPassword:    "password",
 						ChangeRequired: true,
 					},
 				},
@@ -2052,8 +2233,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						OldPassword:    gu.Ptr("password"),
+						Password:       "password2",
+						OldPassword:    "password",
 						ChangeRequired: true,
 					},
 				},
@@ -2076,7 +2257,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						OldPassword:    gu.Ptr("password"),
+						OldPassword:    "password",
 						ChangeRequired: true,
 					},
 				},
@@ -2110,7 +2291,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
+						Password:       "password2",
 						ChangeRequired: true,
 					},
 				},
@@ -2164,7 +2345,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
+						Password:       "password2",
 						ChangeRequired: true,
 					},
 				},
@@ -2220,8 +2401,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						OldPassword:    gu.Ptr("password"),
+						Password:       "password2",
+						OldPassword:    "password",
 						ChangeRequired: true,
 					},
 				},
@@ -2257,8 +2438,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						OldPassword:    gu.Ptr("wrong"),
+						Password:       "password2",
+						OldPassword:    "wrong",
 						ChangeRequired: true,
 					},
 				},
@@ -2327,8 +2508,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						PasswordCode:   gu.Ptr("code"),
+						Password:       "password2",
+						PasswordCode:   "code",
 						ChangeRequired: true,
 					},
 				},
@@ -2380,8 +2561,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:       gu.Ptr("password2"),
-						PasswordCode:   gu.Ptr("wrong"),
+						Password:       "password2",
+						PasswordCode:   "wrong",
 						ChangeRequired: true,
 					},
 				},
@@ -2394,7 +2575,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "change human password encoded, password code, ok",
+			name: "change human password, password code, not matching policy",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -2427,9 +2608,58 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								1,
-								false,
-								false,
-								false,
+								true,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				checkPermission:    newMockPermissionCheckAllowed(),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &ChangeHuman{
+					Password: &Password{
+						Password:       "password2",
+						PasswordCode:   "code",
+						ChangeRequired: true,
+					},
+				},
+				codeAlg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "change human password encoded, password code, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							newAddHumanEvent("$plain$x$password", true, true, "", language.English),
+						),
+						eventFromEventPusher(
+							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
+								&userAgg.Aggregate,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanPasswordCodeAddedEventV2(context.Background(),
+								&userAgg.Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("code"),
+								},
+								time.Hour*1,
+								domain.NotificationTypeEmail,
+								"",
 								false,
 							),
 						),
@@ -2451,8 +2681,8 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						EncodedPasswordHash: gu.Ptr("$plain$x$password2"),
-						PasswordCode:        gu.Ptr("code"),
+						EncodedPasswordHash: "$plain$x$password2",
+						PasswordCode:        "code",
 						ChangeRequired:      true,
 					},
 				},
@@ -2524,9 +2754,9 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				orgID: "org1",
 				human: &ChangeHuman{
 					Password: &Password{
-						Password:            gu.Ptr("passwordnotused"),
-						EncodedPasswordHash: gu.Ptr("$plain$x$password2"),
-						PasswordCode:        gu.Ptr("code"),
+						Password:            "passwordnotused",
+						EncodedPasswordHash: "$plain$x$password2",
+						PasswordCode:        "code",
 						ChangeRequired:      true,
 					},
 				},
@@ -2548,6 +2778,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				newEncryptedCode:   tt.fields.newCode,
 				checkPermission:    tt.fields.checkPermission,
+				userEncryption:     tt.args.codeAlg,
 			}
 			err := r.ChangeUserHuman(tt.args.ctx, tt.args.human, tt.args.codeAlg)
 			if tt.res.err == nil {

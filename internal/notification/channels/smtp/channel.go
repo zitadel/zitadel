@@ -91,9 +91,9 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 	}
 
 	if !tlsRequired {
-		client, err = smtpConfig.getSMPTClient()
+		client, err = smtpConfig.getSMTPClient()
 	} else {
-		client, err = smtpConfig.getSMPTClientWithTls(host)
+		client, err = smtpConfig.getSMTPClientWithTls(host)
 	}
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (smtpConfig SMTP) connectToSMTP(tlsRequired bool) (client *smtp.Client, err
 	return client, nil
 }
 
-func (smtpConfig SMTP) getSMPTClient() (*smtp.Client, error) {
+func (smtpConfig SMTP) getSMTPClient() (*smtp.Client, error) {
 	client, err := smtp.Dial(smtpConfig.Host)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "EMAIL-skwos", "could not make smtp dial")
@@ -114,12 +114,12 @@ func (smtpConfig SMTP) getSMPTClient() (*smtp.Client, error) {
 	return client, nil
 }
 
-func (smtpConfig SMTP) getSMPTClientWithTls(host string) (*smtp.Client, error) {
+func (smtpConfig SMTP) getSMTPClientWithTls(host string) (*smtp.Client, error) {
 	conn, err := tls.Dial("tcp", smtpConfig.Host, &tls.Config{})
 
 	if errors.As(err, &tls.RecordHeaderError{}) {
 		logging.Log("MAIN-xKIzT").OnError(err).Warn("could not connect using normal tls. trying starttls instead...")
-		return smtpConfig.getSMPTClientWithStartTls(host)
+		return smtpConfig.getSMTPClientWithStartTls(host)
 	}
 
 	if err != nil {
@@ -133,8 +133,8 @@ func (smtpConfig SMTP) getSMPTClientWithTls(host string) (*smtp.Client, error) {
 	return client, err
 }
 
-func (smtpConfig SMTP) getSMPTClientWithStartTls(host string) (*smtp.Client, error) {
-	client, err := smtpConfig.getSMPTClient()
+func (smtpConfig SMTP) getSMTPClientWithStartTls(host string) (*smtp.Client, error) {
+	client, err := smtpConfig.getSMTPClient()
 	if err != nil {
 		return nil, err
 	}
@@ -152,10 +152,7 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 		return nil
 	}
 	// Auth
-	auth := unencryptedAuth{
-		smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, host),
-	}
-	err := client.Auth(auth)
+	err := client.Auth(PlainOrLoginAuth(smtpConfig.User, smtpConfig.Password, host))
 	if err != nil {
 		return zerrors.ThrowInternalf(err, "EMAIL-s9kfs", "could not add smtp auth for user %s", smtpConfig.User)
 	}

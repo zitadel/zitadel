@@ -1,0 +1,69 @@
+.feature-settings-wrapper {
+  .feature-title-row {
+    display: flex;
+    align-items: center;
+
+    h1 {
+      margin: 0;
+    }
+
+    a .icon {
+      font-size: 1.2rem;
+      height: 1.2rem;
+      line-height: 1.2rem;
+    }
+  }
+
+  .features {
+    .feature-row {
+      display: flex;
+      flex-direction: column;
+
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .buttongroup {
+          margin-right: 0.5rem;
+          margin-top: 0.5rem;
+
+          .toggle-row {
+            display: flex;
+            align-items: center;
+
+            i {
+              margin-right: 0.5rem;
+            }
+
+            .info-i {
+              font-size: 1.2rem;
+              margin-left: 0.5rem;
+              margin-right: 0;
+            }
+
+            .current-dot {
+              height: 8px;
+              width: 8px;
+              border-radius: 50%;
+              // background-color: rgb(84, 142, 230);
+              margin-left: 0.5rem;
+
+              &.enabled {
+                background-color: var(--success);
+              }
+
+              &.disabled {
+                background-color: var(--warn);
+              }
+            }
+          }
+        }
+      }
+
+      .feature-info {
+        margin-bottom: 1rem;
+      }
+    }
+  }
+}

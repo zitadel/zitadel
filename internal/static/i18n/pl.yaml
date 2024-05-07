@@ -56,6 +56,7 @@ Errors:
   SMTPConfig:
     NotFound: Konfiguracja SMTP nie znaleziona
     AlreadyExists: Konfiguracja SMTP już istnieje
+    AlreadyDeactivated: Konfiguracja SMTP jest już dezaktywowana
     SenderAdressNotCustomDomain: Adres nadawcy musi być skonfigurowany jako domena niestandardowa na instancji.
   Notification:
     NoDomain: Nie znaleziono domeny dla wiadomości
@@ -108,6 +109,7 @@ Errors:
       Key:
         NotFound: Klucz maszyny nie znaleziony
         AlreadyExisting: Klucz maszyny już istnieje
+        Invalid: Klucz publiczny nie jest prawidłowym kluczem publicznym RSA w formacie PKIX z kodowaniem PEM
       Secret:
         NotExisting: Sekret nie istnieje
         Invalid: Sekret jest nieprawidłowy
@@ -134,7 +136,7 @@ Errors:
       Invalid: Hasło jest nieprawidłowe
       NotSet: Użytkownik nie ustawił hasła
       NotChanged: Nowe hasło nie może być takie samo jak Twoje obecne hasło
-      NotSupported: Kodowanie skrótu hasła nie jest obsługiwane
+      NotSupported: Kodowanie skrótu hasła nie jest obsługiwane. Sprawdź https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Polityka hasła nie znaleziona
       MinLength: Hasło jest zbyt krótkie
@@ -468,6 +470,7 @@ Errors:
     NotActive: Działanie nie jest aktywne
     NotInactive: Działanie nie jest dezaktywowane
     MaxAllowed: Nie dopuszcza się dodatkowych aktywnych działań.
+    NotEnabled: Funkcja „Akcja” nie jest włączona
   Flow:
     FlowTypeMissing: Typ przepływu brakuje
     Empty: Przepływ jest już pusty
@@ -581,6 +584,15 @@ AggregateTypes:
   target: Cel
   execution: Wykonanie
   user_schema: Schemat użytkownika
+  auth_request: Auth Request
+  device_auth: Uwierzytelnianie urządzenia
+  idpintent: Intencja IDP
+  limits: Limit
+  milestone: Kamień milowy
+  oidc_session: Sesja OIDC
+  restrictions: Ograniczenia
+  system: System
+  session: Sesja
 
 EventTypes:
   execution:
@@ -1001,6 +1013,9 @@ EventTypes:
           check:
             succeeded: Sprawdzenie sekretu OIDC Klienta powiodło się
             failed: Sprawdzenie sekretu OIDC Klienta nie powiodło się
+        key:
+          added: Dodano klucz aplikacji OIDC
+          removed: Klucz aplikacji OIDC usunięty
       api:
         secret:
           check:
@@ -1119,6 +1134,9 @@ EventTypes:
       config:
         added: Dodano konfigurację SMTP
         changed: Zmieniono konfigurację SMTP
+        activated: Konfiguracja SMTP została aktywowana
+        deactivated: Konfiguracja SMTP dezaktywowana
+        removed: Konfiguracja SMTP została usunięta
         password:
           changed: Zmieniono sekret konfiguracji SMTP
     sms:
@@ -1264,6 +1282,8 @@ EventTypes:
       config:
         added: Konfiguracja SMTP dodana
         changed: Konfiguracja SMTP zmieniona
+        activated: Konfiguracja SMTP została aktywowana
+        deactivated: Konfiguracja SMTP dezaktywowana
         password:
           changed: Hasło konfiguracji SMTP zmienione
         removed: Konfiguracja SMTP usunięta

@@ -48,13 +48,13 @@
       "TITLE": "Usuários",
       "DESCRIPTION": "Um usuário é um humano ou uma máquina que pode acessar seus aplicativos.",
       "HUMANS": {
-        "TITLE": "Humanos",
-        "DESCRIPTION": "Humanos autenticam interativamente em uma sessão de navegador com um prompt de login.",
+        "TITLE": "Usuários",
+        "DESCRIPTION": "Os usuários são autenticados interativamente em uma sessão do navegador com um prompt de login.",
         "METADATA": "Adicione atributos personalizados ao usuário, como o departamento. Você pode usar essas informações em suas ações."
       },
       "MACHINES": {
-        "TITLE": "Máquinas",
-        "DESCRIPTION": "Máquinas autenticam de forma não interativa usando um token JWT assinado com uma chave privada. Eles também podem usar um token de acesso pessoal.",
+        "TITLE": "Usuários do serviço",
+        "DESCRIPTION": "Os usuários do serviço autenticam-se de forma não interativa usando um token de portador JWT assinado com uma chave privada. Eles também podem usar um token de acesso pessoal.",
         "METADATA": "Adicione atributos personalizados ao usuário, como o sistema de autenticação. Você pode usar essas informações em suas ações."
       },
       "SELF": {
@@ -85,6 +85,10 @@
       "ORG": {
         "TITLE": "Configurações da Organização",
         "DESCRIPTION": "Personalize as configurações da sua organização."
+      },
+      "FEATURES": {
+        "TITLE": "Configurações de recursos",
+        "DESCRIPTION": "Desbloqueie recursos para sua instância."
       },
       "IDPS": {
         "TITLE": "Provedores de Identidade",
@@ -265,9 +269,9 @@
             "TITLE": "Login Externo permitido",
             "DESCRIPTION": "Permite que seus usuários façam login com um provedor de identidade externo em vez de usar o usuário ZITADEL para fazer login."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Redefinição de Senha permitida",
-            "DESCRIPTION": "Permite que seus usuários redefinam sua senha."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Redefinição de senha oculta",
+            "DESCRIPTION": "Não permita que seus usuários redefinam a senha."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Descoberta de Domínio permitida",
@@ -1289,6 +1293,7 @@
       "MEMBERCHANGED": "Gerente alterado.",
       "SETPRIMARY": "Domínio principal definido.",
       "DELETED": "Organização excluída com sucesso",
+      "DEFAULTORGNOTFOUND": "A organização padrão não foi encontrada",
       "ORG_WAS_DELETED": "Organização foi excluída."
     },
     "DIALOG": {
@@ -1316,6 +1321,7 @@
     },
     "LIST": {
       "ORGS": "Organizações",
+      "FEATURESETTINGS": "Configurações de Recursos",
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamento de Login e Segurança",
       "LOCKOUT": "Bloqueio",
@@ -1377,6 +1383,8 @@
       }
     },
     "SMTP": {
+      "TITLE": "Configurações SMTP",
+      "DESCRIPTION": "Descrição",
       "SENDERADDRESS": "Endereço de e-mail do remetente",
       "SENDERNAME": "Nome do remetente",
       "REPLYTOADDRESS": "Endereço Reply-To",
@@ -1387,6 +1395,7 @@
       "PASSWORDSET": "Senha do SMTP definida com sucesso.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Salvo com sucesso!",
+      "NOCHANGES": "Sem alterações!",
       "REQUIREDWARN": "Para enviar notificações do seu domínio, você precisa inserir seus dados SMTP."
     },
     "SMS": {
@@ -1445,6 +1454,27 @@
       "IMPERSONATIONTITLE": "Personificação",
       "IMPERSONATIONENABLED": "Permitir representação",
       "IMPERSONATIONDESCRIPTION": "Esta configuração permite usar a representação em princípio. Observe que o imitador também precisa das funções `*_IMPERSONATOR` apropriadas atribuídas."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Organização Padrão de Login",
+      "LOGINDEFAULTORG_DESCRIPTION": "A interface de login utilizará as configurações da organização padrão (e não da instância) se nenhum contexto de organização estiver definido",
+      "OIDCLEGACYINTROSPECTION": "Introspecção Legada OIDC",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Recentemente refatoramos o endpoint de introspecção por motivos de performance. Esse recurso pode ser usado para reverter para a implementação legada caso surjam bugs inesperados.",
+      "OIDCTOKENEXCHANGE": "Troca de Token OIDC",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Habilita o tipo de concessão experimental urn:ietf:params:oauth:grant-type:token-exchange para o endpoint de token OIDC. A troca de token pode ser usada para solicitar tokens com escopo menor ou personificar outros usuários. Consulte a política de segurança para permitir a personificação em uma instância.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Projeções de Introspecção com Gatilho OIDC",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Habilita gatilhos de projeção durante uma solicitação de introspecção. Isso pode funcionar como uma solução alternativa se houver problemas de consistência perceptíveis na resposta de introspecção, mas pode impactar o desempenho. Planejamos remover gatilhos para solicitações de introspecção no futuro.",
+      "USERSCHEMA": "Esquema de Usuário",
+      "USERSCHEMAS_DESCRIPTION": "Esquemas de Usuário permitem gerenciar esquemas de dados do usuário. Se o sinalizador estiver ativado, você poderá usar a nova API e seus recursos.",
+      "ACTIONS": "Ações",
+      "ACTIONS_DESCRIPTION": "Actions v2 permitem gerenciar execuções e destinos de dados. Se a flag estiver habilitada, você poderá usar a nova API e seus recursos.",
+      "STATES": {
+        "INHERITED": "Herdade",
+        "ENABLED": "Habilitado",
+        "DISABLED": "Desabilitado"
+      },
+      "INHERITED_DESCRIPTION": "Essa configuração define o valor para o padrão do sistema.",
+      "RESET": "Definir tudo para herdar"
     },
     "DIALOG": {
       "RESET": {
@@ -1590,6 +1620,7 @@
         "initPasswordText": "Inicialização de senha",
         "initializeDoneText": "Inicialização de usuário concluída",
         "initializeUserText": "Inicializaçãode usuário",
+        "linkingUserPromptText": "Prompt de usuário para vinculação",
         "linkingUserDoneText": "Vinculação de usuário concluída",
         "loginText": "Login",
         "logoutText": "Logout",
@@ -1661,7 +1692,8 @@
       "HASLOWERCASE": "tem letra minúscula",
       "HASUPPERCASE": "tem letra maiúscula",
       "SHOWLOCKOUTFAILURES": "mostrar falhas de bloqueio",
-      "MAXATTEMPTS": "Máximo de tentativas de senha",
+      "MAXPASSWORDATTEMPTS": "Máximo de tentativas de senha",
+      "MAXOTPATTEMPTS": "Máximo de tentativas de OTP",
       "EXPIREWARNDAYS": "Aviso de expiração após dias",
       "MAXAGEDAYS": "Idade máxima em dias",
       "USERLOGINMUSTBEDOMAIN": "Adicionar domínio da organização como sufixo aos nomes de login",
@@ -2020,7 +2052,13 @@
       "ISCREATIONALLOWED": "Criação de Conta Permitida",
       "ISCREATIONALLOWED_DESC": "Determina se as contas podem ser criadas.",
       "ISLINKINGALLOWED": "Vinculação de Conta Permitida",
-      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada a uma conta existente."
+      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada a uma conta existente.",
+      "AUTOLINKING_DESC": "Determina se uma identidade será solicitada a ser vinculada a uma conta existente.",
+      "AUTOLINKINGTYPE": {
+        "0": "Desativado",
+        "1": "Verificar nome de usuário existente",
+        "2": "Verificar e-mail existente"
+      }
     },
     "OWNERTYPES": {
       "0": "desconhecido",
@@ -2177,6 +2215,48 @@
     "PASSWORDLESSTYPE": {
       "0": "Não permitido",
       "1": "Permitido"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Provedor SMTP",
+      "DESCRIPTION": "Estes são os provedores SMTP para sua instância Zitadel. Ative aquele que deseja usar para enviar notificações aos seus usuários.",
+      "EMPTY": "Nenhum provedor SMTP disponível",
+      "ACTIVATED": "Ativado",
+      "ACTIVATE": "Ativar provedor",
+      "DEACTIVATE": "Desativar provedor",
+      "TYPE": "Tipo",
+      "DIALOG": {
+        "ACTIVATED": "A configuração SMTP foi ativada",
+        "ACTIVATE_WARN_TITLE": "Ativar configuração SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Você está prestes a ativar uma configuração SMTP. Primeiro, desativaremos o provedor ativo atual e depois ativaremos esta configuração. Tem certeza?",
+        "DEACTIVATE_WARN_TITLE": "Desativar configuração SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Você está prestes a desativar uma configuração SMTP. Tem certeza?",
+        "DEACTIVATED": "A configuração SMTP foi desativada",
+        "DELETE_TITLE": "Excluir configuração SMTP",
+        "DELETE_DESCRIPTION": "Você está prestes a excluir uma configuração. Confirme esta ação digitando o nome do remetente",
+        "DELETED": "A configuração SMTP foi excluída",
+        "SENDER": "Digite {{ value }} para excluir esta configuração SMTP."
+      }
+    },
+    "CREATE": {
+      "TITLE": "Adicionar provedor SMTP",
+      "DESCRIPTION": "Selecione um ou mais dos seguintes fornecedores.",
+      "STEPS": {
+        "TITLE": "Adicionar {{ value }} provedor SMTP",
+        "CREATE_DESC_TITLE": "Insira suas configurações SMTP de {{ value }} passo a passo",
+        "CURRENT_DESC_TITLE": "Estas são suas configurações de SMTP",
+        "PROVIDER_SETTINGS": "Configurações do provedor SMTP",
+        "SENDER_SETTINGS": "Configurações do remetente",
+        "TEST_SETTINGS": "Testar configurações de SMTP"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Configurações do provedor SMTP"
+    },
+    "EMPTY": "Nenhum provedor SMTP disponível",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {

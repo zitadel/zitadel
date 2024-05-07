@@ -1734,7 +1734,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Create Key for machine user";
-            description: "A new key is generated and will be returned in the response. Make sure to store the returned key. Machine keys are used to authenticate with jwt profile."
+            description: "If a public key is not supplied, a new key is generated and will be returned in the response. Make sure to store the returned key. If an RSA public key is supplied, the private key is omitted from the response. Machine keys are used to authenticate with jwt profile."
             tags: "Users";
             tags: "User Machine";
             responses: {
@@ -7857,7 +7857,7 @@ message ImportHumanUserRequest {
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 min_length: 1;
                 max_length: 200;
-                example: "\"idp-config-id\"";
+                example: "\"external-user-id\"";
                 description: "The id of the user in the external identity provider"
             }
         ];
@@ -8502,6 +8502,12 @@ message AddMachineKeyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"2519-04-01T08:45:00.000000Z\"";
             description: "The date the key will expire and no logins will be possible";
+        }
+    ];
+    bytes public_key = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+           example: "\"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1...\"";
+           description: "Optionally provide a public key of your own generated RSA private key.";
         }
     ];
 }
@@ -10412,6 +10418,12 @@ message AddCustomLockoutPolicyRequest {
             description: "When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger."
         }
     ];
+    uint32 max_otp_attempts = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum failed attempts for a single OTP type (TOTP, SMS, Email) before the account gets locked. Attempts are reset as soon as the OTP is entered correctly. If set to 0 the account will never be locked."
+            example: "\"10\""
+        }
+    ];
 }
 
 message AddCustomLockoutPolicyResponse {
@@ -10422,6 +10434,12 @@ message UpdateCustomLockoutPolicyRequest {
     uint32 max_password_attempts = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "When the user has reached the maximum password attempts the account will be locked, If this is set to 0 the lockout will not trigger."
+        }
+    ];
+    uint32 max_otp_attempts = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Maximum failed attempts for a single OTP type (TOTP, SMS, Email) before the account gets locked. Attempts are reset as soon as the OTP is entered correctly. If set to 0 the account will never be locked."
+            example: "\"10\""
         }
     ];
 }
@@ -10936,6 +10954,7 @@ message SetCustomLoginTextsRequest {
     zitadel.text.v1.PasswordlessRegistrationScreenText passwordless_registration_text = 33;
     zitadel.text.v1.PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
     zitadel.text.v1.ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
+    zitadel.text.v1.LinkingUserPromptScreenText linking_user_prompt_text = 36;
 }
 
 message SetCustomLoginTextsResponse {

@@ -14,6 +14,7 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.
 		TriggerIntrospectionProjections: req.OidcTriggerIntrospectionProjections,
 		LegacyIntrospection:             req.OidcLegacyIntrospection,
 		UserSchema:                      req.UserSchema,
+		Actions:                         req.Actions,
 		TokenExchange:                   req.OidcTokenExchange,
 	}
 }
@@ -26,6 +27,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
+		Actions:                             featureSourceToFlagPb(&f.Actions),
 	}
 }
 
@@ -36,6 +38,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		LegacyIntrospection:             req.OidcLegacyIntrospection,
 		UserSchema:                      req.UserSchema,
 		TokenExchange:                   req.OidcTokenExchange,
+		Actions:                         req.Actions,
 	}
 }
 
@@ -47,6 +50,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		OidcLegacyIntrospection:             featureSourceToFlagPb(&f.LegacyIntrospection),
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
+		Actions:                             featureSourceToFlagPb(&f.Actions),
 	}
 }
 

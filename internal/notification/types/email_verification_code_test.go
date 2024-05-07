@@ -15,10 +15,11 @@ import (
 
 func TestNotify_SendEmailVerificationCode(t *testing.T) {
 	type args struct {
-		user    *query.NotifyUser
-		origin  string
-		code    string
-		urlTmpl string
+		user          *query.NotifyUser
+		origin        string
+		code          string
+		urlTmpl       string
+		authRequestID string
 	}
 	tests := []struct {
 		name    string
@@ -33,12 +34,13 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 					ID:            "user1",
 					ResourceOwner: "org1",
 				},
-				origin:  "https://example.com",
-				code:    "123",
-				urlTmpl: "",
+				origin:        "https://example.com",
+				code:          "123",
+				urlTmpl:       "",
+				authRequestID: "authRequestID",
 			},
 			want: &notifyResult{
-				url:                                "https://example.com/ui/login/mail/verification?userID=user1&code=123&orgID=org1",
+				url:                                "https://example.com/ui/login/mail/verification?authRequestID=authRequestID&code=123&orgID=org1&userID=user1",
 				args:                               map[string]interface{}{"Code": "123"},
 				messageType:                        domain.VerifyEmailMessageType,
 				allowUnverifiedNotificationChannel: true,
@@ -51,9 +53,10 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 					ID:            "user1",
 					ResourceOwner: "org1",
 				},
-				origin:  "https://example.com",
-				code:    "123",
-				urlTmpl: "{{",
+				origin:        "https://example.com",
+				code:          "123",
+				urlTmpl:       "{{",
+				authRequestID: "authRequestID",
 			},
 			want:    &notifyResult{},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-oGh5e", "Errors.User.InvalidURLTemplate"),
@@ -65,9 +68,10 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 					ID:            "user1",
 					ResourceOwner: "org1",
 				},
-				origin:  "https://example.com",
-				code:    "123",
-				urlTmpl: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+				origin:        "https://example.com",
+				code:          "123",
+				urlTmpl:       "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+				authRequestID: "authRequestID",
 			},
 			want: &notifyResult{
 				url:                                "https://example.com/email/verify?userID=user1&code=123&orgID=org1",
@@ -80,7 +84,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, notify := mockNotify()
-			err := notify.SendEmailVerificationCode(http_utils.WithComposedOrigin(context.Background(), tt.args.origin), tt.args.user, tt.args.code, tt.args.urlTmpl)
+			err := notify.SendEmailVerificationCode(http_utils.WithComposedOrigin(context.Background(), tt.args.origin), tt.args.user, tt.args.code, tt.args.urlTmpl, tt.args.authRequestID)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})

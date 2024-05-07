@@ -20,7 +20,6 @@ func targetAddEvent(aggID, resourceOwner string) *target.AddedEvent {
 		"https://example.com",
 		time.Second,
 		false,
-		false,
 	)
 }
 

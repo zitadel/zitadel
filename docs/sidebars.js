@@ -732,17 +732,17 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Execution Lifecycle (Preview)",
+              label: "Action Lifecycle (Preview)",
               link: {
                 type: "generated-index",
-                title: "Execution Service API (Preview)",
-                slug: "/apis/resources/execution_service_v3",
+                title: "Action Service API (Preview)",
+                slug: "/apis/resources/action_service_v3",
                 description:
-                  "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance.\n" +
+                  "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
                   "\n" +
                   "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
               },
-              items: require("./docs/apis/resources/execution_service_v3/sidebar.js"),
+              items: require("./docs/apis/resources/action_service_v3/sidebar.js"),
             },
           ],
         },
@@ -793,6 +793,15 @@ module.exports = {
         "apis/actions/complement-token",
         "apis/actions/customize-samlresponse",
         "apis/actions/objects",
+      ],
+    },
+    {
+      type: "category",
+      label: "Actions V2",
+      collapsed: false,
+      items: [
+        "apis/actionsv2/introduction",
+        "apis/actionsv2/execution-local",
       ],
     },
     {
