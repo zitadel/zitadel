@@ -49,7 +49,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.smtp_configs2 SET (change_date, sequence, tls, sender_address, sender_name, reply_to_address, host, username, description) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (id = $10) AND (resource_owner = $11) AND (instance_id = $12)",
+							expectedStmt: "UPDATE projections.smtp_configs3 SET (change_date, sequence, tls, sender_address, sender_name, reply_to_address, host, username, description) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE (id = $10) AND (resource_owner = $11) AND (instance_id = $12)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -100,7 +100,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.smtp_configs2 (creation_date, change_date, resource_owner, instance_id, sequence, id, tls, sender_address, sender_name, reply_to_address, host, username, password, state, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
+							expectedStmt: "INSERT INTO projections.smtp_configs3 (creation_date, change_date, resource_owner, instance_id, sequence, id, tls, sender_address, sender_name, reply_to_address, host, username, password, state, description) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -141,7 +141,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.smtp_configs2 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.smtp_configs3 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -173,7 +173,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.smtp_configs2 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.smtp_configs3 SET (change_date, sequence, state) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -211,7 +211,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.smtp_configs2 SET (change_date, sequence, password) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
+							expectedStmt: "UPDATE projections.smtp_configs3 SET (change_date, sequence, password) = ($1, $2, $3) WHERE (id = $4) AND (resource_owner = $5) AND (instance_id = $6)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -241,7 +241,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.smtp_configs2 WHERE (id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
+							expectedStmt: "DELETE FROM projections.smtp_configs3 WHERE (id = $1) AND (resource_owner = $2) AND (instance_id = $3)",
 							expectedArgs: []interface{}{
 								"config-id",
 								"ro-id",
@@ -269,7 +269,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.smtp_configs2 WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.smtp_configs3 WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
