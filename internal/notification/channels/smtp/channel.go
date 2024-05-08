@@ -161,3 +161,52 @@ func (smtpConfig SMTP) smtpAuth(client *smtp.Client, host string) error {
 	}
 	return nil
 }
+
+func TestConfiguration(cfg *Config, testEmail string) error {
+	client, err := cfg.SMTP.connectToSMTP(cfg.Tls)
+	if err != nil {
+		return err
+	}
+
+	defer client.Close()
+
+	message := &messages.Email{
+		Recipients:  []string{testEmail},
+		Subject:     "Test email",
+		Content:     "This a test email to check if your SMTP provider works fine",
+		SenderEmail: cfg.From,
+		SenderName:  cfg.FromName,
+	}
+
+	if err := client.Mail(cfg.From); err != nil {
+		return zerrors.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", cfg.From)
+	}
+
+	if err := client.Rcpt(testEmail); err != nil {
+		return zerrors.ThrowInternalf(err, "EMAIL-s4is4", "could not set recipient: %v", testEmail)
+	}
+
+	// Open data connection
+	w, err := client.Data()
+	if err != nil {
+		return err
+	}
+
+	// Send content
+	content, err := message.GetContent()
+	if err != nil {
+		return err
+	}
+	_, err = w.Write([]byte(content))
+	if err != nil {
+		return err
+	}
+
+	// Close IO and quit smtp connection
+	err = w.Close()
+	if err != nil {
+		return err
+	}
+
+	return client.Quit()
+}

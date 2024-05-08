@@ -4274,7 +4274,7 @@ message RemoveSMTPConfigResponse {
 message TestSMTPConfigByIdRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
     string test_address = 2 [
-        (validate.rules).string = {min_len: 1, max_len: 200},
+        (validate.rules).string = {min_len: 1, max_len: 200, email: true},
         (google.api.field_behavior) = REQUIRED,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"noreply@m.zitadel.cloud\"";
@@ -4284,9 +4284,8 @@ message TestSMTPConfigByIdRequest {
     ];
 }
 
-message TestSMTPConfigByIdResponse {
-    zitadel.settings.v1.SMTPTestResult test_results = 1;
-}
+// This is an empty response
+message TestSMTPConfigByIdResponse {}
 
 message ListSMSProvidersRequest {
     //list limitations and ordering

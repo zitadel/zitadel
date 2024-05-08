@@ -240,6 +240,8 @@ import {
   SetSecurityPolicyResponse,
   SetUpOrgRequest,
   SetUpOrgResponse,
+  TestSMTPConfigByIdRequest,
+  TestSMTPConfigByIdResponse,
   UpdateAppleProviderRequest,
   UpdateAppleProviderResponse,
   UpdateAzureADProviderRequest,
@@ -944,6 +946,13 @@ export class AdminService {
     const req = new DeactivateSMTPConfigRequest();
     req.setId(id);
     return this.grpcService.admin.deactivateSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public testSMTPConfigById(id: string, testEmailAddress: string): Promise<TestSMTPConfigByIdResponse.AsObject> {
+    const req = new TestSMTPConfigByIdRequest();
+    req.setId(id);
+    req.setTestAddress(testEmailAddress);
+    return this.grpcService.admin.testSMTPConfigById(req, null).then((resp) => resp.toObject());
   }
 
   public removeSMTPConfig(id: string): Promise<RemoveSMTPConfigResponse.AsObject> {

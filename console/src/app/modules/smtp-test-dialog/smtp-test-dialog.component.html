@@ -16,12 +16,12 @@
 
   <cnsl-form-field class="formfield">
     <cnsl-label>{{ data.emailKey | translate }}</cnsl-label>
-    <input cnslInput [(ngModel)]="confirm" data-e2e="email-test-dialog-input" />
+    <input cnslInput [(ngModel)]="email" data-e2e="email-test-dialog-input" />
   </cnsl-form-field>
 
-  <cnsl-form-field class="formfield">
+  <cnsl-form-field class="formfield" *ngIf="testResult">
     <cnsl-label>{{ data.testResultKey | translate }}</cnsl-label>
-    <textarea cnslInput class="test-result"></textarea>
+    <textarea cnslInput class="test-result" [(ngModel)]="testResult"></textarea>
   </cnsl-form-field>
 </div>
 
@@ -32,11 +32,11 @@
   <span class="fill-space"></span>
   <button
     color="primary"
-    [disabled]="data.confirmation && confirm !== data.confirmation"
+    [disabled]="!email"
     mat-raised-button
     class="ok-button"
-    (click)="closeDialogWithSuccess()"
-    data-e2e="confirm-dialog-button"
+    (click)="testEmailConfiguration()"
+    data-e2e="test-email-button"
   >
     {{ data.confirmKey | translate }}
   </button>
