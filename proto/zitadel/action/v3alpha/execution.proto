@@ -14,17 +14,20 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha;action";
 
 message Execution {
-  string execution_id = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"request.zitadel.session.v2beta.SessionService\"";
-    }
-  ];
+  Condition Condition = 1;
   // Details provide some base information (such as the last change date) of the target.
   zitadel.object.v2beta.Details details = 2;
-  // Targets which are called in the defined conditions.
-  repeated string targets = 3;
-  // Included executions with the same condition-types.
-  repeated string includes = 4;
+  // List of ordered list of targets/includes called during the execution.
+  repeated ExecutionTargetType targets = 3;
+}
+
+message ExecutionTargetType {
+  oneof type {
+    // Unique identifier of existing target to call.
+    string target = 1;
+    // Unique identifier of existing execution to include targets of.
+    Condition include = 2;
+  }
 }
 
 message Condition {
@@ -37,7 +40,7 @@ message Condition {
     // Condition-type to execute on response if a request on the defined API point happens.
     ResponseExecution response = 2;
     // Condition-type to execute if function is used, replaces actions v1.
-    string function = 3;
+    FunctionExecution function = 3;
     // Condition-type to execute if an event is created in the system.
     EventExecution event = 4;
   }
@@ -93,6 +96,11 @@ message ResponseExecution {
     // All calls to any available service and endpoint as condition.
     bool all = 3;
   }
+}
+
+// Executed on the specified function
+message FunctionExecution {
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 1000}];
 }
 
 message EventExecution{

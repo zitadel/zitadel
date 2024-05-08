@@ -95,7 +95,7 @@ func (w *Config) BeginRegistration(ctx context.Context, user *domain.Human, acco
 	}, nil
 }
 
-func (w *Config) FinishRegistration(ctx context.Context, user *domain.Human, webAuthN *domain.WebAuthNToken, tokenName string, credData []byte, isLoginUI bool) (*domain.WebAuthNToken, error) {
+func (w *Config) FinishRegistration(ctx context.Context, user *domain.Human, webAuthN *domain.WebAuthNToken, tokenName string, credData []byte) (*domain.WebAuthNToken, error) {
 	if webAuthN == nil {
 		return nil, zerrors.ThrowInternal(nil, "WEBAU-5M9so", "Errors.User.WebAuthN.NotFound")
 	}

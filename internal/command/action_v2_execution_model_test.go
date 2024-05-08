@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 )
@@ -32,10 +33,12 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 					),
@@ -53,10 +56,12 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
@@ -65,10 +70,12 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 					),
@@ -91,10 +98,12 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 					),
@@ -112,10 +121,12 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
@@ -138,24 +149,30 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 					),
@@ -174,17 +191,21 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
@@ -193,10 +214,12 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 					),
@@ -214,17 +237,21 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
@@ -233,10 +260,12 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 					),
@@ -254,24 +283,30 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
@@ -299,24 +334,30 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 					),
@@ -334,10 +375,12 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
@@ -346,17 +389,21 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
@@ -385,10 +432,12 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution1", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
@@ -397,17 +446,21 @@ func TestCommandSide_executionsExistsWriteModel(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution2", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
-							execution.NewSetEvent(context.Background(),
+							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("execution3", "org1"),
-								[]string{"target"},
-								[]string{"include"},
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
 							),
 						),
 						eventFromEventPusher(
