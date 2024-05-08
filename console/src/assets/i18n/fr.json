@@ -269,9 +269,9 @@
             "TITLE": "External Login allowed",
             "DESCRIPTION": "Allow your users to log in with an external identity provider instead of using the ZITADEL user to log in."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Password Reset allowed",
-            "DESCRIPTION": "Allow your users to reset their password."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Réinitialisation du mot de passe masquée",
+            "DESCRIPTION": "Ne permettez pas à vos utilisateurs de réinitialiser leur mot de passe."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Domain Discovery allowed",
