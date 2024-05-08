@@ -223,9 +223,10 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		actor = actorToken.nestedActor()
 	}
 
+	var sessionID string
 	switch tokenType {
 	case oidc.AccessTokenType, "":
-		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeAccessToken(ctx, client, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.AccessToken, resp.RefreshToken, sessionID, resp.ExpiresIn, err = s.createExchangeAccessToken(ctx, client, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.AccessTokenType
 
@@ -235,7 +236,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		resp.IssuedTokenType = oidc.JWTTokenType
 
 	case oidc.IDTokenType:
-		resp.AccessToken, resp.ExpiresIn, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, "", actor)
+		resp.AccessToken, resp.ExpiresIn, err = s.createIDToken(ctx, client, getUserInfo, getSigner, "", resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, "", actor)
 		resp.TokenType = TokenTypeNA
 		resp.IssuedTokenType = oidc.IDTokenType
 
@@ -249,7 +250,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	}
 
 	if slices.Contains(scopes, oidc.ScopeOpenID) && tokenType != oidc.IDTokenType {
-		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, "", actor)
+		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, sessionID, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, "", actor)
 		if err != nil {
 			return nil, err
 		}
@@ -258,7 +259,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	return resp, nil
 }
 
-func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, userID, resourceOwner string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {
+func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, userID, resourceOwner string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken, refreshToken, sessionID string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -277,13 +278,13 @@ func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, 
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 	)
 	if err != nil {
-		return "", "", 0, err
+		return "", "", "", 0, err
 	}
 	accessToken, err = op.CreateBearerToken(session.TokenID, userID, s.opCrypto)
 	if err != nil {
-		return "", "", 0, err
+		return "", "", "", 0, err
 	}
-	return accessToken, session.RefreshToken, timeToOIDCExpiresIn(session.Expiration), nil
+	return accessToken, session.RefreshToken, session.SessionID, timeToOIDCExpiresIn(session.Expiration), nil
 }
 
 func (s *Server) createExchangeJWT(ctx context.Context, client *Client, getUserInfo userInfoFunc, getSigner signerFunc, userID, resourceOwner string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {

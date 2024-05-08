@@ -363,18 +363,19 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 	}()
 
 	// check for the login client header
-	// and if not provided, terminate the session using the V1 method
 	headers, _ := http_utils.HeadersFromCtx(ctx)
-	if loginClient := headers.Get(LoginClientHeader); loginClient == "" {
-		return endSessionRequest.RedirectURI, o.TerminateSession(ctx, endSessionRequest.UserID, endSessionRequest.ClientID)
-	}
-
-	// in case there are not id_token_hint, redirect to the UI and let it decide which session to terminate
-	if endSessionRequest.IDTokenHintClaims == nil {
+	// in case there is no id_token_hint, redirect to the UI and let it decide which session to terminate
+	if headers.Get(LoginClientHeader) != "" && endSessionRequest.IDTokenHintClaims == nil {
 		return o.defaultLogoutURLV2 + endSessionRequest.RedirectURI, nil
 	}
 
-	// terminate the session of the id_token_hint
+	// If there is no login client header and no id_token_hint or the id_token_hint does not have a session ID,
+	// do a v1 Terminate session.
+	if endSessionRequest.IDTokenHintClaims == nil || endSessionRequest.IDTokenHintClaims.SessionID == "" {
+		return endSessionRequest.RedirectURI, o.TerminateSession(ctx, endSessionRequest.UserID, endSessionRequest.ClientID)
+	}
+
+	// terminate the v2 session of the id_token_hint
 	_, err = o.command.TerminateSessionWithoutTokenCheck(ctx, endSessionRequest.IDTokenHintClaims.SessionID)
 	if err != nil {
 		return "", err

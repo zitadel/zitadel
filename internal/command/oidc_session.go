@@ -30,6 +30,7 @@ const (
 )
 
 type OIDCSession struct {
+	SessionID         string
 	TokenID           string
 	ClientID          string
 	UserID            string
@@ -416,6 +417,7 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 		return nil, err
 	}
 	session := &OIDCSession{
+		SessionID:         c.oidcSessionWriteModel.SessionID,
 		ClientID:          c.oidcSessionWriteModel.ClientID,
 		UserID:            c.oidcSessionWriteModel.UserID,
 		Audience:          c.oidcSessionWriteModel.Audience,
