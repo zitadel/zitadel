@@ -1,0 +1,37 @@
+{{template "main-top" .}}
+
+<div class="lgn-head">
+    <h1>{{t "LinkingUserPrompt.Title"}}</h1>
+    <p>
+        {{t "LinkingUserPrompt.Description"}}<br>
+        {{.Username}}
+    </p>
+</div>
+
+
+<form action="{{ linkingUserPromptUrl }}" method="POST">
+
+    {{ .CSRF }}
+
+    <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" name="userID" value="{{ .UserID }}" />
+
+    {{template "error-message" .}}
+
+    <div class="lgn-actions lgn-reverse-order">
+        <a class="lgn-icon-button lgn-left-action" id="back-button" href="#">
+            <i class="lgn-icon-arrow-left-solid"></i>
+        </a>
+        <button class="lgn-raised-button lgn-primary lgn-initial-focus" id="submit-button" type="submit">{{t "LinkingUserPrompt.LinkButtonText"}}</button>
+        <span class="fill-space"></span>
+        <button class="lgn-stroked-button" name="other" value="true">{{t "LinkingUserPrompt.OtherButtonText"}}</button>
+    </div>
+
+</form>
+
+<script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
+<script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
+<script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
+<script src="{{ resourceUrl "scripts/go_back.js" }}"></script>
+
+{{template "main-bottom" .}}

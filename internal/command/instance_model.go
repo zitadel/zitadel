@@ -82,5 +82,11 @@ func (wm *InstanceWriteModel) Query() *eventstore.SearchQueryBuilder {
 }
 
 func InstanceAggregateFromWriteModel(wm *eventstore.WriteModel) *eventstore.Aggregate {
-	return eventstore.AggregateFromWriteModel(wm, instance.AggregateType, instance.AggregateVersion)
+	return &eventstore.Aggregate{
+		ID:            wm.AggregateID,
+		Type:          instance.AggregateType,
+		ResourceOwner: wm.ResourceOwner,
+		InstanceID:    wm.InstanceID,
+		Version:       instance.AggregateVersion,
+	}
 }

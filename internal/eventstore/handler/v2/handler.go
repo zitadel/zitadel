@@ -423,7 +423,7 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 	}
 }
 
-// lockInstances tries to lock the instance.
+// lockInstance tries to lock the instance.
 // If the instance is already locked from another process no cancel function is returned
 // the instance can be skipped then
 // If the instance is locked, an unlock deferrable function is returned

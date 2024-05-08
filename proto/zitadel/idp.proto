@@ -515,6 +515,21 @@ message Options {
             description: "Enable if a the ZITADEL account fields should be updated automatically on each login.";
         }
     ];
+    AutoLinkingOption auto_linking = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches.";
+        }
+    ];
+}
+
+enum AutoLinkingOption {
+    // AUTO_LINKING_OPTION_UNSPECIFIED disables the auto linking prompt.
+    AUTO_LINKING_OPTION_UNSPECIFIED = 0;
+    // AUTO_LINKING_OPTION_USERNAME will use the username of the external user to check for a corresponding ZITADEL user.
+    AUTO_LINKING_OPTION_USERNAME = 1;
+    // AUTO_LINKING_OPTION_EMAIL  will use the email of the external user to check for a corresponding ZITADEL user with the same verified email
+    // Note that in case multiple users match, no prompt will be shown.
+    AUTO_LINKING_OPTION_EMAIL = 2;
 }
 
 message LDAPAttributes {

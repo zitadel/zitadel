@@ -48,13 +48,13 @@
       "TITLE": "Gebruikers",
       "DESCRIPTION": "Een gebruiker is een mens of een machine die toegang kan krijgen tot je applicaties.",
       "HUMANS": {
-        "TITLE": "Mensen",
-        "DESCRIPTION": "Mensen authenticeren interactief in een browsersessie met een loginprompt.",
+        "TITLE": "Gebruikers",
+        "DESCRIPTION": "Gebruikers authenticeren interactief in een browsersessie met een loginprompt.",
         "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals de afdeling. Je kunt deze informatie gebruiken in je acties."
       },
       "MACHINES": {
-        "TITLE": "Machines",
-        "DESCRIPTION": "Machines authenticeren niet-interactief met een JWT bearer token ondertekend met een privésleutel. Ze kunnen ook een persoonlijke toegangstoken gebruiken.",
+        "TITLE": "Servicegebruikers",
+        "DESCRIPTION": "Servicegebruikers authenticeren niet-interactief met behulp van een JWT-bearertoken ondertekend met een privésleutel. Ze kunnen ook een persoonlijk toegangstoken gebruiken.",
         "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals het authenticatiesysteem. Je kunt deze informatie gebruiken in je acties."
       },
       "SELF": {
@@ -85,6 +85,10 @@
       "ORG": {
         "TITLE": "Organisatie-instellingen",
         "DESCRIPTION": "Pas de instellingen van je organisatie aan."
+      },
+      "FEATURES": {
+        "TITLE": "Functie-instellingen",
+        "DESCRIPTION": "Ontgrendel functies voor uw exemplaar."
       },
       "IDPS": {
         "TITLE": "Identiteitsproviders",
@@ -265,9 +269,9 @@
             "TITLE": "Extern inloggen toegestaan",
             "DESCRIPTION": "Sta je gebruikers toe om in te loggen met een externe identiteitsprovider in plaats van het gebruik van de ZITADEL gebruiker om in te loggen."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Wachtwoord resetten toegestaan",
-            "DESCRIPTION": "Sta je gebruikers toe om hun wachtwoord te resetten."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Wachtwoord reset verborgen",
+            "DESCRIPTION": "Sta uw gebruikers niet toe hun wachtwoord opnieuw in te stellen."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Domeinontdekking toegestaan",
@@ -1288,6 +1292,7 @@
       "MEMBERCHANGED": "Beheerder gewijzigd.",
       "SETPRIMARY": "Primaire domein ingesteld.",
       "DELETED": "Organisatie succesvol verwijderd",
+      "DEFAULTORGNOTFOUND": "De standaardorganisatie is niet gevonden",
       "ORG_WAS_DELETED": "Organisatie is verwijderd."
     },
     "DIALOG": {
@@ -1315,6 +1320,7 @@
     },
     "LIST": {
       "ORGS": "Organisaties",
+      "FEATURESETTINGS": "Functie-instellingen",
       "LANGUAGES": "Talen",
       "LOGIN": "Login Gedrag en Beveiliging",
       "LOCKOUT": "Lockout",
@@ -1376,6 +1382,8 @@
       }
     },
     "SMTP": {
+      "TITLE": "SMTP Instellingen",
+      "DESCRIPTION": "Beschrijving",
       "SENDERADDRESS": "Afzender Email Adres",
       "SENDERNAME": "Afzender Naam",
       "REPLYTOADDRESS": "Antwoord-naar Adres",
@@ -1386,6 +1394,7 @@
       "PASSWORDSET": "SMTP Wachtwoord is succesvol ingesteld.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Succesvol opgeslagen!",
+      "NOCHANGES": "Geen veranderingen!",
       "REQUIREDWARN": "Om notificaties te kunnen versturen vanaf uw domein, moet u uw SMTP-gegevens invoeren."
     },
     "SMS": {
@@ -1444,6 +1453,27 @@
       "IMPERSONATIONTITLE": "Imitatie",
       "IMPERSONATIONENABLED": "Imitatie toestaan",
       "IMPERSONATIONDESCRIPTION": "Deze instelling maakt het in principe mogelijk om imitatie te gebruiken. Houd er rekening mee dat aan de imitator ook de juiste `*_IMPERSONATOR` rollen moeten worden toegewezen."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Standaard inlogorganisatie",
+      "LOGINDEFAULTORG_DESCRIPTION": "Als er geen organisatiecontext is ingesteld, gebruikt de inlog-UI de instellingen van de standaardorganisatie (en niet van de instantie)",
+      "OIDCLEGACYINTROSPECTION": "Oude OIDC-introspectie",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "We hebben onlangs het introspectie-endpoint opnieuw gefactoreerd omwille van de prestaties. Deze functie kan worden gebruikt om terug te keren naar de oude implementatie als er onverwachte bugs optreden.",
+      "OIDCTOKENEXCHANGE": "OIDC-tokenuitwisseling",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Schakel het experimentele type verlening urn:ietf:params:oauth:grant-type:token-exchange in voor het OIDC-tokenendpoint. Tokenuitwisseling kan worden gebruikt om tokens met een kleinere scope op te vragen of om zich voor te doen als andere gebruikers. Raadpleeg het beveiligingsbeleid om impersonation op een instantie toe te staan.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC-triggers voor introspectieprojecties",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Schakel projectietriggers in tijdens een introspectieverzoek. Dit kan dienen als een tijdelijke oplossing als er merkbare consistentieproblemen optreden in het introspectieantwoord, maar het kan wel prestaties beïnvloeden. We zijn van plan om triggers voor introspectieverzoeken in de toekomst te verwijderen.",
+      "USERSCHEMA": "Gebruikerschema",
+      "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
+      "ACTIONS": "Acties",
+      "ACTIONS_DESCRIPTION": "Actions v2 maken het mogelijk om data-uitvoeringen en doelen te beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
+      "STATES": {
+        "INHERITED": "Overgenomen",
+        "ENABLED": "Ingeschakeld",
+        "DISABLED": "Uitgeschakeld"
+      },
+      "INHERITED_DESCRIPTION": "Deze instelling stelt de waarde in op de standaardwaarde van het systeem.",
+      "RESET": "Alles instellen op overgenomen"
     },
     "DIALOG": {
       "RESET": {
@@ -1589,6 +1619,7 @@
         "initPasswordText": "Initialiseer wachtwoord",
         "initializeDoneText": "Gebruiker initialisatie voltooid",
         "initializeUserText": "Initialiseer gebruiker",
+        "linkingUserPromptText": "Gebruiker koppelingsprompt",
         "linkingUserDoneText": "Gebruiker koppeling voltooid",
         "loginText": "Login",
         "logoutText": "Uitloggen",
@@ -1660,7 +1691,8 @@
       "HASLOWERCASE": "heeft kleine letters",
       "HASUPPERCASE": "heeft hoofdletters",
       "SHOWLOCKOUTFAILURES": "toon lockout mislukkingen",
-      "MAXATTEMPTS": "Maximum pogingen voor wachtwoord",
+      "MAXPASSWORDATTEMPTS": "Maximum pogingen voor wachtwoord",
+      "MAXOTPATTEMPTS": "Maximale OTP-pogingen",
       "EXPIREWARNDAYS": "Vervaldatum Waarschuwing na dag",
       "MAXAGEDAYS": "Maximale Leeftijd in dagen",
       "USERLOGINMUSTBEDOMAIN": "Voeg organisatie domein toe als achtervoegsel aan inlognamen",
@@ -2027,7 +2059,13 @@
       "ISCREATIONALLOWED": "Account creatie toegestaan",
       "ISCREATIONALLOWED_DESC": "Bepaalt of accounts kunnen worden aangemaakt.",
       "ISLINKINGALLOWED": "Account koppeling toegestaan",
-      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit kan worden gekoppeld aan een bestaand account."
+      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit kan worden gekoppeld aan een bestaand account.",
+      "AUTOLINKING_DESC": "Bepaalt of een identiteit wordt gevraagd om te worden gekoppeld aan een bestaand account.",
+      "AUTOLINKINGTYPE": {
+        "0": "Uitgeschakeld",
+        "1": "Controleren op bestaande gebruikersnaam",
+        "2": "Controleren op bestaand e-mailadres"
+      }
     },
     "OWNERTYPES": {
       "0": "onbekend",
@@ -2200,6 +2238,48 @@
     "PASSWORDLESSTYPE": {
       "0": "Niet toegestaan",
       "1": "Toegestaan"
+    }
+  },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTP-provider",
+      "DESCRIPTION": "Dit zijn de SMTP-providers voor uw Zitadel-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
+      "EMPTY": "Geen SMTP-provider beschikbaar",
+      "ACTIVATED": "Geactiveerd",
+      "ACTIVATE": "Aanbieder activeren",
+      "DEACTIVATE": "Aanbieder deactiveren",
+      "TYPE": "Type",
+      "DIALOG": {
+        "ACTIVATED": "SMTP-configuratie is geactiveerd",
+        "ACTIVATE_WARN_TITLE": "Activeer SMTP-configuratie",
+        "ACTIVATE_WARN_DESCRIPTION": "U staat op het punt een SMTP-configuratie te activeren. Eerst deactiveren we de huidige actieve provider en activeren vervolgens deze configuratie. Weet je het zeker?",
+        "DEACTIVATE_WARN_TITLE": "Deactiveer SMTP-configuratie",
+        "DEACTIVATE_WARN_DESCRIPTION": "U staat op het punt een SMTP-configuratie te deactiveren. Weet je het zeker?",
+        "DEACTIVATED": "SMTP-configuratie is gedeactiveerd",
+        "DELETE_TITLE": "SMTP-configuratie verwijderen",
+        "DELETE_DESCRIPTION": "U staat op het punt een configuratie te verwijderen. Bevestig deze actie door de naam van de afzender te typen",
+        "DELETED": "SMTP-configuratie is verwijderd",
+        "SENDER": "Typ {{ value }} om deze SMTP-configuratie te verwijderen."
+      }
+    },
+    "CREATE": {
+      "TITLE": "SMTP-provider toevoegen",
+      "DESCRIPTION": "Selecteer één of meer van de volgende aanbieders.",
+      "STEPS": {
+        "TITLE": "Voeg {{ value }} SMTP-provider toe",
+        "CREATE_DESC_TITLE": "Voer stap voor stap uw {{ value }} SMTP-instellingen in",
+        "CURRENT_DESC_TITLE": "Dit zijn uw SMTP-instellingen",
+        "PROVIDER_SETTINGS": "SMTP-providerinstellingen",
+        "SENDER_SETTINGS": "Afzenderinstellingen",
+        "TEST_SETTINGS": "SMTP-instellingen testen"
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTP-providerinstellingen"
+    },
+    "EMPTY": "Geen SMTP-provider beschikbaar",
+    "STEPS": {
+      "SENDGRID": {}
     }
   },
   "APP": {

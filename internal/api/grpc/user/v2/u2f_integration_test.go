@@ -18,10 +18,13 @@ import (
 
 func TestServer_RegisterU2F(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
 
 	// We also need a user session
 	Tester.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	Tester.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
 
 	type args struct {
 		ctx context.Context
@@ -42,9 +45,24 @@ func TestServer_RegisterU2F(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "user mismatch",
+			name: "admin user",
 			args: args{
 				ctx: CTX,
+				req: &user.RegisterU2FRequest{
+					UserId: userID,
+				},
+			},
+			want: &user.RegisterU2FResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "other user, no permission",
+			args: args{
+				ctx: Tester.WithAuthorizationToken(CTX, sessionTokenOtherUser),
 				req: &user.RegisterU2FRequest{
 					UserId: userID,
 				},

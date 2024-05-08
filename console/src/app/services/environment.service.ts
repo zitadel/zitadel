@@ -18,10 +18,13 @@ export interface Environment {
 
 interface WellKnown {
   authorization_endpoint: string;
+  device_authorization_endpoint: string;
   end_session_endpoint: string;
   introspection_endpoint: string;
   token_endpoint: string;
   userinfo_endpoint: string;
+  jwks_uri: string;
+  revocation_endpoint: string;
 }
 @Injectable({
   providedIn: 'root',

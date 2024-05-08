@@ -1,0 +1,130 @@
+<cnsl-refresh-table
+  [loading]="loading$ | async"
+  (refreshed)="refreshPage()"
+  [dataSize]="dataSource.data.length"
+  [emitRefreshOnPreviousRoutes]="[
+    '/instance/smtpprovider/aws-ses/create',
+    '/instance/smtpprovider/generic/create',
+    '/instance/smtpprovider/google/create',
+    '/instance/smtpprovider/mailgun/create',
+    '/instance/smtpprovider/mailjet/create',
+    '/instance/smtpprovider/postmark/create',
+    '/instance/smtpprovider/sendgrid/create',
+    '/instance/smtpprovider/mailchimp/create',
+    '/instance/smtpprovider/brevo/create',
+    '/instance/smtpprovider/outlook/create'
+  ]"
+  [timestamp]="configsResult?.details?.viewTimestamp"
+  [selection]="selection"
+  [hideRefresh]="true"
+>
+  <div class="table-wrapper">
+    <table class="table" mat-table [dataSource]="dataSource">
+      <ng-container matColumnDef="activated">
+        <th class="availability" mat-header-cell *matHeaderCellDef>
+          <span>{{ 'SMTP.LIST.ACTIVATED' | translate }}</span>
+        </th>
+        <td class="pointer availability" mat-cell *matCellDef="let config">
+          <i
+            matTooltip="{{ 'SMTP.LIST.ACTIVATED' | translate }}"
+            *ngIf="isActive(config.state)"
+            class="smtp-available las la-check-circle"
+            data-e2e="active-provider"
+          ></i>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.DESCRIPTION' | translate }}</th>
+        <td class="pointer" mat-cell *matCellDef="let config">
+          <span>{{ config?.description }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tls">
+        <th class="availability" mat-header-cell *matHeaderCellDef>
+          <span>TLS</span>
+        </th>
+        <td class="pointer availability" mat-cell *matCellDef="let config">
+          <i *ngIf="config.tls" class="las la-lock"></i>
+          <i *ngIf="!config.tls" class="las la-unlock"></i>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="host">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.HOSTANDPORT' | translate }}</th>
+        <td class="pointer" mat-cell *matCellDef="let config">
+          <span>{{ config?.host }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="senderAddress">
+        <th mat-header-cell *matHeaderCellDef>{{ 'SETTING.SMTP.SENDERADDRESS' | translate }}</th>
+        <td class="pointer" mat-cell *matCellDef="let config">
+          <span>{{ config?.senderAddress }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions" stickyEnd>
+        <th class="smtp-table-actions" mat-header-cell *matHeaderCellDef></th>
+        <td class="smtp-table-actions" mat-cell *matCellDef="let config">
+          <cnsl-table-actions>
+            <button
+              actions
+              *ngIf="!isActive(config.state)"
+              [disabled]="(['iam.write'] | hasRole | async) === false"
+              mat-icon-button
+              matTooltip="{{ 'SMTP.LIST.ACTIVATE' | translate }}"
+              data-e2e="activate-provider-button"
+              (click)="activateSMTPConfig(config.id); $event.stopPropagation()"
+            >
+              <i class="las la-check-circle"></i>
+            </button>
+
+            <button
+              actions
+              *ngIf="isActive(config.state)"
+              [disabled]="(['iam.write'] | hasRole | async) === false"
+              mat-icon-button
+              matTooltip="{{ 'SMTP.LIST.DEACTIVATE' | translate }}"
+              data-e2e="deactivate-provider-button"
+              (click)="deactivateSMTPConfig(config.id); $event.stopPropagation()"
+            >
+              <i class="las la-times-circle"></i>
+            </button>
+
+            <button
+              actions
+              [disabled]="(['iam.write'] | hasRole | async) === false"
+              mat-icon-button
+              color="warn"
+              matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
+              data-e2e="delete-provider-button"
+              (click)="deleteSMTPConfig(config.id, config.senderName); $event.stopPropagation()"
+            >
+              <i class="las la-trash"></i>
+            </button>
+          </cnsl-table-actions>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr class="highlight" (click)="navigateToProvider(row)" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+
+  <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
+    <i class="las la-exclamation"></i>
+    <span>{{ 'SMTP.LIST.EMPTY' | translate }}</span>
+  </div>
+
+  <cnsl-paginator
+    #paginator
+    class="paginator"
+    [timestamp]="configsResult?.details?.viewTimestamp"
+    [length]="configsResult?.details?.totalResult || 0"
+    [pageSize]="10"
+    [pageSizeOptions]="[10, 20, 50, 100]"
+    (page)="changePage($event)"
+  ></cnsl-paginator>
+</cnsl-refresh-table>

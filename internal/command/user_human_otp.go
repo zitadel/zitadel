@@ -73,6 +73,11 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 		logging.WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get human for loginname")
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-SqyJz", "Errors.User.NotFound")
 	}
+	if authz.GetCtxData(ctx).UserID != userID {
+		if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, human.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
+	}
 	org, err := c.getOrg(ctx, human.ResourceOwner)
 	if err != nil {
 		logging.WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to get org for loginname")
@@ -124,6 +129,11 @@ func (c *Commands) HumanCheckMFATOTPSetup(ctx context.Context, userID, code, use
 	if err != nil {
 		return nil, err
 	}
+	if authz.GetCtxData(ctx).UserID != userID {
+		if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, existingOTP.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
+	}
 	if existingOTP.State == domain.MFAStateUnspecified || existingOTP.State == domain.MFAStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotExisting")
 	}
@@ -158,14 +168,37 @@ func (c *Commands) HumanCheckMFATOTP(ctx context.Context, userID, code, resource
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
-	err = domain.VerifyTOTP(code, existingOTP.Secret, c.multifactors.OTP.CryptoMFA)
-	if err == nil {
+	verifyErr := domain.VerifyTOTP(code, existingOTP.Secret, c.multifactors.OTP.CryptoMFA)
+
+	// recheck for additional events (failed OTP checks or locks)
+	recheckErr := c.eventstore.FilterToQueryReducer(ctx, existingOTP)
+	if recheckErr != nil {
+		return recheckErr
+	}
+	if existingOTP.UserLocked {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3fg", "Errors.User.Locked")
+	}
+
+	// the OTP check succeeded and the user was not locked in the meantime
+	if verifyErr == nil {
 		_, err = c.eventstore.Push(ctx, user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 		return err
 	}
-	_, pushErr := c.eventstore.Push(ctx, user.NewHumanOTPCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+
+	// the OTP check failed, therefore check if the limit was reached and the user must additionally be locked
+	commands := make([]eventstore.Command, 0, 2)
+	commands = append(commands, user.NewHumanOTPCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	lockoutPolicy, err := c.getLockoutPolicy(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+	if lockoutPolicy.MaxOTPAttempts > 0 && existingOTP.CheckFailedCount+1 >= lockoutPolicy.MaxOTPAttempts {
+		commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
+	}
+
+	_, pushErr := c.eventstore.Push(ctx, commands...)
 	logging.OnError(pushErr).Error("error create password check failed event")
-	return err
+	return verifyErr
 }
 
 func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
@@ -215,12 +248,14 @@ func (c *Commands) addHumanOTPSMS(ctx context.Context, userID, resourceOwner str
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-QSF2s", "Errors.User.UserIDMissing")
 	}
-	if err := authz.UserIDInCTX(ctx, userID); err != nil {
-		return nil, err
-	}
 	otpWriteModel, err := c.otpSMSWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
+	}
+	if authz.GetCtxData(ctx).UserID != userID {
+		if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, otpWriteModel.ResourceOwner(), userID); err != nil {
+			return nil, err
+		}
 	}
 	if otpWriteModel.otpAdded {
 		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-Ad3g2", "Errors.User.MFA.OTP.AlreadyReady")
@@ -341,6 +376,11 @@ func (c *Commands) addHumanOTPEmail(ctx context.Context, userID, resourceOwner s
 	otpWriteModel, err := c.otpEmailWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
+	}
+	if authz.GetCtxData(ctx).UserID != userID {
+		if err := c.checkPermission(ctx, domain.PermissionUserCredentialWrite, otpWriteModel.ResourceOwner(), userID); err != nil {
+			return nil, err
+		}
 	}
 	if otpWriteModel.otpAdded {
 		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-MKL2s", "Errors.User.MFA.OTP.AlreadyReady")
@@ -515,14 +555,37 @@ func (c *Commands) humanCheckOTP(
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-S34gh", "Errors.User.Code.NotFound")
 	}
 	userAgg := &user.NewAggregate(userID, existingOTP.ResourceOwner()).Aggregate
-	err = crypto.VerifyCode(existingOTP.CodeCreationDate(), existingOTP.CodeExpiry(), existingOTP.Code(), code, c.userEncryption)
-	if err == nil {
+	verifyErr := crypto.VerifyCode(existingOTP.CodeCreationDate(), existingOTP.CodeExpiry(), existingOTP.Code(), code, c.userEncryption)
+
+	// recheck for additional events (failed OTP checks or locks)
+	recheckErr := c.eventstore.FilterToQueryReducer(ctx, existingOTP)
+	if recheckErr != nil {
+		return recheckErr
+	}
+	if existingOTP.UserLocked() {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-S6h4R", "Errors.User.Locked")
+	}
+
+	// the OTP check succeeded and the user was not locked in the meantime
+	if verifyErr == nil {
 		_, err = c.eventstore.Push(ctx, checkSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 		return err
 	}
-	_, pushErr := c.eventstore.Push(ctx, checkFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+
+	// the OTP check failed, therefore check if the limit was reached and the user must additionally be locked
+	commands := make([]eventstore.Command, 0, 2)
+	commands = append(commands, checkFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	lockoutPolicy, err := c.getLockoutPolicy(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+	if lockoutPolicy.MaxOTPAttempts > 0 && existingOTP.CheckFailedCount()+1 >= lockoutPolicy.MaxOTPAttempts {
+		commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
+	}
+
+	_, pushErr := c.eventstore.Push(ctx, commands...)
 	logging.WithFields("userID", userID).OnError(pushErr).Error("otp failure check push failed")
-	return err
+	return verifyErr
 }
 
 func (c *Commands) totpWriteModelByID(ctx context.Context, userID, resourceOwner string) (writeModel *HumanTOTPWriteModel, err error) {

@@ -56,6 +56,7 @@ Errors:
   SMTPConfig:
     NotFound: Konfigurace SMTP nebyla nalezena
     AlreadyExists: Konfigurace SMTP již existuje
+    AlreadyDeactivated: Konfigurace SMTP je již deaktivována
     SenderAdressNotCustomDomain: Adresa odesílatele musí být nakonfigurována jako vlastní doména na instanci.
   Notification:
     NoDomain: Pro zprávu nebyla nalezena žádná doména
@@ -108,6 +109,7 @@ Errors:
       Key:
         NotFound: Klíč stroje nenalezen
         AlreadyExisting: Klíč stroje již existuje
+        Invalid: Veřejný klíč není platný veřejný klíč RSA ve formátu PKIX s kódováním PEM
       Secret:
         NotExisting: Tajemství neexistuje
         Invalid: Tajemství je neplatné
@@ -134,7 +136,7 @@ Errors:
       Invalid: Heslo je neplatné
       NotSet: Uživatel nenastavil heslo
       NotChanged: Nové heslo nesmí být stejné jako současné heslo
-      NotSupported: Kódování hash hesla není podporováno
+      NotSupported: Kódování hash hesla není podporováno. Podívejte se na https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Politika složitosti hesla nenalezena
       MinLength: Heslo je příliš krátké
@@ -468,6 +470,7 @@ Errors:
     NotActive: Akce není aktivní
     NotInactive: Akce není neaktivní
     MaxAllowed: Není dovoleno více aktivních akcí
+    NotEnabled: Funkce "Akce" není povolena
   Flow:
     FlowTypeMissing: Chybí typ toku
     Empty: Tok je již prázdný
@@ -579,6 +582,15 @@ AggregateTypes:
   target: Cíl
   execution: Provedení
   user_schema: Uživatelské schéma
+  auth_request: Požadavek na autentizaci
+  device_auth: Ověření zařízení
+  idpintent: Záměr IDP
+  limits: Limit
+  milestone: Milník
+  oidc_session: OIDC sezení
+  restrictions: Omezení
+  system: Systém
+  session: Sezení
 
 EventTypes:
   execution:
@@ -999,6 +1011,9 @@ EventTypes:
           check:
             succeeded: Kontrola tajného klíče OIDC klienta byla úspěšná
             failed: Kontrola tajného klíče OIDC klienta selhala
+        key:
+          added: Přidán klíč k aplikaci OIDC
+          removed: Odstranění klíče aplikace OIDC
       api:
         secret:
           check:
@@ -1117,6 +1132,9 @@ EventTypes:
       config:
         added: Konfigurace SMTP přidána
         changed: Konfigurace SMTP změněna
+        activated: Konfigurace SMTP aktivována
+        deactivated: Konfigurace SMTP deaktivována
+        removed: Konfigurace SMTP odstraněna
         password:
           changed: Tajemství konfigurace SMTP změněno
     sms:
@@ -1262,6 +1280,8 @@ EventTypes:
       config:
         added: Konfigurace SMTP přidána
         changed: Konfigurace SMTP změněna
+        activated: Konfigurace SMTP aktivována
+        deactivated: Konfigurace SMTP deaktivována
         password:
           changed: Heslo konfigurace SMTP změněno
         removed: Konfigurace SMTP odstraněna
