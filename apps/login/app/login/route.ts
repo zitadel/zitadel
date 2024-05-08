@@ -53,6 +53,13 @@ export async function GET(request: NextRequest) {
     sessions = await loadSessions(ids);
   }
 
+  /**
+   * TODO: before automatically redirecting to the callbackUrl, check if the session is still valid
+   * possible scenaio:
+   * mfa is required, session is not valid anymore (e.g. session expired, user logged out, etc.)
+   * to check for mfa for automatically selected session -> const response = await listAuthenticationMethodTypes(userId);
+   **/
+
   if (authRequestId && sessionId) {
     console.log(
       `Login with session: ${sessionId} and authRequest: ${authRequestId}`
@@ -86,7 +93,8 @@ export async function GET(request: NextRequest) {
   if (authRequestId) {
     console.log(`Login with authRequest: ${authRequestId}`);
     const { authRequest } = await getAuthRequest(server, { authRequestId });
-    let organization;
+
+    let organization = "";
 
     if (authRequest?.scope) {
       const orgScope = authRequest.scope.find((s: string) =>
@@ -112,6 +120,18 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    const gotoAccounts = (): NextResponse<unknown> => {
+      const accountsUrl = new URL("/accounts", request.url);
+      if (authRequest?.id) {
+        accountsUrl.searchParams.set("authRequestId", authRequest?.id);
+      }
+      if (organization) {
+        accountsUrl.searchParams.set("organization", organization);
+      }
+
+      return NextResponse.redirect(accountsUrl);
+    };
+
     if (authRequest && authRequest.prompt.includes(Prompt.PROMPT_CREATE)) {
       const registerUrl = new URL("/register", request.url);
       if (authRequest?.id) {
@@ -128,15 +148,7 @@ export async function GET(request: NextRequest) {
     if (authRequest && sessions.length) {
       // if some accounts are available for selection and select_account is set
       if (authRequest.prompt.includes(Prompt.PROMPT_SELECT_ACCOUNT)) {
-        const accountsUrl = new URL("/accounts", request.url);
-        if (authRequest?.id) {
-          accountsUrl.searchParams.set("authRequestId", authRequest?.id);
-        }
-        if (organization) {
-          accountsUrl.searchParams.set("organization", organization);
-        }
-
-        return NextResponse.redirect(accountsUrl);
+        return gotoAccounts();
       } else if (authRequest.prompt.includes(Prompt.PROMPT_LOGIN)) {
         // if prompt is login
         const loginNameUrl = new URL("/loginname", request.url);
@@ -196,26 +208,25 @@ export async function GET(request: NextRequest) {
               sessionId: cookie?.id,
               sessionToken: cookie?.token,
             };
-            const { callbackUrl } = await createCallback(server, {
-              authRequestId,
-              session,
-            });
-            return NextResponse.redirect(callbackUrl);
-          } else {
-            const accountsUrl = new URL("/accounts", request.url);
-            accountsUrl.searchParams.set("authRequestId", authRequestId);
-            if (organization) {
-              accountsUrl.searchParams.set("organization", organization);
+            try {
+              const { callbackUrl } = await createCallback(server, {
+                authRequestId,
+                session,
+              });
+              if (callbackUrl) {
+                return NextResponse.redirect(callbackUrl);
+              } else {
+                return gotoAccounts();
+              }
+            } catch (error) {
+              console.error(error);
+              return gotoAccounts();
             }
-            return NextResponse.redirect(accountsUrl);
+          } else {
+            return gotoAccounts();
           }
         } else {
-          const accountsUrl = new URL("/accounts", request.url);
-          accountsUrl.searchParams.set("authRequestId", authRequestId);
-          if (organization) {
-            accountsUrl.searchParams.set("organization", organization);
-          }
-          return NextResponse.redirect(accountsUrl);
+          return gotoAccounts();
         }
       }
     } else {

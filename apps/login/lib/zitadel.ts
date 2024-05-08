@@ -1,24 +1,34 @@
+import { VerifyU2FRegistrationRequest } from "@zitadel/server";
 import {
+  GetUserByIDResponse,
+  RegisterTOTPResponse,
+  VerifyTOTPRegistrationResponse,
+} from "@zitadel/server";
+import {
+  LegalAndSupportSettings,
+  PasswordComplexitySettings,
   ZitadelServer,
+  VerifyMyAuthFactorOTPResponse,
   ZitadelServerOptions,
   user,
   oidc,
   settings,
   getServers,
+  auth,
   initializeServer,
   session,
   GetGeneralSettingsResponse,
   CreateSessionResponse,
   GetBrandingSettingsResponse,
   GetPasswordComplexitySettingsResponse,
+  RegisterU2FResponse,
   GetLegalAndSupportSettingsResponse,
   AddHumanUserResponse,
   BrandingSettings,
   ListSessionsResponse,
-  LegalAndSupportSettings,
-  PasswordComplexitySettings,
   GetSessionResponse,
   VerifyEmailResponse,
+  Checks,
   SetSessionResponse,
   SetSessionRequest,
   ListUsersResponse,
@@ -39,8 +49,13 @@ import {
   CreateCallbackResponse,
   RequestChallenges,
   TextQueryMethod,
+  ListHumanAuthFactorsResponse,
   AddHumanUserRequest,
+  AddOTPEmailResponse,
+  AddOTPSMSResponse,
 } from "@zitadel/server";
+
+const SESSION_LIFETIME_S = 3000;
 
 export const zitadelConfig: ZitadelServerOptions = {
   name: "zitadel login",
@@ -76,6 +91,65 @@ export async function getLoginSettings(
   return settingsService
     .getLoginSettings({ ctx: orgId ? { orgId } : { instance: true } }, {})
     .then((resp: GetLoginSettingsResponse) => resp.settings);
+}
+
+export async function verifyMyAuthFactorOTP(
+  code: string
+): Promise<VerifyMyAuthFactorOTPResponse> {
+  const authService = auth.getAuth(server);
+  return authService.verifyMyAuthFactorOTP({ code }, {});
+}
+
+export async function addOTPEmail(
+  userId: string
+): Promise<AddOTPEmailResponse | undefined> {
+  const userService = user.getUser(server);
+  return userService.addOTPEmail(
+    {
+      userId,
+    },
+    {}
+  );
+}
+
+export async function addOTPSMS(
+  userId: string,
+  token?: string
+): Promise<AddOTPSMSResponse | undefined> {
+  let userService;
+  if (token) {
+    const authConfig: ZitadelServerOptions = {
+      name: "zitadel login",
+      apiUrl: process.env.ZITADEL_API_URL ?? "",
+      token: token,
+    };
+
+    const sessionUser = initializeServer(authConfig);
+    userService = user.getUser(sessionUser);
+  } else {
+    userService = user.getUser(server);
+  }
+  return userService.addOTPSMS({ userId }, {});
+}
+
+export async function registerTOTP(
+  userId: string,
+  token?: string
+): Promise<RegisterTOTPResponse | undefined> {
+  let userService;
+  if (token) {
+    const authConfig: ZitadelServerOptions = {
+      name: "zitadel login",
+      apiUrl: process.env.ZITADEL_API_URL ?? "",
+      token: token,
+    };
+
+    const sessionUser = initializeServer(authConfig);
+    userService = user.getUser(sessionUser);
+  } else {
+    userService = user.getUser(server);
+  }
+  return userService.registerTOTP({ userId }, {});
 }
 
 export async function getGeneralSettings(
@@ -118,68 +192,23 @@ export async function getPasswordComplexitySettings(
     .then((resp: GetPasswordComplexitySettingsResponse) => resp.settings);
 }
 
-export async function createSessionForLoginname(
+export async function createSessionFromChecks(
   server: ZitadelServer,
-  loginName: string,
-  password: string | undefined,
+  checks: Checks,
   challenges: RequestChallenges | undefined
 ): Promise<CreateSessionResponse | undefined> {
   const sessionService = session.getSession(server);
-  return password
-    ? sessionService.createSession(
-        {
-          checks: { user: { loginName }, password: { password } },
-          challenges,
-          lifetime: {
-            seconds: 300,
-            nanos: 0,
-          },
-        },
-        {}
-      )
-    : sessionService.createSession(
-        {
-          checks: { user: { loginName } },
-          challenges,
-          lifetime: {
-            seconds: 300,
-            nanos: 0,
-          },
-        },
-        {}
-      );
-}
-
-export async function createSessionForUserId(
-  server: ZitadelServer,
-  userId: string,
-  password: string | undefined,
-  challenges: RequestChallenges | undefined
-): Promise<CreateSessionResponse | undefined> {
-  const sessionService = session.getSession(server);
-  return password
-    ? sessionService.createSession(
-        {
-          checks: { user: { userId }, password: { password } },
-          challenges,
-          lifetime: {
-            seconds: 300,
-            nanos: 0,
-          },
-        },
-        {}
-      )
-    : sessionService.createSession(
-        {
-          checks: { user: { userId } },
-          challenges,
-          lifetime: {
-            seconds: 300,
-            nanos: 0,
-          },
-        },
-        {}
-      );
+  return sessionService.createSession(
+    {
+      checks: checks,
+      challenges,
+      lifetime: {
+        seconds: SESSION_LIFETIME_S,
+        nanos: 0,
+      },
+    },
+    {}
+  );
 }
 
 export async function createSessionForUserIdAndIdpIntent(
@@ -208,9 +237,8 @@ export async function setSession(
   server: ZitadelServer,
   sessionId: string,
   sessionToken: string,
-  password: string | undefined,
-  webAuthN: { credentialAssertionData: any } | undefined,
-  challenges: RequestChallenges | undefined
+  challenges: RequestChallenges | undefined,
+  checks: Checks
 ): Promise<SetSessionResponse | undefined> {
   const sessionService = session.getSession(server);
 
@@ -222,12 +250,8 @@ export async function setSession(
     metadata: {},
   };
 
-  if (password && payload.checks) {
-    payload.checks.password = { password };
-  }
-
-  if (webAuthN && payload.checks) {
-    payload.checks.webAuthN = webAuthN;
+  if (checks && payload.checks) {
+    payload.checks = checks;
   }
 
   return sessionService.setSession(payload, {});
@@ -294,6 +318,35 @@ export async function addHumanUser(
       : payload,
     {}
   );
+}
+
+export async function verifyTOTPRegistration(
+  code: string,
+  userId: string,
+  token?: string
+): Promise<VerifyTOTPRegistrationResponse> {
+  let userService;
+  if (token) {
+    const authConfig: ZitadelServerOptions = {
+      name: "zitadel login",
+      apiUrl: process.env.ZITADEL_API_URL ?? "",
+      token: token,
+    };
+
+    const sessionUser = initializeServer(authConfig);
+    userService = user.getUser(sessionUser);
+  } else {
+    userService = user.getUser(server);
+  }
+  return userService.verifyTOTPRegistration({ code, userId }, {});
+}
+
+export async function getUserByID(
+  userId: string
+): Promise<GetUserByIDResponse> {
+  const userService = user.getUser(server);
+
+  return userService.getUserByID({ userId }, {});
 }
 
 export async function listUsers(
@@ -423,14 +476,61 @@ export async function setEmail(
  * @returns the newly set email
  */
 export async function createPasskeyRegistrationLink(
-  userId: string
+  userId: string,
+  token?: string
 ): Promise<any> {
-  const userservice = user.getUser(server);
+  let userService;
+  if (token) {
+    const authConfig: ZitadelServerOptions = {
+      name: "zitadel login",
+      apiUrl: process.env.ZITADEL_API_URL ?? "",
+      token: token,
+    };
 
-  return userservice.createPasskeyRegistrationLink({
+    const sessionUser = initializeServer(authConfig);
+    userService = user.getUser(sessionUser);
+  } else {
+    userService = user.getUser(server);
+  }
+
+  return userService.createPasskeyRegistrationLink({
     userId,
     returnCode: {},
   });
+}
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @param domain the domain on which the factor is registered
+ * @returns the newly set email
+ */
+export async function registerU2F(
+  userId: string,
+  domain: string
+): Promise<RegisterU2FResponse> {
+  const userservice = user.getUser(server);
+
+  return userservice.registerU2F({
+    userId,
+    domain,
+  });
+}
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @param domain the domain on which the factor is registered
+ * @returns the newly set email
+ */
+export async function verifyU2FRegistration(
+  request: VerifyU2FRegistrationRequest
+): Promise<any> {
+  const userservice = user.getUser(server);
+
+  return userservice.verifyU2FRegistration(request, {});
 }
 
 /**

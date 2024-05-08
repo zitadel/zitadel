@@ -1,8 +1,7 @@
 "use server";
 
 import {
-  createSessionForLoginname,
-  createSessionForUserId,
+  createSessionFromChecks,
   createSessionForUserIdAndIdpIntent,
   getSession,
   server,
@@ -13,7 +12,12 @@ import {
   addSessionToCookie,
   updateSessionCookie,
 } from "./cookies";
-import { Session, Challenges, RequestChallenges } from "@zitadel/server";
+import {
+  Session,
+  Challenges,
+  RequestChallenges,
+  Checks,
+} from "@zitadel/server";
 
 export async function createSessionAndUpdateCookie(
   loginName: string,
@@ -22,10 +26,15 @@ export async function createSessionAndUpdateCookie(
   organization?: string,
   authRequestId?: string
 ): Promise<Session> {
-  const createdSession = await createSessionForLoginname(
+  const createdSession = await createSessionFromChecks(
     server,
-    loginName,
-    password,
+    password
+      ? {
+          user: { loginName },
+          password: { password },
+          // totp: { code: totpCode },
+        }
+      : { user: { loginName } },
     challenges
   );
 
@@ -72,10 +81,15 @@ export async function createSessionForUserIdAndUpdateCookie(
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined
 ): Promise<Session> {
-  const createdSession = await createSessionForUserId(
+  const createdSession = await createSessionFromChecks(
     server,
-    userId,
-    password,
+    password
+      ? {
+          user: { userId },
+          password: { password },
+          // totp: { code: totpCode },
+        }
+      : { user: { userId } },
     challenges
   );
 
@@ -174,8 +188,7 @@ export type SessionWithChallenges = Session & {
 
 export async function setSessionAndUpdateCookie(
   recentCookie: SessionCookie,
-  password: string | undefined,
-  webAuthN: { credentialAssertionData: any } | undefined,
+  checks: Checks,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined
 ): Promise<SessionWithChallenges> {
@@ -183,9 +196,8 @@ export async function setSessionAndUpdateCookie(
     server,
     recentCookie.id,
     recentCookie.token,
-    password,
-    webAuthN,
-    challenges
+    challenges,
+    checks
   ).then((updatedSession) => {
     if (updatedSession) {
       const sessionCookie: SessionCookie = {
@@ -202,39 +214,31 @@ export async function setSessionAndUpdateCookie(
         sessionCookie.authRequestId = authRequestId;
       }
 
-      return new Promise((resolve) => setTimeout(resolve, 1000)).then(() =>
-        // TODO: remove
-        getSession(server, sessionCookie.id, sessionCookie.token).then(
-          (response) => {
-            if (
-              response?.session &&
-              response.session.factors?.user?.loginName
-            ) {
-              const { session } = response;
-              const newCookie: SessionCookie = {
-                id: sessionCookie.id,
-                token: updatedSession.sessionToken,
-                creationDate: sessionCookie.creationDate,
-                expirationDate: sessionCookie.expirationDate,
-                changeDate: `${session.changeDate?.getTime() ?? ""}`,
-                loginName: session.factors?.user?.loginName ?? "",
-                organization: session.factors?.user?.organizationId ?? "",
-              };
+      return getSession(server, sessionCookie.id, sessionCookie.token).then(
+        (response) => {
+          if (response?.session && response.session.factors?.user?.loginName) {
+            const { session } = response;
+            const newCookie: SessionCookie = {
+              id: sessionCookie.id,
+              token: updatedSession.sessionToken,
+              creationDate: sessionCookie.creationDate,
+              expirationDate: sessionCookie.expirationDate,
+              changeDate: `${session.changeDate?.getTime() ?? ""}`,
+              loginName: session.factors?.user?.loginName ?? "",
+              organization: session.factors?.user?.organizationId ?? "",
+            };
 
-              if (sessionCookie.authRequestId) {
-                newCookie.authRequestId = sessionCookie.authRequestId;
-              }
-
-              return updateSessionCookie(sessionCookie.id, newCookie).then(
-                () => {
-                  return { challenges: updatedSession.challenges, ...session };
-                }
-              );
-            } else {
-              throw "could not get session or session does not have loginName";
+            if (sessionCookie.authRequestId) {
+              newCookie.authRequestId = sessionCookie.authRequestId;
             }
+
+            return updateSessionCookie(sessionCookie.id, newCookie).then(() => {
+              return { challenges: updatedSession.challenges, ...session };
+            });
+          } else {
+            throw "could not get session or session does not have loginName";
           }
-        )
+        }
       );
     } else {
       throw "Session not be set";

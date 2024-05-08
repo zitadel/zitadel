@@ -3,6 +3,7 @@ import * as session from "./v2/session";
 import * as user from "./v2/user";
 import * as oidc from "./v2/oidc";
 import * as management from "./management";
+import * as auth from "./auth";
 
 import * as login from "./proto/server/zitadel/settings/v2beta/login_settings";
 import * as password from "./proto/server/zitadel/settings/v2beta/password_settings";
@@ -51,6 +52,7 @@ export {
   CreateSessionResponse,
   SetSessionResponse,
   SetSessionRequest,
+  Checks,
   DeleteSessionResponse,
 } from "./proto/server/zitadel/session/v2beta/session_service";
 export {
@@ -67,6 +69,7 @@ export { TextQueryMethod } from "./proto/server/zitadel/object/v2beta/object";
 export {
   AddHumanUserResponse,
   AddHumanUserRequest,
+  GetUserByIDResponse,
   VerifyEmailResponse,
   VerifyPasskeyRegistrationRequest,
   VerifyPasskeyRegistrationResponse,
@@ -83,17 +86,37 @@ export {
   RetrieveIdentityProviderIntentResponse,
   ListUsersRequest,
   ListUsersResponse,
+  AddOTPEmailResponse,
+  AddOTPEmailRequest,
+  AddOTPSMSResponse,
+  AddOTPSMSRequest,
+  RegisterTOTPRequest,
+  RegisterTOTPResponse,
+  VerifyTOTPRegistrationRequest,
+  VerifyTOTPRegistrationResponse,
+  VerifyU2FRegistrationRequest,
+  VerifyU2FRegistrationResponse,
+  RegisterU2FResponse,
+  RegisterU2FRequest,
 } from "./proto/server/zitadel/user/v2beta/user_service";
+
+export { AuthFactor } from "./proto/server/zitadel/user";
+
 export {
   SetHumanPasswordResponse,
   SetHumanPasswordRequest,
   GetOrgByDomainGlobalResponse,
+  ListHumanAuthFactorsResponse,
 } from "./proto/server/zitadel/management";
+
 export * from "./proto/server/zitadel/idp";
 export { type LegalAndSupportSettings } from "./proto/server/zitadel/settings/v2beta/legal_settings";
 export { type PasswordComplexitySettings } from "./proto/server/zitadel/settings/v2beta/password_settings";
 export { type ResourceOwnerType } from "./proto/server/zitadel/settings/v2beta/settings";
-
+export {
+  type VerifyMyAuthFactorOTPResponse,
+  AddMyAuthFactorOTPResponse,
+} from "./proto/server/zitadel/auth";
 import {
   getServers,
   initializeServer,
@@ -115,4 +138,5 @@ export {
   password,
   legal,
   oidc,
+  auth,
 };

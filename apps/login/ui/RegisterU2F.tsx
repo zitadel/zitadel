@@ -6,20 +6,18 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { AuthRequest, RegisterPasskeyResponse } from "@zitadel/server";
+import { RegisterU2FResponse } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "#/utils/base64";
 type Inputs = {};
 
 type Props = {
   sessionId: string;
-  isPrompt: boolean;
   authRequestId?: string;
   organization?: string;
 };
 
-export default function RegisterPasskey({
+export default function RegisterU2F({
   sessionId,
-  isPrompt,
   organization,
   authRequestId,
 }: Props) {
@@ -36,7 +34,7 @@ export default function RegisterPasskey({
   async function submitRegister() {
     setError("");
     setLoading(true);
-    const res = await fetch("/api/passkeys", {
+    const res = await fetch("/api/u2f", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,19 +55,19 @@ export default function RegisterPasskey({
   }
 
   async function submitVerify(
-    passkeyId: string,
+    u2fId: string,
     passkeyName: string,
     publicKeyCredential: any,
     sessionId: string
   ) {
     setLoading(true);
-    const res = await fetch("/api/passkeys/verify", {
+    const res = await fetch("/api/u2f/verify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        passkeyId,
+        u2fId,
         passkeyName,
         publicKeyCredential,
         sessionId,
@@ -87,8 +85,8 @@ export default function RegisterPasskey({
   }
 
   function submitRegisterAndContinue(value: Inputs): Promise<boolean | void> {
-    return submitRegister().then((resp: RegisterPasskeyResponse) => {
-      const passkeyId = resp.passkeyId;
+    return submitRegister().then((resp: RegisterU2FResponse) => {
+      const u2fId = resp.u2fId;
 
       if (
         resp.publicKeyCredentialCreationOptions &&
@@ -147,7 +145,7 @@ export default function RegisterPasskey({
                   ),
                 },
               };
-              return submitVerify(passkeyId, "", data, sessionId).then(() => {
+              return submitVerify(u2fId, "", data, sessionId).then(() => {
                 const params = new URLSearchParams();
 
                 if (organization) {
@@ -160,7 +158,7 @@ export default function RegisterPasskey({
                   // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
                   // params.set("loginName", resp.loginName);
 
-                  router.push("/passkey/login?" + params);
+                  router.push("/u2f?" + params);
                 } else {
                   router.push("/accounts?" + params);
                 }
@@ -193,37 +191,13 @@ export default function RegisterPasskey({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
-        {isPrompt ? (
-          <Button
-            type="button"
-            variant={ButtonVariants.Secondary}
-            onClick={() => {
-              const params = new URLSearchParams();
-              if (authRequestId) {
-                params.set("authRequest", authRequestId);
-              }
-              if (sessionId) {
-                params.set("sessionId", sessionId);
-              }
-
-              if (organization) {
-                params.set("organization", organization);
-              }
-
-              router.push("/login?" + params);
-            }}
-          >
-            skip
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            variant={ButtonVariants.Secondary}
-            onClick={() => router.back()}
-          >
-            back
-          </Button>
-        )}
+        <Button
+          type="button"
+          variant={ButtonVariants.Secondary}
+          onClick={() => router.back()}
+        >
+          back
+        </Button>
 
         <span className="flex-grow"></span>
         <Button

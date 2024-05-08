@@ -1,4 +1,9 @@
-import { getBrandingSettings, getSession, server } from "#/lib/zitadel";
+import {
+  getBrandingSettings,
+  getLoginSettings,
+  getSession,
+  server,
+} from "#/lib/zitadel";
 import Alert from "#/ui/Alert";
 import DynamicTheme from "#/ui/DynamicTheme";
 import LoginPasskey from "#/ui/LoginPasskey";
@@ -8,17 +13,16 @@ import {
   getSessionCookieById,
 } from "#/utils/cookies";
 
-const title = "Authenticate with a passkey";
-const description =
-  "Your device will ask for your fingerprint, face, or screen lock";
-
 export default async function Page({
   searchParams,
+  params,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
+  params: Record<string | number | symbol, string | undefined>;
 }) {
-  const { loginName, altPassword, authRequestId, organization, sessionId } =
-    searchParams;
+  const { loginName, authRequestId, sessionId, organization } = searchParams;
+
+  const branding = await getBrandingSettings(server, organization);
 
   const sessionFactors = sessionId
     ? await loadSessionById(sessionId, organization)
@@ -48,12 +52,10 @@ export default async function Page({
     });
   }
 
-  const branding = await getBrandingSettings(server, organization);
-
   return (
     <DynamicTheme branding={branding}>
       <div className="flex flex-col items-center space-y-4">
-        <h1>{title}</h1>
+        <h1>Verify 2-Factor</h1>
 
         {sessionFactors && (
           <UserAvatar
@@ -63,7 +65,9 @@ export default async function Page({
             searchParams={searchParams}
           ></UserAvatar>
         )}
-        <p className="ztdl-p mb-6 block">{description}</p>
+        <p className="ztdl-p mb-6 block">
+          Verify your account with your device.
+        </p>
 
         {!(loginName || sessionId) && (
           <Alert>Provide your active session as loginName param</Alert>
@@ -74,8 +78,9 @@ export default async function Page({
             loginName={loginName}
             sessionId={sessionId}
             authRequestId={authRequestId}
-            altPassword={altPassword === "true"}
+            altPassword={false}
             organization={organization}
+            login={false} // this sets the userVerificationRequirement to discouraged as its used as second factor
           />
         )}
       </div>

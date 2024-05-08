@@ -1,4 +1,10 @@
-import { server, deleteSession } from "#/lib/zitadel";
+import {
+  server,
+  deleteSession,
+  getSession,
+  getUserByID,
+  listAuthenticationMethodTypes,
+} from "#/lib/zitadel";
 import {
   SessionCookie,
   getMostRecentSessionCookie,
@@ -11,7 +17,7 @@ import {
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "#/utils/session";
-import { RequestChallenges } from "@zitadel/server";
+import { Challenges, Checks, RequestChallenges } from "@zitadel/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -67,11 +73,10 @@ export async function PUT(request: NextRequest) {
       loginName,
       sessionId,
       organization,
-      password,
-      webAuthN,
+      checks,
       authRequestId,
+      challenges,
     } = body;
-    const challenges: RequestChallenges = body.challenges;
 
     const recentPromise: Promise<SessionCookie> = sessionId
       ? getSessionCookieById(sessionId).catch((error) => {
@@ -92,22 +97,63 @@ export async function PUT(request: NextRequest) {
     }
 
     return recentPromise
-      .then((recent) => {
+      .then(async (recent) => {
+        if (
+          challenges &&
+          (challenges.otpEmail === "" || challenges.otpSms === "")
+        ) {
+          const sessionResponse = await getSession(
+            server,
+            recent.id,
+            recent.token
+          );
+          if (sessionResponse && sessionResponse.session?.factors?.user?.id) {
+            const userResponse = await getUserByID(
+              sessionResponse.session.factors.user.id
+            );
+            if (
+              challenges.otpEmail === "" &&
+              userResponse.user?.human?.email?.email
+            ) {
+              challenges.otpEmail = userResponse.user?.human?.email?.email;
+            }
+
+            if (
+              challenges.otpSms === "" &&
+              userResponse.user?.human?.phone?.phone
+            ) {
+              challenges.otpSms = userResponse.user?.human?.phone?.phone;
+            }
+          }
+        }
+
         return setSessionAndUpdateCookie(
           recent,
-          password,
-          webAuthN,
+          checks,
           challenges,
           authRequestId
-        ).then((session) => {
+        ).then(async (session) => {
+          // if password, check if user has MFA methods
+          let authMethods;
+          if (checks && checks.password && session.factors?.user?.id) {
+            const response = await listAuthenticationMethodTypes(
+              session.factors?.user?.id
+            );
+            if (response.authMethodTypes && response.authMethodTypes.length) {
+              authMethods = response.authMethodTypes;
+            }
+          }
+
           return NextResponse.json({
             sessionId: session.id,
             factors: session.factors,
             challenges: session.challenges,
+            authMethods,
           });
         });
       })
       .catch((error) => {
+        console.error(error);
         return NextResponse.json({ details: error }, { status: 500 });
       });
   } else {

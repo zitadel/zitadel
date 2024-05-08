@@ -1,2 +1,2 @@
-export * from "../proto/server/zitadel/auth";
-export { getAuth } from "./auth";
+export * from "./auth";
+export * as auth from "../proto/server/zitadel/auth";
