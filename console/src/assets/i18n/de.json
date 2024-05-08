@@ -45,15 +45,15 @@
       }
     },
     "USERS": {
-      "TITLE": "Benutzer",
+      "TITLE": "Users",
       "DESCRIPTION": "Ein Benutzer ist ein Mensch oder eine Maschine, die auf deine Anwendungen zugreifen kann.",
       "HUMANS": {
-        "TITLE": "Menschen",
-        "DESCRIPTION": "Menschen authentifizieren sich interaktiv in einer Browsersitzung mit einer Anmeldeaufforderung.",
+        "TITLE": "Users",
+        "DESCRIPTION": "User authentifizieren sich interaktiv in einer Browsersitzung mit einer Anmeldeaufforderung.",
         "METADATA": "Füge dem Benutzer benutzerdefinierte Attribute hinzu, wie die Abteilung. Du kannst diese Informationen in deinen Aktionen nutzen."
       },
       "MACHINES": {
-        "TITLE": "Maschinen",
+        "TITLE": "Service users",
         "DESCRIPTION": "Maschinen authentifizieren sich nicht-interaktiv mit einem JWT Bearer-Token, das mit einem privaten Schlüssel signiert ist. Sie können auch ein persönliches Zugangstoken verwenden.",
         "METADATA": "Füge dem Benutzer benutzerdefinierte Attribute hinzu, wie das authentifizierende System. Du kannst diese Informationen in deinen Aktionen nutzen."
       },
@@ -269,9 +269,9 @@
             "TITLE": "Externer Login erlaubt",
             "DESCRIPTION": "Erlaube deinen Benutzern, sich mit einem externen Identitätsanbieter einzuloggen, anstatt den ZITADEL-Benutzer zum Einloggen zu verwenden."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Passwort-Reset erlaubt",
-            "DESCRIPTION": "Erlaube deinen Benutzern, ihr Passwort zurückzusetzen."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Passwort-Reset ausgeblendet",
+            "DESCRIPTION": "Erlauben Sie Ihren Benutzern nicht, ihr Passwort zurückzusetzen."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Domänenentdeckung erlaubt",
@@ -1291,6 +1291,7 @@
       "MEMBERCHANGED": "Manager geändert.",
       "SETPRIMARY": "Primäre Domain gesetzt.",
       "DELETED": "Organisation erfolgreich gelöscht",
+      "DEFAULTORGNOTFOUND": "Die Standardorganisation wurde nicht gefunden",
       "ORG_WAS_DELETED": "Organisation wurde gelöscht."
     },
     "DIALOG": {

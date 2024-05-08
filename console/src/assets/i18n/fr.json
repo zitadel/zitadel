@@ -48,13 +48,13 @@
       "TITLE": "Utilisateurs",
       "DESCRIPTION": "Un utilisateur est un humain ou une machine qui peut accéder à tes applications.",
       "HUMANS": {
-        "TITLE": "Humains",
-        "DESCRIPTION": "Les humains s'authentifient de manière interactive dans une session de navigateur avec une invite de connexion.",
+        "TITLE": "utilisateurs",
+        "DESCRIPTION": "Les utilisateurs s'authentifient de manière interactive dans une session de navigateur avec une invite de connexion.",
         "METADATA": "Ajoute des attributs personnalisés à l'utilisateur comme le département. Tu peux utiliser cette information dans tes actions."
       },
       "MACHINES": {
-        "TITLE": "Machines",
-        "DESCRIPTION": "Les machines s'authentifient de manière non interactive en utilisant un token porteur JWT signé avec une clé privée. Elles peuvent également utiliser un token d'accès personnel.",
+        "TITLE": "Utilisateurs des services",
+        "DESCRIPTION": "Les utilisateurs des services s'authentifient de manière non interactive en utilisant un token porteur JWT signé avec une clé privée. Elles peuvent également utiliser un token d'accès personnel.",
         "METADATA": "Ajoute des attributs personnalisés à l'utilisateur comme le système d'authentification. Tu peux utiliser cette information dans tes actions."
       },
       "SELF": {
@@ -269,9 +269,9 @@
             "TITLE": "External Login allowed",
             "DESCRIPTION": "Allow your users to log in with an external identity provider instead of using the ZITADEL user to log in."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Password Reset allowed",
-            "DESCRIPTION": "Allow your users to reset their password."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Réinitialisation du mot de passe masquée",
+            "DESCRIPTION": "Ne permettez pas à vos utilisateurs de réinitialiser leur mot de passe."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Domain Discovery allowed",
@@ -1291,6 +1291,7 @@
       "MEMBERCHANGED": "Gestionnaire modifié.",
       "SETPRIMARY": "Domaine primaire défini.",
       "DELETED": "Organisation supprimée avec succès",
+      "DEFAULTORGNOTFOUND": "L'organisation par défaut est introuvable",
       "ORG_WAS_DELETED": "L'organisation a été supprimée"
     },
     "DIALOG": {

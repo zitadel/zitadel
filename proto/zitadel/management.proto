@@ -7857,7 +7857,7 @@ message ImportHumanUserRequest {
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 min_length: 1;
                 max_length: 200;
-                example: "\"idp-config-id\"";
+                example: "\"external-user-id\"";
                 description: "The id of the user in the external identity provider"
             }
         ];

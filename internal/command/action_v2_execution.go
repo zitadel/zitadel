@@ -2,11 +2,16 @@ package command
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/zerrors"
+)
+
+const (
+	EventGroupSuffix = ".*"
 )
 
 type ExecutionAPICondition struct {
@@ -134,7 +139,11 @@ func (e *ExecutionEventCondition) ID() string {
 		return execution.ID(domain.ExecutionTypeEvent, e.Event)
 	}
 	if e.Group != "" {
-		return execution.ID(domain.ExecutionTypeEvent, e.Group)
+		group := e.Group
+		if !strings.HasSuffix(e.Group, EventGroupSuffix) {
+			group += EventGroupSuffix
+		}
+		return execution.ID(domain.ExecutionTypeEvent, group)
 	}
 	if e.All {
 		return execution.IDAll(domain.ExecutionTypeEvent)
@@ -168,25 +177,43 @@ func (c *Commands) SetExecutionEvent(ctx context.Context, cond *ExecutionEventCo
 type SetExecution struct {
 	models.ObjectRoot
 
-	Targets  []string
-	Includes []string
+	Targets []*execution.Target
+}
+
+func (t SetExecution) GetIncludes() []string {
+	includes := make([]string, 0)
+	for i := range t.Targets {
+		if t.Targets[i].Type == domain.ExecutionTargetTypeInclude {
+			includes = append(includes, t.Targets[i].Target)
+		}
+	}
+	return includes
+}
+
+func (t SetExecution) GetTargets() []string {
+	targets := make([]string, 0)
+	for i := range t.Targets {
+		if t.Targets[i].Type == domain.ExecutionTargetTypeTarget {
+			targets = append(targets, t.Targets[i].Target)
+		}
+	}
+	return targets
 }
 
 func (e *SetExecution) IsValid() error {
-	if len(e.Targets) == 0 && len(e.Includes) == 0 {
+	if len(e.Targets) == 0 {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-56bteot2uj", "Errors.Execution.NoTargets")
-	}
-	if len(e.Targets) > 0 && len(e.Includes) > 0 {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-5zleae34r1", "Errors.Execution.Invalid")
 	}
 	return nil
 }
 
 func (e *SetExecution) Existing(c *Commands, ctx context.Context, resourceOwner string) error {
-	if len(e.Targets) > 0 && !c.existsTargetsByIDs(ctx, e.Targets, resourceOwner) {
+	targets := e.GetTargets()
+	if len(targets) > 0 && !c.existsTargetsByIDs(ctx, targets, resourceOwner) {
 		return zerrors.ThrowNotFound(nil, "COMMAND-17e8fq1ggk", "Errors.Target.NotFound")
 	}
-	if len(e.Includes) > 0 && !c.existsExecutionsByIDs(ctx, e.Includes, resourceOwner) {
+	includes := e.GetIncludes()
+	if len(includes) > 0 && !c.existsExecutionsByIDs(ctx, includes, resourceOwner) {
 		return zerrors.ThrowNotFound(nil, "COMMAND-slgj0l4cdz", "Errors.Execution.IncludeNotFound")
 	}
 	return nil
@@ -206,11 +233,10 @@ func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resource
 		return nil, err
 	}
 
-	if err := c.pushAppendAndReduce(ctx, wm, execution.NewSetEvent(
+	if err := c.pushAppendAndReduce(ctx, wm, execution.NewSetEventV2(
 		ctx,
 		ExecutionAggregateFromWriteModel(&wm.WriteModel),
 		set.Targets,
-		set.Includes,
 	)); err != nil {
 		return nil, err
 	}

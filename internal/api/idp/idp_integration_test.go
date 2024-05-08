@@ -52,8 +52,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_SAMLCertificate(t *testing.T) {
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t)
-	oauthIdpID := Tester.AddGenericOAuthProvider(t)
+	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX)
+	oauthIdpID := Tester.AddGenericOAuthProvider(t, CTX)
 
 	type args struct {
 		ctx   context.Context
@@ -109,8 +109,8 @@ func TestServer_SAMLCertificate(t *testing.T) {
 }
 
 func TestServer_SAMLMetadata(t *testing.T) {
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t)
-	oauthIdpID := Tester.AddGenericOAuthProvider(t)
+	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX)
+	oauthIdpID := Tester.AddGenericOAuthProvider(t, CTX)
 
 	type args struct {
 		ctx   context.Context
@@ -167,7 +167,7 @@ func TestServer_SAMLMetadata(t *testing.T) {
 
 func TestServer_SAMLACS(t *testing.T) {
 	userHuman := Tester.CreateHumanUser(CTX)
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t)
+	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX)
 	externalUserID := "test1"
 	linkedExternalUserID := "test2"
 	Tester.CreateUserIDPlink(CTX, userHuman.UserId, linkedExternalUserID, samlRedirectIdpID, linkedExternalUserID)

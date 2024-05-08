@@ -416,7 +416,7 @@ func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation
 				return nil, zerrors.ThrowAlreadyExists(nil, "Org-Dgfb2", "Errors.Org.LoginPolicy.AlreadyExists")
 			}
 			for _, idp := range policy.IDPProviders {
-				exists, err := ExistsIDP(ctx, filter, idp.ConfigID, authz.GetCtxData(ctx).OrgID)
+				exists, err := ExistsIDPOnOrgOrInstance(ctx, filter, authz.GetInstance(ctx).InstanceID(), a.ResourceOwner, idp.ConfigID)
 				if !exists || err != nil {
 					return nil, zerrors.ThrowPreconditionFailed(err, "Org-FEd32", "Errors.IDPConfig.NotExisting")
 				}

@@ -15,8 +15,9 @@ To access default settings, use the settomgs page at `{instanceDomain}/ui/consol
 
 When you configure your default settings, you can set the following:
 
-- **General**: Default Language for the UI
-- [**Notification settings**](#notification-providers-and-smtp): Notification and Email Server settings, so initialization-, verification- and other mails are sent from your own domain. For SMS, Twilio is supported as notification provider.
+- **Organizations**: A list of your organizations
+- [**Features**](#features): Feature Settings let you try out new features before they become generally available. You can also disable features you are not interested in.
+- [**Notification settings**](#notification-providers-and-smtp): Setup Notification and Email Server settings for initialization-, verification- and other mails. Setup Twilio as SMS notification provider.
 - [**Login Behavior and Access**](#login-behavior-and-access): Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavour for the login interface.
 - [**Identity Providers**](#identity-providers): Define IDPs which are available for all organizations
 - [**Password Complexity**](#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
@@ -28,6 +29,25 @@ When you configure your default settings, you can set the following:
 - [**External Links**](#external-links): Links to your own Terms of Service and Privacy Policy regulations, Help Page, Support email, documentation link...
 - [**OIDC Token Lifetimes and Expiration**](#oidc-token-lifetimes-and-expiration): Token lifetime and expiration settings.
 - [**Secret Generator**](#secret-generator): Appearance and expiration of the generated codes and secrets used in mails for verification etc.
+
+## Features
+
+Feature Settings let you try out new features before they become generally available. You can also disable features you are not interested in.
+
+The Page lets you choose between the settings `Enabled`, `Disabled` or `Inherit`.
+If a feature is set to `Inherit`, it becomes available once its enabled per default.
+
+<img
+  src="/docs/img/console_feature_settings.png"
+  alt="Feature page"
+  width="700px"
+/>
+
+Features can range from UI changes in the console, to new APIs or performance improvements.
+
+:::warning
+Be careful on which features you enable as they can be in an experimental state.
+:::
 
 ## Branding
 
@@ -85,13 +105,13 @@ To configure your custom SMTP please fill the following fields:
 - User
 - SMTP Password
 
-<img src="/docs/img/guides/console/smtp.png" alt="SMTP" width="400px" />
+<img src="/docs/img/guides/console/smtp.png" alt="SMTP" width="800px" />
 
 ### SMS
 
 No default provider is configured to send some SMS to your users. If you like to validate the phone numbers of your users make sure to add your twilio configuration by adding your Sid, Token and Sender Number.
 
-<img src="/docs/img/guides/console/twilio.png" alt="Twilio" width="400px" />
+<img src="/docs/img/guides/console/twilio.png" alt="Twilio" width="700px" />
 
 ## Login Behavior and Access
 
@@ -111,7 +131,7 @@ The Login Policy defines how the login process should look like and which authen
 <img
   src="/docs/img/guides/console/loginpolicy.png"
   alt="Login Bahaviour and Access"
-  width="600px"
+  width="800px"
 />
 
 ### Default Redirect URI
@@ -130,7 +150,11 @@ We recommend setting your own default redirect URI, if you do not want end users
 
 Change default redirect url of instance: https://<custom_domain>/ui/console/settings?id=login
 
-![Login Policy Advanced Setting: Default Redirect URL](/img/guides/solution-scenarios/console-default-redirect.png)
+<img
+  src="/docs//img/guides/solution-scenarios/console-default-redirect.png"
+  alt="Login Policy Advanced Setting: Default Redirect URL"
+  width="600px"
+/>
 
 ### Passwordless
 
@@ -182,7 +206,7 @@ The following properties can be set:
 - Has Uppercase
 - Has Lowercase
 - Has Number
-- Has Symbol
+- Has Symbol (Everything that is not a number or letter)
 
 <img
   src="/docs/img/guides/console/complexity.png"
@@ -288,6 +312,14 @@ These are the texts for the login. Just like for message texts, you can select t
   alt="Login texts"
   width="600px"
 />
+
+## Languages
+
+Drag allowed languages to the left column. Languages in the right column are not shown to your users.
+
+Choose a default language which acts as a fallback, if no language header is set.
+
+<img src="/docs/img/console_languages.png" alt="Languages" width="800px" />
 
 ## OIDC token lifetimes and expiration
 
