@@ -150,6 +150,7 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 
 	cmd.AddSession(ctx,
 		deviceAuthModel.UserID,
+		deviceAuthModel.UserOrgID,
 		"",
 		deviceAuthModel.ClientID,
 		deviceAuthModel.Audience,
@@ -160,7 +161,7 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 		deviceAuthModel.PreferredLanguage,
 		deviceAuthModel.UserAgent,
 	)
-	if err = cmd.AddAccessToken(ctx, deviceAuthModel.Scopes, domain.TokenReasonAuthRequest, nil); err != nil {
+	if err = cmd.AddAccessToken(ctx, deviceAuthModel.Scopes, deviceAuthModel.UserID, deviceAuthModel.UserOrgID, domain.TokenReasonAuthRequest, nil); err != nil {
 		return nil, err
 	}
 

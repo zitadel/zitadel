@@ -23,6 +23,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -612,7 +613,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", &language.Afrikaans, &domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
 								IP:            net.ParseIP("1.2.3.4"),
@@ -624,6 +625,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil,
 						),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						deviceauth.NewDoneEvent(ctx,
 							deviceauth.NewAggregate("123", "instance1"),
 						),
@@ -691,7 +693,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", &language.Afrikaans, &domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
 								IP:            net.ParseIP("1.2.3.4"),
@@ -703,6 +705,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil,
 						),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour,
 						),

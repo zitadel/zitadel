@@ -24,6 +24,7 @@ type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	UserID            string                      `json:"userID"`
+	UserResourceOwner string                      `json:"userResourceOwner"`
 	SessionID         string                      `json:"sessionID"`
 	ClientID          string                      `json:"clientID"`
 	Audience          []string                    `json:"audience"`
@@ -50,6 +51,7 @@ func (e *AddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 func NewAddedEvent(ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userID,
+	userResourceOwner,
 	sessionID,
 	clientID string,
 	audience,
@@ -67,6 +69,7 @@ func NewAddedEvent(ctx context.Context,
 			AddedType,
 		),
 		UserID:            userID,
+		UserResourceOwner: userResourceOwner,
 		SessionID:         sessionID,
 		ClientID:          clientID,
 		Audience:          audience,

@@ -266,7 +266,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 					expectPush(
 						authrequest.NewCodeExchangedEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 							&domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
@@ -277,6 +277,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 						),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonAuthRequest, nil),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 						authrequest.NewSucceededEvent(context.Background(), &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
@@ -378,7 +379,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid"},
+							"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid"},
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 							&domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
@@ -520,7 +521,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 							&domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
@@ -537,6 +538,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 								Issuer: "foo.com",
 							},
 						),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 					),
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
@@ -600,7 +602,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 					expectFilter(), // token lifetime
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 							&domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
@@ -616,6 +618,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 								UserID: "user2",
 								Issuer: "foo.com",
 							}),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						oidcsession.NewRefreshTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"rt_refreshTokenID", 7*24*time.Hour, 24*time.Hour),
 					),
@@ -727,7 +730,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 							Issuer: "foo.com",
 						}),
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
+							"userID", "org1", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 							&domain.UserAgent{
 								FingerprintID: gu.Ptr("fp1"),
@@ -744,6 +747,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 								Issuer: "foo.com",
 							},
 						),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 					),
 				),
 				idGenerator:                     mock.NewIDGeneratorExpectIDs(t, "oidcSessionID", "accessTokenID"),
@@ -917,7 +921,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -946,7 +950,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -979,7 +983,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -997,6 +1001,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 					expectPush(
 						oidcsession.NewAccessTokenAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"at_accessTokenID", []string{"openid", "offline_access"}, time.Hour, domain.TokenReasonRefresh, nil),
+						user.NewUserTokenV2AddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, "at_accessTokenID"),
 						oidcsession.NewRefreshTokenRenewedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"rt_refreshTokenID2", 24*time.Hour),
 					),
@@ -1115,7 +1120,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -1143,7 +1148,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -1175,7 +1180,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusherWithCreationDateNow(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "clientID", []string{"audience"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -1290,7 +1295,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -1315,7 +1320,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "otherClientID", []string{"otherClientID"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "otherClientID", []string{"otherClientID"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -1340,7 +1345,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -1376,7 +1381,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -1401,7 +1406,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "otherClientID", []string{"otherClientID"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "otherClientID", []string{"otherClientID"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),
@@ -1426,7 +1431,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
-								"userID", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
+								"userID", "org1", "sessionID", "clientID", []string{"clientID"}, []string{"openid", "profile", "offline_access"},
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "nonce", &language.Afrikaans,
 								&domain.UserAgent{FingerprintID: gu.Ptr("browserFP")},
 							),

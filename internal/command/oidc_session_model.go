@@ -15,6 +15,7 @@ type OIDCSessionWriteModel struct {
 	eventstore.WriteModel
 
 	UserID                     string
+	UserResourceOwner          string
 	PreferredLanguage          *language.Tag
 	SessionID                  string
 	ClientID                   string
@@ -90,6 +91,7 @@ func (wm *OIDCSessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.UserID = e.UserID
+	wm.UserResourceOwner = e.UserResourceOwner
 	wm.SessionID = e.SessionID
 	wm.ClientID = e.ClientID
 	wm.Audience = e.Audience

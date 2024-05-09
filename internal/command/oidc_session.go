@@ -92,10 +92,22 @@ func (c *Commands) CreateOIDCSessionFromAuthRequest(ctx context.Context, authReq
 		return nil, "", err
 	}
 
-	cmd.AddSession(ctx, sessionModel.UserID, sessionModel.AggregateID, authReqModel.ClientID, authReqModel.Audience, authReqModel.Scope, authReqModel.AuthMethods, authReqModel.AuthTime, authReqModel.Nonce, sessionModel.PreferredLanguage, sessionModel.UserAgent)
+	cmd.AddSession(ctx,
+		sessionModel.UserID,
+		sessionModel.UserResourceOwner,
+		sessionModel.AggregateID,
+		authReqModel.ClientID,
+		authReqModel.Audience,
+		authReqModel.Scope,
+		authReqModel.AuthMethods,
+		authReqModel.AuthTime,
+		authReqModel.Nonce,
+		sessionModel.PreferredLanguage,
+		sessionModel.UserAgent,
+	)
 
 	if authReqModel.ResponseType != domain.OIDCResponseTypeIDToken {
-		if err = cmd.AddAccessToken(ctx, authReqModel.Scope, domain.TokenReasonAuthRequest, nil); err != nil {
+		if err = cmd.AddAccessToken(ctx, authReqModel.Scope, sessionModel.UserID, sessionModel.UserResourceOwner, domain.TokenReasonAuthRequest, nil); err != nil {
 			return nil, "", err
 		}
 	}
@@ -138,8 +150,8 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 		cmd.UserImpersonated(ctx, userID, resourceOwner, clientID, actor)
 	}
 
-	cmd.AddSession(ctx, userID, "", clientID, audience, scope, authMethods, authTime, nonce, preferredLanguage, userAgent)
-	if err = cmd.AddAccessToken(ctx, scope, reason, actor); err != nil {
+	cmd.AddSession(ctx, userID, resourceOwner, "", clientID, audience, scope, authMethods, authTime, nonce, preferredLanguage, userAgent)
+	if err = cmd.AddAccessToken(ctx, scope, userID, resourceOwner, reason, actor); err != nil {
 		return nil, err
 	}
 	if needRefreshToken {
@@ -166,7 +178,13 @@ func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	if err = cmd.AddAccessToken(ctx, scope, domain.TokenReasonRefresh, cmd.oidcSessionWriteModel.AccessTokenActor); err != nil {
+	err = cmd.AddAccessToken(ctx, scope,
+		cmd.oidcSessionWriteModel.UserID,
+		cmd.oidcSessionWriteModel.UserResourceOwner,
+		domain.TokenReasonRefresh,
+		cmd.oidcSessionWriteModel.AccessTokenActor,
+	)
+	if err != nil {
 		return nil, err
 	}
 	if err = cmd.RenewRefreshToken(ctx); err != nil {
@@ -338,6 +356,7 @@ type OIDCSessionEvents struct {
 func (c *OIDCSessionEvents) AddSession(
 	ctx context.Context,
 	userID,
+	userResourceOwner,
 	sessionID,
 	clientID string,
 	audience,
@@ -352,6 +371,7 @@ func (c *OIDCSessionEvents) AddSession(
 		ctx,
 		c.oidcSessionWriteModel.aggregate,
 		userID,
+		userResourceOwner,
 		sessionID,
 		clientID,
 		audience,
@@ -379,13 +399,16 @@ func (c *OIDCSessionEvents) SetAuthRequestFailed(ctx context.Context, authReques
 	c.events = append(c.events, authrequest.NewFailedEvent(ctx, authRequestAggregate, domain.OIDCErrorReasonFromError(err)))
 }
 
-func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string, reason domain.TokenReason, actor *domain.TokenActor) error {
+func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string, userID, resourceOwner string, reason domain.TokenReason, actor *domain.TokenActor) error {
 	accessTokenID, err := c.idGenerator.Next()
 	if err != nil {
 		return err
 	}
 	c.accessTokenID = AccessTokenPrefix + accessTokenID
-	c.events = append(c.events, oidcsession.NewAccessTokenAddedEvent(ctx, c.oidcSessionWriteModel.aggregate, c.accessTokenID, scope, c.accessTokenLifetime, reason, actor))
+	c.events = append(c.events,
+		oidcsession.NewAccessTokenAddedEvent(ctx, c.oidcSessionWriteModel.aggregate, c.accessTokenID, scope, c.accessTokenLifetime, reason, actor),
+		user.NewUserTokenV2AddedEvent(ctx, &user.NewAggregate(userID, resourceOwner).Aggregate, c.accessTokenID), // for user audit log
+	)
 	return nil
 }
 
