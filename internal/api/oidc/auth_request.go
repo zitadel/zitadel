@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 	"slices"
 	"strings"
@@ -13,7 +14,6 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"golang.org/x/text/language"
 
-	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
@@ -153,7 +153,7 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 }
 
 func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.AuthRequest, err error) {
-	return nil, err
+	panic(o.panicErr("AuthRequestByCode"))
 }
 
 // decryptGrant decrypts a code or refresh_token
@@ -184,101 +184,19 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err erro
 }
 
 func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() {
-		err = oidcError(err)
-		span.EndWithError(err)
-	}()
-
-	return o.repo.DeleteAuthRequest(ctx, id)
+	panic(o.panicErr("DeleteAuthRequest"))
 }
 
-func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {
-	/*	ctx, span := tracing.NewSpan(ctx)
-		defer func() {
-			err = oidcError(err)
-			span.EndWithError(err)
-		}()
-		if authReq, ok := req.(*AuthRequestV2); ok {
-			activity.Trigger(ctx, "", authReq.CurrentAuthRequest.UserID, activity.OIDCAccessToken, o.eventstore.FilterToQueryReducer)
-			token, err := o.command.AddOIDCSessionAccessToken(setContextUserSystem(ctx), authReq.GetID())
-			if err != nil {
-				return "", time.Time{}, err
-			}
-			return token.TokenID, token.Expiration, nil
-		}
-
-		userAgentID, applicationID, userOrgID, authTime, amr, reason, actor := getInfoFromRequest(req)
-		accessTokenLifetime, _, _, _, err := o.getOIDCSettings(ctx)
-		if err != nil {
-			return "", time.Time{}, err
-		}
-
-		resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), amr, accessTokenLifetime, authTime, reason, actor)
-		if err != nil {
-			return "", time.Time{}, err
-		}
-
-		// trigger activity log for authentication for user
-		activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCAccessToken, o.eventstore.FilterToQueryReducer)
-		return resp.TokenID, resp.Expiration, nil
-	*/
-	return "", time.Time{}, err
+func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (string, time.Time, error) {
+	panic(o.panicErr("CreateAccessToken"))
 }
 
-func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.TokenRequest, refreshToken string) (_, _ string, _ time.Time, err error) {
-	/*
-		ctx, span := tracing.NewSpan(ctx)
-		defer func() {
-			err = oidcError(err)
-			span.EndWithError(err)
-		}()
+func (o *OPStorage) CreateAccessAndRefreshTokens(context.Context, op.TokenRequest, string) (string, string, time.Time, error) {
+	panic(o.panicErr("CreateAccessAndRefreshTokens"))
+}
 
-		// handle V2 request directly
-		switch tokenReq := req.(type) {
-		case *AuthRequestV2:
-			// trigger activity log for authentication for user
-			activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
-			tokenInfo, refreshToken, err := o.command.CreateOIDCSessionFromCodeExchange(setContextUserSystem(ctx), tokenReq.GetID())
-			if err != nil {
-				return "", "", time.Time{}, err
-			}
-			return tokenInfo.TokenID, refreshToken, tokenInfo.Expiration, nil
-		case *RefreshTokenRequestV2:
-			// trigger activity log for authentication for user
-			activity.Trigger(ctx, "", tokenReq.GetSubject(), activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
-			return o.command.ExchangeOIDCSessionRefreshAndAccessToken(setContextUserSystem(ctx), tokenReq.OIDCSessionWriteModel.AggregateID, refreshToken, tokenReq.RequestedScopes)
-		}
-
-		userAgentID, applicationID, userOrgID, authTime, authMethodsReferences, reason, actor := getInfoFromRequest(req)
-		scopes, err := o.assertProjectRoleScopes(ctx, applicationID, req.GetScopes())
-		if err != nil {
-			return "", "", time.Time{}, zerrors.ThrowPreconditionFailed(err, "OIDC-Df2fq", "Errors.Internal")
-		}
-		if request, ok := req.(op.RefreshTokenRequest); ok {
-			request.SetCurrentScopes(scopes)
-		}
-
-		accessTokenLifetime, _, refreshTokenIdleExpiration, refreshTokenExpiration, err := o.getOIDCSettings(ctx)
-		if err != nil {
-			return "", "", time.Time{}, err
-		}
-
-		resp, token, err := o.command.AddAccessAndRefreshToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(),
-			refreshToken, req.GetAudience(), scopes, authMethodsReferences, accessTokenLifetime,
-			refreshTokenIdleExpiration, refreshTokenExpiration, authTime, reason, actor) //PLANNED: lifetime from client
-		if err != nil {
-			if zerrors.IsErrorInvalidArgument(err) {
-				err = oidc.ErrInvalidGrant().WithParent(err)
-			}
-			return "", "", time.Time{}, err
-		}
-
-		// trigger activity log for authentication for user
-		activity.Trigger(ctx, userOrgID, req.GetSubject(), activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
-		return resp.TokenID, token, resp.Expiration, nil
-	*/
-	return "", "", time.Time{}, err
+func (*OPStorage) panicErr(method string) error {
+	return fmt.Errorf("OPStorage.%s should not be called anymore. This is a bug. Please report https://github.com/zitadel/zitadel/issues", method)
 }
 
 func getInfoFromRequest(req op.TokenRequest) (agentID, clientID, userOrgID string, authTime time.Time, amr []string, preferredLanguage *language.Tag, reason domain.TokenReason, actor *domain.TokenActor) {
@@ -299,34 +217,7 @@ func getInfoFromRequest(req op.TokenRequest) (agentID, clientID, userOrgID strin
 }
 
 func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (_ op.RefreshTokenRequest, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() {
-		err = oidcError(err)
-		span.EndWithError(err)
-	}()
-
-	plainToken, err := o.decryptGrant(refreshToken)
-	if err != nil {
-		return nil, op.ErrInvalidRefreshToken
-	}
-	if strings.HasPrefix(plainToken, command.IDPrefixV2) {
-		oidcSession, err := o.command.OIDCSessionByRefreshToken(ctx, plainToken)
-		if err != nil {
-			return nil, err
-		}
-		// trigger activity log for authentication for user
-		activity.Trigger(ctx, "", oidcSession.UserID, activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
-		return &RefreshTokenRequestV2{OIDCSessionWriteModel: oidcSession}, nil
-	}
-
-	tokenView, err := o.repo.RefreshTokenByToken(ctx, refreshToken)
-	if err != nil {
-		return nil, err
-	}
-
-	// trigger activity log for use of refresh token for user
-	activity.Trigger(ctx, tokenView.ResourceOwner, tokenView.UserID, activity.OIDCRefreshToken, o.eventstore.FilterToQueryReducer)
-	return RefreshTokenRequestFromBusiness(tokenView), nil
+	panic("TokenRequestByRefreshToken should not be called anymore. This is a bug. Please report https://github.com/zitadel/zitadel/issues")
 }
 
 func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID string) (err error) {
