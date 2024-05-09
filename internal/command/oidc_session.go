@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -478,7 +479,7 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 		// we need to use `-` as a delimiter because the OIDC library uses `:` and will check for a length of 2 parts
 		session.TokenID = c.oidcSessionWriteModel.AggregateID + TokenDelimiter + c.accessTokenID
 	}
-
+	activity.Trigger(ctx, c.oidcSessionWriteModel.UserResourceOwner, c.oidcSessionWriteModel.UserID, tokenReasonToActivityMethodType(c.oidcSessionWriteModel.AccessTokenReason), c.eventstore.FilterToQueryReducer)
 	return session, nil
 }
 
@@ -501,4 +502,15 @@ func (c *Commands) tokenTokenLifetimes(ctx context.Context) (accessTokenLifetime
 		refreshTokenIdleLifetime = oidcSettings.RefreshTokenIdleExpiration
 	}
 	return accessTokenLifetime, refreshTokenLifetime, refreshTokenIdleLifetime, nil
+}
+
+func tokenReasonToActivityMethodType(r domain.TokenReason) activity.TriggerMethod {
+	if r == domain.TokenReasonUnspecified {
+		return activity.Unspecified
+	}
+	if r == domain.TokenReasonRefresh {
+		return activity.OIDCRefreshToken
+	}
+	// all other reasons result in an access token
+	return activity.OIDCAccessToken
 }
