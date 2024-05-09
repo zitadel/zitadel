@@ -20,6 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoRequest]) (_ *op.Response, err error) {
@@ -48,7 +49,8 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 	)
 	if token.clientID != "" {
 		projectID, assertion, err = s.query.GetOIDCUserinfoClientByID(ctx, token.clientID)
-		if err != nil {
+		// token.clientID might contain a username (e.g. client credentials) -> ignore the not found
+		if err != nil && !zerrors.IsNotFound(err) {
 			return nil, err
 		}
 	}
