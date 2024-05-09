@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -64,10 +66,12 @@ func NewAddedEvent(
 type ApprovedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	UserID          string
-	UserOrgID       string
-	UserAuthMethods []domain.UserAuthMethodType
-	AuthTime        time.Time
+	UserID            string
+	UserOrgID         string
+	UserAuthMethods   []domain.UserAuthMethodType
+	AuthTime          time.Time
+	PreferredLanguage *language.Tag
+	UserAgent         *domain.UserAgent
 }
 
 func (e *ApprovedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
@@ -89,6 +93,8 @@ func NewApprovedEvent(
 	userOrgID string,
 	userAuthMethods []domain.UserAuthMethodType,
 	authTime time.Time,
+	preferredLanguage *language.Tag,
+	userAgent *domain.UserAgent,
 ) *ApprovedEvent {
 	return &ApprovedEvent{
 		eventstore.NewBaseEventForPush(
@@ -98,6 +104,8 @@ func NewApprovedEvent(
 		userOrgID,
 		userAuthMethods,
 		authTime,
+		preferredLanguage,
+		userAgent,
 	}
 }
 

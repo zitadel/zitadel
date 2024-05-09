@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -133,13 +134,16 @@ func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token 
 		return idTokenClaimsToExchangeToken(claims, resourceOwner), nil
 
 	case oidc.JWTTokenType:
-		resourceOwner := new(string)
-		verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, client.client.ClockSkew, s.jwtProfileUserCheck(ctx, resourceOwner))
+		var (
+			resourceOwner     string
+			preferredLanguage *language.Tag
+		)
+		verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, client.client.ClockSkew, s.jwtProfileUserCheck(ctx, &resourceOwner, &preferredLanguage))
 		jwt, err := op.VerifyJWTAssertion(ctx, token, verifier)
 		if err != nil {
 			return nil, zerrors.ThrowPermissionDenied(err, "OIDC-eiS6o", "Errors.TokenExchange.Token.Invalid")
 		}
-		return jwtToExchangeToken(jwt, *resourceOwner), nil
+		return jwtToExchangeToken(jwt, resourceOwner, preferredLanguage), nil
 
 	case UserIDTokenType:
 		user, err := s.query.GetUserByID(ctx, false, token)
@@ -155,13 +159,17 @@ func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token 
 	}
 }
 
-func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string) op.JWTProfileVerifierOption {
+func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string, preferredLanguage **language.Tag) op.JWTProfileVerifierOption {
 	return op.SubjectCheck(func(request *oidc.JWTTokenRequest) error {
 		user, err := s.query.GetUserByID(ctx, false, request.Subject)
 		if err != nil {
 			return zerrors.ThrowPermissionDenied(err, "OIDC-Nee6r", "Errors.TokenExchange.Token.Invalid")
 		}
 		*resourceOwner = user.ResourceOwner
+		if user.Human != nil {
+			*preferredLanguage = user.Human.PreferredLanguage
+		}
+		user.Human.PreferredLanguage.MarshalText()
 		return nil
 	})
 }
@@ -226,12 +234,12 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	var sessionID string
 	switch tokenType {
 	case oidc.AccessTokenType, "":
-		resp.AccessToken, resp.RefreshToken, sessionID, resp.ExpiresIn, err = s.createExchangeAccessToken(ctx, client, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.AccessToken, resp.RefreshToken, sessionID, resp.ExpiresIn, err = s.createExchangeAccessToken(ctx, client, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, subjectToken.preferredLanguage, reason, actor)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.AccessTokenType
 
 	case oidc.JWTTokenType:
-		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeJWT(ctx, client, getUserInfo, getSigner, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeJWT(ctx, client, getUserInfo, getSigner, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, subjectToken.preferredLanguage, reason, actor)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.JWTTokenType
 
@@ -259,7 +267,19 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	return resp, nil
 }
 
-func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, userID, resourceOwner string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken, refreshToken, sessionID string, exp uint64, err error) {
+func (s *Server) createExchangeAccessToken(
+	ctx context.Context,
+	client *Client,
+	userID,
+	resourceOwner string,
+	audience,
+	scope []string,
+	authMethods []domain.UserAuthMethodType,
+	authTime time.Time,
+	preferredLanguage *language.Tag,
+	reason domain.TokenReason,
+	actor *domain.TokenActor,
+) (accessToken, refreshToken, sessionID string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -272,6 +292,7 @@ func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, 
 		authMethods,
 		authTime,
 		"",
+		preferredLanguage,
 		nil,
 		reason,
 		actor,
@@ -287,7 +308,21 @@ func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, 
 	return accessToken, session.RefreshToken, session.SessionID, timeToOIDCExpiresIn(session.Expiration), nil
 }
 
-func (s *Server) createExchangeJWT(ctx context.Context, client *Client, getUserInfo userInfoFunc, getSigner signerFunc, userID, resourceOwner string, audience, scope []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {
+func (s *Server) createExchangeJWT(
+	ctx context.Context,
+	client *Client,
+	getUserInfo userInfoFunc,
+	getSigner signerFunc,
+	userID,
+	resourceOwner string,
+	audience,
+	scope []string,
+	authMethods []domain.UserAuthMethodType,
+	authTime time.Time,
+	preferredLanguage *language.Tag,
+	reason domain.TokenReason,
+	actor *domain.TokenActor,
+) (accessToken string, refreshToken string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -300,6 +335,7 @@ func (s *Server) createExchangeJWT(ctx context.Context, client *Client, getUserI
 		authMethods,
 		authTime,
 		"",
+		preferredLanguage,
 		nil,
 		reason,
 		actor,

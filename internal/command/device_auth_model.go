@@ -3,6 +3,8 @@ package command
 import (
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
@@ -12,18 +14,20 @@ type DeviceAuthWriteModel struct {
 	eventstore.WriteModel
 	aggregate *eventstore.Aggregate
 
-	ClientID         string
-	DeviceCode       string
-	UserCode         string
-	Expires          time.Time
-	Scopes           []string
-	Audience         []string
-	State            domain.DeviceAuthState
-	UserID           string
-	UserOrgID        string
-	UserAuthMethods  []domain.UserAuthMethodType
-	AuthTime         time.Time
-	NeedRefreshToken bool
+	ClientID          string
+	DeviceCode        string
+	UserCode          string
+	Expires           time.Time
+	Scopes            []string
+	Audience          []string
+	State             domain.DeviceAuthState
+	UserID            string
+	UserOrgID         string
+	UserAuthMethods   []domain.UserAuthMethodType
+	AuthTime          time.Time
+	PreferredLanguage *language.Tag
+	UserAgent         *domain.UserAgent
+	NeedRefreshToken  bool
 }
 
 func NewDeviceAuthWriteModel(deviceCode, resourceOwner string) *DeviceAuthWriteModel {
@@ -54,6 +58,8 @@ func (m *DeviceAuthWriteModel) Reduce() error {
 			m.UserOrgID = e.UserOrgID
 			m.UserAuthMethods = e.UserAuthMethods
 			m.AuthTime = e.AuthTime
+			m.PreferredLanguage = e.PreferredLanguage
+			m.UserAgent = e.UserAgent
 		case *deviceauth.CanceledEvent:
 			m.State = e.Reason.State()
 		case *deviceauth.DoneEvent:

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -39,7 +41,16 @@ func (c *Commands) AddDeviceAuth(ctx context.Context, clientID, deviceCode, user
 	return writeModelToObjectDetails(&model.WriteModel), nil
 }
 
-func (c *Commands) ApproveDeviceAuth(ctx context.Context, deviceCode, userID, userOrgID string, authMethods []domain.UserAuthMethodType, authTime time.Time) (*domain.ObjectDetails, error) {
+func (c *Commands) ApproveDeviceAuth(
+	ctx context.Context,
+	deviceCode,
+	userID,
+	userOrgID string,
+	authMethods []domain.UserAuthMethodType,
+	authTime time.Time,
+	preferredLanguage *language.Tag,
+	userAgent *domain.UserAgent,
+) (*domain.ObjectDetails, error) {
 	model, err := c.getDeviceAuthWriteModelByDeviceCode(ctx, deviceCode)
 	if err != nil {
 		return nil, err
@@ -47,7 +58,7 @@ func (c *Commands) ApproveDeviceAuth(ctx context.Context, deviceCode, userID, us
 	if !model.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound")
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, model.aggregate, userID, userOrgID, authMethods, authTime))
+	pushedEvents, err := c.eventstore.Push(ctx, deviceauth.NewApprovedEvent(ctx, model.aggregate, userID, userOrgID, authMethods, authTime, preferredLanguage, userAgent))
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +157,8 @@ func (c *Commands) CreateOIDCSessionFromDeviceAuth(ctx context.Context, deviceCo
 		deviceAuthModel.UserAuthMethods,
 		deviceAuthModel.AuthTime,
 		"",
-		nil, // TBD: should we use some kind of device fingerprint as useragent?
+		deviceAuthModel.PreferredLanguage,
+		deviceAuthModel.UserAgent,
 	)
 	if err = cmd.AddAccessToken(ctx, deviceAuthModel.Scopes, domain.TokenReasonAuthRequest, nil); err != nil {
 		return nil, err

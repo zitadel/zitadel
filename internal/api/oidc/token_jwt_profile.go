@@ -49,6 +49,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		time.Now(),
 		"",
 		nil,
+		nil,
 		domain.TokenReasonClientCredentials,
 		nil,
 		false,

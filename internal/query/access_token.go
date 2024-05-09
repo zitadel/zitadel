@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
@@ -29,6 +31,8 @@ type OIDCSessionAccessTokenReadModel struct {
 	AccessTokenID         string
 	AccessTokenCreation   time.Time
 	AccessTokenExpiration time.Time
+	PreferredLanguage     *language.Tag
+	UserAgent             *domain.UserAgent
 	Reason                domain.TokenReason
 	Actor                 *domain.TokenActor
 }
@@ -81,6 +85,8 @@ func (wm *OIDCSessionAccessTokenReadModel) reduceAdded(e *oidcsession.AddedEvent
 	wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
 	wm.Nonce = e.Nonce
+	wm.PreferredLanguage = e.PreferredLanguage
+	wm.UserAgent = e.UserAgent
 	wm.State = domain.OIDCSessionStateActive
 }
 

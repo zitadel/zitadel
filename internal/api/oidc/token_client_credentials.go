@@ -41,6 +41,7 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 		time.Now(),
 		"",
 		nil,
+		nil,
 		domain.TokenReasonClientCredentials,
 		nil,
 		false,

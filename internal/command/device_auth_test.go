@@ -4,12 +4,16 @@ import (
 	"context"
 	"errors"
 	"io"
+	"net"
+	"net/http"
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -124,12 +128,14 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx         context.Context
-		id          string
-		userID      string
-		userOrgID   string
-		authMethods []domain.UserAuthMethodType
-		authTime    time.Time
+		ctx               context.Context
+		id                string
+		userID            string
+		userOrgID         string
+		authMethods       []domain.UserAuthMethodType
+		authTime          time.Time
+		preferredLanguage *language.Tag
+		userAgent         *domain.UserAgent
 	}
 	tests := []struct {
 		name        string
@@ -148,7 +154,12 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			args: args{
 				ctx, "123", "subj", "orgID",
 				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				time.Unix(123, 456),
+				time.Unix(123, 456), &language.Afrikaans, &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
 			},
 			wantErr: zerrors.ThrowNotFound(nil, "COMMAND-Hief9", "Errors.DeviceAuth.NotFound"),
 		},
@@ -170,7 +181,12 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 						deviceauth.NewApprovedEvent(
 							ctx, deviceauth.NewAggregate("123", "instance1"), "subj", "orgID",
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-							time.Unix(123, 456),
+							time.Unix(123, 456), &language.Afrikaans, &domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
 						),
 					),
 				),
@@ -178,7 +194,12 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			args: args{
 				ctx, "123", "subj", "orgID",
 				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				time.Unix(123, 456),
+				time.Unix(123, 456), &language.Afrikaans, &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
 			},
 			wantErr: pushErr,
 		},
@@ -200,7 +221,12 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 						deviceauth.NewApprovedEvent(
 							ctx, deviceauth.NewAggregate("123", "instance1"), "subj", "orgID",
 							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-							time.Unix(123, 456),
+							time.Unix(123, 456), &language.Afrikaans, &domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
 						),
 					),
 				),
@@ -208,7 +234,12 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			args: args{
 				ctx, "123", "subj", "orgID",
 				[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				time.Unix(123, 456),
+				time.Unix(123, 456), &language.Afrikaans, &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
 			},
 			wantDetails: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
@@ -220,7 +251,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.userID, tt.args.userOrgID, tt.args.authMethods, tt.args.authTime)
+			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.userID, tt.args.userOrgID, tt.args.authMethods, tt.args.authTime, tt.args.preferredLanguage, tt.args.userAgent)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, gotDetails, tt.wantDetails)
 		})
@@ -569,7 +600,12 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"userID", "org1",
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-								testNow,
+								testNow, &language.Afrikaans, &domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
 							),
 						),
 					),
@@ -577,7 +613,12 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
-							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", nil,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", &language.Afrikaans, &domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
 						),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(),
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -599,16 +640,22 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				"123",
 			},
 			want: &OIDCSession{
-				TokenID:     "V2_oidcSessionID-at_accessTokenID",
-				ClientID:    "clientID",
-				UserID:      "userID",
-				Audience:    []string{"audience"},
-				Expiration:  time.Time{}.Add(time.Hour),
-				Scope:       []string{"openid", "offline_access"},
-				AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				AuthTime:    testNow,
-				UserAgent:   nil,
-				Reason:      domain.TokenReasonAuthRequest,
+				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				ClientID:          "clientID",
+				UserID:            "userID",
+				Audience:          []string{"audience"},
+				Expiration:        time.Time{}.Add(time.Hour),
+				Scope:             []string{"openid", "offline_access"},
+				AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:          testNow,
+				PreferredLanguage: &language.Afrikaans,
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
+				Reason: domain.TokenReasonAuthRequest,
 			},
 		},
 		{
@@ -632,7 +679,12 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 								deviceauth.NewAggregate("123", "instance1"),
 								"userID", "org1",
 								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-								testNow,
+								testNow, &language.Afrikaans, &domain.UserAgent{
+									FingerprintID: gu.Ptr("fp1"),
+									IP:            net.ParseIP("1.2.3.4"),
+									Description:   gu.Ptr("firefox"),
+									Header:        http.Header{"foo": []string{"bar"}},
+								},
 							),
 						),
 					),
@@ -640,7 +692,12 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 					expectPush(
 						oidcsession.NewAddedEvent(context.Background(), &oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
 							"userID", "", "clientID", []string{"audience"}, []string{"openid", "offline_access"},
-							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", nil,
+							[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword}, testNow, "", &language.Afrikaans, &domain.UserAgent{
+								FingerprintID: gu.Ptr("fp1"),
+								IP:            net.ParseIP("1.2.3.4"),
+								Description:   gu.Ptr("firefox"),
+								Header:        http.Header{"foo": []string{"bar"}},
+							},
 						),
 						oidcsession.NewAccessTokenAddedEvent(context.Background(),
 							&oidcsession.NewAggregate("V2_oidcSessionID", "org1").Aggregate,
@@ -665,15 +722,21 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				"123",
 			},
 			want: &OIDCSession{
-				TokenID:      "V2_oidcSessionID-at_accessTokenID",
-				ClientID:     "clientID",
-				UserID:       "userID",
-				Audience:     []string{"audience"},
-				Expiration:   time.Time{}.Add(time.Hour),
-				Scope:        []string{"openid", "offline_access"},
-				AuthMethods:  []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				AuthTime:     testNow,
-				UserAgent:    nil,
+				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				ClientID:          "clientID",
+				UserID:            "userID",
+				Audience:          []string{"audience"},
+				Expiration:        time.Time{}.Add(time.Hour),
+				Scope:             []string{"openid", "offline_access"},
+				AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
+				AuthTime:          testNow,
+				PreferredLanguage: &language.Afrikaans,
+				UserAgent: &domain.UserAgent{
+					FingerprintID: gu.Ptr("fp1"),
+					IP:            net.ParseIP("1.2.3.4"),
+					Description:   gu.Ptr("firefox"),
+					Header:        http.Header{"foo": []string{"bar"}},
+				},
 				Reason:       domain.TokenReasonAuthRequest,
 				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
 			},

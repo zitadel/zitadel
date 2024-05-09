@@ -166,6 +166,10 @@ func userInfoEmailToOIDC(user *query.User) oidc.UserInfoEmail {
 
 func userInfoProfileToOidc(user *query.User, assetPrefix string) oidc.UserInfoProfile {
 	if human := user.Human; human != nil {
+		var locale *oidc.Locale
+		if human.PreferredLanguage != nil {
+			locale = oidc.NewLocale(*human.PreferredLanguage)
+		}
 		return oidc.UserInfoProfile{
 			Name:              human.DisplayName,
 			GivenName:         human.FirstName,
@@ -173,7 +177,7 @@ func userInfoProfileToOidc(user *query.User, assetPrefix string) oidc.UserInfoPr
 			Nickname:          human.NickName,
 			Picture:           domain.AvatarURL(assetPrefix, user.ResourceOwner, user.Human.AvatarKey),
 			Gender:            getGender(human.Gender),
-			Locale:            oidc.NewLocale(human.PreferredLanguage),
+			Locale:            locale,
 			UpdatedAt:         oidc.FromTime(user.ChangeDate),
 			PreferredUsername: user.PreferredLoginName,
 		}

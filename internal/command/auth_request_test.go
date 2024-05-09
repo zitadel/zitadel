@@ -10,6 +10,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -360,7 +361,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							)),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"userID", "org1", testNow.Add(-5*time.Minute)),
+								"userID", "org1", testNow.Add(-5*time.Minute), &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -471,7 +472,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							)),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"userID", "org1", testNow),
+								"userID", "org1", testNow, &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -557,7 +558,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							)),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"userID", "org1", testNow),
+								"userID", "org1", testNow, &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,

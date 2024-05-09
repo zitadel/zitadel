@@ -9,6 +9,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/muhlemmer/gu"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -46,7 +47,7 @@ type Human struct {
 	NickName               string              `json:"nick_name,omitempty"`
 	DisplayName            string              `json:"display_name,omitempty"`
 	AvatarKey              string              `json:"avatar_key,omitempty"`
-	PreferredLanguage      language.Tag        `json:"preferred_language,omitempty"`
+	PreferredLanguage      *language.Tag       `json:"preferred_language,omitempty"`
 	Gender                 domain.Gender       `json:"gender,omitempty"`
 	Email                  domain.EmailAddress `json:"email,omitempty"`
 	IsEmailVerified        bool                `json:"is_email_verified,omitempty"`
@@ -66,7 +67,7 @@ type Profile struct {
 	NickName          string
 	DisplayName       string
 	AvatarKey         string
-	PreferredLanguage language.Tag
+	PreferredLanguage *language.Tag
 	Gender            domain.Gender
 }
 
@@ -877,13 +878,15 @@ func scanUser(row *sql.Row) (*User, error) {
 			NickName:               nickName.String,
 			DisplayName:            displayName.String,
 			AvatarKey:              avatarKey.String,
-			PreferredLanguage:      language.Make(preferredLanguage.String),
 			Gender:                 domain.Gender(gender.Int32),
 			Email:                  domain.EmailAddress(email.String),
 			IsEmailVerified:        isEmailVerified.Bool,
 			Phone:                  domain.PhoneNumber(phone.String),
 			IsPhoneVerified:        isPhoneVerified.Bool,
 			PasswordChangeRequired: passwordChangeRequired.Bool,
+		}
+		if preferredLanguage.Valid {
+			u.Human.PreferredLanguage = gu.Ptr(language.Make(preferredLanguage.String))
 		}
 	} else if machineID.Valid {
 		u.Machine = &Machine{
@@ -1011,7 +1014,9 @@ func prepareProfileQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 			p.NickName = nickName.String
 			p.DisplayName = displayName.String
 			p.AvatarKey = avatarKey.String
-			p.PreferredLanguage = language.Make(preferredLanguage.String)
+			if preferredLanguage.Valid {
+				p.PreferredLanguage = gu.Ptr(language.Make(preferredLanguage.String))
+			}
 			p.Gender = domain.Gender(gender.Int32)
 
 			return p, nil
@@ -1409,13 +1414,15 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 						NickName:               nickName.String,
 						DisplayName:            displayName.String,
 						AvatarKey:              avatarKey.String,
-						PreferredLanguage:      language.Make(preferredLanguage.String),
 						Gender:                 domain.Gender(gender.Int32),
 						Email:                  domain.EmailAddress(email.String),
 						IsEmailVerified:        isEmailVerified.Bool,
 						Phone:                  domain.PhoneNumber(phone.String),
 						IsPhoneVerified:        isPhoneVerified.Bool,
 						PasswordChangeRequired: passwordChangeRequired.Bool,
+					}
+					if preferredLanguage.Valid {
+						u.Human.PreferredLanguage = gu.Ptr(language.Make(preferredLanguage.String))
 					}
 				} else if machineID.Valid {
 					u.Machine = &Machine{

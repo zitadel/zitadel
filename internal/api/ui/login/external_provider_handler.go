@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/crewjam/saml/samlsp"
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -814,7 +815,7 @@ func (l *Login) updateExternalUserProfile(ctx context.Context, user *query.User,
 		externalUser.LastName == user.Human.LastName &&
 		externalUser.NickName == user.Human.NickName &&
 		externalUser.DisplayName == user.Human.DisplayName &&
-		externalUser.PreferredLanguage == user.Human.PreferredLanguage {
+		externalUser.PreferredLanguage == gu.Value(user.Human.PreferredLanguage) {
 		return nil
 	}
 	_, err := l.command.ChangeHumanProfile(setContext(ctx, user.ResourceOwner), &domain.Profile{

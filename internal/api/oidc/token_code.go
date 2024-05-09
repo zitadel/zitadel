@@ -68,7 +68,7 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 	if req.RedirectURI != authReq.GetRedirectURI() {
 		return nil, "", oidc.ErrInvalidGrant().WithDescription("redirect_uri does not correspond")
 	}
-	userAgentID, _, userOrgID, authTime, authMethodsReferences, reason, actor := getInfoFromRequest(authReq)
+	userAgentID, _, userOrgID, authTime, authMethodsReferences, preferredLanguage, reason, actor := getInfoFromRequest(authReq)
 
 	scope := authReq.GetScopes()
 	session, err = s.command.CreateOIDCSession(ctx,
@@ -80,6 +80,7 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		AMRToAuthMethodTypes(authMethodsReferences),
 		authTime,
 		authReq.GetNonce(),
+		preferredLanguage,
 		&domain.UserAgent{
 			FingerprintID: &userAgentID,
 		},

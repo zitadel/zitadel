@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
@@ -21,15 +23,16 @@ const (
 type AddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID      string                      `json:"userID"`
-	SessionID   string                      `json:"sessionID"`
-	ClientID    string                      `json:"clientID"`
-	Audience    []string                    `json:"audience"`
-	Scope       []string                    `json:"scope"`
-	AuthMethods []domain.UserAuthMethodType `json:"authMethods"`
-	AuthTime    time.Time                   `json:"authTime"`
-	Nonce       string                      `json:"nonce,omitempty"`
-	UserAgent   *domain.UserAgent           `json:"userAgent,omitempty"`
+	UserID            string                      `json:"userID"`
+	SessionID         string                      `json:"sessionID"`
+	ClientID          string                      `json:"clientID"`
+	Audience          []string                    `json:"audience"`
+	Scope             []string                    `json:"scope"`
+	AuthMethods       []domain.UserAuthMethodType `json:"authMethods"`
+	AuthTime          time.Time                   `json:"authTime"`
+	Nonce             string                      `json:"nonce,omitempty"`
+	PreferredLanguage *language.Tag               `json:"preferredLanguage,omitempty"`
+	UserAgent         *domain.UserAgent           `json:"userAgent,omitempty"`
 }
 
 func (e *AddedEvent) Payload() interface{} {
@@ -54,6 +57,7 @@ func NewAddedEvent(ctx context.Context,
 	authMethods []domain.UserAuthMethodType,
 	authTime time.Time,
 	nonce string,
+	preferredLanguage *language.Tag,
 	userAgent *domain.UserAgent,
 ) *AddedEvent {
 	return &AddedEvent{
@@ -62,15 +66,16 @@ func NewAddedEvent(ctx context.Context,
 			aggregate,
 			AddedType,
 		),
-		UserID:      userID,
-		SessionID:   sessionID,
-		ClientID:    clientID,
-		Audience:    audience,
-		Scope:       scope,
-		AuthMethods: authMethods,
-		AuthTime:    authTime,
-		Nonce:       nonce,
-		UserAgent:   userAgent,
+		UserID:            userID,
+		SessionID:         sessionID,
+		ClientID:          clientID,
+		Audience:          audience,
+		Scope:             scope,
+		AuthMethods:       authMethods,
+		AuthTime:          authTime,
+		Nonce:             nonce,
+		PreferredLanguage: preferredLanguage,
+		UserAgent:         userAgent,
 	}
 }
 

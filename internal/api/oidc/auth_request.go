@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -280,20 +281,20 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	return "", "", time.Time{}, err
 }
 
-func getInfoFromRequest(req op.TokenRequest) (agentID string, clientID string, userOrgID string, authTime time.Time, amr []string, reason domain.TokenReason, actor *domain.TokenActor) {
+func getInfoFromRequest(req op.TokenRequest) (agentID, clientID, userOrgID string, authTime time.Time, amr []string, preferredLanguage *language.Tag, reason domain.TokenReason, actor *domain.TokenActor) {
 	switch r := req.(type) {
 	case *AuthRequest:
-		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR(), domain.TokenReasonAuthRequest, nil
+		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR(), r.PreferredLanguage, domain.TokenReasonAuthRequest, nil
 	case *RefreshTokenRequest:
-		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences, domain.TokenReasonRefresh, r.Actor
+		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences, nil, domain.TokenReasonRefresh, r.Actor
 	case op.IDTokenRequest:
-		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR(), domain.TokenReasonAuthRequest, nil
+		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR(), nil, domain.TokenReasonAuthRequest, nil
 	case *oidc.JWTTokenRequest:
-		return "", "", "", r.GetAuthTime(), nil, domain.TokenReasonJWTProfile, nil
+		return "", "", "", r.GetAuthTime(), nil, nil, domain.TokenReasonJWTProfile, nil
 	case *clientCredentialsRequest:
-		return "", "", "", time.Time{}, nil, domain.TokenReasonClientCredentials, nil
+		return "", "", "", time.Time{}, nil, nil, domain.TokenReasonClientCredentials, nil
 	default:
-		return "", "", "", time.Time{}, nil, domain.TokenReasonAuthRequest, nil
+		return "", "", "", time.Time{}, nil, nil, domain.TokenReasonAuthRequest, nil
 	}
 }
 
@@ -668,7 +669,7 @@ func (s *Server) authResponseToken(authReq op.AuthRequest, authorizer op.Authori
 		return zerrors.ThrowInternal(nil, "OIDC-waeN6", "Error.Internal")
 	}
 
-	userAgentID, _, userOrgID, authTime, authMethodsReferences, reason, actor := getInfoFromRequest(authReq)
+	userAgentID, _, userOrgID, authTime, authMethodsReferences, preferredLanguage, reason, actor := getInfoFromRequest(authReq)
 	scope := authReq.GetScopes()
 	session, err := s.command.CreateOIDCSession(ctx,
 		authReq.GetSubject(),
@@ -679,6 +680,7 @@ func (s *Server) authResponseToken(authReq op.AuthRequest, authorizer op.Authori
 		AMRToAuthMethodTypes(authMethodsReferences),
 		authTime,
 		authReq.GetNonce(),
+		preferredLanguage,
 		&domain.UserAgent{
 			FingerprintID: &userAgentID,
 		},

@@ -3,6 +3,8 @@ package command
 import (
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
@@ -13,6 +15,7 @@ type OIDCSessionWriteModel struct {
 	eventstore.WriteModel
 
 	UserID                     string
+	PreferredLanguage          *language.Tag
 	SessionID                  string
 	ClientID                   string
 	Audience                   []string
@@ -94,6 +97,7 @@ func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
 	wm.Nonce = e.Nonce
+	wm.PreferredLanguage = e.PreferredLanguage
 	wm.UserAgent = e.UserAgent
 	wm.State = domain.OIDCSessionStateActive
 	// the write model might be initialized without resource owner,
