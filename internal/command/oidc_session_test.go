@@ -842,8 +842,14 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 }
 
 func mockRefreshTokenComplianceChecker(returnErr error) RefreshTokenComplianceChecker {
-	return func(context.Context, *OIDCSessionWriteModel) error {
-		return returnErr
+	return func(_ context.Context, wm *OIDCSessionWriteModel, scope []string) ([]string, error) {
+		if returnErr != nil {
+			return nil, returnErr
+		}
+		if len(scope) > 0 {
+			return scope, nil
+		}
+		return wm.Scope, nil
 	}
 }
 

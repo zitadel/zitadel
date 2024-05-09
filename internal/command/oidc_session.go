@@ -150,7 +150,7 @@ func (c *Commands) CreateOIDCSession(ctx context.Context,
 	return cmd.PushEvents(ctx)
 }
 
-type RefreshTokenComplianceChecker func(context.Context, *OIDCSessionWriteModel) error
+type RefreshTokenComplianceChecker func(ctx context.Context, wm *OIDCSessionWriteModel, requestedScope []string) (scope []string, err error)
 
 // ExchangeOIDCSessionRefreshAndAccessToken updates an existing OIDC Session, creates a new access and refresh token.
 // It returns the access token id and expiration and the new refresh token.
@@ -162,7 +162,8 @@ func (c *Commands) ExchangeOIDCSessionRefreshAndAccessToken(ctx context.Context,
 	if err != nil {
 		return nil, err
 	}
-	if err = complianceCheck(ctx, cmd.oidcSessionWriteModel); err != nil {
+	scope, err = complianceCheck(ctx, cmd.oidcSessionWriteModel, scope)
+	if err != nil {
 		return nil, err
 	}
 	if err = cmd.AddAccessToken(ctx, scope, domain.TokenReasonRefresh, cmd.oidcSessionWriteModel.AccessTokenActor); err != nil {
