@@ -1,7 +1,6 @@
 package migrate
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/cmd/encryption"
 	"github.com/zitadel/zitadel/cmd/key"
 	"github.com/zitadel/zitadel/cmd/tls"
 	admin_es "github.com/zitadel/zitadel/internal/admin/repository/eventsourcing"
@@ -45,9 +45,6 @@ import (
 )
 
 func projectionsCmd() *cobra.Command {
-	err := viper.MergeConfig(bytes.NewBuffer(defaultConfig))
-	logging.OnError(err).Fatal("unable to read setup steps")
-
 	cmd := &cobra.Command{
 		Use:   "projections",
 		Short: "calls the projections synchronously",
@@ -69,7 +66,7 @@ func projectionsCmd() *cobra.Command {
 type ProjectionsConfig struct {
 	Destination    database.Config
 	Projections    projection.Config
-	EncryptionKeys *encryptionKeyConfig
+	EncryptionKeys *encryption.EncryptionKeyConfig
 	SystemAPIUsers map[string]*internal_authz.SystemAPIUser
 	Eventstore     *eventstore.Config
 
@@ -110,7 +107,7 @@ func projections(
 	keyStorage, err := crypto_db.NewKeyStorage(client, masterKey)
 	logging.OnError(err).Fatal("cannot start key storage")
 
-	keys, err := ensureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
+	keys, err := encryption.EnsureEncryptionKeys(ctx, config.EncryptionKeys, keyStorage)
 	logging.OnError(err).Fatal("unable to read encryption keys")
 
 	staticStorage, err := config.AssetStorage.NewStorage(client.DB)
@@ -127,6 +124,7 @@ func projections(
 	queries, err := query.StartQueries(
 		ctx,
 		es,
+		nil,
 		client,
 		client,
 		config.Projections,
@@ -226,6 +224,12 @@ func projections(
 	wg := sync.WaitGroup{}
 	wg.Add(int(config.Projections.ConcurrentInstances))
 
+	go func() {
+		for instance := range failedInstances {
+			logging.WithFields("instance", instance).Error("projection failed")
+		}
+	}()
+
 	for i := 0; i < int(config.Projections.ConcurrentInstances); i++ {
 		go execProjections(ctx, instances, failedInstances, &wg)
 	}
@@ -237,9 +241,6 @@ func projections(
 	wg.Wait()
 
 	close(failedInstances)
-	for instance := range failedInstances {
-		logging.WithFields("instance", instance).Error("projection failed")
-	}
 
 	logging.WithFields("took", time.Since(start)).Info("projections executed")
 }

@@ -188,6 +188,7 @@ func writeAggregateFilters(stmt *database.Statement, filters []*eventstore.Aggre
 
 func writeAggregateFilter(stmt *database.Statement, filter *eventstore.AggregateFilter) {
 	conditions := definedConditions([]*condition{
+		{column: "owner", condition: filter.Owners()},
 		{column: "aggregate_type", condition: filter.Type()},
 		{column: "aggregate_id", condition: filter.IDs()},
 	})

@@ -2,9 +2,10 @@ package migrate
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
+	"errors"
 	"io"
-	"strconv"
 	"time"
 
 	"github.com/jackc/pgx/v5/stdlib"
@@ -12,12 +13,13 @@ import (
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/database"
+	db "github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	es_old "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
-	es_v3 "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/v2/database"
+	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var shouldIgnorePrevious bool
@@ -25,8 +27,8 @@ var shouldIgnorePrevious bool
 func eventstoreCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "eventstore",
-		Short: "migrates the eventstore of an instance from one database to another",
-		Long: `migrates the eventstore of an instance from one database to another
+		Short: "mirrors the eventstore of an instance from one database to another",
+		Long: `mirrors the eventstore of an instance from one database to another
 ZITADEL needs to be initialized
 Migrate only copies events2 and unique constraints`,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -42,19 +44,19 @@ Migrate only copies events2 and unique constraints`,
 }
 
 func copyEventstore(ctx context.Context, config *Migration) {
-	sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
+	sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeQuery)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 
-	destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
+	destClient, err := db.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
 	logging.OnError(err).Fatal("unable to connect to destination database")
 	defer destClient.Close()
 
-	copyEvents(ctx, sourceClient, destClient)
+	copyEvents(ctx, sourceClient, destClient, config.EventBulkSize)
 	copyUniqueConstraints(ctx, sourceClient, destClient)
 }
 
-func positionQuery(db *database.DB) string {
+func positionQuery(db *db.DB) string {
 	switch db.Type() {
 	case "postgres":
 		return "SELECT EXTRACT(EPOCH FROM clock_timestamp())"
@@ -66,10 +68,9 @@ func positionQuery(db *database.DB) string {
 	}
 }
 
-func copyEvents(ctx context.Context, source, dest *database.DB) {
+func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	start := time.Now()
 	reader, writer := io.Pipe()
-	errs := make(chan error, 1)
 
 	migrationID, err := id.SonyFlakeGenerator().Next()
 	logging.OnError(err).Fatal("unable to generate migration id")
@@ -80,10 +81,7 @@ func copyEvents(ctx context.Context, source, dest *database.DB) {
 	destConn, err := dest.Conn(ctx)
 	logging.OnError(err).Fatal("unable to acquire dest connection")
 
-	es := eventstore.NewEventstore(&eventstore.Config{
-		Pusher:  es_v3.NewEventstore(source),
-		Querier: es_old.NewCRDB(source),
-	})
+	es := eventstore.NewEventstoreFromOne(postgres.New(source))
 
 	previousMigration, err := queryLastSuccessfulMigration(ctx, es, dest.DatabaseName())
 	logging.OnError(err).Fatal("unable to query latest successful migration")
@@ -91,54 +89,98 @@ func copyEvents(ctx context.Context, source, dest *database.DB) {
 	maxPosition, err := writeMigrationStart(ctx, es, migrationID, dest.DatabaseName())
 	logging.OnError(err).Fatal("unable to write migration started event")
 
-	// get position
-	pos := make(chan float64)
+	logging.WithFields("from", previousMigration.Position.Position, "to", maxPosition).Info("start event migration")
 
-	logging.WithFields("from", previousMigration.position, "to", maxPosition).Info("start event migration")
+	nextPos := make(chan bool, 1)
+	pos := make(chan float64, 1)
+	errs := make(chan error, 3)
 
 	go func() {
-		position := strconv.FormatFloat(<-pos, 'E', -1, 64)
 		err := sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
-			// TODO: sql injection
-			_, err := conn.PgConn().CopyTo(ctx, writer, "COPY (SELECT instance_id, aggregate_type, aggregate_id, event_type, sequence, revision, created_at,  regexp_replace(payload::TEXT, '\\\\u0000', '', 'g')::JSON payload, creator, owner, (SELECT "+position+"::DECIMAL) AS position, row_number() OVER (PARTITION BY instance_id ORDER BY position, in_tx_order) AS in_tx_order FROM eventstore.events2 "+instanceClause()+" AND position <= (SELECT "+strconv.FormatFloat(maxPosition, 'E', -1, 64)+"::DECIMAL) AND position > (SELECT "+strconv.FormatFloat(previousMigration.position, 'E', -1, 64)+"::DECIMAL) ORDER BY instance_id, position, in_tx_order) TO STDOUT")
-			writer.Close()
-			return err
+			nextPos <- true
+			var i uint32
+			for position := range pos {
+				var stmt database.Statement
+				stmt.WriteString("COPY (SELECT instance_id, aggregate_type, aggregate_id, event_type, sequence, revision, created_at, regexp_replace(payload::TEXT, '\\\\u0000', '', 'g')::JSON payload, creator, owner, ")
+				stmt.WriteArg(position)
+				stmt.WriteString(" position, row_number() OVER (PARTITION BY instance_id ORDER BY position, in_tx_order) AS in_tx_order FROM eventstore.events2 ")
+				stmt.WriteString(instanceClause())
+				stmt.WriteString(" AND ")
+				database.NewNumberAtMost(maxPosition).Write(&stmt, "position")
+				stmt.WriteString(" AND ")
+				database.NewNumberGreater(previousMigration.Position.Position).Write(&stmt, "position")
+				stmt.WriteString(" ORDER BY instance_id, position, in_tx_order")
+				stmt.WriteString(" LIMIT ")
+				stmt.WriteArg(bulkSize)
+				stmt.WriteString(" OFFSET ")
+				stmt.WriteArg(bulkSize * i)
+				stmt.WriteString(") TO STDOUT")
+
+				// Copy does not allow args so we use we replace the args in the statement
+				tag, err := conn.PgConn().CopyTo(ctx, writer, stmt.Debug())
+				if err != nil {
+					return zerrors.ThrowUnknownf(err, "MIGRA-KTuSq", "unable to copy events from source during iteration %d", i)
+				}
+				if tag.RowsAffected() < int64(bulkSize) {
+					return nil
+				}
+
+				nextPos <- true
+				i++
+			}
+			return nil
 		})
+		writer.Close()
+		// reader.Close()
+		close(nextPos)
 		errs <- err
 	}()
 
+	// generate next position for
+	go func() {
+		defer close(pos)
+		for range nextPos {
+			var position float64
+			err := dest.QueryRowContext(
+				ctx,
+				func(row *sql.Row) error {
+					return row.Scan(&position)
+				},
+				positionQuery(dest),
+			)
+			if err != nil {
+				errs <- zerrors.ThrowUnknown(err, "MIGRA-kMyPH", "unable to query next position")
+				return
+			}
+			pos <- position
+		}
+	}()
+
 	var eventCount int64
-	err = destConn.Raw(func(driverConn interface{}) error {
+	errs <- destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
-		tx, err := conn.Begin(ctx)
-		if err != nil {
-			return err
-		}
-		row := tx.QueryRow(ctx, positionQuery(dest))
-		var position float64
-		if err := row.Scan(&position); err != nil {
-			return err
-		}
-		_ = tx.Commit(ctx)
-		pos <- position
 
 		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.events2 FROM STDIN")
 		eventCount = tag.RowsAffected()
+		if err != nil {
+			return zerrors.ThrowUnknown(err, "MIGRA-DTHi7", "unable to copy events into destination")
+		}
 
-		return err
+		return nil
 	})
 
-	writeCopyEventsDone(ctx, es, dest.DatabaseName(), migrationID, <-errs, err)
+	close(errs)
+	writeCopyEventsDone(ctx, es, migrationID, errs)
 
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events migrated")
 }
 
-func decryptEventPayload(ctx context.Context, source *database.DB, maxPosition float64) {
-	err := createDecryptedEventsTable(ctx, source)
-	logging.OnError(err).Fatal("unable to create decrypted events table in source")
+// func decryptEventPayload(ctx context.Context, source *database.DB, maxPosition float64) {
+// 	err := createDecryptedEventsTable(ctx, source)
+// 	logging.OnError(err).Fatal("unable to create decrypted events table in source")
 
-}
+// }
 
 /*
 idpintent.saml.succeeded: {assertion}
@@ -191,32 +233,30 @@ key_pair.certificate.added: {certificate}
 //go:embed sql/decrypted_payload_table.sql
 var decryptedPayloadTable string
 
-func createDecryptedEventsTable(ctx context.Context, db *database.DB) error {
-	_, err := db.ExecContext(ctx, decryptedPayloadTable)
-	return err
-}
+// func createDecryptedEventsTable(ctx context.Context, db *database.DB) error {
+// 	_, err := db.ExecContext(ctx, decryptedPayloadTable)
+// 	return err
+// }
 
-func writeCopyEventsDone(ctx context.Context, es *eventstore.Eventstore, destName string, id string, sourceErr, destErr error) {
-	logging.OnError(destErr).Error("unable to copy events to destination")
-	logging.OnError(sourceErr).Fatal("unable to copy events from source")
+func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id string, errs <-chan error) {
+	joinedErrs := make([]error, 0, len(errs))
+	for err := range errs {
+		joinedErrs = append(joinedErrs, err)
+	}
+	err := errors.Join(joinedErrs...)
 
-	if destErr != nil {
-		err := writeMigrationDone(ctx, es, id, destErr, destName)
+	if err != nil {
+		logging.WithError(err).Error("unable to mirror events")
+		err := writeMigrationFailed(ctx, es, id, err)
 		logging.OnError(err).Fatal("unable to write failed event")
 		return
 	}
 
-	if sourceErr != nil {
-		err := writeMigrationDone(ctx, es, id, sourceErr, destName)
-		logging.OnError(err).Fatal("unable to write failed event")
-		return
-	}
-
-	err := writeMigrationDone(ctx, es, id, nil, destName)
+	err = writeMigrationSucceeded(ctx, es, id)
 	logging.OnError(err).Fatal("unable to write failed event")
 }
 
-func copyUniqueConstraints(ctx context.Context, source, dest *database.DB) {
+func copyUniqueConstraints(ctx context.Context, source, dest *db.DB) {
 	start := time.Now()
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
@@ -227,8 +267,12 @@ func copyUniqueConstraints(ctx context.Context, source, dest *database.DB) {
 	go func() {
 		err := sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
-			// TODO: sql injection
-			_, err := conn.PgConn().CopyTo(ctx, writer, "COPY (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints "+instanceClause()+") TO stdout")
+			var stmt database.Statement
+			stmt.WriteString("COPY (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints ")
+			stmt.WriteString(instanceClause())
+			stmt.WriteString(") TO stdout")
+
+			_, err := conn.PgConn().CopyTo(ctx, writer, stmt.String())
 			writer.Close()
 			return err
 		})
@@ -243,7 +287,11 @@ func copyUniqueConstraints(ctx context.Context, source, dest *database.DB) {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
 		if shouldReplace {
-			_, err := conn.Exec(ctx, "DELETE FROM eventstore.unique_constraints "+instanceClause())
+			var stmt database.Statement
+			stmt.WriteString("DELETE FROM eventstore.unique_constraints ")
+			stmt.WriteString(instanceClause())
+
+			_, err := conn.Exec(ctx, stmt.String())
 			if err != nil {
 				return err
 			}

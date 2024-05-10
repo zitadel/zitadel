@@ -22,6 +22,8 @@ type Migration struct {
 	Source      database.Config
 	Destination database.Config
 
+	EventBulkSize uint32
+
 	Log     *logging.Config
 	Machine *id.Config
 }

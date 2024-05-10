@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/zitadel/logging"
 
@@ -61,7 +62,7 @@ func (s *Storage) Push(ctx context.Context, intent *eventstore.PushIntent) (err 
 
 // setAppName for the the current transaction
 func setAppName(ctx context.Context, tx *sql.Tx, name string) error {
-	_, err := tx.ExecContext(ctx, "SET LOCAL application_name TO $1", name)
+	_, err := tx.ExecContext(ctx, fmt.Sprintf("SET LOCAL application_name TO '%s'", name))
 	if err != nil {
 		logging.WithFields("name", name).WithError(err).Debug("setting app name failed")
 		return zerrors.ThrowInternal(err, "POSTG-G3OmZ", "Errors.Internal")

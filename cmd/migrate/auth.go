@@ -18,10 +18,10 @@ import (
 func authCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "auth",
-		Short: "migrates the auth requests table from one database to another",
-		Long: `migrates the auth requests table from one database to another
+		Short: "mirrors the auth requests table from one database to another",
+		Long: `mirrors the auth requests table from one database to another
 ZITADEL needs to be initialized
-Migrations only copies auth requests`,
+Only auth requests are mirrored`,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := mustNewMigrationConfig(viper.GetViper())
 			copyAuth(cmd.Context(), config)
@@ -69,7 +69,7 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 	logging.OnError(err).Fatal("unable to acquire connection")
 	defer destConn.Close()
 
-	var eventCount int64
+	var affected int64
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
@@ -81,11 +81,11 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 		}
 
 		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY auth.auth_requests FROM STDIN")
-		eventCount = tag.RowsAffected()
+		affected = tag.RowsAffected()
 
 		return err
 	})
 	logging.OnError(err).Fatal("unable to copy auth requests to destination")
 	logging.OnError(<-errs).Fatal("unable to copy auth requests from source")
-	logging.WithFields("took", time.Since(start), "count", eventCount).Info("auth requests migrated")
+	logging.WithFields("took", time.Since(start), "count", affected).Info("auth requests migrated")
 }

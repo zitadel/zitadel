@@ -18,10 +18,10 @@ import (
 func systemCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "system",
-		Short: "migrates the system tables of ZITADEL from one database to another",
-		Long: `migrates the system tables of ZITADEL from one database to another
+		Short: "mirrors the system tables of ZITADEL from one database to another",
+		Long: `mirrors the system tables of ZITADEL from one database to another
 ZITADEL needs to be initialized
-Migrations only copies keys and assets`,
+Only keys and assets are mirrored`,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := mustNewMigrationConfig(viper.GetViper())
 			copySystem(cmd.Context(), config)
@@ -81,7 +81,7 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 			}
 		}
 
-		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY system.assets FROM stdin")
+		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY system.assets (instance_id, asset_type, resource_owner, name, content_type, data, updated_at) FROM stdin")
 		eventCount = tag.RowsAffected()
 
 		return err
