@@ -416,7 +416,7 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 	for i := 0; ; i++ {
 		additionalIteration, err := h.processEvents(ctx, config)
 		h.log().OnError(err).Info("process events failed")
-		h.log().WithField("iteration", i).Debug("trigger iteration")
+		h.log().WithField("iteration", i).WithField("instance", authz.GetInstance(ctx).InstanceID()).Debug("trigger iteration")
 		if !additionalIteration || err != nil {
 			return call.ResetTimestamp(ctx), err
 		}
@@ -521,7 +521,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		return additionalIteration, err
 	}
 
-	lastProcessedIndex, err := h.executeStatements(ctx, tx, currentState, statements)
+	lastProcessedIndex, err := h.executeStatements(ctx, tx, statements)
 	h.log().OnError(err).WithField("lastProcessedIndex", lastProcessedIndex).Debug("execution of statements failed")
 	if lastProcessedIndex < 0 {
 		return false, err
@@ -593,7 +593,7 @@ func skipPreviouslyReduced(statements []*Statement, currentState *state) int {
 	return -1
 }
 
-func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentState *state, statements []*Statement) (lastProcessedIndex int, err error) {
+func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, statements []*Statement) (lastProcessedIndex int, err error) {
 	lastProcessedIndex = -1
 
 	for i, statement := range statements {
@@ -601,7 +601,7 @@ func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentStat
 		case <-ctx.Done():
 			break
 		default:
-			err := h.executeStatement(ctx, tx, currentState, statement)
+			err := h.executeStatement(ctx, tx, statement)
 			if err != nil {
 				return lastProcessedIndex, err
 			}
@@ -611,24 +611,23 @@ func (h *Handler) executeStatements(ctx context.Context, tx *sql.Tx, currentStat
 	return lastProcessedIndex, nil
 }
 
-func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, currentState *state, statement *Statement) (err error) {
+func (h *Handler) executeStatement(ctx context.Context, tx *sql.Tx, statement *Statement) (err error) {
 	if statement.Execute == nil {
 		return nil
 	}
 
-	_, err = tx.Exec("SAVEPOINT exec")
+	_, err = tx.ExecContext(ctx, "SAVEPOINT exec")
 	if err != nil {
 		h.log().WithError(err).Debug("create savepoint failed")
 		return err
 	}
 	var shouldContinue bool
 	defer func() {
-		_, errSave := tx.Exec("RELEASE SAVEPOINT exec")
+		_, errSave := tx.ExecContext(ctx, "RELEASE SAVEPOINT exec")
 		if err == nil {
 			err = errSave
 		}
 	}()
-
 	if err = statement.Execute(tx, h.projection.Name()); err != nil {
 		h.log().WithError(err).Error("statement execution failed")
 
