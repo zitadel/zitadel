@@ -614,6 +614,7 @@ EventTypes:
         failed: Initialization check failed
     token:
       added: Access Token created
+      v2.added: Access Token created
       removed: Access Token removed
     impersonated: User impersonated
     username:
