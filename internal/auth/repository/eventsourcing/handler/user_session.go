@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/user/model"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -204,28 +204,42 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		user.HumanPasswordlessTokenCheckSucceededType,
 		user.HumanPasswordlessTokenCheckFailedType,
 		user.HumanSignedOutType:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			var session *view_model.UserSessionView
-			eventData, err := view_model.UserSessionFromEvent(event)
-			if err != nil {
-				return err
-			}
-			session, err = u.view.UserSessionByIDs(eventData.UserAgentID, event.Aggregate().ID, event.Aggregate().InstanceID)
-			if err != nil {
-				if !zerrors.IsNotFound(err) {
-					return err
-				}
-				session = &view_model.UserSessionView{
-					CreationDate:  event.CreatedAt(),
-					ResourceOwner: event.Aggregate().ResourceOwner,
-					UserAgentID:   eventData.UserAgentID,
-					UserID:        event.Aggregate().ID,
-					State:         int32(domain.UserSessionStateActive),
-					InstanceID:    event.Aggregate().InstanceID,
-				}
-			}
-			return u.updateSession(session, event)
-		}), nil
+
+		eventData, err := view_model.UserSessionFromEvent(event)
+		if err != nil {
+			return nil, err
+		}
+		session := &view_model.UserSessionView{
+			UserAgentID: eventData.UserAgentID,
+			UserID:      event.Aggregate().ID,
+			InstanceID:  event.Aggregate().InstanceID,
+		}
+		session.CreationDate.Set(event.CreatedAt())
+		session.ResourceOwner.Set(event.Aggregate().ResourceOwner)
+		session.State.Set(int32(domain.UserSessionStateActive))
+
+		ensureExists := handler.AddEnsureExistsStatement(
+			session.PKColumns(),
+			append(session.PKColumns(), session.Changes()...),
+		)
+
+		if err := session.AppendEvent(event); err != nil {
+			return nil, err
+		}
+
+		changes := session.Changes()
+		if len(changes) == 0 {
+			return handler.NewNoOpStatement(event), nil
+		}
+
+		return handler.NewMultiStatement(
+			event,
+			ensureExists,
+			handler.AddUpdateStatement(
+				changes,
+				session.PKConditions(),
+			),
+		), nil
 	case user.UserLockedType,
 		user.UserDeactivatedType:
 		return handler.NewUpdateStatement(event,
@@ -323,44 +337,68 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			},
 		), nil
 	case user.UserRemovedType:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return u.view.DeleteUserSessions(event.Aggregate().ID, event.Aggregate().InstanceID)
-		}), nil
+		return handler.NewDeleteStatement(
+			event, []handler.Condition{
+				handler.NewCond(
+					view_model.UserSessionSearchKey(model.UserSessionSearchKeyInstanceID).ToColumnName(),
+					event.Aggregate().InstanceID,
+				),
+				handler.NewCond(
+					view_model.UserSessionSearchKey(model.UserSessionSearchKeyUserID).ToColumnName(),
+					event.Aggregate().ID,
+				),
+			},
+		), nil
 	case user.HumanRegisteredType:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			eventData, err := view_model.UserSessionFromEvent(event)
-			if err != nil {
-				return err
-			}
-			session := &view_model.UserSessionView{
-				CreationDate:         event.CreatedAt(),
-				ResourceOwner:        event.Aggregate().ResourceOwner,
-				UserAgentID:          eventData.UserAgentID,
-				UserID:               event.Aggregate().ID,
-				State:                int32(domain.UserSessionStateActive),
-				InstanceID:           event.Aggregate().InstanceID,
-				PasswordVerification: event.CreatedAt(),
-			}
-			return u.updateSession(session, event)
-		}), nil
-	case instance.InstanceRemovedEventType:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return u.view.DeleteInstanceUserSessions(event.Aggregate().InstanceID)
-		}), nil
-	case org.OrgRemovedEventType:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return u.view.DeleteOrgUserSessions(event)
-		}), nil
-	default:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return nil
-		}), nil
-	}
-}
+		eventData, err := view_model.UserSessionFromEvent(event)
+		if err != nil {
+			return nil, err
+		}
+		session := &view_model.UserSessionView{
+			UserAgentID: eventData.UserAgentID,
+			UserID:      event.Aggregate().ID,
+			InstanceID:  event.Aggregate().InstanceID,
+		}
+		session.CreationDate.Set(event.CreatedAt())
+		session.ResourceOwner.Set(event.Aggregate().ResourceOwner)
+		session.State.Set(int32(domain.UserSessionStateActive))
+		session.PasswordVerification.Set(event.CreatedAt())
+		if err := session.AppendEvent(event); err != nil {
+			return nil, err
+		}
 
-func (u *UserSession) updateSession(session *view_model.UserSessionView, event eventstore.Event) error {
-	if err := session.AppendEvent(event); err != nil {
-		return err
+		changes := session.Changes()
+		if len(changes) == 0 {
+			return handler.NewNoOpStatement(event), nil
+		}
+		return handler.NewUpsertStatement(
+			event,
+			session.PKColumns(),
+			changes,
+		), nil
+	case instance.InstanceRemovedEventType:
+		return handler.NewDeleteStatement(
+			event, []handler.Condition{
+				handler.NewCond(
+					view_model.UserSessionSearchKey(model.UserSessionSearchKeyInstanceID).ToColumnName(),
+					event.Aggregate().InstanceID,
+				),
+			},
+		), nil
+	case org.OrgRemovedEventType:
+		return handler.NewDeleteStatement(
+			event, []handler.Condition{
+				handler.NewCond(
+					view_model.UserSessionSearchKey(model.UserSessionSearchKeyInstanceID).ToColumnName(),
+					event.Aggregate().InstanceID,
+				),
+				handler.NewCond(
+					view_model.UserSessionSearchKey(model.UserSessionSearchKeyResourceOwner).ToColumnName(),
+					event.Aggregate().ResourceOwner,
+				),
+			},
+		), nil
+	default:
+		return handler.NewNoOpStatement(event), nil
 	}
-	return u.view.PutUserSession(session)
 }

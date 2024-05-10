@@ -5,12 +5,8 @@ import (
 	_ "embed"
 	"errors"
 
-	"github.com/jinzhu/gorm"
-
 	"github.com/zitadel/zitadel/internal/database"
-	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -44,35 +40,6 @@ func UserSessionsByAgentID(db *database.DB, agentID, instanceID string) (userSes
 		instanceID,
 	)
 	return userSessions, err
-}
-
-func PutUserSession(db *gorm.DB, table string, session *model.UserSessionView) error {
-	save := repository.PrepareSave(table)
-	return save(db, session)
-}
-
-func DeleteUserSessions(db *gorm.DB, table, userID, instanceID string) error {
-	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), Value: userID},
-		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID), Value: instanceID},
-	)
-	return delete(db)
-}
-
-func DeleteInstanceUserSessions(db *gorm.DB, table, instanceID string) error {
-	delete := repository.PrepareDeleteByKey(table,
-		model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID),
-		instanceID,
-	)
-	return delete(db)
-}
-
-func DeleteOrgUserSessions(db *gorm.DB, table, instanceID, orgID string) error {
-	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyResourceOwner), Value: orgID},
-		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID), Value: instanceID},
-	)
-	return delete(db)
 }
 
 func scanUserSession(row *sql.Row) (*model.UserSessionView, error) {

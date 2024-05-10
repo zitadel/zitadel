@@ -11,12 +11,12 @@ type View struct {
 }
 
 func StartView(sqlClient *database.DB) (*View, error) {
-	gorm, err := gorm.Open("postgres", sqlClient.DB)
+	db, err := gorm.Open("postgres", sqlClient.DB)
 	if err != nil {
 		return nil, err
 	}
 	return &View{
-		Db: gorm,
+		Db: db,
 	}, nil
 }
 
