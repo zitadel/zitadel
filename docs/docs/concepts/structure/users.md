@@ -57,12 +57,14 @@ You can use the same email address for different user accounts.
 
 Consider this general recommendation as a starting point:
 
-- Create one organization ("default organization") for your own team
+- Create one organization ("default organization") for your own company
 - Configure projects and applications in the default organization
-- Structure users in the smallest unit of self-managed groups ("teams", "user pools")
+- Structure users in organizations based on common domains that are self-managed (eg, company)
 - Grant your projects to the organizations, allow Managers to give granted roles to their users
 
-You might want to adjust this general setup based on your [scenario](/guides/solution-scenarios/introduction).
+You might want to adjust this general setup based on your [scenario](/guides/solution-scenarios/introduction). 
+
+One important consideration in the setup is that you can only have a domain once for an organization. If you have multiple teams working with the same email address, you might need to add them to one single organization that has the domain verified for the teams' domain.
 
 For a CIAM / B2C setup, you might want to store all users in one organization and allow that organization to use a specific set of social logins.
 In a multitenancy / B2B scenario, you might have thousands of smaller teams.
