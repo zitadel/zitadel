@@ -22,7 +22,7 @@ ZITADEL gives you great flexibility to configure account linking for an organiza
 When using external identity providers (ie. social login, enterprise SSO), a user account will be created in ZITADEL.
 The [external identity](../structure/users#federated-users) will be linked to the ZITADEL account.
 
-If login with "Username / Password" (ie. local account) is enabled and you have configured external IDPs, the user can decide if she wants to login with an external IDP or the local account.
+If login with "Username / Password" (ie. local account) is enabled and you have configured external IDPs, the user can decide if they want to login with an external IDP or the local account.
 
 When only one external identity provider is configured and login with "Username / Password" is disabled, then the user is immediately redirected to the external identity provider.
 
