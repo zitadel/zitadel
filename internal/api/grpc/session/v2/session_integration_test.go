@@ -29,7 +29,6 @@ var (
 	Tester          *integration.Tester
 	Client          session.SessionServiceClient
 	User            *user.AddHumanUserResponse
-	UserTOTP        *user.AddHumanUserResponse
 	DeactivatedUser *user.AddHumanUserResponse
 	LockedUser      *user.AddHumanUserResponse
 )
@@ -114,7 +113,7 @@ func verifyFactors(t testing.TB, factors *session.Factors, window time.Duration,
 			uf := factors.GetUser()
 			assert.NotNil(t, uf)
 			assert.WithinRange(t, uf.GetVerifiedAt().AsTime(), time.Now().Add(-window), time.Now().Add(window))
-			//assert.Equal(t, User.GetUserId(), uf.GetId())
+			assert.NotEmpty(t, uf.GetId())
 		case wantPasswordFactor:
 			pf := factors.GetPassword()
 			assert.NotNil(t, pf)
@@ -516,7 +515,6 @@ func registerOTPEmail(ctx context.Context, t *testing.T, userID string) {
 }
 
 func TestServer_SetSession_flow_totp(t *testing.T) {
-	userTOTP := Tester.CreateHumanUser(CTX)
 	// create new, empty session
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
@@ -530,7 +528,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 			Checks: &session.Checks{
 				User: &session.CheckUser{
 					Search: &session.CheckUser_UserId{
-						UserId: userTOTP.GetUserId(),
+						UserId: User.GetUserId(),
 					},
 				},
 			},
@@ -540,9 +538,43 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor)
 	})
 
+	t.Run("check webauthn, user verified (passkey)", func(t *testing.T) {
+		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
+			SessionId:    createResp.GetSessionId(),
+			SessionToken: sessionToken,
+			Challenges: &session.RequestChallenges{
+				WebAuthN: &session.RequestChallenges_WebAuthN{
+					Domain:                      Tester.Config.ExternalDomain,
+					UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
+				},
+			},
+		})
+		require.NoError(t, err)
+		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0)
+		sessionToken = resp.GetSessionToken()
+
+		assertionData, err := Tester.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
+		require.NoError(t, err)
+
+		resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
+			SessionId:    createResp.GetSessionId(),
+			SessionToken: sessionToken,
+			Checks: &session.Checks{
+				WebAuthN: &session.CheckWebAuthN{
+					CredentialAssertionData: assertionData,
+				},
+			},
+		})
+		require.NoError(t, err)
+		sessionToken = resp.GetSessionToken()
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantWebAuthNFactorUserVerified)
+	})
+
 	userAuthCtx := Tester.WithAuthorizationToken(CTX, sessionToken)
-	Tester.RegisterUserU2F(userAuthCtx, userTOTP.GetUserId())
-	totpSecret := registerTOTP(userAuthCtx, t, userTOTP.GetUserId())
+	Tester.RegisterUserU2F(userAuthCtx, User.GetUserId())
+	totpSecret := registerTOTP(userAuthCtx, t, User.GetUserId())
+	registerOTPSMS(userAuthCtx, t, User.GetUserId())
+	registerOTPEmail(userAuthCtx, t, User.GetUserId())
 
 	t.Run("check TOTP", func(t *testing.T) {
 		code, err := totp.GenerateCode(totpSecret, time.Now())
@@ -558,7 +590,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionToken = resp.GetSessionToken()
-		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantWebAuthNFactor, wantTOTPFactor)
+		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantTOTPFactor)
 	})
 
 	userImport := Tester.CreateHumanUserWithTOTP(CTX, totpSecret)
@@ -597,7 +629,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		})
 		require.NoError(t, err)
 		sessionTokenImport = resp.GetSessionToken()
-		verifyCurrentSession(t, createRespImport.GetSessionId(), sessionTokenImport, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantWebAuthNFactor, wantTOTPFactor)
+		verifyCurrentSession(t, createRespImport.GetSessionId(), sessionTokenImport, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantTOTPFactor)
 	})
 }
 
