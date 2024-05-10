@@ -169,7 +169,6 @@ func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string,
 		if user.Human != nil {
 			*preferredLanguage = user.Human.PreferredLanguage
 		}
-		user.Human.PreferredLanguage.MarshalText()
 		return nil
 	})
 }

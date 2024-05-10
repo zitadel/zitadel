@@ -83,13 +83,17 @@ func userTypeToPb(userQ *query.User, assetPrefix string) user.UserType {
 }
 
 func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
+	var preferredLanguage *string
+	if userQ.PreferredLanguage != nil {
+		preferredLanguage = gu.Ptr(userQ.PreferredLanguage.String())
+	}
 	return &user.HumanUser{
 		Profile: &user.HumanProfile{
 			GivenName:         userQ.FirstName,
 			FamilyName:        userQ.LastName,
 			NickName:          gu.Ptr(userQ.NickName),
 			DisplayName:       gu.Ptr(userQ.DisplayName),
-			PreferredLanguage: gu.Ptr(userQ.PreferredLanguage.String()),
+			PreferredLanguage: preferredLanguage,
 			Gender:            gu.Ptr(genderToPb(userQ.Gender)),
 			AvatarUrl:         domain.AvatarURL(assetPrefix, owner, userQ.AvatarKey),
 		},
