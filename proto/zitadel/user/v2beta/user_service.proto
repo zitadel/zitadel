@@ -936,6 +936,7 @@ message AddHumanUserRequest{
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1;
       max_length: 200;
+      example: "\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
     }
   ];
 }
