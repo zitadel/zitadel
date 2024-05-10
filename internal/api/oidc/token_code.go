@@ -42,7 +42,7 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 			codeExchangeComplianceChecker(client, r.Data),
 		)
 	} else {
-		session, state, err = s.codeExchangeV1(ctx, client, r.Data, plainCode)
+		session, state, err = s.codeExchangeV1(ctx, client, r.Data, r.Data.Code)
 	}
 	if err != nil {
 		return nil, err
@@ -51,11 +51,11 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 }
 
 // codeExchangeV1 creates a v2 token from a v1 auth request.
-func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.AccessTokenRequest, plainCode string) (session *command.OIDCSession, state string, err error) {
+func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.AccessTokenRequest, code string) (session *command.OIDCSession, state string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	authReq, err := s.getAuthRequestV1ByCode(ctx, plainCode)
+	authReq, err := s.getAuthRequestV1ByCode(ctx, code)
 	if err != nil {
 		return nil, "", err
 	}
@@ -94,8 +94,11 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 	return session, authReq.GetState(), s.repo.DeleteAuthRequest(ctx, authReq.GetID())
 }
 
-func (s *Server) getAuthRequestV1ByCode(ctx context.Context, plainCode string) (op.AuthRequest, error) {
-	authReq, err := s.repo.AuthRequestByCode(ctx, plainCode)
+// getAuthRequestV1ByCode finds the v1 auth request by code.
+// code needs to be the encrypted version of the ID,
+// this is required by the underlying repo.
+func (s *Server) getAuthRequestV1ByCode(ctx context.Context, code string) (op.AuthRequest, error) {
+	authReq, err := s.repo.AuthRequestByCode(ctx, code)
 	if err != nil {
 		return nil, err
 	}
