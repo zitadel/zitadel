@@ -1265,6 +1265,7 @@ func Test_push(t *testing.T) {
 			},
 		},
 	}
+	initPushStmt("postgres")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbMock := mock.NewSQLMock(t, append([]mock.Expectation{mock.ExpectBegin(nil)}, tt.args.expectations...)...)

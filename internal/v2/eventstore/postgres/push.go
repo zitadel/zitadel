@@ -155,7 +155,8 @@ func push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands 
 			cmd.Sequence,
 			i,
 		)
-		stmt.WriteString(", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())")
+
+		stmt.WriteString(pushPositionStmt)
 		stmt.WriteString(`)`)
 	}
 	stmt.WriteString(` RETURNING created_at, "position"`)
