@@ -538,7 +538,7 @@ func (s *Server) authResponse(authReq op.AuthRequest, authorizer op.Authorizer, 
 	r = r.WithContext(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	client, err := authorizer.Storage().GetClientByClientID(r.Context(), authReq.GetClientID())
+	client, err := authorizer.Storage().GetClientByClientID(ctx, authReq.GetClientID())
 	if err != nil {
 		op.AuthRequestError(w, r, authReq, err, authorizer)
 		return err

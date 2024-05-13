@@ -159,6 +159,8 @@ func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token 
 	}
 }
 
+// jwtProfileUserCheck finds the user by subject (user ID) and sets the resourceOwner through the pointer.
+// preferred Language is set only if it was defined for a Human user, else the pointed pointer remains nil.
 func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string, preferredLanguage **language.Tag) op.JWTProfileVerifierOption {
 	return op.SubjectCheck(func(request *oidc.JWTTokenRequest) error {
 		user, err := s.query.GetUserByID(ctx, false, request.Subject)
@@ -166,8 +168,8 @@ func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string,
 			return zerrors.ThrowPermissionDenied(err, "OIDC-Nee6r", "Errors.TokenExchange.Token.Invalid")
 		}
 		*resourceOwner = user.ResourceOwner
-		if user.Human != nil {
-			*preferredLanguage = user.Human.PreferredLanguage
+		if user.Human != nil && !user.Human.PreferredLanguage.IsRoot() {
+			*preferredLanguage = &user.Human.PreferredLanguage
 		}
 		return nil
 	})

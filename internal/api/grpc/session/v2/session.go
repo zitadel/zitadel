@@ -355,8 +355,8 @@ func (s *Server) checksToCommand(ctx context.Context, checks *session.Checks) ([
 		}
 
 		var preferredLanguage *language.Tag
-		if user.Human != nil {
-			preferredLanguage = user.Human.PreferredLanguage
+		if user.Human != nil && !user.Human.PreferredLanguage.IsRoot() {
+			preferredLanguage = &user.Human.PreferredLanguage
 		}
 		sessionChecks = append(sessionChecks, command.CheckUser(user.ID, user.ResourceOwner, preferredLanguage))
 	}

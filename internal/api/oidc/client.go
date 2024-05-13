@@ -399,9 +399,7 @@ func (o *OPStorage) setUserInfoProfile(ctx context.Context, userInfo *oidc.UserI
 	userInfo.GivenName = user.Human.FirstName
 	userInfo.Nickname = user.Human.NickName
 	userInfo.Gender = getGender(user.Human.Gender)
-	if user.Human.PreferredLanguage != nil {
-		userInfo.Locale = oidc.NewLocale(*user.Human.PreferredLanguage)
-	}
+	userInfo.Locale = oidc.NewLocale(user.Human.PreferredLanguage)
 	userInfo.Picture = domain.AvatarURL(o.assetAPIPrefix(ctx), user.ResourceOwner, user.Human.AvatarKey)
 }
 

@@ -198,7 +198,7 @@ func Test_userInfoToOIDC(t *testing.T) {
 				NickName:          "foobar",
 				DisplayName:       "xxx",
 				AvatarKey:         "picture.png",
-				PreferredLanguage: &language.Dutch,
+				PreferredLanguage: language.Dutch,
 				Gender:            domain.GenderDiverse,
 				Email:             "foo@bar.com",
 				IsEmailVerified:   true,
