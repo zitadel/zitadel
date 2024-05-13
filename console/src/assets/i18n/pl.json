@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Linki zewnętrzne",
-        "DESCRIPTION": "Przekieruj użytkowników do niestandardowych zasobów zewnętrznych pokazanych na stronie logowania. Użytkownicy muszą zaakceptować Warunki korzystania z usługi i Politykę prywatności, zanim będą mogli się zarejestrować."
+        "DESCRIPTION": "Poprowadź użytkowników do niestandardowych zasobów zewnętrznych wyświetlanych na stronie logowania. Użytkownicy muszą zaakceptować Warunki świadczenia usług i Politykę prywatności, zanim będą mogli się zarejestrować. Zmień łącze do dokumentacji lub ustaw pusty ciąg, aby ukryć przycisk dokumentacji w konsoli. Dodaj niestandardowy link zewnętrzny i niestandardowy tekst dla tego łącza w konsoli lub ustaw je puste, aby ukryć ten przycisk."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Ustawienia SMTP",
@@ -1570,6 +1570,9 @@
       "POLICYLINK": "Link do polityki prywatności",
       "HELPLINK": "Link do pomocy",
       "SUPPORTEMAIL": "E-mail wsparcia",
+      "DOCSLINK": "Link do Dokumentów (Console)",
+      "CUSTOMLINK": "Link niestandardowy (Console)",
+      "CUSTOMLINKTEXT": "Niestandardowy tekst łącza (Console)",
       "SAVED": "Pomyślnie zapisano!",
       "RESET_TITLE": "Przywróć wartości domyślne",
       "RESET_DESCRIPTION": "Masz zamiar przywrócić domyślne linki dla TOS i polityki prywatności. Czy na pewno chcesz kontynuować?"

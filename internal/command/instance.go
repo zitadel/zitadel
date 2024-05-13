@@ -81,10 +81,13 @@ type InstanceSetup struct {
 		PasswordChange bool
 	}
 	PrivacyPolicy struct {
-		TOSLink      string
-		PrivacyLink  string
-		HelpLink     string
-		SupportEmail domain.EmailAddress
+		TOSLink        string
+		PrivacyLink    string
+		HelpLink       string
+		SupportEmail   domain.EmailAddress
+		DocsLink       string
+		CustomLink     string
+		CustomLinkText string
 	}
 	LabelPolicy struct {
 		PrimaryColor        string
@@ -270,7 +273,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		*/
 		prepareAddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
-		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink, setup.PrivacyPolicy.SupportEmail),
+		prepareAddDefaultPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink, setup.PrivacyPolicy.SupportEmail, setup.PrivacyPolicy.DocsLink, setup.PrivacyPolicy.CustomLink, setup.PrivacyPolicy.CustomLinkText),
 		prepareAddDefaultNotificationPolicy(instanceAgg, setup.NotificationPolicy.PasswordChange),
 		prepareAddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxPasswordAttempts, setup.LockoutPolicy.MaxOTPAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
