@@ -269,9 +269,9 @@
             "TITLE": "Dozwolone logowanie zewnętrzne",
             "DESCRIPTION": "Pozwól swoim użytkownikom logować się za pomocą zewnętrznego dostawcy tożsamości zamiast używać użytkownika ZITADEL do logowania."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Dozwolone resetowanie hasła",
-            "DESCRIPTION": "Pozwól swoim użytkownikom na resetowanie ich hasła."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Ukryte resetowanie hasła",
+            "DESCRIPTION": "Nie zezwalaj użytkownikom na resetowanie hasła."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Dozwolone odkrywanie domen",
