@@ -7,6 +7,7 @@ import ThemedImage from "@theme/ThemedImage";
 
 import AuthType from "../../integrate/application/_auth-type.mdx";
 import ReviewConfig from "../../integrate/application/_review-config.mdx";
+import AppType from "./_application-types.mdx";
 
 ## What is an application?
 
@@ -36,13 +37,9 @@ To add an application to your project, click on the add button and select your a
 
 ## Application Types
 
-At the moment ZITADEL offers four client types:
+At the moment ZITADEL offers five client types:
 
-- [**Web**](#web) (Server-side web applications such as java, .net, ...)
-- [**Native**](#native) (native, mobile or desktop applications)
-- [**User Agent**](#user-agent) (single page applications / SPA, generally JavaScript executed in the browser)
-- [**API**](#api) (OAuth Resource Server)
-- [**SAML**](#saml)
+<AppType />
 
 The first three options (Web, Native and User Agent) require user interaction, the fourth option (API) has no direct user-interaction.
 Depending on the app type, there are small differences in the possible settings.
