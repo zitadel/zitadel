@@ -316,17 +316,23 @@ func Test_domainSettingsToPb(t *testing.T) {
 
 func Test_legalSettingsToPb(t *testing.T) {
 	arg := &query.PrivacyPolicy{
-		TOSLink:      "http://example.com/tos",
-		PrivacyLink:  "http://example.com/pricacy",
-		HelpLink:     "http://example.com/help",
-		SupportEmail: "support@zitadel.com",
-		IsDefault:    true,
+		TOSLink:        "http://example.com/tos",
+		PrivacyLink:    "http://example.com/pricacy",
+		HelpLink:       "http://example.com/help",
+		SupportEmail:   "support@zitadel.com",
+		IsDefault:      true,
+		DocsLink:       "http://example.com/docs",
+		CustomLink:     "http://example.com/custom",
+		CustomLinkText: "Custom",
 	}
 	want := &settings.LegalAndSupportSettings{
 		TosLink:           "http://example.com/tos",
 		PrivacyPolicyLink: "http://example.com/pricacy",
 		HelpLink:          "http://example.com/help",
 		SupportEmail:      "support@zitadel.com",
+		DocsLink:          "http://example.com/docs",
+		CustomLink:        "http://example.com/custom",
+		CustomLinkText:    "Custom",
 		ResourceOwnerType: settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
 	}
 	got := legalAndSupportSettingsToPb(arg)
