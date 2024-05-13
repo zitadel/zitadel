@@ -1,11 +1,11 @@
 # ZITADEL Login UI
 
-This is going to be our next UI for the hosted login. It's based on Next.js 13 and its introduced `app/` directory.
+This is going to be our next UI for the hosted login. It's based on Next.js 13 and its introduced `app/` directory.
 
 The Login UI should provide the following functionality:
 
-- **Login API:** Uses the new ZITADEL Login API
-- **Server Components:** Making server-first components
+- **Login API:** Uses the new ZITADEL Login API
+- **Server Components:** Making server-first components
 
 ## Running Locally
 
