@@ -42,14 +42,14 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 
 		token = new(model.TokenView)
 		token.ID = tokenID
-		token.UserID = userID
+		token.UserID.Set(userID)
 		token.InstanceID = instanceID
 		if sequence != nil {
-			token.ChangeDate = sequence.EventCreatedAt
+			token.ChangeDate.Set(sequence.EventCreatedAt)
 		}
 	}
 
-	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.ChangeDate, token.GetRelevantEventTypes())
+	events, esErr := repo.getUserEvents(ctx, userID, token.InstanceID, token.ChangeDate.Value(), token.GetRelevantEventTypes())
 	if zerrors.IsNotFound(viewErr) && len(events) == 0 {
 		return nil, zerrors.ThrowNotFound(nil, "EVENT-4T90g", "Errors.Token.NotFound")
 	}
@@ -65,7 +65,7 @@ func (repo *TokenRepo) TokenByIDs(ctx context.Context, userID, tokenID string) (
 			return model.TokenViewToModel(&viewToken), nil
 		}
 	}
-	if !token.Expiration.After(time.Now().UTC()) || token.Deactivated {
+	if !token.Expiration.Value().After(time.Now().UTC()) || token.Deactivated {
 		return nil, zerrors.ThrowNotFound(nil, "EVENT-5Bm9s", "Errors.Token.NotFound")
 	}
 	return model.TokenViewToModel(token), nil

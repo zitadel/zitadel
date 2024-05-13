@@ -10,40 +10,108 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	TokenKeyTokenID        = "id"
-	TokenKeyUserID         = "user_id"
-	TokenKeyRefreshTokenID = "refresh_token_id"
-	TokenKeyApplicationID  = "application_id"
-	TokenKeyUserAgentID    = "user_agent_id"
-	TokenKeyExpiration     = "expiration"
-	TokenKeyResourceOwner  = "resource_owner"
-	TokenKeyInstanceID     = "instance_id"
+	TokenKeyTokenID           = "id"
+	TokenKeyUserID            = "user_id"
+	TokenKeyRefreshTokenID    = "refresh_token_id"
+	TokenKeyApplicationID     = "application_id"
+	TokenKeyUserAgentID       = "user_agent_id"
+	TokenKeyExpiration        = "expiration"
+	TokenKeyResourceOwner     = "resource_owner"
+	TokenKeyInstanceID        = "instance_id"
+	TokenKeyPreferredLanguage = "preferred_language"
 )
 
 type TokenView struct {
-	ID                string                     `json:"tokenId" gorm:"column:id;primary_key"`
-	CreationDate      time.Time                  `json:"-" gorm:"column:creation_date"`
-	ChangeDate        time.Time                  `json:"-" gorm:"column:change_date"`
-	ResourceOwner     string                     `json:"-" gorm:"column:resource_owner"`
-	UserID            string                     `json:"-" gorm:"column:user_id"`
-	ApplicationID     string                     `json:"applicationId" gorm:"column:application_id"`
-	UserAgentID       string                     `json:"userAgentId" gorm:"column:user_agent_id"`
-	Audience          database.TextArray[string] `json:"audience" gorm:"column:audience"`
-	Scopes            database.TextArray[string] `json:"scopes" gorm:"column:scopes"`
-	Expiration        time.Time                  `json:"expiration" gorm:"column:expiration"`
-	Sequence          uint64                     `json:"-" gorm:"column:sequence"`
-	PreferredLanguage string                     `json:"preferredLanguage" gorm:"column:preferred_language"`
-	RefreshTokenID    string                     `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
-	IsPAT             bool                       `json:"-" gorm:"is_pat"`
-	Deactivated       bool                       `json:"-" gorm:"-"`
-	InstanceID        string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
-	Actor             TokenActor                 `json:"actor" gorm:"column:actor"`
+	ID         string `json:"tokenId" gorm:"column:id;primary_key"`
+	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
+
+	Deactivated bool `json:"-" gorm:"-"`
+
+	CreationDate      repository.Field[time.Time]                  `json:"-" gorm:"column:creation_date"`
+	ChangeDate        repository.Field[time.Time]                  `json:"-" gorm:"column:change_date"`
+	ResourceOwner     repository.Field[string]                     `json:"-" gorm:"column:resource_owner"`
+	UserID            repository.Field[string]                     `json:"-" gorm:"column:user_id"`
+	ApplicationID     repository.Field[string]                     `json:"applicationId" gorm:"column:application_id"`
+	UserAgentID       repository.Field[string]                     `json:"userAgentId" gorm:"column:user_agent_id"`
+	Audience          repository.Field[database.TextArray[string]] `json:"audience" gorm:"column:audience"`
+	Scopes            repository.Field[database.TextArray[string]] `json:"scopes" gorm:"column:scopes"`
+	Expiration        repository.Field[time.Time]                  `json:"expiration" gorm:"column:expiration"`
+	Sequence          repository.Field[uint64]                     `json:"-" gorm:"column:sequence"`
+	PreferredLanguage repository.Field[string]                     `json:"preferredLanguage" gorm:"column:preferred_language"`
+	RefreshTokenID    repository.Field[string]                     `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
+	IsPAT             repository.Field[bool]                       `json:"-" gorm:"is_pat"`
+	Actor             repository.Field[TokenActor]                 `json:"actor" gorm:"column:actor"`
+}
+
+func (v *TokenView) PKColumns() []handler.Column {
+	return []handler.Column{
+		handler.NewCol("id", v.ID),
+		handler.NewCol("instance_id", v.InstanceID),
+	}
+}
+
+func (v *TokenView) PKConditions() []handler.Condition {
+	return []handler.Condition{
+		handler.NewCond("id", v.ID),
+		handler.NewCond("instance_id", v.InstanceID),
+	}
+}
+
+func (v *TokenView) Changes() []handler.Column {
+	changes := make([]handler.Column, 0, 12)
+
+	if v.CreationDate.DidChange() {
+		changes = append(changes, handler.NewCol("creation_date", v.CreationDate.Value()))
+	}
+	if v.ChangeDate.DidChange() {
+		changes = append(changes, handler.NewCol("change_date", v.ChangeDate.Value()))
+	}
+	if v.ResourceOwner.DidChange() {
+		changes = append(changes, handler.NewCol("resource_owner", v.ResourceOwner.Value()))
+	}
+	if v.UserID.DidChange() {
+		changes = append(changes, handler.NewCol("user_id", v.UserID.Value()))
+	}
+	if v.ApplicationID.DidChange() {
+		changes = append(changes, handler.NewCol("application_id", v.ApplicationID.Value()))
+	}
+	if v.UserAgentID.DidChange() {
+		changes = append(changes, handler.NewCol("user_agent_id", v.UserAgentID.Value()))
+	}
+	if v.Audience.DidChange() {
+		changes = append(changes, handler.NewCol("audience", v.Audience.Value()))
+	}
+	if v.Scopes.DidChange() {
+		changes = append(changes, handler.NewCol("scopes", v.Scopes.Value()))
+	}
+	if v.Expiration.DidChange() {
+		changes = append(changes, handler.NewCol("expiration", v.Expiration.Value()))
+	}
+	if v.Sequence.DidChange() {
+		changes = append(changes, handler.NewCol("sequence", v.Sequence.Value()))
+	}
+	if v.PreferredLanguage.DidChange() {
+		changes = append(changes, handler.NewCol("preferred_language", v.PreferredLanguage.Value()))
+	}
+	if v.RefreshTokenID.DidChange() {
+		changes = append(changes, handler.NewCol("refresh_token_id", v.RefreshTokenID.Value()))
+	}
+	if v.IsPAT.DidChange() {
+		changes = append(changes, handler.NewCol("is_pat", v.IsPAT.Value()))
+	}
+	if v.Actor.DidChange() {
+		changes = append(changes, handler.NewCol("actor", v.Actor.Value()))
+	}
+
+	return changes
 }
 
 type TokenActor struct {
@@ -82,20 +150,20 @@ func (a TokenActor) Value() (driver.Value, error) {
 func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 	return &usr_model.TokenView{
 		ID:                token.ID,
-		CreationDate:      token.CreationDate,
-		ChangeDate:        token.ChangeDate,
-		ResourceOwner:     token.ResourceOwner,
-		UserID:            token.UserID,
-		ApplicationID:     token.ApplicationID,
-		UserAgentID:       token.UserAgentID,
-		Audience:          token.Audience,
-		Scopes:            token.Scopes,
-		Expiration:        token.Expiration,
-		Sequence:          token.Sequence,
-		PreferredLanguage: token.PreferredLanguage,
-		RefreshTokenID:    token.RefreshTokenID,
-		IsPAT:             token.IsPAT,
-		Actor:             token.Actor.TokenActor,
+		CreationDate:      token.CreationDate.Value(),
+		ChangeDate:        token.ChangeDate.Value(),
+		ResourceOwner:     token.ResourceOwner.Value(),
+		UserID:            token.UserID.Value(),
+		ApplicationID:     token.ApplicationID.Value(),
+		UserAgentID:       token.UserAgentID.Value(),
+		Audience:          token.Audience.Value(),
+		Scopes:            token.Scopes.Value(),
+		Expiration:        token.Expiration.Value(),
+		Sequence:          token.Sequence.Value(),
+		PreferredLanguage: token.PreferredLanguage.Value(),
+		RefreshTokenID:    token.RefreshTokenID.Value(),
+		IsPAT:             token.IsPAT.Value(),
+		Actor:             token.Actor.Value().TokenActor,
 	}
 }
 
@@ -116,7 +184,7 @@ func (t *TokenView) AppendEventIfMyToken(event eventstore.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		if t.UserAgentID == id {
+		if t.UserAgentID.Value() == id {
 			t.Deactivated = true
 		}
 		return nil
@@ -127,7 +195,7 @@ func (t *TokenView) AppendEventIfMyToken(event eventstore.Event) (err error) {
 		return nil
 	case user_repo.UserUnlockedType,
 		user_repo.UserReactivatedType:
-		if t.ID != "" && event.CreatedAt().Before(t.CreationDate) {
+		if t.ID != "" && event.CreatedAt().Before(t.CreationDate.Value()) {
 			t.Deactivated = false
 		}
 		return nil
@@ -146,8 +214,8 @@ func (t *TokenView) AppendEventIfMyToken(event eventstore.Event) (err error) {
 }
 
 func (t *TokenView) AppendEvent(event eventstore.Event) error {
-	t.ChangeDate = event.CreatedAt()
-	t.Sequence = event.Sequence()
+	t.ChangeDate.Set(event.CreatedAt())
+	t.Sequence.Set(event.Sequence())
 	switch event.Type() {
 	case user_repo.UserTokenAddedType,
 		user_repo.PersonalAccessTokenAddedType:
@@ -156,15 +224,15 @@ func (t *TokenView) AppendEvent(event eventstore.Event) error {
 		if err != nil {
 			return err
 		}
-		t.CreationDate = event.CreatedAt()
-		t.IsPAT = event.Type() == user_repo.PersonalAccessTokenAddedType
+		t.CreationDate.Set(event.CreatedAt())
+		t.IsPAT.Set(event.Type() == user_repo.PersonalAccessTokenAddedType)
 	}
 	return nil
 }
 
 func (t *TokenView) setRootData(event eventstore.Event) {
-	t.UserID = event.Aggregate().ID
-	t.ResourceOwner = event.Aggregate().ResourceOwner
+	t.UserID.Set(event.Aggregate().ID)
+	t.ResourceOwner.Set(event.Aggregate().ResourceOwner)
 	t.InstanceID = event.Aggregate().InstanceID
 }
 
@@ -212,7 +280,7 @@ func (t *TokenView) appendPATRemoved(event eventstore.Event) error {
 	if err != nil {
 		return err
 	}
-	if pat["tokenId"] == t.ID && t.IsPAT {
+	if pat["tokenId"] == t.ID && t.IsPAT.Value() {
 		t.Deactivated = true
 	}
 	return nil

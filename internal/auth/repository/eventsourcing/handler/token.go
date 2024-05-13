@@ -150,92 +150,149 @@ func (t *Token) Reducers() []handler.AggregateReducer {
 }
 
 func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error) { //nolint:gocognit
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		switch event.Type() {
-		case user.UserTokenAddedType,
-			user.PersonalAccessTokenAddedType:
-			token := new(view_model.TokenView)
-			err := token.AppendEvent(event)
-			if err != nil {
-				return err
-			}
-			return t.view.PutToken(token)
-		case user.UserV1ProfileChangedType,
-			user.HumanProfileChangedType:
-			user := new(view_model.UserView)
-			err := user.AppendEvent(event)
-			if err != nil {
-				return err
-			}
-			tokens, err := t.view.TokensByUserID(event.Aggregate().ID, event.Aggregate().InstanceID)
-			if err != nil {
-				return err
-			}
-			for _, token := range tokens {
-				token.PreferredLanguage = user.PreferredLanguage
-			}
-			return t.view.PutTokens(tokens)
-		case user.UserV1SignedOutType,
-			user.HumanSignedOutType:
-			id, err := agentIDFromSession(event)
-			if err != nil {
-				return err
-			}
-
-			return t.view.DeleteSessionTokens(id, event)
-		case user.UserLockedType,
-			user.UserDeactivatedType,
-			user.UserRemovedType:
-
-			return t.view.DeleteUserTokens(event)
-		case user.UserTokenRemovedType,
-			user.PersonalAccessTokenRemovedType:
-			id, err := tokenIDFromRemovedEvent(event)
-			if err != nil {
-				return err
-			}
-
-			return t.view.DeleteToken(id, event.Aggregate().InstanceID)
-		case user.HumanRefreshTokenRemovedType:
-			id, err := refreshTokenIDFromRemovedEvent(event)
-			if err != nil {
-				return err
-			}
-
-			return t.view.DeleteTokensFromRefreshToken(id, event.Aggregate().InstanceID)
-		case project.ApplicationDeactivatedType,
-			project.ApplicationRemovedType:
-			application, err := applicationFromSession(event)
-			if err != nil {
-				return err
-			}
-
-			return t.view.DeleteApplicationTokens(event, application.AppID)
-		case project.ProjectDeactivatedType,
-			project.ProjectRemovedType:
-			project, err := t.getProjectByID(context.Background(), event.Aggregate().ID, event.Aggregate().InstanceID)
-			if err != nil {
-				return err
-			}
-			applicationIDs := make([]string, 0, len(project.Applications))
-			for _, app := range project.Applications {
-				if app.OIDCConfig != nil && app.OIDCConfig.ClientID != "" {
-					applicationIDs = append(applicationIDs, app.OIDCConfig.ClientID)
-				}
-			}
-
-			return t.view.DeleteApplicationTokens(event, applicationIDs...)
-		case instance.InstanceRemovedEventType:
-			return t.view.DeleteInstanceTokens(event)
-		case org.OrgRemovedEventType:
-			// deletes all tokens including PATs, which is expected for now
-			// if there is an undo of the org deletion in the future,
-			// we will need to have a look on how to handle the deleted PATs
-			return t.view.DeleteOrgTokens(event)
-		default:
-			return nil
+	switch event.Type() {
+	case user.UserTokenAddedType,
+		user.PersonalAccessTokenAddedType:
+		token := new(view_model.TokenView)
+		err := token.AppendEvent(event)
+		if err != nil {
+			return nil, err
 		}
-	}), nil
+		return handler.NewCreateStatement(
+			event,
+			append(token.PKColumns(), token.Changes()...),
+		), nil
+	case user.UserV1ProfileChangedType,
+		user.HumanProfileChangedType:
+		user := new(view_model.UserView)
+		err := user.AppendEvent(event)
+		if err != nil {
+			return nil, err
+		}
+		if !user.HumanView.Value().PreferredLanguage.DidChange() {
+			return handler.NewNoOpStatement(event), nil
+		}
+
+		return handler.NewUpdateStatement(
+			event,
+			[]handler.Column{
+				handler.NewCol(view_model.TokenKeyPreferredLanguage, user.HumanView.Value().PreferredLanguage.Value()),
+			},
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyUserID, event.Aggregate().ID),
+				handler.NewCond(view_model.TokenKeyResourceOwner, event.Aggregate().ResourceOwner),
+			},
+		), nil
+	case user.UserV1SignedOutType,
+		user.HumanSignedOutType:
+		id, err := agentIDFromSession(event)
+		if err != nil {
+			return nil, err
+		}
+
+		return handler.NewDeleteStatement(
+			event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyUserAgentID, id),
+				handler.NewCond(view_model.TokenKeyUserID, event.Aggregate().ID),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+			},
+		), nil
+
+	case user.UserLockedType,
+		user.UserDeactivatedType,
+		user.UserRemovedType:
+
+		return handler.NewDeleteStatement(
+			event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyUserID, event.Aggregate().ID),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+			},
+		), nil
+	case user.UserTokenRemovedType,
+		user.PersonalAccessTokenRemovedType:
+		id, err := tokenIDFromRemovedEvent(event)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewDeleteStatement(
+			event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyTokenID, id),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+			},
+		), nil
+	case user.HumanRefreshTokenRemovedType:
+		id, err := refreshTokenIDFromRemovedEvent(event)
+		if err != nil {
+			return nil, err
+		}
+
+		return handler.NewDeleteStatement(
+			event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyRefreshTokenID, id),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+			},
+		), nil
+	case project.ApplicationDeactivatedType,
+		project.ApplicationRemovedType:
+		application, err := applicationFromSession(event)
+		if err != nil {
+			return nil, err
+		}
+
+		return handler.NewDeleteStatement(
+			event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyApplicationID, application.AppID),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+			},
+		), nil
+	case project.ProjectDeactivatedType,
+		project.ProjectRemovedType:
+		project, err := t.getProjectByID(context.Background(), event.Aggregate().ID, event.Aggregate().InstanceID)
+		if err != nil {
+			return nil, err
+		}
+		applicationIDs := make([]string, 0, len(project.Applications))
+		for _, app := range project.Applications {
+			if app.OIDCConfig != nil && app.OIDCConfig.ClientID != "" {
+				applicationIDs = append(applicationIDs, app.OIDCConfig.ClientID)
+			}
+		}
+
+		deletes := make([]func(eventstore.Event) handler.Exec, len(applicationIDs))
+		for i, applicationID := range applicationIDs {
+			deletes[i] = handler.AddDeleteStatement([]handler.Condition{
+				handler.NewCond(view_model.TokenKeyApplicationID, applicationID),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+			})
+		}
+
+		return handler.NewMultiStatement(event, deletes...), nil
+	case instance.InstanceRemovedEventType:
+		return handler.NewDeleteStatement(
+			event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+			},
+		), nil
+	case org.OrgRemovedEventType:
+		// deletes all tokens including PATs, which is expected for now
+		// if there is an undo of the org deletion in the future,
+		// we will need to have a look on how to handle the deleted PATs
+		return handler.NewDeleteStatement(
+			event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyResourceOwner, event.Aggregate().ID),
+			},
+		), nil
+	default:
+		return handler.NewNoOpStatement(event), nil
+	}
 }
 
 func agentIDFromSession(event eventstore.Event) (string, error) {

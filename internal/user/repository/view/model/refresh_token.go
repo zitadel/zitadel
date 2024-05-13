@@ -7,8 +7,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
+	"github.com/zitadel/zitadel/internal/view/repository"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -23,23 +25,90 @@ const (
 )
 
 type RefreshTokenView struct {
-	ID                    string                     `json:"tokenId" gorm:"column:id;primary_key"`
-	CreationDate          time.Time                  `json:"-" gorm:"column:creation_date"`
-	ChangeDate            time.Time                  `json:"-" gorm:"column:change_date"`
-	ResourceOwner         string                     `json:"-" gorm:"column:resource_owner"`
-	Token                 string                     `json:"-" gorm:"column:token"`
-	UserID                string                     `json:"-" gorm:"column:user_id"`
-	ClientID              string                     `json:"clientID" gorm:"column:client_id"`
-	UserAgentID           string                     `json:"userAgentId" gorm:"column:user_agent_id"`
-	Audience              database.TextArray[string] `json:"audience" gorm:"column:audience"`
-	Scopes                database.TextArray[string] `json:"scopes" gorm:"column:scopes"`
-	AuthMethodsReferences database.TextArray[string] `json:"authMethodsReference" gorm:"column:amr"`
-	AuthTime              time.Time                  `json:"authTime" gorm:"column:auth_time"`
-	IdleExpiration        time.Time                  `json:"-" gorm:"column:idle_expiration"`
-	Expiration            time.Time                  `json:"-" gorm:"column:expiration"`
-	Sequence              uint64                     `json:"-" gorm:"column:sequence"`
-	InstanceID            string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
-	Actor                 TokenActor                 `json:"actor" gorm:"column:actor"`
+	ID         string `json:"tokenId" gorm:"column:id;primary_key"`
+	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
+
+	CreationDate          repository.Field[time.Time]                  `json:"-" gorm:"column:creation_date"`
+	ChangeDate            repository.Field[time.Time]                  `json:"-" gorm:"column:change_date"`
+	ResourceOwner         repository.Field[string]                     `json:"-" gorm:"column:resource_owner"`
+	Token                 repository.Field[string]                     `json:"-" gorm:"column:token"`
+	UserID                repository.Field[string]                     `json:"-" gorm:"column:user_id"`
+	ClientID              repository.Field[string]                     `json:"clientID" gorm:"column:client_id"`
+	UserAgentID           repository.Field[string]                     `json:"userAgentId" gorm:"column:user_agent_id"`
+	Audience              repository.Field[database.TextArray[string]] `json:"audience" gorm:"column:audience"`
+	Scopes                repository.Field[database.TextArray[string]] `json:"scopes" gorm:"column:scopes"`
+	AuthMethodsReferences repository.Field[database.TextArray[string]] `json:"authMethodsReference" gorm:"column:amr"`
+	AuthTime              repository.Field[time.Time]                  `json:"authTime" gorm:"column:auth_time"`
+	IdleExpiration        repository.Field[time.Time]                  `json:"-" gorm:"column:idle_expiration"`
+	Expiration            repository.Field[time.Time]                  `json:"-" gorm:"column:expiration"`
+	Sequence              repository.Field[uint64]                     `json:"-" gorm:"column:sequence"`
+	Actor                 repository.Field[TokenActor]                 `json:"actor" gorm:"column:actor"`
+}
+
+func (v *RefreshTokenView) PKColumns() []handler.Column {
+	return []handler.Column{
+		handler.NewCol(RefreshTokenKeyTokenID, v.ID),
+		handler.NewCol(RefreshTokenKeyInstanceID, v.InstanceID),
+	}
+}
+
+func (v *RefreshTokenView) PKConditions() []handler.Condition {
+	return []handler.Condition{
+		handler.NewCond(RefreshTokenKeyTokenID, v.ID),
+		handler.NewCond(RefreshTokenKeyInstanceID, v.InstanceID),
+	}
+}
+
+func (v *RefreshTokenView) Changes() []handler.Column {
+	changes := make([]handler.Column, 0, 14)
+
+	if v.CreationDate.DidChange() {
+		changes = append(changes, handler.NewCol("creation_date", v.CreationDate.Value()))
+	}
+	if v.ChangeDate.DidChange() {
+		changes = append(changes, handler.NewCol("change_date", v.ChangeDate.Value()))
+	}
+	if v.ResourceOwner.DidChange() {
+		changes = append(changes, handler.NewCol("resource_owner", v.ResourceOwner.Value()))
+	}
+	if v.Token.DidChange() {
+		changes = append(changes, handler.NewCol("token", v.Token.Value()))
+	}
+	if v.UserID.DidChange() {
+		changes = append(changes, handler.NewCol("user_id", v.UserID.Value()))
+	}
+	if v.ClientID.DidChange() {
+		changes = append(changes, handler.NewCol("client_id", v.ClientID.Value()))
+	}
+	if v.UserAgentID.DidChange() {
+		changes = append(changes, handler.NewCol("user_agent_id", v.UserAgentID.Value()))
+	}
+	if v.Audience.DidChange() {
+		changes = append(changes, handler.NewCol("audience", v.Audience.Value()))
+	}
+	if v.Scopes.DidChange() {
+		changes = append(changes, handler.NewCol("scopes", v.Scopes.Value()))
+	}
+	if v.AuthMethodsReferences.DidChange() {
+		changes = append(changes, handler.NewCol("amr", v.AuthMethodsReferences.Value()))
+	}
+	if v.AuthTime.DidChange() {
+		changes = append(changes, handler.NewCol("auth_time", v.AuthTime.Value()))
+	}
+	if v.IdleExpiration.DidChange() {
+		changes = append(changes, handler.NewCol("idle_expiration", v.IdleExpiration.Value()))
+	}
+	if v.Expiration.DidChange() {
+		changes = append(changes, handler.NewCol("expiration", v.Expiration.Value()))
+	}
+	if v.Sequence.DidChange() {
+		changes = append(changes, handler.NewCol("sequence", v.Sequence.Value()))
+	}
+	if v.Actor.DidChange() {
+		changes = append(changes, handler.NewCol("actor", v.Actor.Value()))
+	}
+
+	return changes
 }
 
 func RefreshTokenViewsToModel(tokens []*RefreshTokenView) []*usr_model.RefreshTokenView {
@@ -53,21 +122,21 @@ func RefreshTokenViewsToModel(tokens []*RefreshTokenView) []*usr_model.RefreshTo
 func RefreshTokenViewToModel(token *RefreshTokenView) *usr_model.RefreshTokenView {
 	return &usr_model.RefreshTokenView{
 		ID:                    token.ID,
-		CreationDate:          token.CreationDate,
-		ChangeDate:            token.ChangeDate,
-		ResourceOwner:         token.ResourceOwner,
-		Token:                 token.Token,
-		UserID:                token.UserID,
-		ClientID:              token.ClientID,
-		UserAgentID:           token.UserAgentID,
-		Audience:              token.Audience,
-		Scopes:                token.Scopes,
-		AuthMethodsReferences: token.AuthMethodsReferences,
-		AuthTime:              token.AuthTime,
-		IdleExpiration:        token.IdleExpiration,
-		Expiration:            token.Expiration,
-		Sequence:              token.Sequence,
-		Actor:                 token.Actor.TokenActor,
+		CreationDate:          token.CreationDate.Value(),
+		ChangeDate:            token.ChangeDate.Value(),
+		ResourceOwner:         token.ResourceOwner.Value(),
+		Token:                 token.Token.Value(),
+		UserID:                token.UserID.Value(),
+		ClientID:              token.ClientID.Value(),
+		UserAgentID:           token.UserAgentID.Value(),
+		Audience:              token.Audience.Value(),
+		Scopes:                token.Scopes.Value(),
+		AuthMethodsReferences: token.AuthMethodsReferences.Value(),
+		AuthTime:              token.AuthTime.Value(),
+		IdleExpiration:        token.IdleExpiration.Value(),
+		Expiration:            token.Expiration.Value(),
+		Sequence:              token.Sequence.Value(),
+		Actor:                 token.Actor.Value().TokenActor,
 	}
 }
 
@@ -101,8 +170,8 @@ func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event eventstore.Event) (
 }
 
 func (t *RefreshTokenView) AppendEvent(event eventstore.Event) error {
-	t.ChangeDate = event.CreatedAt()
-	t.Sequence = event.Sequence()
+	t.ChangeDate.Set(event.CreatedAt())
+	t.Sequence.Set(event.Sequence())
 	switch event.Type() {
 	case user_repo.HumanRefreshTokenAddedType:
 		t.setRootData(event)
@@ -115,8 +184,8 @@ func (t *RefreshTokenView) AppendEvent(event eventstore.Event) error {
 }
 
 func (t *RefreshTokenView) setRootData(event eventstore.Event) {
-	t.UserID = event.Aggregate().ID
-	t.ResourceOwner = event.Aggregate().ResourceOwner
+	t.UserID.Set(event.Aggregate().ID)
+	t.ResourceOwner.Set(event.Aggregate().ResourceOwner)
 	t.InstanceID = event.Aggregate().InstanceID
 }
 
@@ -127,17 +196,17 @@ func (t *RefreshTokenView) appendAddedEvent(event eventstore.Event) error {
 		return zerrors.ThrowInternal(err, "MODEL-Bbr42", "could not unmarshal event")
 	}
 	t.ID = e.TokenID
-	t.CreationDate = event.CreatedAt()
-	t.AuthMethodsReferences = e.AuthMethodsReferences
-	t.AuthTime = e.AuthTime
-	t.Audience = e.Audience
-	t.ClientID = e.ClientID
-	t.Expiration = event.CreatedAt().Add(e.Expiration)
-	t.IdleExpiration = event.CreatedAt().Add(e.IdleExpiration)
-	t.Scopes = e.Scopes
-	t.Token = e.TokenID
-	t.UserAgentID = e.UserAgentID
-	t.Actor = TokenActor{e.Actor}
+	t.CreationDate.Set(event.CreatedAt())
+	t.AuthMethodsReferences.Set(e.AuthMethodsReferences)
+	t.AuthTime.Set(e.AuthTime)
+	t.Audience.Set(e.Audience)
+	t.ClientID.Set(e.ClientID)
+	t.Expiration.Set(event.CreatedAt().Add(e.Expiration))
+	t.IdleExpiration.Set(event.CreatedAt().Add(e.IdleExpiration))
+	t.Scopes.Set(e.Scopes)
+	t.Token.Set(e.TokenID)
+	t.UserAgentID.Set(e.UserAgentID)
+	t.Actor.Set(TokenActor{e.Actor})
 	return nil
 }
 
@@ -148,13 +217,13 @@ func (t *RefreshTokenView) appendRenewedEvent(event eventstore.Event) error {
 		return zerrors.ThrowInternal(err, "MODEL-Bbrn4", "could not unmarshal event")
 	}
 	t.ID = e.TokenID
-	t.IdleExpiration = event.CreatedAt().Add(e.IdleExpiration)
-	t.Token = e.RefreshToken
+	t.IdleExpiration.Set(event.CreatedAt().Add(e.IdleExpiration))
+	t.Token.Set(e.RefreshToken)
 	return nil
 }
 
 func (t *RefreshTokenView) appendRemovedEvent(event eventstore.Event) {
-	t.Expiration = event.CreatedAt()
+	t.Expiration.Set(event.CreatedAt())
 }
 
 func (t *RefreshTokenView) GetRelevantEventTypes() []eventstore.EventType {
