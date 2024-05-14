@@ -138,30 +138,6 @@ func NewCreateStatement(event eventstore.Event, values []Column, opts ...execOpt
 	return NewStatement(event, exec(config, q, opts))
 }
 
-func NewEnsureExistsStatement(event eventstore.Event, conflictCols []Column, values []Column, opts ...execOption) *Statement {
-	cols, params, args := columnsToQuery(values)
-
-	conflictTarget := make([]string, len(conflictCols))
-	for i, col := range conflictCols {
-		conflictTarget[i] = col.Name
-	}
-
-	config := execConfig{
-		args: args,
-	}
-
-	if len(values) == 0 {
-		config.err = ErrNoValues
-	}
-
-	q := func(config execConfig) string {
-		return "INSERT INTO " + config.tableName + " (" + strings.Join(cols, ", ") + ") VALUES (" + strings.Join(params, ", ") + ")" +
-			" ON CONFLICT (" + strings.Join(conflictTarget, ", ") + ") DO NOTHING"
-	}
-
-	return NewStatement(event, exec(config, q, opts))
-}
-
 func NewUpsertStatement(event eventstore.Event, conflictCols []Column, values []Column, opts ...execOption) *Statement {
 	cols, params, args := columnsToQuery(values)
 
@@ -319,21 +295,9 @@ func AddNoOpStatement() func(eventstore.Event) Exec {
 	}
 }
 
-func AddStatement(e Exec) func(eventstore.Event) Exec {
-	return func(event eventstore.Event) Exec {
-		return e
-	}
-}
-
 func AddCreateStatement(columns []Column, opts ...execOption) func(eventstore.Event) Exec {
 	return func(event eventstore.Event) Exec {
 		return NewCreateStatement(event, columns, opts...).Execute
-	}
-}
-
-func AddEnsureExistsStatement(indexCols []Column, values []Column, opts ...execOption) func(eventstore.Event) Exec {
-	return func(event eventstore.Event) Exec {
-		return NewEnsureExistsStatement(event, indexCols, values, opts...).Execute
 	}
 }
 
