@@ -3,7 +3,6 @@ package model
 import (
 	"database/sql/driver"
 	"encoding/json"
-	"slices"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -15,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/user/model"
 	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -44,21 +42,20 @@ const (
 )
 
 type UserView struct {
-	ID         string `json:"-" gorm:"column:id;primary_key"`
-	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
-
-	CreationDate       repository.Field[time.Time]                  `json:"-" gorm:"column:creation_date"`
-	ChangeDate         repository.Field[time.Time]                  `json:"-" gorm:"column:change_date"`
-	ResourceOwner      repository.Field[string]                     `json:"-" gorm:"column:resource_owner"`
-	State              repository.Field[int32]                      `json:"-" gorm:"column:user_state"`
-	LastLogin          repository.Field[time.Time]                  `json:"-" gorm:"column:last_login"`
-	LoginNames         repository.Field[database.TextArray[string]] `json:"-" gorm:"column:login_names"`
-	PreferredLoginName repository.Field[string]                     `json:"-" gorm:"column:preferred_login_name"`
-	Sequence           repository.Field[uint64]                     `json:"-" gorm:"column:sequence"`
-	Type               repository.Field[userType]                   `json:"-" gorm:"column:user_type"`
-	UserName           repository.Field[string]                     `json:"userName" gorm:"column:user_name"`
-	MachineView        repository.Field[*MachineView]
-	HumanView          repository.Field[*HumanView]
+	ID                 string                     `json:"-" gorm:"column:id;primary_key"`
+	CreationDate       time.Time                  `json:"-" gorm:"column:creation_date"`
+	ChangeDate         time.Time                  `json:"-" gorm:"column:change_date"`
+	ResourceOwner      string                     `json:"-" gorm:"column:resource_owner"`
+	State              int32                      `json:"-" gorm:"column:user_state"`
+	LastLogin          time.Time                  `json:"-" gorm:"column:last_login"`
+	LoginNames         database.TextArray[string] `json:"-" gorm:"column:login_names"`
+	PreferredLoginName string                     `json:"-" gorm:"column:preferred_login_name"`
+	Sequence           uint64                     `json:"-" gorm:"column:sequence"`
+	Type               userType                   `json:"-" gorm:"column:user_type"`
+	UserName           string                     `json:"userName" gorm:"column:user_name"`
+	InstanceID         string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	*MachineView
+	*HumanView
 }
 
 type UserState int32
@@ -74,44 +71,44 @@ const (
 )
 
 type HumanView struct {
-	FirstName                repository.Field[string]         `json:"firstName" gorm:"column:first_name"`
-	LastName                 repository.Field[string]         `json:"lastName" gorm:"column:last_name"`
-	NickName                 repository.Field[string]         `json:"nickName" gorm:"column:nick_name"`
-	DisplayName              repository.Field[string]         `json:"displayName" gorm:"column:display_name"`
-	PreferredLanguage        repository.Field[string]         `json:"preferredLanguage" gorm:"column:preferred_language"`
-	Gender                   repository.Field[int32]          `json:"gender" gorm:"column:gender"`
-	AvatarKey                repository.Field[string]         `json:"storeKey" gorm:"column:avatar_key"`
-	Email                    repository.Field[string]         `json:"email" gorm:"column:email"`
-	IsEmailVerified          repository.Field[bool]           `json:"-" gorm:"column:is_email_verified"`
-	Phone                    repository.Field[string]         `json:"phone" gorm:"column:phone"`
-	IsPhoneVerified          repository.Field[bool]           `json:"-" gorm:"column:is_phone_verified"`
-	Country                  repository.Field[string]         `json:"country" gorm:"column:country"`
-	Locality                 repository.Field[string]         `json:"locality" gorm:"column:locality"`
-	PostalCode               repository.Field[string]         `json:"postalCode" gorm:"column:postal_code"`
-	Region                   repository.Field[string]         `json:"region" gorm:"column:region"`
-	StreetAddress            repository.Field[string]         `json:"streetAddress" gorm:"column:street_address"`
-	OTPState                 repository.Field[int32]          `json:"-" gorm:"column:otp_state"`
-	OTPSMSAdded              repository.Field[bool]           `json:"-" gorm:"column:otp_sms_added"`
-	OTPEmailAdded            repository.Field[bool]           `json:"-" gorm:"column:otp_email_added"`
-	U2FTokens                repository.Field[WebAuthNTokens] `json:"-" gorm:"column:u2f_tokens"`
-	MFAMaxSetUp              repository.Field[int32]          `json:"-" gorm:"column:mfa_max_set_up"`
-	MFAInitSkipped           repository.Field[time.Time]      `json:"-" gorm:"column:mfa_init_skipped"`
-	InitRequired             repository.Field[bool]           `json:"-" gorm:"column:init_required"`
-	PasswordlessInitRequired repository.Field[bool]           `json:"-" gorm:"column:passwordless_init_required"`
-	PasswordInitRequired     repository.Field[bool]           `json:"-" gorm:"column:password_init_required"`
-	PasswordSet              repository.Field[bool]           `json:"-" gorm:"column:password_set"`
-	PasswordChangeRequired   repository.Field[bool]           `json:"-" gorm:"column:password_change_required"`
-	UsernameChangeRequired   repository.Field[bool]           `json:"-" gorm:"column:username_change_required"`
-	PasswordChanged          repository.Field[time.Time]      `json:"-" gorm:"column:password_change"`
-	PasswordlessTokens       repository.Field[WebAuthNTokens] `json:"-" gorm:"column:passwordless_tokens"`
+	FirstName                string         `json:"firstName" gorm:"column:first_name"`
+	LastName                 string         `json:"lastName" gorm:"column:last_name"`
+	NickName                 string         `json:"nickName" gorm:"column:nick_name"`
+	DisplayName              string         `json:"displayName" gorm:"column:display_name"`
+	PreferredLanguage        string         `json:"preferredLanguage" gorm:"column:preferred_language"`
+	Gender                   int32          `json:"gender" gorm:"column:gender"`
+	AvatarKey                string         `json:"storeKey" gorm:"column:avatar_key"`
+	Email                    string         `json:"email" gorm:"column:email"`
+	IsEmailVerified          bool           `json:"-" gorm:"column:is_email_verified"`
+	Phone                    string         `json:"phone" gorm:"column:phone"`
+	IsPhoneVerified          bool           `json:"-" gorm:"column:is_phone_verified"`
+	Country                  string         `json:"country" gorm:"column:country"`
+	Locality                 string         `json:"locality" gorm:"column:locality"`
+	PostalCode               string         `json:"postalCode" gorm:"column:postal_code"`
+	Region                   string         `json:"region" gorm:"column:region"`
+	StreetAddress            string         `json:"streetAddress" gorm:"column:street_address"`
+	OTPState                 int32          `json:"-" gorm:"column:otp_state"`
+	OTPSMSAdded              bool           `json:"-" gorm:"column:otp_sms_added"`
+	OTPEmailAdded            bool           `json:"-" gorm:"column:otp_email_added"`
+	U2FTokens                WebAuthNTokens `json:"-" gorm:"column:u2f_tokens"`
+	MFAMaxSetUp              int32          `json:"-" gorm:"column:mfa_max_set_up"`
+	MFAInitSkipped           time.Time      `json:"-" gorm:"column:mfa_init_skipped"`
+	InitRequired             bool           `json:"-" gorm:"column:init_required"`
+	PasswordlessInitRequired bool           `json:"-" gorm:"column:passwordless_init_required"`
+	PasswordInitRequired     bool           `json:"-" gorm:"column:password_init_required"`
+	PasswordSet              bool           `json:"-" gorm:"column:password_set"`
+	PasswordChangeRequired   bool           `json:"-" gorm:"column:password_change_required"`
+	UsernameChangeRequired   bool           `json:"-" gorm:"column:username_change_required"`
+	PasswordChanged          time.Time      `json:"-" gorm:"column:password_change"`
+	PasswordlessTokens       WebAuthNTokens `json:"-" gorm:"column:passwordless_tokens"`
 }
 
 type WebAuthNTokens []*WebAuthNView
 
 type WebAuthNView struct {
-	ID    repository.Field[string] `json:"webAuthNTokenId"`
-	Name  repository.Field[string] `json:"webAuthNTokenName,omitempty"`
-	State repository.Field[int32]  `json:"state,omitempty"`
+	ID    string `json:"webAuthNTokenId"`
+	Name  string `json:"webAuthNTokenName,omitempty"`
+	State int32  `json:"state,omitempty"`
 }
 
 func (t WebAuthNTokens) Value() (driver.Value, error) {
@@ -132,69 +129,69 @@ func (t *WebAuthNTokens) Scan(src interface{}) error {
 }
 
 func (h *HumanView) IsZero() bool {
-	return h == nil || h.FirstName.Value() == ""
+	return h == nil || h.FirstName == ""
 }
 
 type MachineView struct {
-	Name        repository.Field[string] `json:"name" gorm:"column:machine_name"`
-	Description repository.Field[string] `json:"description" gorm:"column:machine_description"`
+	Name        string `json:"name" gorm:"column:machine_name"`
+	Description string `json:"description" gorm:"column:machine_description"`
 }
 
 func (m *MachineView) IsZero() bool {
-	return m == nil || m.Name.Value() == ""
+	return m == nil || m.Name == ""
 }
 
 func UserToModel(user *UserView) *model.UserView {
 	userView := &model.UserView{
 		ID:                 user.ID,
-		UserName:           user.UserName.Value(),
-		ChangeDate:         user.ChangeDate.Value(),
-		CreationDate:       user.CreationDate.Value(),
-		ResourceOwner:      user.ResourceOwner.Value(),
-		State:              model.UserState(user.State.Value()),
-		LastLogin:          user.LastLogin.Value(),
-		PreferredLoginName: user.PreferredLoginName.Value(),
-		LoginNames:         user.LoginNames.Value(),
-		Sequence:           user.Sequence.Value(),
+		UserName:           user.UserName,
+		ChangeDate:         user.ChangeDate,
+		CreationDate:       user.CreationDate,
+		ResourceOwner:      user.ResourceOwner,
+		State:              model.UserState(user.State),
+		LastLogin:          user.LastLogin,
+		PreferredLoginName: user.PreferredLoginName,
+		LoginNames:         user.LoginNames,
+		Sequence:           user.Sequence,
 	}
-	if !user.HumanView.Value().IsZero() {
+	if !user.HumanView.IsZero() {
 		userView.HumanView = &model.HumanView{
-			PasswordSet:              user.HumanView.Value().PasswordSet.Value(),
-			PasswordInitRequired:     user.HumanView.Value().PasswordInitRequired.Value(),
-			PasswordChangeRequired:   user.HumanView.Value().PasswordChangeRequired.Value(),
-			PasswordChanged:          user.HumanView.Value().PasswordChanged.Value(),
-			PasswordlessTokens:       WebauthnTokensToModel(user.HumanView.Value().PasswordlessTokens.Value()),
-			U2FTokens:                WebauthnTokensToModel(user.HumanView.Value().U2FTokens.Value()),
-			FirstName:                user.HumanView.Value().FirstName.Value(),
-			LastName:                 user.HumanView.Value().LastName.Value(),
-			NickName:                 user.HumanView.Value().NickName.Value(),
-			DisplayName:              user.HumanView.Value().DisplayName.Value(),
-			AvatarKey:                user.HumanView.Value().AvatarKey.Value(),
-			PreferredLanguage:        user.HumanView.Value().PreferredLanguage.Value(),
-			Gender:                   model.Gender(user.HumanView.Value().Gender.Value()),
-			Email:                    user.HumanView.Value().Email.Value(),
-			IsEmailVerified:          user.HumanView.Value().IsEmailVerified.Value(),
-			Phone:                    user.HumanView.Value().Phone.Value(),
-			IsPhoneVerified:          user.HumanView.Value().IsPhoneVerified.Value(),
-			Country:                  user.HumanView.Value().Country.Value(),
-			Locality:                 user.HumanView.Value().Locality.Value(),
-			PostalCode:               user.HumanView.Value().PostalCode.Value(),
-			Region:                   user.HumanView.Value().Region.Value(),
-			StreetAddress:            user.HumanView.Value().StreetAddress.Value(),
-			OTPState:                 model.MFAState(user.HumanView.Value().OTPState.Value()),
-			OTPSMSAdded:              user.HumanView.Value().OTPSMSAdded.Value(),
-			OTPEmailAdded:            user.HumanView.Value().OTPEmailAdded.Value(),
-			MFAMaxSetUp:              domain.MFALevel(user.HumanView.Value().MFAMaxSetUp.Value()),
-			MFAInitSkipped:           user.HumanView.Value().MFAInitSkipped.Value(),
-			InitRequired:             user.HumanView.Value().InitRequired.Value(),
-			PasswordlessInitRequired: user.HumanView.Value().PasswordlessInitRequired.Value(),
+			PasswordSet:              user.PasswordSet,
+			PasswordInitRequired:     user.PasswordInitRequired,
+			PasswordChangeRequired:   user.PasswordChangeRequired,
+			PasswordChanged:          user.PasswordChanged,
+			PasswordlessTokens:       WebauthnTokensToModel(user.PasswordlessTokens),
+			U2FTokens:                WebauthnTokensToModel(user.U2FTokens),
+			FirstName:                user.FirstName,
+			LastName:                 user.LastName,
+			NickName:                 user.NickName,
+			DisplayName:              user.DisplayName,
+			AvatarKey:                user.AvatarKey,
+			PreferredLanguage:        user.PreferredLanguage,
+			Gender:                   model.Gender(user.Gender),
+			Email:                    user.Email,
+			IsEmailVerified:          user.IsEmailVerified,
+			Phone:                    user.Phone,
+			IsPhoneVerified:          user.IsPhoneVerified,
+			Country:                  user.Country,
+			Locality:                 user.Locality,
+			PostalCode:               user.PostalCode,
+			Region:                   user.Region,
+			StreetAddress:            user.StreetAddress,
+			OTPState:                 model.MFAState(user.OTPState),
+			OTPSMSAdded:              user.OTPSMSAdded,
+			OTPEmailAdded:            user.OTPEmailAdded,
+			MFAMaxSetUp:              domain.MFALevel(user.MFAMaxSetUp),
+			MFAInitSkipped:           user.MFAInitSkipped,
+			InitRequired:             user.InitRequired,
+			PasswordlessInitRequired: user.PasswordlessInitRequired,
 		}
 	}
 
-	if !user.MachineView.Value().IsZero() {
+	if !user.MachineView.IsZero() {
 		userView.MachineView = &model.MachineView{
-			Description: user.MachineView.Value().Description.Value(),
-			Name:        user.MachineView.Value().Name.Value(),
+			Description: user.MachineView.Description,
+			Name:        user.MachineView.Name,
 		}
 	}
 	return userView
@@ -213,42 +210,39 @@ func WebauthnTokensToModel(tokens []*WebAuthNView) []*model.WebAuthNView {
 
 func WebauthnTokenToModel(token *WebAuthNView) *model.WebAuthNView {
 	return &model.WebAuthNView{
-		TokenID: token.ID.Value(),
-		Name:    token.Name.Value(),
-		State:   model.MFAState(token.State.Value()),
+		TokenID: token.ID,
+		Name:    token.Name,
+		State:   model.MFAState(token.State),
 	}
 }
 
 func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
 	if !appendDomain {
-		return u.UserName.Value()
+		return u.UserName
 	}
-	return u.UserName.Value() + "@" + domain
+	return u.UserName + "@" + domain
 }
 
 func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_model.OrgDomain) {
-	loginNames := make([]string, 0, len(domains))
-
+	u.LoginNames = make([]string, 0, len(domains))
 	for _, d := range domains {
 		if d.Verified {
-			loginNames = append(loginNames, u.GenerateLoginName(d.Domain, true))
+			u.LoginNames = append(u.LoginNames, u.GenerateLoginName(d.Domain, true))
 		}
 	}
 	if !userLoginMustBeDomain {
-		loginNames = append(loginNames, u.GenerateLoginName(u.UserName.Value(), true))
+		u.LoginNames = append(u.LoginNames, u.GenerateLoginName(u.UserName, true))
 	}
-
-	u.LoginNames.Set(loginNames)
 }
 
 func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
-	u.ChangeDate.Set(event.CreatedAt())
-	u.Sequence.Set(event.Sequence())
+	u.ChangeDate = event.CreatedAt()
+	u.Sequence = event.Sequence()
 	switch event.Type() {
 	case user.MachineAddedEventType:
-		u.CreationDate.Set(event.CreatedAt())
+		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
-		u.Type.Set(userTypeMachine)
+		u.Type = userTypeMachine
 		err = u.setData(event)
 		if err != nil {
 			return err
@@ -257,16 +251,16 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 		user.UserV1RegisteredType,
 		user.HumanRegisteredType,
 		user.HumanAddedType:
-		u.CreationDate.Set(event.CreatedAt())
+		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
-		u.Type.Set(userTypeHuman)
+		u.Type = userTypeHuman
 		err = u.setData(event)
 		if err != nil {
 			return err
 		}
 		err = u.setPasswordData(event)
 	case user.UserRemovedType:
-		u.State.Set(int32(model.UserStateDeleted))
+		u.State = int32(model.UserStateDeleted)
 	case user.UserV1PasswordChangedType,
 		user.HumanPasswordChangedType:
 		err = u.setPasswordData(event)
@@ -283,70 +277,70 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 		user.MachineChangedEventType:
 		err = u.setData(event)
 	case user.UserDomainClaimedType:
-		if u.HumanView.Value() != nil {
-			u.HumanView.Value().UsernameChangeRequired.Set(true)
+		if u.HumanView != nil {
+			u.HumanView.UsernameChangeRequired = true
 		}
 		err = u.setData(event)
 	case user.UserUserNameChangedType:
-		if u.HumanView.Value() != nil {
-			u.HumanView.Value().UsernameChangeRequired.Set(false)
+		if u.HumanView != nil {
+			u.HumanView.UsernameChangeRequired = false
 		}
 		err = u.setData(event)
 	case user.UserV1EmailChangedType,
 		user.HumanEmailChangedType:
-		u.HumanView.Value().IsEmailVerified.Set(false)
+		u.IsEmailVerified = false
 		err = u.setData(event)
 	case user.UserV1EmailVerifiedType,
 		user.HumanEmailVerifiedType:
-		u.HumanView.Value().IsEmailVerified.Set(true)
+		u.IsEmailVerified = true
 	case user.UserV1PhoneChangedType,
 		user.HumanPhoneChangedType:
-		u.HumanView.Value().IsPhoneVerified.Set(false)
+		u.IsPhoneVerified = false
 		err = u.setData(event)
 	case user.UserV1PhoneVerifiedType,
 		user.HumanPhoneVerifiedType:
-		u.HumanView.Value().IsPhoneVerified.Set(true)
+		u.IsPhoneVerified = true
 	case user.UserV1PhoneRemovedType,
 		user.HumanPhoneRemovedType:
-		u.HumanView.Value().Phone.Set("")
-		u.HumanView.Value().IsPhoneVerified.Set(false)
-		u.HumanView.Value().OTPSMSAdded.Set(false)
-		u.HumanView.Value().MFAInitSkipped.Set(time.Time{})
+		u.Phone = ""
+		u.IsPhoneVerified = false
+		u.OTPSMSAdded = false
+		u.MFAInitSkipped = time.Time{}
 	case user.UserDeactivatedType:
-		u.State.Set(int32(model.UserStateInactive))
+		u.State = int32(model.UserStateInactive)
 	case user.UserReactivatedType,
 		user.UserUnlockedType:
-		u.State.Set(int32(model.UserStateActive))
+		u.State = int32(model.UserStateActive)
 	case user.UserLockedType:
-		u.State.Set(int32(model.UserStateLocked))
+		u.State = int32(model.UserStateLocked)
 	case user.UserV1MFAOTPAddedType,
 		user.HumanMFAOTPAddedType:
-		if u.HumanView.Value() == nil {
+		if u.HumanView == nil {
 			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
 			return zerrors.ThrowInvalidArgument(nil, "MODEL-p2BXx", "event ignored: human not exists")
 		}
-		u.HumanView.Value().OTPState.Set(int32(model.MFAStateNotReady))
+		u.OTPState = int32(model.MFAStateNotReady)
 	case user.UserV1MFAOTPVerifiedType,
 		user.HumanMFAOTPVerifiedType:
-		if u.HumanView.Value() == nil {
+		if u.HumanView == nil {
 			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
 			return zerrors.ThrowInvalidArgument(nil, "MODEL-o6Lcq", "event ignored: human not exists")
 		}
-		u.HumanView.Value().OTPState.Set(int32(model.MFAStateReady))
-		u.HumanView.Value().MFAInitSkipped.Set(time.Time{})
+		u.OTPState = int32(model.MFAStateReady)
+		u.MFAInitSkipped = time.Time{}
 	case user.UserV1MFAOTPRemovedType,
 		user.HumanMFAOTPRemovedType:
-		u.HumanView.Value().OTPState.Set(int32(model.MFAStateUnspecified))
+		u.OTPState = int32(model.MFAStateUnspecified)
 	case user.HumanOTPSMSAddedType:
-		u.HumanView.Value().OTPSMSAdded.Set(true)
+		u.OTPSMSAdded = true
 	case user.HumanOTPSMSRemovedType:
-		u.HumanView.Value().OTPSMSAdded.Set(false)
-		u.HumanView.Value().MFAInitSkipped.Set(time.Time{})
+		u.OTPSMSAdded = false
+		u.MFAInitSkipped = time.Time{}
 	case user.HumanOTPEmailAddedType:
-		u.HumanView.Value().OTPEmailAdded.Set(true)
+		u.OTPEmailAdded = true
 	case user.HumanOTPEmailRemovedType:
-		u.HumanView.Value().OTPEmailAdded.Set(false)
-		u.HumanView.Value().MFAInitSkipped.Set(time.Time{})
+		u.OTPEmailAdded = false
+		u.MFAInitSkipped = time.Time{}
 	case user.HumanU2FTokenAddedType:
 		err = u.addU2FToken(event)
 	case user.HumanU2FTokenVerifiedType:
@@ -354,31 +348,31 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 		if err != nil {
 			return err
 		}
-		u.HumanView.Value().MFAInitSkipped.Set(time.Time{})
+		u.MFAInitSkipped = time.Time{}
 	case user.HumanU2FTokenRemovedType:
 		err = u.removeU2FToken(event)
 	case user.UserV1MFAInitSkippedType,
 		user.HumanMFAInitSkippedType:
-		u.HumanView.Value().MFAInitSkipped.Set(event.CreatedAt())
+		u.MFAInitSkipped = event.CreatedAt()
 	case user.UserV1InitialCodeAddedType,
 		user.HumanInitialCodeAddedType:
-		u.HumanView.Value().InitRequired.Set(true)
+		u.InitRequired = true
 	case user.UserV1InitializedCheckSucceededType,
 		user.HumanInitializedCheckSucceededType:
-		u.HumanView.Value().InitRequired.Set(false)
+		u.InitRequired = false
 	case user.HumanAvatarAddedType:
 		err = u.setData(event)
 	case user.HumanAvatarRemovedType:
-		u.HumanView.Value().AvatarKey.Set("")
+		u.AvatarKey = ""
 	case user.HumanPasswordlessInitCodeAddedType,
 		user.HumanPasswordlessInitCodeRequestedType:
-		if u.HumanView.Value() == nil {
+		if u.HumanView == nil {
 			logging.WithFields("event_sequence", event.Sequence, "aggregate_id", event.Aggregate().ID, "instance", event.Aggregate().InstanceID).Warn("event is ignored because human not exists")
 			return zerrors.ThrowInvalidArgument(nil, "MODEL-MbyC0", "event ignored: human not exists")
 		}
-		if !u.HumanView.Value().PasswordSet.Value() {
-			u.HumanView.Value().PasswordlessInitRequired.Set(true)
-			u.HumanView.Value().PasswordInitRequired.Set(false)
+		if !u.PasswordSet {
+			u.PasswordlessInitRequired = true
+			u.PasswordInitRequired = false
 		}
 	}
 	u.ComputeObject()
@@ -387,7 +381,7 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 
 func (u *UserView) setRootData(event eventstore.Event) {
 	u.ID = event.Aggregate().ID
-	u.ResourceOwner.Set(event.Aggregate().ResourceOwner)
+	u.ResourceOwner = event.Aggregate().ResourceOwner
 	u.InstanceID = event.Aggregate().InstanceID
 }
 
@@ -405,10 +399,10 @@ func (u *UserView) setPasswordData(event eventstore.Event) error {
 		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
 		return zerrors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
-	u.HumanView.Value().PasswordSet.Set(password.Secret != nil || password.EncodedHash != "")
-	u.HumanView.Value().PasswordInitRequired.Set(!u.HumanView.Value().PasswordSet.Value())
-	u.HumanView.Value().PasswordChangeRequired.Set(password.ChangeRequired)
-	u.HumanView.Value().PasswordChanged.Set(event.CreatedAt())
+	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""
+	u.PasswordInitRequired = !u.PasswordSet
+	u.PasswordChangeRequired = password.ChangeRequired
+	u.PasswordChanged = event.CreatedAt()
 	return nil
 }
 
@@ -417,14 +411,14 @@ func (u *UserView) addPasswordlessToken(event eventstore.Event) error {
 	if err != nil {
 		return err
 	}
-	for i, t := range u.HumanView.Value().PasswordlessTokens.Value() {
-		if t.State.Value() == int32(model.MFAStateNotReady) {
-			u.HumanView.Value().PasswordlessTokens.Value()[i].ID.Set(token.ID.Value())
+	for i, t := range u.PasswordlessTokens {
+		if t.State == int32(model.MFAStateNotReady) {
+			u.PasswordlessTokens[i].ID = token.ID
 			return nil
 		}
 	}
-	token.State.Set(int32(model.MFAStateNotReady))
-	u.HumanView.Value().PasswordlessTokens.Set(append(u.HumanView.Value().PasswordlessTokens.Value(), token))
+	token.State = int32(model.MFAStateNotReady)
+	u.PasswordlessTokens = append(u.PasswordlessTokens, token)
 	return nil
 }
 
@@ -433,10 +427,10 @@ func (u *UserView) updatePasswordlessToken(event eventstore.Event) error {
 	if err != nil {
 		return err
 	}
-	for i, t := range u.HumanView.Value().PasswordlessTokens.Value() {
+	for i, t := range u.PasswordlessTokens {
 		if t.ID == token.ID {
-			u.HumanView.Value().PasswordlessTokens.Value()[i].Name.Set(token.Name.Value())
-			u.HumanView.Value().PasswordlessTokens.Value()[i].State.Set(int32(model.MFAStateReady))
+			u.PasswordlessTokens[i].Name = token.Name
+			u.PasswordlessTokens[i].State = int32(model.MFAStateReady)
 			return nil
 		}
 	}
@@ -448,9 +442,11 @@ func (u *UserView) removePasswordlessToken(event eventstore.Event) error {
 	if err != nil {
 		return err
 	}
-	for i, t := range u.HumanView.Value().PasswordlessTokens.Value() {
+	for i, t := range u.PasswordlessTokens {
 		if t.ID == token.ID {
-			u.HumanView.Value().PasswordlessTokens.Set(slices.Delete(u.HumanView.Value().PasswordlessTokens.Value(), i, i+1))
+			u.PasswordlessTokens[i] = u.PasswordlessTokens[len(u.PasswordlessTokens)-1]
+			u.PasswordlessTokens[len(u.PasswordlessTokens)-1] = nil
+			u.PasswordlessTokens = u.PasswordlessTokens[:len(u.PasswordlessTokens)-1]
 			return nil
 		}
 	}
@@ -462,14 +458,14 @@ func (u *UserView) addU2FToken(event eventstore.Event) error {
 	if err != nil {
 		return err
 	}
-	for i, t := range u.HumanView.Value().U2FTokens.Value() {
-		if t.State.Value() == int32(model.MFAStateNotReady) {
-			u.HumanView.Value().U2FTokens.Value()[i].ID.Set(token.ID.Value())
+	for i, t := range u.U2FTokens {
+		if t.State == int32(model.MFAStateNotReady) {
+			u.U2FTokens[i].ID = token.ID
 			return nil
 		}
 	}
-	token.State.Set(int32(model.MFAStateNotReady))
-	u.HumanView.Value().U2FTokens.Set(append(u.HumanView.Value().U2FTokens.Value(), token))
+	token.State = int32(model.MFAStateNotReady)
+	u.U2FTokens = append(u.U2FTokens, token)
 	return nil
 }
 
@@ -478,10 +474,10 @@ func (u *UserView) updateU2FToken(event eventstore.Event) error {
 	if err != nil {
 		return err
 	}
-	for i, t := range u.HumanView.Value().U2FTokens.Value() {
+	for i, t := range u.U2FTokens {
 		if t.ID == token.ID {
-			u.HumanView.Value().U2FTokens.Value()[i].Name.Set(token.Name.Value())
-			u.HumanView.Value().U2FTokens.Value()[i].State.Set(int32(model.MFAStateReady))
+			u.U2FTokens[i].Name = token.Name
+			u.U2FTokens[i].State = int32(model.MFAStateReady)
 			return nil
 		}
 	}
@@ -493,9 +489,11 @@ func (u *UserView) removeU2FToken(event eventstore.Event) error {
 	if err != nil {
 		return err
 	}
-	for i := len(u.HumanView.Value().U2FTokens.Value()) - 1; i >= 0; i-- {
-		if u.HumanView.Value().U2FTokens.Value()[i].ID == token.ID {
-			u.HumanView.Value().U2FTokens.Set(slices.Delete(u.HumanView.Value().U2FTokens.Value(), i, i+1))
+	for i := len(u.U2FTokens) - 1; i >= 0; i-- {
+		if u.U2FTokens[i].ID == token.ID {
+			u.U2FTokens[i] = u.U2FTokens[len(u.U2FTokens)-1]
+			u.U2FTokens[len(u.U2FTokens)-1] = nil
+			u.U2FTokens = u.U2FTokens[:len(u.U2FTokens)-1]
 		}
 	}
 	return nil
@@ -511,49 +509,49 @@ func webAuthNViewFromEvent(event eventstore.Event) (*WebAuthNView, error) {
 }
 
 func (u *UserView) ComputeObject() {
-	if !u.MachineView.Value().IsZero() {
-		if u.State.Value() == int32(model.UserStateUnspecified) {
-			u.State.Set(int32(model.UserStateActive))
+	if !u.MachineView.IsZero() {
+		if u.State == int32(model.UserStateUnspecified) {
+			u.State = int32(model.UserStateActive)
 		}
 		return
 	}
-	if u.State.Value() == int32(model.UserStateUnspecified) || u.State.Value() == int32(model.UserStateInitial) {
-		if u.HumanView.Value().IsEmailVerified.Value() {
-			u.State.Set(int32(model.UserStateActive))
+	if u.State == int32(model.UserStateUnspecified) || u.State == int32(model.UserStateInitial) {
+		if u.IsEmailVerified {
+			u.State = int32(model.UserStateActive)
 		} else {
-			u.State.Set(int32(model.UserStateInitial))
+			u.State = int32(model.UserStateInitial)
 		}
 	}
 	u.ComputeMFAMaxSetUp()
 }
 
 func (u *UserView) ComputeMFAMaxSetUp() {
-	for _, token := range u.HumanView.Value().PasswordlessTokens.Value() {
-		if token.State.Value() == int32(model.MFAStateReady) {
-			u.HumanView.Value().MFAMaxSetUp.Set(int32(domain.MFALevelMultiFactor))
-			u.HumanView.Value().PasswordlessInitRequired.Set(false)
+	for _, token := range u.PasswordlessTokens {
+		if token.State == int32(model.MFAStateReady) {
+			u.MFAMaxSetUp = int32(domain.MFALevelMultiFactor)
+			u.PasswordlessInitRequired = false
 			return
 		}
 	}
-	for _, token := range u.HumanView.Value().U2FTokens.Value() {
-		if token.State.Value() == int32(model.MFAStateReady) {
-			u.HumanView.Value().MFAMaxSetUp.Set(int32(domain.MFALevelSecondFactor))
+	for _, token := range u.U2FTokens {
+		if token.State == int32(model.MFAStateReady) {
+			u.MFAMaxSetUp = int32(domain.MFALevelSecondFactor)
 			return
 		}
 	}
-	if u.HumanView.Value().OTPState.Value() == int32(model.MFAStateReady) ||
-		u.HumanView.Value().OTPSMSAdded.Value() || u.HumanView.Value().OTPEmailAdded.Value() {
-		u.HumanView.Value().MFAMaxSetUp.Set(int32(domain.MFALevelSecondFactor))
+	if u.OTPState == int32(model.MFAStateReady) ||
+		u.OTPSMSAdded || u.OTPEmailAdded {
+		u.MFAMaxSetUp = int32(domain.MFALevelSecondFactor)
 		return
 	}
-	u.HumanView.Value().MFAMaxSetUp.Set(int32(domain.MFALevelNotSetUp))
+	u.MFAMaxSetUp = int32(domain.MFALevelNotSetUp)
 }
 
 func (u *UserView) SetEmptyUserType() {
-	if u.MachineView.Value() != nil && u.MachineView.Value().Name.Value() == "" {
-		u.MachineView.Set(nil)
+	if u.MachineView != nil && u.MachineView.Name == "" {
+		u.MachineView = nil
 	} else {
-		u.HumanView.Set(nil)
+		u.HumanView = nil
 	}
 }
 

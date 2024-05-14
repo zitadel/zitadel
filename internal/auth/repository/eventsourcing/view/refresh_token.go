@@ -33,10 +33,12 @@ func (v *View) PutRefreshToken(token *model.RefreshTokenView) error {
 	return usr_view.PutRefreshToken(v.Db, refreshTokenTable, token)
 }
 
+// TODO: replace with handler.Statement
 func (v *View) PutRefreshTokens(token []*model.RefreshTokenView) error {
 	return usr_view.PutRefreshTokens(v.Db, refreshTokenTable, token...)
 }
 
+// TODO: replace with handler.Statement
 func (v *View) DeleteRefreshToken(tokenID, instanceID string) error {
 	err := usr_view.DeleteRefreshToken(v.Db, refreshTokenTable, tokenID, instanceID)
 	if err != nil && !zerrors.IsNotFound(err) {
@@ -45,6 +47,7 @@ func (v *View) DeleteRefreshToken(tokenID, instanceID string) error {
 	return nil
 }
 
+// TODO: replace with handler.Statement
 func (v *View) DeleteUserRefreshTokens(userID, instanceID string) error {
 	err := usr_view.DeleteUserRefreshTokens(v.Db, refreshTokenTable, userID, instanceID)
 	if err != nil && !zerrors.IsNotFound(err) {
@@ -53,6 +56,7 @@ func (v *View) DeleteUserRefreshTokens(userID, instanceID string) error {
 	return nil
 }
 
+// TODO: replace with handler.Statement
 func (v *View) DeleteApplicationRefreshTokens(event *models.Event, ids ...string) error {
 	err := usr_view.DeleteApplicationTokens(v.Db, refreshTokenTable, event.InstanceID, ids)
 	if err != nil && !zerrors.IsNotFound(err) {
@@ -61,6 +65,7 @@ func (v *View) DeleteApplicationRefreshTokens(event *models.Event, ids ...string
 	return nil
 }
 
+// TODO: replace with handler.Statement
 func (v *View) DeleteInstanceRefreshTokens(instanceID string) error {
 	err := usr_view.DeleteInstanceRefreshTokens(v.Db, refreshTokenTable, instanceID)
 	if err != nil && !zerrors.IsNotFound(err) {
@@ -69,6 +74,7 @@ func (v *View) DeleteInstanceRefreshTokens(instanceID string) error {
 	return nil
 }
 
+// TODO: replace with handler.Statement
 func (v *View) DeleteOrgRefreshTokens(event eventstore.Event) error {
 	err := usr_view.DeleteOrgRefreshTokens(v.Db, refreshTokenTable, event.Aggregate().InstanceID, event.Aggregate().ResourceOwner)
 	if err != nil && !zerrors.IsNotFound(err) {

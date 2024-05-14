@@ -60,39 +60,39 @@ func UsersByOrgID(db *gorm.DB, table, orgID, instanceID string) ([]*model.UserVi
 	return users, err
 }
 
-// func PutUsers(db *gorm.DB, table string, users ...*model.UserView) error {
-// 	save := repository.PrepareBulkSave(table)
-// 	u := make([]interface{}, len(users))
-// 	for i, user := range users {
-// 		u[i] = user
-// 	}
-// 	return save(db, u...)
-// }
+func PutUsers(db *gorm.DB, table string, users ...*model.UserView) error {
+	save := repository.PrepareBulkSave(table)
+	u := make([]interface{}, len(users))
+	for i, user := range users {
+		u[i] = user
+	}
+	return save(db, u...)
+}
 
-// func PutUser(db *gorm.DB, table string, user *model.UserView) error {
-// 	save := repository.PrepareSave(table)
-// 	return save(db, user)
-// }
+func PutUser(db *gorm.DB, table string, user *model.UserView) error {
+	save := repository.PrepareSave(table)
+	return save(db, user)
+}
 
-// func DeleteUser(db *gorm.DB, table, userID, instanceID string) error {
-// 	delete := repository.PrepareDeleteByKeys(table,
-// 		repository.Key{model.UserSearchKey(usr_model.UserSearchKeyUserID), userID},
-// 		repository.Key{model.UserSearchKey(usr_model.UserSearchKeyInstanceID), instanceID},
-// 	)
-// 	return delete(db)
-// }
+func DeleteUser(db *gorm.DB, table, userID, instanceID string) error {
+	delete := repository.PrepareDeleteByKeys(table,
+		repository.Key{model.UserSearchKey(usr_model.UserSearchKeyUserID), userID},
+		repository.Key{model.UserSearchKey(usr_model.UserSearchKeyInstanceID), instanceID},
+	)
+	return delete(db)
+}
 
-// func DeleteInstanceUsers(db *gorm.DB, table, instanceID string) error {
-// 	delete := repository.PrepareDeleteByKey(table, model.UserSearchKey(usr_model.UserSearchKeyInstanceID), instanceID)
-// 	return delete(db)
-// }
+func DeleteInstanceUsers(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.UserSearchKey(usr_model.UserSearchKeyInstanceID), instanceID)
+	return delete(db)
+}
 
-// func UpdateOrgOwnerRemovedUsers(db *gorm.DB, table, instanceID, aggID string) error {
-// 	update := repository.PrepareUpdateByKeys(table,
-// 		model.UserSearchKey(usr_model.UserSearchOwnerRemoved),
-// 		true,
-// 		repository.Key{Key: model.UserSearchKey(usr_model.UserSearchKeyInstanceID), Value: instanceID},
-// 		repository.Key{Key: model.UserSearchKey(usr_model.UserSearchKeyResourceOwner), Value: aggID},
-// 	)
-// 	return update(db)
-// }
+func UpdateOrgOwnerRemovedUsers(db *gorm.DB, table, instanceID, aggID string) error {
+	update := repository.PrepareUpdateByKeys(table,
+		model.UserSearchKey(usr_model.UserSearchOwnerRemoved),
+		true,
+		repository.Key{Key: model.UserSearchKey(usr_model.UserSearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.UserSearchKey(usr_model.UserSearchKeyResourceOwner), Value: aggID},
+	)
+	return update(db)
+}

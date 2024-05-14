@@ -98,77 +98,50 @@ func (t *RefreshToken) Reducers() []handler.AggregateReducer {
 }
 
 func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err error) {
-	switch event.Type() {
-	case user.HumanRefreshTokenAddedType:
-		token := new(view_model.RefreshTokenView)
-		err := token.AppendEvent(event)
-		if err != nil {
-			return nil, err
-		}
-		return handler.NewCreateStatement(
-			event,
-			append(token.PKColumns(), token.Changes()...),
-		), nil
-	case user.HumanRefreshTokenRenewedType:
-		e := new(user.HumanRefreshTokenRenewedEvent)
-		if err := event.Unmarshal(e); err != nil {
-			logging.WithError(err).Error("could not unmarshal event data")
-			return nil, zerrors.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
-		}
-		token := &view_model.RefreshTokenView{
-			ID:         e.TokenID,
-			InstanceID: event.Aggregate().InstanceID,
-		}
-		err = token.AppendEvent(event)
-		if err != nil {
-			return nil, err
-		}
-		return handler.NewUpdateStatement(
-			event,
-			token.Changes(),
-			token.PKConditions(),
-		), nil
-	case user.HumanRefreshTokenRemovedType:
-		e := new(user.HumanRefreshTokenRemovedEvent)
-		if err := event.Unmarshal(e); err != nil {
-			logging.WithError(err).Error("could not unmarshal event data")
-			return nil, zerrors.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
-		}
+	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+		switch event.Type() {
+		case user.HumanRefreshTokenAddedType:
+			token := new(view_model.RefreshTokenView)
+			err := token.AppendEvent(event)
+			if err != nil {
+				return err
+			}
 
-		return handler.NewDeleteStatement(
-			event,
-			[]handler.Condition{
-				handler.NewCond(view_model.RefreshTokenKeyTokenID, e.TokenID),
-				handler.NewCond(view_model.RefreshTokenKeyInstanceID, event.Aggregate().InstanceID),
-			},
-		), nil
-	case user.UserLockedType,
-		user.UserDeactivatedType,
-		user.UserRemovedType:
+			return t.view.PutRefreshToken(token)
+		case user.HumanRefreshTokenRenewedType:
+			e := new(user.HumanRefreshTokenRenewedEvent)
+			if err := event.Unmarshal(e); err != nil {
+				logging.WithError(err).Error("could not unmarshal event data")
+				return zerrors.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
+			}
+			token, err := t.view.RefreshTokenByID(e.TokenID, event.Aggregate().InstanceID)
+			if err != nil {
+				return err
+			}
+			err = token.AppendEvent(event)
+			if err != nil {
+				return err
+			}
+			return t.view.PutRefreshToken(token)
+		case user.HumanRefreshTokenRemovedType:
+			e := new(user.HumanRefreshTokenRemovedEvent)
+			if err := event.Unmarshal(e); err != nil {
+				logging.WithError(err).Error("could not unmarshal event data")
+				return zerrors.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
+			}
+			return t.view.DeleteRefreshToken(e.TokenID, event.Aggregate().InstanceID)
+		case user.UserLockedType,
+			user.UserDeactivatedType,
+			user.UserRemovedType:
 
-		return handler.NewDeleteStatement(
-			event,
-			[]handler.Condition{
-				handler.NewCond(view_model.RefreshTokenKeyUserID, event.Aggregate().ID),
-				handler.NewCond(view_model.RefreshTokenKeyInstanceID, event.Aggregate().InstanceID),
-			},
-		), nil
-	case instance.InstanceRemovedEventType:
-		return handler.NewDeleteStatement(
-			event,
-			[]handler.Condition{
-				handler.NewCond(view_model.RefreshTokenKeyInstanceID, event.Aggregate().InstanceID),
-			},
-		), nil
-	case org.OrgRemovedEventType:
-		return handler.NewDeleteStatement(
-			event,
-			[]handler.Condition{
-				handler.NewCond(view_model.RefreshTokenKeyResourceOwner, event.Aggregate().ID),
-				handler.NewCond(view_model.RefreshTokenKeyInstanceID, event.Aggregate().InstanceID),
-			},
-		), nil
-	default:
-		return handler.NewNoOpStatement(event), nil
-	}
+			return t.view.DeleteUserRefreshTokens(event.Aggregate().ID, event.Aggregate().InstanceID)
+		case instance.InstanceRemovedEventType:
+
+			return t.view.DeleteInstanceRefreshTokens(event.Aggregate().InstanceID)
+		case org.OrgRemovedEventType:
+			return t.view.DeleteOrgRefreshTokens(event)
+		default:
+			return nil
+		}
+	}), nil
 }
