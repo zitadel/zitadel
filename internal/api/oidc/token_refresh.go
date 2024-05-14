@@ -71,6 +71,13 @@ func (s *Server) refreshTokenV1(ctx context.Context, client *Client, r *op.Clien
 	if err != nil {
 		return nil, err
 	}
+
+	// make sure the v1 refresh token can't be reused.
+	_, err = s.command.RevokeRefreshToken(ctx, refreshToken.UserID, refreshToken.ResourceOwner, refreshToken.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return response(s.accessTokenResponseFromSession(ctx, client, session, "", client.client.ProjectID, client.client.ProjectRoleAssertion))
 }
 
