@@ -931,6 +931,17 @@ message AddHumanUserRequest{
     HashedPassword hashed_password = 8;
   }
   repeated IDPLink idp_links = 9;
+
+  // An Implementation of RFC 6238 is used, with HMAC-SHA-1 and time-step of 30 seconds.
+  // Currently no other options are supported, and if anything different is used the validation will fail.
+  optional string totp_secret = 12 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
+    }
+  ];
 }
 
 message AddHumanUserResponse {
