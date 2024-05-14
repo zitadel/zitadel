@@ -47,9 +47,10 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 		keyAlgorithm                    crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx             context.Context
-		authRequestID   string
-		complianceCheck AuthRequestComplianceChecker
+		ctx              context.Context
+		authRequestID    string
+		complianceCheck  AuthRequestComplianceChecker
+		needRefreshToken bool
 	}
 	type res struct {
 		session *OIDCSession
@@ -290,9 +291,10 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				keyAlgorithm:                    crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args{
-				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				authRequestID:   "V2_authRequestID",
-				complianceCheck: mockAuthRequestComplianceChecker(nil),
+				ctx:              authz.WithInstanceID(context.Background(), "instanceID"),
+				authRequestID:    "V2_authRequestID",
+				complianceCheck:  mockAuthRequestComplianceChecker(nil),
+				needRefreshToken: true,
 			},
 			res{
 				session: &OIDCSession{
@@ -434,7 +436,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
-			gotSession, gotState, err := c.CreateOIDCSessionFromAuthRequest(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck)
+			gotSession, gotState, err := c.CreateOIDCSessionFromAuthRequest(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck, tt.args.needRefreshToken)
 			require.ErrorIs(t, err, tt.res.err)
 
 			if gotSession != nil {

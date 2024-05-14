@@ -40,6 +40,7 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 			setContextUserSystem(ctx),
 			plainCode,
 			codeExchangeComplianceChecker(client, r.Data),
+			slices.Contains(client.GrantTypes(), oidc.GrantTypeRefreshToken),
 		)
 	} else {
 		session, state, err = s.codeExchangeV1(ctx, client, r.Data, r.Data.Code)

@@ -484,6 +484,7 @@ func (s *Server) CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest)
 		setContextUserSystem(ctx),
 		req.GetID(),
 		implicitFlowComplianceChecker(),
+		slices.Contains(client.GrantTypes(), oidc.GrantTypeRefreshToken),
 	)
 	if err != nil {
 		return "", err
