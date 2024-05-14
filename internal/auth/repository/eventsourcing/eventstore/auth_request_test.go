@@ -74,26 +74,24 @@ type mockUser struct {
 }
 
 func (m *mockViewUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
-	session := new(user_view_model.UserSessionView)
-	session.ExternalLoginVerification.Set(m.ExternalLoginVerification)
-	session.PasswordlessVerification.Set(m.PasswordlessVerification)
-	session.PasswordVerification.Set(m.PasswordVerification)
-	session.SecondFactorVerification.Set(m.SecondFactorVerification)
-	session.MultiFactorVerification.Set(m.MultiFactorVerification)
-
-	return session, nil
+	return &user_view_model.UserSessionView{
+		ExternalLoginVerification: m.ExternalLoginVerification,
+		PasswordlessVerification:  m.PasswordlessVerification,
+		PasswordVerification:      m.PasswordVerification,
+		SecondFactorVerification:  m.SecondFactorVerification,
+		MultiFactorVerification:   m.MultiFactorVerification,
+	}, nil
 }
 
 func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_view_model.UserSessionView, error) {
 	sessions := make([]*user_view_model.UserSessionView, len(m.Users))
 	for i, user := range m.Users {
 		sessions[i] = &user_view_model.UserSessionView{
-			UserID:    user.UserID,
-			LoginName: user.LoginName,
+			ResourceOwner: user.ResourceOwner,
+			State:         int32(user.SessionState),
+			UserID:        user.UserID,
+			LoginName:     user.LoginName,
 		}
-
-		sessions[i].ResourceOwner.Set(user.ResourceOwner)
-		sessions[i].State.Set(int32(user.SessionState))
 	}
 	return sessions, nil
 }

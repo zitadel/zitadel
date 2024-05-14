@@ -23,3 +23,23 @@ func GetStylingByAggregateIDAndState(db *gorm.DB, table, aggregateID, instanceID
 	}
 	return policy, err
 }
+
+func PutStyling(db *gorm.DB, table string, policy *model.LabelPolicyView) error {
+	save := repository.PrepareSave(table)
+	return save(db, policy)
+}
+
+func UpdateOrgOwnerRemovedStyling(db *gorm.DB, table, instanceID, aggID string) error {
+	update := repository.PrepareUpdateByKeys(table,
+		model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyOwnerRemoved),
+		true,
+		repository.Key{Key: model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyInstanceID), Value: instanceID},
+		repository.Key{Key: model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyAggregateID), Value: aggID},
+	)
+	return update(db)
+}
+
+func DeleteInstanceStyling(db *gorm.DB, table, instanceID string) error {
+	delete := repository.PrepareDeleteByKey(table, model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyInstanceID), instanceID)
+	return delete(db)
+}
