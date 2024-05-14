@@ -24,6 +24,9 @@ func BrowserInfoFromRequest(r *net_http.Request) *BrowserInfo {
 }
 
 func (b *BrowserInfo) ToUserAgent() *UserAgent {
+	if b == nil {
+		return nil
+	}
 	return &UserAgent{
 		FingerprintID: &b.UserAgent,
 		IP:            b.RemoteIP,

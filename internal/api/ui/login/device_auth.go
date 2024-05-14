@@ -112,6 +112,7 @@ func (l *Login) handleDeviceAuthUserCode(w http.ResponseWriter, r *http.Request)
 	}
 	authRequest, err := l.authRepo.CreateAuthRequest(ctx, &domain.AuthRequest{
 		CreationDate:  time.Now(),
+		BrowserInfo:   domain.BrowserInfoFromRequest(r),
 		AgentID:       userAgentID,
 		ApplicationID: deviceAuthReq.ClientID,
 		InstanceID:    authz.GetInstance(ctx).InstanceID(),
