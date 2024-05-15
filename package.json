@@ -20,7 +20,7 @@
     "@changesets/cli": "^2.22.0",
     "eslint": "^7.32.0",
     "eslint-config-zitadel": "workspace:*",
-    "prettier": "^2.5.1",
+    "prettier": "^3.2.5",
     "turbo": "^1.10.8"
   },
   "packageManager": "pnpm@8.15.5+sha256.4b4efa12490e5055d59b9b9fc9438b7d581a6b7af3b5675eb5c5f447cee1a589"

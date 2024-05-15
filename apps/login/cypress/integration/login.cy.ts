@@ -111,7 +111,7 @@ describe("login", () => {
         cy.get('button[type="submit"]').click();
         cy.location("pathname", { timeout: 10_000 }).should(
           "eq",
-          "/passkey/add"
+          "/passkey/add",
         );
       });
     });
@@ -160,7 +160,7 @@ describe("login", () => {
       cy.visit("/loginname?loginName=john%40zitadel.com&submit=true");
       cy.location("pathname", { timeout: 10_000 }).should(
         "eq",
-        "/passkey/login"
+        "/passkey/login",
       );
     });
   });

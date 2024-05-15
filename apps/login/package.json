@@ -54,6 +54,7 @@
     "tinycolor2": "1.4.2"
   },
   "devDependencies": {
+    "@zitadel/prettier-config": "workspace:*",
     "@bufbuild/buf": "^1.14.0",
     "@jest/types": "^29.5.0",
     "@testing-library/jest-dom": "^5.16.5",
