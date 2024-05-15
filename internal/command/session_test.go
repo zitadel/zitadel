@@ -683,7 +683,8 @@ func TestCommands_updateSession(t *testing.T) {
 									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
 							),
 							eventFromEventPusher(
-								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
+								idpintent.NewSucceededEvent(context.Background(),
+									&idpintent.NewAggregate("id", "instance1").Aggregate,
 									nil,
 									"idpUserID",
 									"idpUserName",
@@ -775,7 +776,8 @@ func TestCommands_updateSession(t *testing.T) {
 									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
 							),
 							eventFromEventPusher(
-								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
+								idpintent.NewSucceededEvent(context.Background(),
+									&idpintent.NewAggregate("id", "instance1").Aggregate,
 									nil,
 									"idpUserID",
 									"idpUsername",
@@ -827,7 +829,9 @@ func TestCheckTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("instance1", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
-	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
+	key, err := domain.NewTOTPKey("example.com", "user1")
+	require.NoError(t, err)
+	secret, err := crypto.Encrypt([]byte(key.Secret()), cryptoAlg)
 	require.NoError(t, err)
 
 	sessAgg := &session.NewAggregate("session1", "instance1").Aggregate

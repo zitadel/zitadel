@@ -154,6 +154,9 @@ func legalAndSupportSettingsToPb(current *query.PrivacyPolicy) *settings.LegalAn
 		HelpLink:          current.HelpLink,
 		SupportEmail:      string(current.SupportEmail),
 		ResourceOwnerType: isDefaultToResourceOwnerTypePb(current.IsDefault),
+		DocsLink:          current.DocsLink,
+		CustomLink:        current.CustomLink,
+		CustomLinkText:    current.CustomLinkText,
 	}
 }
 

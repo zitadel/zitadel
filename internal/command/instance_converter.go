@@ -116,11 +116,14 @@ func writeModelToLockoutPolicy(wm *LockoutPolicyWriteModel) *domain.LockoutPolic
 
 func writeModelToPrivacyPolicy(wm *PrivacyPolicyWriteModel) *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
-		ObjectRoot:   writeModelToObjectRoot(wm.WriteModel),
-		TOSLink:      wm.TOSLink,
-		PrivacyLink:  wm.PrivacyLink,
-		HelpLink:     wm.HelpLink,
-		SupportEmail: wm.SupportEmail,
+		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
+		TOSLink:        wm.TOSLink,
+		PrivacyLink:    wm.PrivacyLink,
+		HelpLink:       wm.HelpLink,
+		SupportEmail:   wm.SupportEmail,
+		DocsLink:       wm.DocsLink,
+		CustomLink:     wm.CustomLink,
+		CustomLinkText: wm.CustomLinkText,
 	}
 }
 

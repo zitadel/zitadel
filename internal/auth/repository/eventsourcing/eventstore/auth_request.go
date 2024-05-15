@@ -447,7 +447,7 @@ func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceO
 func (repo *AuthRequestRepo) BeginPasswordlessSetup(ctx context.Context, userID, resourceOwner string, authenticatorPlatform domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.Command.HumanAddPasswordlessSetup(ctx, userID, resourceOwner, true, authenticatorPlatform)
+	return repo.Command.HumanAddPasswordlessSetup(ctx, userID, resourceOwner, authenticatorPlatform)
 }
 
 func (repo *AuthRequestRepo) VerifyPasswordlessSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName string, credentialData []byte) (err error) {
@@ -1286,12 +1286,15 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 			CreationDate:  p.CreationDate,
 			ChangeDate:    p.ChangeDate,
 		},
-		State:        p.State,
-		Default:      p.IsDefault,
-		TOSLink:      p.TOSLink,
-		PrivacyLink:  p.PrivacyLink,
-		HelpLink:     p.HelpLink,
-		SupportEmail: p.SupportEmail,
+		State:          p.State,
+		Default:        p.IsDefault,
+		TOSLink:        p.TOSLink,
+		PrivacyLink:    p.PrivacyLink,
+		HelpLink:       p.HelpLink,
+		SupportEmail:   p.SupportEmail,
+		DocsLink:       p.DocsLink,
+		CustomLink:     p.CustomLink,
+		CustomLinkText: p.CustomLinkText,
 	}
 }
 
