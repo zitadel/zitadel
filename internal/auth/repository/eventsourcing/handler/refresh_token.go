@@ -175,7 +175,7 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
 				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(resourceOwnerCol, event.Aggregate().InstanceID),
+				handler.NewCond(resourceOwnerCol, event.Aggregate().ResourceOwner),
 			},
 		), nil
 	default:
