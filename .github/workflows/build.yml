@@ -85,22 +85,3 @@ jobs:
     uses: ./.github/workflows/e2e.yml
     needs: [compile]
 
-  release:
-    uses: ./.github/workflows/release.yml
-    permissions:
-      packages: write
-      contents: write
-      issues: write
-      pull-requests: write
-    needs:
-      [version, core-test, lint, container, e2e]
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    secrets:
-      GCR_JSON_KEY_BASE64: ${{ secrets.GCR_JSON_KEY_BASE64 }}
-      APP_ID: ${{ secrets.APP_ID }}
-      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
-    with:
-      build_image_name: ${{ needs.container.outputs.build_image }}
-      semantic_version: "23.0.7"
-      image_name: "ghcr.io/zitadel/zitadel"
-      google_image_name: "europe-docker.pkg.dev/zitadel-common/zitadel-repo/zitadel"
