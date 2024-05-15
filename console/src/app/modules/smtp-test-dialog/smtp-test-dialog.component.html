@@ -19,9 +19,13 @@
     <input cnslInput [(ngModel)]="email" data-e2e="email-test-dialog-input" />
   </cnsl-form-field>
 
+  <div class="is-loading" *ngIf="isLoading()">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
   <cnsl-form-field class="formfield" *ngIf="testResult">
     <cnsl-label>{{ data.testResultKey | translate }}</cnsl-label>
-    <textarea cnslInput class="test-result" [(ngModel)]="testResult"></textarea>
+    <textarea cnslInput class="{{ resultClass }}" [(ngModel)]="testResult"></textarea>
   </cnsl-form-field>
 </div>
 
@@ -32,7 +36,7 @@
   <span class="fill-space"></span>
   <button
     color="primary"
-    [disabled]="!email"
+    [disabled]="!email || isLoading()"
     mat-raised-button
     class="ok-button"
     (click)="testEmailConfiguration()"

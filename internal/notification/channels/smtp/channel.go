@@ -118,7 +118,7 @@ func (smtpConfig SMTP) getSMTPClientWithTls(host string) (*smtp.Client, error) {
 	conn, err := tls.Dial("tcp", smtpConfig.Host, &tls.Config{})
 
 	if errors.As(err, &tls.RecordHeaderError{}) {
-		logging.Log("MAIN-xKIzT").OnError(err).Warn("could not connect using normal tls. trying starttls instead...")
+		logging.OnError(err).Warn("could not connect using normal tls. trying starttls instead...")
 		return smtpConfig.getSMTPClientWithStartTls(host)
 	}
 

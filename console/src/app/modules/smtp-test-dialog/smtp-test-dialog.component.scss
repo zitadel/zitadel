@@ -35,6 +35,17 @@ h1 {
   }
 }
 
-.test-result {
+.is-loading {
+  display: flex;
+  justify-content: center;
+}
+
+.test-error {
+  border-color: #ff3b5b;
+  min-height: 200px;
+}
+
+.test-success {
+  border-color: #10b981;
   min-height: 200px;
 }
