@@ -2256,7 +2256,16 @@
         "CURRENT_DESC_TITLE": "Queste sono le tue impostazioni SMTP",
         "PROVIDER_SETTINGS": "Impostazioni del provider SMTP",
         "SENDER_SETTINGS": "Impostazioni mittente",
-        "TEST_SETTINGS": "Testare le impostazioni SMTP"
+        "TEST_SETTINGS": "Testare le impostazioni SMTP",
+        "NEXT_STEPS": "Prossimi passi",
+        "ACTIVATE": {
+          "TITLE": "Attiva il tuo provider SMTP",
+          "DESCRIPTION": "Zitadel non può utilizzare questo provider SMTP per inviare notifiche finché non lo attivi. Se attivi questo fornitore, qualsiasi altro fornitore che era attivo verrà ora disattivato."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Disattiva il tuo provider SMTP",
+          "DESCRIPTION": "Dopo aver disattivato l'archivio SMTP, la schermata non è disponibile per l'utente, il documento è nuovo e non è attivo."
+        }
       }
     },
     "DETAIL": {

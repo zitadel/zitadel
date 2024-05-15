@@ -2274,7 +2274,16 @@
         "CURRENT_DESC_TITLE": "Dit zijn uw SMTP-instellingen",
         "PROVIDER_SETTINGS": "SMTP-providerinstellingen",
         "SENDER_SETTINGS": "Afzenderinstellingen",
-        "TEST_SETTINGS": "SMTP-instellingen testen"
+        "TEST_SETTINGS": "SMTP-instellingen testen",
+        "NEXT_STEPS": "Volgende stappen",
+        "ACTIVATE": {
+          "TITLE": "Activeer uw SMTP-provider",
+          "DESCRIPTION": "Zitadel kan deze SMTP-provider niet gebruiken om meldingen te verzenden totdat u deze activeert. Als u deze provider activeert, worden alle andere actieve providers nu gedeactiveerd."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deactiveer uw SMTP-provider",
+          "DESCRIPTION": "Als u deze SMTP-provider deactiveert, kan Zitadel deze niet gebruiken om meldingen te verzenden totdat u deze opnieuw activeert."
+        }
       }
     },
     "DETAIL": {

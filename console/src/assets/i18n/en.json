@@ -2274,7 +2274,16 @@
         "CURRENT_DESC_TITLE": "These are your SMTP settings",
         "PROVIDER_SETTINGS": "SMTP Provider Settings",
         "SENDER_SETTINGS": "Sender Settings",
-        "TEST_SETTINGS": "Test SMTP Settings"
+        "TEST_SETTINGS": "Test SMTP Settings",
+        "NEXT_STEPS": "Next Steps",
+        "ACTIVATE": {
+          "TITLE": "Activate your SMTP Provider",
+          "DESCRIPTION": "Zitadel cannot use this SMTP Provider to send notifications until you activate it. If you activate this provider any other provider that was active will now be deactivated."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deactivate your SMTP Provider",
+          "DESCRIPTION": "If you deactivate this SMTP Provider, Zitadel cannot use it to send notifications until you activate it again."
+        }
       }
     },
     "DETAIL": {

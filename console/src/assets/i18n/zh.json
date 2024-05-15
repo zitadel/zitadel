@@ -2255,7 +2255,16 @@
         "CURRENT_DESC_TITLE": "这些是您的 SMTP 设置",
         "PROVIDER_SETTINGS": "SMTP 提供商设置",
         "SENDER_SETTINGS": "发件人设置",
-        "TEST_SETTINGS": "测试 SMTP 设置"
+        "TEST_SETTINGS": "测试 SMTP 设置",
+        "NEXT_STEPS": "下一步",
+        "ACTIVATE": {
+          "TITLE": "激活您的 SMTP 提供商",
+          "DESCRIPTION": "在您激活此 SMTP 提供程序之前，Zitadel 无法使用它来发送通知。如果您激活此提供程序，任何其他处于活动状态的提供程序现在都将被停用。"
+        },
+        "DEACTIVATE": {
+          "TITLE": "停用您的 SMTP 提供商",
+          "DESCRIPTION": "如果您停用此 SMTP 提供程序，Zitadel 将无法使用它发送通知，直到您再次激活它。"
+        }
       }
     },
     "DETAIL": {

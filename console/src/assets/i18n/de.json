@@ -2255,7 +2255,16 @@
         "CURRENT_DESC_TITLE": "Dies sind Ihre SMTP-Einstellungen",
         "PROVIDER_SETTINGS": "SMTP-Anbietereinstellungen",
         "SENDER_SETTINGS": "Absendereinstellungen",
-        "TEST_SETTINGS": "Testen Sie die SMTP-Einstellungen"
+        "TEST_SETTINGS": "Testen Sie die SMTP-Einstellungen",
+        "NEXT_STEPS": "Nächste Schritte",
+        "ACTIVATE": {
+          "TITLE": "Aktivieren Sie Ihren SMTP-Anbieter",
+          "DESCRIPTION": "Zitadel kann diesen SMTP-Anbieter nicht zum Senden von Benachrichtigungen verwenden, bis Sie ihn aktivieren. Wenn Sie diesen Anbieter aktivieren, werden alle anderen aktiven Anbieter nun deaktiviert."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktivieren Sie Ihren SMTP-Anbieter",
+          "DESCRIPTION": "Wenn Sie diesen SMTP-Anbieter deaktivieren, kann Zitadel ihn nicht zum Versenden von Benachrichtigungen verwenden, bis Sie ihn erneut aktivieren."
+        }
       }
     },
     "DETAIL": {

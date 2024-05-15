@@ -2256,7 +2256,16 @@
         "CURRENT_DESC_TITLE": "Ce sont vos paramètres SMTP",
         "PROVIDER_SETTINGS": "Paramètres du fournisseur SMTP",
         "SENDER_SETTINGS": "Paramètres de l'expéditeur",
-        "TEST_SETTINGS": "Tester les paramètres SMTP"
+        "TEST_SETTINGS": "Tester les paramètres SMTP",
+        "NEXT_STEPS": "Prochaines étapes",
+        "ACTIVATE": {
+          "TITLE": "Activez votre fournisseur SMTP",
+          "DESCRIPTION": "Zitadel ne peut pas utiliser ce fournisseur SMTP pour envoyer des notifications tant que vous ne l'avez pas activé. Si vous activez ce fournisseur, tout autre fournisseur qui était actif sera désormais désactivé."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Désactivez votre fournisseur SMTP",
+          "DESCRIPTION": "Si vous désactivez l'option SMTP, vous ne pourrez pas vous connecter à l'application, le dossier sera alors désactivé."
+        }
       }
     },
     "DETAIL": {
