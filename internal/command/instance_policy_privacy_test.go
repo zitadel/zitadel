@@ -20,11 +20,14 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx          context.Context
-		tosLink      string
-		privacyLink  string
-		helpLink     string
-		supportEmail domain.EmailAddress
+		ctx            context.Context
+		tosLink        string
+		privacyLink    string
+		helpLink       string
+		supportEmail   domain.EmailAddress
+		docsLink       string
+		customLink     string
+		customLinkText string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -49,17 +52,23 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 								"PrivacyLink",
 								"HelpLink",
 								"support@example.com",
+								"DocsLink",
+								"CustomLink",
+								"Custom",
 							),
 						),
 					),
 				),
 			},
 			args: args{
-				ctx:          context.Background(),
-				tosLink:      "TOSLink",
-				privacyLink:  "PrivacyLink",
-				helpLink:     "HelpLink",
-				supportEmail: "support@example.com",
+				ctx:            context.Background(),
+				tosLink:        "TOSLink",
+				privacyLink:    "PrivacyLink",
+				helpLink:       "HelpLink",
+				supportEmail:   "support@example.com",
+				docsLink:       "DocsLink",
+				customLink:     "CustomLink",
+				customLinkText: "Custom",
 			},
 			res: res{
 				err: zerrors.IsErrorAlreadyExists,
@@ -78,16 +87,22 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 							"PrivacyLink",
 							"HelpLink",
 							"support@example.com",
+							"DocsLink",
+							"CustomLink",
+							"Custom",
 						),
 					),
 				),
 			},
 			args: args{
-				ctx:          authz.WithInstanceID(context.Background(), "INSTANCE"),
-				tosLink:      "TOSLink",
-				privacyLink:  "PrivacyLink",
-				helpLink:     "HelpLink",
-				supportEmail: "support@example.com",
+				ctx:            authz.WithInstanceID(context.Background(), "INSTANCE"),
+				tosLink:        "TOSLink",
+				privacyLink:    "PrivacyLink",
+				helpLink:       "HelpLink",
+				supportEmail:   "support@example.com",
+				docsLink:       "DocsLink",
+				customLink:     "CustomLink",
+				customLinkText: "Custom",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -103,11 +118,14 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:          authz.WithInstanceID(context.Background(), "INSTANCE"),
-				tosLink:      "TOSLink",
-				privacyLink:  "PrivacyLink",
-				helpLink:     "HelpLink",
-				supportEmail: "wrong email",
+				ctx:            authz.WithInstanceID(context.Background(), "INSTANCE"),
+				tosLink:        "TOSLink",
+				privacyLink:    "PrivacyLink",
+				helpLink:       "HelpLink",
+				supportEmail:   "wrong email",
+				docsLink:       "DocsLink",
+				customLink:     "CustomLink",
+				customLinkText: "Custom",
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -122,6 +140,9 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 					expectPush(
 						instance.NewPrivacyPolicyAddedEvent(context.Background(),
 							&instance.NewAggregate("INSTANCE").Aggregate,
+							"",
+							"",
+							"",
 							"",
 							"",
 							"",
@@ -149,7 +170,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultPrivacyPolicy(tt.args.ctx, tt.args.tosLink, tt.args.privacyLink, tt.args.helpLink, tt.args.supportEmail)
+			got, err := r.AddDefaultPrivacyPolicy(tt.args.ctx, tt.args.tosLink, tt.args.privacyLink, tt.args.helpLink, tt.args.supportEmail, tt.args.docsLink, tt.args.customLink, tt.args.customLinkText)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -192,10 +213,13 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.PrivacyPolicy{
-					TOSLink:      "TOSLink",
-					PrivacyLink:  "PrivacyLink",
-					HelpLink:     "HelpLink",
-					SupportEmail: "support@example.com",
+					TOSLink:        "TOSLink",
+					PrivacyLink:    "PrivacyLink",
+					HelpLink:       "HelpLink",
+					SupportEmail:   "support@example.com",
+					DocsLink:       "DocsLink",
+					CustomLink:     "CustomLink",
+					CustomLinkText: "CustomLinkText",
 				},
 			},
 			res: res{
@@ -215,6 +239,9 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 								"PrivacyLink",
 								"HelpLink",
 								"support@example.com",
+								"DocsLink",
+								"CustomLink",
+								"CustomLinkText",
 							),
 						),
 					),
@@ -223,10 +250,13 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.PrivacyPolicy{
-					TOSLink:      "TOSLink",
-					PrivacyLink:  "PrivacyLink",
-					HelpLink:     "HelpLink",
-					SupportEmail: "support@example.com",
+					TOSLink:        "TOSLink",
+					PrivacyLink:    "PrivacyLink",
+					HelpLink:       "HelpLink",
+					SupportEmail:   "support@example.com",
+					DocsLink:       "DocsLink",
+					CustomLink:     "CustomLink",
+					CustomLinkText: "CustomLinkText",
 				},
 			},
 			res: res{
@@ -243,10 +273,13 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.PrivacyPolicy{
-					TOSLink:      "TOSLink",
-					PrivacyLink:  "PrivacyLink",
-					HelpLink:     "HelpLink",
-					SupportEmail: "wrong email",
+					TOSLink:        "TOSLink",
+					PrivacyLink:    "PrivacyLink",
+					HelpLink:       "HelpLink",
+					SupportEmail:   "wrong email",
+					DocsLink:       "DocsLink",
+					CustomLink:     "CustomLink",
+					CustomLinkText: "CustomLinkText",
 				},
 			},
 			res: res{
@@ -266,6 +299,9 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 								"PrivacyLink",
 								"HelpLink",
 								"support@example.com",
+								"DocsLink",
+								"CustomLink",
+								"CustomLinkText",
 							),
 						),
 					),
@@ -275,6 +311,9 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 							"PrivacyLinkChanged",
 							"HelpLinkChanged",
 							"support2@example.com",
+							"DocsLinkChanged",
+							"CustomLinkChanged",
+							"CustomLinkTextChanged",
 						),
 					),
 				),
@@ -282,10 +321,13 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				policy: &domain.PrivacyPolicy{
-					TOSLink:      "TOSLinkChanged",
-					PrivacyLink:  "PrivacyLinkChanged",
-					HelpLink:     "HelpLinkChanged",
-					SupportEmail: "support2@example.com",
+					TOSLink:        "TOSLinkChanged",
+					PrivacyLink:    "PrivacyLinkChanged",
+					HelpLink:       "HelpLinkChanged",
+					SupportEmail:   "support2@example.com",
+					DocsLink:       "DocsLinkChanged",
+					CustomLink:     "CustomLinkChanged",
+					CustomLinkText: "CustomLinkTextChanged",
 				},
 			},
 			res: res{
@@ -295,10 +337,13 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 						ResourceOwner: "INSTANCE",
 						InstanceID:    "INSTANCE",
 					},
-					TOSLink:      "TOSLinkChanged",
-					PrivacyLink:  "PrivacyLinkChanged",
-					HelpLink:     "HelpLinkChanged",
-					SupportEmail: "support2@example.com",
+					TOSLink:        "TOSLinkChanged",
+					PrivacyLink:    "PrivacyLinkChanged",
+					HelpLink:       "HelpLinkChanged",
+					SupportEmail:   "support2@example.com",
+					DocsLink:       "DocsLinkChanged",
+					CustomLink:     "CustomLinkChanged",
+					CustomLinkText: "CustomLinkTextChanged",
 				},
 			},
 		},
@@ -322,7 +367,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultPrivacyPolicyChangedEvent(ctx context.Context, tosLink, privacyLink, helpLink, supportEmail string) *instance.PrivacyPolicyChangedEvent {
+func newDefaultPrivacyPolicyChangedEvent(ctx context.Context, tosLink, privacyLink, helpLink, supportEmail, docsLink, customLink, customLinkText string) *instance.PrivacyPolicyChangedEvent {
 	event, _ := instance.NewPrivacyPolicyChangedEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.PrivacyPolicyChanges{
@@ -330,6 +375,9 @@ func newDefaultPrivacyPolicyChangedEvent(ctx context.Context, tosLink, privacyLi
 			policy.ChangePrivacyLink(privacyLink),
 			policy.ChangeHelpLink(helpLink),
 			policy.ChangeSupportEmail(domain.EmailAddress(supportEmail)),
+			policy.ChangeDocsLink(docsLink),
+			policy.ChangeCustomLink(customLink),
+			policy.ChangeCustomLinkText(customLinkText),
 		},
 	)
 	return event

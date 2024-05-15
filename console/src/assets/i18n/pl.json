@@ -48,13 +48,13 @@
       "TITLE": "Użytkownicy",
       "DESCRIPTION": "Użytkownik to człowiek lub maszyna, która może uzyskać dostęp do twoich aplikacji.",
       "HUMANS": {
-        "TITLE": "Ludzie",
-        "DESCRIPTION": "Ludzie uwierzytelniają się interaktywnie w sesji przeglądarki z monitem logowania.",
+        "TITLE": "Użytkownicy",
+        "DESCRIPTION": "Użytkownicy uwierzytelniają się interaktywnie w sesji przeglądarki z monitem logowania.",
         "METADATA": "Dodaj niestandardowe atrybuty do użytkownika, takie jak dział. Możesz użyć tych informacji w swoich działaniach."
       },
       "MACHINES": {
-        "TITLE": "Maszyny",
-        "DESCRIPTION": "Maszyny uwierzytelniają się nieinteraktywnie, używając tokena JWT podpisanego prywatnym kluczem. Mogą również używać osobistego tokena dostępu.",
+        "TITLE": "Użytkownicy serwisu",
+        "DESCRIPTION": "Użytkownicy usługi uwierzytelniają się w sposób nieinteraktywny przy użyciu tokena okaziciela JWT podpisanego kluczem prywatnym. Mogą także skorzystać z osobistego tokena dostępu.",
         "METADATA": "Dodaj niestandardowe atrybuty do użytkownika, takie jak system uwierzytelniający. Możesz użyć tych informacji w swoich działaniach."
       },
       "SELF": {
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Linki zewnętrzne",
-        "DESCRIPTION": "Przekieruj użytkowników do niestandardowych zasobów zewnętrznych pokazanych na stronie logowania. Użytkownicy muszą zaakceptować Warunki korzystania z usługi i Politykę prywatności, zanim będą mogli się zarejestrować."
+        "DESCRIPTION": "Poprowadź użytkowników do niestandardowych zasobów zewnętrznych wyświetlanych na stronie logowania. Użytkownicy muszą zaakceptować Warunki świadczenia usług i Politykę prywatności, zanim będą mogli się zarejestrować. Zmień łącze do dokumentacji lub ustaw pusty ciąg, aby ukryć przycisk dokumentacji w konsoli. Dodaj niestandardowy link zewnętrzny i niestandardowy tekst dla tego łącza w konsoli lub ustaw je puste, aby ukryć ten przycisk."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Ustawienia SMTP",
@@ -269,9 +269,9 @@
             "TITLE": "Dozwolone logowanie zewnętrzne",
             "DESCRIPTION": "Pozwól swoim użytkownikom logować się za pomocą zewnętrznego dostawcy tożsamości zamiast używać użytkownika ZITADEL do logowania."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Dozwolone resetowanie hasła",
-            "DESCRIPTION": "Pozwól swoim użytkownikom na resetowanie ich hasła."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Ukryte resetowanie hasła",
+            "DESCRIPTION": "Nie zezwalaj użytkownikom na resetowanie hasła."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Dozwolone odkrywanie domen",
@@ -1570,6 +1570,9 @@
       "POLICYLINK": "Link do polityki prywatności",
       "HELPLINK": "Link do pomocy",
       "SUPPORTEMAIL": "E-mail wsparcia",
+      "DOCSLINK": "Link do Dokumentów (Console)",
+      "CUSTOMLINK": "Link niestandardowy (Console)",
+      "CUSTOMLINKTEXT": "Niestandardowy tekst łącza (Console)",
       "SAVED": "Pomyślnie zapisano!",
       "RESET_TITLE": "Przywróć wartości domyślne",
       "RESET_DESCRIPTION": "Masz zamiar przywrócić domyślne linki dla TOS i polityki prywatności. Czy na pewno chcesz kontynuować?"

@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -129,7 +128,8 @@ type AppleProvider struct {
 	IDPOptions idp.Options
 }
 
-func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id, orgID string) (exists bool, err error) {
+// ExistsIDPOnOrgOrInstance query first org level IDPs and then instance level IDPs, no check if the IDP is active
+func ExistsIDPOnOrgOrInstance(ctx context.Context, filter preparation.FilterToQueryReducer, instanceID, orgID, id string) (exists bool, err error) {
 	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
@@ -144,7 +144,7 @@ func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id,
 		return writeModel.State.Exists(), nil
 	}
 
-	instanceWriteModel := NewInstanceIDPRemoveWriteModel(authz.GetInstance(ctx).InstanceID(), id)
+	instanceWriteModel := NewInstanceIDPRemoveWriteModel(instanceID, id)
 	events, err = filter(ctx, instanceWriteModel.Query())
 	if err != nil {
 		return false, err
@@ -158,6 +158,23 @@ func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id,
 		return false, err
 	}
 	return instanceWriteModel.State.Exists(), nil
+}
+
+// ExistsIDP query IDPs only with the ID, no check if the IDP is active
+func ExistsIDP(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (exists bool, err error) {
+	writeModel := NewIDPTypeWriteModel(id)
+	events, err := filter(ctx, writeModel.Query())
+	if err != nil {
+		return false, err
+	}
+	if len(events) == 0 {
+		return false, nil
+	}
+	writeModel.AppendEvents(events...)
+	if err := writeModel.Reduce(); err != nil {
+		return false, err
+	}
+	return writeModel.State.Exists(), nil
 }
 
 func IDPProviderWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer, id string) (_ *AllIDPWriteModel, err error) {

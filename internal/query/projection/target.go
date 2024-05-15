@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	TargetTable               = "projections.targets"
+	TargetTable               = "projections.targets1"
 	TargetIDCol               = "id"
 	TargetCreationDateCol     = "creation_date"
 	TargetChangeDateCol       = "change_date"
@@ -20,9 +20,8 @@ const (
 	TargetSequenceCol         = "sequence"
 	TargetNameCol             = "name"
 	TargetTargetType          = "target_type"
-	TargetURLCol              = "url"
+	TargetEndpointCol         = "endpoint"
 	TargetTimeoutCol          = "timeout"
-	TargetAsyncCol            = "async"
 	TargetInterruptOnErrorCol = "interrupt_on_error"
 )
 
@@ -47,10 +46,9 @@ func (*targetProjection) Init() *old_handler.Check {
 			handler.NewColumn(TargetTargetType, handler.ColumnTypeEnum),
 			handler.NewColumn(TargetSequenceCol, handler.ColumnTypeInt64),
 			handler.NewColumn(TargetNameCol, handler.ColumnTypeText),
-			handler.NewColumn(TargetURLCol, handler.ColumnTypeText, handler.Default("")),
-			handler.NewColumn(TargetTimeoutCol, handler.ColumnTypeInt64, handler.Default(0)),
-			handler.NewColumn(TargetAsyncCol, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(TargetInterruptOnErrorCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(TargetEndpointCol, handler.ColumnTypeText),
+			handler.NewColumn(TargetTimeoutCol, handler.ColumnTypeInt64),
+			handler.NewColumn(TargetInterruptOnErrorCol, handler.ColumnTypeBool),
 		},
 			handler.NewPrimaryKey(TargetInstanceIDCol, TargetIDCol),
 		),
@@ -103,10 +101,9 @@ func (p *targetProjection) reduceTargetAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(TargetChangeDateCol, e.CreationDate()),
 			handler.NewCol(TargetSequenceCol, e.Sequence()),
 			handler.NewCol(TargetNameCol, e.Name),
-			handler.NewCol(TargetURLCol, e.URL),
+			handler.NewCol(TargetEndpointCol, e.Endpoint),
 			handler.NewCol(TargetTargetType, e.TargetType),
 			handler.NewCol(TargetTimeoutCol, e.Timeout),
-			handler.NewCol(TargetAsyncCol, e.Async),
 			handler.NewCol(TargetInterruptOnErrorCol, e.InterruptOnError),
 		},
 	), nil
@@ -128,14 +125,11 @@ func (p *targetProjection) reduceTargetChanged(event eventstore.Event) (*handler
 	if e.TargetType != nil {
 		values = append(values, handler.NewCol(TargetTargetType, *e.TargetType))
 	}
-	if e.URL != nil {
-		values = append(values, handler.NewCol(TargetURLCol, *e.URL))
+	if e.Endpoint != nil {
+		values = append(values, handler.NewCol(TargetEndpointCol, *e.Endpoint))
 	}
 	if e.Timeout != nil {
 		values = append(values, handler.NewCol(TargetTimeoutCol, *e.Timeout))
-	}
-	if e.Async != nil {
-		values = append(values, handler.NewCol(TargetAsyncCol, *e.Async))
 	}
 	if e.InterruptOnError != nil {
 		values = append(values, handler.NewCol(TargetInterruptOnErrorCol, *e.InterruptOnError))

@@ -95,6 +95,7 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		Register:               false,
 		Metadata:               metadata,
 		Links:                  links,
+		TOTPSecret:             req.GetTotpSecret(),
 	}, nil
 }
 
@@ -249,33 +250,12 @@ func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
 	if password == nil {
 		return nil
 	}
-	var changeRequired bool
-	var passwordStr *string
-	if password.GetPassword() != nil {
-		passwordStr = &password.GetPassword().Password
-		changeRequired = password.GetPassword().GetChangeRequired()
-	}
-	var hash *string
-	if password.GetHashedPassword() != nil {
-		hash = &password.GetHashedPassword().Hash
-		changeRequired = password.GetHashedPassword().GetChangeRequired()
-	}
-	var code *string
-	if password.GetVerificationCode() != "" {
-		codeT := password.GetVerificationCode()
-		code = &codeT
-	}
-	var oldPassword *string
-	if password.GetCurrentPassword() != "" {
-		oldPasswordT := password.GetCurrentPassword()
-		oldPassword = &oldPasswordT
-	}
 	return &command.Password{
-		PasswordCode:        code,
-		OldPassword:         oldPassword,
-		Password:            passwordStr,
-		EncodedPasswordHash: hash,
-		ChangeRequired:      changeRequired,
+		PasswordCode:        password.GetVerificationCode(),
+		OldPassword:         password.GetCurrentPassword(),
+		Password:            password.GetPassword().GetPassword(),
+		EncodedPasswordHash: password.GetHashedPassword().GetHash(),
+		ChangeRequired:      password.GetPassword().GetChangeRequired() || password.GetHashedPassword().GetChangeRequired(),
 	}
 }
 
@@ -391,7 +371,7 @@ func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.Star
 }
 
 func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -415,7 +395,7 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetCtxData(ctx).OrgID)
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -494,7 +474,7 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 }
 
 func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), authz.GetCtxData(ctx).OrgID)
+	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -502,7 +482,7 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-nme4gszsvx", "Errors.Intent.NotSucceeded")
 	}
 	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }

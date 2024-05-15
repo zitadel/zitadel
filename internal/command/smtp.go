@@ -350,7 +350,7 @@ func (c *Commands) getSMTPConfig(ctx context.Context, instanceID, id, domain str
 }
 
 // TODO: SetUpInstance still uses this and would be removed as soon as deprecated PrepareCommands is removed
-func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, description, from, name, replyTo, hostAndPort, user string, password []byte, tls bool) preparation.Validation {
+func (c *Commands) prepareAddAndActivateSMTPConfig(a *instance.Aggregate, description, from, name, replyTo, hostAndPort, user string, password []byte, tls bool) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if from = strings.TrimSpace(from); from == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-mruNY", "Errors.Invalid.Argument")
@@ -401,6 +401,11 @@ func (c *Commands) prepareAddSMTPConfig(a *instance.Aggregate, description, from
 					hostAndPort,
 					user,
 					smtpPassword,
+				),
+				instance.NewSMTPConfigActivatedEvent(
+					ctx,
+					&a.Aggregate,
+					id,
 				),
 			}, nil
 		}, nil

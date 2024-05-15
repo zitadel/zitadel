@@ -6850,6 +6850,23 @@ message UpdatePrivacyPolicyRequest {
             description: "help / support email address."
         }
     ];
+    string docs_link = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://zitadel.com/docs\"";
+        }
+    ];
+    string custom_link = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Link to an external resource that will be available to users in the console.";
+            example: "\"https://external.link\"";
+        }
+    ];
+    string custom_link_text = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The button text that would be shown in console pointing to custom link.";
+            example: "\"External\"";
+        }
+    ];
 }
 
 message UpdatePrivacyPolicyResponse {
