@@ -299,3 +299,24 @@ func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (userID, clien
 	}
 	return user.GetUserId(), secret.GetClientId(), secret.GetClientSecret(), nil
 }
+
+func (s *Tester) CreateOIDCJWTProfileClient(ctx context.Context) (userID string, keyData []byte, err error) {
+	name := gofakeit.Username()
+	user, err := s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+		Name:            name,
+		UserName:        name,
+		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+	})
+	if err != nil {
+		return "", nil, err
+	}
+	keyResp, err := s.Client.Mgmt.AddMachineKey(ctx, &management.AddMachineKeyRequest{
+		UserId:         user.GetUserId(),
+		Type:           authn.KeyType_KEY_TYPE_JSON,
+		ExpirationDate: timestamppb.New(time.Now().Add(time.Hour)),
+	})
+	if err != nil {
+		return "", nil, err
+	}
+	return user.GetUserId(), keyResp.GetKeyDetails(), nil
+}

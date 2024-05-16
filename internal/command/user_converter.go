@@ -1,9 +1,6 @@
 package command
 
 import (
-	"encoding/base64"
-
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -81,16 +78,6 @@ func writeModelToAddress(wm *HumanAddressWriteModel) *domain.Address {
 	}
 }
 
-func writeModelToMachine(wm *MachineWriteModel) *domain.Machine {
-	return &domain.Machine{
-		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
-		Username:    wm.UserName,
-		Name:        wm.Name,
-		Description: wm.Description,
-		State:       wm.UserState,
-	}
-}
-
 func keyWriteModelToMachineKey(wm *MachineKeyWriteModel) *domain.MachineKey {
 	return &domain.MachineKey{
 		ObjectRoot:     writeModelToObjectRoot(wm.WriteModel),
@@ -98,18 +85,6 @@ func keyWriteModelToMachineKey(wm *MachineKeyWriteModel) *domain.MachineKey {
 		Type:           wm.KeyType,
 		ExpirationDate: wm.ExpirationDate,
 	}
-}
-
-func personalTokenWriteModelToToken(wm *PersonalAccessTokenWriteModel, algorithm crypto.EncryptionAlgorithm) (*domain.Token, string, error) {
-	encrypted, err := algorithm.Encrypt([]byte(wm.TokenID + ":" + wm.AggregateID))
-	if err != nil {
-		return nil, "", err
-	}
-	return &domain.Token{
-		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
-		TokenID:    wm.TokenID,
-		Expiration: wm.ExpirationDate,
-	}, base64.RawURLEncoding.EncodeToString(encrypted), nil
 }
 
 func readModelToWebAuthNTokens(readModel HumanWebAuthNTokensReadModel) []*domain.WebAuthNToken {

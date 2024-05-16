@@ -3,6 +3,8 @@ package command
 import (
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -40,6 +42,7 @@ type SessionWriteModel struct {
 	TokenID              string
 	UserID               string
 	UserResourceOwner    string
+	PreferredLanguage    *language.Tag
 	UserCheckedAt        time.Time
 	PasswordCheckedAt    time.Time
 	IntentCheckedAt      time.Time
@@ -50,6 +53,7 @@ type SessionWriteModel struct {
 	WebAuthNUserVerified bool
 	Metadata             map[string][]byte
 	State                domain.SessionState
+	UserAgent            *domain.UserAgent
 	Expiration           time.Time
 
 	WebAuthNChallenge     *WebAuthNChallengeModel
@@ -137,12 +141,14 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *SessionWriteModel) reduceAdded(e *session.AddedEvent) {
 	wm.State = domain.SessionStateActive
+	wm.UserAgent = e.UserAgent
 }
 
 func (wm *SessionWriteModel) reduceUserChecked(e *session.UserCheckedEvent) {
 	wm.UserID = e.UserID
 	wm.UserResourceOwner = e.UserResourceOwner
 	wm.UserCheckedAt = e.CheckedAt
+	wm.PreferredLanguage = e.PreferredLanguage
 }
 
 func (wm *SessionWriteModel) reducePasswordChecked(e *session.PasswordCheckedEvent) {

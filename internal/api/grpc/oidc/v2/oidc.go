@@ -112,7 +112,7 @@ func (s *Server) linkSessionToAuthRequest(ctx context.Context, authRequestID str
 	if aar.ResponseType == domain.OIDCResponseTypeCode {
 		callback, err = oidc.CreateCodeCallbackURL(ctx, authReq, s.op.Provider())
 	} else {
-		callback, err = oidc.CreateTokenCallbackURL(ctx, authReq, s.op.Provider())
+		callback, err = s.op.CreateTokenCallbackURL(ctx, authReq)
 	}
 	if err != nil {
 		return nil, err
