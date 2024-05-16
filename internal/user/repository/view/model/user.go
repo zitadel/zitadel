@@ -34,13 +34,6 @@ const (
 	UserKeyOwnerRemoved       = "owner_removed"
 )
 
-type userType string
-
-const (
-	userTypeHuman   = "human"
-	userTypeMachine = "machine"
-)
-
 type UserView struct {
 	ID                 string                     `json:"-" gorm:"column:id;primary_key"`
 	CreationDate       time.Time                  `json:"-" gorm:"column:creation_date"`
@@ -51,9 +44,8 @@ type UserView struct {
 	LoginNames         database.TextArray[string] `json:"-" gorm:"column:login_names"`
 	PreferredLoginName string                     `json:"-" gorm:"column:preferred_login_name"`
 	Sequence           uint64                     `json:"-" gorm:"column:sequence"`
-	//Type               userType                   `json:"-" gorm:"column:user_type"`
-	UserName   string `json:"userName" gorm:"column:user_name"`
-	InstanceID string `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	UserName           string                     `json:"userName" gorm:"column:user_name"`
+	InstanceID         string                     `json:"instanceID" gorm:"column:instance_id;primary_key"`
 	*MachineView
 	*HumanView
 }
@@ -242,7 +234,6 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 	case user.MachineAddedEventType:
 		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
-		//u.Type = userTypeMachine
 		err = u.setData(event)
 		if err != nil {
 			return err
@@ -253,7 +244,6 @@ func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
 		user.HumanAddedType:
 		u.CreationDate = event.CreatedAt()
 		u.setRootData(event)
-		//u.Type = userTypeHuman
 		err = u.setData(event)
 		if err != nil {
 			return err

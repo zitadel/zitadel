@@ -312,11 +312,13 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 				applicationIDs = append(applicationIDs, app.OIDCConfig.ClientID)
 			}
 		}
-
+		if len(applicationIDs) == 0 {
+			return handler.NewNoOpStatement(event), nil
+		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
 				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(tokenApplicationIDCol, applicationIDs),
+				handler.NewOneOfTextCond(tokenApplicationIDCol, applicationIDs),
 			},
 		), nil
 	case instance.InstanceRemovedEventType:

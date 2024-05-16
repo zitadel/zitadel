@@ -565,13 +565,12 @@ func Not(condition Condition) Condition {
 	}
 }
 
-//
-//// NewTextArrayContainsCond returns a Condition that checks if the column that stores an array of text contains the given value
-//func NewOneOfCond(column string, values []string) Condition {
-//	return func(param string) (string, []any) {
-//		return column + " @> " + param, []any{database.TextArray[string]{value}}
-//	}
-//}
+// NewOneOfTextCond returns a Condition that checks if the column that stores a text is one of the given values
+func NewOneOfTextCond(column string, values []string) Condition {
+	return func(param string) (string, []any) {
+		return column + " = ANY(" + param + ")", []any{database.TextArray[string](values)}
+	}
+}
 
 type Executer interface {
 	Exec(string, ...interface{}) (sql.Result, error)
