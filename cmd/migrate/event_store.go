@@ -176,68 +176,6 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events migrated")
 }
 
-// func decryptEventPayload(ctx context.Context, source *database.DB, maxPosition float64) {
-// 	err := createDecryptedEventsTable(ctx, source)
-// 	logging.OnError(err).Fatal("unable to create decrypted events table in source")
-
-// }
-
-/*
-idpintent.saml.succeeded: {assertion}
-idpintent.succeeded: idp{idpAccessToken}
-
-instance.idp.oauth.added: {clientSecret}
-instance.idp.oidc.added: {clientSecret}
-instance.idp.oidc.migrated.azure: {client_secret}
-instance.idp.oidc.migrated.google: {clientSecret}
-instance.idp.azure.added: {client_secret}
-instance.idp.github.added: {clientSecret}
-instance.idp.github_enterprise.added: {clientSecret}
-instance.idp.gitlab.added: {client_secret}
-instance.idp.gitlab_self_hosted.added: {client_secret}
-instance.idp.google.added: {clientSecret}
-instance.idp.ldap.v2.added: {bindPassword}
-instance.idp.apple.added: {privateKey}
-instance.idp.saml.added: {key} //TODO: do we need to decrypt the key?
-
-iam.idp.oidc.config.added: {clientSecret}
-
-org.idp.oauth.added: {clientSecret}
-org.idp.oidc.added: {clientSecret}
-org.idp.oidc.migrated.azure: {client_secret}
-org.idp.oidc.migrated.google: {clientSecret}
-org.idp.azure.added: {client_secret}
-org.idp.github.added: {clientSecret}
-org.idp.github_enterprise.added: {clientSecret}
-org.idp.gitlab.added: {client_secret}
-org.idp.gitlab_self_hosted.added: {client_secret}
-org.idp.google.added: {clientSecret}
-org.idp.ldap.v2.added: {bindPassword}
-org.idp.apple.added: {privateKey}
-org.idp.saml.added: {key} //TODO: do we need to decrypt the key?
-
-instance.sms.configtwilio.added: {token}
-instance.sms.configtwilio.token.changed: {token}
-
-instance.smtp.config.password.changed: {password}
-instance.smtp.config.added: {password}
-
-user.human.mfa.otp.added: {otpSecret}
-
-key_pair.added: {publicKey}
-key_pair.certificate.added: {certificate}
-
-// TODO: internal/api/saml/certificate.go
-*/
-
-//go:embed sql/decrypted_payload_table.sql
-var decryptedPayloadTable string
-
-// func createDecryptedEventsTable(ctx context.Context, db *database.DB) error {
-// 	_, err := db.ExecContext(ctx, decryptedPayloadTable)
-// 	return err
-// }
-
 func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id string, errs <-chan error) {
 	joinedErrs := make([]error, 0, len(errs))
 	for err := range errs {

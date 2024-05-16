@@ -51,7 +51,7 @@ func verifyMigration(ctx context.Context, config *Migration) {
 				entry.Debug("equal count")
 				continue
 			}
-			entry.WithField("diff", destCount-sourceCount).Error("unequal count")
+			entry.WithField("diff", destCount-sourceCount).Info("unequal count")
 		}
 	}
 }

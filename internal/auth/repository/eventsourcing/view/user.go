@@ -146,17 +146,14 @@ func (v *View) UsersByOrgID(orgID, instanceID string) ([]*model.UserView, error)
 	return view.UsersByOrgID(v.Db, userTable, orgID, instanceID)
 }
 
-// TODO: replace with handler.Statement
 func (v *View) PutUser(user *model.UserView, event eventstore.Event) error {
 	return view.PutUser(v.Db, userTable, user)
 }
 
-// TODO: replace with handler.Statement
 func (v *View) PutUsers(users []*model.UserView, event eventstore.Event) error {
 	return view.PutUsers(v.Db, userTable, users...)
 }
 
-// TODO: replace with handler.Statement
 func (v *View) DeleteUser(userID, instanceID string, event eventstore.Event) error {
 	err := view.DeleteUser(v.Db, userTable, userID, instanceID)
 	if err != nil && !zerrors.IsNotFound(err) {
@@ -165,7 +162,6 @@ func (v *View) DeleteUser(userID, instanceID string, event eventstore.Event) err
 	return nil
 }
 
-// TODO: replace with handler.Statement
 func (v *View) DeleteInstanceUsers(event eventstore.Event) error {
 	err := view.DeleteInstanceUsers(v.Db, userTable, event.Aggregate().InstanceID)
 	if err != nil && !zerrors.IsNotFound(err) {
@@ -174,7 +170,6 @@ func (v *View) DeleteInstanceUsers(event eventstore.Event) error {
 	return nil
 }
 
-// TODO: replace with handler.Statement
 func (v *View) UpdateOrgOwnerRemovedUsers(event eventstore.Event) error {
 	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.Aggregate().InstanceID, event.Aggregate().ID)
 	if err != nil && !zerrors.IsNotFound(err) {
