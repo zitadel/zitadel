@@ -485,6 +485,8 @@
     "NEXT": "下一页",
     "MORE": "更多",
     "STEP": "步",
+    "SETUP": "设置",
+    "TEST": "测试",
     "UNSAVEDCHANGES": "未保存的更改",
     "UNSAVED": {
       "DIALOG": {
@@ -2232,6 +2234,7 @@
       "ACTIVATED": "活性",
       "ACTIVATE": "激活提供商",
       "DEACTIVATE": "停用提供商",
+      "TEST": "测试您的提供商",
       "TYPE": "类型",
       "DIALOG": {
         "ACTIVATED": "SMTP 配置已激活",
@@ -2255,7 +2258,11 @@
         "CURRENT_DESC_TITLE": "这些是您的 SMTP 设置",
         "PROVIDER_SETTINGS": "SMTP 提供商设置",
         "SENDER_SETTINGS": "发件人设置",
-        "TEST_SETTINGS": "测试 SMTP 设置"
+        "SAVE_SETTINGS": "保存您的设置",
+        "TEST": {
+          "TITLE": "测试您的设置",
+          "DESCRIPTION": "您可以测试您的 SMTP 提供商设置并在保存之前检查测试结果"
+        }
       }
     },
     "DETAIL": {

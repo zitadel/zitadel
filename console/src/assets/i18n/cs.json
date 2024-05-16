@@ -486,6 +486,7 @@
     "MORE": "více",
     "STEP": "Krok",
     "SETUP": "Nastavit",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Neuložené změny",
     "UNSAVED": {
       "DIALOG": {
@@ -2242,6 +2243,7 @@
       "ACTIVATED": "Aktivováno",
       "ACTIVATE": "Aktivujte poskytovatele",
       "DEACTIVATE": "Deaktivovat poskytovatele",
+      "TEST": "Otestujte svého poskytovatele",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "Konfigurace SMTP byla aktivována",
@@ -2265,7 +2267,11 @@
         "CURRENT_DESC_TITLE": "Toto jsou vaše nastavení SMTP",
         "PROVIDER_SETTINGS": "Nastavení poskytovatele SMTP",
         "SENDER_SETTINGS": "Nastavení odesílatele",
-        "TEST_SETTINGS": "Otestujte nastavení SMTP"
+        "SAVE_SETTINGS": "Uložte nastavení",
+        "TEST": {
+          "TITLE": "Otestujte svá nastavení",
+          "DESCRIPTION": "Nastavení poskytovatele SMTP můžete otestovat a před uložením zkontrolovat výsledek testu"
+        }
       }
     },
     "DETAIL": {

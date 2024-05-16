@@ -53,11 +53,23 @@ Errors:
     NotFound: Konfigurace SMS nebyla nalezena
     AlreadyActive: Konfigurace SMS je již aktivní
     AlreadyDeactivated: Konfigurace SMS je již deaktivovaná
+  SMTP:
+    NotEmailMessage: zpráva není EmailMessage
+    RequiredAttributes: předmět, příjemci a obsah musí být nastaveny, ale některé nebo všechny jsou prázdné
+    CouldNotSplit: nemohl rozdělit hostitele a port pro připojení k smtp
+    CouldNotDial: nelze se spojit se serverem SMTP, zkontrolovat port, problémy s firewallem...
+    CouldNotDialTLS: nelze se spojit se serverem SMTP pomocí TLS, zkontrolovat port, problémy s firewallem...
+    CouldNotCreateClient: nelze vytvořit smtp klienta
+    CouldNotStartTLS: nelze spustit tls
+    CouldNotAuth: nemohlo se přidat smtp auth, zkontrolujte, zda je váš uživatel i heslo správné, pokud jsou správné, možná váš poskytovatel vyžaduje metodu auth, kterou Zitadel nepodporuje
+    CouldNotSetSender: nelze nastavit odesílatele
+    CouldNotSetRecipient: nelze nastavit příjemce
   SMTPConfig:
     NotFound: Konfigurace SMTP nebyla nalezena
     AlreadyExists: Konfigurace SMTP již existuje
     AlreadyDeactivated: Konfigurace SMTP je již deaktivována
     SenderAdressNotCustomDomain: Adresa odesílatele musí být nakonfigurována jako vlastní doména na instanci.
+    TestEmailNotFound: E-mailová adresa pro test nebyla nalezena
   Notification:
     NoDomain: Pro zprávu nebyla nalezena žádná doména
   User:

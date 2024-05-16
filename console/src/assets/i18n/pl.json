@@ -486,6 +486,7 @@
     "MORE": "więcej",
     "STEP": "Krok",
     "UNSAVEDCHANGES": "Niezapisane zmiany",
+    "TEST": "Test",
     "UNSAVED": {
       "DIALOG": {
         "DESCRIPTION": "Czy na pewno chcesz odrzucić to nowe działanie? Twoje działanie zostanie utracone",
@@ -2233,6 +2234,7 @@
       "ACTIVATED": "Aktywowany",
       "ACTIVATE": "Aktywuj dostawcę",
       "DEACTIVATE": "Dezaktywuj dostawcę",
+      "TEST": "Przetestuj swojego dostawcę",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "Konfiguracja SMTP została aktywowana",
@@ -2256,7 +2258,11 @@
         "CURRENT_DESC_TITLE": "To są Twoje ustawienia SMTP",
         "PROVIDER_SETTINGS": "Ustawienia dostawcy SMTP",
         "SENDER_SETTINGS": "Ustawienia nadawcy",
-        "TEST_SETTINGS": "Przetestuj ustawienia SMTP"
+        "SAVE_SETTINGS": "Zapisz swoje ustawienia",
+        "TEST": {
+          "TITLE": "Przetestuj swoje ustawienia",
+          "DESCRIPTION": "Możesz przetestować ustawienia dostawcy SMTP i sprawdzić wynik testu przed ich zapisaniem"
+        }
       }
     },
     "DETAIL": {

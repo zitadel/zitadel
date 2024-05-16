@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -139,4 +140,22 @@ func (s *Server) TestSMTPConfigById(ctx context.Context, req *admin_pb.TestSMTPC
 	}
 
 	return &admin_pb.TestSMTPConfigByIdResponse{}, nil
+}
+
+func (s *Server) TestSMTPConfig(ctx context.Context, req *admin_pb.TestSMTPConfigRequest) (*admin_pb.TestSMTPConfigResponse, error) {
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	config := smtp.Config{}
+	config.Tls = req.Tls
+	config.From = req.SenderAddress
+	config.FromName = req.SenderName
+	config.SMTP.Host = req.Host
+	config.SMTP.User = req.User
+	config.SMTP.Password = req.Password
+
+	err := s.command.TestSMTPConfig(ctx, instanceID, req.Id, req.TestAddress, &config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin_pb.TestSMTPConfigResponse{}, nil
 }

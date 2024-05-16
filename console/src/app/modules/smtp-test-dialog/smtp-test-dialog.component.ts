@@ -6,6 +6,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { TranslateService } from '@ngx-translate/core';
+import { TestSMTPConfigByIdRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 
 @Component({
   selector: 'cnsl-smtp-test-dialog',
@@ -40,34 +41,22 @@ export class SmtpTestDialogComponent {
 
   public testEmailConfiguration(): void {
     this.isLoading.set(true);
+
+    const req = new TestSMTPConfigByIdRequest();
+    req.setId(this.data.id);
+    req.setTestAddress(this.email);
+
     this.adminService
-      .testSMTPConfigById(this.data.id, this.email)
+      .testSMTPConfigById(req)
       .then(() => {
         this.resultClass = 'test-success';
         this.isLoading.set(false);
-        // this.translate.get('ORG.TOAST.ORG_WAS_DELETED').subscribe((data) => {
-        //   this.toast.showInfo(data);
-        // });
-
         this.testResult = 'Your email was succesfully sent';
       })
       .catch((error) => {
         this.resultClass = 'test-error';
         this.isLoading.set(false);
-        let errorMsg: string = error.message;
-        if (errorMsg.includes('could not make smtp dial')) {
-          errorMsg =
-            "We couldn't contact with the SMTP server, check the server port, if you're behind a proxy or firewall... ";
-          // TODO translate error message
-        }
-
-        if (errorMsg.includes('could not add smtp auth')) {
-          errorMsg =
-            "There was an issue with authentication, check that your user and password are correct. If they're correct maybe your provider requires an auth method not supported by Zitadel";
-          // TODO translate error message
-        }
-
-        this.testResult = errorMsg;
+        this.testResult = error;
       });
   }
 

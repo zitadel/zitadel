@@ -53,11 +53,23 @@ Errors:
     NotFound: SMS конфигурацијата не е пронајдена
     AlreadyActive: SMS конфигурацијата е веќе активна
     AlreadyDeactivated: SMS конфигурацијата е веќе деактивирана
+  SMTP:
+    NotEmailMessage: пораката не е Email Message
+    RequiredAttributes: предметот, примачите и содржината мора да бидат поставени, но некои или сите се празни
+    CouldNotSplit: не може да се подели домаќинот и портата за поврзување со smtp
+    CouldNotDial: не можев да контактираме со SMTP-серверот, да ја провериме портата, проблеми со заштитен ѕид...
+    CouldNotDialTLS: не можев да контактираме со SMTP-серверот користејќи TLS, проверете ја портата, проблеми со заштитен ѕид...
+    CouldNotCreateClient: не можев да креирам smtp клиент
+    CouldNotStartTLS: не можеше да започне tls
+    CouldNotAuth: не можев да додадам smtp auth, проверете дали и корисникот и лозинката се точни, дали се точни, можеби вашиот провајдер бара метод за автетика што не е поддржан од Zitadel
+    CouldNotSetSender: не може да се постави испраќач
+    CouldNotSetRecipient: не може да се постави примач
   SMTPConfig:
     NotFound: SMTP конфигурацијата не е пронајдена
     AlreadyExists: SMTP конфигурацијата веќе постои
     AlreadyDeactivated: SMTP конфигурацијата е веќе деактивирана
     SenderAdressNotCustomDomain: Адресата на испраќачот мора да биде конфигурирана како прилагоден домен на инстанцата.
+    TestEmailNotFound: Адресата на е-пошта за тест не е пронајдена
   Notification:
     NoDomain: Не е пронајден домен за пораката
   User:

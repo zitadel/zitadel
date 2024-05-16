@@ -485,6 +485,8 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
+    "SETUP": "Setup",
+    "TEST": "Test",
     "UNSAVED": {
       "DIALOG": {
         "DESCRIPTION": "Sei sicuro di voler eliminare questa nuova azione? La tua azione andrà persa",
@@ -2233,6 +2235,7 @@
       "ACTIVATED": "Attivato",
       "ACTIVATE": "Attiva fornitore",
       "DEACTIVATE": "Disattiva fornitore",
+      "TEST": "Metti alla prova il tuo fornitore",
       "TYPE": "Tipo",
       "DIALOG": {
         "ACTIVATED": "La configurazione SMTP è stata attivata",
@@ -2256,7 +2259,11 @@
         "CURRENT_DESC_TITLE": "Queste sono le tue impostazioni SMTP",
         "PROVIDER_SETTINGS": "Impostazioni del provider SMTP",
         "SENDER_SETTINGS": "Impostazioni mittente",
-        "TEST_SETTINGS": "Testare le impostazioni SMTP"
+        "SAVE_SETTINGS": "Salva le tue impostazioni",
+        "TEST": {
+          "TITLE": "Metti alla prova le tue impostazioni",
+          "DESCRIPTION": "Puoi testare le impostazioni del tuo provider SMTP e controllare il risultato del test prima di salvarle"
+        }
       }
     },
     "DETAIL": {

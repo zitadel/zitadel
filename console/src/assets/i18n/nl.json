@@ -486,6 +486,7 @@
     "MORE": "meer",
     "STEP": "Stap",
     "SETUP": "Instellen",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Niet-opgeslagen wijzigingen",
     "UNSAVED": {
       "DIALOG": {
@@ -2251,6 +2252,7 @@
       "ACTIVATED": "Geactiveerd",
       "ACTIVATE": "Aanbieder activeren",
       "DEACTIVATE": "Aanbieder deactiveren",
+      "TEST": "Test uw aanbieder",
       "TYPE": "Type",
       "DIALOG": {
         "ACTIVATED": "SMTP-configuratie is geactiveerd",
@@ -2274,7 +2276,11 @@
         "CURRENT_DESC_TITLE": "Dit zijn uw SMTP-instellingen",
         "PROVIDER_SETTINGS": "SMTP-providerinstellingen",
         "SENDER_SETTINGS": "Afzenderinstellingen",
-        "TEST_SETTINGS": "SMTP-instellingen testen"
+        "SAVE_SETTINGS": "Sla uw instellingen op",
+        "TEST": {
+          "TITLE": "Test uw instellingen",
+          "DESCRIPTION": "U kunt de instellingen van uw SMTP-provider testen en het testresultaat controleren voordat u deze opslaat"
+        }
       }
     },
     "DETAIL": {

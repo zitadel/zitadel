@@ -53,11 +53,23 @@ Errors:
     NotFound: 未找到 SMS 配置
     AlreadyActive: SMS 配置已启用
     AlreadyDeactivated: SMS 配置已停用
+  SMTP:
+    NotEmailMessage: 消息不是电子邮件消息
+    RequiredAttributes: 必须设置主题、收件人和内容，但部分或全部为空
+    CouldNotSplit: 无法拆分主机和端口以连接到 smtp
+    CouldNotDial: 无法与 SMTP 服务器联系，请检查端口、防火墙问题...
+    CouldNotDialTLS: 无法使用 TLS 与 SMTP 服务器联系，请检查端口、防火墙问题...
+    CouldNotCreateClient: 无法创建 smtp 客户端
+    CouldNotStartTLS: 无法启动 tls
+    CouldNotAuth: 无法添加 smtp 身份验证，请检查您的用户名和密码是否正确，如果正确，可能您的提供商需要 Zitadel 不支持的身份验证方法
+    CouldNotSetSender: 无法设置发件人
+    CouldNotSetRecipient: 无法设置收件人
   SMTPConfig:
     NotFound: 未找到 SMTP 配置
     AlreadyExists: SMTP 配置已存在
     AlreadyDeactivated: SMTP 配置已停用
     SenderAdressNotCustomDomain: 发件人地址必须在在实例的域名设置中验证。
+    TestEmailNotFound: 找不到用于测试的电子邮件地址
   Notification:
     NoDomain: 未找到对应的域名
   User:

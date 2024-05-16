@@ -485,6 +485,8 @@
     "NEXT": "Weiter",
     "MORE": "mehr",
     "STEP": "Schritt",
+    "SETUP": "Aufstellen",
+    "TEST": "Prüfen",
     "UNSAVEDCHANGES": "Nicht gespeicherte Änderungen",
     "UNSAVED": {
       "DIALOG": {
@@ -2232,6 +2234,7 @@
       "ACTIVATED": "Aktiviert",
       "ACTIVATE": "Anbieter aktivieren",
       "DEACTIVATE": "Anbieter deaktivieren",
+      "TEST": "Testen Sie Ihren Anbieter",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "Die SMTP-Konfiguration wurde aktiviert",
@@ -2255,7 +2258,11 @@
         "CURRENT_DESC_TITLE": "Dies sind Ihre SMTP-Einstellungen",
         "PROVIDER_SETTINGS": "SMTP-Anbietereinstellungen",
         "SENDER_SETTINGS": "Absendereinstellungen",
-        "TEST_SETTINGS": "Testen Sie die SMTP-Einstellungen"
+        "SAVE_SETTINGS": "Speichern Sie Ihre Einstellungen",
+        "TEST": {
+          "TITLE": "Testen Sie Ihre Einstellungen",
+          "DESCRIPTION": "Sie können die Einstellungen Ihres SMTP-Anbieters testen und das Testergebnis überprüfen, bevor Sie sie speichern"
+        }
       }
     },
     "DETAIL": {

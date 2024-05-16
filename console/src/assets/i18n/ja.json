@@ -486,6 +486,7 @@
     "MORE": "さらに",
     "STEP": "ステップ",
     "SETUP": "セットアップ",
+    "TEST": "テスト",
     "UNSAVEDCHANGES": "未保存の変更",
     "UNSAVED": {
       "DIALOG": {
@@ -2225,6 +2226,7 @@
       "ACTIVATED": "アクティブ化された",
       "ACTIVATE": "プロバイダーをアクティブ化する",
       "DEACTIVATE": "プロバイダーを非アクティブ化する",
+      "TEST": "プロバイダーをテストする",
       "TYPE": "タイプ",
       "DIALOG": {
         "ACTIVATED": "SMTP設定が有効化されました",
@@ -2248,7 +2250,11 @@
         "CURRENT_DESC_TITLE": "これらは SMTP 設定です",
         "PROVIDER_SETTINGS": "SMTPプロバイダーの設定",
         "SENDER_SETTINGS": "送信者の設定",
-        "TEST_SETTINGS": "SMTP設定をテストする"
+        "SAVE_SETTINGS": "設定を保存する",
+        "TEST": {
+          "TITLE": "設定をテストする",
+          "DESCRIPTION": "SMTP プロバイダーの設定をテストし、保存する前にテスト結果を確認できます。"
+        }
       }
     },
     "DETAIL": {

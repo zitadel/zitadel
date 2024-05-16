@@ -285,6 +285,44 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context, instanceID, id string) 
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
+func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email string, config *smtp.Config) error {
+	password := config.SMTP.Password
+
+	if email == "" {
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-h6yw", "Errors.SMTPConfig.TestEmailNotFound")
+	}
+
+	// TODO change error messages and codes
+	if id == "" && password == "" {
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-7f5cv", "Errors.IDMissing")
+	}
+
+	if id != "" && password == "" {
+		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+		if err != nil {
+			return err
+		}
+		if !smtpConfigWriteModel.State.Exists() {
+			return zerrors.ThrowNotFound(nil, "COMMAND-kg8rt", "Errors.SMTPConfig.NotFound")
+		}
+
+		password, err = crypto.DecryptString(smtpConfigWriteModel.Password, c.smtpEncryption)
+		if err != nil {
+			return err
+		}
+	}
+
+	config.SMTP.Password = password
+
+	// Try to send an email
+	err := smtp.TestConfiguration(config, email)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *Commands) TestSMTPConfigById(ctx context.Context, instanceID, id, email string) error {
 	if id == "" {
 		return zerrors.ThrowInvalidArgument(nil, "SMTP-8h6yw", "Errors.IDMissing")

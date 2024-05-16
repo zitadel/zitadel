@@ -2252,7 +2252,7 @@
       "ACTIVATED": "Activated",
       "ACTIVATE": "Activate provider",
       "DEACTIVATE": "Deactivate provider",
-      "TEST": "Test provider",
+      "TEST": "Test your provider",
       "TYPE": "Type",
       "DIALOG": {
         "ACTIVATED": "SMTP config has been activated",
@@ -2280,7 +2280,11 @@
         "CURRENT_DESC_TITLE": "These are your SMTP settings",
         "PROVIDER_SETTINGS": "SMTP Provider Settings",
         "SENDER_SETTINGS": "Sender Settings",
-        "TEST_SETTINGS": "Test SMTP Settings"
+        "SAVE_SETTINGS": "Save your settings",
+        "TEST": {
+          "TITLE": "Test your settings",
+          "DESCRIPTION": "You can test your SMTP provider settings and check the test result before saving them"
+        }
       }
     },
     "DETAIL": {
