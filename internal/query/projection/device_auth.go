@@ -74,6 +74,10 @@ func (p *deviceAuthRequestProjection) Reducers() []handler.AggregateReducer {
 					Event:  deviceauth.CanceledEventType,
 					Reduce: p.reduceDoneEvents,
 				},
+				{
+					Event:  deviceauth.DoneEventType,
+					Reduce: p.reduceDoneEvents,
+				},
 			},
 		},
 	}
@@ -103,7 +107,7 @@ func (p *deviceAuthRequestProjection) reduceAdded(event eventstore.Event) (*hand
 // reduceDoneEvents removes the device auth request from the projection.
 func (p *deviceAuthRequestProjection) reduceDoneEvents(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
-	case *deviceauth.ApprovedEvent, *deviceauth.CanceledEvent:
+	case *deviceauth.ApprovedEvent, *deviceauth.CanceledEvent, *deviceauth.DoneEvent:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
 				handler.NewCond(DeviceAuthRequestColumnInstanceID, event.Aggregate().InstanceID),

@@ -6,8 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
@@ -19,19 +21,20 @@ import (
 )
 
 type accessToken struct {
-	tokenID         string
-	userID          string
-	resourceOwner   string
-	subject         string
-	clientID        string
-	audience        []string
-	scope           []string
-	authMethods     []domain.UserAuthMethodType
-	authTime        time.Time
-	tokenCreation   time.Time
-	tokenExpiration time.Time
-	isPAT           bool
-	actor           *domain.TokenActor
+	tokenID           string
+	userID            string
+	resourceOwner     string
+	subject           string
+	preferredLanguage *language.Tag
+	clientID          string
+	audience          []string
+	scope             []string
+	authMethods       []domain.UserAuthMethodType
+	authTime          time.Time
+	tokenCreation     time.Time
+	tokenExpiration   time.Time
+	isPAT             bool
+	actor             *domain.TokenActor
 }
 
 var ErrInvalidTokenFormat = errors.New("invalid token format")
@@ -73,35 +76,41 @@ func (s *Server) verifyAccessToken(ctx context.Context, tkn string) (_ *accessTo
 }
 
 func accessTokenV1(tokenID, subject string, token *model.TokenView) *accessToken {
+	var preferredLanguage *language.Tag
+	if token.PreferredLanguage != "" {
+		preferredLanguage = gu.Ptr(language.Make(token.PreferredLanguage))
+	}
 	return &accessToken{
-		tokenID:         tokenID,
-		userID:          token.UserID,
-		resourceOwner:   token.ResourceOwner,
-		subject:         subject,
-		clientID:        token.ApplicationID,
-		audience:        token.Audience,
-		scope:           token.Scopes,
-		tokenCreation:   token.CreationDate,
-		tokenExpiration: token.Expiration,
-		isPAT:           token.IsPAT,
-		actor:           token.Actor,
+		tokenID:           tokenID,
+		userID:            token.UserID,
+		resourceOwner:     token.ResourceOwner,
+		subject:           subject,
+		preferredLanguage: preferredLanguage,
+		clientID:          token.ApplicationID,
+		audience:          token.Audience,
+		scope:             token.Scopes,
+		tokenCreation:     token.CreationDate,
+		tokenExpiration:   token.Expiration,
+		isPAT:             token.IsPAT,
+		actor:             token.Actor,
 	}
 }
 
 func accessTokenV2(tokenID, subject string, token *query.OIDCSessionAccessTokenReadModel) *accessToken {
 	return &accessToken{
-		tokenID:         tokenID,
-		userID:          token.UserID,
-		resourceOwner:   token.ResourceOwner,
-		subject:         subject,
-		clientID:        token.ClientID,
-		audience:        token.Audience,
-		scope:           token.Scope,
-		authMethods:     token.AuthMethods,
-		authTime:        token.AuthTime,
-		tokenCreation:   token.AccessTokenCreation,
-		tokenExpiration: token.AccessTokenExpiration,
-		actor:           token.Actor,
+		tokenID:           tokenID,
+		userID:            token.UserID,
+		resourceOwner:     token.ResourceOwner,
+		subject:           subject,
+		preferredLanguage: token.PreferredLanguage,
+		clientID:          token.ClientID,
+		audience:          token.Audience,
+		scope:             token.Scope,
+		authMethods:       token.AuthMethods,
+		authTime:          token.AuthTime,
+		tokenCreation:     token.AccessTokenCreation,
+		tokenExpiration:   token.AccessTokenExpiration,
+		actor:             token.Actor,
 	}
 }
 

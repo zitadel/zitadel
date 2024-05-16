@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -1429,91 +1428,6 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				return
 			}
 			assert.Equal(t, tt.res.want, got)
-		})
-	}
-}
-
-func TestCommandSide_AddUserToken(t *testing.T) {
-	type fields struct {
-		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
-	}
-	type (
-		args struct {
-			ctx                   context.Context
-			orgID                 string
-			agentID               string
-			clientID              string
-			userID                string
-			audience              []string
-			scopes                []string
-			authMethodsReferences []string
-			lifetime              time.Duration
-			authTime              time.Time
-			reason                domain.TokenReason
-			actor                 *domain.TokenActor
-		}
-	)
-	type res struct {
-		want *domain.Token
-		err  func(error) bool
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{
-		{
-			name: "userid missing, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "",
-			},
-			res: res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
-		},
-		{
-			name: "user not existing, not found error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-				),
-			},
-			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
-			},
-			res: res{
-				err: zerrors.IsNotFound,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
-			}
-			got, err := r.AddUserToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.audience, tt.args.scopes, tt.args.authMethodsReferences, tt.args.lifetime, tt.args.authTime, tt.args.reason, tt.args.actor)
-			if tt.res.err == nil {
-				assert.NoError(t, err)
-			}
-			if tt.res.err != nil && !tt.res.err(err) {
-				t.Errorf("got wrong err: %v ", err)
-			}
-			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
-			}
 		})
 	}
 }
