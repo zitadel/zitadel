@@ -5,12 +5,8 @@ import (
 	_ "embed"
 	"errors"
 
-	"github.com/jinzhu/gorm"
-
 	"github.com/zitadel/zitadel/internal/database"
-	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/view/repository"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -46,38 +42,8 @@ func UserSessionsByAgentID(db *database.DB, agentID, instanceID string) (userSes
 	return userSessions, err
 }
 
-func PutUserSession(db *gorm.DB, table string, session *model.UserSessionView) error {
-	save := repository.PrepareSave(table)
-	return save(db, session)
-}
-
-func DeleteUserSessions(db *gorm.DB, table, userID, instanceID string) error {
-	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyUserID), Value: userID},
-		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID), Value: instanceID},
-	)
-	return delete(db)
-}
-
-func DeleteInstanceUserSessions(db *gorm.DB, table, instanceID string) error {
-	delete := repository.PrepareDeleteByKey(table,
-		model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID),
-		instanceID,
-	)
-	return delete(db)
-}
-
-func DeleteOrgUserSessions(db *gorm.DB, table, instanceID, orgID string) error {
-	delete := repository.PrepareDeleteByKeys(table,
-		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyResourceOwner), Value: orgID},
-		repository.Key{Key: model.UserSessionSearchKey(usr_model.UserSessionSearchKeyInstanceID), Value: instanceID},
-	)
-	return delete(db)
-}
-
 func scanUserSession(row *sql.Row) (*model.UserSessionView, error) {
 	session := new(model.UserSessionView)
-	var userName, loginName, displayName, avatarKey sql.NullString
 	err := row.Scan(
 		&session.CreationDate,
 		&session.ChangeDate,
@@ -85,10 +51,10 @@ func scanUserSession(row *sql.Row) (*model.UserSessionView, error) {
 		&session.State,
 		&session.UserAgentID,
 		&session.UserID,
-		&userName,
-		&loginName,
-		&displayName,
-		&avatarKey,
+		&session.UserName,
+		&session.LoginName,
+		&session.DisplayName,
+		&session.AvatarKey,
 		&session.SelectedIDPConfigID,
 		&session.PasswordVerification,
 		&session.PasswordlessVerification,
@@ -103,10 +69,6 @@ func scanUserSession(row *sql.Row) (*model.UserSessionView, error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, zerrors.ThrowNotFound(nil, "VIEW-NGBs1", "Errors.UserSession.NotFound")
 	}
-	session.UserName = userName.String
-	session.LoginName = loginName.String
-	session.DisplayName = displayName.String
-	session.AvatarKey = avatarKey.String
 	return session, err
 }
 
@@ -114,7 +76,6 @@ func scanUserSessions(rows *sql.Rows) ([]*model.UserSessionView, error) {
 	sessions := make([]*model.UserSessionView, 0)
 	for rows.Next() {
 		session := new(model.UserSessionView)
-		var userName, loginName, displayName, avatarKey sql.NullString
 		err := rows.Scan(
 			&session.CreationDate,
 			&session.ChangeDate,
@@ -122,10 +83,10 @@ func scanUserSessions(rows *sql.Rows) ([]*model.UserSessionView, error) {
 			&session.State,
 			&session.UserAgentID,
 			&session.UserID,
-			&userName,
-			&loginName,
-			&displayName,
-			&avatarKey,
+			&session.UserName,
+			&session.LoginName,
+			&session.DisplayName,
+			&session.AvatarKey,
 			&session.SelectedIDPConfigID,
 			&session.PasswordVerification,
 			&session.PasswordlessVerification,
@@ -140,10 +101,6 @@ func scanUserSessions(rows *sql.Rows) ([]*model.UserSessionView, error) {
 		if err != nil {
 			return nil, err
 		}
-		session.UserName = userName.String
-		session.LoginName = loginName.String
-		session.DisplayName = displayName.String
-		session.AvatarKey = avatarKey.String
 		sessions = append(sessions, session)
 	}
 

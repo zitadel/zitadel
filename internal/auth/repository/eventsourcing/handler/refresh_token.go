@@ -125,11 +125,6 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-AG43hq", "reduce.wrong.event.type %s", user.HumanRefreshTokenRenewedType)
 		}
-		//e := new(user.HumanRefreshTokenRenewedEvent)
-		//if err := event.Unmarshal(e); err != nil {
-		//	logging.WithError(err).Error("could not unmarshal event data")
-		//	return nil, zerrors.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
-		//}
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
 				handler.NewCol("idle_expiration", event.CreatedAt().Add(e.IdleExpiration)),
@@ -145,11 +140,6 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-SFF3t", "reduce.wrong.event.type %s", user.HumanRefreshTokenRemovedType)
 		}
-		//e := new(user.HumanRefreshTokenRemovedEvent)
-		//if err := event.Unmarshal(e); err != nil {
-		//	logging.WithError(err).Error("could not unmarshal event data")
-		//	return nil, zerrors.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
-		//}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
 				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
@@ -179,8 +169,6 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err
 			},
 		), nil
 	default:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return nil
-		}), nil
+		return handler.NewNoOpStatement(event), nil
 	}
 }

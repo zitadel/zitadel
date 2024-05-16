@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	userTable = "auth.users2"
+	userTable = "auth.users3"
 )
 
 func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {

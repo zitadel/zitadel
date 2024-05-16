@@ -194,7 +194,6 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 				handler.NewCol("is_pat", true),
 			},
 		), nil
-		//return t.view.PutToken(token)
 	case user.UserV1ProfileChangedType,
 		user.HumanProfileChangedType:
 		e, ok := event.(*user.HumanProfileChangedEvent)
@@ -202,7 +201,7 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-ASF2t", "reduce.wrong.event.type %s", user.HumanProfileChangedType)
 		}
 		if e.PreferredLanguage == nil {
-			return nil, nil
+			return handler.NewNoOpStatement(event), nil
 		}
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
@@ -289,7 +288,6 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 				handler.NewCond("application_id", applicationIDs),
 			},
 		), nil
-		//return t.view.DeleteApplicationTokens(event, applicationIDs...)
 	case instance.InstanceRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
@@ -304,9 +302,7 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 			},
 		), nil
 	default:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return nil
-		}), nil
+		return handler.NewNoOpStatement(event), nil
 	}
 }
 

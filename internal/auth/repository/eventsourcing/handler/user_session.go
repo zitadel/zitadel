@@ -212,7 +212,7 @@ func sessionColumns(event eventstore.Event, columns ...handler.Column) ([]handle
 		handler.NewCol(userAgentIDCol, userAgent),
 		handler.NewCol(userIDCol, event.Aggregate().ID),
 		handler.NewCol(instanceIDCol, event.Aggregate().InstanceID),
-		handler.NewCol(creationDateCol, handler.OnlySetValueOnInsert(creationDateCol, event.CreatedAt())),
+		handler.NewCol(creationDateCol, handler.OnlySetValueOnInsert(userSessionTable, event.CreatedAt())),
 		handler.NewCol(changeDateCol, event.CreatedAt()),
 		handler.NewCol(resourceOwnerCol, event.Aggregate().ResourceOwner),
 		handler.NewCol(sequenceCol, event.Sequence()),
@@ -225,12 +225,12 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		user.HumanPasswordCheckSucceededType:
 		columns, err := sessionColumns(event,
 			handler.NewCol(passwordVerificationCol, event.CreatedAt()),
-			handler.NewCol(stateCol, domain.UserSchemaStateActive),
+			handler.NewCol(stateCol, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:2], columns), nil
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserV1PasswordCheckFailedType,
 		user.HumanPasswordCheckFailedType:
 		columns, err := sessionColumns(event,
@@ -239,18 +239,18 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:2], columns), nil
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserV1MFAOTPCheckSucceededType,
 		user.HumanMFAOTPCheckSucceededType:
 		columns, err := sessionColumns(event,
 			handler.NewCol(secondFactorVerificationCol, event.CreatedAt()),
 			handler.NewCol(secondFactorVerificationTypeCol, domain.MFATypeTOTP),
-			handler.NewCol(stateCol, domain.UserSchemaStateActive),
+			handler.NewCol(stateCol, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:2], columns), nil
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserV1MFAOTPCheckFailedType,
 		user.HumanMFAOTPCheckFailedType,
 		user.HumanU2FTokenCheckFailedType:
@@ -260,7 +260,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:2], columns), nil
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserV1SignedOutType,
 		user.HumanSignedOutType:
 		columns, err := sessionColumns(event,
@@ -276,7 +276,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:2], columns), nil
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserIDPLoginCheckSucceededType:
 		data := new(es_model.AuthRequest)
 		err := data.SetData(event)
@@ -291,7 +291,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:2], columns), nil
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.HumanU2FTokenCheckSucceededType:
 		data := new(es_model.AuthRequest)
 		err := data.SetData(event)
@@ -301,12 +301,12 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		columns, err := sessionColumns(event,
 			handler.NewCol(secondFactorVerificationCol, event.CreatedAt()),
 			handler.NewCol(secondFactorVerificationTypeCol, domain.MFATypeU2F),
-			handler.NewCol(stateCol, domain.UserSchemaStateActive),
+			handler.NewCol(stateCol, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:2], columns), nil
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.HumanPasswordlessTokenCheckSucceededType:
 		data := new(es_model.AuthRequest)
 		err := data.SetData(event)
@@ -317,12 +317,12 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			handler.NewCol(passwordlessVerificationCol, event.CreatedAt()),
 			handler.NewCol(multiFactorVerificationCol, event.CreatedAt()),
 			handler.NewCol(multiFactorVerificationTypeCol, domain.MFATypeU2FUserVerification),
-			handler.NewCol(stateCol, domain.UserSchemaStateActive),
+			handler.NewCol(stateCol, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:2], columns), nil
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.HumanPasswordlessTokenCheckFailedType:
 		data := new(es_model.AuthRequest)
 		err := data.SetData(event)
@@ -336,7 +336,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		if err != nil {
 			return nil, err
 		}
-		return handler.NewUpsertStatement(event, columns[0:2], columns), nil
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserLockedType,
 		user.UserDeactivatedType:
 		return handler.NewUpdateStatement(event,
@@ -465,8 +465,6 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			},
 		), nil
 	default:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return nil
-		}), nil
+		return handler.NewNoOpStatement(event), nil
 	}
 }
