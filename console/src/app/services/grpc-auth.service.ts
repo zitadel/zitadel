@@ -418,9 +418,13 @@ export class GrpcAuthService {
     if (queryList) {
       req.setQueriesList(queryList);
     }
-    // if (sortingColumn) {
-    //     req.setSortingColumn(sortingColumn);
-    // }
+    if (sortingDirection) {
+      query.setAsc(sortingDirection === 'asc');
+    }
+
+    if (sortingColumn) {
+      req.setSortingColumn(sortingColumn);
+    }
 
     req.setQuery(query);
 
