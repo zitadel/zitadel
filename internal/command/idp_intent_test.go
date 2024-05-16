@@ -28,20 +28,21 @@ import (
 	rep_idp "github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/instance"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestCommands_CreateIntent(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx           context.Context
-		idpID         string
-		successURL    string
-		failureURL    string
-		resourceOwner string
+		ctx        context.Context
+		idpID      string
+		successURL string
+		failureURL string
+		instanceID string
 	}
 	type res struct {
 		intentID string
@@ -57,11 +58,11 @@ func TestCommands_CreateIntent(t *testing.T) {
 		{
 			"error no id generator",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: mock.NewIDGeneratorExpectError(t, zerrors.ThrowInternal(nil, "", "error id")),
 			},
 			args{
-				ctx:        authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				ctx:        context.Background(),
 				idpID:      "",
 				successURL: "https://success.url",
 				failureURL: "https://failure.url",
@@ -73,11 +74,11 @@ func TestCommands_CreateIntent(t *testing.T) {
 		{
 			"error no idpID",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
-				ctx:        authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				ctx:        context.Background(),
 				idpID:      "",
 				successURL: "https://success.url",
 				failureURL: "https://failure.url",
@@ -89,11 +90,11 @@ func TestCommands_CreateIntent(t *testing.T) {
 		{
 			"error no successURL",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
-				ctx:        authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				ctx:        context.Background(),
 				idpID:      "idp",
 				successURL: ":",
 				failureURL: "https://failure.url",
@@ -105,11 +106,11 @@ func TestCommands_CreateIntent(t *testing.T) {
 		{
 			"error no failureURL",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
-				ctx:        authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				ctx:        context.Background(),
 				idpID:      "idp",
 				successURL: "https://success.url",
 				failureURL: ":",
@@ -119,18 +120,18 @@ func TestCommands_CreateIntent(t *testing.T) {
 			},
 		},
 		{
-			"error idp not existing",
+			"error idp not existing org",
 			fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(),
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(),
 				),
 				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
-				ctx:        authz.SetCtxData(context.Background(), authz.CtxData{OrgID: "ro"}),
+				ctx:        context.Background(),
 				idpID:      "idp",
+				instanceID: "instance",
 				successURL: "https://success.url",
 				failureURL: "https://failure.url",
 			},
@@ -139,14 +140,33 @@ func TestCommands_CreateIntent(t *testing.T) {
 			},
 		},
 		{
-			"push",
+			"error idp not existing instance",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
+					expectFilter(),
+				),
+				idGenerator: mock.ExpectID(t, "id"),
+			},
+			args{
+				ctx:        context.Background(),
+				idpID:      "idp",
+				instanceID: "instance",
+				successURL: "https://success.url",
+				failureURL: "https://failure.url",
+			},
+			res{
+				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-39n221fs", "Errors.IDPConfig.NotExisting"),
+			},
+		},
+		{
+			"push, org",
+			fields{
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("ro").Aggregate,
+							org.NewOAuthIDPAddedEvent(context.Background(), &org.NewAggregate("org").Aggregate,
 								"idp",
 								"name",
 								"clientID",
@@ -170,7 +190,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 							failure, _ := url.Parse("https://failure.url")
 							return idpintent.NewStartedEvent(
 								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
+								&idpintent.NewAggregate("id", "instance").Aggregate,
 								success,
 								failure,
 								"idp",
@@ -181,25 +201,131 @@ func TestCommands_CreateIntent(t *testing.T) {
 				idGenerator: mock.ExpectID(t, "id"),
 			},
 			args{
-				ctx:           context.Background(),
-				resourceOwner: "ro",
-				idpID:         "idp",
-				successURL:    "https://success.url",
-				failureURL:    "https://failure.url",
+				ctx:        context.Background(),
+				instanceID: "instance",
+				idpID:      "idp",
+				successURL: "https://success.url",
+				failureURL: "https://failure.url",
 			},
 			res{
 				intentID: "id",
-				details:  &domain.ObjectDetails{ResourceOwner: "ro"},
+				details:  &domain.ObjectDetails{ResourceOwner: "instance"},
+			},
+		},
+		{
+			"push, instance",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								"auth",
+								"token",
+								"user",
+								"idAttribute",
+								nil,
+								rep_idp.Options{},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							success, _ := url.Parse("https://success.url")
+							failure, _ := url.Parse("https://failure.url")
+							return idpintent.NewStartedEvent(
+								context.Background(),
+								&idpintent.NewAggregate("id", "instance").Aggregate,
+								success,
+								failure,
+								"idp",
+							)
+						}(),
+					),
+				),
+				idGenerator: mock.ExpectID(t, "id"),
+			},
+			args{
+				ctx:        context.Background(),
+				instanceID: "instance",
+				idpID:      "idp",
+				successURL: "https://success.url",
+				failureURL: "https://failure.url",
+			},
+			res{
+				intentID: "id",
+				details:  &domain.ObjectDetails{ResourceOwner: "instance"},
+			},
+		},
+		{
+			"push, instance without org",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewOAuthIDPAddedEvent(context.Background(), &instance.NewAggregate("instance").Aggregate,
+								"idp",
+								"name",
+								"clientID",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("clientSecret"),
+								},
+								"auth",
+								"token",
+								"user",
+								"idAttribute",
+								nil,
+								rep_idp.Options{},
+							)),
+					),
+					expectPush(
+						func() eventstore.Command {
+							success, _ := url.Parse("https://success.url")
+							failure, _ := url.Parse("https://failure.url")
+							return idpintent.NewStartedEvent(
+								context.Background(),
+								&idpintent.NewAggregate("id", "instance").Aggregate,
+								success,
+								failure,
+								"idp",
+							)
+						}(),
+					),
+				),
+				idGenerator: mock.ExpectID(t, "id"),
+			},
+			args{
+				ctx:        context.Background(),
+				instanceID: "instance",
+				idpID:      "idp",
+				successURL: "https://success.url",
+				failureURL: "https://failure.url",
+			},
+			res{
+				intentID: "id",
+				details:  &domain.ObjectDetails{ResourceOwner: "instance"},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore,
+				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.resourceOwner)
+			intentWriteModel, details, err := c.CreateIntent(tt.args.ctx, tt.args.idpID, tt.args.successURL, tt.args.failureURL, tt.args.instanceID)
 			require.ErrorIs(t, err, tt.res.err)
 			if intentWriteModel != nil {
 				assert.Equal(t, tt.res.intentID, intentWriteModel.AggregateID)
@@ -213,7 +339,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 
 func TestCommands_AuthFromProvider(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(t *testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -238,7 +364,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 			"idp not existing",
 			fields{
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -256,7 +382,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 			"idp removed",
 			fields{
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"instance",
@@ -300,7 +426,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 			"oauth auth redirect",
 			fields{
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"instance",
@@ -360,7 +486,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 			"migrated and push",
 			fields{
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"instance",
@@ -450,7 +576,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			content, redirect, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL, tt.args.samlRootURL)
@@ -463,7 +589,7 @@ func TestCommands_AuthFromProvider(t *testing.T) {
 
 func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(t *testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -488,7 +614,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 			"saml auth default redirect",
 			fields{
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusherWithInstanceID(
 							"instance",
@@ -534,7 +660,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 								failure, _ := url.Parse("https://failure.url")
 								return idpintent.NewStartedEvent(
 									context.Background(),
-									&idpintent.NewAggregate("id", "ro").Aggregate,
+									&idpintent.NewAggregate("id", "instance").Aggregate,
 									success,
 									failure,
 									"idp",
@@ -546,7 +672,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 						[]eventstore.Command{
 							idpintent.NewSAMLRequestEvent(
 								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
+								&idpintent.NewAggregate("id", "instance").Aggregate,
 								"request",
 							),
 						},
@@ -572,7 +698,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			content, _, err := c.AuthFromProvider(tt.args.ctx, tt.args.idpID, tt.args.state, tt.args.callbackURL, tt.args.samlRootURL)
@@ -595,7 +721,7 @@ func TestCommands_AuthFromProvider_SAML(t *testing.T) {
 
 func TestCommands_SucceedIDPIntent(t *testing.T) {
 	type fields struct {
-		eventstore          *eventstore.Eventstore
+		eventstore          func(t *testing.T) *eventstore.Eventstore
 		idpConfigEncryption crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -623,6 +749,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:        context.Background(),
@@ -643,6 +770,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:        context.Background(),
@@ -663,12 +791,12 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			"push",
 			fields{
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectPush(
 						func() eventstore.Command {
 							event := idpintent.NewSucceededEvent(
 								context.Background(),
-								&idpintent.NewAggregate("id", "ro").Aggregate,
+								&idpintent.NewAggregate("id", "instance").Aggregate,
 								[]byte(`{"sub":"id","preferred_username":"username"}`),
 								"id",
 								"username",
@@ -688,7 +816,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				idpSession: &openid.Session{
 					Tokens: &oidc.Tokens[*oidc.IDTokenClaims]{
 						Token: &oauth2.Token{
@@ -712,7 +840,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
 			got, err := c.SucceedIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.idpSession, tt.args.userID)
@@ -724,7 +852,7 @@ func TestCommands_SucceedIDPIntent(t *testing.T) {
 
 func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 	type fields struct {
-		eventstore          *eventstore.Eventstore
+		eventstore          func(t *testing.T) *eventstore.Eventstore
 		idpConfigEncryption crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -752,6 +880,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:        context.Background(),
@@ -765,11 +894,11 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			"push",
 			fields{
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectPush(
 						idpintent.NewSAMLSucceededEvent(
 							context.Background(),
-							&idpintent.NewAggregate("id", "ro").Aggregate,
+							&idpintent.NewAggregate("id", "instance").Aggregate,
 							[]byte(`{"sub":"id","preferred_username":"username"}`),
 							"id",
 							"username",
@@ -786,7 +915,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				assertion:  &saml.Assertion{ID: "id"},
 				idpUser: openid.NewUser(&oidc.UserInfo{
 					Subject: "id",
@@ -803,11 +932,11 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			"push with userID",
 			fields{
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectPush(
 						idpintent.NewSAMLSucceededEvent(
 							context.Background(),
-							&idpintent.NewAggregate("id", "ro").Aggregate,
+							&idpintent.NewAggregate("id", "instance").Aggregate,
 							[]byte(`{"sub":"id","preferred_username":"username"}`),
 							"id",
 							"username",
@@ -824,7 +953,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				assertion:  &saml.Assertion{ID: "id"},
 				idpUser: openid.NewUser(&oidc.UserInfo{
 					Subject: "id",
@@ -842,7 +971,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
 			got, err := c.SucceedSAMLIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.assertion)
@@ -854,7 +983,7 @@ func TestCommands_SucceedSAMLIDPIntent(t *testing.T) {
 
 func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
@@ -873,11 +1002,11 @@ func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 		{
 			"push",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectPush(
 						idpintent.NewSAMLRequestEvent(
 							context.Background(),
-							&idpintent.NewAggregate("id", "ro").Aggregate,
+							&idpintent.NewAggregate("id", "instance").Aggregate,
 							"request",
 						),
 					),
@@ -885,7 +1014,7 @@ func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				request:    "request",
 			},
 			res{},
@@ -894,7 +1023,7 @@ func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			err := c.RequestSAMLIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.request)
 			require.ErrorIs(t, err, tt.res.err)
@@ -905,7 +1034,7 @@ func TestCommands_RequestSAMLIDPIntent(t *testing.T) {
 
 func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 	type fields struct {
-		eventstore          *eventstore.Eventstore
+		eventstore          func(t *testing.T) *eventstore.Eventstore
 		idpConfigEncryption crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -933,10 +1062,11 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 					m.EXPECT().Encrypt(gomock.Any()).Return(nil, zerrors.ThrowInternal(nil, "id", "encryption failed"))
 					return m
 				}(),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "encryption failed"),
@@ -946,11 +1076,11 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 			"push",
 			fields{
 				idpConfigEncryption: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectPush(
 						idpintent.NewLDAPSucceededEvent(
 							context.Background(),
-							&idpintent.NewAggregate("id", "ro").Aggregate,
+							&idpintent.NewAggregate("id", "instance").Aggregate,
 							[]byte(`{"id":"id","preferredUsername":"username","preferredLanguage":"und"}`),
 							"id",
 							"username",
@@ -962,7 +1092,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				attributes: map[string][]string{"id": {"id"}},
 				idpUser: ldap.NewUser(
 					"id",
@@ -988,7 +1118,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.idpConfigEncryption,
 			}
 			got, err := c.SucceedLDAPIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.idpUser, tt.args.userID, tt.args.attributes)
@@ -1000,7 +1130,7 @@ func TestCommands_SucceedLDAPIDPIntent(t *testing.T) {
 
 func TestCommands_FailIDPIntent(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
@@ -1019,11 +1149,11 @@ func TestCommands_FailIDPIntent(t *testing.T) {
 		{
 			"push",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectPush(
 						idpintent.NewFailedEvent(
 							context.Background(),
-							&idpintent.NewAggregate("id", "ro").Aggregate,
+							&idpintent.NewAggregate("id", "instance").Aggregate,
 							"reason",
 						),
 					),
@@ -1031,7 +1161,7 @@ func TestCommands_FailIDPIntent(t *testing.T) {
 			},
 			args{
 				ctx:        context.Background(),
-				writeModel: NewIDPIntentWriteModel("id", "ro"),
+				writeModel: NewIDPIntentWriteModel("id", "instance"),
 				reason:     "reason",
 			},
 			res{
@@ -1042,7 +1172,7 @@ func TestCommands_FailIDPIntent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			err := c.FailIDPIntent(tt.args.ctx, tt.args.writeModel, tt.args.reason)
 			require.ErrorIs(t, err, tt.res.err)

@@ -460,6 +460,7 @@ Errors:
     NotActive: アクションはアクティブではありません
     NotInactive: アクションは非アクティブではありません
     MaxAllowed: 追加のアクティブアクションは許可されていません
+    NotEnabled: 機能「アクション」が有効になっていません
   Flow:
     FlowTypeMissing: フロータイプがありません
     Empty: フローはすでに空です

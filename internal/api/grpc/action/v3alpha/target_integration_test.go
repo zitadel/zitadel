@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -69,8 +70,8 @@ func TestServer_CreateTarget(t *testing.T) {
 			ctx:  CTX,
 			req: &action.CreateTargetRequest{
 				Name: fmt.Sprint(time.Now().UnixNano() + 1),
-				TargetType: &action.CreateTargetRequest_RestRequestResponse{
-					RestRequestResponse: &action.SetRESTRequestResponse{},
+				TargetType: &action.CreateTargetRequest_RestCall{
+					RestCall: &action.SetRESTCall{},
 				},
 			},
 			wantErr: true,
@@ -79,29 +80,25 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty timeout",
 			ctx:  CTX,
 			req: &action.CreateTargetRequest{
-				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestWebhook{
-					RestWebhook: &action.SetRESTWebhook{
-						Url: "https://example.com",
-					},
+					RestWebhook: &action.SetRESTWebhook{},
 				},
-				Timeout:       nil,
-				ExecutionType: nil,
+				Timeout: nil,
 			},
 			wantErr: true,
 		},
 		{
-			name: "empty execution type, ok",
+			name: "async, ok",
 			ctx:  CTX,
 			req: &action.CreateTargetRequest{
-				Name: fmt.Sprint(time.Now().UnixNano() + 1),
-				TargetType: &action.CreateTargetRequest_RestWebhook{
-					RestWebhook: &action.SetRESTWebhook{
-						Url: "https://example.com",
-					},
+				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Endpoint: "https://example.com",
+				TargetType: &action.CreateTargetRequest_RestAsync{
+					RestAsync: &action.SetRESTAsync{},
 				},
-				Timeout:       durationpb.New(10 * time.Second),
-				ExecutionType: nil,
+				Timeout: durationpb.New(10 * time.Second),
 			},
 			want: &action.CreateTargetResponse{
 				Details: &object.Details{
@@ -111,19 +108,17 @@ func TestServer_CreateTarget(t *testing.T) {
 			},
 		},
 		{
-			name: "async execution, ok",
+			name: "webhook, ok",
 			ctx:  CTX,
 			req: &action.CreateTargetRequest{
-				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{
-						Url: "https://example.com",
+						InterruptOnError: false,
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
-				ExecutionType: &action.CreateTargetRequest_IsAsync{
-					IsAsync: true,
-				},
 			},
 			want: &action.CreateTargetResponse{
 				Details: &object.Details{
@@ -133,19 +128,58 @@ func TestServer_CreateTarget(t *testing.T) {
 			},
 		},
 		{
-			name: "interrupt on error execution, ok",
+			name: "webhook, interrupt on error, ok",
 			ctx:  CTX,
 			req: &action.CreateTargetRequest{
-				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Endpoint: "https://example.com",
 				TargetType: &action.CreateTargetRequest_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{
-						Url: "https://example.com",
+						InterruptOnError: true,
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
-				ExecutionType: &action.CreateTargetRequest_InterruptOnError{
-					InterruptOnError: true,
+			},
+			want: &action.CreateTargetResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
 				},
+			},
+		},
+		{
+			name: "call, ok",
+			ctx:  CTX,
+			req: &action.CreateTargetRequest{
+				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Endpoint: "https://example.com",
+				TargetType: &action.CreateTargetRequest_RestCall{
+					RestCall: &action.SetRESTCall{
+						InterruptOnError: false,
+					},
+				},
+				Timeout: durationpb.New(10 * time.Second),
+			},
+			want: &action.CreateTargetResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+			},
+		},
+
+		{
+			name: "call, interruptOnError, ok",
+			ctx:  CTX,
+			req: &action.CreateTargetRequest{
+				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Endpoint: "https://example.com",
+				TargetType: &action.CreateTargetRequest_RestCall{
+					RestCall: &action.SetRESTCall{
+						InterruptOnError: true,
+					},
+				},
+				Timeout: durationpb.New(10 * time.Second),
 			},
 			want: &action.CreateTargetResponse{
 				Details: &object.Details{
@@ -186,7 +220,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
@@ -215,7 +249,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change name, ok",
 			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
@@ -235,16 +269,16 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change type, ok",
 			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
 			args: args{
 				ctx: CTX,
 				req: &action.UpdateTargetRequest{
-					TargetType: &action.UpdateTargetRequest_RestRequestResponse{
-						RestRequestResponse: &action.SetRESTRequestResponse{
-							Url: "https://example.com",
+					TargetType: &action.UpdateTargetRequest_RestCall{
+						RestCall: &action.SetRESTCall{
+							InterruptOnError: true,
 						},
 					},
 				},
@@ -259,18 +293,14 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change url, ok",
 			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
 			args: args{
 				ctx: CTX,
 				req: &action.UpdateTargetRequest{
-					TargetType: &action.UpdateTargetRequest_RestWebhook{
-						RestWebhook: &action.SetRESTWebhook{
-							Url: "https://example.com/hooks/new",
-						},
-					},
+					Endpoint: gu.Ptr("https://example.com/hooks/new"),
 				},
 			},
 			want: &action.UpdateTargetResponse{
@@ -283,7 +313,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 		{
 			name: "change timeout, ok",
 			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
@@ -301,17 +331,17 @@ func TestServer_UpdateTarget(t *testing.T) {
 			},
 		},
 		{
-			name: "change execution type, ok",
+			name: "change type async, ok",
 			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t).GetId()
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeAsync, false).GetId()
 				request.TargetId = targetID
 				return nil
 			},
 			args: args{
 				ctx: CTX,
 				req: &action.UpdateTargetRequest{
-					ExecutionType: &action.UpdateTargetRequest_IsAsync{
-						IsAsync: true,
+					TargetType: &action.UpdateTargetRequest_RestAsync{
+						RestAsync: &action.SetRESTAsync{},
 					},
 				},
 			},
@@ -341,7 +371,7 @@ func TestServer_UpdateTarget(t *testing.T) {
 
 func TestServer_DeleteTarget(t *testing.T) {
 	ensureFeatureEnabled(t)
-	target := Tester.CreateTarget(CTX, t)
+	target := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 	tests := []struct {
 		name    string
 		ctx     context.Context

@@ -23,7 +23,10 @@ func NewAggregate(aggrID, instanceID string) *eventstore.Aggregate {
 }
 
 func ID(executionType domain.ExecutionType, value string) string {
-	return strings.Join([]string{executionType.String(), value}, ".")
+	if strings.HasPrefix(value, "/") {
+		return strings.Join([]string{executionType.String(), value}, "")
+	}
+	return strings.Join([]string{executionType.String(), value}, "/")
 }
 
 func IDAll(executionType domain.ExecutionType) string {

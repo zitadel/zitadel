@@ -471,6 +471,7 @@ Errors:
     NotActive: 动作不是启用状态
     NotInactive: 动作不是停用状态
     MaxAllowed: 不允许额外的动作
+    NotEnabled: 未启用“操作”功能
   Flow:
     FlowTypeMissing: 缺少身份认证流程类型
     Empty: 身份认证流程为空
