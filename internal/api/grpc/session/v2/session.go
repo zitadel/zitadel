@@ -89,13 +89,9 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 		return nil, err
 	}
 
-	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), req.GetSessionToken(), cmds, req.GetMetadata(), req.GetLifetime().AsDuration())
+	set, err := s.command.UpdateSession(ctx, req.GetSessionId(), cmds, req.GetMetadata(), req.GetLifetime().AsDuration())
 	if err != nil {
 		return nil, err
-	}
-	// if there's no new token, just return the current
-	if set.NewToken == "" {
-		set.NewToken = req.GetSessionToken()
 	}
 	return &session.SetSessionResponse{
 		Details:      object.DomainToDetailsPb(set.ObjectDetails),
@@ -105,7 +101,7 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 }
 
 func (s *Server) DeleteSession(ctx context.Context, req *session.DeleteSessionRequest) (*session.DeleteSessionResponse, error) {
-	details, err := s.command.TerminateSession(ctx, req.GetSessionId(), req.GetSessionToken())
+	details, err := s.command.TerminateSession(ctx, req.GetSessionId())
 	if err != nil {
 		return nil, err
 	}

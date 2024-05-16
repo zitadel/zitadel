@@ -312,34 +312,31 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
 
-func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken string, cmds []SessionCommand, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
+func (c *Commands) UpdateSession(ctx context.Context, sessionID string, cmds []SessionCommand, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
-		return nil, err
-	}
-	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
 	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
 
-func (c *Commands) TerminateSession(ctx context.Context, sessionID string, sessionToken string) (*domain.ObjectDetails, error) {
-	return c.terminateSession(ctx, sessionID, sessionToken, true)
+func (c *Commands) TerminateSession(ctx context.Context, sessionID string) (*domain.ObjectDetails, error) {
+	return c.terminateSession(ctx, sessionID, true)
 }
 
 func (c *Commands) TerminateSessionWithoutTokenCheck(ctx context.Context, sessionID string) (*domain.ObjectDetails, error) {
-	return c.terminateSession(ctx, sessionID, "", false)
+	return c.terminateSession(ctx, sessionID, false)
 }
 
-func (c *Commands) terminateSession(ctx context.Context, sessionID, sessionToken string, mustCheckToken bool) (*domain.ObjectDetails, error) {
+func (c *Commands) terminateSession(ctx context.Context, sessionID string, mustCheckPermission bool) (*domain.ObjectDetails, error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	if err := c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel); err != nil {
 		return nil, err
 	}
-	if mustCheckToken {
-		if err := c.checkSessionTerminationPermission(ctx, sessionWriteModel, sessionToken); err != nil {
+	if mustCheckPermission {
+		if err := c.checkSessionTerminationPermission(ctx, sessionWriteModel); err != nil {
 			return nil, err
 		}
 	}
@@ -395,10 +392,7 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 // checkSessionTerminationPermission will check that the provided sessionToken is correct or
 // if empty, check that the caller is either terminating the own session or
 // is granted the "session.delete" permission on the resource owner of the authenticated user.
-func (c *Commands) checkSessionTerminationPermission(ctx context.Context, model *SessionWriteModel, token string) error {
-	if token != "" {
-		return c.sessionTokenVerifier(ctx, token, model.AggregateID, model.TokenID)
-	}
+func (c *Commands) checkSessionTerminationPermission(ctx context.Context, model *SessionWriteModel) error {
 	if model.UserID != "" && model.UserID == authz.GetCtxData(ctx).UserID {
 		return nil
 	}
