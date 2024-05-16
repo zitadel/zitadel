@@ -4,14 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	org_model "github.com/zitadel/zitadel/internal/org/model"
-	org_es_model "github.com/zitadel/zitadel/internal/org/repository/eventsourcing/model"
-	org_view "github.com/zitadel/zitadel/internal/org/repository/view"
 	query2 "github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -398,23 +393,23 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 				}
 			}
 			err = user.AppendEvent(event)
-		case user_repo.UserDomainClaimedType,
-			user_repo.UserUserNameChangedType:
-			user, err = u.view.UserByID(event.Aggregate().ID, event.Aggregate().InstanceID)
-			if err != nil {
-				if !zerrors.IsNotFound(err) {
-					return err
-				}
-				user, err = u.userFromEventstore(event.Aggregate(), user.EventTypes())
-				if err != nil {
-					return err
-				}
-			}
-			err = user.AppendEvent(event)
-			if err != nil {
-				return err
-			}
-			err = u.fillLoginNames(user)
+		//case user_repo.UserDomainClaimedType,
+		//	user_repo.UserUserNameChangedType:
+		//	user, err = u.view.UserByID(event.Aggregate().ID, event.Aggregate().InstanceID)
+		//	if err != nil {
+		//		if !zerrors.IsNotFound(err) {
+		//			return err
+		//		}
+		//		user, err = u.userFromEventstore(event.Aggregate(), user.EventTypes())
+		//		if err != nil {
+		//			return err
+		//		}
+		//	}
+		//	err = user.AppendEvent(event)
+		//	if err != nil {
+		//		return err
+		//	}
+		//	err = u.fillLoginNames(user)
 		case user_repo.UserRemovedType:
 			return u.view.DeleteUser(event.Aggregate().ID, event.Aggregate().InstanceID, event)
 		default:
@@ -427,124 +422,135 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 	}), nil
 }
 
-func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
-	userLoginMustBeDomain, primaryDomain, domains, err := u.loginNameInformation(context.Background(), user.ResourceOwner, user.InstanceID)
-	if err != nil {
-		return err
-	}
-	user.SetLoginNames(userLoginMustBeDomain, domains)
-	user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
-	return nil
-}
+//
+//func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
+//	userLoginMustBeDomain, primaryDomain, domains, err := u.loginNameInformation(context.Background(), user.ResourceOwner, user.InstanceID)
+//	if err != nil {
+//		return err
+//	}
+//	user.SetLoginNames(userLoginMustBeDomain, domains)
+//	user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
+//	return nil
+//}
 
 func (u *User) ProcessOrg(event eventstore.Event) (_ *handler.Statement, err error) {
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		switch event.Type() {
-		case org.OrgDomainVerifiedEventType,
-			org.OrgDomainRemovedEventType,
-			org.DomainPolicyAddedEventType,
-			org.DomainPolicyChangedEventType,
-			org.DomainPolicyRemovedEventType:
-			return u.fillLoginNamesOnOrgUsers(event)
-		case org.OrgDomainPrimarySetEventType:
-			return u.fillPreferredLoginNamesOnOrgUsers(event)
-		case org.OrgRemovedEventType:
-			return u.view.UpdateOrgOwnerRemovedUsers(event)
-		default:
+	//return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+	switch event.Type() {
+	//case org.OrgDomainVerifiedEventType,
+	//	org.OrgDomainRemovedEventType,
+	//	org.DomainPolicyAddedEventType,
+	//	org.DomainPolicyChangedEventType,
+	//	org.DomainPolicyRemovedEventType:
+	//	return u.fillLoginNamesOnOrgUsers(event)
+	//case org.OrgDomainPrimarySetEventType:
+	//	return u.fillPreferredLoginNamesOnOrgUsers(event)
+	case org.OrgRemovedEventType:
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(resourceOwnerCol, event.Aggregate().ID),
+			},
+		), nil
+		//return u.view.UpdateOrgOwnerRemovedUsers(event)
+	default:
+		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
 			return nil
-		}
-	}), nil
+		}), nil
+	}
 }
 
 func (u *User) ProcessInstance(event eventstore.Event) (_ *handler.Statement, err error) {
 	switch event.Type() {
 	case instance.InstanceRemovedEventType:
-		return handler.NewStatement(event,
-			func(ex handler.Executer, projectionName string) error {
-				return u.view.DeleteInstanceUsers(event)
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
 			},
+			//return u.view.DeleteInstanceUsers(event)
 		), nil
 	default:
 		return handler.NewNoOpStatement(event), nil
 	}
 }
 
-func (u *User) fillLoginNamesOnOrgUsers(event eventstore.Event) error {
-	userLoginMustBeDomain, _, domains, err := u.loginNameInformation(context.Background(), event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
-	if err != nil {
-		return err
-	}
-	users, err := u.view.UsersByOrgID(event.Aggregate().ID, event.Aggregate().InstanceID)
-	if err != nil {
-		return err
-	}
-	for _, user := range users {
-		user.SetLoginNames(userLoginMustBeDomain, domains)
-	}
-	return u.view.PutUsers(users, event)
-}
+//
+//func (u *User) fillLoginNamesOnOrgUsers(event eventstore.Event) error {
+//	userLoginMustBeDomain, _, domains, err := u.loginNameInformation(context.Background(), event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
+//	if err != nil {
+//		return err
+//	}
+//	users, err := u.view.UsersByOrgID(event.Aggregate().ID, event.Aggregate().InstanceID)
+//	if err != nil {
+//		return err
+//	}
+//	for _, user := range users {
+//		user.SetLoginNames(userLoginMustBeDomain, domains)
+//	}
+//	return u.view.PutUsers(users, event)
+//}
+//
+//func (u *User) fillPreferredLoginNamesOnOrgUsers(event eventstore.Event) error {
+//	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
+//	if err != nil {
+//		return err
+//	}
+//	if !userLoginMustBeDomain {
+//		return nil
+//	}
+//	users, err := u.view.UsersByOrgID(event.Aggregate().ID, event.Aggregate().InstanceID)
+//	if err != nil {
+//		return err
+//	}
+//	for _, user := range users {
+//		user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
+//	}
+//	return u.view.PutUsers(users, event)
+//}
+//
+//func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
+//	query, err := org_view.OrgByIDQuery(orgID, instanceID, 0)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	esOrg := &org_es_model.Org{
+//		ObjectRoot: es_models.ObjectRoot{
+//			AggregateID: orgID,
+//		},
+//	}
+//	events, err := u.es.Filter(ctx, query)
+//	if err != nil {
+//		return nil, err
+//	}
+//	if err = esOrg.AppendEvents(events...); err != nil {
+//		return nil, err
+//	}
+//	if esOrg.Sequence == 0 {
+//		return nil, zerrors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
+//	}
+//
+//	return org_es_model.OrgToModel(esOrg), nil
+//}
 
-func (u *User) fillPreferredLoginNamesOnOrgUsers(event eventstore.Event) error {
-	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.Aggregate().ResourceOwner, event.Aggregate().InstanceID)
-	if err != nil {
-		return err
-	}
-	if !userLoginMustBeDomain {
-		return nil
-	}
-	users, err := u.view.UsersByOrgID(event.Aggregate().ID, event.Aggregate().InstanceID)
-	if err != nil {
-		return err
-	}
-	for _, user := range users {
-		user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
-	}
-	return u.view.PutUsers(users, event)
-}
-
-func (u *User) getOrgByID(ctx context.Context, orgID, instanceID string) (*org_model.Org, error) {
-	query, err := org_view.OrgByIDQuery(orgID, instanceID, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	esOrg := &org_es_model.Org{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID: orgID,
-		},
-	}
-	events, err := u.es.Filter(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	if err = esOrg.AppendEvents(events...); err != nil {
-		return nil, err
-	}
-	if esOrg.Sequence == 0 {
-		return nil, zerrors.ThrowNotFound(nil, "EVENT-3m9vs", "Errors.Org.NotFound")
-	}
-
-	return org_es_model.OrgToModel(esOrg), nil
-}
-
-func (u *User) loginNameInformation(ctx context.Context, orgID string, instanceID string) (userLoginMustBeDomain bool, primaryDomain string, domains []*org_model.OrgDomain, err error) {
-	org, err := u.getOrgByID(ctx, orgID, instanceID)
-	if err != nil {
-		return false, "", nil, err
-	}
-	primaryDomain, err = org.GetPrimaryDomain()
-	if err != nil {
-		return false, "", nil, err
-	}
-	if org.DomainPolicy != nil {
-		return org.DomainPolicy.UserLoginMustBeDomain, primaryDomain, org.Domains, nil
-	}
-	policy, err := u.queries.DefaultDomainPolicy(authz.WithInstanceID(ctx, org.InstanceID))
-	if err != nil {
-		return false, "", nil, err
-	}
-	return policy.UserLoginMustBeDomain, primaryDomain, org.Domains, nil
-}
+//
+//func (u *User) loginNameInformation(ctx context.Context, orgID string, instanceID string) (userLoginMustBeDomain bool, primaryDomain string, domains []*org_model.OrgDomain, err error) {
+//	org, err := u.getOrgByID(ctx, orgID, instanceID)
+//	if err != nil {
+//		return false, "", nil, err
+//	}
+//	primaryDomain, err = org.GetPrimaryDomain()
+//	if err != nil {
+//		return false, "", nil, err
+//	}
+//	if org.DomainPolicy != nil {
+//		return org.DomainPolicy.UserLoginMustBeDomain, primaryDomain, org.Domains, nil
+//	}
+//	policy, err := u.queries.DefaultDomainPolicy(authz.WithInstanceID(ctx, org.InstanceID))
+//	if err != nil {
+//		return false, "", nil, err
+//	}
+//	return policy.UserLoginMustBeDomain, primaryDomain, org.Domains, nil
+//}
 
 func (u *User) userFromEventstore(agg *eventstore.Aggregate, eventTypes []eventstore.EventType) (*view_model.UserView, error) {
 	query, err := usr_view.UserByIDQuery(agg.ID, agg.InstanceID, time.Time{}, eventTypes)

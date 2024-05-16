@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -205,7 +206,7 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("preferred_language", *e.PreferredLanguage),
+				handler.NewCol("preferred_language", gu.Value(e.PreferredLanguage).String()),
 			},
 			[]handler.Condition{
 				handler.NewCond(instanceIDCol, e.Aggregate().InstanceID),
