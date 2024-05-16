@@ -4,7 +4,8 @@ type TargetType uint
 
 const (
 	TargetTypeWebhook TargetType = iota
-	TargetTypeRequestResponse
+	TargetTypeCall
+	TargetTypeAsync
 )
 
 type TargetState int32

@@ -1,5 +1,5 @@
 import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
@@ -8,8 +8,8 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-
 import { ActionKeysType } from '../action-keys/action-keys.component';
+import { GetPrivacyPolicyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 
 @Component({
   selector: 'cnsl-header',
@@ -31,6 +31,9 @@ export class HeaderComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
   public BreadcrumbType: any = BreadcrumbType;
   public ActionKeysType: any = ActionKeysType;
+  public docsLink = 'https://zitadel.com/docs';
+  public customLink = '';
+  public customLinkText = '';
 
   public positions: ConnectedPosition[] = [
     new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
@@ -47,7 +50,25 @@ export class HeaderComponent implements OnDestroy {
     public mgmtService: ManagementService,
     public breadcrumbService: BreadcrumbService,
     public router: Router,
-  ) {}
+  ) {
+    this.loadData();
+  }
+
+  public async loadData(): Promise<any> {
+    const getData = (): Promise<GetPrivacyPolicyResponse.AsObject> => {
+      return this.mgmtService.getPrivacyPolicy();
+    };
+
+    getData()
+      .then((resp) => {
+        if (resp.policy) {
+          this.docsLink = resp.policy.docsLink;
+          this.customLink = resp.policy.customLink;
+          this.customLinkText = resp.policy.customLinkText;
+        }
+      })
+      .catch(() => {});
+  }
 
   public ngOnDestroy() {
     this.destroy$.next();

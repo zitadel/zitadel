@@ -76,7 +76,7 @@ func (l *Login) renderOTPVerification(w http.ResponseWriter, r *http.Request, au
 func (l *Login) handleOTPVerificationCheck(w http.ResponseWriter, r *http.Request) {
 	formData := new(mfaOTPFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, formData)
-	if err != nil {
+	if authReq == nil || err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/muhlemmer/gu"
-
 	"github.com/zitadel/logging"
 
 	object_pb "github.com/zitadel/zitadel/internal/api/grpc/object"

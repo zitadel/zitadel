@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -56,12 +58,12 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 }
 
 // CheckUser defines a user check to be executed for a session update
-func CheckUser(id string, resourceOwner string) SessionCommand {
+func CheckUser(id string, resourceOwner string, preferredLanguage *language.Tag) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) error {
 		if cmd.sessionWriteModel.UserID != "" && id != "" && cmd.sessionWriteModel.UserID != id {
 			return zerrors.ThrowInvalidArgument(nil, "", "user change not possible")
 		}
-		return cmd.UserChecked(ctx, id, resourceOwner, cmd.now())
+		return cmd.UserChecked(ctx, id, resourceOwner, cmd.now(), preferredLanguage)
 	}
 }
 
@@ -171,8 +173,8 @@ func (s *SessionCommands) Start(ctx context.Context, userAgent *domain.UserAgent
 	s.eventCommands = append(s.eventCommands, session.NewAddedEvent(ctx, s.sessionWriteModel.aggregate, userAgent))
 }
 
-func (s *SessionCommands) UserChecked(ctx context.Context, userID, resourceOwner string, checkedAt time.Time) error {
-	s.eventCommands = append(s.eventCommands, session.NewUserCheckedEvent(ctx, s.sessionWriteModel.aggregate, userID, resourceOwner, checkedAt))
+func (s *SessionCommands) UserChecked(ctx context.Context, userID, resourceOwner string, checkedAt time.Time, preferredLanguage *language.Tag) error {
+	s.eventCommands = append(s.eventCommands, session.NewUserCheckedEvent(ctx, s.sessionWriteModel.aggregate, userID, resourceOwner, checkedAt, preferredLanguage))
 	// set the userID so other checks can use it
 	s.sessionWriteModel.UserID = userID
 	s.sessionWriteModel.UserResourceOwner = resourceOwner

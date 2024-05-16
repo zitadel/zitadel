@@ -48,13 +48,13 @@
       "TITLE": "用户",
       "DESCRIPTION": "用户是可以访问你的应用的人或机器。",
       "HUMANS": {
-        "TITLE": "人类",
-        "DESCRIPTION": "人类在浏览器会话中通过登录提示进行交互式认证。",
+        "TITLE": "用户",
+        "DESCRIPTION": "用户在浏览器会话中通过登录提示进行交互身份验证。",
         "METADATA": "为用户添加自定义属性，如部门。你可以在你的行动中使用这些信息。"
       },
       "MACHINES": {
-        "TITLE": "机器",
-        "DESCRIPTION": "机器使用私钥签名的JWT bearer令牌进行非交互式认证。它们也可以使用个人访问令牌。",
+        "TITLE": "服务用户",
+        "DESCRIPTION": "服务用户使用使用私钥签名的 JWT 不记名令牌进行非交互式身份验证。他们还可以使用个人访问令牌。",
         "METADATA": "为用户添加自定义属性，如认证系统。你可以在你的行动中使用这些信息。"
       },
       "SELF": {
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "外部链接",
-        "DESCRIPTION": "引导您的用户到登录页面上显示的自定义外部资源。用户需要在注册前接受服务条款和隐私政策。"
+        "DESCRIPTION": "引导您的用户访问登录页面上显示的自定义外部资源。用户需要先接受服务条款和隐私政策，然后才能注册。更改文档的链接或设置空字符串以在控制台中隐藏文档按钮。在控制台中添加自定义外部链接和该链接的自定义文本，或将它们设置为空以隐藏该按钮。"
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP设置",
@@ -269,9 +269,9 @@
             "TITLE": "允许外部登录",
             "DESCRIPTION": "允许用户使用外部身份提供者登录，而不是使用ZITADEL用户登录。"
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "允许密码重置",
-            "DESCRIPTION": "允许用户重置他们的密码。"
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "隐藏密码重置",
+            "DESCRIPTION": "不允许用户重置密码。"
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "允许域名发现",
@@ -1569,6 +1569,9 @@
       "POLICYLINK": "链接到隐私政策",
       "HELPLINK": "链接到帮助",
       "SUPPORTEMAIL": "支持邮箱",
+      "DOCSLINK": "文档链接（Console）",
+      "CUSTOMLINK": "自定义链接（Console）",
+      "CUSTOMLINKTEXT": "自定义链接文本（Console）",
       "SAVED": "保存成功！",
       "RESET_TITLE": "恢复默认值",
       "RESET_DESCRIPTION": "您即将恢复 TOS 和隐私政策的默认链接。你真的要继续吗？"

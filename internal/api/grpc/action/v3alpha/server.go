@@ -66,5 +66,5 @@ func checkExecutionEnabled(ctx context.Context) error {
 	if authz.GetInstance(ctx).Features().Actions {
 		return nil
 	}
-	return zerrors.ThrowPreconditionFailed(nil, "SCHEMA-141bwx3lef", "Errors.action.NotEnabled")
+	return zerrors.ThrowPreconditionFailed(nil, "ACTION-8o6pvqfjhs", "Errors.Action.NotEnabled")
 }

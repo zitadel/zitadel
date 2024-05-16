@@ -566,7 +566,7 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectPush(
 						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-							"userID", "org1", testNow,
+							"userID", "org1", testNow, &language.Afrikaans,
 						),
 						session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow,
@@ -585,7 +585,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1"),
+						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckPassword("password"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -634,7 +634,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1"),
+						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -673,7 +673,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1"),
+						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -683,7 +683,8 @@ func TestCommands_updateSession(t *testing.T) {
 									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
 							),
 							eventFromEventPusher(
-								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
+								idpintent.NewSucceededEvent(context.Background(),
+									&idpintent.NewAggregate("id", "instance1").Aggregate,
 									nil,
 									"idpUserID",
 									"idpUserName",
@@ -722,7 +723,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1"),
+						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent2", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t),
@@ -750,7 +751,7 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectPush(
 						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-							"userID", "org1", testNow),
+							"userID", "org1", testNow, &language.Afrikaans),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
 						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -765,7 +766,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1"),
+						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -775,7 +776,8 @@ func TestCommands_updateSession(t *testing.T) {
 									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
 							),
 							eventFromEventPusher(
-								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
+								idpintent.NewSucceededEvent(context.Background(),
+									&idpintent.NewAggregate("id", "instance1").Aggregate,
 									nil,
 									"idpUserID",
 									"idpUsername",
@@ -827,7 +829,9 @@ func TestCheckTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("instance1", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
-	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
+	key, err := domain.NewTOTPKey("example.com", "user1")
+	require.NoError(t, err)
+	secret, err := crypto.Encrypt([]byte(key.Secret()), cryptoAlg)
 	require.NoError(t, err)
 
 	sessAgg := &session.NewAggregate("session1", "instance1").Aggregate
@@ -1184,7 +1188,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"user1", "org1", testNow),
+								"user1", "org1", testNow, &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -1225,7 +1229,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"userID", "org1", testNow),
+								"userID", "org1", testNow, &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -1267,7 +1271,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org2").Aggregate,
-								"userID", "", testNow),
+								"userID", "", testNow, &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org2").Aggregate,
