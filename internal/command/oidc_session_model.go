@@ -3,6 +3,8 @@ package command
 import (
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
@@ -13,12 +15,16 @@ type OIDCSessionWriteModel struct {
 	eventstore.WriteModel
 
 	UserID                     string
+	UserResourceOwner          string
+	PreferredLanguage          *language.Tag
 	SessionID                  string
 	ClientID                   string
 	Audience                   []string
 	Scope                      []string
 	AuthMethods                []domain.UserAuthMethodType
 	AuthTime                   time.Time
+	Nonce                      string
+	UserAgent                  *domain.UserAgent
 	State                      domain.OIDCSessionState
 	AccessTokenID              string
 	AccessTokenCreation        time.Time
@@ -85,12 +91,16 @@ func (wm *OIDCSessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 
 func (wm *OIDCSessionWriteModel) reduceAdded(e *oidcsession.AddedEvent) {
 	wm.UserID = e.UserID
+	wm.UserResourceOwner = e.UserResourceOwner
 	wm.SessionID = e.SessionID
 	wm.ClientID = e.ClientID
 	wm.Audience = e.Audience
 	wm.Scope = e.Scope
 	wm.AuthMethods = e.AuthMethods
 	wm.AuthTime = e.AuthTime
+	wm.Nonce = e.Nonce
+	wm.PreferredLanguage = e.PreferredLanguage
+	wm.UserAgent = e.UserAgent
 	wm.State = domain.OIDCSessionStateActive
 	// the write model might be initialized without resource owner,
 	// so update the aggregate
