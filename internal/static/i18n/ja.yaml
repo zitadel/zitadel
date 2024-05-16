@@ -65,6 +65,7 @@ Errors:
     CouldNotSetSender: 送信者を設定できませんでした
     CouldNotSetRecipient: 受信者を設定できませんでした
   SMTPConfig:
+    TestPassword: テスト用のパスワードが見つかりません
     NotFound: SMTP構成が見つかりません
     AlreadyExists: すでに存在するSMTP構成です
     AlreadyDeactivated: SMTP設定はすでに無効化されています

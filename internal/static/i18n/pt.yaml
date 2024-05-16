@@ -65,6 +65,7 @@ Errors:
     CouldNotSetSender: não foi possível definir o remetente
     CouldNotSetRecipient: não foi possível definir o destinatário
   SMTPConfig:
+    TestPassword: Senha para teste não encontrada
     NotFound: Configuração de SMTP não encontrada
     AlreadyExists: Configuração de SMTP já existe
     AlreadyDeactivated: Configuração SMTP já desativada

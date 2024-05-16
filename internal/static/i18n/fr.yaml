@@ -65,6 +65,7 @@ Errors:
     CouldNotSetSender: impossible de définir l'expéditeur
     CouldNotSetRecipient: impossible de définir le destinataire
   SMTPConfig:
+    TestPassword: Mot de passe pour le test introuvable
     NotFound: Configuration SMTP non trouvée
     AlreadyExists: La configuration SMTP existe déjà
     AlreadyDeactivated: Configuration SMTP déjà désactivée

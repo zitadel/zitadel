@@ -65,6 +65,7 @@ Errors:
     CouldNotSetSender: nelze nastavit odesílatele
     CouldNotSetRecipient: nelze nastavit příjemce
   SMTPConfig:
+    TestPassword: Heslo pro test nenalezeno
     NotFound: Konfigurace SMTP nebyla nalezena
     AlreadyExists: Konfigurace SMTP již existuje
     AlreadyDeactivated: Konfigurace SMTP je již deaktivována

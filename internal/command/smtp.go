@@ -289,21 +289,22 @@ func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email str
 	password := config.SMTP.Password
 
 	if email == "" {
-		return zerrors.ThrowInvalidArgument(nil, "SMTP-h6yw", "Errors.SMTPConfig.TestEmailNotFound")
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-p9uy", "Errors.SMTPConfig.TestEmailNotFound")
 	}
 
-	// TODO change error messages and codes
 	if id == "" && password == "" {
-		return zerrors.ThrowInvalidArgument(nil, "SMTP-7f5cv", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-p9kj", "Errors.SMTPConfig.TestPassword")
 	}
 
+	// If the password is not sent it'd mean that the password hasn't been changed for
+	// the stored configuration identified by its id so we can try to retrieve it
 	if id != "" && password == "" {
 		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 		if err != nil {
 			return err
 		}
 		if !smtpConfigWriteModel.State.Exists() {
-			return zerrors.ThrowNotFound(nil, "COMMAND-kg8rt", "Errors.SMTPConfig.NotFound")
+			return zerrors.ThrowNotFound(nil, "SMTP-p9cc", "Errors.SMTPConfig.NotFound")
 		}
 
 		password, err = crypto.DecryptString(smtpConfigWriteModel.Password, c.smtpEncryption)
@@ -325,11 +326,11 @@ func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email str
 
 func (c *Commands) TestSMTPConfigById(ctx context.Context, instanceID, id, email string) error {
 	if id == "" {
-		return zerrors.ThrowInvalidArgument(nil, "SMTP-8h6yw", "Errors.IDMissing")
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-99oki", "Errors.IDMissing")
 	}
 
 	if email == "" {
-		return zerrors.ThrowInvalidArgument(nil, "SMTP-h6yw", "Errors.SMTPConfig.TestEmailNotFound")
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-99yth", "Errors.SMTPConfig.TestEmailNotFound")
 	}
 
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
@@ -338,7 +339,7 @@ func (c *Commands) TestSMTPConfigById(ctx context.Context, instanceID, id, email
 	}
 
 	if !smtpConfigWriteModel.State.Exists() {
-		return zerrors.ThrowNotFound(nil, "COMMAND-ll7io", "Errors.SMTPConfig.NotFound")
+		return zerrors.ThrowNotFound(nil, "SMTP-99klw", "Errors.SMTPConfig.NotFound")
 	}
 
 	password, err := crypto.DecryptString(smtpConfigWriteModel.Password, c.smtpEncryption)

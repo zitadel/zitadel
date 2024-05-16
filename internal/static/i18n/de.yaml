@@ -65,6 +65,7 @@ Errors:
     CouldNotSetSender: Absender konnte nicht eingestellt werden
     CouldNotSetRecipient: Der Empfänger konnte nicht festgelegt werden
   SMTPConfig:
+    TestPassword: Passwort für Test nicht gefunden
     NotFound: SMTP Konfiguration nicht gefunden
     AlreadyExists: SMTP Konfiguration existiert bereits
     AlreadyDeactivated: SMTP-Konfiguration bereits deaktiviert

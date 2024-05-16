@@ -65,6 +65,7 @@ Errors:
     CouldNotSetSender: не можа да зададе подател
     CouldNotSetRecipient: не можа да зададе получател
   SMTPConfig:
+    TestPassword: Паролата за тест не е намерена
     NotFound: SMTP конфигурацията не е намерена
     AlreadyExists: SMTP конфигурация вече съществува
     AlreadyDeactivated: SMTP конфигурацията вече е деактивирана

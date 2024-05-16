@@ -65,6 +65,7 @@ Errors:
     CouldNotSetSender: kon de afzender niet instellen
     CouldNotSetRecipient: Kan de ontvanger niet instellen
   SMTPConfig:
+    TestPassword: Wachtwoord voor test niet gevonden
     NotFound: SMTP-configuratie niet gevonden
     AlreadyExists: SMTP-configuratie bestaat al
     AlreadyDeactivated: SMTP-configuratie al gedeactiveerd

@@ -65,6 +65,7 @@ Errors:
     CouldNotSetSender: 无法设置发件人
     CouldNotSetRecipient: 无法设置收件人
   SMTPConfig:
+    TestPassword: 未找到测试密码
     NotFound: 未找到 SMTP 配置
     AlreadyExists: SMTP 配置已存在
     AlreadyDeactivated: SMTP 配置已停用

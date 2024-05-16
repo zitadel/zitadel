@@ -65,6 +65,7 @@ Errors:
     CouldNotSetSender: не удалось установить отправителя
     CouldNotSetRecipient: не удалось установить получателя
   SMTPConfig:
+    TestPassword: Пароль для теста не найден
     NotFound: Конфигурация SMTP не найдена
     AlreadyExists: Конфигурация SMTP уже существует
     AlreadyDeactivated: Конфигурация SMTP уже деактивирована
