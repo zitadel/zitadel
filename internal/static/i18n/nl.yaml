@@ -627,6 +627,7 @@ EventTypes:
         failed: Initialisatiecontrole mislukt
     token:
       added: Toegangstoken aangemaakt
+      v2.added: Toegangstoken aangemaakt
       removed: Toegangstoken verwijderd
     impersonated: Gebruiker nagebootst
     username:

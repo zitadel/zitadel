@@ -627,6 +627,7 @@ EventTypes:
         failed: Controllo dell'inizializzazione fallito
     token:
       added: Access Token creato
+      v2.added: Access Token creato
     impersonated: Utente impersonificato
     username:
       reserved: Nome utente riservato

@@ -42,6 +42,7 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, UserReactivatedType, UserReactivatedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, UserRemovedType, UserRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, UserTokenAddedType, UserTokenAddedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, UserTokenV2AddedType, eventstore.GenericEventMapper[UserTokenV2AddedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, UserImpersonatedType, eventstore.GenericEventMapper[UserImpersonatedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, UserTokenRemovedType, UserTokenRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, UserDomainClaimedType, DomainClaimedEventMapper)

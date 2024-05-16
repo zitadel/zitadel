@@ -616,6 +616,7 @@ EventTypes:
         failed: 初期化チェックの失敗
     token:
       added: アクセストークンの作成
+      v2.added: アクセストークンの作成
       removed: アクセストークンの削除
     impersonated: ユーザーがなりすました
     username:

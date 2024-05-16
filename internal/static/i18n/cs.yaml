@@ -625,6 +625,7 @@ EventTypes:
         failed: Kontrola inicializace selhala
     token:
       added: Přístupový token vytvořen
+      v2.added: Přístupový token vytvořen
       removed: Přístupový token odstraněn
     impersonated: Usuario suplantado
     username:
