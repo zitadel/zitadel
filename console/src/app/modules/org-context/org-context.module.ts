@@ -12,11 +12,16 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 
 import { InputModule } from '../input/input.module';
 import { OrgContextComponent } from './org-context.component';
+import { ScrollNearEndDirective } from 'src/app/directives/scoll-near-end/scroll-near-end.directive';
+import { S } from '@angular/cdk/keycodes';
+import { ScrollableDirective } from 'src/app/directives/scrollable/scrollable.directive';
 
 @NgModule({
   declarations: [OrgContextComponent],
   imports: [
     CommonModule,
+    ScrollNearEndDirective,
+    ScrollableDirective,
     FormsModule,
     A11yModule,
     ReactiveFormsModule,
