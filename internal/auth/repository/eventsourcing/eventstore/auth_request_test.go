@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"testing"
 	"time"
@@ -75,11 +76,11 @@ type mockUser struct {
 
 func (m *mockViewUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
 	return &user_view_model.UserSessionView{
-		ExternalLoginVerification: m.ExternalLoginVerification,
-		PasswordlessVerification:  m.PasswordlessVerification,
-		PasswordVerification:      m.PasswordVerification,
-		SecondFactorVerification:  m.SecondFactorVerification,
-		MultiFactorVerification:   m.MultiFactorVerification,
+		ExternalLoginVerification: sql.NullTime{Time: m.ExternalLoginVerification},
+		PasswordlessVerification:  sql.NullTime{Time: m.PasswordlessVerification},
+		PasswordVerification:      sql.NullTime{Time: m.PasswordVerification},
+		SecondFactorVerification:  sql.NullTime{Time: m.SecondFactorVerification},
+		MultiFactorVerification:   sql.NullTime{Time: m.MultiFactorVerification},
 	}, nil
 }
 
@@ -90,7 +91,7 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_vie
 			ResourceOwner: user.ResourceOwner,
 			State:         int32(user.SessionState),
 			UserID:        user.UserID,
-			LoginName:     user.LoginName,
+			LoginName:     sql.NullString{String: user.LoginName},
 		}
 	}
 	return sessions, nil
