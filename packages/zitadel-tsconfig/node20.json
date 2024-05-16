@@ -1,10 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Node 14",
+  "display": "Node 20",
   "extends": "./base.json",
   "compilerOptions": {
-    "lib": ["ES2020"],
-    "module": "commonjs",
-    "target": "ES2020"
+    "lib": ["es2023"],
+    "module": "node16",
+    "target": "es2022"
   }
 }

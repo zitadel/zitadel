@@ -1,7 +1,12 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
-import PasswordComplexity from "@/ui/PasswordComplexity";
-// TODO: Why does this not compile?
-// import { ResourceOwnerType } from '@zitadel/server';
+import { expect, describe, test, beforeEach, afterEach } from "vitest";
+import {
+  render,
+  cleanup,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import PasswordComplexity from "./PasswordComplexity";
 
 const matchesTitle = `Matches`;
 const doesntMatchTitle = `Doesn't match`;
@@ -33,8 +38,10 @@ describe("<PasswordComplexity/>", () => {
           />,
         );
       });
+      afterEach(cleanup);
+
       if (expectSVGTitle === false) {
-        it(`should not render the feedback element`, async () => {
+        test(`should not render the feedback element`, async () => {
           await waitFor(() => {
             expect(
               screen.queryByText(feedbackElementLabel),
@@ -42,7 +49,7 @@ describe("<PasswordComplexity/>", () => {
           });
         });
       } else {
-        it(`Should show one SVG with title ${expectSVGTitle}`, async () => {
+        test(`Should show one SVG with title ${expectSVGTitle}`, async () => {
           await waitFor(async () => {
             const svg = within(
               screen.getByText(feedbackElementLabel)

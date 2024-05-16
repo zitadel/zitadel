@@ -1,10 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "React Library",
-  "extends": "./base.json",
+  "display": "tsup",
+  "extends": "./node20.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "lib": ["dom", "ES2015"],
     "module": "preserve",
     "moduleResolution": "Bundler"
   }
