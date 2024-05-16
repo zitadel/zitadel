@@ -44,11 +44,6 @@ SELECT
     , h.is_email_verified
     , h.phone
     , h.is_phone_verified
---     , o.country
---     , o.locality
---     , o.postal_code
---     , o.region
---     , o.street_address
     , (SELECT COALESCE((SELECT state FROM auth_methods WHERE method_type = 1), 0)) AS otp_state
     , CASE
         WHEN EXISTS (SELECT true FROM verified_auth_methods WHERE method_type = 3) THEN 2
@@ -76,7 +71,6 @@ SELECT
     , au.passwordless_init_required
     , au.password_init_required
     , u.instance_id
---     , o.owner_removed
     , (SELECT EXISTS (SELECT true FROM verified_auth_methods WHERE method_type = 6)) AS otp_sms_added
     , (SELECT EXISTS (SELECT true FROM verified_auth_methods WHERE method_type = 7)) AS otp_email_added
 FROM projections.users12 u
@@ -93,7 +87,6 @@ FROM projections.users12 u
     LEFT JOIN auth.users3 au
         ON u.instance_id = au.instance_id
         AND u.id = au.id
-    --          LEFT JOIN auth.users2 o ON o.id = u.id AND o.instance_id = u.instance_id
 WHERE
   u.instance_id = $1
   AND u.id = $2
