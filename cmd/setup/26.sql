@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS auth.users3 (
     passwordless_init_required BOOL NULL,
     password_init_required BOOL NULL,
 
-    PRIMARY KEY (instance_id ASC, id ASC)
+    PRIMARY KEY (instance_id, id)
 )
