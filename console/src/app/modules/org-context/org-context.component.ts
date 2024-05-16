@@ -20,16 +20,15 @@ export class OrgContextComponent implements OnInit {
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
 
   public bottom: boolean = false;
-  private _cursor: BehaviorSubject<number> = new BehaviorSubject(0);
   private _done: BehaviorSubject<any> = new BehaviorSubject(false);
   private _loading: BehaviorSubject<any> = new BehaviorSubject(false);
   public _orgs: BehaviorSubject<Org.AsObject[]> = new BehaviorSubject<Org.AsObject[]>([]);
 
   public orgs$: Observable<Org.AsObject[]> = this._orgs.pipe(
-    scan((acc, val) => {
-      console.log(acc, val);
-      return false ? val.concat(acc) : acc.concat(val);
-    }),
+    // scan((acc, val) => {
+    //   console.log(acc, val);
+    //   return false ? val.concat(acc) : acc.concat(val);
+    // }),
     map((orgs) => {
       return orgs.sort((left, right) => left.name.localeCompare(right.name));
     }),
@@ -59,7 +58,8 @@ export class OrgContextComponent implements OnInit {
   ) {
     this.filterControl.valueChanges.pipe(debounceTime(500)).subscribe((value) => {
       // this.orgs$.next([]);
-      this.loadOrgs(0, value.trim().toLowerCase());
+      const filteredValues = this.loadOrgs(0, value.trim().toLowerCase());
+      this.mapAndUpdate(filteredValues, true);
     });
   }
 
@@ -81,17 +81,14 @@ export class OrgContextComponent implements OnInit {
   }
 
   public more(): void {
-    const _cursor = this._cursor.getValue();
+    const _cursor = this._orgs.getValue().length;
     const nextOffset = _cursor + ORG_QUERY_LIMIT;
-    this._cursor.next(nextOffset);
-    console.log('more', nextOffset);
     let more: Promise<Org.AsObject[]> = this.loadOrgs(nextOffset, '');
     this.mapAndUpdate(more);
   }
 
   public init(): void {
-    let first: Promise<Org.AsObject[]>;
-    first = this.loadOrgs(0);
+    let first: Promise<Org.AsObject[]> = this.loadOrgs(0);
     this.mapAndUpdate(first);
   }
 
@@ -124,7 +121,7 @@ export class OrgContextComponent implements OnInit {
     // this.orgLoading$.next(false);
   }
 
-  private mapAndUpdate(col: Promise<Org.AsObject[]>): any {
+  private mapAndUpdate(col: Promise<Org.AsObject[]>, clear?: boolean): any {
     if (this._done.value || this._loading.value) {
       return;
     }
@@ -136,7 +133,13 @@ export class OrgContextComponent implements OnInit {
         .pipe(
           take(1),
           tap((res: Org.AsObject[]) => {
-            this._orgs.next(res);
+            const current = this._orgs.getValue();
+            if (clear) {
+              this._orgs.next(res);
+            } else {
+              this._orgs.next([...current, ...res]);
+            }
+
             this._loading.next(false);
             if (!res.length) {
               this._done.next(true);
