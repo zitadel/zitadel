@@ -15,9 +15,9 @@ type humanPasswordChangedPayload struct {
 }
 
 type HumanPasswordChangedEvent humanPasswordChangedEvent
-type humanPasswordChangedEvent = eventstore.Event[humanPasswordChangedPayload]
+type humanPasswordChangedEvent = eventstore.StorageEvent[humanPasswordChangedPayload]
 
-func HumanPasswordChangedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanPasswordChangedEvent, error) {
+func HumanPasswordChangedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanPasswordChangedEvent, error) {
 	event, err := eventstore.EventFromStorage[humanPasswordChangedEvent](e)
 	if err != nil {
 		return nil, err

@@ -5,9 +5,9 @@ import (
 )
 
 type UserUnlockedEvent userUnlockedEvent
-type userUnlockedEvent = eventstore.Event[struct{}]
+type userUnlockedEvent = eventstore.StorageEvent[struct{}]
 
-func UserUnlockedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*UserUnlockedEvent, error) {
+func UserUnlockedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*UserUnlockedEvent, error) {
 	event, err := eventstore.EventFromStorage[userUnlockedEvent](e)
 	if err != nil {
 		return nil, err

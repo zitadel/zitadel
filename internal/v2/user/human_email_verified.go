@@ -5,9 +5,9 @@ import (
 )
 
 type HumanEmailVerifiedEvent humanEmailVerifiedEvent
-type humanEmailVerifiedEvent = eventstore.Event[struct{}]
+type humanEmailVerifiedEvent = eventstore.StorageEvent[struct{}]
 
-func HumanEmailVerifiedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanEmailVerifiedEvent, error) {
+func HumanEmailVerifiedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanEmailVerifiedEvent, error) {
 	event, err := eventstore.EventFromStorage[humanEmailVerifiedEvent](e)
 	if err != nil {
 		return nil, err

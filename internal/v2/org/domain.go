@@ -1,102 +1,125 @@
 package org
 
 import (
-	"strings"
-
 	"github.com/zitadel/zitadel/internal/v2/domain"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var uniqueOrgDomain = "org_domain"
 
-var (
-	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	DomainAdded DomainAddedEvent
-)
+const DomainAddedType = "org." + domain.AddedTypeSuffix
 
-type DomainAddedEvent struct {
-	*domain.AddedEvent
+type DomainAddedPayload domain.AddedPayload
+
+type DomainAddedEvent eventstore.Event[DomainAddedPayload]
+
+var _ eventstore.TypeChecker = (*DomainAddedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *DomainAddedEvent) ActionType() string {
+	return DomainAddedType
 }
 
-func DomainAddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainAddedEvent, error) {
-	event, err := domain.AddedEventFromStorage(e)
+func DomainAddedEventFromStorage(event *eventstore.StorageEvent) (e *DomainAddedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[DomainAddedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
+
 	return &DomainAddedEvent{
-		AddedEvent: event,
+		StorageEvent: event,
+		Payload:      payload,
 	}, nil
 }
 
-func (e DomainAddedEvent) IsType(typ string) bool {
-	return strings.HasPrefix(typ, "org") && e.AddedEvent.HasTypeSuffix(typ)
+const DomainVerifiedType = "org." + domain.VerifiedTypeSuffix
+
+type DomainVerifiedPayload domain.VerifiedPayload
+
+type DomainVerifiedEvent eventstore.Event[DomainVerifiedPayload]
+
+var _ eventstore.TypeChecker = (*DomainVerifiedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *DomainVerifiedEvent) ActionType() string {
+	return DomainVerifiedType
 }
 
-var (
-	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	DomainVerified DomainVerifiedEvent
-)
+func DomainVerifiedEventFromStorage(event *eventstore.StorageEvent) (e *DomainVerifiedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
 
-type DomainVerifiedEvent struct {
-	*domain.VerifiedEvent
-}
-
-func DomainVerifiedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainVerifiedEvent, error) {
-	event, err := domain.VerifiedEventFromStorage(e)
+	payload, err := eventstore.UnmarshalPayload[DomainVerifiedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
+
 	return &DomainVerifiedEvent{
-		VerifiedEvent: event,
+		StorageEvent: event,
+		Payload:      payload,
 	}, nil
 }
 
-func (e DomainVerifiedEvent) IsType(typ string) bool {
-	return strings.HasPrefix(typ, "org") && e.VerifiedEvent.HasTypeSuffix(typ)
+const DomainPrimarySetType = "org." + domain.PrimarySetTypeSuffix
+
+type DomainPrimarySetPayload domain.PrimarySetPayload
+
+type DomainPrimarySetEvent eventstore.Event[DomainPrimarySetPayload]
+
+var _ eventstore.TypeChecker = (*DomainPrimarySetEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *DomainPrimarySetEvent) ActionType() string {
+	return DomainPrimarySetType
 }
 
-var (
-	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	DomainPrimarySet DomainPrimarySetEvent
-)
+func DomainPrimarySetEventFromStorage(event *eventstore.StorageEvent) (e *DomainPrimarySetEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
 
-type DomainPrimarySetEvent struct {
-	*domain.PrimarySetEvent
-}
-
-func DomainPrimarySetEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainPrimarySetEvent, error) {
-	event, err := domain.PrimarySetEventFromStorage(e)
+	payload, err := eventstore.UnmarshalPayload[DomainPrimarySetPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
+
 	return &DomainPrimarySetEvent{
-		PrimarySetEvent: event,
+		StorageEvent: event,
+		Payload:      payload,
 	}, nil
 }
 
-func (e DomainPrimarySetEvent) IsType(typ string) bool {
-	return strings.HasPrefix(typ, "org") && e.PrimarySetEvent.HasTypeSuffix(typ)
+const DomainRemovedType = "org." + domain.RemovedTypeSuffix
+
+type DomainRemovedPayload domain.RemovedPayload
+
+type DomainRemovedEvent eventstore.Event[DomainRemovedPayload]
+
+var _ eventstore.TypeChecker = (*DomainRemovedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *DomainRemovedEvent) ActionType() string {
+	return DomainRemovedType
 }
 
-var (
-	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	DomainRemoved DomainRemovedEvent
-)
+func DomainRemovedEventFromStorage(event *eventstore.StorageEvent) (e *DomainRemovedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
 
-type DomainRemovedEvent struct {
-	*domain.RemovedEvent
-}
-
-func DomainRemovedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainRemovedEvent, error) {
-	event, err := domain.RemovedEventFromStorage(e)
+	payload, err := eventstore.UnmarshalPayload[DomainRemovedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return &DomainRemovedEvent{
-		RemovedEvent: event,
-	}, nil
-}
 
-func (e DomainRemovedEvent) IsType(typ string) bool {
-	return strings.HasPrefix(typ, "org") && e.RemovedEvent.HasTypeSuffix(typ)
+	return &DomainRemovedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }

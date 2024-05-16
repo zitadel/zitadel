@@ -10,9 +10,9 @@ type humanPhoneChangedPayload struct {
 }
 
 type HumanPhoneChangedEvent humanPhoneChangedEvent
-type humanPhoneChangedEvent = eventstore.Event[humanPhoneChangedPayload]
+type humanPhoneChangedEvent = eventstore.StorageEvent[humanPhoneChangedPayload]
 
-func HumanPhoneChangedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanPhoneChangedEvent, error) {
+func HumanPhoneChangedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanPhoneChangedEvent, error) {
 	event, err := eventstore.EventFromStorage[humanPhoneChangedEvent](e)
 	if err != nil {
 		return nil, err

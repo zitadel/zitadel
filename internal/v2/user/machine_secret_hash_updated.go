@@ -9,9 +9,9 @@ type machineSecretHashUpdatedPayload struct {
 }
 
 type MachineSecretHashUpdatedEvent machineSecretHashUpdatedEvent
-type machineSecretHashUpdatedEvent = eventstore.Event[machineSecretHashUpdatedPayload]
+type machineSecretHashUpdatedEvent = eventstore.StorageEvent[machineSecretHashUpdatedPayload]
 
-func MachineSecretHashUpdatedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*MachineSecretHashUpdatedEvent, error) {
+func MachineSecretHashUpdatedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*MachineSecretHashUpdatedEvent, error) {
 	event, err := eventstore.EventFromStorage[machineSecretHashUpdatedEvent](e)
 	if err != nil {
 		return nil, err

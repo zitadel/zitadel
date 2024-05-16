@@ -10,9 +10,9 @@ type domainClaimedPayload struct {
 }
 
 type DomainClaimedEvent domainClaimedEvent
-type domainClaimedEvent = eventstore.Event[domainClaimedPayload]
+type domainClaimedEvent = eventstore.StorageEvent[domainClaimedPayload]
 
-func DomainClaimedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainClaimedEvent, error) {
+func DomainClaimedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*DomainClaimedEvent, error) {
 	event, err := eventstore.EventFromStorage[domainClaimedEvent](e)
 	if err != nil {
 		return nil, err

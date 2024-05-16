@@ -12,9 +12,9 @@ type machineChangedPayload struct {
 }
 
 type MachineChangedEvent machineChangedEvent
-type machineChangedEvent = eventstore.Event[machineChangedPayload]
+type machineChangedEvent = eventstore.StorageEvent[machineChangedPayload]
 
-func MachineChangedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*MachineChangedEvent, error) {
+func MachineChangedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*MachineChangedEvent, error) {
 	event, err := eventstore.EventFromStorage[machineChangedEvent](e)
 	if err != nil {
 		return nil, err

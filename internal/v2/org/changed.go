@@ -1,27 +1,37 @@
 package org
 
-import "github.com/zitadel/zitadel/internal/v2/eventstore"
-
-var (
-	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	Changed ChangedEvent
+import (
+	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+const ChangedType = "org.changed"
+
 type changedPayload struct {
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name"`
 }
 
-type ChangedEvent changedEvent
-type changedEvent = eventstore.Event[changedPayload]
+type ChangedEvent eventstore.Event[changedPayload]
 
-func ChangedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*ChangedEvent, error) {
-	event, err := eventstore.EventFromStorage[changedEvent](e)
+var _ eventstore.TypeChecker = (*ChangedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *ChangedEvent) ActionType() string {
+	return ChangedType
+}
+
+func ChangedEventFromStorage(event *eventstore.StorageEvent) (e *ChangedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[changedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*ChangedEvent)(event), nil
-}
 
-func (e ChangedEvent) IsType(typ string) bool {
-	return typ == "org.changed"
+	return &ChangedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }

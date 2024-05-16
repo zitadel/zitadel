@@ -5,9 +5,9 @@ import (
 )
 
 type HumanInitialCodeSucceededEvent humanInitialCodeSucceededEvent
-type humanInitialCodeSucceededEvent = eventstore.Event[struct{}]
+type humanInitialCodeSucceededEvent = eventstore.StorageEvent[struct{}]
 
-func HumanInitialCodeSucceededEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanInitialCodeSucceededEvent, error) {
+func HumanInitialCodeSucceededEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanInitialCodeSucceededEvent, error) {
 	event, err := eventstore.EventFromStorage[humanInitialCodeSucceededEvent](e)
 	if err != nil {
 		return nil, err

@@ -1,77 +1,94 @@
 package org
 
 import (
-	"strings"
-
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/policy"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var (
-	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	DomainPolicyAdded DomainPolicyAddedEvent
-)
+const DomainPolicyAddedType = "org." + policy.DomainPolicyAddedTypeSuffix
 
-type DomainPolicyAddedEvent struct {
-	*policy.DomainPolicyAddedEvent
+type DomainPolicyAddedPayload policy.DomainPolicyAddedPayload
+
+type DomainPolicyAddedEvent eventstore.Event[DomainPolicyAddedPayload]
+
+var _ eventstore.TypeChecker = (*DomainPolicyAddedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *DomainPolicyAddedEvent) ActionType() string {
+	return DomainPolicyAddedType
 }
 
-func DomainPolicyAddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainPolicyAddedEvent, error) {
-	event, err := policy.DomainPolicyAddedEventFromStorage(e)
+func DomainPolicyAddedEventFromStorage(event *eventstore.StorageEvent) (e *DomainPolicyAddedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[DomainPolicyAddedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
+
 	return &DomainPolicyAddedEvent{
-		DomainPolicyAddedEvent: event,
+		StorageEvent: event,
+		Payload:      payload,
 	}, nil
 }
 
-func (e DomainPolicyAddedEvent) IsType(typ string) bool {
-	return strings.HasPrefix(typ, "org") && e.DomainPolicyAddedEvent.HasTypeSuffix(typ)
+const DomainPolicyChangedType = "org." + policy.DomainPolicyChangedTypeSuffix
+
+type DomainPolicyChangedPayload policy.DomainPolicyChangedPayload
+
+type DomainPolicyChangedEvent eventstore.Event[DomainPolicyChangedPayload]
+
+var _ eventstore.TypeChecker = (*DomainPolicyChangedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *DomainPolicyChangedEvent) ActionType() string {
+	return DomainPolicyChangedType
 }
 
-var (
-	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	DomainPolicyChanged DomainPolicyChangedEvent
-)
+func DomainPolicyChangedEventFromStorage(event *eventstore.StorageEvent) (e *DomainPolicyChangedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
 
-type DomainPolicyChangedEvent struct {
-	*policy.DomainPolicyChangedEvent
-}
-
-func DomainPolicyChangedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainPolicyChangedEvent, error) {
-	event, err := policy.DomainPolicyChangedEventFromStorage(e)
+	payload, err := eventstore.UnmarshalPayload[DomainPolicyChangedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
+
 	return &DomainPolicyChangedEvent{
-		DomainPolicyChangedEvent: event,
+		StorageEvent: event,
+		Payload:      payload,
 	}, nil
 }
 
-func (e DomainPolicyChangedEvent) IsType(typ string) bool {
-	return strings.HasPrefix(typ, "org") && e.DomainPolicyChangedEvent.HasTypeSuffix(typ)
+const DomainPolicyRemovedType = "org." + policy.DomainPolicyRemovedTypeSuffix
+
+type DomainPolicyRemovedPayload policy.DomainPolicyRemovedPayload
+
+type DomainPolicyRemovedEvent eventstore.Event[DomainPolicyRemovedPayload]
+
+var _ eventstore.TypeChecker = (*DomainPolicyRemovedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *DomainPolicyRemovedEvent) ActionType() string {
+	return DomainPolicyRemovedType
 }
 
-var (
-	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	DomainPolicyRemoved DomainPolicyRemovedEvent
-)
+func DomainPolicyRemovedEventFromStorage(event *eventstore.StorageEvent) (e *DomainPolicyRemovedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
 
-type DomainPolicyRemovedEvent struct {
-	*policy.DomainPolicyRemovedEvent
-}
-
-func DomainPolicyRemovedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*DomainPolicyRemovedEvent, error) {
-	event, err := policy.DomainPolicyRemovedEventFromStorage(e)
+	payload, err := eventstore.UnmarshalPayload[DomainPolicyRemovedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return &DomainPolicyRemovedEvent{
-		DomainPolicyRemovedEvent: event,
-	}, nil
-}
 
-func (e DomainPolicyRemovedEvent) IsType(typ string) bool {
-	return strings.HasPrefix(typ, "org") && e.DomainPolicyRemovedEvent.HasTypeSuffix(typ)
+	return &DomainPolicyRemovedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }

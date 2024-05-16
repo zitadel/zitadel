@@ -7,14 +7,14 @@ type projection struct {
 	position eventstore.GlobalPosition
 }
 
-func (p *projection) reduce(event *eventstore.Event[eventstore.StoragePayload]) {
+func (p *projection) reduce(event *eventstore.StorageEvent) {
 	if p.instance == "" {
 		p.instance = event.Aggregate.Instance
 	}
 	p.position = event.Position
 }
 
-func (p projection) shouldReduce(event *eventstore.Event[eventstore.StoragePayload]) bool {
+func (p *projection) shouldReduce(event *eventstore.StorageEvent) bool {
 	shouldReduce := p.instance == "" || p.instance == event.Aggregate.Instance
 	if p.position.Position == event.Position.Position {
 		shouldReduce = shouldReduce && p.position.InPositionOrder < event.Position.InPositionOrder

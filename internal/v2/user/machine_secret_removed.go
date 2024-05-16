@@ -5,9 +5,9 @@ import (
 )
 
 type MachineSecretRemovedEvent machineSecretRemovedEvent
-type machineSecretRemovedEvent = eventstore.Event[struct{}]
+type machineSecretRemovedEvent = eventstore.StorageEvent[struct{}]
 
-func MachineSecretRemovedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*MachineSecretRemovedEvent, error) {
+func MachineSecretRemovedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*MachineSecretRemovedEvent, error) {
 	event, err := eventstore.EventFromStorage[machineSecretRemovedEvent](e)
 	if err != nil {
 		return nil, err

@@ -32,9 +32,9 @@ type humanRegisteredPayload struct {
 }
 
 type HumanRegisteredEvent humanRegisteredEvent
-type humanRegisteredEvent = eventstore.Event[humanRegisteredPayload]
+type humanRegisteredEvent = eventstore.StorageEvent[humanRegisteredPayload]
 
-func HumanRegisteredEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanRegisteredEvent, error) {
+func HumanRegisteredEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanRegisteredEvent, error) {
 	event, err := eventstore.EventFromStorage[humanRegisteredEvent](e)
 	if err != nil {
 		return nil, err

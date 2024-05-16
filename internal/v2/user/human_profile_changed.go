@@ -17,9 +17,9 @@ type humanProfileChangedPayload struct {
 }
 
 type HumanProfileChangedEvent humanProfileChangedEvent
-type humanProfileChangedEvent = eventstore.Event[humanProfileChangedPayload]
+type humanProfileChangedEvent = eventstore.StorageEvent[humanProfileChangedPayload]
 
-func HumanProfileChangedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanProfileChangedEvent, error) {
+func HumanProfileChangedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanProfileChangedEvent, error) {
 	event, err := eventstore.EventFromStorage[humanProfileChangedEvent](e)
 	if err != nil {
 		return nil, err

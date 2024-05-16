@@ -12,9 +12,9 @@ type humanInitialCodeAddedPayload struct {
 }
 
 type HumanInitialCodeAddedEvent humanInitialCodeAddedEvent
-type humanInitialCodeAddedEvent = eventstore.Event[humanInitialCodeAddedPayload]
+type humanInitialCodeAddedEvent = eventstore.StorageEvent[humanInitialCodeAddedPayload]
 
-func HumanInitialCodeAddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanInitialCodeAddedEvent, error) {
+func HumanInitialCodeAddedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanInitialCodeAddedEvent, error) {
 	event, err := eventstore.EventFromStorage[humanInitialCodeAddedEvent](e)
 	if err != nil {
 		return nil, err

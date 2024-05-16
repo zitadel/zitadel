@@ -10,9 +10,9 @@ type humanEmailChangedPayload struct {
 }
 
 type HumanEmailChangedEvent humanEmailChangedEvent
-type humanEmailChangedEvent = eventstore.Event[humanEmailChangedPayload]
+type humanEmailChangedEvent = eventstore.StorageEvent[humanEmailChangedPayload]
 
-func HumanEmailChangedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanEmailChangedEvent, error) {
+func HumanEmailChangedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanEmailChangedEvent, error) {
 	event, err := eventstore.EventFromStorage[humanEmailChangedEvent](e)
 	if err != nil {
 		return nil, err

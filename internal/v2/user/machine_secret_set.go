@@ -12,9 +12,9 @@ type machineSecretSetPayload struct {
 }
 
 type MachineSecretSetEvent machineSecretSetEvent
-type machineSecretSetEvent = eventstore.Event[machineSecretSetPayload]
+type machineSecretSetEvent = eventstore.StorageEvent[machineSecretSetPayload]
 
-func MachineSecretSetEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*MachineSecretSetEvent, error) {
+func MachineSecretSetEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*MachineSecretSetEvent, error) {
 	event, err := eventstore.EventFromStorage[machineSecretSetEvent](e)
 	if err != nil {
 		return nil, err

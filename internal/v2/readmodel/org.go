@@ -40,10 +40,10 @@ func (rm *Org) Filter() []*eventstore.Filter {
 	}
 }
 
-func (rm *Org) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
+func (rm *Org) Reduce(events ...*eventstore.StorageEvent) error {
 	for _, event := range events {
 		switch {
-		case org.Added.IsType(event.Type):
+		case eventstore.IsType[*org.AddedEvent](event.Type):
 			added, err := org.AddedEventFromStorage(event)
 			if err != nil {
 				return err
@@ -51,7 +51,7 @@ func (rm *Org) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) er
 			rm.Name = added.Payload.Name
 			rm.Owner = event.Aggregate.Owner
 			rm.CreationDate = event.CreatedAt
-		case org.Changed.IsType(event.Type):
+		case eventstore.IsType[*org.ChangedEvent](event.Type):
 			changed, err := org.ChangedEventFromStorage(event)
 			if err != nil {
 				return err

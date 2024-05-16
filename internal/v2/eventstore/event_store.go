@@ -35,7 +35,7 @@ type GlobalPosition struct {
 }
 
 type Reducer interface {
-	Reduce(events ...*Event[StoragePayload]) error
+	Reduce(events ...*StorageEvent) error
 }
 
-type Reduce func(events ...*Event[StoragePayload]) error
+type Reduce func(events ...*StorageEvent) error

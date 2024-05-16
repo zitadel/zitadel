@@ -32,10 +32,10 @@ func (p *OrgState) Filter() []*eventstore.Filter {
 				eventstore.AggregateIDs(p.id),
 				eventstore.AppendEvent(
 					eventstore.SetEventTypes(
-						"org.added",
-						"org.deactivated",
-						"org.reactivated",
-						"org.removed",
+						org.AddedType,
+						org.DeactivatedType,
+						org.ReactivatedType,
+						org.RemovedType,
 					),
 				),
 			),
@@ -43,28 +43,25 @@ func (p *OrgState) Filter() []*eventstore.Filter {
 	}
 }
 
-func (p *OrgState) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
+func (p *OrgState) Reduce(events ...*eventstore.StorageEvent) error {
 	for _, event := range events {
 		if !p.shouldReduce(event) {
 			continue
 		}
 
-		switch {
-		case org.Added.IsType(event.Type):
+		switch event.Type {
+		case org.AddedType:
 			p.State = org.ActiveState
-		case org.Deactivated.IsType(event.Type):
+		case org.DeactivatedType:
 			p.State = org.InactiveState
-		case org.Reactivated.IsType(event.Type):
+		case org.ReactivatedType:
 			p.State = org.ActiveState
-		case org.Removed.IsType(event.Type):
+		case org.RemovedType:
 			p.State = org.RemovedState
 		default:
 			continue
 		}
 		p.position = event.Position
 	}
-
-	// TODO: if more than x events store state
-
 	return nil
 }

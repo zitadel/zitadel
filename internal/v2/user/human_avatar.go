@@ -6,9 +6,9 @@ import (
 )
 
 type HumanAvatarAddedEvent humanAvatarAddedEvent
-type humanAvatarAddedEvent = eventstore.Event[avatar.AddedPayload]
+type humanAvatarAddedEvent = eventstore.StorageEvent[avatar.AddedPayload]
 
-func HumanAvatarAddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanAvatarAddedEvent, error) {
+func HumanAvatarAddedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanAvatarAddedEvent, error) {
 	event, err := eventstore.EventFromStorage[humanAvatarAddedEvent](e)
 	if err != nil {
 		return nil, err
@@ -17,9 +17,9 @@ func HumanAvatarAddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayl
 }
 
 type HumanAvatarRemovedEvent humanAvatarRemovedEvent
-type humanAvatarRemovedEvent = eventstore.Event[avatar.RemovedPayload]
+type humanAvatarRemovedEvent = eventstore.StorageEvent[avatar.RemovedPayload]
 
-func HumanAvatarRemovedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanAvatarRemovedEvent, error) {
+func HumanAvatarRemovedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanAvatarRemovedEvent, error) {
 	event, err := eventstore.EventFromStorage[humanAvatarRemovedEvent](e)
 	if err != nil {
 		return nil, err

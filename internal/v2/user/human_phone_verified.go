@@ -5,9 +5,9 @@ import (
 )
 
 type HumanPhoneVerifiedEvent humanPhoneVerifiedEvent
-type humanPhoneVerifiedEvent = eventstore.Event[struct{}]
+type humanPhoneVerifiedEvent = eventstore.StorageEvent[struct{}]
 
-func HumanPhoneVerifiedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanPhoneVerifiedEvent, error) {
+func HumanPhoneVerifiedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanPhoneVerifiedEvent, error) {
 	event, err := eventstore.EventFromStorage[humanPhoneVerifiedEvent](e)
 	if err != nil {
 		return nil, err

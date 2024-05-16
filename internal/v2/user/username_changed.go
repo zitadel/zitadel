@@ -9,9 +9,9 @@ type usernameChangedPayload struct {
 }
 
 type UsernameChangedEvent usernameChangedEvent
-type usernameChangedEvent = eventstore.Event[usernameChangedPayload]
+type usernameChangedEvent = eventstore.StorageEvent[usernameChangedPayload]
 
-func UsernameChangedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*UsernameChangedEvent, error) {
+func UsernameChangedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*UsernameChangedEvent, error) {
 	event, err := eventstore.EventFromStorage[usernameChangedEvent](e)
 	if err != nil {
 		return nil, err

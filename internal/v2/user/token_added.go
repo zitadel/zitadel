@@ -20,9 +20,9 @@ type tokenAddedPayload struct {
 }
 
 type TokenAddedEvent tokenAddedEvent
-type tokenAddedEvent = eventstore.Event[tokenAddedPayload]
+type tokenAddedEvent = eventstore.StorageEvent[tokenAddedPayload]
 
-func TokenAddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*TokenAddedEvent, error) {
+func TokenAddedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*TokenAddedEvent, error) {
 	event, err := eventstore.EventFromStorage[tokenAddedEvent](e)
 	if err != nil {
 		return nil, err
