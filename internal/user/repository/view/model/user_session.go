@@ -50,13 +50,14 @@ type UserSessionView struct {
 	InstanceID                   string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
-func UserSessionFromEvent(event eventstore.Event) (*UserSessionView, error) {
-	v := new(UserSessionView)
-	if err := event.Unmarshal(v); err != nil {
-		logging.Log("EVEN-lso9e").WithError(err).Error("could not unmarshal event data")
-		return nil, zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
+func UserAgentIDFromEvent(event eventstore.Event) (string, error) {
+	v := make(map[string]interface{})
+	if err := event.Unmarshal(&v); err != nil {
+		logging.WithError(err).Error("could not unmarshal event data")
+		return "", zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
-	return v, nil
+	userAgentID, _ := v["userAgentID"].(string)
+	return userAgentID, nil
 }
 
 func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {

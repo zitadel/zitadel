@@ -18,22 +18,22 @@ import (
 const (
 	userSessionTable = "auth.user_sessions"
 
-	userAgentIDCol                  = "user_agent_id"
-	userIDCol                       = "user_id"
-	instanceIDCol                   = "instance_id"
-	creationDateCol                 = "creation_date"
-	changeDateCol                   = "change_date"
-	resourceOwnerCol                = "resource_owner"
-	sequenceCol                     = "sequence"
-	passwordVerificationCol         = "password_verification"
-	stateCol                        = "state"
-	secondFactorVerificationCol     = "second_factor_verification"
-	secondFactorVerificationTypeCol = "second_factor_verification_type"
-	multiFactorVerificationCol      = "multi_factor_verification"
-	multiFactorVerificationTypeCol  = "multi_factor_verification_type"
-	passwordlessVerificationCol     = "passwordless_verification"
-	externalLoginVerificationCol    = "external_login_verification"
-	selectedIDPConfigIDCol          = "selected_idp_config_id"
+	userSessionUserAgentIDCol                  = "user_agent_id"
+	userSessionUserIDCol                       = "user_id"
+	userSessionInstanceIDCol                   = "instance_id"
+	userSessionCreationDateCol                 = "creation_date"
+	userSessionChangeDateCol                   = "change_date"
+	userSessionResourceOwnerCol                = "resource_owner"
+	userSessionSequenceCol                     = "sequence"
+	userSessionPasswordVerificationCol         = "password_verification"
+	userSessionStateCol                        = "state"
+	userSessionSecondFactorVerificationCol     = "second_factor_verification"
+	userSessionSecondFactorVerificationTypeCol = "second_factor_verification_type"
+	userSessionMultiFactorVerificationCol      = "multi_factor_verification"
+	userSessionMultiFactorVerificationTypeCol  = "multi_factor_verification_type"
+	userSessionPasswordlessVerificationCol     = "passwordless_verification"
+	userSessionExternalLoginVerificationCol    = "external_login_verification"
+	userSessionSelectedIDPConfigIDCol          = "selected_idp_config_id"
 )
 
 type UserSession struct {
@@ -209,13 +209,13 @@ func sessionColumns(event eventstore.Event, columns ...handler.Column) ([]handle
 		return nil, err
 	}
 	return append([]handler.Column{
-		handler.NewCol(userAgentIDCol, userAgent),
-		handler.NewCol(userIDCol, event.Aggregate().ID),
-		handler.NewCol(instanceIDCol, event.Aggregate().InstanceID),
-		handler.NewCol(creationDateCol, handler.OnlySetValueOnInsert(userSessionTable, event.CreatedAt())),
-		handler.NewCol(changeDateCol, event.CreatedAt()),
-		handler.NewCol(resourceOwnerCol, event.Aggregate().ResourceOwner),
-		handler.NewCol(sequenceCol, event.Sequence()),
+		handler.NewCol(userSessionUserAgentIDCol, userAgent),
+		handler.NewCol(userSessionUserIDCol, event.Aggregate().ID),
+		handler.NewCol(userSessionInstanceIDCol, event.Aggregate().InstanceID),
+		handler.NewCol(userSessionCreationDateCol, handler.OnlySetValueOnInsert(userSessionTable, event.CreatedAt())),
+		handler.NewCol(userSessionChangeDateCol, event.CreatedAt()),
+		handler.NewCol(userSessionResourceOwnerCol, event.Aggregate().ResourceOwner),
+		handler.NewCol(userSessionSequenceCol, event.Sequence()),
 	}, columns...), nil
 }
 
@@ -224,8 +224,8 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 	case user.UserV1PasswordCheckSucceededType,
 		user.HumanPasswordCheckSucceededType:
 		columns, err := sessionColumns(event,
-			handler.NewCol(passwordVerificationCol, event.CreatedAt()),
-			handler.NewCol(stateCol, domain.UserSessionStateActive),
+			handler.NewCol(userSessionPasswordVerificationCol, event.CreatedAt()),
+			handler.NewCol(userSessionStateCol, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
@@ -234,7 +234,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 	case user.UserV1PasswordCheckFailedType,
 		user.HumanPasswordCheckFailedType:
 		columns, err := sessionColumns(event,
-			handler.NewCol(passwordVerificationCol, time.Time{}),
+			handler.NewCol(userSessionPasswordVerificationCol, time.Time{}),
 		)
 		if err != nil {
 			return nil, err
@@ -243,9 +243,9 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 	case user.UserV1MFAOTPCheckSucceededType,
 		user.HumanMFAOTPCheckSucceededType:
 		columns, err := sessionColumns(event,
-			handler.NewCol(secondFactorVerificationCol, event.CreatedAt()),
-			handler.NewCol(secondFactorVerificationTypeCol, domain.MFATypeTOTP),
-			handler.NewCol(stateCol, domain.UserSessionStateActive),
+			handler.NewCol(userSessionSecondFactorVerificationCol, event.CreatedAt()),
+			handler.NewCol(userSessionSecondFactorVerificationTypeCol, domain.MFATypeTOTP),
+			handler.NewCol(userSessionStateCol, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
@@ -255,7 +255,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		user.HumanMFAOTPCheckFailedType,
 		user.HumanU2FTokenCheckFailedType:
 		columns, err := sessionColumns(event,
-			handler.NewCol(secondFactorVerificationCol, time.Time{}),
+			handler.NewCol(userSessionSecondFactorVerificationCol, time.Time{}),
 		)
 		if err != nil {
 			return nil, err
@@ -264,14 +264,14 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 	case user.UserV1SignedOutType,
 		user.HumanSignedOutType:
 		columns, err := sessionColumns(event,
-			handler.NewCol(passwordlessVerificationCol, time.Time{}),
-			handler.NewCol(passwordVerificationCol, time.Time{}),
-			handler.NewCol(secondFactorVerificationCol, time.Time{}),
-			handler.NewCol(secondFactorVerificationTypeCol, domain.MFALevelNotSetUp),
-			handler.NewCol(multiFactorVerificationCol, time.Time{}),
-			handler.NewCol(multiFactorVerificationTypeCol, domain.MFALevelNotSetUp),
-			handler.NewCol(externalLoginVerificationCol, time.Time{}),
-			handler.NewCol(stateCol, domain.UserSessionStateTerminated),
+			handler.NewCol(userSessionPasswordlessVerificationCol, time.Time{}),
+			handler.NewCol(userSessionPasswordVerificationCol, time.Time{}),
+			handler.NewCol(userSessionSecondFactorVerificationCol, time.Time{}),
+			handler.NewCol(userSessionSecondFactorVerificationTypeCol, domain.MFALevelNotSetUp),
+			handler.NewCol(userSessionMultiFactorVerificationCol, time.Time{}),
+			handler.NewCol(userSessionMultiFactorVerificationTypeCol, domain.MFALevelNotSetUp),
+			handler.NewCol(userSessionExternalLoginVerificationCol, time.Time{}),
+			handler.NewCol(userSessionStateCol, domain.UserSessionStateTerminated),
 		)
 		if err != nil {
 			return nil, err
@@ -284,9 +284,9 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			return nil, err
 		}
 		columns, err := sessionColumns(event,
-			handler.NewCol(externalLoginVerificationCol, event.CreatedAt()),
-			handler.NewCol(selectedIDPConfigIDCol, data.SelectedIDPConfigID),
-			handler.NewCol(stateCol, domain.UserSessionStateActive),
+			handler.NewCol(userSessionExternalLoginVerificationCol, event.CreatedAt()),
+			handler.NewCol(userSessionSelectedIDPConfigIDCol, data.SelectedIDPConfigID),
+			handler.NewCol(userSessionStateCol, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
@@ -299,9 +299,9 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			return nil, err
 		}
 		columns, err := sessionColumns(event,
-			handler.NewCol(secondFactorVerificationCol, event.CreatedAt()),
-			handler.NewCol(secondFactorVerificationTypeCol, domain.MFATypeU2F),
-			handler.NewCol(stateCol, domain.UserSessionStateActive),
+			handler.NewCol(userSessionSecondFactorVerificationCol, event.CreatedAt()),
+			handler.NewCol(userSessionSecondFactorVerificationTypeCol, domain.MFATypeU2F),
+			handler.NewCol(userSessionStateCol, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
@@ -314,10 +314,10 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			return nil, err
 		}
 		columns, err := sessionColumns(event,
-			handler.NewCol(passwordlessVerificationCol, event.CreatedAt()),
-			handler.NewCol(multiFactorVerificationCol, event.CreatedAt()),
-			handler.NewCol(multiFactorVerificationTypeCol, domain.MFATypeU2FUserVerification),
-			handler.NewCol(stateCol, domain.UserSessionStateActive),
+			handler.NewCol(userSessionPasswordlessVerificationCol, event.CreatedAt()),
+			handler.NewCol(userSessionMultiFactorVerificationCol, event.CreatedAt()),
+			handler.NewCol(userSessionMultiFactorVerificationTypeCol, domain.MFATypeU2FUserVerification),
+			handler.NewCol(userSessionStateCol, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
@@ -330,8 +330,8 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			return nil, err
 		}
 		columns, err := sessionColumns(event,
-			handler.NewCol(passwordlessVerificationCol, time.Time{}),
-			handler.NewCol(multiFactorVerificationCol, time.Time{}),
+			handler.NewCol(userSessionPasswordlessVerificationCol, time.Time{}),
+			handler.NewCol(userSessionMultiFactorVerificationCol, time.Time{}),
 		)
 		if err != nil {
 			return nil, err
@@ -341,21 +341,21 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		user.UserDeactivatedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol(passwordlessVerificationCol, time.Time{}),
-				handler.NewCol(passwordVerificationCol, time.Time{}),
-				handler.NewCol(secondFactorVerificationCol, time.Time{}),
-				handler.NewCol(secondFactorVerificationTypeCol, domain.MFALevelNotSetUp),
-				handler.NewCol(multiFactorVerificationCol, time.Time{}),
-				handler.NewCol(multiFactorVerificationTypeCol, domain.MFALevelNotSetUp),
-				handler.NewCol(externalLoginVerificationCol, time.Time{}),
-				handler.NewCol(stateCol, domain.UserSessionStateTerminated),
-				handler.NewCol(changeDateCol, event.CreatedAt()),
-				handler.NewCol(sequenceCol, event.Sequence()),
+				handler.NewCol(userSessionPasswordlessVerificationCol, time.Time{}),
+				handler.NewCol(userSessionPasswordVerificationCol, time.Time{}),
+				handler.NewCol(userSessionSecondFactorVerificationCol, time.Time{}),
+				handler.NewCol(userSessionSecondFactorVerificationTypeCol, domain.MFALevelNotSetUp),
+				handler.NewCol(userSessionMultiFactorVerificationCol, time.Time{}),
+				handler.NewCol(userSessionMultiFactorVerificationTypeCol, domain.MFALevelNotSetUp),
+				handler.NewCol(userSessionExternalLoginVerificationCol, time.Time{}),
+				handler.NewCol(userSessionStateCol, domain.UserSessionStateTerminated),
+				handler.NewCol(userSessionChangeDateCol, event.CreatedAt()),
+				handler.NewCol(userSessionSequenceCol, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
-				handler.Not(handler.NewCond(stateCol, domain.UserSessionStateTerminated)),
+				handler.NewCond(userSessionInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userSessionUserIDCol, event.Aggregate().ID),
+				handler.Not(handler.NewCond(userSessionStateCol, domain.UserSessionStateTerminated)),
 			},
 		), nil
 	case user.UserV1PasswordChangedType,
@@ -367,26 +367,26 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		return handler.NewMultiStatement(event,
 			handler.AddUpdateStatement(
 				[]handler.Column{
-					handler.NewCol(passwordVerificationCol, event.CreatedAt()),
-					handler.NewCol(changeDateCol, event.CreatedAt()),
-					handler.NewCol(sequenceCol, event.Sequence()),
+					handler.NewCol(userSessionPasswordVerificationCol, event.CreatedAt()),
+					handler.NewCol(userSessionChangeDateCol, event.CreatedAt()),
+					handler.NewCol(userSessionSequenceCol, event.Sequence()),
 				},
 				[]handler.Condition{
-					handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-					handler.NewCond(userIDCol, event.Aggregate().ID),
-					handler.NewCond(userAgentIDCol, userAgent),
+					handler.NewCond(userSessionInstanceIDCol, event.Aggregate().InstanceID),
+					handler.NewCond(userSessionUserIDCol, event.Aggregate().ID),
+					handler.NewCond(userSessionUserAgentIDCol, userAgent),
 				}),
 			handler.AddUpdateStatement(
 				[]handler.Column{
-					handler.NewCol(passwordVerificationCol, time.Time{}),
-					handler.NewCol(changeDateCol, event.CreatedAt()),
-					handler.NewCol(sequenceCol, event.Sequence()),
+					handler.NewCol(userSessionPasswordVerificationCol, time.Time{}),
+					handler.NewCol(userSessionChangeDateCol, event.CreatedAt()),
+					handler.NewCol(userSessionSequenceCol, event.Sequence()),
 				},
 				[]handler.Condition{
-					handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-					handler.NewCond(userIDCol, event.Aggregate().ID),
-					handler.Not(handler.NewCond(userAgentIDCol, userAgent)),
-					handler.Not(handler.NewCond(stateCol, domain.UserSessionStateTerminated)),
+					handler.NewCond(userSessionInstanceIDCol, event.Aggregate().InstanceID),
+					handler.NewCond(userSessionUserIDCol, event.Aggregate().ID),
+					handler.Not(handler.NewCond(userSessionUserAgentIDCol, userAgent)),
+					handler.Not(handler.NewCond(userSessionStateCol, domain.UserSessionStateTerminated)),
 				}),
 		), nil
 	case user.UserV1MFAOTPRemovedType,
@@ -394,56 +394,56 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		user.HumanU2FTokenRemovedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol(secondFactorVerificationCol, time.Time{}),
-				handler.NewCol(changeDateCol, event.CreatedAt()),
-				handler.NewCol(sequenceCol, event.Sequence()),
+				handler.NewCol(userSessionSecondFactorVerificationCol, time.Time{}),
+				handler.NewCol(userSessionChangeDateCol, event.CreatedAt()),
+				handler.NewCol(userSessionSequenceCol, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
-				handler.Not(handler.NewCond(stateCol, domain.UserSessionStateTerminated)),
+				handler.NewCond(userSessionInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userSessionUserIDCol, event.Aggregate().ID),
+				handler.Not(handler.NewCond(userSessionStateCol, domain.UserSessionStateTerminated)),
 			},
 		), nil
 	case user.UserIDPLinkRemovedType,
 		user.UserIDPLinkCascadeRemovedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol(externalLoginVerificationCol, time.Time{}),
-				handler.NewCol(selectedIDPConfigIDCol, ""),
-				handler.NewCol(changeDateCol, event.CreatedAt()),
-				handler.NewCol(sequenceCol, event.Sequence()),
+				handler.NewCol(userSessionExternalLoginVerificationCol, time.Time{}),
+				handler.NewCol(userSessionSelectedIDPConfigIDCol, ""),
+				handler.NewCol(userSessionChangeDateCol, event.CreatedAt()),
+				handler.NewCol(userSessionSequenceCol, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
-				handler.Not(handler.NewCond(selectedIDPConfigIDCol, "")),
+				handler.NewCond(userSessionInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userSessionUserIDCol, event.Aggregate().ID),
+				handler.Not(handler.NewCond(userSessionSelectedIDPConfigIDCol, "")),
 			},
 		), nil
 	case user.HumanPasswordlessTokenRemovedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol(passwordlessVerificationCol, time.Time{}),
-				handler.NewCol(multiFactorVerificationCol, time.Time{}),
-				handler.NewCol(changeDateCol, event.CreatedAt()),
-				handler.NewCol(sequenceCol, event.Sequence()),
+				handler.NewCol(userSessionPasswordlessVerificationCol, time.Time{}),
+				handler.NewCol(userSessionMultiFactorVerificationCol, time.Time{}),
+				handler.NewCol(userSessionChangeDateCol, event.CreatedAt()),
+				handler.NewCol(userSessionSequenceCol, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
-				handler.Not(handler.NewCond(stateCol, domain.UserSessionStateTerminated)),
+				handler.NewCond(userSessionInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userSessionUserIDCol, event.Aggregate().ID),
+				handler.Not(handler.NewCond(userSessionStateCol, domain.UserSessionStateTerminated)),
 			},
 		), nil
 	case user.UserRemovedType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
+				handler.NewCond(userSessionInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userSessionUserIDCol, event.Aggregate().ID),
 			},
 		), nil
 	case user.HumanRegisteredType:
 		columns, err := sessionColumns(event,
-			handler.NewCol(stateCol, domain.UserSessionStateActive),
-			handler.NewCol(passwordVerificationCol, event.CreatedAt()),
+			handler.NewCol(userSessionStateCol, domain.UserSessionStateActive),
+			handler.NewCol(userSessionPasswordVerificationCol, event.CreatedAt()),
 		)
 		if err != nil {
 			return nil, err
@@ -454,14 +454,14 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 	case instance.InstanceRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userSessionInstanceIDCol, event.Aggregate().InstanceID),
 			},
 		), nil
 	case org.OrgRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(resourceOwnerCol, event.Aggregate().ResourceOwner),
+				handler.NewCond(userSessionInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userSessionResourceOwnerCol, event.Aggregate().ResourceOwner),
 			},
 		), nil
 	default:

@@ -23,6 +23,23 @@ import (
 
 const (
 	tokenTable = "auth.tokens"
+
+	tokenInstanceIDCol        = "instance_id"
+	tokenUserIDCol            = "user_id"
+	tokenResourceOwnerCol     = "resource_owner"
+	tokenCreationDateCol      = "creation_date"
+	tokenChangeDateCol        = "change_date"
+	tokenApplicationIDCol     = "application_id"
+	tokenUserAgentIDCol       = "user_agent_id"
+	tokenSequencerCol         = "sequence"
+	tokenActorCol             = "actor"
+	tokenIDCol                = "id"
+	tokenAudienceCol          = "audience"
+	tokenPreferredLanguageCol = "preferred_language"
+	tokenExpirationCol        = "expiration"
+	tokenRefreshTokenIDCol    = "refresh_token_id"
+	tokenScopesCol            = "scopes"
+	tokenIsPatCol             = "is_pat"
 )
 
 var _ handler.Projection = (*Token)(nil)
@@ -159,21 +176,22 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewCreateStatement(event,
 			[]handler.Column{
-				handler.NewCol(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCol(userIDCol, event.Aggregate().ID),
-				handler.NewCol(resourceOwnerCol, event.Aggregate().ResourceOwner),
-				handler.NewCol("id", e.TokenID),
-				handler.NewCol(creationDateCol, event.CreatedAt()),
-				handler.NewCol(changeDateCol, event.CreatedAt()),
-				handler.NewCol("application_id", e.ApplicationID),
-				handler.NewCol(userAgentIDCol, e.UserAgentID),
-				handler.NewCol("audience", e.Audience),
-				handler.NewCol("scopes", e.Scopes),
-				handler.NewCol("expiration", e.Expiration),
-				handler.NewCol("preferred_language", e.PreferredLanguage),
-				handler.NewCol("refresh_token_id", e.RefreshTokenID),
-				handler.NewCol("actor", view_model.TokenActor{TokenActor: e.Actor}),
-				handler.NewCol("is_pat", false),
+				handler.NewCol(tokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCol(tokenUserIDCol, event.Aggregate().ID),
+				handler.NewCol(tokenResourceOwnerCol, event.Aggregate().ResourceOwner),
+				handler.NewCol(tokenIDCol, e.TokenID),
+				handler.NewCol(tokenCreationDateCol, event.CreatedAt()),
+				handler.NewCol(tokenChangeDateCol, event.CreatedAt()),
+				handler.NewCol(tokenSequencerCol, event.Sequence()),
+				handler.NewCol(tokenApplicationIDCol, e.ApplicationID),
+				handler.NewCol(tokenUserAgentIDCol, e.UserAgentID),
+				handler.NewCol(tokenAudienceCol, e.Audience),
+				handler.NewCol(tokenScopesCol, e.Scopes),
+				handler.NewCol(tokenExpirationCol, e.Expiration),
+				handler.NewCol(tokenPreferredLanguageCol, e.PreferredLanguage),
+				handler.NewCol(tokenRefreshTokenIDCol, e.RefreshTokenID),
+				handler.NewCol(tokenActorCol, view_model.TokenActor{TokenActor: e.Actor}),
+				handler.NewCol(tokenIsPatCol, false),
 			},
 		), nil
 	case user.PersonalAccessTokenAddedType:
@@ -183,15 +201,16 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewCreateStatement(event,
 			[]handler.Column{
-				handler.NewCol(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCol(userIDCol, event.Aggregate().ID),
-				handler.NewCol(resourceOwnerCol, event.Aggregate().ResourceOwner),
-				handler.NewCol("id", e.TokenID),
-				handler.NewCol(creationDateCol, event.CreatedAt()),
-				handler.NewCol(changeDateCol, event.CreatedAt()),
-				handler.NewCol("scopes", e.Scopes),
-				handler.NewCol("expiration", e.Expiration),
-				handler.NewCol("is_pat", true),
+				handler.NewCol(tokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCol(tokenUserIDCol, event.Aggregate().ID),
+				handler.NewCol(tokenResourceOwnerCol, event.Aggregate().ResourceOwner),
+				handler.NewCol(tokenIDCol, e.TokenID),
+				handler.NewCol(tokenCreationDateCol, event.CreatedAt()),
+				handler.NewCol(tokenChangeDateCol, event.CreatedAt()),
+				handler.NewCol(tokenSequencerCol, event.Sequence()),
+				handler.NewCol(tokenScopesCol, e.Scopes),
+				handler.NewCol(tokenExpirationCol, e.Expiration),
+				handler.NewCol(tokenIsPatCol, true),
 			},
 		), nil
 	case user.UserV1ProfileChangedType,
@@ -205,24 +224,26 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("preferred_language", gu.Value(e.PreferredLanguage).String()),
+				handler.NewCol(tokenPreferredLanguageCol, gu.Value(e.PreferredLanguage).String()),
+				handler.NewCol(tokenChangeDateCol, event.CreatedAt()),
+				handler.NewCol(tokenSequencerCol, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, e.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, e.Aggregate().ID),
+				handler.NewCond(tokenInstanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCond(tokenUserIDCol, e.Aggregate().ID),
 			},
 		), nil
 	case user.UserV1SignedOutType,
 		user.HumanSignedOutType:
-		id, err := agentIDFromSession(event)
-		if err != nil {
-			return nil, err
+		e, ok := event.(*user.HumanSignedOutEvent)
+		if !ok {
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-Wtn2q", "reduce.wrong.event.type %s", user.HumanSignedOutType)
 		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
-				handler.NewCond(userAgentIDCol, id),
+				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(tokenUserIDCol, event.Aggregate().ID),
+				handler.NewCond(tokenUserAgentIDCol, e.UserAgentID),
 			},
 		), nil
 	case user.UserLockedType,
@@ -230,43 +251,53 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		user.UserRemovedType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
+				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(tokenUserIDCol, event.Aggregate().ID),
 			},
 		), nil
 	case user.UserTokenRemovedType,
 		user.PersonalAccessTokenRemovedType:
-		id, err := tokenIDFromRemovedEvent(event)
-		if err != nil {
-			return nil, err
+		var tokenID string
+		switch e := event.(type) {
+		case *user.UserTokenRemovedEvent:
+			tokenID = e.TokenID
+		case *user.PersonalAccessTokenRemovedEvent:
+			tokenID = e.TokenID
+		default:
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-SF3ga", "reduce.wrong.event.type %s", user.UserTokenRemovedType)
 		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("id", id),
+				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(tokenIDCol, tokenID),
 			},
 		), nil
 	case user.HumanRefreshTokenRemovedType:
-		id, err := refreshTokenIDFromRemovedEvent(event)
-		if err != nil {
-			return nil, err
+		e, ok := event.(*user.HumanRefreshTokenRemovedEvent)
+		if !ok {
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-Sfe11", "reduce.wrong.event.type %s", user.HumanRefreshTokenRemovedType)
 		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("refresh_token_id", id),
+				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(tokenRefreshTokenIDCol, e.TokenID),
 			},
 		), nil
 	case project.ApplicationDeactivatedType,
 		project.ApplicationRemovedType:
-		application, err := applicationFromSession(event)
-		if err != nil {
-			return nil, err
+		var applicationID string
+		switch e := event.(type) {
+		case *project.ApplicationDeactivatedEvent:
+			applicationID = e.AppID
+		case *project.ApplicationRemovedEvent:
+			applicationID = e.AppID
+		default:
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-SF3fq", "reduce.wrong.event.type  %v", []eventstore.EventType{project.ApplicationDeactivatedType, project.ApplicationRemovedType})
 		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("application_id", application.AppID),
+				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(tokenApplicationIDCol, applicationID),
 			},
 		), nil
 	case project.ProjectDeactivatedType,
@@ -284,21 +315,21 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("application_id", applicationIDs),
+				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(tokenApplicationIDCol, applicationIDs),
 			},
 		), nil
 	case instance.InstanceRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
 			},
 		), nil
 	case org.OrgRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(resourceOwnerCol, event.Aggregate().ResourceOwner),
+				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(tokenResourceOwnerCol, event.Aggregate().ResourceOwner),
 			},
 		), nil
 	default:
@@ -314,33 +345,6 @@ func agentIDFromSession(event eventstore.Event) (string, error) {
 	}
 	agentID, _ := session["userAgentID"].(string)
 	return agentID, nil
-}
-
-func applicationFromSession(event eventstore.Event) (*project_es_model.Application, error) {
-	application := new(project_es_model.Application)
-	if err := event.Unmarshal(application); err != nil {
-		logging.WithError(err).Error("could not unmarshal event data")
-		return nil, zerrors.ThrowInternal(nil, "MODEL-Hrw1q", "could not unmarshal data")
-	}
-	return application, nil
-}
-
-func tokenIDFromRemovedEvent(event eventstore.Event) (string, error) {
-	removed := make(map[string]interface{})
-	if err := event.Unmarshal(&removed); err != nil {
-		logging.WithError(err).Error("could not unmarshal event data")
-		return "", zerrors.ThrowInternal(nil, "MODEL-Sff32", "could not unmarshal data")
-	}
-	return removed["tokenId"].(string), nil
-}
-
-func refreshTokenIDFromRemovedEvent(event eventstore.Event) (string, error) {
-	removed := make(map[string]interface{})
-	if err := event.Unmarshal(&removed); err != nil {
-		logging.WithError(err).Error("could not unmarshal event data")
-		return "", zerrors.ThrowInternal(nil, "MODEL-Dfb3w", "could not unmarshal data")
-	}
-	return removed["tokenId"].(string), nil
 }
 
 func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (*proj_model.Project, error) {

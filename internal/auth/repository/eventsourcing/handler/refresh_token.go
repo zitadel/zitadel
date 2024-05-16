@@ -15,6 +15,24 @@ import (
 
 const (
 	refreshTokenTable = "auth.refresh_tokens"
+
+	refreshTokenIDCol            = "id"
+	refreshTokenUserAgentIDCol   = "user_agent_id"
+	refreshTokenUserIDCol        = "user_id"
+	refreshTokenInstanceIDCol    = "instance_id"
+	refreshTokenCreationDateCol  = "creation_date"
+	refreshTokenChangeDateCol    = "change_date"
+	refreshTokenResourceOwnerCol = "resource_owner"
+	refreshTokenSequenceOwnerCol = "sequence"
+	refreshTokenActorCol         = "actor"
+	refreshTokenAMR              = "amr"
+	refreshTokenAuthTime         = "auth_time"
+	refreshTokenAudience         = "audience"
+	refreshTokenClientID         = "client_id"
+	refreshTokenExpiration       = "expiration"
+	refreshTokenIdleExpiration   = "idle_expiration"
+	refreshTokenScopes           = "scopes"
+	refreshTokenToken            = "token"
 )
 
 var _ handler.Projection = (*RefreshToken)(nil)
@@ -102,24 +120,26 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-IoF6j", "reduce.wrong.event.type %s", user.HumanRefreshTokenAddedType)
 		}
-		return handler.NewCreateStatement(event,
-			[]handler.Column{
-				handler.NewCol("id", e.TokenID),
-				handler.NewCol(userIDCol, e.Aggregate().ID),
-				handler.NewCol(resourceOwnerCol, e.Aggregate().ResourceOwner),
-				handler.NewCol(instanceIDCol, e.Aggregate().InstanceID),
-				handler.NewCol(creationDateCol, event.CreatedAt()),
-				handler.NewCol("amr", e.AuthMethodsReferences),
-				handler.NewCol("auth_time", e.AuthTime),
-				handler.NewCol("audience", e.Audience),
-				handler.NewCol("client_id", e.ClientID),
-				handler.NewCol("expiration", event.CreatedAt().Add(e.Expiration)),
-				handler.NewCol("idle_expiration", event.CreatedAt().Add(e.IdleExpiration)),
-				handler.NewCol("scopes", e.Scopes),
-				handler.NewCol("token", e.TokenID),
-				handler.NewCol(userAgentIDCol, e.UserAgentID),
-				handler.NewCol("actor", view_model.TokenActor{TokenActor: e.Actor}),
-			}), nil
+		columns := []handler.Column{
+			handler.NewCol(refreshTokenClientID, e.ClientID),
+			handler.NewCol(refreshTokenUserAgentIDCol, e.UserAgentID),
+			handler.NewCol(refreshTokenUserIDCol, e.Aggregate().ID),
+			handler.NewCol(refreshTokenInstanceIDCol, e.Aggregate().InstanceID),
+			handler.NewCol(refreshTokenIDCol, e.TokenID),
+			handler.NewCol(refreshTokenResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(refreshTokenCreationDateCol, event.CreatedAt()),
+			handler.NewCol(refreshTokenChangeDateCol, event.CreatedAt()),
+			handler.NewCol(refreshTokenSequenceOwnerCol, event.Sequence()),
+			handler.NewCol(refreshTokenAMR, e.AuthMethodsReferences),
+			handler.NewCol(refreshTokenAuthTime, e.AuthTime),
+			handler.NewCol(refreshTokenAudience, e.Audience),
+			handler.NewCol(refreshTokenExpiration, event.CreatedAt().Add(e.Expiration)),
+			handler.NewCol(refreshTokenIdleExpiration, event.CreatedAt().Add(e.IdleExpiration)),
+			handler.NewCol(refreshTokenScopes, e.Scopes),
+			handler.NewCol(refreshTokenToken, e.TokenID),
+			handler.NewCol(refreshTokenActorCol, view_model.TokenActor{TokenActor: e.Actor}),
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.HumanRefreshTokenRenewedType:
 		e, ok := event.(*user.HumanRefreshTokenRenewedEvent)
 		if !ok {
@@ -127,12 +147,14 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err
 		}
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("idle_expiration", event.CreatedAt().Add(e.IdleExpiration)),
-				handler.NewCol("token", e.RefreshToken),
+				handler.NewCol(refreshTokenIdleExpiration, event.CreatedAt().Add(e.IdleExpiration)),
+				handler.NewCol(refreshTokenToken, e.RefreshToken),
+				handler.NewCol(refreshTokenChangeDateCol, e.CreatedAt()),
+				handler.NewCol(refreshTokenSequenceOwnerCol, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond("id", e.TokenID),
-				handler.NewCond(instanceIDCol, e.Aggregate().InstanceID),
+				handler.NewCond(refreshTokenIDCol, e.TokenID),
+				handler.NewCond(refreshTokenInstanceIDCol, e.Aggregate().InstanceID),
 			},
 		), nil
 	case user.HumanRefreshTokenRemovedType:
@@ -142,8 +164,8 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err
 		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("id", e.TokenID),
+				handler.NewCond(refreshTokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(refreshTokenIDCol, e.TokenID),
 			},
 		), nil
 	case user.UserLockedType,
@@ -151,21 +173,21 @@ func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err
 		user.UserRemovedType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(refreshTokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(refreshTokenUserIDCol, event.Aggregate().ID),
 			},
 		), nil
 	case instance.InstanceRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(refreshTokenInstanceIDCol, event.Aggregate().InstanceID),
 			},
 		), nil
 	case org.OrgRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(resourceOwnerCol, event.Aggregate().ResourceOwner),
+				handler.NewCond(refreshTokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(refreshTokenResourceOwnerCol, event.Aggregate().ResourceOwner),
 			},
 		), nil
 	default:

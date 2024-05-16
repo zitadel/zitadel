@@ -17,6 +17,16 @@ import (
 
 const (
 	userTable = "auth.users3"
+
+	userInstanceIDCol            = "instance_id"
+	userIDCol                    = "id"
+	userPasswordSet              = "password_set"
+	userPasswordInitRequired     = "password_init_required"
+	userPasswordChange           = "password_change"
+	userInitRequired             = "init_required"
+	userPasswordlessInitRequired = "passwordless_init_required"
+	userMFAInitSkipped           = "mfa_init_skipped"
+	userResourceOwnerCol         = "resource_owner"
 )
 
 type User struct {
@@ -163,19 +173,6 @@ func (u *User) Reducers() []handler.AggregateReducer {
 	}
 }
 
-func (u *User) setPasswordData(event eventstore.Event, secret *crypto.CryptoValue, hash string, changeRequired bool) *handler.Statement {
-	set := secret != nil || hash != ""
-	columns := []handler.Column{
-		handler.NewCol(instanceIDCol, event.Aggregate().InstanceID),
-		handler.NewCol("id", event.Aggregate().ID),
-		handler.NewCol("password_set", set),
-		handler.NewCol("password_init_required", !set),
-		handler.NewCol("password_change", event.CreatedAt()),
-		//handler.NewCol("password_change_required", changeRequired),
-	}
-	return handler.NewUpsertStatement(event, columns[0:2], columns)
-}
-
 //nolint:gocognit
 func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err error) {
 	switch event.Type() {
@@ -185,21 +182,21 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-SDAGF", "reduce.wrong.event.type %s", user_repo.HumanAddedType)
 		}
-		return u.setPasswordData(event, e.Secret, e.EncodedHash, e.ChangeRequired), nil
+		return u.setPasswordData(event, e.Secret, e.EncodedHash), nil
 	case user_repo.UserV1RegisteredType,
 		user_repo.HumanRegisteredType:
 		e, ok := event.(*user_repo.HumanRegisteredEvent)
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-AS1hz", "reduce.wrong.event.type %s", user_repo.HumanRegisteredType)
 		}
-		return u.setPasswordData(event, e.Secret, e.EncodedHash, e.ChangeRequired), nil
+		return u.setPasswordData(event, e.Secret, e.EncodedHash), nil
 	case user_repo.UserV1PasswordChangedType,
 		user_repo.HumanPasswordChangedType:
 		e, ok := event.(*user_repo.HumanPasswordChangedEvent)
 		if !ok {
 			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-Gd31w", "reduce.wrong.event.type %s", user_repo.HumanPasswordChangedType)
 		}
-		return u.setPasswordData(event, e.Secret, e.EncodedHash, e.ChangeRequired), nil
+		return u.setPasswordData(event, e.Secret, e.EncodedHash), nil
 	case user_repo.UserV1PhoneRemovedType,
 		user_repo.HumanPhoneRemovedType,
 		user_repo.UserV1MFAOTPVerifiedType,
@@ -209,63 +206,75 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 		user_repo.HumanU2FTokenVerifiedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("mfa_init_skipped", time.Time{}),
+				handler.NewCol(userMFAInitSkipped, time.Time{}),
 			},
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("id", event.Aggregate().ID),
+				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userIDCol, event.Aggregate().ID),
 			}), nil
 	case user_repo.UserV1MFAInitSkippedType,
 		user_repo.HumanMFAInitSkippedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("mfa_init_skipped", event.CreatedAt()),
+				handler.NewCol(userMFAInitSkipped, event.CreatedAt()),
 			},
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("id", event.Aggregate().ID),
+				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userIDCol, event.Aggregate().ID),
 			}), nil
 	case user_repo.UserV1InitialCodeAddedType,
 		user_repo.HumanInitialCodeAddedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("init_required", true),
+				handler.NewCol(userInitRequired, true),
 			},
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("id", event.Aggregate().ID),
+				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userIDCol, event.Aggregate().ID),
 			}), nil
 	case user_repo.UserV1InitializedCheckSucceededType,
 		user_repo.HumanInitializedCheckSucceededType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("init_required", false),
+				handler.NewCol(userInitRequired, false),
 			},
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("id", event.Aggregate().ID),
+				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userIDCol, event.Aggregate().ID),
 			}), nil
 	case user_repo.HumanPasswordlessInitCodeAddedType,
 		user_repo.HumanPasswordlessInitCodeRequestedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("passwordless_init_required", true),
-				handler.NewCol("password_init_required", false),
+				handler.NewCol(userPasswordlessInitRequired, true),
+				handler.NewCol(userPasswordInitRequired, false),
 			},
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("id", event.Aggregate().ID),
-				handler.NewCond("password_set", false),
+				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userIDCol, event.Aggregate().ID),
+				handler.NewCond(userPasswordSet, false),
 			}), nil
 	case user_repo.UserRemovedType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond("id", event.Aggregate().ID),
+				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userIDCol, event.Aggregate().ID),
 			}), nil
 	default:
 		return handler.NewNoOpStatement(event), nil
 	}
+}
+
+func (u *User) setPasswordData(event eventstore.Event, secret *crypto.CryptoValue, hash string) *handler.Statement {
+	set := secret != nil || hash != ""
+	columns := []handler.Column{
+		handler.NewCol(userInstanceIDCol, event.Aggregate().InstanceID),
+		handler.NewCol(userIDCol, event.Aggregate().ID),
+		handler.NewCol(userPasswordSet, set),
+		handler.NewCol(userPasswordInitRequired, !set),
+		handler.NewCol(userPasswordChange, event.CreatedAt()),
+	}
+	return handler.NewUpsertStatement(event, columns[0:2], columns)
 }
 
 func (u *User) ProcessOrg(event eventstore.Event) (_ *handler.Statement, err error) {
@@ -273,8 +282,8 @@ func (u *User) ProcessOrg(event eventstore.Event) (_ *handler.Statement, err err
 	case org.OrgRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(resourceOwnerCol, event.Aggregate().ID),
+				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userResourceOwnerCol, event.Aggregate().ID),
 			},
 		), nil
 	default:
@@ -287,7 +296,7 @@ func (u *User) ProcessInstance(event eventstore.Event) (_ *handler.Statement, er
 	case instance.InstanceRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(instanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
 			},
 		), nil
 	default:
