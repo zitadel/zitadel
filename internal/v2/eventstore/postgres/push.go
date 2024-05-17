@@ -150,9 +150,9 @@ func push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands 
 			cmd.Revision,
 			cmd.Creator,
 			cmd.Type,
-			cmd.Payload,
+			cmd.payload,
 			cmd.sequence,
-			i,
+			cmd.position.InPositionOrder,
 		)
 		stmt.WriteString(", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())")
 		stmt.WriteString(`)`)
