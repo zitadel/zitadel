@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Liens Externes",
-        "DESCRIPTION": "Guidez vos utilisateurs vers des ressources externes personnalisées affichées sur la page de connexion. Les utilisateurs doivent accepter les Termes de Service et la Politique de Confidentialité avant de pouvoir s'inscrire."
+        "DESCRIPTION": "Guidez vos utilisateurs vers des ressources externes personnalisées affichées sur la page de connexion. Les utilisateurs doivent accepter les conditions d'utilisation et la politique de confidentialité avant de pouvoir s'inscrire. Modifiez le lien vers votre documentation ou définissez une chaîne vide pour masquer le bouton de documentation de la console. Ajoutez un lien externe personnalisé et un texte personnalisé pour ce lien dans la console, ou définissez-les vides pour masquer ce bouton."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Paramètres SMTP",
@@ -1570,6 +1570,9 @@
       "POLICYLINK": "Lien vers la politique de confidentialité",
       "HELPLINK": "Lien vers l'aide",
       "SUPPORTEMAIL": "E-mail d'assistance",
+      "DOCSLINK": "Lien Docs (Console)",
+      "CUSTOMLINK": "Lien personnalisé (Console)",
+      "CUSTOMLINKTEXT": "Texte de lien personnalisé (Console)",
       "SAVED": "Enregistré avec succès !",
       "RESET_TITLE": "Restaurer les valeurs par défaut",
       "RESET_DESCRIPTION": "Vous êtes sur le point de restaurer les liens par défaut pour les CGS et la politique de confidentialité. Voulez-vous vraiment continuer ?"

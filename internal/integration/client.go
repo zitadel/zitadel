@@ -150,6 +150,37 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 	return resp
 }
 
+func (s *Tester) CreateHumanUserWithTOTP(ctx context.Context, secret string) *user.AddHumanUserResponse {
+	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
+		Organization: &object.Organization{
+			Org: &object.Organization_OrgId{
+				OrgId: s.Organisation.ID,
+			},
+		},
+		Profile: &user.SetHumanProfile{
+			GivenName:         "Mickey",
+			FamilyName:        "Mouse",
+			PreferredLanguage: gu.Ptr("nl"),
+			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
+		},
+		Email: &user.SetHumanEmail{
+			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+			Verification: &user.SetHumanEmail_ReturnCode{
+				ReturnCode: &user.ReturnEmailVerificationCode{},
+			},
+		},
+		Phone: &user.SetHumanPhone{
+			Phone: "+41791234567",
+			Verification: &user.SetHumanPhone_ReturnCode{
+				ReturnCode: &user.ReturnPhoneVerificationCode{},
+			},
+		},
+		TotpSecret: gu.Ptr(secret),
+	})
+	logging.OnError(err).Fatal("create human user")
+	return resp
+}
+
 func (s *Tester) CreateOrganization(ctx context.Context, name, adminEmail string) *org.AddOrganizationResponse {
 	resp, err := s.Client.OrgV2.AddOrganization(ctx, &org.AddOrganizationRequest{
 		Name: name,

@@ -614,6 +614,7 @@ EventTypes:
         failed: Sprawdzenie inicjujące nie powiodło się
     token:
       added: Token dostępu utworzony
+      v2.added: Token dostępu utworzony
       removed: Token dostępu usunięty
     impersonated: Użytkownik podszywał się pod użytkownika
     username:

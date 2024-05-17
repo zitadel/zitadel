@@ -614,6 +614,7 @@ EventTypes:
         failed: La comprobación de inicialización falló
     token:
       added: Token de acceso creado
+      v2.added: Token de acceso creado
       removed: Token de acceso eliminado
     impersonated: Usuario suplantado
     username:

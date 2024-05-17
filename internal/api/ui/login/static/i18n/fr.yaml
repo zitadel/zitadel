@@ -103,10 +103,10 @@ InitMFAOTP:
   NextButtonText: Suivant
   CancelButtonText: Annuler
 
-InitMFASMS:
-  Title: Vérification authentification à 2 facteurs
-  DescriptionPhone: Créez votre authentification à 2 facteurs. Entrez votre numéro de téléphone pour le vérifier.
-  DescriptionCode: Créez votre authentification à 2 facteurs. Entrez le code reçu pour vérifier votre numéro de téléphone.
+InitMFAOTPSMS:
+  Title: Vérification à deux facteurs
+  DescriptionPhone: Créez votre 2-facteurs. Entrez votre numéro de téléphone pour le vérifier.
+  DescriptionCode: Créez votre 2-facteurs. Entrez le code reçu pour vérifier votre numéro de téléphone.
   PhoneLabel: Numéro de téléphone
   CodeLabel: Code
   EditButtonText: Modifier

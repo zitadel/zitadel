@@ -218,6 +218,17 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 		cmds = append(cmds, cmd)
 	}
 
+	if human.TOTPSecret != "" {
+		encryptedSecret, err := crypto.Encrypt([]byte(human.TOTPSecret), c.multifactors.OTP.CryptoMFA)
+		if err != nil {
+			return err
+		}
+		cmds = append(cmds,
+			user.NewHumanOTPAddedEvent(ctx, &existingHuman.Aggregate().Aggregate, encryptedSecret),
+			user.NewHumanOTPVerifiedEvent(ctx, &existingHuman.Aggregate().Aggregate, ""),
+		)
+	}
+
 	if len(cmds) == 0 {
 		human.Details = writeModelToObjectDetails(&existingHuman.WriteModel)
 		return nil
