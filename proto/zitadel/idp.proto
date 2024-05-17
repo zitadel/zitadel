@@ -474,6 +474,8 @@ message SAMLConfig {
             description: "Boolean which defines if the authentication requests are signed";
         }
     ];
+    zitadel.idp.v1.SAMLNameIDFormat name_id_format = 4;
+    optional string transient_mapping_attribute_name = 5;
 }
 
 message AzureADConfig {

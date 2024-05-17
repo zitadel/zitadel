@@ -2001,6 +2001,8 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 				handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
 				handler.NewCol(SAMLBindingCol, idpEvent.Binding),
 				handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
+				handler.NewCol(SAMLNameIDFormatCol, idpEvent.NameIDFormat),
+				handler.NewCol(SAMLTransientMappingAttributeName, idpEvent.TransientMappingAttributeName),
 			},
 			handler.WithTableSuffix(IDPTemplateSAMLSuffix),
 		),
@@ -2493,6 +2495,12 @@ func reduceSAMLIDPChangedColumns(idpEvent idp.SAMLIDPChangedEvent) []handler.Col
 	}
 	if idpEvent.WithSignedRequest != nil {
 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLWithSignedRequestCol, *idpEvent.WithSignedRequest))
+	}
+	if idpEvent.NameIDFormat != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLNameIDFormatCol, *idpEvent.NameIDFormat))
+	}
+	if idpEvent.TransientMappingAttributeName != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLTransientMappingAttributeName, *idpEvent.TransientMappingAttributeName))
 	}
 	return SAMLCols
 }
