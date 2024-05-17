@@ -351,7 +351,7 @@ func SAMLNameIDFormatToDomain(format idp_pb.SAMLNameIDFormat) domain.SAMLNameIDF
 	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT:
 		return domain.SAMLNameIDFormatTransient
 	default:
-		return domain.SAMLNameIDFormatUnspecified // TODO: ?
+		return domain.SAMLNameIDFormatUnspecified
 	}
 }
 

@@ -17,8 +17,8 @@ type SAMLIDPAddedEvent struct {
 	Certificate                   []byte                  `json:"certificate,omitempty"`
 	Binding                       string                  `json:"binding,omitempty"`
 	WithSignedRequest             bool                    `json:"withSignedRequest,omitempty"`
-	NameIDFormat                  domain.SAMLNameIDFormat `json:"name_id_format,omitempty"` //TODO: ?
-	TransientMappingAttributeName string                  `json:"transient_mapping_attribute_name,omitempty"`
+	NameIDFormat                  domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"` //TODO: ?
+	TransientMappingAttributeName string                  `json:"transientMappingAttributeName,omitempty"`
 	Options
 }
 
@@ -81,8 +81,8 @@ type SAMLIDPChangedEvent struct {
 	Certificate                   []byte                   `json:"certificate,omitempty"`
 	Binding                       *string                  `json:"binding,omitempty"`
 	WithSignedRequest             *bool                    `json:"withSignedRequest,omitempty"`
-	NameIDFormat                  *domain.SAMLNameIDFormat `json:"name_id_format,omitempty"`
-	TransientMappingAttributeName *string                  `json:"transient_mapping_attribute_name,omitempty"`
+	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
+	TransientMappingAttributeName *string                  `json:"transientMappingAttributeName,omitempty"`
 	OptionChanges
 }
 

@@ -72,7 +72,7 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 
 	nameID := s.Assertion.Subject.NameID
 	userMapper := NewUser()
-	// use the nameid as default mapping id
+	// use the nameID as default mapping id
 	userMapper.SetID(nameID.Value)
 	for _, statement := range s.Assertion.AttributeStatements {
 		for _, attribute := range statement.Attributes {
@@ -81,7 +81,7 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 				values[i] = attribute.Values[i].Value
 			}
 			userMapper.Attributes[attribute.Name] = values
-			// in case the nameid returned is in transient-format, check if the attribute is used as mapping id
+			// in case the nameID returned is in transient-format, check if the attribute is used as mapping id
 			if nameID.Format == string(saml.TransientNameIDFormat) && attribute.Name == s.TransientMappingAttributeName {
 				userMapper.SetID(attribute.Values[0].Value)
 			}
