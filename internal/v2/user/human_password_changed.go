@@ -14,13 +14,40 @@ type humanPasswordChangedPayload struct {
 	TriggeredAtOrigin string `json:"triggerOrigin,omitempty"`
 }
 
-type HumanPasswordChangedEvent humanPasswordChangedEvent
-type humanPasswordChangedEvent = eventstore.StorageEvent[humanPasswordChangedPayload]
+type HumanPasswordChangedEvent eventstore.Event[humanPasswordChangedPayload]
 
-func HumanPasswordChangedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanPasswordChangedEvent, error) {
-	event, err := eventstore.EventFromStorage[humanPasswordChangedEvent](e)
+const HumanPasswordChangedType = humanPrefix + ".initialization.code.added"
+
+var _ eventstore.TypeChecker = (*HumanPasswordChangedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *HumanPasswordChangedEvent) ActionType() string {
+	return HumanPasswordChangedType
+}
+
+func HumanPasswordChangedEventFromStorage(event *eventstore.StorageEvent) (e *HumanPasswordChangedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[humanPasswordChangedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*HumanPasswordChangedEvent)(event), nil
+
+	return &HumanPasswordChangedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }
+
+// type HumanPasswordChangedEvent humanPasswordChangedEvent
+// type humanPasswordChangedEvent = eventstore.StorageEvent[humanPasswordChangedPayload]
+
+// func HumanPasswordChangedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanPasswordChangedEvent, error) {
+// 	event, err := eventstore.EventFromStorage[humanPasswordChangedEvent](e)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return (*HumanPasswordChangedEvent)(event), nil
+// }

@@ -3,26 +3,59 @@ package user
 import (
 	"github.com/zitadel/zitadel/internal/v2/avatar"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type HumanAvatarAddedEvent humanAvatarAddedEvent
-type humanAvatarAddedEvent = eventstore.StorageEvent[avatar.AddedPayload]
+type HumanAvatarAddedEvent eventstore.Event[avatar.AddedPayload]
 
-func HumanAvatarAddedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanAvatarAddedEvent, error) {
-	event, err := eventstore.EventFromStorage[humanAvatarAddedEvent](e)
-	if err != nil {
-		return nil, err
-	}
-	return (*HumanAvatarAddedEvent)(event), nil
+const HumanAvatarAddedType = humanPrefix + avatar.AvatarAddedTypeSuffix
+
+var _ eventstore.TypeChecker = (*HumanAvatarAddedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *HumanAvatarAddedEvent) ActionType() string {
+	return HumanAvatarAddedType
 }
 
-type HumanAvatarRemovedEvent humanAvatarRemovedEvent
-type humanAvatarRemovedEvent = eventstore.StorageEvent[avatar.RemovedPayload]
+func HumanAvatarAddedEventFromStorage(event *eventstore.StorageEvent) (e *HumanAvatarAddedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
 
-func HumanAvatarRemovedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanAvatarRemovedEvent, error) {
-	event, err := eventstore.EventFromStorage[humanAvatarRemovedEvent](e)
+	payload, err := eventstore.UnmarshalPayload[avatar.AddedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*HumanAvatarRemovedEvent)(event), nil
+
+	return &HumanAvatarAddedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
+}
+
+type HumanAvatarRemovedEvent eventstore.Event[avatar.RemovedPayload]
+
+const HumanAvatarRemovedType = humanPrefix + avatar.AvatarRemovedTypeSuffix
+
+var _ eventstore.TypeChecker = (*HumanAvatarRemovedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *HumanAvatarRemovedEvent) ActionType() string {
+	return HumanAvatarRemovedType
+}
+
+func HumanAvatarRemovedEventFromStorage(event *eventstore.StorageEvent) (e *HumanAvatarRemovedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[avatar.RemovedPayload](event.Payload)
+	if err != nil {
+		return nil, err
+	}
+
+	return &HumanAvatarRemovedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }

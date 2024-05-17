@@ -6,7 +6,10 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+const HumanAddedType = AggregateType + ".human.added"
 
 type humanAddedPayload struct {
 	Username string `json:"userName"`
@@ -35,13 +38,27 @@ type humanAddedPayload struct {
 	PasswordChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
-type HumanAddedEvent humanAddedEvent
-type humanAddedEvent = eventstore.StorageEvent[humanAddedPayload]
+type HumanAddedEvent eventstore.Event[humanAddedPayload]
 
-func HumanAddedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanAddedEvent, error) {
-	event, err := eventstore.EventFromStorage[humanAddedEvent](e)
+var _ eventstore.TypeChecker = (*HumanAddedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *HumanAddedEvent) ActionType() string {
+	return HumanAddedType
+}
+
+func HumanAddedEventFromStorage(event *eventstore.StorageEvent) (e *HumanAddedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[humanAddedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*HumanAddedEvent)(event), nil
+
+	return &HumanAddedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }
