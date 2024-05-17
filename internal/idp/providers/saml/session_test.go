@@ -27,7 +27,6 @@ func TestSession_FetchUser(t *testing.T) {
 		options     []ProviderOpts
 	}
 	type args struct {
-		intentID  string
 		requestID string
 		request   *http.Request
 	}
@@ -174,16 +173,9 @@ func TestSession_FetchUser(t *testing.T) {
 			provider, err := New(tt.fields.name, tt.fields.rootURL, tt.fields.metadata, tt.fields.certificate, tt.fields.key, tt.fields.options...)
 			require.NoError(t, err)
 
-			sp, err := provider.GetSP()
+			session, err := NewSession(provider, tt.args.requestID, tt.args.request)
 			require.NoError(t, err)
 
-			session := &Session{
-				ServiceProvider: sp,
-				state:           tt.args.intentID,
-				//TransientMappingAttributeName: tt.args.
-				RequestID: tt.args.requestID,
-				Request:   tt.args.request,
-			}
 			// set to time of response for validation
 			saml.TimeNow = func() time.Time {
 				time, _ := time.Parse(time.RFC3339, "2023-09-21T13:47:40.0Z")

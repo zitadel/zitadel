@@ -27,6 +27,19 @@ type Session struct {
 	Assertion *saml.Assertion
 }
 
+func NewSession(provider *Provider, requestID string, request *http.Request) (*Session, error) {
+	sp, err := provider.GetSP()
+	if err != nil {
+		return nil, err
+	}
+	return &Session{
+		ServiceProvider:               sp,
+		TransientMappingAttributeName: provider.TransientMappingAttributeName(),
+		RequestID:                     requestID,
+		Request:                       request,
+	}, nil
+}
+
 // GetAuth implements the [idp.Session] interface.
 func (s *Session) GetAuth(ctx context.Context) (string, bool) {
 	url, _ := url.Parse(s.state)

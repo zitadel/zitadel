@@ -319,13 +319,11 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		samlProvider := provider.(*saml.Provider)
-		sp, err := samlProvider.GetSP()
+		session, err = saml.NewSession(provider.(*saml.Provider), authReq.SAMLRequestID, r)
 		if err != nil {
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &saml.Session{ServiceProvider: sp, TransientMappingAttributeName: samlProvider.TransientMappingAttributeName(), RequestID: authReq.SAMLRequestID, Request: r}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:

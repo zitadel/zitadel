@@ -30,12 +30,12 @@ func (u *UserMapper) GetID() string {
 
 // GetFirstName is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetFirstName() string {
-	return u.singleStringAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")
+	return ""
 }
 
 // GetLastName is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetLastName() string {
-	return u.singleStringAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")
+	return ""
 }
 
 // GetDisplayName is an implementation of the [idp.User] interface.
@@ -50,12 +50,12 @@ func (u *UserMapper) GetNickname() string {
 
 // GetPreferredUsername is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetPreferredUsername() string {
-	return u.singleStringAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn")
+	return ""
 }
 
 // GetEmail is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetEmail() domain.EmailAddress {
-	return domain.EmailAddress(u.singleStringAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"))
+	return ""
 }
 
 // IsEmailVerified is an implementation of the [idp.User] interface.
@@ -86,12 +86,4 @@ func (u *UserMapper) GetAvatarURL() string {
 // GetProfile is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetProfile() string {
 	return ""
-}
-
-func (u *UserMapper) singleStringAttribute(attribute string) string {
-	nameValues, _ := u.Attributes[attribute]
-	if len(nameValues) != 1 {
-		return ""
-	}
-	return nameValues[0]
 }
