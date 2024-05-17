@@ -421,9 +421,8 @@ export class GrpcAuthService {
     if (sortingDirection) {
       query.setAsc(sortingDirection === 'asc');
     }
-
     if (sortingColumn) {
-      // req.setSortingColumn(sortingColumn);
+      req.setSortingColumn(sortingColumn);
     }
 
     req.setQuery(query);

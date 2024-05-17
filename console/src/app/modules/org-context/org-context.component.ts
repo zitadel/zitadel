@@ -6,8 +6,9 @@ import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { Org, OrgFieldName, OrgNameQuery, OrgQuery, OrgState, OrgStateQuery } from 'src/app/proto/generated/zitadel/org_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ToastService } from 'src/app/services/toast.service';
 
-const ORG_QUERY_LIMIT = 4;
+const ORG_QUERY_LIMIT = 100;
 
 @Component({
   selector: 'cnsl-org-context',
@@ -25,10 +26,6 @@ export class OrgContextComponent implements OnInit {
   public _orgs: BehaviorSubject<Org.AsObject[]> = new BehaviorSubject<Org.AsObject[]>([]);
 
   public orgs$: Observable<Org.AsObject[]> = this._orgs.pipe(
-    // scan((acc, val) => {
-    //   console.log(acc, val);
-    //   return false ? val.concat(acc) : acc.concat(val);
-    // }),
     map((orgs) => {
       return orgs.sort((left, right) => left.name.localeCompare(right.name));
     }),
@@ -55,9 +52,9 @@ export class OrgContextComponent implements OnInit {
   constructor(
     public authService: AuthenticationService,
     private auth: GrpcAuthService,
+    private toast: ToastService,
   ) {
     this.filterControl.valueChanges.pipe(debounceTime(500)).subscribe((value) => {
-      // this.orgs$.next([]);
       const filteredValues = this.loadOrgs(0, value.trim().toLowerCase());
       this.mapAndUpdate(filteredValues, true);
     });
@@ -75,15 +72,13 @@ export class OrgContextComponent implements OnInit {
 
   public onNearEndScroll(position: 'top' | 'bottom'): void {
     if (position === 'bottom') {
-      console.log('more');
       this.more();
     }
   }
 
   public more(): void {
     const _cursor = this._orgs.getValue().length;
-    const nextOffset = _cursor + ORG_QUERY_LIMIT;
-    let more: Promise<Org.AsObject[]> = this.loadOrgs(nextOffset, '');
+    let more: Promise<Org.AsObject[]> = this.loadOrgs(_cursor, '');
     this.mapAndUpdate(more);
   }
 
@@ -111,18 +106,22 @@ export class OrgContextComponent implements OnInit {
       orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
       query.setNameQuery(orgNameQuery);
     }
-
-    // this.orgLoading$.next(true);
+    this.orgLoading$.next(true);
     return this.auth
       .listMyProjectOrgs(ORG_QUERY_LIMIT, offset, query ? [query] : undefined, OrgFieldName.ORG_FIELD_NAME_NAME, 'asc')
       .then((result) => {
+        this.orgLoading$.next(false);
         return result.resultList;
+      })
+      .catch((error) => {
+        this.orgLoading$.next(false);
+        this.toast.showError(error);
+        return [];
       });
-    // this.orgLoading$.next(false);
   }
 
   private mapAndUpdate(col: Promise<Org.AsObject[]>, clear?: boolean): any {
-    if (this._done.value || this._loading.value) {
+    if (clear === false && (this._done.value || this._loading.value)) {
       return;
     }
 
