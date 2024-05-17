@@ -55,8 +55,9 @@ var (
 		table: orgsTable,
 	}
 	OrgColumnName = Column{
-		name:  projection.OrgColumnName,
-		table: orgsTable,
+		name:           projection.OrgColumnName,
+		table:          orgsTable,
+		isOrderByLower: true,
 	}
 	OrgColumnDomain = Column{
 		name:  projection.OrgColumnDomain,
