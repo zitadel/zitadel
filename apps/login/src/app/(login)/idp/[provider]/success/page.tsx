@@ -136,7 +136,7 @@ export default async function Page({
                       <div className="w-full">
                         {
                           <Alert type={AlertType.ALERT}>
-                            {JSON.stringify(error.message)}
+                            {JSON.stringify(error.details)}
                           </Alert>
                         }
                       </div>

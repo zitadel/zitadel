@@ -1,3 +1,5 @@
+import { describe, expect, test, vitest } from "vitest";
+
 import { CallOptions, ClientMiddlewareCall, Metadata, MethodDescriptor } from "nice-grpc";
 import { authMiddleware } from "./middleware";
 
@@ -24,9 +26,9 @@ describe('authMiddleware', () => {
     ];
 
     scenarios.forEach(({ name, initialMetadata, expectedMetadata, token }) => {
-      it(name, async () => {
+      test(name, async () => {
 
-        const mockNext = jest.fn().mockImplementation(async function*() { });
+        const mockNext = vitest.fn().mockImplementation(async function*() { });
         const mockRequest = {};
 
         const mockMethodDescriptor: MethodDescriptor = {

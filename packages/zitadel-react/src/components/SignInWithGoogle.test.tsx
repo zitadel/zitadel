@@ -1,19 +1,23 @@
-import { render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, test } from "vitest";
+
+import { cleanup, render, screen } from "@testing-library/react";
 import { SignInWithGoogle } from "./SignInWithGoogle";
 
+afterEach(cleanup);
+
 describe("<SignInWithGoogle />", () => {
-  it("renders without crashing", () => {
+  test("renders without crashing", () => {
     const { container } = render(<SignInWithGoogle />);
     expect(container.firstChild).toBeDefined();
   });
 
-  it("displays the default text", () => {
+  test("displays the default text", () => {
     render(<SignInWithGoogle />);
     const signInText = screen.getByText(/Sign in with Google/i);
     expect(signInText).toBeInTheDocument();
   });
 
-  it("displays the given text", () => {
+  test("displays the given text", () => {
     render(<SignInWithGoogle name={"Google"} />);
     const signInText = screen.getByText(/Google/i);
     expect(signInText).toBeInTheDocument();
