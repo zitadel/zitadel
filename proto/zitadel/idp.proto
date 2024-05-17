@@ -276,6 +276,13 @@ enum SAMLBinding {
     SAML_BINDING_ARTIFACT = 3;
 }
 
+enum SAMLNameIDFormat {
+    SAML_NAME_ID_FORMAT_UNSPECIFIED = 0;
+    SAML_NAME_ID_FORMAT_EMAIL_ADDRESS = 1;
+    SAML_NAME_ID_FORMAT_PERSISTENT = 2;
+    SAML_NAME_ID_FORMAT_TRANSIENT = 3;
+}
+
 message ProviderConfig {
     Options options = 1;
     oneof config {

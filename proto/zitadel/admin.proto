@@ -6053,6 +6053,8 @@ message AddSAMLProviderRequest {
         }
     ];
     zitadel.idp.v1.Options provider_options = 6;
+    zitadel.idp.v1.SAMLNameIDFormat name_id_format = 7;
+    optional string transient_mapping_attribute_name = 8;
 }
 
 message AddSAMLProviderResponse {
@@ -6090,6 +6092,8 @@ message UpdateSAMLProviderRequest {
         }
     ];
     zitadel.idp.v1.Options provider_options = 7;
+    zitadel.idp.v1.SAMLNameIDFormat name_id_format = 8;
+    optional string transient_mapping_attribute_name = 9;
 }
 
 message UpdateSAMLProviderResponse {

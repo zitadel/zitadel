@@ -463,23 +463,27 @@ func updateAppleProviderToCommand(req *mgmt_pb.UpdateAppleProviderRequest) comma
 
 func addSAMLProviderToCommand(req *mgmt_pb.AddSAMLProviderRequest) command.SAMLProvider {
 	return command.SAMLProvider{
-		Name:              req.Name,
-		Metadata:          req.GetMetadataXml(),
-		MetadataURL:       req.GetMetadataUrl(),
-		Binding:           bindingToCommand(req.Binding),
-		WithSignedRequest: req.WithSignedRequest,
-		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:                          req.Name,
+		Metadata:                      req.GetMetadataXml(),
+		MetadataURL:                   req.GetMetadataUrl(),
+		Binding:                       bindingToCommand(req.Binding),
+		WithSignedRequest:             req.WithSignedRequest,
+		NameIDFormat:                  idp_grpc.SAMLNameIDFormatToDomain(req.NameIdFormat),
+		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 
 func updateSAMLProviderToCommand(req *mgmt_pb.UpdateSAMLProviderRequest) command.SAMLProvider {
 	return command.SAMLProvider{
-		Name:              req.Name,
-		Metadata:          req.GetMetadataXml(),
-		MetadataURL:       req.GetMetadataUrl(),
-		Binding:           bindingToCommand(req.Binding),
-		WithSignedRequest: req.WithSignedRequest,
-		IDPOptions:        idp_grpc.OptionsToCommand(req.ProviderOptions),
+		Name:                          req.Name,
+		Metadata:                      req.GetMetadataXml(),
+		MetadataURL:                   req.GetMetadataUrl(),
+		Binding:                       bindingToCommand(req.Binding),
+		WithSignedRequest:             req.WithSignedRequest,
+		NameIDFormat:                  idp_grpc.SAMLNameIDFormatToDomain(req.NameIdFormat),
+		TransientMappingAttributeName: req.GetTransientMappingAttributeName(),
+		IDPOptions:                    idp_grpc.OptionsToCommand(req.ProviderOptions),
 	}
 }
 

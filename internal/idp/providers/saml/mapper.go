@@ -1,7 +1,6 @@
 package saml
 
 import (
-	"github.com/crewjam/saml"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -20,8 +19,8 @@ func NewUser() *UserMapper {
 	return &UserMapper{Attributes: map[string][]string{}}
 }
 
-func (u *UserMapper) SetID(id *saml.NameID) {
-	u.ID = id.Value
+func (u *UserMapper) SetID(id string) {
+	u.ID = id
 }
 
 // GetID is an implementation of the [idp.User] interface.
@@ -31,12 +30,12 @@ func (u *UserMapper) GetID() string {
 
 // GetFirstName is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetFirstName() string {
-	return ""
+	return u.singleStringAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")
 }
 
 // GetLastName is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetLastName() string {
-	return ""
+	return u.singleStringAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")
 }
 
 // GetDisplayName is an implementation of the [idp.User] interface.
@@ -51,12 +50,12 @@ func (u *UserMapper) GetNickname() string {
 
 // GetPreferredUsername is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetPreferredUsername() string {
-	return ""
+	return u.singleStringAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn")
 }
 
 // GetEmail is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetEmail() domain.EmailAddress {
-	return ""
+	return domain.EmailAddress(u.singleStringAttribute("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"))
 }
 
 // IsEmailVerified is an implementation of the [idp.User] interface.
@@ -87,4 +86,12 @@ func (u *UserMapper) GetAvatarURL() string {
 // GetProfile is an implementation of the [idp.User] interface.
 func (u *UserMapper) GetProfile() string {
 	return ""
+}
+
+func (u *UserMapper) singleStringAttribute(attribute string) string {
+	nameValues, _ := u.Attributes[attribute]
+	if len(nameValues) != 1 {
+		return ""
+	}
+	return nameValues[0]
 }

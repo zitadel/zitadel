@@ -339,6 +339,21 @@ func azureADTenantTypeToCommand(tenantType idp_pb.AzureADTenantType) azuread.Ten
 	}
 }
 
+func SAMLNameIDFormatToDomain(format idp_pb.SAMLNameIDFormat) domain.SAMLNameIDFormat {
+	switch format {
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_UNSPECIFIED:
+		return domain.SAMLNameIDFormatUnspecified
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_EMAIL_ADDRESS:
+		return domain.SAMLNameIDFormatEmailAddress
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_PERSISTENT:
+		return domain.SAMLNameIDFormatPersistent
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT:
+		return domain.SAMLNameIDFormatTransient
+	default:
+		return domain.SAMLNameIDFormatUnspecified // TODO: ?
+	}
+}
+
 func ProvidersToPb(providers []*query.IDPTemplate) []*idp_pb.Provider {
 	list := make([]*idp_pb.Provider, len(providers))
 	for i, provider := range providers {

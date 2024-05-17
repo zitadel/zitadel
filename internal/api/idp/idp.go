@@ -246,9 +246,10 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session := saml2.Session{
-		ServiceProvider: sp,
-		RequestID:       intent.RequestID,
-		Request:         r,
+		ServiceProvider:               sp,
+		RequestID:                     intent.RequestID,
+		Request:                       r,
+		TransientMappingAttributeName: samlProvider.TransientMappingAttributeName(),
 	}
 
 	idpUser, err := session.FetchUser(r.Context())

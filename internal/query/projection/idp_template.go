@@ -161,13 +161,15 @@ const (
 	ApplePrivateKeyCol = "private_key"
 	AppleScopesCol     = "scopes"
 
-	SAMLIDCol                = "idp_id"
-	SAMLInstanceIDCol        = "instance_id"
-	SAMLMetadataCol          = "metadata"
-	SAMLKeyCol               = "key"
-	SAMLCertificateCol       = "certificate"
-	SAMLBindingCol           = "binding"
-	SAMLWithSignedRequestCol = "with_signed_request"
+	SAMLIDCol                         = "idp_id"
+	SAMLInstanceIDCol                 = "instance_id"
+	SAMLMetadataCol                   = "metadata"
+	SAMLKeyCol                        = "key"
+	SAMLCertificateCol                = "certificate"
+	SAMLBindingCol                    = "binding"
+	SAMLWithSignedRequestCol          = "with_signed_request"
+	SAMLNameIDFormatCol               = "name_id_format"
+	SAMLTransientMappingAttributeName = "transient_mapping_attribute_name"
 )
 
 type idpTemplateProjection struct{}
@@ -367,6 +369,8 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(SAMLCertificateCol, handler.ColumnTypeBytes),
 			handler.NewColumn(SAMLBindingCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SAMLWithSignedRequestCol, handler.ColumnTypeBool, handler.Nullable()),
+			handler.NewColumn(SAMLNameIDFormatCol, handler.ColumnTypeEnum, handler.Nullable()),
+			handler.NewColumn(SAMLTransientMappingAttributeName, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SAMLInstanceIDCol, SAMLIDCol),
 			IDPTemplateSAMLSuffix,

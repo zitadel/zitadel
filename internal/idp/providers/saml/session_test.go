@@ -180,8 +180,9 @@ func TestSession_FetchUser(t *testing.T) {
 			session := &Session{
 				ServiceProvider: sp,
 				state:           tt.args.intentID,
-				RequestID:       tt.args.requestID,
-				Request:         tt.args.request,
+				//TransientMappingAttributeName: tt.args.
+				RequestID: tt.args.requestID,
+				Request:   tt.args.request,
 			}
 			// set to time of response for validation
 			saml.TimeNow = func() time.Time {

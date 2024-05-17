@@ -17,8 +17,9 @@ var _ idp.Session = (*Session)(nil)
 
 // Session is the [idp.Session] implementation for the SAML provider.
 type Session struct {
-	ServiceProvider *samlsp.Middleware
-	state           string
+	ServiceProvider               *samlsp.Middleware
+	state                         string
+	TransientMappingAttributeName string
 
 	RequestID string
 	Request   *http.Request
@@ -56,8 +57,10 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, zerrors.ThrowInvalidArgument(err, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid")
 	}
 
+	nameID := s.Assertion.Subject.NameID
 	userMapper := NewUser()
-	userMapper.SetID(s.Assertion.Subject.NameID)
+	// use the nameid as default mapping id
+	userMapper.SetID(nameID.Value)
 	for _, statement := range s.Assertion.AttributeStatements {
 		for _, attribute := range statement.Attributes {
 			values := make([]string, len(attribute.Values))
@@ -65,10 +68,26 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 				values[i] = attribute.Values[i].Value
 			}
 			userMapper.Attributes[attribute.Name] = values
+			// in case the nameid returned is in transient-format, check if the attribute is used as mapping id
+			if nameID.Format == string(saml.TransientNameIDFormat) && attribute.Name == s.TransientMappingAttributeName {
+				userMapper.SetID(attribute.Values[0].Value)
+			}
 		}
 	}
 	return userMapper, nil
 }
+
+//
+//func (s *Session) mappingID() *saml.NameID {
+//	for _, statement := range s.Assertion.AttributeStatements {
+//		for _, attribute := range statement.Attributes {
+//			if attribute.Name == "XY" {
+//				return attribute.Values[0].NameID
+//			}
+//		}
+//	}
+//	return s.Assertion.Subject.NameID.Value
+//}
 
 type TempResponseWriter struct {
 	header  http.Header

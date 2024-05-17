@@ -319,12 +319,13 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		sp, err := provider.(*saml.Provider).GetSP()
+		samlProvider := provider.(*saml.Provider)
+		sp, err := samlProvider.GetSP()
 		if err != nil {
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &saml.Session{ServiceProvider: sp, RequestID: authReq.SAMLRequestID, Request: r}
+		session = &saml.Session{ServiceProvider: sp, TransientMappingAttributeName: samlProvider.TransientMappingAttributeName(), RequestID: authReq.SAMLRequestID, Request: r}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:
@@ -1029,12 +1030,18 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]saml.ProviderOpts, 0, 2)
+	opts := make([]saml.ProviderOpts, 0, 6)
 	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
 		opts = append(opts, saml.WithSignedRequest())
 	}
 	if identityProvider.SAMLIDPTemplate.Binding != "" {
 		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
+	}
+	if identityProvider.SAMLIDPTemplate.NameIDFormat != 0 { // TODO: default?
+		opts = append(opts, saml.WithNameIDFormat(identityProvider.SAMLIDPTemplate.NameIDFormat))
+	}
+	if identityProvider.SAMLIDPTemplate.TransientMappingAttributeName != "" {
+		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))
 	}
 	opts = append(opts,
 		saml.WithEntityID(http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure)+"/idps/"+identityProvider.ID+"/saml/metadata"),
