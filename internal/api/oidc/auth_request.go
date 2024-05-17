@@ -12,7 +12,6 @@ import (
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
@@ -197,23 +196,6 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(context.Context, op.TokenReques
 
 func (*OPStorage) panicErr(method string) error {
 	return fmt.Errorf("OPStorage.%s should not be called anymore. This is a bug. Please report https://github.com/zitadel/zitadel/issues", method)
-}
-
-func getInfoFromRequest(req op.TokenRequest) (agentID, clientID, userOrgID string, authTime time.Time, amr []string, preferredLanguage *language.Tag, reason domain.TokenReason, actor *domain.TokenActor) {
-	switch r := req.(type) {
-	case *AuthRequest:
-		return r.AgentID, r.ApplicationID, r.UserOrgID, r.AuthTime, r.GetAMR(), r.PreferredLanguage, domain.TokenReasonAuthRequest, nil
-	case *RefreshTokenRequest:
-		return r.UserAgentID, r.ClientID, "", r.AuthTime, r.AuthMethodsReferences, nil, domain.TokenReasonRefresh, r.Actor
-	case op.IDTokenRequest:
-		return "", r.GetClientID(), "", r.GetAuthTime(), r.GetAMR(), nil, domain.TokenReasonAuthRequest, nil
-	case *oidc.JWTTokenRequest:
-		return "", "", "", r.GetAuthTime(), nil, nil, domain.TokenReasonJWTProfile, nil
-	case *clientCredentialsRequest:
-		return "", "", "", time.Time{}, nil, nil, domain.TokenReasonClientCredentials, nil
-	default:
-		return "", "", "", time.Time{}, nil, nil, domain.TokenReasonAuthRequest, nil
-	}
 }
 
 func (o *OPStorage) TokenRequestByRefreshToken(ctx context.Context, refreshToken string) (_ op.RefreshTokenRequest, err error) {
@@ -511,8 +493,8 @@ func implicitFlowComplianceChecker() command.AuthRequestComplianceChecker {
 
 func (s *Server) authorizeCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	authorizer := s.Provider()
-	authReq, err := func() (authReq op.AuthRequest, err error) {
-		ctx, span := tracing.NewSpan(r.Context())
+	authReq, err := func(ctx context.Context) (authReq *AuthRequest, err error) {
+		ctx, span := tracing.NewSpan(ctx)
 		r = r.WithContext(ctx)
 		defer func() { span.EndWithError(err) }()
 
@@ -520,7 +502,7 @@ func (s *Server) authorizeCallbackHandler(w http.ResponseWriter, r *http.Request
 		if err != nil {
 			return nil, err
 		}
-		authReq, err = authorizer.Storage().AuthRequestByID(r.Context(), id)
+		authReq, err = s.getAuthRequestV1ByID(ctx, id)
 		if err != nil {
 			return nil, err
 		}
@@ -528,13 +510,13 @@ func (s *Server) authorizeCallbackHandler(w http.ResponseWriter, r *http.Request
 			return authReq, oidc.ErrInteractionRequired().WithDescription("Unfortunately, the user may be not logged in and/or additional interaction is required.")
 		}
 		return authReq, s.authResponse(authReq, authorizer, w, r)
-	}()
+	}(r.Context())
 	if err != nil {
 		op.AuthRequestError(w, r, authReq, err, authorizer)
 	}
 }
 
-func (s *Server) authResponse(authReq op.AuthRequest, authorizer op.Authorizer, w http.ResponseWriter, r *http.Request) (err error) {
+func (s *Server) authResponse(authReq *AuthRequest, authorizer op.Authorizer, w http.ResponseWriter, r *http.Request) (err error) {
 	ctx, span := tracing.NewSpan(r.Context())
 	r = r.WithContext(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -551,7 +533,7 @@ func (s *Server) authResponse(authReq op.AuthRequest, authorizer op.Authorizer, 
 	return s.authResponseToken(authReq, authorizer, client, w, r)
 }
 
-func (s *Server) authResponseToken(authReq op.AuthRequest, authorizer op.Authorizer, opClient op.Client, w http.ResponseWriter, r *http.Request) (err error) {
+func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorizer, opClient op.Client, w http.ResponseWriter, r *http.Request) (err error) {
 	ctx, span := tracing.NewSpan(r.Context())
 	r = r.WithContext(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -561,23 +543,20 @@ func (s *Server) authResponseToken(authReq op.AuthRequest, authorizer op.Authori
 		return zerrors.ThrowInternal(nil, "OIDC-waeN6", "Error.Internal")
 	}
 
-	userAgentID, _, userOrgID, authTime, authMethodsReferences, preferredLanguage, reason, actor := getInfoFromRequest(authReq)
 	scope := authReq.GetScopes()
 	session, err := s.command.CreateOIDCSession(ctx,
-		authReq.GetSubject(),
-		userOrgID,
+		authReq.UserID,
+		authReq.UserOrgID,
 		client.client.ClientID,
 		scope,
-		authReq.GetAudience(),
-		AMRToAuthMethodTypes(authMethodsReferences),
-		authTime,
+		authReq.Audience,
+		authReq.AuthMethods(),
+		authReq.AuthTime,
 		authReq.GetNonce(),
-		preferredLanguage,
-		&domain.UserAgent{
-			FingerprintID: &userAgentID,
-		},
-		reason,
-		actor,
+		authReq.PreferredLanguage,
+		authReq.BrowserInfo.ToUserAgent(),
+		domain.TokenReasonAuthRequest,
+		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 	)
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -69,41 +70,50 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 	if req.RedirectURI != authReq.GetRedirectURI() {
 		return nil, "", oidc.ErrInvalidGrant().WithDescription("redirect_uri does not correspond")
 	}
-	userAgentID, _, userOrgID, authTime, authMethodsReferences, preferredLanguage, reason, actor := getInfoFromRequest(authReq)
 
 	scope := authReq.GetScopes()
 	session, err = s.command.CreateOIDCSession(ctx,
-		authReq.GetSubject(),
-		userOrgID,
+		authReq.UserID,
+		authReq.UserOrgID,
 		client.client.ClientID,
 		scope,
-		authReq.GetAudience(),
-		AMRToAuthMethodTypes(authMethodsReferences),
-		authTime,
+		authReq.Audience,
+		authReq.AuthMethods(),
+		authReq.AuthTime,
 		authReq.GetNonce(),
-		preferredLanguage,
-		&domain.UserAgent{
-			FingerprintID: &userAgentID,
-		},
-		reason,
-		actor,
+		authReq.PreferredLanguage,
+		authReq.BrowserInfo.ToUserAgent(),
+		domain.TokenReasonAuthRequest,
+		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 	)
 	if err != nil {
 		return nil, "", err
 	}
-	return session, authReq.GetState(), s.repo.DeleteAuthRequest(ctx, authReq.GetID())
+	return session, authReq.TransferState, s.repo.DeleteAuthRequest(ctx, authReq.ID)
 }
 
 // getAuthRequestV1ByCode finds the v1 auth request by code.
 // code needs to be the encrypted version of the ID,
 // this is required by the underlying repo.
-func (s *Server) getAuthRequestV1ByCode(ctx context.Context, code string) (op.AuthRequest, error) {
+func (s *Server) getAuthRequestV1ByCode(ctx context.Context, code string) (*AuthRequest, error) {
 	authReq, err := s.repo.AuthRequestByCode(ctx, code)
 	if err != nil {
 		return nil, err
 	}
 	return AuthRequestFromBusiness(authReq)
+}
+
+func (s *Server) getAuthRequestV1ByID(ctx context.Context, id string) (*AuthRequest, error) {
+	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
+	if !ok {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-TiTu7", "no user agent id")
+	}
+	resp, err := s.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID)
+	if err != nil {
+		return nil, err
+	}
+	return AuthRequestFromBusiness(resp)
 }
 
 func codeExchangeComplianceChecker(client *Client, req *oidc.AccessTokenRequest) command.AuthRequestComplianceChecker {
