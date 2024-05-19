@@ -2,15 +2,26 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type UserReactivatedEvent userReactivatedEvent
-type userReactivatedEvent = eventstore.StorageEvent[struct{}]
+type ReactivatedEvent eventstore.Event[eventstore.EmptyPayload]
 
-func UserReactivatedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*UserReactivatedEvent, error) {
-	event, err := eventstore.EventFromStorage[userReactivatedEvent](e)
-	if err != nil {
-		return nil, err
+const ReactivatedType = AggregateType + ".reactivated"
+
+var _ eventstore.TypeChecker = (*ReactivatedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *ReactivatedEvent) ActionType() string {
+	return ReactivatedType
+}
+
+func ReactivatedEventFromStorage(event *eventstore.StorageEvent) (e *ReactivatedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
 	}
-	return (*UserReactivatedEvent)(event), nil
+
+	return &ReactivatedEvent{
+		StorageEvent: event,
+	}, nil
 }

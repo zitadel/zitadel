@@ -6,6 +6,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type tokenAddedPayload struct {
@@ -19,13 +20,29 @@ type tokenAddedPayload struct {
 	PreferredLanguage language.Tag `json:"preferredLanguage"`
 }
 
-type TokenAddedEvent tokenAddedEvent
-type tokenAddedEvent = eventstore.StorageEvent[tokenAddedPayload]
+type TokenAddedEvent eventstore.Event[tokenAddedPayload]
 
-func TokenAddedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*TokenAddedEvent, error) {
-	event, err := eventstore.EventFromStorage[tokenAddedEvent](e)
+const TokenAddedType = AggregateType + ".token.added"
+
+var _ eventstore.TypeChecker = (*TokenAddedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *TokenAddedEvent) ActionType() string {
+	return TokenAddedType
+}
+
+func TokenAddedEventFromStorage(event *eventstore.StorageEvent) (e *TokenAddedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[tokenAddedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*TokenAddedEvent)(event), nil
+
+	return &TokenAddedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }

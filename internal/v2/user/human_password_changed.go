@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type humanPasswordChangedPayload struct {
@@ -16,7 +17,7 @@ type humanPasswordChangedPayload struct {
 
 type HumanPasswordChangedEvent eventstore.Event[humanPasswordChangedPayload]
 
-const HumanPasswordChangedType = humanPrefix + ".initialization.code.added"
+const HumanPasswordChangedType = humanPrefix + ".password.changed"
 
 var _ eventstore.TypeChecker = (*HumanPasswordChangedEvent)(nil)
 
@@ -40,14 +41,3 @@ func HumanPasswordChangedEventFromStorage(event *eventstore.StorageEvent) (e *Hu
 		Payload:      payload,
 	}, nil
 }
-
-// type HumanPasswordChangedEvent humanPasswordChangedEvent
-// type humanPasswordChangedEvent = eventstore.StorageEvent[humanPasswordChangedPayload]
-
-// func HumanPasswordChangedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*HumanPasswordChangedEvent, error) {
-// 	event, err := eventstore.EventFromStorage[humanPasswordChangedEvent](e)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return (*HumanPasswordChangedEvent)(event), nil
-// }

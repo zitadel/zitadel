@@ -2,19 +2,36 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type usernameChangedPayload struct {
 	Username string `json:"userName"`
 }
 
-type UsernameChangedEvent usernameChangedEvent
-type usernameChangedEvent = eventstore.StorageEvent[usernameChangedPayload]
+type UsernameChangedEvent eventstore.Event[usernameChangedPayload]
 
-func UsernameChangedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*UsernameChangedEvent, error) {
-	event, err := eventstore.EventFromStorage[usernameChangedEvent](e)
+const UsernameChangedType = AggregateType + ".username.changed"
+
+var _ eventstore.TypeChecker = (*UsernameChangedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *UsernameChangedEvent) ActionType() string {
+	return UsernameChangedType
+}
+
+func UsernameChangedEventFromStorage(event *eventstore.StorageEvent) (e *UsernameChangedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[usernameChangedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*UsernameChangedEvent)(event), nil
+
+	return &UsernameChangedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }

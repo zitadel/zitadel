@@ -14,7 +14,7 @@ type readModel struct {
 	Sequence     uint32
 }
 
-func (rm *readModel) reduce(event *eventstore.StorageEvent[eventstore.StoragePayload]) {
+func (rm *readModel) reduce(event *eventstore.StorageEvent) {
 	if rm.CreationDate.IsZero() {
 		rm.CreationDate = event.CreatedAt
 	}

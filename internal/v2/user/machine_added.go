@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type machineAddedPayload struct {
@@ -12,13 +13,29 @@ type machineAddedPayload struct {
 	AccessTokenType domain.OIDCTokenType `json:"accessTokenType,omitempty"`
 }
 
-type MachineAddedEvent machineAddedEvent
-type machineAddedEvent = eventstore.StorageEvent[machineAddedPayload]
+type MachineAddedEvent eventstore.Event[machineAddedPayload]
 
-func MachineAddedEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*MachineAddedEvent, error) {
-	event, err := eventstore.EventFromStorage[machineAddedEvent](e)
+const MachineAddedType = machinePrefix + ".added"
+
+var _ eventstore.TypeChecker = (*MachineAddedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *MachineAddedEvent) ActionType() string {
+	return MachineAddedType
+}
+
+func MachineAddedEventFromStorage(event *eventstore.StorageEvent) (e *MachineAddedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[machineAddedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*MachineAddedEvent)(event), nil
+
+	return &MachineAddedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }

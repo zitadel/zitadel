@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type machineSecretSetPayload struct {
@@ -11,13 +12,29 @@ type machineSecretSetPayload struct {
 	HashedSecret string `json:"hashedSecret,omitempty"`
 }
 
-type MachineSecretSetEvent machineSecretSetEvent
-type machineSecretSetEvent = eventstore.StorageEvent[machineSecretSetPayload]
+type MachineSecretHashSetEvent eventstore.Event[machineSecretSetPayload]
 
-func MachineSecretSetEventFromStorage(e *eventstore.StorageEvent[eventstore.StoragePayload]) (*MachineSecretSetEvent, error) {
-	event, err := eventstore.EventFromStorage[machineSecretSetEvent](e)
+const MachineSecretHashSetType = machinePrefix + ".secret.set"
+
+var _ eventstore.TypeChecker = (*MachineSecretHashSetEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *MachineSecretHashSetEvent) ActionType() string {
+	return MachineSecretHashSetType
+}
+
+func MachineSecretHashSetEventFromStorage(event *eventstore.StorageEvent) (e *MachineSecretHashSetEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[machineSecretSetPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*MachineSecretSetEvent)(event), nil
+
+	return &MachineSecretHashSetEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }
