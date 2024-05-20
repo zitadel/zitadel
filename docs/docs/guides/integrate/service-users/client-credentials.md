@@ -26,7 +26,7 @@ If you lose it, you will have to generate a new one.
 
 ![Create new service user](/img/console_serviceusers_secret.gif)
 
-## 2. Authenticating a service user and request a token
+### 2. Authenticating a service user and request a token
 
 In this step, we will authenticate a service user and receive an access_token to use against the ZITADEL API.
 
