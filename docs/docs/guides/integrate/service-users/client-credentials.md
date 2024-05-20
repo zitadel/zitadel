@@ -42,6 +42,7 @@ curl --request POST \
   --user "$CLIENT_ID:$CLIENT_SECRET"
 ```
 
+* `CUSTOM_DOMAIN` should be set to your [custom domain](/docs/concepts/features/custom-domain)
 * `grant_type` should be set to `client_credentials`
 * `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
 * `CLIENT_ID` and `CLIENT_SECRET` should be set with the values shown in Console
