@@ -2227,7 +2227,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP 提供商",
-      "DESCRIPTION": "这些是您的 Zitadel 实例的 SMTP 提供商。激活您想要用来向用户发送通知的通知。",
+      "DESCRIPTION": "这些是您的 ZITADEL 实例的 SMTP 提供商。激活您想要用来向用户发送通知的通知。",
       "EMPTY": "没有可用的 SMTP 提供商",
       "ACTIVATED": "活性",
       "ACTIVATE": "激活提供商",

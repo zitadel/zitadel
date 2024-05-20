@@ -2227,7 +2227,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP-Anbieter",
-      "DESCRIPTION": "Dies sind die SMTP-Anbieter für Ihre Zitadel-Instanz. Aktivieren Sie diejenige, die Sie zum Senden von Benachrichtigungen an Ihre Benutzer verwenden möchten.",
+      "DESCRIPTION": "Dies sind die SMTP-Anbieter für Ihre ZITADEL-Instanz. Aktivieren Sie diejenige, die Sie zum Senden von Benachrichtigungen an Ihre Benutzer verwenden möchten.",
       "EMPTY": "Kein SMTP-Anbieter verfügbar",
       "ACTIVATED": "Aktiviert",
       "ACTIVATE": "Anbieter aktivieren",
@@ -2259,11 +2259,11 @@
         "NEXT_STEPS": "Nächste Schritte",
         "ACTIVATE": {
           "TITLE": "Aktivieren Sie Ihren SMTP-Anbieter",
-          "DESCRIPTION": "Zitadel kann diesen SMTP-Anbieter nicht zum Senden von Benachrichtigungen verwenden, bis Sie ihn aktivieren. Wenn Sie diesen Anbieter aktivieren, werden alle anderen aktiven Anbieter nun deaktiviert."
+          "DESCRIPTION": "ZITADEL kann diesen SMTP-Anbieter nicht zum Senden von Benachrichtigungen verwenden, bis Sie ihn aktivieren. Wenn Sie diesen Anbieter aktivieren, werden alle anderen aktiven Anbieter nun deaktiviert."
         },
         "DEACTIVATE": {
           "TITLE": "Deaktivieren Sie Ihren SMTP-Anbieter",
-          "DESCRIPTION": "Wenn Sie diesen SMTP-Anbieter deaktivieren, kann Zitadel ihn nicht zum Versenden von Benachrichtigungen verwenden, bis Sie ihn erneut aktivieren."
+          "DESCRIPTION": "Wenn Sie diesen SMTP-Anbieter deaktivieren, kann ZITADEL ihn nicht zum Versenden von Benachrichtigungen verwenden, bis Sie ihn erneut aktivieren."
         }
       }
     },

@@ -2225,7 +2225,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Proveedor SMTP",
-      "DESCRIPTION": "Estos son los proveedores SMTP para tu instancia de Zitadel. Activa el que quieras utilizar para enviar notificaciones a tus usuarios.",
+      "DESCRIPTION": "Estos son los proveedores SMTP para tu instancia de ZITADEL. Activa el que quieras utilizar para enviar notificaciones a tus usuarios.",
       "EMPTY": "No hay ningún proveedor SMTP disponible",
       "ACTIVATED": "Activado",
       "ACTIVATE": "Activar proveedor",
@@ -2257,11 +2257,11 @@
         "NEXT_STEPS": "Pŕoximos pasos",
         "ACTIVATE": {
           "TITLE": "Activa tu proveedor SMTP",
-          "DESCRIPTION": "Zitadel no puede usar este proveedor SMTP para enviar notificaciones hasta que lo actives. Si activas este proveedor cualquier otro proveedor que estuviera activado será desactivado ahora."
+          "DESCRIPTION": "ZITADEL no puede usar este proveedor SMTP para enviar notificaciones hasta que lo actives. Si activas este proveedor cualquier otro proveedor que estuviera activado será desactivado ahora."
         },
         "DEACTIVATE": {
           "TITLE": "Desactiva tu proveedor SMTP",
-          "DESCRIPTION": "Si desactivas este proveedor SMTP, Zitadel no puede utilizarlo para enviar notificationes hasta que lo actives otra vez."
+          "DESCRIPTION": "Si desactivas este proveedor SMTP, ZITADEL no puede utilizarlo para enviar notificationes hasta que lo actives otra vez."
         }
       }
     },

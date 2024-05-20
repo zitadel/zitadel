@@ -2246,7 +2246,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP-provider",
-      "DESCRIPTION": "Dit zijn de SMTP-providers voor uw Zitadel-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
+      "DESCRIPTION": "Dit zijn de SMTP-providers voor uw ZITADEL-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
       "EMPTY": "Geen SMTP-provider beschikbaar",
       "ACTIVATED": "Geactiveerd",
       "ACTIVATE": "Aanbieder activeren",
@@ -2278,11 +2278,11 @@
         "NEXT_STEPS": "Volgende stappen",
         "ACTIVATE": {
           "TITLE": "Activeer uw SMTP-provider",
-          "DESCRIPTION": "Zitadel kan deze SMTP-provider niet gebruiken om meldingen te verzenden totdat u deze activeert. Als u deze provider activeert, worden alle andere actieve providers nu gedeactiveerd."
+          "DESCRIPTION": "ZITADEL kan deze SMTP-provider niet gebruiken om meldingen te verzenden totdat u deze activeert. Als u deze provider activeert, worden alle andere actieve providers nu gedeactiveerd."
         },
         "DEACTIVATE": {
           "TITLE": "Deactiveer uw SMTP-provider",
-          "DESCRIPTION": "Als u deze SMTP-provider deactiveert, kan Zitadel deze niet gebruiken om meldingen te verzenden totdat u deze opnieuw activeert."
+          "DESCRIPTION": "Als u deze SMTP-provider deactiveert, kan ZITADEL deze niet gebruiken om meldingen te verzenden totdat u deze opnieuw activeert."
         }
       }
     },

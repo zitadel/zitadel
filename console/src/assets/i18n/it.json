@@ -2228,7 +2228,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Fornitore SMTP",
-      "DESCRIPTION": "Questi sono i provider SMTP per la tua istanza Zitadel. Attiva quello che desideri utilizzare per inviare notifiche ai tuoi utenti.",
+      "DESCRIPTION": "Questi sono i provider SMTP per la tua istanza ZITADEL. Attiva quello che desideri utilizzare per inviare notifiche ai tuoi utenti.",
       "EMPTY": "Nessun provider SMTP disponibile",
       "ACTIVATED": "Attivato",
       "ACTIVATE": "Attiva fornitore",
@@ -2260,7 +2260,7 @@
         "NEXT_STEPS": "Prossimi passi",
         "ACTIVATE": {
           "TITLE": "Attiva il tuo provider SMTP",
-          "DESCRIPTION": "Zitadel non può utilizzare questo provider SMTP per inviare notifiche finché non lo attivi. Se attivi questo fornitore, qualsiasi altro fornitore che era attivo verrà ora disattivato."
+          "DESCRIPTION": "ZITADEL non può utilizzare questo provider SMTP per inviare notifiche finché non lo attivi. Se attivi questo fornitore, qualsiasi altro fornitore che era attivo verrà ora disattivato."
         },
         "DEACTIVATE": {
           "TITLE": "Disattiva il tuo provider SMTP",
