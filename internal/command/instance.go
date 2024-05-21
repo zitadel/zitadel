@@ -200,13 +200,45 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	if err := setup.generateIDs(c.idGenerator); err != nil {
 		return "", "", nil, nil, err
 	}
+
+	validations := make([]preparation.Validation, 0)
+	pat, machineKey, err := setUpInstance(ctx, c, &validations, setup, c.externalDomain)
+	if err != nil {
+		return "", "", nil, nil, err
+	}
+
+	//nolint:staticcheck
+	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
+	if err != nil {
+		return "", "", nil, nil, err
+	}
+
+	events, err := c.eventstore.Push(ctx, cmds...)
+	if err != nil {
+		return "", "", nil, nil, err
+	}
+
+	var token string
+	if pat != nil {
+		token = pat.Token
+	}
+
+	return setup.zitadel.instanceID, token, machineKey, &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreatedAt(),
+		ResourceOwner: setup.zitadel.orgID,
+	}, nil
+}
+
+func setUpInstance(ctx context.Context, c *Commands, validations *[]preparation.Validation, setup *InstanceSetup, externalDomain string) (pat *PersonalAccessToken, machineKey *MachineKey, err error) {
+	instanceAgg := instance.NewAggregate(setup.zitadel.instanceID)
 	ctx = authz.WithConsole(
 		authz.SetCtxData(
 			authz.WithRequestedDomain(
 				authz.WithInstanceID(
 					ctx,
 					setup.zitadel.instanceID),
-				c.externalDomain,
+				externalDomain,
 			),
 			authz.CtxData{ResourceOwner: setup.zitadel.instanceID},
 		),
@@ -214,22 +246,53 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 		setup.zitadel.consoleAppID,
 	)
 
-	instanceAgg := instance.NewAggregate(setup.zitadel.instanceID)
-	limitsAgg := limits.NewAggregate(setup.zitadel.limitsID, setup.zitadel.instanceID)
-	restrictionsAgg := restrictions.NewAggregate(setup.zitadel.restrictionsID, setup.zitadel.instanceID, setup.zitadel.instanceID)
+	setupInstanceElements(validations, instanceAgg, setup.InstanceName, setup.DefaultLanguage, setup.SecretGenerators)
+	setupInstancePolicies(validations, instanceAgg, setup)
+	*validations = append(*validations, prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate))
 
-	validations := []preparation.Validation{
-		prepareAddInstance(instanceAgg, setup.InstanceName, setup.DefaultLanguage),
-		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, setup.SecretGenerators.ClientSecret),
-		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, setup.SecretGenerators.InitializeUserCode),
-		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, setup.SecretGenerators.EmailVerificationCode),
-		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyPhoneCode, setup.SecretGenerators.PhoneVerificationCode),
-		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, setup.SecretGenerators.PasswordVerificationCode),
-		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, setup.SecretGenerators.PasswordlessInitCode),
-		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, setup.SecretGenerators.DomainVerification),
-		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPSMS, setup.SecretGenerators.OTPSMS),
-		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPEmail, setup.SecretGenerators.OTPEmail),
+	// default organization on setup'd instance
+	pat, machineKey, err = setupDefaultOrg(ctx, c, validations, instanceAgg, setup.Org.Name, setup.Org.Machine, setup.Org.Human, setup.zitadel)
+	if err != nil {
+		return nil, nil, err
+	}
 
+	// domains
+	if err := setupGeneratedDomain(ctx, c, validations, instanceAgg, setup.InstanceName); err != nil {
+		return nil, nil, err
+	}
+	setupCustomDomain(c, validations, instanceAgg, setup.CustomDomain)
+
+	// optional setting if set
+	setupMessageTexts(validations, setup.MessageTexts, instanceAgg)
+	if err := setupQuotas(c, validations, setup.Quotas, setup.zitadel.instanceID); err != nil {
+		return nil, nil, err
+	}
+	setupSMTPSettings(c, validations, setup.SMTPConfiguration, instanceAgg)
+	setupOIDCSettings(c, validations, setup.OIDCSettings, instanceAgg)
+	setupFeatures(validations, setup.Features, setup.zitadel.instanceID)
+	setupLimits(c, validations, limits.NewAggregate(setup.zitadel.limitsID, setup.zitadel.instanceID), setup.Limits)
+	setupRestrictions(c, validations, restrictions.NewAggregate(setup.zitadel.restrictionsID, setup.zitadel.instanceID, setup.zitadel.instanceID), setup.Restrictions)
+
+	return pat, machineKey, nil
+}
+
+func setupInstanceElements(validations *[]preparation.Validation, instanceAgg *instance.Aggregate, name string, defaultLanguage language.Tag, secretGenerators *SecretGenerators) {
+	*validations = append(*validations,
+		prepareAddInstance(instanceAgg, name, defaultLanguage),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeAppSecret, secretGenerators.ClientSecret),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeInitCode, secretGenerators.InitializeUserCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyEmailCode, secretGenerators.EmailVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyPhoneCode, secretGenerators.PhoneVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordResetCode, secretGenerators.PasswordVerificationCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypePasswordlessInitCode, secretGenerators.PasswordlessInitCode),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeVerifyDomain, secretGenerators.DomainVerification),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPSMS, secretGenerators.OTPSMS),
+		prepareAddSecretGeneratorConfig(instanceAgg, domain.SecretGeneratorTypeOTPEmail, secretGenerators.OTPEmail),
+	)
+}
+
+func setupInstancePolicies(validations *[]preparation.Validation, instanceAgg *instance.Aggregate, setup *InstanceSetup) {
+	*validations = append(*validations,
 		prepareAddDefaultPasswordComplexityPolicy(
 			instanceAgg,
 			setup.PasswordComplexityPolicy.MinLength,
@@ -297,54 +360,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 			setup.LabelPolicy.ThemeMode,
 		),
 		prepareActivateDefaultLabelPolicy(instanceAgg),
-
-		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
-	}
-
-	// default organization on setup'd instance
-	pat, machineKey, err := setupDefaultOrg(ctx, c, &validations, instanceAgg, setup.Org.Name, setup.Org.Machine, setup.Org.Human, setup.zitadel)
-	if err != nil {
-		return "", "", nil, nil, err
-	}
-
-	// domains
-	if err := setupGeneratedDomain(ctx, c, &validations, instanceAgg, setup.InstanceName); err != nil {
-		return "", "", nil, nil, err
-	}
-	setupCustomDomain(c, &validations, instanceAgg, setup.CustomDomain)
-
-	// optional setting if set
-	setupMessageTexts(&validations, setup.MessageTexts, instanceAgg)
-	if err := setupQuotas(c, &validations, setup.Quotas, setup.zitadel.instanceID); err != nil {
-		return "", "", nil, nil, err
-	}
-	setupSMTPSettings(c, &validations, setup.SMTPConfiguration, instanceAgg)
-	setupOIDCSettings(c, &validations, setup.OIDCSettings, instanceAgg)
-	setupFeatures(&validations, setup.Features, setup.zitadel.instanceID)
-	setupLimits(c, &validations, limitsAgg, setup.Limits)
-	setupRestrictions(c, &validations, restrictionsAgg, setup.Restrictions)
-
-	//nolint:staticcheck
-	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, validations...)
-	if err != nil {
-		return "", "", nil, nil, err
-	}
-
-	events, err := c.eventstore.Push(ctx, cmds...)
-	if err != nil {
-		return "", "", nil, nil, err
-	}
-
-	var token string
-	if pat != nil {
-		token = pat.Token
-	}
-
-	return setup.zitadel.instanceID, token, machineKey, &domain.ObjectDetails{
-		Sequence:      events[len(events)-1].Sequence(),
-		EventDate:     events[len(events)-1].CreatedAt(),
-		ResourceOwner: setup.zitadel.orgID,
-	}, nil
+	)
 }
 
 func setupLimits(commands *Commands, validations *[]preparation.Validation, limitsAgg *limits.Aggregate, setLimits *SetLimits) {

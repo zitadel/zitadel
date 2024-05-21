@@ -82,6 +82,8 @@ type Commands struct {
 	ActionFunctionExisting func(function string) bool
 	EventExisting          func(event string) bool
 	EventGroupExisting     func(group string) bool
+
+	GenerateDomain func(instanceName, domain string) (string, error)
 }
 
 func StartCommands(
@@ -167,6 +169,9 @@ func StartCommands(
 				CryptoMFA: otpEncryption,
 				Issuer:    defaults.Multifactors.OTP.Issuer,
 			},
+		},
+		GenerateDomain: func(instanceName, domainName string) (string, error) {
+			return domain.NewGeneratedInstanceDomain(instanceName, domainName)
 		},
 	}
 

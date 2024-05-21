@@ -24,6 +24,18 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+func instanceSetupZitadelIDs() ZitadelConfig {
+	return ZitadelConfig{
+		instanceID:   "INSTANCE",
+		orgID:        "ORG",
+		projectID:    "PROJECT",
+		consoleAppID: "console-id",
+		authAppID:    "auth-id",
+		mgmtAppID:    "mgmt-id",
+		adminAppID:   "admin-id",
+	}
+}
+
 func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string, externalSecure bool) []eventstore.Command {
 	events := []eventstore.Command{
 		project.NewProjectAddedEvent(ctx,
@@ -115,13 +127,13 @@ func oidcAppEvents(ctx context.Context, orgID, projectID, id, name, clientID str
 	}
 }
 
-func orgFilters(ctx context.Context, orgID string, machine, human bool) []expect {
+func orgFilters(orgID string, machine, human bool) []expect {
 	orgAgg := org.NewAggregate(orgID)
 
 	filters := []expect{
 		expectFilter(),
 		expectFilter(
-			org.NewOrgAddedEvent(ctx, &orgAgg.Aggregate, ""),
+			org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, ""),
 		),
 	}
 	if machine {
@@ -169,6 +181,192 @@ func orgIDs() []string {
 	return slices.Concat([]string{"USER-MACHINE", "PAT", "USER"}, projectClientIDs())
 }
 
+func instancePoliciesFilters(instanceID string) []expect {
+	return []expect{
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(
+			instance.NewLabelPolicyAddedEvent(context.Background(), &instance.NewAggregate(instanceID).Aggregate, "", "", "", "", "", "", "", "", false, false, false, domain.LabelPolicyThemeAuto),
+		),
+	}
+}
+
+func instancePoliciesEvents(ctx context.Context, instanceID string) []eventstore.Command {
+	instanceAgg := instance.NewAggregate(instanceID)
+	return []eventstore.Command{
+		instance.NewPasswordComplexityPolicyAddedEvent(ctx, &instanceAgg.Aggregate, 8, true, true, true, true),
+		instance.NewPasswordAgePolicyAddedEvent(ctx, &instanceAgg.Aggregate, 0, 0),
+		instance.NewDomainPolicyAddedEvent(ctx, &instanceAgg.Aggregate, false, false, false),
+		instance.NewLoginPolicyAddedEvent(ctx, &instanceAgg.Aggregate, true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240*time.Hour, 240*time.Hour, 720*time.Hour, 18*time.Hour, 12*time.Hour),
+		instance.NewLoginPolicySecondFactorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecondFactorTypeTOTP),
+		instance.NewLoginPolicySecondFactorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecondFactorTypeU2F),
+		instance.NewLoginPolicyMultiFactorAddedEvent(ctx, &instanceAgg.Aggregate, domain.MultiFactorTypeU2FWithPIN),
+		instance.NewPrivacyPolicyAddedEvent(ctx, &instanceAgg.Aggregate, "", "", "", "", "", "", ""),
+		instance.NewNotificationPolicyAddedEvent(ctx, &instanceAgg.Aggregate, true),
+		instance.NewLockoutPolicyAddedEvent(ctx, &instanceAgg.Aggregate, 0, 0, true),
+		instance.NewLabelPolicyAddedEvent(ctx, &instanceAgg.Aggregate, "#5469d4", "#fafafa", "#cd3d56", "#000000", "#2073c4", "#111827", "#ff3b5b", "#ffffff", false, false, false, domain.LabelPolicyThemeAuto),
+		instance.NewLabelPolicyActivatedEvent(ctx, &instanceAgg.Aggregate),
+	}
+}
+
+func instanceSetupPoliciesConfig() *InstanceSetup {
+	return &InstanceSetup{
+		PasswordComplexityPolicy: struct {
+			MinLength    uint64
+			HasLowercase bool
+			HasUppercase bool
+			HasNumber    bool
+			HasSymbol    bool
+		}{8, true, true, true, true},
+		PasswordAgePolicy: struct {
+			ExpireWarnDays uint64
+			MaxAgeDays     uint64
+		}{0, 0},
+		DomainPolicy: struct {
+			UserLoginMustBeDomain                  bool
+			ValidateOrgDomains                     bool
+			SMTPSenderAddressMatchesInstanceDomain bool
+		}{false, false, false},
+		LoginPolicy: struct {
+			AllowUsernamePassword      bool
+			AllowRegister              bool
+			AllowExternalIDP           bool
+			ForceMFA                   bool
+			ForceMFALocalOnly          bool
+			HidePasswordReset          bool
+			IgnoreUnknownUsername      bool
+			AllowDomainDiscovery       bool
+			DisableLoginWithEmail      bool
+			DisableLoginWithPhone      bool
+			PasswordlessType           domain.PasswordlessType
+			DefaultRedirectURI         string
+			PasswordCheckLifetime      time.Duration
+			ExternalLoginCheckLifetime time.Duration
+			MfaInitSkipLifetime        time.Duration
+			SecondFactorCheckLifetime  time.Duration
+			MultiFactorCheckLifetime   time.Duration
+		}{true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240 * time.Hour, 240 * time.Hour, 720 * time.Hour, 18 * time.Hour, 12 * time.Hour},
+		NotificationPolicy: struct {
+			PasswordChange bool
+		}{true},
+		PrivacyPolicy: struct {
+			TOSLink        string
+			PrivacyLink    string
+			HelpLink       string
+			SupportEmail   domain.EmailAddress
+			DocsLink       string
+			CustomLink     string
+			CustomLinkText string
+		}{"", "", "", "", "", "", ""},
+		LabelPolicy: struct {
+			PrimaryColor        string
+			BackgroundColor     string
+			WarnColor           string
+			FontColor           string
+			PrimaryColorDark    string
+			BackgroundColorDark string
+			WarnColorDark       string
+			FontColorDark       string
+			HideLoginNameSuffix bool
+			ErrorMsgPopup       bool
+			DisableWatermark    bool
+			ThemeMode           domain.LabelPolicyThemeMode
+		}{"#5469d4", "#fafafa", "#cd3d56", "#000000", "#2073c4", "#111827", "#ff3b5b", "#ffffff", false, false, false, domain.LabelPolicyThemeAuto},
+		LockoutPolicy: struct {
+			MaxPasswordAttempts      uint64
+			MaxOTPAttempts           uint64
+			ShouldShowLockoutFailure bool
+		}{0, 0, true},
+	}
+}
+
+func instanceElementsFilters() []expect {
+	return []expect{
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+	}
+}
+
+func instanceElementsEvents(ctx context.Context, instanceID, instanceName string, defaultLanguage language.Tag) []eventstore.Command {
+	instanceAgg := instance.NewAggregate(instanceID)
+	return []eventstore.Command{
+		instance.NewInstanceAddedEvent(ctx, &instanceAgg.Aggregate, instanceName),
+		instance.NewDefaultLanguageSetEvent(ctx, &instanceAgg.Aggregate, defaultLanguage),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeAppSecret, 64, 0, true, true, true, false),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeInitCode, 6, 72*time.Hour, false, true, true, false),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeVerifyEmailCode, 6, time.Hour, false, true, true, false),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeVerifyPhoneCode, 6, time.Hour, false, true, true, false),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypePasswordResetCode, 6, time.Hour, false, true, true, false),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypePasswordlessInitCode, 12, time.Hour, true, true, true, false),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeVerifyDomain, 32, 0, true, true, true, false),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeOTPSMS, 8, 5*time.Minute, false, false, true, false),
+		instance.NewSecretGeneratorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecretGeneratorTypeOTPEmail, 8, 5*time.Minute, false, false, true, false),
+	}
+}
+func instanceElementsConfig() *SecretGenerators {
+	return &SecretGenerators{
+		ClientSecret:             &crypto.GeneratorConfig{Length: 64, IncludeLowerLetters: true, IncludeUpperLetters: true, IncludeDigits: true},
+		InitializeUserCode:       &crypto.GeneratorConfig{Length: 6, Expiry: 72 * time.Hour, IncludeUpperLetters: true, IncludeDigits: true},
+		EmailVerificationCode:    &crypto.GeneratorConfig{Length: 6, Expiry: time.Hour, IncludeUpperLetters: true, IncludeDigits: true},
+		PhoneVerificationCode:    &crypto.GeneratorConfig{Length: 6, Expiry: time.Hour, IncludeUpperLetters: true, IncludeDigits: true},
+		PasswordVerificationCode: &crypto.GeneratorConfig{Length: 6, Expiry: time.Hour, IncludeUpperLetters: true, IncludeDigits: true},
+		PasswordlessInitCode:     &crypto.GeneratorConfig{Length: 12, Expiry: time.Hour, IncludeLowerLetters: true, IncludeUpperLetters: true, IncludeDigits: true},
+		DomainVerification:       &crypto.GeneratorConfig{Length: 32, IncludeLowerLetters: true, IncludeUpperLetters: true, IncludeDigits: true},
+		OTPSMS:                   &crypto.GeneratorConfig{Length: 8, Expiry: 5 * time.Minute, IncludeDigits: true},
+		OTPEmail:                 &crypto.GeneratorConfig{Length: 8, Expiry: 5 * time.Minute, IncludeDigits: true},
+	}
+}
+func setupInstanceFilters(instanceID string) []expect {
+	return slices.Concat(
+		instanceElementsFilters(),
+		instancePoliciesFilters(instanceID),
+		[]expect{expectFilter()},
+		orgFilters("ORG", true, true),
+		domainFilters(),
+	)
+}
+
+func setupInstanceEvents(ctx context.Context, instanceID, instanceName string, defaultLanguage language.Tag) []eventstore.Command {
+	instanceAgg := instance.NewAggregate(instanceID)
+	return slices.Concat(
+		instanceElementsEvents(ctx, instanceID, instanceName, defaultLanguage),
+		instancePoliciesEvents(ctx, instanceID),
+		[]eventstore.Command{instance.NewMailTemplateAddedEvent(ctx, &instanceAgg.Aggregate, []byte("something"))},
+		orgEvents(ctx, instanceID, "ORG", "org-name", "PROJECT", "DOMAIN", false, true, true),
+		generatedDomainEvents(ctx, instanceID, "DOMAIN"),
+	)
+}
+
+func setupInstanceConfig() *InstanceSetup {
+	conf := instanceSetupPoliciesConfig()
+	conf.zitadel = instanceSetupZitadelIDs()
+	conf.SecretGenerators = instanceElementsConfig()
+	conf.EmailTemplate = []byte("something")
+	conf.Org = InstanceOrgSetup{
+		Name:    "ZITADEL",
+		Machine: instanceSetupMachineConfig(),
+		Human:   instanceSetupHumanConfig(),
+	}
+	conf.CustomDomain = ""
+	return conf
+}
+
 func generatedDomainEvents(ctx context.Context, instanceID, defaultDomain string) []eventstore.Command {
 	instanceAgg := instance.NewAggregate(instanceID)
 	return []eventstore.Command{
@@ -178,7 +376,45 @@ func generatedDomainEvents(ctx context.Context, instanceID, defaultDomain string
 }
 
 func domainFilters() []expect {
-	return []expect{}
+	id := "console-id"
+	return []expect{
+		expectFilter(),
+		expectFilter(
+			project.NewApplicationAddedEvent(context.Background(),
+				&project.NewAggregate("PROJECT", "ORG").Aggregate,
+				id,
+				"console",
+			),
+			project.NewOIDCConfigAddedEvent(context.Background(),
+				&project.NewAggregate("PROJECT", "ORG").Aggregate,
+				domain.OIDCVersionV1,
+				id,
+				"clientID",
+				"",
+				[]string{},
+				[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				domain.OIDCApplicationTypeUserAgent,
+				domain.OIDCAuthMethodTypeNone,
+				[]string{},
+				true,
+				domain.OIDCTokenTypeBearer,
+				false,
+				false,
+				false,
+				0,
+				nil,
+				false,
+			),
+		),
+		expectFilter(
+			instance.NewDomainAddedEvent(context.Background(),
+				&instance.NewAggregate("INSTANCE").Aggregate,
+				"DOMAIN",
+				true,
+			),
+		),
+	}
 }
 
 func humanFilters() []expect {
@@ -207,6 +443,21 @@ func humanFilters() []expect {
 	}
 }
 
+func instanceSetupHumanConfig() *AddHuman {
+	return &AddHuman{
+		Username:  "zitadel-admin",
+		FirstName: "ZITADEL",
+		LastName:  "Admin",
+		Email: Email{
+			Address:  domain.EmailAddress("admin@zitadel.test"),
+			Verified: true,
+		},
+		PreferredLanguage:      language.English,
+		Password:               "password",
+		PasswordChangeRequired: false,
+	}
+}
+
 func machineFilters(pat bool) []expect {
 	filters := []expect{
 		expectFilter(),
@@ -227,6 +478,27 @@ func machineFilters(pat bool) []expect {
 		)
 	}
 	return filters
+}
+
+func instanceSetupMachineConfig() *AddMachine {
+	return &AddMachine{
+		Machine: &Machine{
+			Username:        "zitadel-admin-machine",
+			Name:            "ZITADEL-machine",
+			Description:     "Admin",
+			AccessTokenType: domain.OIDCTokenTypeBearer,
+		},
+		Pat: &AddPat{
+			ExpirationDate: time.Time{},
+			Scopes:         nil,
+		},
+		/* not predictable with the key value in the events
+		MachineKey: &AddMachineKey{
+			Type:           domain.AuthNKeyTypeJSON,
+			ExpirationDate: time.Time{},
+		},
+		*/
+	}
 }
 
 func projectFilters() []expect {
@@ -376,15 +648,7 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
 				owner:       "owner",
-				ids: ZitadelConfig{
-					instanceID:   "INSTANCE",
-					orgID:        "ORG",
-					projectID:    "PROJECT",
-					consoleAppID: "console-id",
-					authAppID:    "auth-id",
-					mgmtAppID:    "mgmt-id",
-					adminAppID:   "admin-id",
-				},
+				ids:         instanceSetupZitadelIDs(),
 			},
 			res: res{
 				err: nil,
@@ -465,18 +729,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 			args: args{
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
-				human: &AddHuman{
-					Username:  "zitadel-admin",
-					FirstName: "ZITADEL",
-					LastName:  "Admin",
-					Email: Email{
-						Address:  domain.EmailAddress("admin@zitadel.test"),
-						Verified: true,
-					},
-					PreferredLanguage:      language.English,
-					Password:               "password",
-					PasswordChangeRequired: false,
-				},
+				human:       instanceSetupHumanConfig(),
 			},
 			res: res{
 				owner:      "USER",
@@ -514,24 +767,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 			args: args{
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
-				machine: &AddMachine{
-					Machine: &Machine{
-						Username:        "zitadel-admin-machine",
-						Name:            "ZITADEL-machine",
-						Description:     "Admin",
-						AccessTokenType: domain.OIDCTokenTypeBearer,
-					},
-					Pat: &AddPat{
-						ExpirationDate: time.Time{},
-						Scopes:         nil,
-					},
-					/* not predictable with the key value in the events
-					MachineKey: &AddMachineKey{
-						Type:           domain.AuthNKeyTypeJSON,
-						ExpirationDate: time.Time{},
-					},
-					*/
-				},
+				machine:     instanceSetupMachineConfig(),
 			},
 			res: res{
 				owner:      "USER-MACHINE",
@@ -579,36 +815,8 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 			args: args{
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
-				machine: &AddMachine{
-					Machine: &Machine{
-						Username:        "zitadel-admin-machine",
-						Name:            "ZITADEL-machine",
-						Description:     "Admin",
-						AccessTokenType: domain.OIDCTokenTypeBearer,
-					},
-					Pat: &AddPat{
-						ExpirationDate: time.Time{},
-						Scopes:         nil,
-					},
-					/* not predictable with the key value in the events
-					MachineKey: &AddMachineKey{
-						Type:           domain.AuthNKeyTypeJSON,
-						ExpirationDate: time.Time{},
-					},
-					*/
-				},
-				human: &AddHuman{
-					Username:  "zitadel-admin",
-					FirstName: "ZITADEL",
-					LastName:  "Admin",
-					Email: Email{
-						Address:  domain.EmailAddress("admin@zitadel.test"),
-						Verified: true,
-					},
-					PreferredLanguage:      language.English,
-					Password:               "password",
-					PasswordChangeRequired: false,
-				},
+				machine:     instanceSetupMachineConfig(),
+				human:       instanceSetupHumanConfig(),
 			},
 			res: res{
 				owner:      "USER",
@@ -690,7 +898,7 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
-						orgFilters(context.Background(),
+						orgFilters(
 							"ORG",
 							true,
 							true,
@@ -783,6 +991,240 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 			}
 			validations := make([]preparation.Validation, 0)
 			pat, mk, err := setupDefaultOrg(tt.args.ctx, r, &validations, tt.args.instanceAgg, tt.args.orgName, tt.args.machine, tt.args.human, tt.args.ids)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+
+			err = testSetup(context.Background(), r, validations)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+
+			if tt.res.err == nil {
+				if tt.res.pat {
+					assert.NotNil(t, pat)
+				}
+				if tt.res.machineKey {
+					assert.NotNil(t, mk)
+				}
+			}
+		})
+	}
+}
+
+func TestCommandSide_setupInstanceElements(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx              context.Context
+		instanceAgg      *instance.Aggregate
+		instanceName     string
+		defaultLanguage  language.Tag
+		secretGenerators *SecretGenerators
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					slices.Concat(
+						instanceElementsFilters(),
+						[]expect{
+							expectPush(
+								instanceElementsEvents(context.Background(),
+									"INSTANCE",
+									"ZITADEL",
+									language.English,
+								)...,
+							),
+						},
+					)...,
+				),
+			},
+			args: args{
+				ctx:              authz.WithRequestedDomain(context.Background(), "DOMAIN"),
+				instanceAgg:      instance.NewAggregate("INSTANCE"),
+				instanceName:     "ZITADEL",
+				defaultLanguage:  language.English,
+				secretGenerators: instanceElementsConfig(),
+			},
+			res: res{
+				err: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			validations := make([]preparation.Validation, 0)
+			setupInstanceElements(&validations, tt.args.instanceAgg, tt.args.instanceName, tt.args.defaultLanguage, tt.args.secretGenerators)
+
+			err := testSetup(context.Background(), r, validations)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestCommandSide_setupInstancePolicies(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx         context.Context
+		instanceAgg *instance.Aggregate
+		setup       *InstanceSetup
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					slices.Concat(
+						instancePoliciesFilters("INSTANCE"),
+						[]expect{
+							expectPush(
+								instancePoliciesEvents(context.Background(),
+									"INSTANCE",
+								)...,
+							),
+						},
+					)...,
+				),
+			},
+			args: args{
+				ctx:         authz.WithRequestedDomain(context.Background(), "DOMAIN"),
+				instanceAgg: instance.NewAggregate("INSTANCE"),
+				setup:       instanceSetupPoliciesConfig(),
+			},
+			res: res{
+				err: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+
+			validations := make([]preparation.Validation, 0)
+			setupInstancePolicies(&validations, tt.args.instanceAgg, tt.args.setup)
+			err := testSetup(context.Background(), r, validations)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestCommandSide_setUpInstance(t *testing.T) {
+	type fields struct {
+		eventstore         func(t *testing.T) *eventstore.Eventstore
+		idGenerator        id.Generator
+		userPasswordHasher *crypto.Hasher
+		roles              []authz.RoleMapping
+		keyAlgorithm       crypto.EncryptionAlgorithm
+		generateDomain     func(string, string) (string, error)
+	}
+	type args struct {
+		ctx            context.Context
+		setup          *InstanceSetup
+		externalDomain string
+	}
+	type res struct {
+		pat        bool
+		machineKey bool
+		err        func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					slices.Concat(
+						setupInstanceFilters("INSTANCE"),
+						[]expect{
+							expectPush(
+								setupInstanceEvents(context.Background(),
+									"INSTANCE",
+									"ZITADEL",
+									language.English,
+								)...,
+							),
+						},
+					)...,
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, orgIDs()...),
+				roles: []authz.RoleMapping{
+					{Role: domain.RoleOrgOwner, Permissions: []string{""}},
+					{Role: domain.RoleIAMOwner, Permissions: []string{""}},
+				},
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+				generateDomain: func(string, string) (string, error) {
+					return "DOMAIN", nil
+				},
+			},
+			args: args{
+				ctx:   authz.WithRequestedDomain(context.Background(), "DOMAIN"),
+				setup: setupInstanceConfig(),
+			},
+			res: res{
+				err: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:         tt.fields.eventstore(t),
+				idGenerator:        tt.fields.idGenerator,
+				zitadelRoles:       tt.fields.roles,
+				userPasswordHasher: tt.fields.userPasswordHasher,
+				keyAlgorithm:       tt.fields.keyAlgorithm,
+				GenerateDomain:     tt.fields.generateDomain,
+			}
+
+			validations := make([]preparation.Validation, 0)
+			pat, mk, err := setUpInstance(tt.args.ctx, r, &validations, tt.args.setup, tt.args.externalDomain)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
