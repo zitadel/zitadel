@@ -34,7 +34,7 @@ func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequ
 	session, err := s.command.CreateOIDCSession(ctx,
 		client.user.ID,
 		client.user.ResourceOwner,
-		r.Data.ClientID,
+		"",
 		scope,
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},

@@ -42,7 +42,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 	session, err := s.command.CreateOIDCSession(ctx,
 		user.ID,
 		user.ResourceOwner,
-		jwtReq.Subject,
+		"",
 		scope,
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
 		nil,
