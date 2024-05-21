@@ -296,7 +296,7 @@ message CreateSessionResponse{
   ];
   string session_token = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"The current token of the session, which is required for further updates of the session or the request other resources.\"";
+      description: "\"The current token of the session, which is required for delete session, get session or the request of other resources.\"";
     }
   ];
   Challenges challenges = 4;
@@ -344,7 +344,7 @@ message SetSessionResponse{
   zitadel.object.v2beta.Details details = 1;
   string session_token = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"The current token of the session, which is required for further updates of the session or to request other resources.\"";
+      description: "\"The current token of the session, which is required for delete session, get session or the request of other resources.\"";
     }
   ];
   Challenges challenges = 3;
