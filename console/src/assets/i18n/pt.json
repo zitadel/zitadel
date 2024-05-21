@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Links Externos",
-        "DESCRIPTION": "Guie seus usuários para recursos externos personalizados mostrados na página de login. Os usuários precisam aceitar os Termos de Serviço e a Política de Privacidade antes de poderem se inscrever."
+        "DESCRIPTION": "Oriente seus usuários sobre recursos externos personalizados mostrados na página de login. Os usuários precisam aceitar os Termos de Serviço e a Política de Privacidade antes de se inscreverem. Altere o link para sua documentação ou defina uma string vazia para ocultar o botão de documentação do console. Adicione um link externo personalizado e um texto personalizado para esse link no console ou deixe-os vazios para ocultar esse botão."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Configurações de SMTP",
@@ -269,9 +269,9 @@
             "TITLE": "Login Externo permitido",
             "DESCRIPTION": "Permite que seus usuários façam login com um provedor de identidade externo em vez de usar o usuário ZITADEL para fazer login."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Redefinição de Senha permitida",
-            "DESCRIPTION": "Permite que seus usuários redefinam sua senha."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Redefinição de senha oculta",
+            "DESCRIPTION": "Não permita que seus usuários redefinam a senha."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Descoberta de Domínio permitida",
@@ -1572,6 +1572,9 @@
       "POLICYLINK": "Link para a Política de Privacidade",
       "HELPLINK": "Link para Ajuda",
       "SUPPORTEMAIL": "E-mail de suporte",
+      "DOCSLINK": "Link do Documentos (Console)",
+      "CUSTOMLINK": "Link personalizado (Console)",
+      "CUSTOMLINKTEXT": "Texto do link personalizado (Console)",
       "SAVED": "Salvo com sucesso!",
       "RESET_TITLE": "Restaurar valores padrão",
       "RESET_DESCRIPTION": "Você está prestes a restaurar os Links padrão para TOS e Política de Privacidade. Deseja realmente continuar?"

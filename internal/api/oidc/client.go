@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -69,7 +70,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 		err = oidcError(err)
 		span.EndWithError(err)
 	}()
-	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer, false)
+	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer)
 	if err != nil {
 		return nil, err
 	}
@@ -1039,4 +1040,27 @@ func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClien
 	}
 	s.command.OIDCSecretCheckSucceeded(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner, updated)
 	return nil
+}
+
+func (s *Server) checkOrgScopes(ctx context.Context, user *query.User, scopes []string) ([]string, error) {
+	if slices.ContainsFunc(scopes, func(scope string) bool {
+		return strings.HasPrefix(scope, domain.OrgDomainPrimaryScope)
+	}) {
+		org, err := s.query.OrgByID(ctx, false, user.ResourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		scopes = slices.DeleteFunc(scopes, func(scope string) bool {
+			if domain, ok := strings.CutPrefix(scope, domain.OrgDomainPrimaryScope); ok {
+				return domain != org.Domain
+			}
+			return false
+		})
+	}
+	return slices.DeleteFunc(scopes, func(scope string) bool {
+		if orgID, ok := strings.CutPrefix(scope, domain.OrgIDScope); ok {
+			return orgID != user.ResourceOwner
+		}
+		return false
+	}), nil
 }

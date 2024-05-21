@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externe Links",
-        "DESCRIPTION": "Leite deine Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Allgemeinen Geschäftsbedingungen und die Datenschutzrichtlinie akzeptieren, bevor sie sich anmelden können."
+        "DESCRIPTION": "Leiten Sie Ihre Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Nutzungsbedingungen und Datenschutzrichtlinien akzeptieren, bevor sie sich anmelden können. Ändern Sie den Link zu Ihrer Dokumentation oder legen Sie eine leere Zeichenfolge fest, um die Dokumentationsschaltfläche in der Konsole auszublenden. Fügen Sie in der Konsole einen benutzerdefinierten externen Link und einen benutzerdefinierten Text für diesen Link hinzu oder setzen Sie sie leer, um diese Schaltfläche auszublenden."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP-Einstellungen",
@@ -269,9 +269,9 @@
             "TITLE": "Externer Login erlaubt",
             "DESCRIPTION": "Erlaube deinen Benutzern, sich mit einem externen Identitätsanbieter einzuloggen, anstatt den ZITADEL-Benutzer zum Einloggen zu verwenden."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Passwort-Reset erlaubt",
-            "DESCRIPTION": "Erlaube deinen Benutzern, ihr Passwort zurückzusetzen."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Passwort-Reset ausgeblendet",
+            "DESCRIPTION": "Erlauben Sie Ihren Benutzern nicht, ihr Passwort zurückzusetzen."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Domänenentdeckung erlaubt",
@@ -1570,6 +1570,9 @@
       "POLICYLINK": "Link zur den Datenschutzrichtlinien",
       "HELPLINK": "Link zur Hilfestellung",
       "SUPPORTEMAIL": "Support E-Mail",
+      "DOCSLINK": "Link zu Dokumenten (Console)",
+      "CUSTOMLINK": "Benutzerdefinierter Link (Console)",
+      "CUSTOMLINKTEXT": "Benutzerdefinierter Linktext (Console)",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Standardwerte wiederherstellen",
       "RESET_DESCRIPTION": "Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"

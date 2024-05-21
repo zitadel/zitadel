@@ -27,9 +27,10 @@ func (p *Permissions) appendPermission(ctxID, permission string) {
 type PermissionCheck func(ctx context.Context, permission, orgID, resourceID string) (err error)
 
 const (
-	PermissionUserWrite     = "user.write"
-	PermissionUserRead      = "user.read"
-	PermissionUserDelete    = "user.delete"
-	PermissionSessionWrite  = "session.write"
-	PermissionSessionDelete = "session.delete"
+	PermissionUserWrite           = "user.write"
+	PermissionUserRead            = "user.read"
+	PermissionUserDelete          = "user.delete"
+	PermissionUserCredentialWrite = "user.credential.write"
+	PermissionSessionWrite        = "session.write"
+	PermissionSessionDelete       = "session.delete"
 )
