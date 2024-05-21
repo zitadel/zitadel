@@ -266,9 +266,10 @@ func ListMyProjectOrgsRequestToQuery(req *auth_pb.ListMyProjectOrgsRequest) (*qu
 	}
 	return &query.OrgSearchQueries{
 		SearchRequest: query.SearchRequest{
-			Offset: offset,
-			Limit:  limit,
-			Asc:    asc,
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: org.FieldNameToOrgColumn(req.SortingColumn),
 		},
 		Queries: queries,
 	}, nil
