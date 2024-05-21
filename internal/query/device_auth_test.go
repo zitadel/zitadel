@@ -6,166 +6,17 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"io"
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/deviceauth"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
-
-func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1")
-	timestamp := time.Date(2015, 12, 15, 22, 13, 45, 0, time.UTC)
-	tests := []struct {
-		name       string
-		eventstore func(t *testing.T) *eventstore.Eventstore
-		want       *DeviceAuth
-		wantErr    error
-	}{
-		{
-			name: "filter error",
-			eventstore: expectEventstore(
-				expectFilterError(io.ErrClosedPipe),
-			),
-			wantErr: io.ErrClosedPipe,
-		},
-		{
-			name: "not found",
-			eventstore: expectEventstore(
-				expectFilter(),
-			),
-			wantErr: zerrors.ThrowNotFound(nil, "QUERY-eeR0e", "Errors.DeviceAuth.NotExisting"),
-		},
-		{
-			name: "ok, initiated",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(deviceauth.NewAddedEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
-						[]string{"projectID", "clientID"},
-					)),
-				),
-			),
-			want: &DeviceAuth{
-				ClientID:   "client1",
-				DeviceCode: "device1",
-				UserCode:   "user-code",
-				Expires:    timestamp,
-				Scopes:     []string{"foo", "bar"},
-				Audience:   []string{"projectID", "clientID"},
-				State:      domain.DeviceAuthStateInitiated,
-			},
-		},
-		{
-			name: "ok, approved",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(deviceauth.NewAddedEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
-						[]string{"projectID", "clientID"},
-					)),
-					eventFromEventPusher(deviceauth.NewApprovedEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						"user1", []domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
-						timestamp,
-					)),
-				),
-			),
-			want: &DeviceAuth{
-				ClientID:        "client1",
-				DeviceCode:      "device1",
-				UserCode:        "user-code",
-				Expires:         timestamp,
-				Scopes:          []string{"foo", "bar"},
-				Audience:        []string{"projectID", "clientID"},
-				State:           domain.DeviceAuthStateApproved,
-				Subject:         "user1",
-				UserAuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
-				AuthTime:        timestamp,
-			},
-		},
-		{
-			name: "ok, denied",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(deviceauth.NewAddedEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
-						[]string{"projectID", "clientID"},
-					)),
-					eventFromEventPusher(deviceauth.NewCanceledEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						domain.DeviceAuthCanceledDenied,
-					)),
-				),
-			),
-			want: &DeviceAuth{
-				ClientID:   "client1",
-				DeviceCode: "device1",
-				UserCode:   "user-code",
-				Expires:    timestamp,
-				Scopes:     []string{"foo", "bar"},
-				Audience:   []string{"projectID", "clientID"},
-				State:      domain.DeviceAuthStateDenied,
-			},
-		},
-		{
-			name: "ok, expired",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(deviceauth.NewAddedEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
-						[]string{"projectID", "clientID"},
-					)),
-					eventFromEventPusher(deviceauth.NewCanceledEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						domain.DeviceAuthCanceledExpired,
-					)),
-				),
-			),
-			want: &DeviceAuth{
-				ClientID:   "client1",
-				DeviceCode: "device1",
-				UserCode:   "user-code",
-				Expires:    timestamp,
-				Scopes:     []string{"foo", "bar"},
-				Audience:   []string{"projectID", "clientID"},
-				State:      domain.DeviceAuthStateExpired,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			q := &Queries{
-				eventstore: tt.eventstore(t),
-			}
-			got, err := q.DeviceAuthByDeviceCode(ctx, "device1")
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
 
 const (
 	expectedDeviceAuthQueryC = `SELECT` +

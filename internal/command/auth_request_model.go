@@ -34,6 +34,7 @@ type AuthRequestWriteModel struct {
 	AuthTime         time.Time
 	AuthMethods      []domain.UserAuthMethodType
 	AuthRequestState domain.AuthRequestState
+	NeedRefreshToken bool
 }
 
 func NewAuthRequestWriteModel(ctx context.Context, id string) *AuthRequestWriteModel {
@@ -64,6 +65,7 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.LoginHint = e.LoginHint
 			m.HintUserID = e.HintUserID
 			m.AuthRequestState = domain.AuthRequestStateAdded
+			m.NeedRefreshToken = e.NeedRefreshToken
 		case *authrequest.SessionLinkedEvent:
 			m.SessionID = e.SessionID
 			m.UserID = e.UserID

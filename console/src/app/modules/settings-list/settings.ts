@@ -187,7 +187,7 @@ export const LOGINTEXTS: SidenavSetting = {
 
 export const PRIVACYPOLICY: SidenavSetting = {
   id: 'privacypolicy',
-  i18nKey: 'SETTINGS.LIST.PRIVACYPOLICY',
+  i18nKey: 'DESCRIPTIONS.SETTINGS.PRIVACY_POLICY.TITLE',
   groupI18nKey: 'SETTINGS.GROUPS.OTHER',
   requiredRoles: {
     [PolicyComponentServiceType.MGMT]: ['policy.read'],

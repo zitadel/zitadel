@@ -68,6 +68,9 @@ type AddHuman struct {
 	// Links are optional
 	Links []*AddLink
 
+	// TOTPSecret is optional
+	TOTPSecret string
+
 	// Details are set after a successful execution of the command
 	Details *domain.ObjectDetails
 
