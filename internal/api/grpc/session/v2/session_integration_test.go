@@ -834,6 +834,23 @@ func TestServer_SetSession_expired(t *testing.T) {
 	require.Error(t, err)
 }
 
+func TestServer_DeleteSession_token(t *testing.T) {
+	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
+	require.NoError(t, err)
+
+	_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: gu.Ptr("invalid"),
+	})
+	require.Error(t, err)
+
+	_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
+		SessionId:    createResp.GetSessionId(),
+		SessionToken: gu.Ptr(createResp.GetSessionToken()),
+	})
+	require.NoError(t, err)
+}
+
 func TestServer_DeleteSession_own_session(t *testing.T) {
 	// create two users for the test and a session each to get tokens for authorization
 	user1 := Tester.CreateHumanUser(CTX)
@@ -930,7 +947,8 @@ func Test_ZITADEL_API_session_not_found(t *testing.T) {
 
 	//terminate the session and test it does not work anymore
 	_, err = Tester.Client.SessionV2.DeleteSession(CTX, &session.DeleteSessionRequest{
-		SessionId: id,
+		SessionId:    id,
+		SessionToken: gu.Ptr(token),
 	})
 	require.NoError(t, err)
 	ctx = Tester.WithAuthorizationToken(context.Background(), token)

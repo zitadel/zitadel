@@ -362,7 +362,7 @@ message DeleteSessionRequest{
   ];
   optional string session_token = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "\"DEPRECATED: this field is ignored.\"";
+      description: "\"The current token of the session, previously returned on the create / update request. The token is required unless the authenticated user terminates the own session or is granted the `session.delete` permission.\"";
     }
   ];
 }

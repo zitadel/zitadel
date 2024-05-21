@@ -101,7 +101,7 @@ func (s *Server) SetSession(ctx context.Context, req *session.SetSessionRequest)
 }
 
 func (s *Server) DeleteSession(ctx context.Context, req *session.DeleteSessionRequest) (*session.DeleteSessionResponse, error) {
-	details, err := s.command.TerminateSession(ctx, req.GetSessionId())
+	details, err := s.command.TerminateSession(ctx, req.GetSessionId(), req.GetSessionToken())
 	if err != nil {
 		return nil, err
 	}

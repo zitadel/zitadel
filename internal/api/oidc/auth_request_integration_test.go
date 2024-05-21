@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
@@ -486,7 +487,8 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 
 	// simulate termination by login UI
 	_, err = Tester.Client.SessionV2.DeleteSession(CTXLOGIN, &session.DeleteSessionRequest{
-		SessionId: sessionID,
+		SessionId:    sessionID,
+		SessionToken: gu.Ptr(sessionToken),
 	})
 	require.NoError(t, err)
 
