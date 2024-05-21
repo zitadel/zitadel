@@ -516,6 +516,7 @@ Errors:
     IDPMissing: Brak identyfikatora IDP w żądaniu
     IDPInvalid: IDP nieprawidłowe dla żądania
     ResponseInvalid: Odpowiedź IDP jest nieprawidłowa
+    MissingSingleMappingAttribute: Nie zawiera atrybutu mapowania lub ma więcej niż jedną wartość
     SuccessURLMissing: Brak adresu URL powodzenia w żądaniu
     FailureURLMissing: Brak adresu URL niepowodzenia w żądaniu
     StateMissing: Brak parametru stanu w żądaniu

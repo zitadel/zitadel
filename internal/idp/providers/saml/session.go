@@ -74,6 +74,13 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 	userMapper := NewUser()
 	// use the nameID as default mapping id
 	userMapper.SetID(nameID.Value)
+	if nameID.Format == string(saml.TransientNameIDFormat) {
+		mappingID, err := s.transientMappingID()
+		if err != nil {
+			return nil, err
+		}
+		userMapper.SetID(mappingID)
+	}
 	for _, statement := range s.Assertion.AttributeStatements {
 		for _, attribute := range statement.Attributes {
 			values := make([]string, len(attribute.Values))
@@ -81,26 +88,25 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 				values[i] = attribute.Values[i].Value
 			}
 			userMapper.Attributes[attribute.Name] = values
-			// in case the nameID returned is in transient-format, check if the attribute is used as mapping id
-			if nameID.Format == string(saml.TransientNameIDFormat) && attribute.Name == s.TransientMappingAttributeName {
-				userMapper.SetID(attribute.Values[0].Value)
-			}
 		}
 	}
 	return userMapper, nil
 }
 
-//
-//func (s *Session) mappingID() *saml.NameID {
-//	for _, statement := range s.Assertion.AttributeStatements {
-//		for _, attribute := range statement.Attributes {
-//			if attribute.Name == "XY" {
-//				return attribute.Values[0].NameID
-//			}
-//		}
-//	}
-//	return s.Assertion.Subject.NameID.Value
-//}
+func (s *Session) transientMappingID() (string, error) {
+	for _, statement := range s.Assertion.AttributeStatements {
+		for _, attribute := range statement.Attributes {
+			if attribute.Name != s.TransientMappingAttributeName {
+				continue
+			}
+			if len(attribute.Values) != 1 {
+				return "", zerrors.ThrowInvalidArgument(nil, "SAML-Soij4", "Errors.Intent.MissingSingleMappingAttribute")
+			}
+			return attribute.Values[0].Value, nil
+		}
+	}
+	return "", zerrors.ThrowInvalidArgument(nil, "SAML-swwg2", "Errors.Intent.MissingSingleMappingAttribute")
+}
 
 type TempResponseWriter struct {
 	header  http.Header
