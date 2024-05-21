@@ -2,9 +2,12 @@ package command
 
 import (
 	"context"
+	"slices"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -58,6 +61,10 @@ func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string
 	return events
 }
 
+func projectClientIDs() []string {
+	return []string{"clientID", "clientID", "clientID", "clientID"}
+}
+
 func apiAppEvents(ctx context.Context, orgID, projectID, id, name string) []eventstore.Command {
 	return []eventstore.Command{
 		project.NewApplicationAddedEvent(
@@ -108,7 +115,30 @@ func oidcAppEvents(ctx context.Context, orgID, projectID, id, name, clientID str
 	}
 }
 
-func orgEvents(ctx context.Context, instanceID, orgID, name, projectID, defaultDomain string, externalSecure bool) []eventstore.Command {
+func orgFilters(ctx context.Context, orgID string, machine, human bool) []expect {
+	orgAgg := org.NewAggregate(orgID)
+
+	filters := []expect{
+		expectFilter(),
+		expectFilter(
+			org.NewOrgAddedEvent(ctx, &orgAgg.Aggregate, ""),
+		),
+	}
+	if machine {
+		filters = append(filters, machineFilters(true)...)
+		filters = append(filters, adminMemberFilters(orgID, "USER")...)
+	}
+	if human {
+		filters = append(filters, humanFilters()...)
+		filters = append(filters, adminMemberFilters(orgID, "USER")...)
+	}
+
+	return append(filters,
+		projectFilters()...,
+	)
+}
+
+func orgEvents(ctx context.Context, instanceID, orgID, name, projectID, defaultDomain string, externalSecure bool, machine, human bool) []eventstore.Command {
 	instanceAgg := instance.NewAggregate(instanceID)
 	orgAgg := org.NewAggregate(orgID)
 	events := []eventstore.Command{
@@ -118,9 +148,107 @@ func orgEvents(ctx context.Context, instanceID, orgID, name, projectID, defaultD
 		org.NewDomainPrimarySetEvent(ctx, &orgAgg.Aggregate, defaultDomain),
 		instance.NewDefaultOrgSetEventEvent(ctx, &instanceAgg.Aggregate, orgID),
 	}
+
 	owner := ""
+	if machine {
+		machineID := "USER-MACHINE"
+		events = append(events, machineEvents(ctx, instanceID, orgID, machineID, "PAT")...)
+		owner = machineID
+	}
+	if human {
+		userID := "USER"
+		events = append(events, humanEvents(ctx, instanceID, orgID, userID)...)
+		owner = userID
+	}
+
 	events = append(events, projectAddedEvents(ctx, instanceID, orgID, projectID, owner, externalSecure)...)
 	return events
+}
+
+func orgIDs() []string {
+	return slices.Concat([]string{"USER-MACHINE", "PAT", "USER"}, projectClientIDs())
+}
+
+func generatedDomainEvents(ctx context.Context, instanceID, defaultDomain string) []eventstore.Command {
+	instanceAgg := instance.NewAggregate(instanceID)
+	return []eventstore.Command{
+		instance.NewDomainAddedEvent(ctx, &instanceAgg.Aggregate, defaultDomain, true),
+		instance.NewDomainPrimarySetEvent(ctx, &instanceAgg.Aggregate, defaultDomain),
+	}
+}
+
+func domainFilters() []expect {
+	return []expect{}
+}
+
+func humanFilters() []expect {
+	return []expect{
+		expectFilter(),
+		expectFilter(
+			org.NewDomainPolicyAddedEvent(
+				context.Background(),
+				&org.NewAggregate("id").Aggregate,
+				true,
+				true,
+				true,
+			),
+		),
+		expectFilter(
+			org.NewPasswordComplexityPolicyAddedEvent(
+				context.Background(),
+				&org.NewAggregate("id").Aggregate,
+				2,
+				false,
+				false,
+				false,
+				false,
+			),
+		),
+	}
+}
+
+func machineFilters(pat bool) []expect {
+	filters := []expect{
+		expectFilter(),
+		expectFilter(
+			org.NewDomainPolicyAddedEvent(
+				context.Background(),
+				&org.NewAggregate("id").Aggregate,
+				true,
+				true,
+				true,
+			),
+		),
+	}
+	if pat {
+		filters = append(filters,
+			expectFilter(),
+			expectFilter(),
+		)
+	}
+	return filters
+}
+
+func projectFilters() []expect {
+	return []expect{
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+		expectFilter(),
+	}
+}
+
+func adminMemberFilters(orgID, userID string) []expect {
+	return []expect{
+		expectFilter(
+			addHumanEvent(context.Background(), orgID, userID),
+		),
+		expectFilter(),
+		expectFilter(
+			addHumanEvent(context.Background(), orgID, userID),
+		),
+		expectFilter(),
+	}
 }
 
 func humanEvents(ctx context.Context, instanceID, orgID, userID string) []eventstore.Command {
@@ -128,27 +256,67 @@ func humanEvents(ctx context.Context, instanceID, orgID, userID string) []events
 	instanceAgg := instance.NewAggregate(instanceID)
 	orgAgg := org.NewAggregate(orgID)
 	return []eventstore.Command{
-		func() *user.HumanAddedEvent {
-			event := user.NewHumanAddedEvent(
-				ctx,
-				&agg.Aggregate,
-				"zitadel-admin",
-				"ZITADEL",
-				"Admin",
-				"",
-				"ZITADEL Admin",
-				language.English,
-				0,
-				"admin@zitadel.test",
-				false,
-			)
-			event.AddPasswordData("$plain$x$password", false)
-			return event
-		}(),
+		addHumanEvent(ctx, orgID, userID),
 		user.NewHumanEmailVerifiedEvent(ctx, &agg.Aggregate),
 		org.NewMemberAddedEvent(ctx, &orgAgg.Aggregate, userID, domain.RoleOrgOwner),
 		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMOwner),
 	}
+}
+
+func addHumanEvent(ctx context.Context, orgID, userID string) *user.HumanAddedEvent {
+	agg := user.NewAggregate(userID, orgID)
+	return func() *user.HumanAddedEvent {
+		event := user.NewHumanAddedEvent(
+			ctx,
+			&agg.Aggregate,
+			"zitadel-admin",
+			"ZITADEL",
+			"Admin",
+			"",
+			"ZITADEL Admin",
+			language.English,
+			0,
+			"admin@zitadel.test",
+			false,
+		)
+		event.AddPasswordData("$plain$x$password", false)
+		return event
+	}()
+}
+
+// machineEvents all events from setup to create the machine user, machinekey can't be tested here, as the public key is not provided and as such the value in the event can't be expected
+func machineEvents(ctx context.Context, instanceID, orgID, userID, patID string) []eventstore.Command {
+	agg := user.NewAggregate(userID, orgID)
+	instanceAgg := instance.NewAggregate(instanceID)
+	orgAgg := org.NewAggregate(orgID)
+	events := []eventstore.Command{addMachineEvent(ctx, orgID, userID)}
+	if patID != "" {
+		events = append(events,
+			user.NewPersonalAccessTokenAddedEvent(
+				ctx,
+				&agg.Aggregate,
+				patID,
+				time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC),
+				nil,
+			),
+		)
+	}
+	return append(events,
+		org.NewMemberAddedEvent(ctx, &orgAgg.Aggregate, userID, domain.RoleOrgOwner),
+		instance.NewMemberAddedEvent(ctx, &instanceAgg.Aggregate, userID, domain.RoleIAMOwner),
+	)
+}
+
+func addMachineEvent(ctx context.Context, orgID, userID string) *user.MachineAddedEvent {
+	agg := user.NewAggregate(userID, orgID)
+	return user.NewMachineAddedEvent(ctx,
+		&agg.Aggregate,
+		"zitadel-admin-machine",
+		"ZITADEL-machine",
+		"Admin",
+		false,
+		domain.OIDCTokenTypeBearer,
+	)
 }
 
 func testSetup(ctx context.Context, c *Commands, validations []preparation.Validation) error {
@@ -164,7 +332,7 @@ func testSetup(ctx context.Context, c *Commands, validations []preparation.Valid
 
 func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
@@ -186,23 +354,22 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 		{
 			name: "create, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-					expectFilter(),
-					expectFilter(),
-					expectFilter(),
-					expectPush(
-						projectAddedEvents(context.Background(),
-							"INSTANCE",
-							"ORG",
-							"PROJECT",
-							"owner",
-							false,
-						)...,
-					),
+				eventstore: expectEventstore(
+					slices.Concat(
+						projectFilters(),
+						[]expect{expectPush(
+							projectAddedEvents(context.Background(),
+								"INSTANCE",
+								"ORG",
+								"PROJECT",
+								"owner",
+								false,
+							)...,
+						),
+						},
+					)...,
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "clientID", "clientID", "clientID", "clientID"),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, projectClientIDs()...),
 			},
 			args: args{
 				ctx:         authz.WithInstanceID(context.Background(), "INSTANCE"),
@@ -227,7 +394,7 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
+				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
 			validations := make([]preparation.Validation, 0)
@@ -250,6 +417,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 		idGenerator        id.Generator
 		userPasswordHasher *crypto.Hasher
 		roles              []authz.RoleMapping
+		keyAlgorithm       crypto.EncryptionAlgorithm
 	}
 	type args struct {
 		instanceAgg *instance.Aggregate
@@ -258,6 +426,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 		human       *AddHuman
 	}
 	type res struct {
+		owner      string
 		pat        bool
 		machineKey bool
 		err        func(error) bool
@@ -272,66 +441,19 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 			name: "human, ok",
 			fields: fields{
 				eventstore: expectEventstore(
-					expectFilter(),
-					expectFilter(
-						org.NewDomainPolicyAddedEvent(
-							context.Background(),
-							&org.NewAggregate("id").Aggregate,
-							true,
-							true,
-							true,
-						),
-					),
-					expectFilter(
-						org.NewPasswordComplexityPolicyAddedEvent(
-							context.Background(),
-							&org.NewAggregate("id").Aggregate,
-							2,
-							false,
-							false,
-							false,
-							false,
-						),
-					),
-					expectFilter(
-						user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("USER", "ORG").Aggregate,
-							"zitadel-admin",
-							"ZITADEL",
-							"Admin",
-							"",
-							"ZITADEL Admin",
-							language.English,
-							0,
-							"admin@zitadel.test",
-							false,
-						),
-					),
-					expectFilter(),
-					expectFilter(
-						user.NewHumanAddedEvent(
-							context.Background(),
-							&user.NewAggregate("USER", "ORG").Aggregate,
-							"zitadel-admin",
-							"ZITADEL",
-							"Admin",
-							"",
-							"ZITADEL Admin",
-							language.English,
-							0,
-							"admin@zitadel.test",
-							false,
-						),
-					),
-					expectFilter(),
-					expectPush(
-						humanEvents(context.Background(),
-							"INSTANCE",
-							"ORG",
-							"USER",
-						)...,
-					),
+					slices.Concat(
+						humanFilters(),
+						adminMemberFilters("ORG", "USER"),
+						[]expect{
+							expectPush(
+								humanEvents(context.Background(),
+									"INSTANCE",
+									"ORG",
+									"USER",
+								)...,
+							),
+						},
+					)...,
 				),
 				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "USER"),
 				userPasswordHasher: mockPasswordHasher("x"),
@@ -357,7 +479,142 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				},
 			},
 			res: res{
-				err: nil,
+				owner:      "USER",
+				pat:        false,
+				machineKey: false,
+				err:        nil,
+			},
+		},
+		{
+			name: "machine, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					slices.Concat(
+						machineFilters(true),
+						adminMemberFilters("ORG", "USER-MACHINE"),
+						[]expect{
+							expectPush(
+								machineEvents(context.Background(),
+									"INSTANCE",
+									"ORG",
+									"USER-MACHINE",
+									"PAT",
+								)...,
+							),
+						},
+					)...,
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "USER-MACHINE", "PAT"),
+				roles: []authz.RoleMapping{
+					{Role: domain.RoleOrgOwner, Permissions: []string{""}},
+					{Role: domain.RoleIAMOwner, Permissions: []string{""}},
+				},
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				instanceAgg: instance.NewAggregate("INSTANCE"),
+				orgAgg:      org.NewAggregate("ORG"),
+				machine: &AddMachine{
+					Machine: &Machine{
+						Username:        "zitadel-admin-machine",
+						Name:            "ZITADEL-machine",
+						Description:     "Admin",
+						AccessTokenType: domain.OIDCTokenTypeBearer,
+					},
+					Pat: &AddPat{
+						ExpirationDate: time.Time{},
+						Scopes:         nil,
+					},
+					/* not predictable with the key value in the events
+					MachineKey: &AddMachineKey{
+						Type:           domain.AuthNKeyTypeJSON,
+						ExpirationDate: time.Time{},
+					},
+					*/
+				},
+			},
+			res: res{
+				owner:      "USER-MACHINE",
+				pat:        true,
+				machineKey: false,
+				err:        nil,
+			},
+		},
+		{
+			name: "human and machine, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					slices.Concat(
+						machineFilters(true),
+						adminMemberFilters("ORG", "USER-MACHINE"),
+						humanFilters(),
+						adminMemberFilters("ORG", "USER"),
+						[]expect{
+							expectPush(
+								slices.Concat(
+									machineEvents(context.Background(),
+										"INSTANCE",
+										"ORG",
+										"USER-MACHINE",
+										"PAT",
+									),
+									humanEvents(context.Background(),
+										"INSTANCE",
+										"ORG",
+										"USER",
+									),
+								)...,
+							),
+						},
+					)...,
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "USER-MACHINE", "PAT", "USER"),
+				roles: []authz.RoleMapping{
+					{Role: domain.RoleOrgOwner, Permissions: []string{""}},
+					{Role: domain.RoleIAMOwner, Permissions: []string{""}},
+				},
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				instanceAgg: instance.NewAggregate("INSTANCE"),
+				orgAgg:      org.NewAggregate("ORG"),
+				machine: &AddMachine{
+					Machine: &Machine{
+						Username:        "zitadel-admin-machine",
+						Name:            "ZITADEL-machine",
+						Description:     "Admin",
+						AccessTokenType: domain.OIDCTokenTypeBearer,
+					},
+					Pat: &AddPat{
+						ExpirationDate: time.Time{},
+						Scopes:         nil,
+					},
+					/* not predictable with the key value in the events
+					MachineKey: &AddMachineKey{
+						Type:           domain.AuthNKeyTypeJSON,
+						ExpirationDate: time.Time{},
+					},
+					*/
+				},
+				human: &AddHuman{
+					Username:  "zitadel-admin",
+					FirstName: "ZITADEL",
+					LastName:  "Admin",
+					Email: Email{
+						Address:  domain.EmailAddress("admin@zitadel.test"),
+						Verified: true,
+					},
+					PreferredLanguage:      language.English,
+					Password:               "password",
+					PasswordChangeRequired: false,
+				},
+			},
+			res: res{
+				owner:      "USER",
+				pat:        true,
+				machineKey: false,
+				err:        nil,
 			},
 		},
 	}
@@ -368,6 +625,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				idGenerator:        tt.fields.idGenerator,
 				zitadelRoles:       tt.fields.roles,
 				userPasswordHasher: tt.fields.userPasswordHasher,
+				keyAlgorithm:       tt.fields.keyAlgorithm,
 			}
 			validations := make([]preparation.Validation, 0)
 			owner, pat, mk, err := setupAdmins(r, &validations, tt.args.instanceAgg, tt.args.orgAgg, tt.args.machine, tt.args.human)
@@ -387,7 +645,160 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 			}
 
 			if tt.res.err == nil {
-				assert.NotEmpty(t, owner)
+				assert.Equal(t, owner, tt.res.owner)
+				if tt.res.pat {
+					assert.NotNil(t, pat)
+				}
+				if tt.res.machineKey {
+					assert.NotNil(t, mk)
+				}
+			}
+		})
+	}
+}
+
+func TestCommandSide_setupDefaultOrg(t *testing.T) {
+	type fields struct {
+		eventstore         func(t *testing.T) *eventstore.Eventstore
+		idGenerator        id.Generator
+		userPasswordHasher *crypto.Hasher
+		roles              []authz.RoleMapping
+		keyAlgorithm       crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx          context.Context
+		instanceAgg  *instance.Aggregate
+		instanceName string
+		orgName      string
+		machine      *AddMachine
+		human        *AddHuman
+		ids          ZitadelConfig
+	}
+	type res struct {
+		pat        bool
+		machineKey bool
+		err        func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "human and machine, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					slices.Concat(
+						orgFilters(context.Background(),
+							"ORG",
+							true,
+							true,
+						),
+						[]expect{
+							expectPush(
+								slices.Concat(
+									orgEvents(context.Background(),
+										"INSTANCE",
+										"ORG",
+										"ZITADEL",
+										"PROJECT",
+										"zitadel.domain",
+										false,
+										true,
+										true,
+									),
+								)...,
+							),
+						},
+					)...,
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+				idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, orgIDs()...),
+				roles: []authz.RoleMapping{
+					{Role: domain.RoleOrgOwner, Permissions: []string{""}},
+					{Role: domain.RoleIAMOwner, Permissions: []string{""}},
+				},
+				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:         authz.WithRequestedDomain(context.Background(), "DOMAIN"),
+				instanceAgg: instance.NewAggregate("INSTANCE"),
+				orgName:     "ZITADEL",
+				machine: &AddMachine{
+					Machine: &Machine{
+						Username:        "zitadel-admin-machine",
+						Name:            "ZITADEL-machine",
+						Description:     "Admin",
+						AccessTokenType: domain.OIDCTokenTypeBearer,
+					},
+					Pat: &AddPat{
+						ExpirationDate: time.Time{},
+						Scopes:         nil,
+					},
+					/* not predictable with the key value in the events
+					MachineKey: &AddMachineKey{
+						Type:           domain.AuthNKeyTypeJSON,
+						ExpirationDate: time.Time{},
+					},
+					*/
+				},
+				human: &AddHuman{
+					Username:  "zitadel-admin",
+					FirstName: "ZITADEL",
+					LastName:  "Admin",
+					Email: Email{
+						Address:  domain.EmailAddress("admin@zitadel.test"),
+						Verified: true,
+					},
+					PreferredLanguage:      language.English,
+					Password:               "password",
+					PasswordChangeRequired: false,
+				},
+				ids: ZitadelConfig{
+					instanceID:   "INSTANCE",
+					orgID:        "ORG",
+					projectID:    "PROJECT",
+					consoleAppID: "console-id",
+					authAppID:    "auth-id",
+					mgmtAppID:    "mgmt-id",
+					adminAppID:   "admin-id",
+				},
+			},
+			res: res{
+				pat:        true,
+				machineKey: false,
+				err:        nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:         tt.fields.eventstore(t),
+				idGenerator:        tt.fields.idGenerator,
+				zitadelRoles:       tt.fields.roles,
+				userPasswordHasher: tt.fields.userPasswordHasher,
+				keyAlgorithm:       tt.fields.keyAlgorithm,
+			}
+			validations := make([]preparation.Validation, 0)
+			pat, mk, err := setupDefaultOrg(tt.args.ctx, r, &validations, tt.args.instanceAgg, tt.args.orgName, tt.args.machine, tt.args.human, tt.args.ids)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+
+			err = testSetup(context.Background(), r, validations)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+
+			if tt.res.err == nil {
 				if tt.res.pat {
 					assert.NotNil(t, pat)
 				}

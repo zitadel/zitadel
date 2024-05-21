@@ -300,16 +300,24 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 
 		prepareAddDefaultEmailTemplate(instanceAgg, setup.EmailTemplate),
 	}
-	if err := setupQuotas(c, &validations, setup.Quotas, setup.zitadel.instanceID); err != nil {
-		return "", "", nil, nil, err
-	}
-	setupMessageTexts(&validations, setup.MessageTexts, instanceAgg)
 
-	pat, machineKey, err := setupDefaultOrg(ctx, c, &validations, instanceAgg, setup.InstanceName, setup.Org.Name, setup.Org.Machine, setup.Org.Human, setup.zitadel)
+	// default organization on setup'd instance
+	pat, machineKey, err := setupDefaultOrg(ctx, c, &validations, instanceAgg, setup.Org.Name, setup.Org.Machine, setup.Org.Human, setup.zitadel)
 	if err != nil {
 		return "", "", nil, nil, err
 	}
+
+	// domains
+	if err := setupGeneratedDomain(ctx, c, &validations, instanceAgg, setup.InstanceName); err != nil {
+		return "", "", nil, nil, err
+	}
 	setupCustomDomain(c, &validations, instanceAgg, setup.CustomDomain)
+
+	// optional setting if set
+	setupMessageTexts(&validations, setup.MessageTexts, instanceAgg)
+	if err := setupQuotas(c, &validations, setup.Quotas, setup.zitadel.instanceID); err != nil {
+		return "", "", nil, nil, err
+	}
 	setupSMTPSettings(c, &validations, setup.SMTPConfiguration, instanceAgg)
 	setupOIDCSettings(c, &validations, setup.OIDCSettings, instanceAgg)
 	setupFeatures(&validations, setup.Features, setup.zitadel.instanceID)
@@ -492,7 +500,6 @@ func setupDefaultOrg(ctx context.Context,
 	commands *Commands,
 	validations *[]preparation.Validation,
 	instanceAgg *instance.Aggregate,
-	instanceName string,
 	name string,
 	machine *AddMachine,
 	human *AddHuman,
@@ -511,9 +518,6 @@ func setupDefaultOrg(ctx context.Context,
 		return nil, nil, err
 	}
 	setupMinimalInterfaces(commands, validations, instanceAgg, orgAgg, projectOwner, ids)
-	if err := setupGeneratedDomain(ctx, commands, validations, instanceAgg, instanceName); err != nil {
-		return nil, nil, err
-	}
 	return pat, machineKey, nil
 }
 
