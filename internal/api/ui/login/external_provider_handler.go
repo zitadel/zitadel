@@ -1035,8 +1035,8 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	if identityProvider.SAMLIDPTemplate.Binding != "" {
 		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
 	}
-	if identityProvider.SAMLIDPTemplate.NameIDFormat != 0 { // TODO: default?
-		opts = append(opts, saml.WithNameIDFormat(identityProvider.SAMLIDPTemplate.NameIDFormat))
+	if identityProvider.SAMLIDPTemplate.NameIDFormat.Valid {
+		opts = append(opts, saml.WithNameIDFormat(identityProvider.SAMLIDPTemplate.NameIDFormat.V))
 	}
 	if identityProvider.SAMLIDPTemplate.TransientMappingAttributeName != "" {
 		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))

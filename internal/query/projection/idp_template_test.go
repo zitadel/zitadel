@@ -2812,7 +2812,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, name_id_format, transient_mapping_attribute_name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, transient_mapping_attribute_name, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2821,8 +2821,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								anyArg{},
 								"binding",
 								true,
-								domain.SAMLNameIDFormatTransient,
 								"customAttribute",
+								domain.SAMLNameIDFormatTransient,
 							},
 						},
 					},
@@ -2884,7 +2884,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, name_id_format, transient_mapping_attribute_name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, transient_mapping_attribute_name, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2893,8 +2893,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								anyArg{},
 								"binding",
 								true,
-								domain.SAMLNameIDFormatTransient,
 								"customAttribute",
+								domain.SAMLNameIDFormatTransient,
 							},
 						},
 					},

@@ -928,7 +928,7 @@ func (wm *OrgSAMLIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
-	nameIDFormat domain.SAMLNameIDFormat,
+	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
 	options idp.Options,
 ) (*org.SAMLIDPChangedEvent, error) {

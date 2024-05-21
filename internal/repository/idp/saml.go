@@ -10,15 +10,15 @@ import (
 type SAMLIDPAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID                            string                  `json:"id"`
-	Name                          string                  `json:"name,omitempty"`
-	Metadata                      []byte                  `json:"metadata,omitempty"`
-	Key                           *crypto.CryptoValue     `json:"key,omitempty"`
-	Certificate                   []byte                  `json:"certificate,omitempty"`
-	Binding                       string                  `json:"binding,omitempty"`
-	WithSignedRequest             bool                    `json:"withSignedRequest,omitempty"`
-	NameIDFormat                  domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"` //TODO: ?
-	TransientMappingAttributeName string                  `json:"transientMappingAttributeName,omitempty"`
+	ID                            string                   `json:"id"`
+	Name                          string                   `json:"name,omitempty"`
+	Metadata                      []byte                   `json:"metadata,omitempty"`
+	Key                           *crypto.CryptoValue      `json:"key,omitempty"`
+	Certificate                   []byte                   `json:"certificate,omitempty"`
+	Binding                       string                   `json:"binding,omitempty"`
+	WithSignedRequest             bool                     `json:"withSignedRequest,omitempty"`
+	NameIDFormat                  *domain.SAMLNameIDFormat `json:"nameIDFormat,omitempty"`
+	TransientMappingAttributeName string                   `json:"transientMappingAttributeName,omitempty"`
 	Options
 }
 
@@ -31,7 +31,7 @@ func NewSAMLIDPAddedEvent(
 	certificate []byte,
 	binding string,
 	withSignedRequest bool,
-	nameIDFormat domain.SAMLNameIDFormat,
+	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
 	options Options,
 ) *SAMLIDPAddedEvent {
@@ -142,9 +142,9 @@ func ChangeSAMLWithSignedRequest(withSignedRequest bool) func(*SAMLIDPChangedEve
 	}
 }
 
-func ChangeSAMLNameIDFormat(nameIDFormat domain.SAMLNameIDFormat) func(*SAMLIDPChangedEvent) {
+func ChangeSAMLNameIDFormat(nameIDFormat *domain.SAMLNameIDFormat) func(*SAMLIDPChangedEvent) {
 	return func(e *SAMLIDPChangedEvent) {
-		e.NameIDFormat = &nameIDFormat
+		e.NameIDFormat = nameIDFormat
 	}
 }
 

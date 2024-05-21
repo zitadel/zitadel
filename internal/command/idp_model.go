@@ -1733,7 +1733,7 @@ type SAMLIDPWriteModel struct {
 	Certificate                   []byte
 	Binding                       string
 	WithSignedRequest             bool
-	NameIDFormat                  domain.SAMLNameIDFormat
+	NameIDFormat                  *domain.SAMLNameIDFormat
 	TransientMappingAttributeName string
 	idp.Options
 
@@ -1787,7 +1787,7 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 		wm.WithSignedRequest = *e.WithSignedRequest
 	}
 	if e.NameIDFormat != nil {
-		wm.NameIDFormat = *e.NameIDFormat
+		wm.NameIDFormat = e.NameIDFormat
 	}
 	if e.TransientMappingAttributeName != nil {
 		wm.TransientMappingAttributeName = *e.TransientMappingAttributeName
@@ -1803,7 +1803,7 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
-	nameIDFormat domain.SAMLNameIDFormat,
+	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
 	options idp.Options,
 ) ([]idp.SAMLIDPChanges, error) {
@@ -1868,8 +1868,8 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	if wm.Binding != "" {
 		opts = append(opts, saml2.WithBinding(wm.Binding))
 	}
-	if wm.NameIDFormat != 0 { //TODO: ?
-		opts = append(opts, saml2.WithNameIDFormat(wm.NameIDFormat))
+	if wm.NameIDFormat != nil {
+		opts = append(opts, saml2.WithNameIDFormat(*wm.NameIDFormat))
 	}
 	if wm.TransientMappingAttributeName != "" {
 		opts = append(opts, saml2.WithTransientMappingAttributeName(wm.TransientMappingAttributeName))

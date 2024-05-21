@@ -116,7 +116,7 @@ type SAMLProvider struct {
 	MetadataURL                   string
 	Binding                       string
 	WithSignedRequest             bool
-	NameIDFormat                  domain.SAMLNameIDFormat
+	NameIDFormat                  *domain.SAMLNameIDFormat
 	TransientMappingAttributeName string
 	IDPOptions                    idp.Options
 }

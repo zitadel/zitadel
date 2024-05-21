@@ -161,7 +161,7 @@ type SAMLIDPTemplate struct {
 	Certificate                   []byte
 	Binding                       string
 	WithSignedRequest             bool
-	NameIDFormat                  domain.SAMLNameIDFormat
+	NameIDFormat                  sql.Null[domain.SAMLNameIDFormat]
 	TransientMappingAttributeName string
 }
 
@@ -1009,7 +1009,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			var samlCertificate []byte
 			samlBinding := sql.NullString{}
 			samlWithSignedRequest := sql.NullBool{}
-			samlNameIDFormat := sql.NullInt16{}
+			samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
 			samlTransientMappingAttributeName := sql.NullString{}
 
 			ldapID := sql.NullString{}
@@ -1259,7 +1259,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					Certificate:                   samlCertificate,
 					Binding:                       samlBinding.String,
 					WithSignedRequest:             samlWithSignedRequest.Bool,
-					NameIDFormat:                  domain.SAMLNameIDFormat(samlNameIDFormat.Int16),
+					NameIDFormat:                  samlNameIDFormat,
 					TransientMappingAttributeName: samlTransientMappingAttributeName.String,
 				}
 			}
@@ -1509,7 +1509,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				var samlCertificate []byte
 				samlBinding := sql.NullString{}
 				samlWithSignedRequest := sql.NullBool{}
-				samlNameIDFormat := sql.NullInt16{}
+				samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
 				samlTransientMappingAttributeName := sql.NullString{}
 
 				ldapID := sql.NullString{}
@@ -1758,7 +1758,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						Certificate:                   samlCertificate,
 						Binding:                       samlBinding.String,
 						WithSignedRequest:             samlWithSignedRequest.Bool,
-						NameIDFormat:                  domain.SAMLNameIDFormat(samlNameIDFormat.Int16),
+						NameIDFormat:                  samlNameIDFormat,
 						TransientMappingAttributeName: samlTransientMappingAttributeName.String,
 					}
 				}

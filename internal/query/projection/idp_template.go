@@ -1971,6 +1971,20 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
 	}
 
+	columns := []handler.Column{
+		handler.NewCol(SAMLIDCol, idpEvent.ID),
+		handler.NewCol(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
+		handler.NewCol(SAMLMetadataCol, idpEvent.Metadata),
+		handler.NewCol(SAMLKeyCol, idpEvent.Key),
+		handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
+		handler.NewCol(SAMLBindingCol, idpEvent.Binding),
+		handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
+		handler.NewCol(SAMLTransientMappingAttributeName, idpEvent.TransientMappingAttributeName),
+	}
+	if idpEvent.NameIDFormat != nil {
+		columns = append(columns, handler.NewCol(SAMLNameIDFormatCol, *idpEvent.NameIDFormat))
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
@@ -1993,17 +2007,7 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 			},
 		),
 		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(SAMLIDCol, idpEvent.ID),
-				handler.NewCol(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(SAMLMetadataCol, idpEvent.Metadata),
-				handler.NewCol(SAMLKeyCol, idpEvent.Key),
-				handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
-				handler.NewCol(SAMLBindingCol, idpEvent.Binding),
-				handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
-				handler.NewCol(SAMLNameIDFormatCol, idpEvent.NameIDFormat),
-				handler.NewCol(SAMLTransientMappingAttributeName, idpEvent.TransientMappingAttributeName),
-			},
+			columns,
 			handler.WithTableSuffix(IDPTemplateSAMLSuffix),
 		),
 	), nil

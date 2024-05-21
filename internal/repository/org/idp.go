@@ -1018,7 +1018,7 @@ func NewSAMLIDPAddedEvent(
 	certificate []byte,
 	binding string,
 	withSignedRequest bool,
-	nameIDFormat domain.SAMLNameIDFormat,
+	nameIDFormat *domain.SAMLNameIDFormat,
 	transientMappingAttributeName string,
 	options idp.Options,
 ) *SAMLIDPAddedEvent {

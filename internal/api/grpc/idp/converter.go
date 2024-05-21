@@ -655,12 +655,16 @@ func appleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.Appl
 }
 
 func samlConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.SAMLIDPTemplate) {
+	nameIDFormat := idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_PERSISTENT
+	if template.NameIDFormat.Valid {
+		nameIDFormat = nameIDToPb(template.NameIDFormat.V)
+	}
 	providerConfig.Config = &idp_pb.ProviderConfig_Saml{
 		Saml: &idp_pb.SAMLConfig{
 			MetadataXml:                   template.Metadata,
 			Binding:                       bindingToPb(template.Binding),
 			WithSignedRequest:             template.WithSignedRequest,
-			NameIdFormat:                  nameIDToPb(template.NameIDFormat),
+			NameIdFormat:                  nameIDFormat,
 			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
 		},
 	}

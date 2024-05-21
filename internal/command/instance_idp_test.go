@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 	"go.uber.org/mock/gomock"
@@ -5245,7 +5246,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 							[]byte("certificate"),
 							"",
 							false,
-							domain.SAMLNameIDFormatUnspecified,
+							nil,
 							"",
 							idp.Options{},
 						),
@@ -5286,7 +5287,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 							[]byte("certificate"),
 							"binding",
 							true,
-							domain.SAMLNameIDFormatTransient,
+							gu.Ptr(domain.SAMLNameIDFormatTransient),
 							"customAttribute",
 							idp.Options{
 								IsCreationAllowed: true,
@@ -5308,7 +5309,7 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 					Metadata:                      []byte("metadata"),
 					Binding:                       "binding",
 					WithSignedRequest:             true,
-					NameIDFormat:                  domain.SAMLNameIDFormatTransient,
+					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
 					TransientMappingAttributeName: "customAttribute",
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
@@ -5454,7 +5455,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 								[]byte("certificate"),
 								"",
 								false,
-								domain.SAMLNameIDFormatUnspecified,
+								nil,
 								"",
 								idp.Options{},
 							)),
@@ -5492,7 +5493,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 								[]byte("certificate"),
 								"binding",
 								false,
-								domain.SAMLNameIDFormatUnspecified,
+								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
 								idp.Options{},
 							)),
@@ -5507,7 +5508,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 									idp.ChangeSAMLMetadata([]byte("new metadata")),
 									idp.ChangeSAMLBinding("new binding"),
 									idp.ChangeSAMLWithSignedRequest(true),
-									idp.ChangeSAMLNameIDFormat(domain.SAMLNameIDFormatTransient),
+									idp.ChangeSAMLNameIDFormat(gu.Ptr(domain.SAMLNameIDFormatTransient)),
 									idp.ChangeSAMLTransientMappingAttributeName("customAttribute"),
 									idp.ChangeSAMLOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
@@ -5531,7 +5532,7 @@ func TestCommandSide_UpdateInstanceGenericSAMLIDP(t *testing.T) {
 					Metadata:                      []byte("new metadata"),
 					Binding:                       "new binding",
 					WithSignedRequest:             true,
-					NameIDFormat:                  domain.SAMLNameIDFormatTransient,
+					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
 					TransientMappingAttributeName: "customAttribute",
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
@@ -5634,7 +5635,7 @@ func TestCommandSide_RegenerateInstanceSAMLProviderCertificate(t *testing.T) {
 								[]byte("certificate"),
 								"binding",
 								false,
-								domain.SAMLNameIDFormatUnspecified,
+								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
 								"",
 								idp.Options{},
 							)),

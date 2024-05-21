@@ -125,7 +125,7 @@ export class ProviderSamlSpComponent {
         metadataUrl: new UntypedFormControl('', []),
         binding: new UntypedFormControl(this.bindingValues[0], [requiredValidator]),
         withSignedRequest: new UntypedFormControl(true, [requiredValidator]),
-        nameIdFormat: new UntypedFormControl(this.nameIDFormatValues[0], []),
+        nameIdFormat: new UntypedFormControl(SAMLNameIDFormat.SAML_NAME_ID_FORMAT_PERSISTENT, []),
         transientMappingAttributeName: new UntypedFormControl('', []),
       },
       atLeastOneIsFilled('metadataXml', 'metadataUrl'),
@@ -242,8 +242,10 @@ export class ProviderSamlSpComponent {
     // @ts-ignore
     req.setBinding(SAMLBinding[this.binding?.value]);
     req.setWithSignedRequest(this.withSignedRequest?.value);
-    // @ts-ignore
-    req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat?.value])
+    if (this.nameIDFormat) {
+      // @ts-ignore
+      req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value])
+    }
     req.setTransientMappingAttributeName(this.transientMapping?.value)
     this.loading = true;
     this.service
@@ -296,6 +298,7 @@ export class ProviderSamlSpComponent {
   }
 
   compareNameIDFormat(value: string, index: number) {
+    console.log(value, index)
     if (value) {
       return value === Object.keys(SAMLNameIDFormat)[index];
     }
