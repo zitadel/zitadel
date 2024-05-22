@@ -108,6 +108,7 @@ type Steps struct {
 	s23CorrectGlobalUniqueConstraints      *CorrectGlobalUniqueConstraints
 	s24AddActorToAuthTokens                *AddActorToAuthTokens
 	s25User11AddLowerFieldsToVerifiedEmail *User11AddLowerFieldsToVerifiedEmail
+	s26AuthUsers3                          *AuthUsers3
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
