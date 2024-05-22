@@ -288,12 +288,11 @@ func TestCommands_UpdateSession(t *testing.T) {
 		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 	}
 	type args struct {
-		ctx          context.Context
-		sessionID    string
-		sessionToken string
-		checks       []SessionCommand
-		metadata     map[string][]byte
-		lifetime     time.Duration
+		ctx       context.Context
+		sessionID string
+		checks    []SessionCommand
+		metadata  map[string][]byte
+		lifetime  time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -317,37 +316,6 @@ func TestCommands_UpdateSession(t *testing.T) {
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "filter failed"),
-			},
-		},
-		{
-			"invalid session token",
-			fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "instance1").Aggregate,
-								&domain.UserAgent{
-									FingerprintID: gu.Ptr("fp1"),
-									IP:            net.ParseIP("1.2.3.4"),
-									Description:   gu.Ptr("firefox"),
-									Header:        http.Header{"foo": []string{"bar"}},
-								},
-							)),
-						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"tokenID")),
-					),
-				),
-				tokenVerifier: newMockTokenVerifierInvalid(),
-			},
-			args{
-				ctx:          context.Background(),
-				sessionID:    "sessionID",
-				sessionToken: "invalid",
-			},
-			res{
-				err: zerrors.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
 			},
 		},
 		{
@@ -375,9 +343,8 @@ func TestCommands_UpdateSession(t *testing.T) {
 				},
 			},
 			args{
-				ctx:          context.Background(),
-				sessionID:    "sessionID",
-				sessionToken: "token",
+				ctx:       context.Background(),
+				sessionID: "sessionID",
 			},
 			res{
 				want: &SessionChanged{
@@ -397,7 +364,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore:           tt.fields.eventstore,
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
-			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata, tt.args.lifetime)
+			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
