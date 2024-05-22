@@ -614,6 +614,7 @@ EventTypes:
         failed: Benutzerinitialisierung fehlgeschlagen
     token:
       added: Access Token ausgestellt
+      v2.added: Access Token ausgestellt
       removed: Access Token gelöscht
     impersonated: Benutzer hat sich als Benutzer ausgegeben
     username:

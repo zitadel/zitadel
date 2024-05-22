@@ -106,7 +106,11 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 	if issuer == "" {
 		issuer = authz.GetInstance(ctx).RequestedDomain()
 	}
-	key, secret, err := domain.NewTOTPKey(issuer, accountName, c.multifactors.OTP.CryptoMFA)
+	key, err := domain.NewTOTPKey(issuer, accountName)
+	if err != nil {
+		return nil, err
+	}
+	encryptedSecret, err := crypto.Encrypt([]byte(key.Secret()), c.multifactors.OTP.CryptoMFA)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +119,7 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 		userAgg: userAgg,
 		key:     key,
 		cmds: []eventstore.Command{
-			user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+			user.NewHumanOTPAddedEvent(ctx, userAgg, encryptedSecret),
 		},
 	}, nil
 }

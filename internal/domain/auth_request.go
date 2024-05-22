@@ -34,6 +34,7 @@ type AuthRequest struct {
 	AvatarKey                string
 	PresignedAvatar          string
 	UserOrgID                string
+	PreferredLanguage        *language.Tag
 	RequestedOrgID           string
 	RequestedOrgName         string
 	RequestedPrimaryDomain   string

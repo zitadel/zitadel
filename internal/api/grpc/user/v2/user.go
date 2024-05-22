@@ -95,6 +95,7 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		Register:               false,
 		Metadata:               metadata,
 		Links:                  links,
+		TOTPSecret:             req.GetTotpSecret(),
 	}, nil
 }
 

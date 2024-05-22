@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Link Esterni",
-        "DESCRIPTION": "Guida i tuoi utenti verso risorse esterne personalizzate mostrate nella pagina di login. Gli utenti devono accettare i Termini di Servizio e la Politica sulla Privacy prima che possano iscriversi."
+        "DESCRIPTION": "Guida i tuoi utenti alle risorse esterne personalizzate mostrate nella pagina di accesso. Gli utenti devono accettare i Termini di servizio e l'Informativa sulla privacy prima di potersi registrare. Cambia il collegamento alla tua documentazione o imposta una stringa vuota per nascondere il pulsante della documentazione dalla console. Aggiungi un collegamento esterno personalizzato e un testo personalizzato per quel collegamento nella console oppure impostali vuoti per nascondere quel pulsante."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Impostazioni SMTP",
@@ -1570,6 +1570,9 @@
       "POLICYLINK": "Link all'informativa sulla privacy",
       "HELPLINK": "link per l'aiuto",
       "SUPPORTEMAIL": "e-mail di supporto",
+      "DOCSLINK": "Collegamento a Documenti (Console)",
+      "CUSTOMLINK": "Collegamento personalizzato (Console)",
+      "CUSTOMLINKTEXT": "Testo del collegamento personalizzato (Console)",
       "SAVED": "Salvato con successo!",
       "RESET_TITLE": "Ripristina i valori predefiniti",
       "RESET_DESCRIPTION": "Stai per ripristinare i link predefiniti per i TOS e l'informativa sulla privacy. Vuoi davvero continuare?"
@@ -2225,7 +2228,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Fornitore SMTP",
-      "DESCRIPTION": "Questi sono i provider SMTP per la tua istanza Zitadel. Attiva quello che desideri utilizzare per inviare notifiche ai tuoi utenti.",
+      "DESCRIPTION": "Questi sono i provider SMTP per la tua istanza ZITADEL. Attiva quello che desideri utilizzare per inviare notifiche ai tuoi utenti.",
       "EMPTY": "Nessun provider SMTP disponibile",
       "ACTIVATED": "Attivato",
       "ACTIVATE": "Attiva fornitore",
@@ -2253,7 +2256,16 @@
         "CURRENT_DESC_TITLE": "Queste sono le tue impostazioni SMTP",
         "PROVIDER_SETTINGS": "Impostazioni del provider SMTP",
         "SENDER_SETTINGS": "Impostazioni mittente",
-        "TEST_SETTINGS": "Testare le impostazioni SMTP"
+        "TEST_SETTINGS": "Testare le impostazioni SMTP",
+        "NEXT_STEPS": "Prossimi passi",
+        "ACTIVATE": {
+          "TITLE": "Attiva il tuo provider SMTP",
+          "DESCRIPTION": "ZITADEL non può utilizzare questo provider SMTP per inviare notifiche finché non lo attivi. Se attivi questo fornitore, qualsiasi altro fornitore che era attivo verrà ora disattivato."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Disattiva il tuo provider SMTP",
+          "DESCRIPTION": "Dopo aver disattivato l'archivio SMTP, la schermata non è disponibile per l'utente, il documento è nuovo e non è attivo."
+        }
       }
     },
     "DETAIL": {

@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"encoding/json"
 	"testing"
 	"time"
@@ -33,7 +34,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Typ: user.UserV1PasswordCheckSucceededType},
 				userView: &UserSessionView{},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: now()},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: sql.NullTime{Time: now(), Valid: true}},
 		},
 		{
 			name: "append human password check succeeded event",
@@ -41,23 +42,23 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Typ: user.HumanPasswordCheckSucceededType},
 				userView: &UserSessionView{},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: now()},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: sql.NullTime{Time: now(), Valid: true}},
 		},
 		{
 			name: "append user password check failed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Typ: user.UserV1PasswordCheckFailedType},
-				userView: &UserSessionView{PasswordVerification: now()},
+				userView: &UserSessionView{PasswordVerification: sql.NullTime{Time: now(), Valid: true}},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: sql.NullTime{Time: time.Time{}, Valid: true}},
 		},
 		{
 			name: "append human password check failed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Typ: user.HumanPasswordCheckFailedType},
-				userView: &UserSessionView{PasswordVerification: now()},
+				userView: &UserSessionView{PasswordVerification: sql.NullTime{Time: now(), Valid: true}},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), PasswordVerification: sql.NullTime{Time: time.Time{}, Valid: true}},
 		},
 		{
 			name: "append user password changed event",
@@ -72,9 +73,9 @@ func TestAppendEvent(t *testing.T) {
 						return d
 					}(),
 				},
-				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: now()},
+				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: sql.NullTime{Time: now(), Valid: true}},
 			},
-			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: time.Time{}},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: sql.NullTime{Time: time.Time{}, Valid: true}},
 		},
 		{
 			name: "append human password changed event",
@@ -91,9 +92,9 @@ func TestAppendEvent(t *testing.T) {
 						return d
 					}(),
 				},
-				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: now()},
+				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: sql.NullTime{Time: now(), Valid: true}},
 			},
-			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: time.Time{}},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: sql.NullTime{Time: time.Time{}, Valid: true}},
 		},
 		{
 			name: "append human password changed event same user agent",
@@ -111,9 +112,9 @@ func TestAppendEvent(t *testing.T) {
 						return d
 					}(),
 				},
-				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: now()},
+				userView: &UserSessionView{UserAgentID: "id", PasswordVerification: sql.NullTime{Time: now(), Valid: true}},
 			},
-			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: now()},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), PasswordVerification: sql.NullTime{Time: now(), Valid: true}},
 		},
 		{
 			name: "append user otp verified event",
@@ -142,7 +143,7 @@ func TestAppendEvent(t *testing.T) {
 				},
 				userView: &UserSessionView{UserAgentID: "id"},
 			},
-			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), SecondFactorVerification: now()},
+			result: &UserSessionView{UserAgentID: "id", ChangeDate: now(), SecondFactorVerification: sql.NullTime{Time: now(), Valid: true}},
 		},
 		{
 			name: "append user otp check succeeded event",
@@ -150,7 +151,7 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Typ: user.UserV1MFAOTPCheckSucceededType},
 				userView: &UserSessionView{},
 			},
-			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: now()},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: sql.NullTime{Time: now(), Valid: true}},
 		},
 		{
 			name: "append human otp check succeeded event",
@@ -158,55 +159,77 @@ func TestAppendEvent(t *testing.T) {
 				event:    &es_models.Event{CreationDate: now(), Typ: user.HumanMFAOTPCheckSucceededType},
 				userView: &UserSessionView{},
 			},
-			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: now()},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: sql.NullTime{Time: now(), Valid: true}},
 		},
 		{
 			name: "append user otp check failed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Typ: user.UserV1MFAOTPCheckFailedType},
-				userView: &UserSessionView{SecondFactorVerification: now()},
+				userView: &UserSessionView{SecondFactorVerification: sql.NullTime{Time: now(), Valid: true}},
 			},
-			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: sql.NullTime{Time: time.Time{}, Valid: true}},
 		},
 		{
 			name: "append human otp check failed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Typ: user.HumanMFAOTPCheckFailedType},
-				userView: &UserSessionView{SecondFactorVerification: now()},
+				userView: &UserSessionView{SecondFactorVerification: sql.NullTime{Time: now(), Valid: true}},
 			},
-			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: sql.NullTime{Time: time.Time{}, Valid: true}},
 		},
 		{
 			name: "append user otp removed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Typ: user.UserV1MFAOTPRemovedType},
-				userView: &UserSessionView{SecondFactorVerification: now()},
+				userView: &UserSessionView{SecondFactorVerification: sql.NullTime{Time: now(), Valid: true}},
 			},
-			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: sql.NullTime{Time: time.Time{}, Valid: true}},
 		},
 		{
 			name: "append human otp removed event",
 			args: args{
 				event:    &es_models.Event{CreationDate: now(), Typ: user.HumanMFAOTPRemovedType},
-				userView: &UserSessionView{SecondFactorVerification: now()},
+				userView: &UserSessionView{SecondFactorVerification: sql.NullTime{Time: now(), Valid: true}},
 			},
-			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: time.Time{}},
+			result: &UserSessionView{ChangeDate: now(), SecondFactorVerification: sql.NullTime{Time: time.Time{}, Valid: true}},
 		},
 		{
 			name: "append user signed out event",
 			args: args{
-				event:    &es_models.Event{CreationDate: now(), Typ: user.UserV1SignedOutType},
-				userView: &UserSessionView{PasswordVerification: now(), SecondFactorVerification: now()},
+				event: &es_models.Event{CreationDate: now(), Typ: user.UserV1SignedOutType},
+				userView: &UserSessionView{
+					PasswordVerification:     sql.NullTime{Time: now(), Valid: true},
+					SecondFactorVerification: sql.NullTime{Time: now(), Valid: true},
+				},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, SecondFactorVerification: time.Time{}, State: 1},
+			result: &UserSessionView{
+				ChangeDate:                now(),
+				PasswordVerification:      sql.NullTime{Time: time.Time{}, Valid: true},
+				SecondFactorVerification:  sql.NullTime{Time: time.Time{}, Valid: true},
+				ExternalLoginVerification: sql.NullTime{Time: time.Time{}, Valid: true},
+				PasswordlessVerification:  sql.NullTime{Time: time.Time{}, Valid: true},
+				MultiFactorVerification:   sql.NullTime{Time: time.Time{}, Valid: true},
+				State:                     1,
+			},
 		},
 		{
 			name: "append human signed out event",
 			args: args{
-				event:    &es_models.Event{CreationDate: now(), Typ: user.HumanSignedOutType},
-				userView: &UserSessionView{PasswordVerification: now(), SecondFactorVerification: now()},
+				event: &es_models.Event{CreationDate: now(), Typ: user.HumanSignedOutType},
+				userView: &UserSessionView{
+					PasswordVerification:     sql.NullTime{Time: now(), Valid: true},
+					SecondFactorVerification: sql.NullTime{Time: now(), Valid: true},
+				},
 			},
-			result: &UserSessionView{ChangeDate: now(), PasswordVerification: time.Time{}, SecondFactorVerification: time.Time{}, State: 1},
+			result: &UserSessionView{
+				ChangeDate:                now(),
+				PasswordVerification:      sql.NullTime{Time: time.Time{}, Valid: true},
+				SecondFactorVerification:  sql.NullTime{Time: time.Time{}, Valid: true},
+				ExternalLoginVerification: sql.NullTime{Time: time.Time{}, Valid: true},
+				PasswordlessVerification:  sql.NullTime{Time: time.Time{}, Valid: true},
+				MultiFactorVerification:   sql.NullTime{Time: time.Time{}, Valid: true},
+				State:                     1,
+			},
 		},
 	}
 	for _, tt := range tests {
