@@ -52,7 +52,7 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>
+      <th mat-header-cell mat-sort-header *matHeaderCellDef>
         {{ 'ORG.PAGES.NAME' | translate }}
       </th>
       <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
