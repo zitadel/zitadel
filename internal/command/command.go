@@ -170,9 +170,7 @@ func StartCommands(
 				Issuer:    defaults.Multifactors.OTP.Issuer,
 			},
 		},
-		GenerateDomain: func(instanceName, domainName string) (string, error) {
-			return domain.NewGeneratedInstanceDomain(instanceName, domainName)
-		},
+		GenerateDomain: domain.NewGeneratedInstanceDomain,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {

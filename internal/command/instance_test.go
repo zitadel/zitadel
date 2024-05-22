@@ -287,6 +287,34 @@ func instanceSetupPoliciesConfig() *InstanceSetup {
 	}
 }
 
+func setupInstanceElementsFilters(instanceID string) []expect {
+	return slices.Concat(
+		instanceElementsFilters(),
+		instancePoliciesFilters(instanceID),
+		// email template
+		[]expect{expectFilter()},
+	)
+}
+
+func setupInstanceElementsConfig() *InstanceSetup {
+	conf := instanceSetupPoliciesConfig()
+	conf.InstanceName = "ZITADEL"
+	conf.DefaultLanguage = language.English
+	conf.zitadel = instanceSetupZitadelIDs()
+	conf.SecretGenerators = instanceElementsConfig()
+	conf.EmailTemplate = []byte("something")
+	return conf
+}
+
+func setupInstanceElementsEvents(ctx context.Context, instanceID, instanceName string, defaultLanguage language.Tag) []eventstore.Command {
+	instanceAgg := instance.NewAggregate(instanceID)
+	return slices.Concat(
+		instanceElementsEvents(ctx, instanceID, instanceName, defaultLanguage),
+		instancePoliciesEvents(ctx, instanceID),
+		[]eventstore.Command{instance.NewMailTemplateAddedEvent(ctx, &instanceAgg.Aggregate, []byte("something"))},
+	)
+}
+
 func instanceElementsFilters() []expect {
 	return []expect{
 		expectFilter(),
@@ -330,35 +358,25 @@ func instanceElementsConfig() *SecretGenerators {
 		OTPEmail:                 &crypto.GeneratorConfig{Length: 8, Expiry: 5 * time.Minute, IncludeDigits: true},
 	}
 }
+
 func setupInstanceFilters(instanceID, orgID, projectID, appID, domain string) []expect {
 	return slices.Concat(
-		instanceElementsFilters(),
-		instancePoliciesFilters(instanceID),
-		// email template
-		[]expect{expectFilter()},
+		setupInstanceElementsFilters(instanceID),
 		orgFilters(orgID, true, true),
 		generatedDomainFilters(instanceID, orgID, projectID, appID, domain),
 	)
 }
 
 func setupInstanceEvents(ctx context.Context, instanceID, orgID, projectID, appID, instanceName, orgName string, defaultLanguage language.Tag, domain string, externalSecure bool) []eventstore.Command {
-	instanceAgg := instance.NewAggregate(instanceID)
 	return slices.Concat(
-		instanceElementsEvents(ctx, instanceID, instanceName, defaultLanguage),
-		instancePoliciesEvents(ctx, instanceID),
-		[]eventstore.Command{instance.NewMailTemplateAddedEvent(ctx, &instanceAgg.Aggregate, []byte("something"))},
+		setupInstanceElementsEvents(ctx, instanceID, instanceName, defaultLanguage),
 		orgEvents(ctx, instanceID, orgID, orgName, projectID, domain, externalSecure, true, true),
 		generatedDomainEvents(ctx, instanceID, orgID, projectID, appID, domain),
 	)
 }
 
 func setupInstanceConfig() *InstanceSetup {
-	conf := instanceSetupPoliciesConfig()
-	conf.InstanceName = "ZITADEL"
-	conf.DefaultLanguage = language.English
-	conf.zitadel = instanceSetupZitadelIDs()
-	conf.SecretGenerators = instanceElementsConfig()
-	conf.EmailTemplate = []byte("something")
+	conf := setupInstanceElementsConfig()
 	conf.Org = InstanceOrgSetup{
 		Name:    "ZITADEL",
 		Machine: instanceSetupMachineConfig(),
@@ -889,13 +907,12 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 		keyAlgorithm       crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx          context.Context
-		instanceAgg  *instance.Aggregate
-		instanceName string
-		orgName      string
-		machine      *AddMachine
-		human        *AddHuman
-		ids          ZitadelConfig
+		ctx         context.Context
+		instanceAgg *instance.Aggregate
+		orgName     string
+		machine     *AddMachine
+		human       *AddHuman
+		ids         ZitadelConfig
 	}
 	type res struct {
 		pat        bool
@@ -1038,11 +1055,9 @@ func TestCommandSide_setupInstanceElements(t *testing.T) {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx              context.Context
-		instanceAgg      *instance.Aggregate
-		instanceName     string
-		defaultLanguage  language.Tag
-		secretGenerators *SecretGenerators
+		ctx         context.Context
+		instanceAgg *instance.Aggregate
+		setup       *InstanceSetup
 	}
 	type res struct {
 		err func(error) bool
@@ -1058,10 +1073,10 @@ func TestCommandSide_setupInstanceElements(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
-						instanceElementsFilters(),
+						setupInstanceElementsFilters("INSTANCE"),
 						[]expect{
 							expectPush(
-								instanceElementsEvents(context.Background(),
+								setupInstanceElementsEvents(context.Background(),
 									"INSTANCE",
 									"ZITADEL",
 									language.English,
@@ -1072,11 +1087,9 @@ func TestCommandSide_setupInstanceElements(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:              contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
-				instanceAgg:      instance.NewAggregate("INSTANCE"),
-				instanceName:     "ZITADEL",
-				defaultLanguage:  language.English,
-				secretGenerators: instanceElementsConfig(),
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
+				instanceAgg: instance.NewAggregate("INSTANCE"),
+				setup:       setupInstanceElementsConfig(),
 			},
 			res: res{
 				err: nil,
@@ -1088,8 +1101,7 @@ func TestCommandSide_setupInstanceElements(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			validations := make([]preparation.Validation, 0)
-			setupInstanceElements(&validations, tt.args.instanceAgg, tt.args.instanceName, tt.args.defaultLanguage, tt.args.secretGenerators)
+			validations := setupInstanceElements(tt.args.instanceAgg, tt.args.setup)
 
 			err := testSetup(context.Background(), r, validations)
 			if tt.res.err == nil {
@@ -1102,6 +1114,7 @@ func TestCommandSide_setupInstanceElements(t *testing.T) {
 	}
 }
 
+/*
 func TestCommandSide_setupInstancePolicies(t *testing.T) {
 	type fields struct {
 		eventstore func(t *testing.T) *eventstore.Eventstore
@@ -1163,7 +1176,7 @@ func TestCommandSide_setupInstancePolicies(t *testing.T) {
 			}
 		})
 	}
-}
+}*/
 
 func TestCommandSide_setUpInstance(t *testing.T) {
 	type fields struct {
@@ -1175,9 +1188,8 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 		generateDomain     func(string, string) (string, error)
 	}
 	type args struct {
-		ctx            context.Context
-		setup          *InstanceSetup
-		externalDomain string
+		ctx   context.Context
+		setup *InstanceSetup
 	}
 	type res struct {
 		pat        bool
@@ -1225,9 +1237,8 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:            contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
-				externalDomain: "DOMAIN",
-				setup:          setupInstanceConfig(),
+				ctx:   contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
+				setup: setupInstanceConfig(),
 			},
 			res: res{
 				err: nil,
@@ -1245,8 +1256,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 				GenerateDomain:     tt.fields.generateDomain,
 			}
 
-			validations := make([]preparation.Validation, 0)
-			pat, mk, err := setUpInstance(tt.args.ctx, r, &validations, tt.args.setup, tt.args.externalDomain)
+			validations, pat, mk, err := setUpInstance(tt.args.ctx, r, tt.args.setup)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
