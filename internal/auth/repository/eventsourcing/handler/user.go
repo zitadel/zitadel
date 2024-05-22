@@ -12,21 +12,12 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
+	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
 	userTable = "auth.users3"
-
-	userInstanceIDCol            = "instance_id"
-	userIDCol                    = "id"
-	userPasswordSet              = "password_set"
-	userPasswordInitRequired     = "password_init_required"
-	userPasswordChange           = "password_change"
-	userInitRequired             = "init_required"
-	userPasswordlessInitRequired = "passwordless_init_required"
-	userMFAInitSkipped           = "mfa_init_skipped"
-	userResourceOwnerCol         = "resource_owner"
 )
 
 type User struct {
@@ -206,59 +197,59 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 		user_repo.HumanU2FTokenVerifiedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol(userMFAInitSkipped, time.Time{}),
+				handler.NewCol(view_model.UserKeyMFAInitSkipped, time.Time{}),
 			},
 			[]handler.Condition{
-				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
+				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserKeyUserID, event.Aggregate().ID),
 			}), nil
 	case user_repo.UserV1MFAInitSkippedType,
 		user_repo.HumanMFAInitSkippedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol(userMFAInitSkipped, event.CreatedAt()),
+				handler.NewCol(view_model.UserKeyMFAInitSkipped, event.CreatedAt()),
 			},
 			[]handler.Condition{
-				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
+				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserKeyUserID, event.Aggregate().ID),
 			}), nil
 	case user_repo.UserV1InitialCodeAddedType,
 		user_repo.HumanInitialCodeAddedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol(userInitRequired, true),
+				handler.NewCol(view_model.UserKeyInitRequired, true),
 			},
 			[]handler.Condition{
-				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
+				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserKeyUserID, event.Aggregate().ID),
 			}), nil
 	case user_repo.UserV1InitializedCheckSucceededType,
 		user_repo.HumanInitializedCheckSucceededType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol(userInitRequired, false),
+				handler.NewCol(view_model.UserKeyInitRequired, false),
 			},
 			[]handler.Condition{
-				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
+				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserKeyUserID, event.Aggregate().ID),
 			}), nil
 	case user_repo.HumanPasswordlessInitCodeAddedType,
 		user_repo.HumanPasswordlessInitCodeRequestedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol(userPasswordlessInitRequired, true),
-				handler.NewCol(userPasswordInitRequired, false),
+				handler.NewCol(view_model.UserKeyPasswordlessInitRequired, true),
+				handler.NewCol(view_model.UserKeyPasswordInitRequired, false),
 			},
 			[]handler.Condition{
-				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
-				handler.NewCond(userPasswordSet, false),
+				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserKeyUserID, event.Aggregate().ID),
+				handler.NewCond(view_model.UserKeyPasswordSet, false),
 			}), nil
 	case user_repo.UserRemovedType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userIDCol, event.Aggregate().ID),
+				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserKeyUserID, event.Aggregate().ID),
 			}), nil
 	default:
 		return handler.NewNoOpStatement(event), nil
@@ -268,11 +259,11 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 func (u *User) setPasswordData(event eventstore.Event, secret *crypto.CryptoValue, hash string) *handler.Statement {
 	set := secret != nil || hash != ""
 	columns := []handler.Column{
-		handler.NewCol(userInstanceIDCol, event.Aggregate().InstanceID),
-		handler.NewCol(userIDCol, event.Aggregate().ID),
-		handler.NewCol(userPasswordSet, set),
-		handler.NewCol(userPasswordInitRequired, !set),
-		handler.NewCol(userPasswordChange, event.CreatedAt()),
+		handler.NewCol(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
+		handler.NewCol(view_model.UserKeyUserID, event.Aggregate().ID),
+		handler.NewCol(view_model.UserKeyPasswordSet, set),
+		handler.NewCol(view_model.UserKeyPasswordInitRequired, !set),
+		handler.NewCol(view_model.UserKeyPasswordChange, event.CreatedAt()),
 	}
 	return handler.NewUpsertStatement(event, columns[0:2], columns)
 }
@@ -282,8 +273,8 @@ func (u *User) ProcessOrg(event eventstore.Event) (_ *handler.Statement, err err
 	case org.OrgRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(userResourceOwnerCol, event.Aggregate().ID),
+				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserKeyResourceOwner, event.Aggregate().ID),
 			},
 		), nil
 	default:
@@ -296,7 +287,7 @@ func (u *User) ProcessInstance(event eventstore.Event) (_ *handler.Statement, er
 	case instance.InstanceRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(userInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
 			},
 		), nil
 	default:

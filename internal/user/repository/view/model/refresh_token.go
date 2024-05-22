@@ -13,13 +13,24 @@ import (
 )
 
 const (
-	RefreshTokenKeyTokenID       = "id"
-	RefreshTokenKeyUserID        = "user_id"
-	RefreshTokenKeyApplicationID = "application_id"
-	RefreshTokenKeyUserAgentID   = "user_agent_id"
-	RefreshTokenKeyExpiration    = "expiration"
-	RefreshTokenKeyResourceOwner = "resource_owner"
-	RefreshTokenKeyInstanceID    = "instance_id"
+	RefreshTokenKeyTokenID        = "id"
+	RefreshTokenKeyUserID         = "user_id"
+	RefreshTokenKeyApplicationID  = "application_id"
+	RefreshTokenKeyUserAgentID    = "user_agent_id"
+	RefreshTokenKeyExpiration     = "expiration"
+	RefreshTokenKeyResourceOwner  = "resource_owner"
+	RefreshTokenKeyInstanceID     = "instance_id"
+	RefreshTokenKeyCreationDate   = "creation_date"
+	RefreshTokenKeyChangeDate     = "change_date"
+	RefreshTokenKeySequence       = "sequence"
+	RefreshTokenKeyActor          = "actor"
+	RefreshTokenKeyAMR            = "amr"
+	RefreshTokenKeyAuthTime       = "auth_time"
+	RefreshTokenKeyAudience       = "audience"
+	RefreshTokenKeyClientID       = "client_id"
+	RefreshTokenKeyIdleExpiration = "idle_expiration"
+	RefreshTokenKeyScopes         = "scopes"
+	RefreshTokenKeyToken          = "token"
 )
 
 type RefreshTokenView struct {

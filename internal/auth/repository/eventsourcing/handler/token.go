@@ -23,23 +23,6 @@ import (
 
 const (
 	tokenTable = "auth.tokens"
-
-	tokenInstanceIDCol        = "instance_id"
-	tokenUserIDCol            = "user_id"
-	tokenResourceOwnerCol     = "resource_owner"
-	tokenCreationDateCol      = "creation_date"
-	tokenChangeDateCol        = "change_date"
-	tokenApplicationIDCol     = "application_id"
-	tokenUserAgentIDCol       = "user_agent_id"
-	tokenSequencerCol         = "sequence"
-	tokenActorCol             = "actor"
-	tokenIDCol                = "id"
-	tokenAudienceCol          = "audience"
-	tokenPreferredLanguageCol = "preferred_language"
-	tokenExpirationCol        = "expiration"
-	tokenRefreshTokenIDCol    = "refresh_token_id"
-	tokenScopesCol            = "scopes"
-	tokenIsPatCol             = "is_pat"
 )
 
 var _ handler.Projection = (*Token)(nil)
@@ -176,22 +159,22 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewCreateStatement(event,
 			[]handler.Column{
-				handler.NewCol(tokenInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCol(tokenUserIDCol, event.Aggregate().ID),
-				handler.NewCol(tokenResourceOwnerCol, event.Aggregate().ResourceOwner),
-				handler.NewCol(tokenIDCol, e.TokenID),
-				handler.NewCol(tokenCreationDateCol, event.CreatedAt()),
-				handler.NewCol(tokenChangeDateCol, event.CreatedAt()),
-				handler.NewCol(tokenSequencerCol, event.Sequence()),
-				handler.NewCol(tokenApplicationIDCol, e.ApplicationID),
-				handler.NewCol(tokenUserAgentIDCol, e.UserAgentID),
-				handler.NewCol(tokenAudienceCol, e.Audience),
-				handler.NewCol(tokenScopesCol, e.Scopes),
-				handler.NewCol(tokenExpirationCol, e.Expiration),
-				handler.NewCol(tokenPreferredLanguageCol, e.PreferredLanguage),
-				handler.NewCol(tokenRefreshTokenIDCol, e.RefreshTokenID),
-				handler.NewCol(tokenActorCol, view_model.TokenActor{TokenActor: e.Actor}),
-				handler.NewCol(tokenIsPatCol, false),
+				handler.NewCol(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCol(view_model.TokenKeyUserID, event.Aggregate().ID),
+				handler.NewCol(view_model.TokenKeyResourceOwner, event.Aggregate().ResourceOwner),
+				handler.NewCol(view_model.TokenKeyID, e.TokenID),
+				handler.NewCol(view_model.TokenKeyCreationDate, event.CreatedAt()),
+				handler.NewCol(view_model.TokenKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.TokenKeySequence, event.Sequence()),
+				handler.NewCol(view_model.TokenKeyApplicationID, e.ApplicationID),
+				handler.NewCol(view_model.TokenKeyUserAgentID, e.UserAgentID),
+				handler.NewCol(view_model.TokenKeyAudience, e.Audience),
+				handler.NewCol(view_model.TokenKeyScopes, e.Scopes),
+				handler.NewCol(view_model.TokenKeyExpiration, e.Expiration),
+				handler.NewCol(view_model.TokenKeyPreferredLanguage, e.PreferredLanguage),
+				handler.NewCol(view_model.TokenKeyRefreshTokenID, e.RefreshTokenID),
+				handler.NewCol(view_model.TokenKeyActor, view_model.TokenActor{TokenActor: e.Actor}),
+				handler.NewCol(view_model.TokenKeyIsPat, false),
 			},
 		), nil
 	case user.PersonalAccessTokenAddedType:
@@ -201,16 +184,16 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewCreateStatement(event,
 			[]handler.Column{
-				handler.NewCol(tokenInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCol(tokenUserIDCol, event.Aggregate().ID),
-				handler.NewCol(tokenResourceOwnerCol, event.Aggregate().ResourceOwner),
-				handler.NewCol(tokenIDCol, e.TokenID),
-				handler.NewCol(tokenCreationDateCol, event.CreatedAt()),
-				handler.NewCol(tokenChangeDateCol, event.CreatedAt()),
-				handler.NewCol(tokenSequencerCol, event.Sequence()),
-				handler.NewCol(tokenScopesCol, e.Scopes),
-				handler.NewCol(tokenExpirationCol, e.Expiration),
-				handler.NewCol(tokenIsPatCol, true),
+				handler.NewCol(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCol(view_model.TokenKeyUserID, event.Aggregate().ID),
+				handler.NewCol(view_model.TokenKeyResourceOwner, event.Aggregate().ResourceOwner),
+				handler.NewCol(view_model.TokenKeyID, e.TokenID),
+				handler.NewCol(view_model.TokenKeyCreationDate, event.CreatedAt()),
+				handler.NewCol(view_model.TokenKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.TokenKeySequence, event.Sequence()),
+				handler.NewCol(view_model.TokenKeyScopes, e.Scopes),
+				handler.NewCol(view_model.TokenKeyExpiration, e.Expiration),
+				handler.NewCol(view_model.TokenKeyIsPat, true),
 			},
 		), nil
 	case user.UserV1ProfileChangedType,
@@ -224,13 +207,13 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol(tokenPreferredLanguageCol, gu.Value(e.PreferredLanguage).String()),
-				handler.NewCol(tokenChangeDateCol, event.CreatedAt()),
-				handler.NewCol(tokenSequencerCol, event.Sequence()),
+				handler.NewCol(view_model.TokenKeyPreferredLanguage, gu.Value(e.PreferredLanguage).String()),
+				handler.NewCol(view_model.TokenKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.TokenKeySequence, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond(tokenInstanceIDCol, e.Aggregate().InstanceID),
-				handler.NewCond(tokenUserIDCol, e.Aggregate().ID),
+				handler.NewCond(view_model.TokenKeyInstanceID, e.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyUserID, e.Aggregate().ID),
 			},
 		), nil
 	case user.UserV1SignedOutType,
@@ -241,9 +224,9 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(tokenUserIDCol, event.Aggregate().ID),
-				handler.NewCond(tokenUserAgentIDCol, e.UserAgentID),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyUserID, event.Aggregate().ID),
+				handler.NewCond(view_model.TokenKeyUserAgentID, e.UserAgentID),
 			},
 		), nil
 	case user.UserLockedType,
@@ -251,8 +234,8 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		user.UserRemovedType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(tokenUserIDCol, event.Aggregate().ID),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyUserID, event.Aggregate().ID),
 			},
 		), nil
 	case user.UserTokenRemovedType,
@@ -268,8 +251,8 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(tokenIDCol, tokenID),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyID, tokenID),
 			},
 		), nil
 	case user.HumanRefreshTokenRemovedType:
@@ -279,8 +262,8 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(tokenRefreshTokenIDCol, e.TokenID),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyRefreshTokenID, e.TokenID),
 			},
 		), nil
 	case project.ApplicationDeactivatedType,
@@ -296,8 +279,8 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(tokenApplicationIDCol, applicationID),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyApplicationID, applicationID),
 			},
 		), nil
 	case project.ProjectDeactivatedType,
@@ -317,21 +300,21 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 		}
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewOneOfTextCond(tokenApplicationIDCol, applicationIDs),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewOneOfTextCond(view_model.TokenKeyApplicationID, applicationIDs),
 			},
 		), nil
 	case instance.InstanceRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
 			},
 		), nil
 	case org.OrgRemovedEventType:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
-				handler.NewCond(tokenInstanceIDCol, event.Aggregate().InstanceID),
-				handler.NewCond(tokenResourceOwnerCol, event.Aggregate().ResourceOwner),
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyResourceOwner, event.Aggregate().ResourceOwner),
 			},
 		), nil
 	default:
@@ -339,14 +322,17 @@ func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error)
 	}
 }
 
+type userAgentIDPayload struct {
+	ID string `json:"userAgentID"`
+}
+
 func agentIDFromSession(event eventstore.Event) (string, error) {
-	session := make(map[string]interface{})
-	if err := event.Unmarshal(&session); err != nil {
+	payload := new(userAgentIDPayload)
+	if err := event.Unmarshal(&payload); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
 		return "", zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
-	agentID, _ := session["userAgentID"].(string)
-	return agentID, nil
+	return payload.ID, nil
 }
 
 func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (*proj_model.Project, error) {

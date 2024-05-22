@@ -15,12 +15,23 @@ import (
 )
 
 const (
-	UserSessionKeyUserAgentID   = "user_agent_id"
-	UserSessionKeyUserID        = "user_id"
-	UserSessionKeyState         = "state"
-	UserSessionKeyResourceOwner = "resource_owner"
-	UserSessionKeyInstanceID    = "instance_id"
-	UserSessionKeyOwnerRemoved  = "owner_removed"
+	UserSessionKeyUserAgentID                  = "user_agent_id"
+	UserSessionKeyUserID                       = "user_id"
+	UserSessionKeyState                        = "state"
+	UserSessionKeyResourceOwner                = "resource_owner"
+	UserSessionKeyInstanceID                   = "instance_id"
+	UserSessionKeyOwnerRemoved                 = "owner_removed"
+	UserSessionKeyCreationDate                 = "creation_date"
+	UserSessionKeyChangeDate                   = "change_date"
+	UserSessionKeySequence                     = "sequence"
+	UserSessionKeyPasswordVerification         = "password_verification"
+	UserSessionKeySecondFactorVerification     = "second_factor_verification"
+	UserSessionKeySecondFactorVerificationType = "second_factor_verification_type"
+	UserSessionKeyMultiFactorVerification      = "multi_factor_verification"
+	UserSessionKeyMultiFactorVerificationType  = "multi_factor_verification_type"
+	UserSessionKeyPasswordlessVerification     = "passwordless_verification"
+	UserSessionKeyExternalLoginVerification    = "external_login_verification"
+	UserSessionKeySelectedIDPConfigID          = "selected_idp_config_id"
 )
 
 type UserSessionView struct {
@@ -50,14 +61,17 @@ type UserSessionView struct {
 	InstanceID                   string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
+type userAgentIDPayload struct {
+	ID string `json:"userAgentID"`
+}
+
 func UserAgentIDFromEvent(event eventstore.Event) (string, error) {
-	v := make(map[string]interface{})
-	if err := event.Unmarshal(&v); err != nil {
+	payload := new(userAgentIDPayload)
+	if err := event.Unmarshal(&payload); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
-		return "", zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
+		return "", zerrors.ThrowInternal(nil, "MODEL-HJwk9", "could not unmarshal data")
 	}
-	userAgentID, _ := v["userAgentID"].(string)
-	return userAgentID, nil
+	return payload.ID, nil
 }
 
 func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {

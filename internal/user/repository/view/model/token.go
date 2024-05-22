@@ -16,14 +16,23 @@ import (
 )
 
 const (
-	TokenKeyTokenID        = "id"
-	TokenKeyUserID         = "user_id"
-	TokenKeyRefreshTokenID = "refresh_token_id"
-	TokenKeyApplicationID  = "application_id"
-	TokenKeyUserAgentID    = "user_agent_id"
-	TokenKeyExpiration     = "expiration"
-	TokenKeyResourceOwner  = "resource_owner"
-	TokenKeyInstanceID     = "instance_id"
+	TokenKeyTokenID           = "id"
+	TokenKeyUserID            = "user_id"
+	TokenKeyRefreshTokenID    = "refresh_token_id"
+	TokenKeyApplicationID     = "application_id"
+	TokenKeyUserAgentID       = "user_agent_id"
+	TokenKeyExpiration        = "expiration"
+	TokenKeyResourceOwner     = "resource_owner"
+	TokenKeyInstanceID        = "instance_id"
+	TokenKeyCreationDate      = "creation_date"
+	TokenKeyChangeDate        = "change_date"
+	TokenKeySequence          = "sequence"
+	TokenKeyActor             = "actor"
+	TokenKeyID                = "id"
+	TokenKeyAudience          = "audience"
+	TokenKeyPreferredLanguage = "preferred_language"
+	TokenKeyScopes            = "scopes"
+	TokenKeyIsPat             = "is_pat"
 )
 
 type TokenView struct {
