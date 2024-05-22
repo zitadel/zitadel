@@ -26,6 +26,6 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json(
     { sessions },
-    { status: 500, headers: responseHeaders },
+    { status: 200, headers: responseHeaders },
   );
 }
