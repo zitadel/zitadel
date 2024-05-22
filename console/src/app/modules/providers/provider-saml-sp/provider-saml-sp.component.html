@@ -64,7 +64,9 @@
         <cnsl-form-field class="formfield">
           <cnsl-label>{{ 'IDP.SAML.NAMEIDFORMAT' | translate }}</cnsl-label>
           <mat-select formControlName="nameIdFormat" [compareWith]="compareNameIDFormat">
-            <mat-option *ngFor="let nameIdFormat of nameIDFormatValues" [value]="nameIdFormat">{{ nameIdFormat }}</mat-option>
+            <mat-option *ngFor="let nameIdFormat of nameIDFormatValues" [value]="nameIdFormat">{{
+              nameIdFormat
+            }}</mat-option>
           </mat-select>
         </cnsl-form-field>
         <cnsl-form-field class="formfield">

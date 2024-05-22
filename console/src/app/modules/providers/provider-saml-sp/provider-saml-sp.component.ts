@@ -5,7 +5,7 @@ import {
   Options,
   Provider,
   SAMLBinding,
-  SAMLNameIDFormat
+  SAMLNameIDFormat,
 } from '../../../proto/generated/zitadel/idp_pb';
 import { AbstractControl, FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
@@ -206,8 +206,8 @@ export class ProviderSamlSpComponent {
       // @ts-ignore
       req.setBinding(SAMLBinding[this.binding?.value]);
       // @ts-ignore
-      req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat?.value])
-      req.setTransientMappingAttributeName(this.transientMapping?.value)
+      req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat?.value]);
+      req.setTransientMappingAttributeName(this.transientMapping?.value);
       req.setProviderOptions(this.options);
 
       console.log(req);
@@ -244,9 +244,9 @@ export class ProviderSamlSpComponent {
     req.setWithSignedRequest(this.withSignedRequest?.value);
     if (this.nameIDFormat) {
       // @ts-ignore
-      req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value])
+      req.setNameIdFormat(SAMLNameIDFormat[this.nameIDFormat.value]);
     }
-    req.setTransientMappingAttributeName(this.transientMapping?.value)
+    req.setTransientMappingAttributeName(this.transientMapping?.value);
     this.loading = true;
     this.service
       .addSAMLProvider(req)
@@ -298,7 +298,7 @@ export class ProviderSamlSpComponent {
   }
 
   compareNameIDFormat(value: string, index: number) {
-    console.log(value, index)
+    console.log(value, index);
     if (value) {
       return value === Object.keys(SAMLNameIDFormat)[index];
     }
