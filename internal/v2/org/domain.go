@@ -6,8 +6,6 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var uniqueOrgDomain = "org_domain"
-
 const DomainAddedType = "org." + domain.AddedTypeSuffix
 
 type DomainAddedPayload domain.AddedPayload
