@@ -522,8 +522,7 @@ func (s *Tester) CreateVerifiedWebAuthNSessionWithLifetime(t *testing.T, ctx con
 	require.NoError(t, err)
 
 	updateResp, err := s.Client.SessionV2.SetSession(ctx, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
+		SessionId: createResp.GetSessionId(),
 		Checks: &session.Checks{
 			WebAuthN: &session.CheckWebAuthN{
 				CredentialAssertionData: assertion,

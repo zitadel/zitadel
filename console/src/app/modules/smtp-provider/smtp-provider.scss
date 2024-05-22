@@ -68,4 +68,32 @@
       font-size: 14px;
     }
   }
+
+  .title-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .left {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .right {
+      flex-shrink: 0;
+    }
+
+    .title {
+      margin: 1.2rem 0;
+    }
+
+    .next-icon {
+      font-size: 1.2rem;
+      height: 1.2rem;
+      width: 1.2rem;
+    }
+  }
 }

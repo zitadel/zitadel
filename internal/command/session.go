@@ -312,13 +312,10 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
 
-func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken string, cmds []SessionCommand, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
+func (c *Commands) UpdateSession(ctx context.Context, sessionID string, cmds []SessionCommand, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
-		return nil, err
-	}
-	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)

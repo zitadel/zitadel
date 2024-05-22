@@ -3,8 +3,6 @@ package handler
 import (
 	"context"
 
-	"github.com/zitadel/logging"
-
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
@@ -98,50 +96,84 @@ func (t *RefreshToken) Reducers() []handler.AggregateReducer {
 }
 
 func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err error) {
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		switch event.Type() {
-		case user.HumanRefreshTokenAddedType:
-			token := new(view_model.RefreshTokenView)
-			err := token.AppendEvent(event)
-			if err != nil {
-				return err
-			}
-
-			return t.view.PutRefreshToken(token)
-		case user.HumanRefreshTokenRenewedType:
-			e := new(user.HumanRefreshTokenRenewedEvent)
-			if err := event.Unmarshal(e); err != nil {
-				logging.WithError(err).Error("could not unmarshal event data")
-				return zerrors.ThrowInternal(nil, "MODEL-BHn75", "could not unmarshal data")
-			}
-			token, err := t.view.RefreshTokenByID(e.TokenID, event.Aggregate().InstanceID)
-			if err != nil {
-				return err
-			}
-			err = token.AppendEvent(event)
-			if err != nil {
-				return err
-			}
-			return t.view.PutRefreshToken(token)
-		case user.HumanRefreshTokenRemovedType:
-			e := new(user.HumanRefreshTokenRemovedEvent)
-			if err := event.Unmarshal(e); err != nil {
-				logging.WithError(err).Error("could not unmarshal event data")
-				return zerrors.ThrowInternal(nil, "MODEL-Bz653", "could not unmarshal data")
-			}
-			return t.view.DeleteRefreshToken(e.TokenID, event.Aggregate().InstanceID)
-		case user.UserLockedType,
-			user.UserDeactivatedType,
-			user.UserRemovedType:
-
-			return t.view.DeleteUserRefreshTokens(event.Aggregate().ID, event.Aggregate().InstanceID)
-		case instance.InstanceRemovedEventType:
-
-			return t.view.DeleteInstanceRefreshTokens(event.Aggregate().InstanceID)
-		case org.OrgRemovedEventType:
-			return t.view.DeleteOrgRefreshTokens(event)
-		default:
-			return nil
+	// in case anything needs to be change here check if appendEvent function needs the change as well
+	switch event.Type() {
+	case user.HumanRefreshTokenAddedType:
+		e, ok := event.(*user.HumanRefreshTokenAddedEvent)
+		if !ok {
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-IoF6j", "reduce.wrong.event.type %s", user.HumanRefreshTokenAddedType)
 		}
-	}), nil
+		columns := []handler.Column{
+			handler.NewCol(view_model.RefreshTokenKeyClientID, e.ClientID),
+			handler.NewCol(view_model.RefreshTokenKeyUserAgentID, e.UserAgentID),
+			handler.NewCol(view_model.RefreshTokenKeyUserID, e.Aggregate().ID),
+			handler.NewCol(view_model.RefreshTokenKeyInstanceID, e.Aggregate().InstanceID),
+			handler.NewCol(view_model.RefreshTokenKeyTokenID, e.TokenID),
+			handler.NewCol(view_model.RefreshTokenKeyResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(view_model.RefreshTokenKeyCreationDate, event.CreatedAt()),
+			handler.NewCol(view_model.RefreshTokenKeyChangeDate, event.CreatedAt()),
+			handler.NewCol(view_model.RefreshTokenKeySequence, event.Sequence()),
+			handler.NewCol(view_model.RefreshTokenKeyAMR, e.AuthMethodsReferences),
+			handler.NewCol(view_model.RefreshTokenKeyAuthTime, e.AuthTime),
+			handler.NewCol(view_model.RefreshTokenKeyAudience, e.Audience),
+			handler.NewCol(view_model.RefreshTokenKeyExpiration, event.CreatedAt().Add(e.Expiration)),
+			handler.NewCol(view_model.RefreshTokenKeyIdleExpiration, event.CreatedAt().Add(e.IdleExpiration)),
+			handler.NewCol(view_model.RefreshTokenKeyScopes, e.Scopes),
+			handler.NewCol(view_model.RefreshTokenKeyToken, e.TokenID),
+			handler.NewCol(view_model.RefreshTokenKeyActor, view_model.TokenActor{TokenActor: e.Actor}),
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.HumanRefreshTokenRenewedType:
+		e, ok := event.(*user.HumanRefreshTokenRenewedEvent)
+		if !ok {
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-AG43hq", "reduce.wrong.event.type %s", user.HumanRefreshTokenRenewedType)
+		}
+		return handler.NewUpdateStatement(event,
+			[]handler.Column{
+				handler.NewCol(view_model.RefreshTokenKeyIdleExpiration, event.CreatedAt().Add(e.IdleExpiration)),
+				handler.NewCol(view_model.RefreshTokenKeyToken, e.RefreshToken),
+				handler.NewCol(view_model.RefreshTokenKeyChangeDate, e.CreatedAt()),
+				handler.NewCol(view_model.RefreshTokenKeySequence, event.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(view_model.RefreshTokenKeyTokenID, e.TokenID),
+				handler.NewCond(view_model.RefreshTokenKeyInstanceID, e.Aggregate().InstanceID),
+			},
+		), nil
+	case user.HumanRefreshTokenRemovedType:
+		e, ok := event.(*user.HumanRefreshTokenRemovedEvent)
+		if !ok {
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-SFF3t", "reduce.wrong.event.type %s", user.HumanRefreshTokenRemovedType)
+		}
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.RefreshTokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.RefreshTokenKeyTokenID, e.TokenID),
+			},
+		), nil
+	case user.UserLockedType,
+		user.UserDeactivatedType,
+		user.UserRemovedType:
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.RefreshTokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.RefreshTokenKeyUserID, event.Aggregate().ID),
+			},
+		), nil
+	case instance.InstanceRemovedEventType:
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.RefreshTokenKeyInstanceID, event.Aggregate().InstanceID),
+			},
+		), nil
+	case org.OrgRemovedEventType:
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.RefreshTokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.RefreshTokenKeyResourceOwner, event.Aggregate().ResourceOwner),
+			},
+		), nil
+	default:
+		return handler.NewNoOpStatement(event), nil
+	}
 }
