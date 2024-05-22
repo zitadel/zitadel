@@ -2,15 +2,26 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type MachineSecretRemovedEvent machineSecretRemovedEvent
-type machineSecretRemovedEvent = eventstore.Event[struct{}]
+type MachineSecretRemovedEvent eventstore.Event[eventstore.EmptyPayload]
 
-func MachineSecretRemovedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*MachineSecretRemovedEvent, error) {
-	event, err := eventstore.EventFromStorage[machineSecretRemovedEvent](e)
-	if err != nil {
-		return nil, err
+const MachineSecretRemovedType = machinePrefix + ".secret.removed"
+
+var _ eventstore.TypeChecker = (*MachineSecretRemovedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *MachineSecretRemovedEvent) ActionType() string {
+	return MachineSecretRemovedType
+}
+
+func MachineSecretRemovedEventFromStorage(event *eventstore.StorageEvent) (e *MachineSecretRemovedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
 	}
-	return (*MachineSecretRemovedEvent)(event), nil
+
+	return &MachineSecretRemovedEvent{
+		StorageEvent: event,
+	}, nil
 }

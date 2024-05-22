@@ -47,13 +47,16 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewAddEventUniqueConstraint("test", "id", "error"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewAddEventUniqueConstraint("test", "id", "error"),
+							},
 						},
 					},
 				},
@@ -72,13 +75,16 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewAddGlobalUniqueConstraint("test", "id", "error"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewAddGlobalUniqueConstraint("test", "id", "error"),
+							},
 						},
 					},
 				},
@@ -97,14 +103,17 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewAddEventUniqueConstraint("test", "id", "error"),
-							eventstore.NewAddEventUniqueConstraint("test", "id2", "error"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewAddEventUniqueConstraint("test", "id", "error"),
+								eventstore.NewAddEventUniqueConstraint("test", "id2", "error"),
+							},
 						},
 					},
 				},
@@ -128,23 +137,29 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewAddEventUniqueConstraint("test", "id", "error"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewAddEventUniqueConstraint("test", "id", "error"),
+							},
 						},
 					},
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewAddEventUniqueConstraint("test", "id2", "error"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewAddEventUniqueConstraint("test", "id2", "error"),
+							},
 						},
 					},
 				},
@@ -168,13 +183,16 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewRemoveInstanceUniqueConstraints(),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewRemoveInstanceUniqueConstraints(),
+							},
 						},
 					},
 				},
@@ -193,23 +211,29 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewRemoveInstanceUniqueConstraints(),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewRemoveInstanceUniqueConstraints(),
+							},
 						},
 					},
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewRemoveInstanceUniqueConstraints(),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewRemoveInstanceUniqueConstraints(),
+							},
 						},
 					},
 				},
@@ -233,13 +257,16 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewRemoveUniqueConstraint("test", "id"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewRemoveUniqueConstraint("test", "id"),
+							},
 						},
 					},
 				},
@@ -258,13 +285,16 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewRemoveGlobalUniqueConstraint("test", "id"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewRemoveGlobalUniqueConstraint("test", "id"),
+							},
 						},
 					},
 				},
@@ -283,14 +313,17 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewRemoveUniqueConstraint("test", "id"),
-							eventstore.NewRemoveUniqueConstraint("test", "id2"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewRemoveUniqueConstraint("test", "id"),
+								eventstore.NewRemoveUniqueConstraint("test", "id2"),
+							},
 						},
 					},
 				},
@@ -314,23 +347,29 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewRemoveUniqueConstraint("test", "id"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewRemoveUniqueConstraint("test", "id"),
+							},
 						},
 					},
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewRemoveUniqueConstraint("test", "id2"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewRemoveUniqueConstraint("test", "id2"),
+							},
 						},
 					},
 				},
@@ -354,13 +393,16 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewAddEventUniqueConstraint("test", "id", ""),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewAddEventUniqueConstraint("test", "id", ""),
+							},
 						},
 					},
 				},
@@ -385,13 +427,16 @@ func Test_uniqueConstraints(t *testing.T) {
 			args: args{
 				commands: []*command{
 					{
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								Instance: "instance",
-							},
+						intent: &intent{
+							PushAggregate: eventstore.NewPushIntent(
+								"instance",
+								eventstore.AppendAggregate("", "", ""),
+							).Aggregates()[0],
 						},
-						uniqueConstraints: []*eventstore.UniqueConstraint{
-							eventstore.NewAddEventUniqueConstraint("test", "id", "My.Error"),
+						Command: eventstore.Command{
+							UniqueConstraints: []*eventstore.UniqueConstraint{
+								eventstore.NewAddEventUniqueConstraint("test", "id", "My.Error"),
+							},
 						},
 					},
 				},
@@ -741,16 +786,14 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: *eventstore.NewPushIntent(
-								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
-							).Aggregates()[0].Aggregate(),
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type",
-							Sequence: 1,
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type",
+							},
 						},
+						sequence: 1,
 					},
 				},
 				expectations: []mock.Expectation{
@@ -764,9 +807,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type",
-							nil,
+							mock.NilArg,
 							uint32(1),
-							0,
+							uint32(0),
 						),
 						mock.WithQueryResult(
 							[]string{"created_at", "position"},
@@ -798,16 +841,14 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: *eventstore.NewPushIntent(
-								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
-							).Aggregates()[0].Aggregate(),
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type",
-							Sequence: 1,
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type",
+							},
 						},
+						sequence: 1,
 					},
 					{
 						intent: &intent{
@@ -816,16 +857,14 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: *eventstore.NewPushIntent(
-								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
-							).Aggregates()[0].Aggregate(),
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type2",
-							Sequence: 2,
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type2",
+							},
 						},
+						sequence: 2,
 					},
 				},
 				expectations: []mock.Expectation{
@@ -839,9 +878,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type",
-							nil,
+							mock.NilArg,
 							uint32(1),
-							0,
+							uint32(0),
 							"instance",
 							"owner",
 							"testType",
@@ -849,9 +888,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type2",
-							nil,
+							mock.NilArg,
 							uint32(2),
-							1,
+							uint32(1),
 						),
 						mock.WithQueryResult(
 							[]string{"created_at", "position"},
@@ -887,36 +926,30 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: *eventstore.NewPushIntent(
-								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
-							).Aggregates()[0].Aggregate(),
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type",
-							Sequence: 1,
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type",
+							},
 						},
+						sequence: 1,
 					},
 					{
 						intent: &intent{
 							PushAggregate: eventstore.NewPushIntent(
 								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
+								eventstore.AppendAggregate("owner", "type2", "id2"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: eventstore.Aggregate{
-								ID:       "id2",
-								Type:     "type2",
-								Instance: "instance",
-								Owner:    "owner",
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type2",
 							},
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type2",
-							Sequence: 10,
 						},
+						sequence: 10,
 					},
 				},
 				expectations: []mock.Expectation{
@@ -930,9 +963,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type",
-							nil,
+							mock.NilArg,
 							uint32(1),
-							0,
+							uint32(0),
 							"instance",
 							"owner",
 							"type2",
@@ -940,9 +973,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type2",
-							nil,
+							mock.NilArg,
 							uint32(10),
-							1,
+							uint32(1),
 						),
 						mock.WithQueryResult(
 							[]string{"created_at", "position"},
@@ -978,17 +1011,15 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: *eventstore.NewPushIntent(
-								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
-							).Aggregates()[0].Aggregate(),
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type",
-							Sequence: 1,
-							Payload:  unmarshalPayload(`{"name": "gigi"}`),
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type",
+							},
 						},
+						sequence: 1,
+						payload:  []byte(`{"name": "gigi"}`),
 					},
 				},
 				expectations: []mock.Expectation{
@@ -1002,9 +1033,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type",
-							unmarshalPayload(`{"name": "gigi"}`),
+							[]byte(`{"name": "gigi"}`),
 							uint32(1),
-							0,
+							uint32(0),
 						),
 						mock.WithQueryResult(
 							[]string{"created_at", "position"},
@@ -1036,16 +1067,14 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: *eventstore.NewPushIntent(
-								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
-							).Aggregates()[0].Aggregate(),
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type",
-							Sequence: 1,
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type",
+							},
 						},
+						sequence: 1,
 					},
 				},
 				expectations: []mock.Expectation{
@@ -1059,9 +1088,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type",
-							nil,
+							mock.NilArg,
 							uint32(1),
-							0,
+							uint32(0),
 						),
 						mock.WithQueryResult(
 							[]string{"created_at", "position"},
@@ -1094,16 +1123,14 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: *eventstore.NewPushIntent(
-								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
-							).Aggregates()[0].Aggregate(),
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type",
-							Sequence: 1,
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type",
+							},
 						},
+						sequence: 1,
 					},
 					{
 						intent: &intent{
@@ -1112,16 +1139,14 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: *eventstore.NewPushIntent(
-								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
-							).Aggregates()[0].Aggregate(),
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type2",
-							Sequence: 2,
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type2",
+							},
 						},
+						sequence: 2,
 					},
 				},
 				expectations: []mock.Expectation{
@@ -1135,9 +1160,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type",
-							nil,
+							mock.NilArg,
 							uint32(1),
-							0,
+							uint32(0),
 							"instance",
 							"owner",
 							"testType",
@@ -1145,9 +1170,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type2",
-							nil,
+							mock.NilArg,
 							uint32(2),
-							1,
+							uint32(1),
 						),
 						mock.WithQueryResult(
 							[]string{"created_at", "position"},
@@ -1189,16 +1214,14 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: *eventstore.NewPushIntent(
-								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
-							).Aggregates()[0].Aggregate(),
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type",
-							Sequence: 1,
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type",
+							},
 						},
+						sequence: 1,
 					},
 					{
 						intent: &intent{
@@ -1207,16 +1230,14 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Event: &eventstore.Event[eventstore.StoragePayload]{
-							Aggregate: *eventstore.NewPushIntent(
-								"instance",
-								eventstore.AppendAggregate("owner", "testType", "testID"),
-							).Aggregates()[0].Aggregate(),
-							Creator:  "gigi",
-							Revision: 1,
-							Type:     "test.type2",
-							Sequence: 2,
+						Command: eventstore.Command{
+							Action: eventstore.Action[any]{
+								Creator:  "gigi",
+								Revision: 1,
+								Type:     "test.type2",
+							},
 						},
+						sequence: 2,
 					},
 				},
 				expectations: []mock.Expectation{
@@ -1230,9 +1251,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type",
-							nil,
+							mock.NilArg,
 							uint32(1),
-							0,
+							uint32(0),
 							"instance",
 							"owner",
 							"testType",
@@ -1240,9 +1261,9 @@ func Test_push(t *testing.T) {
 							uint16(1),
 							"gigi",
 							"test.type2",
-							nil,
+							mock.NilArg,
 							uint32(2),
-							1,
+							uint32(1),
 						),
 						mock.WithQueryResult(
 							[]string{"created_at", "position"},

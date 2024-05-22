@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type humanRegisteredPayload struct {
@@ -18,11 +19,6 @@ type humanRegisteredPayload struct {
 	Gender            domain.Gender       `json:"gender,omitempty"`
 	EmailAddress      domain.EmailAddress `json:"email,omitempty"`
 	PhoneNumber       domain.PhoneNumber  `json:"phone,omitempty"`
-	Country           string              `json:"country,omitempty"`
-	Locality          string              `json:"locality,omitempty"`
-	PostalCode        string              `json:"postalCode,omitempty"`
-	Region            string              `json:"region,omitempty"`
-	StreetAddress     string              `json:"streetAddress,omitempty"`
 
 	// New events only use EncodedHash. However, the secret field
 	// is preserved to handle events older than the switch to Passwap.
@@ -31,13 +27,29 @@ type humanRegisteredPayload struct {
 	PasswordChangeRequired bool                `json:"changeRequired,omitempty"`
 }
 
-type HumanRegisteredEvent humanRegisteredEvent
-type humanRegisteredEvent = eventstore.Event[humanRegisteredPayload]
+type HumanRegisteredEvent eventstore.Event[humanRegisteredPayload]
 
-func HumanRegisteredEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanRegisteredEvent, error) {
-	event, err := eventstore.EventFromStorage[humanRegisteredEvent](e)
+const HumanRegisteredType = humanPrefix + ".selfregistered"
+
+var _ eventstore.TypeChecker = (*HumanRegisteredEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *HumanRegisteredEvent) ActionType() string {
+	return HumanRegisteredType
+}
+
+func HumanRegisteredEventFromStorage(event *eventstore.StorageEvent) (e *HumanRegisteredEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[humanRegisteredPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*HumanRegisteredEvent)(event), nil
+
+	return &HumanRegisteredEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }

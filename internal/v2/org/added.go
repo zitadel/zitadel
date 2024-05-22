@@ -9,74 +9,54 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var uniqueOrgName = "org_name"
-
-var (
-	// TODO: use same logic as in [strings.Builder] to get rid of the following line
-	Added AddedEvent
-)
+const AddedType = eventTypePrefix + "added"
 
 type addedPayload struct {
 	Name string `json:"name"`
 }
 
-type AddedEvent addedEvent
-type addedEvent = eventstore.Event[addedPayload]
+type AddedEvent eventstore.Event[addedPayload]
 
-func AddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*AddedEvent, error) {
-	event, err := eventstore.EventFromStorage[addedEvent](e)
+var _ eventstore.TypeChecker = (*AddedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *AddedEvent) ActionType() string {
+	return AddedType
+}
+
+func AddedEventFromStorage(event *eventstore.StorageEvent) (e *AddedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[addedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*AddedEvent)(event), nil
-}
 
-func (e AddedEvent) IsType(typ string) bool {
-	return typ == "org.added"
-}
-
-var _ eventstore.Command = (*AddedCommand)(nil)
-
-type AddedCommand struct {
-	creator string
-	addedPayload
-}
-
-func NewAddedCommand(ctx context.Context, name string) (*AddedCommand, error) {
-	if name = strings.TrimSpace(name); name == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")
-	}
-	return &AddedCommand{
-		creator: authz.GetCtxData(ctx).UserID,
-		addedPayload: addedPayload{
-			Name: name,
-		},
+	return &AddedEvent{
+		StorageEvent: event,
+		Payload:      payload,
 	}, nil
 }
 
-// Creator implements eventstore.Command.
-func (a *AddedCommand) Creator() string {
-	return a.creator
-}
+const uniqueOrgName = "org_name"
 
-// Payload implements eventstore.Command.
-func (a *AddedCommand) Payload() any {
-	return a.addedPayload
-}
-
-// Revision implements [eventstore.action].
-func (*AddedCommand) Revision() uint16 {
-	return 1
-}
-
-// UniqueConstraints implements [eventstore.Command].
-func (e *AddedCommand) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{
-		eventstore.NewAddEventUniqueConstraint(uniqueOrgName, e.Name, "Errors.Org.AlreadyExists"),
+func NewAddedCommand(ctx context.Context, name string) (*eventstore.Command, error) {
+	if name = strings.TrimSpace(name); name == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")
 	}
-}
-
-// Type implements [eventstore.action].
-func (*AddedCommand) Type() string {
-	return "org.added"
+	return &eventstore.Command{
+		Action: eventstore.Action[any]{
+			Creator:  authz.GetCtxData(ctx).UserID,
+			Type:     AddedType,
+			Revision: 1,
+			Payload: addedPayload{
+				Name: name,
+			},
+		},
+		UniqueConstraints: []*eventstore.UniqueConstraint{
+			eventstore.NewAddEventUniqueConstraint(uniqueOrgName, name, "Errors.Org.AlreadyExists"),
+		},
+	}, nil
 }

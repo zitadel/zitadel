@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
-var (
+const (
 	AggregateType   = "org"
 	eventTypePrefix = AggregateType + "."
 )

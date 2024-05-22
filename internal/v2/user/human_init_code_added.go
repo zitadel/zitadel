@@ -3,21 +3,41 @@ package user
 import (
 	"time"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type humanInitialCodeAddedPayload struct {
-	Expiry            time.Duration `json:"expiry,omitempty"`
-	TriggeredAtOrigin string        `json:"triggerOrigin,omitempty"`
+type humanInitCodeAddedPayload struct {
+	Code              *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry            time.Duration       `json:"expiry,omitempty"`
+	TriggeredAtOrigin string              `json:"triggerOrigin,omitempty"`
+	AuthRequestID     string              `json:"authRequestID,omitempty"`
 }
 
-type HumanInitialCodeAddedEvent humanInitialCodeAddedEvent
-type humanInitialCodeAddedEvent = eventstore.Event[humanInitialCodeAddedPayload]
+type HumanInitCodeAddedEvent eventstore.Event[humanInitCodeAddedPayload]
 
-func HumanInitialCodeAddedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanInitialCodeAddedEvent, error) {
-	event, err := eventstore.EventFromStorage[humanInitialCodeAddedEvent](e)
+const HumanInitCodeAddedType = humanPrefix + ".initialization.code.added"
+
+var _ eventstore.TypeChecker = (*HumanInitCodeAddedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *HumanInitCodeAddedEvent) ActionType() string {
+	return HumanInitCodeAddedType
+}
+
+func HumanInitCodeAddedEventFromStorage(event *eventstore.StorageEvent) (e *HumanInitCodeAddedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[humanInitCodeAddedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*HumanInitialCodeAddedEvent)(event), nil
+
+	return &HumanInitCodeAddedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }

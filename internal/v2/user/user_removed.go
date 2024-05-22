@@ -2,15 +2,26 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type UserRemovedEvent userRemovedEvent
-type userRemovedEvent = eventstore.Event[struct{}]
+type RemovedEvent eventstore.Event[eventstore.EmptyPayload]
 
-func UserRemovedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*UserRemovedEvent, error) {
-	event, err := eventstore.EventFromStorage[userRemovedEvent](e)
-	if err != nil {
-		return nil, err
+const RemovedType = AggregateType + ".removed"
+
+var _ eventstore.TypeChecker = (*RemovedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *RemovedEvent) ActionType() string {
+	return RemovedType
+}
+
+func RemovedEventFromStorage(event *eventstore.StorageEvent) (e *RemovedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
 	}
-	return (*UserRemovedEvent)(event), nil
+
+	return &RemovedEvent{
+		StorageEvent: event,
+	}, nil
 }

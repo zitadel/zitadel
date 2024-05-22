@@ -2,15 +2,26 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type HumanPhoneRemovedEvent humanPhoneRemovedEvent
-type humanPhoneRemovedEvent = eventstore.Event[struct{}]
+type HumanPhoneRemovedEvent eventstore.Event[eventstore.EmptyPayload]
 
-func HumanPhoneRemovedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanPhoneRemovedEvent, error) {
-	event, err := eventstore.EventFromStorage[humanPhoneRemovedEvent](e)
-	if err != nil {
-		return nil, err
+const HumanPhoneRemovedType = humanPrefix + ".phone.removed"
+
+var _ eventstore.TypeChecker = (*HumanPhoneRemovedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *HumanPhoneRemovedEvent) ActionType() string {
+	return HumanPhoneRemovedType
+}
+
+func HumanPhoneRemovedEventFromStorage(event *eventstore.StorageEvent) (e *HumanPhoneRemovedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
 	}
-	return (*HumanPhoneRemovedEvent)(event), nil
+
+	return &HumanPhoneRemovedEvent{
+		StorageEvent: event,
+	}, nil
 }

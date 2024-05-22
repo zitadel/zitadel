@@ -2,4 +2,7 @@ package instance
 
 import "github.com/zitadel/zitadel/internal/repository/instance"
 
-var AggregateType = string(instance.AggregateType)
+const (
+	AggregateType   = string(instance.AggregateType)
+	eventTypePrefix = AggregateType + "."
+)
