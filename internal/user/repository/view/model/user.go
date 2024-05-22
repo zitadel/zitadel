@@ -234,6 +234,7 @@ func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_mode
 }
 
 func (u *UserView) AppendEvent(event eventstore.Event) (err error) {
+	// in case anything needs to be change here check if the Reduce function needs the change as well
 	u.ChangeDate = event.CreatedAt()
 	u.Sequence = event.Sequence()
 	switch event.Type() {
@@ -392,7 +393,7 @@ func (u *UserView) setData(event eventstore.Event) error {
 func (u *UserView) setPasswordData(event eventstore.Event) error {
 	password := new(es_model.Password)
 	if err := event.Unmarshal(password); err != nil {
-		logging.Log("MODEL-sdw4r").WithError(err).Error("could not unmarshal event data")
+		logging.WithError(err).Error("could not unmarshal event data")
 		return zerrors.ThrowInternal(nil, "MODEL-6jhsw", "could not unmarshal data")
 	}
 	u.PasswordSet = password.Secret != nil || password.EncodedHash != ""

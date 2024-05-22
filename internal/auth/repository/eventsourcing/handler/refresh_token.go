@@ -96,6 +96,7 @@ func (t *RefreshToken) Reducers() []handler.AggregateReducer {
 }
 
 func (t *RefreshToken) Reduce(event eventstore.Event) (_ *handler.Statement, err error) {
+	// in case anything needs to be change here check if appendEvent function needs the change as well
 	switch event.Type() {
 	case user.HumanRefreshTokenAddedType:
 		e, ok := event.(*user.HumanRefreshTokenAddedEvent)

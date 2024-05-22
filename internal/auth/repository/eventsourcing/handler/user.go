@@ -166,6 +166,7 @@ func (u *User) Reducers() []handler.AggregateReducer {
 
 //nolint:gocognit
 func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err error) {
+	// in case anything needs to be change here check if appendEvent function needs the change as well
 	switch event.Type() {
 	case user_repo.UserV1AddedType,
 		user_repo.HumanAddedType:
@@ -269,6 +270,7 @@ func (u *User) setPasswordData(event eventstore.Event, secret *crypto.CryptoValu
 }
 
 func (u *User) ProcessOrg(event eventstore.Event) (_ *handler.Statement, err error) {
+	// in case anything needs to be change here check if appendEvent function needs the change as well
 	switch event.Type() {
 	case org.OrgRemovedEventType:
 		return handler.NewDeleteStatement(event,
@@ -283,6 +285,7 @@ func (u *User) ProcessOrg(event eventstore.Event) (_ *handler.Statement, err err
 }
 
 func (u *User) ProcessInstance(event eventstore.Event) (_ *handler.Statement, err error) {
+	// in case anything needs to be change here check if appendEvent function needs the change as well
 	switch event.Type() {
 	case instance.InstanceRemovedEventType:
 		return handler.NewDeleteStatement(event,

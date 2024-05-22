@@ -204,6 +204,7 @@ func sessionColumns(event eventstore.Event, columns ...handler.Column) ([]handle
 }
 
 func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err error) {
+	// in case anything needs to be change here check if appendEvent function needs the change as well
 	switch event.Type() {
 	case user.UserV1PasswordCheckSucceededType,
 		user.HumanPasswordCheckSucceededType:

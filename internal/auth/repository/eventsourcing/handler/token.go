@@ -151,6 +151,7 @@ func (t *Token) Reducers() []handler.AggregateReducer {
 }
 
 func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error) { //nolint:gocognit
+	// in case anything needs to be change here check if appendEvent function needs the change as well
 	switch event.Type() {
 	case user.UserTokenAddedType:
 		e, ok := event.(*user.UserTokenAddedEvent)
@@ -328,7 +329,7 @@ type userAgentIDPayload struct {
 
 func agentIDFromSession(event eventstore.Event) (string, error) {
 	payload := new(userAgentIDPayload)
-	if err := event.Unmarshal(&payload); err != nil {
+	if err := event.Unmarshal(payload); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
 		return "", zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}

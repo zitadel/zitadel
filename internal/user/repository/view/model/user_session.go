@@ -67,7 +67,7 @@ type userAgentIDPayload struct {
 
 func UserAgentIDFromEvent(event eventstore.Event) (string, error) {
 	payload := new(userAgentIDPayload)
-	if err := event.Unmarshal(&payload); err != nil {
+	if err := event.Unmarshal(payload); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
 		return "", zerrors.ThrowInternal(nil, "MODEL-HJwk9", "could not unmarshal data")
 	}
@@ -107,6 +107,7 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 }
 
 func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
+	// in case anything needs to be change here check if the Reduce function needs the change as well
 	v.Sequence = event.Sequence()
 	v.ChangeDate = event.CreatedAt()
 	switch event.Type() {
