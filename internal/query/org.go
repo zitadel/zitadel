@@ -104,7 +104,7 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	}
 
 	foundOrg := readmodel.NewOrg(id)
-	eventCount, err := q.eventStore.Query(
+	eventCount, err := q.eventStoreV4.Query(
 		ctx,
 		eventstore.NewQuery(
 			authz.GetInstance(ctx).InstanceID(),

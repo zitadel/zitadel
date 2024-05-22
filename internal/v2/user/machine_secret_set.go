@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -8,8 +9,8 @@ import (
 type machineSecretSetPayload struct {
 	// New events only use EncodedHash. However, the ClientSecret field
 	// is preserved to handle events older than the switch to Passwap.
-	// ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
-	HashedSecret string `json:"hashedSecret,omitempty"`
+	ClientSecret *crypto.CryptoValue `json:"clientSecret,omitempty"`
+	HashedSecret string              `json:"hashedSecret,omitempty"`
 }
 
 type MachineSecretHashSetEvent eventstore.Event[machineSecretSetPayload]

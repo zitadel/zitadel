@@ -34,6 +34,10 @@ type GlobalPosition struct {
 	InPositionOrder uint32
 }
 
+func (gp GlobalPosition) IsLess(other GlobalPosition) bool {
+	return gp.Position < other.Position || (gp.Position == other.Position && gp.InPositionOrder < other.InPositionOrder)
+}
+
 type Reducer interface {
 	Reduce(events ...*StorageEvent) error
 }

@@ -19,11 +19,6 @@ type humanRegisteredPayload struct {
 	Gender            domain.Gender       `json:"gender,omitempty"`
 	EmailAddress      domain.EmailAddress `json:"email,omitempty"`
 	PhoneNumber       domain.PhoneNumber  `json:"phone,omitempty"`
-	Country           string              `json:"country,omitempty"`
-	Locality          string              `json:"locality,omitempty"`
-	PostalCode        string              `json:"postalCode,omitempty"`
-	Region            string              `json:"region,omitempty"`
-	StreetAddress     string              `json:"streetAddress,omitempty"`
 
 	// New events only use EncodedHash. However, the secret field
 	// is preserved to handle events older than the switch to Passwap.

@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const DomainPolicyAddedType = "instance." + policy.DomainPolicyAddedTypeSuffix
+const DomainPolicyAddedType = eventTypePrefix + policy.DomainPolicyAddedTypeSuffix
 
 type DomainPolicyAddedPayload policy.DomainPolicyAddedPayload
 
@@ -35,7 +35,7 @@ func DomainPolicyAddedEventFromStorage(event *eventstore.StorageEvent) (e *Domai
 	}, nil
 }
 
-const DomainPolicyChangedType = "instance." + policy.DomainPolicyChangedTypeSuffix
+const DomainPolicyChangedType = eventTypePrefix + policy.DomainPolicyChangedTypeSuffix
 
 type DomainPolicyChangedPayload policy.DomainPolicyChangedPayload
 

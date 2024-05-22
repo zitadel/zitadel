@@ -5,10 +5,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const ChangedType = "org.changed"
+const ChangedType = eventTypePrefix + "changed"
 
 type changedPayload struct {
-	Name *string `json:"name"`
+	Name string `json:"name"`
 }
 
 type ChangedEvent eventstore.Event[changedPayload]

@@ -16,11 +16,5 @@ func (p *projection) reduce(event *eventstore.StorageEvent) {
 
 func (p *projection) shouldReduce(event *eventstore.StorageEvent) bool {
 	shouldReduce := p.instance == "" || p.instance == event.Aggregate.Instance
-	if p.position.Position == event.Position.Position {
-		shouldReduce = shouldReduce && p.position.InPositionOrder < event.Position.InPositionOrder
-	} else {
-		shouldReduce = shouldReduce && p.position.Position < event.Position.Position
-	}
-
-	return shouldReduce
+	return shouldReduce && p.position.IsLess(event.Position)
 }

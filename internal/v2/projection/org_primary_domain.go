@@ -29,7 +29,7 @@ func (p *OrgPrimaryDomain) Filter() []*eventstore.Filter {
 				org.AggregateType,
 				eventstore.AggregateIDs(p.id),
 				eventstore.AppendEvent(
-					eventstore.SetEventTypes("org.domain.primary.set"),
+					eventstore.SetEventTypes(org.DomainPrimarySetType),
 				),
 			),
 		),

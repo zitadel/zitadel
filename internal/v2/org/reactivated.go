@@ -5,7 +5,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const ReactivatedType = "org.reactivated"
+const ReactivatedType = eventTypePrefix + "reactivated"
 
 type ReactivatedEvent eventstore.Event[eventstore.EmptyPayload]
 

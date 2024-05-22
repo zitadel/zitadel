@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const AddedType = "org.added"
+const AddedType = eventTypePrefix + "added"
 
 type addedPayload struct {
 	Name string `json:"name"`

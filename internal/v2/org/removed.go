@@ -5,7 +5,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-const RemovedType = "org.removed"
+const RemovedType = eventTypePrefix + "removed"
 
 type RemovedEvent eventstore.Event[eventstore.EmptyPayload]
 
