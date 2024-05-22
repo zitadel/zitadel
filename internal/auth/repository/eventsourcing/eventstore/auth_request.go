@@ -1517,12 +1517,12 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			user_repo.HumanPasswordlessTokenCheckFailedType,
 			user_repo.HumanU2FTokenCheckSucceededType,
 			user_repo.HumanU2FTokenCheckFailedType:
-			eventData, err := user_view_model.UserSessionFromEvent(event)
+			userAgentID, err := user_view_model.UserAgentIDFromEvent(event)
 			if err != nil {
 				logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error getting event data")
 				return user_view_model.UserSessionToModel(session), nil
 			}
-			if eventData.UserAgentID != agentID {
+			if userAgentID != agentID {
 				continue
 			}
 		case user_repo.UserRemovedType:
