@@ -304,8 +304,9 @@
   text-decoration: none;
   color: inherit;
   font-family: inherit;
+  text-decoration: underline;
+}
 
-  &:hover {
-    text-decoration: underline;
-  }
+.download-button {
+  margin-left: 1rem;
 }

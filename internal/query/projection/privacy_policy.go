@@ -14,21 +14,24 @@ import (
 )
 
 const (
-	PrivacyPolicyTable = "projections.privacy_policies3"
+	PrivacyPolicyTable = "projections.privacy_policies4"
 
-	PrivacyPolicyIDCol            = "id"
-	PrivacyPolicyCreationDateCol  = "creation_date"
-	PrivacyPolicyChangeDateCol    = "change_date"
-	PrivacyPolicySequenceCol      = "sequence"
-	PrivacyPolicyStateCol         = "state"
-	PrivacyPolicyIsDefaultCol     = "is_default"
-	PrivacyPolicyResourceOwnerCol = "resource_owner"
-	PrivacyPolicyInstanceIDCol    = "instance_id"
-	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
-	PrivacyPolicyTOSLinkCol       = "tos_link"
-	PrivacyPolicyHelpLinkCol      = "help_link"
-	PrivacyPolicySupportEmailCol  = "support_email"
-	PrivacyPolicyOwnerRemovedCol  = "owner_removed"
+	PrivacyPolicyIDCol             = "id"
+	PrivacyPolicyCreationDateCol   = "creation_date"
+	PrivacyPolicyChangeDateCol     = "change_date"
+	PrivacyPolicySequenceCol       = "sequence"
+	PrivacyPolicyStateCol          = "state"
+	PrivacyPolicyIsDefaultCol      = "is_default"
+	PrivacyPolicyResourceOwnerCol  = "resource_owner"
+	PrivacyPolicyInstanceIDCol     = "instance_id"
+	PrivacyPolicyPrivacyLinkCol    = "privacy_link"
+	PrivacyPolicyTOSLinkCol        = "tos_link"
+	PrivacyPolicyHelpLinkCol       = "help_link"
+	PrivacyPolicySupportEmailCol   = "support_email"
+	PrivacyPolicyDocsLinkCol       = "docs_link"
+	PrivacyPolicyCustomLinkCol     = "custom_link"
+	PrivacyPolicyCustomLinkTextCol = "custom_link_text"
+	PrivacyPolicyOwnerRemovedCol   = "owner_removed"
 )
 
 type privacyPolicyProjection struct{}
@@ -56,6 +59,9 @@ func (*privacyPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(PrivacyPolicyTOSLinkCol, handler.ColumnTypeText),
 			handler.NewColumn(PrivacyPolicyHelpLinkCol, handler.ColumnTypeText),
 			handler.NewColumn(PrivacyPolicySupportEmailCol, handler.ColumnTypeText),
+			handler.NewColumn(PrivacyPolicyDocsLinkCol, handler.ColumnTypeText, handler.Default("https://zitadel.com/docs")),
+			handler.NewColumn(PrivacyPolicyCustomLinkCol, handler.ColumnTypeText),
+			handler.NewColumn(PrivacyPolicyCustomLinkTextCol, handler.ColumnTypeText),
 			handler.NewColumn(PrivacyPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(PrivacyPolicyInstanceIDCol, PrivacyPolicyIDCol),
@@ -132,6 +138,9 @@ func (p *privacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 			handler.NewCol(PrivacyPolicyTOSLinkCol, policyEvent.TOSLink),
 			handler.NewCol(PrivacyPolicyHelpLinkCol, policyEvent.HelpLink),
 			handler.NewCol(PrivacyPolicySupportEmailCol, policyEvent.SupportEmail),
+			handler.NewCol(PrivacyPolicyDocsLinkCol, policyEvent.DocsLink),
+			handler.NewCol(PrivacyPolicyCustomLinkCol, policyEvent.CustomLink),
+			handler.NewCol(PrivacyPolicyCustomLinkTextCol, policyEvent.CustomLinkText),
 			handler.NewCol(PrivacyPolicyIsDefaultCol, isDefault),
 			handler.NewCol(PrivacyPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 			handler.NewCol(PrivacyPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
@@ -163,6 +172,15 @@ func (p *privacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	}
 	if policyEvent.SupportEmail != nil {
 		cols = append(cols, handler.NewCol(PrivacyPolicySupportEmailCol, *policyEvent.SupportEmail))
+	}
+	if policyEvent.DocsLink != nil {
+		cols = append(cols, handler.NewCol(PrivacyPolicyDocsLinkCol, *policyEvent.DocsLink))
+	}
+	if policyEvent.CustomLink != nil {
+		cols = append(cols, handler.NewCol(PrivacyPolicyCustomLinkCol, *policyEvent.CustomLink))
+	}
+	if policyEvent.CustomLinkText != nil {
+		cols = append(cols, handler.NewCol(PrivacyPolicyCustomLinkTextCol, *policyEvent.CustomLinkText))
 	}
 	return handler.NewUpdateStatement(
 		&policyEvent,

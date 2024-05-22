@@ -186,3 +186,14 @@ func DomainValidationTypeFromModel(validationType domain.OrgDomainValidationType
 		return org_pb.DomainValidationType_DOMAIN_VALIDATION_TYPE_UNSPECIFIED
 	}
 }
+
+func FieldNameToOrgColumn(fieldName org_pb.OrgFieldName) query.Column {
+	switch fieldName {
+	case org_pb.OrgFieldName_ORG_FIELD_NAME_NAME:
+		return query.OrgColumnName
+	case org_pb.OrgFieldName_ORG_FIELD_NAME_UNSPECIFIED:
+		return query.Column{}
+	default:
+		return query.Column{}
+	}
+}

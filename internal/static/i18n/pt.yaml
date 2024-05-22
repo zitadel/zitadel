@@ -136,6 +136,7 @@ Errors:
       Invalid: Senha é inválida
       NotSet: O usuário não definiu uma senha
       NotChanged: A nova senha não pode ser igual à sua senha atual
+      NotSupported: Codificação hash da senha não suportada. Confira https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Política de complexidade de senha não encontrada
       MinLength: A senha é muito curta
@@ -468,6 +469,7 @@ Errors:
     NotActive: A ação não está ativa
     NotInactive: A ação não está inativa
     MaxAllowed: Não são permitidas ações adicionais ativas
+    NotEnabled: O recurso "Ação" não está ativado
   Flow:
     FlowTypeMissing: O tipo de fluxo está faltando
     Empty: O fluxo já está vazio
@@ -607,6 +609,7 @@ EventTypes:
         failed: Verificação de inicialização falhou
     token:
       added: Token de acesso criado
+      v2.added: Token de acesso criado
       removed: Token de acesso removido
     impersonated: Usuário personificado
     username:

@@ -19,5 +19,8 @@ func ModelPrivacyPolicyToPb(policy *query.PrivacyPolicy) *policy_pb.PrivacyPolic
 			policy.ChangeDate,
 			policy.ResourceOwner,
 		),
+		DocsLink:       policy.DocsLink,
+		CustomLink:     policy.CustomLink,
+		CustomLinkText: policy.CustomLinkText,
 	}
 }

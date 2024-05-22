@@ -297,7 +297,7 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
-      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.PASSWORD_RESET_ALLOWED.DESCRIPTION' | translate }}"
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.HIDE_PASSWORD_RESET.DESCRIPTION' | translate }}"
       [(ngModel)]="loginData.hidePasswordReset"
       [disabled]="
         ([
@@ -311,7 +311,7 @@
           | async) === false
       "
     >
-      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.PASSWORD_RESET_ALLOWED.TITLE' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.HIDE_PASSWORD_RESET.TITLE' | translate }}
     </mat-checkbox>
 
     <!-- <ng-template #passwordResetInfo>

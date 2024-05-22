@@ -48,13 +48,13 @@
       "TITLE": "Usuarios",
       "DESCRIPTION": "Un usuario es un humano o una máquina que puede acceder a tus aplicaciones.",
       "HUMANS": {
-        "TITLE": "Humanos",
-        "DESCRIPTION": "Los humanos se autentican de manera interactiva en una sesión de navegador con una solicitud de inicio de sesión.",
+        "TITLE": "Usuarios",
+        "DESCRIPTION": "Los Usuarios se autentican de manera interactiva en una sesión de navegador con una solicitud de inicio de sesión.",
         "METADATA": "Añade atributos personalizados al usuario como el departamento. Puedes usar esta información en tus acciones."
       },
       "MACHINES": {
-        "TITLE": "Máquinas",
-        "DESCRIPTION": "Las máquinas se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
+        "TITLE": "Usuarios del servicio",
+        "DESCRIPTION": "Los Usuarios del servicio se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
         "METADATA": "Añade atributos personalizados al usuario como el sistema autenticador. Puedes usar esta información en tus acciones."
       },
       "SELF": {
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Enlaces Externos",
-        "DESCRIPTION": "Guía a tus usuarios hacia recursos externos personalizados mostrados en la página de inicio de sesión. Los usuarios necesitan aceptar los Términos de Servicio y la Política de Privacidad antes de que puedan registrarse."
+        "DESCRIPTION": "Guía a tus usuarios a recursos externos personalizados que se muestran en la página de inicio de sesión. Los usuarios deben aceptar los Términos de servicio y la Política de privacidad antes de poder registrarse. Cambia el enlace a tu documentación o introduce una cadena de texto vacía para ocultar el botón de documentación de la consola. Agrega un enlace externo personalizado y un texto personalizado para dicho enlace en la consola, o déjalos vacíos para ocultar ese botón."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Configuración de SMTP",
@@ -269,9 +269,9 @@
             "TITLE": "Permitido Inicio de Sesión Externo",
             "DESCRIPTION": "Permite a tus usuarios iniciar sesión con un proveedor de identidad externo en lugar de usar el usuario de ZITADEL para iniciar sesión."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Permitido Restablecimiento de Contraseña",
-            "DESCRIPTION": "Permite a tus usuarios restablecer su contraseña."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Restablecimiento de contraseña oculto",
+            "DESCRIPTION": "No permita que sus usuarios restablezcan su contraseña."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Permitido Descubrimiento de Dominio",
@@ -1572,6 +1572,9 @@
       "POLICYLINK": "Enlace a Política de privacidad",
       "HELPLINK": "Enlace de ayuda",
       "SUPPORTEMAIL": "Email de soporte",
+      "DOCSLINK": "Enlace de documentos (Console)",
+      "CUSTOMLINK": "Enlace personalizado (Console)",
+      "CUSTOMLINKTEXT": "Texto de enlace personalizado (Console)",
       "SAVED": "¡Se guardó con éxito!",
       "RESET_TITLE": "Restaurar valores por defecto",
       "RESET_DESCRIPTION": "Estás a punto de restaurar los enlaces por defecto para los TDS y la política de privacida. ¿Quieres continuar?"

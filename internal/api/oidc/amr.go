@@ -1,6 +1,10 @@
 package oidc
 
-import "github.com/zitadel/zitadel/internal/domain"
+import (
+	"slices"
+
+	"github.com/zitadel/zitadel/internal/domain"
+)
 
 const (
 	// Password states that the users password has been verified
@@ -87,5 +91,5 @@ func AMRToAuthMethodTypes(amr []string) []domain.UserAuthMethodType {
 			authMethods = append(authMethods, domain.UserAuthMethodTypeU2F)
 		}
 	}
-	return authMethods
+	return slices.Compact(authMethods) // remove duplicate entries
 }

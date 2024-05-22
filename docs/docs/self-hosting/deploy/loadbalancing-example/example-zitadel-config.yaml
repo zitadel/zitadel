@@ -2,7 +2,7 @@
 Log:
   Level: 'info'
 
-# Make ZITADEL accessible over HTTP, not HTTPS
+# Make ZITADEL accessible over HTTPs, not HTTP
 ExternalSecure: true
 ExternalDomain: my.domain
 ExternalPort: 443

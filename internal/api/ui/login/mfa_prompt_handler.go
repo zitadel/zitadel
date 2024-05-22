@@ -96,7 +96,7 @@ func (l *Login) handleMFACreation(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) handleTOTPCreation(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *mfaVerifyData) {
-	otp, err := l.command.AddHumanTOTP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID)
+	otp, err := l.command.AddHumanTOTP(setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID), authReq.UserID, authReq.UserOrgID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

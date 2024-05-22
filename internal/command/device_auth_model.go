@@ -3,6 +3,8 @@ package command
 import (
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
@@ -10,16 +12,22 @@ import (
 
 type DeviceAuthWriteModel struct {
 	eventstore.WriteModel
+	aggregate *eventstore.Aggregate
 
-	ClientID        string
-	DeviceCode      string
-	UserCode        string
-	Expires         time.Time
-	Scopes          []string
-	State           domain.DeviceAuthState
-	Subject         string
-	UserAuthMethods []domain.UserAuthMethodType
-	AuthTime        time.Time
+	ClientID          string
+	DeviceCode        string
+	UserCode          string
+	Expires           time.Time
+	Scopes            []string
+	Audience          []string
+	State             domain.DeviceAuthState
+	UserID            string
+	UserOrgID         string
+	UserAuthMethods   []domain.UserAuthMethodType
+	AuthTime          time.Time
+	PreferredLanguage *language.Tag
+	UserAgent         *domain.UserAgent
+	NeedRefreshToken  bool
 }
 
 func NewDeviceAuthWriteModel(deviceCode, resourceOwner string) *DeviceAuthWriteModel {
@@ -28,6 +36,7 @@ func NewDeviceAuthWriteModel(deviceCode, resourceOwner string) *DeviceAuthWriteM
 			AggregateID:   deviceCode,
 			ResourceOwner: resourceOwner,
 		},
+		aggregate: deviceauth.NewAggregate(deviceCode, resourceOwner),
 	}
 }
 
@@ -40,14 +49,21 @@ func (m *DeviceAuthWriteModel) Reduce() error {
 			m.UserCode = e.UserCode
 			m.Expires = e.Expires
 			m.Scopes = e.Scopes
+			m.Audience = e.Audience
 			m.State = e.State
+			m.NeedRefreshToken = e.NeedRefreshToken
 		case *deviceauth.ApprovedEvent:
 			m.State = domain.DeviceAuthStateApproved
-			m.Subject = e.Subject
+			m.UserID = e.UserID
+			m.UserOrgID = e.UserOrgID
 			m.UserAuthMethods = e.UserAuthMethods
 			m.AuthTime = e.AuthTime
+			m.PreferredLanguage = e.PreferredLanguage
+			m.UserAgent = e.UserAgent
 		case *deviceauth.CanceledEvent:
 			m.State = e.Reason.State()
+		case *deviceauth.DoneEvent:
+			m.State = domain.DeviceAuthStateDone
 		}
 	}
 
