@@ -18,7 +18,7 @@ func (c *HumanEmailVerifiedEvent) ActionType() string {
 
 func HumanEmailVerifiedEventFromStorage(event *eventstore.StorageEvent) (e *HumanEmailVerifiedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-X3esB", "Errors.Invalid.Event.Type")
 	}
 
 	return &HumanEmailVerifiedEvent{

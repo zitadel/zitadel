@@ -18,7 +18,7 @@ func (c *HumanInitCodeSucceededEvent) ActionType() string {
 
 func HumanInitCodeSucceededEventFromStorage(event *eventstore.StorageEvent) (e *HumanInitCodeSucceededEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-12A5m", "Errors.Invalid.Event.Type")
 	}
 
 	return &HumanInitCodeSucceededEvent{

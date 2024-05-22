@@ -22,7 +22,7 @@ func (c *ChangedEvent) ActionType() string {
 
 func ChangedEventFromStorage(event *eventstore.StorageEvent) (e *ChangedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-pzOfP", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[changedPayload](event.Payload)

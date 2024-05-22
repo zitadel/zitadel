@@ -28,7 +28,7 @@ func (c *HumanInitCodeAddedEvent) ActionType() string {
 
 func HumanInitCodeAddedEventFromStorage(event *eventstore.StorageEvent) (e *HumanInitCodeAddedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-XaGf6", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[humanInitCodeAddedPayload](event.Payload)

@@ -26,7 +26,7 @@ func (c *MachineAddedEvent) ActionType() string {
 
 func MachineAddedEventFromStorage(event *eventstore.StorageEvent) (e *MachineAddedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-WLLoW", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[machineAddedPayload](event.Payload)

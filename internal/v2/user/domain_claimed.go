@@ -23,7 +23,7 @@ func (c *DomainClaimedEvent) ActionType() string {
 
 func DomainClaimedEventFromStorage(event *eventstore.StorageEvent) (e *DomainClaimedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-x8O4o", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[domainClaimedPayload](event.Payload)

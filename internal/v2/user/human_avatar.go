@@ -19,7 +19,7 @@ func (c *HumanAvatarAddedEvent) ActionType() string {
 
 func HumanAvatarAddedEventFromStorage(event *eventstore.StorageEvent) (e *HumanAvatarAddedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-ddQaI", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[avatar.AddedPayload](event.Payload)
@@ -46,7 +46,7 @@ func (c *HumanAvatarRemovedEvent) ActionType() string {
 
 func HumanAvatarRemovedEventFromStorage(event *eventstore.StorageEvent) (e *HumanAvatarRemovedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-j2CkY", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[avatar.RemovedPayload](event.Payload)

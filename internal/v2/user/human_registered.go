@@ -40,7 +40,7 @@ func (c *HumanRegisteredEvent) ActionType() string {
 
 func HumanRegisteredEventFromStorage(event *eventstore.StorageEvent) (e *HumanRegisteredEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-8HvGi", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[humanRegisteredPayload](event.Payload)

@@ -18,7 +18,7 @@ func (c *LockedEvent) ActionType() string {
 
 func LockedEventFromStorage(event *eventstore.StorageEvent) (e *LockedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-48jjE", "Errors.Invalid.Event.Type")
 	}
 
 	return &LockedEvent{

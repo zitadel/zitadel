@@ -23,7 +23,7 @@ func (c *DomainAddedEvent) ActionType() string {
 
 func DomainAddedEventFromStorage(event *eventstore.StorageEvent) (e *DomainAddedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-CXVe3", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[DomainAddedPayload](event.Payload)
@@ -52,7 +52,7 @@ func (c *DomainVerifiedEvent) ActionType() string {
 
 func DomainVerifiedEventFromStorage(event *eventstore.StorageEvent) (e *DomainVerifiedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-RAwdb", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[DomainVerifiedPayload](event.Payload)
@@ -81,7 +81,7 @@ func (c *DomainPrimarySetEvent) ActionType() string {
 
 func DomainPrimarySetEventFromStorage(event *eventstore.StorageEvent) (e *DomainPrimarySetEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-7P3Iz", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[DomainPrimarySetPayload](event.Payload)
@@ -110,7 +110,7 @@ func (c *DomainRemovedEvent) ActionType() string {
 
 func DomainRemovedEventFromStorage(event *eventstore.StorageEvent) (e *DomainRemovedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-ndpL2", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[DomainRemovedPayload](event.Payload)

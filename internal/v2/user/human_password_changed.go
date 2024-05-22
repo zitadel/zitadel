@@ -29,7 +29,7 @@ func (c *HumanPasswordChangedEvent) ActionType() string {
 
 func HumanPasswordChangedEventFromStorage(event *eventstore.StorageEvent) (e *HumanPasswordChangedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-Fx5tr", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[humanPasswordChangedPayload](event.Payload)

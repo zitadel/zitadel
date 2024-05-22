@@ -26,7 +26,7 @@ func (c *MachineSecretHashSetEvent) ActionType() string {
 
 func MachineSecretHashSetEventFromStorage(event *eventstore.StorageEvent) (e *MachineSecretHashSetEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-DzycT", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[machineSecretSetPayload](event.Payload)
