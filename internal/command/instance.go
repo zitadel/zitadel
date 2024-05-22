@@ -363,7 +363,6 @@ func setupInstancePolicies(validations *[]preparation.Validation, instanceAgg *i
 			setup.LabelPolicy.DisableWatermark,
 			setup.LabelPolicy.ThemeMode,
 		),
-		prepareActivateDefaultLabelPolicy(instanceAgg),
 	)
 }
 

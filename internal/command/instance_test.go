@@ -195,9 +195,6 @@ func instancePoliciesFilters(instanceID string) []expect {
 		expectFilter(),
 		expectFilter(),
 		expectFilter(),
-		expectFilter(
-			instance.NewLabelPolicyAddedEvent(context.Background(), &instance.NewAggregate(instanceID).Aggregate, "", "", "", "", "", "", "", "", false, false, false, domain.LabelPolicyThemeAuto),
-		),
 	}
 }
 
