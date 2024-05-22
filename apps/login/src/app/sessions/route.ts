@@ -20,5 +20,12 @@ export async function GET(request: NextRequest) {
     sessions = await loadSessions(ids);
   }
 
-  return NextResponse.json({ sessions }, { status: 500 });
+  const responseHeaders = new Headers();
+  responseHeaders.set("Access-Control-Allow-Origin", "*");
+  responseHeaders.set("Access-Control-Allow-Headers", "*");
+
+  return NextResponse.json(
+    { sessions },
+    { status: 500, headers: responseHeaders },
+  );
 }
