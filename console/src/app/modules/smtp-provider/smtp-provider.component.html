@@ -168,6 +168,7 @@
                 color="primary"
                 mat-raised-button
                 class="continue-button"
+                data-e2e="activate-button"
                 (click)="activateSMTPConfig(); $event.stopPropagation()"
               >
                 {{ 'ACTIONS.ACTIVATE' | translate }}
@@ -199,6 +200,7 @@
                 color="primary"
                 mat-raised-button
                 class="continue-button"
+                data-e2e="deactivate-button"
                 (click)="deactivateSMTPConfig(); $event.stopPropagation()"
               >
                 {{ 'ACTIONS.DEACTIVATE' | translate }}
@@ -210,7 +212,7 @@
 
         <div class="smtp-create-actions">
           <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
-          <button mat-raised-button class="create-button" color="primary" data-e2e="create-button" (click)="this.close()">
+          <button mat-raised-button class="create-button" color="primary" data-e2e="close-button" (click)="this.close()">
             {{ 'ACTIONS.CLOSE' | translate }}
           </button>
         </div>
