@@ -38,6 +38,7 @@ const (
 	UserKeyInitRequired             = "init_required"
 	UserKeyPasswordlessInitRequired = "passwordless_init_required"
 	UserKeyMFAInitSkipped           = "mfa_init_skipped"
+	UserKeyChangeDate               = "change_date"
 )
 
 type UserView struct {

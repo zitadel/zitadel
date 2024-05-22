@@ -22,7 +22,7 @@ verified_auth_methods AS (
 SELECT
     u.id
     , u.creation_date
-    , u.change_date
+    , GREATEST(u.change_date, au.change_date)
     , u.resource_owner
     , u.state AS user_state
     , au.password_set

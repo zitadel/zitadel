@@ -199,6 +199,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
 				handler.NewCol(view_model.UserKeyMFAInitSkipped, time.Time{}),
+				handler.NewCol(view_model.UserKeyChangeDate, event.CreatedAt()),
 			},
 			[]handler.Condition{
 				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
@@ -209,6 +210,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
 				handler.NewCol(view_model.UserKeyMFAInitSkipped, event.CreatedAt()),
+				handler.NewCol(view_model.UserKeyChangeDate, event.CreatedAt()),
 			},
 			[]handler.Condition{
 				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
@@ -219,6 +221,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
 				handler.NewCol(view_model.UserKeyInitRequired, true),
+				handler.NewCol(view_model.UserKeyChangeDate, event.CreatedAt()),
 			},
 			[]handler.Condition{
 				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
@@ -229,6 +232,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
 				handler.NewCol(view_model.UserKeyInitRequired, false),
+				handler.NewCol(view_model.UserKeyChangeDate, event.CreatedAt()),
 			},
 			[]handler.Condition{
 				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
@@ -240,6 +244,7 @@ func (u *User) ProcessUser(event eventstore.Event) (_ *handler.Statement, err er
 			[]handler.Column{
 				handler.NewCol(view_model.UserKeyPasswordlessInitRequired, true),
 				handler.NewCol(view_model.UserKeyPasswordInitRequired, false),
+				handler.NewCol(view_model.UserKeyChangeDate, event.CreatedAt()),
 			},
 			[]handler.Condition{
 				handler.NewCond(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
@@ -262,6 +267,8 @@ func (u *User) setPasswordData(event eventstore.Event, secret *crypto.CryptoValu
 	columns := []handler.Column{
 		handler.NewCol(view_model.UserKeyInstanceID, event.Aggregate().InstanceID),
 		handler.NewCol(view_model.UserKeyUserID, event.Aggregate().ID),
+		handler.NewCol(view_model.UserKeyResourceOwner, event.Aggregate().ResourceOwner),
+		handler.NewCol(view_model.UserKeyChangeDate, event.CreatedAt()),
 		handler.NewCol(view_model.UserKeyPasswordSet, set),
 		handler.NewCol(view_model.UserKeyPasswordInitRequired, !set),
 		handler.NewCol(view_model.UserKeyPasswordChange, event.CreatedAt()),

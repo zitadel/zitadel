@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS auth.users3 (
     instance_id TEXT NOT NULL,
     id TEXT NOT NULL,
+    resource_owner TEXT NOT NULL,
+    change_date TIMESTAMPTZ NULL,
     password_set BOOL NULL,
     password_change TIMESTAMPTZ NULL,
     last_login TIMESTAMPTZ NULL,
