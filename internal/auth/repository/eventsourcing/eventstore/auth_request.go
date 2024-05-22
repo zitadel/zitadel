@@ -1113,19 +1113,24 @@ func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.
 	if len(request.Prompt) > 0 && !domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
 		return append(steps, new(domain.LoginStep)), nil
 	} else {
-		// if no user was specified, no prompt or select_account was provided,
+		// if no user was specified, either select_account or no prompt was provided,
 		// then check the active user sessions (of the user agent)
 		users, err := repo.usersForUserSelection(ctx, request)
 		if err != nil {
 			return nil, err
 		}
-		if domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+		// in case select_account was specified ignore it if there aren't any user sessions
+		if domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) && len(users) > 0 {
 			steps = append(steps, &domain.SelectUserStep{Users: users})
 		}
+		// If we get here, either no sessions were found for select_account
+		// or no prompt was provided.
+		// In either case if there was a specific idp is selected (scope), directly redirect
 		if request.SelectedIDPConfigID != "" {
 			steps = append(steps, &domain.RedirectToExternalIDPStep{})
 		}
-		if len(request.Prompt) == 0 && len(users) == 0 {
+		// or there aren't any sessions to use, present the login page (https://github.com/zitadel/zitadel/issues/7213)
+		if len(users) == 0 {
 			steps = append(steps, new(domain.LoginStep))
 		}
 		// if no prompt was provided, but there are multiple user sessions, then the user must decide which to use

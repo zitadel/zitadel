@@ -2237,7 +2237,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Poskytovatel SMTP",
-      "DESCRIPTION": "Toto jsou poskytovatelé SMTP pro vaši instanci Zitadel. Aktivujte ten, který chcete používat k odesílání upozornění svým uživatelům.",
+      "DESCRIPTION": "Toto jsou poskytovatelé SMTP pro vaši instanci ZITADEL. Aktivujte ten, který chcete používat k odesílání upozornění svým uživatelům.",
       "EMPTY": "Není k dispozici žádný poskytovatel SMTP",
       "ACTIVATED": "Aktivováno",
       "ACTIVATE": "Aktivujte poskytovatele",
@@ -2265,7 +2265,16 @@
         "CURRENT_DESC_TITLE": "Toto jsou vaše nastavení SMTP",
         "PROVIDER_SETTINGS": "Nastavení poskytovatele SMTP",
         "SENDER_SETTINGS": "Nastavení odesílatele",
-        "TEST_SETTINGS": "Otestujte nastavení SMTP"
+        "TEST_SETTINGS": "Otestujte nastavení SMTP",
+        "NEXT_STEPS": "Další kroky",
+        "ACTIVATE": {
+          "TITLE": "Aktivujte svého poskytovatele SMTP",
+          "DESCRIPTION": "ZITADEL nemůže používat tohoto poskytovatele SMTP k odesílání upozornění, dokud jej neaktivujete. Pokud aktivujete tohoto poskytovatele, jakýkoli jiný aktivní poskytovatel bude nyní deaktivován."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktivujte svého poskytovatele SMTP",
+          "DESCRIPTION": "Pokud deaktivujete tohoto poskytovatele SMTP, ZITADEL jej nebude moci používat k odesílání upozornění, dokud jej znovu neaktivujete."
+        }
       }
     },
     "DETAIL": {

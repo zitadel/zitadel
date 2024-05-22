@@ -467,7 +467,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"user not set, prompt select account, no active session, select account step",
+			"user not set, prompt select account, no active session, login step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
 					Users: nil,
@@ -476,9 +476,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			[]domain.NextStep{
-				&domain.SelectUserStep{
-					Users: []domain.UserSelection{},
-				}},
+				&domain.LoginStep{}},
 			nil,
 		},
 		{
