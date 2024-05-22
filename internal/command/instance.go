@@ -230,21 +230,25 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 	}, nil
 }
 
-func setUpInstance(ctx context.Context, c *Commands, validations *[]preparation.Validation, setup *InstanceSetup, externalDomain string) (pat *PersonalAccessToken, machineKey *MachineKey, err error) {
-	instanceAgg := instance.NewAggregate(setup.zitadel.instanceID)
-	ctx = authz.WithConsole(
+func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, consoleAppID, externalDomain string) context.Context {
+	return authz.WithConsole(
 		authz.SetCtxData(
 			authz.WithRequestedDomain(
 				authz.WithInstanceID(
 					ctx,
-					setup.zitadel.instanceID),
+					instanceID),
 				externalDomain,
 			),
-			authz.CtxData{ResourceOwner: setup.zitadel.instanceID},
+			authz.CtxData{ResourceOwner: instanceID},
 		),
-		setup.zitadel.projectID,
-		setup.zitadel.consoleAppID,
+		projectID,
+		consoleAppID,
 	)
+}
+
+func setUpInstance(ctx context.Context, c *Commands, validations *[]preparation.Validation, setup *InstanceSetup, externalDomain string) (pat *PersonalAccessToken, machineKey *MachineKey, err error) {
+	instanceAgg := instance.NewAggregate(setup.zitadel.instanceID)
+	ctx = contextWithInstanceSetupInfo(ctx, setup.zitadel.instanceID, setup.zitadel.projectID, setup.zitadel.consoleAppID, externalDomain)
 
 	setupInstanceElements(validations, instanceAgg, setup.InstanceName, setup.DefaultLanguage, setup.SecretGenerators)
 	setupInstancePolicies(validations, instanceAgg, setup)
@@ -390,7 +394,9 @@ func setupQuotas(commands *Commands, validations *[]preparation.Validation, setQ
 }
 
 func setupFeatures(validations *[]preparation.Validation, features *InstanceFeatures, instanceID string) {
-	*validations = append(*validations, prepareSetFeatures(instanceID, features))
+	if features != nil {
+		*validations = append(*validations, prepareSetFeatures(instanceID, features))
+	}
 }
 
 func setupOIDCSettings(commands *Commands, validations *[]preparation.Validation, oidcSettings *OIDCSettings, instanceAgg *instance.Aggregate) {

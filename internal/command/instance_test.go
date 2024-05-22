@@ -2,7 +2,9 @@ package command
 
 import (
 	"context"
+	"encoding/json"
 	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -128,20 +130,18 @@ func oidcAppEvents(ctx context.Context, orgID, projectID, id, name, clientID str
 }
 
 func orgFilters(orgID string, machine, human bool) []expect {
-	orgAgg := org.NewAggregate(orgID)
-
 	filters := []expect{
 		expectFilter(),
 		expectFilter(
-			org.NewOrgAddedEvent(context.Background(), &orgAgg.Aggregate, ""),
+			org.NewOrgAddedEvent(context.Background(), &org.NewAggregate(orgID).Aggregate, ""),
 		),
 	}
 	if machine {
-		filters = append(filters, machineFilters(true)...)
-		filters = append(filters, adminMemberFilters(orgID, "USER")...)
+		filters = append(filters, machineFilters(orgID, true)...)
+		filters = append(filters, adminMemberFilters(orgID, "USER-MACHINE")...)
 	}
 	if human {
-		filters = append(filters, humanFilters()...)
+		filters = append(filters, humanFilters(orgID)...)
 		filters = append(filters, adminMemberFilters(orgID, "USER")...)
 	}
 
@@ -153,11 +153,12 @@ func orgFilters(orgID string, machine, human bool) []expect {
 func orgEvents(ctx context.Context, instanceID, orgID, name, projectID, defaultDomain string, externalSecure bool, machine, human bool) []eventstore.Command {
 	instanceAgg := instance.NewAggregate(instanceID)
 	orgAgg := org.NewAggregate(orgID)
+	domain := strings.ToLower(name + "." + defaultDomain)
 	events := []eventstore.Command{
 		org.NewOrgAddedEvent(ctx, &orgAgg.Aggregate, name),
-		org.NewDomainAddedEvent(ctx, &orgAgg.Aggregate, defaultDomain),
-		org.NewDomainVerifiedEvent(ctx, &orgAgg.Aggregate, defaultDomain),
-		org.NewDomainPrimarySetEvent(ctx, &orgAgg.Aggregate, defaultDomain),
+		org.NewDomainAddedEvent(ctx, &orgAgg.Aggregate, domain),
+		org.NewDomainVerifiedEvent(ctx, &orgAgg.Aggregate, domain),
+		org.NewDomainPrimarySetEvent(ctx, &orgAgg.Aggregate, domain),
 		instance.NewDefaultOrgSetEventEvent(ctx, &instanceAgg.Aggregate, orgID),
 	}
 
@@ -332,29 +333,32 @@ func instanceElementsConfig() *SecretGenerators {
 		OTPEmail:                 &crypto.GeneratorConfig{Length: 8, Expiry: 5 * time.Minute, IncludeDigits: true},
 	}
 }
-func setupInstanceFilters(instanceID string) []expect {
+func setupInstanceFilters(instanceID, orgID, projectID, appID, domain string) []expect {
 	return slices.Concat(
 		instanceElementsFilters(),
 		instancePoliciesFilters(instanceID),
+		// email template
 		[]expect{expectFilter()},
-		orgFilters("ORG", true, true),
-		domainFilters(),
+		orgFilters(orgID, true, true),
+		generatedDomainFilters(instanceID, orgID, projectID, appID, domain),
 	)
 }
 
-func setupInstanceEvents(ctx context.Context, instanceID, instanceName string, defaultLanguage language.Tag) []eventstore.Command {
+func setupInstanceEvents(ctx context.Context, instanceID, orgID, projectID, appID, instanceName, orgName string, defaultLanguage language.Tag, domain string, externalSecure bool) []eventstore.Command {
 	instanceAgg := instance.NewAggregate(instanceID)
 	return slices.Concat(
 		instanceElementsEvents(ctx, instanceID, instanceName, defaultLanguage),
 		instancePoliciesEvents(ctx, instanceID),
 		[]eventstore.Command{instance.NewMailTemplateAddedEvent(ctx, &instanceAgg.Aggregate, []byte("something"))},
-		orgEvents(ctx, instanceID, "ORG", "org-name", "PROJECT", "DOMAIN", false, true, true),
-		generatedDomainEvents(ctx, instanceID, "DOMAIN"),
+		orgEvents(ctx, instanceID, orgID, orgName, projectID, domain, externalSecure, true, true),
+		generatedDomainEvents(ctx, instanceID, orgID, projectID, appID, domain),
 	)
 }
 
 func setupInstanceConfig() *InstanceSetup {
 	conf := instanceSetupPoliciesConfig()
+	conf.InstanceName = "ZITADEL"
+	conf.DefaultLanguage = language.English
 	conf.zitadel = instanceSetupZitadelIDs()
 	conf.SecretGenerators = instanceElementsConfig()
 	conf.EmailTemplate = []byte("something")
@@ -367,28 +371,34 @@ func setupInstanceConfig() *InstanceSetup {
 	return conf
 }
 
-func generatedDomainEvents(ctx context.Context, instanceID, defaultDomain string) []eventstore.Command {
+func generatedDomainEvents(ctx context.Context, instanceID, orgID, projectID, appID, defaultDomain string) []eventstore.Command {
 	instanceAgg := instance.NewAggregate(instanceID)
+	changed, _ := project.NewOIDCConfigChangedEvent(ctx, &project.NewAggregate(projectID, orgID).Aggregate, appID,
+		[]project.OIDCConfigChanges{
+			project.ChangeRedirectURIs([]string{"http://" + defaultDomain + "/ui/console/auth/callback"}),
+			project.ChangePostLogoutRedirectURIs([]string{"http://" + defaultDomain + "/ui/console/signedout"}),
+		},
+	)
 	return []eventstore.Command{
 		instance.NewDomainAddedEvent(ctx, &instanceAgg.Aggregate, defaultDomain, true),
+		changed,
 		instance.NewDomainPrimarySetEvent(ctx, &instanceAgg.Aggregate, defaultDomain),
 	}
 }
 
-func domainFilters() []expect {
-	id := "console-id"
+func generatedDomainFilters(instanceID, orgID, projectID, appID, generatedDomain string) []expect {
 	return []expect{
 		expectFilter(),
 		expectFilter(
 			project.NewApplicationAddedEvent(context.Background(),
-				&project.NewAggregate("PROJECT", "ORG").Aggregate,
-				id,
+				&project.NewAggregate(projectID, orgID).Aggregate,
+				appID,
 				"console",
 			),
 			project.NewOIDCConfigAddedEvent(context.Background(),
-				&project.NewAggregate("PROJECT", "ORG").Aggregate,
+				&project.NewAggregate(projectID, orgID).Aggregate,
 				domain.OIDCVersionV1,
-				id,
+				appID,
 				"clientID",
 				"",
 				[]string{},
@@ -408,22 +418,26 @@ func domainFilters() []expect {
 			),
 		),
 		expectFilter(
-			instance.NewDomainAddedEvent(context.Background(),
-				&instance.NewAggregate("INSTANCE").Aggregate,
-				"DOMAIN",
-				true,
-			),
+			func() eventstore.Event {
+				event := instance.NewDomainAddedEvent(context.Background(),
+					&instance.NewAggregate(instanceID).Aggregate,
+					generatedDomain,
+					true,
+				)
+				event.Data, _ = json.Marshal(event)
+				return event
+			}(),
 		),
 	}
 }
 
-func humanFilters() []expect {
+func humanFilters(orgID string) []expect {
 	return []expect{
 		expectFilter(),
 		expectFilter(
 			org.NewDomainPolicyAddedEvent(
 				context.Background(),
-				&org.NewAggregate("id").Aggregate,
+				&org.NewAggregate(orgID).Aggregate,
 				true,
 				true,
 				true,
@@ -432,7 +446,7 @@ func humanFilters() []expect {
 		expectFilter(
 			org.NewPasswordComplexityPolicyAddedEvent(
 				context.Background(),
-				&org.NewAggregate("id").Aggregate,
+				&org.NewAggregate(orgID).Aggregate,
 				2,
 				false,
 				false,
@@ -458,13 +472,13 @@ func instanceSetupHumanConfig() *AddHuman {
 	}
 }
 
-func machineFilters(pat bool) []expect {
+func machineFilters(orgID string, pat bool) []expect {
 	filters := []expect{
 		expectFilter(),
 		expectFilter(
 			org.NewDomainPolicyAddedEvent(
 				context.Background(),
-				&org.NewAggregate("id").Aggregate,
+				&org.NewAggregate(orgID).Aggregate,
 				true,
 				true,
 				true,
@@ -644,7 +658,7 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, projectClientIDs()...),
 			},
 			args: args{
-				ctx:         authz.WithInstanceID(context.Background(), "INSTANCE"),
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
 				owner:       "owner",
@@ -684,6 +698,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 		keyAlgorithm       crypto.EncryptionAlgorithm
 	}
 	type args struct {
+		ctx         context.Context
 		instanceAgg *instance.Aggregate
 		orgAgg      *org.Aggregate
 		machine     *AddMachine
@@ -706,7 +721,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
-						humanFilters(),
+						humanFilters("ORG"),
 						adminMemberFilters("ORG", "USER"),
 						[]expect{
 							expectPush(
@@ -727,6 +742,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				},
 			},
 			args: args{
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
 				human:       instanceSetupHumanConfig(),
@@ -743,7 +759,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
-						machineFilters(true),
+						machineFilters("ORG", true),
 						adminMemberFilters("ORG", "USER-MACHINE"),
 						[]expect{
 							expectPush(
@@ -765,6 +781,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
 				machine:     instanceSetupMachineConfig(),
@@ -781,9 +798,9 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
-						machineFilters(true),
+						machineFilters("ORG", true),
 						adminMemberFilters("ORG", "USER-MACHINE"),
-						humanFilters(),
+						humanFilters("ORG"),
 						adminMemberFilters("ORG", "USER"),
 						[]expect{
 							expectPush(
@@ -813,6 +830,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgAgg:      org.NewAggregate("ORG"),
 				machine:     instanceSetupMachineConfig(),
@@ -844,7 +862,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 
-			err = testSetup(context.Background(), r, validations)
+			err = testSetup(tt.args.ctx, r, validations)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -911,7 +929,7 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 										"ORG",
 										"ZITADEL",
 										"PROJECT",
-										"zitadel.domain",
+										"DOMAIN",
 										false,
 										true,
 										true,
@@ -930,7 +948,7 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx:         authz.WithRequestedDomain(context.Background(), "DOMAIN"),
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				orgName:     "ZITADEL",
 				machine: &AddMachine{
@@ -1057,7 +1075,7 @@ func TestCommandSide_setupInstanceElements(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:              authz.WithRequestedDomain(context.Background(), "DOMAIN"),
+				ctx:              contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
 				instanceAgg:      instance.NewAggregate("INSTANCE"),
 				instanceName:     "ZITADEL",
 				defaultLanguage:  language.English,
@@ -1122,7 +1140,7 @@ func TestCommandSide_setupInstancePolicies(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:         authz.WithRequestedDomain(context.Background(), "DOMAIN"),
+				ctx:         contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
 				instanceAgg: instance.NewAggregate("INSTANCE"),
 				setup:       instanceSetupPoliciesConfig(),
 			},
@@ -1180,13 +1198,19 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 			fields: fields{
 				eventstore: expectEventstore(
 					slices.Concat(
-						setupInstanceFilters("INSTANCE"),
+						setupInstanceFilters("INSTANCE", "ORG", "PROJECT", "console-id", "DOMAIN"),
 						[]expect{
 							expectPush(
 								setupInstanceEvents(context.Background(),
 									"INSTANCE",
+									"ORG",
+									"PROJECT",
+									"console-id",
+									"ZITADEL",
 									"ZITADEL",
 									language.English,
+									"DOMAIN",
+									false,
 								)...,
 							),
 						},
@@ -1204,8 +1228,9 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:   authz.WithRequestedDomain(context.Background(), "DOMAIN"),
-				setup: setupInstanceConfig(),
+				ctx:            contextWithInstanceSetupInfo(context.Background(), "INSTANCE", "PROJECT", "console-id", "DOMAIN"),
+				externalDomain: "DOMAIN",
+				setup:          setupInstanceConfig(),
 			},
 			res: res{
 				err: nil,
@@ -1232,7 +1257,7 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 
-			err = testSetup(context.Background(), r, validations)
+			err = testSetup(tt.args.ctx, r, validations)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
