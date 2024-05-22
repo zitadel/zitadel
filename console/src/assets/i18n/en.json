@@ -2044,7 +2044,7 @@
         "DESCRIPTION": "Enter the credentials for your Apple Provider"
       },
       "SAML": {
-        "TITLE": "Sign in with Saml SP",
+        "TITLE": "Sign in with SAML SP",
         "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
@@ -2177,7 +2177,22 @@
       "METADATAXML": "Metadata Xml",
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
-      "SIGNEDREQUEST": "Signed Request"
+      "BINDINGS": {
+        "SAML_BINDING_UNSPECIFIED": "Unspecified",
+        "SAML_BINDING_POST": "HTTP POST",
+        "SAML_BINDING_REDIRECT": "HTTP Redirect",
+        "SAML_BINDING_ARTIFACT": "HTTP Artifact"
+      },
+      "SIGNEDREQUEST": "Signed Request",
+      "NAMEIDFORMAT": "NameID Format",
+      "NAMEIDFORMATS": {
+        "SAML_NAME_ID_FORMAT_UNSPECIFIED": "Unspecified",
+        "SAML_NAME_ID_FORMAT_EMAIL_ADDRESS": "EmailAddress",
+        "SAML_NAME_ID_FORMAT_PERSISTENT": "Persistent",
+        "SAML_NAME_ID_FORMAT_TRANSIENT": "Transient"
+      },
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
     },
     "TOAST": {
       "SAVED": "Successfully saved.",
