@@ -32,12 +32,14 @@ Password:
   Title: Mot de passe
   Description: Entrez vos identifiants.
   PasswordLabel: Mot de passe
-  MinLength: Longueur minimale
-  HasUppercase: Lettre majuscule
-  HasLowercase: Lettre minuscule
-  HasNumber: Numéro
-  HasSymbol: Symbole
-  Confirmation: Les mots de passe sont identiques
+  MinLength: Doit contenir au moins
+  MinLengthp2: caractères.
+  MaxLength: Doit contenir moins de 70 caractères.
+  HasUppercase: Doit inclure une lettre majuscule.
+  HasLowercase: Doit inclure une lettre minuscule.
+  HasNumber: Doit inclure un chiffre.
+  HasSymbol: Doit inclure un symbole.
+  Confirmation: La confirmation du mot de passe correspond.
   ResetLinkText: Réinitialiser le mot de passe
   BackButtonText: Retour
   NextButtonText: Suivant

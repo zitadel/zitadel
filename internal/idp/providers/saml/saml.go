@@ -11,6 +11,7 @@ import (
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -26,7 +27,9 @@ type Provider struct {
 
 	spOptions *samlsp.Options
 
-	binding string
+	binding                       string
+	nameIDFormat                  saml.NameIDFormat
+	transientMappingAttributeName string
 
 	isLinkingAllowed  bool
 	isCreationAllowed bool
@@ -77,6 +80,18 @@ func WithBinding(binding string) ProviderOpts {
 	}
 }
 
+func WithNameIDFormat(format domain.SAMLNameIDFormat) ProviderOpts {
+	return func(p *Provider) {
+		p.nameIDFormat = nameIDFormatFromDomain(format)
+	}
+}
+
+func WithTransientMappingAttributeName(attribute string) ProviderOpts {
+	return func(p *Provider) {
+		p.transientMappingAttributeName = attribute
+	}
+}
+
 func WithCustomRequestTracker(tracker samlsp.RequestTracker) ProviderOpts {
 	return func(p *Provider) {
 		p.requestTracker = tracker
@@ -124,6 +139,8 @@ func New(
 		name:        name,
 		spOptions:   &opts,
 		Certificate: certificate,
+		// the library uses transient as default, which does not make sense for federating accounts
+		nameIDFormat: saml.PersistentNameIDFormat,
 	}
 	for _, option := range options {
 		option(provider)
@@ -156,10 +173,7 @@ func (p *Provider) GetSP() (*samlsp.Middleware, error) {
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "SAML-qee09ffuq5", "Errors.Intent.IDPInvalid")
 	}
-	// the library uses transient as default, which we currently can't handle (https://github.com/zitadel/zitadel/discussions/7421)
-	// for the moment we'll use persistent (for those who actually use it from the saml request) and add an option
-	// later on to specify on the provider: https://github.com/zitadel/zitadel/issues/7743
-	sp.ServiceProvider.AuthnNameIDFormat = saml.PersistentNameIDFormat
+	sp.ServiceProvider.AuthnNameIDFormat = p.nameIDFormat
 	if p.requestTracker != nil {
 		sp.RequestTracker = p.requestTracker
 	}
@@ -179,4 +193,23 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, _ ...idp.Paramet
 		ServiceProvider: m,
 		state:           state,
 	}, nil
+}
+
+func (p *Provider) TransientMappingAttributeName() string {
+	return p.transientMappingAttributeName
+}
+
+func nameIDFormatFromDomain(format domain.SAMLNameIDFormat) saml.NameIDFormat {
+	switch format {
+	case domain.SAMLNameIDFormatUnspecified:
+		return saml.UnspecifiedNameIDFormat
+	case domain.SAMLNameIDFormatEmailAddress:
+		return saml.EmailAddressNameIDFormat
+	case domain.SAMLNameIDFormatPersistent:
+		return saml.PersistentNameIDFormat
+	case domain.SAMLNameIDFormatTransient:
+		return saml.TransientNameIDFormat
+	default:
+		return saml.UnspecifiedNameIDFormat
+	}
 }

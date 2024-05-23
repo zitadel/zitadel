@@ -59,6 +59,7 @@ var (
 	prepareAuthMethodTypesRequiredStmt = `SELECT projections.users12_notifications.password_set,` +
 		` auth_method_types.method_type,` +
 		` user_idps_count.count,` +
+		` projections.users12.type,` +
 		` auth_methods_force_mfa.force_mfa,` +
 		` auth_methods_force_mfa.force_mfa_local_only` +
 		` FROM projections.users12` +
@@ -75,6 +76,7 @@ var (
 `
 	prepareAuthMethodTypesRequiredCols = []string{
 		"password_set",
+		"type",
 		"method_type",
 		"idps_count",
 		"force_mfa",
@@ -317,14 +319,10 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 		},
 		{
 			name: "prepareUserAuthMethodTypesRequiredQuery no result",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*UserAuthMethodRequirements, error)) {
 				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
-				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
-					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
-					if err != nil {
-						return nil, err
-					}
-					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
+				return builder, func(rows *sql.Rows) (*UserAuthMethodRequirements, error) {
+					return scan(rows)
 				}
 			},
 			want: want{
@@ -334,18 +332,14 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 					nil,
 				),
 			},
-			object: &testUserAuthMethodTypesRequired{authMethods: []domain.UserAuthMethodType{}, forceMFA: false},
+			object: &UserAuthMethodRequirements{AuthMethods: []domain.UserAuthMethodType{}, ForceMFA: false},
 		},
 		{
 			name: "prepareUserAuthMethodTypesRequiredQuery one second factor",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*UserAuthMethodRequirements, error)) {
 				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
-				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
-					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
-					if err != nil {
-						return nil, err
-					}
-					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
+				return builder, func(rows *sql.Rows) (*UserAuthMethodRequirements, error) {
+					return scan(rows)
 				}
 			},
 			want: want{
@@ -357,32 +351,30 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 							true,
 							domain.UserAuthMethodTypePasswordless,
 							1,
+							domain.UserTypeHuman,
 							true,
 							true,
 						},
 					},
 				),
 			},
-			object: &testUserAuthMethodTypesRequired{
-				authMethods: []domain.UserAuthMethodType{
+			object: &UserAuthMethodRequirements{
+				UserType: domain.UserTypeHuman,
+				AuthMethods: []domain.UserAuthMethodType{
 					domain.UserAuthMethodTypePasswordless,
 					domain.UserAuthMethodTypePassword,
 					domain.UserAuthMethodTypeIDP,
 				},
-				forceMFA:          true,
-				forceMFALocalOnly: true,
+				ForceMFA:          true,
+				ForceMFALocalOnly: true,
 			},
 		},
 		{
 			name: "prepareUserAuthMethodTypesRequiredQuery multiple second factors",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*UserAuthMethodRequirements, error)) {
 				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
-				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
-					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
-					if err != nil {
-						return nil, err
-					}
-					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
+				return builder, func(rows *sql.Rows) (*UserAuthMethodRequirements, error) {
+					return scan(rows)
 				}
 			},
 			want: want{
@@ -394,6 +386,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 							true,
 							domain.UserAuthMethodTypePasswordless,
 							1,
+							domain.UserTypeHuman,
 							true,
 							true,
 						},
@@ -401,6 +394,7 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 							true,
 							domain.UserAuthMethodTypeTOTP,
 							1,
+							domain.UserTypeHuman,
 							true,
 							true,
 						},
@@ -408,27 +402,24 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 				),
 			},
 
-			object: &testUserAuthMethodTypesRequired{
-				authMethods: []domain.UserAuthMethodType{
+			object: &UserAuthMethodRequirements{
+				UserType: domain.UserTypeHuman,
+				AuthMethods: []domain.UserAuthMethodType{
 					domain.UserAuthMethodTypePasswordless,
 					domain.UserAuthMethodTypeTOTP,
 					domain.UserAuthMethodTypePassword,
 					domain.UserAuthMethodTypeIDP,
 				},
-				forceMFA:          true,
-				forceMFALocalOnly: true,
+				ForceMFA:          true,
+				ForceMFALocalOnly: true,
 			},
 		},
 		{
 			name: "prepareUserAuthMethodTypesRequiredQuery sql err",
-			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*testUserAuthMethodTypesRequired, error)) {
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*UserAuthMethodRequirements, error)) {
 				builder, scan := prepareUserAuthMethodTypesRequiredQuery(ctx, db)
-				return builder, func(rows *sql.Rows) (*testUserAuthMethodTypesRequired, error) {
-					authMethods, forceMFA, forceMFALocalOnly, err := scan(rows)
-					if err != nil {
-						return nil, err
-					}
-					return &testUserAuthMethodTypesRequired{authMethods: authMethods, forceMFA: forceMFA, forceMFALocalOnly: forceMFALocalOnly}, nil
+				return builder, func(rows *sql.Rows) (*UserAuthMethodRequirements, error) {
+					return scan(rows)
 				}
 			},
 			want: want{
@@ -451,11 +442,4 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err, defaultPrepareArgs...)
 		})
 	}
-}
-
-// testUserAuthMethodTypesRequired is required as assetPrepare is only able to return a single object from scan
-type testUserAuthMethodTypesRequired struct {
-	authMethods       []domain.UserAuthMethodType
-	forceMFA          bool
-	forceMFALocalOnly bool
 }

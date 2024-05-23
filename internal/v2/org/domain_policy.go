@@ -21,7 +21,7 @@ func (c *DomainPolicyAddedEvent) ActionType() string {
 
 func DomainPolicyAddedEventFromStorage(event *eventstore.StorageEvent) (e *DomainPolicyAddedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-asiSN", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[DomainPolicyAddedPayload](event.Payload)
@@ -50,7 +50,7 @@ func (c *DomainPolicyChangedEvent) ActionType() string {
 
 func DomainPolicyChangedEventFromStorage(event *eventstore.StorageEvent) (e *DomainPolicyChangedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-BmN6K", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[DomainPolicyChangedPayload](event.Payload)
@@ -79,7 +79,7 @@ func (c *DomainPolicyRemovedEvent) ActionType() string {
 
 func DomainPolicyRemovedEventFromStorage(event *eventstore.StorageEvent) (e *DomainPolicyRemovedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-nHy4z", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[DomainPolicyRemovedPayload](event.Payload)

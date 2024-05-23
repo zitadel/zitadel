@@ -22,7 +22,7 @@ func (c *UsernameChangedEvent) ActionType() string {
 
 func UsernameChangedEventFromStorage(event *eventstore.StorageEvent) (e *UsernameChangedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-hCGsh", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[usernameChangedPayload](event.Payload)

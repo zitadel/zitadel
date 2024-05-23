@@ -18,7 +18,7 @@ func (c *ReactivatedEvent) ActionType() string {
 
 func ReactivatedEventFromStorage(event *eventstore.StorageEvent) (e *ReactivatedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-B3fcY", "Errors.Invalid.Event.Type")
 	}
 
 	return &ReactivatedEvent{

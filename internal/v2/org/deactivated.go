@@ -18,7 +18,7 @@ func (c *DeactivatedEvent) ActionType() string {
 
 func DeactivatedEventFromStorage(event *eventstore.StorageEvent) (e *DeactivatedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-4zeWH", "Errors.Invalid.Event.Type")
 	}
 
 	return &DeactivatedEvent{

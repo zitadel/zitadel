@@ -23,7 +23,7 @@ func (c *HumanEmailChangedEvent) ActionType() string {
 
 func HumanEmailChangedEventFromStorage(event *eventstore.StorageEvent) (e *HumanEmailChangedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-Wr2lR", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[humanEmailChangedPayload](event.Payload)

@@ -22,7 +22,7 @@ func (c *MachineSecretHashUpdatedEvent) ActionType() string {
 
 func MachineSecretHashUpdatedEventFromStorage(event *eventstore.StorageEvent) (e *MachineSecretHashUpdatedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-y41RK", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[machineSecretHashUpdatedPayload](event.Payload)

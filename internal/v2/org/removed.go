@@ -18,7 +18,7 @@ func (c *RemovedEvent) ActionType() string {
 
 func RemovedEventFromStorage(event *eventstore.StorageEvent) (e *RemovedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-RSPYk", "Errors.Invalid.Event.Type")
 	}
 
 	return &RemovedEvent{

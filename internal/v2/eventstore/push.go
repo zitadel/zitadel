@@ -170,21 +170,3 @@ func AppendCommands(commands ...Command) PushAggregateOpt {
 		pa.commands = append(pa.commands, commands...)
 	}
 }
-
-// type Command interface {
-// 	// Creator is the id of the user which created the action
-// 	Creator() string
-// 	// Type describes the action it's in the past (e.g. user.created)
-// 	Type() string
-// 	// Revision of the action
-// 	Revision() uint16
-// 	// Payload returns the payload of the event. It represent the changed fields by the event
-// 	// valid types are:
-// 	// * nil: no payload
-// 	// * struct: which can be marshalled to json
-// 	// * pointer to struct: which can be marshalled to json
-// 	// * []byte: json marshalled data
-// 	Payload() any
-// 	// UniqueConstraints should be added for unique attributes of an event, if nil constraints will not be checked
-// 	UniqueConstraints() []*UniqueConstraint
-// }

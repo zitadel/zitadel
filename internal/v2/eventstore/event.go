@@ -6,7 +6,11 @@ import (
 
 type Unmarshal func(ptr any) error
 
-type Action[P Unmarshal | any] struct {
+type Payload interface {
+	Unmarshal | any
+}
+
+type Action[P Payload] struct {
 	Creator  string
 	Type     string
 	Revision uint16

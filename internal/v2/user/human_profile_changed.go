@@ -30,7 +30,7 @@ func (c *HumanProfileChangedEvent) ActionType() string {
 
 func HumanProfileChangedEventFromStorage(event *eventstore.StorageEvent) (e *HumanProfileChangedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-Z1aFH", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[humanProfileChangedPayload](event.Payload)

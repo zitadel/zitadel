@@ -18,7 +18,7 @@ func (c *HumanPhoneVerifiedEvent) ActionType() string {
 
 func HumanPhoneVerifiedEventFromStorage(event *eventstore.StorageEvent) (e *HumanPhoneVerifiedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-ycRBi", "Errors.Invalid.Event.Type")
 	}
 
 	return &HumanPhoneVerifiedEvent{

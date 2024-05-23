@@ -36,7 +36,7 @@ func (c *TokenAddedEvent) ActionType() string {
 
 func TokenAddedEventFromStorage(event *eventstore.StorageEvent) (e *TokenAddedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-0YSt4", "Errors.Invalid.Event.Type")
 	}
 
 	payload, err := eventstore.UnmarshalPayload[tokenAddedPayload](event.Payload)

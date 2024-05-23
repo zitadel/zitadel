@@ -18,7 +18,7 @@ func (c *MachineSecretRemovedEvent) ActionType() string {
 
 func MachineSecretRemovedEventFromStorage(event *eventstore.StorageEvent) (e *MachineSecretRemovedEvent, _ error) {
 	if event.Type != e.ActionType() {
-		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-jeeON", "Errors.Invalid.Event.Type")
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-SMtct", "Errors.Invalid.Event.Type")
 	}
 
 	return &MachineSecretRemovedEvent{
