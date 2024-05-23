@@ -66,9 +66,9 @@ Errors:
     NotFoundOnOrg: L'utilisateur n'a pas été trouvé dans l'organisation choisie
     NotAllowedOrg: L'utilisateur n'est pas membre de l'organisation requise
     UserIDMissing: L'ID de l'utilisateur est manquant
-    UserIDWrong: "L'utilisateur de la demande n'est pas égal à l'utilisateur authentifié"
+    UserIDWrong: L'utilisateur de la demande n'est pas égal à l'utilisateur authentifié
     DomainPolicyNil: La politique de l'organisation est vide
-    EmailAsUsernameNotAllowed: L'email n'est pas autorisé comme nom d'utilisateur
+    EmailAsUsernameNotAllowed: L'e-mail n'est pas autorisé comme nom d'utilisateur
     Invalid: Les données de l'utilisateur ne sont pas valides
     DomainNotAllowedAsUsername: Le domaine est déjà réservé et ne peut être utilisé.
     AlreadyInactive: L'utilisateur est déjà inactif
@@ -90,12 +90,12 @@ Errors:
       LastNameEmpty: Le nom de famille dans le profil est vide
       IDMissing: Profil ID manquant
     Email:
-      NotFound: Email non trouvé
-      Invalid: L'email n'est pas valide
+      NotFound: E-mail non trouvé
+      Invalid: L'e-mail n'est pas valide
       AlreadyVerified: L'adresse électronique est déjà vérifiée
       NotChanged: L'adresse électronique n'a pas changé
-      Empty: Email est vide
-      IDMissing: Email ID manquant
+      Empty: L'e-mail est vide
+      IDMissing: E-mail ID manquant
     Phone:
       Notfound: Téléphone non trouvé
       Invalid: Le téléphone n'est pas valide
@@ -517,6 +517,7 @@ Errors:
     IDPMissing: IDP manquant dans la requête
     IDPInvalid: IDP non valide pour la demande
     ResponseInvalid: La réponse de l'IDP n'est pas valide
+    MissingSingleMappingAttribute: Ne contient pas l'attribut de mappage ou a plus d'une valeur
     SuccessURLMissing: Success URL absent de la requête
     FailureURLMissing: Failure URL absent de la requête
     StateMissing: Paramètre d'état manquant dans la requête
@@ -615,13 +616,14 @@ EventTypes:
         failed: La vérification de l'initialisation a échoué
     token:
       added: Jeton d'accès créé
+      v2.added: Jeton d'accès créé
     impersonated: Utilisateur usurpé l'identité
     username:
       reserved: Nom d'utilisateur réservé
       released: Nom d'utilisateur libéré
     email:
       reserved: Adresse e-mail réservée
-      released: Adresse email libérée
+      released: Adresse e-mail libérée
       changed: Adresse e-mail modifiée
       verified: Adresse e-mail vérifiée
       verification:

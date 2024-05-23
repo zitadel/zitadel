@@ -1143,7 +1143,7 @@ type testReducer struct {
 }
 
 // Reduce implements eventstore.Reducer.
-func (r *testReducer) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
+func (r *testReducer) Reduce(events ...*eventstore.StorageEvent) error {
 	if r == nil {
 		return nil
 	}

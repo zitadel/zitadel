@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -75,9 +77,10 @@ func AddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 type UserCheckedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	UserID            string    `json:"userID"`
-	UserResourceOwner string    `json:"userResourceOwner"`
-	CheckedAt         time.Time `json:"checkedAt"`
+	UserID            string        `json:"userID"`
+	UserResourceOwner string        `json:"userResourceOwner"`
+	CheckedAt         time.Time     `json:"checkedAt"`
+	PreferredLanguage *language.Tag `json:"preferredLanguage,omitempty"`
 }
 
 func (e *UserCheckedEvent) Payload() interface{} {
@@ -94,6 +97,7 @@ func NewUserCheckedEvent(
 	userID,
 	userResourceOwner string,
 	checkedAt time.Time,
+	preferredLanguage *language.Tag,
 ) *UserCheckedEvent {
 	return &UserCheckedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -104,6 +108,7 @@ func NewUserCheckedEvent(
 		UserID:            userID,
 		UserResourceOwner: userResourceOwner,
 		CheckedAt:         checkedAt,
+		PreferredLanguage: preferredLanguage,
 	}
 }
 

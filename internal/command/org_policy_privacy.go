@@ -58,7 +58,10 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 			policy.TOSLink,
 			policy.PrivacyLink,
 			policy.HelpLink,
-			policy.SupportEmail))
+			policy.SupportEmail,
+			policy.DocsLink,
+			policy.CustomLink,
+			policy.CustomLinkText))
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +94,7 @@ func (c *Commands) ChangePrivacyPolicy(ctx context.Context, resourceOwner string
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink, policy.SupportEmail)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink, policy.SupportEmail, policy.DocsLink, policy.CustomLink, policy.CustomLinkText)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-4N9fs", "Errors.Org.PrivacyPolicy.NotChanged")
 	}

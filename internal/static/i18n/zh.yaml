@@ -517,6 +517,7 @@ Errors:
     IDPMissing: 请求中缺少IDP ID
     IDPInvalid: 请求的 IDP 无效
     ResponseInvalid: IDP 响应无效
+    MissingSingleMappingAttribute: 不包含映射属性或具有多个值
     SuccessURLMissing: 请求中缺少成功URL
     FailureURLMissing: 请求中缺少失败的URL
     StateMissing: 请求中缺少状态参数
@@ -615,6 +616,7 @@ EventTypes:
         failed: 初始化检查失败
     token:
       added: 已创建访问令牌
+      v2.added: 已创建访问令牌
     impersonated: 用户冒充
     username:
       reserved: 保留用户名

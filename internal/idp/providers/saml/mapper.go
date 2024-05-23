@@ -1,7 +1,6 @@
 package saml
 
 import (
-	"github.com/crewjam/saml"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -20,8 +19,8 @@ func NewUser() *UserMapper {
 	return &UserMapper{Attributes: map[string][]string{}}
 }
 
-func (u *UserMapper) SetID(id *saml.NameID) {
-	u.ID = id.Value
+func (u *UserMapper) SetID(id string) {
+	u.ID = id
 }
 
 // GetID is an implementation of the [idp.User] interface.

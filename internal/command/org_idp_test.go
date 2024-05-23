@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 	"go.uber.org/mock/gomock"
@@ -22,7 +23,7 @@ import (
 
 func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
@@ -45,7 +46,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -62,7 +63,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -81,7 +82,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid clientSecret",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -101,7 +102,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid auth endpoint",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -122,7 +123,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid token endpoint",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -144,7 +145,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid user endpoint",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -167,7 +168,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid id attribute",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -191,7 +192,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewOAuthIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -237,7 +238,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewOAuthIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -296,7 +297,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -317,7 +318,7 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -339,7 +340,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -355,7 +356,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -372,7 +373,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -391,7 +392,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid auth endpoint",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -411,7 +412,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid token endpoint",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -432,7 +433,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid user endpoint",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -454,7 +455,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 		{
 			"invalid id attribute",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -477,7 +478,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -501,7 +502,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOAuthIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -544,7 +545,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOAuthIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -627,7 +628,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGenericOAuthProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -646,7 +647,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 
 func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
@@ -669,7 +670,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -686,7 +687,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 		{
 			"invalid issuer",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -705,7 +706,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -725,7 +726,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 		{
 			"invalid clientSecret",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -746,7 +747,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -787,7 +788,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -842,7 +843,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -863,7 +864,7 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -885,7 +886,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -901,7 +902,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -918,7 +919,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 		{
 			"invalid issuer",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -937,7 +938,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -957,7 +958,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -978,7 +979,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1016,7 +1017,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1093,7 +1094,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGenericOIDCProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -1112,7 +1113,7 @@ func TestCommandSide_UpdateOrgGenericOIDCIDP(t *testing.T) {
 
 func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -1134,7 +1135,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -1150,7 +1151,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 		{
 			"invalid client id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -1168,7 +1169,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 		{
 			"invalid client secret",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -1187,7 +1188,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1208,7 +1209,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 		{
 			name: "migrate ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1267,7 +1268,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 		{
 			name: "migrate full ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1338,7 +1339,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.MigrateOrgGenericOIDCToAzureADProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -1357,7 +1358,7 @@ func TestCommandSide_MigrateOrgGenericOIDCToAzureADProvider(t *testing.T) {
 
 func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -1379,7 +1380,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -1396,7 +1397,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 		{
 			"invalid clientSecret",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -1415,7 +1416,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 		{
 			"not found",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1435,7 +1436,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 		{
 			name: "migrate ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1488,7 +1489,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 		{
 			name: "migrate full ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOIDCIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1554,7 +1555,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.MigrateOrgGenericOIDCToGoogleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -1573,7 +1574,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 
 func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
@@ -1596,7 +1597,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -1613,7 +1614,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 		{
 			"invalid client id",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -1632,7 +1633,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 		{
 			"invalid client secret",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -1652,7 +1653,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewAzureADIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1692,7 +1693,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewAzureADIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1747,7 +1748,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -1768,7 +1769,7 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -1790,7 +1791,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -1806,7 +1807,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -1823,7 +1824,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 		{
 			"invalid client id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -1842,7 +1843,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1862,7 +1863,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewAzureADIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1899,7 +1900,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewAzureADIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -1976,7 +1977,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgAzureADProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -1995,7 +1996,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 
 func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
@@ -2018,7 +2019,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 		{
 			"invalid client id",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -2035,7 +2036,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 		{
 			"invalid client secret",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -2054,7 +2055,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewGitHubIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -2091,7 +2092,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewGitHubIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -2142,7 +2143,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -2163,7 +2164,7 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -2185,7 +2186,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -2201,7 +2202,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 		{
 			"invalid client id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -2218,7 +2219,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -2237,7 +2238,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGitHubIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -2271,7 +2272,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGitHubIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -2342,7 +2343,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGitHubProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -2361,7 +2362,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 
 func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
@@ -2384,7 +2385,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -2401,7 +2402,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -2420,7 +2421,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid clientSecret",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -2440,7 +2441,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid auth endpoint",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -2461,7 +2462,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid token endpoint",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -2483,7 +2484,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid user endpoint",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -2506,7 +2507,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -2550,7 +2551,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -2607,7 +2608,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -2628,7 +2629,7 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -2650,7 +2651,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -2666,7 +2667,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -2683,7 +2684,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -2702,7 +2703,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid auth endpoint",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -2722,7 +2723,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid token endpoint",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -2743,7 +2744,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			"invalid user endpoint",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -2765,7 +2766,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -2788,7 +2789,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -2829,7 +2830,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGitHubEnterpriseIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -2909,7 +2910,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGitHubEnterpriseProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -2928,7 +2929,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 
 func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
@@ -2951,7 +2952,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -2968,7 +2969,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 		{
 			"invalid clientSecret",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -2987,7 +2988,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewGitLabIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -3024,7 +3025,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewGitLabIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -3074,7 +3075,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -3095,7 +3096,7 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -3117,7 +3118,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -3133,7 +3134,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -3150,7 +3151,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -3169,7 +3170,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGitLabIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -3203,7 +3204,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGitLabIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -3272,7 +3273,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGitLabProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -3291,7 +3292,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 
 func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
@@ -3314,7 +3315,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -3331,7 +3332,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			"invalid issuer",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -3350,7 +3351,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -3370,7 +3371,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			"invalid clientSecret",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -3391,7 +3392,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -3431,7 +3432,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -3484,7 +3485,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -3505,7 +3506,7 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -3527,7 +3528,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -3543,7 +3544,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -3560,7 +3561,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			"invalid issuer",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -3579,7 +3580,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -3599,7 +3600,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -3620,7 +3621,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -3657,7 +3658,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGitLabSelfHostedIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -3731,7 +3732,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGitLabSelfHostedProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -3750,7 +3751,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 
 func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
@@ -3773,7 +3774,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -3790,7 +3791,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 		{
 			"invalid clientSecret",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -3809,7 +3810,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -3846,7 +3847,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -3896,7 +3897,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -3917,7 +3918,7 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -3939,7 +3940,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -3955,7 +3956,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -3972,7 +3973,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -3991,7 +3992,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -4025,7 +4026,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewGoogleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -4094,7 +4095,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgGoogleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -4113,7 +4114,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 
 func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
@@ -4136,7 +4137,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4153,7 +4154,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid baseDN",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4172,7 +4173,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid binddn",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4192,7 +4193,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid password",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4213,7 +4214,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid userbase",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4235,7 +4236,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid servers",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4258,7 +4259,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid userObjectClasses",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4282,7 +4283,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid userFilters",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4307,7 +4308,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewLDAPIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -4359,7 +4360,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewLDAPIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -4452,7 +4453,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -4473,7 +4474,7 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -4495,7 +4496,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -4511,7 +4512,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -4528,7 +4529,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid baseDN",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -4547,7 +4548,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid binddn",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -4567,7 +4568,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid userbase",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -4588,7 +4589,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid servers",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -4610,7 +4611,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid userObjectClasses",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -4633,7 +4634,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			"invalid userFilters",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -4657,7 +4658,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -4685,7 +4686,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLDAPIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -4733,7 +4734,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewLDAPIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -4853,7 +4854,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgLDAPProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -4872,7 +4873,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 
 func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		idGenerator  id.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
@@ -4895,7 +4896,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4912,7 +4913,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 		{
 			"invalid teamID",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4931,7 +4932,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 		{
 			"invalid keyID",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4951,7 +4952,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 		{
 			"invalid privateKey",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -4972,7 +4973,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewAppleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -5013,7 +5014,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewAppleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -5067,7 +5068,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
@@ -5088,7 +5089,7 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -5110,7 +5111,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -5126,7 +5127,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 		{
 			"invalid clientID",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -5143,7 +5144,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 		{
 			"invalid teamID",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -5162,7 +5163,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 		{
 			"invalid keyID",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -5182,7 +5183,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -5203,7 +5204,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewAppleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -5241,7 +5242,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewAppleIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -5316,7 +5317,7 @@ func TestCommandSide_UpdateOrgAppleIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgAppleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -5339,7 +5340,7 @@ func stringPointer(s string) *string {
 
 func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 	type fields struct {
-		eventstore                 *eventstore.Eventstore
+		eventstore                 func(*testing.T) *eventstore.Eventstore
 		idGenerator                id.Generator
 		secretCrypto               crypto.EncryptionAlgorithm
 		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
@@ -5363,7 +5364,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -5380,7 +5381,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 		{
 			"invalid metadata",
 			fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "id1"),
 			},
 			args{
@@ -5399,7 +5400,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -5415,6 +5416,8 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 							[]byte("certificate"),
 							"",
 							false,
+							nil,
+							"",
 							idp.Options{},
 						),
 					),
@@ -5438,7 +5441,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 		{
 			name: "ok all set",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -5454,6 +5457,8 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 							[]byte("certificate"),
 							"binding",
 							true,
+							gu.Ptr(domain.SAMLNameIDFormatTransient),
+							"customAttribute",
 							idp.Options{
 								IsCreationAllowed: true,
 								IsLinkingAllowed:  true,
@@ -5471,10 +5476,12 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 				ctx:           context.Background(),
 				resourceOwner: "org1",
 				provider: SAMLProvider{
-					Name:              "name",
-					Metadata:          []byte("metadata"),
-					Binding:           "binding",
-					WithSignedRequest: true,
+					Name:                          "name",
+					Metadata:                      []byte("metadata"),
+					Binding:                       "binding",
+					WithSignedRequest:             true,
+					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
+					TransientMappingAttributeName: "customAttribute",
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -5492,7 +5499,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:                     tt.fields.eventstore,
+				eventstore:                     tt.fields.eventstore(t),
 				idGenerator:                    tt.fields.idGenerator,
 				idpConfigEncryption:            tt.fields.secretCrypto,
 				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
@@ -5514,7 +5521,7 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 
 func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 	type fields struct {
-		eventstore   *eventstore.Eventstore
+		eventstore   func(*testing.T) *eventstore.Eventstore
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -5536,7 +5543,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -5552,7 +5559,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 		{
 			"invalid name",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -5569,7 +5576,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 		{
 			"invalid metadata",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -5588,7 +5595,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -5610,7 +5617,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 		{
 			name: "no changes",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -5626,6 +5633,8 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 								[]byte("certificate"),
 								"",
 								false,
+								nil,
+								"",
 								idp.Options{},
 							)),
 					),
@@ -5647,7 +5656,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -5663,6 +5672,8 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 								[]byte("certificate"),
 								"binding",
 								false,
+								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
+								"",
 								idp.Options{},
 							)),
 					),
@@ -5676,6 +5687,8 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 									idp.ChangeSAMLMetadata([]byte("new metadata")),
 									idp.ChangeSAMLBinding("new binding"),
 									idp.ChangeSAMLWithSignedRequest(true),
+									idp.ChangeSAMLNameIDFormat(gu.Ptr(domain.SAMLNameIDFormatTransient)),
+									idp.ChangeSAMLTransientMappingAttributeName("customAttribute"),
 									idp.ChangeSAMLOptions(idp.OptionChanges{
 										IsCreationAllowed: &t,
 										IsLinkingAllowed:  &t,
@@ -5695,10 +5708,12 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 				resourceOwner: "org1",
 				id:            "id1",
 				provider: SAMLProvider{
-					Name:              "new name",
-					Metadata:          []byte("new metadata"),
-					Binding:           "new binding",
-					WithSignedRequest: true,
+					Name:                          "new name",
+					Metadata:                      []byte("new metadata"),
+					Binding:                       "new binding",
+					WithSignedRequest:             true,
+					NameIDFormat:                  gu.Ptr(domain.SAMLNameIDFormatTransient),
+					TransientMappingAttributeName: "customAttribute",
 					IDPOptions: idp.Options{
 						IsCreationAllowed: true,
 						IsLinkingAllowed:  true,
@@ -5715,7 +5730,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          tt.fields.eventstore,
+				eventstore:          tt.fields.eventstore(t),
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
 			got, err := c.UpdateOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.id, tt.args.provider)
@@ -5734,7 +5749,7 @@ func TestCommandSide_UpdateOrgSAMLIDP(t *testing.T) {
 
 func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 	type fields struct {
-		eventstore                 *eventstore.Eventstore
+		eventstore                 func(*testing.T) *eventstore.Eventstore
 		secretCrypto               crypto.EncryptionAlgorithm
 		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	}
@@ -5756,7 +5771,7 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 		{
 			"invalid id",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx:           context.Background(),
@@ -5771,7 +5786,7 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 		{
 			name: "not found",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -5789,7 +5804,7 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 		{
 			name: "change ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							org.NewSAMLIDPAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
@@ -5805,6 +5820,8 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 								[]byte("certificate"),
 								"binding",
 								false,
+								gu.Ptr(domain.SAMLNameIDFormatUnspecified),
+								"",
 								idp.Options{},
 							)),
 					),
@@ -5844,7 +5861,7 @@ func TestCommandSide_RegenerateOrgSAMLProviderCertificate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:                     tt.fields.eventstore,
+				eventstore:                     tt.fields.eventstore(t),
 				idpConfigEncryption:            tt.fields.secretCrypto,
 				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
