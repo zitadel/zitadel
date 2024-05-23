@@ -1030,15 +1030,11 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	if err != nil {
 		return nil, err
 	}
-	if (!isInternalLogin || len(idps.Links) > 0) && len(request.LinkingUsers) == 0 && !checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, request.LoginPolicy.ExternalLoginCheckLifetime, request) {
-		selectedIDPConfigID := request.SelectedIDPConfigID
-		if selectedIDPConfigID == "" {
-			selectedIDPConfigID = userSession.SelectedIDPConfigID
+	if (!isInternalLogin || len(idps.Links) > 0) && len(request.LinkingUsers) == 0 {
+		step := repo.idpChecked(request, idps.Links, userSession)
+		if step != nil {
+			return append(steps, step), nil
 		}
-		if selectedIDPConfigID == "" {
-			selectedIDPConfigID = idps.Links[0].IDPID
-		}
-		return append(steps, &domain.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}), nil
 	}
 	if isInternalLogin || (!isInternalLogin && len(request.LinkingUsers) > 0) {
 		step := repo.firstFactorChecked(request, user, userSession)
@@ -1223,6 +1219,22 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 		return step
 	}
 	return &domain.PasswordStep{}
+}
+
+func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []*query.IDPUserLink, userSession *user_model.UserSessionView) domain.NextStep {
+	if checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, request.LoginPolicy.ExternalLoginCheckLifetime, request) {
+		request.IDPLoginChecked = true
+		request.AuthTime = userSession.ExternalLoginVerification
+		return nil
+	}
+	selectedIDPConfigID := request.SelectedIDPConfigID
+	if selectedIDPConfigID == "" {
+		selectedIDPConfigID = userSession.SelectedIDPConfigID
+	}
+	if selectedIDPConfigID == "" && len(idps) > 0 {
+		selectedIDPConfigID = idps[0].IDPID
+	}
+	return &domain.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}
 }
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView, isInternalAuthentication bool) (domain.NextStep, bool, error) {

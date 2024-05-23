@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"slices"
 	"strings"
 	"time"
 
@@ -81,7 +82,7 @@ func (a *AuthRequest) AuthMethods() []UserAuthMethodType {
 	for _, mfa := range a.MFAsVerified {
 		list = append(list, mfa.UserAuthMethodType())
 	}
-	return list
+	return slices.Compact(list)
 }
 
 type ExternalUser struct {

@@ -472,7 +472,6 @@ func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareData
 				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypePassword)
 			}
 			if idp.Valid && idp.Int64 > 0 {
-				logging.Error("IDP", idp.Int64)
 				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypeIDP)
 			}
 
