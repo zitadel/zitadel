@@ -2,6 +2,7 @@ package idp
 
 import (
 	"github.com/crewjam/saml"
+	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	obj_grpc "github.com/zitadel/zitadel/internal/api/grpc/object"
@@ -339,6 +340,21 @@ func azureADTenantTypeToCommand(tenantType idp_pb.AzureADTenantType) azuread.Ten
 	}
 }
 
+func SAMLNameIDFormatToDomain(format idp_pb.SAMLNameIDFormat) domain.SAMLNameIDFormat {
+	switch format {
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_UNSPECIFIED:
+		return domain.SAMLNameIDFormatUnspecified
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_EMAIL_ADDRESS:
+		return domain.SAMLNameIDFormatEmailAddress
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_PERSISTENT:
+		return domain.SAMLNameIDFormatPersistent
+	case idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT:
+		return domain.SAMLNameIDFormatTransient
+	default:
+		return domain.SAMLNameIDFormatUnspecified
+	}
+}
+
 func ProvidersToPb(providers []*query.IDPTemplate) []*idp_pb.Provider {
 	list := make([]*idp_pb.Provider, len(providers))
 	for i, provider := range providers {
@@ -639,11 +655,17 @@ func appleConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.Appl
 }
 
 func samlConfigToPb(providerConfig *idp_pb.ProviderConfig, template *query.SAMLIDPTemplate) {
+	nameIDFormat := idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_PERSISTENT
+	if template.NameIDFormat.Valid {
+		nameIDFormat = nameIDToPb(template.NameIDFormat.V)
+	}
 	providerConfig.Config = &idp_pb.ProviderConfig_Saml{
 		Saml: &idp_pb.SAMLConfig{
-			MetadataXml:       template.Metadata,
-			Binding:           bindingToPb(template.Binding),
-			WithSignedRequest: template.WithSignedRequest,
+			MetadataXml:                   template.Metadata,
+			Binding:                       bindingToPb(template.Binding),
+			WithSignedRequest:             template.WithSignedRequest,
+			NameIdFormat:                  nameIDFormat,
+			TransientMappingAttributeName: gu.Ptr(template.TransientMappingAttributeName),
 		},
 	}
 }
@@ -660,5 +682,20 @@ func bindingToPb(binding string) idp_pb.SAMLBinding {
 		return idp_pb.SAMLBinding_SAML_BINDING_ARTIFACT
 	default:
 		return idp_pb.SAMLBinding_SAML_BINDING_UNSPECIFIED
+	}
+}
+
+func nameIDToPb(format domain.SAMLNameIDFormat) idp_pb.SAMLNameIDFormat {
+	switch format {
+	case domain.SAMLNameIDFormatUnspecified:
+		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_UNSPECIFIED
+	case domain.SAMLNameIDFormatEmailAddress:
+		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_EMAIL_ADDRESS
+	case domain.SAMLNameIDFormatPersistent:
+		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_PERSISTENT
+	case domain.SAMLNameIDFormatTransient:
+		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_TRANSIENT
+	default:
+		return idp_pb.SAMLNameIDFormat_SAML_NAME_ID_FORMAT_UNSPECIFIED
 	}
 }

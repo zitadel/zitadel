@@ -1763,6 +1763,8 @@ func (c *Commands) prepareAddInstanceSAMLProvider(a *instance.Aggregate, writeMo
 					cert,
 					provider.Binding,
 					provider.WithSignedRequest,
+					provider.NameIDFormat,
+					provider.TransientMappingAttributeName,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -1811,6 +1813,8 @@ func (c *Commands) prepareUpdateInstanceSAMLProvider(a *instance.Aggregate, writ
 				c.idpConfigEncryption,
 				provider.Binding,
 				provider.WithSignedRequest,
+				provider.NameIDFormat,
+				provider.TransientMappingAttributeName,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -1854,6 +1858,8 @@ func (c *Commands) prepareRegenerateInstanceSAMLProviderCertificate(a *instance.
 				c.idpConfigEncryption,
 				writeModel.Binding,
 				writeModel.WithSignedRequest,
+				writeModel.NameIDFormat,
+				writeModel.TransientMappingAttributeName,
 				writeModel.Options,
 			)
 			if err != nil || event == nil {

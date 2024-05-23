@@ -196,6 +196,33 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 		executionTargetsSingleTarget(targetResp.GetId()),
 	)
 
+	circularExecutionService := &action.Condition{
+		ConditionType: &action.Condition_Request{
+			Request: &action.RequestExecution{
+				Condition: &action.RequestExecution_Service{
+					Service: "zitadel.session.v2beta.SessionService",
+				},
+			},
+		},
+	}
+	Tester.SetExecution(CTX, t,
+		circularExecutionService,
+		executionTargetsSingleInclude(executionCond),
+	)
+	circularExecutionMethod := &action.Condition{
+		ConditionType: &action.Condition_Request{
+			Request: &action.RequestExecution{
+				Condition: &action.RequestExecution_Method{
+					Method: "/zitadel.session.v2beta.SessionService/ListSessions",
+				},
+			},
+		},
+	}
+	Tester.SetExecution(CTX, t,
+		circularExecutionMethod,
+		executionTargetsSingleInclude(circularExecutionService),
+	)
+
 	tests := []struct {
 		name    string
 		ctx     context.Context
@@ -203,6 +230,15 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 		want    *action.SetExecutionResponse
 		wantErr bool
 	}{
+		{
+			name: "method, circular error",
+			ctx:  CTX,
+			req: &action.SetExecutionRequest{
+				Condition: circularExecutionService,
+				Targets:   executionTargetsSingleInclude(circularExecutionMethod),
+			},
+			wantErr: true,
+		},
 		{
 			name: "method, ok",
 			ctx:  CTX,
@@ -247,30 +283,6 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 				},
 			},
 		},
-		/* circular
-		{
-			name: "all, ok",
-			ctx:  CTX,
-			req: &action.SetExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Request{
-						Request: &action.RequestExecution{
-							Condition: &action.RequestExecution_All{
-								All: true,
-							},
-						},
-					},
-				},
-				Targets: executionTargetsSingleInclude(executionCond),
-			},
-			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-		*/
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

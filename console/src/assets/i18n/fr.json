@@ -594,6 +594,7 @@
     "INVALID_FORMAT": "Le format n'est pas valide.",
     "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail.",
     "MINLENGTH": "Doit comporter au moins {{length}} caractères.",
+    "MAXLENGTH": "Doit contenir moins de {{requiredLength}} caractères.",
     "UPPERCASEMISSING": "Doit inclure un caractère majuscule.",
     "LOWERCASEMISSING": "Doit inclure un caractère minuscule.",
     "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
@@ -879,7 +880,8 @@
       "SET": "Définir un nouveau mot de passe",
       "RESENDNOTIFICATION": "Envoyer le lien de réinitialisation du mot de passe",
       "REQUIRED": "Certains champs obligatoires sont manquants.",
-      "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères."
+      "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères.",
+      "MAXLENGTHERROR": "Doit contenir moins de {{value}} caractères"
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -2228,7 +2230,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Fournisseur SMTP",
-      "DESCRIPTION": "Ce sont les fournisseurs SMTP de votre instance Zitadel. Activez celui que vous souhaitez utiliser pour envoyer des notifications à vos utilisateurs.",
+      "DESCRIPTION": "Ce sont les fournisseurs SMTP de votre instance ZITADEL. Activez celui que vous souhaitez utiliser pour envoyer des notifications à vos utilisateurs.",
       "EMPTY": "Aucun fournisseur SMTP disponible",
       "ACTIVATED": "Activé",
       "ACTIVATE": "Activer le fournisseur",
@@ -2256,7 +2258,16 @@
         "CURRENT_DESC_TITLE": "Ce sont vos paramètres SMTP",
         "PROVIDER_SETTINGS": "Paramètres du fournisseur SMTP",
         "SENDER_SETTINGS": "Paramètres de l'expéditeur",
-        "TEST_SETTINGS": "Tester les paramètres SMTP"
+        "TEST_SETTINGS": "Tester les paramètres SMTP",
+        "NEXT_STEPS": "Prochaines étapes",
+        "ACTIVATE": {
+          "TITLE": "Activez votre fournisseur SMTP",
+          "DESCRIPTION": "ZITADEL ne peut pas utiliser ce fournisseur SMTP pour envoyer des notifications tant que vous ne l'avez pas activé. Si vous activez ce fournisseur, tout autre fournisseur qui était actif sera désormais désactivé."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Désactivez votre fournisseur SMTP",
+          "DESCRIPTION": "Si vous désactivez l'option SMTP, vous ne pourrez pas vous connecter à l'application, le dossier sera alors désactivé."
+        }
       }
     },
     "DETAIL": {

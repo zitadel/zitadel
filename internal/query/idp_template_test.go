@@ -95,6 +95,8 @@ var (
 		` projections.idp_templates6_saml.certificate,` +
 		` projections.idp_templates6_saml.binding,` +
 		` projections.idp_templates6_saml.with_signed_request,` +
+		` projections.idp_templates6_saml.name_id_format,` +
+		` projections.idp_templates6_saml.transient_mapping_attribute_name,` +
 		// ldap
 		` projections.idp_templates6_ldap2.idp_id,` +
 		` projections.idp_templates6_ldap2.servers,` +
@@ -220,6 +222,8 @@ var (
 		"certificate",
 		"binding",
 		"with_signed_request",
+		"name_id_format",
+		"transient_mapping_attribute_name",
 		// ldap config
 		"idp_id",
 		"servers",
@@ -331,6 +335,8 @@ var (
 		` projections.idp_templates6_saml.certificate,` +
 		` projections.idp_templates6_saml.binding,` +
 		` projections.idp_templates6_saml.with_signed_request,` +
+		` projections.idp_templates6_saml.name_id_format,` +
+		` projections.idp_templates6_saml.transient_mapping_attribute_name,` +
 		// ldap
 		` projections.idp_templates6_ldap2.idp_id,` +
 		` projections.idp_templates6_ldap2.servers,` +
@@ -457,6 +463,8 @@ var (
 		"certificate",
 		"binding",
 		"with_signed_request",
+		"name_id_format",
+		"transient_mapping_attribute_name",
 		// ldap config
 		"idp_id",
 		"servers",
@@ -602,6 +610,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -756,6 +766,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -896,6 +908,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1047,6 +1061,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1191,6 +1207,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1329,6 +1347,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1480,6 +1500,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -1624,6 +1646,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						"binding",
 						false,
+						domain.SAMLNameIDFormatTransient,
+						"customAttribute",
 						// ldap config
 						nil,
 						nil,
@@ -1674,12 +1698,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 				IsAutoUpdate:      true,
 				AutoLinking:       domain.AutoLinkingOptionUsername,
 				SAMLIDPTemplate: &SAMLIDPTemplate{
-					IDPID:             "idp-id",
-					Metadata:          []byte("metadata"),
-					Key:               nil,
-					Certificate:       nil,
-					Binding:           "binding",
-					WithSignedRequest: false,
+					IDPID:                         "idp-id",
+					Metadata:                      []byte("metadata"),
+					Key:                           nil,
+					Certificate:                   nil,
+					Binding:                       "binding",
+					WithSignedRequest:             false,
+					NameIDFormat:                  sql.Null[domain.SAMLNameIDFormat]{V: domain.SAMLNameIDFormatTransient, Valid: true},
+					TransientMappingAttributeName: "customAttribute",
 				},
 			},
 		},
@@ -1764,6 +1790,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -1934,6 +1962,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						nil,
+						nil,
 						// ldap config
 						nil,
 						nil,
@@ -2074,6 +2104,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						nil,
 						nil,
 						// saml
+						nil,
+						nil,
 						nil,
 						nil,
 						nil,
@@ -2254,6 +2286,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// ldap config
 							"idp-id",
 							database.TextArray[string]{"server"},
@@ -2427,6 +2461,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -2574,6 +2610,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// ldap config
 							"idp-id-ldap",
 							database.TextArray[string]{"server"},
@@ -2686,6 +2724,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							"binding",
 							false,
+							domain.SAMLNameIDFormatTransient,
+							"customAttribute",
 							// ldap config
 							nil,
 							nil,
@@ -2792,6 +2832,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							database.TextArray[string]{"profile"},
 							// saml
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -2910,6 +2952,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -3016,6 +3060,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							// saml
+							nil,
+							nil,
 							nil,
 							nil,
 							nil,
@@ -3134,6 +3180,8 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
 							// ldap config
 							nil,
 							nil,
@@ -3232,12 +3280,14 @@ func Test_IDPTemplateTemplatesPrepares(t *testing.T) {
 						IsAutoUpdate:      true,
 						AutoLinking:       domain.AutoLinkingOptionUsername,
 						SAMLIDPTemplate: &SAMLIDPTemplate{
-							IDPID:             "idp-id-saml",
-							Metadata:          []byte("metadata"),
-							Key:               nil,
-							Certificate:       nil,
-							Binding:           "binding",
-							WithSignedRequest: false,
+							IDPID:                         "idp-id-saml",
+							Metadata:                      []byte("metadata"),
+							Key:                           nil,
+							Certificate:                   nil,
+							Binding:                       "binding",
+							WithSignedRequest:             false,
+							NameIDFormat:                  sql.Null[domain.SAMLNameIDFormat]{V: domain.SAMLNameIDFormatTransient, Valid: true},
+							TransientMappingAttributeName: "customAttribute",
 						},
 					},
 					{

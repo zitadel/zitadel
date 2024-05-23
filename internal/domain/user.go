@@ -43,6 +43,7 @@ const (
 	UserAuthMethodTypeOTPSMS
 	UserAuthMethodTypeOTPEmail
 	UserAuthMethodTypeOTP // generic OTP when parsing AMR from OIDC
+	UserAuthMethodTypePrivateKey
 	userAuthMethodTypeCount
 )
 

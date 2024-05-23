@@ -1883,7 +1883,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
 	notDefaultOrgIdpID := Tester.AddOrgGenericOAuthProvider(t, CTX, orgResp.OrganizationId)
 	samlIdpID := Tester.AddSAMLProvider(t, CTX)
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX)
+	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX, "")
 	samlPostIdpID := Tester.AddSAMLPostProvider(t, CTX)
 	type args struct {
 		ctx context.Context
