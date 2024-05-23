@@ -34,6 +34,9 @@ Cockroach
 
 func VerifySettings(databaseName, username string) func(*database.DB) error {
 	return func(db *database.DB) error {
+		if db.Type() == "postgres" {
+			return nil
+		}
 		logging.WithFields("user", username, "database", databaseName).Info("verify settings")
 
 		return exec(db, fmt.Sprintf(settingsStmt, databaseName, username), nil)
