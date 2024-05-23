@@ -2044,7 +2044,7 @@
         "DESCRIPTION": "Enter the credentials for your Apple Provider"
       },
       "SAML": {
-        "TITLE": "Sign in with Saml SP",
+        "TITLE": "Sign in with SAML SP",
         "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
@@ -2177,7 +2177,10 @@
       "METADATAXML": "Metadata Xml",
       "METADATAURL": "Metadata URL",
       "BINDING": "Binding",
-      "SIGNEDREQUEST": "Signed Request"
+      "SIGNEDREQUEST": "Signed Request",
+      "NAMEIDFORMAT": "NameID Format",
+      "TRANSIENTMAPPINGATTRIBUTENAME": "Custom Mapping Attribute Name",
+      "TRANSIENTMAPPINGATTRIBUTENAME_DESC": "Alternative attribute name to map the user in case the `nameid-format` returned is `transient`, e.g. `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`"
     },
     "TOAST": {
       "SAVED": "Successfully saved.",
@@ -2246,7 +2249,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP Provider",
-      "DESCRIPTION": "These are the SMTP providers for your Zitadel instance. Activate the one you want to use to send notifications to your users.",
+      "DESCRIPTION": "These are the SMTP providers for your ZITADEL instance. Activate the one you want to use to send notifications to your users.",
       "EMPTY": "No SMTP Provider available",
       "ACTIVATED": "Activated",
       "ACTIVATE": "Activate provider",
@@ -2274,7 +2277,16 @@
         "CURRENT_DESC_TITLE": "These are your SMTP settings",
         "PROVIDER_SETTINGS": "SMTP Provider Settings",
         "SENDER_SETTINGS": "Sender Settings",
-        "TEST_SETTINGS": "Test SMTP Settings"
+        "TEST_SETTINGS": "Test SMTP Settings",
+        "NEXT_STEPS": "Next Steps",
+        "ACTIVATE": {
+          "TITLE": "Activate your SMTP Provider",
+          "DESCRIPTION": "ZITADEL cannot use this SMTP Provider to send notifications until you activate it. If you activate this provider any other provider that was active will now be deactivated."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deactivate your SMTP Provider",
+          "DESCRIPTION": "If you deactivate this SMTP Provider, ZITADEL cannot use it to send notifications until you activate it again."
+        }
       }
     },
     "DETAIL": {

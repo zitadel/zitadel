@@ -2044,7 +2044,7 @@
         "DESCRIPTION": "Voer de inloggegevens in voor uw Apple Provider"
       },
       "SAML": {
-        "TITLE": "Log in met Saml SP",
+        "TITLE": "Log in met SAML SP",
         "DESCRIPTION": "Voer de inloggegevens in voor uw SAML Provider"
       }
     },
@@ -2246,7 +2246,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP-provider",
-      "DESCRIPTION": "Dit zijn de SMTP-providers voor uw Zitadel-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
+      "DESCRIPTION": "Dit zijn de SMTP-providers voor uw ZITADEL-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
       "EMPTY": "Geen SMTP-provider beschikbaar",
       "ACTIVATED": "Geactiveerd",
       "ACTIVATE": "Aanbieder activeren",
@@ -2274,7 +2274,16 @@
         "CURRENT_DESC_TITLE": "Dit zijn uw SMTP-instellingen",
         "PROVIDER_SETTINGS": "SMTP-providerinstellingen",
         "SENDER_SETTINGS": "Afzenderinstellingen",
-        "TEST_SETTINGS": "SMTP-instellingen testen"
+        "TEST_SETTINGS": "SMTP-instellingen testen",
+        "NEXT_STEPS": "Volgende stappen",
+        "ACTIVATE": {
+          "TITLE": "Activeer uw SMTP-provider",
+          "DESCRIPTION": "ZITADEL kan deze SMTP-provider niet gebruiken om meldingen te verzenden totdat u deze activeert. Als u deze provider activeert, worden alle andere actieve providers nu gedeactiveerd."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deactiveer uw SMTP-provider",
+          "DESCRIPTION": "Als u deze SMTP-provider deactiveert, kan ZITADEL deze niet gebruiken om meldingen te verzenden totdat u deze opnieuw activeert."
+        }
       }
     },
     "DETAIL": {
