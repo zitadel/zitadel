@@ -78,8 +78,6 @@ import (
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
-	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
-	"github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
 	"github.com/zitadel/zitadel/internal/webauthn"
 	"github.com/zitadel/zitadel/openapi"
 )
@@ -158,12 +156,9 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
-	es := es_v4.NewEventstoreFromOne(postgres.New(esPusherDBClient))
-
 	queries, err := query.StartQueries(
 		ctx,
 		eventstoreClient,
-		es,
 		queryDBClient,
 		projectionDBClient,
 		config.Projections,

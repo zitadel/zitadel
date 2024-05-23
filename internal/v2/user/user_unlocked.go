@@ -2,15 +2,26 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type UserUnlockedEvent userUnlockedEvent
-type userUnlockedEvent = eventstore.Event[struct{}]
+type UnlockedEvent eventstore.Event[eventstore.EmptyPayload]
 
-func UserUnlockedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*UserUnlockedEvent, error) {
-	event, err := eventstore.EventFromStorage[userUnlockedEvent](e)
-	if err != nil {
-		return nil, err
+const UnlockedType = AggregateType + ".unlocked"
+
+var _ eventstore.TypeChecker = (*UnlockedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *UnlockedEvent) ActionType() string {
+	return UnlockedType
+}
+
+func UnlockedEventFromStorage(event *eventstore.StorageEvent) (e *UnlockedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-HB0wi", "Errors.Invalid.Event.Type")
 	}
-	return (*UserUnlockedEvent)(event), nil
+
+	return &UnlockedEvent{
+		StorageEvent: event,
+	}, nil
 }

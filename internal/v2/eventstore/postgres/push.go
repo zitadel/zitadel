@@ -141,19 +141,19 @@ func push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands 
 			stmt.WriteString(", ")
 		}
 
-		cmd.Position.InPositionOrder = uint32(i)
+		cmd.position.InPositionOrder = uint32(i)
 		stmt.WriteString(`(`)
 		stmt.WriteArgs(
-			cmd.Aggregate.Instance,
-			cmd.Aggregate.Owner,
-			cmd.Aggregate.Type,
-			cmd.Aggregate.ID,
+			cmd.intent.Aggregate().Instance,
+			cmd.intent.Aggregate().Owner,
+			cmd.intent.Aggregate().Type,
+			cmd.intent.Aggregate().ID,
 			cmd.Revision,
 			cmd.Creator,
 			cmd.Type,
-			cmd.Payload,
-			cmd.Sequence,
-			i,
+			cmd.payload,
+			cmd.sequence,
+			cmd.position.InPositionOrder,
 		)
 
 		stmt.WriteString(pushPositionStmt)
@@ -173,13 +173,13 @@ func push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands 
 		defer func() { i++ }()
 
 		err := scan(
-			&commands[i].CreatedAt,
-			&commands[i].Position.Position,
+			&commands[i].createdAt,
+			&commands[i].position.Position,
 		)
 		if err != nil {
 			return err
 		}
-		return reducer.Reduce(commands[i].Event)
+		return reducer.Reduce(commands[i].toEvent())
 	})
 }
 
@@ -190,12 +190,13 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (er
 	var stmt database.Statement
 
 	for _, cmd := range commands {
-		if len(cmd.uniqueConstraints) == 0 {
+		if len(cmd.UniqueConstraints) == 0 {
 			continue
 		}
-		for _, constraint := range cmd.uniqueConstraints {
+		for _, constraint := range cmd.UniqueConstraints {
 			stmt.Reset()
-			instance := cmd.Aggregate.Instance
+
+			instance := cmd.intent.PushAggregate.Aggregate().Instance
 			if constraint.IsGlobal {
 				instance = ""
 			}

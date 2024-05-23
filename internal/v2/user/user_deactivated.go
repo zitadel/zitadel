@@ -2,15 +2,26 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type UserDeactivatedEvent userDeactivatedEvent
-type userDeactivatedEvent = eventstore.Event[struct{}]
+type DeactivatedEvent eventstore.Event[eventstore.EmptyPayload]
 
-func UserDeactivatedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*UserDeactivatedEvent, error) {
-	event, err := eventstore.EventFromStorage[userDeactivatedEvent](e)
-	if err != nil {
-		return nil, err
+const DeactivatedType = AggregateType + ".deactivated"
+
+var _ eventstore.TypeChecker = (*DeactivatedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *DeactivatedEvent) ActionType() string {
+	return DeactivatedType
+}
+
+func DeactivatedEventFromStorage(event *eventstore.StorageEvent) (e *DeactivatedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-SBLu2", "Errors.Invalid.Event.Type")
 	}
-	return (*UserDeactivatedEvent)(event), nil
+
+	return &DeactivatedEvent{
+		StorageEvent: event,
+	}, nil
 }

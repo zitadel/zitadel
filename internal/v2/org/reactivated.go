@@ -1,22 +1,27 @@
 package org
 
-import "github.com/zitadel/zitadel/internal/v2/eventstore"
-
-var (
-	Reactivated ReactivatedEvent
+import (
+	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type ReactivatedEvent reactivatedEvent
-type reactivatedEvent = eventstore.Event[struct{}]
+const ReactivatedType = eventTypePrefix + "reactivated"
 
-func ReactivatedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*ReactivatedEvent, error) {
-	event, err := eventstore.EventFromStorage[reactivatedEvent](e)
-	if err != nil {
-		return nil, err
-	}
-	return (*ReactivatedEvent)(event), nil
+type ReactivatedEvent eventstore.Event[eventstore.EmptyPayload]
+
+var _ eventstore.TypeChecker = (*ReactivatedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *ReactivatedEvent) ActionType() string {
+	return ReactivatedType
 }
 
-func (e ReactivatedEvent) IsType(typ string) bool {
-	return typ == "org.reactivated"
+func ReactivatedEventFromStorage(event *eventstore.StorageEvent) (e *ReactivatedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-cPWZw", "Errors.Invalid.Event.Type")
+	}
+
+	return &ReactivatedEvent{
+		StorageEvent: event,
+	}, nil
 }

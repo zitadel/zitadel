@@ -2,15 +2,26 @@ package instance
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type RemovedEvent removedEvent
-type removedEvent = eventstore.Event[struct{}]
+const RemovedType = eventTypePrefix + "removed"
 
-func RemovedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*RemovedEvent, error) {
-	event, err := eventstore.EventFromStorage[removedEvent](e)
-	if err != nil {
-		return nil, err
+type RemovedEvent eventstore.Event[eventstore.EmptyPayload]
+
+var _ eventstore.TypeChecker = (*RemovedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *RemovedEvent) ActionType() string {
+	return RemovedType
+}
+
+func RemovedEventFromStorage(event *eventstore.StorageEvent) (e *RemovedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "INSTA-xppIg", "Errors.Invalid.Event.Type")
 	}
-	return (*RemovedEvent)(event), nil
+
+	return &RemovedEvent{
+		StorageEvent: event,
+	}, nil
 }

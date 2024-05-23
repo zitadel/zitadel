@@ -595,6 +595,7 @@
     "INVALID_FORMAT": "El formato no es valido.",
     "NOTANEMAIL": "El valor proporcionado no es una dirección de email.",
     "MINLENGTH": "Debe tener al menos {{requiredLength}} caracteres de longitud.",
+    "MAXLENGTH": "Debe tener menos de {{requiredLength}} caracteres.",
     "UPPERCASEMISSING": "Debe incluir un carácter en mayúscula.",
     "LOWERCASEMISSING": "Debe incluir un carácter en minúscula.",
     "SYMBOLERROR": "Debe incluir un símbolo o un signo de puntuación.",
@@ -880,7 +881,8 @@
       "SET": "Establecer nueva contraseña",
       "RESENDNOTIFICATION": "Enviar enlace para restablecer la contraseña",
       "REQUIRED": "Faltan algunos campos requeridos.",
-      "MINLENGTHERROR": "Debe tener al menos {{value}} caracteres de longitud."
+      "MINLENGTHERROR": "Debe tener al menos {{value}} caracteres de longitud.",
+      "MAXLENGTHERROR": "Debe tener menos de {{value}} caracteres"
     },
     "ID": "ID",
     "EMAIL": "Email",

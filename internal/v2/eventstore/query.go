@@ -41,7 +41,7 @@ func (q *Query) Pagination() *Pagination {
 	return q.pagination
 }
 
-func (q *Query) Reduce(events ...*Event[StoragePayload]) error {
+func (q *Query) Reduce(events ...*StorageEvent) error {
 	return q.reducer.Reduce(events...)
 }
 

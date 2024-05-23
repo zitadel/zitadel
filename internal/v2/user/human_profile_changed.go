@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type humanProfileChangedPayload struct {
@@ -16,13 +17,29 @@ type humanProfileChangedPayload struct {
 	Gender            *domain.Gender `json:"gender,omitempty"`
 }
 
-type HumanProfileChangedEvent humanProfileChangedEvent
-type humanProfileChangedEvent = eventstore.Event[humanProfileChangedPayload]
+type HumanProfileChangedEvent eventstore.Event[humanProfileChangedPayload]
 
-func HumanProfileChangedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanProfileChangedEvent, error) {
-	event, err := eventstore.EventFromStorage[humanProfileChangedEvent](e)
+const HumanProfileChangedType = humanPrefix + ".profile.changed"
+
+var _ eventstore.TypeChecker = (*HumanProfileChangedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *HumanProfileChangedEvent) ActionType() string {
+	return HumanProfileChangedType
+}
+
+func HumanProfileChangedEventFromStorage(event *eventstore.StorageEvent) (e *HumanProfileChangedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-Z1aFH", "Errors.Invalid.Event.Type")
+	}
+
+	payload, err := eventstore.UnmarshalPayload[humanProfileChangedPayload](event.Payload)
 	if err != nil {
 		return nil, err
 	}
-	return (*HumanProfileChangedEvent)(event), nil
+
+	return &HumanProfileChangedEvent{
+		StorageEvent: event,
+		Payload:      payload,
+	}, nil
 }

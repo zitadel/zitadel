@@ -276,6 +276,13 @@ enum SAMLBinding {
     SAML_BINDING_ARTIFACT = 3;
 }
 
+enum SAMLNameIDFormat {
+    SAML_NAME_ID_FORMAT_UNSPECIFIED = 0;
+    SAML_NAME_ID_FORMAT_EMAIL_ADDRESS = 1;
+    SAML_NAME_ID_FORMAT_PERSISTENT = 2;
+    SAML_NAME_ID_FORMAT_TRANSIENT = 3;
+}
+
 message ProviderConfig {
     Options options = 1;
     oneof config {
@@ -452,21 +459,17 @@ message LDAPConfig {
 }
 
 message SAMLConfig {
-    bytes metadata_xml = 1 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Metadata of the SAML identity provider";
-        }
-    ];
-    zitadel.idp.v1.SAMLBinding binding = 2 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Binding which defines the type of communication with the identity provider";
-        }
-    ];
-    bool with_signed_request = 3 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Boolean which defines if the authentication requests are signed";
-        }
-    ];
+    // Metadata of the SAML identity provider.
+    bytes metadata_xml = 1;
+    // Binding which defines the type of communication with the identity provider.
+    zitadel.idp.v1.SAMLBinding binding = 2;
+    // Boolean which defines if the authentication requests are signed.
+    bool with_signed_request = 3;
+    // `nameid-format` for the SAML Request.
+    zitadel.idp.v1.SAMLNameIDFormat name_id_format = 4;
+    // Optional name of the attribute, which will be used to map the user
+    // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
+    optional string transient_mapping_attribute_name = 5;
 }
 
 message AzureADConfig {

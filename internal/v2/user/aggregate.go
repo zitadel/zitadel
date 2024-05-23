@@ -7,8 +7,10 @@ import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 )
 
-var (
+const (
 	AggregateType = "user"
+	humanPrefix   = AggregateType + ".human"
+	machinePrefix = AggregateType + ".machine"
 )
 
 func NewAggregate(ctx context.Context, id string) *eventstore.Aggregate {

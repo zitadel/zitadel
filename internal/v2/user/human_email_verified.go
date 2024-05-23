@@ -2,15 +2,26 @@ package user
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type HumanEmailVerifiedEvent humanEmailVerifiedEvent
-type humanEmailVerifiedEvent = eventstore.Event[struct{}]
+type HumanEmailVerifiedEvent eventstore.Event[eventstore.EmptyPayload]
 
-func HumanEmailVerifiedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*HumanEmailVerifiedEvent, error) {
-	event, err := eventstore.EventFromStorage[humanEmailVerifiedEvent](e)
-	if err != nil {
-		return nil, err
+const HumanEmailVerifiedType = humanPrefix + ".email.verified"
+
+var _ eventstore.TypeChecker = (*HumanEmailVerifiedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *HumanEmailVerifiedEvent) ActionType() string {
+	return HumanEmailVerifiedType
+}
+
+func HumanEmailVerifiedEventFromStorage(event *eventstore.StorageEvent) (e *HumanEmailVerifiedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "USER-X3esB", "Errors.Invalid.Event.Type")
 	}
-	return (*HumanEmailVerifiedEvent)(event), nil
+
+	return &HumanEmailVerifiedEvent{
+		StorageEvent: event,
+	}, nil
 }

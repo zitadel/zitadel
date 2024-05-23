@@ -34,8 +34,6 @@ import (
 	notify_handler "github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
-	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
-	"github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
 	"github.com/zitadel/zitadel/internal/webauthn"
 )
 
@@ -141,6 +139,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s24AddActorToAuthTokens = &AddActorToAuthTokens{dbClient: queryDBClient}
 	steps.s25User11AddLowerFieldsToVerifiedEmail = &User11AddLowerFieldsToVerifiedEmail{dbClient: esPusherDBClient}
 	steps.s26AuthUsers3 = &AuthUsers3{dbClient: esPusherDBClient}
+	steps.s27IDPTemplate6SAMLNameIDFormat = &IDPTemplate6SAMLNameIDFormat{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -192,6 +191,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		steps.s18AddLowerFieldsToLoginNames,
 		steps.s21AddBlockFieldToLimits,
 		steps.s25User11AddLowerFieldsToVerifiedEmail,
+		steps.s27IDPTemplate6SAMLNameIDFormat,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -275,11 +275,9 @@ func initProjections(
 	}
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
-	es := es_v4.NewEventstoreFromOne(postgres.New(queryDBClient))
 	queries, err := query.StartQueries(
 		ctx,
 		eventstoreClient,
-		es,
 		queryDBClient,
 		projectionDBClient,
 		config.Projections,

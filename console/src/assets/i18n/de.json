@@ -594,6 +594,7 @@
     "INVALID_FORMAT": "Das Format is ungültig.",
     "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
     "MINLENGTH": "Muss mindestens {{requiredLength}} Zeichen lang sein.",
+    "MAXLENGTH": "Muss weniger als {{requiredLength}} Zeichen enthalten",
     "UPPERCASEMISSING": "Muss einen Grossbuchstaben beinhalten.",
     "LOWERCASEMISSING": "Muss einen Kleinbuchstaben beinhalten.",
     "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
@@ -879,7 +880,8 @@
       "SET": "Passwort neu setzen",
       "RESENDNOTIFICATION": "Email zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
-      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein."
+      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
+      "MAXLENGTHERROR": "Muss weniger als {{value}} Zeichen umfassen."
     },
     "ID": "ID",
     "EMAIL": "E-Mail",

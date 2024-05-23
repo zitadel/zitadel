@@ -1,22 +1,27 @@
 package org
 
-import "github.com/zitadel/zitadel/internal/v2/eventstore"
-
-var (
-	Removed RemovedEvent
+import (
+	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type RemovedEvent removedEvent
-type removedEvent = eventstore.Event[struct{}]
+const RemovedType = eventTypePrefix + "removed"
 
-func RemovedEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*RemovedEvent, error) {
-	event, err := eventstore.EventFromStorage[removedEvent](e)
-	if err != nil {
-		return nil, err
-	}
-	return (*RemovedEvent)(event), nil
+type RemovedEvent eventstore.Event[eventstore.EmptyPayload]
+
+var _ eventstore.TypeChecker = (*RemovedEvent)(nil)
+
+// ActionType implements eventstore.Typer.
+func (c *RemovedEvent) ActionType() string {
+	return RemovedType
 }
 
-func (e RemovedEvent) IsType(typ string) bool {
-	return typ == "org.removed"
+func RemovedEventFromStorage(event *eventstore.StorageEvent) (e *RemovedEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-RSPYk", "Errors.Invalid.Event.Type")
+	}
+
+	return &RemovedEvent{
+		StorageEvent: event,
+	}, nil
 }

@@ -32,14 +32,16 @@ Password:
   Title: Password
   Description: Inserisci i tuoi dati di accesso.
   PasswordLabel: Password
-  MinLength: Lunghezza minima
-  HasUppercase: Lettera maiuscola
-  HasLowercase: Lettera minuscola
-  HasNumber: Numero
-  HasSymbol: Simbolo
-  Confirmation: Conferma password
-  ResetLinkText: Password dimenticata?
-  BackButtonText: indietro
+  MinLength: Deve contenere almeno
+  MinLengthp2: caratteri.
+  MaxLength: Deve contenere meno di 70 caratteri.
+  HasUppercase: Deve includere una lettera maiuscola.
+  HasLowercase: Deve includere una lettera minuscola.
+  HasNumber: Deve includere un numero.
+  HasSymbol: Deve includere un simbolo.
+  Confirmation: La conferma della password corrisponde.
+  ResetLinkText: Reimposta password
+  BackButtonText: Indietro
   NextButtonText: Avanti
 
 UsernameChange:

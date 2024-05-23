@@ -29,20 +29,19 @@ func (p *OrgPrimaryDomain) Filter() []*eventstore.Filter {
 				org.AggregateType,
 				eventstore.AggregateIDs(p.id),
 				eventstore.AppendEvent(
-					eventstore.SetEventTypes("org.domain.primary.set"),
+					eventstore.SetEventTypes(org.DomainPrimarySetType),
 				),
 			),
 		),
 	}
 }
 
-func (p *OrgPrimaryDomain) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
+func (p *OrgPrimaryDomain) Reduce(events ...*eventstore.StorageEvent) error {
 	for _, event := range events {
 		if !p.shouldReduce(event) {
 			continue
 		}
-
-		if !org.DomainPrimarySet.IsType(event.Type) {
+		if event.Type != org.DomainPrimarySetType {
 			continue
 		}
 		e, err := org.DomainPrimarySetEventFromStorage(event)
