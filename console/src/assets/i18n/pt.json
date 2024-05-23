@@ -48,13 +48,13 @@
       "TITLE": "Usuários",
       "DESCRIPTION": "Um usuário é um humano ou uma máquina que pode acessar seus aplicativos.",
       "HUMANS": {
-        "TITLE": "Humanos",
-        "DESCRIPTION": "Humanos autenticam interativamente em uma sessão de navegador com um prompt de login.",
+        "TITLE": "Usuários",
+        "DESCRIPTION": "Os usuários são autenticados interativamente em uma sessão do navegador com um prompt de login.",
         "METADATA": "Adicione atributos personalizados ao usuário, como o departamento. Você pode usar essas informações em suas ações."
       },
       "MACHINES": {
-        "TITLE": "Máquinas",
-        "DESCRIPTION": "Máquinas autenticam de forma não interativa usando um token JWT assinado com uma chave privada. Eles também podem usar um token de acesso pessoal.",
+        "TITLE": "Usuários do serviço",
+        "DESCRIPTION": "Os usuários do serviço autenticam-se de forma não interativa usando um token de portador JWT assinado com uma chave privada. Eles também podem usar um token de acesso pessoal.",
         "METADATA": "Adicione atributos personalizados ao usuário, como o sistema de autenticação. Você pode usar essas informações em suas ações."
       },
       "SELF": {
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Links Externos",
-        "DESCRIPTION": "Guie seus usuários para recursos externos personalizados mostrados na página de login. Os usuários precisam aceitar os Termos de Serviço e a Política de Privacidade antes de poderem se inscrever."
+        "DESCRIPTION": "Oriente seus usuários sobre recursos externos personalizados mostrados na página de login. Os usuários precisam aceitar os Termos de Serviço e a Política de Privacidade antes de se inscreverem. Altere o link para sua documentação ou defina uma string vazia para ocultar o botão de documentação do console. Adicione um link externo personalizado e um texto personalizado para esse link no console ou deixe-os vazios para ocultar esse botão."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Configurações de SMTP",
@@ -269,9 +269,9 @@
             "TITLE": "Login Externo permitido",
             "DESCRIPTION": "Permite que seus usuários façam login com um provedor de identidade externo em vez de usar o usuário ZITADEL para fazer login."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Redefinição de Senha permitida",
-            "DESCRIPTION": "Permite que seus usuários redefinam sua senha."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Redefinição de senha oculta",
+            "DESCRIPTION": "Não permita que seus usuários redefinam a senha."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Descoberta de Domínio permitida",
@@ -1574,6 +1574,9 @@
       "POLICYLINK": "Link para a Política de Privacidade",
       "HELPLINK": "Link para Ajuda",
       "SUPPORTEMAIL": "E-mail de suporte",
+      "DOCSLINK": "Link do Documentos (Console)",
+      "CUSTOMLINK": "Link personalizado (Console)",
+      "CUSTOMLINKTEXT": "Texto do link personalizado (Console)",
       "SAVED": "Salvo com sucesso!",
       "RESET_TITLE": "Restaurar valores padrão",
       "RESET_DESCRIPTION": "Você está prestes a restaurar os Links padrão para TOS e Política de Privacidade. Deseja realmente continuar?"
@@ -2222,7 +2225,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Provedor SMTP",
-      "DESCRIPTION": "Estes são os provedores SMTP para sua instância Zitadel. Ative aquele que deseja usar para enviar notificações aos seus usuários.",
+      "DESCRIPTION": "Estes são os provedores SMTP para sua instância ZITADEL. Ative aquele que deseja usar para enviar notificações aos seus usuários.",
       "EMPTY": "Nenhum provedor SMTP disponível",
       "ACTIVATED": "Ativado",
       "ACTIVATE": "Ativar provedor",
@@ -2250,7 +2253,16 @@
         "CURRENT_DESC_TITLE": "Estas são suas configurações de SMTP",
         "PROVIDER_SETTINGS": "Configurações do provedor SMTP",
         "SENDER_SETTINGS": "Configurações do remetente",
-        "TEST_SETTINGS": "Testar configurações de SMTP"
+        "TEST_SETTINGS": "Testar configurações de SMTP",
+        "NEXT_STEPS": "Próximos passos",
+        "ACTIVATE": {
+          "TITLE": "Ative seu provedor SMTP",
+          "DESCRIPTION": "ZITADEL não pode usar este provedor SMTP para enviar notificações até que você o ative. Se você ativar este provedor, qualquer outro provedor que estava ativo será desativado."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Desative seu provedor SMTP",
+          "DESCRIPTION": "Se você desativar este provedor SMTP, a ZITADEL não poderá usá-lo para enviar notificações até que você o ative novamente."
+        }
       }
     },
     "DETAIL": {

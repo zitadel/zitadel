@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"io"
 	"testing"
 
@@ -30,8 +29,9 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 	}
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
-		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		idGenerator     id.Generator
+		permissionCheck domain.PermissionCheck
 	}
 	type args struct {
 		userID        string
@@ -46,17 +46,9 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "wrong user",
-			args: args{
-				userID:        "foo",
-				resourceOwner: "org1",
-			},
-			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTH-Bohd2", "Errors.User.UserIDWrong"),
-		},
-		{
 			name: "get human passwordless error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilterError(io.ErrClosedPipe),
 				),
 			},
@@ -67,9 +59,37 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 			wantErr: io.ErrClosedPipe,
 		},
 		{
+			name: "other user, no permission",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(eventFromEventPusher(
+						user.NewHumanAddedEvent(ctx,
+							userAgg,
+							"username",
+							"firstname",
+							"lastname",
+							"nickname",
+							"displayname",
+							language.German,
+							domain.GenderUnspecified,
+							"email@test.ch",
+							true,
+						),
+					)),
+				),
+				permissionCheck: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				userID:        "foo",
+				resourceOwner: "org1",
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"),
+		},
+		{
 			name: "id generator error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(), // getHumanPasswordlessTokens
 					expectFilter(eventFromEventPusher(
 						user.NewHumanAddedEvent(ctx,
@@ -110,9 +130,10 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:     tt.fields.eventstore,
-				idGenerator:    tt.fields.idGenerator,
-				webauthnConfig: webauthnConfig,
+				eventstore:      tt.fields.eventstore(t),
+				idGenerator:     tt.fields.idGenerator,
+				checkPermission: tt.fields.permissionCheck,
+				webauthnConfig:  webauthnConfig,
 			}
 			_, err := c.RegisterUserU2F(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.rpID)
 			require.ErrorIs(t, err, tt.wantErr)
@@ -122,7 +143,7 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 }
 
 func TestCommands_pushUserU2F(t *testing.T) {
-	ctx := authz.WithRequestedDomain(context.Background(), "example.com")
+	ctx := authz.WithRequestedDomain(authz.NewMockContext("instance1", "org1", "user1"), "example.com")
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
 		ExternalSecure: true,

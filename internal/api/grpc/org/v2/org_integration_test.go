@@ -41,7 +41,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddOrganization(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t, CTX)
 
 	tests := []struct {
 		name    string

@@ -16,14 +16,23 @@ import (
 )
 
 const (
-	TokenKeyTokenID        = "id"
-	TokenKeyUserID         = "user_id"
-	TokenKeyRefreshTokenID = "refresh_token_id"
-	TokenKeyApplicationID  = "application_id"
-	TokenKeyUserAgentID    = "user_agent_id"
-	TokenKeyExpiration     = "expiration"
-	TokenKeyResourceOwner  = "resource_owner"
-	TokenKeyInstanceID     = "instance_id"
+	TokenKeyTokenID           = "id"
+	TokenKeyUserID            = "user_id"
+	TokenKeyRefreshTokenID    = "refresh_token_id"
+	TokenKeyApplicationID     = "application_id"
+	TokenKeyUserAgentID       = "user_agent_id"
+	TokenKeyExpiration        = "expiration"
+	TokenKeyResourceOwner     = "resource_owner"
+	TokenKeyInstanceID        = "instance_id"
+	TokenKeyCreationDate      = "creation_date"
+	TokenKeyChangeDate        = "change_date"
+	TokenKeySequence          = "sequence"
+	TokenKeyActor             = "actor"
+	TokenKeyID                = "id"
+	TokenKeyAudience          = "audience"
+	TokenKeyPreferredLanguage = "preferred_language"
+	TokenKeyScopes            = "scopes"
+	TokenKeyIsPat             = "is_pat"
 )
 
 type TokenView struct {
@@ -100,6 +109,7 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 }
 
 func (t *TokenView) AppendEventIfMyToken(event eventstore.Event) (err error) {
+	// in case anything needs to be change here check if the Reduce function needs the change as well
 	view := new(TokenView)
 	switch event.Type() {
 	case user_repo.UserTokenAddedType,
@@ -112,7 +122,7 @@ func (t *TokenView) AppendEventIfMyToken(event eventstore.Event) (err error) {
 		return t.appendRefreshTokenRemoved(event)
 	case user_repo.UserV1SignedOutType,
 		user_repo.HumanSignedOutType:
-		id, err := agentIDFromSession(event)
+		id, err := UserAgentIDFromEvent(event)
 		if err != nil {
 			return err
 		}
@@ -146,6 +156,7 @@ func (t *TokenView) AppendEventIfMyToken(event eventstore.Event) (err error) {
 }
 
 func (t *TokenView) AppendEvent(event eventstore.Event) error {
+	// in case anything needs to be change here check if the Reduce function needs the change as well
 	t.ChangeDate = event.CreatedAt()
 	t.Sequence = event.Sequence()
 	switch event.Type() {
@@ -170,49 +181,40 @@ func (t *TokenView) setRootData(event eventstore.Event) {
 
 func (t *TokenView) setData(event eventstore.Event) error {
 	if err := event.Unmarshal(t); err != nil {
-		logging.Log("EVEN-3Gm9s").WithError(err).Error("could not unmarshal event data")
+		logging.WithError(err).Error("could not unmarshal event data")
 		return zerrors.ThrowInternal(err, "MODEL-5Gms9", "could not unmarshal event")
 	}
 	return nil
 }
 
-func agentIDFromSession(event eventstore.Event) (string, error) {
-	session := make(map[string]interface{})
-	if err := event.Unmarshal(&session); err != nil {
-		logging.Log("EVEN-Ghgt3").WithError(err).Error("could not unmarshal event data")
-		return "", zerrors.ThrowInternal(nil, "MODEL-GBf32", "could not unmarshal data")
-	}
-	return session["userAgentID"].(string), nil
-}
-
 func (t *TokenView) appendTokenRemoved(event eventstore.Event) error {
-	token, err := eventToMap(event)
+	tokenID, err := tokenIDFromEvent(event)
 	if err != nil {
 		return err
 	}
-	if token["tokenId"] == t.ID {
+	if tokenID == t.ID {
 		t.Deactivated = true
 	}
 	return nil
 }
 
 func (t *TokenView) appendRefreshTokenRemoved(event eventstore.Event) error {
-	refreshToken, err := eventToMap(event)
+	tokenID, err := tokenIDFromEvent(event)
 	if err != nil {
 		return err
 	}
-	if refreshToken["tokenId"] == t.RefreshTokenID {
+	if tokenID == t.RefreshTokenID {
 		t.Deactivated = true
 	}
 	return nil
 }
 
 func (t *TokenView) appendPATRemoved(event eventstore.Event) error {
-	pat, err := eventToMap(event)
+	tokenID, err := tokenIDFromEvent(event)
 	if err != nil {
 		return err
 	}
-	if pat["tokenId"] == t.ID && t.IsPAT {
+	if tokenID == t.ID && t.IsPAT {
 		t.Deactivated = true
 	}
 	return nil
@@ -235,11 +237,15 @@ func (t *TokenView) GetRelevantEventTypes() []eventstore.EventType {
 	}
 }
 
-func eventToMap(event eventstore.Event) (map[string]interface{}, error) {
-	m := make(map[string]interface{})
+type tokenIDPayload struct {
+	ID string `json:"tokenId"`
+}
+
+func tokenIDFromEvent(event eventstore.Event) (string, error) {
+	m := new(tokenIDPayload)
 	if err := event.Unmarshal(&m); err != nil {
-		logging.Log("EVEN-Dbffe").WithError(err).Error("could not unmarshal event data")
-		return nil, zerrors.ThrowInternal(nil, "MODEL-SDAfw", "could not unmarshal data")
+		logging.WithError(err).Error("could not unmarshal event data")
+		return "", zerrors.ThrowInternal(nil, "MODEL-SDAfw", "could not unmarshal data")
 	}
-	return m, nil
+	return m.ID, nil
 }

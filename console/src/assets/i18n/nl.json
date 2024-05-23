@@ -48,13 +48,13 @@
       "TITLE": "Gebruikers",
       "DESCRIPTION": "Een gebruiker is een mens of een machine die toegang kan krijgen tot je applicaties.",
       "HUMANS": {
-        "TITLE": "Mensen",
-        "DESCRIPTION": "Mensen authenticeren interactief in een browsersessie met een loginprompt.",
+        "TITLE": "Gebruikers",
+        "DESCRIPTION": "Gebruikers authenticeren interactief in een browsersessie met een loginprompt.",
         "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals de afdeling. Je kunt deze informatie gebruiken in je acties."
       },
       "MACHINES": {
-        "TITLE": "Machines",
-        "DESCRIPTION": "Machines authenticeren niet-interactief met een JWT bearer token ondertekend met een privésleutel. Ze kunnen ook een persoonlijke toegangstoken gebruiken.",
+        "TITLE": "Servicegebruikers",
+        "DESCRIPTION": "Servicegebruikers authenticeren niet-interactief met behulp van een JWT-bearertoken ondertekend met een privésleutel. Ze kunnen ook een persoonlijk toegangstoken gebruiken.",
         "METADATA": "Voeg aangepaste attributen toe aan de gebruiker zoals het authenticatiesysteem. Je kunt deze informatie gebruiken in je acties."
       },
       "SELF": {
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externe links",
-        "DESCRIPTION": "Leid je gebruikers naar aangepaste externe bronnen die worden getoond op de inlogpagina. Gebruikers moeten de Algemene Voorwaarden en het Privacybeleid accepteren voordat ze zich kunnen aanmelden."
+        "DESCRIPTION": "Leid uw gebruikers naar aangepaste externe bronnen die op de inlogpagina worden weergegeven. Gebruikers moeten de Servicevoorwaarden en het Privacybeleid accepteren voordat ze zich kunnen aanmelden. Wijzig de link naar uw documentatie of stel een lege string in om de documentatieknop voor de console te verbergen. Voeg een aangepaste externe link en een aangepaste tekst voor die link toe in de console, of stel ze leeg om die knop te verbergen."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP-instellingen",
@@ -269,9 +269,9 @@
             "TITLE": "Extern inloggen toegestaan",
             "DESCRIPTION": "Sta je gebruikers toe om in te loggen met een externe identiteitsprovider in plaats van het gebruik van de ZITADEL gebruiker om in te loggen."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Wachtwoord resetten toegestaan",
-            "DESCRIPTION": "Sta je gebruikers toe om hun wachtwoord te resetten."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Wachtwoord reset verborgen",
+            "DESCRIPTION": "Sta uw gebruikers niet toe hun wachtwoord opnieuw in te stellen."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Domeinontdekking toegestaan",
@@ -1573,6 +1573,9 @@
       "POLICYLINK": "Link naar Privacybeleid",
       "HELPLINK": "Link naar Help",
       "SUPPORTEMAIL": "Ondersteuning Email",
+      "DOCSLINK": "Documentenlink (Console)",
+      "CUSTOMLINK": "Aangepaste link (Console)",
+      "CUSTOMLINKTEXT": "Aangepaste linktekst (Console)",
       "SAVED": "Succesvol opgeslagen!",
       "RESET_TITLE": "Herstel Standaard Waarden",
       "RESET_DESCRIPTION": "U staat op het punt de standaard Links voor TOS en Privacybeleid te herstellen. Weet u zeker dat u wilt doorgaan?"
@@ -2043,7 +2046,7 @@
         "DESCRIPTION": "Voer de inloggegevens in voor uw Apple Provider"
       },
       "SAML": {
-        "TITLE": "Log in met Saml SP",
+        "TITLE": "Log in met SAML SP",
         "DESCRIPTION": "Voer de inloggegevens in voor uw SAML Provider"
       }
     },
@@ -2245,7 +2248,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP-provider",
-      "DESCRIPTION": "Dit zijn de SMTP-providers voor uw Zitadel-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
+      "DESCRIPTION": "Dit zijn de SMTP-providers voor uw ZITADEL-instantie. Activeer degene die u wilt gebruiken om meldingen naar uw gebruikers te sturen.",
       "EMPTY": "Geen SMTP-provider beschikbaar",
       "ACTIVATED": "Geactiveerd",
       "ACTIVATE": "Aanbieder activeren",
@@ -2273,7 +2276,16 @@
         "CURRENT_DESC_TITLE": "Dit zijn uw SMTP-instellingen",
         "PROVIDER_SETTINGS": "SMTP-providerinstellingen",
         "SENDER_SETTINGS": "Afzenderinstellingen",
-        "TEST_SETTINGS": "SMTP-instellingen testen"
+        "TEST_SETTINGS": "SMTP-instellingen testen",
+        "NEXT_STEPS": "Volgende stappen",
+        "ACTIVATE": {
+          "TITLE": "Activeer uw SMTP-provider",
+          "DESCRIPTION": "ZITADEL kan deze SMTP-provider niet gebruiken om meldingen te verzenden totdat u deze activeert. Als u deze provider activeert, worden alle andere actieve providers nu gedeactiveerd."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deactiveer uw SMTP-provider",
+          "DESCRIPTION": "Als u deze SMTP-provider deactiveert, kan ZITADEL deze niet gebruiken om meldingen te verzenden totdat u deze opnieuw activeert."
+        }
       }
     },
     "DETAIL": {

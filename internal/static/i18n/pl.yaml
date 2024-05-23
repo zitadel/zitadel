@@ -136,7 +136,7 @@ Errors:
       Invalid: Hasło jest nieprawidłowe
       NotSet: Użytkownik nie ustawił hasła
       NotChanged: Nowe hasło nie może być takie samo jak Twoje obecne hasło
-      NotSupported: Kodowanie skrótu hasła nie jest obsługiwane
+      NotSupported: Kodowanie skrótu hasła nie jest obsługiwane. Sprawdź https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Polityka hasła nie znaleziona
       MinLength: Hasło jest zbyt krótkie
@@ -470,6 +470,7 @@ Errors:
     NotActive: Działanie nie jest aktywne
     NotInactive: Działanie nie jest dezaktywowane
     MaxAllowed: Nie dopuszcza się dodatkowych aktywnych działań.
+    NotEnabled: Funkcja „Akcja” nie jest włączona
   Flow:
     FlowTypeMissing: Typ przepływu brakuje
     Empty: Przepływ jest już pusty
@@ -515,6 +516,7 @@ Errors:
     IDPMissing: Brak identyfikatora IDP w żądaniu
     IDPInvalid: IDP nieprawidłowe dla żądania
     ResponseInvalid: Odpowiedź IDP jest nieprawidłowa
+    MissingSingleMappingAttribute: Nie zawiera atrybutu mapowania lub ma więcej niż jedną wartość
     SuccessURLMissing: Brak adresu URL powodzenia w żądaniu
     FailureURLMissing: Brak adresu URL niepowodzenia w żądaniu
     StateMissing: Brak parametru stanu w żądaniu
@@ -613,6 +615,7 @@ EventTypes:
         failed: Sprawdzenie inicjujące nie powiodło się
     token:
       added: Token dostępu utworzony
+      v2.added: Token dostępu utworzony
       removed: Token dostępu usunięty
     impersonated: Użytkownik podszywał się pod użytkownika
     username:
@@ -1012,6 +1015,9 @@ EventTypes:
           check:
             succeeded: Sprawdzenie sekretu OIDC Klienta powiodło się
             failed: Sprawdzenie sekretu OIDC Klienta nie powiodło się
+        key:
+          added: Dodano klucz aplikacji OIDC
+          removed: Klucz aplikacji OIDC usunięty
       api:
         secret:
           check:

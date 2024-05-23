@@ -28,8 +28,11 @@ import {
   MailjetDefaultSettings,
   PostmarkDefaultSettings,
   ProviderDefaultSettings,
+  OutlookDefaultSettings,
   SendgridDefaultSettings,
 } from './known-smtp-providers-settings';
+import { MatStepper } from '@angular/material/stepper';
+import { SMTPConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
 
 @Component({
   selector: 'cnsl-smtp-provider',
@@ -47,7 +50,7 @@ export class SMTPProviderComponent {
 
   public smtpLoading: boolean = false;
   public hasSMTPConfig: boolean = false;
-
+  public isActive: boolean = false;
   public updateClientSecret: boolean = false;
 
   // stepper
@@ -55,6 +58,8 @@ export class SMTPProviderComponent {
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
   public firstFormGroup!: UntypedFormGroup;
   public secondFormGroup!: UntypedFormGroup;
+
+  public senderEmailPlaceholder = 'sender@example.com';
 
   constructor(
     private service: AdminService,
@@ -91,6 +96,9 @@ export class SMTPProviderComponent {
         case 'brevo':
           this.providerDefaultSetting = BrevoDefaultSettings;
           break;
+        case 'outlook':
+          this.providerDefaultSetting = OutlookDefaultSettings;
+          break;
       }
 
       this.firstFormGroup = this.fb.group({
@@ -105,6 +113,8 @@ export class SMTPProviderComponent {
         user: [this.providerDefaultSetting?.user.value || ''],
         password: [this.providerDefaultSetting?.password.value || ''],
       });
+
+      this.senderEmailPlaceholder = this.providerDefaultSetting?.senderEmailPlaceholder || 'sender@example.com';
 
       this.secondFormGroup = this.fb.group({
         senderAddress: ['', [requiredValidator]],
@@ -158,6 +168,7 @@ export class SMTPProviderComponent {
       .then((data) => {
         this.smtpLoading = false;
         if (data.smtpConfig) {
+          this.isActive = data.smtpConfig.state === SMTPConfigState.SMTP_CONFIG_ACTIVE;
           this.hasSMTPConfig = true;
           this.firstFormGroup.patchValue({
             ['description']: data.smtpConfig.description,
@@ -180,7 +191,7 @@ export class SMTPProviderComponent {
       });
   }
 
-  private updateData(): Promise<UpdateSMTPConfigResponse.AsObject | AddSMTPConfigResponse> {
+  private updateData(): Promise<UpdateSMTPConfigResponse.AsObject | AddSMTPConfigResponse.AsObject> {
     if (this.hasSMTPConfig) {
       const req = new UpdateSMTPConfigRequest();
       req.setId(this.id);
@@ -220,19 +231,49 @@ export class SMTPProviderComponent {
     }
   }
 
-  public savePolicy(): void {
-    this.updateData()
+  public activateSMTPConfig() {
+    this.service
+      .activateSMTPConfig(this.id)
       .then(() => {
+        this.toast.showInfo('SMTP.LIST.DIALOG.ACTIVATED', true);
+        this.isActive = true;
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public deactivateSMTPConfig() {
+    this.service
+      .deactivateSMTPConfig(this.id)
+      .then(() => {
+        this.toast.showInfo('SMTP.LIST.DIALOG.DEACTIVATED', true);
+        this.isActive = false;
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public savePolicy(stepper: MatStepper): void {
+    this.updateData()
+      .then((resp) => {
+        if (!this.id) {
+          // This is a new SMTP provider let's get the ID from the addSMTPConfig response
+          let createResponse = resp as AddSMTPConfigResponse.AsObject;
+          this.id = createResponse.id;
+        }
+
         this.toast.showInfo('SETTING.SMTP.SAVED', true);
         setTimeout(() => {
-          this.close();
+          stepper.next();
         }, 2000);
       })
       .catch((error: unknown) => {
         if (`${error}`.includes('No changes')) {
           this.toast.showInfo('SETTING.SMTP.NOCHANGES', true);
           setTimeout(() => {
-            this.close();
+            stepper.next();
           }, 2000);
         } else {
           this.toast.showError(error);

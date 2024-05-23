@@ -224,7 +224,8 @@
         flex: 1;
       }
 
-      .doc-link {
+      .doc-link,
+      .custom-link {
         margin-right: 1rem;
 
         @media only screen and (max-width: 800px) {

@@ -1726,13 +1726,15 @@ func (wm *AppleIDPWriteModel) GetProviderOptions() idp.Options {
 type SAMLIDPWriteModel struct {
 	eventstore.WriteModel
 
-	Name              string
-	ID                string
-	Metadata          []byte
-	Key               *crypto.CryptoValue
-	Certificate       []byte
-	Binding           string
-	WithSignedRequest bool
+	Name                          string
+	ID                            string
+	Metadata                      []byte
+	Key                           *crypto.CryptoValue
+	Certificate                   []byte
+	Binding                       string
+	WithSignedRequest             bool
+	NameIDFormat                  *domain.SAMLNameIDFormat
+	TransientMappingAttributeName string
 	idp.Options
 
 	State domain.IDPState
@@ -1759,6 +1761,8 @@ func (wm *SAMLIDPWriteModel) reduceAddedEvent(e *idp.SAMLIDPAddedEvent) {
 	wm.Certificate = e.Certificate
 	wm.Binding = e.Binding
 	wm.WithSignedRequest = e.WithSignedRequest
+	wm.NameIDFormat = e.NameIDFormat
+	wm.TransientMappingAttributeName = e.TransientMappingAttributeName
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -1782,6 +1786,12 @@ func (wm *SAMLIDPWriteModel) reduceChangedEvent(e *idp.SAMLIDPChangedEvent) {
 	if e.WithSignedRequest != nil {
 		wm.WithSignedRequest = *e.WithSignedRequest
 	}
+	if e.NameIDFormat != nil {
+		wm.NameIDFormat = e.NameIDFormat
+	}
+	if e.TransientMappingAttributeName != nil {
+		wm.TransientMappingAttributeName = *e.TransientMappingAttributeName
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -1793,6 +1803,8 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
+	nameIDFormat *domain.SAMLNameIDFormat,
+	transientMappingAttributeName string,
 	options idp.Options,
 ) ([]idp.SAMLIDPChanges, error) {
 	changes := make([]idp.SAMLIDPChanges, 0)
@@ -1817,6 +1829,12 @@ func (wm *SAMLIDPWriteModel) NewChanges(
 	}
 	if wm.WithSignedRequest != withSignedRequest {
 		changes = append(changes, idp.ChangeSAMLWithSignedRequest(withSignedRequest))
+	}
+	if wm.NameIDFormat != nameIDFormat {
+		changes = append(changes, idp.ChangeSAMLNameIDFormat(nameIDFormat))
+	}
+	if wm.TransientMappingAttributeName != transientMappingAttributeName {
+		changes = append(changes, idp.ChangeSAMLTransientMappingAttributeName(transientMappingAttributeName))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -1849,6 +1867,12 @@ func (wm *SAMLIDPWriteModel) ToProvider(callbackURL string, idpAlg crypto.Encryp
 	}
 	if wm.Binding != "" {
 		opts = append(opts, saml2.WithBinding(wm.Binding))
+	}
+	if wm.NameIDFormat != nil {
+		opts = append(opts, saml2.WithNameIDFormat(*wm.NameIDFormat))
+	}
+	if wm.TransientMappingAttributeName != "" {
+		opts = append(opts, saml2.WithTransientMappingAttributeName(wm.TransientMappingAttributeName))
 	}
 	opts = append(opts, saml2.WithCustomRequestTracker(
 		requesttracker.New(

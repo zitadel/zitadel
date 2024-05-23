@@ -288,12 +288,11 @@ func TestCommands_UpdateSession(t *testing.T) {
 		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 	}
 	type args struct {
-		ctx          context.Context
-		sessionID    string
-		sessionToken string
-		checks       []SessionCommand
-		metadata     map[string][]byte
-		lifetime     time.Duration
+		ctx       context.Context
+		sessionID string
+		checks    []SessionCommand
+		metadata  map[string][]byte
+		lifetime  time.Duration
 	}
 	type res struct {
 		want *SessionChanged
@@ -317,37 +316,6 @@ func TestCommands_UpdateSession(t *testing.T) {
 			},
 			res{
 				err: zerrors.ThrowInternal(nil, "id", "filter failed"),
-			},
-		},
-		{
-			"invalid session token",
-			fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusher(
-							session.NewAddedEvent(context.Background(),
-								&session.NewAggregate("sessionID", "instance1").Aggregate,
-								&domain.UserAgent{
-									FingerprintID: gu.Ptr("fp1"),
-									IP:            net.ParseIP("1.2.3.4"),
-									Description:   gu.Ptr("firefox"),
-									Header:        http.Header{"foo": []string{"bar"}},
-								},
-							)),
-						eventFromEventPusher(
-							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"tokenID")),
-					),
-				),
-				tokenVerifier: newMockTokenVerifierInvalid(),
-			},
-			args{
-				ctx:          context.Background(),
-				sessionID:    "sessionID",
-				sessionToken: "invalid",
-			},
-			res{
-				err: zerrors.ThrowPermissionDenied(nil, "COMMAND-sGr42", "Errors.Session.Token.Invalid"),
 			},
 		},
 		{
@@ -375,9 +343,8 @@ func TestCommands_UpdateSession(t *testing.T) {
 				},
 			},
 			args{
-				ctx:          context.Background(),
-				sessionID:    "sessionID",
-				sessionToken: "token",
+				ctx:       context.Background(),
+				sessionID: "sessionID",
 			},
 			res{
 				want: &SessionChanged{
@@ -397,7 +364,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 				eventstore:           tt.fields.eventstore,
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
-			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken, tt.args.checks, tt.args.metadata, tt.args.lifetime)
+			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
 		})
@@ -566,7 +533,7 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectPush(
 						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-							"userID", "org1", testNow,
+							"userID", "org1", testNow, &language.Afrikaans,
 						),
 						session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow,
@@ -585,7 +552,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1"),
+						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckPassword("password"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -634,7 +601,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1"),
+						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -673,7 +640,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1"),
+						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -683,7 +650,8 @@ func TestCommands_updateSession(t *testing.T) {
 									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
 							),
 							eventFromEventPusher(
-								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
+								idpintent.NewSucceededEvent(context.Background(),
+									&idpintent.NewAggregate("id", "instance1").Aggregate,
 									nil,
 									"idpUserID",
 									"idpUserName",
@@ -722,7 +690,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1"),
+						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent2", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t),
@@ -750,7 +718,7 @@ func TestCommands_updateSession(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectPush(
 						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-							"userID", "org1", testNow),
+							"userID", "org1", testNow, &language.Afrikaans),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
 						session.NewMetadataSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -765,7 +733,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1"),
+						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					eventstore: eventstoreExpect(t,
@@ -775,7 +743,8 @@ func TestCommands_updateSession(t *testing.T) {
 									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
 							),
 							eventFromEventPusher(
-								idpintent.NewSucceededEvent(context.Background(), &idpintent.NewAggregate("intent", "org1").Aggregate,
+								idpintent.NewSucceededEvent(context.Background(),
+									&idpintent.NewAggregate("id", "instance1").Aggregate,
 									nil,
 									"idpUserID",
 									"idpUsername",
@@ -827,7 +796,9 @@ func TestCheckTOTP(t *testing.T) {
 	ctx := authz.NewMockContext("instance1", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
-	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
+	key, err := domain.NewTOTPKey("example.com", "user1")
+	require.NoError(t, err)
+	secret, err := crypto.Encrypt([]byte(key.Secret()), cryptoAlg)
 	require.NoError(t, err)
 
 	sessAgg := &session.NewAggregate("session1", "instance1").Aggregate
@@ -1184,7 +1155,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"user1", "org1", testNow),
+								"user1", "org1", testNow, &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -1225,7 +1196,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"userID", "org1", testNow),
+								"userID", "org1", testNow, &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -1267,7 +1238,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 						),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "org2").Aggregate,
-								"userID", "", testNow),
+								"userID", "", testNow, &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "org2").Aggregate,

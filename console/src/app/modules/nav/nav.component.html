@@ -96,7 +96,12 @@
                     [routerLinkActive]="['active']"
                     [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="['/org-settings']"
-                    *ngIf="(['policy.read'] | hasRole | async) && ((authService.cachedOrgs | async)?.length ?? 1) > 1"
+                    *ngIf="
+                      (['policy.read'] | hasRole | async) &&
+                      ((['iam.read$', 'iam.write$'] | hasRole | async) === false ||
+                        (((authService.cachedOrgs | async)?.length ?? 1) > 1 &&
+                          (['iam.read$', 'iam.write$'] | hasRole | async)))
+                    "
                   >
                     <span class="label">{{ 'MENU.SETTINGS' | translate }}</span>
                   </a>

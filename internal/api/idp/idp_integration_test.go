@@ -52,8 +52,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_SAMLCertificate(t *testing.T) {
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t)
-	oauthIdpID := Tester.AddGenericOAuthProvider(t)
+	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX, "")
+	oauthIdpID := Tester.AddGenericOAuthProvider(t, CTX)
 
 	type args struct {
 		ctx   context.Context
@@ -109,8 +109,8 @@ func TestServer_SAMLCertificate(t *testing.T) {
 }
 
 func TestServer_SAMLMetadata(t *testing.T) {
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t)
-	oauthIdpID := Tester.AddGenericOAuthProvider(t)
+	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX, "")
+	oauthIdpID := Tester.AddGenericOAuthProvider(t, CTX)
 
 	type args struct {
 		ctx   context.Context
@@ -167,7 +167,7 @@ func TestServer_SAMLMetadata(t *testing.T) {
 
 func TestServer_SAMLACS(t *testing.T) {
 	userHuman := Tester.CreateHumanUser(CTX)
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t)
+	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX, "urn:oid:0.9.2342.19200300.100.1.1") // the username is set in urn:oid:0.9.2342.19200300.100.1.1
 	externalUserID := "test1"
 	linkedExternalUserID := "test2"
 	Tester.CreateUserIDPlink(CTX, userHuman.UserId, linkedExternalUserID, samlRedirectIdpID, linkedExternalUserID)
@@ -180,13 +180,15 @@ func TestServer_SAMLACS(t *testing.T) {
 	assert.NoError(t, err)
 
 	type args struct {
-		ctx        context.Context
-		successURL string
-		failureURL string
-		idpID      string
-		username   string
-		intentID   string
-		response   string
+		ctx          context.Context
+		successURL   string
+		failureURL   string
+		idpID        string
+		username     string
+		nameID       string
+		nameIDFormat string
+		intentID     string
+		response     string
 	}
 	type want struct {
 		successful bool
@@ -201,12 +203,14 @@ func TestServer_SAMLACS(t *testing.T) {
 		{
 			name: "intent invalid",
 			args: args{
-				ctx:        CTX,
-				successURL: "https://example.com/success",
-				failureURL: "https://example.com/failure",
-				idpID:      samlRedirectIdpID,
-				username:   externalUserID,
-				intentID:   "notexisting",
+				ctx:          CTX,
+				successURL:   "https://example.com/success",
+				failureURL:   "https://example.com/failure",
+				idpID:        samlRedirectIdpID,
+				username:     externalUserID,
+				nameID:       externalUserID,
+				nameIDFormat: string(saml.PersistentNameIDFormat),
+				intentID:     "notexisting",
 			},
 			want: want{
 				successful: false,
@@ -217,12 +221,14 @@ func TestServer_SAMLACS(t *testing.T) {
 		{
 			name: "response invalid",
 			args: args{
-				ctx:        CTX,
-				successURL: "https://example.com/success",
-				failureURL: "https://example.com/failure",
-				idpID:      samlRedirectIdpID,
-				username:   externalUserID,
-				response:   "invalid",
+				ctx:          CTX,
+				successURL:   "https://example.com/success",
+				failureURL:   "https://example.com/failure",
+				idpID:        samlRedirectIdpID,
+				username:     externalUserID,
+				nameID:       externalUserID,
+				nameIDFormat: string(saml.PersistentNameIDFormat),
+				response:     "invalid",
 			},
 			want: want{
 				successful: false,
@@ -232,11 +238,13 @@ func TestServer_SAMLACS(t *testing.T) {
 		{
 			name: "saml flow redirect, ok",
 			args: args{
-				ctx:        CTX,
-				successURL: "https://example.com/success",
-				failureURL: "https://example.com/failure",
-				idpID:      samlRedirectIdpID,
-				username:   externalUserID,
+				ctx:          CTX,
+				successURL:   "https://example.com/success",
+				failureURL:   "https://example.com/failure",
+				idpID:        samlRedirectIdpID,
+				username:     externalUserID,
+				nameID:       externalUserID,
+				nameIDFormat: string(saml.PersistentNameIDFormat),
 			},
 			want: want{
 				successful: true,
@@ -246,11 +254,45 @@ func TestServer_SAMLACS(t *testing.T) {
 		{
 			name: "saml flow redirect with link, ok",
 			args: args{
-				ctx:        CTX,
-				successURL: "https://example.com/success",
-				failureURL: "https://example.com/failure",
-				idpID:      samlRedirectIdpID,
-				username:   linkedExternalUserID,
+				ctx:          CTX,
+				successURL:   "https://example.com/success",
+				failureURL:   "https://example.com/failure",
+				idpID:        samlRedirectIdpID,
+				username:     linkedExternalUserID,
+				nameID:       linkedExternalUserID,
+				nameIDFormat: string(saml.PersistentNameIDFormat),
+			},
+			want: want{
+				successful: true,
+				user:       userHuman.UserId,
+			},
+		},
+		{
+			name: "saml flow redirect (transient), ok",
+			args: args{
+				ctx:          CTX,
+				successURL:   "https://example.com/success",
+				failureURL:   "https://example.com/failure",
+				idpID:        samlRedirectIdpID,
+				username:     externalUserID,
+				nameID:       "genericID",
+				nameIDFormat: string(saml.TransientNameIDFormat),
+			},
+			want: want{
+				successful: true,
+				user:       "",
+			},
+		},
+		{
+			name: "saml flow redirect with link (transient), ok",
+			args: args{
+				ctx:          CTX,
+				successURL:   "https://example.com/success",
+				failureURL:   "https://example.com/failure",
+				idpID:        samlRedirectIdpID,
+				username:     linkedExternalUserID,
+				nameID:       "genericID",
+				nameIDFormat: string(saml.TransientNameIDFormat),
 			},
 			want: want{
 				successful: true,
@@ -287,7 +329,7 @@ func TestServer_SAMLACS(t *testing.T) {
 				relayState = tt.args.intentID
 			}
 			callbackURL := http_util.BuildOrigin(Tester.Host(), Tester.Server.Config.ExternalSecure) + "/idps/" + tt.args.idpID + "/saml/acs"
-			response := createResponse(t, idp, samlRequest, tt.args.username)
+			response := createResponse(t, idp, samlRequest, tt.args.nameID, tt.args.nameIDFormat, tt.args.username)
 			//test purposes, use defined response
 			if tt.args.response != "" {
 				response = tt.args.response
@@ -432,14 +474,16 @@ func getIDP(zitadelBaseURL string, idpIDs []string, user1, user2 string) (*saml.
 	return &idpServer.IDP, nil
 }
 
-func createResponse(t *testing.T, idp *saml.IdentityProvider, req *http.Request, username string) string {
+func createResponse(t *testing.T, idp *saml.IdentityProvider, req *http.Request, nameID, nameIDFormat, username string) string {
 	authnReq, err := saml.NewIdpAuthnRequest(idp, req)
 	assert.NoError(t, authnReq.Validate())
 
 	err = idp.AssertionMaker.MakeAssertion(authnReq, &saml.Session{
-		CreateTime: time.Now().UTC(),
-		Index:      "",
-		NameID:     username,
+		CreateTime:   time.Now().UTC(),
+		Index:        "",
+		NameID:       nameID,
+		NameIDFormat: nameIDFormat,
+		UserName:     username,
 	})
 	assert.NoError(t, err)
 	err = authnReq.MakeResponse()

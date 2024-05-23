@@ -61,6 +61,9 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
       privacyLink: ['', []],
       helpLink: ['', []],
       supportEmail: ['', []],
+      docsLink: ['', []],
+      customLink: ['', []],
+      customLinkText: ['', []],
     });
 
     this.canWrite$.pipe(take(1)).subscribe((canWrite) => {
@@ -107,6 +110,9 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
             privacyLink: '',
             helpLink: '',
             supportEmail: '',
+            docsLink: '',
+            customLink: '',
+            customLinkText: '',
           });
         }
       })
@@ -117,6 +123,9 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
           privacyLink: '',
           helpLink: '',
           supportEmail: '',
+          docsLink: '',
+          customLink: '',
+          customLinkText: '',
         });
       });
   }
@@ -129,11 +138,16 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
         req.setTosLink(this.form.get('tosLink')?.value);
         req.setHelpLink(this.form.get('helpLink')?.value);
         req.setSupportEmail(this.form.get('supportEmail')?.value);
+        req.setDocsLink(this.form.get('docsLink')?.value);
+        req.setCustomLink(this.form.get('customLink')?.value);
+        req.setCustomLinkText(this.form.get('customLinkText')?.value);
         (this.service as ManagementService)
           .addCustomPrivacyPolicy(req)
           .then(() => {
             this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
             this.loadData();
+            // Reload console as links may have changed
+            this.reloadConsole();
           })
           .catch((error) => this.toast.showError(error));
       } else {
@@ -142,12 +156,17 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
         req.setTosLink(this.form.get('tosLink')?.value);
         req.setHelpLink(this.form.get('helpLink')?.value);
         req.setSupportEmail(this.form.get('supportEmail')?.value);
+        req.setDocsLink(this.form.get('docsLink')?.value);
+        req.setCustomLink(this.form.get('customLink')?.value);
+        req.setCustomLinkText(this.form.get('customLinkText')?.value);
 
         (this.service as ManagementService)
           .updateCustomPrivacyPolicy(req)
           .then(() => {
             this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
             this.loadData();
+            // Reload console as links may have changed
+            this.reloadConsole();
           })
           .catch((error) => this.toast.showError(error));
       }
@@ -157,12 +176,17 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
       req.setTosLink(this.form.get('tosLink')?.value);
       req.setHelpLink(this.form.get('helpLink')?.value);
       req.setSupportEmail(this.form.get('supportEmail')?.value);
+      req.setDocsLink(this.form.get('docsLink')?.value);
+      req.setCustomLink(this.form.get('customLink')?.value);
+      req.setCustomLinkText(this.form.get('customLinkText')?.value);
 
       (this.service as AdminService)
         .updatePrivacyPolicy(req)
         .then(() => {
           this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
           this.loadData();
+          // Reload console as links may have changed
+          this.reloadConsole();
         })
         .catch((error) => this.toast.showError(error));
     }
@@ -188,6 +212,7 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
             .then(() => {
               setTimeout(() => {
                 this.loadData();
+                window.location.reload();
               }, 1000);
             })
             .catch((error) => {
@@ -208,5 +233,11 @@ export class PrivacyPolicyComponent implements OnInit, OnDestroy {
     } else {
       return false;
     }
+  }
+
+  private reloadConsole(): void {
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   }
 }

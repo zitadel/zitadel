@@ -587,5 +587,5 @@ func TestImpersonation_API_Call(t *testing.T) {
 	_, err = Tester.Client.Admin.GetAllowedLanguages(impersonatedCTX, &admin.GetAllowedLanguagesRequest{})
 	status := status.Convert(err)
 	assert.Equal(t, codes.PermissionDenied, status.Code())
-	assert.Equal(t, "Errors.TokenExchange.Token.NotForAPI (APP-wai8O)", status.Message())
+	assert.Equal(t, "Errors.TokenExchange.Token.NotForAPI (APP-Shi0J)", status.Message())
 }
