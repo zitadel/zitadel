@@ -595,6 +595,7 @@
     "INVALID_FORMAT": "Formát je neplatný.",
     "NOTANEMAIL": "Zadaná hodnota není e-mailová adresa.",
     "MINLENGTH": "Musí být dlouhé alespoň {{requiredLength}} znaků.",
+    "MAXLENGTH": "Musí být kratší než {{requiredLength}} znaků",
     "UPPERCASEMISSING": "Musí obsahovat velké písmeno.",
     "LOWERCASEMISSING": "Musí obsahovat malé písmeno.",
     "SYMBOLERROR": "Musí obsahovat symbol nebo interpunkční znaménko.",
@@ -880,7 +881,8 @@
       "SET": "Nastavit nové heslo",
       "RESENDNOTIFICATION": "Odeslat odkaz pro reset hesla",
       "REQUIRED": "Některá povinná pole nejsou vyplněna.",
-      "MINLENGTHERROR": "Musí být alespoň {{value}} znaků dlouhé."
+      "MINLENGTHERROR": "Musí být alespoň {{value}} znaků dlouhé.",
+      "MAXLENGTHERROR": "Musí být kratší než {{value}} znaků."
     },
     "ID": "ID",
     "EMAIL": "E-mail",

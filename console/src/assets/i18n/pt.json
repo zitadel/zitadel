@@ -595,6 +595,7 @@
     "INVALID_FORMAT": "O formato é inválido.",
     "NOTANEMAIL": "O valor fornecido não é um endereço de e-mail.",
     "MINLENGTH": "Deve ter pelo menos {{requiredLength}} caracteres.",
+    "MAXLENGTH": "Deve ter menos de {{requiredLength}} caracteres.",
     "UPPERCASEMISSING": "Deve incluir uma letra maiúscula.",
     "LOWERCASEMISSING": "Deve incluir uma letra minúscula.",
     "SYMBOLERROR": "Deve incluir um símbolo ou caractere de pontuação.",
@@ -880,7 +881,8 @@
       "SET": "Definir Nova Senha",
       "RESENDNOTIFICATION": "Enviar Link de Redefinição de Senha",
       "REQUIRED": "Algumas informações obrigatórias estão faltando.",
-      "MINLENGTHERROR": "Deve ter pelo menos {{value}} caracteres."
+      "MINLENGTHERROR": "Deve ter pelo menos {{value}} caracteres.",
+      "MAXLENGTHERROR": "Deve ter menos de {{value}} caracteres"
     },
     "ID": "ID",
     "EMAIL": "E-mail",

@@ -32,12 +32,14 @@ Password:
   Title: Heslo
   Description: Zadejte své přihlašovací údaje.
   PasswordLabel: Heslo
-  MinLength: Minimální délka
-  HasUppercase: Velké písmeno
-  HasLowercase: Malé písmeno
-  HasNumber: Číslo
-  HasSymbol: Symbol
-  Confirmation: Potvrzení shody
+  MinLength: Musí být alespoň
+  MinLengthp2: znaků dlouhé.
+  MaxLength: Musí být kratší než 70 znaků.
+  HasUppercase: Musí obsahovat velké písmeno.
+  HasLowercase: Musí obsahovat malé písmeno.
+  HasNumber: Musí obsahovat číslo.
+  HasSymbol: Musí obsahovat symbol.
+  Confirmation: Potvrzení hesla odpovídá.
   ResetLinkText: Obnovit heslo
   BackButtonText: Zpět
   NextButtonText: Další
