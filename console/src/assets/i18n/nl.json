@@ -2044,7 +2044,7 @@
         "DESCRIPTION": "Voer de inloggegevens in voor uw Apple Provider"
       },
       "SAML": {
-        "TITLE": "Log in met Saml SP",
+        "TITLE": "Log in met SAML SP",
         "DESCRIPTION": "Voer de inloggegevens in voor uw SAML Provider"
       }
     },

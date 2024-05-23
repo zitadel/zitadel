@@ -139,6 +139,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s24AddActorToAuthTokens = &AddActorToAuthTokens{dbClient: queryDBClient}
 	steps.s25User11AddLowerFieldsToVerifiedEmail = &User11AddLowerFieldsToVerifiedEmail{dbClient: esPusherDBClient}
 	steps.s26AuthUsers3 = &AuthUsers3{dbClient: esPusherDBClient}
+	steps.s27IDPTemplate6SAMLNameIDFormat = &IDPTemplate6SAMLNameIDFormat{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -190,6 +191,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		steps.s18AddLowerFieldsToLoginNames,
 		steps.s21AddBlockFieldToLimits,
 		steps.s25User11AddLowerFieldsToVerifiedEmail,
+		steps.s27IDPTemplate6SAMLNameIDFormat,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
