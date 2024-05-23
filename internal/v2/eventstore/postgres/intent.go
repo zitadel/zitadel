@@ -12,6 +12,11 @@ type intent struct {
 	sequence uint32
 }
 
+func (i *intent) nextSequence() uint32 {
+	i.sequence++
+	return i.sequence
+}
+
 func makeIntents(pushIntent *eventstore.PushIntent) []*intent {
 	res := make([]*intent, len(pushIntent.Aggregates()))
 
