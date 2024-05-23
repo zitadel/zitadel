@@ -882,7 +882,6 @@
       "REQUIRED": "缺少必填字段。",
       "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
       "MAXLENGTHERROR": "必须少于{{value}}个字符"
-      
     },
     "ID": "ID",
     "EMAIL": "电子邮件",
