@@ -594,6 +594,7 @@
     "INVALID_FORMAT": "Le format n'est pas valide.",
     "NOTANEMAIL": "La valeur donnée n'est pas une adresse e-mail.",
     "MINLENGTH": "Doit comporter au moins {{length}} caractères.",
+    "MAXLENGTH": "Doit contenir moins de {{requiredLength}} caractères.",
     "UPPERCASEMISSING": "Doit inclure un caractère majuscule.",
     "LOWERCASEMISSING": "Doit inclure un caractère minuscule.",
     "SYMBOLERROR": "Doit inclure un symbole ou un signe de ponctuation.",
@@ -879,7 +880,8 @@
       "SET": "Définir un nouveau mot de passe",
       "RESENDNOTIFICATION": "Envoyer le lien de réinitialisation du mot de passe",
       "REQUIRED": "Certains champs obligatoires sont manquants.",
-      "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères."
+      "MINLENGTHERROR": "Doit comporter au moins {{value}} caractères.",
+      "MAXLENGTHERROR": "Doit contenir moins de {{value}} caractères"
     },
     "ID": "ID",
     "EMAIL": "E-mail",

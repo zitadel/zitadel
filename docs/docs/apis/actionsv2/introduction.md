@@ -86,6 +86,11 @@ And if you use a different service, for example `zitadel.session.v2.SessionServi
 
 ### Targets and Includes
 
+:::info
+Includes are limited to 3 levels, which mean that include1->include2->include3 is the maximum for now.
+If you have feedback to the include logic, or a reason why 3 levels are not enough, please open [an issue on github](https://github.com/zitadel/zitadel/issues) or [start a discussion on github](https://github.com/zitadel/zitadel/discussions)/[start a topic on discord](https://zitadel.com/chat)
+:::
+
 An execution can not only contain a list of Targets, but also Includes.
 The Includes can be defined in the Execution directly, which means you include all defined Targets by a before set Execution.
 

@@ -161,13 +161,15 @@ const (
 	ApplePrivateKeyCol = "private_key"
 	AppleScopesCol     = "scopes"
 
-	SAMLIDCol                = "idp_id"
-	SAMLInstanceIDCol        = "instance_id"
-	SAMLMetadataCol          = "metadata"
-	SAMLKeyCol               = "key"
-	SAMLCertificateCol       = "certificate"
-	SAMLBindingCol           = "binding"
-	SAMLWithSignedRequestCol = "with_signed_request"
+	SAMLIDCol                         = "idp_id"
+	SAMLInstanceIDCol                 = "instance_id"
+	SAMLMetadataCol                   = "metadata"
+	SAMLKeyCol                        = "key"
+	SAMLCertificateCol                = "certificate"
+	SAMLBindingCol                    = "binding"
+	SAMLWithSignedRequestCol          = "with_signed_request"
+	SAMLNameIDFormatCol               = "name_id_format"
+	SAMLTransientMappingAttributeName = "transient_mapping_attribute_name"
 )
 
 type idpTemplateProjection struct{}
@@ -367,6 +369,8 @@ func (*idpTemplateProjection) Init() *old_handler.Check {
 			handler.NewColumn(SAMLCertificateCol, handler.ColumnTypeBytes),
 			handler.NewColumn(SAMLBindingCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(SAMLWithSignedRequestCol, handler.ColumnTypeBool, handler.Nullable()),
+			handler.NewColumn(SAMLNameIDFormatCol, handler.ColumnTypeEnum, handler.Nullable()),
+			handler.NewColumn(SAMLTransientMappingAttributeName, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(SAMLInstanceIDCol, SAMLIDCol),
 			IDPTemplateSAMLSuffix,
@@ -1967,6 +1971,20 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-9s02m1", "reduce.wrong.event.type %v", []eventstore.EventType{org.SAMLIDPAddedEventType, instance.SAMLIDPAddedEventType})
 	}
 
+	columns := []handler.Column{
+		handler.NewCol(SAMLIDCol, idpEvent.ID),
+		handler.NewCol(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
+		handler.NewCol(SAMLMetadataCol, idpEvent.Metadata),
+		handler.NewCol(SAMLKeyCol, idpEvent.Key),
+		handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
+		handler.NewCol(SAMLBindingCol, idpEvent.Binding),
+		handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
+		handler.NewCol(SAMLTransientMappingAttributeName, idpEvent.TransientMappingAttributeName),
+	}
+	if idpEvent.NameIDFormat != nil {
+		columns = append(columns, handler.NewCol(SAMLNameIDFormatCol, *idpEvent.NameIDFormat))
+	}
+
 	return handler.NewMultiStatement(
 		&idpEvent,
 		handler.AddCreateStatement(
@@ -1989,15 +2007,7 @@ func (p *idpTemplateProjection) reduceSAMLIDPAdded(event eventstore.Event) (*han
 			},
 		),
 		handler.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(SAMLIDCol, idpEvent.ID),
-				handler.NewCol(SAMLInstanceIDCol, idpEvent.Aggregate().InstanceID),
-				handler.NewCol(SAMLMetadataCol, idpEvent.Metadata),
-				handler.NewCol(SAMLKeyCol, idpEvent.Key),
-				handler.NewCol(SAMLCertificateCol, idpEvent.Certificate),
-				handler.NewCol(SAMLBindingCol, idpEvent.Binding),
-				handler.NewCol(SAMLWithSignedRequestCol, idpEvent.WithSignedRequest),
-			},
+			columns,
 			handler.WithTableSuffix(IDPTemplateSAMLSuffix),
 		),
 	), nil
@@ -2489,6 +2499,12 @@ func reduceSAMLIDPChangedColumns(idpEvent idp.SAMLIDPChangedEvent) []handler.Col
 	}
 	if idpEvent.WithSignedRequest != nil {
 		SAMLCols = append(SAMLCols, handler.NewCol(SAMLWithSignedRequestCol, *idpEvent.WithSignedRequest))
+	}
+	if idpEvent.NameIDFormat != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLNameIDFormatCol, *idpEvent.NameIDFormat))
+	}
+	if idpEvent.TransientMappingAttributeName != nil {
+		SAMLCols = append(SAMLCols, handler.NewCol(SAMLTransientMappingAttributeName, *idpEvent.TransientMappingAttributeName))
 	}
 	return SAMLCols
 }

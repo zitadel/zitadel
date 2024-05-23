@@ -13,13 +13,24 @@ import (
 )
 
 const (
-	RefreshTokenKeyTokenID       = "id"
-	RefreshTokenKeyUserID        = "user_id"
-	RefreshTokenKeyApplicationID = "application_id"
-	RefreshTokenKeyUserAgentID   = "user_agent_id"
-	RefreshTokenKeyExpiration    = "expiration"
-	RefreshTokenKeyResourceOwner = "resource_owner"
-	RefreshTokenKeyInstanceID    = "instance_id"
+	RefreshTokenKeyTokenID        = "id"
+	RefreshTokenKeyUserID         = "user_id"
+	RefreshTokenKeyApplicationID  = "application_id"
+	RefreshTokenKeyUserAgentID    = "user_agent_id"
+	RefreshTokenKeyExpiration     = "expiration"
+	RefreshTokenKeyResourceOwner  = "resource_owner"
+	RefreshTokenKeyInstanceID     = "instance_id"
+	RefreshTokenKeyCreationDate   = "creation_date"
+	RefreshTokenKeyChangeDate     = "change_date"
+	RefreshTokenKeySequence       = "sequence"
+	RefreshTokenKeyActor          = "actor"
+	RefreshTokenKeyAMR            = "amr"
+	RefreshTokenKeyAuthTime       = "auth_time"
+	RefreshTokenKeyAudience       = "audience"
+	RefreshTokenKeyClientID       = "client_id"
+	RefreshTokenKeyIdleExpiration = "idle_expiration"
+	RefreshTokenKeyScopes         = "scopes"
+	RefreshTokenKeyToken          = "token"
 )
 
 type RefreshTokenView struct {
@@ -72,6 +83,7 @@ func RefreshTokenViewToModel(token *RefreshTokenView) *usr_model.RefreshTokenVie
 }
 
 func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event eventstore.Event) (err error) {
+	// in case anything needs to be change here check if the Reduce function needs the change as well
 	view := new(RefreshTokenView)
 	switch event.Type() {
 	case user_repo.HumanRefreshTokenAddedType:
@@ -101,6 +113,7 @@ func (t *RefreshTokenView) AppendEventIfMyRefreshToken(event eventstore.Event) (
 }
 
 func (t *RefreshTokenView) AppendEvent(event eventstore.Event) error {
+	// in case anything needs to be change here check if the Reduce function needs the change as well
 	t.ChangeDate = event.CreatedAt()
 	t.Sequence = event.Sequence()
 	switch event.Type() {
@@ -123,7 +136,7 @@ func (t *RefreshTokenView) setRootData(event eventstore.Event) {
 func (t *RefreshTokenView) appendAddedEvent(event eventstore.Event) error {
 	e := new(user_repo.HumanRefreshTokenAddedEvent)
 	if err := event.Unmarshal(e); err != nil {
-		logging.Log("EVEN-Dbb31").WithError(err).Error("could not unmarshal event data")
+		logging.WithError(err).Error("could not unmarshal event data")
 		return zerrors.ThrowInternal(err, "MODEL-Bbr42", "could not unmarshal event")
 	}
 	t.ID = e.TokenID
@@ -144,7 +157,7 @@ func (t *RefreshTokenView) appendAddedEvent(event eventstore.Event) error {
 func (t *RefreshTokenView) appendRenewedEvent(event eventstore.Event) error {
 	e := new(user_repo.HumanRefreshTokenRenewedEvent)
 	if err := event.Unmarshal(e); err != nil {
-		logging.Log("EVEN-Vbbn2").WithError(err).Error("could not unmarshal event data")
+		logging.WithError(err).Error("could not unmarshal event data")
 		return zerrors.ThrowInternal(err, "MODEL-Bbrn4", "could not unmarshal event")
 	}
 	t.ID = e.TokenID

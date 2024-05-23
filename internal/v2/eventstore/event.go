@@ -1,36 +1,66 @@
 package eventstore
 
-import "time"
+import (
+	"time"
+)
 
-type Event[P any] struct {
+type Unmarshal func(ptr any) error
+
+type Payload interface {
+	Unmarshal | any
+}
+
+type Action[P Payload] struct {
+	Creator  string
+	Type     string
+	Revision uint16
+	Payload  P
+}
+
+type Command struct {
+	Action[any]
+	UniqueConstraints []*UniqueConstraint
+}
+
+type StorageEvent struct {
+	Action[Unmarshal]
+
 	Aggregate Aggregate
 	CreatedAt time.Time
-	Creator   string
 	Position  GlobalPosition
-	Revision  uint16
 	Sequence  uint32
-	Type      string
-	Payload   P
 }
 
-type StoragePayload interface {
-	Unmarshal(ptr any) error
+type Event[P any] struct {
+	*StorageEvent
+	Payload P
 }
 
-func EventFromStorage[E Event[P], P any](event *Event[StoragePayload]) (*E, error) {
+func UnmarshalPayload[P any](unmarshal Unmarshal) (P, error) {
 	var payload P
+	err := unmarshal(&payload)
+	return payload, err
+}
 
-	if err := event.Payload.Unmarshal(&payload); err != nil {
-		return nil, err
+type EmptyPayload struct{}
+
+type TypeChecker interface {
+	ActionType() string
+}
+
+func Type[T TypeChecker]() string {
+	var t T
+	return t.ActionType()
+}
+
+func IsType[T TypeChecker](types ...string) bool {
+	gotten := Type[T]()
+
+	for _, typ := range types {
+		if gotten == typ {
+			return true
+		}
 	}
-	return &E{
-		Aggregate: event.Aggregate,
-		CreatedAt: event.CreatedAt,
-		Creator:   event.Creator,
-		Position:  event.Position,
-		Revision:  event.Revision,
-		Sequence:  event.Sequence,
-		Type:      event.Type,
-		Payload:   payload,
-	}, nil
+
+	return false
 }

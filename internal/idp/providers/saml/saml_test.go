@@ -3,10 +3,12 @@ package saml
 import (
 	"testing"
 
+	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml/requesttracker"
 )
 
@@ -20,16 +22,18 @@ func TestProvider_Options(t *testing.T) {
 		options     []ProviderOpts
 	}
 	type want struct {
-		err               bool
-		name              string
-		linkingAllowed    bool
-		creationAllowed   bool
-		autoCreation      bool
-		autoUpdate        bool
-		binding           string
-		withSignedRequest bool
-		requesttracker    samlsp.RequestTracker
-		entityID          string
+		err                           bool
+		name                          string
+		linkingAllowed                bool
+		creationAllowed               bool
+		autoCreation                  bool
+		autoUpdate                    bool
+		binding                       string
+		nameIDFormat                  saml.NameIDFormat
+		transientMappingAttributeName string
+		withSignedRequest             bool
+		requesttracker                samlsp.RequestTracker
+		entityID                      string
 	}
 	tests := []struct {
 		name   string
@@ -103,10 +107,11 @@ func TestProvider_Options(t *testing.T) {
 				creationAllowed: false,
 				autoCreation:    false,
 				autoUpdate:      false,
+				nameIDFormat:    saml.PersistentNameIDFormat,
 			},
 		},
 		{
-			name: "all true",
+			name: "all set / true",
 			fields: fields{
 				name:        "saml",
 				key:         []byte("-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEAxHd087RoEm9ywVWZ/H+tDWxQsmVvhfRz4jAq/RfU+OWXNH4J\njMMSHdFs0Q+WP98nNXRyc7fgbMb8NdmlB2yD4qLYapN5SDaBc5dh/3EnyFt53oSs\njTlKnQUPAeJr2qh/NY046CfyUyQMM4JR5OiQFo4TssfWnqdcgamGt0AEnk2lvbMZ\nKQdAqNS9lDzYbjMGavEQPTZE35mFXFQXjaooZXq+TIa7hbaq7/idH7cHNbLcPLgj\nfPQA8q+DYvnvhXlmq0LPQZH3Oiixf+SF2vRwrBzT2mqGD2OiOkUmhuPwyqEiiBHt\nfxklRtRU6WfLa1Gcb1PsV0uoBGpV3KybIl/GlwIDAQABAoIBAEQjDduLgOCL6Gem\n0X3hpdnW6/HC/jed/Sa//9jBECq2LYeWAqff64ON40hqOHi0YvvGA/+gEOSI6mWe\nsv5tIxxRz+6+cLybsq+tG96kluCE4TJMHy/nY7orS/YiWbd+4odnEApr+D3fbZ/b\nnZ1fDsHTyn8hkYx6jLmnWsJpIHDp7zxD76y7k2Bbg6DZrCGiVxngiLJk23dvz79W\np03lHLM7XE92aFwXQmhfxHGxrbuoB/9eY4ai5IHp36H4fw0vL6NXdNQAo/bhe0p9\nAYB7y0ZumF8Hg0Z/BmMeEzLy6HrYB+VE8cO93pNjhSyH+p2yDB/BlUyTiRLQAoM0\nVTmOZXECgYEA7NGlzpKNhyQEJihVqt0MW0LhKIO/xbBn+XgYfX6GpqPa/ucnMx5/\nVezpl3gK8IU4wPUhAyXXAHJiqNBcEeyxrw0MXLujDVMJgYaLysCLJdvMVgoY08mS\nK5IQivpbozpf4+0y3mOnA+Sy1kbfxv2X8xiWLODRQW3f3q/xoklwOR8CgYEA1GEe\nfaibOFTQAYcIVj77KXtBfYZsX3EGAyfAN9O7cKHq5oaxVstwnF47WxpuVtoKZxCZ\nbNm9D5WvQ9b+Ztpioe42tzwE7Bff/Osj868GcDdRPK7nFlh9N2yVn/D514dOYVwR\n4MBr1KrJzgRWt4QqS4H+to1GzudDTSNlG7gnK4kCgYBUi6AbOHzoYzZL/RhgcJwp\ntJ23nhmH1Su5h2OO4e3mbhcP66w19sxU+8iFN+kH5zfUw26utgKk+TE5vXExQQRK\nT2k7bg2PAzcgk80ybD0BHhA8I0yrx4m0nmfjhe/TPVLgh10iwgbtP+eM0i6v1vc5\nZWyvxu9N4ZEL6lpkqr0y1wKBgG/NAIQd8jhhTW7Aav8cAJQBsqQl038avJOEpYe+\nCnpsgoAAf/K0/f8TDCQVceh+t+MxtdK7fO9rWOxZjWsPo8Si5mLnUaAHoX4/OpnZ\nlYYVWMqdOEFnK+O1Yb7k2GFBdV2DXlX2dc1qavntBsls5ecB89id3pyk2aUN8Pf6\npYQhAoGAMGtrHFely9wyaxI0RTCyfmJbWZHGVGkv6ELK8wneJjdjl82XOBUGCg5q\naRCrTZ3dPitKwrUa6ibJCIFCIziiriBmjDvTHzkMvoJEap2TVxYNDR6IfINVsQ57\nlOsiC4A2uGq4Lbfld+gjoplJ5GX6qXtTgZ6m7eo0y7U6zm2tkN0=\n-----END RSA PRIVATE KEY-----\n"),
@@ -121,18 +126,22 @@ func TestProvider_Options(t *testing.T) {
 					WithSignedRequest(),
 					WithCustomRequestTracker(&requesttracker.RequestTracker{}),
 					WithEntityID("entityID"),
+					WithNameIDFormat(domain.SAMLNameIDFormatTransient),
+					WithTransientMappingAttributeName("attribute"),
 				},
 			},
 			want: want{
-				name:              "saml",
-				linkingAllowed:    true,
-				creationAllowed:   true,
-				autoCreation:      true,
-				autoUpdate:        true,
-				binding:           "binding",
-				withSignedRequest: true,
-				requesttracker:    &requesttracker.RequestTracker{},
-				entityID:          "entityID",
+				name:                          "saml",
+				linkingAllowed:                true,
+				creationAllowed:               true,
+				autoCreation:                  true,
+				autoUpdate:                    true,
+				binding:                       "binding",
+				entityID:                      "entityID",
+				nameIDFormat:                  saml.TransientNameIDFormat,
+				transientMappingAttributeName: "attribute",
+				withSignedRequest:             true,
+				requesttracker:                &requesttracker.RequestTracker{},
 			},
 		},
 	}
@@ -152,6 +161,8 @@ func TestProvider_Options(t *testing.T) {
 				a.Equal(tt.want.autoCreation, provider.IsAutoCreation())
 				a.Equal(tt.want.autoUpdate, provider.IsAutoUpdate())
 				a.Equal(tt.want.binding, provider.binding)
+				a.Equal(tt.want.nameIDFormat, provider.nameIDFormat)
+				a.Equal(tt.want.transientMappingAttributeName, provider.transientMappingAttributeName)
 				a.Equal(tt.want.withSignedRequest, provider.spOptions.SignRequest)
 				a.Equal(tt.want.requesttracker, provider.requestTracker)
 				a.Equal(tt.want.entityID, provider.spOptions.EntityID)

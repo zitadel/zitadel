@@ -595,6 +595,7 @@
     "INVALID_FORMAT": "De opmaak is ongeldig.",
     "NOTANEMAIL": "De opgegeven waarde is geen e-mailadres.",
     "MINLENGTH": "Moet minimaal {{requiredLength}} tekens lang zijn.",
+    "MAXLENGTH": "Moet minder dan {{requiredLength}} tekens bevatten.",
     "UPPERCASEMISSING": "Moet een hoofdletter bevatten.",
     "LOWERCASEMISSING": "Moet een kleine letter bevatten.",
     "SYMBOLERROR": "Moet een symbool of leesteken bevatten.",
@@ -880,7 +881,8 @@
       "SET": "Stel nieuw wachtwoord in",
       "RESENDNOTIFICATION": "Stuur wachtwoord reset link",
       "REQUIRED": "Sommige verplichte velden ontbreken.",
-      "MINLENGTHERROR": "Moet minstens {{value}} tekens lang zijn."
+      "MINLENGTHERROR": "Moet minstens {{value}} tekens lang zijn.",
+      "MAXLENGTHERROR": "Moet minder dan {{value}} tekens bevatten"
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -2044,7 +2046,7 @@
         "DESCRIPTION": "Voer de inloggegevens in voor uw Apple Provider"
       },
       "SAML": {
-        "TITLE": "Log in met Saml SP",
+        "TITLE": "Log in met SAML SP",
         "DESCRIPTION": "Voer de inloggegevens in voor uw SAML Provider"
       }
     },

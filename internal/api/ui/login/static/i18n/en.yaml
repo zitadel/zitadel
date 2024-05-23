@@ -32,12 +32,14 @@ Password:
   Title: Password
   Description: Enter your login data.
   PasswordLabel: Password
-  MinLength: Minimum length
-  HasUppercase: Uppercase letter
-  HasLowercase: Lowercase letter
-  HasNumber: Number
-  HasSymbol: Symbol
-  Confirmation: Confirmation match
+  MinLength: Must be at least
+  MinLengthp2: characters long.
+  MaxLength: Must be less than 70 characters long.
+  HasUppercase: Must include an uppercase letter.
+  HasLowercase: Must include a lowercase letter.
+  HasNumber: Must include a number.
+  HasSymbol: Must include a symbol.
+  Confirmation: Password confirmation matched.
   ResetLinkText: Reset Password
   BackButtonText: Back
   NextButtonText: Next
