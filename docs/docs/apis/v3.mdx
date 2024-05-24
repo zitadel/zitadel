@@ -71,26 +71,6 @@ Or one SMS provider is always assigned to exactly one instance.
     <CodeBlock language="protobuf">{SessionProto}</CodeBlock>
 </details>
 
-### Services
-
-- Instances
-  - Instances
-  - InstanceDomains
-- Organizations
-  - Organizations
-  - OrganizationDomains
-- Projects
-  - Projects
-  - Apps
-  - Roles
-- Sessions
-- Authorizations
-  - Memberships
-  - ProjectGrants
-  - UserGrants
-- Users
-  - Users
-
 ## Reusable Resources
 
 Reusable resources are like standard resources but can be reused in multiple contexts.
@@ -126,16 +106,50 @@ If the community sees a benefit in reusing the resource in multiple contexts, re
     <CodeBlock language="protobuf">{UserSchemaProto}</CodeBlock>
 </details>
 
-### Services
+## Resource Services
 
-- UserSchemas
-- Actions
-  - Executions
-  - Targets
-- IDPs
-- Notifiers
-  - SMTPProviders (only target types system and instance)
-  - SMSProviders
+### Tenants
+
+- Instances
+- InstanceDomains
+- Organizations
+- Organization Domains
+
+### Projects
+
+- Projects
+- Apps
+- Roles
+
+### Users
+
+- Users
+- UserSchemas (reusable)
+
+### Sessions
+
+- Sessions
+
+### Authorizations
+
+- Memberships
+- Grants
+
+### Actions (reusable)
+
+- Executions
+- Targets
+
+### Identity Providers (reusable)
+
+- Identity Providers
+
+### Notifiers (reusable)
+
+only target types system and instance
+
+- SMTPProviders
+- SMSProviders
 
 ## Settings
 
@@ -157,20 +171,68 @@ These properties are inherited to from parent-contexts (instance) to child-conte
     <CodeBlock language="protobuf">{LanguageProto}</CodeBlock>
 </details>
 
-### Services
+## Settings Services
 
-- Texts (key-value pairs for localized login texts, previously known as login texts)
-- Branding (predefined branding settings and custom key-value pairs, previously known as label policy or branding settings)
-- Login (previously known as login policy)
-- Lockout (previously known as lockout policy)
-- Password (previously known as password complexity policy)
-- Help (previously known as legal and support settings or privacy policy)
-- Domain (previously known as domain policy)
-- Features (feature toggles)
-- Languages (default language, restricted languages)
-- Instances (instance-wide settings like disallow_public_org_registration. These settings are not overwritable for orgs)
-- Templates (html and text templates for fully customizable emails and sms)
-- Limits (only on instance level with system-level permissions)
+### Texts
+
+Key-value pairs for localized login texts, previously known as login texts
+
+### Branding
+
+Predefined branding settings and custom key-value pairs, previously known as label policy or branding settings
+
+### Login
+
+previously known as login policy
+
+### Lockout
+
+previously known as lockout policy
+
+### Password
+
+previously known as password complexity policy
+
+### Help
+
+previously known as legal and support settings or privacy policy
+
+### Domain
+
+previously known as domain policy
+
+### Features
+
+feature toggles
+
+### Languages
+
+default language, restricted languages
+
+### Instances
+
+instance-wide settings like disallow_public_org_registration. These settings are not overwritable for orgs
+
+### Templates
+
+html and text templates for fully customizable emails and sms
+
+### Limits (really?)
+
+only on instance level with system-level permissions
+
+## Insight Services
+
+- Events
+- Failed Events
+- Milestones
+
+## Operations Services
+
+- Health
+- Limits
+- Views
+- Runtime (version, build, etc.)
 
 ## API Release Policy
 
