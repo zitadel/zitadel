@@ -35,6 +35,10 @@ export class AuthenticationService {
     return from(this.oauthService.loadUserProfile());
   }
 
+  public getIdToken(): string {
+    return this.oauthService.getIdToken();
+  }
+
   public async authenticate(partialConfig?: Partial<AuthConfig>, force: boolean = false): Promise<boolean> {
     if (partialConfig) {
       Object.assign(this.authConfig, partialConfig);
