@@ -1,4 +1,4 @@
-package migrate
+package mirror
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package migrate
+package mirror
 
 import (
 	"context"
@@ -124,7 +124,6 @@ func projections(
 	queries, err := query.StartQueries(
 		ctx,
 		es,
-		nil,
 		client,
 		client,
 		config.Projections,

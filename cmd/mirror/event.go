@@ -1,4 +1,4 @@
-package migrate
+package mirror
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/v2/projection"
 	"github.com/zitadel/zitadel/internal/v2/readmodel"
 	"github.com/zitadel/zitadel/internal/v2/system"
-	"github.com/zitadel/zitadel/internal/v2/system/mirror"
+	mirror_event "github.com/zitadel/zitadel/internal/v2/system/mirror"
 )
 
 func queryLastSuccessfulMigration(ctx context.Context, es *eventstore.EventStore, destination string) (*readmodel.LastSuccessfulMirror, error) {
@@ -30,17 +30,20 @@ func queryLastSuccessfulMigration(ctx context.Context, es *eventstore.EventStore
 	return lastSuccess, nil
 }
 
-func writeMigrationStart(ctx context.Context, es *eventstore.EventStore, id string, destination string) (float64, error) {
-	var cmd eventstore.Command
+func writeMigrationStart(ctx context.Context, es *eventstore.EventStore, id string, destination string) (_ float64, err error) {
+	var cmd *eventstore.Command
 	if len(instanceIDs) > 0 {
-		cmd = mirror.NewStartedInstancesCommand(destination, instanceIDs)
+		cmd, err = mirror_event.NewStartedInstancesCommand(destination, instanceIDs)
+		if err != nil {
+			return 0, err
+		}
 	} else {
-		cmd = mirror.NewStartedSystemCommand(destination)
+		cmd = mirror_event.NewStartedSystemCommand(destination)
 	}
 
 	var position projection.HighestPosition
 
-	err := es.Push(
+	err = es.Push(
 		ctx,
 		eventstore.NewPushIntent(
 			system.AggregateInstance,
@@ -48,8 +51,7 @@ func writeMigrationStart(ctx context.Context, es *eventstore.EventStore, id stri
 				system.AggregateOwner,
 				system.AggregateType,
 				id,
-				// TODO: what sequence to use
-				eventstore.IgnoreCurrentSequence(),
+				eventstore.CurrentSequenceMatches(0),
 				eventstore.AppendCommands(cmd),
 			),
 			eventstore.PushReducer(&position),
@@ -70,9 +72,8 @@ func writeMigrationSucceeded(ctx context.Context, es *eventstore.EventStore, id 
 				system.AggregateOwner,
 				system.AggregateType,
 				id,
-				// TODO: what sequence to use
-				eventstore.CurrentSequenceAtLeast(1),
-				eventstore.AppendCommands(mirror.NewSucceededCommand()),
+				eventstore.CurrentSequenceMatches(1),
+				eventstore.AppendCommands(mirror_event.NewSucceededCommand()),
 			),
 		),
 	)
@@ -87,9 +88,8 @@ func writeMigrationFailed(ctx context.Context, es *eventstore.EventStore, id str
 				system.AggregateOwner,
 				system.AggregateType,
 				id,
-				// TODO: what sequence to use
-				eventstore.CurrentSequenceAtLeast(1),
-				eventstore.AppendCommands(mirror.NewFailedCommand(err)),
+				eventstore.CurrentSequenceMatches(1),
+				eventstore.AppendCommands(mirror_event.NewFailedCommand(err)),
 			),
 		),
 	)

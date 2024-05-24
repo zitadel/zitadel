@@ -37,12 +37,12 @@ func (p *LastSuccessfulMirror) Filter() *eventstore.Filter {
 }
 
 // Reduce implements eventstore.Reducer.
-func (h *LastSuccessfulMirror) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) (err error) {
+func (h *LastSuccessfulMirror) Reduce(events ...*eventstore.StorageEvent) (err error) {
 	for _, event := range events {
 		switch event.Type {
-		case "system.mirror.started":
+		case mirror.StartedType:
 			err = h.reduceStarted(event)
-		case "system.mirror.succeeded":
+		case mirror.SucceededType:
 			err = h.reduceSucceeded(event)
 		}
 		if err != nil {
@@ -52,7 +52,7 @@ func (h *LastSuccessfulMirror) Reduce(events ...*eventstore.Event[eventstore.Sto
 	return nil
 }
 
-func (h *LastSuccessfulMirror) reduceStarted(event *eventstore.Event[eventstore.StoragePayload]) error {
+func (h *LastSuccessfulMirror) reduceStarted(event *eventstore.StorageEvent) error {
 	startedEvent, err := mirror.StartedEventFromStorage(event)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (h *LastSuccessfulMirror) reduceStarted(event *eventstore.Event[eventstore.
 	return nil
 }
 
-func (h *LastSuccessfulMirror) reduceSucceeded(event *eventstore.Event[eventstore.StoragePayload]) error {
+func (h *LastSuccessfulMirror) reduceSucceeded(event *eventstore.StorageEvent) error {
 	if h.ID != event.Aggregate.ID {
 		return nil
 	}

@@ -2,51 +2,35 @@ package mirror
 
 import (
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type SucceededEvent succeededEvent
-type succeededEvent = eventstore.Event[struct{}]
+const SucceededType = eventTypePrefix + "succeeded"
 
-func SucceededEventFromStorage(e *eventstore.Event[eventstore.StoragePayload]) (*SucceededEvent, error) {
-	event, err := eventstore.EventFromStorage[succeededEvent](e)
-	if err != nil {
-		return nil, err
+type SucceededEvent eventstore.Event[eventstore.EmptyPayload]
+
+var _ eventstore.TypeChecker = (*SucceededEvent)(nil)
+
+func (e *SucceededEvent) ActionType() string {
+	return SucceededType
+}
+
+func SucceededEventFromStorage(event *eventstore.StorageEvent) (e *SucceededEvent, _ error) {
+	if event.Type != e.ActionType() {
+		return nil, zerrors.ThrowInvalidArgument(nil, "MIRRO-xh5IW", "Errors.Invalid.Event.Type")
 	}
-	return (*SucceededEvent)(event), nil
+
+	return &SucceededEvent{
+		StorageEvent: event,
+	}, nil
 }
 
-var (
-	_ eventstore.Command = (*SucceededCommand)(nil)
-)
-
-type SucceededCommand struct {
-}
-
-func NewSucceededCommand() *SucceededCommand {
-	return new(SucceededCommand)
-}
-
-// Creator implements eventstore.Command.
-func (a *SucceededCommand) Creator() string {
-	return Creator
-}
-
-// Payload implements eventstore.Command.
-func (a *SucceededCommand) Payload() any {
-	return nil
-}
-
-// Revision implements [eventstore.Command].
-func (*SucceededCommand) Revision() uint16 {
-	return 1
-}
-
-// UniqueConstraints implements [eventstore.Command].
-func (e *SucceededCommand) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
-}
-
-// Type implements [eventstore.Command].
-func (*SucceededCommand) Type() string {
-	return "system.mirror.succeeded"
+func NewSucceededCommand() *eventstore.Command {
+	return &eventstore.Command{
+		Action: eventstore.Action[any]{
+			Creator:  Creator,
+			Type:     SucceededType,
+			Revision: 1,
+		},
+	}
 }

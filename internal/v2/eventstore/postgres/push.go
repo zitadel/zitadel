@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -29,35 +30,37 @@ func (s *Storage) Push(ctx context.Context, intent *eventstore.PushIntent) (err 
 		}()
 	}
 
-	// allows smaller wait times on query side for instances which are not actively writing
-	if err := setAppName(ctx, tx, "es_pusher_"+intent.Instance()); err != nil {
-		return err
-	}
+	return crdb.Execute(func() error {
+		// allows smaller wait times on query side for instances which are not actively writing
+		if err := setAppName(ctx, tx, "es_pusher_"+intent.Instance()); err != nil {
+			return err
+		}
 
-	intents, err := lockAggregates(ctx, tx, intent)
-	if err != nil {
-		return err
-	}
-
-	if !checkSequences(intents) {
-		return zerrors.ThrowInvalidArgument(nil, "POSTG-KOM6E", "Errors.Internal.Eventstore.SequenceNotMatched")
-	}
-
-	commands := make([]*command, 0, len(intents))
-	for _, intent := range intents {
-		additionalCommands, err := intentToCommands(intent)
+		intents, err := lockAggregates(ctx, tx, intent)
 		if err != nil {
 			return err
 		}
-		commands = append(commands, additionalCommands...)
-	}
 
-	err = uniqueConstraints(ctx, tx, commands)
-	if err != nil {
-		return err
-	}
+		if !checkSequences(intents) {
+			return zerrors.ThrowInvalidArgument(nil, "POSTG-KOM6E", "Errors.Internal.Eventstore.SequenceNotMatched")
+		}
 
-	return push(ctx, tx, intent, commands)
+		commands := make([]*command, 0, len(intents))
+		for _, intent := range intents {
+			additionalCommands, err := intentToCommands(intent)
+			if err != nil {
+				return err
+			}
+			commands = append(commands, additionalCommands...)
+		}
+
+		err = uniqueConstraints(ctx, tx, commands)
+		if err != nil {
+			return err
+		}
+
+		return push(ctx, tx, intent, commands)
+	})
 }
 
 // setAppName for the the current transaction

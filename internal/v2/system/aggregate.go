@@ -1,7 +1,8 @@
 package system
 
-var (
+const (
 	AggregateType     = "system"
 	AggregateOwner    = "SYSTEM"
 	AggregateInstance = ""
+	EventTypePrefix   = AggregateType + "."
 )
