@@ -190,8 +190,7 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if domain.RequiresMFA(
 		requirements.ForceMFA,
 		requirements.ForceMFALocalOnly,
-		!hasIDPAuthentication(authMethods)) ||
-		domain.HasMFA(requirements.AuthMethods) {
+		!hasIDPAuthentication(authMethods)) {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
 	}
 	return nil
