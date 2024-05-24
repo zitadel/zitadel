@@ -81,7 +81,9 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	destConn, err := dest.Conn(ctx)
 	logging.OnError(err).Fatal("unable to acquire dest connection")
 
-	es := eventstore.NewEventstoreFromOne(postgres.New(source))
+	es := eventstore.NewEventstoreFromOne(postgres.New(source, &postgres.Config{
+		MaxRetries: 3,
+	}))
 
 	previousMigration, err := queryLastSuccessfulMigration(ctx, es, dest.DatabaseName())
 	logging.OnError(err).Fatal("unable to query latest successful migration")

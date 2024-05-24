@@ -18,12 +18,18 @@ var (
 
 type Storage struct {
 	client *database.DB
+	config *Config
 }
 
-func New(client *database.DB) *Storage {
+type Config struct {
+	MaxRetries uint32
+}
+
+func New(client *database.DB, config *Config) *Storage {
 	initPushStmt(client.Type())
 	return &Storage{
 		client: client,
+		config: config,
 	}
 }
 

@@ -43,6 +43,7 @@ func copySystem(ctx context.Context, config *Migration) {
 	defer destClient.Close()
 
 	copyAssets(ctx, sourceClient, destClient)
+	copyEncryptionKeys(ctx, sourceClient, destClient)
 }
 
 func copyAssets(ctx context.Context, source, dest *database.DB) {
@@ -89,4 +90,50 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 	logging.OnError(err).Fatal("unable to copy assets to destination")
 	logging.OnError(<-errs).Fatal("unable to copy assets from source")
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("assets migrated")
+}
+
+func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
+	start := time.Now()
+
+	sourceConn, err := source.Conn(ctx)
+	logging.OnError(err).Fatal("unable to acquire source connection")
+	defer sourceConn.Close()
+
+	r, w := io.Pipe()
+	errs := make(chan error, 1)
+
+	go func() {
+		err = sourceConn.Raw(func(driverConn interface{}) error {
+			conn := driverConn.(*stdlib.Conn).Conn()
+			// ignore hash column because it's computed
+			_, err := conn.PgConn().CopyTo(ctx, w, "COPY system.encryption_keys TO stdout")
+			w.Close()
+			return err
+		})
+		errs <- err
+	}()
+
+	destConn, err := dest.Conn(ctx)
+	logging.OnError(err).Fatal("unable to acquire dest connection")
+	defer destConn.Close()
+
+	var eventCount int64
+	err = destConn.Raw(func(driverConn interface{}) error {
+		conn := driverConn.(*stdlib.Conn).Conn()
+
+		if shouldReplace {
+			_, err := conn.Exec(ctx, "TRUNCATE system.encryption_keys")
+			if err != nil {
+				return err
+			}
+		}
+
+		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY system.encryption_keys FROM stdin")
+		eventCount = tag.RowsAffected()
+
+		return err
+	})
+	logging.OnError(err).Fatal("unable to copy encryption keys to destination")
+	logging.OnError(<-errs).Fatal("unable to copy encryption keys from source")
+	logging.WithFields("took", time.Since(start), "count", eventCount).Info("encryption keys migrated")
 }

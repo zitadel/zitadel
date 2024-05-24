@@ -30,7 +30,19 @@ func (s *Storage) Push(ctx context.Context, intent *eventstore.PushIntent) (err 
 		}()
 	}
 
-	return crdb.Execute(func() error {
+	var retryCount uint32
+	return crdb.Execute(func() (err error) {
+		defer func() {
+			if err == nil {
+				return
+			}
+			if retryCount < s.config.MaxRetries {
+				retryCount++
+				return
+			}
+			logging.WithFields("retry_count", retryCount).WithError(err).Debug("max retry count reached")
+			err = zerrors.ThrowInternal(err, "POSTG-VJfJz", "Errors.Internal")
+		}()
 		// allows smaller wait times on query side for instances which are not actively writing
 		if err := setAppName(ctx, tx, "es_pusher_"+intent.Instance()); err != nil {
 			return err

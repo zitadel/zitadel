@@ -93,6 +93,9 @@ Projections:
     notifications:
       MaxFailureCount: 1
 
+Eventstore:
+  MaxRetries: 3
+
 Auth:
   Spooler:
     TransactionDuration: 0s #ZITADEL_AUTH_SPOOLER_TRANSACTIONDURATION

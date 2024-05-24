@@ -41,6 +41,8 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
+	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
+	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
 	"github.com/zitadel/zitadel/internal/webauthn"
 )
 
@@ -118,12 +120,16 @@ func projections(
 	logging.OnError(err).Fatal("unable to connect eventstore push client")
 	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
 	es := eventstore.NewEventstore(config.Eventstore)
+	esV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(client, &es_v4_pg.Config{
+		MaxRetries: config.Eventstore.MaxRetries,
+	}))
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
 	queries, err := query.StartQueries(
 		ctx,
 		es,
+		esV4.Querier,
 		client,
 		client,
 		config.Projections,
