@@ -3,7 +3,7 @@ title: Rate Limit Policy
 custom_edit_url: null
 ---
 
-Last updated on April 20, 2023
+Last updated on April 24, 2024
 
 This policy is an annex to the [Terms of Service](../terms-of-service) and clarifies your obligations while using our Services, specifically how we will use rate limiting to enforce certain aspects of our [Acceptable Use Policy](acceptable-use-policy).
 
@@ -35,10 +35,12 @@ For ZITADEL Cloud, we have a rate limiting rule for login paths (login, register
 
 Rate limits are implemented with the following rules:
 
-| Path                     | Description                            | Rate Limiting                        | One Minute Banning                     |
-|--------------------------|----------------------------------------|--------------------------------------|----------------------------------------|
-| /ui/login*               | Global Login, Register and Reset Limit | 10 requests per second over a minute | 15 requests per second over 3 minutes |
-| All other paths | All gRPC- and REST APIs as well as the ZITADEL Customer Portal | 10 requests per second over a minute       | 10 requests per second over 3 minutes   |
+| Path                 | Description                                                    | Rate Limiting                        | One Minute Banning                    |
+| -------------------- | -------------------------------------------------------------- | ------------------------------------ | ------------------------------------- |
+| /ui/login\*          | Global Login, Register and Reset Limit                         | 10 requests per second over a minute | 15 requests per second over 3 minutes |
+| /oauth/v2/keys       | OAuth/OpenID Public Keys Endpoint                              | 20 requests per second over a minute | 15 requests per second over 3 minutes |
+| /oauth/v2/introspect | OAuth Introspection Endpoint                                   | 20 requests per second over a minute | 15 requests per second over 3 minutes |
+| All other paths      | All gRPC- and REST APIs as well as the ZITADEL Customer Portal | 10 requests per second over a minute | 10 requests per second over 3 minutes |
 
 ## Load Testing
 
