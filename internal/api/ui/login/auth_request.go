@@ -29,7 +29,7 @@ func (l *Login) ensureAuthRequest(r *http.Request) (*domain.AuthRequest, error) 
 	if authRequest != nil || err != nil {
 		return authRequest, err
 	}
-	return nil, zerrors.ThrowInvalidArgument(err, "LOGIN-OLah9", "invalid or missing auth request")
+	return nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-OLah9", "invalid or missing auth request")
 }
 
 func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*domain.AuthRequest, error) {
