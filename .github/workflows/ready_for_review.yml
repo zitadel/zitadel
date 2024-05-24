@@ -9,7 +9,7 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
-            const content = `### Thanks for your contribution! 🎉
+            const content = `### Thanks for your contribution @${{ github.event.pull_request.user.login }}! 🎉
 
             Please make sure you tick the following checkboxes before marking this Pull Request (PR) as ready for review:
             
