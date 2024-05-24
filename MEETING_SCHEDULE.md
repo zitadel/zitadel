@@ -1,4 +1,4 @@
-# Zitadel Office Hours
+# ZITADEL Office Hours
 
 Dear community!
 We're excited to announce bi-weekly office hours.
@@ -10,11 +10,11 @@ The first office hour is dedicated to exploring the [new Actions v2 feature](htt
 What to expect:
 
 * **Deep Dive**: @adlerhurst will walk you through the functionalities and benefits of Actions v2.
-* **Live Q&A**: Get your questions answered directly by the Zitadel team during the dedicated Q&A session.
+* **Live Q&A**: Get your questions answered directly by the ZITADEL team during the dedicated Q&A session.
 
 Details:
 
-* **Target Audience**: Developers and IT Ops personnel using Zitadel
+* **Target Audience**: Developers and IT Ops personnel using ZITADEL
 * **Topic**: Actions v2 deep dive and Q&A
 * **When**: Wednesday 29th of May 12 pm PST / 3 pm EST / 9 pm CEST
 * **Duration**: about 1 hour
@@ -26,4 +26,4 @@ Feel free to share any questions you already have about Actions v2 in the chat o
 
 We look forward to seeing you there!
 
-P.S. Spread the word! Share this announcement with your fellow Zitadel users who might be interested.
+P.S. Spread the word! Share this announcement with your fellow ZITADEL users who might be interested.
