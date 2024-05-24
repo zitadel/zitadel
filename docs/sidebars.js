@@ -764,6 +764,7 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
+          "apis/known_issues",
       ],
     },
     {
