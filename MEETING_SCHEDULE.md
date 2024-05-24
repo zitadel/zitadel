@@ -18,11 +18,11 @@ Details:
 * **Topic**: Actions v2 deep dive and Q&A
 * **When**: Wednesday 29th of May 12 pm PST / 3 pm EST / 9 pm CEST
 * **Duration**: about 1 hour
-* **Platform**: Zitadel Discord Server (Join us here:  https://discord.gg/zitadel-927474939156643850?event=1243282884677341275 )
+* **Platform**: Zitadel Discord Server (Join us here:  https://zitadel.com/office-hours?event=1243282884677341275 )
 
 In the meantime:
 
-Feel free to share any questions you already have about Actions v2 in the chat of the [office hours channel](https://discord.com/channels/927474939156643850/1243281463554605058) on our Discord server.
+Feel free to share any questions you already have about Actions v2 in the chat of the [office hours channel](https://zitadel.com/office-hours) on our Discord server.
 
 We look forward to seeing you there!
 
