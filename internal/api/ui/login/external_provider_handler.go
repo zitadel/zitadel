@@ -127,7 +127,7 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 // handleExternalRegister is called when a user selects the idp on the register options page
 func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 	data := new(externalIDPData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -657,7 +657,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 // and either links or creates an externalUser
 func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(externalNotFoundOptionFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
 		return
