@@ -115,6 +115,9 @@ func improvedPerformanceTypeToPb(typ feature.ImprovedPerformanceType) feature_pb
 }
 
 func improvedPerformanceListToDomain(list []feature_pb.ImprovedPerformance) []feature.ImprovedPerformanceType {
+	if list == nil {
+		return nil
+	}
 	res := make([]feature.ImprovedPerformanceType, len(list))
 
 	for i, typ := range list {
