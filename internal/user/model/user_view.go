@@ -208,17 +208,6 @@ func (u *UserView) MFATypesAllowed(level domain.MFALevel, policy *domain.LoginPo
 				}
 			}
 		}
-		fallthrough
-	case domain.MFALevelMultiFactor:
-		if policy.HasMultiFactors() {
-			for _, mfaType := range policy.MultiFactors {
-				if mfaType == domain.MultiFactorTypeU2FWithPIN {
-					if u.IsPasswordlessReady() {
-						types = append(types, domain.MFATypeU2FUserVerification)
-					}
-				}
-			}
-		}
 	}
 	return types, required
 }

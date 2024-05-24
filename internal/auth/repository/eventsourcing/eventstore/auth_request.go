@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"time"
 
@@ -1194,6 +1195,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 	var step domain.NextStep
 	if request.LoginPolicy.PasswordlessType != domain.PasswordlessTypeNotAllowed && user.IsPasswordlessReady() {
 		if checkVerificationTimeMaxAge(userSession.PasswordlessVerification, request.LoginPolicy.MultiFactorCheckLifetime, request) {
+			request.MFAsVerified = append(request.MFAsVerified, domain.MFATypeU2FUserVerification)
 			request.AuthTime = userSession.PasswordlessVerification
 			return nil
 		}
@@ -1239,6 +1241,9 @@ func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []*que
 
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView, isInternalAuthentication bool) (domain.NextStep, bool, error) {
 	mfaLevel := request.MFALevel()
+	if slices.Contains(request.MFAsVerified, domain.MFATypeU2FUserVerification) {
+		return nil, true, nil
+	}
 	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy, isInternalAuthentication)
 	promptRequired := (user.MFAMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
 	if promptRequired || !repo.mfaSkippedOrSetUp(user, request) {

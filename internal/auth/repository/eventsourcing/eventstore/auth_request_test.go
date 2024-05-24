@@ -1847,6 +1847,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 						MultiFactors:              []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
 						MultiFactorCheckLifetime:  18 * time.Hour,
 					},
+					MFAsVerified: []domain.MFAType{domain.MFATypeU2FUserVerification},
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
@@ -1859,7 +1860,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 						},
 					},
 				},
-				userSession: &user_model.UserSessionView{MultiFactorVerification: testNow.Add(-5 * time.Hour), MultiFactorVerificationType: domain.MFATypeU2FUserVerification},
+				userSession: &user_model.UserSessionView{PasswordlessVerification: testNow.Add(-5 * time.Hour)},
 				isInternal:  true,
 			},
 			nil,
