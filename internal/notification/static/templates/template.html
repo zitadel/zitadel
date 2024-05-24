@@ -260,6 +260,7 @@
                                         </tr>
 
 
+                                        {{if ne .MsgType "VerifyEmail"}}
                                         <tr>
                                           <td
                                                   align="center" vertical-align="middle" class="shadow" style="font-size:0px;padding:10px 25px;word-break:break-word;"
@@ -280,9 +281,9 @@
                                                 </td>
                                               </tr>
                                             </table>
-
                                           </td>
                                         </tr>
+                                        {{end}}
                                         {{if .IncludeFooter}}
                                         <tr>
                                           <td
