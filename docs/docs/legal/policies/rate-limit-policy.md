@@ -35,12 +35,12 @@ For ZITADEL Cloud, we have a rate limiting rule for login paths (login, register
 
 Rate limits are implemented with the following rules:
 
-| Path                     | Description                            | Rate Limiting                        | One Minute Banning                     |
-|--------------------------|----------------------------------------|--------------------------------------|----------------------------------------|
-| /ui/login*               | Global Login, Register and Reset Limit | 10 requests per second over a minute | 15 requests per second over 3 minutes |
-| /oauth/v2/keys               | OAuth/OpenID Public Keys Endpoint | 20 requests per second over a minute | 15 requests per second over 3 minutes |
-| /oauth/v2/introspect               | OAuth Introspection Endpoint | 20 requests1 per second over a minute | 15 requests per second over 3 minutes |
-| All other paths | All gRPC- and REST APIs as well as the ZITADEL Customer Portal | 10 requests per second over a minute       | 10 requests per second over 3 minutes   |
+| Path                 | Description                                                    | Rate Limiting                         | One Minute Banning                    |
+| -------------------- | -------------------------------------------------------------- | ------------------------------------- | ------------------------------------- |
+| /ui/login\*          | Global Login, Register and Reset Limit                         | 10 requests per second over a minute  | 15 requests per second over 3 minutes |
+| /oauth/v2/keys       | OAuth/OpenID Public Keys Endpoint                              | 20 requests per second over a minute  | 15 requests per second over 3 minutes |
+| /oauth/v2/introspect | OAuth Introspection Endpoint                                   | 20 requests1 per second over a minute | 15 requests per second over 3 minutes |
+| All other paths      | All gRPC- and REST APIs as well as the ZITADEL Customer Portal | 10 requests per second over a minute  | 10 requests per second over 3 minutes |
 
 ## Load Testing
 
