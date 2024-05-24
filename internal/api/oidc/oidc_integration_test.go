@@ -183,10 +183,23 @@ func Test_ZITADEL_API_missing_mfa_policy(t *testing.T) {
 	require.Equal(t, userID, myUserResp.GetUser().GetId())
 
 	// require MFA
-	_, err = Tester.Client.Mgmt.AddCustomLoginPolicy(metadata.AppendToOutgoingContext(CTXIAM, "x-zitadel-orgid", org.GetOrganizationId()), &mgmt.AddCustomLoginPolicyRequest{
+	ctxOrg := metadata.AppendToOutgoingContext(CTXIAM, "x-zitadel-orgid", org.GetOrganizationId())
+	_, err = Tester.Client.Mgmt.AddCustomLoginPolicy(ctxOrg, &mgmt.AddCustomLoginPolicyRequest{
 		ForceMfa: true,
 	})
 	require.NoError(t, err)
+
+	// make sure policy is projected
+	retryDuration := 5 * time.Second
+	if ctxDeadline, ok := CTX.Deadline(); ok {
+		retryDuration = time.Until(ctxDeadline)
+	}
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		got, getErr := Tester.Client.Mgmt.GetLoginPolicy(ctxOrg, &mgmt.GetLoginPolicyRequest{})
+		assert.NoError(t, getErr)
+		assert.False(t, got.GetPolicy().IsDefault)
+
+	}, retryDuration, time.Millisecond*100, "timeout waiting for login policy")
 
 	// now it must fail
 	myUserResp, err = Tester.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
