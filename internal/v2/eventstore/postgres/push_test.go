@@ -36,7 +36,9 @@ func Test_uniqueConstraints(t *testing.T) {
 			name: "command without constraints",
 			args: args{
 				commands: []*command{
-					{},
+					{
+						Command: &eventstore.Command{},
+					},
 				},
 				expectations: []mock.Expectation{},
 			},
