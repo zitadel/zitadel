@@ -27,8 +27,8 @@ func (p *LastSuccessfulMirror) Filter() *eventstore.Filter {
 			eventstore.AggregateOwnersEqual(system.AggregateOwner),
 			eventstore.AppendEvent(
 				eventstore.SetEventTypes(
-					"system.mirror.started",
-					"system.mirror.succeeded",
+					mirror.StartedType,
+					mirror.SucceededType,
 				),
 				eventstore.EventCreatorsEqual(mirror.Creator),
 			),
