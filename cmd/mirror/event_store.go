@@ -37,7 +37,7 @@ Migrate only copies events2 and unique constraints`,
 		},
 	}
 
-	cmd.Flags().BoolVar(&shouldReplace, "replace-constraints", false, "allow delete unique constraints of defined instances before copy")
+	cmd.Flags().BoolVar(&shouldReplace, "replace", false, "allow delete unique constraints of defined instances before copy")
 	cmd.Flags().BoolVar(&shouldIgnorePrevious, "ignore-previous", false, "ignores previous migrations of the events table")
 
 	return cmd
