@@ -44,7 +44,7 @@ func (l *Login) renderLinkingUserPrompt(w http.ResponseWriter, r *http.Request, 
 
 func (l *Login) handleLinkingUserPrompt(w http.ResponseWriter, r *http.Request) {
 	data := new(linkingUserPromptFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
