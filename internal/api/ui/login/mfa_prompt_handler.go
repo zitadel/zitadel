@@ -18,7 +18,7 @@ type mfaPromptData struct {
 
 func (l *Login) handleMFAPrompt(w http.ResponseWriter, r *http.Request) {
 	data := new(mfaPromptData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
