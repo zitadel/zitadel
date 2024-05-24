@@ -19,11 +19,14 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
 )
 
 type Queries struct {
-	eventstore *eventstore.Eventstore
-	client     *database.DB
+	eventstore   *eventstore.Eventstore
+	eventStoreV4 es_v4.Querier
+	client       *database.DB
 
 	keyEncryptionAlgorithm crypto.EncryptionAlgorithm
 	idpConfigEncryption    crypto.EncryptionAlgorithm
@@ -56,6 +59,7 @@ func StartQueries(
 ) (repo *Queries, err error) {
 	repo = &Queries{
 		eventstore:                          es,
+		eventStoreV4:                        postgres.New(querySqlClient),
 		client:                              querySqlClient,
 		DefaultLanguage:                     language.Und,
 		LoginTranslationFileContents:        make(map[string][]byte),

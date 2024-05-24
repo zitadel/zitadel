@@ -15,16 +15,12 @@ type TOTP struct {
 	URI    string
 }
 
-func NewTOTPKey(issuer, accountName string, cryptoAlg crypto.EncryptionAlgorithm) (*otp.Key, *crypto.CryptoValue, error) {
+func NewTOTPKey(issuer, accountName string) (*otp.Key, error) {
 	key, err := totp.Generate(totp.GenerateOpts{Issuer: issuer, AccountName: accountName})
 	if err != nil {
-		return nil, nil, zerrors.ThrowInternal(err, "TOTP-ieY3o", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "TOTP-ieY3o", "Errors.Internal")
 	}
-	encryptedSecret, err := crypto.Encrypt([]byte(key.Secret()), cryptoAlg)
-	if err != nil {
-		return nil, nil, err
-	}
-	return key, encryptedSecret, nil
+	return key, nil
 }
 
 func VerifyTOTP(code string, secret *crypto.CryptoValue, cryptoAlg crypto.EncryptionAlgorithm) error {

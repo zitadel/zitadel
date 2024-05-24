@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 
 	auth_view "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -150,129 +151,189 @@ func (t *Token) Reducers() []handler.AggregateReducer {
 }
 
 func (t *Token) Reduce(event eventstore.Event) (_ *handler.Statement, err error) { //nolint:gocognit
-	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-		switch event.Type() {
-		case user.UserTokenAddedType,
-			user.PersonalAccessTokenAddedType:
-			token := new(view_model.TokenView)
-			err := token.AppendEvent(event)
-			if err != nil {
-				return err
-			}
-			return t.view.PutToken(token)
-		case user.UserV1ProfileChangedType,
-			user.HumanProfileChangedType:
-			user := new(view_model.UserView)
-			err := user.AppendEvent(event)
-			if err != nil {
-				return err
-			}
-			tokens, err := t.view.TokensByUserID(event.Aggregate().ID, event.Aggregate().InstanceID)
-			if err != nil {
-				return err
-			}
-			for _, token := range tokens {
-				token.PreferredLanguage = user.PreferredLanguage
-			}
-			return t.view.PutTokens(tokens)
-		case user.UserV1SignedOutType,
-			user.HumanSignedOutType:
-			id, err := agentIDFromSession(event)
-			if err != nil {
-				return err
-			}
-
-			return t.view.DeleteSessionTokens(id, event)
-		case user.UserLockedType,
-			user.UserDeactivatedType,
-			user.UserRemovedType:
-
-			return t.view.DeleteUserTokens(event)
-		case user.UserTokenRemovedType,
-			user.PersonalAccessTokenRemovedType:
-			id, err := tokenIDFromRemovedEvent(event)
-			if err != nil {
-				return err
-			}
-
-			return t.view.DeleteToken(id, event.Aggregate().InstanceID)
-		case user.HumanRefreshTokenRemovedType:
-			id, err := refreshTokenIDFromRemovedEvent(event)
-			if err != nil {
-				return err
-			}
-
-			return t.view.DeleteTokensFromRefreshToken(id, event.Aggregate().InstanceID)
-		case project.ApplicationDeactivatedType,
-			project.ApplicationRemovedType:
-			application, err := applicationFromSession(event)
-			if err != nil {
-				return err
-			}
-
-			return t.view.DeleteApplicationTokens(event, application.AppID)
-		case project.ProjectDeactivatedType,
-			project.ProjectRemovedType:
-			project, err := t.getProjectByID(context.Background(), event.Aggregate().ID, event.Aggregate().InstanceID)
-			if err != nil {
-				return err
-			}
-			applicationIDs := make([]string, 0, len(project.Applications))
-			for _, app := range project.Applications {
-				if app.OIDCConfig != nil && app.OIDCConfig.ClientID != "" {
-					applicationIDs = append(applicationIDs, app.OIDCConfig.ClientID)
-				}
-			}
-
-			return t.view.DeleteApplicationTokens(event, applicationIDs...)
-		case instance.InstanceRemovedEventType:
-			return t.view.DeleteInstanceTokens(event)
-		case org.OrgRemovedEventType:
-			// deletes all tokens including PATs, which is expected for now
-			// if there is an undo of the org deletion in the future,
-			// we will need to have a look on how to handle the deleted PATs
-			return t.view.DeleteOrgTokens(event)
-		default:
-			return nil
+	// in case anything needs to be change here check if appendEvent function needs the change as well
+	switch event.Type() {
+	case user.UserTokenAddedType:
+		e, ok := event.(*user.UserTokenAddedEvent)
+		if !ok {
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-W4tnq", "reduce.wrong.event.type %s", user.UserTokenAddedType)
 		}
-	}), nil
+		return handler.NewCreateStatement(event,
+			[]handler.Column{
+				handler.NewCol(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCol(view_model.TokenKeyUserID, event.Aggregate().ID),
+				handler.NewCol(view_model.TokenKeyResourceOwner, event.Aggregate().ResourceOwner),
+				handler.NewCol(view_model.TokenKeyID, e.TokenID),
+				handler.NewCol(view_model.TokenKeyCreationDate, event.CreatedAt()),
+				handler.NewCol(view_model.TokenKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.TokenKeySequence, event.Sequence()),
+				handler.NewCol(view_model.TokenKeyApplicationID, e.ApplicationID),
+				handler.NewCol(view_model.TokenKeyUserAgentID, e.UserAgentID),
+				handler.NewCol(view_model.TokenKeyAudience, e.Audience),
+				handler.NewCol(view_model.TokenKeyScopes, e.Scopes),
+				handler.NewCol(view_model.TokenKeyExpiration, e.Expiration),
+				handler.NewCol(view_model.TokenKeyPreferredLanguage, e.PreferredLanguage),
+				handler.NewCol(view_model.TokenKeyRefreshTokenID, e.RefreshTokenID),
+				handler.NewCol(view_model.TokenKeyActor, view_model.TokenActor{TokenActor: e.Actor}),
+				handler.NewCol(view_model.TokenKeyIsPat, false),
+			},
+		), nil
+	case user.PersonalAccessTokenAddedType:
+		e, ok := event.(*user.PersonalAccessTokenAddedEvent)
+		if !ok {
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-zF3rb", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
+		}
+		return handler.NewCreateStatement(event,
+			[]handler.Column{
+				handler.NewCol(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCol(view_model.TokenKeyUserID, event.Aggregate().ID),
+				handler.NewCol(view_model.TokenKeyResourceOwner, event.Aggregate().ResourceOwner),
+				handler.NewCol(view_model.TokenKeyID, e.TokenID),
+				handler.NewCol(view_model.TokenKeyCreationDate, event.CreatedAt()),
+				handler.NewCol(view_model.TokenKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.TokenKeySequence, event.Sequence()),
+				handler.NewCol(view_model.TokenKeyScopes, e.Scopes),
+				handler.NewCol(view_model.TokenKeyExpiration, e.Expiration),
+				handler.NewCol(view_model.TokenKeyIsPat, true),
+			},
+		), nil
+	case user.UserV1ProfileChangedType,
+		user.HumanProfileChangedType:
+		e, ok := event.(*user.HumanProfileChangedEvent)
+		if !ok {
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-ASF2t", "reduce.wrong.event.type %s", user.HumanProfileChangedType)
+		}
+		if e.PreferredLanguage == nil {
+			return handler.NewNoOpStatement(event), nil
+		}
+		return handler.NewUpdateStatement(event,
+			[]handler.Column{
+				handler.NewCol(view_model.TokenKeyPreferredLanguage, gu.Value(e.PreferredLanguage).String()),
+				handler.NewCol(view_model.TokenKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.TokenKeySequence, event.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, e.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyUserID, e.Aggregate().ID),
+			},
+		), nil
+	case user.UserV1SignedOutType,
+		user.HumanSignedOutType:
+		e, ok := event.(*user.HumanSignedOutEvent)
+		if !ok {
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-Wtn2q", "reduce.wrong.event.type %s", user.HumanSignedOutType)
+		}
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyUserID, event.Aggregate().ID),
+				handler.NewCond(view_model.TokenKeyUserAgentID, e.UserAgentID),
+			},
+		), nil
+	case user.UserLockedType,
+		user.UserDeactivatedType,
+		user.UserRemovedType:
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyUserID, event.Aggregate().ID),
+			},
+		), nil
+	case user.UserTokenRemovedType,
+		user.PersonalAccessTokenRemovedType:
+		var tokenID string
+		switch e := event.(type) {
+		case *user.UserTokenRemovedEvent:
+			tokenID = e.TokenID
+		case *user.PersonalAccessTokenRemovedEvent:
+			tokenID = e.TokenID
+		default:
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-SF3ga", "reduce.wrong.event.type %s", user.UserTokenRemovedType)
+		}
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyID, tokenID),
+			},
+		), nil
+	case user.HumanRefreshTokenRemovedType:
+		e, ok := event.(*user.HumanRefreshTokenRemovedEvent)
+		if !ok {
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-Sfe11", "reduce.wrong.event.type %s", user.HumanRefreshTokenRemovedType)
+		}
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyRefreshTokenID, e.TokenID),
+			},
+		), nil
+	case project.ApplicationDeactivatedType,
+		project.ApplicationRemovedType:
+		var applicationID string
+		switch e := event.(type) {
+		case *project.ApplicationDeactivatedEvent:
+			applicationID = e.AppID
+		case *project.ApplicationRemovedEvent:
+			applicationID = e.AppID
+		default:
+			return nil, zerrors.ThrowInvalidArgumentf(nil, "MODEL-SF3fq", "reduce.wrong.event.type  %v", []eventstore.EventType{project.ApplicationDeactivatedType, project.ApplicationRemovedType})
+		}
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyApplicationID, applicationID),
+			},
+		), nil
+	case project.ProjectDeactivatedType,
+		project.ProjectRemovedType:
+		project, err := t.getProjectByID(context.Background(), event.Aggregate().ID, event.Aggregate().InstanceID)
+		if err != nil {
+			return nil, err
+		}
+		applicationIDs := make([]string, 0, len(project.Applications))
+		for _, app := range project.Applications {
+			if app.OIDCConfig != nil && app.OIDCConfig.ClientID != "" {
+				applicationIDs = append(applicationIDs, app.OIDCConfig.ClientID)
+			}
+		}
+		if len(applicationIDs) == 0 {
+			return handler.NewNoOpStatement(event), nil
+		}
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewOneOfTextCond(view_model.TokenKeyApplicationID, applicationIDs),
+			},
+		), nil
+	case instance.InstanceRemovedEventType:
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+			},
+		), nil
+	case org.OrgRemovedEventType:
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.TokenKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.TokenKeyResourceOwner, event.Aggregate().ResourceOwner),
+			},
+		), nil
+	default:
+		return handler.NewNoOpStatement(event), nil
+	}
+}
+
+type userAgentIDPayload struct {
+	ID string `json:"userAgentID"`
 }
 
 func agentIDFromSession(event eventstore.Event) (string, error) {
-	session := make(map[string]interface{})
-	if err := event.Unmarshal(&session); err != nil {
+	payload := new(userAgentIDPayload)
+	if err := event.Unmarshal(payload); err != nil {
 		logging.WithError(err).Error("could not unmarshal event data")
 		return "", zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
 	}
-	agentID, _ := session["userAgentID"].(string)
-	return agentID, nil
-}
-
-func applicationFromSession(event eventstore.Event) (*project_es_model.Application, error) {
-	application := new(project_es_model.Application)
-	if err := event.Unmarshal(application); err != nil {
-		logging.WithError(err).Error("could not unmarshal event data")
-		return nil, zerrors.ThrowInternal(nil, "MODEL-Hrw1q", "could not unmarshal data")
-	}
-	return application, nil
-}
-
-func tokenIDFromRemovedEvent(event eventstore.Event) (string, error) {
-	removed := make(map[string]interface{})
-	if err := event.Unmarshal(&removed); err != nil {
-		logging.WithError(err).Error("could not unmarshal event data")
-		return "", zerrors.ThrowInternal(nil, "MODEL-Sff32", "could not unmarshal data")
-	}
-	return removed["tokenId"].(string), nil
-}
-
-func refreshTokenIDFromRemovedEvent(event eventstore.Event) (string, error) {
-	removed := make(map[string]interface{})
-	if err := event.Unmarshal(&removed); err != nil {
-		logging.WithError(err).Error("could not unmarshal event data")
-		return "", zerrors.ThrowInternal(nil, "MODEL-Dfb3w", "could not unmarshal data")
-	}
-	return removed["tokenId"].(string), nil
+	return payload.ID, nil
 }
 
 func (t *Token) getProjectByID(ctx context.Context, projID, instanceID string) (*proj_model.Project, error) {

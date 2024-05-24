@@ -74,7 +74,7 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain stri
 }
 
 func (c *Commands) addGeneratedInstanceDomain(ctx context.Context, a *instance.Aggregate, instanceName string) ([]preparation.Validation, error) {
-	domain, err := domain.NewGeneratedInstanceDomain(instanceName, authz.GetInstance(ctx).RequestedDomain())
+	domain, err := c.GenerateDomain(instanceName, authz.GetInstance(ctx).RequestedDomain())
 	if err != nil {
 		return nil, err
 	}

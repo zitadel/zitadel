@@ -46,10 +46,13 @@ func orgDomainWriteModelToOrgDomain(wm *OrgDomainWriteModel) *domain.OrgDomain {
 
 func orgWriteModelToPrivacyPolicy(wm *OrgPrivacyPolicyWriteModel) *domain.PrivacyPolicy {
 	return &domain.PrivacyPolicy{
-		ObjectRoot:  writeModelToObjectRoot(wm.PrivacyPolicyWriteModel.WriteModel),
-		TOSLink:     wm.TOSLink,
-		PrivacyLink: wm.PrivacyLink,
-		HelpLink:    wm.HelpLink,
-		SupportEmail: wm.SupportEmail,
+		ObjectRoot:     writeModelToObjectRoot(wm.PrivacyPolicyWriteModel.WriteModel),
+		TOSLink:        wm.TOSLink,
+		PrivacyLink:    wm.PrivacyLink,
+		HelpLink:       wm.HelpLink,
+		SupportEmail:   wm.SupportEmail,
+		DocsLink:       wm.DocsLink,
+		CustomLink:     wm.CustomLink,
+		CustomLinkText: wm.CustomLinkText,
 	}
 }

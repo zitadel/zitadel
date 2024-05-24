@@ -16,6 +16,7 @@ func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.
 		UserSchema:                      req.UserSchema,
 		Actions:                         req.Actions,
 		TokenExchange:                   req.OidcTokenExchange,
+		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
 	}
 }
 
@@ -28,6 +29,7 @@ func systemFeaturesToPb(f *query.SystemFeatures) *feature_pb.GetSystemFeaturesRe
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 		Actions:                             featureSourceToFlagPb(&f.Actions),
+		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 	}
 }
 
@@ -39,6 +41,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		UserSchema:                      req.UserSchema,
 		TokenExchange:                   req.OidcTokenExchange,
 		Actions:                         req.Actions,
+		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
 	}
 }
 
@@ -51,6 +54,14 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		UserSchema:                          featureSourceToFlagPb(&f.UserSchema),
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 		Actions:                             featureSourceToFlagPb(&f.Actions),
+		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
+	}
+}
+
+func featureSourceToImprovedPerformanceFlagPb(fs *query.FeatureSource[[]feature.ImprovedPerformanceType]) *feature_pb.ImprovedPerformanceFeatureFlag {
+	return &feature_pb.ImprovedPerformanceFeatureFlag{
+		ExecutionPaths: improvedPerformanceTypesToPb(fs.Value),
+		Source:         featureLevelToSourcePb(fs.Level),
 	}
 }
 
@@ -79,5 +90,50 @@ func featureLevelToSourcePb(level feature.Level) feature_pb.Source {
 		return feature_pb.Source_SOURCE_USER
 	default:
 		return feature_pb.Source(level)
+	}
+}
+
+func improvedPerformanceTypesToPb(types []feature.ImprovedPerformanceType) []feature_pb.ImprovedPerformance {
+	res := make([]feature_pb.ImprovedPerformance, len(types))
+
+	for i, typ := range types {
+		res[i] = improvedPerformanceTypeToPb(typ)
+	}
+
+	return res
+}
+
+func improvedPerformanceTypeToPb(typ feature.ImprovedPerformanceType) feature_pb.ImprovedPerformance {
+	switch typ {
+	case feature.ImprovedPerformanceTypeUnknown:
+		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED
+	case feature.ImprovedPerformanceTypeOrgByID:
+		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID
+	default:
+		return feature_pb.ImprovedPerformance(typ)
+	}
+}
+
+func improvedPerformanceListToDomain(list []feature_pb.ImprovedPerformance) []feature.ImprovedPerformanceType {
+	if list == nil {
+		return nil
+	}
+	res := make([]feature.ImprovedPerformanceType, len(list))
+
+	for i, typ := range list {
+		res[i] = improvedPerformanceToDomain(typ)
+	}
+
+	return res
+}
+
+func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.ImprovedPerformanceType {
+	switch typ {
+	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED:
+		return feature.ImprovedPerformanceTypeUnknown
+	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID:
+		return feature.ImprovedPerformanceTypeOrgByID
+	default:
+		return feature.ImprovedPerformanceTypeUnknown
 	}
 }

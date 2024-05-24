@@ -516,6 +516,7 @@ Errors:
     IDPMissing: IDP ID fehlt im Request
     IDPInvalid: IDP ungültig für die Anfrage
     ResponseInvalid: IDP-Antwort ist ungültig
+    MissingSingleMappingAttribute: Enthält das Zuordnungsattribut nicht oder hat mehr als einen Wert
     SuccessURLMissing: Success URL fehlt im Request
     FailureURLMissing: Failure URL fehlt im Request
     StateMissing: State parameter fehlt im Request
@@ -614,6 +615,7 @@ EventTypes:
         failed: Benutzerinitialisierung fehlgeschlagen
     token:
       added: Access Token ausgestellt
+      v2.added: Access Token ausgestellt
       removed: Access Token gelöscht
     impersonated: Benutzer hat sich als Benutzer ausgegeben
     username:

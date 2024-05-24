@@ -24,6 +24,7 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		UserSchema:                          gu.Ptr(true),
 		Actions:                             gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
+		ImprovedPerformance:                 nil,
 	}
 	want := &command.SystemFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
@@ -32,6 +33,7 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		UserSchema:                      gu.Ptr(true),
 		Actions:                         gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
+		ImprovedPerformance:             nil,
 	}
 	got := systemFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -68,6 +70,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: false,
 		},
+		ImprovedPerformance: query.FeatureSource[[]feature.ImprovedPerformanceType]{
+			Level: feature.LevelSystem,
+			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgByID},
+		},
 	}
 	want := &feature_pb.GetSystemFeaturesResponse{
 		Details: &object.Details{
@@ -99,6 +105,10 @@ func Test_systemFeaturesToPb(t *testing.T) {
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
 		},
+		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
+			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID},
+			Source:         feature_pb.Source_SOURCE_SYSTEM,
+		},
 	}
 	got := systemFeaturesToPb(arg)
 	assert.Equal(t, want, got)
@@ -112,6 +122,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		UserSchema:                          gu.Ptr(true),
 		OidcTokenExchange:                   gu.Ptr(true),
 		Actions:                             gu.Ptr(true),
+		ImprovedPerformance:                 nil,
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
@@ -120,6 +131,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		UserSchema:                      gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
 		Actions:                         gu.Ptr(true),
+		ImprovedPerformance:             nil,
 	}
 	got := instanceFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -156,6 +168,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: false,
 		},
+		ImprovedPerformance: query.FeatureSource[[]feature.ImprovedPerformanceType]{
+			Level: feature.LevelSystem,
+			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgByID},
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -186,6 +202,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		OidcTokenExchange: &feature_pb.FeatureFlag{
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_SYSTEM,
+		},
+		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
+			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID},
+			Source:         feature_pb.Source_SOURCE_SYSTEM,
 		},
 	}
 	got := instanceFeaturesToPb(arg)

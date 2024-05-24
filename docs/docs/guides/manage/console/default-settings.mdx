@@ -26,8 +26,7 @@ When you configure your default settings, you can set the following:
 - [**Branding**](#branding): Appearance of the login interface.
 - [**Message Texts**](#message-texts): Text and internationalization for emails
 - [**Login Interface Texts**](#login-interface-texts): Text and internationalization for the login interface
-- [**Languages**](#languages): Select which supported langauges are shown to your users. Set the default language if no context is provided.
-- [**Privacy Policy**](#privacy-policy-and-tos): Links to your own Terms of Service and Privacy Policy regulations. Link to Help Page.
+- [**External Links**](#external-links): Links to your own Terms of Service and Privacy Policy regulations, Help Page, Support email, documentation link...
 - [**OIDC Token Lifetimes and Expiration**](#oidc-token-lifetimes-and-expiration): Token lifetime and expiration settings.
 - [**Secret Generator**](#secret-generator): Appearance and expiration of the generated codes and secrets used in mails for verification etc.
 
@@ -207,7 +206,7 @@ The following properties can be set:
 - Has Uppercase
 - Has Lowercase
 - Has Number
-- Has Symbol
+- Has Symbol (Everything that is not a number or letter)
 
 <img
   src="/docs/img/guides/console/complexity.png"
@@ -256,9 +255,10 @@ You can either set this attribute on your whole ZITADEL instance or just on some
 
 Please refer to the [configuration guide](/docs/guides/solution-scenarios/configurations#use-email-to-login) for more information.
 
-## Privacy Policy and TOS
+## External links
 
 With this setting you are able to configure your privacy policy, terms of service, help links and help/support email address.
+
 On register each user has to accept these policies.
 
 This policy can be also be overriden by your organizations.
@@ -269,8 +269,16 @@ Example:
 `https://demo.com/tos-{{.Lang}}`
 
 <img
-  src="/docs/img/guides/console/privacypolicy.png"
-  alt="Privacy Policy"
+  src="/docs/img/guides/console/external_links_1.png"
+  alt="External Links"
+  width="600px"
+/>
+
+Also you can set the link associated to the Documentation button in the console. Set an empty text if you don't want to show a Documentation button in your console. If you need a custom button to be shown in the console you can set the button text and the link associated to the button (if the button text is button no text will be shown).
+
+<img
+  src="/docs/img/guides/console/external_links_2.png"
+  alt="Custom button"
   width="600px"
 />
 

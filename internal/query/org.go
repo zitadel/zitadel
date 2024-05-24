@@ -13,8 +13,11 @@ import (
 	"github.com/zitadel/zitadel/internal/api/call"
 	domain_pkg "github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
+	"github.com/zitadel/zitadel/internal/v2/eventstore"
+	"github.com/zitadel/zitadel/internal/v2/readmodel"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -52,8 +55,9 @@ var (
 		table: orgsTable,
 	}
 	OrgColumnName = Column{
-		name:  projection.OrgColumnName,
-		table: orgsTable,
+		name:           projection.OrgColumnName,
+		table:          orgsTable,
+		isOrderByLower: true,
 	}
 	OrgColumnDomain = Column{
 		name:  projection.OrgColumnDomain,
@@ -91,7 +95,44 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
+func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (_ *Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if !authz.GetInstance(ctx).Features().ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeOrgByID) {
+		return q.oldOrgByID(ctx, shouldTriggerBulk, id)
+	}
+
+	foundOrg := readmodel.NewOrg(id)
+	eventCount, err := q.eventStoreV4.Query(
+		ctx,
+		eventstore.NewQuery(
+			authz.GetInstance(ctx).InstanceID(),
+			foundOrg,
+			eventstore.AppendFilters(foundOrg.Filter()...),
+		),
+	)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
+	}
+
+	if eventCount == 0 {
+		return nil, zerrors.ThrowNotFound(nil, "QUERY-leq5Q", "Errors.Org.NotFound")
+	}
+
+	return &Org{
+		ID:            foundOrg.ID,
+		CreationDate:  foundOrg.CreationDate,
+		ChangeDate:    foundOrg.ChangeDate,
+		ResourceOwner: foundOrg.Owner,
+		State:         domain_pkg.OrgState(foundOrg.State.State),
+		Sequence:      uint64(foundOrg.Sequence),
+		Name:          foundOrg.Name,
+		Domain:        foundOrg.PrimaryDomain.Domain,
+	}, nil
+}
+
+func (q *Queries) oldOrgByID(ctx context.Context, shouldTriggerBulk bool, id string) (org *Org, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

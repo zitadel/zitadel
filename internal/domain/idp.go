@@ -134,3 +134,12 @@ const (
 	AutoLinkingOptionUsername
 	AutoLinkingOptionEmail
 )
+
+type SAMLNameIDFormat uint8
+
+const (
+	SAMLNameIDFormatUnspecified SAMLNameIDFormat = iota
+	SAMLNameIDFormatEmailAddress
+	SAMLNameIDFormatPersistent
+	SAMLNameIDFormatTransient
+)
