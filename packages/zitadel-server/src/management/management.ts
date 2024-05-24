@@ -12,7 +12,7 @@ import { ZitadelServer, getServers } from "../server";
 const createClient = <Client>(
   definition: CompatServiceDefinition,
   apiUrl: string,
-  token: string
+  token: string,
 ) => {
   if (!apiUrl) {
     throw Error("ZITADEL_API_URL not set");
@@ -40,6 +40,6 @@ export const getManagement = (app?: string | ZitadelServer) => {
   return createClient<ManagementServiceClient>(
     ManagementServiceDefinition as CompatServiceDefinition,
     config.apiUrl,
-    config.token
+    config.token,
   );
 };

@@ -26,7 +26,7 @@ export interface ZitadelApp {
 
 export async function initializeApp(
   config: ZitadelCoreProps,
-  name?: string
+  name?: string,
 ): Promise<ZitadelApp> {
   const app = { config, name };
   return app;
@@ -40,6 +40,6 @@ export function getApp(name?: string): ZitadelApp | undefined {
   return name
     ? apps.find((a) => a.name === name)
     : apps.length === 1
-    ? apps[0]
-    : undefined;
+      ? apps[0]
+      : undefined;
 }

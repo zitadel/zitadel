@@ -56,7 +56,7 @@ export const SignInWithGoogle = forwardRef<
         <span className="ztdl-ml-4">{name ? name : "Sign in with Google"}</span>
       )}
     </button>
-  )
+  ),
 );
 
 SignInWithGoogle.displayName = "SignInWithGoogle";

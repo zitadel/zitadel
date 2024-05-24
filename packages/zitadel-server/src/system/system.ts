@@ -10,7 +10,7 @@ import { authMiddleware } from "../middleware";
 
 const createSystemClient = <Client>(
   definition: CompatServiceDefinition,
-  accessToken: string
+  accessToken: string,
 ) => {
   const channel = createChannel(process.env.ZITADEL_SYSTEM_API_URL ?? "");
   return createClientFactory()
@@ -30,6 +30,6 @@ export const getSystem = async () => {
 
   return createSystemClient<SystemServiceClient>(
     SystemServiceDefinition as CompatServiceDefinition,
-    token
+    token,
   );
 };

@@ -23,6 +23,6 @@ export const getSettings = (server?: string | ZitadelServer) => {
   return createClient<SettingsServiceClient>(
     SettingsServiceDefinition as CompatServiceDefinition,
     config.apiUrl,
-    config.token
+    config.token,
   );
 };

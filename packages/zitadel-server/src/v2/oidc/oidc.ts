@@ -19,6 +19,6 @@ export const getOidc = (server?: string | ZitadelServer) => {
   return createClient<OIDCServiceClient>(
     OIDCServiceDefinition as CompatServiceDefinition,
     config.apiUrl,
-    config.token
+    config.token,
   );
 };
