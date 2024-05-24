@@ -131,7 +131,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		UserSchema:                      gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
 		Actions:                         gu.Ptr(true),
-		ImprovedPerformance:             []feature.ImprovedPerformanceType{},
+		ImprovedPerformance:             nil,
 	}
 	got := instanceFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
