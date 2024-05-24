@@ -62,9 +62,34 @@ func HasMFA(methods []UserAuthMethodType) bool {
 			UserAuthMethodTypeOTPSMS,
 			UserAuthMethodTypeOTPEmail,
 			UserAuthMethodTypeIDP,
+			UserAuthMethodTypeOTP,
+			UserAuthMethodTypePrivateKey:
+			factors++
+		case UserAuthMethodTypeUnspecified,
+			userAuthMethodTypeCount:
+			// ignore
+		}
+	}
+	return factors > 1
+}
+
+// Has2FA checks whether the auth factors provided are a second factor and will return true if at least one is.
+func Has2FA(methods []UserAuthMethodType) bool {
+	var factors int
+	for _, method := range methods {
+		switch method {
+		case
+			UserAuthMethodTypeU2F,
+			UserAuthMethodTypeTOTP,
+			UserAuthMethodTypeOTPSMS,
+			UserAuthMethodTypeOTPEmail,
 			UserAuthMethodTypeOTP:
 			factors++
 		case UserAuthMethodTypeUnspecified,
+			UserAuthMethodTypePassword,
+			UserAuthMethodTypePasswordless,
+			UserAuthMethodTypeIDP,
+			UserAuthMethodTypePrivateKey,
 			userAuthMethodTypeCount:
 			// ignore
 		}
