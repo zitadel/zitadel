@@ -196,8 +196,8 @@ func Test_ZITADEL_API_missing_mfa_policy(t *testing.T) {
 	}
 	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 		got, getErr := Tester.Client.Mgmt.GetLoginPolicy(ctxOrg, &mgmt.GetLoginPolicyRequest{})
-		assert.NoError(t, getErr)
-		assert.False(t, got.GetPolicy().IsDefault)
+		assert.NoError(ttt, getErr)
+		assert.False(ttt, got.GetPolicy().IsDefault)
 
 	}, retryDuration, time.Millisecond*100, "timeout waiting for login policy")
 
