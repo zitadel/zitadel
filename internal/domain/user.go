@@ -94,7 +94,7 @@ func Has2FA(methods []UserAuthMethodType) bool {
 			// ignore
 		}
 	}
-	return factors > 1
+	return factors > 0
 }
 
 // RequiresMFA checks whether the user requires to authenticate with multiple auth factors based on the LoginPolicy and the authentication type.
