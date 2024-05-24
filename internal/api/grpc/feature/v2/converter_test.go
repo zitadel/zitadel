@@ -33,7 +33,7 @@ func Test_systemFeaturesToCommand(t *testing.T) {
 		UserSchema:                      gu.Ptr(true),
 		Actions:                         gu.Ptr(true),
 		TokenExchange:                   gu.Ptr(true),
-		ImprovedPerformance:             []feature.ImprovedPerformanceType{},
+		ImprovedPerformance:             nil,
 	}
 	got := systemFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
