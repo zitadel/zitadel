@@ -54,7 +54,7 @@
       },
       "MACHINES": {
         "TITLE": "Service Users",
-        "DESCRIPTION": "Les utilisateurs du service s'authentifient de manière non interactive à l'aide d'un jeton de porteur JWT signé avec une clé privée. Ils peuvent également utiliser un jeton d'accès personnel.",
+        "DESCRIPTION": "Maschinen authentifizieren sich nicht-interaktiv mit einem JWT Bearer-Token, das mit einem privaten Schlüssel signiert ist. Sie können auch ein persönliches Zugangstoken verwenden.",
         "METADATA": "Add custom attributes to the user like the authenticating system. You can use this information in your actions."
       },
       "SELF": {
