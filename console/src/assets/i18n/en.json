@@ -54,7 +54,7 @@
       },
       "MACHINES": {
         "TITLE": "Service Users",
-        "DESCRIPTION": "Maschinen authentifizieren sich nicht-interaktiv mit einem JWT Bearer-Token, das mit einem privaten Schlüssel signiert ist. Sie können auch ein persönliches Zugangstoken verwenden.",
+        "DESCRIPTION": "Service Users authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
         "METADATA": "Add custom attributes to the user like the authenticating system. You can use this information in your actions."
       },
       "SELF": {
