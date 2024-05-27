@@ -1,4 +1,5 @@
 {
+  "packageManager": "pnpm@9.1.2+sha256.19c17528f9ca20bd442e4ca42f00f1b9808a9cb419383cd04ba32ef19322aba7",
   "private": true,
   "scripts": {
     "generate": "turbo run generate",
@@ -28,10 +29,9 @@
     "eslint-config-zitadel": "workspace:*",
     "prettier": "^3.2.5",
     "tsup": "^8.0.2",
-    "turbo": "^1.10.8",
+    "turbo": "^1.13.3",
     "typescript": "^5.4.5",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.6.0"
-  },
-  "packageManager": "pnpm@8.15.5+sha256.4b4efa12490e5055d59b9b9fc9438b7d581a6b7af3b5675eb5c5f447cee1a589"
+  }
 }

@@ -15,7 +15,7 @@ export interface ZitadelServerOptions extends ZitadelServerProps {
 
 export function initializeServer(
   config: ZitadelServerProps,
-  name?: string
+  name?: string,
 ): ZitadelServer {
   const server = new ZitadelServer(config, name);
   return server;
@@ -57,7 +57,7 @@ export function getServer(name?: string): ZitadelServer {
 export const createClient = <Client>(
   definition: CompatServiceDefinition,
   apiUrl: string,
-  token: string
+  token: string,
 ) => {
   if (!apiUrl) {
     throw Error("ZITADEL_API_URL not set");

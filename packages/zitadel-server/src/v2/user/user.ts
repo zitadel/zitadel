@@ -23,6 +23,6 @@ export const getUser = (server?: string | ZitadelServer) => {
   return createClient<UserServiceClient>(
     UserServiceDefinition as CompatServiceDefinition,
     config.apiUrl,
-    config.token
+    config.token,
   );
 };

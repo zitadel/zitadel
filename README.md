@@ -1,4 +1,4 @@
-# ZITADEL typescript with Turborepo and Changesets
+# ZITADEL TypeScript with Turborepo and Changesets
 
 This repository contains all TypeScript and JavaScript packages and applications you need to create your own ZITADEL Login UI.
 The repo makes use of the [build system Turbo](https://turbo.build/repo) and the [Changesets CLI for versioning the packages](https://github.com/changesets/changesets).
@@ -27,6 +27,7 @@ We think the easiest path of getting up and running, is the following:
 - `login`: The login UI used by ZITADEL Cloud, powered by Next.js
 - `@zitadel/server`: core components for establishing node client connection, grpc stub
 - `@zitadel/client`: core components for establishing web client connection, grpc stub
+- `@zitadel/proto`: shared protobuf types
 - `@zitadel/react`: shared React utilities and components built with tailwindcss
 - `@zitadel/next`: shared Next.js utilities
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
@@ -36,7 +37,7 @@ Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 ### Login
 
-The login is currently in a work in progress state. 
+The login is currently in a work in progress state.
 The goal is to implement a login UI, using the session API of ZITADEL, which also implements the OIDC Standard and is ready to use for everyone.
 
 In the first phase we want to have a MVP login ready with the OIDC Standard and a basic feature set. In a second step the features will be extended.
@@ -45,7 +46,7 @@ This list should show the current implementation state, and also what is missing
 You can already use the current state, and extend it with your needs.
 
 - [x] Local User Registration (with Password)
-- [x] User Registration and Login with external Provider 
+- [x] User Registration and Login with external Provider
   - [x] Google
   - [ ] GitHub
   - [ ] GitHub Enterprise
@@ -67,22 +68,22 @@ You can already use the current state, and extend it with your needs.
 - [ ] Domain Discovery
 - [x] Branding
 - OIDC Standard
-   - [x] Authorization Code Flow with PKCE
-   - [x] AuthRequest `hintUserId`
-   - [x] AuthRequest `loginHint`
-   - [x] AuthRequest `prompt`
-     - [x] Login
-     - [x] Select Account
-     - [ ] Consent
-     - [x] Create
-   - Scopes
-     - [x] `openid email profile address``
-     - [x] `offline access`
-     - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
-     - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
-     - [x] `urn:zitadel:iam:org:id:{orgid}`
-     - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
-   - [ ] AuthRequest UI locales
+  - [x] Authorization Code Flow with PKCE
+  - [x] AuthRequest `hintUserId`
+  - [x] AuthRequest `loginHint`
+  - [x] AuthRequest `prompt`
+    - [x] Login
+    - [x] Select Account
+    - [ ] Consent
+    - [x] Create
+  - Scopes
+    - [x] `openid email profile address``
+    - [x] `offline access`
+    - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
+    - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
+    - [x] `urn:zitadel:iam:org:id:{orgid}`
+    - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
+  - [ ] AuthRequest UI locales
 
 ## Tooling
 

@@ -11,7 +11,7 @@ import { authMiddleware } from "../middleware";
 const createClient = <Client>(
   definition: CompatServiceDefinition,
   apiUrl: string,
-  token: string
+  token: string,
 ) => {
   if (!apiUrl) {
     throw Error("ZITADEL_API_URL not set");
@@ -39,7 +39,7 @@ export const getAuth = (app?: string | ZitadelServer) => {
   return createClient<AuthServiceClient>(
     AuthServiceDefinition as CompatServiceDefinition,
     config.apiUrl,
-    config.token
+    config.token,
   );
 };
 

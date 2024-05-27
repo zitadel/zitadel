@@ -36,7 +36,7 @@ export const SignInWithAzureAD = forwardRef<
         </span>
       )}
     </button>
-  )
+  ),
 );
 
 SignInWithAzureAD.displayName = "SignInWithAzureAD";
