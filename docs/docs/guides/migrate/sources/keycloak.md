@@ -5,7 +5,7 @@ sidebar_label: From Keycloak
 
 ## Migrating from Keycloak to ZITADEL
 
-This guide will use [Docker installation](https://www.docker.com/) to run Keycloak and ZITADEL. However, both Keycloak and ZITADEL offer different installation methods. As a result, this guide won't include any required production tuning or security hardening for either system. However, it's advised you follow [recommended guidelines](/docs/guides/manage/self-hosted/production) before putting those systems into production. You can skip setting up Keycloak and ZITADEL if you already have running instances.  
+This guide will use [Docker installation](https://www.docker.com/) to run Keycloak and ZITADEL. However, both Keycloak and ZITADEL offer different installation methods. As a result, this guide won't include any required production tuning or security hardening for either system. However, it's advised you follow [recommended guidelines](/docs/self-hosting/manage/production) before putting those systems into production. You can skip setting up Keycloak and ZITADEL if you already have running instances.  
 
 ## Set up Keycloak
 ### Run Keycloak
