@@ -30,14 +30,23 @@ func (m *InstanceFeaturesWriteModel) Reduce() (err error) {
 		case *feature_v2.ResetEvent:
 			m.reduceReset()
 		case *feature_v1.SetEvent[feature_v1.Boolean]:
-			err = m.reduceBoolFeature(
-				feature_v1.DefaultLoginInstanceEventToV2(e),
+			reduceInstanceFeature(
+				&m.InstanceFeatures,
+				feature.KeyLoginDefaultOrg,
+				feature_v1.DefaultLoginInstanceEventToV2(e).Value,
 			)
 		case *feature_v2.SetEvent[bool]:
-			err = m.reduceBoolFeature(e)
-		}
-		if err != nil {
-			return err
+			_, key, err := e.FeatureInfo()
+			if err != nil {
+				return err
+			}
+			reduceInstanceFeature(&m.InstanceFeatures, key, e.Value)
+		case *feature_v2.SetEvent[[]feature.ImprovedPerformanceType]:
+			_, key, err := e.FeatureInfo()
+			if err != nil {
+				return err
+			}
+			reduceInstanceFeature(&m.InstanceFeatures, key, e.Value)
 		}
 	}
 	return m.WriteModel.Reduce()
@@ -57,41 +66,41 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceUserSchemaEventType,
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceActionsEventType,
+			feature_v2.InstanceImprovedPerformanceEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
 
 func (m *InstanceFeaturesWriteModel) reduceReset() {
-	m.LoginDefaultOrg = nil
-	m.TriggerIntrospectionProjections = nil
-	m.LegacyIntrospection = nil
-	m.UserSchema = nil
-	m.TokenExchange = nil
-	m.Actions = nil
+	m.InstanceFeatures = InstanceFeatures{}
 }
 
-func (m *InstanceFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {
-	_, key, err := event.FeatureInfo()
-	if err != nil {
-		return err
-	}
+func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value any) {
 	switch key {
 	case feature.KeyUnspecified:
-		return nil
+		return
 	case feature.KeyLoginDefaultOrg:
-		m.LoginDefaultOrg = &event.Value
+		v := value.(bool)
+		features.LoginDefaultOrg = &v
 	case feature.KeyTriggerIntrospectionProjections:
-		m.TriggerIntrospectionProjections = &event.Value
+		v := value.(bool)
+		features.TriggerIntrospectionProjections = &v
 	case feature.KeyLegacyIntrospection:
-		m.LegacyIntrospection = &event.Value
+		v := value.(bool)
+		features.LegacyIntrospection = &v
 	case feature.KeyTokenExchange:
-		m.TokenExchange = &event.Value
+		v := value.(bool)
+		features.TokenExchange = &v
 	case feature.KeyUserSchema:
-		m.UserSchema = &event.Value
+		v := value.(bool)
+		features.UserSchema = &v
 	case feature.KeyActions:
-		m.Actions = &event.Value
+		v := value.(bool)
+		features.Actions = &v
+	case feature.KeyImprovedPerformance:
+		v := value.([]feature.ImprovedPerformanceType)
+		features.ImprovedPerformance = v
 	}
-	return nil
 }
 
 func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *InstanceFeatures) []eventstore.Command {
@@ -103,5 +112,6 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.InstanceTokenExchangeEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.InstanceUserSchemaEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.Actions, f.Actions, feature_v2.InstanceActionsEventType)
+	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.InstanceImprovedPerformanceEventType)
 	return cmds
 }
