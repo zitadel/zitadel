@@ -120,6 +120,7 @@ func CheckOTPSMS(code string) SessionCommand {
 			if err != nil {
 				return nil, err
 			}
+			// explicitly set the challenge from the session write model since the code write model will only check user events
 			otpWriteModel.otpCode = cmd.sessionWriteModel.OTPSMSCodeChallenge
 			return otpWriteModel, nil
 		}
@@ -134,17 +135,6 @@ func CheckOTPSMS(code string) SessionCommand {
 			return commands, err
 		}
 		cmd.eventCommands = append(cmd.eventCommands, commands...)
-		//if cmd.sessionWriteModel.UserID == "" {
-		//	return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-VDrh3", "Errors.User.UserIDMissing")
-		//}
-		//challenge := cmd.sessionWriteModel.OTPSMSCodeChallenge
-		//if challenge == nil {
-		//	return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3tv", "Errors.User.Code.NotFound")
-		//}
-		//err = crypto.VerifyCode(challenge.CreationDate, challenge.Expiry, challenge.Code, code, cmd.otpAlg)
-		//if err != nil {
-		//	return nil, err
-		//}
 		cmd.OTPSMSChecked(ctx, cmd.now())
 		return nil, nil
 	}
@@ -152,24 +142,13 @@ func CheckOTPSMS(code string) SessionCommand {
 
 func CheckOTPEmail(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (_ []eventstore.Command, err error) {
-		//if cmd.sessionWriteModel.UserID == "" {
-		//	return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ejo2w", "Errors.User.UserIDMissing")
-		//}
-		//challenge := cmd.sessionWriteModel.OTPEmailCodeChallenge
-		//if challenge == nil {
-		//	return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-zF3g3", "Errors.User.Code.NotFound")
-		//}
-		//err = crypto.VerifyCode(challenge.CreationDate, challenge.Expiry, challenge.Code, code, cmd.otpAlg)
-		//if err != nil {
-		//	return nil, err
-		//}
 		writeModel := func(ctx context.Context, userID string, resourceOwner string) (OTPCodeWriteModel, error) {
 			otpWriteModel := NewHumanOTPEmailCodeWriteModel(cmd.sessionWriteModel.UserID, "")
 			err := cmd.eventstore.FilterToQueryReducer(ctx, otpWriteModel)
 			if err != nil {
 				return nil, err
 			}
-			// explicitly set the challenge from the session write model
+			// explicitly set the challenge from the session write model since the code write model will only check user events
 			otpWriteModel.otpCode = cmd.sessionWriteModel.OTPEmailCodeChallenge
 			return otpWriteModel, nil
 		}

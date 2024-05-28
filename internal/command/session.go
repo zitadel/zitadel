@@ -68,14 +68,6 @@ func CheckUser(id string, resourceOwner string, preferredLanguage *language.Tag)
 // CheckPassword defines a password check to be executed for a session update
 func CheckPassword(password string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
-		//if cmd.sessionWriteModel.UserID == "" {
-		//	return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3f", "Errors.User.UserIDMissing")
-		//}
-		//cmd.passwordWriteModel = NewHumanPasswordWriteModel(cmd.sessionWriteModel.UserID, "")
-		//err := cmd.eventstore.FilterToQueryReducer(ctx, cmd.passwordWriteModel)
-		//if err != nil {
-		//	return nil, err
-		//}
 		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil)
 		if err != nil {
 			return commands, err
@@ -83,29 +75,6 @@ func CheckPassword(password string) SessionCommand {
 		cmd.eventCommands = append(cmd.eventCommands, commands...)
 		cmd.PasswordChecked(ctx, cmd.now())
 		return nil, nil
-		//if !cmd.passwordWriteModel.UserState.Exists() {
-		//	return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound")
-		//}
-		//if cmd.passwordWriteModel.UserState == domain.UserStateLocked {
-		//	return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Th32w", "Errors.User.Locked")
-		//}
-		//
-		//if cmd.passwordWriteModel.EncodedHash == "" {
-		//	return zerrors.ThrowPreconditionFailed(nil, "COMMAND-WEf3t", "Errors.User.Password.NotSet")
-		//}
-		//ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-		//updated, err := cmd.hasher.Verify(cmd.passwordWriteModel.EncodedHash, password)
-		//spanPasswordComparison.EndWithError(err)
-		//if err != nil {
-		//  // TODO: maybe we want to reset the session in the future https://github.com/zitadel/zitadel/issues/5807
-		//return zerrors.ThrowInvalidArgument(err, "COMMAND-SAF3g", "Errors.User.Password.Invalid")
-		//}
-		//if updated != "" {
-		//	cmd.eventCommands = append(cmd.eventCommands, user.NewHumanPasswordHashUpdatedEvent(ctx, UserAggregateFromWriteModel(&cmd.passwordWriteModel.WriteModel), updated))
-		//}
-		//
-		//cmd.PasswordChecked(ctx, cmd.now())
-		//return nil
 	}
 }
 
@@ -147,17 +116,6 @@ func CheckIntent(intentID, token string) SessionCommand {
 
 func CheckTOTP(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (_ []eventstore.Command, err error) {
-		//writeModel := func(ctx context.Context, userID string, resourceOwner string) (OTPCodeWriteModel, error) {
-		//	totpWriteModel := NewHumanTOTPWriteModel(cmd.sessionWriteModel.UserID, "")
-		//	err = cmd.eventstore.FilterToQueryReducer(ctx, cmd.totpWriteModel)
-		//	return totpWriteModel, err
-		//}
-		//succeededEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, info *user.AuthRequestInfo) eventstore.Command {
-		//	return user.NewHumanOTPSMSCheckSucceededEvent(ctx, aggregate, nil)
-		//}
-		//failedEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, info *user.AuthRequestInfo) eventstore.Command {
-		//	return user.NewHumanOTPSMSCheckFailedEvent(ctx, aggregate, nil)
-		//}
 		commands, err := checkTOTP(
 			ctx,
 			cmd.sessionWriteModel.UserID,
@@ -171,21 +129,6 @@ func CheckTOTP(code string) SessionCommand {
 			return commands, err
 		}
 		cmd.eventCommands = append(cmd.eventCommands, commands...)
-		//if cmd.sessionWriteModel.UserID == "" {
-		//	return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing")
-		//}
-		//cmd.totpWriteModel = NewHumanTOTPWriteModel(cmd.sessionWriteModel.UserID, "")
-		//err = cmd.eventstore.FilterToQueryReducer(ctx, cmd.totpWriteModel)
-		//if err != nil {
-		//	return nil, err
-		//}
-		//if cmd.totpWriteModel.State != domain.MFAStateReady {
-		//	return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady")
-		//}
-		//err = domain.VerifyTOTP(code, cmd.totpWriteModel.Secret, cmd.totpAlg)
-		//if err != nil {
-		//	return nil, err
-		//}
 		cmd.TOTPChecked(ctx, cmd.now())
 		return nil, nil
 	}
