@@ -23,16 +23,23 @@ func NewSystemFeaturesWriteModel() *SystemFeaturesWriteModel {
 	return m
 }
 
-func (m *SystemFeaturesWriteModel) Reduce() (err error) {
+func (m *SystemFeaturesWriteModel) Reduce() error {
 	for _, event := range m.Events {
 		switch e := event.(type) {
 		case *feature_v2.ResetEvent:
 			m.reduceReset()
 		case *feature_v2.SetEvent[bool]:
-			err = m.reduceBoolFeature(e)
-		}
-		if err != nil {
-			return err
+			_, key, err := e.FeatureInfo()
+			if err != nil {
+				return err
+			}
+			reduceSystemFeature(&m.SystemFeatures, key, e.Value)
+		case *feature_v2.SetEvent[[]feature.ImprovedPerformanceType]:
+			_, key, err := e.FeatureInfo()
+			if err != nil {
+				return err
+			}
+			reduceSystemFeature(&m.SystemFeatures, key, e.Value)
 		}
 	}
 	return m.WriteModel.Reduce()
@@ -52,41 +59,40 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemActionsEventType,
+			feature_v2.SystemImprovedPerformanceEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
 
 func (m *SystemFeaturesWriteModel) reduceReset() {
-	m.LoginDefaultOrg = nil
-	m.TriggerIntrospectionProjections = nil
-	m.LegacyIntrospection = nil
-	m.TokenExchange = nil
-	m.UserSchema = nil
-	m.Actions = nil
+	m.SystemFeatures = SystemFeatures{}
 }
 
-func (m *SystemFeaturesWriteModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {
-	_, key, err := event.FeatureInfo()
-	if err != nil {
-		return err
-	}
+func reduceSystemFeature(features *SystemFeatures, key feature.Key, value any) {
 	switch key {
 	case feature.KeyUnspecified:
-		return nil
+		return
 	case feature.KeyLoginDefaultOrg:
-		m.LoginDefaultOrg = &event.Value
+		v := value.(bool)
+		features.LoginDefaultOrg = &v
 	case feature.KeyTriggerIntrospectionProjections:
-		m.TriggerIntrospectionProjections = &event.Value
+		v := value.(bool)
+		features.TriggerIntrospectionProjections = &v
 	case feature.KeyLegacyIntrospection:
-		m.LegacyIntrospection = &event.Value
+		v := value.(bool)
+		features.LegacyIntrospection = &v
 	case feature.KeyUserSchema:
-		m.UserSchema = &event.Value
+		v := value.(bool)
+		features.UserSchema = &v
 	case feature.KeyTokenExchange:
-		m.TokenExchange = &event.Value
+		v := value.(bool)
+		features.TokenExchange = &v
 	case feature.KeyActions:
-		m.Actions = &event.Value
+		v := value.(bool)
+		features.Actions = &v
+	case feature.KeyImprovedPerformance:
+		features.ImprovedPerformance = value.([]feature.ImprovedPerformanceType)
 	}
-	return nil
 }
 
 func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFeatures) []eventstore.Command {
@@ -98,12 +104,25 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.SystemUserSchemaEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.SystemTokenExchangeEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.Actions, f.Actions, feature_v2.SystemActionsEventType)
+	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.SystemImprovedPerformanceEventType)
 	return cmds
 }
 
 func appendFeatureUpdate[T comparable](ctx context.Context, cmds []eventstore.Command, aggregate *feature_v2.Aggregate, oldValue, newValue *T, eventType eventstore.EventType) []eventstore.Command {
 	if newValue != nil && (oldValue == nil || *oldValue != *newValue) {
 		cmds = append(cmds, feature_v2.NewSetEvent[T](ctx, aggregate, eventType, *newValue))
+	}
+	return cmds
+}
+
+func appendFeatureSliceUpdate[T comparable](ctx context.Context, cmds []eventstore.Command, aggregate *feature_v2.Aggregate, oldValues, newValues []T, eventType eventstore.EventType) []eventstore.Command {
+	if len(newValues) != len(oldValues) {
+		return append(cmds, feature_v2.NewSetEvent[[]T](ctx, aggregate, eventType, newValues))
+	}
+	for i, oldValue := range oldValues {
+		if oldValue != newValues[i] {
+			return append(cmds, feature_v2.NewSetEvent[[]T](ctx, aggregate, eventType, newValues))
+		}
 	}
 	return cmds
 }

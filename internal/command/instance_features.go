@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -18,6 +19,7 @@ type InstanceFeatures struct {
 	UserSchema                      *bool
 	TokenExchange                   *bool
 	Actions                         *bool
+	ImprovedPerformance             []feature.ImprovedPerformanceType
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
@@ -26,7 +28,9 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.LegacyIntrospection == nil &&
 		m.UserSchema == nil &&
 		m.TokenExchange == nil &&
-		m.Actions == nil
+		m.Actions == nil &&
+		// nil check to allow unset improvements
+		m.ImprovedPerformance == nil
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {
@@ -37,11 +41,11 @@ func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures)
 	if err := c.eventstore.FilterToQueryReducer(ctx, wm); err != nil {
 		return nil, err
 	}
-	cmds := wm.setCommands(ctx, f)
-	if len(cmds) == 0 {
+	commands := wm.setCommands(ctx, f)
+	if len(commands) == 0 {
 		return writeModelToObjectDetails(wm.WriteModel), nil
 	}
-	events, err := c.eventstore.Push(ctx, cmds...)
+	events, err := c.eventstore.Push(ctx, commands...)
 	if err != nil {
 		return nil, err
 	}
