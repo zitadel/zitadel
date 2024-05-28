@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@zitadel/proto": "workspace:*",
-    "@bufbuild/protobuf": "^1.8.0",
+    "@bufbuild/protobuf": "^1.9.0",
     "@connectrpc/connect": "^1.4.0"
   },
   "devDependencies": {
