@@ -26,12 +26,10 @@ type SessionCommand func(ctx context.Context, cmd *SessionCommands) ([]eventstor
 type SessionCommands struct {
 	sessionCommands []SessionCommand
 
-	sessionWriteModel  *SessionWriteModel
-	passwordWriteModel *HumanPasswordWriteModel
-	intentWriteModel   *IDPIntentWriteModel
-	totpWriteModel     *HumanTOTPWriteModel
-	eventstore         *eventstore.Eventstore
-	eventCommands      []eventstore.Command
+	sessionWriteModel *SessionWriteModel
+	intentWriteModel  *IDPIntentWriteModel
+	eventstore        *eventstore.Eventstore
+	eventCommands     []eventstore.Command
 
 	hasher      *crypto.Hasher
 	intentAlg   crypto.EncryptionAlgorithm
@@ -79,12 +77,10 @@ func CheckPassword(password string) SessionCommand {
 		//	return nil, err
 		//}
 		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil)
-		if len(commands) > 0 {
-			cmd.eventCommands = append(cmd.eventCommands, commands...)
-		}
 		if err != nil {
 			return commands, err
 		}
+		cmd.eventCommands = append(cmd.eventCommands, commands...)
 		cmd.PasswordChecked(ctx, cmd.now())
 		return nil, nil
 		//if !cmd.passwordWriteModel.UserState.Exists() {
@@ -151,21 +147,45 @@ func CheckIntent(intentID, token string) SessionCommand {
 
 func CheckTOTP(code string) SessionCommand {
 	return func(ctx context.Context, cmd *SessionCommands) (_ []eventstore.Command, err error) {
-		if cmd.sessionWriteModel.UserID == "" {
-			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing")
-		}
-		cmd.totpWriteModel = NewHumanTOTPWriteModel(cmd.sessionWriteModel.UserID, "")
-		err = cmd.eventstore.FilterToQueryReducer(ctx, cmd.totpWriteModel)
+		//writeModel := func(ctx context.Context, userID string, resourceOwner string) (OTPCodeWriteModel, error) {
+		//	totpWriteModel := NewHumanTOTPWriteModel(cmd.sessionWriteModel.UserID, "")
+		//	err = cmd.eventstore.FilterToQueryReducer(ctx, cmd.totpWriteModel)
+		//	return totpWriteModel, err
+		//}
+		//succeededEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, info *user.AuthRequestInfo) eventstore.Command {
+		//	return user.NewHumanOTPSMSCheckSucceededEvent(ctx, aggregate, nil)
+		//}
+		//failedEvent := func(ctx context.Context, aggregate *eventstore.Aggregate, info *user.AuthRequestInfo) eventstore.Command {
+		//	return user.NewHumanOTPSMSCheckFailedEvent(ctx, aggregate, nil)
+		//}
+		commands, err := checkTOTP(
+			ctx,
+			cmd.sessionWriteModel.UserID,
+			"",
+			code,
+			cmd.eventstore.FilterToQueryReducer,
+			cmd.totpAlg,
+			nil,
+		)
 		if err != nil {
-			return nil, err
+			return commands, err
 		}
-		if cmd.totpWriteModel.State != domain.MFAStateReady {
-			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady")
-		}
-		err = domain.VerifyTOTP(code, cmd.totpWriteModel.Secret, cmd.totpAlg)
-		if err != nil {
-			return nil, err
-		}
+		cmd.eventCommands = append(cmd.eventCommands, commands...)
+		//if cmd.sessionWriteModel.UserID == "" {
+		//	return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing")
+		//}
+		//cmd.totpWriteModel = NewHumanTOTPWriteModel(cmd.sessionWriteModel.UserID, "")
+		//err = cmd.eventstore.FilterToQueryReducer(ctx, cmd.totpWriteModel)
+		//if err != nil {
+		//	return nil, err
+		//}
+		//if cmd.totpWriteModel.State != domain.MFAStateReady {
+		//	return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady")
+		//}
+		//err = domain.VerifyTOTP(code, cmd.totpWriteModel.Secret, cmd.totpAlg)
+		//if err != nil {
+		//	return nil, err
+		//}
 		cmd.TOTPChecked(ctx, cmd.now())
 		return nil, nil
 	}

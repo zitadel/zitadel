@@ -492,10 +492,8 @@ func checkPassword(ctx context.Context, userID, password string, es *eventstore.
 
 	lockoutPolicy, lockoutErr := getLockoutPolicy(ctx, wm.ResourceOwner, es.FilterToQueryReducer)
 	logging.OnError(lockoutErr).Error("unable to get lockout policy")
-	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 {
-		if wm.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
-			commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
-		}
+	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 && wm.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
+		commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
 	}
 	return commands, err
 }
