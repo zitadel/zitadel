@@ -59,7 +59,11 @@ Flags:
       --config stringArray       path to config file to overwrite system defaults
 
       --ignore-previous          ignores previous migrations of the events table. This flag should be used if you manually dropped previously mirrored events.
-      --replace                  replaces all data except events and projections
+      --replace                  replaces all data of the following tables for the provided instances or all if the `--system`-flag is set:
+                                 * system.assets
+                                 * auth.auth_requests
+                                 * eventstore.unique_constraints
+                                 The should be provided if you want to execute the mirror command multiple times so that the static data are also mirrored to prevent inconsistent states.
 
       --instance strings         id or comma separated ids of the instance(s) to migrate. Either this or the `--system`-flag must be set
       --system                   migrates the whole system. Either this or the `--instance`-flag must be set

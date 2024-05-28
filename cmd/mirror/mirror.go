@@ -52,7 +52,11 @@ Order of execution:
 
 	migrateFlags(cmd)
 	cmd.Flags().BoolVar(&shouldIgnorePrevious, "ignore-previous", false, "ignores previous migrations of the events table")
-	cmd.Flags().BoolVar(&shouldReplace, "replace", false, "replaces all data except events and projections")
+	cmd.Flags().BoolVar(&shouldReplace, "replace", false, `replaces all data of the following tables for the provided instances or all if the "--system"-flag is set:
+* system.assets
+* auth.auth_requests
+* eventstore.unique_constraints
+The flag should be provided if you want to execute the mirror command multiple times so that the static data are also mirrored to prevent inconsistent states.`)
 	migrateProjectionsFlags(cmd)
 
 	err := viper.MergeConfig(bytes.NewBuffer(defaultConfig))
