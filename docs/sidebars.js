@@ -885,9 +885,12 @@ module.exports = {
           type: "category",
           label: "Command Line Interface",
           collapsed: false,
+          link: {
+            type: "doc",
+            id: "self-hosting/manage/cli/overview"
+          },
           items: [
-            "self-hosting/manage/cli/overview",
-            "self-hosting/manage/cli/mirror",
+            "self-hosting/manage/cli/mirror"
           ],
         },
       ],
