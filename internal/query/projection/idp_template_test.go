@@ -2774,6 +2774,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
     },
 	"certificate": `+stringToJSONByte("certificate")+`,
 	"binding": "binding",
+	"nameIDFormat": 3,
+	"transientMappingAttributeName": "customAttribute",
 	"withSignedRequest": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
@@ -2810,7 +2812,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, transient_mapping_attribute_name, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2819,6 +2821,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								anyArg{},
 								"binding",
 								true,
+								"customAttribute",
+								domain.SAMLNameIDFormatTransient,
 							},
 						},
 					},
@@ -2842,6 +2846,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
     },
 	"certificate": `+stringToJSONByte("certificate")+`,
 	"binding": "binding",
+	"nameIDFormat": 3,
+	"transientMappingAttributeName": "customAttribute",
 	"withSignedRequest": true,
 	"isCreationAllowed": true,
 	"isLinkingAllowed": true,
@@ -2878,7 +2884,7 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_templates6_saml (idp_id, instance_id, metadata, key, certificate, binding, with_signed_request, transient_mapping_attribute_name, name_id_format) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"idp-id",
 								"instance-id",
@@ -2887,6 +2893,8 @@ func TestIDPTemplateProjection_reducesSAML(t *testing.T) {
 								anyArg{},
 								"binding",
 								true,
+								"customAttribute",
+								domain.SAMLNameIDFormatTransient,
 							},
 						},
 					},

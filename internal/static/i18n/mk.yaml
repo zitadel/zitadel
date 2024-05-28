@@ -516,6 +516,7 @@ Errors:
     IDPMissing: ID на IDP недостасува во барањето6bg
     IDPInvalid: ВРЛ неважечки за барањето
     ResponseInvalid: Одговорот на ВРЛ е неважечки
+    MissingSingleMappingAttribute: не го содржи атрибутот за мапирање или има повеќе од една вредност
     SuccessURLMissing: URL за успех недостасува во барањето
     FailureURLMissing: URL за неуспех недостасува во барањето
     StateMissing: Параметарот State недостасува во барањето
@@ -614,6 +615,7 @@ EventTypes:
         failed: Проверката на иницијализацијата е неуспешна
     token:
       added: Креиран е токен за пристап
+      v2.added: Креиран е токен за пристап
       removed: Токенот за пристап е отстранет
     impersonated: Корисникот имитиран
     username:

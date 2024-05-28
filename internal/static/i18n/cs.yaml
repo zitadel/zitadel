@@ -515,6 +515,7 @@ Errors:
     IDPMissing: V požadavku chybí IDP ID
     IDPInvalid: IDP je pro požadavek neplatné
     ResponseInvalid: Odpověď IDP je neplatná
+    MissingSingleMappingAttribute: Neobsahuje atribut mapování nebo má více než jednu hodnotu
     SuccessURLMissing: V požadavku chybí úspěšná URL
     FailureURLMissing: V požadavku chybí URL selhání
     StateMissing: V požadavku chybí parametr stavu
@@ -613,6 +614,7 @@ EventTypes:
         failed: Kontrola inicializace selhala
     token:
       added: Přístupový token vytvořen
+      v2.added: Přístupový token vytvořen
       removed: Přístupový token odstraněn
     impersonated: Usuario suplantado
     username:

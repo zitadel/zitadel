@@ -37,4 +37,22 @@ message LegalAndSupportSettings {
       description: "resource_owner_type returns if the setting is managed on the organization or on the instance";
     }
   ];
+  string docs_link = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Link to documentation to be shown in the console.";
+        example: "\"https://zitadel.com/docs\"";
+    }
+];
+string custom_link = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "Link to an external resource that will be available to users in the console.";
+        example: "\"https://external.link\"";
+    }
+];
+string custom_link_text = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "The button text that would be shown in console pointing to custom link.";
+        example: "\"External\"";
+    }
+];
 }

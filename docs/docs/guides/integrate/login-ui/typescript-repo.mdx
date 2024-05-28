@@ -76,12 +76,14 @@ The application can then request a token calling the /token endpoint of the logi
 - [ ] AuthRequest UI locales
 - Multifactor
   - [x] Passkeys
-  - [ ] TOTP
+  - [x] TOTP
+  - [x] OTP via email
+  - [x] OTP via SMS
 - Passwordless
   - [x] Passkeys
 - Security Prompts
   - [x] Setup Passkey as Passwordless method
-  - [ ] Setup TOTP as Multifactor
+  - [x] Setup TOTP as Multifactor
   - [ ] Password Change
 - Login
   - [x] Email Password
@@ -89,7 +91,7 @@ The application can then request a token calling the /token endpoint of the logi
   - [x] IDPs
     - [x] Google
     - [ ] GitHub
-    - [ ] GitLab
+    - [x] GitLab
     - [ ] Azure
     - [ ] Apple
 - Register
@@ -104,8 +106,12 @@ Authenticated users are directly able to self service their account.
 - [ ] Change user information
 - [ ] Password Change
 - [x] Setup Passkey
-- [ ] Setup Multifactor TOTP
-- [ ] Setup Multifactor Passkey (U2F)
+- [x] Setup Multifactor
+  - [x] Passkeys
+  - [x] TOTP
+  - [x] OTP via email
+  - [x] OTP via SMS
+- [x] Setup Multifactor Passkey (U2F)
 - [ ] Validate Account (email verification)
 
 ### Setup

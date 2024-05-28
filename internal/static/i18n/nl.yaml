@@ -516,6 +516,7 @@ Errors:
     IDPMissing: IDP ID ontbreekt in het verzoek
     IDPInvalid: IDP ongeldig voor het verzoek
     ResponseInvalid: IDP respons is ongeldig
+    MissingSingleMappingAttribute: Bevat kenmerk toewijzing niet of heeft meer dan één waarde
     SuccessURLMissing: Success URL ontbreekt in het verzoek
     FailureURLMissing: Failure URL ontbreekt in het verzoek
     StateMissing: Staat parameter ontbreekt in het verzoek
@@ -614,6 +615,7 @@ EventTypes:
         failed: Initialisatiecontrole mislukt
     token:
       added: Toegangstoken aangemaakt
+      v2.added: Toegangstoken aangemaakt
       removed: Toegangstoken verwijderd
     impersonated: Gebruiker nagebootst
     username:

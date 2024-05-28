@@ -94,7 +94,7 @@ func (a *AuthRequest) oidc() *domain.AuthRequestOIDC {
 	return a.Request.(*domain.AuthRequestOIDC)
 }
 
-func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ op.AuthRequest, err error) {
+func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ *AuthRequest, err error) {
 	if _, ok := authReq.Request.(*domain.AuthRequestOIDC); !ok {
 		return nil, zerrors.ThrowInvalidArgument(nil, "OIDC-Haz7A", "auth request is not of type oidc")
 	}

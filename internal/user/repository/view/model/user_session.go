@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/zitadel/logging"
@@ -14,48 +15,63 @@ import (
 )
 
 const (
-	UserSessionKeyUserAgentID   = "user_agent_id"
-	UserSessionKeyUserID        = "user_id"
-	UserSessionKeyState         = "state"
-	UserSessionKeyResourceOwner = "resource_owner"
-	UserSessionKeyInstanceID    = "instance_id"
-	UserSessionKeyOwnerRemoved  = "owner_removed"
+	UserSessionKeyUserAgentID                  = "user_agent_id"
+	UserSessionKeyUserID                       = "user_id"
+	UserSessionKeyState                        = "state"
+	UserSessionKeyResourceOwner                = "resource_owner"
+	UserSessionKeyInstanceID                   = "instance_id"
+	UserSessionKeyOwnerRemoved                 = "owner_removed"
+	UserSessionKeyCreationDate                 = "creation_date"
+	UserSessionKeyChangeDate                   = "change_date"
+	UserSessionKeySequence                     = "sequence"
+	UserSessionKeyPasswordVerification         = "password_verification"
+	UserSessionKeySecondFactorVerification     = "second_factor_verification"
+	UserSessionKeySecondFactorVerificationType = "second_factor_verification_type"
+	UserSessionKeyMultiFactorVerification      = "multi_factor_verification"
+	UserSessionKeyMultiFactorVerificationType  = "multi_factor_verification_type"
+	UserSessionKeyPasswordlessVerification     = "passwordless_verification"
+	UserSessionKeyExternalLoginVerification    = "external_login_verification"
+	UserSessionKeySelectedIDPConfigID          = "selected_idp_config_id"
 )
 
 type UserSessionView struct {
-	CreationDate  time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
-	ResourceOwner string    `json:"-" gorm:"column:resource_owner"`
-	State         int32     `json:"-" gorm:"column:state"`
-	UserAgentID   string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
-	UserID        string    `json:"userID" gorm:"column:user_id;primary_key"`
+	CreationDate  time.Time                         `json:"-" gorm:"column:creation_date"`
+	ChangeDate    time.Time                         `json:"-" gorm:"column:change_date"`
+	ResourceOwner string                            `json:"-" gorm:"column:resource_owner"`
+	State         sql.Null[domain.UserSessionState] `json:"-" gorm:"column:state"`
+	UserAgentID   string                            `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
+	UserID        string                            `json:"userID" gorm:"column:user_id;primary_key"`
 	// As of https://github.com/zitadel/zitadel/pull/7199 the following 4 attributes
 	// are not projected in the user session handler anymore
 	// and are therefore annotated with a `gorm:"-"`.
 	// They will be read from the corresponding projection directly.
-	UserName                     string    `json:"-" gorm:"-"`
-	LoginName                    string    `json:"-" gorm:"-"`
-	DisplayName                  string    `json:"-" gorm:"-"`
-	AvatarKey                    string    `json:"-" gorm:"-"`
-	SelectedIDPConfigID          string    `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
-	PasswordVerification         time.Time `json:"-" gorm:"column:password_verification"`
-	PasswordlessVerification     time.Time `json:"-" gorm:"column:passwordless_verification"`
-	ExternalLoginVerification    time.Time `json:"-" gorm:"column:external_login_verification"`
-	SecondFactorVerification     time.Time `json:"-" gorm:"column:second_factor_verification"`
-	SecondFactorVerificationType int32     `json:"-" gorm:"column:second_factor_verification_type"`
-	MultiFactorVerification      time.Time `json:"-" gorm:"column:multi_factor_verification"`
-	MultiFactorVerificationType  int32     `json:"-" gorm:"column:multi_factor_verification_type"`
-	Sequence                     uint64    `json:"-" gorm:"column:sequence"`
-	InstanceID                   string    `json:"instanceID" gorm:"column:instance_id;primary_key"`
+	UserName                     sql.NullString `json:"-" gorm:"-"`
+	LoginName                    sql.NullString `json:"-" gorm:"-"`
+	DisplayName                  sql.NullString `json:"-" gorm:"-"`
+	AvatarKey                    sql.NullString `json:"-" gorm:"-"`
+	SelectedIDPConfigID          sql.NullString `json:"selectedIDPConfigID" gorm:"column:selected_idp_config_id"`
+	PasswordVerification         sql.NullTime   `json:"-" gorm:"column:password_verification"`
+	PasswordlessVerification     sql.NullTime   `json:"-" gorm:"column:passwordless_verification"`
+	ExternalLoginVerification    sql.NullTime   `json:"-" gorm:"column:external_login_verification"`
+	SecondFactorVerification     sql.NullTime   `json:"-" gorm:"column:second_factor_verification"`
+	SecondFactorVerificationType sql.NullInt32  `json:"-" gorm:"column:second_factor_verification_type"`
+	MultiFactorVerification      sql.NullTime   `json:"-" gorm:"column:multi_factor_verification"`
+	MultiFactorVerificationType  sql.NullInt32  `json:"-" gorm:"column:multi_factor_verification_type"`
+	Sequence                     uint64         `json:"-" gorm:"column:sequence"`
+	InstanceID                   string         `json:"instanceID" gorm:"column:instance_id;primary_key"`
 }
 
-func UserSessionFromEvent(event eventstore.Event) (*UserSessionView, error) {
-	v := new(UserSessionView)
-	if err := event.Unmarshal(v); err != nil {
-		logging.Log("EVEN-lso9e").WithError(err).Error("could not unmarshal event data")
-		return nil, zerrors.ThrowInternal(nil, "MODEL-sd325", "could not unmarshal data")
+type userAgentIDPayload struct {
+	ID string `json:"userAgentID"`
+}
+
+func UserAgentIDFromEvent(event eventstore.Event) (string, error) {
+	payload := new(userAgentIDPayload)
+	if err := event.Unmarshal(payload); err != nil {
+		logging.WithError(err).Error("could not unmarshal event data")
+		return "", zerrors.ThrowInternal(nil, "MODEL-HJwk9", "could not unmarshal data")
 	}
-	return v, nil
+	return payload.ID, nil
 }
 
 func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
@@ -63,21 +79,21 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		ChangeDate:                   userSession.ChangeDate,
 		CreationDate:                 userSession.CreationDate,
 		ResourceOwner:                userSession.ResourceOwner,
-		State:                        domain.UserSessionState(userSession.State),
+		State:                        userSession.State.V,
 		UserAgentID:                  userSession.UserAgentID,
 		UserID:                       userSession.UserID,
-		UserName:                     userSession.UserName,
-		LoginName:                    userSession.LoginName,
-		DisplayName:                  userSession.DisplayName,
-		AvatarKey:                    userSession.AvatarKey,
-		SelectedIDPConfigID:          userSession.SelectedIDPConfigID,
-		PasswordVerification:         userSession.PasswordVerification,
-		PasswordlessVerification:     userSession.PasswordlessVerification,
-		ExternalLoginVerification:    userSession.ExternalLoginVerification,
-		SecondFactorVerification:     userSession.SecondFactorVerification,
-		SecondFactorVerificationType: domain.MFAType(userSession.SecondFactorVerificationType),
-		MultiFactorVerification:      userSession.MultiFactorVerification,
-		MultiFactorVerificationType:  domain.MFAType(userSession.MultiFactorVerificationType),
+		UserName:                     userSession.UserName.String,
+		LoginName:                    userSession.LoginName.String,
+		DisplayName:                  userSession.DisplayName.String,
+		AvatarKey:                    userSession.AvatarKey.String,
+		SelectedIDPConfigID:          userSession.SelectedIDPConfigID.String,
+		PasswordVerification:         userSession.PasswordVerification.Time,
+		PasswordlessVerification:     userSession.PasswordlessVerification.Time,
+		ExternalLoginVerification:    userSession.ExternalLoginVerification.Time,
+		SecondFactorVerification:     userSession.SecondFactorVerification.Time,
+		SecondFactorVerificationType: domain.MFAType(userSession.SecondFactorVerificationType.Int32),
+		MultiFactorVerification:      userSession.MultiFactorVerification.Time,
+		MultiFactorVerificationType:  domain.MFAType(userSession.MultiFactorVerificationType.Int32),
 		Sequence:                     userSession.Sequence,
 	}
 }
@@ -91,34 +107,35 @@ func UserSessionsToModel(userSessions []*UserSessionView) []*model.UserSessionVi
 }
 
 func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
+	// in case anything needs to be change here check if the Reduce function needs the change as well
 	v.Sequence = event.Sequence()
 	v.ChangeDate = event.CreatedAt()
 	switch event.Type() {
 	case user.UserV1PasswordCheckSucceededType,
 		user.HumanPasswordCheckSucceededType:
-		v.PasswordVerification = event.CreatedAt()
-		v.State = int32(domain.UserSessionStateActive)
+		v.PasswordVerification = sql.NullTime{Time: event.CreatedAt(), Valid: true}
+		v.State.V = domain.UserSessionStateActive
 	case user.UserIDPLoginCheckSucceededType:
 		data := new(es_model.AuthRequest)
 		err := data.SetData(event)
 		if err != nil {
 			return err
 		}
-		v.ExternalLoginVerification = event.CreatedAt()
-		v.SelectedIDPConfigID = data.SelectedIDPConfigID
-		v.State = int32(domain.UserSessionStateActive)
+		v.ExternalLoginVerification = sql.NullTime{Time: event.CreatedAt(), Valid: true}
+		v.SelectedIDPConfigID = sql.NullString{String: data.SelectedIDPConfigID, Valid: true}
+		v.State.V = domain.UserSessionStateActive
 	case user.HumanPasswordlessTokenCheckSucceededType:
-		v.PasswordlessVerification = event.CreatedAt()
-		v.MultiFactorVerification = event.CreatedAt()
-		v.MultiFactorVerificationType = int32(domain.MFATypeU2FUserVerification)
-		v.State = int32(domain.UserSessionStateActive)
+		v.PasswordlessVerification = sql.NullTime{Time: event.CreatedAt(), Valid: true}
+		v.MultiFactorVerification = sql.NullTime{Time: event.CreatedAt(), Valid: true}
+		v.MultiFactorVerificationType = sql.NullInt32{Int32: int32(domain.MFATypeU2FUserVerification)}
+		v.State.V = domain.UserSessionStateActive
 	case user.HumanPasswordlessTokenCheckFailedType,
 		user.HumanPasswordlessTokenRemovedType:
-		v.PasswordlessVerification = time.Time{}
-		v.MultiFactorVerification = time.Time{}
+		v.PasswordlessVerification = sql.NullTime{Time: time.Time{}, Valid: true}
+		v.MultiFactorVerification = sql.NullTime{Time: time.Time{}, Valid: true}
 	case user.UserV1PasswordCheckFailedType,
 		user.HumanPasswordCheckFailedType:
-		v.PasswordVerification = time.Time{}
+		v.PasswordVerification = sql.NullTime{Time: time.Time{}, Valid: true}
 	case user.UserV1PasswordChangedType,
 		user.HumanPasswordChangedType:
 		data := new(es_model.PasswordChange)
@@ -127,7 +144,7 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 			return err
 		}
 		if v.UserAgentID != data.UserAgentID {
-			v.PasswordVerification = time.Time{}
+			v.PasswordVerification = sql.NullTime{Time: time.Time{}, Valid: true}
 		}
 	case user.HumanMFAOTPVerifiedType:
 		data := new(es_model.OTPVerified)
@@ -167,7 +184,7 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 		user.HumanU2FTokenRemovedType,
 		user.HumanOTPSMSCheckFailedType,
 		user.HumanOTPEmailCheckFailedType:
-		v.SecondFactorVerification = time.Time{}
+		v.SecondFactorVerification = sql.NullTime{Time: time.Time{}, Valid: true}
 	case user.HumanU2FTokenVerifiedType:
 		data := new(es_model.WebAuthNVerify)
 		err := data.SetData(event)
@@ -183,25 +200,25 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 		user.HumanSignedOutType,
 		user.UserLockedType,
 		user.UserDeactivatedType:
-		v.PasswordlessVerification = time.Time{}
-		v.PasswordVerification = time.Time{}
-		v.SecondFactorVerification = time.Time{}
-		v.SecondFactorVerificationType = int32(domain.MFALevelNotSetUp)
-		v.MultiFactorVerification = time.Time{}
-		v.MultiFactorVerificationType = int32(domain.MFALevelNotSetUp)
-		v.ExternalLoginVerification = time.Time{}
-		v.State = int32(domain.UserSessionStateTerminated)
+		v.PasswordlessVerification = sql.NullTime{Time: time.Time{}, Valid: true}
+		v.PasswordVerification = sql.NullTime{Time: time.Time{}, Valid: true}
+		v.SecondFactorVerification = sql.NullTime{Time: time.Time{}, Valid: true}
+		v.SecondFactorVerificationType = sql.NullInt32{Int32: int32(domain.MFALevelNotSetUp)}
+		v.MultiFactorVerification = sql.NullTime{Time: time.Time{}, Valid: true}
+		v.MultiFactorVerificationType = sql.NullInt32{Int32: int32(domain.MFALevelNotSetUp)}
+		v.ExternalLoginVerification = sql.NullTime{Time: time.Time{}, Valid: true}
+		v.State.V = domain.UserSessionStateTerminated
 	case user.UserIDPLinkRemovedType, user.UserIDPLinkCascadeRemovedType:
-		v.ExternalLoginVerification = time.Time{}
-		v.SelectedIDPConfigID = ""
+		v.ExternalLoginVerification = sql.NullTime{Time: time.Time{}, Valid: true}
+		v.SelectedIDPConfigID = sql.NullString{String: "", Valid: true}
 	}
 	return nil
 }
 
 func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time, mfaType domain.MFAType) {
-	v.SecondFactorVerification = verificationTime
-	v.SecondFactorVerificationType = int32(mfaType)
-	v.State = int32(domain.UserSessionStateActive)
+	v.SecondFactorVerification = sql.NullTime{Time: verificationTime, Valid: true}
+	v.SecondFactorVerificationType = sql.NullInt32{Int32: int32(mfaType)}
+	v.State.V = domain.UserSessionStateActive
 }
 
 func (v *UserSessionView) EventTypes() []eventstore.EventType {

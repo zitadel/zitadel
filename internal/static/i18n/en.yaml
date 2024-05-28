@@ -517,6 +517,7 @@ Errors:
     IDPMissing: IDP ID is missing in the request
     IDPInvalid: IDP invalid for the request
     ResponseInvalid: IDP response is invalid
+    MissingSingleMappingAttribute: IDP response does not contain the mapping attribute or has more than one value
     SuccessURLMissing: Success URL is missing in the request
     FailureURLMissing: Failure URL is missing in the request
     StateMissing: State parameter is missing in the request
@@ -615,6 +616,7 @@ EventTypes:
         failed: Initialization check failed
     token:
       added: Access Token created
+      v2.added: Access Token created
       removed: Access Token removed
     impersonated: User impersonated
     username:

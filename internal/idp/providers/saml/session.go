@@ -17,13 +17,27 @@ var _ idp.Session = (*Session)(nil)
 
 // Session is the [idp.Session] implementation for the SAML provider.
 type Session struct {
-	ServiceProvider *samlsp.Middleware
-	state           string
+	ServiceProvider               *samlsp.Middleware
+	state                         string
+	TransientMappingAttributeName string
 
 	RequestID string
 	Request   *http.Request
 
 	Assertion *saml.Assertion
+}
+
+func NewSession(provider *Provider, requestID string, request *http.Request) (*Session, error) {
+	sp, err := provider.GetSP()
+	if err != nil {
+		return nil, err
+	}
+	return &Session{
+		ServiceProvider:               sp,
+		TransientMappingAttributeName: provider.TransientMappingAttributeName(),
+		RequestID:                     requestID,
+		Request:                       request,
+	}, nil
 }
 
 // GetAuth implements the [idp.Session] interface.
@@ -56,8 +70,17 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		return nil, zerrors.ThrowInvalidArgument(err, "SAML-nuo0vphhh9", "Errors.Intent.ResponseInvalid")
 	}
 
+	nameID := s.Assertion.Subject.NameID
 	userMapper := NewUser()
-	userMapper.SetID(s.Assertion.Subject.NameID)
+	// use the nameID as default mapping id
+	userMapper.SetID(nameID.Value)
+	if nameID.Format == string(saml.TransientNameIDFormat) {
+		mappingID, err := s.transientMappingID()
+		if err != nil {
+			return nil, err
+		}
+		userMapper.SetID(mappingID)
+	}
 	for _, statement := range s.Assertion.AttributeStatements {
 		for _, attribute := range statement.Attributes {
 			values := make([]string, len(attribute.Values))
@@ -68,6 +91,21 @@ func (s *Session) FetchUser(ctx context.Context) (user idp.User, err error) {
 		}
 	}
 	return userMapper, nil
+}
+
+func (s *Session) transientMappingID() (string, error) {
+	for _, statement := range s.Assertion.AttributeStatements {
+		for _, attribute := range statement.Attributes {
+			if attribute.Name != s.TransientMappingAttributeName {
+				continue
+			}
+			if len(attribute.Values) != 1 {
+				return "", zerrors.ThrowInvalidArgument(nil, "SAML-Soij4", "Errors.Intent.MissingSingleMappingAttribute")
+			}
+			return attribute.Values[0].Value, nil
+		}
+	}
+	return "", zerrors.ThrowInvalidArgument(nil, "SAML-swwg2", "Errors.Intent.MissingSingleMappingAttribute")
 }
 
 type TempResponseWriter struct {

@@ -27,7 +27,6 @@ import {
   GetMyPhoneRequest,
   GetMyPhoneResponse,
   GetMyPrivacyPolicyRequest,
-  GetMyPrivacyPolicyResponse,
   GetMyProfileRequest,
   GetMyProfileResponse,
   GetMyUserRequest,
@@ -99,11 +98,10 @@ import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { Org, OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
-import { LabelPolicy } from '../proto/generated/zitadel/policy_pb';
+import { LabelPolicy, PrivacyPolicy } from '../proto/generated/zitadel/policy_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
-import { ThemeService } from './theme.service';
 
 @Injectable({
   providedIn: 'root',
@@ -137,11 +135,18 @@ export class GrpcAuthService {
   >(undefined);
   labelPolicyLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
+  public privacypolicy$!: Observable<PrivacyPolicy.AsObject>;
+  public privacypolicy: BehaviorSubject<PrivacyPolicy.AsObject | undefined> = new BehaviorSubject<
+    PrivacyPolicy.AsObject | undefined
+  >(undefined);
+  privacyPolicyLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+
   public zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
   public readonly fetchedZitadelPermissions: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   public cachedOrgs: BehaviorSubject<Org.AsObject[]> = new BehaviorSubject<Org.AsObject[]>([]);
   private cachedLabelPolicies: { [orgId: string]: LabelPolicy.AsObject } = {};
+  private cachedPrivacyPolicies: { [orgId: string]: PrivacyPolicy.AsObject } = {};
 
   constructor(
     private readonly grpcService: GrpcService,
@@ -166,6 +171,25 @@ export class GrpcAuthService {
       error: (error) => {
         console.error(error);
         this.labelPolicyLoading$.next(false);
+      },
+    });
+
+    this.privacypolicy$ = this.activeOrgChanged.pipe(
+      switchMap((org) => {
+        this.privacyPolicyLoading$.next(true);
+        return from(this.getMyPrivacyPolicy(org ? org.id : ''));
+      }),
+      filter((policy) => !!policy),
+    );
+
+    this.privacypolicy$.subscribe({
+      next: (policy) => {
+        this.privacypolicy.next(policy);
+        this.privacyPolicyLoading$.next(false);
+      },
+      error: (error) => {
+        console.error(error);
+        this.privacyPolicyLoading$.next(false);
       },
     });
 
@@ -394,9 +418,12 @@ export class GrpcAuthService {
     if (queryList) {
       req.setQueriesList(queryList);
     }
-    // if (sortingColumn) {
-    //     req.setSortingColumn(sortingColumn);
-    // }
+    if (sortingDirection) {
+      query.setAsc(sortingDirection === 'asc');
+    }
+    if (sortingColumn) {
+      req.setSortingColumn(sortingColumn);
+    }
 
     req.setQuery(query);
 
@@ -697,7 +724,23 @@ export class GrpcAuthService {
     }
   }
 
-  public getMyPrivacyPolicy(): Promise<GetMyPrivacyPolicyResponse.AsObject> {
-    return this.grpcService.auth.getMyPrivacyPolicy(new GetMyPrivacyPolicyRequest(), null).then((resp) => resp.toObject());
+  public getMyPrivacyPolicy(orgIdForCache?: string): Promise<PrivacyPolicy.AsObject> {
+    if (orgIdForCache && this.cachedPrivacyPolicies[orgIdForCache]) {
+      return Promise.resolve(this.cachedPrivacyPolicies[orgIdForCache]);
+    } else {
+      return this.grpcService.auth
+        .getMyPrivacyPolicy(new GetMyPrivacyPolicyRequest(), null)
+        .then((resp) => resp.toObject())
+        .then((resp) => {
+          if (resp.policy) {
+            if (orgIdForCache) {
+              this.cachedPrivacyPolicies[orgIdForCache] = resp.policy;
+            }
+            return Promise.resolve(resp.policy);
+          } else {
+            return Promise.reject();
+          }
+        });
+    }
   }
 }
