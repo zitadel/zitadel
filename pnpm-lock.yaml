@@ -236,6 +236,25 @@ importers:
         specifier: ^1.139.0
         version: 1.146.0
 
+  packages/zitadel-client2:
+    dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^1.8.0
+        version: 1.9.0
+      '@connectrpc/connect':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.9.0)
+      '@zitadel/proto':
+        specifier: workspace:*
+        version: link:../zitadel-proto
+    devDependencies:
+      '@zitadel/tsconfig':
+        specifier: workspace:*
+        version: link:../zitadel-tsconfig
+      eslint-config-zitadel:
+        specifier: workspace:*
+        version: link:../eslint-config-zitadel
+
   packages/zitadel-next:
     dependencies:
       '@zitadel/react':
@@ -652,6 +671,11 @@ packages:
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==, tarball: https://registry.npmjs.org/@colors/colors/-/colors-1.5.0.tgz}
     engines: {node: '>=0.1.90'}
+
+  '@connectrpc/connect@1.4.0':
+    resolution: {integrity: sha512-vZeOkKaAjyV4+RH3+rJZIfDFJAfr+7fyYr6sLDKbYX3uuTVszhFe9/YKf5DNqrDb5cKdKVlYkGn6DTDqMitAnA==, tarball: https://registry.npmjs.org/@connectrpc/connect/-/connect-1.4.0.tgz}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.4.2
 
   '@cypress/request@3.0.1':
     resolution: {integrity: sha512-TWivJlJi8ZDx2wGOw1dbLuHJKUYX7bWySw377nlnGOW3hP9/MUKIsEdXT/YngWxVdgNCHRBmFlBipE+5/2ZZlQ==, tarball: https://registry.npmjs.org/@cypress/request/-/request-3.0.1.tgz}
@@ -5292,6 +5316,10 @@ snapshots:
 
   '@colors/colors@1.5.0':
     optional: true
+
+  '@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.9.0)':
+    dependencies:
+      '@bufbuild/protobuf': 1.9.0
 
   '@cypress/request@3.0.1':
     dependencies:
