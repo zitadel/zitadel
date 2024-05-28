@@ -83,7 +83,7 @@ Each organization within this instance can then choose to use this identity prov
 Reusable resources have the same behavior as standard resources with the following additions:
 
 - Reusable resources can be created in a given context level (system, instance, org).
-- For requests, that require a request ID, no request context is needed.
+- For requests, that require a resource ID, no request context is needed.
 - Reusable resources are available in child contexts and by default have the same state (active or inactive) as in their immediate parent context.
 - In child contexts, the state of a reused resource is *inherited* by default and can be changed to *active*, *inactive* or *inherit*.
 - In child contexts, a reused resources configuration is read-only.
