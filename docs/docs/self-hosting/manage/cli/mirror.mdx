@@ -58,7 +58,7 @@ Flags:
 
       --config stringArray       path to config file to overwrite system defaults
 
-      --ignore-previous          ignores previous migrations of the events table. This flag should be used if you copy to a fresh environment with the same name as a previous migration.
+      --ignore-previous          ignores previous migrations of the events table. This flag should be used if you manually dropped previously mirrored events.
       --replace                  replaces all data except events and projections
 
       --instance strings         id or comma separated ids of the instance(s) to migrate. Either this or the `--system`-flag must be set
@@ -166,10 +166,6 @@ Projections:
   # Limits the amount of events projected by each iteration
   EventBulkLimit: 1000 # ZITADEL_PROJECTIONS_EVENTBULKLIMIT
 
-Eventstore:
-  # Limit the maximum amount of client side retries of the eventstore push command
-  MaxRetries: 3 # ZITADEL_EVENTSTORE_MAXRETRIES
-
 Auth:
   Spooler:
     # Limits the amount of events projected by each iteration
@@ -214,11 +210,12 @@ Prints the amount of rows of the source and destination database and the diff. P
 
 The following tables will likely have an unequal count:
 
-* **eventstore.events2**: because only event of instances are migrated
 * **projections.current_states**: If your deployment was upgraded several times, the number of entries in the destination will be lower
 * **projections.locks**: If your deployment was upgraded several times, the number of entries in the destination will be lower
-* **projections.keys4\***: Only not expired keys are inserted
+* **projections.keys4\***: Only not expired keys are inserted, the number of entries in the destination will be lower
 * **projections.failed_events**: Should be lower or equal.
+* **auth.users2**: Was replaced with auth.users3, the number of entries in the destination will be 0
+* **auth.users3**: Is the replacement of auth.users2, the number of entries in the destination will be equal or higher
 
 ## Limitations
 
