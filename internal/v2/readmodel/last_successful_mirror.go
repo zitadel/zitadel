@@ -7,14 +7,14 @@ import (
 )
 
 type LastSuccessfulMirror struct {
-	ID          string
-	Position    eventstore.GlobalPosition
-	destination string
+	ID       string
+	Position float64
+	source   string
 }
 
-func NewLastSuccessfulMirror(destination string) *LastSuccessfulMirror {
+func NewLastSuccessfulMirror(source string) *LastSuccessfulMirror {
 	return &LastSuccessfulMirror{
-		destination: destination,
+		source: source,
 	}
 }
 
@@ -27,11 +27,13 @@ func (p *LastSuccessfulMirror) Filter() *eventstore.Filter {
 			eventstore.AggregateOwnersEqual(system.AggregateOwner),
 			eventstore.AppendEvent(
 				eventstore.SetEventTypes(
-					mirror.StartedType,
 					mirror.SucceededType,
 				),
 				eventstore.EventCreatorsEqual(mirror.Creator),
 			),
+		),
+		eventstore.FilterPagination(
+			eventstore.Descending(),
 		),
 	)
 }
@@ -39,10 +41,7 @@ func (p *LastSuccessfulMirror) Filter() *eventstore.Filter {
 // Reduce implements eventstore.Reducer.
 func (h *LastSuccessfulMirror) Reduce(events ...*eventstore.StorageEvent) (err error) {
 	for _, event := range events {
-		switch event.Type {
-		case mirror.StartedType:
-			err = h.reduceStarted(event)
-		case mirror.SucceededType:
+		if event.Type == mirror.SucceededType {
 			err = h.reduceSucceeded(event)
 		}
 		if err != nil {
@@ -52,27 +51,22 @@ func (h *LastSuccessfulMirror) Reduce(events ...*eventstore.StorageEvent) (err e
 	return nil
 }
 
-func (h *LastSuccessfulMirror) reduceStarted(event *eventstore.StorageEvent) error {
-	startedEvent, err := mirror.StartedEventFromStorage(event)
+func (h *LastSuccessfulMirror) reduceSucceeded(event *eventstore.StorageEvent) error {
+	// if position is set we skip all older events
+	if h.Position > 0 {
+		return nil
+
+	}
+	succeededEvent, err := mirror.SucceededEventFromStorage(event)
 	if err != nil {
 		return err
 	}
 
-	if h.destination != startedEvent.Payload.Destination {
+	if h.source != succeededEvent.Payload.Source {
 		return nil
 	}
 
-	h.ID = event.Aggregate.ID
-
-	return nil
-}
-
-func (h *LastSuccessfulMirror) reduceSucceeded(event *eventstore.StorageEvent) error {
-	if h.ID != event.Aggregate.ID {
-		return nil
-	}
-
-	h.Position = event.Position
+	h.Position = succeededEvent.Payload.Position
 
 	return nil
 }

@@ -6,6 +6,7 @@ import (
 )
 
 type startedPayload struct {
+	// Destination is the name of the database data are mirrored to
 	Destination string `json:"destination"`
 	// Either Instances or System needs to be set
 	Instances []string `json:"instances,omitempty"`

@@ -81,17 +81,20 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	destConn, err := dest.Conn(ctx)
 	logging.OnError(err).Fatal("unable to acquire dest connection")
 
-	es := eventstore.NewEventstoreFromOne(postgres.New(source, &postgres.Config{
+	sourceES := eventstore.NewEventstoreFromOne(postgres.New(source, &postgres.Config{
+		MaxRetries: 3,
+	}))
+	destinationES := eventstore.NewEventstoreFromOne(postgres.New(dest, &postgres.Config{
 		MaxRetries: 3,
 	}))
 
-	previousMigration, err := queryLastSuccessfulMigration(ctx, es, dest.DatabaseName())
+	previousMigration, err := queryLastSuccessfulMigration(ctx, destinationES, source.DatabaseName())
 	logging.OnError(err).Fatal("unable to query latest successful migration")
 
-	maxPosition, err := writeMigrationStart(ctx, es, migrationID, dest.DatabaseName())
+	maxPosition, err := writeMigrationStart(ctx, sourceES, migrationID, dest.DatabaseName())
 	logging.OnError(err).Fatal("unable to write migration started event")
 
-	logging.WithFields("from", previousMigration.Position.Position, "to", maxPosition).Info("start event migration")
+	logging.WithFields("from", previousMigration.Position, "to", maxPosition).Info("start event migration")
 
 	nextPos := make(chan bool, 1)
 	pos := make(chan float64, 1)
@@ -111,7 +114,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 				stmt.WriteString(" AND ")
 				database.NewNumberAtMost(maxPosition).Write(&stmt, "position")
 				stmt.WriteString(" AND ")
-				database.NewNumberGreater(previousMigration.Position.Position).Write(&stmt, "position")
+				database.NewNumberGreater(previousMigration.Position).Write(&stmt, "position")
 				stmt.WriteString(" ORDER BY instance_id, position, in_tx_order")
 				stmt.WriteString(" LIMIT ")
 				stmt.WriteArg(bulkSize)
@@ -134,7 +137,6 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 			return nil
 		})
 		writer.Close()
-		// reader.Close()
 		close(nextPos)
 		errs <- err
 	}()
@@ -173,12 +175,12 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	})
 
 	close(errs)
-	writeCopyEventsDone(ctx, es, migrationID, errs)
+	writeCopyEventsDone(ctx, destinationES, migrationID, source.DatabaseName(), maxPosition, errs)
 
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events migrated")
 }
 
-func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id string, errs <-chan error) {
+func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, source string, position float64, errs <-chan error) {
 	joinedErrs := make([]error, 0, len(errs))
 	for err := range errs {
 		joinedErrs = append(joinedErrs, err)
@@ -187,12 +189,12 @@ func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id stri
 
 	if err != nil {
 		logging.WithError(err).Error("unable to mirror events")
-		err := writeMigrationFailed(ctx, es, id, err)
+		err := writeMigrationFailed(ctx, es, id, source, err)
 		logging.OnError(err).Fatal("unable to write failed event")
 		return
 	}
 
-	err = writeMigrationSucceeded(ctx, es, id)
+	err = writeMigrationSucceeded(ctx, es, id, source, position)
 	logging.OnError(err).Fatal("unable to write failed event")
 }
 

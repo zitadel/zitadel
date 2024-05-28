@@ -10,12 +10,12 @@ import (
 	mirror_event "github.com/zitadel/zitadel/internal/v2/system/mirror"
 )
 
-func queryLastSuccessfulMigration(ctx context.Context, es *eventstore.EventStore, destination string) (*readmodel.LastSuccessfulMirror, error) {
-	lastSuccess := readmodel.NewLastSuccessfulMirror(destination)
+func queryLastSuccessfulMigration(ctx context.Context, destinationES *eventstore.EventStore, source string) (*readmodel.LastSuccessfulMirror, error) {
+	lastSuccess := readmodel.NewLastSuccessfulMirror(source)
 	if shouldIgnorePrevious {
 		return lastSuccess, nil
 	}
-	_, err := es.Query(
+	_, err := destinationES.Query(
 		ctx,
 		eventstore.NewQuery(
 			system.AggregateInstance,
@@ -30,7 +30,7 @@ func queryLastSuccessfulMigration(ctx context.Context, es *eventstore.EventStore
 	return lastSuccess, nil
 }
 
-func writeMigrationStart(ctx context.Context, es *eventstore.EventStore, id string, destination string) (_ float64, err error) {
+func writeMigrationStart(ctx context.Context, sourceES *eventstore.EventStore, id string, destination string) (_ float64, err error) {
 	var cmd *eventstore.Command
 	if len(instanceIDs) > 0 {
 		cmd, err = mirror_event.NewStartedInstancesCommand(destination, instanceIDs)
@@ -43,7 +43,7 @@ func writeMigrationStart(ctx context.Context, es *eventstore.EventStore, id stri
 
 	var position projection.HighestPosition
 
-	err = es.Push(
+	err = sourceES.Push(
 		ctx,
 		eventstore.NewPushIntent(
 			system.AggregateInstance,
@@ -63,8 +63,8 @@ func writeMigrationStart(ctx context.Context, es *eventstore.EventStore, id stri
 	return position.Position, nil
 }
 
-func writeMigrationSucceeded(ctx context.Context, es *eventstore.EventStore, id string) error {
-	return es.Push(
+func writeMigrationSucceeded(ctx context.Context, destinationES *eventstore.EventStore, id, source string, position float64) error {
+	return destinationES.Push(
 		ctx,
 		eventstore.NewPushIntent(
 			system.AggregateInstance,
@@ -72,15 +72,15 @@ func writeMigrationSucceeded(ctx context.Context, es *eventstore.EventStore, id 
 				system.AggregateOwner,
 				system.AggregateType,
 				id,
-				eventstore.CurrentSequenceMatches(1),
-				eventstore.AppendCommands(mirror_event.NewSucceededCommand()),
+				eventstore.CurrentSequenceMatches(0),
+				eventstore.AppendCommands(mirror_event.NewSucceededCommand(source, position)),
 			),
 		),
 	)
 }
 
-func writeMigrationFailed(ctx context.Context, es *eventstore.EventStore, id string, err error) error {
-	return es.Push(
+func writeMigrationFailed(ctx context.Context, destinationES *eventstore.EventStore, id, source string, err error) error {
+	return destinationES.Push(
 		ctx,
 		eventstore.NewPushIntent(
 			system.AggregateInstance,
@@ -88,8 +88,8 @@ func writeMigrationFailed(ctx context.Context, es *eventstore.EventStore, id str
 				system.AggregateOwner,
 				system.AggregateType,
 				id,
-				eventstore.CurrentSequenceMatches(1),
-				eventstore.AppendCommands(mirror_event.NewFailedCommand(err)),
+				eventstore.CurrentSequenceMatches(0),
+				eventstore.AppendCommands(mirror_event.NewFailedCommand(source, err)),
 			),
 		),
 	)

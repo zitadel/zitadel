@@ -7,6 +7,8 @@ import (
 
 type failedPayload struct {
 	Cause string `json:"cause"`
+	// Source is the name of the database data are mirrored to
+	Source string `json:"source"`
 }
 
 const FailedType = eventTypePrefix + "failed"
@@ -35,13 +37,14 @@ func FailedEventFromStorage(event *eventstore.StorageEvent) (e *FailedEvent, _ e
 	}, nil
 }
 
-func NewFailedCommand(cause error) *eventstore.Command {
+func NewFailedCommand(source string, cause error) *eventstore.Command {
 	return &eventstore.Command{
 		Action: eventstore.Action[any]{
 			Creator: Creator,
 			Type:    FailedType,
 			Payload: failedPayload{
-				Cause: cause.Error(),
+				Cause:  cause.Error(),
+				Source: source,
 			},
 			Revision: 1,
 		},
