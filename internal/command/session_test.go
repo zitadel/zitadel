@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -430,8 +431,8 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						func(ctx context.Context, cmd *SessionCommands) error {
-							return zerrors.ThrowInternal(nil, "id", "check failed")
+						func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
+							return nil, zerrors.ThrowInternal(nil, "id", "check failed")
 						},
 					},
 				},
@@ -535,6 +536,7 @@ func TestCommands_updateSession(t *testing.T) {
 						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"userID", "org1", testNow, &language.Afrikaans,
 						),
+						user.NewHumanPasswordCheckSucceededEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, nil),
 						session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow,
 						),
@@ -564,6 +566,13 @@ func TestCommands_updateSession(t *testing.T) {
 							eventFromEventPusher(
 								user.NewHumanPasswordChangedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
 									"$plain$x$password", false, ""),
+							),
+						),
+						expectFilter(), // recheck
+						expectFilter(
+							eventFromEventPusher(
+								org.NewLockoutPolicyAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate,
+									0, 0, false),
 							),
 						),
 					),
@@ -803,6 +812,7 @@ func TestCheckTOTP(t *testing.T) {
 
 	sessAgg := &session.NewAggregate("session1", "instance1").Aggregate
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
+	orgAgg := &org.NewAggregate("org1").Aggregate
 
 	code, err := totp.GenerateCode(key.Secret(), testNow)
 	require.NoError(t, err)
@@ -817,6 +827,7 @@ func TestCheckTOTP(t *testing.T) {
 		code              string
 		fields            fields
 		wantEventCommands []eventstore.Command
+		wantErrorCommands []eventstore.Command
 		wantErr           error
 	}{
 		{
@@ -828,7 +839,7 @@ func TestCheckTOTP(t *testing.T) {
 				},
 				eventstore: expectEventstore(),
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
 		},
 		{
 			name: "filter error",
@@ -862,7 +873,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 				),
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady"),
 		},
 		{
 			name: "otp verify error",
@@ -882,7 +893,14 @@ func TestCheckTOTP(t *testing.T) {
 							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
 						),
 					),
+					expectFilter(), // recheck
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
+					),
 				),
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode"),
 		},
@@ -904,9 +922,11 @@ func TestCheckTOTP(t *testing.T) {
 							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
 						),
 					),
+					expectFilter(), // recheck
 				),
 			},
 			wantEventCommands: []eventstore.Command{
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil),
 				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
 			},
 		},
@@ -919,8 +939,9 @@ func TestCheckTOTP(t *testing.T) {
 				totpAlg:           cryptoAlg,
 				now:               func() time.Time { return testNow },
 			}
-			err := CheckTOTP(tt.code)(ctx, cmd)
+			gotCmds, err := CheckTOTP(tt.code)(ctx, cmd)
 			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantErrorCommands, gotCmds)
 			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
 		})
 	}

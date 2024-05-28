@@ -184,7 +184,7 @@ func checkTOTP(
 	optionalAuthRequestInfo *user.AuthRequestInfo,
 ) ([]eventstore.Command, error) {
 	if userID == "" {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing")
 	}
 	existingOTP := NewHumanTOTPWriteModel(userID, resourceOwner)
 	err := queryReducer(ctx, existingOTP)

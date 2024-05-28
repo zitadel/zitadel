@@ -295,8 +295,8 @@ func (c *Commands) PasswordChangeSent(ctx context.Context, orgID, userID string)
 	return err
 }
 
-// HumanCheckPassword check password for user with additional informations from authRequest
-func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest, lockoutPolicy *domain.LockoutPolicy) (err error) {
+// HumanCheckPassword check password for user with additional information from authRequest
+func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
