@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
@@ -26,6 +27,7 @@ import (
 var (
 	CTX      context.Context
 	CTXLOGIN context.Context
+	CTXIAM   context.Context
 	Tester   *integration.Tester
 	User     *user.AddHumanUserResponse
 )
@@ -50,6 +52,7 @@ func TestMain(m *testing.M) {
 		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword, false)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
 		CTXLOGIN = Tester.WithAuthorization(ctx, integration.Login)
+		CTXIAM = Tester.WithAuthorization(ctx, integration.IAMOwner)
 		return m.Run()
 	}())
 }
@@ -117,10 +120,13 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	require.Nil(t, myUserResp)
 }
 
-func Test_ZITADEL_API_missing_mfa(t *testing.T) {
+func Test_ZITADEL_API_missing_mfa_2fa_setup(t *testing.T) {
 	clientID, _ := createClient(t)
+	userResp := Tester.CreateHumanUser(CTX)
+	Tester.SetUserPassword(CTX, userResp.GetUserId(), integration.UserPassword, false)
+	Tester.RegisterUserU2F(CTX, userResp.GetUserId())
 	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasswordSession(t, CTX, User.GetUserId(), integration.UserPassword)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasswordSession(t, CTXLOGIN, userResp.GetUserId(), integration.UserPassword)
 	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
@@ -136,11 +142,67 @@ func Test_ZITADEL_API_missing_mfa(t *testing.T) {
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPassword, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, userResp.GetUserId(), armPassword, startTime, changeTime)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
 
 	myUserResp, err := Tester.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
+	require.Error(t, err)
+	require.Nil(t, myUserResp)
+}
+
+func Test_ZITADEL_API_missing_mfa_policy(t *testing.T) {
+	clientID, _ := createClient(t)
+	org := Tester.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_API_MISSING_MFA_%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	userID := org.CreatedAdmins[0].GetUserId()
+	Tester.SetUserPassword(CTXIAM, userID, integration.UserPassword, false)
+	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
+	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasswordSession(t, CTXLOGIN, userID, integration.UserPassword)
+	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+		AuthRequestId: authRequestID,
+		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
+			Session: &oidc_pb.Session{
+				SessionId:    sessionID,
+				SessionToken: sessionToken,
+			},
+		},
+	})
+	require.NoError(t, err)
+
+	// code exchange
+	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
+	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	require.NoError(t, err)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, userID, armPassword, startTime, changeTime)
+
+	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
+
+	// pre check if request would succeed
+	myUserResp, err := Tester.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
+	require.NoError(t, err)
+	require.Equal(t, userID, myUserResp.GetUser().GetId())
+
+	// require MFA
+	ctxOrg := metadata.AppendToOutgoingContext(CTXIAM, "x-zitadel-orgid", org.GetOrganizationId())
+	_, err = Tester.Client.Mgmt.AddCustomLoginPolicy(ctxOrg, &mgmt.AddCustomLoginPolicyRequest{
+		ForceMfa: true,
+	})
+	require.NoError(t, err)
+
+	// make sure policy is projected
+	retryDuration := 5 * time.Second
+	if ctxDeadline, ok := CTX.Deadline(); ok {
+		retryDuration = time.Until(ctxDeadline)
+	}
+	require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		got, getErr := Tester.Client.Mgmt.GetLoginPolicy(ctxOrg, &mgmt.GetLoginPolicyRequest{})
+		assert.NoError(ttt, getErr)
+		assert.False(ttt, got.GetPolicy().IsDefault)
+
+	}, retryDuration, time.Millisecond*100, "timeout waiting for login policy")
+
+	// now it must fail
+	myUserResp, err = Tester.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
 	require.Error(t, err)
 	require.Nil(t, myUserResp)
 }
