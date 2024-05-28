@@ -63,6 +63,7 @@ Or one SMS provider is always assigned to exactly one instance.
 - For pagination, [we provide a *next_page_token*](https://protobuf.dev/programming-guides/api/#define-pagination-api) in the response. <!-- TODO verify @muhlemmer -->
 - Resource configurations are partially updatable. With HTTP, this is done via PATCH requests. If no changes were made, the response is successful.
 - Status changes or other actions on resources with side effects are done via POST requests. Their HTTP path ends with the underscore prefixed action name. For example `POST /resources/idps/{id}/_activate`.
+<!-- TODO verify @livio-a, @hifabienne -->
 - For all resources, custom metadata can be added and removed.
 - All resources are queryable by their metadata.
 
@@ -118,7 +119,7 @@ All resource services support the following CRUD operations [as described above]
 
 ### ZITADELInstances
 
-Additional methods for instances:
+Additional to the standard CRUD methods:
 
 - Limit (partial update of block and audit log retention)
 - BulkLimit (partial update of block and audit log retention for multiple instances)
@@ -126,18 +127,18 @@ Additional methods for instances:
 
 ### ZITADELOrganizations
 
-- SetDefault
-- GetDefault
+Additional to the standard CRUD methods:
+
 - IsUnique
 - GetOIDCInformation
+- SetAsInstanceDefault
+- GetInstanceDefault
 
 ### ZITADELDomains
 
-CRUD for context-aware domains
+Additional to the standard CRUD methods:
 
-Additional methods:
-
-- SetPrimary
+- SetAsPrimary
 - Validate
 - Exists
 
@@ -152,8 +153,9 @@ No additional methods
 
 ### ZITADELUsers
 
-- Standard CRUD for Users <!-- TODO verify -->
-- All methods from the auth service that are not defined in this document already (list and revoke tokens <!-- TODO verify @livio-a -->, list permissions etc.)
+Standard CRUD for Users
+
+-> internally plan mapping of old methods and auth service
 
 ### ZITADELUserSchemas
 
@@ -161,7 +163,7 @@ No additional methods
 
 ### ZITADELSessions
 
-Additional method Challenge which returns an updated session. <!-- TODO verify @livio-a -->
+- Standard CRUD for Sessions
 
 ### ZITADELMemberships
 
@@ -227,21 +229,15 @@ Predefined branding settings and custom key-value pairs, previously known as lab
 
 ### ZITADELLogin
 
-<!-- TODO should we integrate this into the user schema? @livio-a -->
-
 previously known as login policy
 
 ### ZITADELLockout
-
-<!-- TODO should we integrate this into the user schema? @livio-a -->
 
 previously known as lockout policy
 
 ### ZITADELPassword
 
-<!-- TODO should we integrate this into the user schema? @livio-a -->
-
-previously known as password complexity and password age policy (do we still need the password age policy? <!-- TODO verify @livio-a -->)
+previously known as password complexity policy
 
 ### ZITADELHelp
 
