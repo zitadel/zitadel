@@ -23,7 +23,7 @@ func New() *cobra.Command {
 		Use:   "mirror",
 		Short: "mirrors all data of ZITADEL from one database to another",
 		Long: `mirrors all data of ZITADEL from one database to another
-ZITADEL needs to be initialized
+ZITADEL needs to be initialized and set up with --for-mirror
 
 The command does mirror all data needed and recomputes the projections.
 For more details call the help functions of the sub commands.
@@ -73,6 +73,7 @@ func migrateFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringSliceVar(&instanceIDs, "instance", nil, "id of the instance to migrate")
 	cmd.PersistentFlags().BoolVar(&isSystem, "system", false, "migrates the whole system")
 	cmd.MarkFlagsOneRequired("system", "instance")
+	cmd.MarkFlagsMutuallyExclusive("system", "instance")
 }
 
 func instanceClause() string {

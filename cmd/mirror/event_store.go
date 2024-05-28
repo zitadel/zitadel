@@ -29,7 +29,7 @@ func eventstoreCmd() *cobra.Command {
 		Use:   "eventstore",
 		Short: "mirrors the eventstore of an instance from one database to another",
 		Long: `mirrors the eventstore of an instance from one database to another
-ZITADEL needs to be initialized
+ZITADEL needs to be initialized and set up with the --for-mirror flag
 Migrate only copies events2 and unique constraints`,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := mustNewMigrationConfig(viper.GetViper())

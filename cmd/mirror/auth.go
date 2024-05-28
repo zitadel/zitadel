@@ -20,7 +20,7 @@ func authCmd() *cobra.Command {
 		Use:   "auth",
 		Short: "mirrors the auth requests table from one database to another",
 		Long: `mirrors the auth requests table from one database to another
-ZITADEL needs to be initialized
+ZITADEL needs to be initialized and set up with the --for-mirror flag
 Only auth requests are mirrored`,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := mustNewMigrationConfig(viper.GetViper())
