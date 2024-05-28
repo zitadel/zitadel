@@ -17,6 +17,12 @@ message Organization {
   }
 }
 
+message Description {
+  string name = 1;
+  optional string description = 2;
+  map<string, bytes> metadata = 3;
+}
+
 message Details {
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

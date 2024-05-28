@@ -252,7 +252,7 @@ message ListSessionsRequest{
 
 message ListSessionsResponse{
   zitadel.resources.object.v2alpha.ListDetails details = 1;
-  repeated Session sessions = 2;
+  repeated GetSession sessions = 2;
 }
 
 message GetSessionRequest{
@@ -260,7 +260,7 @@ message GetSessionRequest{
   optional string session_token = 2;
 }
 message GetSessionResponse{
-  Session session = 1;
+  GetSession session = 1;
 }
 
 message CreateSessionRequest{

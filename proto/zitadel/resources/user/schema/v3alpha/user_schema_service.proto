@@ -12,6 +12,7 @@ import "validate/validate.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/resources/user/schema/v3alpha/user_schema.proto";
 import "zitadel/resources/object/v2alpha/object.proto";
+import "zitadel/object/v2alpha/object.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/schema/v3alpha";
 
@@ -144,7 +145,7 @@ service UserSchemaService {
   // User schema by ID
   //
   // Returns the user schema identified by the requested ID.
-  rpc GetUserSchemaByID (GetUserSchemaByIDRequest) returns (GetUserSchemaByIDResponse) {
+  rpc GetUserSchema (GetUserSchemaRequest) returns (GetUserSchemaResponse) {
     option (google.api.http) = {
       get: "/user_schemas/{id}"
     };
@@ -298,8 +299,7 @@ service UserSchemaService {
 }
 
 message SearchUserSchemasRequest {
-  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
-  reserved 1;
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
   // list limitations and ordering.
   zitadel.resources.object.v2alpha.ListQuery query = 2;
   // the field the result is sorted.
@@ -318,11 +318,11 @@ message SearchUserSchemasResponse {
   // States by which field the results are sorted.
   zitadel.resources.user.schema.v3alpha.FieldName sorting_column = 2;
   // The result contains the user schemas, which matched the queries.
-  repeated zitadel.resources.user.schema.v3alpha.UserSchema result = 3;
+  repeated zitadel.resources.user.schema.v3alpha.GetUserSchema result = 3;
 }
 
 
-message GetUserSchemaByIDRequest {
+message GetUserSchemaRequest {
   // unique identifier of the schema.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -335,15 +335,15 @@ message GetUserSchemaByIDRequest {
   ];
 }
 
-message GetUserSchemaByIDResponse {
+message GetUserSchemaResponse {
   zitadel.resources.user.schema.v3alpha.GetUserSchema schema = 1;
 }
 
 
 message CreateUserSchemaRequest {
-  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
-  reserved 1;
-  UserSchema schema = 2;
+  optional zitadel.object.v2alpha.RequestContext ctx = 1;
+  zitadel.resources.object.v2alpha.Description desc = 2;
+  UserSchema schema = 3;
 }
 
 message CreateUserSchemaResponse {
@@ -353,12 +353,11 @@ message CreateUserSchemaResponse {
   zitadel.resources.object.v2alpha.Details details = 2;
 }
 
-
 message PatchUserSchemaRequest {
   // unique identifier of the schema.
   string id = 1;
-  // Type is a human readable word describing the schema.
-  PatchUserSchema schema = 2;
+  optional zitadel.resources.object.v2alpha.Description desc = 2;
+  UserSchema schema = 3;
 }
 
 message PatchUserSchemaResponse {

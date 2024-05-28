@@ -9,7 +9,7 @@ import "validate/validate.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/session/v2alpha;session";
 
-message Session {
+message GetSession {
   string id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"id of the session\"";
