@@ -16,6 +16,7 @@ message RequestContext {
     string instance_domain = 3;
     string org_id = 4;
     string org_domain = 5;
+    bool mine = 6 [(validate.rules).bool = {const: true}]; // The instance is discovered by the domain from the requests host header.
   }
 }
 
