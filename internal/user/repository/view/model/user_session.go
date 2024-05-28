@@ -35,12 +35,12 @@ const (
 )
 
 type UserSessionView struct {
-	CreationDate  time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate    time.Time `json:"-" gorm:"column:change_date"`
-	ResourceOwner string    `json:"-" gorm:"column:resource_owner"`
-	State         int32     `json:"-" gorm:"column:state"`
-	UserAgentID   string    `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
-	UserID        string    `json:"userID" gorm:"column:user_id;primary_key"`
+	CreationDate  time.Time                         `json:"-" gorm:"column:creation_date"`
+	ChangeDate    time.Time                         `json:"-" gorm:"column:change_date"`
+	ResourceOwner string                            `json:"-" gorm:"column:resource_owner"`
+	State         sql.Null[domain.UserSessionState] `json:"-" gorm:"column:state"`
+	UserAgentID   string                            `json:"userAgentID" gorm:"column:user_agent_id;primary_key"`
+	UserID        string                            `json:"userID" gorm:"column:user_id;primary_key"`
 	// As of https://github.com/zitadel/zitadel/pull/7199 the following 4 attributes
 	// are not projected in the user session handler anymore
 	// and are therefore annotated with a `gorm:"-"`.
@@ -79,7 +79,7 @@ func UserSessionToModel(userSession *UserSessionView) *model.UserSessionView {
 		ChangeDate:                   userSession.ChangeDate,
 		CreationDate:                 userSession.CreationDate,
 		ResourceOwner:                userSession.ResourceOwner,
-		State:                        domain.UserSessionState(userSession.State),
+		State:                        userSession.State.V,
 		UserAgentID:                  userSession.UserAgentID,
 		UserID:                       userSession.UserID,
 		UserName:                     userSession.UserName.String,
@@ -114,7 +114,7 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 	case user.UserV1PasswordCheckSucceededType,
 		user.HumanPasswordCheckSucceededType:
 		v.PasswordVerification = sql.NullTime{Time: event.CreatedAt(), Valid: true}
-		v.State = int32(domain.UserSessionStateActive)
+		v.State.V = domain.UserSessionStateActive
 	case user.UserIDPLoginCheckSucceededType:
 		data := new(es_model.AuthRequest)
 		err := data.SetData(event)
@@ -123,12 +123,12 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 		}
 		v.ExternalLoginVerification = sql.NullTime{Time: event.CreatedAt(), Valid: true}
 		v.SelectedIDPConfigID = sql.NullString{String: data.SelectedIDPConfigID, Valid: true}
-		v.State = int32(domain.UserSessionStateActive)
+		v.State.V = domain.UserSessionStateActive
 	case user.HumanPasswordlessTokenCheckSucceededType:
 		v.PasswordlessVerification = sql.NullTime{Time: event.CreatedAt(), Valid: true}
 		v.MultiFactorVerification = sql.NullTime{Time: event.CreatedAt(), Valid: true}
 		v.MultiFactorVerificationType = sql.NullInt32{Int32: int32(domain.MFATypeU2FUserVerification)}
-		v.State = int32(domain.UserSessionStateActive)
+		v.State.V = domain.UserSessionStateActive
 	case user.HumanPasswordlessTokenCheckFailedType,
 		user.HumanPasswordlessTokenRemovedType:
 		v.PasswordlessVerification = sql.NullTime{Time: time.Time{}, Valid: true}
@@ -207,7 +207,7 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 		v.MultiFactorVerification = sql.NullTime{Time: time.Time{}, Valid: true}
 		v.MultiFactorVerificationType = sql.NullInt32{Int32: int32(domain.MFALevelNotSetUp)}
 		v.ExternalLoginVerification = sql.NullTime{Time: time.Time{}, Valid: true}
-		v.State = int32(domain.UserSessionStateTerminated)
+		v.State.V = domain.UserSessionStateTerminated
 	case user.UserIDPLinkRemovedType, user.UserIDPLinkCascadeRemovedType:
 		v.ExternalLoginVerification = sql.NullTime{Time: time.Time{}, Valid: true}
 		v.SelectedIDPConfigID = sql.NullString{String: "", Valid: true}
@@ -218,7 +218,7 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 func (v *UserSessionView) setSecondFactorVerification(verificationTime time.Time, mfaType domain.MFAType) {
 	v.SecondFactorVerification = sql.NullTime{Time: verificationTime, Valid: true}
 	v.SecondFactorVerificationType = sql.NullInt32{Int32: int32(mfaType)}
-	v.State = int32(domain.UserSessionStateActive)
+	v.State.V = domain.UserSessionStateActive
 }
 
 func (v *UserSessionView) EventTypes() []eventstore.EventType {

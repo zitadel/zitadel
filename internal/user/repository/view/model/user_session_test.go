@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
@@ -209,7 +210,7 @@ func TestAppendEvent(t *testing.T) {
 				ExternalLoginVerification: sql.NullTime{Time: time.Time{}, Valid: true},
 				PasswordlessVerification:  sql.NullTime{Time: time.Time{}, Valid: true},
 				MultiFactorVerification:   sql.NullTime{Time: time.Time{}, Valid: true},
-				State:                     1,
+				State:                     sql.Null[domain.UserSessionState]{V: domain.UserSessionStateTerminated},
 			},
 		},
 		{
@@ -228,7 +229,7 @@ func TestAppendEvent(t *testing.T) {
 				ExternalLoginVerification: sql.NullTime{Time: time.Time{}, Valid: true},
 				PasswordlessVerification:  sql.NullTime{Time: time.Time{}, Valid: true},
 				MultiFactorVerification:   sql.NullTime{Time: time.Time{}, Valid: true},
-				State:                     1,
+				State:                     sql.Null[domain.UserSessionState]{V: domain.UserSessionStateTerminated},
 			},
 		},
 	}
