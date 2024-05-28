@@ -59,9 +59,12 @@ Or one SMS provider is always assigned to exactly one instance.
 
 - Search request results can be scoped to a RequestContext.
 - Search request results only contain results for which the requesting user has the necessary read permissions.
-- Search requests are limited to 100 by default. The limit can be increased up to 1000.
+- Search requests are limited to 100 by default. The limit can be increased by the caller up to 1000 by default.
+- For pagination, [we provide a *next_page_token*](https://protobuf.dev/programming-guides/api/#define-pagination-api) in the response. <!-- TODO verify -->
 - Resource configurations are partially updatable. With HTTP, this is done via PATCH requests. If no changes were made, the response is successful.
 - Status changes or other actions on resources with side effects are done via POST requests. Their HTTP path ends with the underscore prefixed action name. For example `POST /resources/idps/{id}/_activate`.
+- For all resources, custom metadata can be added and removed.
+- All resources are queryable by their metadata.
 
 ### Standard Resources Proto Example
 
@@ -118,39 +121,47 @@ All resource services support the following CRUD operations [as described above]
 Additional methods for instances:
 
 - Limit (partial update of block and audit log retention)
-- LimitBulk (partial update of block and audit log retention for multiple instances)
-
-### ZITADELInstanceDomains
-
-Additional methods for instance domains:
-
-- SetPrimary
+- BulkLimit (partial update of block and audit log retention for multiple instances)
+- GetOIDCInformation (replaces the management services GetIAM method <!-- TODO verify --> )
 
 ### ZITADELOrganizations
 
-No additional methods
+- SetDefault
+- GetDefault
+- IsUnique
+- GetOIDCInformation
 
-### ZITADELOrganizationDomains
+### ZITADELDomains
 
-Additional methods for instance domains:
+CRUD for context-aware domains
+
+Additional methods:
 
 - SetPrimary
 - Validate
+- Exists
+
+### ZITADELSecretGenerators
+
+No additional methods
 
 ### ZITADELProjects
 
-### ZITADELApps
-
-### ZITADELRoles
+- CRUD for projects
+- CRUD for apps
 
 ### ZITADELUsers
 
-- Users
-- UserSchemas (reusable)
+- Standard CRUD for Users <!-- TODO verify -->
+- All methods from the auth service that are not defined in this document already (list and revoke tokens <!-- TODO verify -->, list permissions etc.)
+
+### ZITADELUserSchemas
+
+- Standard CRUD and methods for reusable UserSchemas <!-- TODO verify -->
 
 ### ZITADELSessions
 
-<!-- Additionally various checks to update and validate sessions.-->
+Additional method for Challenge which returns an updated session. <!-- TODO verify -->
 
 ### ZITADELMemberships
 
@@ -161,19 +172,20 @@ Additional methods for memberships:
 
 - ListAvailableRoles (context-aware)
 
-### ZITADELProjectGrants
+### ZITADELGrants
 
-### ZITADELUserGrants
-
+- CRUD for project grants
+- CRUD for user grants
+- CRUD for roles
 
 ### ZITADELActions
 
-- standard CRUD on instances for Executions
-- standard CRUD on instances for Targets
+- standard CRUD for context-aware Executions <!-- TODO verify -->
+- standard CRUD and methods for reusable Targets <!-- TODO verify -->
 
 ### ZITADELIdentityProviders (reusable)
 
-Standard CRUD and methods for reusable resources
+Standard CRUD and methods for all IDPs as reusable resources
 
 ### ZITADELSMTPProviders (reusable)
 
@@ -223,7 +235,7 @@ previously known as lockout policy
 
 ### ZITADELPassword
 
-previously known as password complexity policy
+previously known as password complexity and password age policy (do we still need the password age policy? <!-- TODO verify-->)
 
 ### ZITADELHelp
 
@@ -241,15 +253,19 @@ Also contains disallow public org registrations on system and instance level.
 
 ### ZITADELLanguages
 
-default language, restricted languages
+default language, restricted languages, supported languages
 
 ### ZITADELTemplates
 
 html and text templates for fully customizable emails and sms
 
-## Insight Services
+## Insights Services
+
+Query services for auditing, analytics and data synchronization.
 
 ### ZITADELEvents
+
+The given queries are checked against the requesting users permissions.
 
 ### ZITADELMilestones
 
@@ -259,6 +275,7 @@ html and text templates for fully customizable emails and sms
 - Failed Events
 - Views
 - Metrics (version, uptime etc.)
+- Import/Export
 
 ## API Release Policy
 
