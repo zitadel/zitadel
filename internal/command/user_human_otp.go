@@ -192,7 +192,7 @@ func (c *Commands) HumanCheckMFATOTP(ctx context.Context, userID, code, resource
 	// the OTP check failed, therefore check if the limit was reached and the user must additionally be locked
 	commands := make([]eventstore.Command, 0, 2)
 	commands = append(commands, user.NewHumanOTPCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
-	lockoutPolicy, err := c.getLockoutPolicy(ctx, resourceOwner)
+	lockoutPolicy, err := getLockoutPolicy(ctx, resourceOwner, c.eventstore.FilterToQueryReducer)
 	if err != nil {
 		return err
 	}
@@ -579,7 +579,7 @@ func (c *Commands) humanCheckOTP(
 	// the OTP check failed, therefore check if the limit was reached and the user must additionally be locked
 	commands := make([]eventstore.Command, 0, 2)
 	commands = append(commands, checkFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
-	lockoutPolicy, err := c.getLockoutPolicy(ctx, resourceOwner)
+	lockoutPolicy, err := getLockoutPolicy(ctx, resourceOwner, c.eventstore.FilterToQueryReducer)
 	if err != nil {
 		return err
 	}
