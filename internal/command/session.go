@@ -134,7 +134,8 @@ func CheckTOTP(code string) SessionCommand {
 	}
 }
 
-// Exec will execute the commands specified and returns an error on the first occurrence
+// Exec will execute the commands specified and returns an error on the first occurrence.
+// In case of an error there might be specific commands returned, e.g. a failed pw check will have to be stored.
 func (s *SessionCommands) Exec(ctx context.Context) ([]eventstore.Command, error) {
 	for _, cmd := range s.sessionCommands {
 		if cmds, err := cmd(ctx, s); err != nil {
@@ -336,7 +337,6 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 		return nil, err
 	}
 	if cmds, err := checks.Exec(ctx); err != nil {
-		// TODO: how to handle failed checks (e.g. pw wrong) https://github.com/zitadel/zitadel/issues/5807
 		if len(cmds) > 0 {
 			_, pushErr := c.eventstore.Push(ctx, cmds...)
 			logging.OnError(pushErr).Error("unable to store check failures")
