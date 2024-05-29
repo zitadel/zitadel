@@ -4,9 +4,11 @@ title: APIs V3 (Preview)
 
 import DocCardList from '@theme/DocCardList';
 import CodeBlock from '@theme/CodeBlock';
-import SessionProto from '!!raw-loader!./_preview_session_service.proto'
-import UserSchemaProto from '!!raw-loader!./_preview_user_schema_service.proto'
-import LanguageProto from '!!raw-loader!./_preview_language_service.proto'
+import ActionServiceProto from '!!raw-loader!./_v3_action_service.proto'
+import ActionExecutionProto from '!!raw-loader!./_v3_action_execution.proto'
+import ActionTargetProto from '!!raw-loader!./_v3_action_target.proto'
+import ActionQueryProto from '!!raw-loader!./_v3_action_query.proto'
+import LanguageProto from '!!raw-loader!./_v3_language_service.proto'
 
 The APIs described in this section are currently either in *Preview* stage or not implemented, yet.
 Before using these APIs, pleases consider the [API release policy below](#api-release-policy)
@@ -113,6 +115,42 @@ All resource services support the following CRUD operations [as described above]
 - Update (partially, success on no changes)
 - Delete
 
+
+### zitadel.resources.action.v3alpha.ZITADELActions
+
+- standard CRUD methods for Executions
+- standard CRUD methods for Targets
+
+Additional to the standard CRUD methods:
+
+- ListAvailableExecutionServices
+- ListAvailableExecutionMethods
+- ListAvailableExecutionFunctions
+
+<details><summary>action_service.proto</summary>
+    <CodeBlock language="protobuf">{ActionServiceProto}</CodeBlock>
+</details>
+
+<details><summary>action_target.proto</summary>
+    <CodeBlock language="protobuf">{ActionTargetProto}</CodeBlock>
+</details>
+
+<details><summary>action_execution.proto</summary>
+    <CodeBlock language="protobuf">{ActionExecutionProto}</CodeBlock>
+</details>
+
+<details><summary>action_query.proto</summary>
+    <CodeBlock language="protobuf">{ActionQueryProto}</CodeBlock>
+</details>
+
+### zitadel.resources.user.v3alpha.ZITADELUsers
+
+standard CRUD methods
+
+### zitadel.resources.userschema.v3alpha.ZITADELUserSchemas
+
+standard CRUD methods
+
 ### zitadel.resources.instance.v3alpha.ZITADELInstances
 
 additional to the standard CRUD methods:
@@ -149,14 +187,6 @@ standard CRUD methods
 
 standard CRUD methods
 
-### zitadel.resources.user.v3alpha.ZITADELUsers
-
-standard CRUD methods
-
-### zitadel.resources.userschema.v3alpha.ZITADELUserSchemas
-
-standard CRUD methods
-
 ### zitadel.resources.session.v3alpha.ZITADELSessions
 
 standard CRUD methods
@@ -175,11 +205,6 @@ additional to the standard CRUD methods:
 - standard CRUD methods for project grants
 - standard CRUD methods for user grants
 - standard CRUD methods for roles
-
-### zitadel.resources.action.v3alpha.ZITADELActions
-
-- standard CRUD methods for Executions
-- standard CRUD methods for Targets
 
 ### zitadel.resources.idp.v3alpha.ZITADELIdentityProviders (reusable)
 
