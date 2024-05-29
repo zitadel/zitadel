@@ -116,14 +116,14 @@ All resource services support the following CRUD operations [as described above]
 - Update (partially, success on no changes)
 - Delete
 
-### ZITADELInstances
+### zitadel.resources.instance.v3alpha.ZITADELInstances
 
 additional to the standard CRUD methods:
 
 - Limit (partial update of block and audit log retention)
 - BulkLimit (partial update of block and audit log retention for multiple instances)
 
-### ZITADELOrganizations
+### zitadel.resources.organization.v3alpha.ZITADELOrganizations
 
 additional to the standard CRUD methods:
 
@@ -132,7 +132,7 @@ additional to the standard CRUD methods:
 - SetAsInstanceDefault
 - GetInstanceDefault
 
-### ZITADELDomains
+### zitadel.resources.domain.v3alpha.ZITADELDomains
 
 additional to the standard CRUD methods:
 
@@ -140,33 +140,33 @@ additional to the standard CRUD methods:
 - Validate
 - Exists
 
-### ZITADELSecretGenerators
+### zitadel.resources.secretgenerator.v3alpha.ZITADELSecretGenerators
 
 standard CRUD methods
 
-### ZITADELProjects
+### zitadel.resources.project.v3alpha.ZITADELProjects
 
 standard CRUD methods
 
-### ZITADELApps
+### zitadel.resources.app.v3alpha.ZITADELApps
 
 standard CRUD methods
 
-### ZITADELUsers
+### zitadel.resources.user.v3alpha.ZITADELUsers
 
 standard CRUD methods
 
-### ZITADELUserSchemas
+### zitadel.resources.userschema.v3alpha.ZITADELUserSchemas
 
 standard CRUD methods
 
 - Standard CRUD and methods for reusable UserSchemas <!-- TODO verify @hifabienne-->
 
-### ZITADELSessions
+### zitadel.resources.session.v3alpha.ZITADELSessions
 
 standard CRUD methods
 
-### ZITADELMemberships
+### zitadel.resources.membership.v3alpha.ZITADELMemberships
 
 The given context defines the organization, instance or system where the membership is created.
 The context and the user ID together are unique.
@@ -175,26 +175,26 @@ additional to the standard CRUD methods:
 
 - ListAvailableRoles (context-aware)
 
-### ZITADELGrants
+### zitadel.resources.grant.v3alpha.ZITADELGrants
 
 - standard CRUD methods for project grants
 - standard CRUD methods for user grants
 - standard CRUD methods for roles
 
-### ZITADELActions
+### zitadel.resources.action.v3alpha.ZITADELActions
 
 - standard CRUD methods for Executions
 - standard CRUD methods for Targets
 
-### ZITADELIdentityProviders (reusable)
+### zitadel.resources.idp.v3alpha.ZITADELIdentityProviders (reusable)
 
 standard CRUD and methods for all IDPs and standard methods for reusable resources
 
-### ZITADELSMTPProviders
+### zitadel.resources.smtp.v3alpha.ZITADELSMTPProviders
 
 standard CRUD methods
 
-### ZITADELSMSProviders
+### zitadel.resources.sms.v3alpha.ZITADELSMSProviders
 
 standard CRUD methods
 
@@ -220,45 +220,45 @@ These properties are inherited to from parent-contexts (instance) to child-conte
 
 ## Settings Services
 
-### ZITADELTexts
+### zitadel.settings.text.v3alpha.ZITADELTexts
 
 key-value pairs for localized login texts, previously known as login texts
 
-### ZITADELBranding
+### zitadel.settings.branding.v3alpha.ZITADELBranding
 
 predefined branding settings and custom key-value pairs, previously known as label policy or branding settings
 
-### ZITADELLogin
+### zitadel.settings.login.v3alpha.ZITADELLogin
 
 previously known as login policy
 
-### ZITADELLockout
+### zitadel.settings.lockout.v3alpha.ZITADELLockout
 
 previously known as lockout policy
 
-### ZITADELPassword
+### zitadel.settings.password.v3alpha.ZITADELPassword
 
 previously known as password complexity policy
 
-### ZITADELHelp
+### zitadel.settings.help.v3alpha.ZITADELHelp
 
 previously known as legal and support settings or privacy policy
 
-### ZITADELDomain
+### zitadel.settings.domain.v3alpha.ZITADELDomain
 
 previously known as domain policy
 
-### ZITADELFeatures
+### zitadel.settings.feature.v3alpha.ZITADELFeatures
 
 feature toggles
 
 also contains disallow public org registrations on system and instance level.
 
-### ZITADELLanguages
+### zitadel.settings.language.v3alpha.ZITADELLanguages
 
 default language, restricted languages, supported languages
 
-### ZITADELTemplates
+### zitadel.settings.template.v3alpha.ZITADELTemplates
 
 html and text templates for fully customizable emails and sms
 
@@ -266,15 +266,15 @@ html and text templates for fully customizable emails and sms
 
 query services for auditing, analytics and data synchronization.
 
-### ZITADELEvents
+### zitadel.insights.event.v3alpha.ZITADELEvents
 
 The given queries are checked against the requesting users permissions.
 
-### ZITADELMilestones
+### zitadel.insights.milestone.v3alpha.ZITADELMilestones
 
 The given queries are checked against the requesting users permissions.
 
-## ZITADELOperations
+## zitadel.operations.v3alpha.ZITADELOperations
 
 - Health
 - Failed Events
