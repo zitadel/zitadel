@@ -57,7 +57,7 @@ Standard resources exist in exactly one context.
 For example, a user is always assigned to exactly one organization.
 Or one SMS provider is always assigned to exactly one instance.
 
-### Standard Resources Behavior
+Standard resource methods behave like this:
 
 - Search request results can be scoped to a RequestContext.
 - Search request results only contain results for which the requesting user has the necessary read permissions.
@@ -65,11 +65,7 @@ Or one SMS provider is always assigned to exactly one instance.
 - Resource configurations are partially updatable. With HTTP, this is done via PATCH requests. If no changes were made, the response is successful.
 - Status changes or other actions on resources with side effects are done via POST requests. Their HTTP path ends with the underscore prefixed action name. For example `POST /resources/idps/{id}/_activate`.
 
-### Standard Resources Proto Example
-
-<details><summary>session_service.proto</summary>
-    <CodeBlock language="protobuf">{SessionProto}</CodeBlock>
-</details>
+For a concrete proto example, have a look at the [ZITADELActions service](#zitadel.resources.action.v3alpha.ZITADELActions).
 
 ## Reusable Resources
 
@@ -77,7 +73,7 @@ Reusable resources are like standard resources but can be reused in multiple con
 For example, an external identity provider can be defined once on the instance.
 Each organization within this instance can then choose to use this identity provider or not.
 
-### Reusable Resources Behavior
+Additionally to the methods described for standard resources, reusable have the following capabilities:
 
 Reusable resources have the same behavior as standard resources with the following additions:
 
@@ -100,15 +96,11 @@ Reusable resources have the same behavior as standard resources with the followi
 Typically, a new resource is first designed and implemented as a non-reusable resource.
 If the community sees a benefit in reusing the resource in multiple contexts, reusability is added to the resource.
 
-### Reusable Resources Proto Example
-
-<details><summary>user_schema_service.proto</summary>
-    <CodeBlock language="protobuf">{UserSchemaProto}</CodeBlock>
-</details>
+For a concrete proto example, have a look at the [ZITADELIdentityProviders service](#zitadel.resources.idp.v3alpha.ZITADELIdentityProviders).
 
 ## Resource Services
 
-All resource services support the following CRUD operations [as described above](#Standard Resources Behavior).
+All resource services support the following CRUD operations [as described above](#standard-resources-behavior).
 
 - Create
 - Read (list, get)
@@ -162,8 +154,6 @@ additional to the standard CRUD methods:
 
 additional to the standard CRUD methods:
 
-- IsUnique
-- GetOIDCInformation
 - SetAsInstanceDefault
 - GetInstanceDefault
 
@@ -173,11 +163,6 @@ additional to the standard CRUD methods:
 
 - SetAsPrimary
 - Validate
-- Exists
-
-### zitadel.resources.secretgenerator.v3alpha.ZITADELSecretGenerators
-
-standard CRUD methods
 
 ### zitadel.resources.project.v3alpha.ZITADELProjects
 
@@ -232,67 +217,64 @@ These properties are inherited to from parent-contexts (instance) to child-conte
 - All settings properties can be partially reset in child-contexts, so their values default to the parent contexts property values.
 - All settings properties returned by queries contain the value and if it is inherited, the context where it is inherited from.
 
-### Proto Example
+## Settings Services
+
+### zitadel.settings.language.v3alpha.ZITADELLanguageSettings
+
+default language, restricted languages, supported languages
 
 <details><summary>language_service.proto</summary>
     <CodeBlock language="protobuf">{LanguageProto}</CodeBlock>
 </details>
 
-## Settings Services
-
-### zitadel.settings.text.v3alpha.ZITADELTexts
+### zitadel.settings.text.v3alpha.ZITADELTextSettings
 
 key-value pairs for localized login texts, previously known as login texts
 
-### zitadel.settings.branding.v3alpha.ZITADELBranding
+### zitadel.settings.branding.v3alpha.ZITADELBrandingSettings
 
 predefined branding settings and custom key-value pairs, previously known as label policy or branding settings
 
-### zitadel.settings.login.v3alpha.ZITADELLogin
+### zitadel.settings.login.v3alpha.ZITADELLoginSettings
 
 previously known as login policy
 
-### zitadel.settings.lockout.v3alpha.ZITADELLockout
+### zitadel.settings.lockout.v3alpha.ZITADELLockoutSettings
 
 previously known as lockout policy
 
-### zitadel.settings.password.v3alpha.ZITADELPassword
+### zitadel.settings.password.v3alpha.ZITADELPasswordSettings
 
 previously known as password complexity policy
 
-### zitadel.settings.help.v3alpha.ZITADELHelp
+### zitadel.settings.help.v3alpha.ZITADELHelpSettings
 
 previously known as legal and support settings or privacy policy
 
-### zitadel.settings.domain.v3alpha.ZITADELDomain
+### zitadel.settings.domain.v3alpha.ZITADELDomainSettings
 
 previously known as domain policy
 
-### zitadel.settings.feature.v3alpha.ZITADELFeatures
+### zitadel.settings.feature.v3alpha.ZITADELFeatureSettings
 
 feature toggles
 
 also contains disallow public org registrations on system and instance level.
 
-### zitadel.settings.language.v3alpha.ZITADELLanguages
-
-default language, restricted languages, supported languages
-
-### zitadel.settings.template.v3alpha.ZITADELTemplates
+### zitadel.settings.template.v3alpha.ZITADELTemplatesSettings
 
 html and text templates for fully customizable emails and sms
 
-## Insights Services
+### zitadel.settings.secret.v3alpha.ZITADELSecretSettings
+
+replaces secret generators
+
+## zitadel.insights.v3alpha.ZITADELInsights
 
 query services for auditing, analytics and data synchronization.
 
-### zitadel.insights.event.v3alpha.ZITADELEvents
-
-The given queries are checked against the requesting users permissions.
-
-### zitadel.insights.milestone.v3alpha.ZITADELMilestones
-
-The given queries are checked against the requesting users permissions.
+- Events
+- Milestones
 
 ## zitadel.operations.v3alpha.ZITADELOperations
 
@@ -300,7 +282,6 @@ The given queries are checked against the requesting users permissions.
 - Failed Events
 - Views
 - Metrics (version, uptime etc.)
-- Import/Export
 
 ## API Release Policy
 
