@@ -245,6 +245,7 @@ module.exports = {
             outputDir: "docs/apis/resources/auth",
             sidebarOptions: {
               groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           mgmt: {
@@ -252,6 +253,7 @@ module.exports = {
             outputDir: "docs/apis/resources/mgmt",
             sidebarOptions: {
               groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           admin: {
@@ -259,6 +261,7 @@ module.exports = {
             outputDir: "docs/apis/resources/admin",
             sidebarOptions: {
               groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           system: {
@@ -266,6 +269,7 @@ module.exports = {
             outputDir: "docs/apis/resources/system",
             sidebarOptions: {
               groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           user: {
@@ -273,6 +277,7 @@ module.exports = {
             outputDir: "docs/apis/resources/user_service",
             sidebarOptions: {
               groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           session: {
@@ -280,6 +285,7 @@ module.exports = {
             outputDir: "docs/apis/resources/session_service",
             sidebarOptions: {
               groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           oidc: {
@@ -287,6 +293,7 @@ module.exports = {
             outputDir: "docs/apis/resources/oidc_service",
             sidebarOptions: {
               groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           settings: {
@@ -294,6 +301,7 @@ module.exports = {
             outputDir: "docs/apis/resources/settings_service",
             sidebarOptions: {
               groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           user_schema: {
@@ -301,6 +309,7 @@ module.exports = {
             outputDir: "docs/apis/resources/user_schema_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           user_v3: {
@@ -308,6 +317,7 @@ module.exports = {
             outputDir: "docs/apis/resources/user_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           action_v3: {
@@ -315,6 +325,7 @@ module.exports = {
             outputDir: "docs/apis/resources/action_service_v3",
             sidebarOptions: {
                 groupPathsBy: "tag",
+                categoryLinkSource: "tag",
             },
           },
           feature_v2: {
@@ -322,6 +333,7 @@ module.exports = {
             outputDir: "docs/apis/resources/feature_service_v2",
             sidebarOptions: {
                 groupPathsBy: "tag",
+                categoryLinkSource: "tag",
             },
           },
         },
