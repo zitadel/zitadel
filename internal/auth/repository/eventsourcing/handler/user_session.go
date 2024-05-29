@@ -220,6 +220,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		user.HumanPasswordCheckFailedType:
 		columns, err := sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
@@ -241,6 +242,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		user.HumanU2FTokenCheckFailedType:
 		columns, err := sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
@@ -317,6 +319,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		columns, err := sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeyPasswordlessVerification, time.Time{}),
 			handler.NewCol(view_model.UserSessionKeyMultiFactorVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
 		)
 		if err != nil {
 			return nil, err
