@@ -33,7 +33,7 @@ SELECT
     , (SELECT array_agg(ll.login_name) login_names FROM projections.login_names3 ll
                                                    WHERE u.instance_id = ll.instance_id AND u.id = ll.user_id
                                                    GROUP BY ll.user_id, ll.instance_id) AS login_names
-    , l.login_name
+    , l.login_name as preferred_login_name
     , h.first_name
     , h.last_name
     , h.nick_name
