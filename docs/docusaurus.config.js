@@ -223,7 +223,7 @@ module.exports = {
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
-          docLayoutComponent: "@theme/DocPage",
+          
           docItemComponent:  '@theme/ApiItem'
         },
         theme: {
