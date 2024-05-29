@@ -60,7 +60,6 @@ Or one SMS provider is always assigned to exactly one instance.
 - Search request results can be scoped to a RequestContext.
 - Search request results only contain results for which the requesting user has the necessary read permissions.
 - Search requests are limited to 100 by default. The limit can be increased by the caller up to 1000 by default.
-- For pagination, [we provide a *next_page_token*](https://protobuf.dev/programming-guides/api/#define-pagination-api) in the response. <!-- TODO verify @muhlemmer -->
 - Resource configurations are partially updatable. With HTTP, this is done via PATCH requests. If no changes were made, the response is successful.
 - Status changes or other actions on resources with side effects are done via POST requests. Their HTTP path ends with the underscore prefixed action name. For example `POST /resources/idps/{id}/_activate`.
 <!-- TODO verify @livio-a, @hifabienne -->
@@ -119,15 +118,14 @@ All resource services support the following CRUD operations [as described above]
 
 ### ZITADELInstances
 
-Additional to the standard CRUD methods:
+additional to the standard CRUD methods:
 
 - Limit (partial update of block and audit log retention)
 - BulkLimit (partial update of block and audit log retention for multiple instances)
-- GetOIDCInformation (replaces the management services GetIAM method <!-- TODO verify @muhlemmer --> )
 
 ### ZITADELOrganizations
 
-Additional to the standard CRUD methods:
+additional to the standard CRUD methods:
 
 - IsUnique
 - GetOIDCInformation
@@ -136,7 +134,7 @@ Additional to the standard CRUD methods:
 
 ### ZITADELDomains
 
-Additional to the standard CRUD methods:
+additional to the standard CRUD methods:
 
 - SetAsPrimary
 - Validate
@@ -144,58 +142,61 @@ Additional to the standard CRUD methods:
 
 ### ZITADELSecretGenerators
 
-No additional methods
+standard CRUD methods
 
 ### ZITADELProjects
 
-- CRUD for projects
-- CRUD for apps
+standard CRUD methods
+
+### ZITADELApps
+
+standard CRUD methods
 
 ### ZITADELUsers
 
-Standard CRUD for Users
-
--> internally plan mapping of old methods and auth service
+standard CRUD methods
 
 ### ZITADELUserSchemas
+
+standard CRUD methods
 
 - Standard CRUD and methods for reusable UserSchemas <!-- TODO verify @hifabienne-->
 
 ### ZITADELSessions
 
-- Standard CRUD for Sessions
+standard CRUD methods
 
 ### ZITADELMemberships
 
 The given context defines the organization, instance or system where the membership is created.
 The context and the user ID together are unique.
 
-Additional methods for memberships:
+additional to the standard CRUD methods:
 
 - ListAvailableRoles (context-aware)
 
 ### ZITADELGrants
 
-- CRUD for project grants
-- CRUD for user grants
-- CRUD for roles
+- standard CRUD methods for project grants
+- standard CRUD methods for user grants
+- standard CRUD methods for roles
 
 ### ZITADELActions
 
-- standard CRUD for Executions
-- standard CRUD for Targets
+- standard CRUD methods for Executions
+- standard CRUD methods for Targets
 
 ### ZITADELIdentityProviders (reusable)
 
-Standard CRUD and methods for all IDPs as reusable resources
+standard CRUD and methods for all IDPs and standard methods for reusable resources
 
 ### ZITADELSMTPProviders
 
-Standard CRUD and methods for reusable resources, but only on the system and instance level
+standard CRUD methods
 
 ### ZITADELSMSProviders
 
-Standard CRUD and methods for reusable resources, but only on the system and instance level
+standard CRUD methods
 
 ## Settings
 
@@ -221,11 +222,11 @@ These properties are inherited to from parent-contexts (instance) to child-conte
 
 ### ZITADELTexts
 
-Key-value pairs for localized login texts, previously known as login texts
+key-value pairs for localized login texts, previously known as login texts
 
 ### ZITADELBranding
 
-Predefined branding settings and custom key-value pairs, previously known as label policy or branding settings
+predefined branding settings and custom key-value pairs, previously known as label policy or branding settings
 
 ### ZITADELLogin
 
@@ -251,7 +252,7 @@ previously known as domain policy
 
 feature toggles
 
-Also contains disallow public org registrations on system and instance level.
+also contains disallow public org registrations on system and instance level.
 
 ### ZITADELLanguages
 
@@ -263,7 +264,7 @@ html and text templates for fully customizable emails and sms
 
 ## Insights Services
 
-Query services for auditing, analytics and data synchronization.
+query services for auditing, analytics and data synchronization.
 
 ### ZITADELEvents
 
