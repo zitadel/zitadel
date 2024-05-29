@@ -62,9 +62,6 @@ Or one SMS provider is always assigned to exactly one instance.
 - Search requests are limited to 100 by default. The limit can be increased by the caller up to 1000 by default.
 - Resource configurations are partially updatable. With HTTP, this is done via PATCH requests. If no changes were made, the response is successful.
 - Status changes or other actions on resources with side effects are done via POST requests. Their HTTP path ends with the underscore prefixed action name. For example `POST /resources/idps/{id}/_activate`.
-<!-- TODO verify @livio-a, @hifabienne -->
-- For all resources, custom metadata can be added and removed.
-- All resources are queryable by their metadata.
 
 ### Standard Resources Proto Example
 
@@ -159,8 +156,6 @@ standard CRUD methods
 ### zitadel.resources.userschema.v3alpha.ZITADELUserSchemas
 
 standard CRUD methods
-
-- Standard CRUD and methods for reusable UserSchemas <!-- TODO verify @hifabienne-->
 
 ### zitadel.resources.session.v3alpha.ZITADELSessions
 
