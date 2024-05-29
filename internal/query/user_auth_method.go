@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -69,8 +71,12 @@ var (
 	authMethodTypeTable      = userAuthMethodTable.setAlias("auth_method_types")
 	authMethodTypeUserID     = UserAuthMethodColumnUserID.setTable(authMethodTypeTable)
 	authMethodTypeInstanceID = UserAuthMethodColumnInstanceID.setTable(authMethodTypeTable)
-	authMethodTypeTypes      = UserAuthMethodColumnMethodType.setTable(authMethodTypeTable)
-	authMethodTypeState      = UserAuthMethodColumnState.setTable(authMethodTypeTable)
+	authMethodTypeType       = UserAuthMethodColumnMethodType.setTable(authMethodTypeTable)
+	authMethodTypeTypes      = Column{
+		name:  "method_types",
+		table: authMethodTypeTable,
+	}
+	authMethodTypeState = UserAuthMethodColumnState.setTable(authMethodTypeTable)
 
 	userIDPsCountTable      = idpUserLinkTable.setAlias("user_idps_count")
 	userIDPsCountUserID     = IDPUserLinkUserIDCol.setTable(userIDPsCountTable)
@@ -172,11 +178,18 @@ func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID stri
 	return userAuthMethodTypes, err
 }
 
-func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID string) (userAuthMethodTypes []domain.UserAuthMethodType, forceMFA, forceMFALocalOnly bool, err error) {
+type UserAuthMethodRequirements struct {
+	UserType          domain.UserType
+	AuthMethods       []domain.UserAuthMethodType
+	ForceMFA          bool
+	ForceMFALocalOnly bool
+}
+
+func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID string) (requirements *UserAuthMethodRequirements, err error) {
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.UserID != userID {
 		if err := q.checkPermission(ctx, domain.PermissionUserRead, ctxData.OrgID, userID); err != nil {
-			return nil, false, false, err
+			return nil, err
 		}
 	}
 	ctx, span := tracing.NewSpan(ctx)
@@ -189,17 +202,17 @@ func (q *Queries) ListUserAuthMethodTypesRequired(ctx context.Context, userID st
 	}
 	stmt, args, err := query.Where(eq).ToSql()
 	if err != nil {
-		return nil, false, false, zerrors.ThrowInvalidArgument(err, "QUERY-E5ut4", "Errors.Query.InvalidRequest")
+		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-E5ut4", "Errors.Query.InvalidRequest")
 	}
 
-	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
-		userAuthMethodTypes, forceMFA, forceMFALocalOnly, err = scan(rows)
+	err = q.client.QueryRowContext(ctx, func(row *sql.Row) error {
+		requirements, err = scan(row)
 		return err
 	}, stmt, args...)
 	if err != nil {
-		return nil, false, false, zerrors.ThrowInternal(err, "QUERY-Dun75", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "QUERY-Dun75", "Errors.Internal")
 	}
-	return userAuthMethodTypes, forceMFA, forceMFALocalOnly, nil
+	return requirements, nil
 }
 
 func NewUserAuthMethodUserIDSearchQuery(value string) (SearchQuery, error) {
@@ -353,7 +366,7 @@ func prepareActiveUserAuthMethodTypesQuery(ctx context.Context, db prepareDataba
 	}
 	return sq.Select(
 			NotifyPasswordSetCol.identifier(),
-			authMethodTypeTypes.identifier(),
+			authMethodTypeType.identifier(),
 			userIDPsCountCount.identifier()).
 			From(userTable.identifier()).
 			LeftJoin(join(NotifyUserIDCol, UserIDCol)).
@@ -404,12 +417,12 @@ func prepareActiveUserAuthMethodTypesQuery(ctx context.Context, db prepareDataba
 		}
 }
 
-func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (_ []domain.UserAuthMethodType, forceMFA, forceMFALocalOnly bool, err error)) {
+func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*UserAuthMethodRequirements, error)) {
 	loginPolicyQuery, err := prepareAuthMethodsForceMFAQuery()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
-	authMethodsQuery, authMethodsArgs, err := prepareAuthMethodQuery()
+	authMethodsQuery, authMethodsArgs, err := prepareAggAuthMethodsQuery()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
@@ -421,6 +434,7 @@ func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareData
 			NotifyPasswordSetCol.identifier(),
 			authMethodTypeTypes.identifier(),
 			userIDPsCountCount.identifier(),
+			UserTypeCol.identifier(),
 			forceMFAForce.identifier(),
 			forceMFAForceLocalOnly.identifier()).
 			From(userTable.identifier()).
@@ -434,43 +448,44 @@ func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareData
 				userIDPsCountInstanceID.identifier() + " = " + UserInstanceIDCol.identifier()).
 			LeftJoin("(" + loginPolicyQuery + ") AS " + forceMFATable.alias + " ON " +
 				"(" + forceMFAOrgID.identifier() + " = " + UserInstanceIDCol.identifier() + " OR " + forceMFAOrgID.identifier() + " = " + UserResourceOwnerCol.identifier() + ") AND " +
-				forceMFAInstanceID.identifier() + " = " + UserInstanceIDCol.identifier() + db.Timetravel(call.Took(ctx))).
+				forceMFAInstanceID.identifier() + " = " + UserInstanceIDCol.identifier()).
+			OrderBy(forceMFAIsDefault.identifier()).
+			Limit(1).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) ([]domain.UserAuthMethodType, bool, bool, error) {
-			userAuthMethodTypes := make([]domain.UserAuthMethodType, 0)
+		func(row *sql.Row) (*UserAuthMethodRequirements, error) {
 			var passwordSet sql.NullBool
+			var authMethodTypes database.NumberArray[domain.UserAuthMethodType]
 			var idp sql.NullInt64
+			var userType sql.NullInt32
 			var forceMFA sql.NullBool
 			var forceMFALocalOnly sql.NullBool
-			for rows.Next() {
-				var authMethodType sql.NullInt16
-				err := rows.Scan(
-					&passwordSet,
-					&authMethodType,
-					&idp,
-					&forceMFA,
-					&forceMFALocalOnly,
-				)
-				if err != nil {
-					return nil, false, false, err
+			err := row.Scan(
+				&passwordSet,
+				&authMethodTypes,
+				&idp,
+				&userType,
+				&forceMFA,
+				&forceMFALocalOnly,
+			)
+			if err != nil {
+				if errors.Is(err, sql.ErrNoRows) {
+					return nil, zerrors.ThrowNotFound(err, "QUERY-SF3h2", "Errors.Internal")
 				}
-				if authMethodType.Valid {
-					userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodType(authMethodType.Int16))
-				}
+				return nil, zerrors.ThrowInternal(err, "QUERY-Sf3rt", "Errors.Internal")
 			}
 			if passwordSet.Valid && passwordSet.Bool {
-				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypePassword)
+				authMethodTypes = append(authMethodTypes, domain.UserAuthMethodTypePassword)
 			}
 			if idp.Valid && idp.Int64 > 0 {
-				logging.Error("IDP", idp.Int64)
-				userAuthMethodTypes = append(userAuthMethodTypes, domain.UserAuthMethodTypeIDP)
+				authMethodTypes = append(authMethodTypes, domain.UserAuthMethodTypeIDP)
 			}
 
-			if err := rows.Close(); err != nil {
-				return nil, false, false, zerrors.ThrowInternal(err, "QUERY-W4zje", "Errors.Query.CloseRows")
-			}
-
-			return userAuthMethodTypes, forceMFA.Bool, forceMFALocalOnly.Bool, nil
+			return &UserAuthMethodRequirements{
+				UserType:          domain.UserType(userType.Int32),
+				AuthMethods:       authMethodTypes,
+				ForceMFA:          forceMFA.Bool,
+				ForceMFALocalOnly: forceMFALocalOnly.Bool,
+			}, nil
 		}
 }
 
@@ -490,11 +505,22 @@ func prepareAuthMethodsIDPsQuery() (string, error) {
 
 func prepareAuthMethodQuery() (string, []interface{}, error) {
 	return sq.Select(
-		"DISTINCT("+authMethodTypeTypes.identifier()+")",
+		"DISTINCT("+authMethodTypeType.identifier()+")",
 		authMethodTypeUserID.identifier(),
 		authMethodTypeInstanceID.identifier()).
 		From(authMethodTypeTable.identifier()).
 		Where(sq.Eq{authMethodTypeState.identifier(): domain.MFAStateReady}).
+		ToSql()
+}
+
+func prepareAggAuthMethodsQuery() (string, []interface{}, error) {
+	return sq.Select(
+		"array_agg(DISTINCT("+authMethodTypeType.identifier()+")) as method_types",
+		authMethodTypeUserID.identifier(),
+		authMethodTypeInstanceID.identifier()).
+		From(authMethodTypeTable.identifier()).
+		Where(sq.Eq{authMethodTypeState.identifier(): domain.MFAStateReady}).
+		GroupBy(authMethodTypeInstanceID.identifier(), authMethodTypeUserID.identifier()).
 		ToSql()
 }
 
@@ -504,9 +530,9 @@ func prepareAuthMethodsForceMFAQuery() (string, error) {
 		forceMFAForceLocalOnly.identifier(),
 		forceMFAInstanceID.identifier(),
 		forceMFAOrgID.identifier(),
+		forceMFAIsDefault.identifier(),
 	).
 		From(forceMFATable.identifier()).
-		OrderBy(forceMFAIsDefault.identifier()).
 		ToSql()
 	return loginPolicyQuery, err
 }

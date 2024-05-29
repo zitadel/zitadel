@@ -26,7 +26,7 @@ type mfaInitVerifyData struct {
 
 func (l *Login) handleMFAInitVerify(w http.ResponseWriter, r *http.Request) {
 	data := new(mfaInitVerifyData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

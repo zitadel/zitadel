@@ -30,17 +30,19 @@ SelectAccount:
 
 Password:
   Title: Contraseña
-  Description: Introduce tus datos de inicio de sesión.
+  Description: Introduce tus datos de acceso.
   PasswordLabel: Contraseña
-  MinLength: Longitud mínima
-  HasUppercase: Una letra mayúscula
-  HasLowercase: Una letra minúscula
-  HasNumber: Número
-  HasSymbol: Símbolo
-  Confirmation: Las contraseñas coinciden
-  ResetLinkText: restablecer contraseña
-  BackButtonText: atrás
-  NextButtonText: siguiente
+  MinLength: Debe tener al menos
+  MinLengthp2: caracteres de longitud.
+  MaxLength: Debe tener menos de 70 caracteres de longitud.
+  HasUppercase: Debe incluir una letra mayúscula.
+  HasLowercase: Debe incluir una letra minúscula.
+  HasNumber: Debe incluir un número.
+  HasSymbol: Debe incluir un símbolo.
+  Confirmation: La confirmación de la contraseña coincide.
+  ResetLinkText: Restablecer contraseña
+  BackButtonText: Atrás
+  NextButtonText: Siguiente
 
 UsernameChange:
   Title: Cambiar nombre de usuario

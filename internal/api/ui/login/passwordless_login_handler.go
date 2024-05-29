@@ -49,7 +49,7 @@ func (l *Login) renderPasswordlessVerification(w http.ResponseWriter, r *http.Re
 
 func (l *Login) handlePasswordlessVerification(w http.ResponseWriter, r *http.Request) {
 	formData := new(passwordlessFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, formData)
+	authReq, err := l.ensureAuthRequestAndParseData(r, formData)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

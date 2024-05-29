@@ -7,6 +7,7 @@ import (
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -23,8 +24,25 @@ func (l *Login) getAuthRequest(r *http.Request) (*domain.AuthRequest, error) {
 	return l.authRepo.AuthRequestByID(r.Context(), authRequestID, userAgentID)
 }
 
+func (l *Login) ensureAuthRequest(r *http.Request) (*domain.AuthRequest, error) {
+	authRequest, err := l.getAuthRequest(r)
+	if authRequest != nil || err != nil {
+		return authRequest, err
+	}
+	return nil, zerrors.ThrowInvalidArgument(nil, "LOGIN-OLah9", "invalid or missing auth request")
+}
+
 func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*domain.AuthRequest, error) {
 	authReq, err := l.getAuthRequest(r)
+	if err != nil {
+		return authReq, err
+	}
+	err = l.parser.Parse(r, data)
+	return authReq, err
+}
+
+func (l *Login) ensureAuthRequestAndParseData(r *http.Request, data interface{}) (*domain.AuthRequest, error) {
+	authReq, err := l.ensureAuthRequest(r)
 	if err != nil {
 		return authReq, err
 	}
