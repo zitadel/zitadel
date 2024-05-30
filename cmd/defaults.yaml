@@ -147,6 +147,10 @@ Database:
         Cert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
         Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
     Admin:
+      # The default ExistingDatabase is postgres
+      # If your db system doesn't have a database named postgres, configure an existing database here
+      # It is used in zitadel init to connect to postgres and create a dedicated database for ZITADEL.
+      ExistingDatabase: # ZITADEL_DATABASE_POSTGRES_ADMIN_EXISTINGDATABASE
       Username: # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
       Password: # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
       SSL:

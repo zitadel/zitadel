@@ -116,8 +116,9 @@ type User struct {
 }
 
 type AdminUser struct {
-	DefaultDatabase string
-	User            `mapstructure:",squash"`
+	// ExistingDatabase is the database to connect to before the ZITADEL database exists
+	ExistingDatabase string
+	User             `mapstructure:",squash"`
 }
 
 type SSL struct {
@@ -172,7 +173,7 @@ func (c Config) String(useAdmin bool, appName string) string {
 	if !useAdmin {
 		fields = append(fields, "dbname="+c.Database)
 	} else {
-		defaultDB := c.Admin.DefaultDatabase
+		defaultDB := c.Admin.ExistingDatabase
 		if defaultDB == "" {
 			defaultDB = "postgres"
 		}
