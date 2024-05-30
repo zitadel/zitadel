@@ -707,7 +707,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Preview",
+          label: "V3 (Preview)",
           collapsed: false,
           link: {
             type: "doc",

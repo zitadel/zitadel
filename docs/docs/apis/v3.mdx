@@ -7,7 +7,7 @@ import CodeBlock from '@theme/CodeBlock';
 import ActionServiceProto from '!!raw-loader!./_v3_action_service.proto'
 import ActionExecutionProto from '!!raw-loader!./_v3_action_execution.proto'
 import ActionTargetProto from '!!raw-loader!./_v3_action_target.proto'
-import ActionQueryProto from '!!raw-loader!./_v3_action_query.proto'
+import ActionSearchProto from '!!raw-loader!./_v3_action_search.proto'
 import IDPServiceProto from '!!raw-loader!./_v3_idp_service.proto'
 import IDPProto from '!!raw-loader!./_v3_idp.proto'
 import IDPSearchProto from '!!raw-loader!./_v3_idp_search.proto'
@@ -24,17 +24,15 @@ Before using these APIs, pleases consider the [API release policy below](#api-re
 ## We Appreciate your Help
 
 We invite you to...
-- ... share your thoughts about the concepts by opening discussions on GitHub.
-- ... try the implementations and provide feedback by filing issues on GitHub.
+- ... share your thoughts about the concepts [by opening discussions on GitHub](https://github.com/zitadel/zitadel/discussions/new/choose).
+- ... try the implementations and provide feedback [by filing issues on GitHub](https://github.com/zitadel/zitadel/issues/new/choose).
 
-## The Problems
+## The Ideas behind the New V3 APIs
 
 The current ZITADEL *GA* APIs are structured around contexts like System, Admin, Management, and Auth.
 This structure leads to duplicate methods and makes it hard to find the right API for the right task.
 Especially interacting with resources from multiple organizations is cumbersome.
 Also, the APIs evolved over time, which lead to inconsistencies and a lack of flexibility in development.
-
-## The Improvements
 
 ### Service Structure
 
@@ -87,8 +85,9 @@ Reusable resources have the same behavior as standard resources with the followi
 
 - Reusable resources can be created in a given context level (system, instance, org).
 - For requests, that require a resource ID, no request context is needed.
-- Reusable resources are available in child contexts and by default have the same state (active or inactive) as in their immediate parent context.
-- In child contexts, the state policy of a reused resource is *inherit* by default and can be changed to *active*, *inactive* or back to *inherit*.
+- Reusable resources are available in child contexts, even if their state is *inactive*.
+- The child context can control if an inherited resource should be active or inactive for itself using a state policy.
+- In child contexts, the state policy of a reused resource is *inherit* by default and can be changed to *activate*, *deactivate* or back to *inherit*.
 - In child contexts, a reused resources configuration is read-only.
 - Child contexts can read at least the following properties of reused resources:
     - ID
@@ -140,7 +139,7 @@ Additional to the standard CRUD methods:
 </details>
 
 <details><summary>action_query.proto</summary>
-    <CodeBlock language="protobuf">{ActionQueryProto}</CodeBlock>
+    <CodeBlock language="protobuf">{ActionSearchProto}</CodeBlock>
 </details>
 
 ### ZITADELUsers
