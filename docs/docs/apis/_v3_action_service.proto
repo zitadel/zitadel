@@ -12,7 +12,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 import "zitadel/resources/action/v3alpha/target.proto";
 import "zitadel/resources/action/v3alpha/execution.proto";
-import "zitadel/resources/action/v3alpha/query.proto";
+import "zitadel/resources/action/v3alpha/search.proto";
 import "zitadel/resources/object/v3alpha/object.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
@@ -21,7 +21,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Action Service";
     version: "3.0-alpha";
-    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. It is behind the feature flag \"multitenancy_resources_api\". It can AND will continue breaking until the services provide the same functionality as the current actions.";
+    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. It is behind the feature flag \"multitenancy_resources_api\". It will continue breaking as long as it is in alpha state.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -220,7 +220,7 @@ service ZITADELActions {
   rpc SearchTargets (SearchTargetsRequest) returns (SearchTargetsResponse) {
     option (google.api.http) = {
       post: "/targets/_search",
-      body: "queries"
+      body: "filters"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -250,10 +250,11 @@ service ZITADELActions {
     };
   }
 
-  // Create an execution
+  // Put an execution to call a target or include the targets of another execution.
   //
-  // Create an execution to call a previously defined target or include the targets of a previously defined execution.
-  rpc CreateExecution (CreateExecutionRequest) returns (CreateExecutionResponse) {
+  // Creates an execution for the given condition if it doesn't exists.
+  // Otherwise, the existing execution is updated.
+  rpc PutExecution (PutExecutionRequest) returns (PutExecutionResponse) {
     option (google.api.http) = {
       post: "/executions"
       body: "execution"
@@ -339,7 +340,7 @@ service ZITADELActions {
   rpc SearchExecutions (SearchExecutionsRequest) returns (SearchExecutionsResponse) {
     option (google.api.http) = {
       post: "/executions/_search"
-      body: "queries"
+      body: "filters"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -441,9 +442,9 @@ service ZITADELActions {
 }
 
 message CreateTargetRequest {
-  // ctx is reserved for the case we make it a reusable resource
-  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
+  // field number reserved for the case we make it a reusable resource
   reserved 1;
+  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
   Target target = 2;
 }
 
@@ -485,9 +486,9 @@ message DeleteTargetResponse {
 }
 
 message SearchTargetsRequest {
-  // ctx is reserved for the case we make it a reusable resource
-  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
+  // field number reserved for the case we make it a reusable resource
   reserved 1;
+  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
   // list limitations and ordering.
   zitadel.resources.object.v3alpha.ListQuery query = 2;
   // the field the result is sorted.
@@ -523,32 +524,14 @@ message GetTargetResponse {
   zitadel.resources.action.v3alpha.GetTarget target = 1;
 }
 
-message CreateExecutionRequest {
-  // ctx is reserved for the case we make it a reusable resource
-  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
+message PutExecutionRequest {
+  // field number reserved for the case we make it a reusable resource
   reserved 1;
+  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
   Execution execution = 2;
 }
 
-message CreateExecutionResponse {
-  string id = 1;
-  zitadel.resources.object.v3alpha.Details details = 2;
-}
-
-message PatchExecutionRequest {
-  string id = 1 [
-    (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      min_length: 1,
-      max_length: 200,
-      example: "\"69629026806489455\"";
-    }
-  ];
-  PatchExecution execution = 2;
-}
-
-message PatchExecutionResponse {
+message PutExecutionResponse {
   zitadel.resources.object.v3alpha.Details details = 2;
 }
 
@@ -572,7 +555,7 @@ message SearchExecutionsRequest {
   // list limitations and ordering.
   zitadel.resources.object.v3alpha.ListQuery query = 1;
   // Define the criteria to query for.
-  repeated zitadel.resources.action.v3alpha.SearchFilter filters = 2;
+  repeated zitadel.resources.action.v3alpha.ExecutionSearchFilter filters = 2;
 }
 
 message SearchExecutionsResponse {
