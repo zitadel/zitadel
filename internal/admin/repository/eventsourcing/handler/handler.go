@@ -41,14 +41,24 @@ func Register(ctx context.Context, config Config, view *view.View, static static
 	))
 }
 
+func Projections() []*handler2.Handler {
+	return projections
+}
+
 func Start(ctx context.Context) {
 	for _, projection := range projections {
 		projection.Start(ctx)
 	}
 }
 
-func Projections() []*handler2.Handler {
-	return projections
+func ProjectInstance(ctx context.Context) error {
+	for _, projection := range projections {
+		_, err := projection.Trigger(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (config Config) overwrite(viewModel string) handler2.Config {

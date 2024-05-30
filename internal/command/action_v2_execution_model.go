@@ -3,6 +3,7 @@ package command
 import (
 	"slices"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 )
@@ -13,6 +14,16 @@ type ExecutionWriteModel struct {
 	Targets          []string
 	Includes         []string
 	ExecutionTargets []*execution.Target
+}
+
+func (e *ExecutionWriteModel) IncludeList() []string {
+	includes := make([]string, 0)
+	for i := range e.ExecutionTargets {
+		if e.ExecutionTargets[i].Type == domain.ExecutionTargetTypeInclude {
+			includes = append(includes, e.ExecutionTargets[i].Target)
+		}
+	}
+	return includes
 }
 
 func (e *ExecutionWriteModel) Exists() bool {

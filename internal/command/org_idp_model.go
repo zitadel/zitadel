@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -927,6 +928,8 @@ func (wm *OrgSAMLIDPWriteModel) NewChangedEvent(
 	secretCrypto crypto.EncryptionAlgorithm,
 	binding string,
 	withSignedRequest bool,
+	nameIDFormat *domain.SAMLNameIDFormat,
+	transientMappingAttributeName string,
 	options idp.Options,
 ) (*org.SAMLIDPChangedEvent, error) {
 	changes, err := wm.SAMLIDPWriteModel.NewChanges(
@@ -937,6 +940,8 @@ func (wm *OrgSAMLIDPWriteModel) NewChangedEvent(
 		secretCrypto,
 		binding,
 		withSignedRequest,
+		nameIDFormat,
+		transientMappingAttributeName,
 		options,
 	)
 	if err != nil || len(changes) == 0 {

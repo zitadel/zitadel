@@ -216,7 +216,9 @@ func (e *SetExecution) Existing(c *Commands, ctx context.Context, resourceOwner 
 	if len(includes) > 0 && !c.existsExecutionsByIDs(ctx, includes, resourceOwner) {
 		return zerrors.ThrowNotFound(nil, "COMMAND-slgj0l4cdz", "Errors.Execution.IncludeNotFound")
 	}
-	return nil
+	get, set := createIncludeCacheFunctions()
+	// maxLevels could be configurable, but set as 3 for now
+	return checkForIncludeCircular(ctx, e.AggregateID, resourceOwner, includes, c.getExecutionIncludes(get, set), 3)
 }
 
 func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resourceOwner string) (_ *domain.ObjectDetails, err error) {
@@ -308,4 +310,76 @@ func (c *Commands) getExecutionWriteModelByID(ctx context.Context, id string, re
 		return nil, err
 	}
 	return wm, nil
+}
+
+func createIncludeCacheFunctions() (func(s string) ([]string, bool), func(s string, strings []string)) {
+	tempCache := make(map[string][]string)
+	return func(s string) ([]string, bool) {
+			include, ok := tempCache[s]
+			return include, ok
+		}, func(s string, strings []string) {
+			tempCache[s] = strings
+		}
+}
+
+type includeCacheFunc func(ctx context.Context, id string, resourceOwner string) ([]string, error)
+
+func checkForIncludeCircular(ctx context.Context, id string, resourceOwner string, includes []string, cache includeCacheFunc, maxLevels int) error {
+	if len(includes) == 0 {
+		return nil
+	}
+	level := 0
+	for _, include := range includes {
+		if id == include {
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-mo1cmjp5k7", "Errors.Execution.CircularInclude")
+		}
+		if err := checkForIncludeCircularRecur(ctx, []string{id}, resourceOwner, include, cache, maxLevels, level); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Commands) getExecutionIncludes(
+	getCache func(string) ([]string, bool),
+	setCache func(string, []string),
+) includeCacheFunc {
+	return func(ctx context.Context, id string, resourceOwner string) ([]string, error) {
+		included, ok := getCache(id)
+		if !ok {
+			included, err := c.getExecutionWriteModelByID(ctx, id, resourceOwner)
+			if err != nil {
+				return nil, err
+			}
+			includes := included.IncludeList()
+			setCache(id, includes)
+			return includes, nil
+		}
+		return included, nil
+	}
+}
+
+func checkForIncludeCircularRecur(ctx context.Context, ids []string, resourceOwner string, include string, cache includeCacheFunc, maxLevels, level int) error {
+	included, err := cache(ctx, include, resourceOwner)
+	if err != nil {
+		return err
+	}
+	currentLevel := level + 1
+	if currentLevel >= maxLevels {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-gbhd3g57oo", "Errors.Execution.MaxLevelsInclude")
+	}
+	for _, includedInclude := range included {
+		if include == includedInclude {
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-iuch02i656", "Errors.Execution.CircularInclude")
+		}
+		for _, id := range ids {
+			if includedInclude == id {
+				return zerrors.ThrowPreconditionFailed(nil, "COMMAND-819opvhgjv", "Errors.Execution.CircularInclude")
+			}
+		}
+		if err := checkForIncludeCircularRecur(ctx, append(ids, include), resourceOwner, includedInclude, cache, maxLevels, currentLevel); err != nil {
+			return err
+		}
+	}
+	return nil
 }

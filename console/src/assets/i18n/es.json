@@ -595,6 +595,7 @@
     "INVALID_FORMAT": "El formato no es valido.",
     "NOTANEMAIL": "El valor proporcionado no es una dirección de email.",
     "MINLENGTH": "Debe tener al menos {{requiredLength}} caracteres de longitud.",
+    "MAXLENGTH": "Debe tener menos de {{requiredLength}} caracteres.",
     "UPPERCASEMISSING": "Debe incluir un carácter en mayúscula.",
     "LOWERCASEMISSING": "Debe incluir un carácter en minúscula.",
     "SYMBOLERROR": "Debe incluir un símbolo o un signo de puntuación.",
@@ -880,7 +881,8 @@
       "SET": "Establecer nueva contraseña",
       "RESENDNOTIFICATION": "Enviar enlace para restablecer la contraseña",
       "REQUIRED": "Faltan algunos campos requeridos.",
-      "MINLENGTHERROR": "Debe tener al menos {{value}} caracteres de longitud."
+      "MINLENGTHERROR": "Debe tener al menos {{value}} caracteres de longitud.",
+      "MAXLENGTHERROR": "Debe tener menos de {{value}} caracteres"
     },
     "ID": "ID",
     "EMAIL": "Email",
@@ -2225,7 +2227,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Proveedor SMTP",
-      "DESCRIPTION": "Estos son los proveedores SMTP para tu instancia de Zitadel. Activa el que quieras utilizar para enviar notificaciones a tus usuarios.",
+      "DESCRIPTION": "Estos son los proveedores SMTP para tu instancia de ZITADEL. Activa el que quieras utilizar para enviar notificaciones a tus usuarios.",
       "EMPTY": "No hay ningún proveedor SMTP disponible",
       "ACTIVATED": "Activado",
       "ACTIVATE": "Activar proveedor",
@@ -2253,7 +2255,16 @@
         "CURRENT_DESC_TITLE": "Estas son tus configuraciones SMTP",
         "PROVIDER_SETTINGS": "Configuración del proveedor SMTP",
         "SENDER_SETTINGS": "Configuración del remitente",
-        "TEST_SETTINGS": "Probar la configuración SMTP"
+        "TEST_SETTINGS": "Probar la configuración SMTP",
+        "NEXT_STEPS": "Pŕoximos pasos",
+        "ACTIVATE": {
+          "TITLE": "Activa tu proveedor SMTP",
+          "DESCRIPTION": "ZITADEL no puede usar este proveedor SMTP para enviar notificaciones hasta que lo actives. Si activas este proveedor cualquier otro proveedor que estuviera activado será desactivado ahora."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Desactiva tu proveedor SMTP",
+          "DESCRIPTION": "Si desactivas este proveedor SMTP, ZITADEL no puede utilizarlo para enviar notificationes hasta que lo actives otra vez."
+        }
       }
     },
     "DETAIL": {

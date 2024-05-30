@@ -34,7 +34,7 @@ Requirements:
 
 			setupConfig := setup.MustNewConfig(viper.GetViper())
 			setupSteps := setup.MustNewSteps(viper.New())
-			setup.Setup(setupConfig, setupSteps, masterKey)
+			setup.Setup(cmd.Context(), setupConfig, setupSteps, masterKey)
 
 			startConfig := MustNewConfig(viper.GetViper())
 
