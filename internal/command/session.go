@@ -121,7 +121,7 @@ func CheckIntent(intentID, token string) SessionCommand {
 				return zerrors.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
 			}
 		} else {
-			linkWriteModel := NewUserIDPLinkWriteModel(cmd.sessionWriteModel.UserID, cmd.intentWriteModel.IDPID, cmd.intentWriteModel.IDPUserID, cmd.intentWriteModel.ResourceOwner)
+			linkWriteModel := NewUserIDPLinkWriteModel(cmd.sessionWriteModel.UserID, cmd.intentWriteModel.IDPID, cmd.intentWriteModel.IDPUserID, cmd.sessionWriteModel.UserResourceOwner)
 			err := cmd.eventstore.FilterToQueryReducer(ctx, linkWriteModel)
 			if err != nil {
 				return err

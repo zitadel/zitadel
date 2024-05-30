@@ -413,6 +413,14 @@ func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t, CTX)
 
+	// successful intent without known / linked user
+	idpUserID := "id"
+	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", idpUserID)
+
+	// link the user (with info from intent)
+	Tester.CreateUserIDPlink(CTX, User.GetUserId(), idpUserID, idpID, User.GetUserId())
+
+	// session with intent check must now succeed
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -420,30 +428,6 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 					UserId: User.GetUserId(),
 				},
 			},
-		},
-	})
-	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0)
-
-	idpUserID := "id"
-	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", idpUserID)
-	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
-		Checks: &session.Checks{
-			IdpIntent: &session.CheckIDPIntent{
-				IdpIntentId:    intentID,
-				IdpIntentToken: token,
-			},
-		},
-	})
-	require.Error(t, err)
-	Tester.CreateUserIDPlink(CTX, User.GetUserId(), idpUserID, idpID, User.GetUserId())
-	intentID, token, _, _ = Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), idpUserID)
-	updateResp, err = Client.SetSession(CTX, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
-		Checks: &session.Checks{
 			IdpIntent: &session.CheckIDPIntent{
 				IdpIntentId:    intentID,
 				IdpIntentToken: token,
@@ -451,7 +435,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantIntentFactor)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, wantUserFactor, wantIntentFactor)
 }
 
 func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
