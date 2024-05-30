@@ -322,7 +322,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 		{
 			"invalid session token",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
@@ -843,7 +843,7 @@ func TestCommands_updateSession(t *testing.T) {
 					),
 					expectPush(
 						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
-							"userID", "org1", testNow, &language.Afrikaans),
+							"userID", "org1", testNow),
 						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow),
 						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -856,7 +856,7 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckUser("userID", "org1"),
 						CheckIntent("intent", "aW50ZW50"),
 					},
 					createToken: func(sessionID string) (string, string, error) {
