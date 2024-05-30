@@ -12,11 +12,11 @@ This example shows you how to secure a Python3 Flask API with both authenticatio
 
 The Python API will have public, private, and private-scoped routes and check if a user is authenticated and authorized to access the routes.
 The private routes expect an authorization header with a valid access token in the request. The access token is used as a bearer token to authenticate the user when calling the API.
-The API will validate the access token on the [introspect endpoint](https://zitadel.com/docs/apis/openidoauth/endpoints#introspection_endpoint) and will receive the user's roles from ZITADEL.
+The API will validate the access token on the [introspect endpoint](/docs/apis/openidoauth/endpoints#introspection_endpoint) and will receive the user's roles from ZITADEL.
 
-The API application uses [Client Secret Basic](https://zitadel.com/docs/apis/openidoauth/authn-methods#client-secret-basic) to authenticate against ZITADEL and access the introspection endpoint.
+The API application uses [Client Secret Basic](/docs/apis/openidoauth/authn-methods#client-secret-basic) to authenticate against ZITADEL and access the introspection endpoint.
 You can use any valid access_token from a user or service account to send requests to the example API.
-In this example we will use a service account with a [personal access token](https://zitadel.com/docs/guides/integrate/service-users/personal-access-token) which can be used directly to access the example API.
+In this example we will use a service account with a [personal access token](/docs/guides/integrate/service-users/personal-access-token) which can be used directly to access the example API.
 
 
 ## Running the example
@@ -31,9 +31,9 @@ In order to run the example you need to have `python3` and `pip3` installed.
 
 You need to setup a couple of things in ZITADEL. 
 
-1. If you don't have an instance yet, please go ahead and create an instance as explained [here](https://zitadel.com/docs/guides/start/quickstart#2-create-your-first-instance). Also, create a new project by following the steps [here](https://zitadel.com/docs/guides/start/quickstart#2-create-your-first-instance).
+1. If you don't have an instance yet, please go ahead and create an instance as explained [here](/docs/guides/start/quickstart#2-create-your-first-instance). Also, create a new project by following the steps [here](/docs/guides/start/quickstart#2-create-your-first-instance).
 
-2. You must create an API application in your project. Follow [this guide](https://zitadel.com/docs/guides/manage/console/applications) to create a new application of type "API" with authentication method "Basic". Save both the ClientID and ClientSecret after you create the application. 
+2. You must create an API application in your project. Follow [this guide](/docs/guides/manage/console/applications) to create a new application of type "API" with authentication method "Basic". Save both the ClientID and ClientSecret after you create the application. 
 
 ### Create the API
 
@@ -179,7 +179,7 @@ class ZitadelIntrospectTokenValidator(IntrospectTokenValidator):
         res = self.introspect_token(*args, **kwargs)
         return res
 ```
-3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Instance Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](https://zitadel.com/docs/guides/start/quickstart#referred1).
+3. Create a new file named ".env" in the directory. Copy the configuration in the [".env.example"](https://github.com/zitadel/example-api-python3-flask/blob/main/.env.example) file to the newly created .env file. Set the values with your Instance Domain/Issuer URL, Client ID, and Client Secret from the previous steps. Obtain your Issuer URL by following [these steps](/docs/guides/start/quickstart#referred1).
 
 ```python
 ZITADEL_DOMAIN = "https://your-domain-abcdef.zitadel.cloud"
@@ -191,9 +191,9 @@ CLIENT_SECRET = "NVAp70IqiGmJldbS...."
 
 ![Create a service user](/img/python-flask/3.png)
 
-1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](https://zitadel.com/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat). 
-2. To enable authorization, follow [this guide](https://zitadel.com/docs/guides/manage/console/roles) to create a role `read:messages` on your project. 
-3. Next, create an authorization for the service user you created by adding the role `read:messages` to the user. Follow this [guide](https://zitadel.com/docs/guides/manage/console/roles#authorizations) for more information on creating an authorization. 
+1. Create a service user and a Personal Access Token (PAT) for that user by following [this guide](/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat). 
+2. To enable authorization, follow [this guide](/docs/guides/manage/console/roles) to create a role `read:messages` on your project. 
+3. Next, create an authorization for the service user you created by adding the role `read:messages` to the user. Follow this [guide](/docs/guides/manage/console/roles#authorizations) for more information on creating an authorization. 
 
 
 ### Run the API
