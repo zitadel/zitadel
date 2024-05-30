@@ -881,6 +881,18 @@ module.exports = {
         "self-hosting/manage/database/database",
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/usage_control",
+        {
+          type: "category",
+          label: "Command Line Interface",
+          collapsed: false,
+          link: {
+            type: "doc",
+            id: "self-hosting/manage/cli/overview"
+          },
+          items: [
+            "self-hosting/manage/cli/mirror"
+          ],
+        },
       ],
     },
   ],

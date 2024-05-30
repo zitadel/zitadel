@@ -29,14 +29,14 @@ func intentToCommands(intent *intent) (commands []*command, err error) {
 }
 
 func marshalPayload(payload any) ([]byte, error) {
-	if reflect.ValueOf(payload).IsZero() {
+	if payload == nil || reflect.ValueOf(payload).IsZero() {
 		return nil, nil
 	}
 	return json.Marshal(payload)
 }
 
 type command struct {
-	eventstore.Command
+	*eventstore.Command
 
 	intent *intent
 
