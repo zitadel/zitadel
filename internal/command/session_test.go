@@ -779,6 +779,85 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 		},
+		{
+			"set user, intent (user not linked yet)",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectPush(
+						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							"userID", "org1", testNow, &language.Afrikaans),
+						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							testNow),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							"tokenID"),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckIntent("intent", "aW50ZW50"),
+					},
+					eventstore: eventstoreExpect(t,
+						expectFilter(
+							eventFromEventPusher(
+								user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+							),
+							eventFromEventPusher(
+								idpintent.NewStartedEvent(context.Background(),
+									&idpintent.NewAggregate("id", "instance1").Aggregate,
+									nil,
+									nil,
+									"idpID",
+								),
+							),
+							eventFromEventPusher(
+								idpintent.NewSucceededEvent(context.Background(),
+									&idpintent.NewAggregate("id", "instance1").Aggregate,
+									nil,
+									"idpUserID",
+									"idpUsername",
+									"",
+									nil,
+									"",
+								),
+							),
+						),
+						expectFilter(
+							eventFromEventPusher(
+								user.NewUserIDPLinkAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+									"idpID",
+									"idpUsername",
+									"idpUserID",
+								),
+							),
+						),
+					),
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+			},
+			res{
+				want: &SessionChanged{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "instance1",
+					},
+					ID:       "sessionID",
+					NewToken: "token",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
