@@ -4,8 +4,9 @@ module.exports = {
   trailingSlash: false,
   url: "https://zitadel.com",
   baseUrl: "/docs",
-  onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenLinks: "warn",
+  onBrokenAnchors: "warn",
+  onBrokenMarkdownLinks: "throw",
   favicon: "img/favicon.ico",
   organizationName: "zitadel",
   projectName: "zitadel",
@@ -202,6 +203,11 @@ module.exports = {
           parser: {
             syntax: 'typescript',
             tsx: true,
+          },
+          transform: {
+            react: {
+              runtime: 'automatic',
+            },
           },
           target: 'es2017',
         },

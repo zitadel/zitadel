@@ -15,8 +15,10 @@
     "write-heading-ids": "docusaurus write-heading-ids",
     "generate": "yarn run generate:grpc && yarn run generate:apidocs && yarn run generate:configdocs",
     "generate:grpc": "buf generate ../proto",
-    "generate:apidocs": "docusaurus clean-api-docs all && docusaurus gen-api-docs all",
-    "generate:configdocs": "cp -r ../cmd/defaults.yaml ./docs/self-hosting/manage/configure/ && cp -r ../cmd/setup/steps.yaml ./docs/self-hosting/manage/configure/"
+    "generate:apidocs": "docusaurus gen-api-docs all",
+    "generate:configdocs": "cp -r ../cmd/defaults.yaml ./docs/self-hosting/manage/configure/ && cp -r ../cmd/setup/steps.yaml ./docs/self-hosting/manage/configure/",
+    "generate:re-gen": "yarn clean-all && yarn gen-all",
+    "generate:clean-all": "docusaurus clean-api-docs all"
   },
   "dependencies": {
     "@bufbuild/buf": "^1.14.0",
