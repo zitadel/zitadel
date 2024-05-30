@@ -16,22 +16,15 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alph
 
 message Execution {
   Condition condition = 1;
-  // field number reserved for the case we make it a reusable resource
-  // zitadel.resources.object.v3alpha.StatePolicy state_policy = 2;
-  reserved 2;
   // Target IDs which are called when the defined conditions trigger.
-  repeated string targets = 3;
+  repeated string targets = 2;
   // Included executions with the same condition-types.
-  repeated string includes = 4;
+  repeated string includes = 3;
 }
 
 message GetExecution {
   zitadel.resources.object.v3alpha.Details details = 1;
-  // field numbers reserved for the case we make it a reusable resource
-  // optional zitadel.resources.object.v3alpha.Parent parent = 2;
-  // zitadel.resources.object.v3alpha.State state = 3;
-  reserved 2, 3;
-  Execution execution = 4;
+  Execution execution = 2;
 }
 
 message Condition {

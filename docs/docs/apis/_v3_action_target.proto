@@ -15,7 +15,7 @@ import "zitadel/resources/object/v3alpha/object.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
 message Target {
-  string name = 3 [
+  string name = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"ip_allow_list\"";
     }
@@ -40,35 +40,34 @@ message Target {
 }
 
 message GetTarget {
-  zitadel.resources.object.v3alpha.Details details = 2;
-  Target target = 3;
+  zitadel.resources.object.v3alpha.Details details = 1;
+  Target target = 2;
 }
 
 message PatchTarget {
-  optional string name = 3 [
+  optional string name = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"ip_allow_list\"";
     }
   ];
   // Defines the target type and how the response of the target is treated.
   oneof target_type {
-    SetRESTWebhook rest_webhook = 4;
-    SetRESTRequestResponse rest_request_response = 5;
+    SetRESTWebhook rest_webhook = 3;
+    SetRESTRequestResponse rest_request_response = 4;
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
-  optional google.protobuf.Duration timeout = 6 [
+  optional google.protobuf.Duration timeout = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"10s\"";
     }
   ];
   oneof execution_type {
     // Set the execution to run asynchronously.
-    bool is_async = 7;
+    bool is_async = 6;
     // Define if any error stops the whole execution. By default the process continues as normal.
-    bool interrupt_on_error = 8;
+    bool interrupt_on_error = 7;
   }
 }
-
 
 message SetRESTWebhook {
   string url = 1 [

@@ -281,28 +281,10 @@ service ZITADELActions {
           }
         };
       };
-    };
-  }
-  // Patch an execution
-  //
-  // Patch an existing execution to call a previously defined target or include the targets of a previously defined execution.
-  rpc PatchExecution (PatchExecutionRequest) returns (PatchExecutionResponse) {
-    option (google.api.http) = {
-      patch: "/executions/{id}"
-      body: "execution"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "action.execution.write"
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
         key: "200";
         value: {
-          description: "Execution successfully set";
+          description: "Execution successfully updated";
         };
       };
     };
@@ -442,9 +424,6 @@ service ZITADELActions {
 }
 
 message CreateTargetRequest {
-  // field number reserved for the case we make it a reusable resource
-  reserved 1;
-  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
   Target target = 2;
 }
 
@@ -486,9 +465,6 @@ message DeleteTargetResponse {
 }
 
 message SearchTargetsRequest {
-  // field number reserved for the case we make it a reusable resource
-  reserved 1;
-  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
   // list limitations and ordering.
   zitadel.resources.object.v3alpha.ListQuery query = 2;
   // the field the result is sorted.
@@ -525,9 +501,6 @@ message GetTargetResponse {
 }
 
 message PutExecutionRequest {
-  // field number reserved for the case we make it a reusable resource
-  reserved 1;
-  // optional zitadel.object.v2alpha.RequestContext ctx = 1;
   Execution execution = 2;
 }
 
