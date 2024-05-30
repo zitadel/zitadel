@@ -65,8 +65,8 @@ Flags:
                                  * eventstore.unique_constraints
                                  The should be provided if you want to execute the mirror command multiple times so that the static data are also mirrored to prevent inconsistent states.
 
-      --instance strings         id or comma separated ids of the instance(s) to migrate. Either this or the `--system`-flag must be set
-      --system                   migrates the whole system. Either this or the `--instance`-flag must be set
+      --instance strings         id or comma separated ids of the instance(s) to migrate. Either this or the `--system`-flag must be set. Make sure to always use the same flag if you execute the command multiple times.
+      --system                   migrates the whole system. Either this or the `--instance`-flag must be set. Make sure to always use the same flag if you execute the command multiple times.
 
 # For the flags below use the same configuration you also use in the current deployment
 
@@ -228,3 +228,5 @@ It is not possible to use files as source or destination. See github issue [here
 Currently the encryption keys of the source database must be copied to the destination database. See github issue [here](https://github.com/zitadel/zitadel/issues/7964)
 
 It is not possible to change the domain of the ZITADEL deployment.
+
+If you want to mirror the data multiple times make sure to always use the same flag to define the instances migrated (`--system` or `--instance`).

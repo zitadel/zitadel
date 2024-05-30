@@ -50,7 +50,7 @@ Order of execution:
 		},
 	}
 
-	migrateFlags(cmd)
+	mirrorFlags(cmd)
 	cmd.Flags().BoolVar(&shouldIgnorePrevious, "ignore-previous", false, "ignores previous migrations of the events table")
 	cmd.Flags().BoolVar(&shouldReplace, "replace", false, `replaces all data of the following tables for the provided instances or all if the "--system"-flag is set:
 * system.assets
@@ -73,9 +73,9 @@ The flag should be provided if you want to execute the mirror command multiple t
 	return cmd
 }
 
-func migrateFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringSliceVar(&instanceIDs, "instance", nil, "id of the instance to migrate")
-	cmd.PersistentFlags().BoolVar(&isSystem, "system", false, "migrates the whole system")
+func mirrorFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().StringSliceVar(&instanceIDs, "instance", nil, "id or comma separated ids of the instance(s) to migrate. Either this or the `--system`-flag must be set. Make sure to always use the same flag if you execute the command multiple times.")
+	cmd.PersistentFlags().BoolVar(&isSystem, "system", false, "migrates the whole system. Either this or the `--instance`-flag must be set. Make sure to always use the same flag if you execute the command multiple times.")
 	cmd.MarkFlagsOneRequired("system", "instance")
 	cmd.MarkFlagsMutuallyExclusive("system", "instance")
 }
