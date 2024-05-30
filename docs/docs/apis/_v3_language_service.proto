@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package zitadel.settings.language.v2alpha;
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/language/v2alpha;language";
+package zitadel.settings.language.v3alpha;
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/language/v3alpha;language";
 
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-import "zitadel/object/v2alpha/object.proto";
-import "zitadel/settings/object/v2alpha/object.proto";
-import "zitadel/settings/language/v2alpha/language.proto";
+import "zitadel/object/v3alpha/object.proto";
+import "zitadel/settings/object/v3alpha/object.proto";
+import "zitadel/settings/language/v3alpha/language.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -140,19 +140,19 @@ service LanguageService {
 }
 
 message SetLanguageSettingsRequest{
-  optional zitadel.object.v2alpha.RequestContext ctx = 1;
+  optional zitadel.object.v3alpha.RequestContext ctx = 1;
   SetLanguageSettings settings = 2;
 }
 
 message SetLanguageSettingsResponse{
-  zitadel.settings.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v3alpha.Details details = 1;
 }
 
 message ResolveLanguageSettingsRequest{
-  optional zitadel.object.v2alpha.RequestContext ctx = 1;
+  optional zitadel.object.v3alpha.RequestContext ctx = 1;
 }
 
 message ResolveLanguageSettingsResponse{
-  zitadel.settings.object.v2alpha.Details details = 1;
+  zitadel.settings.object.v3alpha.Details details = 1;
   ResolvedLanguageSettings settings = 2;
 }

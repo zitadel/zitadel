@@ -8,7 +8,8 @@ import ActionServiceProto from '!!raw-loader!./_v3_action_service.proto'
 import ActionExecutionProto from '!!raw-loader!./_v3_action_execution.proto'
 import ActionTargetProto from '!!raw-loader!./_v3_action_target.proto'
 import ActionQueryProto from '!!raw-loader!./_v3_action_query.proto'
-import LanguageProto from '!!raw-loader!./_v3_language_service.proto'
+import LanguageServiceProto from '!!raw-loader!./_v3_language_service.proto'
+import LanguageProto from '!!raw-loader!./_v3_language.proto'
 
 The APIs described in this section are currently either in *Preview* stage or not implemented, yet.
 Before using these APIs, pleases consider the [API release policy below](#api-release-policy)
@@ -65,7 +66,7 @@ Standard resource methods behave like this:
 - Resource configurations are partially updatable. With HTTP, this is done via PATCH requests. If no changes were made, the response is successful.
 - Status changes or other actions on resources with side effects are done via POST requests. Their HTTP path ends with the underscore prefixed action name. For example `POST /resources/idps/{id}/_activate`.
 
-For a concrete proto example, have a look at the [ZITADELActions service](#zitadel.resources.action.v3alpha.ZITADELActions).
+For a concrete proto example, have a look at the [ZITADELActions service](#zitadelactions).
 
 ## Reusable Resources
 
@@ -96,19 +97,18 @@ Reusable resources have the same behavior as standard resources with the followi
 Typically, a new resource is first designed and implemented as a non-reusable resource.
 If the community sees a benefit in reusing the resource in multiple contexts, reusability is added to the resource.
 
-For a concrete proto example, have a look at the [ZITADELIdentityProviders service](#zitadel.resources.idp.v3alpha.ZITADELIdentityProviders).
+For a concrete proto example, have a look at the [ZITADELIdentityProviders service](#zitadelidentityproviders).
 
 ## Resource Services
 
 All resource services support the following CRUD operations [as described above](#standard-resources-behavior).
 
 - Create
-- Read (list, get)
-- Update (partially, success on no changes)
+- Read (get, search)
+- Patch (partially update, success on no changes)
 - Delete
 
-
-### zitadel.resources.action.v3alpha.ZITADELActions
+### ZITADELActions
 
 - standard CRUD methods for Executions
 - standard CRUD methods for Targets
@@ -135,48 +135,48 @@ Additional to the standard CRUD methods:
     <CodeBlock language="protobuf">{ActionQueryProto}</CodeBlock>
 </details>
 
-### zitadel.resources.user.v3alpha.ZITADELUsers
+### ZITADELUsers
 
 standard CRUD methods
 
-### zitadel.resources.userschema.v3alpha.ZITADELUserSchemas
+### ZITADELUserSchemas
 
 standard CRUD methods
 
-### zitadel.resources.instance.v3alpha.ZITADELInstances
+### ZITADELInstances
 
 additional to the standard CRUD methods:
 
 - Limit (partial update of block and audit log retention)
 - BulkLimit (partial update of block and audit log retention for multiple instances)
 
-### zitadel.resources.organization.v3alpha.ZITADELOrganizations
+### ZITADELOrganizations
 
 additional to the standard CRUD methods:
 
 - SetAsInstanceDefault
 - GetInstanceDefault
 
-### zitadel.resources.domain.v3alpha.ZITADELDomains
+### ZITADELDomains
 
 additional to the standard CRUD methods:
 
 - SetAsPrimary
 - Validate
 
-### zitadel.resources.project.v3alpha.ZITADELProjects
+### ZITADELProjects
 
 standard CRUD methods
 
-### zitadel.resources.app.v3alpha.ZITADELApps
+### ZITADELApps
 
 standard CRUD methods
 
-### zitadel.resources.session.v3alpha.ZITADELSessions
+### ZITADELSessions
 
 standard CRUD methods
 
-### zitadel.resources.membership.v3alpha.ZITADELMemberships
+### ZITADELMemberships
 
 The given context defines the organization, instance or system where the membership is created.
 The context and the user ID together are unique.
@@ -185,21 +185,21 @@ additional to the standard CRUD methods:
 
 - ListAvailableRoles (context-aware)
 
-### zitadel.resources.grant.v3alpha.ZITADELGrants
+### ZITADELGrants
 
 - standard CRUD methods for project grants
 - standard CRUD methods for user grants
 - standard CRUD methods for roles
 
-### zitadel.resources.idp.v3alpha.ZITADELIdentityProviders (reusable)
+### ZITADELIdentityProviders (reusable)
 
 standard CRUD and methods for all IDPs and standard methods for reusable resources
 
-### zitadel.resources.smtp.v3alpha.ZITADELSMTPProviders
+### ZITADELSMTPProviders
 
 standard CRUD methods
 
-### zitadel.resources.sms.v3alpha.ZITADELSMSProviders
+### ZITADELSMSProviders
 
 standard CRUD methods
 
@@ -210,78 +210,70 @@ They also don't have a state like active or inactive.
 They only have properties that can be set and queried.
 These properties are inherited to from parent-contexts (instance) to child-contexts (organization).
 
-### Behavior
+Settings behave like this:
 
 - Setting and retrieving settings is always context-aware. By default, the context is the instance discovered by the requests *Host* header.
 - All settings properties can be partially overridden in child-contexts.
 - All settings properties can be partially reset in child-contexts, so their values default to the parent contexts property values.
 - All settings properties returned by queries contain the value and if it is inherited, the context where it is inherited from.
 
+For a concrete proto example, have a look at the [ZITADELLanguageSettings service](#zitadellanguagesettings).
+
 ## Settings Services
 
-### zitadel.settings.language.v3alpha.ZITADELLanguageSettings
+### ZITADELLanguageSettings
 
 default language, restricted languages, supported languages
 
 <details><summary>language_service.proto</summary>
+    <CodeBlock language="protobuf">{LanguageServiceProto}</CodeBlock>
+</details>
+
+<details><summary>language.proto</summary>
     <CodeBlock language="protobuf">{LanguageProto}</CodeBlock>
 </details>
 
-### zitadel.settings.text.v3alpha.ZITADELTextSettings
+### ZITADELTextSettings
 
 key-value pairs for localized login texts, previously known as login texts
 
-### zitadel.settings.branding.v3alpha.ZITADELBrandingSettings
+### ZITADELBrandingSettings
 
 predefined branding settings and custom key-value pairs, previously known as label policy or branding settings
 
-### zitadel.settings.login.v3alpha.ZITADELLoginSettings
+### ZITADELLoginSettings
 
 previously known as login policy
 
-### zitadel.settings.lockout.v3alpha.ZITADELLockoutSettings
+### ZITADELLockoutSettings
 
 previously known as lockout policy
 
-### zitadel.settings.password.v3alpha.ZITADELPasswordSettings
+### ZITADELPasswordSettings
 
 previously known as password complexity policy
 
-### zitadel.settings.help.v3alpha.ZITADELHelpSettings
+### ZITADELHelpSettings
 
 previously known as legal and support settings or privacy policy
 
-### zitadel.settings.domain.v3alpha.ZITADELDomainSettings
+### ZITADELDomainSettings
 
 previously known as domain policy
 
-### zitadel.settings.feature.v3alpha.ZITADELFeatureSettings
+### ZITADELFeatureSettings
 
 feature toggles
 
 also contains disallow public org registrations on system and instance level.
 
-### zitadel.settings.template.v3alpha.ZITADELTemplatesSettings
+### ZITADELTemplatesSettings
 
 html and text templates for fully customizable emails and sms
 
-### zitadel.settings.secret.v3alpha.ZITADELSecretSettings
+### ZITADELSecretSettings
 
 replaces secret generators
-
-## zitadel.insights.v3alpha.ZITADELInsights
-
-query services for auditing, analytics and data synchronization.
-
-- Events
-- Milestones
-
-## zitadel.operations.v3alpha.ZITADELOperations
-
-- Health
-- Failed Events
-- Views
-- Metrics (version, uptime etc.)
 
 ## API Release Policy
 
