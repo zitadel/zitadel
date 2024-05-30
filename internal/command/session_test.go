@@ -31,7 +31,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 	userAggr := &user.NewAggregate("user1", "org1").Aggregate
 
 	type fields struct {
-		eventstore        *eventstore.Eventstore
+		eventstore        func(*testing.T) *eventstore.Eventstore
 		sessionWriteModel *SessionWriteModel
 	}
 	type res struct {
@@ -46,7 +46,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 		{
 			name: "missing UID",
 			fields: fields{
-				eventstore:        &eventstore.Eventstore{},
+				eventstore:        expectEventstore(),
 				sessionWriteModel: &SessionWriteModel{},
 			},
 			res: res{
@@ -57,7 +57,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 		{
 			name: "filter error",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilterError(io.ErrClosedPipe),
 				),
 				sessionWriteModel: &SessionWriteModel{
@@ -72,7 +72,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 		{
 			name: "removed user",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -101,7 +101,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 		{
 			name: "ok",
 			fields: fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -133,7 +133,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 	}
 	for _, tt := range tests {
 		s := &SessionCommands{
-			eventstore:        tt.fields.eventstore,
+			eventstore:        tt.fields.eventstore(t),
 			sessionWriteModel: tt.fields.sessionWriteModel,
 		}
 		got, err := s.gethumanWriteModel(context.Background())
@@ -271,7 +271,7 @@ func TestCommands_CreateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:          eventstoreExpect(t, tt.expect...),
+				eventstore:          expectEventstore(tt.expect...)(t),
 				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}
@@ -284,7 +284,7 @@ func TestCommands_CreateSession(t *testing.T) {
 
 func TestCommands_UpdateSession(t *testing.T) {
 	type fields struct {
-		eventstore    *eventstore.Eventstore
+		eventstore    func(*testing.T) *eventstore.Eventstore
 		tokenVerifier func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
 	}
 	type args struct {
@@ -307,7 +307,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 		{
 			"eventstore failed",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilterError(zerrors.ThrowInternal(nil, "id", "filter failed")),
 				),
 			},
@@ -321,7 +321,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 		{
 			"no change",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							session.NewAddedEvent(context.Background(),
@@ -361,7 +361,7 @@ func TestCommands_UpdateSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:           tt.fields.eventstore,
+				eventstore:           tt.fields.eventstore(t),
 				sessionTokenVerifier: tt.fields.tokenVerifier,
 			}
 			got, err := c.UpdateSession(tt.args.ctx, tt.args.sessionID, tt.args.checks, tt.args.metadata, tt.args.lifetime)
@@ -387,7 +387,7 @@ func TestCommands_updateSession(t *testing.T) {
 
 	testNow := time.Now()
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx      context.Context
@@ -408,7 +408,7 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"terminated",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
@@ -423,7 +423,7 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"check failed",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: context.Background(),
@@ -443,7 +443,7 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"no change",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -463,14 +463,13 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"negative lifetime",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands:   []SessionCommand{},
-					eventstore:        eventstoreExpect(t),
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
 							"token",
@@ -489,7 +488,7 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"lifetime set",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
 					expectPush(
 						session.NewLifetimeSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							10*time.Minute,
@@ -505,7 +504,6 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands:   []SessionCommand{},
-					eventstore:        eventstoreExpect(t),
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
 							"token",
@@ -530,7 +528,17 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"set user, password, metadata and token",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"$plain$x$password", false, ""),
+						),
+					),
 					expectPush(
 						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"userID", "org1", testNow, &language.Afrikaans,
@@ -555,18 +563,6 @@ func TestCommands_updateSession(t *testing.T) {
 						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckPassword("password"),
 					},
-					eventstore: eventstoreExpect(t,
-						expectFilter(
-							eventFromEventPusher(
-								user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
-							),
-							eventFromEventPusher(
-								user.NewHumanPasswordChangedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-									"$plain$x$password", false, ""),
-							),
-						),
-					),
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
 							"token",
@@ -594,7 +590,14 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"set user, intent not successful",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+					),
+				),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -604,14 +607,6 @@ func TestCommands_updateSession(t *testing.T) {
 						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent", "aW50ZW50"),
 					},
-					eventstore: eventstoreExpect(t,
-						expectFilter(
-							eventFromEventPusher(
-								user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
-							),
-						),
-					),
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
 							"token",
@@ -633,7 +628,25 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"set user, intent not for user",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							idpintent.NewSucceededEvent(context.Background(),
+								&idpintent.NewAggregate("id", "instance1").Aggregate,
+								nil,
+								"idpUserID",
+								"idpUserName",
+								"userID2",
+								nil,
+								"",
+							),
+						),
+					),
+				),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -643,25 +656,6 @@ func TestCommands_updateSession(t *testing.T) {
 						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent", "aW50ZW50"),
 					},
-					eventstore: eventstoreExpect(t,
-						expectFilter(
-							eventFromEventPusher(
-								user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
-							),
-							eventFromEventPusher(
-								idpintent.NewSucceededEvent(context.Background(),
-									&idpintent.NewAggregate("id", "instance1").Aggregate,
-									nil,
-									"idpUserID",
-									"idpUserName",
-									"userID2",
-									nil,
-									"",
-								),
-							),
-						),
-					),
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
 							"token",
@@ -683,7 +677,7 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"set user, intent incorrect token",
 			fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args{
 				ctx: authz.NewMockContext("instance1", "", ""),
@@ -693,7 +687,6 @@ func TestCommands_updateSession(t *testing.T) {
 						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent2", "aW50ZW50"),
 					},
-					eventstore: eventstoreExpect(t),
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
 							"token",
@@ -715,7 +708,24 @@ func TestCommands_updateSession(t *testing.T) {
 		{
 			"set user, intent, metadata and token",
 			fields{
-				eventstore: eventstoreExpect(t,
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							idpintent.NewSucceededEvent(context.Background(),
+								&idpintent.NewAggregate("id", "instance1").Aggregate,
+								nil,
+								"idpUserID",
+								"idpUsername",
+								"userID",
+								nil,
+								"",
+							),
+						),
+					),
 					expectPush(
 						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"userID", "org1", testNow, &language.Afrikaans),
@@ -736,25 +746,6 @@ func TestCommands_updateSession(t *testing.T) {
 						CheckUser("userID", "org1", &language.Afrikaans),
 						CheckIntent("intent", "aW50ZW50"),
 					},
-					eventstore: eventstoreExpect(t,
-						expectFilter(
-							eventFromEventPusher(
-								user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-									"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
-							),
-							eventFromEventPusher(
-								idpintent.NewSucceededEvent(context.Background(),
-									&idpintent.NewAggregate("id", "instance1").Aggregate,
-									nil,
-									"idpUserID",
-									"idpUsername",
-									"userID",
-									nil,
-									"",
-								),
-							),
-						),
-					),
 					createToken: func(sessionID string) (string, string, error) {
 						return "tokenID",
 							"token",
@@ -779,12 +770,90 @@ func TestCommands_updateSession(t *testing.T) {
 				},
 			},
 		},
+		{
+			"set user, intent (user not linked yet)",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							idpintent.NewStartedEvent(context.Background(),
+								&idpintent.NewAggregate("id", "instance1").Aggregate,
+								nil,
+								nil,
+								"idpID",
+							),
+						),
+						eventFromEventPusher(
+							idpintent.NewSucceededEvent(context.Background(),
+								&idpintent.NewAggregate("id", "instance1").Aggregate,
+								nil,
+								"idpUserID",
+								"idpUsername",
+								"",
+								nil,
+								"",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"idpID",
+								"idpUsername",
+								"idpUserID",
+							),
+						),
+					),
+					expectPush(
+						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							"userID", "org1", testNow, &language.Afrikaans),
+						session.NewIntentCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							testNow),
+						session.NewTokenSetEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
+							"tokenID"),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckIntent("intent", "aW50ZW50"),
+					},
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					intentAlg: decryption(nil),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+			},
+			res{
+				want: &SessionChanged{
+					ObjectDetails: &domain.ObjectDetails{
+						ResourceOwner: "instance1",
+					},
+					ID:       "sessionID",
+					NewToken: "token",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
+			tt.args.checks.eventstore = c.eventstore
 			got, err := c.updateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)
