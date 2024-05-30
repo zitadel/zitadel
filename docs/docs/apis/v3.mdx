@@ -14,6 +14,9 @@ import IDPSearchProto from '!!raw-loader!./_v3_idp_search.proto'
 import IDPGitLabProto from '!!raw-loader!./_v3_idp_gitlab.proto'
 import LanguageServiceProto from '!!raw-loader!./_v3_language_service.proto'
 import LanguageProto from '!!raw-loader!./_v3_language.proto'
+import ObjectProto from '!!raw-loader!./_v3_object.proto'
+import ResourceObjectProto from '!!raw-loader!./_v3_resource_object.proto'
+import SettingsObjectProto from '!!raw-loader!./_v3_settings_object.proto'
 
 The APIs described in this section are currently either in *Preview* stage or not implemented, yet.
 Before using these APIs, pleases consider the [API release policy below](#api-release-policy)
@@ -70,7 +73,7 @@ Standard resource methods behave like this:
 - Resource configurations are partially updatable. With HTTP, this is done via PATCH requests. If no changes were made, the response is successful.
 - Status changes or other actions on resources with side effects are done via POST requests. Their HTTP path ends with the underscore prefixed action name. For example `POST /resources/idps/{id}/_activate`.
 
-For a concrete proto example, have a look at the [ZITADELActions service](#zitadelactions).
+For a full proto example, have a look at the [ZITADELActions service](#zitadelactions).
 
 ## Reusable Resources
 
@@ -102,7 +105,7 @@ Reusable resources have the same behavior as standard resources with the followi
 Typically, a new resource is first designed and implemented as a non-reusable resource.
 If the community sees a benefit in reusing the resource in multiple contexts, reusability is added to the resource.
 
-For a concrete proto example, have a look at the [ZITADELIdentityProviders service](#zitadelidentityproviders).
+For a full proto example, have a look at the [ZITADELIdentityProviders service](#zitadelidentityproviders).
 
 ## Resource Services
 
@@ -140,6 +143,14 @@ Additional to the standard CRUD methods:
     <CodeBlock language="protobuf">{ActionQueryProto}</CodeBlock>
 </details>
 
+### ZITADELUsers
+
+Standard CRUD methods
+
+### ZITADELUserSchemas
+
+Standard CRUD methods
+
 ### ZITADELIdentityProviders
 
 - Standard CRUD and methods for all IDPs
@@ -161,13 +172,13 @@ Additional to the standard CRUD methods:
     <CodeBlock language="protobuf">{IDPGitLabProto}</CodeBlock>
 </details>
 
-### ZITADELUsers
+<details><summary>object.proto</summary>
+    <CodeBlock language="protobuf">{ObjectProto}</CodeBlock>
+</details>
 
-Standard CRUD methods
-
-### ZITADELUserSchemas
-
-Standard CRUD methods
+<details><summary>resource_object.proto</summary>
+    <CodeBlock language="protobuf">{ResourceObjectProto}</CodeBlock>
+</details>
 
 ### ZITADELInstances
 
@@ -190,15 +201,15 @@ Additional to the standard CRUD methods:
 - SetAsPrimary
 - Validate
 
+### ZITADELSessions
+
+Standard CRUD methods
+
 ### ZITADELProjects
 
 Standard CRUD methods
 
 ### ZITADELApps
-
-Standard CRUD methods
-
-### ZITADELSessions
 
 Standard CRUD methods
 
@@ -239,7 +250,7 @@ Settings behave like this:
 - All settings properties can be partially reset in child-contexts, so their values default to the parent contexts property values.
 - All settings properties returned by queries contain the value and if it is inherited, the context where it is inherited from.
 
-For a concrete proto example, have a look at the [ZITADELLanguageSettings service](#zitadellanguagesettings).
+For a full proto example, have a look at the [ZITADELLanguageSettings service](#zitadellanguagesettings).
 
 ## Settings Services
 
@@ -253,6 +264,14 @@ Default language, restricted languages, supported languages
 
 <details><summary>language.proto</summary>
     <CodeBlock language="protobuf">{LanguageProto}</CodeBlock>
+</details>
+
+<details><summary>object.proto</summary>
+    <CodeBlock language="protobuf">{ObjectProto}</CodeBlock>
+</details>
+
+<details><summary>settings_object.proto</summary>
+    <CodeBlock language="protobuf">{SettingsObjectProto}</CodeBlock>
 </details>
 
 ### ZITADELTextSettings
