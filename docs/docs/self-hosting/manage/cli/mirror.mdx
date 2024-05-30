@@ -229,4 +229,4 @@ Currently the encryption keys of the source database must be copied to the desti
 
 It is not possible to change the domain of the ZITADEL deployment.
 
-If you want to mirror the data multiple times make sure to always use the same flag and parameter to define the instances migrated (`--system` or `--instance`).
+Once you mirrored an instance using the `--instance` flag, you have to make sure you don't mirror other preexisting instances. This means for example, you cannot mirror a few instances and then pass the `--system` flag. You have to pass all remaining instances explicitly, once you used the `--instance` flag 
