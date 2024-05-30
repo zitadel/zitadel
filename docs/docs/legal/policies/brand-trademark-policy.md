@@ -34,7 +34,7 @@ To ensure the logo is used as intended, we provide specific examples below and r
 
 - Use in architecture diagrams without implying affiliation or partnership
 - Editorial and informational purposes such as blog posts or news articles
-- Linking back to our [website](https://zitadel.com), official [repositories](https://github.com/zitadel), or [documentation](https://zitadel.com/docs)
+- Linking back to our [website](https://zitadel.com), official [repositories](https://github.com/zitadel), or [documentation](/docs)
 - Indicating that the software is available for use or installation without implying any affiliation or endorsement
 
 ### Not acceptable

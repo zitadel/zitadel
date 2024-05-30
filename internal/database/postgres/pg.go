@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	config := &Config{}
+	config := new(Config)
 	dialect.Register(config, config, false)
 }
 
@@ -50,11 +50,12 @@ func (c *Config) MatchName(name string) bool {
 	return false
 }
 
-func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
+func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
+	connector := new(Config)
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		DecodeHook:       mapstructure.StringToTimeDurationHookFunc(),
 		WeaklyTypedInput: true,
-		Result:           c,
+		Result:           connector,
 	})
 	if err != nil {
 		return nil, err
@@ -66,7 +67,7 @@ func (c *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 		}
 	}
 
-	return c, nil
+	return connector, nil
 }
 
 func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, error) {

@@ -7,7 +7,7 @@ ZITADEL leverages the power of eventsourcing, meaning every action and change wi
 To provide you with greater flexibility and access to these events, ZITADEL has introduced an Event API. 
 This API allows you to easily retrieve and utilize the events generated within the system, enabling you to integrate them into your own system and respond to specific events as they occur.
 
-You need to give a user the [manager role](https://zitadel.com/docs/guides/manage/console/managers) IAM_OWNER_VIEWER or IAM_OWNER to access the Event API.
+You need to give a user the [manager role](/docs/guides/manage/console/managers) IAM_OWNER_VIEWER or IAM_OWNER to access the Event API.
 
 If you like to know more about eventsourcing/eventstore and how this works in ZITADEL, head over to our [concepts](/docs/concepts/eventstore/overview).
 ## Request Events
