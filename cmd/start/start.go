@@ -78,6 +78,8 @@ import (
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
+	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
+	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
 	"github.com/zitadel/zitadel/internal/webauthn"
 	"github.com/zitadel/zitadel/openapi"
 )
@@ -153,12 +155,16 @@ func startZitadel(ctx context.Context, config *Config, masterKey string, server 
 	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
 	config.Eventstore.Querier = old_es.NewCRDB(queryDBClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
+	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(queryDBClient, &es_v4_pg.Config{
+		MaxRetries: config.Eventstore.MaxRetries,
+	}))
 
 	sessionTokenVerifier := internal_authz.SessionTokenVerifier(keys.OIDC)
 
 	queries, err := query.StartQueries(
 		ctx,
 		eventstoreClient,
+		eventstoreV4.Querier,
 		queryDBClient,
 		projectionDBClient,
 		config.Projections,

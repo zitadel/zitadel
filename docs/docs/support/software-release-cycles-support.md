@@ -74,7 +74,7 @@ During this phase, support is limited as we focus on testing and bug fixing.
 ### General available
 
 Generally available features are available to everyone and have the appropriate test coverage to be used for critical tasks.
-The software will be backwards-compatible with previous versions, for exceptions we will publish a [technical advisory](https://zitadel.com/docs/support/technical_advisory).
+The software will be backwards-compatible with previous versions, for exceptions we will publish a [technical advisory](/docs/support/technical_advisory).
 Features in General Availability are not marked explicitly.
 
 ## Release types

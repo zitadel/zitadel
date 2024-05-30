@@ -28,6 +28,7 @@ import (
 )
 
 type Config struct {
+	ForMirror       bool
 	Database        database.Config
 	SystemDefaults  systemdefaults.SystemDefaults
 	InternalAuthZ   internal_authz.Config
