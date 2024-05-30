@@ -8,6 +8,10 @@ import ActionServiceProto from '!!raw-loader!./_v3_action_service.proto'
 import ActionExecutionProto from '!!raw-loader!./_v3_action_execution.proto'
 import ActionTargetProto from '!!raw-loader!./_v3_action_target.proto'
 import ActionQueryProto from '!!raw-loader!./_v3_action_query.proto'
+import IDPServiceProto from '!!raw-loader!./_v3_idp_service.proto'
+import IDPProto from '!!raw-loader!./_v3_idp.proto'
+import IDPSearchProto from '!!raw-loader!./_v3_idp_search.proto'
+import IDPGitLabProto from '!!raw-loader!./_v3_idp_gitlab.proto'
 import LanguageServiceProto from '!!raw-loader!./_v3_language_service.proto'
 import LanguageProto from '!!raw-loader!./_v3_language.proto'
 
@@ -81,18 +85,19 @@ Reusable resources have the same behavior as standard resources with the followi
 - Reusable resources can be created in a given context level (system, instance, org).
 - For requests, that require a resource ID, no request context is needed.
 - Reusable resources are available in child contexts and by default have the same state (active or inactive) as in their immediate parent context.
-- In child contexts, the state of a reused resource is *inherited* by default and can be changed to *active*, *inactive* or *inherit*.
+- In child contexts, the state policy of a reused resource is *inherit* by default and can be changed to *active*, *inactive* or back to *inherit*.
 - In child contexts, a reused resources configuration is read-only.
-- Child contexts can always read the following properties of reused resources:
+- Child contexts can read at least the following properties of reused resources:
     - ID
     - name
     - description
     - state
+    - the state policy in the child context
     - sequence
     - last changed date
     - parent context
-    - effective state in the immediate parent context.
-- Managers of reusable resources in a parent context can restrict their readability in child contexts to the properties listed above.
+    - state in the immediate parent context.
+- By default, search queries for reused resources return all resources from the given contexts, all inherited resources and all resources defined in all children contexts.
 
 Typically, a new resource is first designed and implemented as a non-reusable resource.
 If the community sees a benefit in reusing the resource in multiple contexts, reusability is added to the resource.
@@ -101,7 +106,7 @@ For a concrete proto example, have a look at the [ZITADELIdentityProviders servi
 
 ## Resource Services
 
-All resource services support the following CRUD operations [as described above](#standard-resources-behavior).
+All resource services by default support the following CRUD operations [as described above](#standard-resources-behavior).
 
 - Create
 - Read (get, search)
@@ -110,8 +115,8 @@ All resource services support the following CRUD operations [as described above]
 
 ### ZITADELActions
 
-- standard CRUD methods for Executions
 - standard CRUD methods for Targets
+- standard CRUD methods for Executions except the PutExecution method replaces the CreateExecution and PatchExecution methods
 
 Additional to the standard CRUD methods:
 
@@ -194,6 +199,22 @@ additional to the standard CRUD methods:
 ### ZITADELIdentityProviders (reusable)
 
 standard CRUD and methods for all IDPs and standard methods for reusable resources
+
+<details><summary>idp_service.proto</summary>
+    <CodeBlock language="protobuf">{IDPServiceProto}</CodeBlock>
+</details>
+
+<details><summary>idp.proto</summary>
+    <CodeBlock language="protobuf">{IDPProto}</CodeBlock>
+</details>
+
+<details><summary>idp_search.proto</summary>
+    <CodeBlock language="protobuf">{IDPSearchProto}</CodeBlock>
+</details>
+
+<details><summary>idp_gitlab.proto</summary>
+    <CodeBlock language="protobuf">{IDPGitLabProto}</CodeBlock>
+</details>
 
 ### ZITADELSMTPProviders
 

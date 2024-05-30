@@ -15,7 +15,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Language Settings Service";
     version: "3.0-alpha";
-    description: "Language Service is intended to manage languages for ZITADEL. Enable the feature flag \"multitenancy_settings\" in order to activate it. Languages are settings, and are therefore inherited through the context hierarchy system -> instance -> org.";
+    description: "Language Service is intended to manage languages for ZITADEL. Enable the feature flag \"multitenancy_settings\" in order to activate it. Languages are settings, and are therefore inherited through the context hierarchy system -> instance -> org. It will continue breaking as long as it is in alpha state.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
