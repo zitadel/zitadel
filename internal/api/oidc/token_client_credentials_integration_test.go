@@ -18,10 +18,11 @@ import (
 )
 
 func TestServer_ClientCredentialsExchange(t *testing.T) {
-	userID, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
+	machine, name, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 
 	type claims struct {
+		profile                    any
 		resourceOwnerID            any
 		resourceOwnerName          any
 		resourceOwnerPrimaryDomain any
@@ -77,6 +78,23 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			clientID:     clientID,
 			clientSecret: clientSecret,
 			scope:        []string{oidc.ScopeOpenID},
+			wantClaims: claims{
+				profile: oidc.UserInfoProfile{},
+			},
+		},
+		{
+			name:         "openid, profile, email",
+			clientID:     clientID,
+			clientSecret: clientSecret,
+			scope:        []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+			wantClaims: claims{
+				profile: oidc.UserInfoProfile{
+					Name:              name,
+					Locale:            nil,
+					UpdatedAt:         oidc.FromTime(machine.GetDetails().GetChangeDate().AsTime()),
+					PreferredUsername: name,
+				},
+			},
 		},
 		{
 			name:         "org id and domain scope",
@@ -88,6 +106,7 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 				domain.OrgDomainPrimaryScope + Tester.Organisation.Domain,
 			},
 			wantClaims: claims{
+				profile:                    oidc.UserInfoProfile{},
 				resourceOwnerID:            Tester.Organisation.ID,
 				resourceOwnerName:          Tester.Organisation.Name,
 				resourceOwnerPrimaryDomain: Tester.Organisation.Domain,
@@ -103,6 +122,7 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 				domain.OrgDomainPrimaryScope + Tester.Organisation.Domain,
 				domain.OrgDomainPrimaryScope + "foo"},
 			wantClaims: claims{
+				profile:   oidc.UserInfoProfile{},
 				orgDomain: Tester.Organisation.Domain,
 			},
 		},
@@ -115,6 +135,7 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 				domain.OrgIDScope + "foo",
 			},
 			wantClaims: claims{
+				profile:                    oidc.UserInfoProfile{},
 				resourceOwnerID:            Tester.Organisation.ID,
 				resourceOwnerName:          Tester.Organisation.Name,
 				resourceOwnerPrimaryDomain: Tester.Organisation.Domain,
@@ -132,12 +153,16 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			}
 			require.NoError(t, err)
 			require.NotNil(t, tokens)
-			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, oidc.BearerToken, userID, provider)
+			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, oidc.BearerToken, machine.GetUserId(), provider)
 			require.NoError(t, err)
 			assert.Equal(t, tt.wantClaims.resourceOwnerID, userinfo.Claims[oidc_api.ClaimResourceOwnerID])
 			assert.Equal(t, tt.wantClaims.resourceOwnerName, userinfo.Claims[oidc_api.ClaimResourceOwnerName])
 			assert.Equal(t, tt.wantClaims.resourceOwnerPrimaryDomain, userinfo.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
 			assert.Equal(t, tt.wantClaims.orgDomain, userinfo.Claims[domain.OrgDomainPrimaryClaim])
+			assert.Equal(t, tt.wantClaims.profile, userinfo.UserInfoProfile)
+			assert.Empty(t, userinfo.UserInfoEmail)
+			assert.Empty(t, userinfo.UserInfoPhone)
+			assert.Empty(t, userinfo.Address)
 		})
 	}
 }
