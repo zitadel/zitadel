@@ -115,8 +115,8 @@ All resource services by default support the following CRUD operations [as descr
 
 ### ZITADELActions
 
-- standard CRUD methods for Targets
-- standard CRUD methods for Executions except the PutExecution method replaces the CreateExecution and PatchExecution methods
+- Standard CRUD methods for Targets
+- Standard CRUD methods for Executions except the PutExecution method replaces the CreateExecution and PatchExecution methods
 
 Additional to the standard CRUD methods:
 
@@ -140,65 +140,10 @@ Additional to the standard CRUD methods:
     <CodeBlock language="protobuf">{ActionQueryProto}</CodeBlock>
 </details>
 
-### ZITADELUsers
+### ZITADELIdentityProviders
 
-standard CRUD methods
-
-### ZITADELUserSchemas
-
-standard CRUD methods
-
-### ZITADELInstances
-
-additional to the standard CRUD methods:
-
-- Limit (partial update of block and audit log retention)
-- BulkLimit (partial update of block and audit log retention for multiple instances)
-
-### ZITADELOrganizations
-
-additional to the standard CRUD methods:
-
-- SetAsInstanceDefault
-- GetInstanceDefault
-
-### ZITADELDomains
-
-additional to the standard CRUD methods:
-
-- SetAsPrimary
-- Validate
-
-### ZITADELProjects
-
-standard CRUD methods
-
-### ZITADELApps
-
-standard CRUD methods
-
-### ZITADELSessions
-
-standard CRUD methods
-
-### ZITADELMemberships
-
-The given context defines the organization, instance or system where the membership is created.
-The context and the user ID together are unique.
-
-additional to the standard CRUD methods:
-
-- ListAvailableRoles (context-aware)
-
-### ZITADELGrants
-
-- standard CRUD methods for project grants
-- standard CRUD methods for user grants
-- standard CRUD methods for roles
-
-### ZITADELIdentityProviders (reusable)
-
-standard CRUD and methods for all IDPs and standard methods for reusable resources
+- Standard CRUD and methods for all IDPs
+- Resources have additional properties for reusability capabilities.
 
 <details><summary>idp_service.proto</summary>
     <CodeBlock language="protobuf">{IDPServiceProto}</CodeBlock>
@@ -216,13 +161,69 @@ standard CRUD and methods for all IDPs and standard methods for reusable resourc
     <CodeBlock language="protobuf">{IDPGitLabProto}</CodeBlock>
 </details>
 
+### ZITADELUsers
+
+Standard CRUD methods
+
+### ZITADELUserSchemas
+
+Standard CRUD methods
+
+### ZITADELInstances
+
+Additional to the standard CRUD methods:
+
+- Limit (partial update of block and audit log retention)
+- BulkLimit (partial update of block and audit log retention for multiple instances)
+
+### ZITADELOrganizations
+
+Additional to the standard CRUD methods:
+
+- SetAsInstanceDefault
+- GetInstanceDefault
+
+### ZITADELDomains
+
+Additional to the standard CRUD methods:
+
+- SetAsPrimary
+- Validate
+
+### ZITADELProjects
+
+Standard CRUD methods
+
+### ZITADELApps
+
+Standard CRUD methods
+
+### ZITADELSessions
+
+Standard CRUD methods
+
+### ZITADELMemberships
+
+The given context defines the organization, instance or system where the membership is created.
+The context and the user ID together are unique.
+
+Additional to the standard CRUD methods:
+
+- ListAvailableRoles (context-aware)
+
+### ZITADELGrants
+
+- Standard CRUD methods for project grants
+- Standard CRUD methods for user grants
+- Standard CRUD methods for roles
+
 ### ZITADELSMTPProviders
 
-standard CRUD methods
+Standard CRUD methods
 
 ### ZITADELSMSProviders
 
-standard CRUD methods
+Standard CRUD methods
 
 ## Settings
 
@@ -244,7 +245,7 @@ For a concrete proto example, have a look at the [ZITADELLanguageSettings servic
 
 ### ZITADELLanguageSettings
 
-default language, restricted languages, supported languages
+Default language, restricted languages, supported languages
 
 <details><summary>language_service.proto</summary>
     <CodeBlock language="protobuf">{LanguageServiceProto}</CodeBlock>
@@ -256,45 +257,45 @@ default language, restricted languages, supported languages
 
 ### ZITADELTextSettings
 
-key-value pairs for localized login texts, previously known as login texts
+Key-value pairs for localized login texts, previously known as login texts
 
 ### ZITADELBrandingSettings
 
-predefined branding settings and custom key-value pairs, previously known as label policy or branding settings
+Predefined branding settings and custom key-value pairs, previously known as label policy or branding settings
 
 ### ZITADELLoginSettings
 
-previously known as login policy
+Previously known as login policy
 
 ### ZITADELLockoutSettings
 
-previously known as lockout policy
+Previously known as lockout policy
 
 ### ZITADELPasswordSettings
 
-previously known as password complexity policy
+Previously known as password complexity policy
 
 ### ZITADELHelpSettings
 
-previously known as legal and support settings or privacy policy
+Previously known as legal and support settings or privacy policy
 
 ### ZITADELDomainSettings
 
-previously known as domain policy
+Previously known as domain policy
 
 ### ZITADELFeatureSettings
 
-feature toggles
+Feature toggles
 
-also contains disallow public org registrations on system and instance level.
+Also contains disallow public org registrations on system and instance level.
 
 ### ZITADELTemplatesSettings
 
-html and text templates for fully customizable emails and sms
+HTML and text templates for fully customizable emails and sms
 
 ### ZITADELSecretSettings
 
-replaces secret generators
+Replaces secret generators
 
 ## API Release Policy
 
