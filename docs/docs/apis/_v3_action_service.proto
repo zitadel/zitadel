@@ -8,18 +8,19 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
 import "zitadel/resources/action/v3alpha/target.proto";
 import "zitadel/resources/action/v3alpha/execution.proto";
 import "zitadel/resources/action/v3alpha/query.proto";
-import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/resources/object/v2alpha/object.proto";
+import "zitadel/resources/object/v3alpha/object.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "Action Service";
-    version: "2.0-alpha";
+    version: "3.0-alpha";
     description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. It is behind the feature flag \"multitenancy_resources_api\". It can AND will continue breaking until the services provide the same functionality as the current actions.";
     contact:{
       name: "ZITADEL"
@@ -104,7 +105,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service ActionService {
+service ZITADELActions {
 
   // Create a target
   //
@@ -188,6 +189,30 @@ service ActionService {
     };
   }
 
+  // Target by ID
+  //
+  // Returns the target identified by the requested ID.
+  rpc GetTarget (GetTargetRequest) returns (GetTargetResponse) {
+    option (google.api.http) = {
+      get: "/targets/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Target successfully retrieved";
+        }
+      };
+    };
+  }
+
   // Search targets
   //
   // Search all matching targets. By default, we will return all targets of your instance.
@@ -221,30 +246,6 @@ service ActionService {
             };
           };
         };
-      };
-    };
-  }
-
-  // Target by ID
-  //
-  // Returns the target identified by the requested ID.
-  rpc GetTarget (GetTargetRequest) returns (GetTargetResponse) {
-    option (google.api.http) = {
-      get: "/targets/{id}"
-    };
-
-    option (zitadel.protoc_gen_zitadel.v2.options) = {
-      auth_option: {
-        permission: "action.target.read"
-      }
-    };
-
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      responses: {
-        key: "200"
-        value: {
-          description: "Target successfully retrieved";
-        }
       };
     };
   }
@@ -447,7 +448,7 @@ message CreateTargetRequest {
 }
 
 message CreateTargetResponse {
-  zitadel.resources.object.v2alpha.Details details = 2;
+  zitadel.resources.object.v3alpha.Details details = 2;
 }
 
 message PatchTargetRequest {
@@ -464,7 +465,7 @@ message PatchTargetRequest {
 }
 
 message PatchTargetResponse {
-  zitadel.resources.object.v2alpha.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message DeleteTargetRequest {
@@ -480,7 +481,7 @@ message DeleteTargetRequest {
 }
 
 message DeleteTargetResponse {
-  zitadel.resources.object.v2alpha.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message SearchTargetsRequest {
@@ -488,7 +489,7 @@ message SearchTargetsRequest {
   // optional zitadel.object.v2alpha.RequestContext ctx = 1;
   reserved 1;
   // list limitations and ordering.
-  zitadel.resources.object.v2alpha.ListQuery query = 2;
+  zitadel.resources.object.v3alpha.ListQuery query = 2;
   // the field the result is sorted.
   zitadel.resources.action.v3alpha.TargetFieldName sorting_column = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -500,7 +501,7 @@ message SearchTargetsRequest {
 }
 
 message SearchTargetsResponse {
-  zitadel.resources.object.v2alpha.ListDetails details = 1;
+  zitadel.resources.object.v3alpha.ListDetails details = 1;
   zitadel.resources.action.v3alpha.TargetFieldName sorting_column = 2;
   repeated zitadel.resources.action.v3alpha.GetTarget result = 3;
 }
@@ -531,7 +532,7 @@ message CreateExecutionRequest {
 
 message CreateExecutionResponse {
   string id = 1;
-  zitadel.resources.object.v2alpha.Details details = 2;
+  zitadel.resources.object.v3alpha.Details details = 2;
 }
 
 message PatchExecutionRequest {
@@ -548,7 +549,7 @@ message PatchExecutionRequest {
 }
 
 message PatchExecutionResponse {
-  zitadel.resources.object.v2alpha.Details details = 2;
+  zitadel.resources.object.v3alpha.Details details = 2;
 }
 
 message DeleteExecutionRequest {
@@ -564,18 +565,18 @@ message DeleteExecutionRequest {
 }
 
 message DeleteExecutionResponse {
-  zitadel.resources.object.v2alpha.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message SearchExecutionsRequest {
   // list limitations and ordering.
-  zitadel.resources.object.v2alpha.ListQuery query = 1;
+  zitadel.resources.object.v3alpha.ListQuery query = 1;
   // Define the criteria to query for.
   repeated zitadel.resources.action.v3alpha.SearchFilter filters = 2;
 }
 
 message SearchExecutionsResponse {
-  zitadel.resources.object.v2alpha.ListDetails details = 1;
+  zitadel.resources.object.v3alpha.ListDetails details = 1;
   repeated zitadel.resources.action.v3alpha.GetExecution result = 2;
 }
 

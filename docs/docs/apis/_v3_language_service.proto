@@ -13,8 +13,8 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "Language Service";
-    version: "2.0";
+    title: "Language Settings Service";
+    version: "3.0-alpha";
     description: "Language Service is intended to manage languages for ZITADEL. Enable the feature flag \"multitenancy_settings\" in order to activate it. Languages are settings, and are therefore inherited through the context hierarchy system -> instance -> org.";
     contact:{
       name: "ZITADEL"
@@ -38,7 +38,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/grpc-web+proto";
 
   host: "$ZITADEL_DOMAIN";
-  base_path: "/";
+  base_path: "/settings/v3alpha";
 
   external_docs: {
     description: "Detailed information about ZITADEL",
@@ -87,13 +87,13 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-// Language Service is intended to manage languages for ZITADEL.
+// ZITADELLanguageSettings is intended to manage languages for ZITADEL.
 // Enable the feature flag \"multitenancy_settings\" in order to activate it.
 // Languages are settings, and are therefore inherited through the context hierarchy system -> instance -> org.
-service LanguageService {
+service ZITADELLanguageSettings {
   rpc SetLanguages (SetLanguageSettingsRequest) returns (SetLanguageSettingsResponse) {
     option (google.api.http) = {
-      patch: "/settings/v2/languages"
+      patch: "/languages"
       body: "settings"
     };
 
@@ -117,7 +117,7 @@ service LanguageService {
 
   rpc ResolveLanguages (ResolveLanguageSettingsRequest) returns (ResolveLanguageSettingsResponse) {
     option (google.api.http) = {
-      get: "/settings/v2/languages"
+      get: "/languages"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
