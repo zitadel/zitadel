@@ -1,0 +1,21 @@
+{
+  "name": "@zitadel/proto",
+  "version": "0.0.0",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "files": ["zitadel/**"],
+  "sideEffects": false,
+  "scripts": {
+    "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
+    "clean": "rm -rf .turbo && rm -rf node_modules"
+  },
+  "dependencies": {
+    "@bufbuild/protobuf": "^1.9.0"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.32.1"
+  }
+}

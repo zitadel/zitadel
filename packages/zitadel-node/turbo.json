@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "//"
+  ],
+  "pipeline": {
+    "build": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["@zitadel/client2#build"]
+    }
+  }
+}

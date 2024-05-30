@@ -43,7 +43,7 @@ export const SignInWithGitlab = forwardRef<
         <span className="ztdl-ml-4">{name ? name : "Sign in with GitLab"}</span>
       )}
     </button>
-  )
+  ),
 );
 
 SignInWithGitlab.displayName = "SignInWithGitlab";

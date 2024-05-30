@@ -23,6 +23,6 @@ export const getSession = (server?: string | ZitadelServer) => {
   return createClient<SessionServiceClient>(
     SessionServiceDefinition as CompatServiceDefinition,
     config.apiUrl,
-    config.token
+    config.token,
   );
 };

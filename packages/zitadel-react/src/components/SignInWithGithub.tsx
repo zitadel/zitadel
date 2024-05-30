@@ -52,7 +52,7 @@ export const SignInWithGithub = forwardRef<
         <span className="ztdl-ml-4">{name ? name : "Sign in with GitHub"}</span>
       )}
     </button>
-  )
+  ),
 );
 
 SignInWithGithub.displayName = "SignInWithGithub";
