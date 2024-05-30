@@ -62,6 +62,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Failed Events"
         },
         {
+            name: "Feature Restrictions"
+        },
+        {
             name: "General"
         },
         {
