@@ -137,3 +137,11 @@ type AnyType[T interface{}] struct{}
 func (a AnyType[T]) Match(v driver.Value) bool {
 	return reflect.TypeOf(new(T)).Elem().Kind().String() == reflect.TypeOf(v).Kind().String()
 }
+
+var NilArg nilArgument
+
+type nilArgument struct{}
+
+func (a nilArgument) Match(v driver.Value) bool {
+	return reflect.ValueOf(v).IsNil()
+}

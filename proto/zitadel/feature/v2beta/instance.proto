@@ -49,6 +49,15 @@ message SetInstanceFeaturesRequest{
       description: "Actions allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
     }
   ];
+
+  repeated ImprovedPerformance improved_performance = 7 [
+    (validate.rules).repeated.unique = true,
+    (validate.rules).repeated.items.enum = {defined_only:  true, not_in: [0]},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[1]";
+      description: "Improves performance of specified execution paths.";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -111,6 +120,13 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
       description: "Actions v2 allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  ImprovedPerformanceFeatureFlag improved_performance = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[1]";
+      description: "Improves performance of specified execution paths.";
     }
   ];
 }

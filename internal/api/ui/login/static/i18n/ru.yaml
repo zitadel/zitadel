@@ -29,17 +29,19 @@ SelectAccount:
 
 Password:
   Title: Пароль
-  Description: Введите ваши данные.
+  Description: Введите свои данные для входа.
   PasswordLabel: Пароль
-  MinLength: Минимальная длина
-  HasUppercase: Заглавная буква
-  HasLowercase: Строчная буква
-  HasNumber: Цифра
-  HasSymbol: Символ
-  Confirmation: Подтверждение пароля
-  ResetLinkText: сброс пароля
-  BackButtonText: назад
-  NextButtonText: далее
+  MinLength: Должно быть не менее
+  MinLengthp2: символов.
+  MaxLength: Должно быть меньше 70 символов.
+  HasUppercase: Должно содержать заглавную букву.
+  HasLowercase: Должно содержать строчную букву.
+  HasNumber: Должно содержать число.
+  HasSymbol: Должно содержать символ.
+  Confirmation: Подтверждение пароля совпадает.
+  ResetLinkText: Сбросить пароль
+  BackButtonText: Назад
+  NextButtonText: Вперед
 
 UsernameChange:
   Title: Изменение логина

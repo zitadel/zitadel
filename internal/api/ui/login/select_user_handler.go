@@ -36,7 +36,7 @@ func (l *Login) renderUserSelection(w http.ResponseWriter, r *http.Request, auth
 
 func (l *Login) handleSelectUser(w http.ResponseWriter, r *http.Request) {
 	data := new(userSelectionFormData)
-	authSession, err := l.getAuthRequestAndParseData(r, data)
+	authSession, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authSession, err)
 		return

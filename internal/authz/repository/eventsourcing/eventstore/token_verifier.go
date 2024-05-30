@@ -172,7 +172,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 }
 
 // checkAuthentication ensures the session or token was authenticated (at least a single [domain.UserAuthMethodType]).
-// It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any
+// It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any second factor
 func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMethods []domain.UserAuthMethodType, userID string) error {
 	if len(authMethods) == 0 {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
@@ -180,11 +180,18 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if domain.HasMFA(authMethods) {
 		return nil
 	}
-	availableAuthMethods, forceMFA, forceMFALocalOnly, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID)
+	requirements, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID)
 	if err != nil {
 		return err
 	}
-	if domain.RequiresMFA(forceMFA, forceMFALocalOnly, hasIDPAuthentication(authMethods)) || domain.HasMFA(availableAuthMethods) {
+	if requirements.UserType == domain.UserTypeMachine {
+		return nil
+	}
+	if domain.RequiresMFA(
+		requirements.ForceMFA,
+		requirements.ForceMFALocalOnly,
+		!hasIDPAuthentication(authMethods)) ||
+		domain.Has2FA(requirements.AuthMethods) {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
 	}
 	return nil

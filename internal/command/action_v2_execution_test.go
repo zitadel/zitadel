@@ -358,6 +358,16 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request/include", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
 					expectPush(
 						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("request/method", "instance"),
@@ -429,6 +439,16 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request/include", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
 					expectPush(
 						execution.NewSetEventV2(context.Background(),
 							execution.NewAggregate("request/service", "instance"),
@@ -489,6 +509,16 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, all include",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request/include", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
@@ -2369,6 +2399,473 @@ func TestCommands_DeleteExecutionFunction(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.details, details)
+			}
+		})
+	}
+}
+
+func mockExecutionIncludesCache(cache map[string][]string) includeCacheFunc {
+	return func(ctx context.Context, id string, resourceOwner string) ([]string, error) {
+		included, ok := cache[id]
+		if !ok {
+			return nil, zerrors.ThrowPreconditionFailed(nil, "", "cache failed")
+		}
+		return included, nil
+	}
+}
+
+func TestCommands_checkForIncludeCircular(t *testing.T) {
+	type args struct {
+		ctx           context.Context
+		id            string
+		resourceOwner string
+		includes      []string
+		cache         map[string][]string
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			"not found, error",
+			args{
+				ctx:           context.Background(),
+				id:            "id",
+				resourceOwner: "",
+				includes:      []string{"notexistent"},
+				cache:         map[string][]string{},
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"single, ok",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id2"},
+				cache: map[string][]string{
+					"id2": {},
+				},
+			},
+			res{},
+		},
+		{
+			"single, circular",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id1"},
+				cache:         map[string][]string{},
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"multi 3, ok",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id2"},
+				cache: map[string][]string{
+					"id2": {"id3"},
+					"id3": {},
+				},
+			},
+			res{},
+		},
+		{
+			"multi 3, circular",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id2"},
+				cache: map[string][]string{
+					"id2": {"id3"},
+					"id3": {"id1"},
+				},
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"multi 5, ok",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id11", "id12"},
+				cache: map[string][]string{
+					"id11": {"id21", "id23"},
+					"id12": {"id22"},
+					"id21": {},
+					"id22": {},
+					"id23": {},
+				},
+			},
+			res{},
+		},
+		{
+			"multi 5, circular",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id11", "id12"},
+				cache: map[string][]string{
+					"id11": {"id21", "id23"},
+					"id12": {"id22"},
+					"id21": {},
+					"id22": {},
+					"id23": {"id1"},
+				},
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"multi 5, circular",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id11", "id12"},
+				cache: map[string][]string{
+					"id11": {"id21", "id23"},
+					"id12": {"id22"},
+					"id21": {},
+					"id22": {},
+					"id23": {"id11"},
+				},
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"multi 5, circular",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id11", "id12"},
+				cache: map[string][]string{
+					"id11": {"id21", "id23"},
+					"id12": {"id22"},
+					"id21": {"id11"},
+					"id22": {},
+					"id23": {},
+				},
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"multi 5, circular",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id11", "id12"},
+				cache: map[string][]string{
+					"id11": {"id21", "id23"},
+					"id12": {"id22"},
+					"id21": {},
+					"id22": {"id12"},
+					"id23": {},
+				},
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"multi 3, maxlevel",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id2"},
+				cache: map[string][]string{
+					"id2": {"id3"},
+					"id3": {},
+				},
+			},
+			res{},
+		},
+		{
+			"multi 4, over maxlevel",
+			args{
+				ctx:           context.Background(),
+				id:            "id1",
+				resourceOwner: "",
+				includes:      []string{"id2"},
+				cache: map[string][]string{
+					"id2": {"id3"},
+					"id3": {"id4"},
+					"id4": {},
+				},
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			f := mockExecutionIncludesCache(tt.args.cache)
+			err := checkForIncludeCircular(tt.args.ctx, tt.args.id, tt.args.resourceOwner, tt.args.includes, f, 3)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func mockExecutionIncludesCacheFuncs(cache map[string][]string) (func(string) ([]string, bool), func(string, []string)) {
+	return func(s string) ([]string, bool) {
+			includes, ok := cache[s]
+			return includes, ok
+		}, func(s string, strings []string) {
+			cache[s] = strings
+		}
+}
+
+func TestCommands_getExecutionIncludes(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		cache         map[string][]string
+		id            string
+		resourceOwner string
+	}
+	type res struct {
+		includes []string
+		cache    map[string][]string
+		err      func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"new empty, ok",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request/include", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx:           context.Background(),
+				cache:         map[string][]string{},
+				id:            "id",
+				resourceOwner: "instance",
+			},
+			res{
+				includes: []string{},
+				cache:    map[string][]string{"id": {}},
+			},
+		},
+		{
+			"new includes, ok",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request/include", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx:           context.Background(),
+				cache:         map[string][]string{},
+				id:            "id",
+				resourceOwner: "instance",
+			},
+			res{
+				includes: []string{"include"},
+				cache:    map[string][]string{"id": {"include"}},
+			},
+		},
+		{
+			"found, ok",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				cache:         map[string][]string{"id": nil},
+				id:            "id",
+				resourceOwner: "instance",
+			},
+			res{
+				includes: nil,
+				cache:    map[string][]string{"id": nil},
+			},
+		},
+		{
+			"found includes, ok",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				cache:         map[string][]string{"id": {"include1", "include2", "include3"}},
+				id:            "id",
+				resourceOwner: "instance",
+			},
+			res{
+				includes: []string{"include1", "include2", "include3"},
+				cache:    map[string][]string{"id": {"include1", "include2", "include3"}},
+			},
+		},
+		{
+			"found multiple, ok",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: context.Background(),
+				cache: map[string][]string{
+					"id1": {"include1", "include2", "include3"},
+					"id2": {"include1", "include2", "include3"},
+					"id3": {"include1", "include2", "include3"},
+				},
+				id:            "id2",
+				resourceOwner: "instance",
+			},
+			res{
+				includes: []string{"include1", "include2", "include3"},
+				cache: map[string][]string{
+					"id1": {"include1", "include2", "include3"},
+					"id2": {"include1", "include2", "include3"},
+					"id3": {"include1", "include2", "include3"},
+				},
+			},
+		},
+		{
+			"new multiple, ok",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request/include", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cache: map[string][]string{
+					"id1": {"include1", "include2", "include3"},
+					"id2": {"include1", "include2", "include3"},
+					"id3": {"include1", "include2", "include3"},
+				},
+				id:            "id",
+				resourceOwner: "instance",
+			},
+			res{
+				includes: []string{},
+				cache: map[string][]string{
+					"id1": {"include1", "include2", "include3"},
+					"id2": {"include1", "include2", "include3"},
+					"id3": {"include1", "include2", "include3"},
+					"id":  {},
+				},
+			},
+		},
+		{
+			"new multiple includes, ok",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request/include", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
+								},
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cache: map[string][]string{
+					"id1": {"include1", "include2", "include3"},
+					"id2": {"include1", "include2", "include3"},
+					"id3": {"include1", "include2", "include3"},
+				},
+				id:            "id",
+				resourceOwner: "instance",
+			},
+			res{
+				includes: []string{"include"},
+				cache: map[string][]string{
+					"id1": {"include1", "include2", "include3"},
+					"id2": {"include1", "include2", "include3"},
+					"id3": {"include1", "include2", "include3"},
+					"id":  {"include"},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			includes, err := c.getExecutionIncludes(mockExecutionIncludesCacheFuncs(tt.args.cache))(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.cache, tt.args.cache)
+				assert.Equal(t, tt.res.includes, includes)
 			}
 		})
 	}
