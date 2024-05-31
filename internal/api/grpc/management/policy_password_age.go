@@ -3,6 +3,8 @@ package management
 import (
 	"context"
 
+	"github.com/zitadel/logging"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/zitadel/zitadel/internal/api/grpc/policy"
@@ -10,6 +12,7 @@ import (
 )
 
 func (s *Server) GetPasswordAgePolicy(ctx context.Context, req *mgmt_pb.GetPasswordAgePolicyRequest) (*mgmt_pb.GetPasswordAgePolicyResponse, error) {
+	logging.Warn("Deprecated: GetPasswordAgePolicy will be removed with ZITADEL v2.56.0")
 	policy, err := s.query.PasswordAgePolicyByOrg(ctx, true, authz.GetCtxData(ctx).OrgID, false)
 	if err != nil {
 		return nil, err
@@ -21,6 +24,7 @@ func (s *Server) GetPasswordAgePolicy(ctx context.Context, req *mgmt_pb.GetPassw
 }
 
 func (s *Server) GetDefaultPasswordAgePolicy(ctx context.Context, req *mgmt_pb.GetDefaultPasswordAgePolicyRequest) (*mgmt_pb.GetDefaultPasswordAgePolicyResponse, error) {
+	logging.Warn("Deprecated: GetDefaultPasswordAgePolicy will be removed with ZITADEL v2.56.0")
 	policy, err := s.query.DefaultPasswordAgePolicy(ctx, true)
 	if err != nil {
 		return nil, err
@@ -31,6 +35,7 @@ func (s *Server) GetDefaultPasswordAgePolicy(ctx context.Context, req *mgmt_pb.G
 }
 
 func (s *Server) AddCustomPasswordAgePolicy(ctx context.Context, req *mgmt_pb.AddCustomPasswordAgePolicyRequest) (*mgmt_pb.AddCustomPasswordAgePolicyResponse, error) {
+	logging.Warn("Deprecated: AddCustomPasswordAgePolicy will be removed with ZITADEL v2.56.0")
 	result, err := s.command.AddPasswordAgePolicy(ctx, authz.GetCtxData(ctx).OrgID, AddPasswordAgePolicyToDomain(req))
 	if err != nil {
 		return nil, err
@@ -45,6 +50,7 @@ func (s *Server) AddCustomPasswordAgePolicy(ctx context.Context, req *mgmt_pb.Ad
 }
 
 func (s *Server) UpdateCustomPasswordAgePolicy(ctx context.Context, req *mgmt_pb.UpdateCustomPasswordAgePolicyRequest) (*mgmt_pb.UpdateCustomPasswordAgePolicyResponse, error) {
+	logging.Warn("Deprecated: UpdateCustomPasswordAgePolicy will be removed with ZITADEL v2.56.0")
 	result, err := s.command.ChangePasswordAgePolicy(ctx, authz.GetCtxData(ctx).OrgID, UpdatePasswordAgePolicyToDomain(req))
 	if err != nil {
 		return nil, err
@@ -59,6 +65,7 @@ func (s *Server) UpdateCustomPasswordAgePolicy(ctx context.Context, req *mgmt_pb
 }
 
 func (s *Server) ResetPasswordAgePolicyToDefault(ctx context.Context, req *mgmt_pb.ResetPasswordAgePolicyToDefaultRequest) (*mgmt_pb.ResetPasswordAgePolicyToDefaultResponse, error) {
+	logging.Warn("Deprecated: ResetPasswordAgePolicyToDefault will be removed with ZITADEL v2.56.0")
 	objectDetails, err := s.command.RemovePasswordAgePolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err

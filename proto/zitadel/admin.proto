@@ -2642,6 +2642,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: This method will be removed with ZITADEL v2.56.0
     rpc GetPasswordAgePolicy(GetPasswordAgePolicyRequest) returns (GetPasswordAgePolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/age";
@@ -2655,7 +2656,8 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Password Age Settings";
-            description: "Not implemented"
+            description: "This method will be removed with ZITADEL v2.56.0";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
@@ -2665,6 +2667,7 @@ service AdminService {
         };
     }
 
+    // Deprecated: This method will be removed with ZITADEL v2.56.0
     rpc UpdatePasswordAgePolicy(UpdatePasswordAgePolicyRequest) returns (UpdatePasswordAgePolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/age";
@@ -2679,7 +2682,8 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Update Password Age Settings";
-            description: "Not implemented"
+            description: "This method will be removed with ZITADEL v2.56.0";
+            deprecated: true;
             responses: {
                 key: "200";
                 value: {
