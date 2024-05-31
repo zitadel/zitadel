@@ -140,21 +140,25 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 		case oidc.ScopeOpenID:
 			out.Subject = user.User.ID
 		case oidc.ScopeEmail:
-			if userInfoAssertion {
-				out.UserInfoEmail = userInfoEmailToOIDC(user.User)
+			if !userInfoAssertion {
+				continue
 			}
+			out.UserInfoEmail = userInfoEmailToOIDC(user.User)
 		case oidc.ScopeProfile:
-			if userInfoAssertion {
-				out.UserInfoProfile = userInfoProfileToOidc(user.User, assetPrefix)
+			if !userInfoAssertion {
+				continue
 			}
+			out.UserInfoProfile = userInfoProfileToOidc(user.User, assetPrefix)
 		case oidc.ScopePhone:
-			if userInfoAssertion {
-				out.UserInfoPhone = userInfoPhoneToOIDC(user.User)
+			if !userInfoAssertion {
+				continue
 			}
+			out.UserInfoPhone = userInfoPhoneToOIDC(user.User)
 		case oidc.ScopeAddress:
+			if !userInfoAssertion {
+				continue
+			}
 			// TODO: handle address for human users as soon as implemented
-			// if userInfoAssertion {
-			// }
 		case ScopeUserMetaData:
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
