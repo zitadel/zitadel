@@ -80,7 +80,11 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	// with active: false
 	defer func() {
 		if err != nil {
-			s.getLogger(ctx).ErrorContext(ctx, "oidc introspection", "err", err)
+			if zerrors.IsInternal(err) {
+				s.getLogger(ctx).ErrorContext(ctx, "oidc introspection", "err", err)
+			} else {
+				s.getLogger(ctx).InfoContext(ctx, "oidc introspection", "err", err)
+			}
 			resp, err = op.NewResponse(new(oidc.IntrospectionResponse)), nil
 		}
 	}()
