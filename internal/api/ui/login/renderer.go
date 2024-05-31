@@ -342,7 +342,7 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 		if authReq != nil {
 			log = log.WithField("auth_req_id", authReq.ID)
 		}
-		log.Error()
+		log.Info()
 
 		_, msg = l.getErrorMessage(r, err)
 	}
