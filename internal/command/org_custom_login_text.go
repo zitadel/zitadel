@@ -23,6 +23,9 @@ func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, lo
 	if err != nil {
 		return nil, err
 	}
+	if len(events) == 0 {
+		return writeModelToObjectDetails(&existingLoginText.WriteModel), nil
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
