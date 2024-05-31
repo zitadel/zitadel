@@ -54,7 +54,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		nil,
 		false,
 	)
-	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false))
+	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false, true, false, false))
 }
 
 func (s *Server) verifyJWTProfile(ctx context.Context, req *oidc.JWTProfileGrantRequest) (user *query.User, tokenRequest *oidc.JWTTokenRequest, err error) {

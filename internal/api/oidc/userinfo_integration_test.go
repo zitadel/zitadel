@@ -231,9 +231,9 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	projectID := project.GetId()
 	require.NoError(t, err)
-	userID, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
+	user, _, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
-	addProjectRolesGrants(t, userID, projectID, roleFoo, roleBar)
+	addProjectRolesGrants(t, user.GetUserId(), projectID, roleFoo, roleBar)
 
 	scope := []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
 		oidc_api.ScopeProjectRolePrefix + roleFoo,
@@ -245,7 +245,7 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 	tokens, err := rp.ClientCredentials(CTX, provider, nil)
 	require.NoError(t, err)
 
-	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, userID, provider)
+	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, user.GetUserId(), provider)
 	require.NoError(t, err)
 	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, roleFoo)
 }
@@ -291,7 +291,7 @@ func getTokens(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
 
 	return tokens
 }
