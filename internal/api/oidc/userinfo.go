@@ -152,9 +152,9 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 				out.UserInfoPhone = userInfoPhoneToOIDC(user.User)
 			}
 		case oidc.ScopeAddress:
-			if userInfoAssertion {
-				//TODO: handle address for human users as soon as implemented
-			}
+			// TODO: handle address for human users as soon as implemented
+			// if userInfoAssertion {
+			// }
 		case ScopeUserMetaData:
 			setUserInfoMetadata(user.Metadata, out)
 		case ScopeResourceOwner:
