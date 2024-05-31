@@ -22,6 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -430,8 +431,8 @@ func TestCommands_updateSession(t *testing.T) {
 				checks: &SessionCommands{
 					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
 					sessionCommands: []SessionCommand{
-						func(ctx context.Context, cmd *SessionCommands) error {
-							return zerrors.ThrowInternal(nil, "id", "check failed")
+						func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
+							return nil, zerrors.ThrowInternal(nil, "id", "check failed")
 						},
 					},
 				},
@@ -526,6 +527,55 @@ func TestCommands_updateSession(t *testing.T) {
 			},
 		},
 		{
+			"set user, invalid password",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"username", "", "", "", "", language.English, domain.GenderUnspecified, "", false),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
+								"$plain$x$password", false, ""),
+						),
+					),
+					expectFilter(), // recheck
+					expectFilter(
+						org.NewLockoutPolicyAddedEvent(context.Background(), &org.NewAggregate("org1").Aggregate, 0, 0, false),
+					),
+					expectPush(
+						user.NewHumanPasswordCheckFailedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, nil),
+					),
+				),
+			},
+			args{
+				ctx: authz.NewMockContext("instance1", "", ""),
+				checks: &SessionCommands{
+					sessionWriteModel: NewSessionWriteModel("sessionID", "instance1"),
+					sessionCommands: []SessionCommand{
+						CheckUser("userID", "org1", &language.Afrikaans),
+						CheckPassword("invalid password"),
+					},
+					createToken: func(sessionID string) (string, string, error) {
+						return "tokenID",
+							"token",
+							nil
+					},
+					hasher: mockPasswordHasher("x"),
+					now: func() time.Time {
+						return testNow
+					},
+				},
+				metadata: map[string][]byte{
+					"key": []byte("value"),
+				},
+			},
+			res{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMAND-3M0fs", "Errors.User.Password.Invalid"),
+			},
+		},
+		{
 			"set user, password, metadata and token",
 			fields{
 				eventstore: expectEventstore(
@@ -539,10 +589,12 @@ func TestCommands_updateSession(t *testing.T) {
 								"$plain$x$password", false, ""),
 						),
 					),
+					expectFilter(), // recheck
 					expectPush(
 						session.NewUserCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							"userID", "org1", testNow, &language.Afrikaans,
 						),
+						user.NewHumanPasswordCheckSucceededEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate, nil),
 						session.NewPasswordCheckedEvent(context.Background(), &session.NewAggregate("sessionID", "instance1").Aggregate,
 							testNow,
 						),
@@ -872,6 +924,7 @@ func TestCheckTOTP(t *testing.T) {
 
 	sessAgg := &session.NewAggregate("session1", "instance1").Aggregate
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
+	orgAgg := &org.NewAggregate("org1").Aggregate
 
 	code, err := totp.GenerateCode(key.Secret(), testNow)
 	require.NoError(t, err)
@@ -886,6 +939,7 @@ func TestCheckTOTP(t *testing.T) {
 		code              string
 		fields            fields
 		wantEventCommands []eventstore.Command
+		wantErrorCommands []eventstore.Command
 		wantErr           error
 	}{
 		{
@@ -897,7 +951,7 @@ func TestCheckTOTP(t *testing.T) {
 				},
 				eventstore: expectEventstore(),
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-8N9ds", "Errors.User.UserIDMissing"),
 		},
 		{
 			name: "filter error",
@@ -931,7 +985,7 @@ func TestCheckTOTP(t *testing.T) {
 					),
 				),
 			},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-3Mif9s", "Errors.User.MFA.OTP.NotReady"),
 		},
 		{
 			name: "otp verify error",
@@ -951,7 +1005,44 @@ func TestCheckTOTP(t *testing.T) {
 							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
 						),
 					),
+					expectFilter(), // recheck
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 0, 0, false)),
+					),
 				),
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode"),
+		},
+		{
+			name: "otp verify error, locked",
+			code: "foobar",
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+					),
+					expectFilter(), // recheck
+					expectFilter(
+						eventFromEventPusher(org.NewLockoutPolicyAddedEvent(ctx, orgAgg, 1, 1, false)),
+					),
+				),
+			},
+			wantErrorCommands: []eventstore.Command{
+				user.NewHumanOTPCheckFailedEvent(ctx, userAgg, nil),
+				user.NewUserLockedEvent(ctx, userAgg),
 			},
 			wantErr: zerrors.ThrowInvalidArgument(nil, "EVENT-8isk2", "Errors.User.MFA.OTP.InvalidCode"),
 		},
@@ -973,11 +1064,38 @@ func TestCheckTOTP(t *testing.T) {
 							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
 						),
 					),
+					expectFilter(), // recheck
 				),
 			},
 			wantEventCommands: []eventstore.Command{
+				user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, nil),
 				session.NewTOTPCheckedEvent(ctx, sessAgg, testNow),
 			},
+		},
+		{
+			name: "ok, but locked in the meantime",
+			code: code,
+			fields: fields{
+				sessionWriteModel: &SessionWriteModel{
+					UserID:        "user1",
+					UserCheckedAt: testNow,
+					aggregate:     sessAgg,
+				},
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(ctx, userAgg, secret),
+						),
+						eventFromEventPusher(
+							user.NewHumanOTPVerifiedEvent(ctx, userAgg, "agent1"),
+						),
+					),
+					expectFilter(
+						user.NewUserLockedEvent(ctx, userAgg),
+					),
+				),
+			},
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SF3fg", "Errors.User.Locked"),
 		},
 	}
 	for _, tt := range tests {
@@ -988,8 +1106,9 @@ func TestCheckTOTP(t *testing.T) {
 				totpAlg:           cryptoAlg,
 				now:               func() time.Time { return testNow },
 			}
-			err := CheckTOTP(tt.code)(ctx, cmd)
+			gotCmds, err := CheckTOTP(tt.code)(ctx, cmd)
 			require.ErrorIs(t, err, tt.wantErr)
+			assert.Equal(t, tt.wantErrorCommands, gotCmds)
 			assert.Equal(t, tt.wantEventCommands, cmd.eventCommands)
 		})
 	}
