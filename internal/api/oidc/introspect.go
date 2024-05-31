@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -103,7 +104,14 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	if err = validateIntrospectionAudience(token.audience, client.clientID, client.projectID); err != nil {
 		return nil, err
 	}
-	userInfo, err := s.userInfo(ctx, token.userID, token.scope, client.projectID, client.projectRoleAssertion, true)
+	userInfo, err := s.userInfo(
+		token.userID,
+		token.scope,
+		client.projectID,
+		client.projectRoleAssertion,
+		true,
+		true,
+	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
 	if err != nil {
 		return nil, err
 	}

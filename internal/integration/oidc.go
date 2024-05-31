@@ -281,42 +281,42 @@ func CheckRedirect(req *http.Request) (*url.URL, error) {
 	return resp.Location()
 }
 
-func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (userID, clientID, clientSecret string, err error) {
-	name := gofakeit.Username()
-	user, err := s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
+	name = gofakeit.Username()
+	machine, err = s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,
 		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
 	})
 	if err != nil {
-		return "", "", "", err
+		return nil, "", "", "", err
 	}
 	secret, err := s.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
-		UserId: user.GetUserId(),
+		UserId: machine.GetUserId(),
 	})
 	if err != nil {
-		return "", "", "", err
+		return nil, "", "", "", err
 	}
-	return user.GetUserId(), secret.GetClientId(), secret.GetClientSecret(), nil
+	return machine, name, secret.GetClientId(), secret.GetClientSecret(), nil
 }
 
-func (s *Tester) CreateOIDCJWTProfileClient(ctx context.Context) (userID string, keyData []byte, err error) {
-	name := gofakeit.Username()
-	user, err := s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+func (s *Tester) CreateOIDCJWTProfileClient(ctx context.Context) (machine *management.AddMachineUserResponse, name string, keyData []byte, err error) {
+	name = gofakeit.Username()
+	machine, err = s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,
 		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
 	})
 	if err != nil {
-		return "", nil, err
+		return nil, "", nil, err
 	}
 	keyResp, err := s.Client.Mgmt.AddMachineKey(ctx, &management.AddMachineKeyRequest{
-		UserId:         user.GetUserId(),
+		UserId:         machine.GetUserId(),
 		Type:           authn.KeyType_KEY_TYPE_JSON,
 		ExpirationDate: timestamppb.New(time.Now().Add(time.Hour)),
 	})
 	if err != nil {
-		return "", nil, err
+		return nil, "", nil, err
 	}
-	return user.GetUserId(), keyResp.GetKeyDetails(), nil
+	return machine, name, keyResp.GetKeyDetails(), nil
 }
