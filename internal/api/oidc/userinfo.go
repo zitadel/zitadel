@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"net/http"
 	"slices"
 	"strings"
@@ -93,7 +94,7 @@ func (s *Server) userInfo(
 ) func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
 	var (
 		once                         sync.Once
-		userInfo                     *oidc.UserInfo
+		rawUserInfo                  *oidc.UserInfo
 		qu                           *query.OIDCUserInfo
 		roleAudience, requestedRoles []string
 	)
@@ -107,10 +108,19 @@ func (s *Server) userInfo(
 			if err != nil {
 				return
 			}
-			userInfo = userInfoToOIDC(qu, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
+			rawUserInfo = userInfoToOIDC(qu, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
 		})
-		userInfoWithRoles := assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
-		return userInfoWithRoles, s.userinfoFlows(ctx, qu, userInfoWithRoles, triggerType)
+		// copy the userinfo to make sure the assert roles and actions use their own copy (e.g. map)
+		userInfo := &oidc.UserInfo{
+			Subject:         rawUserInfo.Subject,
+			UserInfoProfile: rawUserInfo.UserInfoProfile,
+			UserInfoEmail:   rawUserInfo.UserInfoEmail,
+			UserInfoPhone:   rawUserInfo.UserInfoPhone,
+			Address:         rawUserInfo.Address,
+			Claims:          maps.Clone(rawUserInfo.Claims),
+		}
+		assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
+		return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType)
 	}
 }
 
@@ -191,16 +201,14 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 	return out
 }
 
-func assertRoles(projectID string, user *query.OIDCUserInfo, roleAudience, requestedRoles []string, assertion bool, info *oidc.UserInfo) *oidc.UserInfo {
+func assertRoles(projectID string, user *query.OIDCUserInfo, roleAudience, requestedRoles []string, assertion bool, info *oidc.UserInfo) {
 	if !assertion {
-		return info
+		return
 	}
-	userInfo := *info
 	// prevent returning obtained grants if none where requested
 	if (projectID != "" && len(requestedRoles) > 0) || len(roleAudience) > 0 {
-		setUserInfoRoleClaims(&userInfo, newProjectRoles(projectID, user.UserGrants, requestedRoles))
+		setUserInfoRoleClaims(info, newProjectRoles(projectID, user.UserGrants, requestedRoles))
 	}
-	return &userInfo
 }
 
 func userInfoEmailToOIDC(user *query.User) oidc.UserInfoEmail {
