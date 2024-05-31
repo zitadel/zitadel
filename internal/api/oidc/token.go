@@ -97,10 +97,10 @@ type userInfoFunc func(ctx context.Context, roleAssertion bool, triggerType doma
 // getUserInfo returns a function which retrieves userinfo from the database once.
 // However, each time, role claims are asserted and also action flows will trigger.
 func (s *Server) getUserInfo(userID, projectID string, projectRoleAssertion, userInfoAssertion bool, scope []string) userInfoFunc {
+	userInfo := s.userInfo(userID, scope, projectID, projectRoleAssertion, userInfoAssertion, false)
 	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (*oidc.UserInfo, error) {
-		return s.userInfo(ctx, userID, scope, projectID, projectRoleAssertion, roleAssertion, userInfoAssertion, false, triggerType)
+		return userInfo(ctx, roleAssertion, triggerType)
 	}
-
 }
 
 func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo userInfoFunc, roleAssertion bool, getSigningKey signerFunc, sessionID, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, nonce string, actor *domain.TokenActor) (idToken string, exp uint64, err error) {

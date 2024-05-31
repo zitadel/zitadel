@@ -56,7 +56,14 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 		}
 	}
 
-	userInfo, err := s.userInfo(ctx, token.userID, token.scope, projectID, assertion, true, true, false, domain.TriggerTypePreUserinfoCreation)
+	userInfo, err := s.userInfo(
+		token.userID,
+		token.scope,
+		projectID,
+		assertion,
+		true,
+		false,
+	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
 	if err != nil {
 		return nil, err
 	}
@@ -78,25 +85,33 @@ func (s *Server) UserInfo(ctx context.Context, r *op.Request[oidc.UserInfoReques
 // currentProjectOnly can be set to use the current project ID only and ignore the audience from the scope.
 // It should be set in cases where the client doesn't need to know roles outside its own project,
 // for example an introspection client.
-func (s *Server) userInfo(ctx context.Context, userID string, scope []string, projectID string, projectRoleAssertion, roleAssertion, userInfoAssertion, currentProjectOnly bool, triggerType domain.TriggerType) (userInfo *oidc.UserInfo, err error) {
+func (s *Server) userInfo(
+	userID string,
+	scope []string,
+	projectID string,
+	projectRoleAssertion, userInfoAssertion, currentProjectOnly bool,
+) func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
 	var (
 		once                         sync.Once
+		userInfo                     *oidc.UserInfo
 		qu                           *query.OIDCUserInfo
 		roleAudience, requestedRoles []string
 	)
-	once.Do(func() {
-		ctx, span := tracing.NewSpan(ctx)
-		defer func() { span.EndWithError(err) }()
+	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (_ *oidc.UserInfo, err error) {
+		once.Do(func() {
+			ctx, span := tracing.NewSpan(ctx)
+			defer func() { span.EndWithError(err) }()
 
-		roleAudience, requestedRoles = prepareRoles(ctx, scope, projectID, projectRoleAssertion, currentProjectOnly)
-		qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience)
-		if err != nil {
-			return
-		}
-		userInfo = userInfoToOIDC(qu, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
-	})
-	assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
-	return userInfo, s.userinfoFlows(ctx, qu, userInfo, triggerType)
+			roleAudience, requestedRoles = prepareRoles(ctx, scope, projectID, projectRoleAssertion, currentProjectOnly)
+			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience)
+			if err != nil {
+				return
+			}
+			userInfo = userInfoToOIDC(qu, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
+		})
+		userInfoWithRoles := assertRoles(projectID, qu, roleAudience, requestedRoles, roleAssertion, userInfo)
+		return userInfoWithRoles, s.userinfoFlows(ctx, qu, userInfoWithRoles, triggerType)
+	}
 }
 
 // prepareRoles scans the requested scopes and builds the requested roles
@@ -176,14 +191,16 @@ func userInfoToOIDC(user *query.OIDCUserInfo, userInfoAssertion bool, scope []st
 	return out
 }
 
-func assertRoles(projectID string, user *query.OIDCUserInfo, roleAudience, requestedRoles []string, assertion bool, info *oidc.UserInfo) {
+func assertRoles(projectID string, user *query.OIDCUserInfo, roleAudience, requestedRoles []string, assertion bool, info *oidc.UserInfo) *oidc.UserInfo {
 	if !assertion {
-		return
+		return info
 	}
+	userInfo := *info
 	// prevent returning obtained grants if none where requested
 	if (projectID != "" && len(requestedRoles) > 0) || len(roleAudience) > 0 {
-		setUserInfoRoleClaims(info, newProjectRoles(projectID, user.UserGrants, requestedRoles))
+		setUserInfoRoleClaims(&userInfo, newProjectRoles(projectID, user.UserGrants, requestedRoles))
 	}
+	return &userInfo
 }
 
 func userInfoEmailToOIDC(user *query.User) oidc.UserInfoEmail {
