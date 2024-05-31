@@ -122,7 +122,7 @@ func TestServer_Introspect(t *testing.T) {
 			tokens, err := exchangeTokens(t, app.GetClientId(), code, redirectURI)
 			require.NoError(t, err)
 			assertTokens(t, tokens, true)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
 
 			// test actual introspection
 			introspection, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
@@ -317,7 +317,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assertTokens(t, tokens, false)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
 		})
 	}
 }
