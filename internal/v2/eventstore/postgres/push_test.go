@@ -36,7 +36,9 @@ func Test_uniqueConstraints(t *testing.T) {
 			name: "command without constraints",
 			args: args{
 				commands: []*command{
-					{},
+					{
+						Command: &eventstore.Command{},
+					},
 				},
 				expectations: []mock.Expectation{},
 			},
@@ -53,7 +55,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewAddEventUniqueConstraint("test", "id", "error"),
 							},
@@ -81,7 +83,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewAddGlobalUniqueConstraint("test", "id", "error"),
 							},
@@ -109,7 +111,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewAddEventUniqueConstraint("test", "id", "error"),
 								eventstore.NewAddEventUniqueConstraint("test", "id2", "error"),
@@ -143,7 +145,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewAddEventUniqueConstraint("test", "id", "error"),
 							},
@@ -156,7 +158,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewAddEventUniqueConstraint("test", "id2", "error"),
 							},
@@ -189,7 +191,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewRemoveInstanceUniqueConstraints(),
 							},
@@ -217,7 +219,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewRemoveInstanceUniqueConstraints(),
 							},
@@ -230,7 +232,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewRemoveInstanceUniqueConstraints(),
 							},
@@ -263,7 +265,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewRemoveUniqueConstraint("test", "id"),
 							},
@@ -291,7 +293,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewRemoveGlobalUniqueConstraint("test", "id"),
 							},
@@ -319,7 +321,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewRemoveUniqueConstraint("test", "id"),
 								eventstore.NewRemoveUniqueConstraint("test", "id2"),
@@ -353,7 +355,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewRemoveUniqueConstraint("test", "id"),
 							},
@@ -366,7 +368,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewRemoveUniqueConstraint("test", "id2"),
 							},
@@ -399,7 +401,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewAddEventUniqueConstraint("test", "id", ""),
 							},
@@ -433,7 +435,7 @@ func Test_uniqueConstraints(t *testing.T) {
 								eventstore.AppendAggregate("", "", ""),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							UniqueConstraints: []*eventstore.UniqueConstraint{
 								eventstore.NewAddEventUniqueConstraint("test", "id", "My.Error"),
 							},
@@ -786,7 +788,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -841,7 +843,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -857,7 +859,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -926,7 +928,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -942,7 +944,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "type2", "id2"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -1011,7 +1013,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -1067,7 +1069,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -1123,7 +1125,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -1139,7 +1141,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -1214,7 +1216,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -1230,7 +1232,7 @@ func Test_push(t *testing.T) {
 								eventstore.AppendAggregate("owner", "testType", "testID"),
 							).Aggregates()[0],
 						},
-						Command: eventstore.Command{
+						Command: &eventstore.Command{
 							Action: eventstore.Action[any]{
 								Creator:  "gigi",
 								Revision: 1,
@@ -1286,6 +1288,7 @@ func Test_push(t *testing.T) {
 			},
 		},
 	}
+	initPushStmt("postgres")
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			dbMock := mock.NewSQLMock(t, append([]mock.Expectation{mock.ExpectBegin(nil)}, tt.args.expectations...)...)

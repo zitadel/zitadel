@@ -5,7 +5,7 @@ sidebar_label: From Keycloak
 
 ## Migrating from Keycloak to ZITADEL
 
-This guide will use [Docker installation](https://www.docker.com/) to run Keycloak and ZITADEL. However, both Keycloak and ZITADEL offer different installation methods. As a result, this guide won't include any required production tuning or security hardening for either system. However, it's advised you follow [recommended guidelines](https://zitadel.com/docs/guides/manage/self-hosted/production) before putting those systems into production. You can skip setting up Keycloak and ZITADEL if you already have running instances.  
+This guide will use [Docker installation](https://www.docker.com/) to run Keycloak and ZITADEL. However, both Keycloak and ZITADEL offer different installation methods. As a result, this guide won't include any required production tuning or security hardening for either system. However, it's advised you follow [recommended guidelines](/docs/self-hosting/manage/production) before putting those systems into production. You can skip setting up Keycloak and ZITADEL if you already have running instances.  
 
 ## Set up Keycloak
 ### Run Keycloak
@@ -77,7 +77,7 @@ docker cp <keycloak container ID>:/tmp/my-realm-users-0.json .
 
 ## Set up ZITADEL
 
-After creating a sample application that connects to Keycloak, you need to set up ZITADEL in order to migrate the application and users from Keycloak to ZITADEL. For this, ZITADEL offers a [Docker Compose](https://zitadel.com/docs/self-hosting/deploy/compose) installation guide. Follow the instructions under the [Docker compose](https://zitadel.com/docs/self-hosting/deploy/compose#docker-compose) section to run a ZITADEL instance locally. 
+After creating a sample application that connects to Keycloak, you need to set up ZITADEL in order to migrate the application and users from Keycloak to ZITADEL. For this, ZITADEL offers a [Docker Compose](/docs/self-hosting/deploy/compose) installation guide. Follow the instructions under the [Docker compose](/docs/self-hosting/deploy/compose#docker-compose) section to run a ZITADEL instance locally. 
 
 Next, the application will be available at [http://localhost:8080/ui/console/](http://localhost:8080/ui/console/).
 
@@ -91,13 +91,13 @@ Now you can access the console with the following default credentials:
 
 ## Import Keycloak users into ZITADEL
 
-As explained in this [ZITADEL user migration guide](https://zitadel.com/docs/guides/migrate/users), you can import users individually or in bulk. Since we are looking at importing a single user from Keycloak, migrating that individual user to ZITADEL can be done with the [ImportHumanUser](https://zitadel.com/docs/apis/resources/mgmt/management-service-import-human-user) endpoint. 
+As explained in this [ZITADEL user migration guide](/docs/guides/migrate/users), you can import users individually or in bulk. Since we are looking at importing a single user from Keycloak, migrating that individual user to ZITADEL can be done with the [ImportHumanUser](/docs/apis/resources/mgmt/management-service-import-human-user) endpoint. 
 
 > With this endpoint, an email will only be sent to the user if the email is marked as not verified or if there's no password set.
 
 ### Create a service user to consume ZITADEL API
 
-But first of all, in order to use this ZITADEL API, you need to create a [service user](https://zitadel.com/docs/guides/integrate/service-users/authenticate-service-users#exercise-create-a-service-user). 
+But first of all, in order to use this ZITADEL API, you need to create a [service user](/docs/guides/integrate/service-users/authenticate-service-users#exercise-create-a-service-user). 
 
 Go to the **Users** menu and select the **Service Users** tab. And click the **+ New** button. 
 
@@ -167,7 +167,7 @@ if your Keycloak Realm has a single user, your `my-realm-users-0.json` file, int
 }
 ```
 
-Now, you need to transform the JSON to the ZITADEL data format by adhering to the ZITADEL API [specification](https://zitadel.com/docs/apis/resources/mgmt/management-service-import-human-user) to import a user. The minimal format would be as shown below: 
+Now, you need to transform the JSON to the ZITADEL data format by adhering to the ZITADEL API [specification](/docs/apis/resources/mgmt/management-service-import-human-user) to import a user. The minimal format would be as shown below: 
 
 ```js 
 {

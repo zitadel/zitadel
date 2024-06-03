@@ -259,9 +259,6 @@ func (h *Handler) triggerInstances(ctx context.Context, instances []string, trig
 		for ; err != nil; _, err = h.Trigger(instanceCtx, triggerOpts...) {
 			time.Sleep(h.retryFailedAfter)
 			h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
-			if err == nil {
-				break
-			}
 		}
 	}
 }
