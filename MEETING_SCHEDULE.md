@@ -25,7 +25,7 @@ open discussion.
 
 * **Target Audience**: Developers and IT Ops personnel using ZITADEL
 * **Topic**: API Redesign and Q&A
-* **When**: Wednesday 19th of May 12 pm PST / 3 pm EST / 9 pm CEST
+* **When**: Wednesday 12th of May 12 pm PST / 3 pm EST / 9 pm CEST
 * **Duration**: about 1 hour
 * **Platform**: ZITADEL Discord Server (Join us here:  https://zitadel.com/office-hours?event=1248016231936692274 )
 
