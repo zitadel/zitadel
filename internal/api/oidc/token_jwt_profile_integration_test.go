@@ -4,6 +4,7 @@ package oidc_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,10 +17,13 @@ import (
 )
 
 func TestServer_JWTProfile(t *testing.T) {
-	userID, keyData, err := Tester.CreateOIDCJWTProfileClient(CTX)
+	user, name, keyData, err := Tester.CreateOIDCJWTProfileClient(CTX)
 	require.NoError(t, err)
 
 	type claims struct {
+		name                       string
+		username                   string
+		updated                    time.Time
 		resourceOwnerID            any
 		resourceOwnerName          any
 		resourceOwnerPrimaryDomain any
@@ -36,6 +40,16 @@ func TestServer_JWTProfile(t *testing.T) {
 			name:    "success",
 			keyData: keyData,
 			scope:   []string{oidc.ScopeOpenID},
+		},
+		{
+			name:    "openid, profile, email",
+			keyData: keyData,
+			scope:   []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+			wantClaims: claims{
+				name:     name,
+				username: name,
+				updated:  user.GetDetails().GetChangeDate().AsTime(),
+			},
 		},
 		{
 			name:    "org id and domain scope",
@@ -92,12 +106,20 @@ func TestServer_JWTProfile(t *testing.T) {
 
 			provider, err := rp.NewRelyingPartyOIDC(CTX, Tester.OIDCIssuer(), "", "", redirectURI, tt.scope)
 			require.NoError(t, err)
-			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, oidc.BearerToken, userID, provider)
+			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, oidc.BearerToken, user.GetUserId(), provider)
 			require.NoError(t, err)
 			assert.Equal(t, tt.wantClaims.resourceOwnerID, userinfo.Claims[oidc_api.ClaimResourceOwnerID])
 			assert.Equal(t, tt.wantClaims.resourceOwnerName, userinfo.Claims[oidc_api.ClaimResourceOwnerName])
 			assert.Equal(t, tt.wantClaims.resourceOwnerPrimaryDomain, userinfo.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
 			assert.Equal(t, tt.wantClaims.orgDomain, userinfo.Claims[domain.OrgDomainPrimaryClaim])
+			assert.Equal(t, tt.wantClaims.name, userinfo.Name)
+			assert.Equal(t, tt.wantClaims.username, userinfo.PreferredUsername)
+			assertOIDCTime(t, userinfo.UpdatedAt, tt.wantClaims.updated)
+			assert.Empty(t, userinfo.UserInfoProfile.FamilyName)
+			assert.Empty(t, userinfo.UserInfoProfile.GivenName)
+			assert.Empty(t, userinfo.UserInfoEmail)
+			assert.Empty(t, userinfo.UserInfoPhone)
+			assert.Empty(t, userinfo.Address)
 		})
 	}
 }
