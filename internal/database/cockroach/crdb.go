@@ -34,7 +34,7 @@ type Config struct {
 	MaxConnLifetime time.Duration
 	MaxConnIdleTime time.Duration
 	User            User
-	Admin           User
+	Admin           AdminUser
 	// Additional options to be appended as options=<Options>
 	// The value will be taken as is. Multiple options are space separated.
 	Options string
@@ -114,6 +114,12 @@ type User struct {
 	SSL      SSL
 }
 
+type AdminUser struct {
+	// ExistingDatabase is the database to connect to before the ZITADEL database exists
+	ExistingDatabase string
+	User             `mapstructure:",squash"`
+}
+
 type SSL struct {
 	// type of connection security
 	Mode string
@@ -147,7 +153,7 @@ func (c *Config) checkSSL(user User) {
 func (c Config) String(useAdmin bool, appName string) string {
 	user := c.User
 	if useAdmin {
-		user = c.Admin
+		user = c.Admin.User
 	}
 	c.checkSSL(user)
 	fields := []string{
@@ -163,6 +169,8 @@ func (c Config) String(useAdmin bool, appName string) string {
 	}
 	if !useAdmin {
 		fields = append(fields, "dbname="+c.Database)
+	} else {
+		fields = append(fields, "dbname="+c.Admin.ExistingDatabase)
 	}
 	if user.Password != "" {
 		fields = append(fields, "password="+user.Password)

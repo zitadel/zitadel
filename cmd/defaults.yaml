@@ -120,6 +120,9 @@ Database:
         Cert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
         Key: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
     Admin:
+      # If your db system doesn't have a database named defaultdb, configure an existing database here
+      # It is used in zitadel init to connect to postgres and create a dedicated database for ZITADEL.
+      ExistingDatabase: defaultdb # ZITADEL_DATABASE_COCKROACH_ADMIN_EXISTINGDATABASE
       Username: root # ZITADEL_DATABASE_COCKROACH_ADMIN_USERNAME
       Password: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_PASSWORD
       SSL:
