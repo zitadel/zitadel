@@ -26,6 +26,10 @@ introspect: ensure_modules bundle
 	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
 	./../../xk6-modules/k6 run dist/introspection.js --vus ${VUS} --duration ${DURATION}
 
+.PHONY: add_session
+add_session: bundle
+	k6 run dist/session.js --vus ${VUS} --duration ${DURATION}
+
 .PHONY: lint
 lint:
 	npm i
