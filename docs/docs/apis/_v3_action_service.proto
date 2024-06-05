@@ -1,0 +1,554 @@
+syntax = "proto3";
+
+package zitadel.resources.action.v3alpha;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+import "zitadel/resources/action/v3alpha/target.proto";
+import "zitadel/resources/action/v3alpha/execution.proto";
+import "zitadel/resources/action/v3alpha/search.proto";
+import "zitadel/resources/object/v3alpha/object.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Action Service";
+    version: "3.0-alpha";
+    description: "This API is intended to manage custom executions (previously known as actions) in a ZITADEL instance. It is behind the feature flag \"multitenancy_resources_api\". It will continue breaking as long as it is in alpha state.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$ZITADEL_DOMAIN";
+  base_path: "/resources/v3alpha";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+service ZITADELActions {
+
+  // Create a target
+  //
+  // Create a new target, which can be used in executions.
+  rpc CreateTarget (CreateTargetRequest) returns (CreateTargetResponse) {
+    option (google.api.http) = {
+      post: "/targets"
+      body: "target"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.write"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "201";
+        value: {
+          description: "Target successfully created";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/v2CreateTargetResponse";
+            }
+          }
+        };
+      };
+    };
+  }
+
+  // Patch a target
+  //
+  // Patch an existing target.
+  rpc PatchTarget (PatchTargetRequest) returns (PatchTargetResponse) {
+    option (google.api.http) = {
+      patch: "/targets/{id}"
+      body: "target"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Target successfully updated";
+        };
+      };
+    };
+  }
+
+  // Delete a target
+  //
+  // Delete an existing target. This will remove it from any configured execution as well.
+  rpc DeleteTarget (DeleteTargetRequest) returns (DeleteTargetResponse) {
+    option (google.api.http) = {
+      delete: "/targets/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.delete"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Target successfully deleted";
+        };
+      };
+    };
+  }
+
+  // Target by ID
+  //
+  // Returns the target identified by the requested ID.
+  rpc GetTarget (GetTargetRequest) returns (GetTargetResponse) {
+    option (google.api.http) = {
+      get: "/targets/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Target successfully retrieved";
+        }
+      };
+    };
+  }
+
+  // Search targets
+  //
+  // Search all matching targets. By default, we will return all targets of your instance.
+  // Make sure to include a limit and sorting for pagination.
+  rpc SearchTargets (SearchTargetsRequest) returns (SearchTargetsResponse) {
+    option (google.api.http) = {
+      post: "/targets/_search",
+      body: "filters"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all targets matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+  // Put an execution to call a target or include the targets of another execution.
+  //
+  // Creates an execution for the given condition if it doesn't exists.
+  // Otherwise, the existing execution is updated.
+  rpc PutExecution (PutExecutionRequest) returns (PutExecutionResponse) {
+    option (google.api.http) = {
+      post: "/executions"
+      body: "execution"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.execution.write"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "201";
+        value: {
+          description: "Execution successfully created";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/v2CreateExecutionResponse";
+            }
+          }
+        };
+      };
+      responses: {
+        key: "200";
+        value: {
+          description: "Execution successfully updated";
+        };
+      };
+    };
+  }
+
+  // Delete an execution
+  //
+  // Delete an existing execution.
+  rpc DeleteExecution (DeleteExecutionRequest) returns (DeleteExecutionResponse) {
+    option (google.api.http) = {
+      delete: "/executions/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.execution.delete"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Execution successfully deleted";
+        };
+      };
+    };
+  }
+
+  // Search executions
+  //
+  // Search all matching executions. By default, we will return all executions of your instance.
+  // Depending on the ZITADEL configuration, the number of returned resources is most probably limited.
+  // To make sure you get deterministic results, sort and paginate by the resources creation dates.
+  rpc SearchExecutions (SearchExecutionsRequest) returns (SearchExecutionsResponse) {
+    option (google.api.http) = {
+      post: "/executions/_search"
+      body: "filters"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all executions matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+  // List all available functions
+  //
+  // List all available functions which can be used as condition for executions.
+  rpc ListAvailableExecutionFunctions (ListAvailableExecutionFunctionsRequest) returns (ListAvailableExecutionFunctionsResponse) {
+    option (google.api.http) = {
+      get: "/executions/functions"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all functions successfully";
+        };
+      };
+    };
+  }
+  // List all available methods
+  //
+  // List all available methods which can be used as condition for executions.
+  rpc ListAvailableExecutionMethods (ListAvailableExecutionMethodsRequest) returns (ListAvailableExecutionMethodsResponse) {
+    option (google.api.http) = {
+      get: "/executions/methods"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all methods successfully";
+        };
+      };
+    };
+  }
+  // List all available service
+  //
+  // List all available services which can be used as condition for executions.
+  rpc ListAvailableExecutionServices (ListAvailableExecutionServicesRequest) returns (ListAvailableExecutionServicesResponse) {
+    option (google.api.http) = {
+      get: "/executions/services"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "List all services successfully";
+        };
+      };
+    };
+  }
+}
+
+message CreateTargetRequest {
+  Target target = 2;
+}
+
+message CreateTargetResponse {
+  zitadel.resources.object.v3alpha.Details details = 2;
+}
+
+message PatchTargetRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  PatchTarget target = 2;
+}
+
+message PatchTargetResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
+}
+
+message DeleteTargetRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message DeleteTargetResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
+}
+
+message SearchTargetsRequest {
+  // list limitations and ordering.
+  zitadel.resources.object.v3alpha.ListQuery query = 2;
+  // the field the result is sorted.
+  zitadel.resources.action.v3alpha.TargetFieldName sorting_column = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"FIELD_NAME_SCHEMA_TYPE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated zitadel.resources.action.v3alpha.TargetSearchFilter filters = 4;
+}
+
+message SearchTargetsResponse {
+  zitadel.resources.object.v3alpha.ListDetails details = 1;
+  zitadel.resources.action.v3alpha.TargetFieldName sorting_column = 2;
+  repeated zitadel.resources.action.v3alpha.GetTarget result = 3;
+}
+
+message GetTargetRequest {
+  // unique identifier of the target.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message GetTargetResponse {
+  zitadel.resources.action.v3alpha.GetTarget target = 1;
+}
+
+message PutExecutionRequest {
+  Execution execution = 2;
+}
+
+message PutExecutionResponse {
+  zitadel.resources.object.v3alpha.Details details = 2;
+}
+
+message DeleteExecutionRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message DeleteExecutionResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
+}
+
+message SearchExecutionsRequest {
+  // list limitations and ordering.
+  zitadel.resources.object.v3alpha.ListQuery query = 1;
+  // Define the criteria to query for.
+  repeated zitadel.resources.action.v3alpha.ExecutionSearchFilter filters = 2;
+}
+
+message SearchExecutionsResponse {
+  zitadel.resources.object.v3alpha.ListDetails details = 1;
+  repeated zitadel.resources.action.v3alpha.GetExecution result = 2;
+}
+
+message ListAvailableExecutionFunctionsRequest{}
+message ListAvailableExecutionFunctionsResponse{
+  // All available functions
+  repeated string functions = 1;
+}
+message ListAvailableExecutionMethodsRequest{}
+message ListAvailableExecutionMethodsResponse{
+  // All available methods
+  repeated string methods = 1;
+}
+
+message ListAvailableExecutionServicesRequest{}
+message ListAvailableExecutionServicesResponse{
+  // All available services
+  repeated string services = 1;
+}
