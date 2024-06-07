@@ -120,7 +120,7 @@ Database:
         Cert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
         Key: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
     Admin:
-      # By default, ExistingDatabase not specified in the connection string
+      # By default, ExistingDatabase is not specified in the connection string
       # If the connection resolves to a database that is not existing in your system, configure an existing one here
       # It is used in zitadel init to connect to cockroach and create a dedicated database for ZITADEL.
       ExistingDatabase: # ZITADEL_DATABASE_COCKROACH_ADMIN_EXISTINGDATABASE
