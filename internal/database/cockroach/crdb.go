@@ -169,7 +169,7 @@ func (c Config) String(useAdmin bool, appName string) string {
 	}
 	if !useAdmin {
 		fields = append(fields, "dbname="+c.Database)
-	} else {
+	} else if c.Admin.ExistingDatabase != "" {
 		fields = append(fields, "dbname="+c.Admin.ExistingDatabase)
 	}
 	if user.Password != "" {
