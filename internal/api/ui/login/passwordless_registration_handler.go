@@ -114,11 +114,11 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 	}
 	if authReq == nil {
 		policy, err := l.query.ActiveLabelPolicyByOrg(r.Context(), orgID, false)
-		logging.Log("HANDL-XjWKE").OnError(err).Error("unable to get active label policy")
+		logging.OnError(err).Error("unable to get active label policy")
 		data.LabelPolicy = labelPolicyToDomain(policy)
 		if err == nil {
 			texts, err := l.authRepo.GetLoginText(r.Context(), orgID)
-			logging.Log("LOGIN-HJK4t").OnError(err).Warn("could not get custom texts")
+			logging.OnError(err).Warn("could not get custom texts")
 			l.addLoginTranslations(translator, texts)
 		}
 	}
