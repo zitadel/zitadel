@@ -34,22 +34,21 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 
 	var (
 		session *command.OIDCSession
-		state   string
 	)
 	if strings.HasPrefix(plainCode, command.IDPrefixV2) {
-		session, state, err = s.command.CreateOIDCSessionFromAuthRequest(
+		session, _, err = s.command.CreateOIDCSessionFromAuthRequest(
 			setContextUserSystem(ctx),
 			plainCode,
 			codeExchangeComplianceChecker(client, r.Data),
 			slices.Contains(client.GrantTypes(), oidc.GrantTypeRefreshToken),
 		)
 	} else {
-		session, state, err = s.codeExchangeV1(ctx, client, r.Data, r.Data.Code)
+		session, _, err = s.codeExchangeV1(ctx, client, r.Data, r.Data.Code)
 	}
 	if err != nil {
 		return nil, err
 	}
-	return response(s.accessTokenResponseFromSession(ctx, client, session, state, client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion))
+	return response(s.accessTokenResponseFromSession(ctx, client, session, "", client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion))
 }
 
 // codeExchangeV1 creates a v2 token from a v1 auth request.
