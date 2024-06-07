@@ -58,16 +58,17 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 		l.checkMailCode(w, r, authReq, data.UserID, data.Code)
 		return
 	}
-	userOrg := ""
+	var userOrg, authReqID string
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
+		authReqID = authReq.ID
 	}
 	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
 	if err != nil {
 		l.checkMailCode(w, r, authReq, data.UserID, data.Code)
 		return
 	}
-	_, err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg, emailCodeGenerator, authReq.ID)
+	_, err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg, emailCodeGenerator, authReqID)
 	l.renderMailVerification(w, r, authReq, data.UserID, err)
 }
 
