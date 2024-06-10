@@ -141,6 +141,20 @@ Replace "policeman" with "police officer," "manpower" with "workforce," and "bus
 Ableist language includes words or phrases such as crazy, insane, blind to or blind eye to, cripple, dumb, and others.
 Choose alternative words depending on the context.
 
+### Developing ZITADEL with Dev Containers
+
+Follow the instructions provided by your code editor/IDE to initiate the development container. This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers". The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
+
+When you are connected to the container run the following commands to start ZITADEL.
+
+```bash
+make compile && ./zitadel start-from-init --masterkey MasterkeyNeedsToHave32Characters --tlsMode disabled
+```
+
+ZITADEL serves traffic as soon as you can see the following log line:
+
+`INFO[0001] server is listening on [::]:8080`
+
 ### Backend/login
 
 By executing the commands from this section, you run everything you need to develop the ZITADEL backend locally.
