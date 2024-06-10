@@ -34,6 +34,10 @@ Order of execution:
 3. mirror event store tables
 4. recompute projections
 5. verify`,
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			err := viper.MergeConfig(bytes.NewBuffer(defaultConfig))
+			logging.OnError(err).Fatal("unable to read default config")
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			config := mustNewMigrationConfig(viper.GetViper())
 			projectionConfig := mustNewProjectionsConfig(viper.GetViper())
@@ -58,9 +62,6 @@ Order of execution:
 * eventstore.unique_constraints
 The flag should be provided if you want to execute the mirror command multiple times so that the static data are also mirrored to prevent inconsistent states.`)
 	migrateProjectionsFlags(cmd)
-
-	err := viper.MergeConfig(bytes.NewBuffer(defaultConfig))
-	logging.OnError(err).Fatal("unable to read default config")
 
 	cmd.AddCommand(
 		eventstoreCmd(),
