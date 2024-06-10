@@ -13,9 +13,7 @@ import {
   RetrieveIdentityProviderIntentRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
-import {
-  CreateCallbackRequest,
-} from "@zitadel/proto/zitadel/oidc/v2beta/oidc_service_pb";
+import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2beta/oidc_service_pb";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2beta/object_pb";
 import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2beta/idp_pb";
 import { PlainMessage } from "@zitadel/client2";
@@ -24,7 +22,7 @@ const SESSION_LIFETIME_S = 3000;
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
-  {baseUrl: process.env.ZITADEL_API_URL!},
+  { baseUrl: process.env.ZITADEL_API_URL! },
 );
 
 export const sessionService = createSessionServiceClient(transport);
