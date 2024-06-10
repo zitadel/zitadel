@@ -44,3 +44,6 @@ Before you run the tests you need an initialized user. The tests don't implement
 * `make introspect`  
   setup: creates projects, one api per project, one key per api and generates the jwt from the given keys  
   test: calls introspection endpoint using the given JWTs
+* `make add_session`  
+  setup: creates human users  
+  test: creates new sessions with user id check
