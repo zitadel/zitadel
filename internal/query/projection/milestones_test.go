@@ -310,7 +310,6 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				aggregateType: eventstore.AggregateType("oidc_session"),
 				sequence:      15,
 				executer: &testExecuter{
-					// TODO: This can be optimized to only use one statement with OR
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
