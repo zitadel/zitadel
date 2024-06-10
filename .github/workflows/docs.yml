@@ -3,8 +3,8 @@ env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
-    push:
-    pull_request:
+  push:
+  pull_request:
 jobs:
   Deploy:
     runs-on: ubuntu-latest
@@ -13,11 +13,11 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: filter
         with:
-            filters: |
-                src:
-                    - 'docs/**'
-                    - 'proto/**'
-                    - '.github/workflows/docs.yml'
+          filters: |
+            src:
+              - 'docs/**'
+              - 'proto/**'
+              - '.github/workflows/docs.yml'
       - name: Install Vercel CLI
         if: steps.filter.outputs.src == 'true'
         run: npm install --global vercel@latest
