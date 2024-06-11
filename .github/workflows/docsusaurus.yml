@@ -16,7 +16,7 @@ jobs:
             src:
               - 'docs/**'
               - 'proto/**'
-              - '.github/workflows/docusaurus.yml'
+              - '.github/workflows/docsusaurus.yml'
       - name: Install Vercel CLI
         if: steps.filter.outputs.src == 'true'
         run: npm install --global vercel@latest
