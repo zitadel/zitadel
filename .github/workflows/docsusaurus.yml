@@ -25,12 +25,11 @@ jobs:
           node-version: 20
           cache: 'yarn'
           cache-dependency-path: docs/yarn.lock
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
       - name: Install Dependencies
         if: steps.filter.outputs.src == 'true'
         run: yarn install --frozen-lockfile
-      - name: Install Vercel CLI
-        if: steps.filter.outputs.src == 'true'
-        run: npm install --global vercel@latest
       - name: Pull Vercel Environment Information
         if: steps.filter.outputs.src == 'true'
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
@@ -41,5 +40,5 @@ jobs:
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Production to Vercel 
-        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true'}}
+        if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true'}}
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
