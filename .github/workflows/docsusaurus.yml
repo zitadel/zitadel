@@ -4,6 +4,9 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
   pull_request:
+  push:
+    branches:
+      - main
 jobs:
   Deploy:
     runs-on: ubuntu-latest
@@ -39,18 +42,47 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-docusaurus-${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}
               ${{ runner.os }}-docusaurus-${{ hashFiles('docs/yarn.lock') }}
-      - name: Pull Vercel Environment Preview
+      - name: Prepare Preview Environment
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Pull Vercel Environment Production
+      - name: Perpare Production Environment
         if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} 
       - name: Build Project Artifacts
         if: steps.filter.outputs.src == 'true'
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-      - name: Deploy Preview to Vercel
+      - name: Deploy Preview
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} | tee deploy.log
-      - name: Deploy Production to Vercel 
+        run: |
+          vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }} >deployment-url.txt
+          echo "deploymentUrl=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
+      - name: Deploy Production
         if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true'}}
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} | tee deploy.log
+        run: |
+          vercel deploy --prebuilt --archive=tgz --prod --token=${{ secrets.VERCEL_TOKEN }} >deployment-url.txt
+          echo "deploymentUrl=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
+  Comment-Preview:
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    needs: Deploy
+    permissions: 
+      issues: write
+      pull-requests: write
+    environment:
+      name: Preview – docs
+      url: ${{needs.Deploy-Preview.outputs.deploymentUrl}}
+    steps:
+      - name: Comment URL to PR
+        if: github.event_name == 'pull_request'
+        env: 
+          DEPLOYMENT_URL: ${{needs.Deploy-Preview.outputs.deploymentUrl}}
+        uses: actions/github-script@v6
+        id: my-script
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "Deployed at ${{env.DEPLOYMENT_URL}}"
+            })
