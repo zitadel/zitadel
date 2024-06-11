@@ -40,6 +40,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-docusaurus-${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}
               ${{ runner.os }}-docusaurus-${{ hashFiles('docs/yarn.lock') }}
+      - run: yarn build
+        working-directory: ./docs
       - name: Deploy Preview
         uses: amondnet/vercel-action@v25
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
