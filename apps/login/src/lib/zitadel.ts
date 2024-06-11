@@ -22,7 +22,10 @@ const SESSION_LIFETIME_S = 3000;
 
 const transport = createServerTransport(
   process.env.ZITADEL_SERVICE_USER_TOKEN!,
-  { baseUrl: process.env.ZITADEL_API_URL! },
+  {
+    baseUrl: process.env.ZITADEL_API_URL!,
+    httpVersion: "2",
+  },
 );
 
 export const sessionService = createSessionServiceClient(transport);

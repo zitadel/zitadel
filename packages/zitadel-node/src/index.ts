@@ -1,9 +1,9 @@
 import { NewAuthorizationBearerInterceptor } from "@zitadel/client2";
-// import {
-//   createGrpcWebTransport,
-//   GrpcWebTransportOptions,
-// } from "@connectrpc/connect-node";
-import { createGrpcWebTransport, GrpcWebTransportOptions } from "@connectrpc/connect-web";
+import {
+  createGrpcWebTransport,
+  GrpcWebTransportOptions,
+} from "@connectrpc/connect-node";
+// import { createGrpcWebTransport, GrpcWebTransportOptions } from "@connectrpc/connect-web";
 import { importPKCS8, SignJWT } from "jose";
 
 /**
