@@ -28,6 +28,17 @@ jobs:
         if: steps.filter.outputs.src == 'true'
         run: yarn install --frozen-lockfile
         working-directory: ./docs
+      - uses: actions/cache@v4
+        if: steps.filter.outputs.src == 'true'
+        with:
+          path: |
+            ${{ github.workspace }}docs/.docusaurus
+            ${{ github.workspace }}docs/**/.cache
+          key: |
+            ${{ runner.os }}-docusaurus-${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-docusaurus-${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}
+              ${{ runner.os }}-docusaurus-${{ hashFiles('docs/yarn.lock') }}
       - name: Pull Vercel Environment Preview
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
