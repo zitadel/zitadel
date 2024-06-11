@@ -28,8 +28,7 @@ jobs:
         if: steps.filter.outputs.src == 'true'
         run: yarn install --frozen-lockfile
         working-directory: ./docs
-      - name: Restore Docusaurus Cache
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         if: steps.filter.outputs.src == 'true'
         with:
           path: |
@@ -40,15 +39,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-docusaurus-${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}
               ${{ runner.os }}-docusaurus-${{ hashFiles('docs/yarn.lock') }}
-      - run: yarn build
-        working-directory: ./docs
-      - name: Deploy Preview
-        uses: amondnet/vercel-action@v25
+      - name: Pull Vercel Environment Preview
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-
-
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Pull Vercel Environment Production
+        if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} 
+      - name: Build Project Artifacts
+        if: steps.filter.outputs.src == 'true'
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Preview to Vercel
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} | tee deploy.log
+      - name: Deploy Production to Vercel 
+        if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true'}}
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} | tee deploy.log
