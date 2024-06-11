@@ -34,7 +34,7 @@ jobs:
         with:
           path: |
             ${{ github.workspace }}/docs/.docusaurus
-            ${{ github.workspace }}/docs/**/.cache
+            ${{ github.workspace }}/docs/node_modules/.cache
           key: |
             ${{ runner.os }}-docusaurus-${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
           restore-keys: |
@@ -50,7 +50,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./docs/build
+          working-directory: ./build
 
 
 
