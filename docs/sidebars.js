@@ -156,11 +156,6 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Terraform",
-          items: ["guides/manage/terraform/basics"],
-        },
-        {
-          type: "category",
           label: "Users",
           items: [
             "guides/manage/user/reg-create-user",
@@ -168,6 +163,7 @@ module.exports = {
             "guides/manage/customize/user-schema",
           ],
         },
+        "guides/manage/terraform-provider"
       ],
     },
     {
