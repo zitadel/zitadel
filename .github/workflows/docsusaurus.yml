@@ -1,0 +1,34 @@
+name: Docs
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+on:
+  pull_request: 
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            src:
+              - 'docs/**'
+              - 'proto/**'
+              - '.github/workflows/docs.yml'
+      - name: Install Vercel CLI
+        if: steps.filter.outputs.src == 'true'
+        run: npm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        if: steps.filter.outputs.src == 'true'
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        if: steps.filter.outputs.src == 'true'
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Preview to Vercel
+        if: ${{ github.ref != 'refs/heads/main' }} && steps.filter.outputs.src == 'true'
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Production to Vercel 
+        if: ${{ github.ref != 'refs/heads/main' }} && steps.filter.outputs.src == 'true'
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
