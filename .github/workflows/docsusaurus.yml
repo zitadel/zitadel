@@ -25,6 +25,9 @@ jobs:
           node-version: 20
           cache: 'yarn'
           cache-dependency-path: docs/yarn.lock
+      - name: Install Dependencies
+        if: steps.filter.outputs.src == 'true'
+        run: yarn install --frozen-lockfile
       - name: Install Vercel CLI
         if: steps.filter.outputs.src == 'true'
         run: npm install --global vercel@latest
