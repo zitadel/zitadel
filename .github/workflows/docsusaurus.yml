@@ -4,9 +4,6 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
   pull_request:
-defaults:
-  run:
-    working-directory: ./docs
 jobs:
   Deploy:
     runs-on: ubuntu-latest
@@ -26,13 +23,17 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: docs/yarn.lock
       - name: Install Vercel CLI
-        run: npm install --global vercel@latest
+        run: yarn global add vercel
       - name: Install Dependencies
         if: steps.filter.outputs.src == 'true'
         run: yarn install --frozen-lockfile
-      - name: Pull Vercel Environment Information
-        if: steps.filter.outputs.src == 'true'
+        working-directory: ./docs
+      - name: Pull Vercel Environment Preview
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Pull Vercel Environment Production
+        if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       - name: Build Project Artifacts
         if: steps.filter.outputs.src == 'true'
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
