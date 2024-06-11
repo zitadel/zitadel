@@ -19,7 +19,7 @@ jobs:
             src:
               - 'docs/**'
               - 'proto/**'
-              - '.github/workflows/docs.yml'
+              - '.github/workflows/docusaurus.yml'
       - name: Install Vercel CLI
         if: steps.filter.outputs.src == 'true'
         run: npm install --global vercel@latest
@@ -30,8 +30,8 @@ jobs:
         if: steps.filter.outputs.src == 'true'
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Preview to Vercel
-        if: ${{ github.ref != 'refs/heads/main' }} && steps.filter.outputs.src == 'true'
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Production to Vercel 
-        if: ${{ github.ref != 'refs/heads/main' }} && steps.filter.outputs.src == 'true'
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true'}}
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
