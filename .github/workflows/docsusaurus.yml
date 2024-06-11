@@ -17,6 +17,11 @@ jobs:
               - 'docs/**'
               - 'proto/**'
               - '.github/workflows/docsusaurus.yml'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+          cache-dependency-path: docs/yarn.lock
       - name: Install Vercel CLI
         if: steps.filter.outputs.src == 'true'
         run: npm install --global vercel@latest
