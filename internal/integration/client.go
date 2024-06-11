@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
@@ -311,8 +312,8 @@ func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user u2f")
 }
 
-func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) {
-	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
+func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) *timestamppb.Timestamp {
+	resp, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
 		UserId: userID,
 		NewPassword: &user.Password{
 			Password:       password,
@@ -320,6 +321,7 @@ func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, c
 		},
 	})
 	logging.OnError(err).Fatal("set user password")
+	return resp.GetDetails().GetChangeDate()
 }
 
 func (s *Tester) AddGenericOAuthProvider(t *testing.T, ctx context.Context) string {
