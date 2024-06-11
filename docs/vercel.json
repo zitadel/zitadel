@@ -1,4 +1,7 @@
 {
+    "github": {
+        "enabled": false
+      },
     "cleanUrls": true,
     "rewrites": [
         {
