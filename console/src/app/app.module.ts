@@ -101,7 +101,7 @@ i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/cs.json'));
 registerLocaleData(localeNl);
 i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/nl.json'));
 registerLocaleData(localeSv);
-i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/nsv.json'));
+i18nIsoCountries.registerLocale(require('i18n-iso-countries/langs/sv.json'));
 
 export class WebpackTranslateLoader implements TranslateLoader {
   getTranslation(lang: string): Observable<any> {
