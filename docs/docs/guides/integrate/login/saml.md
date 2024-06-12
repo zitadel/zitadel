@@ -6,23 +6,23 @@ sidebar_label: SAML
 SAML stands for Security Assertion Markup Language. It is a standard commonly used for identity federation and single sign-on (SSO). It is one of the original and most popular standards for SSO. Although it is prone to certain security flaws and exploits if not implemented correctly, it remains relevant and widely used. 
 
 
-## Why Use SAML?
+## Why use SAML?
 
 Here are some reasons why organizations might choose SAML:
 
-**Legacy Systems Compatibility**
+**Legacy systems compatibility**
 
 SAML has been in use since 2002 and is deeply integrated into many legacy systems and enterprise environments. Organizations with existing SAML infrastructure may prefer to continue using it to avoid costly and complex migrations.
 
-**Enterprise Use Cases**
+**Enterprise use cases**
 
 SAML is often favored in enterprise settings where detailed user attributes and complex authorization requirements are necessary. Its support for rich metadata and customizable assertions makes it suitable for intricate access control scenarios.
 
-**Mature Ecosystem**
+**Mature ecosystem**
 
 The SAML ecosystem is mature, with extensive support from a wide range of enterprise applications and identity providers. This broad compatibility ensures that SAML can be used seamlessly across various platforms and services.
 
-## Common SAML Terms
+## Common SAML terms
 - **Service Provider (SP)**: The application the user is trying to sign into.
 - **Identity Provider (IdP)**: The centralized point of authentication.
 - **SAML Request**: A communication from the SP to the IdP.
@@ -35,7 +35,7 @@ The SAML ecosystem is mature, with extensive support from a wide range of enterp
 - **Metadata**: Trust information exchanged between the identity provider and service provider 
 
 
-## SAML Explained
+## SAML explained
 
 The **Service Provider (SP)** is the application that the user is trying to sign into. When the service provider sends a communication to the identity provider, it is called a **SAML request**. When the **Identity Provider (IdP)** responds or sends a communication to the service provider, it is called a SAML response. 
 
@@ -50,7 +50,7 @@ Another important concept in SAML is the **relay state**. The relay state allows
 **Metadata** is another crucial term in SAML. Metadata allows for self-configuration between the identity provider and the service provider. Instead of manually exchanging certificates, endpoint URLs, and issuer information, metadata enables the sharing of an XML configuration file or URLs to these files. This allows the service provider and identity provider to self-configure based on the information within these configuration files, making the process less manual and more convenient.
 
 
-## SAML Workflow
+## SAML workflow
 
 One important aspect of SAML is that the user can initiate the authentication process in two primary workflows:
 
@@ -65,15 +65,13 @@ In IdP-initiated flows, there is no SAML request, while in SP-initiated flows, t
 
 It's important to note that not all service providers support both methods. Some only support IdP-initiated, while others only support SP-initiated. The choice between supporting IdP-initiated or SP-initiated authentication depends on the specific requirements of the product and the preferences of the developer implementing SAML. ZITADEL, for instance, supports only the SP-initiated flow. 
 
-## SAML Requests and Responses
+## SAML requests and responses
 
 SAML uses XML for both requests and responses. A typical SAML request from an SP to an IdP includes an ID, timestamp, destination URL, and issuer information. The IdP processes this request and returns a SAML response containing user assertions, which the SP validates.
 
-### Sample SAML Request and Response
-
 Let's delve into what a SAML request and response look like with the following shortened examples.
 
-**Sample SAML Request**
+**Sample SAML request**
 
 ```xml
 
@@ -123,7 +121,7 @@ In this SAML request:
 These XMLs are stringified, encoded, and passed in the query string to the identity provider, where the user is authenticated, and the SAML response is prepared, which will be received by the SP as an encoded string. 
 
 
-**Sample SAML Response**
+**Sample SAML response**
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -218,9 +216,9 @@ In this SAML response:
 - **AuthnStatement** includes authentication details.
 - **AttributeStatement** contains additional user attributes.
 
-## SAML Identity Brokering
+## SAML identity brokering
 
-### How SAML Identity Brokering Works
+### How SAML identity brokering works
 
 - **Initial Authentication Request**: A user attempts to access a service (SP1) that is protected by an IdP (IdP1).
 - **Redirection to IdP1**: The user is redirected to IdP1 for authentication. If IdP1 trusts another IdP (IdP2) for authentication, it will redirect the user to IdP2.
@@ -231,7 +229,7 @@ In this SAML response:
 See [Let Users Login with Preferred Identity Provider](https://zitadel.com/docs/guides/integrate/identity-providers/introduction) for more information.
 
 
-## Best Practices for SAML Implementation
+## Best practices for SAML implementation
 
 Implementing SAML securely involves several best practices:
 
@@ -254,7 +252,7 @@ For example, SAML is not well-suited for desktop and mobile applications due to 
 If a project requires SAML due to specific requirements or existing infrastructure, it should be used. However, for new projects, it is advisable to consider OpenID Connect because it is a more modern standard and is the more popular choice in the industry. 
 
 
-## Testing SAML Scenarios Using ZITADEL
+## Testing SAML scenarios using ZITADEL
 
 To test SAML scenarios with ZITADEL, follow these steps:
 
@@ -264,7 +262,7 @@ To test SAML scenarios with ZITADEL, follow these steps:
     - Within your project, create a SAML application.
     - Follow this example on how to create a SAML SP and integrate ZITADEL as the SAML IdP: [ZITADEL Python SAML SP Integration](https://github.com/zitadel/python-saml-sp).
 
-2. Integrate ZITADEL with Another SAML IdP for Identity Brokering:
+2. Integrate ZITADEL with another SAML IdP for identity brokering:
 
     - Configure an identity provider that supports SAML.
     - Set up the necessary metadata and endpoints. Here are some guides to help with this setup:
@@ -272,12 +270,12 @@ To test SAML scenarios with ZITADEL, follow these steps:
         - [Configure Okta as a SAML IdP](https://zitadel.com/docs/guides/integrate/identity-providers/okta-saml)
         - [Configure MockSAML as a SAML IdP](https://zitadel.com/docs/guides/integrate/identity-providers/mocksaml)
 
-3. Create Test Users and Simulate Authentication Requests:
+3. Create test users and simulate authentication requests:
     - Create test users in ZITADEL.
     - Simulate authentication requests to verify that the SAML assertions are correctly generated and transmitted.
     - Ensure that the SAML assertions contain the expected attributes and that these attributes are correctly processed by the service provider.
 
-4. Simulate Various Scenarios:
+4. Simulate various scenarios:
     - Successful Login: Verify that a valid user can successfully authenticate and access the service.
     - Failed Login: Test scenarios where authentication fails, such as incorrect credentials or disabled accounts.
     - Attribute Mapping: Check that user attributes (e.g., roles, permissions) are correctly mapped and utilized by the service provider.
