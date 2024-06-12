@@ -60,29 +60,16 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true'}}
         run: |
           vercel deploy --prebuilt --archive=tgz --prod --token=${{ secrets.VERCEL_TOKEN }} >deployment-url.txt
-          echo "deploymentUrl=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
-  Comment-Preview:
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
-    needs: Deploy
-    permissions: 
-      issues: write
-      pull-requests: write
-    environment:
-      name: Preview – docs
-      url: ${{needs.Deploy-Preview.outputs.deploymentUrl}}
-    steps:
-      - name: Comment URL to PR
-        if: github.event_name == 'pull_request'
-        env: 
-          DEPLOYMENT_URL: ${{needs.Deploy-Preview.outputs.deploymentUrl}}
-        uses: actions/github-script@v6
-        id: my-script
+      - name: Get Preview URL
+        run: |
+          vercel ls --token=$VERCEL_TOKEN --meta base_hash=${{ env.META_TAG }} &> vercel-output
+          url=$(cat vercel-output | grep http | awk '{print $2}')
+          echo "New preview URL: $url"
+          echo "META_TAG=$META_TAG"
+          echo "VERCEL_URL=$url" >> "$GITHUB_OUTPUT"
+      - uses: mshick/add-pr-comment@v2
         with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "Deployed at ${{env.DEPLOYMENT_URL}}"
-            })
+          message: |
+            Your build has completed!
+
+            [Preview deployment](${{ steps.vercel.outputs.VERCEL_URL }})
