@@ -33,7 +33,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		unsupportedLanguage       = language.Afrikaans
 	)
 
-	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, ctx, SystemCTX)
+	domain, _, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, ctx, SystemCTX)
 	t.Run("assumed defaults are correct", func(tt *testing.T) {
 		tt.Run("languages are not restricted by default", func(ttt *testing.T) {
 			restrictions, err := Tester.Client.Admin.GetRestrictions(iamOwnerCtx, &admin.GetRestrictionsRequest{})

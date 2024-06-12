@@ -76,7 +76,7 @@ func newClient(cc *grpc.ClientConn) Client {
 	}
 }
 
-func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
+func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId, adminID string, authenticatedIamOwnerCtx context.Context) {
 	primaryDomain = RandString(5) + ".integration.localhost"
 	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
 		InstanceName: "testinstance",
@@ -89,20 +89,23 @@ func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx conte
 			},
 		},
 	})
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(tt, err)
 	t.createClientConn(iamOwnerCtx, fmt.Sprintf("%s:%d", primaryDomain, t.Config.Port))
 	instanceId = instance.GetInstanceId()
+	owner, err := t.Queries.GetUserByLoginName(authz.WithInstanceID(iamOwnerCtx, instanceId), true, "owner@"+primaryDomain)
+	require.NoError(tt, err)
 	t.Users.Set(instanceId, IAMOwner, &User{
+		User:  owner,
 		Token: instance.GetPat(),
 	})
 	newCtx := t.WithInstanceAuthorization(iamOwnerCtx, IAMOwner, instanceId)
+	var adminUser *mgmt.ImportHumanUserResponse
 	// the following serves two purposes:
 	// 1. it ensures that the instance is ready to be used
 	// 2. it enables a normal login with the default admin user credentials
 	require.EventuallyWithT(tt, func(collectT *assert.CollectT) {
-		_, importErr := t.Client.Mgmt.ImportHumanUser(newCtx, &mgmt.ImportHumanUserRequest{
+		var importErr error
+		adminUser, importErr = t.Client.Mgmt.ImportHumanUser(newCtx, &mgmt.ImportHumanUserRequest{
 			UserName: "zitadel-admin@zitadel.localhost",
 			Email: &mgmt.ImportHumanUserRequest_Email{
 				Email:           "zitadel-admin@zitadel.localhost",
@@ -117,7 +120,7 @@ func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx conte
 		})
 		assert.NoError(collectT, importErr)
 	}, 2*time.Minute, 100*time.Millisecond, "instance not ready")
-	return primaryDomain, instanceId, newCtx
+	return primaryDomain, instanceId, adminUser.GetUserId(), newCtx
 }
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
