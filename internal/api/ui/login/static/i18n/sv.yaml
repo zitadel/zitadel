@@ -53,7 +53,7 @@ UsernameChange:
 
 UsernameChangeDone:
   Title: Användarnamn ändrat
-  Description: Ditt användarnamn har ndrats.
+  Description: Ditt användarnamn har ändrats.
   NextButtonText: Fortsätt
 
 InitPassword:
@@ -99,7 +99,7 @@ InitMFAPrompt:
 InitMFAOTP:
   Title: Tvåfaktor verifiering
   Description: Bekräfta med en andra faktor. Ladda ned en autentiserings-app (T ex Google/Microsoft Authenticator, Authy) om du inte redan har en.
-  OTPDescription: Scanna koden med din autentiserings-app (T ex Google/Microsoft Authenticator, Authy). Eller kopiera nyckeln och fyll i den genererade säkerhetskoden här nedan.
+  OTPDescription: Skanna koden med din autentiserings-app (T ex Google/Microsoft Authenticator, Authy). Eller kopiera nyckeln och fyll i den genererade säkerhetskoden här nedan.
   SecretLabel: Nyckel
   CodeLabel: Säkerhetskod
   NextButtonText: Fortsätt
@@ -108,7 +108,7 @@ InitMFAOTP:
 InitMFAOTPSMS:
   Title: Tvåfaktor verifiering
   DescriptionPhone: Verifiera med en andra faktor. Ange ditt mobilnummer.
-  DescriptionCode: Verifiera med en andra faktor. Ange koden du fått på SMS för att bekräfta till mobilnr.
+  DescriptionCode: Verifiera med en andra faktor. Ange koden du fått på SMS för att bekräfta ditt mobilnr.
   PhoneLabel: Mobilnr
   CodeLabel: Kod
   EditButtonText: Ändra
@@ -319,7 +319,7 @@ RegistrationOrg:
 
 LoginSuccess:
   Title: Inloggad
-  AutoRedirectDescription: Duy kommer automatiskt skickas vidare till tjänsten. Om inget händer kan du klicka på länken nedan. Sedan kan du stänga det här fönstret. 
+  AutoRedirectDescription: Du kommer automatiskt skickas vidare till tjänsten. Om inget händer kan du klicka på länken nedan. Sedan kan du stänga det här fönstret.
   RedirectedDescription: Du kan stänga det här fönstret nu.
   NextButtonText: Fortsätt
 
@@ -330,7 +330,7 @@ LogoutDone:
 
 LinkingUserPrompt:
   Title: Det finns redan ett konto
-  Description: "Vill du kopla ihop din inoggning med det befintliga kontot:"
+  Description: "Vill du koppla ihop din inloggning med det befintliga kontot:"
   LinkButtonText: Koppla ihop
   OtherButtonText: Andra åtgärder
 
@@ -468,10 +468,10 @@ Errors:
     MFA:
       NoProviders: Det finns inga MFA-leverantörer tillgängliga
       OTP:
-        AlreadyReady: Multifactor OTP (OneTimePassword) är redan konfigurerat
-        NotExisting: Multifactor OTP (OneTimePassword) finns inte
+        AlreadyReady: Tvåfaktor OTP (OneTimePassword) är redan konfigurerat
+        NotExisting: Tvåfaktor OTP (OneTimePassword) finns inte
         InvalidCode: Ogiltig kod
-        NotReady: Multifactor OTP (OneTimePassword) är inte redo
+        NotReady: Tvåfaktor OTP (OneTimePassword) är inte redo
     Locked: Användaren är spärrad
     SomethingWentWrong: Någonting gick fel
     NotActive: Användaren är inaktiv

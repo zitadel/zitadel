@@ -155,9 +155,9 @@ Errors:
       LoginFailed: Inloggning hos extern IdP misslyckades
     MFA:
       OTP:
-        AlreadyReady: Multifaktor OTP (OneTimePassword) är redan inställd
-        NotExisting: Multifaktor OTP (OneTimePassword) finns inte
-        NotReady: Multifaktor OTP (OneTimePassword) är inte redo
+        AlreadyReady: Tvåfaktor OTP (OneTimePassword) är redan inställd
+        NotExisting: Tvåfaktor OTP (OneTimePassword) finns inte
+        NotReady: Tvåfaktor OTP (OneTimePassword) är inte redo
         InvalidCode: Ogiltig kod
       U2F:
         NotExisting: U2F finns inte
@@ -235,9 +235,9 @@ Errors:
       RegistrationNotAllowed: Registrering är inte tillåten
       UsernamePasswordNotAllowed: Inloggning med användarnamn/lösenord är inte tillåten
       MFA:
-        AlreadyExists: Multifaktor finns redan
-        NotExisting: Multifaktor finns inte
-        Unspecified: Multifaktor är ogiltig
+        AlreadyExists: Tvåfaktor finns redan
+        NotExisting: Tvåfaktor finns inte
+        Unspecified: Tvåfaktor är ogiltig
     MailTemplate:
       NotFound: Standard e-postmall hittades inte
       NotChanged: Standard e-postmall har inte ändrats
@@ -352,9 +352,9 @@ Errors:
       AlreadyExists: Standardinloggningspolicyn finns redan
       RedirectURIInvalid: Standardomdirigerings-URI är ogiltig
       MFA:
-        AlreadyExists: Multifaktor finns redan
-        NotExisting: Multifaktor existerar inte
-        Unspecified: Multifaktor är ogiltig
+        AlreadyExists: Tvåfaktor finns redan
+        NotExisting: Tvåfaktor existerar inte
+        Unspecified: Tvåfaktor är ogiltig
       IDP:
         AlreadyExists: Identitetsleverantören finns redan
         NotExisting: Identitetsleverantören existerar inte
@@ -445,7 +445,7 @@ Errors:
   Login:
     LoginPolicy:
       MFA:
-        ForceAndNotConfigured: Multifaktor är konfigurerad som obligatorisk, men inga möjliga leverantörer är konfigurerade. Vänligen kontakta din systemadministratör.
+        ForceAndNotConfigured: Tvåfaktor är konfigurerad som obligatorisk, men inga möjliga leverantörer är konfigurerade. Vänligen kontakta din systemadministratör.
   Step:
     Started:
       AlreadyExists: Steget startat finns redan
@@ -499,10 +499,10 @@ Errors:
   LogStore:
     Access:
       StorageFailed: Lagring av åtkomstlogg till databasen misslyckades
-      ScanFailed: Fråga om användning för autentiserade begäranden misslyckades
+      ScanFailed: Frågan om användningen av autentiserade förfrågningar misslyckades
     Execution:
       StorageFailed: Lagring av åtgärdslogg till databasen misslyckades
-      ScanFailed: Fråga om användning för åtgärdssekunder misslyckades
+      ScanFailed: Frågan om användning av exekveringstid misslyckades
   Session:
     NotExisting: Sessionen existerar inte
     Terminated: Sessionen är redan avslutad
@@ -706,44 +706,44 @@ EventTypes:
         changed: Användaradress ändrad
       mfa:
         otp:
-          added: Multifaktor OTP tillagd
-          verified: Multifaktor OTP verifierad
-          removed: Multifaktor OTP borttagen
+          added: Tvåfaktor OTP tillagd
+          verified: Tvåfaktor OTP verifierad
+          removed: Tvåfaktor OTP borttagen
           check:
-            succeeded: Multifaktor OTP-kontroll lyckades
-            failed: Multifaktor OTP-kontroll misslyckades
+            succeeded: Tvåfaktor OTP-kontroll lyckades
+            failed: Tvåfaktor OTP-kontroll misslyckades
           sms:
-            added: Multifaktor OTP SMS tillagd
-            removed: Multifaktor OTP SMS borttagen
+            added: Tvåfaktor OTP SMS tillagd
+            removed: Tvåfaktor OTP SMS borttagen
             code:
-              added: Multifaktor OTP SMS-kod tillagd
-              sent: Multifaktor OTP SMS-kod skickad
+              added: Tvåfaktor OTP SMS-kod tillagd
+              sent: Tvåfaktor OTP SMS-kod skickad
             check:
-              succeeded: Multifaktor OTP SMS-kontroll lyckades
-              failed: Multifaktor OTP SMS-kontroll misslyckades
+              succeeded: Tvåfaktor OTP SMS-kontroll lyckades
+              failed: Tvåfaktor OTP SMS-kontroll misslyckades
           email:
-            added: Multifaktor OTP E-post tillagd
-            removed: Multifaktor OTP E-post borttagen
+            added: Tvåfaktor OTP E-post tillagd
+            removed: Tvåfaktor OTP E-post borttagen
             code:
-              added: Multifaktor OTP E-postkod tillagd
-              sent: Multifaktor OTP E-postkod skickad
+              added: Tvåfaktor OTP E-postkod tillagd
+              sent: Tvåfaktor OTP E-postkod skickad
             check:
-              succeeded: Multifaktor OTP E-postkontroll lyckades
-              failed: Multifaktor OTP E-postkontroll misslyckades
+              succeeded: Tvåfaktor OTP E-postkontroll lyckades
+              failed: Tvåfaktor OTP E-postkontroll misslyckades
         u2f:
           token:
-            added: Multifaktor U2F-token tillagd
-            verified: Multifaktor U2F-token verifierad
-            removed: Multifaktor U2F-token borttagen
+            added: Tvåfaktor U2F-token tillagd
+            verified: Tvåfaktor U2F-token verifierad
+            removed: Tvåfaktor U2F-token borttagen
             begin:
-              login: Multifaktor U2F-kontroll startad
+              login: Tvåfaktor U2F-kontroll startad
             check:
-              succeeded: Multifaktor U2F-kontroll lyckades
-              failed: Multifaktor U2F-kontroll misslyckades
+              succeeded: Tvåfaktor U2F-kontroll lyckades
+              failed: Tvåfaktor U2F-kontroll misslyckades
             signcount:
-              changed: Kontrollsumman för Multifaktor U2F-token har ändrats
+              changed: Kontrollsumman för Tvåfaktor U2F-token har ändrats
         init:
-          skipped: Multifaktorinitialisering hoppades över
+          skipped: Tvåfaktorinitialisering hoppades över
       passwordless:
         token:
           added: Token för lösenordsfri inloggning tillagd
@@ -799,16 +799,16 @@ EventTypes:
         changed: Användaradress ändrad
       mfa:
         otp:
-          added: Multifaktor OTP tillagd
-          verified: Multifaktor OTP verifierad
-          removed: Multifaktor OTP borttagen
+          added: Tvåfaktor OTP tillagd
+          verified: Tvåfaktor OTP verifierad
+          removed: Tvåfaktor OTP borttagen
           check:
-            succeeded: Multifaktor OTP-kontroll lyckades
-            failed: Multifaktor OTP-kontroll misslyckades
+            succeeded: Tvåfaktor OTP-kontroll lyckades
+            failed: Tvåfaktor OTP-kontroll misslyckades
           init:
-            skipped: Multifaktor OTP-initialisering hoppades över
+            skipped: Tvåfaktor OTP-initialisering hoppades över
         init:
-          skipped: Multifaktorinitialisering hoppades över
+          skipped: Tvåfaktorinitialisering hoppades över
       signed:
         out: Användare utloggad
       grant:
@@ -901,8 +901,8 @@ EventTypes:
           added: Andra faktorn tillagd till inloggningspolicy
           removed: Andra faktorn borttagen från inloggningspolicy
         multifactor:
-          added: Multifaktor tillagd till inloggningspolicy
-          removed: Multifaktor borttagen från inloggningspolicy
+          added: Tvåfaktor tillagd till inloggningspolicy
+          removed: Tvåfaktor borttagen från inloggningspolicy
       password:
         complexity:
           added: Lösenordskomplexitetspolicy tillagd
@@ -1247,8 +1247,8 @@ EventTypes:
             removed: Identitetsleverantör kaskadborttagen från inloggningspolicy
           removed: Identitetsleverantör borttagen från inloggningspolicy
         multifactor:
-          added: Multifaktor tillagd i inloggningspolicy
-          removed: Multifaktor borttagen från inloggningspolicy
+          added: Tvåfaktor tillagd i inloggningspolicy
+          removed: Tvåfaktor borttagen från inloggningspolicy
         secondfactor:
           added: Andra faktorn tillagd i inloggningspolicy
           removed: Andra faktorn borttagen från inloggningspolicy

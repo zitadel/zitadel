@@ -239,15 +239,15 @@
           },
           "MULTI_FACTOR_INIT": {
             "TITLE": "Multifaktor initieringskontroll",
-            "DESCRIPTION": "Dina användare kommer att uppmanas att ställa in en andra faktor eller en multifaktor under dessa perioder, om de inte redan har gjort det. En livslängd på 0 inaktiverar denna prompt."
+            "DESCRIPTION": "Dina användare kommer att uppmanas att ställa in en andra faktor eller en tvåfaktor under dessa perioder, om de inte redan har gjort det. En livslängd på 0 inaktiverar denna prompt."
           },
           "SECOND_FACTOR_CHECK": {
             "TITLE": "Andra faktorkontroll",
             "DESCRIPTION": "Dina användare måste återvalidera sin andra faktor under dessa perioder."
           },
           "MULTI_FACTOR_CHECK": {
-            "TITLE": "Multifaktorkontroll",
-            "DESCRIPTION": "Dina användare måste återvalidera sin multifaktor under dessa perioder."
+            "TITLE": "Tvåfaktorkontroll",
+            "DESCRIPTION": "Dina användare måste återvalidera sin tvåfaktor under dessa perioder."
           }
         },
         "FORM": {
@@ -726,7 +726,7 @@
       "TABLESTATE": "Status",
       "NAME": "Namn",
       "EMPTY": "Inga ytterligare faktorer",
-      "TITLE": "Multifaktorautentisering",
+      "TITLE": "Tvåfaktorautentisering",
       "DESCRIPTION": "Lägg till en andra faktor för att säkerställa optimal säkerhet för ditt konto.",
       "MANAGE_DESCRIPTION": "Hantera användarnas andra faktormetoder.",
       "ADD": "Lägg till faktor",
@@ -735,7 +735,7 @@
       "OTP_DIALOG_DESCRIPTION": "Skanna QR-koden med en autentiseringsapp och ange koden nedan för att verifiera och aktivera OTP-metoden.",
       "U2F": "Fingeravtryck, säkerhetsnycklar, Face ID och andra",
       "U2F_DIALOG_TITLE": "Verifiera faktor",
-      "U2F_DIALOG_DESCRIPTION": "Ange ett namn för din använda universella multifaktor.",
+      "U2F_DIALOG_DESCRIPTION": "Ange ett namn för din använda universella tvåfaktor.",
       "U2F_SUCCESS": "Faktor tillagd framgångsrikt!",
       "U2F_ERROR": "Ett fel inträffade under inställningen!",
       "U2F_NAME": "Autentiserarens namn",
@@ -2203,8 +2203,8 @@
   "MFA": {
     "LIST": {
       "MULTIFACTORTITLE": "lösenordsfri",
-      "MULTIFACTORDESCRIPTION": "Definiera dina multifaktorer för din lösenordsfria autentisering här.",
-      "SECONDFACTORTITLE": "Multifaktorautentisering",
+      "MULTIFACTORDESCRIPTION": "Definiera dina tvåfaktorer för din lösenordsfria autentisering här.",
+      "SECONDFACTORTITLE": "Tvåfaktorautentisering",
       "SECONDFACTORDESCRIPTION": "Definiera ytterligare möjliga faktorer med vilka du kan säkra din lösenordsautentisering."
     },
     "CREATE": {
