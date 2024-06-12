@@ -16,6 +16,8 @@ const (
 	ApplicationDeactivatedType = applicationEventTypePrefix + "deactivated"
 	ApplicationReactivatedType = applicationEventTypePrefix + "reactivated"
 	ApplicationRemovedType     = applicationEventTypePrefix + "removed"
+
+	AppLookupFieldID = "project:app:id"
 )
 
 func NewAddApplicationUniqueConstraint(name, projectID string) *eventstore.UniqueConstraint {
@@ -44,6 +46,12 @@ func (e *ApplicationAddedEvent) Payload() interface{} {
 
 func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID)}
+}
+
+func (e *ApplicationAddedEvent) LookupOperations() []*eventstore.LookupOperation {
+	return []*eventstore.LookupOperation{
+		eventstore.InsertLookupTextField(e.Aggregate(), AppLookupFieldID, e.AppID),
+	}
 }
 
 func NewApplicationAddedEvent(

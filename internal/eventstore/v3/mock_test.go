@@ -42,6 +42,10 @@ func (m *mockCommand) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return m.constraints
 }
 
+func (e *mockCommand) LookupOperations() []*eventstore.LookupOperation {
+	return nil
+}
+
 func mockEvent(aggregate *eventstore.Aggregate, sequence uint64, payload Payload) eventstore.Event {
 	return &event{
 		aggregate: aggregate,

@@ -20,12 +20,12 @@ import (
 
 func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
 	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
+	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	tx, err := es.client.BeginTx(ctx, nil)
 	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return nil, err
 	}
-	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
 		sequences []*latestSequence
 	)
@@ -41,7 +41,11 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			return err
 		}
 
-		return handleUniqueConstraints(ctx, tx, commands)
+		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+			return err
+		}
+
+		return handleLookupCommands(ctx, tx, commands)
 	})
 
 	if err != nil {

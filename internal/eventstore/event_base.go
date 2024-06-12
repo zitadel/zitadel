@@ -123,3 +123,7 @@ func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventTyp
 		EventType: typ,
 	}
 }
+
+func (*BaseEvent) LookupOperations() []*LookupOperation {
+	return nil
+}

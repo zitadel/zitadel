@@ -17,6 +17,8 @@ const (
 	OIDCClientSecretCheckSucceededType = applicationEventTypePrefix + "oidc.secret.check.succeeded"
 	OIDCClientSecretCheckFailedType    = applicationEventTypePrefix + "oidc.secret.check.failed"
 	OIDCConfigSecretHashUpdatedType    = applicationEventTypePrefix + "config.oidc.secret.updated"
+
+	OIDCConfigLookupFieldClientID = "project:app:oidc:client_id"
 )
 
 type OIDCConfigAddedEvent struct {
@@ -53,6 +55,12 @@ func (e *OIDCConfigAddedEvent) Payload() interface{} {
 
 func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *OIDCConfigAddedEvent) LookupOperations() []*eventstore.LookupOperation {
+	return []*eventstore.LookupOperation{
+		eventstore.InsertLookupTextField(e.Aggregate(), OIDCConfigLookupFieldClientID, e.ClientID),
+	}
 }
 
 func NewOIDCConfigAddedEvent(

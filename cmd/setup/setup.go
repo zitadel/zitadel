@@ -174,6 +174,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 
 	for _, step := range []migration.Migration{
 		steps.s14NewEventsTable,
+		steps.s28AddFieldsTable,
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
 		steps.FirstInstance,
@@ -192,7 +193,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s23CorrectGlobalUniqueConstraints,
 		steps.s24AddActorToAuthTokens,
 		steps.s26AuthUsers3,
-		steps.s28AddFieldsTable,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}

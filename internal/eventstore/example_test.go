@@ -65,6 +65,10 @@ func (e *UserAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
+func (e *UserAddedEvent) LookupOperations() []*eventstore.LookupOperation {
+	return nil
+}
+
 func (e *UserAddedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
@@ -110,6 +114,10 @@ func (e *UserFirstNameChangedEvent) UniqueConstraints() []*eventstore.UniqueCons
 	return nil
 }
 
+func (e *UserFirstNameChangedEvent) LookupOperations() []*eventstore.LookupOperation {
+	return nil
+}
+
 func (e *UserFirstNameChangedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
@@ -147,6 +155,10 @@ func (e *UserPasswordCheckedEvent) UniqueConstraints() []*eventstore.UniqueConst
 	return nil
 }
 
+func (e *UserPasswordCheckedEvent) LookupOperations() []*eventstore.LookupOperation {
+	return nil
+}
+
 func (e *UserPasswordCheckedEvent) Assets() []*eventstore.Asset {
 	return nil
 }
@@ -181,6 +193,10 @@ func (e *UserDeletedEvent) Payload() interface{} {
 }
 
 func (e *UserDeletedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *UserDeletedEvent) LookupOperations() []*eventstore.LookupOperation {
 	return nil
 }
 

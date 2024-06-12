@@ -151,6 +151,12 @@ func generateCommand(aggregateType eventstore.AggregateType, aggregateID string,
 type testEvent struct {
 	eventstore.BaseEvent
 	uniqueConstraints []*eventstore.UniqueConstraint
+	lookupOperations  []*eventstore.LookupOperation
+}
+
+// LookupOperations implements eventstore.Command.
+func (e *testEvent) LookupOperations() []*eventstore.LookupOperation {
+	return e.lookupOperations
 }
 
 func (e *testEvent) Payload() any {

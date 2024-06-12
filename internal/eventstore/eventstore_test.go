@@ -45,6 +45,10 @@ func (e *testEvent) UniqueConstraints() []*UniqueConstraint {
 	return nil
 }
 
+func (e *testEvent) LookupOperations() []*LookupOperation {
+	return nil
+}
+
 func (e *testEvent) Assets() []*Asset {
 	return nil
 }
