@@ -21,7 +21,7 @@ import (
 )
 
 func TestServer_QuotaNotification_Limit(t *testing.T) {
-	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	_, instanceID, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	amount := 10
 	percent := 50
 	percentAmount := amount * percent / 100
@@ -67,7 +67,7 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 }
 
 func TestServer_QuotaNotification_NoLimit(t *testing.T) {
-	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	_, instanceID, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	amount := 10
 	percent := 50
 	percentAmount := amount * percent / 100
