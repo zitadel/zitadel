@@ -60,21 +60,25 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true'}}
         run: |
           vercel deploy --prebuilt --archive=tgz --prod --token=${{ secrets.VERCEL_TOKEN }}
-      - name: run curl
+      - name: Get Preview URL
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
-        env:
-          teamid: ${{ secrets.VERCEL_ORG_ID }}
-          token: ${{ secrets.VERCEL_TOKEN }}
-          commit: ${{ github.sha }}
-        run: | 
-            status=$(curl -s --request GET \
-            --url https://api.vercel.com/v6/deployments?teamId={{ env.TEAMID }}&app=docs \
-            --header 'Authorization: Bearer ${{ env.TOKEN }}' \
-            | jq -r '.deployments[] | select(.meta.githubCommitSha == "${{ env.COMMIT }}")  | .url'); echo "status=$status" >> $GITHUB_OUTPUT
-        id: req
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://api.vercel.com/v6/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}&app=docs'
+          method: 'GET'
+          customHeaders: '{"Authorization": "Bearer ${{ secrets.VERCEL_TOKEN }}"}'
+      - uses: cloudposse/github-action-jq@main
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        id: current
+        with:
+          compact: true
+          input: ${{ steps.myRequest.outputs.response }}
+          script: |-
+            '.deployments[] | select(.meta.githubCommitSha == "${{ github.sha }}")  | .url'
       - uses: mshick/add-pr-comment@v2
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         with:
           message: |
             Your build has completed!
 
-            [Preview deployment](${{ steps.req.outputs.status }})
+            [Preview deployment](${{ steps.current.outputs.output }})
