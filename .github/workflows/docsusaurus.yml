@@ -75,7 +75,7 @@ jobs:
           compact: true
           input: ${{ steps.myRequest.outputs.response }}
           script: |-
-            '.deployments[] | select(.meta.githubCommitSha == "${{ github.sha }}")  | .url'
+            ".deployments[] | select(.meta.githubCommitSha == '${{ github.sha }}')  | .url"
       - uses: mshick/add-pr-comment@v2
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         with:
