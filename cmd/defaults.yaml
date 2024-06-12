@@ -14,16 +14,16 @@ Tracing:
   # for type 'otel' is used for standard [open telemetry](https://opentelemetry.io)
   # Fraction: 1.0
   # Endpoint: 'otel.collector.endpoint'
-  # 
+  #
   # type 'log' or '' disables tracing
-  # 
+  #
   # for type 'google'
   # ProjectID: ''
   # Fraction: 1.0
   Type: none # ZITADEL_TRACING_TYPE
   Fraction: 1.0 # ZITADEL_TRACING_FRACTION
   # The endpoint of the otel collector endpoint
-  Endpoint: '' #ZITADEL_TRACING_ENDPOINT
+  Endpoint: "" #ZITADEL_TRACING_ENDPOINT
 
 Telemetry:
   # As long as Enabled is true, ZITADEL tries to send usage data to the configured Telemetry.Endpoints.
@@ -120,6 +120,10 @@ Database:
         Cert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
         Key: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
     Admin:
+      # By default, ExistingDatabase is not specified in the connection string
+      # If the connection resolves to a database that is not existing in your system, configure an existing one here
+      # It is used in zitadel init to connect to cockroach and create a dedicated database for ZITADEL.
+      ExistingDatabase: # ZITADEL_DATABASE_COCKROACH_ADMIN_EXISTINGDATABASE
       Username: root # ZITADEL_DATABASE_COCKROACH_ADMIN_USERNAME
       Password: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_PASSWORD
       SSL:
@@ -147,6 +151,10 @@ Database:
         Cert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
         Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
     Admin:
+      # The default ExistingDatabase is postgres
+      # If your db system doesn't have a database named postgres, configure an existing database here
+      # It is used in zitadel init to connect to postgres and create a dedicated database for ZITADEL.
+      ExistingDatabase: # ZITADEL_DATABASE_POSTGRES_ADMIN_EXISTINGDATABASE
       Username: # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
       Password: # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
       SSL:
@@ -200,7 +208,7 @@ AssetStorage:
 
 # The Projections section defines the behavior for the scheduled and synchronous events projections.
 Projections:
-  # The maximum duration a transaction remains open 
+  # The maximum duration a transaction remains open
   # before it spots left folding additional events
   # and updates the table.
   TransactionDuration: 500ms # ZITADEL_PROJECTIONS_TRANSACTIONDURATION
@@ -264,7 +272,7 @@ Auth:
   # See Projections.BulkLimit
   SearchLimit: 1000 # ZITADEL_AUTH_SEARCHLIMIT
   Spooler:
-  # See Projections.TransationDuration
+    # See Projections.TransationDuration
     TransactionDuration: 10s #ZITADEL_AUTH_SPOOLER_TRANSACTIONDURATION
     # See Projections.BulkLimit
     BulkLimit: 100 #ZITADEL_AUTH_SPOOLER_BULKLIMIT
@@ -276,7 +284,7 @@ Auth:
     HandleActiveInstances: 0s #ZITADEL_AUTH_SPOOLER_HANDLEACTIVEINSTANCES
   # Defines the amount of auth requests stored in the LRU caches.
   # There are two caches implemented one for id and one for code
-  AmountOfCachedAuthRequests: 128 #ZITADEL_AUTH_AMOUNTOFCACHEDAUTHREQUESTS
+  AmountOfCachedAuthRequests: 0 #ZITADEL_AUTH_AMOUNTOFCACHEDAUTHREQUESTS
 
 Admin:
   # See Projections.BulkLimit
@@ -438,32 +446,25 @@ SystemDefaults:
     # Passwords previously hashed with a different algorithm
     # or cost are automatically re-hashed using this config,
     # upon password validation or update.
+    # Configure the Hasher config by environment variable using JSON notation:
+    # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER='{"Algorithm":"pbkdf2","Rounds":290000,"Hash":"sha256"}'
     Hasher:
-      Algorithm: "bcrypt" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
+      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
+      # Depending on the algorithm, different configuration options take effect.
+      Algorithm: bcrypt
+      # Cost takes effect for the algorithms bcrypt and scrypt
       Cost: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
-
-    # Other supported Hasher configs:
-
-    # Hasher:
-    #   Algorithm: "argon2i" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
-    #   Time: 3 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_TIME
-    #   Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
-    #   Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
-
-    # Hasher:
-    #   Algorithm: "argon2id" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
-    #   Time: 1 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_TIME
-    #   Memory: 65536 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
-    #   Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
-
-    # Hasher:
-    #   Algorithm: "scrypt" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
-    #   Cost: 15 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
-
-    # Hasher:
-    #   Algorithm: "pbkdf2" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
-    #   Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ROUNDS
-    #   Hash: "sha256" # Can be "sha1", "sha224", "sha256", "sha384" or "sha512" # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
+      # Time takes effect for the algorithms argon2i and argon2id
+      Time: 3 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_TIME
+      # Memory takes effect for the algorithms argon2i and argon2id
+      Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_MEMORY
+      # Threads takes effect for the algorithms argon2i and argon2id
+      Threads: 4 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_THREADS
+      # Rounds takes effect for the algorithm pbkdf2
+      Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ROUNDS
+      # Hash takes effect for the algorithm pbkdf2
+      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+      Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_HASH
 
     # Verifiers enable the possibility of verifying
     # passwords that are previously hashed using another
@@ -478,7 +479,7 @@ SystemDefaults:
     # https://passlib.readthedocs.io/en/stable/modular_crypt_format.html
     #
     # Supported verifiers: (uncomment to enable)
-    Verifiers:
+    Verifiers: # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_VERIFIERS
     #   - "argon2" # verifier for both argon2i and argon2id.
     #   - "bcrypt"
     #   - "md5"
@@ -486,11 +487,24 @@ SystemDefaults:
     #   - "pbkdf2" # verifier for all pbkdf2 hash modes.
   SecretHasher:
     # Set hasher configuration for machine users, API and OIDC client secrets.
-    # See PasswordHasher for all possible options
     Hasher:
-      Algorithm: "bcrypt" # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_ALGORITHM
+      # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
+      # Depending on the algorithm, different configuration options take effect.
+      Algorithm: bcrypt
+      # Cost takes effect for the algorithms bcrypt and scrypt
       Cost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_COST
-    Verifiers:
+      # Time takes effect for the algorithms argon2i and argon2id
+      Time: 3 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_TIME
+      # Memory takes effect for the algorithms argon2i and argon2id
+      Memory: 32768 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_MEMORY
+      # Threads takes effect for the algorithms argon2i and argon2id
+      Threads: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_THREADS
+      # Rounds takes effect for the algorithm pbkdf2
+      Rounds: 290000 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_ROUNDS
+      # Hash takes effect for the algorithm pbkdf2
+      # Can be "sha1", "sha224", "sha256", "sha384" or "sha512"
+      Hash: sha256 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_HASH
+    Verifiers: # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_VERIFIERS
   Multifactors:
     OTP:
       # If this is empty, the issuer is the requested domain
@@ -698,6 +712,9 @@ DefaultInstance:
     PrivacyLink: https://zitadel.com/docs/legal/privacy-policy # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_PRIVACYLINK
     HelpLink: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_HELPLINK
     SupportEmail: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_SUPPORTEMAIL
+    DocsLink: https://zitadel.com/docs # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_DOCSLINK
+    CustomLink: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_CUSTOMLINK
+    CustomLinkText: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_CUSTOMLINKTEXT
   NotificationPolicy:
     PasswordChange: true # ZITADEL_DEFAULTINSTANCE_NOTIFICATIONPOLICY_PASSWORDCHANGE
   LabelPolicy:

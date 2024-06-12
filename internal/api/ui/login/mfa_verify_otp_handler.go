@@ -75,7 +75,7 @@ func (l *Login) renderOTPVerification(w http.ResponseWriter, r *http.Request, au
 // A user is also able to request a code resend or choose another provider.
 func (l *Login) handleOTPVerificationCheck(w http.ResponseWriter, r *http.Request) {
 	formData := new(mfaOTPFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, formData)
+	authReq, err := l.ensureAuthRequestAndParseData(r, formData)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

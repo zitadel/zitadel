@@ -15,6 +15,14 @@ function ComplexityPolicyCheck(passwordElement, passwordConfirmationElement) {
     invalid++;
   }
 
+  const maxLengthElem = document.getElementById("maxlength");
+  if (passwordElement.value.length <= 70) {
+    ValidPolicyFlipped(maxLengthElem);
+  } else {
+    InvalidPolicyFlipped(maxLengthElem);
+    invalid++;
+  }
+
   const upper = document.getElementById("uppercase");
   if (upperRegex !== "") {
     if (RegExp(upperRegex).test(passwordElement.value)) {
@@ -84,10 +92,26 @@ function ValidPolicy(element) {
   element.getElementsByTagName("i")[0].classList.add("lgn-valid");
 }
 
+function ValidPolicyFlipped(element) {
+  element.classList.add("valid");
+  element.getElementsByTagName("i")[0].classList.remove("lgn-warn");
+  element.getElementsByTagName("i")[0].classList.remove("lgn-icon-times-solid");
+  element.getElementsByTagName("i")[0].classList.add("lgn-valid");
+  element.getElementsByTagName("i")[0].classList.add("lgn-icon-check-solid");
+}
+
 function InvalidPolicy(element) {
   element.classList.add("invalid");
   element.getElementsByTagName("i")[0].classList.remove("lgn-valid");
   element.getElementsByTagName("i")[0].classList.remove("lgn-icon-check-solid");
   element.getElementsByTagName("i")[0].classList.add("lgn-warn");
   element.getElementsByTagName("i")[0].classList.add("lgn-icon-times-solid");
+}
+
+function InvalidPolicyFlipped(element) {
+  element.classList.remove("valid");
+  element.getElementsByTagName("i")[0].classList.remove("lgn-icon-check-solid");
+  element.getElementsByTagName("i")[0].classList.remove("lgn-valid");
+  element.getElementsByTagName("i")[0].classList.add("lgn-icon-times-solid");
+  element.getElementsByTagName("i")[0].classList.add("lgn-warn");
 }

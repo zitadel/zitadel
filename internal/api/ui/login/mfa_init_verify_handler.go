@@ -26,7 +26,7 @@ type mfaInitVerifyData struct {
 
 func (l *Login) handleMFAInitVerify(w http.ResponseWriter, r *http.Request) {
 	data := new(mfaInitVerifyData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -50,7 +50,7 @@ func (l *Login) handleMFAInitVerify(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) handleOTPVerify(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *mfaInitVerifyData) *mfaVerifyData {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	_, err := l.command.HumanCheckMFATOTPSetup(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, data.Code, userAgentID, authReq.UserOrgID)
+	_, err := l.command.HumanCheckMFATOTPSetup(setUserContext(r.Context(), authReq.UserID, authReq.UserOrgID), authReq.UserID, data.Code, userAgentID, authReq.UserOrgID)
 	if err == nil {
 		return nil
 	}

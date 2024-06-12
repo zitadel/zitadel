@@ -45,15 +45,15 @@
       }
     },
     "USERS": {
-      "TITLE": "Benutzer",
+      "TITLE": "Users",
       "DESCRIPTION": "Ein Benutzer ist ein Mensch oder eine Maschine, die auf deine Anwendungen zugreifen kann.",
       "HUMANS": {
-        "TITLE": "Menschen",
-        "DESCRIPTION": "Menschen authentifizieren sich interaktiv in einer Browsersitzung mit einer Anmeldeaufforderung.",
+        "TITLE": "Users",
+        "DESCRIPTION": "User authentifizieren sich interaktiv in einer Browsersitzung mit einer Anmeldeaufforderung.",
         "METADATA": "Füge dem Benutzer benutzerdefinierte Attribute hinzu, wie die Abteilung. Du kannst diese Informationen in deinen Aktionen nutzen."
       },
       "MACHINES": {
-        "TITLE": "Maschinen",
+        "TITLE": "Service users",
         "DESCRIPTION": "Maschinen authentifizieren sich nicht-interaktiv mit einem JWT Bearer-Token, das mit einem privaten Schlüssel signiert ist. Sie können auch ein persönliches Zugangstoken verwenden.",
         "METADATA": "Füge dem Benutzer benutzerdefinierte Attribute hinzu, wie das authentifizierende System. Du kannst diese Informationen in deinen Aktionen nutzen."
       },
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Externe Links",
-        "DESCRIPTION": "Leite deine Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Allgemeinen Geschäftsbedingungen und die Datenschutzrichtlinie akzeptieren, bevor sie sich anmelden können."
+        "DESCRIPTION": "Leiten Sie Ihre Benutzer zu benutzerdefinierten externen Ressourcen, die auf der Anmeldeseite angezeigt werden. Benutzer müssen die Nutzungsbedingungen und Datenschutzrichtlinien akzeptieren, bevor sie sich anmelden können. Ändern Sie den Link zu Ihrer Dokumentation oder legen Sie eine leere Zeichenfolge fest, um die Dokumentationsschaltfläche in der Konsole auszublenden. Fügen Sie in der Konsole einen benutzerdefinierten externen Link und einen benutzerdefinierten Text für diesen Link hinzu oder setzen Sie sie leer, um diese Schaltfläche auszublenden."
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP-Einstellungen",
@@ -269,9 +269,9 @@
             "TITLE": "Externer Login erlaubt",
             "DESCRIPTION": "Erlaube deinen Benutzern, sich mit einem externen Identitätsanbieter einzuloggen, anstatt den ZITADEL-Benutzer zum Einloggen zu verwenden."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Passwort-Reset erlaubt",
-            "DESCRIPTION": "Erlaube deinen Benutzern, ihr Passwort zurückzusetzen."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Passwort-Reset ausgeblendet",
+            "DESCRIPTION": "Erlauben Sie Ihren Benutzern nicht, ihr Passwort zurückzusetzen."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Domänenentdeckung erlaubt",
@@ -594,6 +594,7 @@
     "INVALID_FORMAT": "Das Format is ungültig.",
     "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
     "MINLENGTH": "Muss mindestens {{requiredLength}} Zeichen lang sein.",
+    "MAXLENGTH": "Muss weniger als {{requiredLength}} Zeichen enthalten",
     "UPPERCASEMISSING": "Muss einen Grossbuchstaben beinhalten.",
     "LOWERCASEMISSING": "Muss einen Kleinbuchstaben beinhalten.",
     "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
@@ -879,7 +880,8 @@
       "SET": "Passwort neu setzen",
       "RESENDNOTIFICATION": "Email zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
-      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein."
+      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
+      "MAXLENGTHERROR": "Muss weniger als {{value}} Zeichen umfassen."
     },
     "ID": "ID",
     "EMAIL": "E-Mail",
@@ -1291,6 +1293,7 @@
       "MEMBERCHANGED": "Manager geändert.",
       "SETPRIMARY": "Primäre Domain gesetzt.",
       "DELETED": "Organisation erfolgreich gelöscht",
+      "DEFAULTORGNOTFOUND": "Die Standardorganisation wurde nicht gefunden",
       "ORG_WAS_DELETED": "Organisation wurde gelöscht."
     },
     "DIALOG": {
@@ -1569,6 +1572,9 @@
       "POLICYLINK": "Link zur den Datenschutzrichtlinien",
       "HELPLINK": "Link zur Hilfestellung",
       "SUPPORTEMAIL": "Support E-Mail",
+      "DOCSLINK": "Link zu Dokumenten (Console)",
+      "CUSTOMLINK": "Benutzerdefinierter Link (Console)",
+      "CUSTOMLINKTEXT": "Benutzerdefinierter Linktext (Console)",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Standardwerte wiederherstellen",
       "RESET_DESCRIPTION": "Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"
@@ -2223,7 +2229,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP-Anbieter",
-      "DESCRIPTION": "Dies sind die SMTP-Anbieter für Ihre Zitadel-Instanz. Aktivieren Sie diejenige, die Sie zum Senden von Benachrichtigungen an Ihre Benutzer verwenden möchten.",
+      "DESCRIPTION": "Dies sind die SMTP-Anbieter für Ihre ZITADEL-Instanz. Aktivieren Sie diejenige, die Sie zum Senden von Benachrichtigungen an Ihre Benutzer verwenden möchten.",
       "EMPTY": "Kein SMTP-Anbieter verfügbar",
       "ACTIVATED": "Aktiviert",
       "ACTIVATE": "Anbieter aktivieren",
@@ -2251,7 +2257,16 @@
         "CURRENT_DESC_TITLE": "Dies sind Ihre SMTP-Einstellungen",
         "PROVIDER_SETTINGS": "SMTP-Anbietereinstellungen",
         "SENDER_SETTINGS": "Absendereinstellungen",
-        "TEST_SETTINGS": "Testen Sie die SMTP-Einstellungen"
+        "TEST_SETTINGS": "Testen Sie die SMTP-Einstellungen",
+        "NEXT_STEPS": "Nächste Schritte",
+        "ACTIVATE": {
+          "TITLE": "Aktivieren Sie Ihren SMTP-Anbieter",
+          "DESCRIPTION": "ZITADEL kann diesen SMTP-Anbieter nicht zum Senden von Benachrichtigungen verwenden, bis Sie ihn aktivieren. Wenn Sie diesen Anbieter aktivieren, werden alle anderen aktiven Anbieter nun deaktiviert."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktivieren Sie Ihren SMTP-Anbieter",
+          "DESCRIPTION": "Wenn Sie diesen SMTP-Anbieter deaktivieren, kann ZITADEL ihn nicht zum Versenden von Benachrichtigungen verwenden, bis Sie ihn erneut aktivieren."
+        }
       }
     },
     "DETAIL": {

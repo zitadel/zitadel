@@ -54,7 +54,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddHumanUser(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t, CTX)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -448,6 +448,86 @@ func TestServer_AddHumanUser(t *testing.T) {
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
+		},
+		{
+			name: "with totp",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{
+						Email: "livio@zitadel.com",
+						Verification: &user.SetHumanEmail_IsVerified{
+							IsVerified: true,
+						},
+					},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password:       "DifficultPW666!",
+							ChangeRequired: false,
+						},
+					},
+					TotpSecret: gu.Ptr("secret"),
+				},
+			},
+			want: &user.AddHumanUserResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "password not complexity conform",
+			args: args{
+				CTX,
+				&user.AddHumanUserRequest{
+					Organization: &object.Organization{
+						Org: &object.Organization_OrgId{
+							OrgId: Tester.Organisation.ID,
+						},
+					},
+					Profile: &user.SetHumanProfile{
+						GivenName:         "Donald",
+						FamilyName:        "Duck",
+						NickName:          gu.Ptr("Dukkie"),
+						DisplayName:       gu.Ptr("Donald Duck"),
+						PreferredLanguage: gu.Ptr("en"),
+						Gender:            user.Gender_GENDER_DIVERSE.Enum(),
+					},
+					Email: &user.SetHumanEmail{},
+					Metadata: []*user.SetMetadataEntry{
+						{
+							Key:   "somekey",
+							Value: []byte("somevalue"),
+						},
+					},
+					PasswordType: &user.AddHumanUserRequest_Password{
+						Password: &user.Password{
+							Password: "insufficient",
+						},
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
 			name: "hashed password",
@@ -1718,7 +1798,7 @@ func TestServer_DeleteUser(t *testing.T) {
 }
 
 func TestServer_AddIDPLink(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t, CTX)
 	type args struct {
 		ctx context.Context
 		req *user.AddIDPLinkRequest
@@ -1798,10 +1878,13 @@ func TestServer_AddIDPLink(t *testing.T) {
 }
 
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t)
-	samlIdpID := Tester.AddSAMLProvider(t)
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t)
-	samlPostIdpID := Tester.AddSAMLPostProvider(t)
+	idpID := Tester.AddGenericOAuthProvider(t, CTX)
+	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, CTX, Tester.Organisation.ID)
+	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	notDefaultOrgIdpID := Tester.AddOrgGenericOAuthProvider(t, CTX, orgResp.OrganizationId)
+	samlIdpID := Tester.AddSAMLProvider(t, CTX)
+	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX, "")
+	samlPostIdpID := Tester.AddSAMLPostProvider(t, CTX)
 	type args struct {
 		ctx context.Context
 		req *user.StartIdentityProviderIntentRequest
@@ -1846,7 +1929,100 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+				url: "https://example.com/oauth/v2/authorize",
+				parametersEqual: map[string]string{
+					"client_id":     "clientID",
+					"prompt":        "select_account",
+					"redirect_uri":  "http://" + Tester.Config.ExternalDomain + ":8080/idps/callback",
+					"response_type": "code",
+					"scope":         "openid profile email",
+				},
+				parametersExisting: []string{"state"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "next step oauth auth url, default org",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: orgIdpID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
+				},
+			},
+			want: want{
+				details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+				url: "https://example.com/oauth/v2/authorize",
+				parametersEqual: map[string]string{
+					"client_id":     "clientID",
+					"prompt":        "select_account",
+					"redirect_uri":  "http://" + Tester.Config.ExternalDomain + ":8080/idps/callback",
+					"response_type": "code",
+					"scope":         "openid profile email",
+				},
+				parametersExisting: []string{"state"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "next step oauth auth url, default org",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: notDefaultOrgIdpID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
+				},
+			},
+			want: want{
+				details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
+				},
+				url: "https://example.com/oauth/v2/authorize",
+				parametersEqual: map[string]string{
+					"client_id":     "clientID",
+					"prompt":        "select_account",
+					"redirect_uri":  "http://" + Tester.Config.ExternalDomain + ":8080/idps/callback",
+					"response_type": "code",
+					"scope":         "openid profile email",
+				},
+				parametersExisting: []string{"state"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "next step oauth auth url org",
+			args: args{
+				CTX,
+				&user.StartIdentityProviderIntentRequest{
+					IdpId: orgIdpID,
+					Content: &user.StartIdentityProviderIntentRequest_Urls{
+						Urls: &user.RedirectURLs{
+							SuccessUrl: "https://example.com/success",
+							FailureUrl: "https://example.com/failure",
+						},
+					},
+				},
+			},
+			want: want{
+				details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 				url: "https://example.com/oauth/v2/authorize",
 				parametersEqual: map[string]string{
@@ -1877,7 +2053,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 				url:                "http://" + Tester.Config.ExternalDomain + ":8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
@@ -1901,7 +2077,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 				url:                "http://" + Tester.Config.ExternalDomain + ":8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
@@ -1925,7 +2101,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 				},
 				postForm: true,
 			},
@@ -1965,13 +2141,13 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 }
 
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t)
-	intentID := Tester.CreateIntent(t, idpID)
-	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "", "id")
-	successfulWithUserID, WithUsertoken, WithUserchangeDate, WithUsersequence := Tester.CreateSuccessfulOAuthIntent(t, idpID, "user", "id")
-	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "", "id")
-	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence := Tester.CreateSuccessfulLDAPIntent(t, idpID, "user", "id")
-	samlSuccessfulID, samlToken, samlChangeDate, samlSequence := Tester.CreateSuccessfulSAMLIntent(t, idpID, "", "id")
+	idpID := Tester.AddGenericOAuthProvider(t, CTX)
+	intentID := Tester.CreateIntent(t, CTX, idpID)
+	successfulID, token, changeDate, sequence := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", "id")
+	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "user", "id")
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Tester.CreateSuccessfulLDAPIntent(t, CTX, idpID, "", "id")
+	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence := Tester.CreateSuccessfulLDAPIntent(t, CTX, idpID, "user", "id")
+	samlSuccessfulID, samlToken, samlChangeDate, samlSequence := Tester.CreateSuccessfulSAMLIntent(t, CTX, idpID, "", "id")
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderIntentRequest
@@ -2016,7 +2192,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(changeDate),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 					Sequence:      sequence,
 				},
 				IdpInformation: &user.IDPInformation{
@@ -2047,14 +2223,14 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 				CTX,
 				&user.RetrieveIdentityProviderIntentRequest{
 					IdpIntentId:    successfulWithUserID,
-					IdpIntentToken: WithUsertoken,
+					IdpIntentToken: withUsertoken,
 				},
 			},
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
-					ChangeDate:    timestamppb.New(WithUserchangeDate),
-					ResourceOwner: Tester.Organisation.ID,
-					Sequence:      WithUsersequence,
+					ChangeDate:    timestamppb.New(withUserchangeDate),
+					ResourceOwner: Tester.Instance.InstanceID(),
+					Sequence:      withUsersequence,
 				},
 				UserId: "user",
 				IdpInformation: &user.IDPInformation{
@@ -2091,7 +2267,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(ldapChangeDate),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 					Sequence:      ldapSequence,
 				},
 				IdpInformation: &user.IDPInformation{
@@ -2136,7 +2312,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(ldapWithUserChangeDate),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 					Sequence:      ldapWithUserSequence,
 				},
 				UserId: "user",
@@ -2182,7 +2358,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(samlChangeDate),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Instance.InstanceID(),
 					Sequence:      samlSequence,
 				},
 				IdpInformation: &user.IDPInformation{

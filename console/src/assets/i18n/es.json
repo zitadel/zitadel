@@ -48,13 +48,13 @@
       "TITLE": "Usuarios",
       "DESCRIPTION": "Un usuario es un humano o una máquina que puede acceder a tus aplicaciones.",
       "HUMANS": {
-        "TITLE": "Humanos",
-        "DESCRIPTION": "Los humanos se autentican de manera interactiva en una sesión de navegador con una solicitud de inicio de sesión.",
+        "TITLE": "Usuarios",
+        "DESCRIPTION": "Los Usuarios se autentican de manera interactiva en una sesión de navegador con una solicitud de inicio de sesión.",
         "METADATA": "Añade atributos personalizados al usuario como el departamento. Puedes usar esta información en tus acciones."
       },
       "MACHINES": {
-        "TITLE": "Máquinas",
-        "DESCRIPTION": "Las máquinas se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
+        "TITLE": "Usuarios del servicio",
+        "DESCRIPTION": "Los Usuarios del servicio se autentican de manera no interactiva usando un token portador JWT firmado con una clave privada. También pueden usar un token de acceso personal.",
         "METADATA": "Añade atributos personalizados al usuario como el sistema autenticador. Puedes usar esta información en tus acciones."
       },
       "SELF": {
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Enlaces Externos",
-        "DESCRIPTION": "Guía a tus usuarios hacia recursos externos personalizados mostrados en la página de inicio de sesión. Los usuarios necesitan aceptar los Términos de Servicio y la Política de Privacidad antes de que puedan registrarse."
+        "DESCRIPTION": "Guía a tus usuarios a recursos externos personalizados que se muestran en la página de inicio de sesión. Los usuarios deben aceptar los Términos de servicio y la Política de privacidad antes de poder registrarse. Cambia el enlace a tu documentación o introduce una cadena de texto vacía para ocultar el botón de documentación de la consola. Agrega un enlace externo personalizado y un texto personalizado para dicho enlace en la consola, o déjalos vacíos para ocultar ese botón."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Configuración de SMTP",
@@ -269,9 +269,9 @@
             "TITLE": "Permitido Inicio de Sesión Externo",
             "DESCRIPTION": "Permite a tus usuarios iniciar sesión con un proveedor de identidad externo en lugar de usar el usuario de ZITADEL para iniciar sesión."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Permitido Restablecimiento de Contraseña",
-            "DESCRIPTION": "Permite a tus usuarios restablecer su contraseña."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Restablecimiento de contraseña oculto",
+            "DESCRIPTION": "No permita que sus usuarios restablezcan su contraseña."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Permitido Descubrimiento de Dominio",
@@ -595,6 +595,7 @@
     "INVALID_FORMAT": "El formato no es valido.",
     "NOTANEMAIL": "El valor proporcionado no es una dirección de email.",
     "MINLENGTH": "Debe tener al menos {{requiredLength}} caracteres de longitud.",
+    "MAXLENGTH": "Debe tener menos de {{requiredLength}} caracteres.",
     "UPPERCASEMISSING": "Debe incluir un carácter en mayúscula.",
     "LOWERCASEMISSING": "Debe incluir un carácter en minúscula.",
     "SYMBOLERROR": "Debe incluir un símbolo o un signo de puntuación.",
@@ -880,7 +881,8 @@
       "SET": "Establecer nueva contraseña",
       "RESENDNOTIFICATION": "Enviar enlace para restablecer la contraseña",
       "REQUIRED": "Faltan algunos campos requeridos.",
-      "MINLENGTHERROR": "Debe tener al menos {{value}} caracteres de longitud."
+      "MINLENGTHERROR": "Debe tener al menos {{value}} caracteres de longitud.",
+      "MAXLENGTHERROR": "Debe tener menos de {{value}} caracteres"
     },
     "ID": "ID",
     "EMAIL": "Email",
@@ -1293,6 +1295,7 @@
       "MEMBERCHANGED": "Mánager modificado.",
       "SETPRIMARY": "Dominio primario establecido.",
       "DELETED": "Organización borrada con éxito",
+      "DEFAULTORGNOTFOUND": "No se encontró la organización por defecto",
       "ORG_WAS_DELETED": "La organización ha sido borrada."
     },
     "DIALOG": {
@@ -1571,6 +1574,9 @@
       "POLICYLINK": "Enlace a Política de privacidad",
       "HELPLINK": "Enlace de ayuda",
       "SUPPORTEMAIL": "Email de soporte",
+      "DOCSLINK": "Enlace de documentos (Console)",
+      "CUSTOMLINK": "Enlace personalizado (Console)",
+      "CUSTOMLINKTEXT": "Texto de enlace personalizado (Console)",
       "SAVED": "¡Se guardó con éxito!",
       "RESET_TITLE": "Restaurar valores por defecto",
       "RESET_DESCRIPTION": "Estás a punto de restaurar los enlaces por defecto para los TDS y la política de privacida. ¿Quieres continuar?"
@@ -2221,7 +2227,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Proveedor SMTP",
-      "DESCRIPTION": "Estos son los proveedores SMTP para tu instancia de Zitadel. Activa el que quieras utilizar para enviar notificaciones a tus usuarios.",
+      "DESCRIPTION": "Estos son los proveedores SMTP para tu instancia de ZITADEL. Activa el que quieras utilizar para enviar notificaciones a tus usuarios.",
       "EMPTY": "No hay ningún proveedor SMTP disponible",
       "ACTIVATED": "Activado",
       "ACTIVATE": "Activar proveedor",
@@ -2249,7 +2255,16 @@
         "CURRENT_DESC_TITLE": "Estas son tus configuraciones SMTP",
         "PROVIDER_SETTINGS": "Configuración del proveedor SMTP",
         "SENDER_SETTINGS": "Configuración del remitente",
-        "TEST_SETTINGS": "Probar la configuración SMTP"
+        "TEST_SETTINGS": "Probar la configuración SMTP",
+        "NEXT_STEPS": "Pŕoximos pasos",
+        "ACTIVATE": {
+          "TITLE": "Activa tu proveedor SMTP",
+          "DESCRIPTION": "ZITADEL no puede usar este proveedor SMTP para enviar notificaciones hasta que lo actives. Si activas este proveedor cualquier otro proveedor que estuviera activado será desactivado ahora."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Desactiva tu proveedor SMTP",
+          "DESCRIPTION": "Si desactivas este proveedor SMTP, ZITADEL no puede utilizarlo para enviar notificationes hasta que lo actives otra vez."
+        }
       }
     },
     "DETAIL": {

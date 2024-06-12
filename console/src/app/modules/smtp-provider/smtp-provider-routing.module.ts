@@ -13,6 +13,7 @@ const types = [
   { path: 'mailjet', component: SMTPProviderComponent },
   { path: 'mailchimp', component: SMTPProviderComponent },
   { path: 'brevo', component: SMTPProviderComponent },
+  { path: 'outlook', component: SMTPProviderComponent },
 ];
 
 const routes: Routes = types.map((value) => {

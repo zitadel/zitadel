@@ -12,7 +12,7 @@ const (
 )
 
 func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
-	authReq, err := l.getAuthRequest(r)
+	authReq, err := l.ensureAuthRequest(r)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -33,7 +33,7 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderPasswordResetDone(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RequestSetPassword(setContext(r.Context(), authReq.UserOrgID), user.ID, authReq.UserOrgID, domain.NotificationTypeEmail, passwordCodeGenerator)
+	_, err = l.command.RequestSetPassword(setContext(r.Context(), authReq.UserOrgID), user.ID, authReq.UserOrgID, domain.NotificationTypeEmail, passwordCodeGenerator, authReq.ID)
 	l.renderPasswordResetDone(w, r, authReq, err)
 }
 

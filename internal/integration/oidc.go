@@ -151,7 +151,10 @@ func (s *Tester) CreateAPIClientBasic(ctx context.Context, projectID string) (*m
 const CodeVerifier = "codeVerifier"
 
 func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	provider, err := s.CreateRelyingParty(ctx, clientID, redirectURI, scope...)
+	return s.CreateOIDCAuthRequestWithDomain(ctx, s.Config.ExternalDomain, clientID, loginClient, redirectURI, scope...)
+}
+func (s *Tester) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	provider, err := s.CreateRelyingPartyForDomain(ctx, domain, clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
 	}
@@ -212,11 +215,15 @@ func (s *Tester) OIDCIssuer() string {
 }
 
 func (s *Tester) CreateRelyingParty(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
+	return s.CreateRelyingPartyForDomain(ctx, s.Config.ExternalDomain, clientID, redirectURI, scope...)
+}
+
+func (s *Tester) CreateRelyingPartyForDomain(ctx context.Context, domain, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
 	if len(scope) == 0 {
 		scope = []string{oidc.ScopeOpenID}
 	}
 	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport}}
-	return rp.NewRelyingPartyOIDC(ctx, s.OIDCIssuer(), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
+	return rp.NewRelyingPartyOIDC(ctx, http_util.BuildHTTP(domain, s.Config.Port, s.Config.ExternalSecure), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
 }
 
 type loginRoundTripper struct {
@@ -281,21 +288,42 @@ func CheckRedirect(req *http.Request) (*url.URL, error) {
 	return resp.Location()
 }
 
-func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (userID, clientID, clientSecret string, err error) {
-	name := gofakeit.Username()
-	user, err := s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
+	name = gofakeit.Username()
+	machine, err = s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,
 		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
 	})
 	if err != nil {
-		return "", "", "", err
+		return nil, "", "", "", err
 	}
 	secret, err := s.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
-		UserId: user.GetUserId(),
+		UserId: machine.GetUserId(),
 	})
 	if err != nil {
-		return "", "", "", err
+		return nil, "", "", "", err
 	}
-	return user.GetUserId(), secret.GetClientId(), secret.GetClientSecret(), nil
+	return machine, name, secret.GetClientId(), secret.GetClientSecret(), nil
+}
+
+func (s *Tester) CreateOIDCJWTProfileClient(ctx context.Context) (machine *management.AddMachineUserResponse, name string, keyData []byte, err error) {
+	name = gofakeit.Username()
+	machine, err = s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+		Name:            name,
+		UserName:        name,
+		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+	})
+	if err != nil {
+		return nil, "", nil, err
+	}
+	keyResp, err := s.Client.Mgmt.AddMachineKey(ctx, &management.AddMachineKeyRequest{
+		UserId:         machine.GetUserId(),
+		Type:           authn.KeyType_KEY_TYPE_JSON,
+		ExpirationDate: timestamppb.New(time.Now().Add(time.Hour)),
+	})
+	if err != nil {
+		return nil, "", nil, err
+	}
+	return machine, name, keyResp.GetKeyDetails(), nil
 }

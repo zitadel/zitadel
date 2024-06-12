@@ -63,7 +63,7 @@ type CreatedOrgAdmin struct {
 }
 
 func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID string, allowInitialMail bool, userIDs ...string) (_ *CreatedOrg, err error) {
-	cmds := c.newOrgSetupCommands(ctx, orgID, o, userIDs)
+	cmds := c.newOrgSetupCommands(ctx, orgID, o)
 	for _, admin := range o.Admins {
 		if err = cmds.setupOrgAdmin(admin, allowInitialMail); err != nil {
 			return nil, err
@@ -76,10 +76,10 @@ func (c *Commands) setUpOrgWithIDs(ctx context.Context, o *OrgSetup, orgID strin
 	return cmds.push(ctx)
 }
 
-func (c *Commands) newOrgSetupCommands(ctx context.Context, orgID string, orgSetup *OrgSetup, userIDs []string) *orgSetupCommands {
+func (c *Commands) newOrgSetupCommands(ctx context.Context, orgID string, orgSetup *OrgSetup) *orgSetupCommands {
 	orgAgg := org.NewAggregate(orgID)
 	validations := []preparation.Validation{
-		AddOrgCommand(ctx, orgAgg, orgSetup.Name, userIDs...),
+		AddOrgCommand(ctx, orgAgg, orgSetup.Name),
 	}
 	return &orgSetupCommands{
 		validations: validations,
@@ -233,7 +233,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail b
 
 // AddOrgCommand defines the commands to create a new org,
 // this includes the verified default domain
-func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string, userIDs ...string) preparation.Validation {
+func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if name = strings.TrimSpace(name); name == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")

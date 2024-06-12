@@ -229,11 +229,6 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	sp, err := samlProvider.GetSP()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
 
 	intent, err := h.commands.GetActiveIntent(ctx, data.RelayState)
 	if err != nil {
@@ -245,10 +240,10 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session := saml2.Session{
-		ServiceProvider: sp,
-		RequestID:       intent.RequestID,
-		Request:         r,
+	session, err := saml2.NewSession(samlProvider, intent.RequestID, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	idpUser, err := session.FetchUser(r.Context())

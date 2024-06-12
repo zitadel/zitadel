@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"testing"
 	"time"
@@ -75,11 +76,11 @@ type mockUser struct {
 
 func (m *mockViewUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
 	return &user_view_model.UserSessionView{
-		ExternalLoginVerification: m.ExternalLoginVerification,
-		PasswordlessVerification:  m.PasswordlessVerification,
-		PasswordVerification:      m.PasswordVerification,
-		SecondFactorVerification:  m.SecondFactorVerification,
-		MultiFactorVerification:   m.MultiFactorVerification,
+		ExternalLoginVerification: sql.NullTime{Time: m.ExternalLoginVerification},
+		PasswordlessVerification:  sql.NullTime{Time: m.PasswordlessVerification},
+		PasswordVerification:      sql.NullTime{Time: m.PasswordVerification},
+		SecondFactorVerification:  sql.NullTime{Time: m.SecondFactorVerification},
+		MultiFactorVerification:   sql.NullTime{Time: m.MultiFactorVerification},
 	}, nil
 }
 
@@ -88,9 +89,9 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_vie
 	for i, user := range m.Users {
 		sessions[i] = &user_view_model.UserSessionView{
 			ResourceOwner: user.ResourceOwner,
-			State:         int32(user.SessionState),
+			State:         sql.Null[domain.UserSessionState]{V: user.SessionState},
 			UserID:        user.UserID,
-			LoginName:     user.LoginName,
+			LoginName:     sql.NullString{String: user.LoginName},
 		}
 	}
 	return sessions, nil
@@ -466,7 +467,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"user not set, prompt select account, no active session, select account step",
+			"user not set, prompt select account, no active session, login step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
 					Users: nil,
@@ -475,9 +476,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			[]domain.NextStep{
-				&domain.SelectUserStep{
-					Users: []domain.UserSelection{},
-				}},
+				&domain.LoginStep{}},
 			nil,
 		},
 		{
@@ -1683,11 +1682,12 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		isInternal  bool
 	}
 	tests := []struct {
-		name        string
-		args        args
-		want        domain.NextStep
-		wantChecked bool
-		errFunc     func(err error) bool
+		name            string
+		args            args
+		want            domain.NextStep
+		wantChecked     bool
+		errFunc         func(err error) bool
+		wantMFAVerified []domain.MFAType
 	}{
 		//{
 		//	"required, prompt and false", //TODO: enable when LevelsOfAssurance is checked
@@ -1719,6 +1719,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			nil,
 			false,
 			zerrors.IsPreconditionFailed,
+			nil,
 		},
 		{
 			"not set up, no mfas configured, no prompt and true",
@@ -1737,6 +1738,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			nil,
 			true,
+			nil,
 			nil,
 		},
 		{
@@ -1761,6 +1763,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				},
 			},
 			false,
+			nil,
 			nil,
 		},
 		{
@@ -1788,6 +1791,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			false,
 			nil,
+			nil,
 		},
 		{
 			"not set up and skipped, true",
@@ -1807,6 +1811,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			nil,
 			true,
+			nil,
 			nil,
 		},
 		{
@@ -1830,6 +1835,38 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			nil,
 			true,
 			nil,
+			[]domain.MFAType{domain.MFATypeTOTP},
+		},
+		{
+			"checked passwordless, true",
+			args{
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeTOTP},
+						SecondFactorCheckLifetime: 18 * time.Hour,
+						MultiFactors:              []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+						MultiFactorCheckLifetime:  18 * time.Hour,
+					},
+					MFAsVerified: []domain.MFAType{domain.MFATypeU2FUserVerification},
+				},
+				user: &user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MFAMaxSetUp: domain.MFALevelMultiFactor,
+						PasswordlessTokens: []*user_model.WebAuthNView{
+							{
+								TokenID: "tokenID",
+								State:   user_model.MFAStateReady,
+							},
+						},
+					},
+				},
+				userSession: &user_model.UserSessionView{PasswordlessVerification: testNow.Add(-5 * time.Hour)},
+				isInternal:  true,
+			},
+			nil,
+			true,
+			nil,
+			[]domain.MFAType{domain.MFATypeU2FUserVerification},
 		},
 		{
 			"not checked, check and false",
@@ -1855,6 +1892,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			false,
 			nil,
+			nil,
 		},
 		{
 			"external not checked or forced but set up, want step",
@@ -1879,6 +1917,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			false,
 			nil,
+			nil,
 		},
 		{
 			"external not forced but checked",
@@ -1901,6 +1940,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			nil,
 			true,
 			nil,
+			[]domain.MFAType{domain.MFATypeTOTP},
 		},
 		{
 			"external not checked but required, want step",
@@ -1928,6 +1968,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			false,
 			nil,
+			nil,
 		},
 		{
 			"external not checked but local required",
@@ -1951,6 +1992,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			nil,
 			true,
 			nil,
+			nil,
 		},
 	}
 	for _, tt := range tests {
@@ -1965,6 +2007,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				t.Errorf("mfaChecked() checked = %v, want %v", ok, tt.wantChecked)
 			}
 			assert.Equal(t, tt.want, got)
+			assert.ElementsMatch(t, tt.args.request.MFAsVerified, tt.wantMFAVerified)
 		})
 	}
 }

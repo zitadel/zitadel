@@ -136,7 +136,7 @@ Errors:
       Invalid: La password non è valida
       NotSet: L'utente non ha impostato una password
       NotChanged: La nuova password non può essere uguale alla password attuale
-      NotSupported: Codifica hash password non supportata
+      NotSupported: Codifica hash password non supportata. Consulta https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Impostazioni di complessità password non trovati
       MinLength: La password è troppo corta
@@ -470,6 +470,7 @@ Errors:
     NotActive: L'azione non è attiva
     NotInactive: L'azione non è inattiva
     MaxAllowed: Non sono permesse altre azioni attive
+    NotEnabled: La funzione "Azione" non è abilitata
   Flow:
     FlowTypeMissing: FlowType mancante
     Empty: Flow è già vuoto
@@ -515,6 +516,7 @@ Errors:
     IDPMissing: IDP mancante nella richiesta
     IDPInvalid: IDP non valido per la richiesta
     ResponseInvalid: La risposta dell'IDP non è valida
+    MissingSingleMappingAttribute: Non contiene l'attributo di mapping o ha più di un valore
     SuccessURLMissing: URL di successo mancante nella richiesta
     FailureURLMissing: URL di errore mancante nella richiesta
     StateMissing: parametro di stato mancante nella richiesta
@@ -613,6 +615,7 @@ EventTypes:
         failed: Controllo dell'inizializzazione fallito
     token:
       added: Access Token creato
+      v2.added: Access Token creato
     impersonated: Utente impersonificato
     username:
       reserved: Nome utente riservato

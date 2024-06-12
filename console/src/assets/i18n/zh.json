@@ -48,13 +48,13 @@
       "TITLE": "用户",
       "DESCRIPTION": "用户是可以访问你的应用的人或机器。",
       "HUMANS": {
-        "TITLE": "人类",
-        "DESCRIPTION": "人类在浏览器会话中通过登录提示进行交互式认证。",
+        "TITLE": "用户",
+        "DESCRIPTION": "用户在浏览器会话中通过登录提示进行交互身份验证。",
         "METADATA": "为用户添加自定义属性，如部门。你可以在你的行动中使用这些信息。"
       },
       "MACHINES": {
-        "TITLE": "机器",
-        "DESCRIPTION": "机器使用私钥签名的JWT bearer令牌进行非交互式认证。它们也可以使用个人访问令牌。",
+        "TITLE": "服务用户",
+        "DESCRIPTION": "服务用户使用使用私钥签名的 JWT 不记名令牌进行非交互式身份验证。他们还可以使用个人访问令牌。",
         "METADATA": "为用户添加自定义属性，如认证系统。你可以在你的行动中使用这些信息。"
       },
       "SELF": {
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "外部链接",
-        "DESCRIPTION": "引导您的用户到登录页面上显示的自定义外部资源。用户需要在注册前接受服务条款和隐私政策。"
+        "DESCRIPTION": "引导您的用户访问登录页面上显示的自定义外部资源。用户需要先接受服务条款和隐私政策，然后才能注册。更改文档的链接或设置空字符串以在控制台中隐藏文档按钮。在控制台中添加自定义外部链接和该链接的自定义文本，或将它们设置为空以隐藏该按钮。"
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP设置",
@@ -269,9 +269,9 @@
             "TITLE": "允许外部登录",
             "DESCRIPTION": "允许用户使用外部身份提供者登录，而不是使用ZITADEL用户登录。"
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "允许密码重置",
-            "DESCRIPTION": "允许用户重置他们的密码。"
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "隐藏密码重置",
+            "DESCRIPTION": "不允许用户重置密码。"
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "允许域名发现",
@@ -594,6 +594,7 @@
     "INVALID_FORMAT": "格式是无效的。",
     "NOTANEMAIL": "给定的值不是合法电子邮件地址。",
     "MINLENGTH": "长度必须至少是{{requiredLength}}字符。",
+    "MAXLENGTH": "必须少于{{requiredLength}}个字符.",
     "UPPERCASEMISSING": "密码必须包含大写字符。",
     "LOWERCASEMISSING": "密码必须包含小写字符。",
     "SYMBOLERROR": "密码必须包含符号或标点符号。",
@@ -879,7 +880,8 @@
       "SET": "设置新密码",
       "RESENDNOTIFICATION": "发送重置密码链接",
       "REQUIRED": "缺少必填字段。",
-      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。"
+      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
+      "MAXLENGTHERROR": "必须少于{{value}}个字符"
     },
     "ID": "ID",
     "EMAIL": "电子邮件",
@@ -1291,6 +1293,7 @@
       "MEMBERCHANGED": "管理者以改变。",
       "SETPRIMARY": "已设为主域名。",
       "DELETED": "成功删除的组织",
+      "DEFAULTORGNOTFOUND": "未找到默认组织",
       "ORG_WAS_DELETED": "组织被删除"
     },
     "DIALOG": {
@@ -1568,6 +1571,9 @@
       "POLICYLINK": "链接到隐私政策",
       "HELPLINK": "链接到帮助",
       "SUPPORTEMAIL": "支持邮箱",
+      "DOCSLINK": "文档链接（Console）",
+      "CUSTOMLINK": "自定义链接（Console）",
+      "CUSTOMLINKTEXT": "自定义链接文本（Console）",
       "SAVED": "保存成功！",
       "RESET_TITLE": "恢复默认值",
       "RESET_DESCRIPTION": "您即将恢复 TOS 和隐私政策的默认链接。你真的要继续吗？"
@@ -2223,7 +2229,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP 提供商",
-      "DESCRIPTION": "这些是您的 Zitadel 实例的 SMTP 提供商。激活您想要用来向用户发送通知的通知。",
+      "DESCRIPTION": "这些是您的 ZITADEL 实例的 SMTP 提供商。激活您想要用来向用户发送通知的通知。",
       "EMPTY": "没有可用的 SMTP 提供商",
       "ACTIVATED": "活性",
       "ACTIVATE": "激活提供商",
@@ -2251,7 +2257,16 @@
         "CURRENT_DESC_TITLE": "这些是您的 SMTP 设置",
         "PROVIDER_SETTINGS": "SMTP 提供商设置",
         "SENDER_SETTINGS": "发件人设置",
-        "TEST_SETTINGS": "测试 SMTP 设置"
+        "TEST_SETTINGS": "测试 SMTP 设置",
+        "NEXT_STEPS": "下一步",
+        "ACTIVATE": {
+          "TITLE": "激活您的 SMTP 提供商",
+          "DESCRIPTION": "在您激活此 SMTP 提供程序之前，Zitadel 无法使用它来发送通知。如果您激活此提供程序，任何其他处于活动状态的提供程序现在都将被停用。"
+        },
+        "DEACTIVATE": {
+          "TITLE": "停用您的 SMTP 提供商",
+          "DESCRIPTION": "如果您停用此 SMTP 提供程序，Zitadel 将无法使用它发送通知，直到您再次激活它。"
+        }
       }
     },
     "DETAIL": {

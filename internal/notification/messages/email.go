@@ -51,9 +51,9 @@ func (msg *Email) GetContent() (string, error) {
 	}
 
 	//default mime-type is html
-	mime := "MIME-version: 1.0;" + lineBreak + "Content-Type: text/html; charset=\"UTF-8\";" + lineBreak + lineBreak
+	mime := "MIME-Version: 1.0" + lineBreak + "Content-Type: text/html; charset=\"UTF-8\"" + lineBreak + lineBreak
 	if !isHTML(msg.Content) {
-		mime = "MIME-version: 1.0;" + lineBreak + "Content-Type: text/plain; charset=\"UTF-8\";" + lineBreak + lineBreak
+		mime = "MIME-Version: 1.0" + lineBreak + "Content-Type: text/plain; charset=\"UTF-8\"" + lineBreak + lineBreak
 	}
 	subject := "Subject: " + bEncodeSubject(msg.Subject) + lineBreak
 	message += subject + mime + lineBreak + msg.Content

@@ -34,6 +34,8 @@ import (
 	notify_handler "github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/query/projection"
+	es_v4 "github.com/zitadel/zitadel/internal/v2/eventstore"
+	es_v4_pg "github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
 	"github.com/zitadel/zitadel/internal/webauthn"
 )
 
@@ -57,13 +59,16 @@ Requirements:
 			err = BindInitProjections(cmd)
 			logging.OnError(err).Fatal("unable to bind \"init-projections\" flag")
 
+			err = bindForMirror(cmd)
+			logging.OnError(err).Fatal("unable to bind \"for-mirror\" flag")
+
 			config := MustNewConfig(viper.GetViper())
 			steps := MustNewSteps(viper.New())
 
 			masterKey, err := key.MasterKey(cmd)
 			logging.OnError(err).Panic("No master key provided")
 
-			Setup(config, steps, masterKey)
+			Setup(cmd.Context(), config, steps, masterKey)
 		},
 	}
 
@@ -77,6 +82,7 @@ Requirements:
 func Flags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringArrayVar(&stepFiles, "steps", nil, "paths to step files to overwrite default steps")
 	cmd.Flags().Bool("init-projections", viper.GetBool("InitProjections"), "beta feature: initializes projections after they are created, allows smooth start as projections are up to date")
+	cmd.Flags().Bool("for-mirror", viper.GetBool("ForMirror"), "use this flag if you want to mirror your existing data")
 	key.AddMasterKeyFlag(cmd)
 	tls.AddTLSModeFlag(cmd)
 }
@@ -85,8 +91,11 @@ func BindInitProjections(cmd *cobra.Command) error {
 	return viper.BindPFlag("InitProjections.Enabled", cmd.Flags().Lookup("init-projections"))
 }
 
-func Setup(config *Config, steps *Steps, masterKey string) {
-	ctx := context.Background()
+func bindForMirror(cmd *cobra.Command) error {
+	return viper.BindPFlag("ForMirror", cmd.Flags().Lookup("for-mirror"))
+}
+
+func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) {
 	logging.Info("setup started")
 
 	i18n.MustLoadSupportedLanguagesFromDir()
@@ -102,10 +111,14 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	config.Eventstore.Pusher = new_es.NewEventstore(esPusherDBClient)
 	eventstoreClient := eventstore.NewEventstore(config.Eventstore)
 	logging.OnError(err).Fatal("unable to start eventstore")
+	eventstoreV4 := es_v4.NewEventstoreFromOne(es_v4_pg.New(queryDBClient, &es_v4_pg.Config{
+		MaxRetries: config.Eventstore.MaxRetries,
+	}))
 
 	steps.s1ProjectionTable = &ProjectionTable{dbClient: queryDBClient.DB}
 	steps.s2AssetsTable = &AssetTable{dbClient: queryDBClient.DB}
 
+	steps.FirstInstance.Skip = config.ForMirror || steps.FirstInstance.Skip
 	steps.FirstInstance.instanceSetup = config.DefaultInstance
 	steps.FirstInstance.userEncryptionKey = config.EncryptionKeys.User
 	steps.FirstInstance.smtpEncryptionKey = config.EncryptionKeys.SMTP
@@ -138,6 +151,8 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 	steps.s23CorrectGlobalUniqueConstraints = &CorrectGlobalUniqueConstraints{dbClient: esPusherDBClient}
 	steps.s24AddActorToAuthTokens = &AddActorToAuthTokens{dbClient: queryDBClient}
 	steps.s25User11AddLowerFieldsToVerifiedEmail = &User11AddLowerFieldsToVerifiedEmail{dbClient: esPusherDBClient}
+	steps.s26AuthUsers3 = &AuthUsers3{dbClient: esPusherDBClient}
+	steps.s27IDPTemplate6SAMLNameIDFormat = &IDPTemplate6SAMLNameIDFormat{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -175,6 +190,7 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		steps.s22ActiveInstancesIndex,
 		steps.s23CorrectGlobalUniqueConstraints,
 		steps.s24AddActorToAuthTokens,
+		steps.s26AuthUsers3,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
@@ -188,15 +204,17 @@ func Setup(config *Config, steps *Steps, masterKey string) {
 		steps.s18AddLowerFieldsToLoginNames,
 		steps.s21AddBlockFieldToLimits,
 		steps.s25User11AddLowerFieldsToVerifiedEmail,
+		steps.s27IDPTemplate6SAMLNameIDFormat,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
 
 	// projection initialization must be done last, since the steps above might add required columns to the projections
-	if config.InitProjections.Enabled {
+	if !config.ForMirror && config.InitProjections.Enabled {
 		initProjections(
 			ctx,
 			eventstoreClient,
+			eventstoreV4,
 			queryDBClient,
 			projectionDBClient,
 			masterKey,
@@ -218,6 +236,7 @@ func readStmt(fs embed.FS, folder, typ, filename string) (string, error) {
 func initProjections(
 	ctx context.Context,
 	eventstoreClient *eventstore.Eventstore,
+	eventstoreV4 *es_v4.EventStore,
 	queryDBClient,
 	projectionDBClient *database.DB,
 	masterKey string,
@@ -274,6 +293,7 @@ func initProjections(
 	queries, err := query.StartQueries(
 		ctx,
 		eventstoreClient,
+		eventstoreV4.Querier,
 		queryDBClient,
 		projectionDBClient,
 		config.Projections,

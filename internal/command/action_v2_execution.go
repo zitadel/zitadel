@@ -2,11 +2,16 @@ package command
 
 import (
 	"context"
+	"strings"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/zerrors"
+)
+
+const (
+	EventGroupSuffix = ".*"
 )
 
 type ExecutionAPICondition struct {
@@ -134,7 +139,11 @@ func (e *ExecutionEventCondition) ID() string {
 		return execution.ID(domain.ExecutionTypeEvent, e.Event)
 	}
 	if e.Group != "" {
-		return execution.ID(domain.ExecutionTypeEvent, e.Group)
+		group := e.Group
+		if !strings.HasSuffix(e.Group, EventGroupSuffix) {
+			group += EventGroupSuffix
+		}
+		return execution.ID(domain.ExecutionTypeEvent, group)
 	}
 	if e.All {
 		return execution.IDAll(domain.ExecutionTypeEvent)
@@ -168,28 +177,48 @@ func (c *Commands) SetExecutionEvent(ctx context.Context, cond *ExecutionEventCo
 type SetExecution struct {
 	models.ObjectRoot
 
-	Targets  []string
-	Includes []string
+	Targets []*execution.Target
+}
+
+func (t SetExecution) GetIncludes() []string {
+	includes := make([]string, 0)
+	for i := range t.Targets {
+		if t.Targets[i].Type == domain.ExecutionTargetTypeInclude {
+			includes = append(includes, t.Targets[i].Target)
+		}
+	}
+	return includes
+}
+
+func (t SetExecution) GetTargets() []string {
+	targets := make([]string, 0)
+	for i := range t.Targets {
+		if t.Targets[i].Type == domain.ExecutionTargetTypeTarget {
+			targets = append(targets, t.Targets[i].Target)
+		}
+	}
+	return targets
 }
 
 func (e *SetExecution) IsValid() error {
-	if len(e.Targets) == 0 && len(e.Includes) == 0 {
+	if len(e.Targets) == 0 {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-56bteot2uj", "Errors.Execution.NoTargets")
-	}
-	if len(e.Targets) > 0 && len(e.Includes) > 0 {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-5zleae34r1", "Errors.Execution.Invalid")
 	}
 	return nil
 }
 
 func (e *SetExecution) Existing(c *Commands, ctx context.Context, resourceOwner string) error {
-	if len(e.Targets) > 0 && !c.existsTargetsByIDs(ctx, e.Targets, resourceOwner) {
+	targets := e.GetTargets()
+	if len(targets) > 0 && !c.existsTargetsByIDs(ctx, targets, resourceOwner) {
 		return zerrors.ThrowNotFound(nil, "COMMAND-17e8fq1ggk", "Errors.Target.NotFound")
 	}
-	if len(e.Includes) > 0 && !c.existsExecutionsByIDs(ctx, e.Includes, resourceOwner) {
+	includes := e.GetIncludes()
+	if len(includes) > 0 && !c.existsExecutionsByIDs(ctx, includes, resourceOwner) {
 		return zerrors.ThrowNotFound(nil, "COMMAND-slgj0l4cdz", "Errors.Execution.IncludeNotFound")
 	}
-	return nil
+	get, set := createIncludeCacheFunctions()
+	// maxLevels could be configurable, but set as 3 for now
+	return checkForIncludeCircular(ctx, e.AggregateID, resourceOwner, includes, c.getExecutionIncludes(get, set), 3)
 }
 
 func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resourceOwner string) (_ *domain.ObjectDetails, err error) {
@@ -206,11 +235,10 @@ func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resource
 		return nil, err
 	}
 
-	if err := c.pushAppendAndReduce(ctx, wm, execution.NewSetEvent(
+	if err := c.pushAppendAndReduce(ctx, wm, execution.NewSetEventV2(
 		ctx,
 		ExecutionAggregateFromWriteModel(&wm.WriteModel),
 		set.Targets,
-		set.Includes,
 	)); err != nil {
 		return nil, err
 	}
@@ -282,4 +310,76 @@ func (c *Commands) getExecutionWriteModelByID(ctx context.Context, id string, re
 		return nil, err
 	}
 	return wm, nil
+}
+
+func createIncludeCacheFunctions() (func(s string) ([]string, bool), func(s string, strings []string)) {
+	tempCache := make(map[string][]string)
+	return func(s string) ([]string, bool) {
+			include, ok := tempCache[s]
+			return include, ok
+		}, func(s string, strings []string) {
+			tempCache[s] = strings
+		}
+}
+
+type includeCacheFunc func(ctx context.Context, id string, resourceOwner string) ([]string, error)
+
+func checkForIncludeCircular(ctx context.Context, id string, resourceOwner string, includes []string, cache includeCacheFunc, maxLevels int) error {
+	if len(includes) == 0 {
+		return nil
+	}
+	level := 0
+	for _, include := range includes {
+		if id == include {
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-mo1cmjp5k7", "Errors.Execution.CircularInclude")
+		}
+		if err := checkForIncludeCircularRecur(ctx, []string{id}, resourceOwner, include, cache, maxLevels, level); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Commands) getExecutionIncludes(
+	getCache func(string) ([]string, bool),
+	setCache func(string, []string),
+) includeCacheFunc {
+	return func(ctx context.Context, id string, resourceOwner string) ([]string, error) {
+		included, ok := getCache(id)
+		if !ok {
+			included, err := c.getExecutionWriteModelByID(ctx, id, resourceOwner)
+			if err != nil {
+				return nil, err
+			}
+			includes := included.IncludeList()
+			setCache(id, includes)
+			return includes, nil
+		}
+		return included, nil
+	}
+}
+
+func checkForIncludeCircularRecur(ctx context.Context, ids []string, resourceOwner string, include string, cache includeCacheFunc, maxLevels, level int) error {
+	included, err := cache(ctx, include, resourceOwner)
+	if err != nil {
+		return err
+	}
+	currentLevel := level + 1
+	if currentLevel >= maxLevels {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-gbhd3g57oo", "Errors.Execution.MaxLevelsInclude")
+	}
+	for _, includedInclude := range included {
+		if include == includedInclude {
+			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-iuch02i656", "Errors.Execution.CircularInclude")
+		}
+		for _, id := range ids {
+			if includedInclude == id {
+				return zerrors.ThrowPreconditionFailed(nil, "COMMAND-819opvhgjv", "Errors.Execution.CircularInclude")
+			}
+		}
+		if err := checkForIncludeCircularRecur(ctx, append(ids, include), resourceOwner, includedInclude, cache, maxLevels, currentLevel); err != nil {
+			return err
+		}
+	}
+	return nil
 }
