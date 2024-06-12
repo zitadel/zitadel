@@ -131,10 +131,7 @@ func (s *Server) DeactivateSMTPConfig(ctx context.Context, req *admin_pb.Deactiv
 }
 
 func (s *Server) TestSMTPConfigById(ctx context.Context, req *admin_pb.TestSMTPConfigByIdRequest) (*admin_pb.TestSMTPConfigByIdResponse, error) {
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	resourceOwner := instanceID // Will be replaced when orgs have smtp configs
-
-	err := s.command.TestSMTPConfigById(ctx, resourceOwner, req.Id, req.TestAddress)
+	err := s.command.TestSMTPConfigById(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.ReceiverAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +140,6 @@ func (s *Server) TestSMTPConfigById(ctx context.Context, req *admin_pb.TestSMTPC
 }
 
 func (s *Server) TestSMTPConfig(ctx context.Context, req *admin_pb.TestSMTPConfigRequest) (*admin_pb.TestSMTPConfigResponse, error) {
-	instanceID := authz.GetInstance(ctx).InstanceID()
 	config := smtp.Config{}
 	config.Tls = req.Tls
 	config.From = req.SenderAddress
@@ -152,7 +148,7 @@ func (s *Server) TestSMTPConfig(ctx context.Context, req *admin_pb.TestSMTPConfi
 	config.SMTP.User = req.User
 	config.SMTP.Password = req.Password
 
-	err := s.command.TestSMTPConfig(ctx, instanceID, req.Id, req.TestAddress, &config)
+	err := s.command.TestSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.ReceiverAddress, &config)
 	if err != nil {
 		return nil, err
 	}

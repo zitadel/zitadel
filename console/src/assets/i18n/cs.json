@@ -2277,7 +2277,7 @@
         "DEACTIVATE": {
           "TITLE": "Deaktivujte svého poskytovatele SMTP",
           "DESCRIPTION": "Pokud deaktivujete tohoto poskytovatele SMTP, ZITADEL jej nebude moci používat k odesílání upozornění, dokud jej znovu neaktivujete."
-        }
+        },
         "SAVE_SETTINGS": "Uložte nastavení",
         "TEST": {
           "TITLE": "Otestujte svá nastavení",

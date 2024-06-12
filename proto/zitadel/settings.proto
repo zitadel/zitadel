@@ -95,16 +95,6 @@ message SMTPConfig {
   string id = 10;
 }
 
-message SMTPTestResult {
-  zitadel.v1.ObjectDetails details = 1;
-  string result = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"Test results\"";
-    }
-  ];
-  bool success = 3;
-}
-
 message SMSProvider {
   zitadel.v1.ObjectDetails details = 1;
   string id = 2;

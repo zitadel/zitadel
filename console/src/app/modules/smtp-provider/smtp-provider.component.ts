@@ -311,7 +311,7 @@ export class SMTPProviderComponent {
     req.setPassword(this.password?.value ?? '');
     req.setTls(this.tls?.value ?? false);
     req.setId(this.id ?? '');
-    req.setTestAddress(this.email ?? '');
+    req.setReceiverAddress(this.email ?? '');
 
     this.service
       .testSMTPConfig(req)

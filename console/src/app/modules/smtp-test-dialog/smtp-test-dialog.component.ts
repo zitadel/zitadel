@@ -44,7 +44,7 @@ export class SmtpTestDialogComponent {
 
     const req = new TestSMTPConfigByIdRequest();
     req.setId(this.data.id);
-    req.setTestAddress(this.email);
+    req.setReceiverAddress(this.email);
 
     this.adminService
       .testSMTPConfigById(req)
