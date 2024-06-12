@@ -151,7 +151,10 @@ func (s *Tester) CreateAPIClientBasic(ctx context.Context, projectID string) (*m
 const CodeVerifier = "codeVerifier"
 
 func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	provider, err := s.CreateRelyingParty(ctx, clientID, redirectURI, scope...)
+	return s.CreateOIDCAuthRequestWithDomain(ctx, s.Config.ExternalDomain, clientID, loginClient, redirectURI, scope...)
+}
+func (s *Tester) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	provider, err := s.CreateRelyingPartyForDomain(ctx, domain, clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
 	}
@@ -212,11 +215,15 @@ func (s *Tester) OIDCIssuer() string {
 }
 
 func (s *Tester) CreateRelyingParty(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
+	return s.CreateRelyingPartyForDomain(ctx, s.Config.ExternalDomain, clientID, redirectURI, scope...)
+}
+
+func (s *Tester) CreateRelyingPartyForDomain(ctx context.Context, domain, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
 	if len(scope) == 0 {
 		scope = []string{oidc.ScopeOpenID}
 	}
 	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport}}
-	return rp.NewRelyingPartyOIDC(ctx, s.OIDCIssuer(), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
+	return rp.NewRelyingPartyOIDC(ctx, http_util.BuildHTTP(domain, s.Config.Port, s.Config.ExternalSecure), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
 }
 
 type loginRoundTripper struct {
