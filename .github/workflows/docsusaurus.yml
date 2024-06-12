@@ -61,6 +61,8 @@ jobs:
         run: |
           vercel deploy --prebuilt --archive=tgz --prod --token=${{ secrets.VERCEL_TOKEN }} >deployment-url.txt
       - name: Get Preview URL
+        env:
+            META_TAG: ${{ steps.hash_branch.outputs.digest }}-${{ github.run_number }}-${{ github.run_attempt}}
         run: |
           vercel ls --token=$VERCEL_TOKEN --meta base_hash=${{ env.META_TAG }} &> vercel-output
           url=$(cat vercel-output | grep http | awk '{print $2}')
