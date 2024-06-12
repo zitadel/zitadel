@@ -82,4 +82,4 @@ jobs:
           message: |
             Your build has completed!
 
-            [Preview deployment](${{ steps.current.outputs.output }})
+            [Preview deployment](https://${{ steps.current.outputs.output }})
