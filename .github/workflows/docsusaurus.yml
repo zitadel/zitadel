@@ -54,27 +54,27 @@ jobs:
       - name: Deploy Preview
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         run: |
-          vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }} >deployment-url.txt
+          vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
           echo "deploymentUrl=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
       - name: Deploy Production
         if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true'}}
         run: |
-          vercel deploy --prebuilt --archive=tgz --prod --token=${{ secrets.VERCEL_TOKEN }} >deployment-url.txt
-      - name: Set info output parameter
-        id: setinfo
+          vercel deploy --prebuilt --archive=tgz --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: run curl
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         env:
           teamid: ${{ secrets.VERCEL_ORG_ID }}
           token: ${{ secrets.VERCEL_TOKEN }}
           commit: ${{ github.sha }}
-        run: |
-          {
-              echo "info=<<EOF"
-              curl -X GET "https://api.vercel.com/v6/deployments?teamId=$teamid&app=docs" -H "Authorization: Bearer $token" --silent | jq -r '.deployments[] | select(.meta.githubCommitSha == "$commit")  | .url'
-              echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+        run: | 
+            status=$(curl -s --request GET \
+            --url https://api.vercel.com/v6/deployments?teamId={{ env.TEAMID }}&app=docs \
+            --header 'Authorization: Bearer ${{ env.TOKEN }}' \
+            | jq -r '.deployments[] | select(.meta.githubCommitSha == "${{ env.COMMIT }}")  | .url'); echo "status=$status" >> $GITHUB_OUTPUT
+        id: req
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
             Your build has completed!
 
-            [Preview deployment](${{ steps.vercel.outputs.INFO }})
+            [Preview deployment](${{ steps.req.outputs.status }})
