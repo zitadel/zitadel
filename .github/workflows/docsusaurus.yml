@@ -62,6 +62,7 @@ jobs:
           vercel deploy --prebuilt --archive=tgz --prod --token=${{ secrets.VERCEL_TOKEN }}
       - name: Get Preview URL
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        id: myRequest
         uses: fjogeleit/http-request-action@v1
         with:
           url: 'https://api.vercel.com/v6/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}&app=docs'
