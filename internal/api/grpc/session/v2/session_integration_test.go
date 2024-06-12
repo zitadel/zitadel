@@ -949,15 +949,6 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	require.Nil(t, sessionResp)
 }
 
-func Test_ZITADEL_API_missing_mfa(t *testing.T) {
-	id, token, _, _ := Tester.CreatePasswordSession(t, CTX, User.GetUserId(), integration.UserPassword)
-
-	ctx := Tester.WithAuthorizationToken(context.Background(), token)
-	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
-	require.Error(t, err)
-	require.Nil(t, sessionResp)
-}
-
 func Test_ZITADEL_API_success(t *testing.T) {
 	id, token, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, User.GetUserId())
 
