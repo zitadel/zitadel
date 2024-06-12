@@ -69,8 +69,7 @@ jobs:
         run: |
           {
               echo "info=<<EOF"
-              curl -u "$user/token:$pass" 'https://test/api/v2/blablabla/test' \
-                  | jq -r 'info.blablabla'
+              curl -X GET "https://api.vercel.com/v6/deployments?teamId=$teamid&app=docs" -H "Authorization: Bearer $token" --silent | jq -r '.deployments[] | select(.meta.githubCommitSha == "$commit")  | .url'
               echo "EOF"
           } >> "$GITHUB_OUTPUT"
       - uses: mshick/add-pr-comment@v2
@@ -78,4 +77,4 @@ jobs:
           message: |
             Your build has completed!
 
-            [Preview deployment](${{ steps.vercel.outputs.VERCEL_URL }})
+            [Preview deployment](${{ steps.vercel.outputs.INFO }})
