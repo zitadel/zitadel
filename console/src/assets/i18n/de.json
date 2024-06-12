@@ -596,6 +596,7 @@
     "INVALID_FORMAT": "Das Format is ungültig.",
     "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
     "MINLENGTH": "Muss mindestens {{requiredLength}} Zeichen lang sein.",
+    "MAXLENGTH": "Muss weniger als {{requiredLength}} Zeichen enthalten",
     "UPPERCASEMISSING": "Muss einen Grossbuchstaben beinhalten.",
     "LOWERCASEMISSING": "Muss einen Kleinbuchstaben beinhalten.",
     "SYMBOLERROR": "Muss ein Symbol/Satzzeichen beinhalten.",
@@ -881,7 +882,8 @@
       "SET": "Passwort neu setzen",
       "RESENDNOTIFICATION": "Email zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
-      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein."
+      "MINLENGTHERROR": "Muss mindestens {{value}} Zeichen lang sein.",
+      "MAXLENGTHERROR": "Muss weniger als {{value}} Zeichen umfassen."
     },
     "ID": "ID",
     "EMAIL": "E-Mail",
@@ -2229,7 +2231,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP-Anbieter",
-      "DESCRIPTION": "Dies sind die SMTP-Anbieter für Ihre Zitadel-Instanz. Aktivieren Sie diejenige, die Sie zum Senden von Benachrichtigungen an Ihre Benutzer verwenden möchten.",
+      "DESCRIPTION": "Dies sind die SMTP-Anbieter für Ihre ZITADEL-Instanz. Aktivieren Sie diejenige, die Sie zum Senden von Benachrichtigungen an Ihre Benutzer verwenden möchten.",
       "EMPTY": "Kein SMTP-Anbieter verfügbar",
       "ACTIVATED": "Aktiviert",
       "ACTIVATE": "Anbieter aktivieren",
@@ -2258,6 +2260,15 @@
         "CURRENT_DESC_TITLE": "Dies sind Ihre SMTP-Einstellungen",
         "PROVIDER_SETTINGS": "SMTP-Anbietereinstellungen",
         "SENDER_SETTINGS": "Absendereinstellungen",
+        "NEXT_STEPS": "Nächste Schritte",
+        "ACTIVATE": {
+          "TITLE": "Aktivieren Sie Ihren SMTP-Anbieter",
+          "DESCRIPTION": "ZITADEL kann diesen SMTP-Anbieter nicht zum Senden von Benachrichtigungen verwenden, bis Sie ihn aktivieren. Wenn Sie diesen Anbieter aktivieren, werden alle anderen aktiven Anbieter nun deaktiviert."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Deaktivieren Sie Ihren SMTP-Anbieter",
+          "DESCRIPTION": "Wenn Sie diesen SMTP-Anbieter deaktivieren, kann ZITADEL ihn nicht zum Versenden von Benachrichtigungen verwenden, bis Sie ihn erneut aktivieren."
+        },
         "SAVE_SETTINGS": "Speichern Sie Ihre Einstellungen",
         "TEST": {
           "TITLE": "Testen Sie Ihre Einstellungen",

@@ -156,11 +156,6 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Terraform",
-          items: ["guides/manage/terraform/basics"],
-        },
-        {
-          type: "category",
           label: "Users",
           items: [
             "guides/manage/user/reg-create-user",
@@ -168,6 +163,7 @@ module.exports = {
             "guides/manage/customize/user-schema",
           ],
         },
+        "guides/manage/terraform-provider"
       ],
     },
     {
@@ -881,6 +877,18 @@ module.exports = {
         "self-hosting/manage/database/database",
         "self-hosting/manage/updating_scaling",
         "self-hosting/manage/usage_control",
+        {
+          type: "category",
+          label: "Command Line Interface",
+          collapsed: false,
+          link: {
+            type: "doc",
+            id: "self-hosting/manage/cli/overview"
+          },
+          items: [
+            "self-hosting/manage/cli/mirror"
+          ],
+        },
       ],
     },
   ],

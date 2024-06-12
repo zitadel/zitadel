@@ -32,13 +32,15 @@ Password:
   Title: Wachtwoord
   Description: Voer uw inloggegevens in.
   PasswordLabel: Wachtwoord
-  MinLength: Minimum lengte
-  HasUppercase: Hoofdletter
-  HasLowercase: Kleine letter
-  HasNumber: Nummer
-  HasSymbol: Symbool
-  Confirmation: Bevestiging komt overeen
-  ResetLinkText: Reset Wachtwoord
+  MinLength: Moet minstens
+  MinLengthp2: tekens lang zijn.
+  MaxLength: Moet minder dan 70 tekens lang zijn.
+  HasUppercase: Moet een hoofdletter bevatten.
+  HasLowercase: Moet een kleine letter bevatten.
+  HasNumber: Moet een nummer bevatten.
+  HasSymbol: Moet een symbool bevatten.
+  Confirmation: Wachtwoordbevestiging komt overeen.
+  ResetLinkText: Wachtwoord resetten
   BackButtonText: Terug
   NextButtonText: Volgende
 

@@ -42,19 +42,22 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 	session, err := s.command.CreateOIDCSession(ctx,
 		user.ID,
 		user.ResourceOwner,
-		jwtReq.Subject,
+		"",
 		scope,
 		domain.AddAudScopeToAudience(ctx, nil, r.Data.Scope),
-		nil,
+		[]domain.UserAuthMethodType{domain.UserAuthMethodTypePrivateKey},
 		time.Now(),
 		"",
 		nil,
 		nil,
-		domain.TokenReasonClientCredentials,
+		domain.TokenReasonJWTProfile,
 		nil,
 		false,
 	)
-	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false))
+	if err != nil {
+		return nil, err
+	}
+	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false, true, false, false))
 }
 
 func (s *Server) verifyJWTProfile(ctx context.Context, req *oidc.JWTProfileGrantRequest) (user *query.User, tokenRequest *oidc.JWTTokenRequest, err error) {

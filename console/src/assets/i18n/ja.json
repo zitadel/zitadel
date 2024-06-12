@@ -596,6 +596,7 @@
     "INVALID_FORMAT": "不正なフォーマットです",
     "NOTANEMAIL": "入力された値がメールアドレスではありません。",
     "MINLENGTH": "{{requiredLength}} 文字以上の文字列が必要です。",
+    "MAXLENGTH": "{{requiredLength}}文字以下でなければなりません.",
     "UPPERCASEMISSING": "大文字を含める必要があります。",
     "LOWERCASEMISSING": "小文字を含める必要があります。",
     "SYMBOLERROR": "記号を含める必要があります。",
@@ -881,7 +882,8 @@
       "SET": "新しいパスワードを設定する",
       "RESENDNOTIFICATION": "パスワードリセットのリンクを送信する",
       "REQUIRED": "一部の必須項目が不足しています。",
-      "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。"
+      "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。",
+      "MAXLENGTHERROR": "{{value}}文字以下でなければなりません"
     },
     "ID": "id",
     "EMAIL": "Eメール",
@@ -2221,7 +2223,7 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTPプロバイダー",
-      "DESCRIPTION": "これらは、Zitadel インスタンスの SMTP プロバイダーです。ユーザーに通知を送信するために使用するものをアクティブにします。",
+      "DESCRIPTION": "これらは、ZITADEL インスタンスの SMTP プロバイダーです。ユーザーに通知を送信するために使用するものをアクティブにします。",
       "EMPTY": "使用可能な SMTP プロバイダーがありません",
       "ACTIVATED": "アクティブ化された",
       "ACTIVATE": "プロバイダーをアクティブ化する",
@@ -2250,6 +2252,15 @@
         "CURRENT_DESC_TITLE": "これらは SMTP 設定です",
         "PROVIDER_SETTINGS": "SMTPプロバイダーの設定",
         "SENDER_SETTINGS": "送信者の設定",
+        "NEXT_STEPS": "次のステップ",
+        "ACTIVATE": {
+          "TITLE": "SMTP プロバイダーをアクティブ化する",
+          "DESCRIPTION": "ZITADEL は、アクティブ化するまで、この SMTP プロバイダーを使用して通知を送信できません。このプロバイダーをアクティブ化すると、アクティブだった他のプロバイダーは非アクティブ化されます。"
+        },
+        "DEACTIVATE": {
+          "TITLE": "SMTPプロバイダーを非アクティブ化します",
+          "DESCRIPTION": "この SMTP プロバイダーを非アクティブ化すると、再度アクティブ化するまで、Zitadel はそれを使用して通知を送信できなくなります。"
+        },
         "SAVE_SETTINGS": "設定を保存する",
         "TEST": {
           "TITLE": "設定をテストする",

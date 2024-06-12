@@ -565,6 +565,13 @@ func Not(condition Condition) Condition {
 	}
 }
 
+// NewOneOfTextCond returns a Condition that checks if the column that stores a text is one of the given values
+func NewOneOfTextCond(column string, values []string) Condition {
+	return func(param string) (string, []any) {
+		return column + " = ANY(" + param + ")", []any{database.TextArray[string](values)}
+	}
+}
+
 type Executer interface {
 	Exec(string, ...interface{}) (sql.Result, error)
 }

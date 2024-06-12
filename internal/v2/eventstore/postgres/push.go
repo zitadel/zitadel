@@ -3,7 +3,9 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
+	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -28,40 +30,54 @@ func (s *Storage) Push(ctx context.Context, intent *eventstore.PushIntent) (err 
 		}()
 	}
 
-	// allows smaller wait times on query side for instances which are not actively writing
-	if err := setAppName(ctx, tx, "es_pusher_"+intent.Instance()); err != nil {
-		return err
-	}
+	var retryCount uint32
+	return crdb.Execute(func() (err error) {
+		defer func() {
+			if err == nil {
+				return
+			}
+			if retryCount < s.config.MaxRetries {
+				retryCount++
+				return
+			}
+			logging.WithFields("retry_count", retryCount).WithError(err).Debug("max retry count reached")
+			err = zerrors.ThrowInternal(err, "POSTG-VJfJz", "Errors.Internal")
+		}()
+		// allows smaller wait times on query side for instances which are not actively writing
+		if err := setAppName(ctx, tx, "es_pusher_"+intent.Instance()); err != nil {
+			return err
+		}
 
-	intents, err := lockAggregates(ctx, tx, intent)
-	if err != nil {
-		return err
-	}
-
-	if !checkSequences(intents) {
-		return zerrors.ThrowInvalidArgument(nil, "POSTG-KOM6E", "Errors.Internal.Eventstore.SequenceNotMatched")
-	}
-
-	commands := make([]*command, 0, len(intents))
-	for _, intent := range intents {
-		additionalCommands, err := intentToCommands(intent)
+		intents, err := lockAggregates(ctx, tx, intent)
 		if err != nil {
 			return err
 		}
-		commands = append(commands, additionalCommands...)
-	}
 
-	err = uniqueConstraints(ctx, tx, commands)
-	if err != nil {
-		return err
-	}
+		if !checkSequences(intents) {
+			return zerrors.ThrowInvalidArgument(nil, "POSTG-KOM6E", "Errors.Internal.Eventstore.SequenceNotMatched")
+		}
 
-	return push(ctx, tx, intent, commands)
+		commands := make([]*command, 0, len(intents))
+		for _, intent := range intents {
+			additionalCommands, err := intentToCommands(intent)
+			if err != nil {
+				return err
+			}
+			commands = append(commands, additionalCommands...)
+		}
+
+		err = uniqueConstraints(ctx, tx, commands)
+		if err != nil {
+			return err
+		}
+
+		return push(ctx, tx, intent, commands)
+	})
 }
 
 // setAppName for the the current transaction
 func setAppName(ctx context.Context, tx *sql.Tx, name string) error {
-	_, err := tx.ExecContext(ctx, "SET LOCAL application_name TO $1", name)
+	_, err := tx.ExecContext(ctx, fmt.Sprintf("SET LOCAL application_name TO '%s'", name))
 	if err != nil {
 		logging.WithFields("name", name).WithError(err).Debug("setting app name failed")
 		return zerrors.ThrowInternal(err, "POSTG-G3OmZ", "Errors.Internal")
@@ -140,21 +156,22 @@ func push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands 
 			stmt.WriteString(", ")
 		}
 
-		cmd.Position.InPositionOrder = uint32(i)
+		cmd.position.InPositionOrder = uint32(i)
 		stmt.WriteString(`(`)
 		stmt.WriteArgs(
-			cmd.Aggregate.Instance,
-			cmd.Aggregate.Owner,
-			cmd.Aggregate.Type,
-			cmd.Aggregate.ID,
+			cmd.intent.Aggregate().Instance,
+			cmd.intent.Aggregate().Owner,
+			cmd.intent.Aggregate().Type,
+			cmd.intent.Aggregate().ID,
 			cmd.Revision,
 			cmd.Creator,
 			cmd.Type,
-			cmd.Payload,
-			cmd.Sequence,
-			i,
+			cmd.payload,
+			cmd.sequence,
+			cmd.position.InPositionOrder,
 		)
-		stmt.WriteString(", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())")
+
+		stmt.WriteString(pushPositionStmt)
 		stmt.WriteString(`)`)
 	}
 	stmt.WriteString(` RETURNING created_at, "position"`)
@@ -171,13 +188,13 @@ func push(ctx context.Context, tx *sql.Tx, reducer eventstore.Reducer, commands 
 		defer func() { i++ }()
 
 		err := scan(
-			&commands[i].CreatedAt,
-			&commands[i].Position.Position,
+			&commands[i].createdAt,
+			&commands[i].position.Position,
 		)
 		if err != nil {
 			return err
 		}
-		return reducer.Reduce(commands[i].Event)
+		return reducer.Reduce(commands[i].toEvent())
 	})
 }
 
@@ -188,12 +205,13 @@ func uniqueConstraints(ctx context.Context, tx *sql.Tx, commands []*command) (er
 	var stmt database.Statement
 
 	for _, cmd := range commands {
-		if len(cmd.uniqueConstraints) == 0 {
+		if len(cmd.UniqueConstraints) == 0 {
 			continue
 		}
-		for _, constraint := range cmd.uniqueConstraints {
+		for _, constraint := range cmd.UniqueConstraints {
 			stmt.Reset()
-			instance := cmd.Aggregate.Instance
+
+			instance := cmd.intent.PushAggregate.Aggregate().Instance
 			if constraint.IsGlobal {
 				instance = ""
 			}

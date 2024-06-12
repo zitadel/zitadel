@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -41,49 +42,49 @@ func (s *SessionCommands) getHumanWebAuthNTokenReadModel(ctx context.Context, us
 }
 
 func (c *Commands) CreateWebAuthNChallenge(userVerification domain.UserVerificationRequirement, rpid string, dst json.Unmarshaler) SessionCommand {
-	return func(ctx context.Context, cmd *SessionCommands) error {
+	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
 		humanPasskeys, err := cmd.getHumanWebAuthNTokens(ctx, userVerification)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		webAuthNLogin, err := c.webauthnConfig.BeginLogin(ctx, humanPasskeys.human, userVerification, rpid, humanPasskeys.tokens...)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if err = json.Unmarshal(webAuthNLogin.CredentialAssertionData, dst); err != nil {
-			return zerrors.ThrowInternal(err, "COMMAND-Yah6A", "Errors.Internal")
+			return nil, zerrors.ThrowInternal(err, "COMMAND-Yah6A", "Errors.Internal")
 		}
 
 		cmd.WebAuthNChallenged(ctx, webAuthNLogin.Challenge, webAuthNLogin.AllowedCredentialIDs, webAuthNLogin.UserVerification, rpid)
-		return nil
+		return nil, nil
 	}
 }
 
 func (c *Commands) CheckWebAuthN(credentialAssertionData json.Marshaler) SessionCommand {
-	return func(ctx context.Context, cmd *SessionCommands) error {
+	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
 		credentialAssertionData, err := json.Marshal(credentialAssertionData)
 		if err != nil {
-			return zerrors.ThrowInternal(err, "COMMAND-ohG2o", "Errors.Internal")
+			return nil, zerrors.ThrowInternal(err, "COMMAND-ohG2o", "Errors.Internal")
 		}
 		challenge := cmd.sessionWriteModel.WebAuthNChallenge
 		if challenge == nil {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "Errors.Session.WebAuthN.NoChallenge")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Ioqu5", "Errors.Session.WebAuthN.NoChallenge")
 		}
 		webAuthNTokens, err := cmd.getHumanWebAuthNTokens(ctx, challenge.UserVerification)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		webAuthN := challenge.WebAuthNLogin(webAuthNTokens.human, credentialAssertionData)
 
 		credential, err := c.webauthnConfig.FinishLogin(ctx, webAuthNTokens.human, webAuthN, credentialAssertionData, webAuthNTokens.tokens...)
 		if err != nil && (credential == nil || credential.ID == nil) {
-			return err
+			return nil, err
 		}
 		_, token := domain.GetTokenByKeyID(webAuthNTokens.tokens, credential.ID)
 		if token == nil {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Aej7i", "Errors.User.WebAuthN.NotFound")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Aej7i", "Errors.User.WebAuthN.NotFound")
 		}
 		cmd.WebAuthNChecked(ctx, cmd.now(), token.WebAuthNTokenID, credential.Authenticator.SignCount, credential.Flags.UserVerified)
-		return nil
+		return nil, nil
 	}
 }

@@ -82,6 +82,8 @@ type Commands struct {
 	ActionFunctionExisting func(function string) bool
 	EventExisting          func(event string) bool
 	EventGroupExisting     func(group string) bool
+
+	GenerateDomain func(instanceName, domain string) (string, error)
 }
 
 func StartCommands(
@@ -168,6 +170,7 @@ func StartCommands(
 				Issuer:    defaults.Multifactors.OTP.Issuer,
 			},
 		},
+		GenerateDomain: domain.NewGeneratedInstanceDomain,
 	}
 
 	if defaultSecretGenerators != nil && defaultSecretGenerators.ClientSecret != nil {

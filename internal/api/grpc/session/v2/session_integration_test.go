@@ -14,12 +14,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
@@ -27,6 +30,7 @@ import (
 
 var (
 	CTX             context.Context
+	IAMOwnerCTX     context.Context
 	Tester          *integration.Tester
 	Client          session.SessionServiceClient
 	User            *user.AddHumanUserResponse
@@ -44,6 +48,7 @@ func TestMain(m *testing.M) {
 		Client = Tester.Client.SessionV2
 
 		CTX, _ = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
+		IAMOwnerCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
 		User = createFullUser(CTX)
 		DeactivatedUser = createDeactivatedUser(CTX)
 		LockedUser = createLockedUser(CTX)
@@ -341,6 +346,48 @@ func TestServer_CreateSession(t *testing.T) {
 	}
 }
 
+func TestServer_CreateSession_lock_user(t *testing.T) {
+	// create a separate org so we don't interfere with any other test
+	org := Tester.CreateOrganization(IAMOwnerCTX,
+		fmt.Sprintf("TestServer_CreateSession_lock_user_%d", time.Now().UnixNano()),
+		fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+	)
+	userID := org.CreatedAdmins[0].GetUserId()
+	Tester.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
+
+	// enable password lockout
+	maxAttempts := 2
+	ctxOrg := metadata.AppendToOutgoingContext(IAMOwnerCTX, "x-zitadel-orgid", org.GetOrganizationId())
+	_, err := Tester.Client.Mgmt.AddCustomLockoutPolicy(ctxOrg, &mgmt.AddCustomLockoutPolicyRequest{
+		MaxPasswordAttempts: uint32(maxAttempts),
+	})
+	require.NoError(t, err)
+
+	for i := 0; i <= maxAttempts; i++ {
+		_, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
+			Checks: &session.Checks{
+				User: &session.CheckUser{
+					Search: &session.CheckUser_UserId{
+						UserId: userID,
+					},
+				},
+				Password: &session.CheckPassword{
+					Password: "invalid",
+				},
+			},
+		})
+		assert.Error(t, err)
+		statusCode := status.Code(err)
+		expectedCode := codes.InvalidArgument
+		// as soon as we hit the limit the user is locked and following request will
+		// already deny any check with a precondition failed since the user is locked
+		if i >= maxAttempts {
+			expectedCode = codes.FailedPrecondition
+		}
+		assert.Equal(t, expectedCode, statusCode)
+	}
+}
+
 func TestServer_CreateSession_webauthn(t *testing.T) {
 	// create new session with user and request the webauthn challenge
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
@@ -366,8 +413,7 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 
 	// update the session with webauthn assertion data
 	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
+		SessionId: createResp.GetSessionId(),
 		Checks: &session.Checks{
 			WebAuthN: &session.CheckWebAuthN{
 				CredentialAssertionData: assertionData,
@@ -394,8 +440,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 
 	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), "id")
 	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
+		SessionId: createResp.GetSessionId(),
 		Checks: &session.Checks{
 			IdpIntent: &session.CheckIDPIntent{
 				IdpIntentId:    intentID,
@@ -431,6 +476,14 @@ func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 	idpID := Tester.AddGenericOAuthProvider(t, CTX)
 
+	// successful intent without known / linked user
+	idpUserID := "id"
+	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", idpUserID)
+
+	// link the user (with info from intent)
+	Tester.CreateUserIDPlink(CTX, User.GetUserId(), idpUserID, idpID, User.GetUserId())
+
+	// session with intent check must now succeed
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -438,30 +491,6 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 					UserId: User.GetUserId(),
 				},
 			},
-		},
-	})
-	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
-
-	idpUserID := "id"
-	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", idpUserID)
-	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
-		Checks: &session.Checks{
-			IdpIntent: &session.CheckIDPIntent{
-				IdpIntentId:    intentID,
-				IdpIntentToken: token,
-			},
-		},
-	})
-	require.Error(t, err)
-	Tester.CreateUserIDPlink(CTX, User.GetUserId(), idpUserID, idpID, User.GetUserId())
-	intentID, token, _, _ = Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), idpUserID)
-	updateResp, err = Client.SetSession(CTX, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
-		Checks: &session.Checks{
 			IdpIntent: &session.CheckIDPIntent{
 				IdpIntentId:    intentID,
 				IdpIntentToken: token,
@@ -469,7 +498,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	verifyCurrentSession(t, createResp.GetSessionId(), updateResp.GetSessionToken(), updateResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
+	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId(), wantUserFactor, wantIntentFactor)
 }
 
 func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
@@ -489,8 +518,7 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 
 	intentID := Tester.CreateIntent(t, CTX, idpID)
 	_, err = Client.SetSession(CTX, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
+		SessionId: createResp.GetSessionId(),
 		Checks: &session.Checks{
 			IdpIntent: &session.CheckIDPIntent{
 				IdpIntentId:    intentID,
@@ -543,8 +571,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 
 	t.Run("check user", func(t *testing.T) {
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Checks: &session.Checks{
 				User: &session.CheckUser{
 					Search: &session.CheckUser_UserId{
@@ -560,8 +587,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 
 	t.Run("check webauthn, user verified (passkey)", func(t *testing.T) {
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Challenges: &session.RequestChallenges{
 				WebAuthN: &session.RequestChallenges_WebAuthN{
 					Domain:                      Tester.Config.ExternalDomain,
@@ -577,8 +603,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		require.NoError(t, err)
 
 		resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Checks: &session.Checks{
 				WebAuthN: &session.CheckWebAuthN{
 					CredentialAssertionData: assertionData,
@@ -600,8 +625,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		code, err := totp.GenerateCode(totpSecret, time.Now())
 		require.NoError(t, err)
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Checks: &session.Checks{
 				Totp: &session.CheckTOTP{
 					Code: code,
@@ -621,8 +645,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 
 	t.Run("check user", func(t *testing.T) {
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createRespImport.GetSessionId(),
-			SessionToken: sessionTokenImport,
+			SessionId: createRespImport.GetSessionId(),
 			Checks: &session.Checks{
 				User: &session.CheckUser{
 					Search: &session.CheckUser_UserId{
@@ -639,8 +662,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		code, err := totp.GenerateCode(totpSecret, time.Now())
 		require.NoError(t, err)
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createRespImport.GetSessionId(),
-			SessionToken: sessionTokenImport,
+			SessionId: createRespImport.GetSessionId(),
 			Checks: &session.Checks{
 				Totp: &session.CheckTOTP{
 					Code: code,
@@ -662,8 +684,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 
 	t.Run("check user", func(t *testing.T) {
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Checks: &session.Checks{
 				User: &session.CheckUser{
 					Search: &session.CheckUser_UserId{
@@ -679,8 +700,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 
 	t.Run("check webauthn, user verified (passkey)", func(t *testing.T) {
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Challenges: &session.RequestChallenges{
 				WebAuthN: &session.RequestChallenges_WebAuthN{
 					Domain:                      Tester.Config.ExternalDomain,
@@ -696,8 +716,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		require.NoError(t, err)
 
 		resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Checks: &session.Checks{
 				WebAuthN: &session.CheckWebAuthN{
 					CredentialAssertionData: assertionData,
@@ -723,8 +742,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		} {
 			t.Run(userVerificationRequirement.String(), func(t *testing.T) {
 				resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-					SessionId:    createResp.GetSessionId(),
-					SessionToken: sessionToken,
+					SessionId: createResp.GetSessionId(),
 					Challenges: &session.RequestChallenges{
 						WebAuthN: &session.RequestChallenges_WebAuthN{
 							Domain:                      Tester.Config.ExternalDomain,
@@ -740,8 +758,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 				require.NoError(t, err)
 
 				resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
-					SessionId:    createResp.GetSessionId(),
-					SessionToken: sessionToken,
+					SessionId: createResp.GetSessionId(),
 					Checks: &session.Checks{
 						WebAuthN: &session.CheckWebAuthN{
 							CredentialAssertionData: assertionData,
@@ -759,8 +776,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		code, err := totp.GenerateCode(totpSecret, time.Now())
 		require.NoError(t, err)
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Checks: &session.Checks{
 				Totp: &session.CheckTOTP{
 					Code: code,
@@ -774,8 +790,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 
 	t.Run("check OTP SMS", func(t *testing.T) {
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Challenges: &session.RequestChallenges{
 				OtpSms: &session.RequestChallenges_OTPSMS{ReturnCode: true},
 			},
@@ -788,8 +803,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		require.NotEmpty(t, otp)
 
 		resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Checks: &session.Checks{
 				OtpSms: &session.CheckOTP{
 					Code: otp,
@@ -803,8 +817,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 
 	t.Run("check OTP Email", func(t *testing.T) {
 		resp, err := Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Challenges: &session.RequestChallenges{
 				OtpEmail: &session.RequestChallenges_OTPEmail{
 					DeliveryType: &session.RequestChallenges_OTPEmail_ReturnCode_{},
@@ -819,8 +832,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		require.NotEmpty(t, otp)
 
 		resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
-			SessionId:    createResp.GetSessionId(),
-			SessionToken: sessionToken,
+			SessionId: createResp.GetSessionId(),
 			Checks: &session.Checks{
 				OtpEmail: &session.CheckOTP{
 					Code: otp,
@@ -840,19 +852,17 @@ func TestServer_SetSession_expired(t *testing.T) {
 	require.NoError(t, err)
 
 	// test session token works
-	sessionResp, err := Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
-		Lifetime:     durationpb.New(20 * time.Second),
+	_, err = Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
+		SessionId: createResp.GetSessionId(),
+		Lifetime:  durationpb.New(20 * time.Second),
 	})
 	require.NoError(t, err)
 
 	// ensure session expires and does not work anymore
 	time.Sleep(20 * time.Second)
 	_, err = Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: sessionResp.GetSessionToken(),
-		Lifetime:     durationpb.New(20 * time.Second),
+		SessionId: createResp.GetSessionId(),
+		Lifetime:  durationpb.New(20 * time.Second),
 	})
 	require.Error(t, err)
 }

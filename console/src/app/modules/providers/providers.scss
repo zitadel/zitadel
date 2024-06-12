@@ -50,7 +50,7 @@
 
     .formfield {
       display: block;
-      max-width: 400px;
+      max-width: 500px;
 
       &.pwd {
         display: none;
@@ -132,7 +132,7 @@
     }
 
     .string-list-component-wrapper {
-      max-width: 400px;
+      max-width: 500px;
     }
 
     .identity-provider-content {
@@ -144,7 +144,7 @@
       }
 
       .identity-provider-2-col {
-        max-width: 400px;
+        max-width: 500px;
         display: grid;
         grid-template-columns: 1fr 1fr;
         column-gap: 1rem;
@@ -160,7 +160,7 @@
         .flex-line {
           display: flex;
           align-items: flex-start;
-          max-width: 400px;
+          max-width: 500px;
 
           .formfield {
             flex: 1;

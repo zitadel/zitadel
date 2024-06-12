@@ -32,15 +32,17 @@ Password:
   Title: 密码
   Description: 输入您的登录数据。
   PasswordLabel: 密码
-  MinLength: 密码
-  HasUppercase: 大写字母
-  HasLowercase: 小写字母
-  HasNumber: 数字
-  HasSymbol: 符号
-  Confirmation: 确认匹配
-  ResetLinkText: 重设密码
-  BackButtonText: 后退
-  NextButtonText: 继续
+  MinLength: 必须至少有
+  MinLengthp2: 个字符。
+  MaxLength: 必须少于70个字符。
+  HasUppercase: 必须包含一个大写字母。
+  HasLowercase: 必须包含一个小写字母。
+  HasNumber: 必须包含一个数字。
+  HasSymbol: 必须包含一个符号。
+  Confirmation: 密码确认匹配。
+  ResetLinkText: 重置密码
+  BackButtonText: 返回
+  NextButtonText: 下一步
 
 UsernameChange:
   Title: 更改用户名
