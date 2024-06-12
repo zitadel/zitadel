@@ -60,15 +60,19 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true'}}
         run: |
           vercel deploy --prebuilt --archive=tgz --prod --token=${{ secrets.VERCEL_TOKEN }} >deployment-url.txt
-      - name: Get Preview URL
+      - name: Set info output parameter
+        id: setinfo
         env:
-            META_TAG: ${{ steps.hash_branch.outputs.digest }}-${{ github.run_number }}-${{ github.run_attempt}}
+          teamid: ${{ secrets.VERCEL_ORG_ID }}
+          token: ${{ secrets.VERCEL_TOKEN }}
+          commit: ${{ github.sha }}
         run: |
-          vercel ls --token=$VERCEL_TOKEN --meta base_hash=${{ env.META_TAG }} &> vercel-output
-          url=$(cat vercel-output | grep http | awk '{print $2}')
-          echo "New preview URL: $url"
-          echo "META_TAG=$META_TAG"
-          echo "VERCEL_URL=$url" >> "$GITHUB_OUTPUT"
+          {
+              echo "info=<<EOF"
+              curl -u "$user/token:$pass" 'https://test/api/v2/blablabla/test' \
+                  | jq -r 'info.blablabla'
+              echo "EOF"
+          } >> "$GITHUB_OUTPUT"
       - uses: mshick/add-pr-comment@v2
         with:
           message: |
