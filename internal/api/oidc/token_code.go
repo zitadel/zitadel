@@ -34,41 +34,40 @@ func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.Acce
 
 	var (
 		session *command.OIDCSession
-		state   string
 	)
 	if strings.HasPrefix(plainCode, command.IDPrefixV2) {
-		session, state, err = s.command.CreateOIDCSessionFromAuthRequest(
+		session, _, err = s.command.CreateOIDCSessionFromAuthRequest(
 			setContextUserSystem(ctx),
 			plainCode,
 			codeExchangeComplianceChecker(client, r.Data),
 			slices.Contains(client.GrantTypes(), oidc.GrantTypeRefreshToken),
 		)
 	} else {
-		session, state, err = s.codeExchangeV1(ctx, client, r.Data, r.Data.Code)
+		session, err = s.codeExchangeV1(ctx, client, r.Data, r.Data.Code)
 	}
 	if err != nil {
 		return nil, err
 	}
-	return response(s.accessTokenResponseFromSession(ctx, client, session, state, client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion))
+	return response(s.accessTokenResponseFromSession(ctx, client, session, "", client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion))
 }
 
 // codeExchangeV1 creates a v2 token from a v1 auth request.
-func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.AccessTokenRequest, code string) (session *command.OIDCSession, state string, err error) {
+func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.AccessTokenRequest, code string) (session *command.OIDCSession, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	authReq, err := s.getAuthRequestV1ByCode(ctx, code)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 
 	if challenge := authReq.GetCodeChallenge(); challenge != nil || client.AuthMethod() == oidc.AuthMethodNone {
 		if err = op.AuthorizeCodeChallenge(req.CodeVerifier, challenge); err != nil {
-			return nil, "", err
+			return nil, err
 		}
 	}
 	if req.RedirectURI != authReq.GetRedirectURI() {
-		return nil, "", oidc.ErrInvalidGrant().WithDescription("redirect_uri does not correspond")
+		return nil, oidc.ErrInvalidGrant().WithDescription("redirect_uri does not correspond")
 	}
 
 	scope := authReq.GetScopes()
@@ -88,9 +87,9 @@ func (s *Server) codeExchangeV1(ctx context.Context, client *Client, req *oidc.A
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
 	)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
-	return session, authReq.TransferState, s.repo.DeleteAuthRequest(ctx, authReq.ID)
+	return session, s.repo.DeleteAuthRequest(ctx, authReq.ID)
 }
 
 // getAuthRequestV1ByCode finds the v1 auth request by code.
