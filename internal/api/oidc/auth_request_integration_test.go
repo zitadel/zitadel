@@ -528,6 +528,9 @@ func assertTokens(t *testing.T, tokens *oidc.Tokens[*oidc.IDTokenClaims], requir
 	} else {
 		assert.Empty(t, tokens.RefreshToken)
 	}
+	// since we test implicit flow directly, we can check that any token response must not
+	// return a `state` in the response
+	assert.Empty(t, tokens.Extra("state"))
 }
 
 func assertIDTokenClaims(t *testing.T, claims *oidc.IDTokenClaims, userID string, arm []string, sessionStart, sessionChange time.Time, sessionID string) {
