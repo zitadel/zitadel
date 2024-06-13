@@ -13,10 +13,6 @@ It explains how to check the token validity in the API and how to check for perm
 
 By the end of this guide, your application will have three different endpoint which are public, private(valid token) and private-scoped(valid token with specific role).
 
-:::info
-This documentation references our [example](https://github.com/zitadel/example-django-python-oauth) on GitHub.
-:::
-
 ## ZITADEL setup
 
 Before we can start building our application, we have to do a few configuration steps in ZITADEL Console.
@@ -38,8 +34,6 @@ Before we can start building our application, we have to do a few configuration 
 At the end you should have the following for the API:
 
 - Issuer, something like `https://example.zitadel.cloud` or `http://localhost:8080`
-- Introspection URL, something like `https://example.zitadel.cloud/oauth/v2/introspect`
-- Token URL, something like `https://example.zitadel.cloud/oauth/v2/token`
 - `.json`-key-file for the API, from the application
 - ID of the project
 
@@ -218,6 +212,10 @@ export const configureApp: PylonAPI["configureApp"] = (app) => {
 To call the API you need an access token, which is then verified by ZITADEL.
 Please follow [this guide here](/docs/guides/integrate/token-introspection/private-key-jwt#get-an-access-token), ignoring the first step as we already have the `.json`-key-file from the serviceaccount.
 
+:::info
+You can also create a PAT for the serviceuser and use it to test the API. For this, follow [this guide](/docs/guides/integrate/service-users/personal-access-token#create-a-service-user-with-a-pat).
+:::
+
 Optionally set the token as an environment variable:
 
 ```
@@ -229,9 +227,9 @@ With the access token, you can then do the following calls:
 1. GraphQL:
 
 ```
-curl -H Authorization: "Bearer $TOKEN" -X GET http://localhost:3000/graphql?query={info}
-curl -H Authorization: Bearer $TOKEN" -X GET http://localhost:3000/graphql?query={me{id name}}
-curl -H Authorization: Bearer $TOKEN" -X GET http://localhost:3000/graphql?query={me{id name messages}}
+curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:3000/graphql?query={info}
+curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:3000/graphql?query={me{id name}}
+curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:3000/graphql?query={me{id name messages}}
 ```
 
 You can also visit the GraphQL playground at `http://localhost:3000/graphql` and execute the queries there.
