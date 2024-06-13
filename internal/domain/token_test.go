@@ -26,18 +26,13 @@ func TestRoleOrgIDsFromScope(t *testing.T) {
 			want: nil,
 		},
 		{
-			name: "orgID scope",
-			args: args{[]string{OrgIDScope + "123"}},
-			want: nil,
-		},
-		{
 			name: "orgID role scope",
-			args: args{[]string{OrgIDScope + "123" + RolesSuffix}},
+			args: args{[]string{OrgRoleIDScope + "123"}},
 			want: []string{"123"},
 		},
 		{
 			name: "mixed scope",
-			args: args{[]string{"foo", OrgIDScope + "123", OrgIDScope + "123" + RolesSuffix}},
+			args: args{[]string{"foo", OrgRoleIDScope + "123"}},
 			want: []string{"123"},
 		},
 	}
