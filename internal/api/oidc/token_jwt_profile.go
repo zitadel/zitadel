@@ -54,6 +54,9 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		nil,
 		false,
 	)
+	if err != nil {
+		return nil, err
+	}
 	return response(s.accessTokenResponseFromSession(ctx, client, session, "", "", false, true, false, false))
 }
 
