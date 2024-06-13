@@ -3,10 +3,10 @@ title: ZITADEL with Pylon
 sidebar_label: Pylon
 ---
 
-import AppJWT from '../imports/_app_jwt.mdx';
-import ServiceuserJWT from '../imports/_serviceuser_jwt.mdx';
-import ServiceuserRole from '../imports/_serviceuser_role.mdx';
-import SetupPylon from '../imports/_setup_pylon.mdx';
+import AppJWT from "../imports/_app_jwt.mdx";
+import ServiceuserJWT from "../imports/_serviceuser_jwt.mdx";
+import ServiceuserRole from "../imports/_serviceuser_role.mdx";
+import SetupPylon from "../imports/_setup_pylon.mdx";
 
 This integration guide demonstrates the recommended way to incorporate ZITADEL into your Pylon application.
 It explains how to check the token validity in the API and how to check for permissions.
@@ -23,19 +23,20 @@ Before we can start building our application, we have to do a few configuration 
 
 ### Create application
 
-<AppJWT/>
+<AppJWT />
 
 ### Create Serviceuser
 
-<ServiceuserJWT/>
+<ServiceuserJWT />
 
 ### Give Serviceuser an authorization
 
-<ServiceuserRole/>
+<ServiceuserRole />
 
 ### Prerequisites
 
 At the end you should have the following for the API:
+
 - Issuer, something like `https://example.zitadel.cloud` or `http://localhost:8080`
 - Introspection URL, something like `https://example.zitadel.cloud/oauth/v2/introspect`
 - Token URL, something like `https://example.zitadel.cloud/oauth/v2/token`
@@ -43,6 +44,7 @@ At the end you should have the following for the API:
 - ID of the project
 
 And the following from the Serviceuser:
+
 - `.json`-key-file from the serviceuser
 
 ## Setup new Pylon service
@@ -74,11 +76,11 @@ my-pylon-project/
 ├── tsconfig.json
 ```
 
-* `.pylon/`: Contains the production build of your project.
-* `src/`: Contains the source code of your project.
-* `src/index.ts`: The entry point of your Pylon service.
-* `package.json`: The npm package configuration file.
-* `tsconfig.json`: The TypeScript configuration file.
+- `.pylon/`: Contains the production build of your project.
+- `src/`: Contains the source code of your project.
+- `src/index.ts`: The entry point of your Pylon service.
+- `package.json`: The npm package configuration file.
+- `tsconfig.json`: The TypeScript configuration file.
 
 ### Basic example
 
@@ -135,75 +137,79 @@ Now we will create a new Pylon service with the following endpoints:
 - `/api/private`: Private endpoint
 - `/api/private-scoped`: Private endpoint with specific role
 - `/graphql`: GraphQL endpoint
-    - Query: `me`: Private endpoint that returns the current user and the messages if the role is `read:messages`
-    - Query: `info`: Public endpoint
+  - Query: `me`: Private endpoint that returns the current user and the messages if the role is `read:messages`
+  - Query: `info`: Public endpoint
 
 ### Create the service
 
 ```typescript
-import { defineService, PylonAPI, auth, requireAuth, getContext } from "@getcronit/pylon";
+import {
+  defineService,
+  PylonAPI,
+  auth,
+  requireAuth,
+  getContext,
+} from "@getcronit/pylon";
 
 class User {
-    id: string;
-    name: string;
-    #messages: string[];
+  id: string;
+  name: string;
+  #messages: string[];
 
-    constructor(id: string, name: string, messages: string[]) {
-        this.id = id;
-        this.name = name;
-        this.#messages = messages;
-    }
+  constructor(id: string, name: string, messages: string[]) {
+    this.id = id;
+    this.name = name;
+    this.#messages = messages;
+  }
 
-    @requireAuth({roles: ['read:messages']})
-    messages() {
-        return this.#messages;
-    }
+  @requireAuth({ roles: ["read:messages"] })
+  messages() {
+    return this.#messages;
+  }
 
-    static users: User[] = [];
+  static users: User[] = [];
 
-    @requireAuth()
-    static async me() {
+  @requireAuth()
+  static async me() {
+    const ctx = getContext();
+    const id = ctx.get("auth")!.sub;
 
-        const ctx = getContext();
-        const id = ctx.get('auth')!.sub;
-
-        return User.users.find(user => user.id === id);
-    }
+    return User.users.find((user) => user.id === id);
+  }
 }
 
 export default defineService({
-    Query: {
-        me: User.me,
-        info: () => "Public Data",
-    }
+  Query: {
+    me: User.me,
+    info: () => "Public Data",
+  },
 });
 
 export const configureApp: PylonAPI["configureApp"] = (app) => {
-    // Initialize the authentication middleware
-    app.use("*", auth.initialize());
+  // Initialize the authentication middleware
+  app.use("*", auth.initialize());
 
-    app.get("/api/info", (c) => {
-        return new Response("Public Data");
-    });
+  app.get("/api/info", (c) => {
+    return new Response("Public Data");
+  });
 
-    app.get("/api/me", auth.require(), (c) => {
+  app.get("/api/me", auth.require(), (c) => {
+    const id = c.get("auth")!.sub;
 
-        const id = c.get('auth')!.sub;
+    const user = User.users.find((user) => user.id === id);
 
-        const user = User.users.find(user => user.id === id);
+    return c.json(user);
+  });
 
-        return c.json(user);
-    });
+  // A role check for `read:messages` is not required here, as the `user.messages` method already checks for it.
+  app.get("/api/me/mesages", auth.require({ roles: [] }), (c) => {
+    const id = c.get("auth")!.sub;
 
-    // A role check for `read:messages` is not required here, as the `user.messages` method already checks for it.
-    app.get("/api/me/mesages", auth.require({roles: []}), (c) => {
-        const id = c.get('auth')!.sub;
+    const user = User.users.find((user) => user.id === id);
 
-        const user = User.users.find(user => user.id === id);
-        
-        // This will throw an error if the user does not have the `read:messages` role
-        return c.json(user.messages());
-    });
+    // This will throw an error if the user does not have the `read:messages` role
+    return c.json(user.messages());
+  });
 };
 ```
 
@@ -213,6 +219,7 @@ To call the API you need an access token, which is then verified by ZITADEL.
 Please follow [this guide here](/docs/guides/integrate/token-introspection/private-key-jwt#get-an-access-token), ignoring the first step as we already have the `.json`-key-file from the serviceaccount.
 
 Optionally set the token as an environment variable:
+
 ```
 export TOKEN='MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
 ```
@@ -229,8 +236,6 @@ curl -H Authorization: Bearer $TOKEN" -X GET http://localhost:3000/graphql?query
 
 You can also visit the GraphQL playground at `http://localhost:3000/graphql` and execute the queries there.
 
-
-
 2. Routes:
 
 ```
@@ -239,10 +244,8 @@ curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:3000/api/me
 curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:3000/api/me/messages
 ```
 
-
 ## Completion
 
 Congratulations! You have successfully integrated your Pylon with ZITADEL!
 
-If you get stuck, consider checking out their [documentation](https://pylon.cronit.io/). If you face issues, contact Pylon or raise an issue on [GitHub](
-https://github.com/getcronit/pylon/issues).
+If you get stuck, consider checking out their [documentation](https://pylon.cronit.io/). If you face issues, contact Pylon or raise an issue on [GitHub](https://github.com/getcronit/pylon/issues).
