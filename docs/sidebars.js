@@ -38,6 +38,7 @@ module.exports = {
             "examples/secure-api/python-django",
             "examples/secure-api/python-flask",
             "examples/secure-api/nodejs-nestjs",
+            "examples/secure-api/pylon",
             {
               type: "link",
               label: ".Net",
@@ -99,6 +100,11 @@ module.exports = {
           type: "link",
           label: "Rust",
           href: "https://github.com/smartive/zitadel-rust",
+        },
+        {
+          type: "link",
+          label: "Pylon",
+          href: "https://github.com/getcronit/pylon",
         },
       ],
     },
