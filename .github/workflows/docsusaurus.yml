@@ -1,0 +1,93 @@
+name: Docs
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            src:
+              - 'docs/**'
+              - 'proto/**'
+              - '.github/workflows/docsusaurus.yml'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+          cache-dependency-path: docs/yarn.lock
+      - name: Install Vercel CLI
+        run: yarn global add vercel
+      - name: Install Dependencies
+        if: steps.filter.outputs.src == 'true'
+        run: yarn install --frozen-lockfile
+        working-directory: ./docs
+      - uses: actions/cache@v4
+        if: steps.filter.outputs.src == 'true'
+        with:
+          path: |
+            ${{ github.workspace }}/docs/.docusaurus
+            ${{ github.workspace }}/docs/node_modules/.cache
+          key: |
+            ${{ runner.os }}-docusaurus-${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-docusaurus-${{ hashFiles('**/package-lock.json', '**/npm-shrinkwrap.json', '**/yarn.lock', '**/pnpm-lock.yaml') }}
+              ${{ runner.os }}-docusaurus-${{ hashFiles('docs/yarn.lock') }}
+      - name: Prepare Preview Environment
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Perpare Production Environment
+        if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} 
+      - name: Build Preview
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        env:
+          NODE_OPTIONS: "--max_old_space_size=8192"
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Production
+        if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        env:
+          NODE_OPTIONS: "--max_old_space_size=8192"
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Preview
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        run: |
+          vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }}
+          echo "deploymentUrl=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
+      - name: Deploy Production
+        if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true'}}
+        run: |
+          vercel deploy --prebuilt --archive=tgz --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Get Preview URL
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        id: myRequest
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://api.vercel.com/v6/deployments?teamId=${{ secrets.VERCEL_ORG_ID }}&app=docs'
+          method: 'GET'
+          customHeaders: '{"Authorization": "Bearer ${{ secrets.VERCEL_TOKEN }}"}'
+      - uses: cloudposse/github-action-jq@main
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        id: current
+        with:
+          compact: true
+          raw-output: true
+          input: ${{ steps.myRequest.outputs.response }}
+          script: |-
+            .deployments[] | select(.meta.githubCommitSha == "${{ github.sha }}")  | .url
+      - uses: mshick/add-pr-comment@v2
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        with:
+          message: |
+            Your build has completed!
+
+            [Preview deployment](https://${{ steps.current.outputs.output }})
