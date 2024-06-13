@@ -80,7 +80,7 @@ my-pylon-project/
 
 Here's an example of a basic Pylon service:
 
-```typescript
+```ts
 import { defineService } from "@getcronit/pylon";
 
 export default defineService({
@@ -136,14 +136,16 @@ Now we will create a new Pylon service with the following endpoints:
 
 ### Create the service
 
-```typescript
+```ts
 import {
   defineService,
   PylonAPI,
   auth,
   requireAuth,
   getContext,
+  ServiceError,
 } from "@getcronit/pylon";
+import { HTTPException } from "hono/http-exception";
 
 class User {
   id: string;
@@ -170,12 +172,37 @@ class User {
 
     return User.users.find((user) => user.id === id);
   }
+
+  @requireAuth()
+  static async create() {
+    const ctx = getContext();
+
+    const auth = ctx.get("auth")!;
+
+    // Check if the user already exists
+
+    if (User.users.find((user) => user.id === auth.sub)) {
+      throw new ServiceError("User already exists", {
+        statusCode: 400,
+        code: "USER_ALREADY_EXISTS",
+      });
+    }
+
+    const user = new User(auth.sub, auth.username || "unknown", []);
+
+    User.users.push(user);
+
+    return user;
+  }
 }
 
 export default defineService({
   Query: {
     me: User.me,
     info: () => "Public Data",
+  },
+  Mutation: {
+    createUser: User.create,
   },
 });
 
@@ -200,6 +227,10 @@ export const configureApp: PylonAPI["configureApp"] = (app) => {
     const id = c.get("auth")!.sub;
 
     const user = User.users.find((user) => user.id === id);
+
+    if (!user) {
+      throw new HTTPException(404, { message: "User not found" });
+    }
 
     // This will throw an error if the user does not have the `read:messages` role
     return c.json(user.messages());
