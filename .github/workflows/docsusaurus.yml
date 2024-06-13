@@ -49,6 +49,8 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} 
       - name: Build Project Artifacts
+        env:
+          NODE_OPTIONS: "--max_old_space_size=8192"
         if: steps.filter.outputs.src == 'true'
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Preview
