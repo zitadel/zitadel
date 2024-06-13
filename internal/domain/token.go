@@ -21,7 +21,7 @@ func AddAudScopeToAudience(ctx context.Context, audience, scopes []string) []str
 	return audience
 }
 
-// RoleOrgIDsFromScope parses orgIDs from `urn:zitadel:iam:org:id:{id}:roles` formatted scopes.
+// RoleOrgIDsFromScope parses orgIDs from [OrgRoleIDScope] prefixed scopes.
 func RoleOrgIDsFromScope(scopes []string) (orgIDs []string) {
 	for _, scope := range scopes {
 		orgID, found := strings.CutPrefix(scope, OrgRoleIDScope)
