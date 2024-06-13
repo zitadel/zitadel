@@ -176,7 +176,7 @@ func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string,
 }
 
 func validateTokenExchangeScopes(client *Client, requestedScopes, subjectScopes, actorScopes []string) ([]string, error) {
-	// Scope always has 1 empty string is the space delimited array was an empty string.
+	// Scope always has 1 empty string if the space delimited array was an empty string.
 	scopes := slices.DeleteFunc(requestedScopes, func(s string) bool {
 		return s == ""
 	})
