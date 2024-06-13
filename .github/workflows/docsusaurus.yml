@@ -48,11 +48,16 @@ jobs:
       - name: Perpare Production Environment
         if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} 
-      - name: Build Project Artifacts
+      - name: Build Preview
+        if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         env:
           NODE_OPTIONS: "--max_old_space_size=8192"
-        if: steps.filter.outputs.src == 'true'
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Production
+        if: ${{ github.ref == 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
+        env:
+          NODE_OPTIONS: "--max_old_space_size=8192"
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy Preview
         if: ${{ github.ref != 'refs/heads/main' && steps.filter.outputs.src == 'true' }} 
         run: |
