@@ -12,10 +12,12 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/call"
+	"github.com/zitadel/zitadel/internal/api/transaction"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -35,7 +37,9 @@ type querier interface {
 type scan func(dest ...interface{}) error
 
 type tx struct {
-	*sql.Tx
+	Tx interface {
+		QueryContext(context.Context, string, ...any) (*sql.Rows, error)
+	}
 }
 
 func (t *tx) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) error {
@@ -54,7 +58,10 @@ func (t *tx) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, 
 	return rows.Err()
 }
 
-func query(ctx context.Context, criteria querier, searchQuery *eventstore.SearchQueryBuilder, dest interface{}, useV1 bool) error {
+func query(ctx context.Context, criteria querier, searchQuery *eventstore.SearchQueryBuilder, dest interface{}, useV1 bool) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
+
 	q, err := repository.QueryFromBuilder(searchQuery)
 	if err != nil {
 		return err
@@ -113,6 +120,8 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	contextQuerier = criteria.db()
 	if q.Tx != nil {
 		contextQuerier = &tx{Tx: q.Tx}
+	} else if ctxTx := transaction.FromContext(ctx); ctxTx != nil {
+		contextQuerier = &tx{Tx: ctxTx}
 	}
 
 	err = contextQuerier.QueryContext(ctx,

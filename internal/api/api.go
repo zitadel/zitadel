@@ -20,6 +20,7 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -71,6 +72,7 @@ func New(
 	ctx context.Context,
 	port uint16,
 	router *mux.Router,
+	client *database.DB,
 	queries *query.Queries,
 	verifier internal_authz.APITokenVerifier,
 	authZ internal_authz.Config,
@@ -88,7 +90,7 @@ func New(
 		accessInterceptor: accessInterceptor,
 	}
 
-	api.grpcServer = server.CreateServer(api.verifier, authZ, queries, http2HostName, externalDomain, tlsConfig, accessInterceptor.AccessService())
+	api.grpcServer = server.CreateServer(api.verifier, authZ, client, queries, http2HostName, externalDomain, tlsConfig, accessInterceptor.AccessService())
 	api.grpcGateway, err = server.CreateGateway(ctx, port, http1HostName, accessInterceptor, tlsConfig)
 	if err != nil {
 		return nil, err

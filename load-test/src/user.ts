@@ -2,7 +2,7 @@ import { Trend } from 'k6/metrics';
 import { Org } from './org';
 import http, { RefinedResponse } from 'k6/http';
 import url from './url';
-import { check } from 'k6';
+import { check, sleep } from 'k6';
 
 export type User = {
   userId: string;
@@ -61,6 +61,9 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
             'x-zitadel-orgid': org.organizationId,
           },
         });
+        check(user, {
+          'get user is status ok': (r) => r.status === 200,
+          }) || reject(`unable to get user(username: ${username}, id ${res.json('userId')}) status: ${user.status} body: ${user.body}`);
         resolve(user.json('user')! as unknown as Human);
       })
       .catch((reason) => {

@@ -75,7 +75,7 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 		return nil, err
 	}
 
-	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, spoolerRatio, pusherRatio, purpose)
+	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, pusherRatio, spoolerRatio, purpose)
 	if err != nil {
 		return nil, err
 	}

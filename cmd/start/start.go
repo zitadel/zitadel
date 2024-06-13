@@ -367,7 +367,7 @@ func startAPIs(
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, config.ExternalDomain, limitingAccessInterceptor)
+	apis, err := api.New(ctx, config.Port, router, dbClient, queries, verifier, config.InternalAuthZ, tlsConfig, config.HTTP2HostHeader, config.HTTP1HostHeader, config.ExternalDomain, limitingAccessInterceptor)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
 	}

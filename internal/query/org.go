@@ -104,12 +104,18 @@ func (q *Queries) OrgByID(ctx context.Context, shouldTriggerBulk bool, id string
 	}
 
 	foundOrg := readmodel.NewOrg(id)
+
+	queryOpts := []eventstore.QueryOpt{eventstore.AppendFilters(foundOrg.Filter()...)}
+	// if tx := transaction.FromContext(ctx); tx != nil {
+	// 	queryOpts = append(queryOpts, eventstore.SetQueryTx(tx))
+	// }
+
 	eventCount, err := q.eventStoreV4.Query(
 		ctx,
 		eventstore.NewQuery(
 			authz.GetInstance(ctx).InstanceID(),
 			foundOrg,
-			eventstore.AppendFilters(foundOrg.Filter()...),
+			queryOpts...,
 		),
 	)
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/transaction"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
@@ -23,6 +24,21 @@ func (s *Storage) Query(ctx context.Context, query *eventstore.Query) (eventCoun
 	if query.Tx() != nil {
 		return executeQuery(ctx, query.Tx(), &stmt, query)
 	}
+	if conn := transaction.FromContext(ctx); conn != nil {
+		return executeQuery(ctx, conn, &stmt, query)
+	}
+
+	ctx, connSpan := tracing.NewNamedSpan(ctx, "db.Conn")
+	conn, err := s.client.Conn(ctx)
+	connSpan.EndWithError(err)
+	if err != nil {
+		return 0, err
+	}
+	defer func() {
+		_, closeSpan := tracing.NewNamedSpan(ctx, "db.Conn.Close")
+		closeErr := conn.Close()
+		closeSpan.EndWithError(closeErr)
+	}()
 
 	return executeQuery(ctx, s.client.DB, &stmt, query)
 }

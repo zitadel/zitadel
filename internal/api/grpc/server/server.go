@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	grpc_api "github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/record"
 	"github.com/zitadel/zitadel/internal/query"
@@ -37,6 +38,7 @@ type WithGatewayPrefix interface {
 func CreateServer(
 	verifier authz.APITokenVerifier,
 	authConfig authz.Config,
+	client *database.DB,
 	queries *query.Queries,
 	hostHeaderName string,
 	externalDomain string,
@@ -51,17 +53,20 @@ func CreateServer(
 				middleware.DefaultTracingServer(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
+				// middleware.BeginMiddlewareTx(client),
 				middleware.InstanceInterceptor(queries, hostHeaderName, externalDomain, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
 				middleware.AccessStorageInterceptor(accessSvc),
 				middleware.ErrorHandler(),
 				middleware.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
+				// middleware.CloseMiddlewareTx(),
 				middleware.TranslationHandler(),
 				middleware.QuotaExhaustedInterceptor(accessSvc, system_pb.SystemService_ServiceDesc.ServiceName),
 				middleware.ExecutionHandler(queries),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
 				middleware.ActivityInterceptor(),
+				// middleware.BeginMiddlewareTx(client),
 			),
 		),
 	}

@@ -3,7 +3,7 @@ import { createOrg, removeOrg } from '../org';
 import { User, createHuman } from '../user';
 import { Trend } from 'k6/metrics';
 import { Config, MaxVUs } from '../config';
-import { createSession } from '../session';
+import { SessionClient, createSession } from '../session';
 import { check } from 'k6';
 
 export async function setup() {
@@ -13,19 +13,25 @@ export async function setup() {
   const org = await createOrg(tokens.accessToken!);
   console.log(`setup: org (${org.organizationId}) created`);
 
-  const humanPromises = Array.from({ length: MaxVUs() }, (_, i) => {
-    return createHuman(`zitizen-${i}`, org, tokens.accessToken!);
-  });
+  let humans = [];
 
-  const humans = (await Promise.all(humanPromises)).map((user) => {
-    return { userId: user.userId, loginName: user.loginNames[0], password: 'Password1!' };
-  });
+  for (let i = 0; i < MaxVUs(); i+=10) {
+    const humanPromises = Array.from({ length: 10 }, (_, ii) => {
+      return createHuman(`zitizen-${i+ii}`, org, tokens.accessToken!);
+    });
+
+    humans.push(...(await Promise.all(humanPromises)).map((user) => {
+      return { userId: user.userId, loginName: user.loginNames[0], password: 'Password1!' };
+    }));
+  }
+
   console.log(`setup: ${humans.length} users created`);
   return { tokens, users: humans, org };
 }
 
 const addSessionTrend = new Trend('add_session_duration', true);
 export default async function (data: any) {
+  SessionClient.connect(Config.host.replace("http://", ""), { plaintext: true });
   const start = new Date();
   const session = await createSession(data.users[__VU - 1], data.org, data.tokens.accessToken);
 
@@ -34,6 +40,7 @@ export default async function (data: any) {
   });
   
   addSessionTrend.add(new Date().getTime() - start.getTime());
+  SessionClient.close();
 }
 
 export function teardown(data: any) {

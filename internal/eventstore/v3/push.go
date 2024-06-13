@@ -19,34 +19,49 @@ import (
 )
 
 func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
+
+	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx.push")
 	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	tx, err := es.client.BeginTx(ctx, nil)
 	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		_, span := tracing.NewNamedSpan(ctx, "db.Close.push")
+		if err != nil {
+			_ = tx.Rollback()
+			span.End()
+			return
+		}
+		err = tx.Commit()
+		span.EndWithError(err)
+	}()
 	var (
 		sequences []*latestSequence
 	)
 
-	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
-		sequences, err = latestSequences(ctx, tx, commands)
-		if err != nil {
-			return err
-		}
+	// err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
+	sequences, err = latestSequences(ctx, tx, commands)
+	if err != nil {
+		return nil, err
+	}
 
-		events, err = insertEvents(ctx, tx, sequences, commands)
-		if err != nil {
-			return err
-		}
+	events, err = insertEvents(ctx, tx, sequences, commands)
+	if err != nil {
+		return nil, err
+	}
 
-		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
-			return err
-		}
+	if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+		return nil, err
+	}
 
-		return handleLookupCommands(ctx, tx, commands)
-	})
+	if err = handleLookupCommands(ctx, tx, commands); err != nil {
+		return nil, err
+	}
+	// })
 
 	if err != nil {
 		return nil, err

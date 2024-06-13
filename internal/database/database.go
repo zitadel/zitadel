@@ -11,6 +11,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/transaction"
 	_ "github.com/zitadel/zitadel/internal/database/cockroach"
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	_ "github.com/zitadel/zitadel/internal/database/postgres"
@@ -38,23 +39,36 @@ func (db *DB) Query(scan func(*sql.Rows) error, query string, args ...any) error
 	return db.QueryContext(context.Background(), scan, query, args...)
 }
 
-func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) (err error) {
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
-	spanBeginTx.EndWithError(err)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Info("commit of read only transaction failed")
-			return
-		}
-		err = tx.Commit()
-	}()
+type queryExecutor interface {
+	QueryContext(context.Context, string, ...any) (*sql.Rows, error)
+	QueryRowContext(context.Context, string, ...any) *sql.Row
+}
 
-	rows, err := tx.QueryContext(ctx, query, args...)
+func (db *DB) QueryContext(ctx context.Context, scan func(rows *sql.Rows) error, query string, args ...any) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.End()
+
+	var executor queryExecutor
+	if tx := transaction.FromContext(ctx); tx != nil {
+		executor = tx
+	} else {
+		ctx, span := tracing.NewNamedSpan(ctx, "db.Conn")
+		conn, err := db.DB.Conn(ctx)
+		span.EndWithError(err)
+		if err != nil {
+			return err
+		}
+		executor = conn
+		defer func() {
+			_, span := tracing.NewNamedSpan(ctx, "conn.Close")
+			logging.OnError(conn.Close()).Error("failed to close connection")
+			span.End()
+		}()
+	}
+
+	ctx, querySpan := tracing.NewNamedSpan(ctx, "db.executeQuery")
+	rows, err := executor.QueryContext(ctx, query, args...)
+	querySpan.EndWithError(err)
 	if err != nil {
 		return err
 	}
@@ -74,22 +88,29 @@ func (db *DB) QueryRow(scan func(*sql.Row) error, query string, args ...any) (er
 }
 
 func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error, query string, args ...any) (err error) {
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
-	spanBeginTx.EndWithError(err)
-	if err != nil {
-		return err
-	}
-	defer func() {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.End()
+	var executor queryExecutor
+	if tx := transaction.FromContext(ctx); tx != nil {
+		executor = tx
+	} else {
+		ctx, span := tracing.NewNamedSpan(ctx, "db.Conn")
+		conn, err := db.DB.Conn(ctx)
+		span.EndWithError(err)
 		if err != nil {
-			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Info("commit of read only transaction failed")
-			return
+			return err
 		}
-		err = tx.Commit()
-	}()
+		executor = conn
+		defer func() {
+			_, span := tracing.NewNamedSpan(ctx, "conn.Close")
+			logging.OnError(conn.Close()).Error("failed to close connection")
+			span.End()
+		}()
+	}
 
-	row := tx.QueryRowContext(ctx, query, args...)
+	ctx, querySpan := tracing.NewNamedSpan(ctx, "db.executeQueryRow")
+	row := executor.QueryRowContext(ctx, query, args...)
+	querySpan.EndWithError(row.Err())
 	logging.OnError(row.Err()).Error("unexpected query error")
 
 	err = scan(row)
@@ -99,9 +120,12 @@ func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error
 	return row.Err()
 }
 
-func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...any) (*T, error) {
+func QueryJSONObject[T any](ctx context.Context, db *DB, query string, args ...any) (_ *T, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.EndWithError(err)
+
 	var data []byte
-	err := db.QueryRowContext(ctx, func(row *sql.Row) error {
+	err = db.QueryRowContext(ctx, func(row *sql.Row) error {
 		return row.Scan(&data)
 	}, query, args...)
 	if errors.Is(err, sql.ErrNoRows) {
