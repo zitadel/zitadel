@@ -38,6 +38,9 @@ user_grants as (
 	where user_id = $1
 	and instance_id = $2
 	and project_id = any($3)
+	{{ if . -}}
+	and resource_owner = any($4)
+	{{- end }}
 ),
 -- filter all orgs we are interested in.
 orgs as (

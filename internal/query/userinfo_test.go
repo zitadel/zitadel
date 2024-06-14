@@ -48,10 +48,10 @@ var (
 )
 
 func TestQueries_GetOIDCUserInfo(t *testing.T) {
-	expQuery := regexp.QuoteMeta(oidcUserInfoQuery)
 	type args struct {
 		userID       string
 		roleAudience []string
+		roleOrgIDs   []string
 	}
 	tests := []struct {
 		name    string
@@ -65,7 +65,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock:    mockQueryErr(expQuery, sql.ErrConnDone, "231965491734773762", "instanceID", database.TextArray[string](nil)),
+			mock:    mockQueryErr(regexp.QuoteMeta(oidcUserInfoQuery), sql.ErrConnDone, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			wantErr: sql.ErrConnDone,
 		},
 		{
@@ -73,7 +73,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock:    mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoNotFound}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
+			mock:    mockQuery(regexp.QuoteMeta(oidcUserInfoQuery), []string{"json_build_object"}, []driver.Value{testdataUserInfoNotFound}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			wantErr: zerrors.ThrowNotFound(nil, "QUERY-ahs4S", "Errors.User.NotFound"),
 		},
 		{
@@ -81,7 +81,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoHumanNoMD}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
+			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQuery), []string{"json_build_object"}, []driver.Value{testdataUserInfoHumanNoMD}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
@@ -120,7 +120,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "231965491734773762",
 			},
-			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoHuman}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
+			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQuery), []string{"json_build_object"}, []driver.Value{testdataUserInfoHuman}, "231965491734773762", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "231965491734773762",
@@ -177,10 +177,114 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 				userID:       "231965491734773762",
 				roleAudience: []string{"236645808328409090", "240762134579904514"},
 			},
-			mock: mockQuery(expQuery,
+			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQuery),
 				[]string{"json_build_object"},
 				[]driver.Value{testdataUserInfoHumanGrants},
 				"231965491734773762", "instanceID", database.TextArray[string]{"236645808328409090", "240762134579904514"},
+			),
+			want: &OIDCUserInfo{
+				User: &User{
+					ID:                 "231965491734773762",
+					CreationDate:       time.Date(2023, time.September, 15, 6, 10, 7, 434142000, timeLocation),
+					ChangeDate:         time.Date(2023, time.November, 14, 13, 27, 2, 72318000, timeLocation),
+					Sequence:           1148,
+					State:              1,
+					ResourceOwner:      "231848297847848962",
+					Username:           "tim+tesmail@zitadel.com",
+					PreferredLoginName: "tim+tesmail@zitadel.com@demo.localhost",
+					Human: &Human{
+						FirstName:         "Tim",
+						LastName:          "Mohlmann",
+						NickName:          "muhlemmer",
+						DisplayName:       "Tim Mohlmann",
+						AvatarKey:         "",
+						PreferredLanguage: language.English,
+						Gender:            domain.GenderMale,
+						Email:             "tim+tesmail@zitadel.com",
+						IsEmailVerified:   true,
+						Phone:             "+40123456789",
+						IsPhoneVerified:   false,
+					},
+					Machine: nil,
+				},
+				Org: &UserInfoOrg{
+					ID:            "231848297847848962",
+					Name:          "demo",
+					PrimaryDomain: "demo.localhost",
+				},
+				Metadata: []UserMetadata{
+					{
+						CreationDate:  time.Date(2023, time.November, 14, 13, 26, 3, 553702000, timeLocation),
+						ChangeDate:    time.Date(2023, time.November, 14, 13, 26, 3, 553702000, timeLocation),
+						Sequence:      1147,
+						ResourceOwner: "231848297847848962",
+						Key:           "bar",
+						Value:         []byte("foo"),
+					},
+					{
+						CreationDate:  time.Date(2023, time.November, 14, 13, 25, 57, 171368000, timeLocation),
+						ChangeDate:    time.Date(2023, time.November, 14, 13, 25, 57, 171368000, timeLocation),
+						Sequence:      1146,
+						ResourceOwner: "231848297847848962",
+						Key:           "foo",
+						Value:         []byte("bar"),
+					},
+				},
+				UserGrants: []UserGrant{
+					{
+						ID:           "240749256523120642",
+						GrantID:      "",
+						State:        1,
+						CreationDate: time.Date(2023, time.November, 14, 20, 28, 59, 168208000, timeLocation),
+						ChangeDate:   time.Date(2023, time.November, 14, 20, 50, 58, 822391000, timeLocation),
+						Sequence:     2,
+						UserID:       "231965491734773762",
+						Roles: []string{
+							"role1",
+							"role2",
+						},
+						ResourceOwner:     "231848297847848962",
+						ProjectID:         "236645808328409090",
+						OrgName:           "demo",
+						OrgPrimaryDomain:  "demo.localhost",
+						ProjectName:       "tests",
+						UserResourceOwner: "231848297847848962",
+					},
+					{
+						ID:           "240762315572510722",
+						GrantID:      "",
+						State:        1,
+						CreationDate: time.Date(2023, time.November, 14, 22, 38, 42, 967317000, timeLocation),
+						ChangeDate:   time.Date(2023, time.November, 14, 22, 38, 42, 967317000, timeLocation),
+						Sequence:     1,
+						UserID:       "231965491734773762",
+						Roles: []string{
+							"role3",
+							"role4",
+						},
+						ResourceOwner:     "231848297847848962",
+						ProjectID:         "240762134579904514",
+						OrgName:           "demo",
+						OrgPrimaryDomain:  "demo.localhost",
+						ProjectName:       "tests2",
+						UserResourceOwner: "231848297847848962",
+					},
+				},
+			},
+		},
+		{
+			name: "human with metadata and grants, role orgIDs",
+			args: args{
+				userID:       "231965491734773762",
+				roleAudience: []string{"236645808328409090", "240762134579904514"},
+				roleOrgIDs:   []string{"231848297847848962"},
+			},
+			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoWithRoleOrgIDsQuery),
+				[]string{"json_build_object"},
+				[]driver.Value{testdataUserInfoHumanGrants},
+				"231965491734773762", "instanceID",
+				database.TextArray[string]{"236645808328409090", "240762134579904514"},
+				database.TextArray[string]{"231848297847848962"},
 			),
 			want: &OIDCUserInfo{
 				User: &User{
@@ -277,7 +381,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 			args: args{
 				userID: "240707570677841922",
 			},
-			mock: mockQuery(expQuery, []string{"json_build_object"}, []driver.Value{testdataUserInfoMachine}, "240707570677841922", "instanceID", database.TextArray[string](nil)),
+			mock: mockQuery(regexp.QuoteMeta(oidcUserInfoQuery), []string{"json_build_object"}, []driver.Value{testdataUserInfoMachine}, "240707570677841922", "instanceID", database.TextArray[string](nil)),
 			want: &OIDCUserInfo{
 				User: &User{
 					ID:                 "240707570677841922",
@@ -331,7 +435,7 @@ func TestQueries_GetOIDCUserInfo(t *testing.T) {
 				}
 				ctx := authz.NewMockContext("instanceID", "orgID", "loginClient")
 
-				got, err := q.GetOIDCUserInfo(ctx, tt.args.userID, tt.args.roleAudience)
+				got, err := q.GetOIDCUserInfo(ctx, tt.args.userID, tt.args.roleAudience, tt.args.roleOrgIDs...)
 				require.ErrorIs(t, err, tt.wantErr)
 				assert.Equal(t, tt.want, got)
 			})
