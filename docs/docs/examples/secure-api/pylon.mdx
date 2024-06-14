@@ -136,6 +136,8 @@ Now we will create a new Pylon service with the following endpoints:
 
 ### Create the service
 
+The following code demonstrates how to create a Pylon service with the required endpoints, it must be added to the `src/index.ts` file of your project:
+
 ```ts
 import {
   defineService,
@@ -145,7 +147,6 @@ import {
   getContext,
   ServiceError,
 } from "@getcronit/pylon";
-import { HTTPException } from "hono/http-exception";
 
 class User {
   id: string;
@@ -159,7 +160,7 @@ class User {
   }
 
   @requireAuth({ roles: ["read:messages"] })
-  messages() {
+  async messages() {
     return this.#messages;
   }
 
@@ -170,7 +171,16 @@ class User {
     const ctx = getContext();
     const id = ctx.get("auth")!.sub;
 
-    return User.users.find((user) => user.id === id);
+    const user = User.users.find((user) => user.id === id);
+
+    if (!user) {
+      throw new ServiceError("User not found", {
+        statusCode: 404,
+        code: "USER_NOT_FOUND",
+      });
+    }
+
+    return user;
   }
 
   @requireAuth()
@@ -188,7 +198,9 @@ class User {
       });
     }
 
-    const user = new User(auth.sub, auth.username || "unknown", []);
+    const user = new User(auth.sub, auth.username || "unknown", [
+      "Welcome to Pylon with ZITADEL!",
+    ]);
 
     User.users.push(user);
 
@@ -210,30 +222,35 @@ export const configureApp: PylonAPI["configureApp"] = (app) => {
   // Initialize the authentication middleware
   app.use("*", auth.initialize());
 
+  // Automatically try to create a user for each request for demonstration purposes
+  app.use(async (_, next) => {
+    try {
+      await User.create();
+    } catch {
+      // Ignore errors
+      // Fail silently if the user already exists
+    }
+
+    await next();
+  });
+
   app.get("/api/info", (c) => {
     return new Response("Public Data");
   });
 
-  app.get("/api/me", auth.require(), (c) => {
-    const id = c.get("auth")!.sub;
-
-    const user = User.users.find((user) => user.id === id);
+  // The `auth.require()` middleware is optional here, as the `User.me` method already checks for it.
+  app.get("/api/me", auth.require(), async (c) => {
+    const user = await User.me();
 
     return c.json(user);
   });
 
   // A role check for `read:messages` is not required here, as the `user.messages` method already checks for it.
-  app.get("/api/me/mesages", auth.require({ roles: [] }), (c) => {
-    const id = c.get("auth")!.sub;
-
-    const user = User.users.find((user) => user.id === id);
-
-    if (!user) {
-      throw new HTTPException(404, { message: "User not found" });
-    }
+  app.get("/api/me/messages", auth.require(), async (c) => {
+    const user = await User.me();
 
     // This will throw an error if the user does not have the `read:messages` role
-    return c.json(user.messages());
+    return c.json(await user.messages());
   });
 };
 ```
@@ -253,14 +270,21 @@ Optionally set the token as an environment variable:
 export TOKEN='MtjHodGy4zxKylDOhg6kW90WeEQs2q...'
 ```
 
+Now you have to start the Pylon service:
+
+```bash
+bun run develop
+```
+
 With the access token, you can then do the following calls:
 
 1. GraphQL:
 
 ```
-curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:3000/graphql?query={info}
-curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:3000/graphql?query={me{id name}}
-curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:3000/graphql?query={me{id name messages}}
+curl -H "Authorization: Bearer $TOKEN" -G http://localhost:3000/graphql --data-urlencode 'query={ info }'
+curl -H "Authorization: Bearer $TOKEN" -G http://localhost:3000/graphql --data-urlencode 'query={ me { id name } }'
+curl -H "Authorization: Bearer $TOKEN" -G http://localhost:3000/graphql --data-urlencode 'query={ me { id name messages } }'
+
 ```
 
 You can also visit the GraphQL playground at `http://localhost:3000/graphql` and execute the queries there.
