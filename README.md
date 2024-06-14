@@ -30,6 +30,9 @@
         <img src="./docs/static/logos/oidc-cert.png" /></a>
 </p>
 
+|Community Meeting|
+|------------------|
+|ZITADEL holds bi-weekly community calls. To join the community calls or to watch previous meeting notes and recordings, please visit the [meeting schedule](https://github.com/zitadel/zitadel/blob/main/MEETING_SCHEDULE.md).|
 
 Are you searching for a user management tool that is quickly set up like Auth0 and open source like Keycloak?
 

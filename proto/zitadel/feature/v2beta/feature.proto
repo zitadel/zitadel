@@ -33,3 +33,25 @@ message FeatureFlag {
     }
   ];
 }
+
+message ImprovedPerformanceFeatureFlag {
+  repeated ImprovedPerformance execution_paths = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[1]";
+      description: "Which of the performance improvements is enabled";
+    }
+  ];
+
+  Source source = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "The source where the setting of the feature was defined. The source may be the resource itself or a resource owner through inheritance.";
+    }
+  ];
+}
+
+enum ImprovedPerformance {
+  IMPROVED_PERFORMANCE_UNSPECIFIED = 0;
+  // Uses the eventstore to query the org by id
+  // instead of the sql table.
+  IMPROVED_PERFORMANCE_ORG_BY_ID = 1;
+}

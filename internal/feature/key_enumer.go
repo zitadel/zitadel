@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _KeyName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactions"
+const _KeyName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performance"
 
-var _KeyIndex = [...]uint8{0, 11, 28, 61, 81, 92, 106, 113}
+var _KeyIndex = [...]uint8{0, 11, 28, 61, 81, 92, 106, 113, 133}
 
-const _KeyLowerName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactions"
+const _KeyLowerName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performance"
 
 func (i Key) String() string {
 	if i < 0 || i >= Key(len(_KeyIndex)-1) {
@@ -31,9 +31,10 @@ func _KeyNoOp() {
 	_ = x[KeyUserSchema-(4)]
 	_ = x[KeyTokenExchange-(5)]
 	_ = x[KeyActions-(6)]
+	_ = x[KeyImprovedPerformance-(7)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActions}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActions, KeyImprovedPerformance}
 
 var _KeyNameToValueMap = map[string]Key{
 	_KeyName[0:11]:         KeyUnspecified,
@@ -50,6 +51,8 @@ var _KeyNameToValueMap = map[string]Key{
 	_KeyLowerName[92:106]:  KeyTokenExchange,
 	_KeyName[106:113]:      KeyActions,
 	_KeyLowerName[106:113]: KeyActions,
+	_KeyName[113:133]:      KeyImprovedPerformance,
+	_KeyLowerName[113:133]: KeyImprovedPerformance,
 }
 
 var _KeyNames = []string{
@@ -60,6 +63,7 @@ var _KeyNames = []string{
 	_KeyName[81:92],
 	_KeyName[92:106],
 	_KeyName[106:113],
+	_KeyName[113:133],
 }
 
 // KeyString retrieves an enum value from the enum constants string name.

@@ -21,7 +21,7 @@ import (
 )
 
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
-	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	_, instanceID, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t)
 	beforeTime := time.Now()
 	farPast := timestamppb.New(beforeTime.Add(-10 * time.Hour).UTC())

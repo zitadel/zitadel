@@ -26,6 +26,8 @@ type FirstInstance struct {
 	PatPath         string
 	Features        *command.InstanceFeatures
 
+	Skip bool
+
 	instanceSetup     command.InstanceSetup
 	userEncryptionKey *crypto.KeyConfig
 	smtpEncryptionKey *crypto.KeyConfig
@@ -42,6 +44,9 @@ type FirstInstance struct {
 }
 
 func (mig *FirstInstance) Execute(ctx context.Context, _ eventstore.Event) error {
+	if mig.Skip {
+		return nil
+	}
 	keyStorage, err := mig.verifyEncryptionKeys(ctx)
 	if err != nil {
 		return err

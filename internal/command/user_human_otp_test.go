@@ -620,7 +620,9 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 	ctx := authz.NewMockContext("", "org1", "user1")
 
 	cryptoAlg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
-	key, secret, err := domain.NewTOTPKey("example.com", "user1", cryptoAlg)
+	key, err := domain.NewTOTPKey("example.com", "user1")
+	require.NoError(t, err)
+	secret, err := crypto.Encrypt([]byte(key.Secret()), cryptoAlg)
 	require.NoError(t, err)
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	userAgg2 := &user.NewAggregate("user2", "org1").Aggregate

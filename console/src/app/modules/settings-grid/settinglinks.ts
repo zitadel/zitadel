@@ -36,7 +36,7 @@ export const APPEARANCE_GROUP: SettingLinks = {
 };
 
 export const PRIVACY_POLICY: SettingLinks = {
-  i18nTitle: 'SETTINGS.LIST.PRIVACYPOLICY',
+  i18nTitle: 'DESCRIPTIONS.SETTINGS.PRIVACY_POLICY.TITLE',
   i18nDesc: 'POLICY.PRIVACY_POLICY.DESCRIPTION',
   iamRouterLink: ['/settings'],
   orgRouterLink: ['/org-settings'],

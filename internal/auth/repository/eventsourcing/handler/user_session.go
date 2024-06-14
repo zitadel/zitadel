@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	es_model "github.com/zitadel/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/zitadel/zitadel/internal/user/repository/view/model"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -187,64 +187,163 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 	}
 }
 
+func sessionColumns(event eventstore.Event, columns ...handler.Column) ([]handler.Column, error) {
+	userAgent, err := agentIDFromSession(event)
+	if err != nil {
+		return nil, err
+	}
+	return append([]handler.Column{
+		handler.NewCol(view_model.UserSessionKeyUserAgentID, userAgent),
+		handler.NewCol(view_model.UserSessionKeyUserID, event.Aggregate().ID),
+		handler.NewCol(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+		handler.NewCol(view_model.UserSessionKeyCreationDate, handler.OnlySetValueOnInsert(userSessionTable, event.CreatedAt())),
+		handler.NewCol(view_model.UserSessionKeyChangeDate, event.CreatedAt()),
+		handler.NewCol(view_model.UserSessionKeyResourceOwner, event.Aggregate().ResourceOwner),
+		handler.NewCol(view_model.UserSessionKeySequence, event.Sequence()),
+	}, columns...), nil
+}
+
 func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err error) {
+	// in case anything needs to be change here check if appendEvent function needs the change as well
 	switch event.Type() {
 	case user.UserV1PasswordCheckSucceededType,
-		user.UserV1PasswordCheckFailedType,
-		user.UserV1MFAOTPCheckSucceededType,
-		user.UserV1MFAOTPCheckFailedType,
-		user.UserV1SignedOutType,
-		user.HumanPasswordCheckSucceededType,
-		user.HumanPasswordCheckFailedType,
-		user.UserIDPLoginCheckSucceededType,
-		user.HumanMFAOTPCheckSucceededType,
+		user.HumanPasswordCheckSucceededType:
+		columns, err := sessionColumns(event,
+			handler.NewCol(view_model.UserSessionKeyPasswordVerification, event.CreatedAt()),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.UserV1PasswordCheckFailedType,
+		user.HumanPasswordCheckFailedType:
+		columns, err := sessionColumns(event,
+			handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.UserV1MFAOTPCheckSucceededType,
+		user.HumanMFAOTPCheckSucceededType:
+		columns, err := sessionColumns(event,
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, event.CreatedAt()),
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerificationType, domain.MFATypeTOTP),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.UserV1MFAOTPCheckFailedType,
 		user.HumanMFAOTPCheckFailedType,
-		user.HumanU2FTokenCheckSucceededType,
-		user.HumanU2FTokenCheckFailedType,
-		user.HumanPasswordlessTokenCheckSucceededType,
-		user.HumanPasswordlessTokenCheckFailedType,
+		user.HumanU2FTokenCheckFailedType:
+		columns, err := sessionColumns(event,
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.UserV1SignedOutType,
 		user.HumanSignedOutType:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			var session *view_model.UserSessionView
-			eventData, err := view_model.UserSessionFromEvent(event)
-			if err != nil {
-				return err
-			}
-			session, err = u.view.UserSessionByIDs(eventData.UserAgentID, event.Aggregate().ID, event.Aggregate().InstanceID)
-			if err != nil {
-				if !zerrors.IsNotFound(err) {
-					return err
-				}
-				session = &view_model.UserSessionView{
-					CreationDate:  event.CreatedAt(),
-					ResourceOwner: event.Aggregate().ResourceOwner,
-					UserAgentID:   eventData.UserAgentID,
-					UserID:        event.Aggregate().ID,
-					State:         int32(domain.UserSessionStateActive),
-					InstanceID:    event.Aggregate().InstanceID,
-				}
-			}
-			return u.updateSession(session, event)
-		}), nil
+		columns, err := sessionColumns(event,
+			handler.NewCol(view_model.UserSessionKeyPasswordlessVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerificationType, domain.MFALevelNotSetUp),
+			handler.NewCol(view_model.UserSessionKeyMultiFactorVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeyMultiFactorVerificationType, domain.MFALevelNotSetUp),
+			handler.NewCol(view_model.UserSessionKeyExternalLoginVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateTerminated),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.UserIDPLoginCheckSucceededType:
+		data := new(es_model.AuthRequest)
+		err := data.SetData(event)
+		if err != nil {
+			return nil, err
+		}
+		columns, err := sessionColumns(event,
+			handler.NewCol(view_model.UserSessionKeyExternalLoginVerification, event.CreatedAt()),
+			handler.NewCol(view_model.UserSessionKeySelectedIDPConfigID, data.SelectedIDPConfigID),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.HumanU2FTokenCheckSucceededType:
+		data := new(es_model.AuthRequest)
+		err := data.SetData(event)
+		if err != nil {
+			return nil, err
+		}
+		columns, err := sessionColumns(event,
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, event.CreatedAt()),
+			handler.NewCol(view_model.UserSessionKeySecondFactorVerificationType, domain.MFATypeU2F),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.HumanPasswordlessTokenCheckSucceededType:
+		data := new(es_model.AuthRequest)
+		err := data.SetData(event)
+		if err != nil {
+			return nil, err
+		}
+		columns, err := sessionColumns(event,
+			handler.NewCol(view_model.UserSessionKeyPasswordlessVerification, event.CreatedAt()),
+			handler.NewCol(view_model.UserSessionKeyMultiFactorVerification, event.CreatedAt()),
+			handler.NewCol(view_model.UserSessionKeyMultiFactorVerificationType, domain.MFATypeU2FUserVerification),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
+	case user.HumanPasswordlessTokenCheckFailedType:
+		data := new(es_model.AuthRequest)
+		err := data.SetData(event)
+		if err != nil {
+			return nil, err
+		}
+		columns, err := sessionColumns(event,
+			handler.NewCol(view_model.UserSessionKeyPasswordlessVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeyMultiFactorVerification, time.Time{}),
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserLockedType,
 		user.UserDeactivatedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("passwordless_verification", time.Time{}),
-				handler.NewCol("password_verification", time.Time{}),
-				handler.NewCol("second_factor_verification", time.Time{}),
-				handler.NewCol("second_factor_verification_type", domain.MFALevelNotSetUp),
-				handler.NewCol("multi_factor_verification", time.Time{}),
-				handler.NewCol("multi_factor_verification_type", domain.MFALevelNotSetUp),
-				handler.NewCol("external_login_verification", time.Time{}),
-				handler.NewCol("state", domain.UserSessionStateTerminated),
-				handler.NewCol("change_date", event.CreatedAt()),
-				handler.NewCol("sequence", event.Sequence()),
+				handler.NewCol(view_model.UserSessionKeyPasswordlessVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeySecondFactorVerificationType, domain.MFALevelNotSetUp),
+				handler.NewCol(view_model.UserSessionKeyMultiFactorVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeyMultiFactorVerificationType, domain.MFALevelNotSetUp),
+				handler.NewCol(view_model.UserSessionKeyExternalLoginVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateTerminated),
+				handler.NewCol(view_model.UserSessionKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.UserSessionKeySequence, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond("instance_id", event.Aggregate().InstanceID),
-				handler.NewCond("user_id", event.Aggregate().ID),
-				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
+				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserSessionKeyUserID, event.Aggregate().ID),
+				handler.Not(handler.NewCond(view_model.UserSessionKeyState, domain.UserSessionStateTerminated)),
 			},
 		), nil
 	case user.UserV1PasswordChangedType,
@@ -256,26 +355,26 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		return handler.NewMultiStatement(event,
 			handler.AddUpdateStatement(
 				[]handler.Column{
-					handler.NewCol("password_verification", event.CreatedAt()),
-					handler.NewCol("change_date", event.CreatedAt()),
-					handler.NewCol("sequence", event.Sequence()),
+					handler.NewCol(view_model.UserSessionKeyPasswordVerification, event.CreatedAt()),
+					handler.NewCol(view_model.UserSessionKeyChangeDate, event.CreatedAt()),
+					handler.NewCol(view_model.UserSessionKeySequence, event.Sequence()),
 				},
 				[]handler.Condition{
-					handler.NewCond("instance_id", event.Aggregate().InstanceID),
-					handler.NewCond("user_id", event.Aggregate().ID),
-					handler.NewCond("user_agent_id", userAgent),
+					handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+					handler.NewCond(view_model.UserSessionKeyUserID, event.Aggregate().ID),
+					handler.NewCond(view_model.UserSessionKeyUserAgentID, userAgent),
 				}),
 			handler.AddUpdateStatement(
 				[]handler.Column{
-					handler.NewCol("password_verification", time.Time{}),
-					handler.NewCol("change_date", event.CreatedAt()),
-					handler.NewCol("sequence", event.Sequence()),
+					handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
+					handler.NewCol(view_model.UserSessionKeyChangeDate, event.CreatedAt()),
+					handler.NewCol(view_model.UserSessionKeySequence, event.Sequence()),
 				},
 				[]handler.Condition{
-					handler.NewCond("instance_id", event.Aggregate().InstanceID),
-					handler.NewCond("user_id", event.Aggregate().ID),
-					handler.Not(handler.NewCond("user_agent_id", userAgent)),
-					handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
+					handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+					handler.NewCond(view_model.UserSessionKeyUserID, event.Aggregate().ID),
+					handler.Not(handler.NewCond(view_model.UserSessionKeyUserAgentID, userAgent)),
+					handler.Not(handler.NewCond(view_model.UserSessionKeyState, domain.UserSessionStateTerminated)),
 				}),
 		), nil
 	case user.UserV1MFAOTPRemovedType,
@@ -283,84 +382,77 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		user.HumanU2FTokenRemovedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("second_factor_verification", time.Time{}),
-				handler.NewCol("change_date", event.CreatedAt()),
-				handler.NewCol("sequence", event.Sequence()),
+				handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.UserSessionKeySequence, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond("instance_id", event.Aggregate().InstanceID),
-				handler.NewCond("user_id", event.Aggregate().ID),
-				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
+				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserSessionKeyUserID, event.Aggregate().ID),
+				handler.Not(handler.NewCond(view_model.UserSessionKeyState, domain.UserSessionStateTerminated)),
 			},
 		), nil
 	case user.UserIDPLinkRemovedType,
 		user.UserIDPLinkCascadeRemovedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("external_login_verification", time.Time{}),
-				handler.NewCol("selected_idp_config_id", ""),
-				handler.NewCol("change_date", event.CreatedAt()),
-				handler.NewCol("sequence", event.Sequence()),
+				handler.NewCol(view_model.UserSessionKeyExternalLoginVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeySelectedIDPConfigID, ""),
+				handler.NewCol(view_model.UserSessionKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.UserSessionKeySequence, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond("instance_id", event.Aggregate().InstanceID),
-				handler.NewCond("user_id", event.Aggregate().ID),
-				handler.Not(handler.NewCond("selected_idp_config_id", "")),
+				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserSessionKeyUserID, event.Aggregate().ID),
+				handler.Not(handler.NewCond(view_model.UserSessionKeySelectedIDPConfigID, "")),
 			},
 		), nil
 	case user.HumanPasswordlessTokenRemovedType:
 		return handler.NewUpdateStatement(event,
 			[]handler.Column{
-				handler.NewCol("passwordless_verification", time.Time{}),
-				handler.NewCol("multi_factor_verification", time.Time{}),
-				handler.NewCol("change_date", event.CreatedAt()),
-				handler.NewCol("sequence", event.Sequence()),
+				handler.NewCol(view_model.UserSessionKeyPasswordlessVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeyMultiFactorVerification, time.Time{}),
+				handler.NewCol(view_model.UserSessionKeyChangeDate, event.CreatedAt()),
+				handler.NewCol(view_model.UserSessionKeySequence, event.Sequence()),
 			},
 			[]handler.Condition{
-				handler.NewCond("instance_id", event.Aggregate().InstanceID),
-				handler.NewCond("user_id", event.Aggregate().ID),
-				handler.Not(handler.NewCond("state", domain.UserSessionStateTerminated)),
+				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserSessionKeyUserID, event.Aggregate().ID),
+				handler.Not(handler.NewCond(view_model.UserSessionKeyState, domain.UserSessionStateTerminated)),
 			},
 		), nil
 	case user.UserRemovedType:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return u.view.DeleteUserSessions(event.Aggregate().ID, event.Aggregate().InstanceID)
-		}), nil
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserSessionKeyUserID, event.Aggregate().ID),
+			},
+		), nil
 	case user.HumanRegisteredType:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			eventData, err := view_model.UserSessionFromEvent(event)
-			if err != nil {
-				return err
-			}
-			session := &view_model.UserSessionView{
-				CreationDate:         event.CreatedAt(),
-				ResourceOwner:        event.Aggregate().ResourceOwner,
-				UserAgentID:          eventData.UserAgentID,
-				UserID:               event.Aggregate().ID,
-				State:                int32(domain.UserSessionStateActive),
-				InstanceID:           event.Aggregate().InstanceID,
-				PasswordVerification: event.CreatedAt(),
-			}
-			return u.updateSession(session, event)
-		}), nil
+		columns, err := sessionColumns(event,
+			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
+			handler.NewCol(view_model.UserSessionKeyPasswordVerification, event.CreatedAt()),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return handler.NewCreateStatement(event,
+			columns,
+		), nil
 	case instance.InstanceRemovedEventType:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return u.view.DeleteInstanceUserSessions(event.Aggregate().InstanceID)
-		}), nil
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+			},
+		), nil
 	case org.OrgRemovedEventType:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return u.view.DeleteOrgUserSessions(event)
-		}), nil
+		return handler.NewDeleteStatement(event,
+			[]handler.Condition{
+				handler.NewCond(view_model.UserSessionKeyInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(view_model.UserSessionKeyResourceOwner, event.Aggregate().ResourceOwner),
+			},
+		), nil
 	default:
-		return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
-			return nil
-		}), nil
+		return handler.NewNoOpStatement(event), nil
 	}
-}
-
-func (u *UserSession) updateSession(session *view_model.UserSessionView, event eventstore.Event) error {
-	if err := session.AppendEvent(event); err != nil {
-		return err
-	}
-	return u.view.PutUserSession(session)
 }

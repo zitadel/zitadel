@@ -181,7 +181,7 @@ As a user of the ZITADEL Cloud Customer Portal, you now can create multiple inst
 
 ![Add Role](/img/guides/quickstart/25.png)
 
-### 6. Add authorizations to your project
+### 6. Add authorizations to your project (optional)
 
 1. Click on “Authorizations” on the top menu.
 
@@ -353,7 +353,7 @@ The provided config extends the `UserManagerSettings` of the `oidc-client-ts` li
 - redirect_uri (the URL to redirect to after the authorization flow is complete)
 - post_logout_redirect_uri (the URL to redirect to after the user logs out)
 - scope (the permissions requested from the user)
-- project_resource_id (To add a ZITADEL project scope. `urn:zitadel:iam:org:project:id:[projectId]:aud` and `urn:zitadel:iam:org:projects:roles` [scopes](https://zitadel.com/docs/apis/openidoauth/scopes#reserved-scopes).)
+- project_resource_id (To add a ZITADEL project scope. `urn:zitadel:iam:org:project:id:[projectId]:aud` and `urn:zitadel:iam:org:projects:roles` [scopes](/docs/apis/openidoauth/scopes#reserved-scopes).)
 - prompt ([the OIDC prompt parameter](/apis/openidoauth/endpoints#additional-parameters))
 
 2. Create a folder named components in the src directory. Create two files named Login.js and Callback.js.
@@ -412,4 +412,4 @@ And this brings us to the end of this quick start guide!
 
 This tutorial covered how to configure ZITADEL and how to use React to build an app that communicates with ZITADEL to access secured resources.
 
-We hope you enjoyed the tutorial and encourage you to check out the ZITADEL [documentation](https://zitadel.com/docs) for more information on how to use the ZITADEL platform to its full potential. Thanks for joining us!
+We hope you enjoyed the tutorial and encourage you to check out the ZITADEL [documentation](/docs) for more information on how to use the ZITADEL platform to its full potential. Thanks for joining us!

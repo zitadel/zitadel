@@ -505,6 +505,7 @@ Errors:
     IDPMissing: リクエストにIDP IDが含まれていません
     IDPInvalid: リクエストのIDPが無効
     ResponseInvalid: IDPの回答は無効
+    MissingSingleMappingAttribute: マッピング属性が含まれていない、または複数の値がある
     SuccessURLMissing: リクエストに成功時の URL がありません
     FailureURLMissing: リクエストに失敗の URL がありません
     StateMissing: リクエストに State パラメータがありません
@@ -603,6 +604,7 @@ EventTypes:
         failed: 初期化チェックの失敗
     token:
       added: アクセストークンの作成
+      v2.added: アクセストークンの作成
       removed: アクセストークンの削除
     impersonated: ユーザーがなりすました
     username:

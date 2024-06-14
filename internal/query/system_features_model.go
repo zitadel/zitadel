@@ -28,7 +28,12 @@ func (m *SystemFeaturesReadModel) Reduce() error {
 		case *feature_v2.ResetEvent:
 			m.reduceReset()
 		case *feature_v2.SetEvent[bool]:
-			err := m.reduceBoolFeature(e)
+			err := reduceSystemFeatureSet(m.system, e)
+			if err != nil {
+				return err
+			}
+		case *feature_v2.SetEvent[[]feature.ImprovedPerformanceType]:
+			err := reduceSystemFeatureSet(m.system, e)
 			if err != nil {
 				return err
 			}
@@ -51,41 +56,38 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemUserSchemaEventType,
 			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemActionsEventType,
+			feature_v2.SystemImprovedPerformanceEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
 
 func (m *SystemFeaturesReadModel) reduceReset() {
+	m.system = nil
 	m.system = new(SystemFeatures)
 }
 
-func (m *SystemFeaturesReadModel) reduceBoolFeature(event *feature_v2.SetEvent[bool]) error {
+func reduceSystemFeatureSet[T any](features *SystemFeatures, event *feature_v2.SetEvent[T]) error {
 	level, key, err := event.FeatureInfo()
 	if err != nil {
 		return err
 	}
-	var dst *FeatureSource[bool]
-
 	switch key {
 	case feature.KeyUnspecified:
 		return nil
 	case feature.KeyLoginDefaultOrg:
-		dst = &m.system.LoginDefaultOrg
+		features.LoginDefaultOrg.set(level, event.Value)
 	case feature.KeyTriggerIntrospectionProjections:
-		dst = &m.system.TriggerIntrospectionProjections
+		features.TriggerIntrospectionProjections.set(level, event.Value)
 	case feature.KeyLegacyIntrospection:
-		dst = &m.system.LegacyIntrospection
+		features.LegacyIntrospection.set(level, event.Value)
 	case feature.KeyUserSchema:
-		dst = &m.system.UserSchema
+		features.UserSchema.set(level, event.Value)
 	case feature.KeyTokenExchange:
-		dst = &m.system.TokenExchange
+		features.TokenExchange.set(level, event.Value)
 	case feature.KeyActions:
-		dst = &m.system.Actions
-	}
-
-	*dst = FeatureSource[bool]{
-		Level: level,
-		Value: event.Value,
+		features.Actions.set(level, event.Value)
+	case feature.KeyImprovedPerformance:
+		features.ImprovedPerformance.set(level, event.Value)
 	}
 	return nil
 }

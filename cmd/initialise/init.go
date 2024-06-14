@@ -19,6 +19,7 @@ var (
 
 	createUserStmt           string
 	grantStmt                string
+	settingsStmt             string
 	databaseStmt             string
 	createEventstoreStmt     string
 	createProjectionsStmt    string
@@ -39,7 +40,7 @@ func New() *cobra.Command {
 		Long: `Sets up the minimum requirements to start ZITADEL.
 
 Prerequisites:
-- cockroachDB
+- database (PostgreSql or cockroachdb)
 
 The user provided by flags needs privileges to
 - create the database if it does not exist
@@ -53,7 +54,7 @@ The user provided by flags needs privileges to
 		},
 	}
 
-	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant())
+	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant(), newSettings())
 	return cmd
 }
 
@@ -62,6 +63,7 @@ func InitAll(ctx context.Context, config *Config) {
 		VerifyUser(config.Database.Username(), config.Database.Password()),
 		VerifyDatabase(config.Database.DatabaseName()),
 		VerifyGrant(config.Database.DatabaseName(), config.Database.Username()),
+		VerifySettings(config.Database.DatabaseName(), config.Database.Username()),
 	)
 	logging.OnError(err).Fatal("unable to initialize the database")
 
@@ -143,6 +145,11 @@ func ReadStmts(typ string) (err error) {
 	}
 
 	createUniqueConstraints, err = readStmt(typ, "10_unique_constraints_table")
+	if err != nil {
+		return err
+	}
+
+	settingsStmt, err = readStmt(typ, "11_settings")
 	if err != nil {
 		return err
 	}

@@ -505,6 +505,7 @@ Errors:
       NoChallenge: Сеанс без вызова WebAuthN
   Intent:
     IDPMissing: В запросе отсутствует идентификатор IDP
+    MissingSingleMappingAttribute: Не содержит атрибут сопоставления или имеет более одного значения
     SuccessURLMissing: В запросе отсутствует URL-адрес успешного выполнения
     FailureURLMissing: В запросе отсутствует URL-адрес ошибки
     StateMissing: В запросе отсутствует параметр State
@@ -603,6 +604,7 @@ EventTypes:
         failed: Проверка инициализации не удалась
     token:
       added: Токен доступа создан
+      v2.added: Токен доступа создан
       removed: Токен доступа удалён
     impersonated: Пользователь олицетворяет себя
     username:

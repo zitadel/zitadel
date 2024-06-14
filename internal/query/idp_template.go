@@ -155,12 +155,14 @@ type AppleIDPTemplate struct {
 }
 
 type SAMLIDPTemplate struct {
-	IDPID             string
-	Metadata          []byte
-	Key               *crypto.CryptoValue
-	Certificate       []byte
-	Binding           string
-	WithSignedRequest bool
+	IDPID                         string
+	Metadata                      []byte
+	Key                           *crypto.CryptoValue
+	Certificate                   []byte
+	Binding                       string
+	WithSignedRequest             bool
+	NameIDFormat                  sql.Null[domain.SAMLNameIDFormat]
+	TransientMappingAttributeName string
 }
 
 var (
@@ -700,6 +702,14 @@ var (
 		name:  projection.SAMLWithSignedRequestCol,
 		table: samlIdpTemplateTable,
 	}
+	SAMLNameIDFormatCol = Column{
+		name:  projection.SAMLNameIDFormatCol,
+		table: samlIdpTemplateTable,
+	}
+	SAMLTransientMappingAttributeNameCol = Column{
+		name:  projection.SAMLTransientMappingAttributeName,
+		table: samlIdpTemplateTable,
+	}
 )
 
 // IDPTemplateByID searches for the requested id
@@ -883,6 +893,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			SAMLCertificateCol.identifier(),
 			SAMLBindingCol.identifier(),
 			SAMLWithSignedRequestCol.identifier(),
+			SAMLNameIDFormatCol.identifier(),
+			SAMLTransientMappingAttributeNameCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -997,6 +1009,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			var samlCertificate []byte
 			samlBinding := sql.NullString{}
 			samlWithSignedRequest := sql.NullBool{}
+			samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
+			samlTransientMappingAttributeName := sql.NullString{}
 
 			ldapID := sql.NullString{}
 			ldapServers := database.TextArray[string]{}
@@ -1109,6 +1123,8 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&samlCertificate,
 				&samlBinding,
 				&samlWithSignedRequest,
+				&samlNameIDFormat,
+				&samlTransientMappingAttributeName,
 				// ldap
 				&ldapID,
 				&ldapServers,
@@ -1237,12 +1253,14 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			}
 			if samlID.Valid {
 				idpTemplate.SAMLIDPTemplate = &SAMLIDPTemplate{
-					IDPID:             samlID.String,
-					Metadata:          samlMetadata,
-					Key:               samlKey,
-					Certificate:       samlCertificate,
-					Binding:           samlBinding.String,
-					WithSignedRequest: samlWithSignedRequest.Bool,
+					IDPID:                         samlID.String,
+					Metadata:                      samlMetadata,
+					Key:                           samlKey,
+					Certificate:                   samlCertificate,
+					Binding:                       samlBinding.String,
+					WithSignedRequest:             samlWithSignedRequest.Bool,
+					NameIDFormat:                  samlNameIDFormat,
+					TransientMappingAttributeName: samlTransientMappingAttributeName.String,
 				}
 			}
 			if ldapID.Valid {
@@ -1370,6 +1388,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			SAMLCertificateCol.identifier(),
 			SAMLBindingCol.identifier(),
 			SAMLWithSignedRequestCol.identifier(),
+			SAMLNameIDFormatCol.identifier(),
+			SAMLTransientMappingAttributeNameCol.identifier(),
 			// ldap
 			LDAPIDCol.identifier(),
 			LDAPServersCol.identifier(),
@@ -1489,6 +1509,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				var samlCertificate []byte
 				samlBinding := sql.NullString{}
 				samlWithSignedRequest := sql.NullBool{}
+				samlNameIDFormat := sql.Null[domain.SAMLNameIDFormat]{}
+				samlTransientMappingAttributeName := sql.NullString{}
 
 				ldapID := sql.NullString{}
 				ldapServers := database.TextArray[string]{}
@@ -1601,6 +1623,8 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&samlCertificate,
 					&samlBinding,
 					&samlWithSignedRequest,
+					&samlNameIDFormat,
+					&samlTransientMappingAttributeName,
 					// ldap
 					&ldapID,
 					&ldapServers,
@@ -1728,12 +1752,14 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				}
 				if samlID.Valid {
 					idpTemplate.SAMLIDPTemplate = &SAMLIDPTemplate{
-						IDPID:             samlID.String,
-						Metadata:          samlMetadata,
-						Key:               samlKey,
-						Certificate:       samlCertificate,
-						Binding:           samlBinding.String,
-						WithSignedRequest: samlWithSignedRequest.Bool,
+						IDPID:                         samlID.String,
+						Metadata:                      samlMetadata,
+						Key:                           samlKey,
+						Certificate:                   samlCertificate,
+						Binding:                       samlBinding.String,
+						WithSignedRequest:             samlWithSignedRequest.Bool,
+						NameIDFormat:                  samlNameIDFormat,
+						TransientMappingAttributeName: samlTransientMappingAttributeName.String,
 					}
 				}
 				if ldapID.Valid {

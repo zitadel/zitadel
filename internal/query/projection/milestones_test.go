@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
+	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -272,6 +273,43 @@ func TestMilestonesProjection_reduces(t *testing.T) {
 				sequence:      15,
 				executer: &testExecuter{
 					// TODO: This can be optimized to only use one statement with OR
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",
+							expectedArgs: []interface{}{
+								now,
+								"instance-id",
+								milestone.AuthenticationSucceededOnInstance,
+							},
+						},
+						{
+							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (NOT (ignore_client_ids @> $4)) AND (reached_date IS NULL)",
+							expectedArgs: []interface{}{
+								now,
+								"instance-id",
+								milestone.AuthenticationSucceededOnApplication,
+								database.TextArray[string]{"client-id"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceOIDCSessionAdded",
+			args: args{
+				event: getEvent(timedTestEvent(
+					oidcsession.AddedType,
+					oidcsession.AggregateType,
+					[]byte(`{"clientID": "client-id"}`),
+					now,
+				), eventstore.GenericEventMapper[oidcsession.AddedEvent]),
+			},
+			reduce: (&milestoneProjection{}).reduceOIDCSessionAdded,
+			want: wantReduce{
+				aggregateType: eventstore.AggregateType("oidc_session"),
+				sequence:      15,
+				executer: &testExecuter{
 					executions: []execution{
 						{
 							expectedStmt: "UPDATE projections.milestones SET reached_date = $1 WHERE (instance_id = $2) AND (type = $3) AND (reached_date IS NULL)",

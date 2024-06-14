@@ -5,9 +5,9 @@ import (
 	"slices"
 	"time"
 
-	"github.com/zitadel/oidc/v3/pkg/crypto"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -134,13 +134,16 @@ func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token 
 		return idTokenClaimsToExchangeToken(claims, resourceOwner), nil
 
 	case oidc.JWTTokenType:
-		resourceOwner := new(string)
-		verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, client.client.ClockSkew, s.jwtProfileUserCheck(ctx, resourceOwner))
+		var (
+			resourceOwner     string
+			preferredLanguage *language.Tag
+		)
+		verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, client.client.ClockSkew, s.jwtProfileUserCheck(ctx, &resourceOwner, &preferredLanguage))
 		jwt, err := op.VerifyJWTAssertion(ctx, token, verifier)
 		if err != nil {
 			return nil, zerrors.ThrowPermissionDenied(err, "OIDC-eiS6o", "Errors.TokenExchange.Token.Invalid")
 		}
-		return jwtToExchangeToken(jwt, *resourceOwner), nil
+		return jwtToExchangeToken(jwt, resourceOwner, preferredLanguage), nil
 
 	case UserIDTokenType:
 		user, err := s.query.GetUserByID(ctx, false, token)
@@ -156,19 +159,24 @@ func (s *Server) verifyExchangeToken(ctx context.Context, client *Client, token 
 	}
 }
 
-func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string) op.JWTProfileVerifierOption {
+// jwtProfileUserCheck finds the user by subject (user ID) and sets the resourceOwner through the pointer.
+// preferred Language is set only if it was defined for a Human user, else the pointed pointer remains nil.
+func (s *Server) jwtProfileUserCheck(ctx context.Context, resourceOwner *string, preferredLanguage **language.Tag) op.JWTProfileVerifierOption {
 	return op.SubjectCheck(func(request *oidc.JWTTokenRequest) error {
 		user, err := s.query.GetUserByID(ctx, false, request.Subject)
 		if err != nil {
 			return zerrors.ThrowPermissionDenied(err, "OIDC-Nee6r", "Errors.TokenExchange.Token.Invalid")
 		}
 		*resourceOwner = user.ResourceOwner
+		if user.Human != nil && !user.Human.PreferredLanguage.IsRoot() {
+			*preferredLanguage = &user.Human.PreferredLanguage
+		}
 		return nil
 	})
 }
 
 func validateTokenExchangeScopes(client *Client, requestedScopes, subjectScopes, actorScopes []string) ([]string, error) {
-	// Scope always has 1 empty string is the space delimited array was an empty string.
+	// Scope always has 1 empty string if the space delimited array was an empty string.
 	scopes := slices.DeleteFunc(requestedScopes, func(s string) bool {
 		return s == ""
 	})
@@ -210,21 +218,8 @@ func validateTokenExchangeAudience(requestedAudience, subjectAudience, actorAudi
 // Both tokens may point to the same object (subjectToken) in case of a regular Token Exchange.
 // When the subject and actor Tokens point to different objects, the new tokens will be for impersonation / delegation.
 func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenType, client *Client, subjectToken, actorToken *exchangeToken, audience, scopes []string) (_ *oidc.TokenExchangeResponse, err error) {
-	var (
-		userInfo   *oidc.UserInfo
-		signingKey op.SigningKey
-	)
-	if slices.Contains(scopes, oidc.ScopeOpenID) || tokenType == oidc.JWTTokenType || tokenType == oidc.IDTokenType {
-		projectID := client.client.ProjectID
-		userInfo, err = s.userInfo(ctx, subjectToken.userID, scopes, projectID, client.client.ProjectRoleAssertion, false)
-		if err != nil {
-			return nil, err
-		}
-		signingKey, err = s.Provider().Storage().SigningKey(ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
+	getUserInfo := s.getUserInfo(subjectToken.userID, client.client.ProjectID, client.client.ProjectRoleAssertion, client.IDTokenUserinfoClaimsAssertion(), scopes)
+	getSigner := s.getSignerOnce()
 
 	resp := &oidc.TokenExchangeResponse{
 		Scopes: scopes,
@@ -237,21 +232,23 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 		actor = actorToken.nestedActor()
 	}
 
+	var sessionID string
 	switch tokenType {
 	case oidc.AccessTokenType, "":
-		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeAccessToken(ctx, client, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.AccessToken, resp.RefreshToken, sessionID, resp.ExpiresIn, err = s.createExchangeAccessToken(ctx, client, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, subjectToken.preferredLanguage, reason, actor)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.AccessTokenType
 
 	case oidc.JWTTokenType:
-		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeJWT(ctx, signingKey, client, subjectToken.resourceOwner, subjectToken.userID, audience, scopes, actorToken.authMethods, actorToken.authTime, reason, actor, userInfo.Claims)
+		resp.AccessToken, resp.RefreshToken, resp.ExpiresIn, err = s.createExchangeJWT(ctx, client, getUserInfo, client.client.AccessTokenRoleAssertion, getSigner, subjectToken.userID, subjectToken.resourceOwner, audience, scopes, actorToken.authMethods, actorToken.authTime, subjectToken.preferredLanguage, reason, actor)
 		resp.TokenType = oidc.BearerToken
 		resp.IssuedTokenType = oidc.JWTTokenType
 
 	case oidc.IDTokenType:
-		resp.AccessToken, resp.ExpiresIn, err = s.createExchangeIDToken(ctx, signingKey, client, subjectToken.userID, "", audience, userInfo, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.AccessToken, resp.ExpiresIn, err = s.createIDToken(ctx, client, getUserInfo, client.client.IDTokenRoleAssertion, getSigner, "", resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, "", actor)
 		resp.TokenType = TokenTypeNA
 		resp.IssuedTokenType = oidc.IDTokenType
+
 	case oidc.RefreshTokenType, UserIDTokenType:
 		fallthrough
 	default:
@@ -262,7 +259,7 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	}
 
 	if slices.Contains(scopes, oidc.ScopeOpenID) && tokenType != oidc.IDTokenType {
-		resp.IDToken, _, err = s.createExchangeIDToken(ctx, signingKey, client, subjectToken.userID, resp.AccessToken, audience, userInfo, actorToken.authMethods, actorToken.authTime, reason, actor)
+		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, client.client.IDTokenRoleAssertion, getSigner, sessionID, resp.AccessToken, audience, actorToken.authMethods, actorToken.authTime, "", actor)
 		if err != nil {
 			return nil, err
 		}
@@ -271,77 +268,84 @@ func (s *Server) createExchangeTokens(ctx context.Context, tokenType oidc.TokenT
 	return resp, nil
 }
 
-func (s *Server) createExchangeAccessToken(ctx context.Context, client *Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (accessToken string, refreshToken string, exp uint64, err error) {
-	tokenInfo, refreshToken, err := s.createAccessTokenCommands(ctx, client, resourceOwner, userID, audience, scopes, authMethods, authTime, reason, actor)
-	if err != nil {
-		return "", "", 0, err
-	}
-	accessToken, err = op.CreateBearerToken(tokenInfo.TokenID, userID, s.Provider().Crypto())
-	if err != nil {
-		return "", "", 0, err
-	}
-	return accessToken, refreshToken, timeToOIDCExpiresIn(tokenInfo.Expiration), nil
-}
+func (s *Server) createExchangeAccessToken(
+	ctx context.Context,
+	client *Client,
+	userID,
+	resourceOwner string,
+	audience,
+	scope []string,
+	authMethods []domain.UserAuthMethodType,
+	authTime time.Time,
+	preferredLanguage *language.Tag,
+	reason domain.TokenReason,
+	actor *domain.TokenActor,
+) (accessToken, refreshToken, sessionID string, exp uint64, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
-func (s *Server) createExchangeJWT(ctx context.Context, signingKey op.SigningKey, client *Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor, privateClaims map[string]any) (accessToken string, refreshToken string, exp uint64, err error) {
-	tokenInfo, refreshToken, err := s.createAccessTokenCommands(ctx, client, resourceOwner, userID, audience, scopes, authMethods, authTime, reason, actor)
-	if err != nil {
-		return "", "", 0, err
-	}
-
-	expTime := tokenInfo.Expiration.Add(client.ClockSkew())
-	claims := oidc.NewAccessTokenClaims(op.IssuerFromContext(ctx), userID, tokenInfo.Audience, expTime, tokenInfo.TokenID, client.GetID(), client.ClockSkew())
-	claims.Actor = actorDomainToClaims(tokenInfo.Actor)
-	claims.Claims = privateClaims
-
-	signer, err := op.SignerFromKey(signingKey)
-	if err != nil {
-		return "", "", 0, err
-	}
-
-	accessToken, err = crypto.Sign(claims, signer)
-	if err != nil {
-		return "", "", 0, nil
-	}
-	return accessToken, refreshToken, timeToOIDCExpiresIn(expTime), nil
-}
-
-func (s *Server) createExchangeIDToken(ctx context.Context, signingKey op.SigningKey, client *Client, userID, accessToken string, audience []string, userInfo *oidc.UserInfo, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
-	expTime := time.Now().Add(client.IDTokenLifetime()).Add(client.ClockSkew())
-	claims := oidc.NewIDTokenClaims(op.IssuerFromContext(ctx), userID, audience, expTime, authTime, "", "", AuthMethodTypesToAMR(authMethods), client.GetID(), client.ClockSkew())
-	claims.Actor = actorDomainToClaims(actor)
-	claims.SetUserInfo(userInfo)
-	if accessToken != "" {
-		claims.AccessTokenHash, err = oidc.ClaimHash(accessToken, signingKey.SignatureAlgorithm())
-		if err != nil {
-			return "", 0, err
-		}
-	}
-	signer, err := op.SignerFromKey(signingKey)
-	if err != nil {
-		return "", 0, err
-	}
-	idToken, err = crypto.Sign(claims, signer)
-	return idToken, timeToOIDCExpiresIn(expTime), err
-}
-
-func timeToOIDCExpiresIn(exp time.Time) uint64 {
-	return uint64(time.Until(exp) / time.Second)
-}
-
-func (s *Server) createAccessTokenCommands(ctx context.Context, client *Client, resourceOwner, userID string, audience, scopes []string, authMethods []domain.UserAuthMethodType, authTime time.Time, reason domain.TokenReason, actor *domain.TokenActor) (tokenInfo *domain.Token, refreshToken string, err error) {
-	settings := client.client.Settings
-	if slices.Contains(scopes, oidc.ScopeOfflineAccess) {
-		return s.command.AddAccessAndRefreshToken(
-			ctx, resourceOwner, "", client.GetID(), userID, "", audience, scopes, AuthMethodTypesToAMR(authMethods),
-			settings.AccessTokenLifetime, settings.RefreshTokenIdleExpiration, settings.RefreshTokenExpiration,
-			authTime, reason, actor,
-		)
-	}
-	tokenInfo, err = s.command.AddUserToken(
-		ctx, resourceOwner, "", client.GetID(), userID, audience, scopes, AuthMethodTypesToAMR(authMethods),
-		settings.AccessTokenLifetime,
-		authTime, reason, actor,
+	session, err := s.command.CreateOIDCSession(ctx,
+		userID,
+		resourceOwner,
+		client.client.ClientID,
+		scope,
+		audience,
+		authMethods,
+		authTime,
+		"",
+		preferredLanguage,
+		nil,
+		reason,
+		actor,
+		slices.Contains(scope, oidc.ScopeOfflineAccess),
 	)
-	return tokenInfo, "", err
+	if err != nil {
+		return "", "", "", 0, err
+	}
+	accessToken, err = op.CreateBearerToken(session.TokenID, userID, s.opCrypto)
+	if err != nil {
+		return "", "", "", 0, err
+	}
+	return accessToken, session.RefreshToken, session.SessionID, timeToOIDCExpiresIn(session.Expiration), nil
+}
+
+func (s *Server) createExchangeJWT(
+	ctx context.Context,
+	client *Client,
+	getUserInfo userInfoFunc,
+	roleAssertion bool,
+	getSigner signerFunc,
+	userID,
+	resourceOwner string,
+	audience,
+	scope []string,
+	authMethods []domain.UserAuthMethodType,
+	authTime time.Time,
+	preferredLanguage *language.Tag,
+	reason domain.TokenReason,
+	actor *domain.TokenActor,
+) (accessToken string, refreshToken string, exp uint64, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	session, err := s.command.CreateOIDCSession(ctx,
+		userID,
+		resourceOwner,
+		client.client.ClientID,
+		scope,
+		audience,
+		authMethods,
+		authTime,
+		"",
+		preferredLanguage,
+		nil,
+		reason,
+		actor,
+		slices.Contains(scope, oidc.ScopeOfflineAccess),
+	)
+	accessToken, err = s.createJWT(ctx, client, session, getUserInfo, roleAssertion, getSigner)
+	if err != nil {
+		return "", "", 0, err
+	}
+	return accessToken, session.RefreshToken, timeToOIDCExpiresIn(session.Expiration), nil
 }

@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	usr_model "github.com/zitadel/zitadel/internal/user/model"
 	"github.com/zitadel/zitadel/internal/user/repository/view"
@@ -14,7 +13,7 @@ import (
 )
 
 const (
-	userTable = "auth.users2"
+	userTable = "auth.users3"
 )
 
 func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
@@ -140,42 +139,6 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 	}
 
 	return user, nil
-}
-
-func (v *View) UsersByOrgID(orgID, instanceID string) ([]*model.UserView, error) {
-	return view.UsersByOrgID(v.Db, userTable, orgID, instanceID)
-}
-
-func (v *View) PutUser(user *model.UserView, event eventstore.Event) error {
-	return view.PutUser(v.Db, userTable, user)
-}
-
-func (v *View) PutUsers(users []*model.UserView, event eventstore.Event) error {
-	return view.PutUsers(v.Db, userTable, users...)
-}
-
-func (v *View) DeleteUser(userID, instanceID string, event eventstore.Event) error {
-	err := view.DeleteUser(v.Db, userTable, userID, instanceID)
-	if err != nil && !zerrors.IsNotFound(err) {
-		return err
-	}
-	return nil
-}
-
-func (v *View) DeleteInstanceUsers(event eventstore.Event) error {
-	err := view.DeleteInstanceUsers(v.Db, userTable, event.Aggregate().InstanceID)
-	if err != nil && !zerrors.IsNotFound(err) {
-		return err
-	}
-	return nil
-}
-
-func (v *View) UpdateOrgOwnerRemovedUsers(event eventstore.Event) error {
-	err := view.UpdateOrgOwnerRemovedUsers(v.Db, userTable, event.Aggregate().InstanceID, event.Aggregate().ID)
-	if err != nil && !zerrors.IsNotFound(err) {
-		return err
-	}
-	return nil
 }
 
 func (v *View) GetLatestUserSequence(ctx context.Context, instanceID string) (_ *query.CurrentState, err error) {

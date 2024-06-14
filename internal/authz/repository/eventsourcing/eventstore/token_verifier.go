@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-jose/go-jose/v4"
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
@@ -96,8 +97,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 		return "", "", "", "", "", zerrors.ThrowUnauthenticated(nil, "APP-Reb32", "invalid token")
 	}
 	if strings.HasPrefix(tokenID, command.IDPrefixV2) {
-		userID, clientID, resourceOwner, err = repo.verifyAccessTokenV2(ctx, tokenID, verifierClientID, projectID)
-		return
+		return repo.verifyAccessTokenV2(ctx, tokenID, verifierClientID, projectID)
 	}
 	if sessionID, ok := strings.CutPrefix(tokenID, authz.SessionTokenPrefix); ok {
 		userID, clientID, resourceOwner, err = repo.verifySessionToken(ctx, sessionID, tokenString)
@@ -106,7 +106,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	return repo.verifyAccessTokenV1(ctx, tokenID, subject, verifierClientID, projectID)
 }
 
-func (repo *TokenVerifierRepo) verifyAccessTokenV1(ctx context.Context, tokenID, subject, verifierClientID, projectID string) (userID string, agentID string, clientID, prefLang, resourceOwner string, err error) {
+func (repo *TokenVerifierRepo) verifyAccessTokenV1(ctx context.Context, tokenID, subject, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -131,24 +131,27 @@ func (repo *TokenVerifierRepo) verifyAccessTokenV1(ctx context.Context, tokenID,
 	return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil
 }
 
-func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, verifierClientID, projectID string) (userID, clientID, resourceOwner string, err error) {
+func (repo *TokenVerifierRepo) verifyAccessTokenV2(ctx context.Context, token, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	activeToken, err := repo.Query.ActiveAccessTokenByToken(ctx, token)
 	if err != nil {
-		return "", "", "", err
+		return "", "", "", "", "", err
 	}
 	if activeToken.Actor != nil {
-		return "", "", "", zerrors.ThrowPermissionDenied(nil, "APP-Shi0J", "Errors.TokenExchange.Token.NotForAPI")
+		return "", "", "", "", "", zerrors.ThrowPermissionDenied(nil, "APP-Shi0J", "Errors.TokenExchange.Token.NotForAPI")
 	}
 	if err = verifyAudience(activeToken.Audience, verifierClientID, projectID); err != nil {
-		return "", "", "", err
+		return "", "", "", "", "", err
 	}
 	if err = repo.checkAuthentication(ctx, activeToken.AuthMethods, activeToken.UserID); err != nil {
-		return "", "", "", err
+		return "", "", "", "", "", err
 	}
-	return activeToken.UserID, activeToken.ClientID, activeToken.ResourceOwner, nil
+	prefLang = gu.Value(activeToken.PreferredLanguage).String()
+	agentID = gu.Value(gu.Value(activeToken.UserAgent).FingerprintID)
+
+	return activeToken.UserID, agentID, activeToken.ClientID, prefLang, activeToken.ResourceOwner, nil
 }
 
 func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID, token string) (userID, clientID, resourceOwner string, err error) {
@@ -169,7 +172,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 }
 
 // checkAuthentication ensures the session or token was authenticated (at least a single [domain.UserAuthMethodType]).
-// It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any
+// It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any second factor
 func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMethods []domain.UserAuthMethodType, userID string) error {
 	if len(authMethods) == 0 {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
@@ -177,11 +180,18 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if domain.HasMFA(authMethods) {
 		return nil
 	}
-	availableAuthMethods, forceMFA, forceMFALocalOnly, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID)
+	requirements, err := repo.Query.ListUserAuthMethodTypesRequired(setCallerCtx(ctx, userID), userID)
 	if err != nil {
 		return err
 	}
-	if domain.RequiresMFA(forceMFA, forceMFALocalOnly, hasIDPAuthentication(authMethods)) || domain.HasMFA(availableAuthMethods) {
+	if requirements.UserType == domain.UserTypeMachine {
+		return nil
+	}
+	if domain.RequiresMFA(
+		requirements.ForceMFA,
+		requirements.ForceMFALocalOnly,
+		!hasIDPAuthentication(authMethods),
+	) {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
 	}
 	return nil

@@ -41,7 +41,7 @@ func (q *Query) Pagination() *Pagination {
 	return q.pagination
 }
 
-func (q *Query) Reduce(events ...*Event[StoragePayload]) error {
+func (q *Query) Reduce(events ...*StorageEvent) error {
 	return q.reducer.Reduce(events...)
 }
 
@@ -255,6 +255,7 @@ func NewAggregateFilter(typ string, opts ...AggregateFilterOpt) *AggregateFilter
 type AggregateFilter struct {
 	typ    string
 	ids    []string
+	owners *filter[[]string]
 	events []*EventFilter
 }
 
@@ -271,6 +272,13 @@ func (f *AggregateFilter) IDs() database.Condition {
 	}
 
 	return database.NewListContains(f.ids...)
+}
+
+func (f *AggregateFilter) Owners() database.Condition {
+	if f.owners == nil {
+		return nil
+	}
+	return f.owners.condition
 }
 
 func (f *AggregateFilter) Events() []*EventFilter {
@@ -295,6 +303,61 @@ func AppendAggregateIDs(ids ...string) AggregateFilterOpt {
 func AggregateIDs(ids ...string) AggregateFilterOpt {
 	return func(f *AggregateFilter) {
 		f.ids = ids
+	}
+}
+
+func AggregateOwnersEqual(owners ...string) AggregateFilterOpt {
+	return func(f *AggregateFilter) {
+		var cond database.Condition
+		switch len(owners) {
+		case 0:
+			return
+		case 1:
+			cond = database.NewTextEqual(owners[0])
+		default:
+			cond = database.NewListEquals(owners...)
+		}
+		f.owners = &filter[[]string]{
+			condition: cond,
+			value:     &owners,
+		}
+	}
+}
+
+func AggregateOwnersContains(owners ...string) AggregateFilterOpt {
+	return func(f *AggregateFilter) {
+		var cond database.Condition
+		switch len(owners) {
+		case 0:
+			return
+		case 1:
+			cond = database.NewTextEqual(owners[0])
+		default:
+			cond = database.NewListContains(owners...)
+		}
+
+		f.owners = &filter[[]string]{
+			condition: cond,
+			value:     &owners,
+		}
+	}
+}
+
+func AggregateOwnersNotContains(owners ...string) AggregateFilterOpt {
+	return func(f *AggregateFilter) {
+		var cond database.Condition
+		switch len(owners) {
+		case 0:
+			return
+		case 1:
+			cond = database.NewTextUnequal(owners[0])
+		default:
+			cond = database.NewListNotContains(owners...)
+		}
+		f.owners = &filter[[]string]{
+			condition: cond,
+			value:     &owners,
+		}
 	}
 }
 

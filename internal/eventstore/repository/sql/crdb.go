@@ -282,17 +282,23 @@ func (db *CRDB) db() *database.DB {
 	return db.DB
 }
 
-func (db *CRDB) orderByEventSequence(desc, useV1 bool) string {
+func (db *CRDB) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string {
 	if useV1 {
 		if desc {
 			return ` ORDER BY event_sequence DESC`
 		}
 		return ` ORDER BY event_sequence`
 	}
+	if shouldOrderBySequence {
+		if desc {
+			return ` ORDER BY "sequence" DESC`
+		}
+		return ` ORDER BY "sequence"`
+	}
+
 	if desc {
 		return ` ORDER BY "position" DESC, in_tx_order DESC`
 	}
-
 	return ` ORDER BY "position", in_tx_order`
 }
 

@@ -71,7 +71,7 @@ func (l *Login) renderRegisterSMS(w http.ResponseWriter, r *http.Request, authRe
 // and a successful OTP SMS check will be added to the auth request.
 func (l *Login) handleRegisterSMSCheck(w http.ResponseWriter, r *http.Request) {
 	formData := new(smsInitFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, formData)
+	authReq, err := l.ensureAuthRequestAndParseData(r, formData)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

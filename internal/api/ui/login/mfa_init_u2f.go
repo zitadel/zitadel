@@ -42,7 +42,7 @@ func (l *Login) renderRegisterU2F(w http.ResponseWriter, r *http.Request, authRe
 
 func (l *Login) handleRegisterU2F(w http.ResponseWriter, r *http.Request) {
 	data := new(webAuthNFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
