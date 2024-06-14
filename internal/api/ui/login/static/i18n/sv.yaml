@@ -153,6 +153,7 @@ VerifyMFAU2F:
   Title: Verifiera tvåfaktor
   Description: Verifiera med kod från din Tvåfaktor-enhet (t ex FaceID, Windows Hello, Fingeravtryck)
   NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t ex Chrome, Safari, Firefox)
+  ErrorRetry: Försök igen, gör en ny förfrågan eller välj en annan metod.
   ValidateTokenButtonText: Verifiera tvåfaktor
 
 Passwordless:

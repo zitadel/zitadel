@@ -61,23 +61,23 @@ Errors:
   Notification:
     NoDomain: Ingen domän hittades för meddelandet
   User:
-    NotFound: Användare kunde inte hittas
-    AlreadyExists: Användare finns redan
-    NotFoundOnOrg: Användare kunde inte hittas på vald organisation
-    NotAllowedOrg: Användare är inte medlem i den nödvändiga organisationen
+    NotFound: Användaren kunde inte hittas
+    AlreadyExists: Användaren finns redan
+    NotFoundOnOrg: Användaren kunde inte hittas på vald organisation
+    NotAllowedOrg: Användaren är inte medlem i den nödvändiga organisationen
     UserIDMissing: Användar-ID saknas
-    UserIDWrong: "Begärd användare är inte samma som autentiserad användare"
+    UserIDWrong: Begärd användare är inte samma som autentiserad användare
     DomainPolicyNil: Organisationspolicy är tom
     EmailAsUsernameNotAllowed: E-post är inte tillåtet som användarnamn
-    Invalid: Användardata är ogiltig
+    Invalid: Användardata är ogiltiga
     DomainNotAllowedAsUsername: Domänen är redan reserverad och kan inte användas
     AlreadyInactive: Användaren redan inaktiv
     NotInactive: Användaren är inte inaktiv
-    CantDeactivateInitial: Användare med status: Initial kan endast raderas, inte avaktiveras
-    ShouldBeActiveOrInitial: Användare är inte aktiv eller initial
-    AlreadyInitialised: Användare är redan initialiserad
-    NotInitialised: Användare är ännu inte initialiserad
-    NotLocked: Användare är inte låst
+    CantDeactivateInitial: Användare med status 'Initial' kan endast raderas, inte avaktiveras
+    ShouldBeActiveOrInitial: Användaren är inte aktiv eller initial
+    AlreadyInitialised: Användaren är redan initialiserad
+    NotInitialised: Användaren är ännu inte initialiserad
+    NotLocked: Användaren är inte låst
     NoChanges: Inga ändringar hittades
     InitCodeNotFound: Initieringskod hittades inte
     UsernameNotChanged: Användarnamn ändrades inte
@@ -771,67 +771,67 @@ EventTypes:
           added: Uppdateringstoken skapad
           renewed: Uppdateringstoken förnyad
           removed: Uppdateringstoken borttagen
-      locked: Användare låst
-      unlocked: Användare upplåst
-      deactivated: Användare avaktiverad
-      reactivated: Användare återaktiverad
-      removed: Användare borttagen
-      password:
-        changed: Lösenord ändrat
-        code:
-          added: Lösenordskod genererad
-          sent: Lösenordskod skickad
-        check:
-          succeeded: Lösenordskontroll lyckades
-          failed: Lösenordskontroll misslyckades
-      phone:
-        changed: Mobilnummer ändrat
-        verified: Mobilnummer verifierat
-        verification:
-          failed: Verifiering av Mobilnummer misslyckades
-        code:
-          added: Mobilnummerkod genererad
-          sent: Mobilnummerkod skickad
+    locked: Användare låst
+    unlocked: Användare upplåst
+    deactivated: Användare avaktiverad
+    reactivated: Användare återaktiverad
+    removed: Användare borttagen
+    password:
+      changed: Lösenord ändrat
+      code:
+        added: Lösenordskod genererad
+        sent: Lösenordskod skickad
+      check:
+        succeeded: Lösenordskontroll lyckades
+        failed: Lösenordskontroll misslyckades
+    phone:
+      changed: Mobilnummer ändrat
+      verified: Mobilnummer verifierat
+      verification:
+        failed: Verifiering av Mobilnummer misslyckades
+      code:
+        added: Mobilnummerkod genererad
+        sent: Mobilnummerkod skickad
 
-      profile:
-        changed: Användarprofil ändrad
-      address:
-        changed: Användaradress ändrad
-      mfa:
-        otp:
-          added: Tvåfaktor OTP tillagd
-          verified: Tvåfaktor OTP verifierad
-          removed: Tvåfaktor OTP borttagen
-          check:
-            succeeded: Tvåfaktor OTP-kontroll lyckades
-            failed: Tvåfaktor OTP-kontroll misslyckades
-          init:
-            skipped: Tvåfaktor OTP-initialisering hoppades över
+    profile:
+      changed: Användarprofil ändrad
+    address:
+      changed: Användaradress ändrad
+    mfa:
+      otp:
+        added: Tvåfaktor OTP tillagd
+        verified: Tvåfaktor OTP verifierad
+        removed: Tvåfaktor OTP borttagen
+        check:
+          succeeded: Tvåfaktor OTP-kontroll lyckades
+          failed: Tvåfaktor OTP-kontroll misslyckades
         init:
-          skipped: Tvåfaktorinitialisering hoppades över
-      signed:
-        out: Användare utloggad
-      grant:
-        added: Auktorisering tillagd
-        changed: Auktorisering ändrad
+          skipped: Hoppade över Tvåfaktor OTP-initialisering
+      init:
+        skipped: Hoppade över tvåfaktorinitialisering
+    signed:
+      out: Användare utloggad
+    grant:
+      added: Auktorisering tillagd
+      changed: Auktorisering ändrad
+      removed: Auktorisering borttagen
+      deactivated: Auktorisering avaktiverad
+      reactivated: Auktorisering återaktiverad
+      reserved: Auktorisering reserverad
+      released: Auktorisering släppt
+      cascade:
         removed: Auktorisering borttagen
-        deactivated: Auktorisering avaktiverad
-        reactivated: Auktorisering återaktiverad
-        reserved: Auktorisering reserverad
-        released: Auktorisering släppt
-        cascade:
-          removed: Auktorisering borttagen
-          changed: Auktorisering ändrad
-      metadata:
-        set: Användarmetadata inställd
-        removed: Användarmetadata borttagen
-        removed.all: All användarmetadata borttagen
-      domain:
-        claimed: Domän anspråkad
-        claimed.sent: Meddelande om anspråkad domän skickad
-      pat:
-        added: Personlig åtkomsttoken tillagd
-        removed: Personlig åtkomsttoken borttagen
+        changed: Auktorisering ändrad
+    metadata:
+      set: Användarmetadata inställd
+      removed: Användarmetadata borttagen
+      removed.all: All användarmetadata borttagen
+    domain:
+      claimed: Domän anspråkad
+      claimed.sent: Meddelande om anspråkad domän skickad
+    pat:
+      added: Personlig åtkomsttoken tillagd
+      removed: Personlig åtkomsttoken borttagen
   org:
     added: Organisation tillagd
     changed: Organisation ändrad
