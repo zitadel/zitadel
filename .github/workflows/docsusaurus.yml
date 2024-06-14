@@ -1,15 +1,22 @@
 name: Docs
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-on:
-  pull_request:
-  push:
-    branches:
-      - main
+on: 
+  workflow_call:
+    secrets:
+      VERCEL_TOKEN:
+        description: 'Vercel API Token'
+        required: true
+      VERCEL_ORG_ID:
+        description: 'Vercel Org/Team ID'
+        required: true 
+      VERCEL_PROJECT_ID:
+        description: 'Vercel Project ID'
+        required: true
 jobs:
   Deploy:
     runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
