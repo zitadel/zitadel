@@ -1325,6 +1325,7 @@
       "LANGUAGES": "语言",
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
+      "AGE": "密码过期",
       "COMPLEXITY": "密码复杂性",
       "NOTIFICATIONS": "通知设置",
       "SMTP_PROVIDER": "SMTP 提供商",
@@ -1544,7 +1545,7 @@
     },
     "PWD_AGE": {
       "TITLE": "密码过期",
-      "DESCRIPTION": "您可以设置密码过期策略。此策略会在特定过期时间过后发出警告。"
+      "DESCRIPTION": "您可以设置密码过期策略。此策略将强制用户在密码过期后下次登录时更改密码。"
     },
     "PWD_LOCKOUT": {
       "TITLE": "锁定策略",
@@ -1696,8 +1697,8 @@
       "SHOWLOCKOUTFAILURES": "显示锁定失败",
       "MAXPASSWORDATTEMPTS": "密码最大尝试次数",
       "MAXOTPATTEMPTS": "最多尝试 OTP 次数",
-      "EXPIREWARNDAYS": "密码过期警告",
-      "MAXAGEDAYS": "Max Age in days",
+      "EXPIREWARNDAYS": "密码将在几天后过期",
+      "MAXAGEDAYS": "最大有效期 (天)",
       "USERLOGINMUSTBEDOMAIN": "用户名必须包含组织域名",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "如果启用此设置，所有登录名都将以组织域为后缀。如果禁用此设置，您必须确保用户名在所有组织中都是唯一的。",
       "VALIDATEORGDOMAINS": "组织域名验证需要 (DNS 或 HTTP 挑战)",

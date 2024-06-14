@@ -1327,6 +1327,7 @@
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamento de Login e Segurança",
       "LOCKOUT": "Bloqueio",
+      "AGE": "Expiração da senha",
       "COMPLEXITY": "Complexidade de Senha",
       "NOTIFICATIONS": "Configurações de Notificação",
       "SMTP_PROVIDER": "Provedor SMTP",
@@ -1546,8 +1547,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Envelhecimento de senha",
-      "DESCRIPTION": "Você pode definir uma política para o envelhecimento de senhas. Essa política emite um aviso após o tempo de envelhecimento específico ter passado."
+      "TITLE": "Expiração da senha",
+      "DESCRIPTION": "Você pode definir uma política para a expiração de senhas. Esta política forçará o usuário a alterar a senha no próximo login após a expiração."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Política de bloqueio",
@@ -1700,7 +1701,7 @@
       "MAXPASSWORDATTEMPTS": "Máximo de tentativas de senha",
       "MAXOTPATTEMPTS": "Máximo de tentativas de OTP",
       "EXPIREWARNDAYS": "Aviso de expiração após dias",
-      "MAXAGEDAYS": "Idade máxima em dias",
+      "MAXAGEDAYS": "Validade máxima em dias",
       "USERLOGINMUSTBEDOMAIN": "Adicionar domínio da organização como sufixo aos nomes de login",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se você habilitar essa configuração, todos os nomes de login serão sufixados com o domínio da organização. Se essa configuração estiver desabilitada, você deve garantir que os nomes de usuário sejam exclusivos em todas as organizações.",
       "VALIDATEORGDOMAINS": "Verificação de domínio da organização necessária (desafio DNS ou HTTP)",

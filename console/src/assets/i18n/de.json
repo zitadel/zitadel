@@ -1325,6 +1325,7 @@
       "LANGUAGES": "Sprachen",
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",
+      "AGE": "Passwortgültigkeitsdauer",
       "COMPLEXITY": "Passwordkomplexität",
       "NOTIFICATIONS": "Benachrichtigungseinstellungen",
       "SMTP_PROVIDER": "SMTP-Anbieter",
@@ -1545,7 +1546,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Gültigkeitsdauer für Passwörter",
-      "DESCRIPTION": "Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
+      "DESCRIPTION": "Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie zwingt den Benutzer dazu, das Passwort bei der nächsten Anmeldung nach dem Ablauf zu ändern."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Passwortsperre",

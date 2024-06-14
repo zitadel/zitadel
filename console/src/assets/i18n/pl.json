@@ -1325,6 +1325,7 @@
       "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",
+      "AGE": "Wygaśnięcie hasła",
       "COMPLEXITY": "Złożoność hasła",
       "NOTIFICATIONS": "Ustawienia powiadomień",
       "SMTP_PROVIDER": "Dostawca SMTP",
@@ -1544,8 +1545,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Starzenie się hasła",
-      "DESCRIPTION": "Możesz ustawić politykę dotyczącą starzenia się haseł. Ta polityka emituje ostrzeżenie po upływie określonego czasu starzenia."
+      "TITLE": "Wygaśnięcie hasła",
+      "TITLE": "Możesz ustawić zasady wygasania haseł. Ta zasada zmusi użytkownika do zmiany hasła przy następnym logowaniu po jego wygaśnięciu."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Polityka blokowania",
@@ -1697,8 +1698,8 @@
       "SHOWLOCKOUTFAILURES": "pokaż blokady nieudanych prób",
       "MAXPASSWORDATTEMPTS": "Maksymalna liczba prób wprowadzenia hasła",
       "MAXOTPATTEMPTS": "Maksymalna liczba prób OTP",
-      "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniu",
-      "MAXAGEDAYS": "Maksymalny wiek w dniach",
+      "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniach",
+      "MAXAGEDAYS": "Maksymalna ważność w dniach",
       "USERLOGINMUSTBEDOMAIN": "Dodaj domenę organizacji jako przyrostek do nazw logowania",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Jeśli włączysz to ustawienie, wszystkie nazwy logowania będą miały przyrostek z domeną organizacji. Jeśli to ustawienie jest wyłączone, musisz zapewnić unikalność nazw użytkowników we wszystkich organizacjach.",
       "VALIDATEORGDOMAINS": "Weryfikacja domeny organizacji jest wymagana (wyzwanie DNS lub HTTP)",

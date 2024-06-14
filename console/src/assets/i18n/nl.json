@@ -1326,6 +1326,7 @@
       "LANGUAGES": "Talen",
       "LOGIN": "Login Gedrag en Beveiliging",
       "LOCKOUT": "Lockout",
+      "AGE": "Wachtwoord verloopt",
       "COMPLEXITY": "Wachtwoord complexiteit",
       "NOTIFICATIONS": "Notificaties",
       "SMTP_PROVIDER": "SMTP Provider",
@@ -1545,8 +1546,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Wachtwoord Veroudering",
-      "DESCRIPTION": "U kunt een beleid instellen voor de veroudering van wachtwoorden. Dit beleid geeft een waarschuwing nadat de specifieke verouderingstijd is verstreken."
+      "TITLE": "Wachtwoord verloopt",
+      "DESCRIPTION": "U kunt een beleid instellen voor het verlopen van wachtwoorden. Dit beleid dwingt de gebruiker om het wachtwoord te wijzigen bij de volgende aanmelding na het verlopen."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Lockout Beleid",
@@ -1698,8 +1699,8 @@
       "SHOWLOCKOUTFAILURES": "toon lockout mislukkingen",
       "MAXPASSWORDATTEMPTS": "Maximum pogingen voor wachtwoord",
       "MAXOTPATTEMPTS": "Maximale OTP-pogingen",
-      "EXPIREWARNDAYS": "Vervaldatum Waarschuwing na dag",
-      "MAXAGEDAYS": "Maximale Leeftijd in dagen",
+      "EXPIREWARNDAYS": "Waarschuwing voor verlopen na dagen",
+      "MAXAGEDAYS": "Maximale geldigheid in dagen",
       "USERLOGINMUSTBEDOMAIN": "Voeg organisatie domein toe als achtervoegsel aan inlognamen",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Als u deze instelling inschakelt, worden alle inlognamen voorzien van een achtervoegsel met het domein van de organisatie. Als deze instelling is uitgeschakeld, moet u ervoor zorgen dat gebruikersnamen uniek zijn over alle organisaties.",
       "VALIDATEORGDOMAINS": "Verificatie van organisatiedomeinen vereist (DNS of HTTP-uitdaging)",
