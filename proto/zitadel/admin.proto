@@ -2655,7 +2655,7 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Password Age Settings";
-            description: "Not implemented"
+            description: "Returns the password age settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             responses: {
                 key: "200";
                 value: {
@@ -2679,7 +2679,7 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Update Password Age Settings";
-            description: "Not implemented"
+            description: "Updates the default password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             responses: {
                 key: "200";
                 value: {
