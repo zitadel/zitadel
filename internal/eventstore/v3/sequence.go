@@ -26,7 +26,8 @@ func latestSequences(ctx context.Context, tx *sql.Tx, commands []eventstore.Comm
 	sequences := commandsToSequences(ctx, commands)
 
 	conditions, args := sequencesToSql(sequences)
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf(latestSequencesStmt, strings.Join(conditions, " UNION ALL ")), args...)
+	rows, err := tx.QueryContext(ctx, fmt.Sprintf("SELECT * FROM (%s) sub", strings.Join(conditions, " UNION ALL ")), args...)
+	// rows, err := tx.QueryContext(ctx, fmt.Sprintf(latestSequencesStmt, strings.Join(conditions, " UNION ALL ")), args...)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "V3-5jU5z", "Errors.Internal")
 	}
