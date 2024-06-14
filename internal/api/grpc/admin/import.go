@@ -247,8 +247,15 @@ func (s *Server) transportDataFromFile(ctx context.Context, v1Transformation boo
 }
 
 func getFileFromS3(ctx context.Context, input *admin_pb.ImportDataRequest_S3Input) ([]byte, error) {
+	var creds *credentials.Credentials
+	if input.AccessKeyId != "" && input.SecretAccessKey != "" {
+		creds = credentials.NewStaticV4(input.AccessKeyId, input.SecretAccessKey, "")
+	} else {
+		creds = credentials.NewIAM(input.Endpoint)
+	}
+
 	minioClient, err := minio.New(input.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(input.AccessKeyId, input.SecretAccessKey, ""),
+		Creds:  creds,
 		Secure: input.Ssl,
 	})
 	if err != nil {
