@@ -120,30 +120,6 @@ export class PasswordAgePolicyComponent implements OnInit {
       });
     }
   }
-  //
-  // public incrementPasswordMaxAttempts(): void {
-  //   if (this.passwordAgeData?.maxPasswordAttempts !== undefined) {
-  //     this.passwordAgeData.maxPasswordAttempts++;
-  //   }
-  // }
-  //
-  // public decrementPasswordMaxAttempts(): void {
-  //   if (this.passwordAgeData?.maxPasswordAttempts && this.passwordAgeData?.maxPasswordAttempts > 0) {
-  //     this.passwordAgeData.maxPasswordAttempts--;
-  //   }
-  // }
-  //
-  // public incrementOTPMaxAttempts(): void {
-  //   if (this.passwordAgeData?.maxOtpAttempts !== undefined) {
-  //     this.passwordAgeData.maxOtpAttempts++;
-  //   }
-  // }
-  //
-  // public decrementOTPMaxAttempts(): void {
-  //   if (this.passwordAgeData?.maxOtpAttempts && this.passwordAgeData?.maxOtpAttempts > 0) {
-  //     this.passwordAgeData.maxOtpAttempts--;
-  //   }
-  // }
 
   public savePolicy(): void {
     let promise: Promise<any>;
