@@ -3,6 +3,7 @@ package domain
 const (
 	OrgDomainPrimaryScope = "urn:zitadel:iam:org:domain:primary:"
 	OrgIDScope            = "urn:zitadel:iam:org:id:"
+	OrgRoleIDScope        = "urn:zitadel:iam:org:roles:id:"
 	OrgDomainPrimaryClaim = "urn:zitadel:iam:org:domain:primary"
 	OrgIDClaim            = "urn:zitadel:iam:org:id"
 	ProjectIDScope        = "urn:zitadel:iam:org:project:id:"
