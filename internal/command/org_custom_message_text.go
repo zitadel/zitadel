@@ -23,6 +23,9 @@ func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, 
 	if err != nil {
 		return nil, err
 	}
+	if len(events) == 0 {
+		return writeModelToObjectDetails(&existingMessageText.WriteModel), nil
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
