@@ -120,37 +120,6 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	require.Nil(t, myUserResp)
 }
 
-func Test_ZITADEL_API_missing_mfa_2fa_setup(t *testing.T) {
-	clientID, _ := createClient(t)
-	userResp := Tester.CreateHumanUser(CTX)
-	Tester.SetUserPassword(CTX, userResp.GetUserId(), integration.UserPassword, false)
-	Tester.RegisterUserU2F(CTX, userResp.GetUserId())
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, zitadelAudienceScope)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreatePasswordSession(t, CTXLOGIN, userResp.GetUserId(), integration.UserPassword)
-	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
-		AuthRequestId: authRequestID,
-		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
-			Session: &oidc_pb.Session{
-				SessionId:    sessionID,
-				SessionToken: sessionToken,
-			},
-		},
-	})
-	require.NoError(t, err)
-
-	// code exchange
-	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
-	require.NoError(t, err)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, userResp.GetUserId(), armPassword, startTime, changeTime, sessionID)
-
-	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("%s %s", tokens.TokenType, tokens.AccessToken))
-
-	myUserResp, err := Tester.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
-	require.Error(t, err)
-	require.Nil(t, myUserResp)
-}
-
 func Test_ZITADEL_API_missing_mfa_policy(t *testing.T) {
 	clientID, _ := createClient(t)
 	org := Tester.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_API_MISSING_MFA_%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))

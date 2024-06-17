@@ -6803,6 +6803,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "List Identity Providers";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6820,6 +6828,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Get Identity Provider By ID";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6838,6 +6854,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Generic OAuth Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6856,6 +6880,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Generic OAuth Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6874,6 +6906,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Generic OIDC Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6892,6 +6932,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Generic OIDC Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6910,6 +6958,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Migrate Generic OIDC Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6928,6 +6984,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add JWT Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6946,6 +7010,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update JWT Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6964,6 +7036,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Azure AD Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6982,6 +7062,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Azure AD Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7000,6 +7088,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitHub Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7018,6 +7114,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitHub Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7036,6 +7140,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitHub Enterprise Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7054,6 +7166,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitHub Enterprise Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7072,6 +7192,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitLab Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7090,6 +7218,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitLab Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7108,6 +7244,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitLab Selfhosted Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7126,6 +7270,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitLab Selfhosted Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7144,6 +7296,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Google Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7162,6 +7322,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Google Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7180,6 +7348,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add LDAP Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7198,6 +7374,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update LDAP Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7216,6 +7400,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Apple Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7234,6 +7426,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Apple Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7252,6 +7452,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add SAML Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7270,6 +7478,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update SAML Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7288,6 +7504,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Regenerate SAML Identity Provider Certificate";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7306,6 +7530,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Delete Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
