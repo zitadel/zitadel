@@ -67,7 +67,6 @@ func TestCommandSide_SetCustomMessageText(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectPush(),
 				),
 			},
 			args: args{
