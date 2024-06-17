@@ -133,8 +133,8 @@ func (wm *SessionWriteModel) Query() *eventstore.SearchQueryBuilder {
 		).
 		Builder()
 
-	if wm.ResourceOwner != "" {
-		query.ResourceOwner(wm.ResourceOwner)
+	if wm.aggregate.ResourceOwner != "" {
+		query.ResourceOwner(wm.aggregate.ResourceOwner)
 	}
 	return query
 }

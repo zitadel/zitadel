@@ -250,7 +250,7 @@ func (q *Queries) ExistsOrg(ctx context.Context, id, domain string) (verifiedID 
 
 	var org *Org
 	if id != "" {
-		org, err = q.OrgByID(ctx, true, id)
+		org, err = q.OrgByID(ctx, false, id)
 	} else {
 		org, err = q.OrgByVerifiedDomain(ctx, domain)
 	}
