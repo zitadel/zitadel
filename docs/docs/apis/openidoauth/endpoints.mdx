@@ -261,7 +261,7 @@ Send a client assertion as JWT for us to validate the signature against the regi
 
 ```BASH
 curl --request POST \
-  --url \{your_domain}/oauth/v2/token \
+  --url {your_domain}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer \
   --data assertion=eyJhbGciOiJSUzI1Ni...
@@ -359,7 +359,7 @@ Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on ho
 
 ```BASH
 curl --request POST \
-  --url \{your_domain}/oauth/v2/token \
+  --url {your_domain}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
@@ -375,7 +375,7 @@ Or you can also send your `client_id` and `client_secret` as parameters in the b
 
 ```BASH
 curl --request POST \
-  --url \{your_domain}/oauth/v2/token \
+  --url {your_domain}/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data grant_type=client_credentials \
   --data client_id=${CLIENT_ID} \
@@ -496,7 +496,7 @@ Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Se
 
 ```BASH
 curl --request POST \
-  --url \{your_domain}/oauth/v2/introspect \
+  --url {your_domain}/oauth/v2/introspect \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --header 'Authorization: Basic {your_basic_auth_header}' \
   --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
@@ -515,7 +515,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 ```BASH
 curl --request POST \
-  --url \{your_domain}/oauth/v2/introspect \
+  --url {your_domain}/oauth/v2/introspect \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
   --data client_assertion=eyJhbGciOiJSUzI1Ni... \
@@ -562,7 +562,7 @@ Send the `access_token` of the **user** (not the client) as Bearer Token in the 
 
 ```BASH
 curl --request GET \
-  --url \{your_domain}/oidc/v1/userinfo
+  --url {your_domain}/oidc/v1/userinfo
   --header 'Authorization: Bearer dsfdsjk29fm2as...'
 ```
 
@@ -637,7 +637,7 @@ Send a `client_assertion` as JWT for ZITADEL to verify the signature against the
 
 ```BASH
 curl --request POST \
-  --url \{your_domain}/oauth/v2/revoke \
+  --url {your_domain}/oauth/v2/revoke \
   --header 'Content-Type: application/x-www-form-urlencoded' \
   --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
   --data client_assertion=eyJhbGciOiJSUzI1Ni... \
