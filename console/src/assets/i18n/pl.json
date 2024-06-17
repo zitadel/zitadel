@@ -1546,7 +1546,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Wygaśnięcie hasła",
-      "TITLE": "Możesz ustawić zasady wygasania haseł. Ta zasada zmusi użytkownika do zmiany hasła przy następnym logowaniu po jego wygaśnięciu."
+      "DESCRIPTION": "Możesz ustawić zasady wygasania haseł. Ta zasada zmusi użytkownika do zmiany hasła przy następnym logowaniu po jego wygaśnięciu. Nie ma automatycznych ostrzeżeń i powiadomień."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Polityka blokowania",

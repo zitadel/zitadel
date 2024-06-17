@@ -1546,7 +1546,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Scadenza password",
-      "DESCRIPTION": "Puoi impostare una policy per la scadenza delle password. Questa policy obbligherà l'utente a cambiare la password al prossimo accesso dopo la scadenza."
+      "DESCRIPTION": "Puoi impostare una policy per la scadenza delle password. Questa policy obbligherà l'utente a cambiare la password al prossimo accesso dopo la scadenza. Non ci sono avvisi e notifiche automatiche."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Impostazioni di blocco",

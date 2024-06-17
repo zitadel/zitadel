@@ -1547,7 +1547,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Password Expiry",
-      "DESCRIPTION": "You can set a policy for the expiry of passwords. This policy will force the user to change the password on the next login after the expiration."
+      "DESCRIPTION": "You can set a policy for the expiry of passwords. This policy will force the user to change the password on the next login after the expiration. There are no automatic warnings and notifications."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Lockout Policy",

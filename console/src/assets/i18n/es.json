@@ -1548,7 +1548,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Caducidad de la contraseña",
-      "DESCRIPTION": "Puedes establecer una política para la caducidad de las contraseñas. Esta política obligará al usuario a cambiar la contraseña en el próximo inicio de sesión después de la caducidad."
+      "DESCRIPTION": "Puedes establecer una política para la caducidad de las contraseñas. Esta política obligará al usuario a cambiar la contraseña en el próximo inicio de sesión después de la caducidad. No hay avisos ni notificaciones automáticos."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Política de bloqueo",

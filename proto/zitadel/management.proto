@@ -10599,7 +10599,9 @@ message GetDefaultPasswordAgePolicyResponse {
 }
 
 message AddCustomPasswordAgePolicyRequest {
+    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
+    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -10608,7 +10610,9 @@ message AddCustomPasswordAgePolicyResponse {
 }
 
 message UpdateCustomPasswordAgePolicyRequest {
+    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
+    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
     uint32 expire_warn_days = 2;
 }
 

@@ -1548,7 +1548,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Expiração da senha",
-      "DESCRIPTION": "Você pode definir uma política para a expiração de senhas. Esta política forçará o usuário a alterar a senha no próximo login após a expiração."
+      "DESCRIPTION": "Você pode definir uma política para a expiração de senhas. Esta política forçará o usuário a alterar a senha no próximo login após a expiração. Não existem avisos e notificações automáticas."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Política de bloqueio",

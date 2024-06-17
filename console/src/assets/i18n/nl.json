@@ -1547,7 +1547,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Wachtwoord verloopt",
-      "DESCRIPTION": "U kunt een beleid instellen voor het verlopen van wachtwoorden. Dit beleid dwingt de gebruiker om het wachtwoord te wijzigen bij de volgende aanmelding na het verlopen."
+      "DESCRIPTION": "U kunt een beleid instellen voor het verlopen van wachtwoorden. Dit beleid dwingt de gebruiker om het wachtwoord te wijzigen bij de volgende aanmelding na het verlopen. Er zijn geen automatische waarschuwingen en meldingen."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Lockout Beleid",

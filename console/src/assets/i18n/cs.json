@@ -1547,7 +1547,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Expirace hesla",
-      "DESCRIPTION": "Můžete nastavit pravidlo pro vypršení platnosti hesel. Toto pravidlo donutí uživatele změnit heslo při dalším přihlášení po uplynutí platnosti."
+      "DESCRIPTION": "Můžete nastavit pravidlo pro vypršení platnosti hesel. Toto pravidlo donutí uživatele změnit heslo při dalším přihlášení po uplynutí platnosti. Neexistují žádná automatická varování a upozornění."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Politika uzamčení",
