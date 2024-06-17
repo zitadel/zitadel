@@ -1423,7 +1423,8 @@
         "pt": "Portuguese",
         "mk": "Македонски",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1664,7 +1665,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "LOCALE": "Код языка",
       "LOCALES": {
@@ -2649,7 +2651,8 @@
     "pt": "Portuguese",
     "mk": "Македонски",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Добавить менеджера",
