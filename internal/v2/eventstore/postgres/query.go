@@ -40,7 +40,7 @@ func (s *Storage) Query(ctx context.Context, query *eventstore.Query) (eventCoun
 		closeSpan.EndWithError(closeErr)
 	}()
 
-	return executeQuery(ctx, s.client.DB, &stmt, query)
+	return executeQuery(ctx, conn, &stmt, query)
 }
 
 func executeQuery(ctx context.Context, tx database.Querier, stmt *database.Statement, reducer eventstore.Reducer) (eventCount int, err error) {
