@@ -54,19 +54,20 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 		select {
 		case client = <-clientChan:
 			resErr = client.err
+			if resErr != nil {
+				// we prioritize the client error over the token error
+				err = resErr
+				cancel()
+			}
 		case token = <-tokenChan:
 			resErr = token.err
-		}
-
-		if resErr == nil {
-			continue
-		}
-		cancel()
-
-		// we only care for the first error that occurred,
-		// as the next error is most probably a context error.
-		if err == nil {
-			err = resErr
+			if resErr == nil {
+				continue
+			}
+			// we prioritize the client error over the token error
+			if err == nil {
+				err = resErr
+			}
 		}
 	}
 
