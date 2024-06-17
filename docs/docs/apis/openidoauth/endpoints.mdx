@@ -104,6 +104,22 @@ no additional parameters required
 | prompt        | If the Auth Server prompts the user for (re)authentication. <br />no prompt: the user will have to choose a session if more than one session exists<br />`none`: user must be authenticated without interaction, an error is returned otherwise <br />`login`: user must reauthenticate / provide a user name <br />`select_account`: user is prompted to select one of the existing sessions or create a new one <br />`create`: the registration form will be displayed to the user directly |
 | state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well, therefore highly **recommended**.                                                                                                                                                                                                                                                                                                                     |
 | ui_locales    | Spaces delimited list of preferred locales for the login UI, e.g. `de-CH de en`. If none is provided or matches the possible locales provided by the login UI, the `accept-language` header of the browser will be taken into account.                                                                                                                                                                                                                                                         |
+| response_mode | The mechanism to be used for returning parameters to the application. See [response modes](#response-modes) for valid values. Invalid values are ignored.                                                                                                                                                                                                                                                                                                                                      |
+
+#### Response modes
+
+ZITADEL supports the following `response_mode` values. When no response mode is requested, the response mode is choosen based on the configured Response Type of the application.
+As per [OpenID Connect Core 1.0, Section 3.1.2.1](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest):
+
+> The use of this parameter is NOT RECOMMENDED when the Response Mode that would be requested is the default mode specified for the Response Type.
+
+| Response Mode | Description                                                                                                                                                                                                                                                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| query         | Encode the returned parameters in the URL query string. This is the default when the Response type is `code`, for example [Web applications](/docs/guides/manage/console/applications#web).                                                                                                                                     |
+| fragment      | Encode the returned parameters in the URL fragment. This is the default when the Response Type is `id_token`, for example implicit [User Agent apps](/docs/guides/manage/console/applications#user-agent). This mode will not work for server-side applications, because fragments are never sent by the browser to the server. |
+| form_post[^1] | ZITADEL serves a small JavaScript to the browser which will send the returned parameters to the `redirect_uri` using HTTP POST. This mode only works for server-side applications and user agents which support / allow JavaScript.                                                                                             |
+
+[^1]: Implements [OAuth 2.0 Form Post Response Mode](https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
 
 ### Successful code response
 

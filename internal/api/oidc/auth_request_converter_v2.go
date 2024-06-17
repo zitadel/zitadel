@@ -53,7 +53,7 @@ func (a *AuthRequestV2) GetResponseType() oidc.ResponseType {
 }
 
 func (a *AuthRequestV2) GetResponseMode() oidc.ResponseMode {
-	return ""
+	return ResponseModeToOIDC(a.ResponseMode)
 }
 
 func (a *AuthRequestV2) GetScopes() []string {
