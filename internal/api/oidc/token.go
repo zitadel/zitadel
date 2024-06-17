@@ -29,8 +29,8 @@ In some cases step 1 till 3 are completely implemented in the command package,
 for example the v2 code exchange and refresh token.
 */
 
-func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.Client, session *command.OIDCSession, state, projectID string, projectRoleAssertion bool) (_ *oidc.AccessTokenResponse, err error) {
-	getUserInfo := s.getUserInfoOnce(session.UserID, projectID, projectRoleAssertion, session.Scope)
+func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.Client, session *command.OIDCSession, state, projectID string, projectRoleAssertion, accessTokenRoleAssertion, idTokenRoleAssertion, userInfoAssertion bool) (_ *oidc.AccessTokenResponse, err error) {
+	getUserInfo := s.getUserInfo(session.UserID, projectID, projectRoleAssertion, userInfoAssertion, session.Scope)
 	getSigner := s.getSignerOnce()
 
 	resp := &oidc.AccessTokenResponse{
@@ -43,7 +43,7 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 	// If the session does not have a token ID, it is an implicit ID-Token only response.
 	if session.TokenID != "" {
 		if client.AccessTokenType() == op.AccessTokenTypeJWT {
-			resp.AccessToken, err = s.createJWT(ctx, client, session, getUserInfo, getSigner)
+			resp.AccessToken, err = s.createJWT(ctx, client, session, getUserInfo, accessTokenRoleAssertion, getSigner)
 		} else {
 			resp.AccessToken, err = op.CreateBearerToken(session.TokenID, session.UserID, s.opCrypto)
 		}
@@ -53,7 +53,7 @@ func (s *Server) accessTokenResponseFromSession(ctx context.Context, client op.C
 	}
 
 	if slices.Contains(session.Scope, oidc.ScopeOpenID) {
-		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, getSigner, session.SessionID, resp.AccessToken, session.Audience, session.AuthMethods, session.AuthTime, session.Nonce, session.Actor)
+		resp.IDToken, _, err = s.createIDToken(ctx, client, getUserInfo, idTokenRoleAssertion, getSigner, session.SessionID, resp.AccessToken, session.Audience, session.AuthMethods, session.AuthTime, session.Nonce, session.Actor)
 	}
 	return resp, err
 }
@@ -92,31 +92,22 @@ func (s *Server) getSignerOnce() signerFunc {
 }
 
 // userInfoFunc is a getter function that allows add-hoc retrieval of a user.
-type userInfoFunc func(ctx context.Context) (*oidc.UserInfo, error)
+type userInfoFunc func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (*oidc.UserInfo, error)
 
-// getUserInfoOnce returns a function which retrieves userinfo from the database once.
-// Repeated calls of the returned function return the same results.
-func (s *Server) getUserInfoOnce(userID, projectID string, projectRoleAssertion bool, scope []string) userInfoFunc {
-	var (
-		once     sync.Once
-		userInfo *oidc.UserInfo
-		err      error
-	)
-	return func(ctx context.Context) (*oidc.UserInfo, error) {
-		once.Do(func() {
-			ctx, span := tracing.NewSpan(ctx)
-			defer func() { span.EndWithError(err) }()
-			userInfo, err = s.userInfo(ctx, userID, scope, projectID, projectRoleAssertion, false)
-		})
-		return userInfo, err
+// getUserInfo returns a function which retrieves userinfo from the database once.
+// However, each time, role claims are asserted and also action flows will trigger.
+func (s *Server) getUserInfo(userID, projectID string, projectRoleAssertion, userInfoAssertion bool, scope []string) userInfoFunc {
+	userInfo := s.userInfo(userID, scope, projectID, projectRoleAssertion, userInfoAssertion, false)
+	return func(ctx context.Context, roleAssertion bool, triggerType domain.TriggerType) (*oidc.UserInfo, error) {
+		return userInfo(ctx, roleAssertion, triggerType)
 	}
 }
 
-func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo userInfoFunc, getSigningKey signerFunc, sessionID, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, nonce string, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
+func (*Server) createIDToken(ctx context.Context, client op.Client, getUserInfo userInfoFunc, roleAssertion bool, getSigningKey signerFunc, sessionID, accessToken string, audience []string, authMethods []domain.UserAuthMethodType, authTime time.Time, nonce string, actor *domain.TokenActor) (idToken string, exp uint64, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	userInfo, err := getUserInfo(ctx)
+	userInfo, err := getUserInfo(ctx, roleAssertion, domain.TriggerTypePreUserinfoCreation)
 	if err != nil {
 		return "", 0, err
 	}
@@ -156,11 +147,11 @@ func timeToOIDCExpiresIn(exp time.Time) uint64 {
 	return uint64(time.Until(exp) / time.Second)
 }
 
-func (*Server) createJWT(ctx context.Context, client op.Client, session *command.OIDCSession, getUserInfo userInfoFunc, getSigner signerFunc) (_ string, err error) {
+func (s *Server) createJWT(ctx context.Context, client op.Client, session *command.OIDCSession, getUserInfo userInfoFunc, assertRoles bool, getSigner signerFunc) (_ string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	userInfo, err := getUserInfo(ctx)
+	userInfo, err := getUserInfo(ctx, assertRoles, domain.TriggerTypePreAccessTokenCreation)
 	if err != nil {
 		return "", err
 	}

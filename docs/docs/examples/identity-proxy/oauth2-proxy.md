@@ -32,7 +32,7 @@ Continue and Create the application.
 After successful app creation a popup will appear showing you your clientID as well as a secret.
 Copy your client ID and Secrets as it will be needed in the next step.
 
-> Note: You will be able to regenerate the secret at a later time if you loose it.
+> Note: You will be able to regenerate the secret at a later time if you lose it.
 
 ## OAuth 2.0 Proxy Setup
 

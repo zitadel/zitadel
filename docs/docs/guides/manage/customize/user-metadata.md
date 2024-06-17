@@ -219,6 +219,11 @@ An example response for your search looks like this:
 }
 ```
 
+## Register user with custom metadata
+
+When you build your own registration UI you have the possibility to have custom fields and add them to the metadata of your user.
+Learn everything about how to build your own registration UI [here](/docs/guides/integrate/onboarding/end-users#build-your-own-registration-form).
+
 ## Manage user metadata through the management API
 
 The previous methods allowed you to retrieve metadata only for the `sub` in the access token.

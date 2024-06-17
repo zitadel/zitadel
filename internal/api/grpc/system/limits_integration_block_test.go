@@ -27,7 +27,7 @@ import (
 )
 
 func TestServer_Limits_Block(t *testing.T) {
-	domain, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	domain, instanceID, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	tests := []*test{
 		publicAPIBlockingTest(domain),
 		{
