@@ -69,7 +69,7 @@ Create a new .xml file with the following minimal SAML metadata contents:
 Set or replace the variables with the values from the next screen as follows:
 
 - `${ENTITYID}`: `google.com/a/<your_domain>`
-- `${ACSURL}`: `https://www.google.com/a/\<your_domain>/acs`
+- `${ACSURL}`: `https://www.google.com/a/<your_domain>/acs`
 
 `<your_domain>` is the domain you have verified in Google Workspace.
 
