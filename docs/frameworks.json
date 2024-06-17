@@ -111,5 +111,11 @@
     "imgSrcDark": "/docs/img/tech/rustlight.svg",
     "docsLink": "https://github.com/smartive/zitadel-rust",
     "external": true
+  },
+  {
+    "title": "Pylon",
+    "imgSrcDark": "/docs/img/tech/pylon.svg",
+    "docsLink": "https://github.com/getcronit/pylon",
+    "external": true
   }
 ]

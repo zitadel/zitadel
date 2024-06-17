@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
+	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
 )
@@ -101,6 +102,15 @@ func (p *milestoneProjection) Reducers() []handler.AggregateReducer {
 					// PATs have no effect on milestone.AuthenticationSucceededOnApplication or milestone.AuthenticationSucceededOnInstance
 					Event:  user.UserTokenAddedType,
 					Reduce: p.reduceUserTokenAdded,
+				},
+			},
+		},
+		{
+			Aggregate: oidcsession.AggregateType,
+			EventReducers: []handler.EventReducer{
+				{
+					Event:  oidcsession.AddedType,
+					Reduce: p.reduceOIDCSessionAdded,
 				},
 			},
 		},
@@ -210,6 +220,40 @@ func (p *milestoneProjection) reduceUserTokenAdded(event eventstore.Event) (*han
 				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
 				handler.NewCond(MilestoneColumnType, milestone.AuthenticationSucceededOnApplication),
 				handler.Not(handler.NewTextArrayContainsCond(MilestoneColumnIgnoreClientIDs, e.ApplicationID)),
+				handler.NewIsNullCond(MilestoneColumnReachedDate),
+			},
+		))
+	}
+	return handler.NewMultiStatement(e, statements...), nil
+}
+
+func (p *milestoneProjection) reduceOIDCSessionAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*oidcsession.AddedEvent](event)
+	if err != nil {
+		return nil, err
+	}
+	statements := []func(eventstore.Event) handler.Exec{
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MilestoneColumnReachedDate, event.CreatedAt()),
+			},
+			[]handler.Condition{
+				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(MilestoneColumnType, milestone.AuthenticationSucceededOnInstance),
+				handler.NewIsNullCond(MilestoneColumnReachedDate),
+			},
+		),
+	}
+	// We ignore authentications without app, for example JWT profile or PAT
+	if e.ClientID != "" {
+		statements = append(statements, handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(MilestoneColumnReachedDate, event.CreatedAt()),
+			},
+			[]handler.Condition{
+				handler.NewCond(MilestoneColumnInstanceID, event.Aggregate().InstanceID),
+				handler.NewCond(MilestoneColumnType, milestone.AuthenticationSucceededOnApplication),
+				handler.Not(handler.NewTextArrayContainsCond(MilestoneColumnIgnoreClientIDs, e.ClientID)),
 				handler.NewIsNullCond(MilestoneColumnReachedDate),
 			},
 		))
