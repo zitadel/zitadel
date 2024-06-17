@@ -28,6 +28,7 @@ const (
 type AuthRequestOIDC struct {
 	Scopes        []string
 	ResponseType  OIDCResponseType
+	ResponseMode  OIDCResponseMode
 	Nonce         string
 	CodeChallenge *OIDCCodeChallenge
 }
