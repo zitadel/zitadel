@@ -30,6 +30,7 @@ type AddedEvent struct {
 	Scope            []string                  `json:"scope,omitempty"`
 	Audience         []string                  `json:"audience,omitempty"`
 	ResponseType     domain.OIDCResponseType   `json:"response_type,omitempty"`
+	ResponseMode     domain.OIDCResponseMode   `json:"response_mode,omitempty"`
 	CodeChallenge    *domain.OIDCCodeChallenge `json:"code_challenge,omitempty"`
 	Prompt           []domain.Prompt           `json:"prompt,omitempty"`
 	UILocales        []string                  `json:"ui_locales,omitempty"`
@@ -57,6 +58,7 @@ func NewAddedEvent(ctx context.Context,
 	scope,
 	audience []string,
 	responseType domain.OIDCResponseType,
+	responseMode domain.OIDCResponseMode,
 	codeChallenge *domain.OIDCCodeChallenge,
 	prompt []domain.Prompt,
 	uiLocales []string,
@@ -79,6 +81,7 @@ func NewAddedEvent(ctx context.Context,
 		Scope:            scope,
 		Audience:         audience,
 		ResponseType:     responseType,
+		ResponseMode:     responseMode,
 		CodeChallenge:    codeChallenge,
 		Prompt:           prompt,
 		UILocales:        uiLocales,

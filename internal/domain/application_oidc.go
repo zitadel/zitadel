@@ -83,6 +83,16 @@ const (
 	OIDCResponseTypeIDTokenToken
 )
 
+//go:generate enumer -type OIDCResponseMode -transform snake -trimprefix OIDCResponseMode
+type OIDCResponseMode int
+
+const (
+	OIDCResponseModeUnspecified OIDCResponseMode = iota
+	OIDCResponseModeQuery
+	OIDCResponseModeFragment
+	OIDCResponseModeFormPost
+)
+
 type OIDCGrantType int32
 
 const (

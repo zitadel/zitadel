@@ -247,6 +247,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -286,6 +287,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -359,6 +361,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: Autorização de dispositivo
