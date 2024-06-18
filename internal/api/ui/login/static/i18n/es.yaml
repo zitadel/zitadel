@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Cambiar contraseña
   Description: Cambia tu contraseña. Introduce tu contraseña anterior y la nueva.
+  ExpiredDescription: Tu contraseña ha caducado y tiene que cambiarla. Introduzca tu contraseña anterior y la nueva.
   OldPasswordLabel: Contraseña anterior
   NewPasswordLabel: Nueva contraseña
   NewPasswordConfirmLabel: Confirmación de contraseña

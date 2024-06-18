@@ -1326,6 +1326,7 @@
       "LANGUAGES": "Jazyky",
       "LOGIN": "Chování při přihlášení a bezpečnost",
       "LOCKOUT": "Blokování",
+      "AGE": "Expirace hesla",
       "COMPLEXITY": "Složitost hesla",
       "NOTIFICATIONS": "Oznámení",
       "SMTP_PROVIDER": "Poskytovatel SMTP",
@@ -1546,8 +1547,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Stáří hesla",
-      "DESCRIPTION": "Můžete nastavit politiku pro stáří hesel. Tato politika vydá varování po uplynutí konkrétního času stáří."
+      "TITLE": "Expirace hesla",
+      "DESCRIPTION": "Můžete nastavit pravidlo pro vypršení platnosti hesel. Toto pravidlo donutí uživatele změnit heslo při dalším přihlášení po uplynutí platnosti. Neexistují žádná automatická varování a upozornění."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Politika uzamčení",
@@ -1700,8 +1701,8 @@
       "SHOWLOCKOUTFAILURES": "zobrazit neúspěšné pokusy o uzamčení",
       "MAXPASSWORDATTEMPTS": "Maximální počet pokusů o heslo",
       "MAXOTPATTEMPTS": "Maximální počet pokusů o OTP",
-      "EXPIREWARNDAYS": "Upozornění na expiraci po dni",
-      "MAXAGEDAYS": "Maximální stáří v dnech",
+      "EXPIREWARNDAYS": "Upozornění na uplynutí po dnech",
+      "MAXAGEDAYS": "Maximální platnost v dnech",
       "USERLOGINMUSTBEDOMAIN": "Přidat doménu organizace jako příponu k přihlašovacím jménům",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Pokud povolíte toto nastavení, všechna přihlašovací jména budou doplněna o doménu organizace. Pokud je toto nastavení zakázáno, musíte zajistit, aby byla uživatelská jména jedinečná napříč všemi organizacemi.",
       "VALIDATEORGDOMAINS": "Požadováno ověření domény organizace (DNS nebo HTTP výzva)",

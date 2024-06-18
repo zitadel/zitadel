@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Промена на лозинка
   Description: Променете ја вашата лозинка. Внесете ја старата и новата лозинка.
+  ExpiredDescription: Вашата лозинка е истечена и мора да се смени. Внесете ја старата и новата лозинка.
   OldPasswordLabel: Стара лозинка
   NewPasswordLabel: Нова лозинка
   NewPasswordConfirmLabel: Потврда на лозинка

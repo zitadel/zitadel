@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Change Password
   Description: Change your password. Enter your old and new password.
+  ExpiredDescription: You password has expired and has to be changed. Enter your old and new password.
   OldPasswordLabel: Old Password
   NewPasswordLabel: New Password
   NewPasswordConfirmLabel: Password confirmation

@@ -186,6 +186,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Alterar senha
   Description: Altere sua senha. Insira sua senha antiga e nova.
+  ExpiredDescription: A sua palavra-passe expirou e tem de ser alterada. Insira sua senha antiga e nova.
   OldPasswordLabel: Senha antiga
   NewPasswordLabel: Nova senha
   NewPasswordConfirmLabel: Confirmação de senha

@@ -117,6 +117,16 @@ export const LOCKOUT: SidenavSetting = {
   },
 };
 
+export const AGE: SidenavSetting = {
+  id: 'age',
+  i18nKey: 'SETTINGS.LIST.AGE',
+  groupI18nKey: 'SETTINGS.GROUPS.LOGIN',
+  requiredRoles: {
+    [PolicyComponentServiceType.MGMT]: ['policy.read'],
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
 export const COMPLEXITY: SidenavSetting = {
   id: 'complexity',
   i18nKey: 'SETTINGS.LIST.COMPLEXITY',
