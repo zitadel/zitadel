@@ -34,6 +34,10 @@ add_session: bundle
 update_session: bundle
 	k6 run dist/update_session.js --vus ${VUS} --duration ${DURATION}
 
+.PHONY: add_and_update_session
+add_and_update_session: bundle
+	k6 run dist/add_update_session.js --vus ${VUS} --duration ${DURATION}
+
 .PHONY: lint
 lint:
 	npm i

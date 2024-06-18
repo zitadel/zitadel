@@ -2,7 +2,7 @@ import { Trend } from 'k6/metrics';
 import { Org } from './org';
 import http from 'k6/http';
 import url from './url';
-import { check, sleep } from 'k6';
+import { check } from 'k6';
 import { User } from './user';
 import { b64encode } from 'k6/encoding';
 
@@ -68,7 +68,7 @@ export function createEmptySession(org: Org, accessToken: string): Promise<Sessi
   });
 }
 
-const addUpdateSessionTrend = new Trend('session_update_session_duration', true);
+const updateSessionTrend = new Trend('session_update_session_duration', true);
 export function updateSession(session: Session, org: Org, accessToken: string): Promise<void> {
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest(
@@ -92,7 +92,7 @@ export function updateSession(session: Session, org: Org, accessToken: string): 
         'add Session status ok': (r) => r.status === 200,
       }) || reject(`unable to update Session status: ${res.status} body: ${res.body}`);
 
-      addUpdateSessionTrend.add(res.timings.duration);
+      updateSessionTrend.add(res.timings.duration);
       resolve();
     });
   });
