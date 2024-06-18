@@ -56,7 +56,6 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectPush(),
 				),
 			},
 			args: args{

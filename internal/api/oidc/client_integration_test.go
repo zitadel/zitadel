@@ -140,6 +140,15 @@ func TestServer_Introspect(t *testing.T) {
 	}
 }
 
+func TestServer_Introspect_invalid_auth_invalid_token(t *testing.T) {
+	// ensure that when an invalid authentication and token is sent, the authentication error is returned
+	// https://github.com/zitadel/zitadel/pull/8133
+	resourceServer, err := Tester.CreateResourceServerClientCredentials(CTX, "xxxxx", "xxxxx")
+	require.NoError(t, err)
+	_, err = rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, "xxxxx")
+	require.Error(t, err)
+}
+
 func assertIntrospection(
 	t *testing.T,
 	introspection *oidc.IntrospectionResponse,
