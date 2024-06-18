@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Verander Wachtwoord
   Description: Verander uw wachtwoord. Voer uw oude en nieuwe wachtwoord in.
+  ExpiredDescription: Je wachtwoord is verlopen en moet worden gewijzigd. Voer uw oude en nieuwe wachtwoord in.
   OldPasswordLabel: Oud Wachtwoord
   NewPasswordLabel: Nieuw Wachtwoord
   NewPasswordConfirmLabel: Bevestig Wachtwoord

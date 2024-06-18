@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Changer le mot de passe
   Description: Changez votre mot de passe. Entrez votre ancien et votre nouveau mot de passe.
+  ExpiredDescription: Votre mot de passe a expiré et doit être modifié. Entrez votre ancien et votre nouveau mot de passe.
   OldPasswordLabel: Ancien mot de passe
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirmLabel: Confirmation du mot de passe

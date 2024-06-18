@@ -316,6 +316,7 @@ func PasswordChangeScreenTextToPb(text domain.PasswordChangeScreenText) *text_pb
 	return &text_pb.PasswordChangeScreenText{
 		Title:                   text.Title,
 		Description:             text.Description,
+		ExpiredDescription:      text.ExpiredDescription,
 		OldPasswordLabel:        text.OldPasswordLabel,
 		NewPasswordLabel:        text.NewPasswordLabel,
 		NewPasswordConfirmLabel: text.NewPasswordConfirmLabel,
@@ -784,6 +785,7 @@ func PasswordChangeScreenTextPbToDomain(text *text_pb.PasswordChangeScreenText) 
 	return domain.PasswordChangeScreenText{
 		Title:                   text.Title,
 		Description:             text.Description,
+		ExpiredDescription:      text.ExpiredDescription,
 		OldPasswordLabel:        text.OldPasswordLabel,
 		NewPasswordLabel:        text.NewPasswordLabel,
 		NewPasswordConfirmLabel: text.NewPasswordConfirmLabel,

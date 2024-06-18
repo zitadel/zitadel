@@ -1326,6 +1326,7 @@
       "LANGUAGES": "Languages",
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
+      "AGE": "Password expiry",
       "COMPLEXITY": "Password complexity",
       "NOTIFICATIONS": "Notifications",
       "SMTP_PROVIDER": "SMTP Provider",
@@ -1546,8 +1547,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Password Aging",
-      "DESCRIPTION": "You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
+      "TITLE": "Password Expiry",
+      "DESCRIPTION": "You can set a policy for the expiry of passwords. This policy will force the user to change the password on the next login after the expiration. There are no automatic warnings and notifications."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Lockout Policy",
@@ -1700,8 +1701,8 @@
       "SHOWLOCKOUTFAILURES": "show lockout failures",
       "MAXPASSWORDATTEMPTS": "Password maximum attempts",
       "MAXOTPATTEMPTS": "OTP maximum attempts",
-      "EXPIREWARNDAYS": "Expiration Warning after day",
-      "MAXAGEDAYS": "Max Age in days",
+      "EXPIREWARNDAYS": "Expiration Warning after days",
+      "MAXAGEDAYS": "Maximum validity in days",
       "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
       "VALIDATEORGDOMAINS": "Organization domain verification required (DNS or HTTP challenge)",
