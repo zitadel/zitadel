@@ -3,6 +3,7 @@ package projection
 import (
 	"database/sql"
 	"testing"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -14,6 +15,7 @@ import (
 )
 
 func TestUserProjection_reduces(t *testing.T) {
+	testNow := time.Now()
 	type args struct {
 		event func(t *testing.T) eventstore.Event
 	}
@@ -27,7 +29,7 @@ func TestUserProjection_reduces(t *testing.T) {
 			name: "reduceHumanAdded",
 			args: args{
 				event: getEvent(
-					testEvent(
+					timedTestEvent(
 						user.HumanAddedType,
 						user.AggregateType,
 						[]byte(`{
@@ -42,6 +44,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"phone": "+41 00 000 00 00",
 						"changeRequired": true
 					}`),
+						testNow,
 					), user.HumanAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
@@ -78,7 +81,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								true,
-								nil,
+								&sql.NullTime{Time: testNow, Valid: false},
 							},
 						},
 						{
@@ -99,7 +102,7 @@ func TestUserProjection_reduces(t *testing.T) {
 			name: "reduceUserV1Added",
 			args: args{
 				event: getEvent(
-					testEvent(
+					timedTestEvent(
 						user.UserV1AddedType,
 						user.AggregateType,
 						[]byte(`{
@@ -113,6 +116,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
+						testNow,
 					), user.HumanAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
@@ -149,7 +153,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								false,
-								anyArg{},
+								&sql.NullTime{Time: testNow, Valid: false},
 							},
 						},
 						{
@@ -170,7 +174,7 @@ func TestUserProjection_reduces(t *testing.T) {
 			name: "reduceHumanAdded NULLs",
 			args: args{
 				event: getEvent(
-					testEvent(
+					timedTestEvent(
 						user.HumanAddedType,
 						user.AggregateType,
 						[]byte(`{
@@ -179,6 +183,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"lastName": "last-name",
 						"email": "email@zitadel.com"
 					}`),
+						testNow,
 					), user.HumanAddedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanAdded,
@@ -215,7 +220,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{},
 								false,
-								anyArg{},
+								&sql.NullTime{Time: testNow, Valid: false},
 							},
 						},
 						{
@@ -236,7 +241,7 @@ func TestUserProjection_reduces(t *testing.T) {
 			name: "reduceHumanRegistered",
 			args: args{
 				event: getEvent(
-					testEvent(
+					timedTestEvent(
 						user.HumanRegisteredType,
 						user.AggregateType,
 						[]byte(`{
@@ -251,6 +256,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"phone": "+41 00 000 00 00",
 						"changeRequired": true
 					}`),
+						testNow,
 					), user.HumanRegisteredEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
@@ -287,7 +293,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								true,
-								anyArg{},
+								&sql.NullTime{Time: testNow, Valid: false},
 							},
 						},
 						{
@@ -308,7 +314,7 @@ func TestUserProjection_reduces(t *testing.T) {
 			name: "reduceUserV1Registered",
 			args: args{
 				event: getEvent(
-					testEvent(
+					timedTestEvent(
 						user.UserV1RegisteredType,
 						user.AggregateType,
 						[]byte(`{
@@ -322,6 +328,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"email": "email@zitadel.com",
 						"phone": "+41 00 000 00 00"
 					}`),
+						testNow,
 					), user.HumanRegisteredEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
@@ -358,7 +365,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								false,
-								anyArg{},
+								&sql.NullTime{Time: testNow, Valid: false},
 							},
 						},
 						{
@@ -379,7 +386,7 @@ func TestUserProjection_reduces(t *testing.T) {
 			name: "reduceHumanRegistered NULLs",
 			args: args{
 				event: getEvent(
-					testEvent(
+					timedTestEvent(
 						user.HumanRegisteredType,
 						user.AggregateType,
 						[]byte(`{
@@ -388,6 +395,7 @@ func TestUserProjection_reduces(t *testing.T) {
 						"lastName": "last-name",
 						"email": "email@zitadel.com"
 					}`),
+						testNow,
 					), user.HumanRegisteredEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanRegistered,
@@ -424,7 +432,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{},
 								false,
-								anyArg{},
+								&sql.NullTime{Time: testNow, Valid: false},
 							},
 						},
 						{
@@ -1404,12 +1412,13 @@ func TestUserProjection_reduces(t *testing.T) {
 			name: "reduceHumanPasswordChanged",
 			args: args{
 				event: getEvent(
-					testEvent(
+					timedTestEvent(
 						user.HumanPasswordChangedType,
 						user.AggregateType,
 						[]byte(`{
 						"changeRequired": true
 					}`),
+						testNow,
 					), user.HumanPasswordChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPasswordChanged,
@@ -1422,7 +1431,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.users13_humans SET (password_change_required, password_changed) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								true,
-								anyArg{},
+								&sql.NullTime{Time: testNow, Valid: true},
 								"agg-id",
 								"instance-id",
 							},
@@ -1443,12 +1452,13 @@ func TestUserProjection_reduces(t *testing.T) {
 			name: "reduceHumanPasswordChanged, false",
 			args: args{
 				event: getEvent(
-					testEvent(
+					timedTestEvent(
 						user.HumanPasswordChangedType,
 						user.AggregateType,
 						[]byte(`{
 						"changeRequired": false
 					}`),
+						testNow,
 					), user.HumanPasswordChangedEventMapper),
 			},
 			reduce: (&userProjection{}).reduceHumanPasswordChanged,
@@ -1461,7 +1471,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							expectedStmt: "UPDATE projections.users13_humans SET (password_change_required, password_changed) = ($1, $2) WHERE (user_id = $3) AND (instance_id = $4)",
 							expectedArgs: []interface{}{
 								false,
-								anyArg{},
+								&sql.NullTime{Time: testNow, Valid: true},
 								"agg-id",
 								"instance-id",
 							},
