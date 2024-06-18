@@ -78,7 +78,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								domain.EmailAddress("email@zitadel.com"),
 								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
 								true,
-								anyArg{},
+								nil,
 							},
 						},
 						{

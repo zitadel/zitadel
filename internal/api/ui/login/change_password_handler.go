@@ -40,6 +40,10 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 		errType, errMessage = l.getErrorMessage(r, err)
 	}
 	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil || len(authReq.PossibleSteps) < 1 {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	step, ok := authReq.PossibleSteps[0].(*domain.ChangePasswordStep)
 	if !ok {
 		l.renderError(w, r, authReq, err)
