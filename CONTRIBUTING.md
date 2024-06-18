@@ -412,6 +412,13 @@ ZITADEL loads translations from four files:
 
 You may edit the texts in these files or create a new file for additional language support. Make sure you set the locale (ISO 639-1 code) as the name of the new language file.
 Please make sure that the languages within the files remain in their own language, e.g. German must always be `Deutsch.
+If you have added support for a new language, please also ensure that it is added in the list of languages in all the other language files.
+
+You also have to add some changes to the following files: 
+- [Register Local File](./console/src/app/app.module.ts)
+- [Add Supported Language](./console/src/app/utils/language.ts)
+- [Customized Text Docs](./docs/docs/guides/manage/customize/texts.md)
+- [Add language option](./internal/api/ui/login/static/templates/external_not_found_option.html)
 
 ## Want to start ZITADEL?
 

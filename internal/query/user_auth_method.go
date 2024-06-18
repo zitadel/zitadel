@@ -11,7 +11,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -180,7 +179,6 @@ func (q *Queries) ListActiveUserAuthMethodTypes(ctx context.Context, userID stri
 
 type UserAuthMethodRequirements struct {
 	UserType          domain.UserType
-	AuthMethods       []domain.UserAuthMethodType
 	ForceMFA          bool
 	ForceMFALocalOnly bool
 }
@@ -422,30 +420,11 @@ func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareData
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
-	authMethodsQuery, authMethodsArgs, err := prepareAggAuthMethodsQuery()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
-	idpsQuery, err := prepareAuthMethodsIDPsQuery()
-	if err != nil {
-		return sq.SelectBuilder{}, nil
-	}
 	return sq.Select(
-			NotifyPasswordSetCol.identifier(),
-			authMethodTypeTypes.identifier(),
-			userIDPsCountCount.identifier(),
 			UserTypeCol.identifier(),
 			forceMFAForce.identifier(),
 			forceMFAForceLocalOnly.identifier()).
 			From(userTable.identifier()).
-			LeftJoin(join(NotifyUserIDCol, UserIDCol)).
-			LeftJoin("("+authMethodsQuery+") AS "+authMethodTypeTable.alias+" ON "+
-				authMethodTypeUserID.identifier()+" = "+UserIDCol.identifier()+" AND "+
-				authMethodTypeInstanceID.identifier()+" = "+UserInstanceIDCol.identifier(),
-				authMethodsArgs...).
-			LeftJoin("(" + idpsQuery + ") AS " + userIDPsCountTable.alias + " ON " +
-				userIDPsCountUserID.identifier() + " = " + UserIDCol.identifier() + " AND " +
-				userIDPsCountInstanceID.identifier() + " = " + UserInstanceIDCol.identifier()).
 			LeftJoin("(" + loginPolicyQuery + ") AS " + forceMFATable.alias + " ON " +
 				"(" + forceMFAOrgID.identifier() + " = " + UserInstanceIDCol.identifier() + " OR " + forceMFAOrgID.identifier() + " = " + UserResourceOwnerCol.identifier() + ") AND " +
 				forceMFAInstanceID.identifier() + " = " + UserInstanceIDCol.identifier()).
@@ -453,16 +432,10 @@ func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareData
 			Limit(1).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*UserAuthMethodRequirements, error) {
-			var passwordSet sql.NullBool
-			var authMethodTypes database.NumberArray[domain.UserAuthMethodType]
-			var idp sql.NullInt64
 			var userType sql.NullInt32
 			var forceMFA sql.NullBool
 			var forceMFALocalOnly sql.NullBool
 			err := row.Scan(
-				&passwordSet,
-				&authMethodTypes,
-				&idp,
 				&userType,
 				&forceMFA,
 				&forceMFALocalOnly,
@@ -473,16 +446,8 @@ func prepareUserAuthMethodTypesRequiredQuery(ctx context.Context, db prepareData
 				}
 				return nil, zerrors.ThrowInternal(err, "QUERY-Sf3rt", "Errors.Internal")
 			}
-			if passwordSet.Valid && passwordSet.Bool {
-				authMethodTypes = append(authMethodTypes, domain.UserAuthMethodTypePassword)
-			}
-			if idp.Valid && idp.Int64 > 0 {
-				authMethodTypes = append(authMethodTypes, domain.UserAuthMethodTypeIDP)
-			}
-
 			return &UserAuthMethodRequirements{
 				UserType:          domain.UserType(userType.Int32),
-				AuthMethods:       authMethodTypes,
 				ForceMFA:          forceMFA.Bool,
 				ForceMFALocalOnly: forceMFALocalOnly.Bool,
 			}, nil
@@ -510,17 +475,6 @@ func prepareAuthMethodQuery() (string, []interface{}, error) {
 		authMethodTypeInstanceID.identifier()).
 		From(authMethodTypeTable.identifier()).
 		Where(sq.Eq{authMethodTypeState.identifier(): domain.MFAStateReady}).
-		ToSql()
-}
-
-func prepareAggAuthMethodsQuery() (string, []interface{}, error) {
-	return sq.Select(
-		"array_agg(DISTINCT("+authMethodTypeType.identifier()+")) as method_types",
-		authMethodTypeUserID.identifier(),
-		authMethodTypeInstanceID.identifier()).
-		From(authMethodTypeTable.identifier()).
-		Where(sq.Eq{authMethodTypeState.identifier(): domain.MFAStateReady}).
-		GroupBy(authMethodTypeInstanceID.identifier(), authMethodTypeUserID.identifier()).
 		ToSql()
 }
 
