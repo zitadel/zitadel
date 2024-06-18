@@ -126,7 +126,7 @@ export class PasswordAgePolicyComponent implements OnInit {
     if (this.passwordAgeData) {
       if (this.service instanceof AdminService) {
         promise = this.service
-          .updatePasswordAgePolicy(this.passwordAgeData.maxAgeDays, this.passwordAgeData.expireWarnDays)
+          .updatePasswordAgePolicy(this.maxAgeDays?.value ?? 0, this.expireWarnDays?.value ?? 0)
           .then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
             this.fetchData();
@@ -137,7 +137,7 @@ export class PasswordAgePolicyComponent implements OnInit {
       } else {
         if ((this.passwordAgeData as PasswordAgePolicy.AsObject).isDefault) {
           promise = (this.service as ManagementService)
-            .addCustomPasswordAgePolicy(this.passwordAgeData.maxAgeDays, this.passwordAgeData.expireWarnDays)
+            .addCustomPasswordAgePolicy(this.maxAgeDays?.value ?? 0, this.expireWarnDays?.value ?? 0)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
               this.fetchData();
@@ -147,7 +147,7 @@ export class PasswordAgePolicyComponent implements OnInit {
             });
         } else {
           promise = (this.service as ManagementService)
-            .updateCustomPasswordAgePolicy(this.passwordAgeData.maxAgeDays, this.passwordAgeData.expireWarnDays)
+            .updateCustomPasswordAgePolicy(this.maxAgeDays?.value ?? 0, this.expireWarnDays?.value ?? 0)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
               this.fetchData();
