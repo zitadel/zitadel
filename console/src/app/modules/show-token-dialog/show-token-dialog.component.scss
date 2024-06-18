@@ -40,6 +40,11 @@
     display: flex;
     align-items: center;
 
+    .token {
+      overflow-wrap: break-word;
+      word-break: break-all;
+    }
+
     .ctc {
       margin-right: 1rem;
     }

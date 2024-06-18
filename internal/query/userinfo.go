@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"strings"
 	"sync"
+	"text/template"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
@@ -35,16 +37,43 @@ func TriggerOIDCUserInfoProjections(ctx context.Context) {
 	triggerBatch(ctx, oidcUserInfoTriggerHandlers()...)
 }
 
-//go:embed userinfo_by_id.sql
-var oidcUserInfoQuery string
+var (
+	//go:embed userinfo_by_id.sql
+	oidcUserInfoQueryTmpl           string
+	oidcUserInfoQuery               string
+	oidcUserInfoWithRoleOrgIDsQuery string
+)
 
-func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudience []string) (_ *OIDCUserInfo, err error) {
+// build the two variants of the userInfo query
+func init() {
+	tmpl := template.Must(template.New("oidcUserInfoQuery").Parse(oidcUserInfoQueryTmpl))
+	var buf strings.Builder
+	if err := tmpl.Execute(&buf, false); err != nil {
+		panic(err)
+	}
+	oidcUserInfoQuery = buf.String()
+	buf.Reset()
+
+	if err := tmpl.Execute(&buf, true); err != nil {
+		panic(err)
+	}
+	oidcUserInfoWithRoleOrgIDsQuery = buf.String()
+	buf.Reset()
+}
+
+func (q *Queries) GetOIDCUserInfo(ctx context.Context, userID string, roleAudience []string, roleOrgIDs ...string) (userInfo *OIDCUserInfo, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	userInfo, err := database.QueryJSONObject[OIDCUserInfo](ctx, q.client, oidcUserInfoQuery,
-		userID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience),
-	)
+	if len(roleOrgIDs) > 0 {
+		userInfo, err = database.QueryJSONObject[OIDCUserInfo](ctx, q.client, oidcUserInfoWithRoleOrgIDsQuery,
+			userID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience), database.TextArray[string](roleOrgIDs),
+		)
+	} else {
+		userInfo, err = database.QueryJSONObject[OIDCUserInfo](ctx, q.client, oidcUserInfoQuery,
+			userID, authz.GetInstance(ctx).InstanceID(), database.TextArray[string](roleAudience),
+		)
+	}
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, zerrors.ThrowNotFound(err, "QUERY-Eey2a", "Errors.User.NotFound")
 	}

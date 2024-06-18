@@ -248,6 +248,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -286,6 +287,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -353,6 +355,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:

@@ -38,7 +38,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectPush(),
 				),
 			},
 			args: args{

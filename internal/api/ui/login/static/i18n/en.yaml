@@ -251,6 +251,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -290,6 +291,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -363,6 +365,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: Device Authorization
   UserCode:

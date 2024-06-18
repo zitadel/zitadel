@@ -21,6 +21,7 @@ type AuthRequest struct {
 	Scope            []string
 	Audience         []string
 	ResponseType     domain.OIDCResponseType
+	ResponseMode     domain.OIDCResponseMode
 	CodeChallenge    *domain.OIDCCodeChallenge
 	Prompt           []domain.Prompt
 	UILocales        []string
@@ -64,6 +65,7 @@ func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest)
 		authRequest.Scope,
 		authRequest.Audience,
 		authRequest.ResponseType,
+		authRequest.ResponseMode,
 		authRequest.CodeChallenge,
 		authRequest.Prompt,
 		authRequest.UILocales,
@@ -162,6 +164,7 @@ func authRequestWriteModelToCurrentAuthRequest(writeModel *AuthRequestWriteModel
 			Scope:         writeModel.Scope,
 			Audience:      writeModel.Audience,
 			ResponseType:  writeModel.ResponseType,
+			ResponseMode:  writeModel.ResponseMode,
 			CodeChallenge: writeModel.CodeChallenge,
 			Prompt:        writeModel.Prompt,
 			UILocales:     writeModel.UILocales,
