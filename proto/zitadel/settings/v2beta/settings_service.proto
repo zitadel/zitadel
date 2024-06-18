@@ -218,7 +218,7 @@ service SettingsService {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Get the password expiry settings";
-      description: "Return the password complexity settings for the requested context"
+      description: "Return the password expiry settings for the requested context"
       responses: {
         key: "200"
         value: {
