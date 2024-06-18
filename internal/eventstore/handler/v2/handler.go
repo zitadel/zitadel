@@ -226,25 +226,25 @@ func (h *Handler) didInitialize(ctx context.Context) bool {
 
 func (h *Handler) schedule(ctx context.Context) {
 	//  start the projection and its configured `RequeueEvery`
-	// reset := randomizeStart(0, h.requeueEvery.Seconds())
-	// if !h.didInitialize(ctx) {
-	// 	reset = randomizeStart(0, 0.5)
-	// }
-	// t := time.NewTimer(reset)
+	reset := randomizeStart(0, h.requeueEvery.Seconds())
+	if !h.didInitialize(ctx) {
+		reset = randomizeStart(0, 0.5)
+	}
+	t := time.NewTimer(reset)
 
-	// for {
-	// 	select {
-	// 	case <-ctx.Done():
-	// 		t.Stop()
-	// 		return
-	// 	case <-t.C:
-	// 		instances, err := h.queryInstances(ctx)
-	// 		h.log().OnError(err).Debug("unable to query instances")
+	for {
+		select {
+		case <-ctx.Done():
+			t.Stop()
+			return
+		case <-t.C:
+			instances, err := h.queryInstances(ctx)
+			h.log().OnError(err).Debug("unable to query instances")
 
-	// 		h.triggerInstances(call.WithTimestamp(ctx), instances)
-	// 		t.Reset(h.requeueEvery)
-	// 	}
-	// }
+			h.triggerInstances(call.WithTimestamp(ctx), instances)
+			t.Reset(h.requeueEvery)
+		}
+	}
 }
 
 func (h *Handler) triggerInstances(ctx context.Context, instances []string, triggerOpts ...TriggerOpt) {

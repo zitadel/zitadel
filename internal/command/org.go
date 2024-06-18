@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -227,6 +228,8 @@ func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail b
 	if err != nil {
 		return nil, err
 	}
+
+	defer projection.OrgProjection.Trigger(ctx)
 
 	return c.setUpOrgWithIDs(ctx, o, orgID, allowInitialMail, userIDs...)
 }
