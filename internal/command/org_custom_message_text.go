@@ -9,12 +9,16 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // SetOrgMessageText only validates if the language is supported, not if it is allowed.
 // This enables setting texts before allowing a language
-func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, messageText *domain.CustomMessageText) (*domain.ObjectDetails, error) {
+func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, messageText *domain.CustomMessageText) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-2biiR", "Errors.ResourceOwnerMissing")
 	}

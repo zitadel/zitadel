@@ -12,6 +12,9 @@ import (
 )
 
 func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (_ *domain.UserGrant, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	event, addedUserGrant, err := c.addUserGrant(ctx, usergrant, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -284,9 +287,12 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 	return writeModel, nil
 }
 
-func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) error {
+func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	preConditions := NewUserGrantPreConditionReadModel(usergrant.UserID, usergrant.ProjectID, usergrant.ProjectGrantID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
+	err = c.eventstore.FilterToQueryReducer(ctx, preConditions)
 	if err != nil {
 		return err
 	}
