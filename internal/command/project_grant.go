@@ -14,6 +14,9 @@ import (
 )
 
 func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *domain.ProjectGrant, grantID string, resourceOwner string) (_ *domain.ProjectGrant, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	existingMember, err := c.projectGrantWriteModelByID(ctx, grantID, grant.AggregateID, resourceOwner)
 	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, err
