@@ -11,7 +11,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, resourceOwner string) (*domain.Member, error) {
+func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, resourceOwner string) (_ *domain.Member, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	addedMember := NewProjectMemberWriteModel(member.AggregateID, member.UserID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedMember.WriteModel)
 	event, err := c.addProjectMember(ctx, projectAgg, addedMember, member)
@@ -31,7 +34,10 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, 
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
-func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, addedMember *ProjectMemberWriteModel, member *domain.Member) (eventstore.Command, error) {
+func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, addedMember *ProjectMemberWriteModel, member *domain.Member) (_ eventstore.Command, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if !member.IsValid() {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
 	}
@@ -39,7 +45,7 @@ func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-3m9ds", "Errors.Project.Member.Invalid")
 	}
 
-	err := c.checkUserExists(ctx, addedMember.UserID, "")
+	err = c.checkUserExists(ctx, addedMember.UserID, "")
 	if err != nil {
 		return nil, err
 	}

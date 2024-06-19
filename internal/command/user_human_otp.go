@@ -16,7 +16,10 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) ImportHumanTOTP(ctx context.Context, userID, userAgentID, resourceOwner string, key string) error {
+func (c *Commands) ImportHumanTOTP(ctx context.Context, userID, userAgentID, resourceOwner string, key string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	encryptedSecret, err := crypto.Encrypt([]byte(key), c.multifactors.OTP.CryptoMFA)
 	if err != nil {
 		return err
