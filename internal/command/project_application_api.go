@@ -68,6 +68,9 @@ func (c *Commands) AddAPIAppCommand(app *addAPIApp) preparation.Validation {
 }
 
 func (c *Commands) AddAPIApplicationWithID(ctx context.Context, apiApp *domain.APIApp, resourceOwner, appID string) (_ *domain.APIApp, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	existingAPI, err := c.getAPIAppWriteModel(ctx, apiApp.AggregateID, appID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -105,6 +108,9 @@ func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp,
 }
 
 func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.APIApp, resourceOwner string, project *domain.Project, appID string) (_ *domain.APIApp, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	apiApp.AppID = appID
 
 	addedApplication := NewAPIApplicationWriteModel(apiApp.AggregateID, resourceOwner)
@@ -262,9 +268,12 @@ func (c *Commands) APISecretCheckFailed(ctx context.Context, appID, projectID, r
 	c.apiSecretCheckFailed(ctx, &agg.Aggregate, appID)
 }
 
-func (c *Commands) getAPIAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*APIApplicationWriteModel, error) {
+func (c *Commands) getAPIAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (_ *APIApplicationWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	appWriteModel := NewAPIApplicationWriteModelWithAppID(projectID, appID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
 	if err != nil {
 		return nil, err
 	}
