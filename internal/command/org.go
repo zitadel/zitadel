@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -275,7 +276,10 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 	return nil
 }
 
-func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner, orgID string, claimedUserIDs []string) (*domain.Org, error) {
+func (c *Commands) AddOrgWithID(ctx context.Context, name, userID, resourceOwner, orgID string, claimedUserIDs []string) (_ *domain.Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	existingOrg, err := c.getOrgWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -300,7 +304,10 @@ func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner strin
 	return c.addOrgWithIDAndMember(ctx, name, userID, resourceOwner, orgID, claimedUserIDs)
 }
 
-func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, resourceOwner, orgID string, claimedUserIDs []string) (*domain.Org, error) {
+func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, resourceOwner, orgID string, claimedUserIDs []string) (_ *domain.Org, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgAgg, addedOrg, events, err := c.addOrgWithID(ctx, &domain.Org{Name: name}, orgID, claimedUserIDs)
 	if err != nil {
 		return nil, err
@@ -717,9 +724,12 @@ func (c *Commands) addOrgWithID(ctx context.Context, organisation *domain.Org, o
 	return orgAgg, addedOrg, events, nil
 }
 
-func (c *Commands) getOrgWriteModelByID(ctx context.Context, orgID string) (*OrgWriteModel, error) {
+func (c *Commands) getOrgWriteModelByID(ctx context.Context, orgID string) (_ *OrgWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgWriteModel := NewOrgWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, orgWriteModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, orgWriteModel)
 	if err != nil {
 		return nil, err
 	}
