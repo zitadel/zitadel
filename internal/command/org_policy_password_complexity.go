@@ -5,10 +5,14 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) getOrgPasswordComplexityPolicy(ctx context.Context, orgID string) (*domain.PasswordComplexityPolicy, error) {
+func (c *Commands) getOrgPasswordComplexityPolicy(ctx context.Context, orgID string) (_ *domain.PasswordComplexityPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	policy, err := c.orgPasswordComplexityPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -28,7 +32,10 @@ func (c *Commands) orgPasswordComplexityPolicyWriteModelByID(ctx context.Context
 	return policy, nil
 }
 
-func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordComplexityPolicy) (*domain.PasswordComplexityPolicy, error) {
+func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwner string, policy *domain.PasswordComplexityPolicy) (_ *domain.PasswordComplexityPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-7ufEs", "Errors.ResourceOwnerMissing")
 	}
@@ -36,7 +43,7 @@ func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwne
 		return nil, err
 	}
 	addedPolicy := NewOrgPasswordComplexityPolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err = c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}

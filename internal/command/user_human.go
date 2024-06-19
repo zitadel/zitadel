@@ -422,6 +422,9 @@ func (h *AddHuman) shouldAddInitCode() bool {
 
 // Deprecated: use commands.AddUserHuman
 func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if orgID == "" {
 		return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-5N8fs", "Errors.ResourceOwnerMissing")
 	}
@@ -470,6 +473,9 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 }
 
 func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, links []*domain.UserIDPLink, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator crypto.Generator) (events []eventstore.Command, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if orgID == "" {
 		return nil, nil, nil, "", zerrors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.Org.Empty")
 	}
@@ -652,9 +658,12 @@ func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []
 	return err
 }
 
-func (c *Commands) getHumanWriteModelByID(ctx context.Context, userID, resourceowner string) (*HumanWriteModel, error) {
+func (c *Commands) getHumanWriteModelByID(ctx context.Context, userID, resourceowner string) (_ *HumanWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	humanWriteModel := NewHumanWriteModel(userID, resourceowner)
-	err := c.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, humanWriteModel)
 	if err != nil {
 		return nil, err
 	}
