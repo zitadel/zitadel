@@ -23,13 +23,6 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.Pro
 		return nil, err
 	}
 	addedMember := NewProjectGrantMemberWriteModel(member.AggregateID, member.UserID, member.GrantID)
-	err = c.eventstore.FilterToQueryReducer(ctx, addedMember)
-	if err != nil {
-		return nil, err
-	}
-	if addedMember.State == domain.MemberStateActive {
-		return nil, zerrors.ThrowAlreadyExists(nil, "PROJECT-16dVN", "Errors.Project.Member.AlreadyExists")
-	}
 	projectAgg := ProjectAggregateFromWriteModel(&addedMember.WriteModel)
 	pushedEvents, err := c.eventstore.Push(
 		ctx,
