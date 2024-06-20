@@ -234,12 +234,15 @@ func samlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte
 		if err != nil {
 			return nil, nil, err
 		}
+		now := time.Now().UTC()
 		template := x509.Certificate{
 			SerialNumber: big.NewInt(int64(serial)),
 			Subject: pkix.Name{
 				Organization: []string{"ZITADEL"},
 				SerialNumber: id,
 			},
+			NotBefore:             now,
+			NotAfter:              now.Add(365 * 24 * time.Hour),
 			KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
 			ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			BasicConstraintsValid: true,
