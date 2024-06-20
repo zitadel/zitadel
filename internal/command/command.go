@@ -234,7 +234,7 @@ func samlCertificateAndKeyGenerator(keySize int, lifetime time.Duration) func(id
 		if err != nil {
 			return nil, nil, err
 		}
-		now := time.Now().UTC()
+		now := time.Now()
 		template := x509.Certificate{
 			SerialNumber: big.NewInt(int64(serial)),
 			Subject: pkix.Name{
