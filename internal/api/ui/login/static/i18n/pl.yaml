@@ -32,15 +32,17 @@ Password:
   Title: Hasło
   Description: Wprowadź swoje dane logowania.
   PasswordLabel: Hasło
-  MinLength: Minimalna długość
-  HasUppercase: Duża litera
-  HasLowercase: Mała litera
-  HasNumber: Liczba
-  HasSymbol: Symbol
-  Confirmation: Potwierdzenie zgodności
-  ResetLinkText: zresetuj hasło
-  BackButtonText: wróć
-  NextButtonText: dalej
+  MinLength: Musi zawierać co najmniej
+  MinLengthp2: znaków.
+  MaxLength: Musi zawierać mniej niż 70 znaków.
+  HasUppercase: Musi zawierać dużą literę.
+  HasLowercase: Musi zawierać małą literę.
+  HasNumber: Musi zawierać numer.
+  HasSymbol: Musi zawierać symbol.
+  Confirmation: Potwierdzenie hasła pasuje.
+  ResetLinkText: Zresetuj hasło
+  BackButtonText: Wstecz
+  NextButtonText: Dalej
 
 UsernameChange:
   Title: Zmiana nazwy użytkownika

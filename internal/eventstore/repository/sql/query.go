@@ -28,7 +28,7 @@ type querier interface {
 	maxSequenceQuery(useV1 bool) string
 	instanceIDsQuery(useV1 bool) string
 	db() *database.DB
-	orderByEventSequence(desc, useV1 bool) string
+	orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string
 	dialect.Database
 }
 
@@ -59,6 +59,7 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 	if err != nil {
 		return err
 	}
+
 	query, rowScanner := prepareColumns(criteria, q.Columns, useV1)
 	where, values := prepareConditions(criteria, q, useV1)
 	if where == "" || query == "" {
@@ -78,10 +79,20 @@ func query(ctx context.Context, criteria querier, searchQuery *eventstore.Search
 		q.Desc = true
 	}
 
+	// if there is only one subquery we can optimize the query ordering by ordering by sequence
+	var shouldOrderBySequence bool
+	if len(q.SubQueries) == 1 {
+		for _, filter := range q.SubQueries[0] {
+			if filter.Field == repository.FieldAggregateID {
+				shouldOrderBySequence = filter.Operation == repository.OperationEquals
+			}
+		}
+	}
+
 	switch q.Columns {
 	case eventstore.ColumnsEvent,
 		eventstore.ColumnsMaxSequence:
-		query += criteria.orderByEventSequence(q.Desc, useV1)
+		query += criteria.orderByEventSequence(q.Desc, shouldOrderBySequence, useV1)
 	}
 
 	if q.Limit > 0 {
@@ -220,7 +231,7 @@ func eventsScanner(useV1 bool) func(scanner scan, dest interface{}) (err error) 
 	}
 }
 
-func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (string, []any) {
+func prepareConditions(criteria querier, query *repository.SearchQuery, useV1 bool) (_ string, args []any) {
 	clauses, args := prepareQuery(criteria, useV1, query.InstanceID, query.InstanceIDs, query.ExcludedInstances)
 	if clauses != "" && len(query.SubQueries) > 0 {
 		clauses += " AND "

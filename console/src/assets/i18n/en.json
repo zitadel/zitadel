@@ -54,7 +54,7 @@
       },
       "MACHINES": {
         "TITLE": "Service Users",
-        "DESCRIPTION": "Les utilisateurs du service s'authentifient de manière non interactive à l'aide d'un jeton de porteur JWT signé avec une clé privée. Ils peuvent également utiliser un jeton d'accès personnel.",
+        "DESCRIPTION": "Service Users authenticate non-interactively using a JWT bearer token signed with a private key. They can also use a personal access token.",
         "METADATA": "Add custom attributes to the user like the authenticating system. You can use this information in your actions."
       },
       "SELF": {
@@ -595,8 +595,9 @@
     "INVALID_FORMAT": "The formatting is invalid.",
     "NOTANEMAIL": "The given value is not an e-mail address.",
     "MINLENGTH": "Must be at least {{requiredLength}} characters long.",
-    "UPPERCASEMISSING": "Must include an uppercase character.",
-    "LOWERCASEMISSING": "Must include a lowercase character.",
+    "MAXLENGTH": "Must be less than {{requiredLength}} characters.",
+    "UPPERCASEMISSING": "Must include an uppercase letter.",
+    "LOWERCASEMISSING": "Must include a lowercase letter.",
     "SYMBOLERROR": "Must include a symbol or punctuation mark.",
     "NUMBERERROR": "Must include a digit.",
     "PWNOTEQUAL": "The passwords provided do not match.",
@@ -880,7 +881,8 @@
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Send Password Reset Link",
       "REQUIRED": "Some required fields are missing.",
-      "MINLENGTHERROR": "Has to be at least {{value}} characters long."
+      "MINLENGTHERROR": "Must be at least {{value}} characters long.",
+      "MAXLENGTHERROR": "Must be less than {{value}} characters."
     },
     "ID": "ID",
     "EMAIL": "E-mail",

@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -80,7 +81,11 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	// with active: false
 	defer func() {
 		if err != nil {
-			s.getLogger(ctx).ErrorContext(ctx, "oidc introspection", "err", err)
+			if zerrors.IsInternal(err) {
+				s.getLogger(ctx).ErrorContext(ctx, "oidc introspection", "err", err)
+			} else {
+				s.getLogger(ctx).InfoContext(ctx, "oidc introspection", "err", err)
+			}
 			resp, err = op.NewResponse(new(oidc.IntrospectionResponse)), nil
 		}
 	}()
@@ -99,7 +104,14 @@ func (s *Server) Introspect(ctx context.Context, r *op.Request[op.IntrospectionR
 	if err = validateIntrospectionAudience(token.audience, client.clientID, client.projectID); err != nil {
 		return nil, err
 	}
-	userInfo, err := s.userInfo(ctx, token.userID, token.scope, client.projectID, client.projectRoleAssertion, true)
+	userInfo, err := s.userInfo(
+		token.userID,
+		token.scope,
+		client.projectID,
+		client.projectRoleAssertion,
+		true,
+		true,
+	)(ctx, true, domain.TriggerTypePreUserinfoCreation)
 	if err != nil {
 		return nil, err
 	}

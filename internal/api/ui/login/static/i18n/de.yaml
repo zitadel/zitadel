@@ -29,15 +29,17 @@ SelectAccount:
   MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
 
 Password:
-  Title: Willkommen zurück!
-  Description: Gib deine Benutzerdaten ein.
+  Title: Passwort
+  Description: Geben Sie Ihre Anmeldedaten ein.
   PasswordLabel: Passwort
-  MinLength: Mindestlänge
-  HasUppercase: Großbuchstaben
-  HasLowercase: Kleinbuchstaben
-  HasNumber: Nummer
-  HasSymbol: Symbol
-  Confirmation: Wiederholung stimmt überein
+  MinLength: Muss mindestens
+  MinLengthp2: Zeichen lang sein.
+  MaxLength: Muss weniger als 70 Zeichen lang sein.
+  HasUppercase: Muss einen Großbuchstaben enthalten.
+  HasLowercase: Muss einen Kleinbuchstaben enthalten.
+  HasNumber: Muss eine Zahl enthalten.
+  HasSymbol: Muss ein Symbol enthalten.
+  Confirmation: Passwortbestätigung stimmt überein.
   ResetLinkText: Passwort zurücksetzen
   BackButtonText: Zurück
   NextButtonText: Weiter
