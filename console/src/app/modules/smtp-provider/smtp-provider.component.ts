@@ -2,7 +2,7 @@ import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { Subject, take } from 'rxjs';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Options } from 'src/app/proto/generated/zitadel/idp_pb';
 import { requiredValidator } from '../form-field/validators/validators';
@@ -35,6 +35,7 @@ import {
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { MatStepper } from '@angular/material/stepper';
 import { SMTPConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'cnsl-smtp-provider',
@@ -76,6 +77,7 @@ export class SMTPProviderComponent {
     private router: Router,
     private route: ActivatedRoute,
     private authService: GrpcAuthService,
+    private translate: TranslateService,
   ) {
     this.route.parent?.url.subscribe((urlPath) => {
       const providerName = urlPath[urlPath.length - 1].path;
@@ -318,7 +320,12 @@ export class SMTPProviderComponent {
       .then(() => {
         this.resultClass = 'test-success';
         this.isLoading.set(false);
-        this.testResult = 'Your email was succesfully sent';
+        this.translate
+          .get('SMTP.CREATE.STEPS.TEST.RESULT')
+          .pipe(take(1))
+          .subscribe((msg) => {
+            this.testResult = msg;
+          });
       })
       .catch((error) => {
         this.resultClass = 'test-error';

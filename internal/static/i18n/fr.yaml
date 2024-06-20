@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: Impossible de contacter le serveur SMTP via TLS, vérifiez le port, problèmes de pare-feu...
     CouldNotCreateClient: impossible de créer un client SMTP
     CouldNotStartTLS: je n'ai pas pu démarrer tls
-    CouldNotAuth: Impossible d'ajouter l'authentification SMTP, vérifiez si votre utilisateur et votre mot de passe sont corrects. S'ils sont corrects, votre fournisseur nécessite peut-être une méthode d'authentification non prise en charge par Zitadel.
+    CouldNotAuth: Impossible d'ajouter l'authentification SMTP, vérifiez si votre utilisateur et votre mot de passe sont corrects. S'ils sont corrects, votre fournisseur nécessite peut-être une méthode d'authentification non prise en charge par ZITADEL.
     CouldNotSetSender: impossible de définir l'expéditeur
     CouldNotSetRecipient: impossible de définir le destinataire
   SMTPConfig:

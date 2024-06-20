@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: kon geen contact maken met de SMTP-server via TLS, controleer de poort, firewallproblemen...
     CouldNotCreateClient: kan geen smtp-client maken
     CouldNotStartTLS: kon tls niet starten
-    CouldNotAuth: kon geen smtp-authenticatie toevoegen, controleer of zowel uw gebruiker als uw wachtwoord correct zijn. Als ze correct zijn, vereist uw provider misschien een auth-methode die niet door Zitadel wordt ondersteund
+    CouldNotAuth: kon geen smtp-authenticatie toevoegen, controleer of zowel uw gebruiker als uw wachtwoord correct zijn. Als ze correct zijn, vereist uw provider misschien een auth-methode die niet door ZITADEL wordt ondersteund
     CouldNotSetSender: kon de afzender niet instellen
     CouldNotSetRecipient: Kan de ontvanger niet instellen
   SMTPConfig:

@@ -2267,7 +2267,8 @@
         "SAVE_SETTINGS": "Salve suas configurações",
         "TEST": {
           "TITLE": "Teste suas configurações",
-          "DESCRIPTION": "Você pode testar as configurações do seu provedor SMTP e verificar o resultado do teste antes de salvá-las"
+          "DESCRIPTION": "Você pode testar as configurações do seu provedor SMTP e verificar o resultado do teste antes de salvá-las",
+          "RESULT": "Seu e-mail foi enviado com sucesso"
         }
       }
     },

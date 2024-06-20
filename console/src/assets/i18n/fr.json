@@ -2273,7 +2273,8 @@
         "SAVE_SETTINGS": "Enregistrez vos paramètres",
         "TEST": {
           "TITLE": "Testez vos paramètres",
-          "DESCRIPTION": "Vous pouvez tester les paramètres de votre fournisseur SMTP et vérifier le résultat du test avant de les enregistrer"
+          "DESCRIPTION": "Vous pouvez tester les paramètres de votre fournisseur SMTP et vérifier le résultat du test avant de les enregistrer",
+          "RESULT": "Votre email a été envoyé avec succès"
         }
       }
     },

@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: 无法使用 TLS 与 SMTP 服务器联系，请检查端口、防火墙问题...
     CouldNotCreateClient: 无法创建 smtp 客户端
     CouldNotStartTLS: 无法启动 tls
-    CouldNotAuth: 无法添加 smtp 身份验证，请检查您的用户名和密码是否正确，如果正确，可能您的提供商需要 Zitadel 不支持的身份验证方法
+    CouldNotAuth: 无法添加 smtp 身份验证，请检查您的用户名和密码是否正确，如果正确，可能您的提供商需要 ZITADEL 不支持的身份验证方法
     CouldNotSetSender: 无法设置发件人
     CouldNotSetRecipient: 无法设置收件人
   SMTPConfig:

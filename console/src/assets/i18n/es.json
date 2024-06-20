@@ -2269,7 +2269,8 @@
         "SAVE_SETTINGS": "Guarda tu configuración",
         "TEST": {
           "TITLE": "Prueba tu configuración",
-          "DESCRIPTION": "Puedes probar tu configuración SMTP y revisar el resultado de la prueba antes de guardar la configuración"
+          "DESCRIPTION": "Puedes probar tu configuración SMTP y revisar el resultado de la prueba antes de guardar la configuración",
+          "RESULT": "Tu email fue enviado con éxito"
         }
       }
     },

@@ -2272,7 +2272,8 @@
         "SAVE_SETTINGS": "保存您的设置",
         "TEST": {
           "TITLE": "测试您的设置",
-          "DESCRIPTION": "您可以测试您的 SMTP 提供商设置并在保存之前检查测试结果"
+          "DESCRIPTION": "您可以测试您的 SMTP 提供商设置并在保存之前检查测试结果",
+          "RESULT": "您的电子邮件已成功发送"
         }
       }
     },

@@ -2273,7 +2273,8 @@
         "SAVE_SETTINGS": "Salva le tue impostazioni",
         "TEST": {
           "TITLE": "Metti alla prova le tue impostazioni",
-          "DESCRIPTION": "Puoi testare le impostazioni del tuo provider SMTP e controllare il risultato del test prima di salvarle"
+          "DESCRIPTION": "Puoi testare le impostazioni del tuo provider SMTP e controllare il risultato del test prima di salvarle",
+          "RESULT": "La tua email è stata inviata correttamente"
         }
       }
     },

@@ -7,6 +7,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { TranslateService } from '@ngx-translate/core';
 import { TestSMTPConfigByIdRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'cnsl-smtp-test-dialog',
@@ -51,7 +52,12 @@ export class SmtpTestDialogComponent {
       .then(() => {
         this.resultClass = 'test-success';
         this.isLoading.set(false);
-        this.testResult = 'Your email was succesfully sent';
+        this.translate
+          .get('SMTP.CREATE.STEPS.TEST.RESULT')
+          .pipe(take(1))
+          .subscribe((msg) => {
+            this.testResult = msg;
+          });
       })
       .catch((error) => {
         this.resultClass = 'test-error';

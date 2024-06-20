@@ -2272,7 +2272,8 @@
         "SAVE_SETTINGS": "Zapisz swoje ustawienia",
         "TEST": {
           "TITLE": "Przetestuj swoje ustawienia",
-          "DESCRIPTION": "Możesz przetestować ustawienia dostawcy SMTP i sprawdzić wynik testu przed ich zapisaniem"
+          "DESCRIPTION": "Możesz przetestować ustawienia dostawcy SMTP i sprawdzić wynik testu przed ich zapisaniem",
+          "RESULT": "Twój email został wysłany"
         }
       }
     },

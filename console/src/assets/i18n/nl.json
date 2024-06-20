@@ -2290,7 +2290,8 @@
         "SAVE_SETTINGS": "Sla uw instellingen op",
         "TEST": {
           "TITLE": "Test uw instellingen",
-          "DESCRIPTION": "U kunt de instellingen van uw SMTP-provider testen en het testresultaat controleren voordat u deze opslaat"
+          "DESCRIPTION": "U kunt de instellingen van uw SMTP-provider testen en het testresultaat controleren voordat u deze opslaat",
+          "RESULT": "Je email is succesvol verzonden"
         }
       }
     },

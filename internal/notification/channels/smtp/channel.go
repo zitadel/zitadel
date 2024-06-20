@@ -170,7 +170,7 @@ func TestConfiguration(cfg *Config, testEmail string) error {
 	message := &messages.Email{
 		Recipients:  []string{testEmail},
 		Subject:     "Test email",
-		Content:     "This a test email to check if your SMTP provider works fine",
+		Content:     "This is a test email to check if your SMTP provider works fine",
 		SenderEmail: cfg.From,
 		SenderName:  cfg.FromName,
 	}

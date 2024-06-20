@@ -2297,7 +2297,8 @@
         "SAVE_SETTINGS": "Save your settings",
         "TEST": {
           "TITLE": "Test your settings",
-          "DESCRIPTION": "You can test your SMTP provider settings and check the test result before saving them"
+          "DESCRIPTION": "You can test your SMTP provider settings and check the test result before saving them",
+          "RESULT": "Your email was succesfully sent"
         }
       }
     },

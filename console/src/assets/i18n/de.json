@@ -2272,7 +2272,8 @@
         "SAVE_SETTINGS": "Speichern Sie Ihre Einstellungen",
         "TEST": {
           "TITLE": "Testen Sie Ihre Einstellungen",
-          "DESCRIPTION": "Sie können die Einstellungen Ihres SMTP-Anbieters testen und das Testergebnis überprüfen, bevor Sie sie speichern"
+          "DESCRIPTION": "Sie können die Einstellungen Ihres SMTP-Anbieters testen und das Testergebnis überprüfen, bevor Sie sie speichern",
+          "RESULT": "Deine E-Mail wurde erfolgreich versandt"
         }
       }
     },

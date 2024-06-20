@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: could not contact with the SMTP server using TLS, check the port, firewall issues...
     CouldNotCreateClient: could not create smtp client
     CouldNotStartTLS: could not start tls
-    CouldNotAuth: could not add smtp auth, check if both your user and password are correct, if they're correct maybe your provider requires an auth method not supported by Zitadel
+    CouldNotAuth: could not add smtp auth, check if both your user and password are correct, if they're correct maybe your provider requires an auth method not supported by ZITADEL
     CouldNotSetSender: could not set sender
     CouldNotSetRecipient: could not set recipient
   SMTPConfig:

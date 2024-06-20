@@ -516,7 +516,7 @@ service AdminService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "SMTP Provider";
             summary: "Test SMTP Provider ";
-            description: "Test an SMTP provider identified by its is. After testing the provider, the users will receive information about the test results."
+            description: "Test an SMTP provider identified by its ID. After testing the provider, the users will receive information about the test results."
         };
     }
 

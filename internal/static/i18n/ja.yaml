@@ -61,7 +61,7 @@ Errors:
     CouldNotDialTLS: TLS を使用して SMTP サーバーに接続できませんでした。ポート、ファイアウォールの問題を確認してください...
     CouldNotCreateClient: SMTPクライアントを作成できませんでした
     CouldNotStartTLS: TLSを開始できませんでした
-    CouldNotAuth: smtp 認証を追加できませんでした。ユーザーとパスワードの両方が正しいかどうかを確認してください。正しい場合は、プロバイダーが Zitadel でサポートされていない認証方法を必要としている可能性があります。
+    CouldNotAuth: smtp 認証を追加できませんでした。ユーザーとパスワードの両方が正しいかどうかを確認してください。正しい場合は、プロバイダーが ZITADEL でサポートされていない認証方法を必要としている可能性があります。
     CouldNotSetSender: 送信者を設定できませんでした
     CouldNotSetRecipient: 受信者を設定できませんでした
   SMTPConfig:

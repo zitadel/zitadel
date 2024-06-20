@@ -2281,7 +2281,8 @@
         "SAVE_SETTINGS": "Uložte nastavení",
         "TEST": {
           "TITLE": "Otestujte svá nastavení",
-          "DESCRIPTION": "Nastavení poskytovatele SMTP můžete otestovat a před uložením zkontrolovat výsledek testu"
+          "DESCRIPTION": "Nastavení poskytovatele SMTP můžete otestovat a před uložením zkontrolovat výsledek testu",
+          "RESULT": "Váš email byl úspěšně odeslán"
         }
       }
     },
