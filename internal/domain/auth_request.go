@@ -56,6 +56,7 @@ type AuthRequest struct {
 	LabelPolicy              *LabelPolicy
 	PrivacyPolicy            *PrivacyPolicy
 	LockoutPolicy            *LockoutPolicy
+	PasswordAgePolicy        *PasswordAgePolicy
 	DefaultTranslations      []*CustomText
 	OrgTranslations          []*CustomText
 	SAMLRequestID            string

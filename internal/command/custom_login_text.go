@@ -687,6 +687,10 @@ func (c *Commands) createPasswordChangeEvents(ctx context.Context, agg *eventsto
 	if event != nil {
 		events = append(events, event)
 	}
+	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordChangeExpiredDescription, existingText.PasswordChangeExpiredDescription, text.PasswordChange.ExpiredDescription, text.Language, defaultText)
+	if event != nil {
+		events = append(events, event)
+	}
 	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordChangeOldPasswordLabel, existingText.PasswordChangeOldPasswordLabel, text.PasswordChange.OldPasswordLabel, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)

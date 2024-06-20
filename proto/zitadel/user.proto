@@ -65,6 +65,8 @@ message Human {
     Profile profile = 1;
     Email email = 2;
     Phone phone = 3;
+    // The time the user last changed their password.
+    google.protobuf.Timestamp password_changed = 4;
 }
 
 message Machine {

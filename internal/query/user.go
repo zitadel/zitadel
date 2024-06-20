@@ -53,6 +53,7 @@ type Human struct {
 	Phone                  domain.PhoneNumber  `json:"phone,omitempty"`
 	IsPhoneVerified        bool                `json:"is_phone_verified,omitempty"`
 	PasswordChangeRequired bool                `json:"password_change_required,omitempty"`
+	PasswordChanged        time.Time           `json:"password_changed,omitempty"`
 }
 
 type Profile struct {
@@ -278,6 +279,10 @@ var (
 
 	HumanPasswordChangeRequiredCol = Column{
 		name:  projection.HumanPasswordChangeRequired,
+		table: humanTable,
+	}
+	HumanPasswordChangedCol = Column{
+		name:  projection.HumanPasswordChanged,
 		table: humanTable,
 	}
 )
@@ -822,6 +827,7 @@ func scanUser(row *sql.Row) (*User, error) {
 	phone := sql.NullString{}
 	isPhoneVerified := sql.NullBool{}
 	passwordChangeRequired := sql.NullBool{}
+	passwordChanged := sql.NullTime{}
 
 	machineID := sql.NullString{}
 	name := sql.NullString{}
@@ -853,6 +859,7 @@ func scanUser(row *sql.Row) (*User, error) {
 		&phone,
 		&isPhoneVerified,
 		&passwordChangeRequired,
+		&passwordChanged,
 		&machineID,
 		&name,
 		&description,
@@ -884,6 +891,7 @@ func scanUser(row *sql.Row) (*User, error) {
 			Phone:                  domain.PhoneNumber(phone.String),
 			IsPhoneVerified:        isPhoneVerified.Bool,
 			PasswordChangeRequired: passwordChangeRequired.Bool,
+			PasswordChanged:        passwordChanged.Time,
 		}
 	} else if machineID.Valid {
 		u.Machine = &Machine{
@@ -929,6 +937,7 @@ func prepareUserQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder
 			HumanPhoneCol.identifier(),
 			HumanIsPhoneVerifiedCol.identifier(),
 			HumanPasswordChangeRequiredCol.identifier(),
+			HumanPasswordChangedCol.identifier(),
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
@@ -1316,6 +1325,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 			HumanPhoneCol.identifier(),
 			HumanIsPhoneVerifiedCol.identifier(),
 			HumanPasswordChangeRequiredCol.identifier(),
+			HumanPasswordChangedCol.identifier(),
 			MachineUserIDCol.identifier(),
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
@@ -1355,6 +1365,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 				phone := sql.NullString{}
 				isPhoneVerified := sql.NullBool{}
 				passwordChangeRequired := sql.NullBool{}
+				passwordChanged := sql.NullTime{}
 
 				machineID := sql.NullString{}
 				name := sql.NullString{}
@@ -1386,6 +1397,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 					&phone,
 					&isPhoneVerified,
 					&passwordChangeRequired,
+					&passwordChanged,
 					&machineID,
 					&name,
 					&description,
@@ -1416,6 +1428,7 @@ func prepareUsersQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilde
 						Phone:                  domain.PhoneNumber(phone.String),
 						IsPhoneVerified:        isPhoneVerified.Bool,
 						PasswordChangeRequired: passwordChangeRequired.Bool,
+						PasswordChanged:        passwordChanged.Time,
 					}
 				} else if machineID.Valid {
 					u.Machine = &Machine{

@@ -2658,7 +2658,7 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Password Age Settings";
-            description: "Not implemented"
+            description: "Returns the password age settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             responses: {
                 key: "200";
                 value: {
@@ -2682,7 +2682,7 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Update Password Age Settings";
-            description: "Not implemented"
+            description: "Updates the default password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             responses: {
                 key: "200";
                 value: {
@@ -6739,18 +6739,10 @@ message GetPasswordAgePolicyResponse {
 }
 
 message UpdatePasswordAgePolicyRequest {
-    uint32 max_age_days = 1 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Maximum days since last password change"
-            example: "\"365\""
-        }
-    ];
-    uint32 expire_warn_days = 2 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Days before the password expiry the user gets notified to change the password"
-            example: "\"10\""
-        }
-    ];
+    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
+    uint32 max_age_days = 1;
+    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
+    uint32 expire_warn_days = 2;
 }
 
 message UpdatePasswordAgePolicyResponse {

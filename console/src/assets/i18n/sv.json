@@ -1326,6 +1326,7 @@
       "LANGUAGES": "Språk",
       "LOGIN": "Inloggningsbeteende och säkerhet",
       "LOCKOUT": "Låsning",
+      "AGE": "Lösenordets utgång",
       "COMPLEXITY": "Lösenordskomplexitet",
       "NOTIFICATIONS": "Meddelanden",
       "SMTP_PROVIDER": "SMTP-leverantör",
@@ -1546,8 +1547,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Lösenordsåldrande",
-      "DESCRIPTION": "Du kan ställa in en policy för lösenordsåldrande. Denna policy avger en varning efter den specifika åldringstiden har passerat."
+      "TITLE": "Lösenordets utgång",
+      "DESCRIPTION": "Du kan ställa in en policy för utgångsdatum för lösenord.  Den här policyn tvingar användaren att byta lösenord vid nästa inloggning efter att lösenordet har löpt ut. Det finns inga automatiska varningar eller meddelanden."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Låsning av lösenordspolicy",
@@ -1700,8 +1701,8 @@
       "SHOWLOCKOUTFAILURES": "visa låsning misslyckanden",
       "MAXPASSWORDATTEMPTS": "Maximalt antal lösenordsförsök",
       "MAXOTPATTEMPTS": "Maximalt antal OTP-försök",
-      "EXPIREWARNDAYS": "Utgångsvarning efter dag",
-      "MAXAGEDAYS": "Max ålder i dagar",
+      "EXPIREWARNDAYS": "Utgångsvarning efter dagar",
+      "MAXAGEDAYS": "Maximal giltighetstid i dagar",
       "USERLOGINMUSTBEDOMAIN": "Lägg till organisationsdomän som suffix till inloggningsnamn",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Om du aktiverar denna inställning kommer alla inloggningsnamn att ha organisationsdomänen som suffix. Om denna inställning är inaktiverad måste du säkerställa att användarnamn är unika över alla organisationer.",
       "VALIDATEORGDOMAINS": "Organisationsdomänverifiering krävs (DNS eller HTTP-utmaning)",
