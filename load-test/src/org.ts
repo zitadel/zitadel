@@ -9,13 +9,16 @@ export type Org = {
 };
 
 const createOrgTrend = new Trend('org_create_org_duration', true);
-export function createOrg(accessToken: string): Promise<Org> {
+export function createOrg(accessToken: string, name?: string): Promise<Org> {
+  if (name == '') {
+    name = `load-test-${new Date(Date.now()).toISOString()}`;
+  }
   return new Promise((resolve, reject) => {
     let response = http.asyncRequest(
       'POST',
       url('/v2beta/organizations'),
       JSON.stringify({
-        name: `load-test-${new Date(Date.now()).toISOString()}`,
+        name: name,
       }),
       {
         headers: {

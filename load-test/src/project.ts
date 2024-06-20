@@ -35,3 +35,33 @@ export function createProject(name: string, org: Org, accessToken: string): Prom
     });
   });
 }
+
+const addProjectGrantTrend = new Trend('project_add_project_grant_duration', true);
+export function createProjectGrant(project: Project, org: Org, roles: string[], accessToken: string): Promise<Project> {
+  return new Promise((resolve, reject) => {
+    let response = http.asyncRequest(
+      'POST',
+      url(`/management/v1/projects/${project.id}/grants`),
+      JSON.stringify({
+        projectId: project.id,
+        grantedOrgId: org.organizationId,
+        roleKeys: roles
+      }),
+      {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          // 'x-zitadel-orgid': org.organizationId,
+        },
+      },
+    );
+    response.then((res) => {
+      check(res, {
+        'add project grant status ok': (r) => r.status === 200,
+      }) || reject(`unable to add project grant status: ${res.status} body: ${res.body}`);
+
+      addProjectGrantTrend.add(res.timings.duration);
+      resolve(res.json() as Project);
+    });
+  });
+}

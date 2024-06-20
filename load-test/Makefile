@@ -38,6 +38,26 @@ update_session: bundle
 add_and_update_session: bundle
 	k6 run dist/add_update_session.js --vus ${VUS} --duration ${DURATION}
 
+.PHONY: add_org
+add_org: bundle
+	k6 run dist/add_org.js --vus ${VUS} --duration ${DURATION}
+
+.PHONY: add_project
+add_project: bundle
+	k6 run dist/add_project.js --vus ${VUS} --duration ${DURATION}
+
+.PHONY: add_project_grant
+add_project_grant: bundle
+	k6 run dist/add_project_grant.js --vus ${VUS}
+
+.PHONY: add_human
+add_human: bundle
+	k6 run dist/add_human.js --vus ${VUS} --duration ${DURATION}
+
+.PHONY: add_machine
+add_machine: bundle
+	k6 run dist/add_machine.js --vus ${VUS} --duration ${DURATION}
+
 .PHONY: lint
 lint:
 	npm i

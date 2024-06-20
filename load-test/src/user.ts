@@ -2,7 +2,7 @@ import { Trend } from 'k6/metrics';
 import { Org } from './org';
 import http, { RefinedResponse } from 'k6/http';
 import url from './url';
-import { check, sleep } from 'k6';
+import { check } from 'k6';
 
 export type User = {
   userId: string;
@@ -54,17 +54,17 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
         }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
         createHumanTrend.add(res.timings.duration);
 
-        const user = http.get(url(`/v2beta/users/${res.json('userId')!}`), {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'x-zitadel-orgid': org.organizationId,
-          },
-        });
-        check(user, {
-          'get user is status ok': (r) => r.status === 200,
-          }) || reject(`unable to get user(username: ${username}, id ${res.json('userId')}) status: ${user.status} body: ${user.body}`);
-        resolve(user.json('user')! as unknown as Human);
+        // const user = http.get(url(`/v2beta/users/${res.json('userId')!}`), {
+        //   headers: {
+        //     authorization: `Bearer ${accessToken}`,
+        //     'Content-Type': 'application/json',
+        //     'x-zitadel-orgid': org.organizationId,
+        //   },
+        // });
+        // check(user, {
+        //   'get user is status ok': (r) => r.status === 200,
+        //   }) || reject(`unable to get user(username: ${username}, id ${res.json('userId')}) status: ${user.status} body: ${user.body}`);
+        // resolve(user.json('user')! as unknown as Human);
       })
       .catch((reason) => {
         reject(reason);
@@ -134,14 +134,14 @@ export function createMachine(username: string, org: Org, accessToken: string): 
         }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
         createMachineTrend.add(res.timings.duration);
 
-        const user = http.get(url(`/v2beta/users/${res.json('userId')!}`), {
-          headers: {
-            authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'x-zitadel-orgid': org.organizationId,
-          },
-        });
-        resolve(user.json('user')! as unknown as Machine);
+        // const user = http.get(url(`/v2beta/users/${res.json('userId')!}`), {
+        //   headers: {
+        //     authorization: `Bearer ${accessToken}`,
+        //     'Content-Type': 'application/json',
+        //     'x-zitadel-orgid': org.organizationId,
+        //   },
+        // });
+        // resolve(user.json('user')! as unknown as Machine);
       })
       .catch((reason) => {
         reject(reason);
@@ -217,6 +217,37 @@ export function deleteUser(userId: string, org: Org, accessToken: string): Promi
         });
         deleteUserTrend.add(res.timings.duration);
         resolve(res);
+      })
+      .catch((reason) => {
+        reject(reason);
+      });
+  });
+}
+
+export type MyUser = {
+  id: string;
+  details: {
+    resourceOwner: string;
+  };
+};
+
+const getMyUserTrend = new Trend('get_my_user_duration', true);
+export function getMyUser(accessToken: string): Promise<MyUser> {
+  return new Promise((resolve, reject) => {
+    let response = http.asyncRequest('GET', url(`/auth/v1/users/me`), null, {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    response
+      .then((res) => {
+        check(res, {
+          'get my user is status ok': (r) => r.status === 200,
+        });
+        getMyUserTrend.add(res.timings.duration);
+        resolve(res.json('user')! as MyUser);
       })
       .catch((reason) => {
         reject(reason);
