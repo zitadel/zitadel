@@ -189,6 +189,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Изменение пароля
   Description: Измените ваш пароль. Введите старый и новый пароли.
+  ExpiredDescription: Срок действия вашего пароля истек, и его необходимо изменить. Введите старый и новый пароль.
   OldPasswordLabel: Старый пароль
   NewPasswordLabel: Новый пароль
   NewPasswordConfirmLabel: Подтверждение пароля

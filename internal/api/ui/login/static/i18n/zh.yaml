@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: 更改密码
   Description: 更改您的密码。输入您的旧密码和新密码。
+  ExpiredDescription: 您的密码已过期，需要更改。请输入您的新旧密码。
   OldPasswordLabel: 旧密码
   NewPasswordLabel: 新密码
   NewPasswordConfirmLabel: 确认密码

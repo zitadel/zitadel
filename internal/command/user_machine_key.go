@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/repository/user"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -96,7 +97,10 @@ func (key *MachineKey) checkAggregate(ctx context.Context, filter preparation.Fi
 	return nil
 }
 
-func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey) (*domain.ObjectDetails, error) {
+func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if machineKey.KeyID == "" {
 		keyID, err := c.idGenerator.Next()
 		if err != nil {
@@ -127,6 +131,9 @@ func prepareAddUserMachineKey(machineKey *MachineKey, keySize int) preparation.V
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			ctx, span := tracing.NewSpan(ctx)
+			defer func() { span.EndWithError(err) }()
+
 			if err := machineKey.checkAggregate(ctx, filter); err != nil {
 				return nil, err
 			}
