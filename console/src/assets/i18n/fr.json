@@ -485,6 +485,8 @@
     "NEXT": "Suivant",
     "MORE": "Plus",
     "STEP": "Étape",
+    "SETUP": "Installation",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Modifications non enregistrées",
     "UNSAVED": {
       "DIALOG": {
@@ -2238,6 +2240,7 @@
       "ACTIVATED": "Activé",
       "ACTIVATE": "Activer le fournisseur",
       "DEACTIVATE": "Désactiver le fournisseur",
+      "TEST": "Testez votre fournisseur",
       "TYPE": "Type",
       "DIALOG": {
         "ACTIVATED": "La configuration SMTP a été activée",
@@ -2261,7 +2264,6 @@
         "CURRENT_DESC_TITLE": "Ce sont vos paramètres SMTP",
         "PROVIDER_SETTINGS": "Paramètres du fournisseur SMTP",
         "SENDER_SETTINGS": "Paramètres de l'expéditeur",
-        "TEST_SETTINGS": "Tester les paramètres SMTP",
         "NEXT_STEPS": "Prochaines étapes",
         "ACTIVATE": {
           "TITLE": "Activez votre fournisseur SMTP",
@@ -2270,6 +2272,12 @@
         "DEACTIVATE": {
           "TITLE": "Désactivez votre fournisseur SMTP",
           "DESCRIPTION": "Si vous désactivez l'option SMTP, vous ne pourrez pas vous connecter à l'application, le dossier sera alors désactivé."
+        },
+        "SAVE_SETTINGS": "Enregistrez vos paramètres",
+        "TEST": {
+          "TITLE": "Testez vos paramètres",
+          "DESCRIPTION": "Vous pouvez tester les paramètres de votre fournisseur SMTP et vérifier le résultat du test avant de les enregistrer",
+          "RESULT": "Votre email a été envoyé avec succès"
         }
       }
     },

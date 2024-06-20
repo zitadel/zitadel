@@ -240,6 +240,10 @@ import {
   SetSecurityPolicyResponse,
   SetUpOrgRequest,
   SetUpOrgResponse,
+  TestSMTPConfigByIdRequest,
+  TestSMTPConfigByIdResponse,
+  TestSMTPConfigRequest,
+  TestSMTPConfigResponse,
   UpdateAppleProviderRequest,
   UpdateAppleProviderResponse,
   UpdateAzureADProviderRequest,
@@ -330,6 +334,7 @@ import {
 } from '../proto/generated/zitadel/milestone/v1/milestone_pb';
 import { OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { SortDirection } from '@angular/material/sort';
+import { SMTPConfig } from '../proto/generated/zitadel/settings_pb';
 
 export interface OnboardingActions {
   order: number;
@@ -944,6 +949,14 @@ export class AdminService {
     const req = new DeactivateSMTPConfigRequest();
     req.setId(id);
     return this.grpcService.admin.deactivateSMTPConfig(req, null).then((resp) => resp.toObject());
+  }
+
+  public testSMTPConfigById(req: TestSMTPConfigByIdRequest): Promise<TestSMTPConfigByIdResponse.AsObject> {
+    return this.grpcService.admin.testSMTPConfigById(req, null).then((resp) => resp.toObject());
+  }
+
+  public testSMTPConfig(req: TestSMTPConfigRequest): Promise<TestSMTPConfigResponse.AsObject> {
+    return this.grpcService.admin.testSMTPConfig(req, null).then((resp) => resp.toObject());
   }
 
   public removeSMTPConfig(id: string): Promise<RemoveSMTPConfigResponse.AsObject> {
