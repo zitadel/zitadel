@@ -124,6 +124,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								[]string{"openid", "offline_access"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								&domain.OIDCCodeChallenge{
 									Challenge: "challenge",
 									Method:    domain.CodeChallengeMethodS256,
@@ -167,6 +168,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								[]string{"openid", "offline_access"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								&domain.OIDCCodeChallenge{
 									Challenge: "challenge",
 									Method:    domain.CodeChallengeMethodS256,
@@ -218,6 +220,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								[]string{"openid", "offline_access"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								&domain.OIDCCodeChallenge{
 									Challenge: "challenge",
 									Method:    domain.CodeChallengeMethodS256,
@@ -336,6 +339,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeIDToken,
+								domain.OIDCResponseModeQuery,
 								&domain.OIDCCodeChallenge{
 									Challenge: "challenge",
 									Method:    domain.CodeChallengeMethodS256,

@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Passwort ändern
   Description: Ändere dein Passwort indem du dein altes und dann dein neues Passwort eingibst.
+  ExpiredDescription: Dein Passwort ist abgelaufen und muss geändert werden. Gib dein altes und neues Passwort ein.
   OldPasswordLabel: Altes Passwort
   NewPasswordLabel: Neues Passwort
   NewPasswordConfirmLabel: Passwort wiederholen
@@ -250,6 +251,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -289,6 +291,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGB
@@ -362,6 +365,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: Gerätezulassung
   UserCode:

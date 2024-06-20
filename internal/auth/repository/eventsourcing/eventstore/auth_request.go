@@ -44,6 +44,7 @@ type AuthRequestRepo struct {
 	OrgViewProvider           orgViewProvider
 	LoginPolicyViewProvider   loginPolicyViewProvider
 	LockoutPolicyViewProvider lockoutPolicyViewProvider
+	PasswordAgePolicyProvider passwordAgePolicyProvider
 	PrivacyPolicyProvider     privacyPolicyProvider
 	IDPProviderViewProvider   idpProviderViewProvider
 	IDPUserLinksProvider      idpUserLinksProvider
@@ -79,6 +80,10 @@ type loginPolicyViewProvider interface {
 
 type lockoutPolicyViewProvider interface {
 	LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error)
+}
+
+type passwordAgePolicyProvider interface {
+	PasswordAgePolicyByOrg(context.Context, bool, string, bool) (*query.PasswordAgePolicy, error)
 }
 
 type idpProviderViewProvider interface {
@@ -685,6 +690,13 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		}
 		request.LabelPolicy = labelPolicy
 	}
+	if request.PasswordAgePolicy == nil || request.PolicyOrgID() != orgID {
+		passwordPolicy, err := repo.getPasswordAgePolicy(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.PasswordAgePolicy = passwordPolicy
+	}
 	if len(request.DefaultTranslations) == 0 {
 		defaultLoginTranslations, err := repo.getLoginTexts(ctx, instance.InstanceID())
 		if err != nil {
@@ -1048,8 +1060,9 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return append(steps, step), nil
 	}
 
-	if user.PasswordChangeRequired {
-		steps = append(steps, &domain.ChangePasswordStep{})
+	expired := passwordAgeChangeRequired(request.PasswordAgePolicy, user.PasswordChanged)
+	if expired || user.PasswordChangeRequired {
+		steps = append(steps, &domain.ChangePasswordStep{Expired: expired})
 	}
 	if !user.IsEmailVerified {
 		steps = append(steps, &domain.VerifyEMailStep{})
@@ -1058,7 +1071,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		steps = append(steps, &domain.ChangeUsernameStep{})
 	}
 
-	if user.PasswordChangeRequired || !user.IsEmailVerified || user.UsernameChangeRequired {
+	if expired || user.PasswordChangeRequired || !user.IsEmailVerified || user.UsernameChangeRequired {
 		return steps, nil
 	}
 
@@ -1091,6 +1104,14 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		steps = append(steps, &domain.LoginSucceededStep{})
 	}
 	return append(steps, &domain.RedirectToCallbackStep{}), nil
+}
+
+func passwordAgeChangeRequired(policy *domain.PasswordAgePolicy, changed time.Time) bool {
+	if policy == nil || policy.MaxAgeDays == 0 {
+		return false
+	}
+	maxDays := time.Duration(policy.MaxAgeDays) * 24 * time.Hour
+	return time.Now().Add(-maxDays).After(changed)
 }
 
 func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.AuthRequest) (_ []domain.NextStep, err error) {
@@ -1368,6 +1389,28 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 		ErrorMsgPopup:       p.ShouldErrorPopup,
 		DisableWatermark:    p.WatermarkDisabled,
 		ThemeMode:           p.ThemeMode,
+	}
+}
+
+func (repo *AuthRequestRepo) getPasswordAgePolicy(ctx context.Context, orgID string) (*domain.PasswordAgePolicy, error) {
+	policy, err := repo.PasswordAgePolicyProvider.PasswordAgePolicyByOrg(ctx, false, orgID, false)
+	if err != nil {
+		return nil, err
+	}
+	return passwordAgePolicyToDomain(policy), nil
+}
+
+func passwordAgePolicyToDomain(policy *query.PasswordAgePolicy) *domain.PasswordAgePolicy {
+	return &domain.PasswordAgePolicy{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:   policy.ID,
+			Sequence:      policy.Sequence,
+			ResourceOwner: policy.ResourceOwner,
+			CreationDate:  policy.CreationDate,
+			ChangeDate:    policy.ChangeDate,
+		},
+		MaxAgeDays:     policy.MaxAgeDays,
+		ExpireWarnDays: policy.ExpireWarnDays,
 	}
 }
 

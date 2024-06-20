@@ -1327,6 +1327,7 @@
       "LANGUAGES": "Lingue",
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
+      "AGE": "Scadenza password",
       "COMPLEXITY": "Complessità della password",
       "NOTIFICATIONS": "Impostazioni di notifica",
       "SMTP_PROVIDER": "Fornitore SMTP",
@@ -1381,7 +1382,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1546,8 +1548,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Impostazioni di validità della password",
-      "DESCRIPTION": "È possibile impostare una impostazone per la validità delle password. Questa emette un avviso dopo che il tempo di invecchiamento specifico è trascorso."
+      "TITLE": "Scadenza password",
+      "DESCRIPTION": "Puoi impostare una policy per la scadenza delle password. Questa policy obbligherà l'utente a cambiare la password al prossimo accesso dopo la scadenza. Non ci sono avvisi e notifiche automatiche."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Impostazioni di blocco",
@@ -1610,7 +1612,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1699,8 +1702,8 @@
       "SHOWLOCKOUTFAILURES": "mostra i fallimenti del blocco",
       "MAXPASSWORDATTEMPTS": "Massimo numero di tentativi di password",
       "MAXOTPATTEMPTS": "Massimo numero di tentativi di OTP",
-      "EXPIREWARNDAYS": "Avviso scadenza dopo il giorno",
-      "MAXAGEDAYS": "Lunghezza massima in giorni",
+      "EXPIREWARNDAYS": "Avviso di scadenza dopo giorni",
+      "MAXAGEDAYS": "Validità massima in giorni",
       "USERLOGINMUSTBEDOMAIN": "Nome utente deve contenere il dominio dell' organizzazione",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se abiliti questa impostazione, a tutti i nomi di accesso verrà aggiunto il suffisso del dominio dell'organizzazione. Se questa impostazione è disabilitata, devi assicurarti che i nomi utente siano univoci per tutte le organizzazioni.",
       "VALIDATEORGDOMAINS": "Verifica del dominio dell'organizzazione richiesta (challenge DNS o HTTP)",
@@ -2549,7 +2552,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

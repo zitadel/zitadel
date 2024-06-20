@@ -117,7 +117,9 @@ func (s *PasswordlessRegistrationPromptStep) Type() NextStepType {
 	return NextStepPasswordlessRegistrationPrompt
 }
 
-type ChangePasswordStep struct{}
+type ChangePasswordStep struct {
+	Expired bool
+}
 
 func (s *ChangePasswordStep) Type() NextStepType {
 	return NextStepChangePassword

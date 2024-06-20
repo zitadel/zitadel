@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	UserTable        = "projections.users12"
+	UserTable        = "projections.users13"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 	UserNotifyTable  = UserTable + "_" + UserNotifySuffix
@@ -35,6 +35,7 @@ const (
 	HumanUserIDCol              = "user_id"
 	HumanUserInstanceIDCol      = "instance_id"
 	HumanPasswordChangeRequired = "password_change_required"
+	HumanPasswordChanged        = "password_changed"
 
 	// profile
 	HumanFirstNameCol         = "first_name"
@@ -116,6 +117,7 @@ func (*userProjection) Init() *old_handler.Check {
 			handler.NewColumn(HumanPhoneCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(HumanIsPhoneVerifiedCol, handler.ColumnTypeBool, handler.Nullable()),
 			handler.NewColumn(HumanPasswordChangeRequired, handler.ColumnTypeBool),
+			handler.NewColumn(HumanPasswordChanged, handler.ColumnTypeTimestamp, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(HumanUserInstanceIDCol, HumanUserIDCol),
 			UserHumanSuffix,
@@ -322,6 +324,7 @@ func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Ebynp", "reduce.wrong.event.type %s", user.HumanAddedType)
 	}
+	passwordSet := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
 	return handler.NewMultiStatement(
 		e,
 		handler.AddCreateStatement(
@@ -350,6 +353,7 @@ func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 				handler.NewCol(HumanEmailCol, e.EmailAddress),
 				handler.NewCol(HumanPhoneCol, &sql.NullString{String: string(e.PhoneNumber), Valid: e.PhoneNumber != ""}),
 				handler.NewCol(HumanPasswordChangeRequired, e.ChangeRequired),
+				handler.NewCol(HumanPasswordChanged, &sql.NullTime{Time: e.CreatedAt(), Valid: passwordSet}),
 			},
 			handler.WithTableSuffix(UserHumanSuffix),
 		),
@@ -359,7 +363,7 @@ func (p *userProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 				handler.NewCol(NotifyInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(NotifyLastEmailCol, e.EmailAddress),
 				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: string(e.PhoneNumber), Valid: e.PhoneNumber != ""}),
-				handler.NewCol(NotifyPasswordSetCol, crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""),
+				handler.NewCol(NotifyPasswordSetCol, passwordSet),
 			},
 			handler.WithTableSuffix(UserNotifySuffix),
 		),
@@ -371,6 +375,7 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 	if !ok {
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-xE53M", "reduce.wrong.event.type %s", user.HumanRegisteredType)
 	}
+	passwordSet := crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""
 	return handler.NewMultiStatement(
 		e,
 		handler.AddCreateStatement(
@@ -399,6 +404,7 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 				handler.NewCol(HumanEmailCol, e.EmailAddress),
 				handler.NewCol(HumanPhoneCol, &sql.NullString{String: string(e.PhoneNumber), Valid: e.PhoneNumber != ""}),
 				handler.NewCol(HumanPasswordChangeRequired, e.ChangeRequired),
+				handler.NewCol(HumanPasswordChanged, &sql.NullTime{Time: e.CreatedAt(), Valid: passwordSet}),
 			},
 			handler.WithTableSuffix(UserHumanSuffix),
 		),
@@ -408,7 +414,7 @@ func (p *userProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 				handler.NewCol(NotifyInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(NotifyLastEmailCol, e.EmailAddress),
 				handler.NewCol(NotifyLastPhoneCol, &sql.NullString{String: string(e.PhoneNumber), Valid: e.PhoneNumber != ""}),
-				handler.NewCol(NotifyPasswordSetCol, crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash) != ""),
+				handler.NewCol(NotifyPasswordSetCol, passwordSet),
 			},
 			handler.WithTableSuffix(UserNotifySuffix),
 		),
@@ -918,6 +924,7 @@ func (p *userProjection) reduceHumanPasswordChanged(event eventstore.Event) (*ha
 		handler.AddUpdateStatement(
 			[]handler.Column{
 				handler.NewCol(HumanPasswordChangeRequired, e.ChangeRequired),
+				handler.NewCol(HumanPasswordChanged, &sql.NullTime{Time: e.CreatedAt(), Valid: true}),
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),

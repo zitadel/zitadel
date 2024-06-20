@@ -24,7 +24,10 @@ func (c *Commands) AddOrgMemberCommand(a *org.Aggregate, userID string, roles ..
 		if len(domain.CheckForInvalidRoles(roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 && len(domain.CheckForInvalidRoles(roles, domain.RoleSelfManagementGlobal, c.zitadelRoles)) > 0 {
 			return nil, zerrors.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
 		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
+				ctx, span := tracing.NewSpan(ctx)
+				defer func() { span.EndWithError(err) }()
+
 				if exists, err := ExistsUser(ctx, filter, userID, ""); err != nil || !exists {
 					return nil, zerrors.ThrowPreconditionFailed(err, "ORG-GoXOn", "Errors.User.NotFound")
 				}
@@ -73,7 +76,10 @@ func IsOrgMember(ctx context.Context, filter preparation.FilterToQueryReducer, o
 	return isMember, nil
 }
 
-func (c *Commands) AddOrgMember(ctx context.Context, orgID, userID string, roles ...string) (*domain.Member, error) {
+func (c *Commands) AddOrgMember(ctx context.Context, orgID, userID string, roles ...string) (_ *domain.Member, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgAgg := org.NewAggregate(orgID)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.AddOrgMemberCommand(orgAgg, userID, roles...))
 	if err != nil {

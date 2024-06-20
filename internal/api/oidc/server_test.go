@@ -73,7 +73,7 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 				RegistrationEndpoint:                               "",
 				ScopesSupported:                                    []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopePhone, oidc.ScopeAddress, oidc.ScopeOfflineAccess},
 				ResponseTypesSupported:                             []string{string(oidc.ResponseTypeCode), string(oidc.ResponseTypeIDTokenOnly), string(oidc.ResponseTypeIDToken)},
-				ResponseModesSupported:                             nil,
+				ResponseModesSupported:                             []string{string(oidc.ResponseModeQuery), string(oidc.ResponseModeFragment), string(oidc.ResponseModeFormPost)},
 				GrantTypesSupported:                                []oidc.GrantType{oidc.GrantTypeCode, oidc.GrantTypeImplicit, oidc.GrantTypeRefreshToken, oidc.GrantTypeBearer},
 				ACRValuesSupported:                                 nil,
 				SubjectTypesSupported:                              []string{"public"},

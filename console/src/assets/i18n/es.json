@@ -1328,6 +1328,7 @@
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamiento del inicio de sesión y de la seguridad",
       "LOCKOUT": "Bloqueo",
+      "AGE": "Caducidad de la contraseña",
       "COMPLEXITY": "Complejidad de contraseña",
       "NOTIFICATIONS": "Ajustes de notificación",
       "SMTP_PROVIDER": "Proveedor SMTP",
@@ -1382,7 +1383,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1547,8 +1549,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Antigüedad de la contraseña",
-      "DESCRIPTION": "Puedes establecer una política para la antigüedad de las contraseñas. Esta política emite un aviso después de que la antigüedad máxima se haya superado."
+      "TITLE": "Caducidad de la contraseña",
+      "DESCRIPTION": "Puedes establecer una política para la caducidad de las contraseñas. Esta política obligará al usuario a cambiar la contraseña en el próximo inicio de sesión después de la caducidad. No hay avisos ni notificaciones automáticos."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Política de bloqueo",
@@ -1611,7 +1613,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificación de email realizada",
@@ -1700,8 +1703,8 @@
       "SHOWLOCKOUTFAILURES": "mostrar fallos de bloqueo",
       "MAXPASSWORDATTEMPTS": "Intentos máximos de contraseña",
       "MAXOTPATTEMPTS": "Intentos máximos de OTP",
-      "EXPIREWARNDAYS": "Aviso de expiración después de estos días: ",
-      "MAXAGEDAYS": "Antigüedad máxima en días",
+      "EXPIREWARNDAYS": "Aviso de caducidad después de días",
+      "MAXAGEDAYS": "Validez máxima en días",
       "USERLOGINMUSTBEDOMAIN": "Añadir el dominio de la organización como sufijo de los nombres de inicio de sesión",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si activas esta opción, todos los nombres de inicio de sesión tendrán como sufijo el dominio de esta organización. Si esta opción está desactivada, tendrás que asegurarte de que los nombres de usuario son únicos para todas las organizaciones.",
       "VALIDATEORGDOMAINS": "Verificación de dominio de la organización requerida (desafío DNS o HTTP)",
@@ -2545,7 +2548,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Añadir un Mánager",
