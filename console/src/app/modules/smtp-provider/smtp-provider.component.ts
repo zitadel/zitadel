@@ -1,8 +1,8 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { Subject, take } from 'rxjs';
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Options } from 'src/app/proto/generated/zitadel/idp_pb';
 import { requiredValidator } from '../form-field/validators/validators';
@@ -11,6 +11,7 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
 import {
   AddSMTPConfigRequest,
   AddSMTPConfigResponse,
+  TestSMTPConfigRequest,
   UpdateSMTPConfigRequest,
   UpdateSMTPConfigResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
@@ -31,8 +32,10 @@ import {
   OutlookDefaultSettings,
   SendgridDefaultSettings,
 } from './known-smtp-providers-settings';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { MatStepper } from '@angular/material/stepper';
 import { SMTPConfigState } from 'src/app/proto/generated/zitadel/settings_pb';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'cnsl-smtp-provider',
@@ -61,6 +64,11 @@ export class SMTPProviderComponent {
 
   public senderEmailPlaceholder = 'sender@example.com';
 
+  public resultClass = 'test-success';
+  public isLoading = signal(false);
+  public email: string = '';
+  public testResult: string = '';
+
   constructor(
     private service: AdminService,
     private _location: Location,
@@ -68,6 +76,8 @@ export class SMTPProviderComponent {
     private toast: ToastService,
     private router: Router,
     private route: ActivatedRoute,
+    private authService: GrpcAuthService,
+    private translate: TranslateService,
   ) {
     this.route.parent?.url.subscribe((urlPath) => {
       const providerName = urlPath[urlPath.length - 1].path;
@@ -136,6 +146,17 @@ export class SMTPProviderComponent {
           this.fetchData(this.id);
         }
       }
+
+      this.authService
+        .getMyUser()
+        .then((resp) => {
+          if (resp.user) {
+            this.email = resp.user.human?.email?.email || '';
+          }
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     });
   }
 
@@ -278,6 +299,38 @@ export class SMTPProviderComponent {
         } else {
           this.toast.showError(error);
         }
+      });
+  }
+
+  public testEmailConfiguration(): void {
+    this.isLoading.set(true);
+
+    const req = new TestSMTPConfigRequest();
+    req.setSenderAddress(this.senderAddress?.value ?? '');
+    req.setSenderName(this.senderName?.value ?? '');
+    req.setHost(this.hostAndPort?.value ?? '');
+    req.setUser(this.user?.value);
+    req.setPassword(this.password?.value ?? '');
+    req.setTls(this.tls?.value ?? false);
+    req.setId(this.id ?? '');
+    req.setReceiverAddress(this.email ?? '');
+
+    this.service
+      .testSMTPConfig(req)
+      .then(() => {
+        this.resultClass = 'test-success';
+        this.isLoading.set(false);
+        this.translate
+          .get('SMTP.CREATE.STEPS.TEST.RESULT')
+          .pipe(take(1))
+          .subscribe((msg) => {
+            this.testResult = msg;
+          });
+      })
+      .catch((error) => {
+        this.resultClass = 'test-error';
+        this.isLoading.set(false);
+        this.testResult = error;
       });
   }
 

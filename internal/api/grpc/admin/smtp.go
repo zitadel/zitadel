@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -127,4 +128,30 @@ func (s *Server) DeactivateSMTPConfig(ctx context.Context, req *admin_pb.Deactiv
 	return &admin_pb.DeactivateSMTPConfigResponse{
 		Details: object.DomainToAddDetailsPb(result),
 	}, nil
+}
+
+func (s *Server) TestSMTPConfigById(ctx context.Context, req *admin_pb.TestSMTPConfigByIdRequest) (*admin_pb.TestSMTPConfigByIdResponse, error) {
+	err := s.command.TestSMTPConfigById(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.ReceiverAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin_pb.TestSMTPConfigByIdResponse{}, nil
+}
+
+func (s *Server) TestSMTPConfig(ctx context.Context, req *admin_pb.TestSMTPConfigRequest) (*admin_pb.TestSMTPConfigResponse, error) {
+	config := smtp.Config{}
+	config.Tls = req.Tls
+	config.From = req.SenderAddress
+	config.FromName = req.SenderName
+	config.SMTP.Host = req.Host
+	config.SMTP.User = req.User
+	config.SMTP.Password = req.Password
+
+	err := s.command.TestSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.ReceiverAddress, &config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin_pb.TestSMTPConfigResponse{}, nil
 }
