@@ -4,7 +4,7 @@ title: Feature Restrictions
 
 New self-hosted and [ZITADEL Cloud instances](https://zitadel.com/signin) are unrestricted by default.
 Self-hosters can change this default using the DefaultInstance.Restrictions configuration section.
-Users with the role IAM_OWNER can change the restrictions of their instance using the [Feature Restrictions Admin API](/category/apis/resources/admin/feature-restrictions).
+Users with the role IAM_OWNER can change the restrictions of their instance using the [Feature Restrictions Admin API](/apis/resources/admin/feature-restrictions).
 Currently, the following restrictions are available:
 
 - *Disallow public organization registrations* - If restricted, only users with the role IAM_OWNERS can create new organizations. The endpoint */ui/login/register/org* returns HTTP status 404 on GET requests, and 409 on POST requests.
