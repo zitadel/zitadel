@@ -1325,6 +1325,7 @@
       "LANGUAGES": "Sprachen",
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",
+      "AGE": "Passwortgültigkeitsdauer",
       "COMPLEXITY": "Passwordkomplexität",
       "NOTIFICATIONS": "Benachrichtigungseinstellungen",
       "SMTP_PROVIDER": "SMTP-Anbieter",
@@ -1379,7 +1380,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1545,7 +1547,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Gültigkeitsdauer für Passwörter",
-      "DESCRIPTION": "Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
+      "DESCRIPTION": "Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie zwingt den Benutzer dazu, das Passwort bei der nächsten Anmeldung nach dem Ablauf zu ändern. Es gibt keine automatischen Warnungen und Benachrichtigungen."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Passwortsperre",
@@ -1608,7 +1610,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -2540,7 +2543,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

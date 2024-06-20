@@ -10,6 +10,9 @@ import (
 )
 
 func (c *Commands) AddApplicationKeyWithID(ctx context.Context, key *domain.ApplicationKey, resourceOwner string) (_ *domain.ApplicationKey, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	writeModel, err := c.applicationKeyWriteModelByID(ctx, key.AggregateID, key.ApplicationID, key.KeyID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -47,6 +50,8 @@ func (c *Commands) AddApplicationKey(ctx context.Context, key *domain.Applicatio
 }
 
 func (c *Commands) addApplicationKey(ctx context.Context, key *domain.ApplicationKey, resourceOwner string) (_ *domain.ApplicationKey, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
 	keyWriteModel := NewApplicationKeyWriteModel(key.AggregateID, key.ApplicationID, key.KeyID, resourceOwner)
 	err = c.eventstore.FilterToQueryReducer(ctx, keyWriteModel)

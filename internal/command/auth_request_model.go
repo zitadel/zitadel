@@ -23,6 +23,7 @@ type AuthRequestWriteModel struct {
 	Scope            []string
 	Audience         []string
 	ResponseType     domain.OIDCResponseType
+	ResponseMode     domain.OIDCResponseMode
 	CodeChallenge    *domain.OIDCCodeChallenge
 	Prompt           []domain.Prompt
 	UILocales        []string
@@ -58,6 +59,7 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.Scope = e.Scope
 			m.Audience = e.Audience
 			m.ResponseType = e.ResponseType
+			m.ResponseMode = e.ResponseMode
 			m.CodeChallenge = e.CodeChallenge
 			m.Prompt = e.Prompt
 			m.UILocales = e.UILocales

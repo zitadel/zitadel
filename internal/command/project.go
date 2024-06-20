@@ -10,10 +10,14 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddProjectWithID(ctx context.Context, project *domain.Project, resourceOwner, projectID string) (_ *domain.Project, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -147,7 +151,10 @@ func projectWriteModel(ctx context.Context, filter preparation.FilterToQueryRedu
 	return project, nil
 }
 
-func (c *Commands) getProjectByID(ctx context.Context, projectID, resourceOwner string) (*domain.Project, error) {
+func (c *Commands) getProjectByID(ctx context.Context, projectID, resourceOwner string) (_ *domain.Project, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	projectWriteModel, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -158,7 +165,10 @@ func (c *Commands) getProjectByID(ctx context.Context, projectID, resourceOwner 
 	return projectWriteModelToProject(projectWriteModel), nil
 }
 
-func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOwner string) error {
+func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOwner string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	projectWriteModel, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
 	if err != nil {
 		return err
@@ -312,9 +322,12 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 	return writeModelToObjectDetails(&existingProject.WriteModel), nil
 }
 
-func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (*ProjectWriteModel, error) {
+func (c *Commands) getProjectWriteModelByID(ctx context.Context, projectID, resourceOwner string) (_ *ProjectWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	projectWriteModel := NewProjectWriteModel(projectID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, projectWriteModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, projectWriteModel)
 	if err != nil {
 		return nil, err
 	}

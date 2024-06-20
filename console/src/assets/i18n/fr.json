@@ -1325,6 +1325,7 @@
       "LANGUAGES": "Langues",
       "LOGIN": "Comportement de connexion et sécurité",
       "LOCKOUT": "Verrouillage",
+      "AGE": "Expiration du mot de passe",
       "COMPLEXITY": "Complexité du mot de passe",
       "NOTIFICATIONS": "Paramètres de notification",
       "SMTP_PROVIDER": "Fournisseur SMTP",
@@ -1379,7 +1380,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1544,8 +1546,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Vieillissement des mots de passe",
-      "DESCRIPTION": "Vous pouvez définir une politique pour le vieillissement des mots de passe. Cette politique émet un avertissement après que le temps de vieillissement spécifique se soit écoulé."
+      "TITLE": "Expiration du mot de passe",
+      "DESCRIPTION": "Vous pouvez définir une politique d'expiration des mots de passe. Cette politique obligera l'utilisateur à changer son mot de passe lors de la prochaine connexion après l'expiration. Il n'y a pas d'avertissements ni de notifications automatiques."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Politique de verrouillage",
@@ -1608,7 +1610,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'e-mail effectuée",
@@ -1697,8 +1700,8 @@
       "SHOWLOCKOUTFAILURES": "montrer les échecs de verrouillage",
       "MAXPASSWORDATTEMPTS": "Tentatives maximales du mot de passe",
       "MAXOTPATTEMPTS": "Tentatives maximales de l'OTP",
-      "EXPIREWARNDAYS": "Avertissement d'expiration après le jour",
-      "MAXAGEDAYS": "Âge maximum en jours",
+      "EXPIREWARNDAYS": "Avertissement d'expiration après jours",
+      "MAXAGEDAYS": "Validité maximale en jours",
       "USERLOGINMUSTBEDOMAIN": "Le nom de connexion de l'utilisateur doit contenir le nom de domaine de l'organisation",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si vous activez ce paramètre, tous les noms de connexion seront suffixés avec le domaine de l'organisation. Si ce paramètre est désactivé, vous devez vous assurer que les noms d'utilisateur sont uniques pour toutes les organisations.",
       "VALIDATEORGDOMAINS": "Vérification du domaine de l'organisation requise (challenge DNS ou HTTP)",
@@ -2541,7 +2544,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Ajouter un responsable",
