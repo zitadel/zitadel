@@ -1,0 +1,502 @@
+Login:
+  Title: Välkommen!
+  Description: Logga in med dina användaruppgifter
+  TitleLinking: Koppla ihop inloggningskonto
+  DescriptionLinking: Ange dina användaruppgifter för att länka med ett befintligt konto
+  LoginNameLabel: Login-namn
+  UsernamePlaceHolder: Användarnamn
+  LoginnamePlaceHolder: namn@domain.com
+  ExternalUserDescription: Använd ett externt konto
+  MustBeMemberOfOrg: Användaren måste finnas i organisationen {{.OrgName}}.
+  RegisterButtonText: Skapa nytt konto
+  NextButtonText: Fortsätt
+
+LDAP:
+  Title: Logga in
+  Description: Ange dina användaruppgifter.
+  LoginNameLabel: Login-namn
+  PasswordLabel: Lösenord
+  NextButtonText: Fortsätt
+
+SelectAccount:
+  Title: Välj konto
+  Description: Använd befintligt konto
+  TitleLinking: Välj konto som ska kopplas ihop
+  DescriptionLinking: Välj det konto som ska kopplas ihop med det extrerna kontot
+  OtherUser: Välj ett annat konto
+  SessionState0: aktivt
+  SessionState1: Utloggad
+  MustBeMemberOfOrg: Användaren måste finnas i organisationen {{.OrgName}}.
+
+Password:
+  Title: Lösenord
+  Description: Ange dina användaruppgifter.
+  PasswordLabel: Lösenord
+  MinLength: Måste vara minst
+  MinLengthp2: tecken långt.
+  MaxLength: Får inte vara längre än 70 tecken.
+  HasUppercase: Måste innehålla minst en stor bokstav.
+  HasLowercase: Måste innehålla minst en liten bokstav.
+  HasNumber: Måste innehålla minst en siffra.
+  HasSymbol: Måste innehålla minst ett specialtecken.
+  Confirmation: Lösenorden stämmer.
+  ResetLinkText: Återställ lösenord
+  BackButtonText: Tillbaka
+  NextButtonText: Fortsätt
+
+UsernameChange:
+  Title: Ändra användarnamn
+  Description: Ange ditt nya användarnamn
+  UsernameLabel: Användarnamn
+  CancelButtonText: Avbryt
+  NextButtonText: Fortsätt
+
+UsernameChangeDone:
+  Title: Användarnamn ändrat
+  Description: Ditt användarnamn har ändrats.
+  NextButtonText: Fortsätt
+
+InitPassword:
+  Title: Ange lösenord
+  Description: Vi har skickat en kod som du behöver ange i fältet nedan innan du kan ändra ditt lösenord.
+  CodeLabel: Kod
+  NewPasswordLabel: Nytt lösenord
+  NewPasswordConfirmLabel: Bekräfta lösenord
+  ResendButtonText: Skicka en ny kod
+  NextButtonText: Fortsätt
+
+InitPasswordDone:
+  Title: Lösenord ändrat
+  Description: Lösenordet har ändrats
+  NextButtonText: Fortsätt
+  CancelButtonText: Avbryt
+
+InitUser:
+  Title: Aktivera ditt användarkonto
+  Description: Bekräfta din e-postadress genom att fylla i koden från meddelandet vi skickat i fältet nedan.
+  CodeLabel: Kod
+  NewPasswordLabel: Nytt lösenord
+  NewPasswordConfirm: Bekräfta lösenord
+  NextButtonText: Fortsätt
+  ResendButtonText: Skicka en ny kod
+
+InitUserDone:
+  Title: Aktiverat användarkonto
+  Description: E-postadressen är bekräftad och lösenordet har sparats.
+  NextButtonText: Fortsätt
+  CancelButtonText: Avbryt
+
+InitMFAPrompt:
+  Title: tvåfaktorinställningar
+  Description: 2-factor-identifiering ökar säkerheten för ditt konto. Enbart du som har tillgång till enheten kan logga in.
+  Provider0: Mobil App (T ex Google/Microsoft Authenticator, Authy)
+  Provider1: Din fysiska mobil/laptop (T ex FaceID, Windows Hello, Fingeravtryck)
+  Provider3: Engångslösenord på SMS
+  Provider4: Engångslösenord på E-Post
+  NextButtonText: Fortsätt
+  SkipButtonText: Använd inte 2-faktor
+
+InitMFAOTP:
+  Title: Tvåfaktor verifiering
+  Description: Bekräfta med en andra faktor. Ladda ned en autentiserings-app (T ex Google/Microsoft Authenticator, Authy) om du inte redan har en.
+  OTPDescription: Skanna koden med din autentiserings-app (T ex Google/Microsoft Authenticator, Authy). Eller kopiera nyckeln och fyll i den genererade säkerhetskoden här nedan.
+  SecretLabel: Nyckel
+  CodeLabel: Säkerhetskod
+  NextButtonText: Fortsätt
+  CancelButtonText: Avbryt
+
+InitMFAOTPSMS:
+  Title: Tvåfaktor verifiering
+  DescriptionPhone: Verifiera med en andra faktor. Ange ditt mobilnummer.
+  DescriptionCode: Verifiera med en andra faktor. Ange koden du fått på SMS för att bekräfta ditt mobilnr.
+  PhoneLabel: Mobilnr
+  CodeLabel: Kod
+  EditButtonText: Ändra
+  ResendButtonText: Skicka på nytt
+  NextButtonText: Fortsätt
+
+InitMFAU2F:
+  Title: Lägg till säkerhetsnyckel
+  Description: Säkerhetsnycklar kan genereras från din mobil, via Bluetooth eller från en enhet som kopplas till din dators USB-port.
+  TokenNameLabel: Namnge enheten som skapar säkerhetsnycklar
+  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t ex Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Lägg till säkerhetsnyckel
+  ErrorRetry: Försök igen. Skapa en ny kod eller pröva ett annat sätt.
+
+InitMFADone:
+  Title: Tvåfaktor verifiering klar
+  Description: Bra jobbat. Ditt konto är nu skyddat med Tvåfaktor-verifiering. Din andra faktor kommer behövas vid varje inloggning.
+  NextButtonText: Fortsätt
+  CancelButtonText: Avbryt
+
+MFAProvider:
+  Provider0: Mobil App (T ex Google/Microsoft Authenticator, Authy)
+  Provider1: Din fysiska mobil/laptop (T ex FaceID, Windows Hello, Fingeravtryck)
+  Provider3: Engångslösenord på SMS
+  Provider4: Engångslösenord på E-Post
+  ChooseOther: eller välj ett annat alternativ
+
+VerifyMFAOTP:
+  Title: Verifiera tvåfaktor
+  Description: Verifiera med kod från din Tvåfaktor-enhet
+  CodeLabel: Kod
+  NextButtonText: Fortsätt
+
+VerifyOTP:
+  Title: Verifiera tvåfaktor
+  Description: Verifiera med kod från din Tvåfaktor-enhet
+  CodeLabel: Kod
+  ResendButtonText: Skicka ny kod
+  NextButtonText: Fortsätt
+
+VerifyMFAU2F:
+  Title: Verifiera tvåfaktor
+  Description: Verifiera med kod från din Tvåfaktor-enhet (t ex FaceID, Windows Hello, Fingeravtryck)
+  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t ex Chrome, Safari, Firefox)
+  ErrorRetry: Försök igen, gör en ny förfrågan eller välj en annan metod.
+  ValidateTokenButtonText: Verifiera tvåfaktor
+
+Passwordless:
+  Title: Lösenordsfri inloggning
+  Description: Logga in med hjälp av din mobil/laptop (med t ex FaceID, Windows Hello, Fingeravtryck)
+  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t ex Chrome, Safari, Firefox)
+  ErrorRetry: Försök igen. Skapa en ny kod eller pröva ett annat sätt.
+  LoginWithPwButtonText: Logga in med lösenord
+  ValidateTokenButtonText: Lösenordsfri inloggning
+
+PasswordlessPrompt:
+  Title: Lösenordsfri inloggning
+  Description: Vill du konfigurera lösenordsfri inloggning med hjälp av din mobil/laptop? (via t exFaceID, Windows Hello eller Fingeravtryck)
+  DescriptionInit: You need to set up passwordless login. Use the link you were given to register your device.
+  PasswordlessButtonText: Go passwordless
+  NextButtonText: Fortsätt
+  SkipButtonText: Skip
+
+PasswordlessRegistration:
+  Title: Konfigurera lösenordsfri inloggning
+  Description: Välj ett beskrivande namn för din inloggningsenhet och klicka sen på 'Konfigurera lösenordsfritt'-knappen nedan
+  TokenNameLabel: Namn på enheten
+  NotSupported: Din webbläsare har inte stöd för WebAuthN-standarden. Kontrollera att du har den senaste versionen, eller byt till en webbläsare med stöd (t ex Chrome, Safari, Firefox)
+  RegisterTokenButtonText: Konfigurera lösenordsfritt
+  ErrorRetry: Försök igen. Skapa en ny kod eller pröva ett annat sätt.
+
+PasswordlessRegistrationDone:
+  Title: Lösenordsfri inloggning klar
+  Description: Inloggningsenhet för lösenordsfri inloggning har sparats.
+  DescriptionClose: Du kan stänga det här webbläsarförnstret.
+  NextButtonText: Fortsätt
+  CancelButtonText: Avbryt
+
+PasswordChange:
+  Title: Ändra lösenord
+  Description: Ändra diit lösenord. Ange både ditt gamla och det nya lösenordet.
+  ExpiredDescription: Ditt lösenord har gått ut och måste bytas ut. Ange ditt gamla och nya lösenord.
+  OldPasswordLabel: Gammalt lösenord
+  NewPasswordLabel: Nytt lösenord
+  NewPasswordConfirmLabel: Nytt lösenord igen
+  CancelButtonText: Avbryt
+  NextButtonText: Fortsätt
+  Footer: Fotnot
+
+PasswordChangeDone:
+  Title: Ändra lösenord
+  Description: Ditt lösenord har ändrats.
+  NextButtonText: Fortsätt
+
+PasswordResetDone:
+  Title: Länk för att återställa Lösenord har skickats.
+  Description: Kontrollera din inkorg för e-post för vidare instruktioner om hur du återställer ditt lösenord.
+  NextButtonText: Fortsätt
+
+EmailVerification:
+  Title: E-postverifiering
+  Description: Vi har skickat ett e-postmeddelande med en kod som du behöver ange i fältet nedan.
+  CodeLabel: Kod
+  NextButtonText: Fortsätt
+  ResendButtonText: Skicka en ny kod
+
+EmailVerificationDone:
+  Title: E-postverifiering
+  Description: Din e-postadress har bekräftats.
+  NextButtonText: Fortsätt
+  CancelButtonText: Avbryt
+  LoginButtonText: Logga in
+
+RegisterOption:
+  Title: Registrera användarkonto
+  Description: Hur vill du registrera dig?
+  RegisterUsernamePasswordButtonText: Med användarnamn och lösenord
+  ExternalLoginDescription: Med ett extern användarkonto
+  LoginButtonText: Logga in
+
+RegistrationUser:
+  Title: Registrering
+  Description: Ange din användarinformation. Din e-postadress kommer att fungera som användarnamn.
+  DescriptionOrgRegister: Ange din användarinformation.
+  EmailLabel: E-post
+  UsernameLabel: Användarnamn
+  FirstnameLabel: Förnamn
+  LastnameLabel: Efternamn
+  LanguageLabel: Språk
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  GenderLabel: Kön
+  Female: Man
+  Male: Kvinna
+  Diverse: Ickebinär
+  PasswordLabel: Lösenord
+  PasswordConfirmLabel: Lösenord igen
+  TosAndPrivacyLabel: Användarvillkor
+  TosConfirm: Jag accepterar
+  TosLinkText: Användarvillkoren
+  PrivacyConfirm: Jag accepterar
+  PrivacyLinkText: personuppgiftspolicyn
+  ExternalLogin: eller registrera dig med ett extern användarkonto
+  BackButtonText: Logga in
+  NextButtonText: Fortsätt
+
+ExternalRegistrationUserOverview:
+  Title: Registrering via externt konto
+  Description: Vi har fyllt i den information som fanns från det exrna kontot. Du kan komplettera eler ändra den här.
+  EmailLabel: E-post
+  UsernameLabel: Användarnamn
+  FirstnameLabel: Förnamn
+  LastnameLabel: Efternamn
+  NicknameLabel: Tilltalsnamn
+  PhoneLabel: Mobilnummer
+  LanguageLabel: språk
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+  TosAndPrivacyLabel: Användarvillkor
+  TosConfirm: Jag accepterar
+  TosLinkText: Användarvillkoren
+  PrivacyConfirm: Jag accepterar
+  PrivacyLinkText: personuppgiftspolicyn
+  ExternalLogin: or register with an external user
+  BackButtonText: Tillbaka
+  NextButtonText: Spara
+
+RegistrationOrg:
+  Title: Registrering av organisation
+  Description: Ange din organisation-data
+  OrgNameLabel: Namn på organisation
+  EmailLabel: E-post
+  UsernameLabel: Användarnamn
+  FirstnameLabel: Förnamn
+  LastnameLabel: Efternamn
+  PasswordLabel: Lösenord
+  PasswordConfirmLabel: Lösenord igen
+  TosAndPrivacyLabel: Användarvillkor
+  TosConfirm: Jag accepterar
+  TosLinkText: Användarvillkoren
+  PrivacyConfirm: Jag accepterar
+  PrivacyLinkText: personuppgiftspolicyn
+  SaveButtonText: Skapa organisation
+
+LoginSuccess:
+  Title: Inloggad
+  AutoRedirectDescription: Du kommer automatiskt skickas vidare till tjänsten. Om inget händer kan du klicka på länken nedan. Sedan kan du stänga det här fönstret.
+  RedirectedDescription: Du kan stänga det här fönstret nu.
+  NextButtonText: Fortsätt
+
+LogoutDone:
+  Title: Utloggad
+  Description: Du har nu loggats ut.
+  LoginButtonText: Logga in igen
+
+LinkingUserPrompt:
+  Title: Det finns redan ett konto
+  Description: "Vill du koppla ihop din inloggning med det befintliga kontot:"
+  LinkButtonText: Koppla ihop
+  OtherButtonText: Andra åtgärder
+
+LinkingUsersDone:
+  Title: Kopplar ihop användare
+  Description: Användarkontot kopplat.
+  CancelButtonText: Avbryt
+  NextButtonText: Fortsätt
+
+ExternalNotFound:
+  Title: Det finns inget konto
+  Description: Du kan registrera ett nytt konto eller koppla ihop det här kontot med ett befintligt.
+  LinkButtonText: Koppla ihop
+  AutoRegisterButtonText: Registrera nytt
+  TosConfirm: Jag accepterar
+  TosLinkText: Användarvillkoren
+  PrivacyConfirm: Jag accepterar
+  PrivacyLinkText: personuppgiftspolicyn
+  SaveButtonText: Skapa organisation
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
+  Chinese: 简体中文
+  Polish: Polski
+  Japanese: 日本語
+  Spanish: Español
+  Bulgarian: Български
+  Portuguese: Português
+  Macedonian: Македонски
+  Czech: Čeština
+  Russian: Русский
+  Dutch: Nederlands
+  Swedish: Svenska
+DeviceAuth:
+  Title: Tillgång från hårdvaruenhet
+  UserCode:
+    Label: Användarkod
+    Description: Ange den användarkod som visas på enheten.
+    ButtonNext: Fortsätt
+  Action:
+    Description: Tillgång för hårdvaruenhet.
+    GrantDevice: Du kommer ge tillgång för hårdvaruenhet
+    AccessToScopes: till följande scopes
+    Button:
+      Allow: Tillåt
+      Deny: Neka
+  Done:
+    Description: Klart.
+    Approved: Hårdvaruenheten har nu tillgång. Fortsätt på enheten.
+    Denied: Hårdvaruenheten nekades tillgång. Du kan fortsätta på enheten.
+
+Footer:
+  PoweredBy: Bygger på
+  Tos: Användarvillkor
+  PrivacyPolicy: Personuppgiftspolicy
+  Help: Hjälp
+  SupportEmail: Kundsupport E-post
+
+SignIn: Logga in med {{.Provider}}
+
+Errors:
+  Internal: Ett internt fel inträffade
+  AuthRequest:
+    NotFound: Kan inte hitta authrequest
+    UserAgentNotCorresponding: User Agent stämmer inte överens
+    UserAgentNotFound: User Agent ID hittades inte
+    TokenNotFound: Token hittades inte
+    RequestTypeNotSupported: Request av en typ som inte stöds
+    MissingParameters: Obligatorisk parameter saknas
+  User:
+    NotFound: Användaren hittades inte
+    AlreadyExists: Användaren finns redan
+    Inactive: Användaren är inaktiverad
+    NotFoundOnOrg: Användaren finns inte i den valda organisationen
+    NotAllowedOrg: Användaren är inte medlem i den valda organisationen
+    NotMatchingUserID: Användaren och den användare som anges i authrequest stämmer inte överens
+    UserIDMissing: UserID är inte angett
+    Invalid: Felaktiga userdata
+    DomainNotAllowedAsUsername: Domänen är reserverad och kan inte användas
+    NotAllowedToLink: Användaren har inte rätt att kopplas ihop med ett externt konto
+    Profile:
+      NotFound: Profilen finns inte
+      NotChanged: Profilen har inte ändrats
+      Empty: Profilen saknar innehåll
+      FirstNameEmpty: Förnamnet i profilen är tomt
+      LastNameEmpty: Efternamnet i profilen är tomt
+      IDMissing: Profile ID saknas
+    E-Post:
+      NotFound: E-Post finns inte
+      Invalid: E-Post är felaktig
+      AlreadyVerified: E-Posten är redan bekräftad
+      NotChanged: E-Posten oförändrad
+      Empty: E-Post tomt
+      IDMissing: E-Post ID saknas
+    Phone:
+      NotFound: Mobilnr finns inte
+      Invalid: Mobilnr är ogiltigt
+      AlreadyVerified: Mobilnr är redan bekräftad
+      Empty: Mobilnr tomt
+      NotChanged: Mobilnr oförändrat
+    Address:
+      NotFound: Adress saknas
+      NotChanged: Adress oförändrad
+    Användarnamn:
+      AlreadyExists: Användarnamnet finns redan
+      Reserved: Användarnamnet är upptaget
+      Empty: Användarnamnet är tomt
+    Lösenord:
+      ConfirmationWrong: Lösenorden stämmer inte överens
+      Empty: Lösenordet är tomt
+      Invalid: Lösenordet är ogiltigt
+      InvalidAndLocked: Lösenordet är ogiltigt och användaren är spärrad. Ta kontakt med systemansvarig.
+      NotChanged: Ditt nya lösenord kan inte vara samma som ditt gamla lösenord
+    UsernameOrPassword:
+      Invalid: Användarnamn eller lösenord har felaktigt format
+    PasswordComplexityPolicy:
+      NotFound: Lösenordspolicy saknas
+      MinLength: Lösenordet är för kort
+      HasLower: Lösenordet måste innehålla små bokstäver
+      HasUpper: Lösenordet måste innehålla stora bokstäver
+      HasNumber: Lösenordet måste innehålla en siffra
+      HasSymbol: Lösenordet måste innehålla ett specialtecken
+    Code:
+      Expired: Koden är för gammal
+      Invalid: Koden är felaktig
+      Empty: Koden är tom
+      CryptoCodeNil: Cryptokoden är tom
+      NotFound: Koden hittades inte
+      GeneratorAlgNotSupported: Genereringsalgoritmen stöds inte
+    EmailVerify:
+      UserIDEmpty: UserID är tom
+    ExternalData:
+      CouldNotRead: Externa data kunde inte läsas rätt
+    MFA:
+      NoProviders: Det finns inga MFA-leverantörer tillgängliga
+      OTP:
+        AlreadyReady: Tvåfaktor OTP (OneTimePassword) är redan konfigurerat
+        NotExisting: Tvåfaktor OTP (OneTimePassword) finns inte
+        InvalidCode: Ogiltig kod
+        NotReady: Tvåfaktor OTP (OneTimePassword) är inte redo
+    Locked: Användaren är spärrad
+    SomethingWentWrong: Någonting gick fel
+    NotActive: Användaren är inaktiv
+    ExternalIDP:
+      IDPTypeNotImplemented: IdP-typen är inte implementerad
+      NotAllowed: Den externa konto-leverantören tillåts inte
+      IDPConfigIDEmpty: Identity Provider ID är tomt
+      ExternalUserIDEmpty: External User ID är tomt
+      UserDisplayNameEmpty: User Display Name är tomt
+      NoExternalUserData: Det kom ingen användarinformation från det externa kontot
+      CreationNotAllowed: Det är inte tillåtet att skapa nya konton från den här externa leverantören
+      LinkingNotAllowed: Det är inte tillåtet att koppla ihop konton från den här externa leverantören
+    GrantRequired: Det går inte att logga in just nu. Användarkontot har inte tillgång till någonting i tjänsten. Ta kontakt med systemansvarig.
+    ProjectRequired: Det går inte att logga in just nu. Användarkontots organisation har inte tillgång till tjänsten. Ta kontakt med systemansvarig.
+  IdentityProvider:
+    InvalidConfig: Identity Provider-konfigurationen är felaktig
+  IAM:
+    LockoutPolicy:
+      NotExisting: Lockout Policy saknas
+  Org:
+    LoginPolicy:
+      RegistrationNotAllowed: Registrering är inte tillåten
+  DeviceAuth:
+    NotExisting: Användarkoden finns inte
+
+optional: (frivilligt)

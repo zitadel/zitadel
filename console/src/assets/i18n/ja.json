@@ -486,6 +486,7 @@
     "MORE": "さらに",
     "STEP": "ステップ",
     "SETUP": "セットアップ",
+    "TEST": "テスト",
     "UNSAVEDCHANGES": "未保存の変更",
     "UNSAVED": {
       "DIALOG": {
@@ -1326,6 +1327,7 @@
       "LANGUAGES": "一般設定",
       "LOGIN": "ログイン動作とセキュリティ",
       "LOCKOUT": "ロックアウト",
+      "AGE": "パスワードの有効期限",
       "COMPLEXITY": "パスワードの複雑さ",
       "NOTIFICATIONS": "通知設定",
       "SMTP_PROVIDER": "SMTPプロバイダー",
@@ -1380,7 +1382,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1541,8 +1544,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "パスワードエージング",
-      "DESCRIPTION": "パスワードエージングに関するポリシーを設定できます。このポリシーは、特定のエージング時間が経過した後に警告を発します。"
+      "TITLE": "パスワードの有効期限",
+      "DESCRIPTION": "パスワードの有効期限ポリシーを設定できます。 このポリシーにより、有効期限が切れた後にユーザーは次回のログイン時にパスワードを変更することを求められます。 自動的な警告や通知はない。"
     },
     "PWD_LOCKOUT": {
       "TITLE": "ロックアウトポリシー",
@@ -1605,7 +1608,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1694,8 +1698,8 @@
       "SHOWLOCKOUTFAILURES": "ロックアウトの失敗を表示する",
       "MAXPASSWORDATTEMPTS": "パスワードの最大試行",
       "MAXOTPATTEMPTS": "最大OTP試行回数",
-      "EXPIREWARNDAYS": "有効期限の翌日以降の警告",
-      "MAXAGEDAYS": "最大有効期限",
+      "EXPIREWARNDAYS": "数日後に有効期限が切れます",
+      "MAXAGEDAYS": "最大有効期限 (日数)",
       "USERLOGINMUSTBEDOMAIN": "ログイン名の接尾辞として組織ドメインを追加する",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "この設定を有効にすると、すべてのログイン名が組織ドメインで接尾辞が付けられます。この設定が無効になっている場合、ユーザー名がすべての組織で一意であることを確認する必要があります。",
       "VALIDATEORGDOMAINS": "組織のドメイン検証が必要です (DNSまたはHTTPチャレンジ)",
@@ -2227,6 +2231,7 @@
       "ACTIVATED": "アクティブ化された",
       "ACTIVATE": "プロバイダーをアクティブ化する",
       "DEACTIVATE": "プロバイダーを非アクティブ化する",
+      "TEST": "プロバイダーをテストする",
       "TYPE": "タイプ",
       "DIALOG": {
         "ACTIVATED": "SMTP設定が有効化されました",
@@ -2250,7 +2255,6 @@
         "CURRENT_DESC_TITLE": "これらは SMTP 設定です",
         "PROVIDER_SETTINGS": "SMTPプロバイダーの設定",
         "SENDER_SETTINGS": "送信者の設定",
-        "TEST_SETTINGS": "SMTP設定をテストする",
         "NEXT_STEPS": "次のステップ",
         "ACTIVATE": {
           "TITLE": "SMTP プロバイダーをアクティブ化する",
@@ -2259,6 +2263,12 @@
         "DEACTIVATE": {
           "TITLE": "SMTPプロバイダーを非アクティブ化します",
           "DESCRIPTION": "この SMTP プロバイダーを非アクティブ化すると、再度アクティブ化するまで、Zitadel はそれを使用して通知を送信できなくなります。"
+        },
+        "SAVE_SETTINGS": "設定を保存する",
+        "TEST": {
+          "TITLE": "設定をテストする",
+          "DESCRIPTION": "SMTP プロバイダーの設定をテストし、保存する前にテスト結果を確認できます。",
+          "RESULT": "あなたの電子メールが正常に送信されました"
         }
       }
     },
@@ -2533,7 +2543,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

@@ -42,7 +42,7 @@ Please also consult our [guide](/docs/guides/manage/user/reg-create-user) on how
 
 ## Bulk import
 
-For bulk import use the [import endpoint](https://zitadel.com/docs/apis/resources/admin/admin-service-import-data) on the admin API:
+For bulk import use the [import endpoint](/docs/apis/resources/admin/admin-service-import-data) on the admin API:
 
 ```json
 {
@@ -191,7 +191,7 @@ Currently it is not possible to migrate passkeys directly from another system.
 
 ## Users linked to an external IDP
 
-A users `sub` is bound to the external [IDP's Client ID](https://zitadel.com/docs/guides/manage/console/default-settings#identity-providers).
+A users `sub` is bound to the external [IDP's Client ID](/docs/guides/manage/console/default-settings#identity-providers).
 This means that the IDP Client ID configured in ZITADEL must be the same ID as in the legacy system.
 
 Users should be imported with their `externalUserId`.
@@ -211,7 +211,7 @@ _snippet from [bulk-import](#bulk-import) example:_
 }
 ```
 
-You can use an Action with [post-creation flow](https://zitadel.com/docs/apis/actions/external-authentication#post-creation) to pull information such as roles from the old system and apply them to the user in ZITADEL.
+You can use an Action with [post-creation flow](/docs/apis/actions/external-authentication#post-creation) to pull information such as roles from the old system and apply them to the user in ZITADEL.
 
 ## Metadata
 
@@ -220,7 +220,7 @@ Use metadata to store additional attributes of the users, such as organizational
 
 :::info
 Metadata must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Metadata](https://zitadel.com/docs/category/apis/resources/mgmt/user-metadata)
+[API reference: User Metadata](/docs/apis/resources/mgmt/user-metadata)
 :::
 
 Request metadata from the userinfo endpoint by passing the required [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) in your auth request.
@@ -232,5 +232,5 @@ You can assign roles from owned or granted projects to a user.
 
 :::info
 Authorizations must be added to users after the users were created. Currently metadata can't be added during user creation.  
-[API reference: User Authorization / Grants](https://zitadel.com/docs/category/apis/resources/auth/user-authorizations-grants)
+[API reference: User Authorization / Grants](/docs/apis/resources/auth/user-authorizations-grants)
 :::

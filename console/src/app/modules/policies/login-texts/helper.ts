@@ -188,6 +188,7 @@ export function mapRequestValues(map: Partial<Map>, req: Req): Req {
 
   const r17 = new PasswordChangeScreenText();
   r17.setDescription(map.passwordChangeText?.description ?? '');
+  r17.setExpiredDescription(map.passwordChangeText?.expiredDescription ?? '');
   r17.setNextButtonText(map.passwordChangeText?.nextButtonText ?? '');
   r17.setTitle(map.passwordChangeText?.title ?? '');
   r17.setNewPasswordLabel(map.passwordChangeText?.newPasswordLabel ?? '');

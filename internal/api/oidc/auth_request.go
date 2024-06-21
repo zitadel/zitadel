@@ -75,6 +75,7 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		Audience:         audience,
 		NeedRefreshToken: slices.Contains(scope, oidc.ScopeOfflineAccess),
 		ResponseType:     ResponseTypeToBusiness(req.ResponseType),
+		ResponseMode:     ResponseModeToBusiness(req.ResponseMode),
 		CodeChallenge:    CodeChallengeToBusiness(req.CodeChallenge, req.CodeChallengeMethod),
 		Prompt:           PromptToBusiness(req.Prompt),
 		UILocales:        UILocalesToBusiness(req.UILocales),
@@ -471,7 +472,7 @@ func (s *Server) CreateTokenCallbackURL(ctx context.Context, req op.AuthRequest)
 	if err != nil {
 		return "", err
 	}
-	resp, err := s.accessTokenResponseFromSession(ctx, client, session, state, client.client.ProjectID, client.client.ProjectRoleAssertion)
+	resp, err := s.accessTokenResponseFromSession(ctx, client, session, state, client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion)
 	if err != nil {
 		return "", err
 	}
@@ -563,7 +564,7 @@ func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorize
 		op.AuthRequestError(w, r, authReq, err, authorizer)
 		return err
 	}
-	resp, err := s.accessTokenResponseFromSession(ctx, client, session, authReq.GetState(), client.client.ProjectID, client.client.ProjectRoleAssertion)
+	resp, err := s.accessTokenResponseFromSession(ctx, client, session, authReq.GetState(), client.client.ProjectID, client.client.ProjectRoleAssertion, client.client.AccessTokenRoleAssertion, client.client.IDTokenRoleAssertion, client.client.IDTokenUserinfoAssertion)
 	if err != nil {
 		op.AuthRequestError(w, r, authReq, err, authorizer)
 		return err

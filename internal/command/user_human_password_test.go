@@ -1456,7 +1456,6 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		resourceOwner string
 		password      string
 		authReq       *domain.AuthRequest
-		lockoutPolicy *domain.LockoutPolicy
 	}
 	type res struct {
 		err func(error) bool
@@ -1768,6 +1767,13 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 								"")),
 					),
 					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								0, 0, false,
+							)),
+					),
 					expectPush(
 						user.NewHumanPasswordCheckFailedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1789,7 +1795,6 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 					ID:      "request1",
 					AgentID: "agent1",
 				},
-				lockoutPolicy: &domain.LockoutPolicy{},
 			},
 			res: res{
 				err: zerrors.IsErrorInvalidArgument,
@@ -1852,6 +1857,13 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 						),
 					),
 					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLockoutPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								1, 1, false,
+							)),
+					),
 					expectPush(
 						user.NewHumanPasswordCheckFailedEvent(context.Background(),
 							&user.NewAggregate("user1", "org1").Aggregate,
@@ -1875,10 +1887,6 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				authReq: &domain.AuthRequest{
 					ID:      "request1",
 					AgentID: "agent1",
-				},
-				lockoutPolicy: &domain.LockoutPolicy{
-					MaxPasswordAttempts: 1,
-					MaxOTPAttempts:      1,
 				},
 			},
 			res: res{
@@ -2230,7 +2238,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			err := r.HumanCheckPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.authReq, tt.args.lockoutPolicy)
+			err := r.HumanCheckPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.authReq)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

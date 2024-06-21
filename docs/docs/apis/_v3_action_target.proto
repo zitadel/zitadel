@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package zitadel.resources.action.v3alpha;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+import "zitadel/resources/object/v3alpha/object.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
+
+message Target {
+  string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ip_allow_list\"";
+    }
+  ];
+  // Defines the target type and how the response of the target is treated.
+  oneof target_type {
+    SetRESTWebhook rest_webhook = 4;
+    SetRESTRequestResponse rest_request_response = 5;
+  }
+  // Timeout defines the duration until ZITADEL cancels the execution.
+  google.protobuf.Duration timeout = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"10s\"";
+    }
+  ];
+  oneof execution_type {
+    // Set the execution to run asynchronously.
+    bool is_async = 7;
+    // Define if any error stops the whole execution. By default the process continues as normal.
+    bool interrupt_on_error = 8;
+  }
+}
+
+message GetTarget {
+  zitadel.resources.object.v3alpha.Details details = 1;
+  Target target = 2;
+}
+
+message PatchTarget {
+  optional string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"ip_allow_list\"";
+    }
+  ];
+  // Defines the target type and how the response of the target is treated.
+  oneof target_type {
+    SetRESTWebhook rest_webhook = 3;
+    SetRESTRequestResponse rest_request_response = 4;
+  }
+  // Timeout defines the duration until ZITADEL cancels the execution.
+  optional google.protobuf.Duration timeout = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"10s\"";
+    }
+  ];
+  oneof execution_type {
+    // Set the execution to run asynchronously.
+    bool is_async = 6;
+    // Define if any error stops the whole execution. By default the process continues as normal.
+    bool interrupt_on_error = 7;
+  }
+}
+
+message SetRESTWebhook {
+  string url = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 1000, uri: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 1000,
+      example: "\"https://example.com/hooks/ip_check\"";
+    }
+  ];
+}
+
+message SetRESTRequestResponse {
+  string url = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 1000, uri: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 1000,
+      example: "\"https://example.com/hooks/ip_check\"";
+    }
+  ];
+}

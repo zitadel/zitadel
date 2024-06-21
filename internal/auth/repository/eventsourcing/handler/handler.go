@@ -63,6 +63,16 @@ func Projections() []*handler2.Handler {
 	return projections
 }
 
+func ProjectInstance(ctx context.Context) error {
+	for _, projection := range projections {
+		_, err := projection.Trigger(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (config Config) overwrite(viewModel string) handler2.Config {
 	c := handler2.Config{
 		Client:                config.Client,

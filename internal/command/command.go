@@ -156,7 +156,7 @@ func StartCommands(
 		defaultRefreshTokenLifetime:     defaultRefreshTokenLifetime,
 		defaultRefreshTokenIdleLifetime: defaultRefreshTokenIdleLifetime,
 		defaultSecretGenerators:         defaultSecretGenerators,
-		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.Size),
+		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.CertificateSize, defaults.KeyConfig.CertificateLifetime),
 		// always true for now until we can check with an eventlist
 		EventExisting: func(event string) bool { return true },
 		// always true for now until we can check with an eventlist
@@ -223,7 +223,7 @@ func exists(ctx context.Context, filter preparation.FilterToQueryReducer, wm exi
 	return wm.Exists(), nil
 }
 
-func samlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte, error) {
+func samlCertificateAndKeyGenerator(keySize int, lifetime time.Duration) func(id string) ([]byte, []byte, error) {
 	return func(id string) ([]byte, []byte, error) {
 		priv, pub, err := crypto.GenerateKeyPair(keySize)
 		if err != nil {
@@ -234,12 +234,15 @@ func samlCertificateAndKeyGenerator(keySize int) func(id string) ([]byte, []byte
 		if err != nil {
 			return nil, nil, err
 		}
+		now := time.Now()
 		template := x509.Certificate{
 			SerialNumber: big.NewInt(int64(serial)),
 			Subject: pkix.Name{
 				Organization: []string{"ZITADEL"},
 				SerialNumber: id,
 			},
+			NotBefore:             now,
+			NotAfter:              now.Add(lifetime),
 			KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
 			ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 			BasicConstraintsValid: true,

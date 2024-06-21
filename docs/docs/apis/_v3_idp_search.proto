@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package zitadel.resources.idp.v3alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/idp/v3alpha;idp";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+import "zitadel/resources/object/v3alpha/object.proto";
+
+enum IDPFieldName {
+  IDP_FIELD_NAME_UNSPECIFIED = 0;
+  IDP_FIELD_NAME_NAME = 1;
+}
+
+message IDPSearchFilter {
+  oneof filter {
+    IDPIDFilter id = 1;
+    IDPNameFilter name = 2;
+    resources.object.v3alpha.StateFilter state = 3;
+  }
+}
+
+message IDPIDFilter {
+  string id = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
+
+message IDPNameFilter {
+  string name = 1 [
+    (validate.rules).string = {max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"google\"";
+    }
+  ];
+  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
+    (validate.rules).enum.defined_only = true,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines which text equality method is used";
+    }
+  ];
+}

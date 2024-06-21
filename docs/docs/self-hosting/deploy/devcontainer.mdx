@@ -1,0 +1,33 @@
+---
+title: Developing ZITADEL with Dev Containers
+sidebar_label: Dev Containers
+---
+
+Dev containers provide a convenient way to set up a development environment for ZITADEL with all the necessary dependencies pre-configured. This allows you to start contributing or working on ZITADEL locally with minimal setup.
+
+## Prerequisites
+
+- Docker installed on your machine. You can find installation instructions for Docker on their official website: https://docs.docker.com/engine/install/
+- A code editor or IDE with remote container development capabilities (optional, but recommended). [Visual Studio Code](https://code.visualstudio.com) with the [Remote Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) is a popular option.
+
+## Setting Up Dev Container
+
+
+ZITADEL provides a `.devcontainer` folder that configures the development environment within a container. Here's how to get started:
+
+1. Clone the ZITADEL repository from GitHub:  
+```bash
+git clone https://github.com/zitadel/zitadel.git
+```
+2. Navigate to the project directory:  
+```bash
+cd zitadel
+```
+3. Open the project in your code editor or IDE (if using one with remote container support).
+4. Follow the instructions provided by your code editor/IDE to initiate the development container. This typically involves opening the "Command Palette" or similar functionality and searching for commands related to "Dev Containers" or "Remote Containers". The quick start guide for VS Code can found [here](https://code.visualstudio.com/docs/devcontainers/containers#_quick-start-open-an-existing-folder-in-a-container)
+
+**Note**: The first time you run this command, it might take some time to download the container image.
+
+## Using Dev Container
+
+Once the container is running, you will have a development environment set up with all the necessary dependencies pre-installed. You can then follow the instructions in the ZITADEL [contribution guide](https://github.com/zitadel/zitadel/blob/main/CONTRIBUTING.md#developing-zitadel-with-dev-containers) to build and run ZITADEL, or develop the ZITADEL console application.

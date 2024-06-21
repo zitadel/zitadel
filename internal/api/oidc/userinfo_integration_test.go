@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"golang.org/x/oauth2"
+	"google.golang.org/grpc/metadata"
 
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -143,7 +144,7 @@ func testServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, roleFoo, roleBar)
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo, roleBar}, []string{Tester.Organisation.ID})
 				},
 			},
 		},
@@ -156,7 +157,7 @@ func testServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, roleFoo)
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Tester.Organisation.ID})
 				},
 			},
 		},
@@ -170,7 +171,7 @@ func testServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, roleFoo)
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Tester.Organisation.ID})
 				},
 			},
 		},
@@ -221,6 +222,76 @@ func testServer_UserInfo(t *testing.T) {
 	}
 }
 
+// TestServer_UserInfo_OrgIDRoles tests the [domain.OrgRoleIDScope] functionality
+// it is a separate test because it is not supported in legacy mode.
+func TestServer_UserInfo_OrgIDRoles(t *testing.T) {
+	const (
+		roleFoo = "foo"
+		roleBar = "bar"
+	)
+	clientID, projectID := createClient(t)
+	addProjectRolesGrants(t, User.GetUserId(), projectID, roleFoo, roleBar)
+	grantedOrgID := addProjectOrgGrant(t, User.GetUserId(), projectID, roleFoo, roleBar)
+
+	_, err := Tester.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
+		Id:                   projectID,
+		Name:                 fmt.Sprintf("project-%d", time.Now().UnixNano()),
+		ProjectRoleAssertion: true,
+	})
+	require.NoError(t, err)
+	resp, err := Tester.Client.Mgmt.GetProjectByID(CTX, &management.GetProjectByIDRequest{Id: projectID})
+	require.NoError(t, err)
+	require.True(t, resp.GetProject().GetProjectRoleAssertion(), "project role assertion")
+
+	tests := []struct {
+		name           string
+		scope          []string
+		wantRoleOrgIDs []string
+	}{
+		{
+			name: "default returns all role orgs",
+			scope: []string{
+				oidc.ScopeOpenID, oidc.ScopeOfflineAccess,
+			},
+			wantRoleOrgIDs: []string{Tester.Organisation.ID, grantedOrgID},
+		},
+		{
+			name: "only granted org",
+			scope: []string{
+				oidc.ScopeOpenID, oidc.ScopeOfflineAccess,
+				domain.OrgRoleIDScope + grantedOrgID},
+			wantRoleOrgIDs: []string{grantedOrgID},
+		},
+		{
+			name: "only own org",
+			scope: []string{
+				oidc.ScopeOpenID, oidc.ScopeOfflineAccess,
+				domain.OrgRoleIDScope + Tester.Organisation.ID,
+			},
+			wantRoleOrgIDs: []string{Tester.Organisation.ID},
+		},
+		{
+			name: "request both orgs",
+			scope: []string{
+				oidc.ScopeOpenID, oidc.ScopeOfflineAccess,
+				domain.OrgRoleIDScope + Tester.Organisation.ID,
+				domain.OrgRoleIDScope + grantedOrgID,
+			},
+			wantRoleOrgIDs: []string{Tester.Organisation.ID, grantedOrgID},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tokens := getTokens(t, clientID, tt.scope)
+			provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
+			require.NoError(t, err)
+			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
+			require.NoError(t, err)
+			assertProjectRoleClaims(t, projectID, userinfo.Claims, true, []string{roleFoo, roleBar}, tt.wantRoleOrgIDs)
+		})
+	}
+}
+
 // https://github.com/zitadel/zitadel/issues/6662
 func TestServer_UserInfo_Issue6662(t *testing.T) {
 	const (
@@ -231,9 +302,9 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
 	projectID := project.GetId()
 	require.NoError(t, err)
-	userID, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
+	user, _, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
-	addProjectRolesGrants(t, userID, projectID, roleFoo, roleBar)
+	addProjectRolesGrants(t, user.GetUserId(), projectID, roleFoo, roleBar)
 
 	scope := []string{oidc.ScopeProfile, oidc.ScopeOpenID, oidc.ScopeEmail, oidc.ScopeOfflineAccess,
 		oidc_api.ScopeProjectRolePrefix + roleFoo,
@@ -245,9 +316,9 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 	tokens, err := rp.ClientCredentials(CTX, provider, nil)
 	require.NoError(t, err)
 
-	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, userID, provider)
+	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, user.GetUserId(), provider)
 	require.NoError(t, err)
-	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, roleFoo)
+	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, []string{roleFoo}, []string{Tester.Organisation.ID})
 }
 
 func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...string) {
@@ -272,6 +343,28 @@ func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...stri
 	require.NoError(t, err)
 }
 
+// addProjectOrgGrant adds a new organization which will be granted on the projectID with the specified roles.
+// The userID will be granted in the new organization to the project with the same roles.
+func addProjectOrgGrant(t *testing.T, userID, projectID string, roles ...string) (grantedOrgID string) {
+	grantedOrg := Tester.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_GRANTED_%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	projectGrant, err := Tester.Client.Mgmt.AddProjectGrant(CTX, &management.AddProjectGrantRequest{
+		ProjectId:    projectID,
+		GrantedOrgId: grantedOrg.GetOrganizationId(),
+		RoleKeys:     roles,
+	})
+	require.NoError(t, err)
+
+	ctxOrg := metadata.AppendToOutgoingContext(CTXIAM, "x-zitadel-orgid", grantedOrg.GetOrganizationId())
+	_, err = Tester.Client.Mgmt.AddUserGrant(ctxOrg, &management.AddUserGrantRequest{
+		UserId:         userID,
+		ProjectId:      projectID,
+		ProjectGrantId: projectGrant.GetGrantId(),
+		RoleKeys:       roles,
+	})
+	require.NoError(t, err)
+	return grantedOrg.GetOrganizationId()
+}
+
 func getTokens(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
 	authRequestID := createAuthRequest(t, clientID, redirectURI, scope...)
 	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
@@ -291,7 +384,7 @@ func getTokens(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc
 	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
+	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
 
 	return tokens
 }
@@ -316,19 +409,36 @@ func assertNoReservedScopes(t *testing.T, claims map[string]any) {
 	}
 }
 
-func assertProjectRoleClaims(t *testing.T, projectID string, claims map[string]any, claimProjectRole bool, roles ...string) {
+// assertProjectRoleClaims asserts the projectRoles in the claims.
+// By default it searches for the [oidc_api.ClaimProjectRolesFormat] claim with a project ID,
+// and optionally for the [oidc_api.ClaimProjectRoles] claim if claimProjectRole is true.
+// Each claim should contain the roles expected by wantRoles and
+// each role should contain the org IDs expected by wantRoleOrgIDs.
+//
+// In the claim map, each project role claim is expected to be a map of multiple roles and
+// each role is expected to be a map of multiple Org IDs to Org Domains.
+func assertProjectRoleClaims(t *testing.T, projectID string, claims map[string]any, claimProjectRole bool, wantRoles, wantRoleOrgIDs []string) {
 	t.Helper()
 	projectRoleClaims := []string{fmt.Sprintf(oidc_api.ClaimProjectRolesFormat, projectID)}
 	if claimProjectRole {
 		projectRoleClaims = append(projectRoleClaims, oidc_api.ClaimProjectRoles)
 	}
 	for _, claim := range projectRoleClaims {
-		roleMap, ok := claims[claim].(map[string]any)
+		roleMap, ok := claims[claim].(map[string]any) // map of multiple roles
 		require.Truef(t, ok, "claim %s not found or wrong type %T", claim, claims[claim])
-		for _, roleKey := range roles {
-			role, ok := roleMap[roleKey].(map[string]any)
+
+		gotRoles := make([]string, 0, len(roleMap))
+		for roleKey := range roleMap {
+			role, ok := roleMap[roleKey].(map[string]any) // map of multiple org IDs to org domains
 			require.Truef(t, ok, "role %s not found or wrong type %T", roleKey, roleMap[roleKey])
-			assert.Equal(t, role[Tester.Organisation.ID], Tester.Organisation.Domain, "org domain in role")
+			gotRoles = append(gotRoles, roleKey)
+
+			gotRoleOrgIDs := make([]string, 0, len(role))
+			for orgID := range role {
+				gotRoleOrgIDs = append(gotRoleOrgIDs, orgID)
+			}
+			assert.ElementsMatch(t, wantRoleOrgIDs, gotRoleOrgIDs)
 		}
+		assert.ElementsMatch(t, wantRoles, gotRoles)
 	}
 }

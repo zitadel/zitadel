@@ -6,9 +6,11 @@
         <mat-icon class="icon">info_outline</mat-icon>
       </a>
     </div>
-    <p class="sub cnsl-secondary-text max-width-description">
-      {{ 'DESCRIPTIONS.PROJECTS.DESCRIPTION' | translate }}
-    </p>
+    <p
+      class="sub cnsl-secondary-text max-width-description"
+      [innerHTML]="'DESCRIPTIONS.PROJECTS.DESCRIPTION' | translate"
+    ></p>
+
     <div class="projects-controls">
       <div class="project-toggle-group">
         <cnsl-nav-toggle

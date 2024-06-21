@@ -49,6 +49,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "User Authentication Factor"
         },
         {
+            name: "User Authorizations/Grants"
+        },
+        {
             name: "User Email"
         },
         {

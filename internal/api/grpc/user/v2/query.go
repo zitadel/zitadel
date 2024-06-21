@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/muhlemmer/gu"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
@@ -83,6 +84,10 @@ func userTypeToPb(userQ *query.User, assetPrefix string) user.UserType {
 }
 
 func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
+	var passwordChanged *timestamppb.Timestamp
+	if !userQ.PasswordChanged.IsZero() {
+		passwordChanged = timestamppb.New(userQ.PasswordChanged)
+	}
 	return &user.HumanUser{
 		Profile: &user.HumanProfile{
 			GivenName:         userQ.FirstName,
@@ -102,6 +107,7 @@ func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
 			IsVerified: userQ.IsPhoneVerified,
 		},
 		PasswordChangeRequired: userQ.PasswordChangeRequired,
+		PasswordChanged:        passwordChanged,
 	}
 }
 

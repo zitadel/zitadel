@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Changer le mot de passe
   Description: Changez votre mot de passe. Entrez votre ancien et votre nouveau mot de passe.
+  ExpiredDescription: Votre mot de passe a expiré et doit être modifié. Entrez votre ancien et votre nouveau mot de passe.
   OldPasswordLabel: Ancien mot de passe
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirmLabel: Confirmation du mot de passe
@@ -251,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Genre
   Female: Femme
   Male: Homme
@@ -290,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
@@ -363,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: Autorisation de l'appareil

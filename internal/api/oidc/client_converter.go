@@ -242,6 +242,9 @@ func isScopeAllowed(scope string, allowedScopes ...string) bool {
 	if strings.HasPrefix(scope, domain.SelectIDPScope) {
 		return true
 	}
+	if strings.HasPrefix(scope, domain.OrgRoleIDScope) {
+		return true
+	}
 	if scope == ScopeUserMetaData {
 		return true
 	}

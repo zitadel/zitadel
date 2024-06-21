@@ -295,8 +295,8 @@ func (c *Commands) PasswordChangeSent(ctx context.Context, orgID, userID string)
 	return err
 }
 
-// HumanCheckPassword check password for user with additional informations from authRequest
-func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest, lockoutPolicy *domain.LockoutPolicy) (err error) {
+// HumanCheckPassword check password for user with additional information from authRequest
+func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, password string, authRequest *domain.AuthRequest) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -314,56 +314,66 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	if !loginPolicy.AllowUsernamePassword {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed")
 	}
-
-	wm, err := c.passwordWriteModel(ctx, userID, orgID)
-	if err != nil {
+	commands, err := checkPassword(ctx, userID, password, c.eventstore, c.userPasswordHasher, authRequestDomainToAuthRequestInfo(authRequest))
+	if len(commands) == 0 {
 		return err
 	}
+	_, pushErr := c.eventstore.Push(ctx, commands...)
+	logging.OnError(pushErr).Error("error create password check failed event")
+	return err
+}
 
-	if !isUserStateExists(wm.UserState) {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
+func checkPassword(ctx context.Context, userID, password string, es *eventstore.Eventstore, hasher *crypto.Hasher, optionalAuthRequestInfo *user.AuthRequestInfo) ([]eventstore.Command, error) {
+	if userID == "" {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3f", "Errors.User.UserIDMissing")
+	}
+	wm := NewHumanPasswordWriteModel(userID, "")
+	err := es.FilterToQueryReducer(ctx, wm)
+	if err != nil {
+		return nil, err
+	}
+	if !wm.UserState.Exists() {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 	if wm.UserState == domain.UserStateLocked {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-JLK35", "Errors.User.Locked")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-JLK35", "Errors.User.Locked")
 	}
 	if wm.EncodedHash == "" {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-3nJ4t", "Errors.User.Password.NotSet")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-3nJ4t", "Errors.User.Password.NotSet")
 	}
 
 	userAgg := UserAggregateFromWriteModel(&wm.WriteModel)
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-	updated, err := c.userPasswordHasher.Verify(wm.EncodedHash, password)
+	updated, err := hasher.Verify(wm.EncodedHash, password)
 	spanPasswordComparison.EndWithError(err)
 	err = convertPasswapErr(err)
 	commands := make([]eventstore.Command, 0, 2)
 
 	// recheck for additional events (failed password checks or locks)
-	recheckErr := c.eventstore.FilterToQueryReducer(ctx, wm)
+	recheckErr := es.FilterToQueryReducer(ctx, wm)
 	if recheckErr != nil {
-		return recheckErr
+		return nil, recheckErr
 	}
 	if wm.UserState == domain.UserStateLocked {
-		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFA3t", "Errors.User.Locked")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFA3t", "Errors.User.Locked")
 	}
 
 	if err == nil {
-		commands = append(commands, user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+		commands = append(commands, user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, optionalAuthRequestInfo))
 		if updated != "" {
 			commands = append(commands, user.NewHumanPasswordHashUpdatedEvent(ctx, userAgg, updated))
 		}
-		_, err = c.eventstore.Push(ctx, commands...)
-		return err
+		return commands, nil
 	}
 
-	commands = append(commands, user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
-	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 {
-		if wm.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
-			commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
-		}
+	commands = append(commands, user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, optionalAuthRequestInfo))
+
+	lockoutPolicy, lockoutErr := getLockoutPolicy(ctx, wm.ResourceOwner, es.FilterToQueryReducer)
+	logging.OnError(lockoutErr).Error("unable to get lockout policy")
+	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 && wm.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
+		commands = append(commands, user.NewUserLockedEvent(ctx, userAgg))
 	}
-	_, pushErr := c.eventstore.Push(ctx, commands...)
-	logging.OnError(pushErr).Error("error create password check failed event")
-	return err
+	return commands, err
 }
 
 func (c *Commands) passwordWriteModel(ctx context.Context, userID, resourceOwner string) (writeModel *HumanPasswordWriteModel, err error) {
