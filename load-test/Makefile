@@ -12,6 +12,10 @@ human_password_login: bundle
 machine_pat_login: bundle
 	k6 run dist/machine_pat_login.js --vus ${VUS} --duration ${DURATION}
 
+.PHONY: machine_client_credentials_login
+machine_client_credentials_login: bundle
+	k6 run dist/machine_client_credentials_login.js --vus ${VUS} --duration ${DURATION}
+
 .PHONY: user_info
 user_info: bundle
 	k6 run dist/user_info.js --vus ${VUS} --duration ${DURATION}
