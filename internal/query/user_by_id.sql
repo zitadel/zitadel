@@ -59,20 +59,21 @@ SELECT
   , h.phone
   , h.is_phone_verified
   , h.password_change_required
+  , h.password_changed
   , m.user_id
   , m.name
   , m.description
   , m.secret
   , m.access_token_type
   , count(*) OVER ()
-FROM projections.users12 u
+FROM projections.users13 u
 LEFT JOIN
-  projections.users12_humans h
+  projections.users13_humans h
   ON
     u.id = h.user_id
     AND u.instance_id = h.instance_id
 LEFT JOIN
-  projections.users12_machines m
+  projections.users13_machines m
   ON
     u.id = m.user_id
     AND u.instance_id = m.instance_id

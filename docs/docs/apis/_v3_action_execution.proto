@@ -1,0 +1,123 @@
+syntax = "proto3";
+
+package zitadel.resources.action.v3alpha;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+import "zitadel/resources/object/v3alpha/object.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
+
+message Execution {
+  Condition condition = 1;
+  // Target IDs which are called when the defined conditions trigger.
+  repeated string targets = 2;
+  // Included executions with the same condition-types.
+  repeated string includes = 3;
+}
+
+message GetExecution {
+  zitadel.resources.object.v3alpha.Details details = 1;
+  Execution execution = 2;
+}
+
+message Condition {
+  // Condition-types under which conditions the execution should trigger. Only one is possible.
+  oneof condition_type {
+    option (validate.required) = true;
+
+    // Condition-type to execute after a request on the defined API point is received.
+    RequestExecution request = 1;
+    // Condition-type to execute before a response on the defined API point is returned.
+    ResponseExecution response = 2;
+    // Condition-type to execute when a function is used, replaces actions v1.
+    string function = 3;
+    // Condition-type to execute after an event is created in the system.
+    EventExecution event = 4;
+  }
+}
+
+message RequestExecution {
+  // Condition for the request execution. Only one is possible.
+  oneof condition{
+    // GRPC-method as condition.
+    string method = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"/zitadel.session.v2beta.SessionService/ListSessions\"";
+      }
+    ];
+    // GRPC-service as condition.
+    string service = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"zitadel.session.v2beta.SessionService\"";
+      }
+    ];
+    // All calls to any available services and methods as condition.
+    bool all = 3;
+  }
+}
+
+message ResponseExecution {
+  // Condition for the response execution. Only one is possible.
+  oneof condition{
+    // GRPC-method as condition.
+    string method = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"/zitadel.session.v2beta.SessionService/ListSessions\"";
+      }
+    ];
+    // GRPC-service as condition.
+    string service = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"zitadel.session.v2beta.SessionService\"";
+      }
+    ];
+    // All calls to any available services and methods as condition.
+    bool all = 3;
+  }
+}
+
+message EventExecution{
+  // Condition for the event execution. Only one is possible.
+  oneof condition{
+    // Event name as condition.
+    string event = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"user.human.added\"";
+      }
+    ];
+    // Event group as condition, all events under this group.
+    string group = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 1000},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 1000,
+        example: "\"user.human\"";
+      }
+    ];
+    // all events as condition.
+    bool all = 3;
+  }
+}
+

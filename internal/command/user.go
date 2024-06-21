@@ -336,7 +336,10 @@ func (c *Commands) UserDomainClaimedSent(ctx context.Context, orgID, userID stri
 	return err
 }
 
-func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) error {
+func (c *Commands) checkUserExists(ctx context.Context, userID, resourceOwner string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	existingUser, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return err

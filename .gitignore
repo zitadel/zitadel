@@ -86,3 +86,4 @@ go.work.sum
 load-test/node_modules
 load-test/yarn-error.log
 load-test/dist
+.vercel

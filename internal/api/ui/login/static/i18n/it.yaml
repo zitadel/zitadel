@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Reimposta password
   Description: Cambia la tua password. Inserisci la tua vecchia e la nuova password.
+  ExpiredDescription: La password è scaduta e deve essere modificata. Inserisci la tua vecchia e la nuova password.
   OldPasswordLabel: Vecchia password
   NewPasswordLabel: Nuova password
   NewPasswordConfirmLabel: Conferma della password
@@ -251,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -290,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -363,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: Autorizzazione del dispositivo
