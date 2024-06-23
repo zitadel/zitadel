@@ -1,7 +1,12 @@
 {
-  "root-for": [
+  "name": "ci",
+  "sdk": "go",
+  "dependencies": [
     {
-      "source": "dagger"
+      "name": "docs",
+      "source": "ci/docs"
     }
-  ]
+  ],
+  "source": "ci",
+  "engineVersion": "v0.11.8"
 }
