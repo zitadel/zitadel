@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     },
-    "DOWNLOAD": "Download"
+    "DOWNLOAD": "Download",
+    "APPLY": "Apply"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Has control over the whole instance, including all organizations",

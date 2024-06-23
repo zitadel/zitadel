@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Toon gebruiker {{value}}"
     },
-    "DOWNLOAD": "Download"
+    "DOWNLOAD": "Download",
+    "APPLY": "Toepassen"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",

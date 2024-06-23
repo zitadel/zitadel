@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Visa användare {{value}}"
     },
-    "DOWNLOAD": "Ladda ner"
+    "DOWNLOAD": "Ladda ner",
+    "APPLY": "Tillämpa"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Har kontroll över hela instansen, inklusive alla organisationer",

@@ -497,7 +497,8 @@
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     },
-    "DOWNLOAD": "Scarica"
+    "DOWNLOAD": "Scarica",
+    "APPLY": "Applicare"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Ha il controllo sull'intera istanza, comprese tutte le organizzazioni",

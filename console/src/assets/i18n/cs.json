@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Zobrazit uživatele {{value}}"
     },
-    "DOWNLOAD": "Stáhnout"
+    "DOWNLOAD": "Stáhnout",
+    "APPLY": "Platit"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Má kontrolu nad celou instancí, včetně všech organizací",

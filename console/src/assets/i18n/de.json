@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
     },
-    "DOWNLOAD": "Herunterladen"
+    "DOWNLOAD": "Herunterladen",
+    "APPLY": "Anwenden"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Hat die Kontrolle über die gesamte Instanz, einschließlich aller Organisationen",
