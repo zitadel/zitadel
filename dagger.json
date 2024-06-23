@@ -3,8 +3,8 @@
   "sdk": "go",
   "dependencies": [
     {
-      "name": "docs",
-      "source": "ci/docs"
+      "name": "console",
+      "source": "ci/console"
     }
   ],
   "source": "ci",
