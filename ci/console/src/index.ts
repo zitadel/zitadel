@@ -5,19 +5,18 @@ import { dag, Container, Directory, object, func } from "@dagger.io/dagger"
 class Console {
 
   @func()
-  build(directory: Directory): Container {
+  build(directory: Directory): Directory {
     return dag
       .container()
       .from("node:20")
-      .withWorkdir("/usr/local/console")
-      .withFile("/usr/local/console/package.json", directory.file("console/package.json"))
-      .withFile("/usr/local/console/yarn.lock", directory.file("console/yarn.lock"))
+      .withDirectory("/src/", directory, {include: ["console/**"]})
+      .withDirectory("/src/", directory, {include: ["proto/**"]})
+      .withDirectory("/src/", directory, {include: ["docs/frameworks.json"]})
+      .withWorkdir("/src/console")
+      //.withMountedCache("/src/console/node_modules", dag.cacheVolume("console-node-modules"))
       .withExec(["yarn", "install", "--frozen-lockfile"])
-      .withExec(["npm", "cache", "clean", "--force"])
-      .withExec(["mv", "/usr/local/console/node_modules", "/node_modules"])
-      .withDirectory("/usr/local/console", directory, {include: ["console"]})
-      .withDirectory("/usr/local/proto", directory, {include: ["proto"]})
       .withExec(["yarn", "generate"])
-      .withExec(["yarn", "build"])
+      .withExec(["yarn", "run", "build"])
+      .directory("./dist")
   }
 }
