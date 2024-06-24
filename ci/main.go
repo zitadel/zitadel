@@ -14,8 +14,8 @@ func (c *Ci) Build(ctx context.Context, directory *Directory) error {
 		return err
 	}
 
-	core := dag.core().Build(directory)
-	_, err := core.Sync(ctx)
+	core := dag.Core().Build(console)
+	_, err = core.Sync(ctx)
 	if err != nil {
 		return err
 	}

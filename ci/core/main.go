@@ -1,9 +1,10 @@
 package main
 
-type HelloDagger struct{}
+type Core struct{}
 
-func (m *HelloDagger) Build(source *Directory) *Container {
+func (c *Core) Build(directory *Directory) *Container {
 	return dag.Container().From("alpine").
-		WithDirectory("/app", dag.console.build).
-		WithExec([]string{"ls", "-la", "/app"})
+		WithWorkdir("/src").
+		WithMountedDirectory("./console/dist/console", directory).
+		WithExec([]string{"ls", "-la", "./console/dist/console/"})
 }
