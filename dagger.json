@@ -5,6 +5,10 @@
     {
       "name": "console",
       "source": "ci/console"
+    },
+    {
+      "name": "core",
+      "source": "ci/core"
     }
   ],
   "source": "ci",
