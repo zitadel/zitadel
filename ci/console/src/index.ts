@@ -5,6 +5,7 @@ import { dag, Container, Directory, object, func } from "@dagger.io/dagger"
 class Console {
 
   @func()
+  
   build(directory: Directory): Directory {
     return dag
       .container()
@@ -13,10 +14,10 @@ class Console {
       .withDirectory("/src/", directory, {include: ["proto/**"]})
       .withDirectory("/src/", directory, {include: ["docs/frameworks.json"]})
       .withWorkdir("/src/console")
-      //.withMountedCache("/src/console/node_modules", dag.cacheVolume("console-node-modules"))
+      .withMountedCache("/src/console/node_modules", dag.cacheVolume("console-node-modules"))
       .withExec(["yarn", "install", "--frozen-lockfile"])
       .withExec(["yarn", "generate"])
       .withExec(["yarn", "run", "build"])
-      .directory("./dist")
+      .directory("./dist/console")
   }
 }

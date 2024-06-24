@@ -16,3 +16,8 @@ func (c *Ci) Build(ctx context.Context, directory *Directory) (*Directory, error
 
 	return console, nil
 }
+
+func (c *Ci) Test(ctx context.Context, directory *Directory) (*Directory, error) {
+	console := dag.Console().Build(directory)
+	return console, nil
+}
