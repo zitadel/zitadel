@@ -41,7 +41,11 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			return err
 		}
 
-		return handleUniqueConstraints(ctx, tx, commands)
+		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+			return err
+		}
+
+		return handleSearchCommands(ctx, tx, commands)
 	})
 
 	if err != nil {
