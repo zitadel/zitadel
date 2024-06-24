@@ -486,6 +486,7 @@
     "MORE": "mer",
     "STEP": "Steg",
     "SETUP": "Inställning",
+    "TEST": "Testa",
     "UNSAVEDCHANGES": "Osparade ändringar",
     "UNSAVED": {
       "DIALOG": {
@@ -2259,6 +2260,7 @@
       "ACTIVATED": "Aktiverad",
       "ACTIVATE": "Aktivera leverantör",
       "DEACTIVATE": "Inaktivera leverantör",
+      "TEST": "Testa din leverantör",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "SMTP-konfigurationen har aktiverats",
@@ -2270,7 +2272,11 @@
         "DELETE_TITLE": "Radera SMTP-konfiguration",
         "DELETE_DESCRIPTION": "Du håller på att radera en konfiguration. Bekräfta denna åtgärd genom att skriva avsändarnamnet",
         "DELETED": "SMTP-konfigurationen har raderats",
-        "SENDER": "Skriv {{value}}, för att radera denna SMTP-konfiguration."
+        "SENDER": "Skriv {{value}}, för att radera denna SMTP-konfiguration.",
+        "TEST_TITLE": "Testa din SMTP-konfiguration",
+        "TEST_DESCRIPTION": "Ange en e-postadress för att testa din SMTP-konfiguration för den här leverantören",
+        "TEST_EMAIL": "E-postadress",
+        "TEST_RESULT": "Testresultat"
       }
     },
     "CREATE": {
@@ -2282,7 +2288,6 @@
         "CURRENT_DESC_TITLE": "Dessa är dina SMTP-inställningar",
         "PROVIDER_SETTINGS": "SMTP-leverantörsinställningar",
         "SENDER_SETTINGS": "Avsändarinställningar",
-        "TEST_SETTINGS": "Testa SMTP-inställningar",
         "NEXT_STEPS": "Nästa steg",
         "ACTIVATE": {
           "TITLE": "Aktivera din SMTP-leverantör",
@@ -2291,6 +2296,12 @@
         "DEACTIVATE": {
           "TITLE": "Inaktivera din SMTP-leverantör",
           "DESCRIPTION": "Om du inaktiverar denna SMTP-leverantör kan ZITADEL inte använda den för att skicka meddelanden förrän du aktiverar den igen."
+        },
+        "SAVE_SETTINGS": "Spara dina inställningar",
+        "TEST": {
+          "TITLE": "Testa dina inställningar",
+          "DESCRIPTION": "Du kan testa inställningarna för din SMTP-leverantör och kontrollera testresultatet innan du sparar dem",
+          "RESULT": "Ditt e-postmeddelande har skickats"
         }
       }
     },

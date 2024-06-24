@@ -18,6 +18,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableModule } from '@angular/material/table';
+import { SmtpTestDialogModule } from '../smtp-test-dialog/smtp-test-dialog.module';
 
 @NgModule({
   declarations: [SMTPTableComponent],
@@ -40,6 +41,7 @@ import { MatTableModule } from '@angular/material/table';
     HasRoleModule,
     HasRolePipeModule,
     TruncatePipeModule,
+    SmtpTestDialogModule,
   ],
   exports: [SMTPTableComponent],
 })
