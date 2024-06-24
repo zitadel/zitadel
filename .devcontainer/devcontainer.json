@@ -16,6 +16,9 @@
 		"ghcr.io/jungaretti/features/make:1": {},
 		"ghcr.io/metcalfc/devcontainer-features/dagger:0": {
 			"version": "v0.11.8"
+		},
+		"ghcr.io/devcontainers/templates/docker-outside-of-docker"{
+			"version": "1.3.0"
 		}
 	},
 	"forwardPorts": [
