@@ -1,0 +1,20 @@
+name: dagger
+on:
+  push:
+    branches: [dagger]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Call Dagger Function
+        uses: dagger/dagger-for-github@v5
+        with:
+          version: "v0.11.8"
+          verb: call
+          args: build --directory .
+          cloud-token: ${{ secrets.DAGGER_CLOUD_TOKEN }}
