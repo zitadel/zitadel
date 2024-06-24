@@ -121,6 +121,6 @@ func (e *Event) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return e.Constraints
 }
 
-func (e *Event) LookupOperations() []*eventstore.LookupOperation {
+func (e *Event) SearchOperations() []*eventstore.SearchOperation {
 	return nil
 }

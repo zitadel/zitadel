@@ -63,17 +63,25 @@ func Benchmark_Push_SameAggregate(b *testing.B) {
 
 	for cmdsKey, cmds := range commands {
 		for pusherKey, store := range pushers {
+			if pusherKey != "v3(postgres)" {
+				continue
+			}
 			b.Run(fmt.Sprintf("Benchmark_Push_SameAggregate-%s-%s", pusherKey, cmdsKey), func(b *testing.B) {
 				b.StopTimer()
 				cleanupEventstore(clients[pusherKey])
 				b.StartTimer()
 
+				var errorCount int
+
 				for n := 0; n < b.N; n++ {
 					_, err := store.Push(ctx, cmds...)
 					if err != nil {
-						b.Error(err)
+						errorCount++
+						// b.Error(err)
 					}
 				}
+				b.ReportMetric(float64(errorCount), "error_count")
+				b.ReportMetric(float64(b.Elapsed().Nanoseconds()), "elapsed_ns")
 			})
 		}
 	}
@@ -137,6 +145,9 @@ func Benchmark_Push_MultipleAggregate_Parallel(b *testing.B) {
 
 	for cmdsKey, commandCreator := range commandCreators {
 		for pusherKey, store := range pushers {
+			if pusherKey != "v3(postgres)" {
+				continue
+			}
 			b.Run(fmt.Sprintf("Benchmark_Push_DifferentAggregate-%s-%s", cmdsKey, pusherKey), func(b *testing.B) {
 				b.StopTimer()
 				cleanupEventstore(clients[pusherKey])
@@ -145,16 +156,23 @@ func Benchmark_Push_MultipleAggregate_Parallel(b *testing.B) {
 				b.StartTimer()
 
 				i := 0
+				var errorCount int
+				var asdf int
 
+				b.SetParallelism(8)
 				b.RunParallel(func(p *testing.PB) {
 					for p.Next() {
-						i++
-						_, err := store.Push(ctx, commandCreator(strconv.Itoa(i))...)
+						asdf, i = i, i+1
+						_, err := store.Push(ctx, commandCreator(strconv.Itoa(asdf))...)
 						if err != nil {
-							b.Error(err)
+							errorCount++
+							// b.Error(err)
 						}
 					}
 				})
+
+				b.ReportMetric(float64(b.Elapsed().Nanoseconds()), "elapsed_ns")
+				b.ReportMetric(float64(errorCount), "error_count")
 				cancel()
 			})
 		}

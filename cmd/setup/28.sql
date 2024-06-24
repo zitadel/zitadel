@@ -1,30 +1,21 @@
--- TODO: whats the correct name of this table?
-CREATE TABLE eventstore.lookup_fields (
+CREATE TABLE eventstore.search (
     instance_id TEXT NOT NULL
     , resource_owner TEXT NOT NULL
+
     , aggregate_type TEXT NOT NULL
     , aggregate_id TEXT NOT NULL
+
+    , object_type TEXT NOT NULL
+    , object_id TEXT NOT NULL
+    , object_revision INT4 NOT NULL -- we use INT4 here because PSQL does not support unsigned numbers
+    
     , field_name TEXT NOT NULL
     , number_value NUMERIC
     , text_value TEXT
-    , CONSTRAINT one_of_values CHECK ((number_value IS NULL) <> (text_value IS NULL))
+    
+    , CONSTRAINT one_of_values CHECK (num_nonnulls(number_value, text_value) = 1)
 );
 
-CREATE INDEX IF NOT EXISTS lf_field_number_idx ON eventstore.lookup_fields (instance_id, field_name, number_value) INCLUDE (resource_owner, aggregate_type, aggregate_id);
-CREATE INDEX IF NOT EXISTS lf_field_text_idx ON eventstore.lookup_fields (instance_id, field_name, text_value) INCLUDE (resource_owner, aggregate_type, aggregate_id);
-
-select 
-    instance_id
-    , resource_owner
-    , aggregate_type
-    , aggregate_id
-    , field_name
-    , text_value
-from 
-    eventstore.lookup_fields 
-where 
-    instance_id = '271204370027177212'
-    and aggregate_type = 'project' 
-    -- and field_name = 'project:app:oidc:client_id' 
-    and field_name = 'project:app:id' 
-    and text_value like '271204370027504892';
+CREATE INDEX IF NOT EXISTS search_number_value_idx ON eventstore.search (instance_id, object_type, object_revision, field_name, number_value) INCLUDE (resource_owner, aggregate_type, aggregate_id, object_id);
+CREATE INDEX IF NOT EXISTS search_text_value_idx ON eventstore.search (instance_id, object_type, object_revision, field_name, text_value) INCLUDE (resource_owner, aggregate_type, aggregate_id, object_id);
+CREATE INDEX IF NOT EXISTS search_object_idx ON eventstore.search (instance_id, object_type, object_id, object_revision) INCLUDE (resource_owner, aggregate_type, aggregate_id);

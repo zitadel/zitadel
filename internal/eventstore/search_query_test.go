@@ -352,7 +352,7 @@ func (matcherCommand) Payload() any { return nil }
 
 func (matcherCommand) UniqueConstraints() []*UniqueConstraint { return nil }
 
-func (matcherCommand) LookupOperations() []*LookupOperation { return nil }
+func (matcherCommand) SearchOperations() []*SearchOperation { return nil }
 
 func TestSearchQueryBuilder_Matches(t *testing.T) {
 	type args struct {

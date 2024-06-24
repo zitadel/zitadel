@@ -18,6 +18,11 @@ const (
 	UserGrantCascadeRemovedType = userGrantEventTypePrefix + "cascade.removed"
 	UserGrantDeactivatedType    = userGrantEventTypePrefix + "deactivated"
 	UserGrantReactivatedType    = userGrantEventTypePrefix + "reactivated"
+
+	UserGrantLookupType                = "user_grant"
+	UserGrantProjectIDLookupField      = "project_id"
+	UserGrantUserIDLookupField         = "user_id"
+	UserGrantProjectGrantIDLookupField = "project_grant_ic"
 )
 
 func NewAddUserGrantUniqueConstraint(resourceOwner, userID, projectID, projectGrantID string) *eventstore.UniqueConstraint {
@@ -49,6 +54,32 @@ func (e *UserGrantAddedEvent) Payload() interface{} {
 func (e *UserGrantAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID)}
 }
+
+// func (e *UserGrantAddedEvent) SearchOperations() []*eventstore.SearchOperation {
+// 	return []*eventstore.SearchOperation{
+// 		eventstore.SetSearchTextField(
+// 			e.Aggregate(),
+// 			UserGrantLookupType,
+// 			e.ID,
+// 			UserGrantProjectGrantIDLookupField,
+// 			e.ProjectGrantID,
+// 		),
+// 		eventstore.SetSearchTextField(
+// 			e.Aggregate(),
+// 			UserGrantLookupType,
+// 			e.ID,
+// 			UserGrantProjectIDLookupField,
+// 			e.ProjectID,
+// 		),
+// 		eventstore.SetSearchTextField(
+// 			e.Aggregate(),
+// 			UserGrantLookupType,
+// 			e.ID,
+// 			UserGrantUserIDLookupField,
+// 			e.UserID,
+// 		),
+// 	}
+// }
 
 func NewUserGrantAddedEvent(
 	ctx context.Context,
@@ -177,6 +208,12 @@ func (e *UserGrantRemovedEvent) Payload() interface{} {
 func (e *UserGrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewRemoveUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.userID, e.projectID, e.projectGrantID)}
 }
+
+// func (e *UserGrantRemovedEvent) SearchOperation() []*eventstore.SearchOperation {
+// 	return []*eventstore.SearchOperation{
+// 		eventstore.RemoveLookupFieldByAggregate(e.Aggregate()),
+// 	}
+// }
 
 func NewUserGrantRemovedEvent(
 	ctx context.Context,

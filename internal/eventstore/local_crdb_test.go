@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/cmd/initialise"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/cockroach"
+	"github.com/zitadel/zitadel/internal/database/postgres"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_sql "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
@@ -54,12 +55,19 @@ func TestMain(m *testing.M) {
 	pushers["v3(inmemory)"] = new_es.NewEventstore(testCRDBClient)
 	clients["v3(inmemory)"] = testCRDBClient
 
-	if localDB, err := connectLocalhost(); err == nil {
+	if localDB, err := connectLocalhostCRDB(); err == nil {
 		if err = initDB(localDB); err != nil {
 			logging.WithFields("error", err).Fatal("migrations failed")
 		}
 		pushers["v3(singlenode)"] = new_es.NewEventstore(localDB)
 		clients["v3(singlenode)"] = localDB
+	}
+	if localDB, err := connectLocalhostPostgres(); err == nil {
+		if err = initDB(localDB); err != nil {
+			logging.WithFields("error", err).Fatal("migrations failed")
+		}
+		pushers["v3(postgres)"] = new_es.NewEventstore(localDB)
+		clients["v3(postgres)"] = localDB
 	}
 
 	// pushers["v2(inmemory)"] = v2
@@ -69,22 +77,43 @@ func TestMain(m *testing.M) {
 		ts.Stop()
 	}()
 
-	if err = initDB(testCRDBClient); err != nil {
-		logging.WithFields("error", err).Fatal("migrations failed")
-	}
+	// if err = initDB(testCRDBClient); err != nil {
+	// 	logging.WithFields("error", err).Fatal("migrations failed")
+	// }
 
 	os.Exit(m.Run())
 }
 
 func initDB(db *database.DB) error {
-	initialise.ReadStmts("cockroach")
+	initialise.ReadStmts(db.Type())
 	config := new(database.Config)
-	config.SetConnector(&cockroach.Config{
-		User: cockroach.User{
-			Username: "zitadel",
-		},
-		Database: "zitadel",
-	})
+	if db.Type() == "cockroach" {
+		config.SetConnector(&cockroach.Config{
+			User: cockroach.User{
+				Username: "zitadel",
+			},
+			Database: "zitadel",
+		})
+	}
+	if db.Type() == "postgres" {
+		config.SetConnector(&postgres.Config{
+			User: postgres.User{
+				Username: "adlerhurst",
+				Password: "password",
+			},
+			Admin: postgres.AdminUser{
+				User: postgres.User{
+					Username: "adlerhurst",
+					Password: "password",
+				},
+			},
+			MaxOpenConns:       50,
+			MaxIdleConns:       50,
+			EventPushConnRatio: 0.9,
+			Database:           "zitadel",
+		})
+	}
+
 	err := initialise.Init(db,
 		initialise.VerifyUser(config.Username(), ""),
 		initialise.VerifyDatabase(config.DatabaseName()),
@@ -102,7 +131,7 @@ func initDB(db *database.DB) error {
 	return err
 }
 
-func connectLocalhost() (*database.DB, error) {
+func connectLocalhostCRDB() (*database.DB, error) {
 	client, err := sql.Open("pgx", "postgresql://root@localhost:26257/defaultdb?sslmode=disable")
 	if err != nil {
 		return nil, err
@@ -112,12 +141,33 @@ func connectLocalhost() (*database.DB, error) {
 	}
 
 	return &database.DB{
-		DB:       client,
-		Database: new(testDB),
+		DB: client,
+		Database: &testDB{
+			typ: "cockroach",
+		},
 	}, nil
 }
 
-type testDB struct{}
+func connectLocalhostPostgres() (*database.DB, error) {
+	client, err := sql.Open("pgx", "postgresql://adlerhurst:password@localhost:5432/postgres?sslmode=disable")
+	if err != nil {
+		return nil, err
+	}
+	if err = client.Ping(); err != nil {
+		return nil, err
+	}
+
+	return &database.DB{
+		DB: client,
+		Database: &testDB{
+			typ: "postgres",
+		},
+	}, nil
+}
+
+type testDB struct {
+	typ string
+}
 
 func (_ *testDB) Timetravel(time.Duration) string { return " AS OF SYSTEM TIME '-1 ms' " }
 
@@ -125,7 +175,7 @@ func (*testDB) DatabaseName() string { return "db" }
 
 func (*testDB) Username() string { return "user" }
 
-func (*testDB) Type() string { return "cockroach" }
+func (db *testDB) Type() string { return db.typ }
 
 func generateCommand(aggregateType eventstore.AggregateType, aggregateID string, opts ...func(*testEvent)) eventstore.Command {
 	e := &testEvent{
@@ -151,12 +201,12 @@ func generateCommand(aggregateType eventstore.AggregateType, aggregateID string,
 type testEvent struct {
 	eventstore.BaseEvent
 	uniqueConstraints []*eventstore.UniqueConstraint
-	lookupOperations  []*eventstore.LookupOperation
+	searchOperations  []*eventstore.SearchOperation
 }
 
-// LookupOperations implements eventstore.Command.
-func (e *testEvent) LookupOperations() []*eventstore.LookupOperation {
-	return e.lookupOperations
+// SearchOperations implements eventstore.Command.
+func (e *testEvent) SearchOperations() []*eventstore.SearchOperation {
+	return e.searchOperations
 }
 
 func (e *testEvent) Payload() any {
@@ -248,5 +298,5 @@ const oldEventsTable = `CREATE TABLE IF NOT EXISTS eventstore.events (
 	, "position" DECIMAL NOT NULL
 	, in_tx_order INTEGER NOT NULL
 
-	, PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence DESC)
+	, PRIMARY KEY (instance_id, aggregate_type, aggregate_id, event_sequence)
 );`

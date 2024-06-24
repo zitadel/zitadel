@@ -65,7 +65,7 @@ func (e *UserAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func (e *UserAddedEvent) LookupOperations() []*eventstore.LookupOperation {
+func (e *UserAddedEvent) SearchOperations() []*eventstore.SearchOperation {
 	return nil
 }
 
@@ -114,7 +114,7 @@ func (e *UserFirstNameChangedEvent) UniqueConstraints() []*eventstore.UniqueCons
 	return nil
 }
 
-func (e *UserFirstNameChangedEvent) LookupOperations() []*eventstore.LookupOperation {
+func (e *UserFirstNameChangedEvent) SearchOperations() []*eventstore.SearchOperation {
 	return nil
 }
 
@@ -155,7 +155,7 @@ func (e *UserPasswordCheckedEvent) UniqueConstraints() []*eventstore.UniqueConst
 	return nil
 }
 
-func (e *UserPasswordCheckedEvent) LookupOperations() []*eventstore.LookupOperation {
+func (e *UserPasswordCheckedEvent) SearchOperations() []*eventstore.SearchOperation {
 	return nil
 }
 
@@ -196,7 +196,7 @@ func (e *UserDeletedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func (e *UserDeletedEvent) LookupOperations() []*eventstore.LookupOperation {
+func (e *UserDeletedEvent) SearchOperations() []*eventstore.SearchOperation {
 	return nil
 }
 

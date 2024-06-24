@@ -48,11 +48,11 @@ func (e *ApplicationAddedEvent) UniqueConstraints() []*eventstore.UniqueConstrai
 	return []*eventstore.UniqueConstraint{NewAddApplicationUniqueConstraint(e.Name, e.Aggregate().ID)}
 }
 
-func (e *ApplicationAddedEvent) LookupOperations() []*eventstore.LookupOperation {
-	return []*eventstore.LookupOperation{
-		eventstore.InsertLookupTextField(e.Aggregate(), AppLookupFieldID, e.AppID),
-	}
-}
+// func (e *ApplicationAddedEvent) SearchOperations() []*eventstore.SearchOperation {
+// 	return []*eventstore.SearchOperation{
+// 		eventstore.InsertLookupTextField(e.Aggregate(), AppLookupFieldID, e.AppID),
+// 	}
+// }
 
 func NewApplicationAddedEvent(
 	ctx context.Context,

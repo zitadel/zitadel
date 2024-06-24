@@ -19,8 +19,9 @@ type Eventstore struct {
 	PushTimeout time.Duration
 	maxRetries  int
 
-	pusher  Pusher
-	querier Querier
+	pusher   Pusher
+	querier  Querier
+	searcher Searcher
 
 	instances         []string
 	lastInstanceQuery time.Time
@@ -62,8 +63,9 @@ func NewEventstore(config *Config) *Eventstore {
 		PushTimeout: config.PushTimeout,
 		maxRetries:  int(config.MaxRetries),
 
-		pusher:  config.Pusher,
-		querier: config.Querier,
+		pusher:   config.Pusher,
+		querier:  config.Querier,
+		searcher: config.Searcher,
 
 		instancesMu: sync.Mutex{},
 	}
@@ -125,6 +127,10 @@ func (es *Eventstore) EventTypes() []string {
 
 func (es *Eventstore) AggregateTypes() []string {
 	return aggregateTypes
+}
+
+func (es *Eventstore) Search(ctx context.Context, conditions ...map[SearchFieldType]any) ([]*SearchResult, error) {
+	return es.searcher.Search(ctx, conditions...)
 }
 
 // Filter filters the stored events based on the searchQuery
@@ -260,6 +266,12 @@ type Pusher interface {
 	Health(ctx context.Context) error
 	// Push stores the actions
 	Push(ctx context.Context, commands ...Command) (_ []Event, err error)
+}
+
+type Searcher interface {
+	// Search predefined results
+	// the instance is used from ctx
+	Search(ctx context.Context, conditions ...map[SearchFieldType]any) (result []*SearchResult, err error)
 }
 
 func appendEventType(typ EventType) {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -252,18 +253,70 @@ func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, proj
 }
 
 func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGrant *domain.ProjectGrant) error {
-	preConditions := NewProjectGrantPreConditionReadModel(projectGrant.AggregateID, projectGrant.GrantedOrgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
+	results, err := c.eventstore.Search(
+		ctx,
+		// project state query
+		map[eventstore.SearchFieldType]any{
+			eventstore.SearchFieldTypeAggregateType: project.AggregateType,
+			eventstore.SearchFieldTypeAggregateID:   projectGrant.AggregateID,
+			eventstore.SearchFieldTypeFieldName:     project.ProjectStateSearchField,
+			eventstore.SearchFieldTypeObjectType:    project.ProjectSearchType,
+		},
+		// granted org query
+		map[eventstore.SearchFieldType]any{
+			eventstore.SearchFieldTypeAggregateType: org.AggregateType,
+			eventstore.SearchFieldTypeAggregateID:   projectGrant.GrantedOrgID,
+			eventstore.SearchFieldTypeFieldName:     org.OrgStateSearchField,
+			eventstore.SearchFieldTypeObjectType:    org.OrgSearchType,
+		},
+		// role query
+		map[eventstore.SearchFieldType]any{
+			eventstore.SearchFieldTypeAggregateType: project.AggregateType,
+			eventstore.SearchFieldTypeAggregateID:   projectGrant.AggregateID,
+			eventstore.SearchFieldTypeFieldName:     project.ProjectRoleKeySearchField,
+			eventstore.SearchFieldTypeObjectType:    project.ProjectRoleSearchType,
+		},
+	)
 	if err != nil {
 		return err
 	}
-	if !preConditions.ProjectExists {
+
+	var (
+		existsProject    bool
+		existsGrantedOrg bool
+		existingRoleKeys []string
+	)
+
+	for _, result := range results {
+		switch result.Object.Type {
+		case project.ProjectRoleSearchType:
+			role, err := eventstore.TextResultValue[string](result)
+			if err != nil {
+				return err
+			}
+			existingRoleKeys = append(existingRoleKeys, role)
+		case org.OrgSearchType:
+			state, err := eventstore.NumericResultValue[domain.OrgState](result)
+			if err != nil {
+				return err
+			}
+			existsGrantedOrg = state.Valid()
+		case project.ProjectSearchType:
+			state, err := eventstore.NumericResultValue[domain.ProjectState](result)
+			if err != nil {
+				return err
+			}
+			existsProject = state.Valid()
+		}
+	}
+
+	if !existsProject {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
 	}
-	if !preConditions.GrantedOrgExists {
+	if !existsGrantedOrg {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
 	}
-	if projectGrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
+	if projectGrant.HasInvalidRoles(existingRoleKeys) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
 	}
 	return nil

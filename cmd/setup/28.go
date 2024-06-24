@@ -23,5 +23,5 @@ func (mig *AddFieldsTable) Execute(ctx context.Context, _ eventstore.Event) erro
 }
 
 func (mig *AddFieldsTable) String() string {
-	return "28_add_field_table"
+	return "28_add_search_table"
 }

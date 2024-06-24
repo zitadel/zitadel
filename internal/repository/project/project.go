@@ -16,6 +16,11 @@ const (
 	ProjectDeactivatedType = projectEventTypePrefix + "deactivated"
 	ProjectReactivatedType = projectEventTypePrefix + "reactivated"
 	ProjectRemovedType     = projectEventTypePrefix + "removed"
+
+	ProjectSearchType       = "project"
+	ProjectObjectRevision   = uint8(1)
+	ProjectNameSearchField  = "name"
+	ProjectStateSearchField = "state"
 )
 
 func NewAddProjectNameUniqueConstraint(projectName, resourceOwner string) *eventstore.UniqueConstraint {
@@ -47,6 +52,23 @@ func (e *ProjectAddedEvent) Payload() interface{} {
 
 func (e *ProjectAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+}
+
+func (e *ProjectAddedEvent) SearchOperations() []*eventstore.SearchOperation {
+	return []*eventstore.SearchOperation{
+		eventstore.SetSearchTextField(
+			e.Aggregate(),
+			projectSearchObject(e.Aggregate().ID),
+			ProjectNameSearchField,
+			e.Name,
+		),
+		eventstore.SetSearchNumericField(
+			e.Aggregate(),
+			projectSearchObject(e.Aggregate().ID),
+			ProjectStateSearchField,
+			domain.ProjectStateActive,
+		),
+	}
 }
 
 func NewProjectAddedEvent(
@@ -108,6 +130,28 @@ func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 		}
 	}
 	return nil
+}
+
+func (e *ProjectChangeEvent) SearchOperations() []*eventstore.SearchOperation {
+	if e.Name == nil {
+		return nil
+	}
+	return []*eventstore.SearchOperation{
+		eventstore.SetSearchTextField(
+			e.Aggregate(),
+			projectSearchObject(e.Aggregate().ID),
+			ProjectNameSearchField,
+			*e.Name,
+
+			eventstore.SearchFieldTypeInstanceID,
+			eventstore.SearchFieldTypeResourceOwner,
+			eventstore.SearchFieldTypeAggregateType,
+			eventstore.SearchFieldTypeAggregateID,
+			eventstore.SearchFieldTypeObjectType,
+			eventstore.SearchFieldTypeObjectID,
+			eventstore.SearchFieldTypeFieldName,
+		),
+	}
 }
 
 func NewProjectChangeEvent(
@@ -190,6 +234,25 @@ func (e *ProjectDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 	return nil
 }
 
+func (e *ProjectDeactivatedEvent) SearchOperations() []*eventstore.SearchOperation {
+	return []*eventstore.SearchOperation{
+		eventstore.SetSearchNumericField(
+			e.Aggregate(),
+			projectSearchObject(e.Aggregate().ID),
+			ProjectStateSearchField,
+			domain.ProjectStateInactive,
+
+			eventstore.SearchFieldTypeInstanceID,
+			eventstore.SearchFieldTypeResourceOwner,
+			eventstore.SearchFieldTypeAggregateType,
+			eventstore.SearchFieldTypeAggregateID,
+			eventstore.SearchFieldTypeObjectType,
+			eventstore.SearchFieldTypeObjectID,
+			eventstore.SearchFieldTypeFieldName,
+		),
+	}
+}
+
 func NewProjectDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *ProjectDeactivatedEvent {
 	return &ProjectDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -216,6 +279,25 @@ func (e *ProjectReactivatedEvent) Payload() interface{} {
 
 func (e *ProjectReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *ProjectReactivatedEvent) SearchOperations() []*eventstore.SearchOperation {
+	return []*eventstore.SearchOperation{
+		eventstore.SetSearchNumericField(
+			e.Aggregate(),
+			projectSearchObject(e.Aggregate().ID),
+			ProjectStateSearchField,
+			domain.ProjectStateActive,
+
+			eventstore.SearchFieldTypeInstanceID,
+			eventstore.SearchFieldTypeResourceOwner,
+			eventstore.SearchFieldTypeAggregateType,
+			eventstore.SearchFieldTypeAggregateID,
+			eventstore.SearchFieldTypeObjectType,
+			eventstore.SearchFieldTypeObjectID,
+			eventstore.SearchFieldTypeFieldName,
+		),
+	}
 }
 
 func NewProjectReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *ProjectReactivatedEvent {
@@ -255,6 +337,12 @@ func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint
 	return constraints
 }
 
+func (e *ProjectRemovedEvent) SearchOperations() []*eventstore.SearchOperation {
+	return []*eventstore.SearchOperation{
+		eventstore.RemoveSearchFieldsByAggregate(e.Aggregate()),
+	}
+}
+
 func NewProjectRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -276,4 +364,12 @@ func ProjectRemovedEventMapper(event eventstore.Event) (eventstore.Event, error)
 	return &ProjectRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
+}
+
+func projectSearchObject(id string) eventstore.SearchObject {
+	return eventstore.SearchObject{
+		Type:     ProjectSearchType,
+		Revision: ProjectObjectRevision,
+		ID:       id,
+	}
 }

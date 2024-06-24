@@ -17,6 +17,10 @@ const (
 	OrgDeactivatedEventType = orgEventTypePrefix + "deactivated"
 	OrgReactivatedEventType = orgEventTypePrefix + "reactivated"
 	OrgRemovedEventType     = orgEventTypePrefix + "removed"
+
+	OrgSearchType       = "org"
+	OrgNameSearchField  = "name"
+	OrgStateSearchField = "state"
 )
 
 func NewAddOrgNameUniqueConstraint(orgName string) *eventstore.UniqueConstraint {
@@ -44,6 +48,23 @@ func (e *OrgAddedEvent) Payload() interface{} {
 
 func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
+}
+
+func (e *OrgAddedEvent) SearchOperations() []*eventstore.SearchOperation {
+	return []*eventstore.SearchOperation{
+		eventstore.SetSearchTextField(
+			e.Aggregate(),
+			orgSearchObject(e.Aggregate().ID),
+			OrgNameSearchField,
+			e.Name,
+		),
+		eventstore.SetSearchNumericField(
+			e.Aggregate(),
+			orgSearchObject(e.Aggregate().ID),
+			OrgStateSearchField,
+			domain.OrgStateActive,
+		),
+	}
 }
 
 func NewOrgAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string) *OrgAddedEvent {
@@ -87,6 +108,25 @@ func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	}
 }
 
+func (e *OrgChangedEvent) SearchOperations() []*eventstore.SearchOperation {
+	return []*eventstore.SearchOperation{
+		eventstore.SetSearchTextField(
+			e.Aggregate(),
+			orgSearchObject(e.Aggregate().ID),
+			OrgNameSearchField,
+			e.Name,
+
+			eventstore.SearchFieldTypeInstanceID,
+			eventstore.SearchFieldTypeResourceOwner,
+			eventstore.SearchFieldTypeAggregateType,
+			eventstore.SearchFieldTypeAggregateID,
+			eventstore.SearchFieldTypeObjectType,
+			eventstore.SearchFieldTypeObjectID,
+			eventstore.SearchFieldTypeFieldName,
+		),
+	}
+}
+
 func NewOrgChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, oldName, newName string) *OrgChangedEvent {
 	return &OrgChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -123,6 +163,25 @@ func (e *OrgDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint
 	return nil
 }
 
+func (e *OrgDeactivatedEvent) SearchOperations() []*eventstore.SearchOperation {
+	return []*eventstore.SearchOperation{
+		eventstore.SetSearchNumericField(
+			e.Aggregate(),
+			orgSearchObject(e.Aggregate().ID),
+			OrgStateSearchField,
+			domain.OrgStateInactive,
+
+			eventstore.SearchFieldTypeInstanceID,
+			eventstore.SearchFieldTypeResourceOwner,
+			eventstore.SearchFieldTypeAggregateType,
+			eventstore.SearchFieldTypeAggregateID,
+			eventstore.SearchFieldTypeObjectType,
+			eventstore.SearchFieldTypeObjectID,
+			eventstore.SearchFieldTypeFieldName,
+		),
+	}
+}
+
 func NewOrgDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *OrgDeactivatedEvent {
 	return &OrgDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -149,6 +208,25 @@ func (e *OrgReactivatedEvent) Payload() interface{} {
 
 func (e *OrgReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *OrgReactivatedEvent) SearchOperations() []*eventstore.SearchOperation {
+	return []*eventstore.SearchOperation{
+		eventstore.SetSearchNumericField(
+			e.Aggregate(),
+			orgSearchObject(e.Aggregate().ID),
+			OrgStateSearchField,
+			domain.OrgStateActive,
+
+			eventstore.SearchFieldTypeInstanceID,
+			eventstore.SearchFieldTypeResourceOwner,
+			eventstore.SearchFieldTypeAggregateType,
+			eventstore.SearchFieldTypeAggregateID,
+			eventstore.SearchFieldTypeObjectType,
+			eventstore.SearchFieldTypeObjectID,
+			eventstore.SearchFieldTypeFieldName,
+		),
+	}
 }
 
 func NewOrgReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *OrgReactivatedEvent {
@@ -200,6 +278,16 @@ func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return constraints
 }
 
+func (e *OrgRemovedEvent) SearchOperations() []*eventstore.SearchOperation {
+	// TODO: project grants are currently not removed because we don't have the relationship between the granted org and the grant
+	return []*eventstore.SearchOperation{
+		eventstore.RemoveSearchFields(map[eventstore.SearchFieldType]any{
+			eventstore.SearchFieldTypeInstanceID:    e.Aggregate().InstanceID,
+			eventstore.SearchFieldTypeResourceOwner: e.Aggregate().ResourceOwner,
+		}),
+	}
+}
+
 func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name string, usernames []string, loginMustBeDomain bool, domains []string, externalIDPs []*domain.UserIDPLink, samlEntityIDs []string) *OrgRemovedEvent {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -220,4 +308,12 @@ func OrgRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return &OrgRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
+}
+
+func orgSearchObject(id string) eventstore.SearchObject {
+	return eventstore.SearchObject{
+		Type:     OrgSearchType,
+		Revision: 1,
+		ID:       id,
+	}
 }

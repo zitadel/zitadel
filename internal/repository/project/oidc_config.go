@@ -57,11 +57,11 @@ func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.UniqueConstrain
 	return nil
 }
 
-func (e *OIDCConfigAddedEvent) LookupOperations() []*eventstore.LookupOperation {
-	return []*eventstore.LookupOperation{
-		eventstore.InsertLookupTextField(e.Aggregate(), OIDCConfigLookupFieldClientID, e.ClientID),
-	}
-}
+// func (e *OIDCConfigAddedEvent) SearchOperations() []*eventstore.SearchOperation {
+// 	return []*eventstore.SearchOperation{
+// 		eventstore.InsertLookupTextField(e.Aggregate(), OIDCConfigLookupFieldClientID, e.ClientID),
+// 	}
+// }
 
 func NewOIDCConfigAddedEvent(
 	ctx context.Context,

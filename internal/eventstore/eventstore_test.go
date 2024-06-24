@@ -45,7 +45,7 @@ func (e *testEvent) UniqueConstraints() []*UniqueConstraint {
 	return nil
 }
 
-func (e *testEvent) LookupOperations() []*LookupOperation {
+func (e *testEvent) SearchOperations() []*SearchOperation {
 	return nil
 }
 
