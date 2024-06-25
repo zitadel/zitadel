@@ -180,7 +180,7 @@ func trySearchAndUserBind(
 	user := sr.Entries[0]
 	// Bind as the user to verify their password
 	if err = conn.Bind(user.DN, password); err != nil {
-		logging.WithFields("userDN", user.DN).WithError(err).Info("ldap bind failed")
+		logging.WithFields("userDN", user.DN).WithError(err).Info("ldap user bind failed")
 		return nil, ErrFailedLogin
 	}
 	return user, nil
