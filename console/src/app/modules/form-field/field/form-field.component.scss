@@ -53,6 +53,13 @@
     overflow: hidden; // prevents multi-line errors from overlapping the control
   }
 
+  mat-dialog-container .cnsl-form-field-subscript-wrapper {
+    position: absolute;
+    box-sizing: border-box;
+    width: auto;
+    overflow: hidden; // prevents multi-line errors from overlapping the control
+  }
+
   .cnsl-form-field-hint-wrapper,
   .cnsl-form-field-error-wrapper {
     display: flex;
