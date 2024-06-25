@@ -486,6 +486,7 @@
     "MORE": "さらに",
     "STEP": "ステップ",
     "SETUP": "セットアップ",
+    "TEST": "テスト",
     "UNSAVEDCHANGES": "未保存の変更",
     "UNSAVED": {
       "DIALOG": {
@@ -2230,6 +2231,7 @@
       "ACTIVATED": "アクティブ化された",
       "ACTIVATE": "プロバイダーをアクティブ化する",
       "DEACTIVATE": "プロバイダーを非アクティブ化する",
+      "TEST": "プロバイダーをテストする",
       "TYPE": "タイプ",
       "DIALOG": {
         "ACTIVATED": "SMTP設定が有効化されました",
@@ -2253,7 +2255,6 @@
         "CURRENT_DESC_TITLE": "これらは SMTP 設定です",
         "PROVIDER_SETTINGS": "SMTPプロバイダーの設定",
         "SENDER_SETTINGS": "送信者の設定",
-        "TEST_SETTINGS": "SMTP設定をテストする",
         "NEXT_STEPS": "次のステップ",
         "ACTIVATE": {
           "TITLE": "SMTP プロバイダーをアクティブ化する",
@@ -2262,6 +2263,12 @@
         "DEACTIVATE": {
           "TITLE": "SMTPプロバイダーを非アクティブ化します",
           "DESCRIPTION": "この SMTP プロバイダーを非アクティブ化すると、再度アクティブ化するまで、Zitadel はそれを使用して通知を送信できなくなります。"
+        },
+        "SAVE_SETTINGS": "設定を保存する",
+        "TEST": {
+          "TITLE": "設定をテストする",
+          "DESCRIPTION": "SMTP プロバイダーの設定をテストし、保存する前にテスト結果を確認できます。",
+          "RESULT": "あなたの電子メールが正常に送信されました"
         }
       }
     },
