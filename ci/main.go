@@ -6,7 +6,7 @@ import (
 
 type Ci struct{}
 
-// Build the whole stack
+// Generate the gRPC stubs
 func (c *Ci) Generate(ctx context.Context, directory *Directory) (*Directory, error) {
 	output := dag.Console().Generate(directory)
 	_, err := output.Sync(ctx)
