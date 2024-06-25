@@ -153,7 +153,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s25User11AddLowerFieldsToVerifiedEmail = &User11AddLowerFieldsToVerifiedEmail{dbClient: esPusherDBClient}
 	steps.s26AuthUsers3 = &AuthUsers3{dbClient: esPusherDBClient}
 	steps.s27IDPTemplate6SAMLNameIDFormat = &IDPTemplate6SAMLNameIDFormat{dbClient: esPusherDBClient}
-	steps.s28AddFieldsTable = &AddFieldsTable{dbClient: esPusherDBClient}
+	steps.s28AddSearchTable = &AddSearchTable{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -176,6 +176,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s14NewEventsTable,
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
+		steps.s28AddSearchTable,
 		steps.FirstInstance,
 		steps.s5LastFailed,
 		steps.s6OwnerRemoveColumns,
@@ -192,7 +193,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s23CorrectGlobalUniqueConstraints,
 		steps.s24AddActorToAuthTokens,
 		steps.s26AuthUsers3,
-		steps.s28AddFieldsTable,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
