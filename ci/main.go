@@ -7,11 +7,11 @@ import (
 type Ci struct{}
 
 // Build the whole stack
-func (c *Ci) Build(ctx context.Context, directory *Directory) error {
-	console := dag.Console().Build(directory)
-	_, err := console.Sync(ctx)
+func (c *Ci) Build(ctx context.Context, directory *Directory) (*Directory, error) {
+	output := dag.Console().Build(directory)
+	_, err := output.Sync(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// core := dag.Core().Build(console)
@@ -19,6 +19,6 @@ func (c *Ci) Build(ctx context.Context, directory *Directory) error {
 	// if err != nil {
 	// 	return err
 	// }
-	return nil
+	return output, err
 
 }
