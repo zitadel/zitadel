@@ -192,7 +192,7 @@ func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOw
 
 	_, state, err := c.projectAggregateByID(ctx, projectID, resourceOwner)
 	if err != nil || !state.Valid() {
-		return zerrors.ThrowNotFound(err, "COMMA-VCnwD", "Errors.Project.NotFound")
+		return zerrors.ThrowPreconditionFailed(err, "COMMA-VCnwD", "Errors.Project.NotFound")
 	}
 	return nil
 }
