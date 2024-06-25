@@ -891,6 +891,9 @@ func passwordChangeKeyToDomain(text *CustomText, result *domain.CustomLoginText)
 	if text.Key == domain.LoginKeyPasswordChangeDescription {
 		result.PasswordChange.Description = text.Text
 	}
+	if text.Key == domain.LoginKeyPasswordChangeExpiredDescription {
+		result.PasswordChange.ExpiredDescription = text.Text
+	}
 	if text.Key == domain.LoginKeyPasswordChangeOldPasswordLabel {
 		result.PasswordChange.OldPasswordLabel = text.Text
 	}

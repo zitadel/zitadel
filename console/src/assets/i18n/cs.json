@@ -486,6 +486,7 @@
     "MORE": "více",
     "STEP": "Krok",
     "SETUP": "Nastavit",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Neuložené změny",
     "UNSAVED": {
       "DIALOG": {
@@ -1322,6 +1323,7 @@
       "LANGUAGES": "Jazyky",
       "LOGIN": "Chování při přihlášení a bezpečnost",
       "LOCKOUT": "Blokování",
+      "AGE": "Expirace hesla",
       "COMPLEXITY": "Složitost hesla",
       "NOTIFICATIONS": "Oznámení",
       "SMTP_PROVIDER": "Poskytovatel SMTP",
@@ -1542,8 +1544,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Stáří hesla",
-      "DESCRIPTION": "Můžete nastavit politiku pro stáří hesel. Tato politika vydá varování po uplynutí konkrétního času stáří."
+      "TITLE": "Expirace hesla",
+      "DESCRIPTION": "Můžete nastavit pravidlo pro vypršení platnosti hesel. Toto pravidlo donutí uživatele změnit heslo při dalším přihlášení po uplynutí platnosti. Neexistují žádná automatická varování a upozornění."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Politika uzamčení",
@@ -1696,8 +1698,8 @@
       "SHOWLOCKOUTFAILURES": "zobrazit neúspěšné pokusy o uzamčení",
       "MAXPASSWORDATTEMPTS": "Maximální počet pokusů o heslo",
       "MAXOTPATTEMPTS": "Maximální počet pokusů o OTP",
-      "EXPIREWARNDAYS": "Upozornění na expiraci po dni",
-      "MAXAGEDAYS": "Maximální stáří v dnech",
+      "EXPIREWARNDAYS": "Upozornění na uplynutí po dnech",
+      "MAXAGEDAYS": "Maximální platnost v dnech",
       "USERLOGINMUSTBEDOMAIN": "Přidat doménu organizace jako příponu k přihlašovacím jménům",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Pokud povolíte toto nastavení, všechna přihlašovací jména budou doplněna o doménu organizace. Pokud je toto nastavení zakázáno, musíte zajistit, aby byla uživatelská jména jedinečná napříč všemi organizacemi.",
       "VALIDATEORGDOMAINS": "Požadováno ověření domény organizace (DNS nebo HTTP výzva)",
@@ -2242,6 +2244,7 @@
       "ACTIVATED": "Aktivováno",
       "ACTIVATE": "Aktivujte poskytovatele",
       "DEACTIVATE": "Deaktivovat poskytovatele",
+      "TEST": "Otestujte svého poskytovatele",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "Konfigurace SMTP byla aktivována",
@@ -2265,7 +2268,6 @@
         "CURRENT_DESC_TITLE": "Toto jsou vaše nastavení SMTP",
         "PROVIDER_SETTINGS": "Nastavení poskytovatele SMTP",
         "SENDER_SETTINGS": "Nastavení odesílatele",
-        "TEST_SETTINGS": "Otestujte nastavení SMTP",
         "NEXT_STEPS": "Další kroky",
         "ACTIVATE": {
           "TITLE": "Aktivujte svého poskytovatele SMTP",
@@ -2274,6 +2276,12 @@
         "DEACTIVATE": {
           "TITLE": "Deaktivujte svého poskytovatele SMTP",
           "DESCRIPTION": "Pokud deaktivujete tohoto poskytovatele SMTP, ZITADEL jej nebude moci používat k odesílání upozornění, dokud jej znovu neaktivujete."
+        },
+        "SAVE_SETTINGS": "Uložte nastavení",
+        "TEST": {
+          "TITLE": "Otestujte svá nastavení",
+          "DESCRIPTION": "Nastavení poskytovatele SMTP můžete otestovat a před uložením zkontrolovat výsledek testu",
+          "RESULT": "Váš email byl úspěšně odeslán"
         }
       }
     },

@@ -97,6 +97,18 @@
               actions
               [disabled]="(['iam.write'] | hasRole | async) === false"
               mat-icon-button
+              color="primary"
+              matTooltip="{{ 'SMTP.LIST.TEST' | translate }}"
+              data-e2e="test-provider-button"
+              (click)="testSMTPConfig(config.id); $event.stopPropagation()"
+            >
+              <i class="las la-flask"></i>
+            </button>
+
+            <button
+              actions
+              [disabled]="(['iam.write'] | hasRole | async) === false"
+              mat-icon-button
               color="warn"
               matTooltip="{{ 'ACTIONS.REMOVE' | translate }}"
               data-e2e="delete-provider-button"

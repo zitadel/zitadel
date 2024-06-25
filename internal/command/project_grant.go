@@ -14,13 +14,8 @@ import (
 )
 
 func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *domain.ProjectGrant, grantID string, resourceOwner string) (_ *domain.ProjectGrant, err error) {
-	existingMember, err := c.projectGrantWriteModelByID(ctx, grantID, grant.AggregateID, resourceOwner)
-	if err != nil && !zerrors.IsNotFound(err) {
-		return nil, err
-	}
-	if existingMember != nil && existingMember.State != domain.ProjectGrantStateUnspecified {
-		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-2b8fs", "Errors.Project.Grant.AlreadyExisting")
-	}
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
 	return c.addProjectGrantWithID(ctx, grant, grantID, resourceOwner)
 }

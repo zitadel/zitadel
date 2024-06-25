@@ -272,6 +272,7 @@ message PasswordChangeScreenText {
     string new_password_confirm_label = 5 [(validate.rules).string = {max_len: 200}];
     string cancel_button_text = 6 [(validate.rules).string = {max_len: 100}];
     string next_button_text = 7 [(validate.rules).string = {max_len: 100}];
+    string expired_description = 8 [(validate.rules).string = {max_len: 500}];
 }
 
 message PasswordChangeDoneScreenText {

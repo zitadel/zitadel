@@ -140,6 +140,7 @@ type mockViewUser struct {
 	InitRequired             bool
 	PasswordInitRequired     bool
 	PasswordSet              bool
+	PasswordChanged          time.Time
 	PasswordChangeRequired   bool
 	IsEmailVerified          bool
 	OTPState                 int32
@@ -186,6 +187,14 @@ type mockLockoutPolicy struct {
 }
 
 func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error) {
+	return m.policy, nil
+}
+
+type mockPasswordAgePolicy struct {
+	policy *query.PasswordAgePolicy
+}
+
+func (m *mockPasswordAgePolicy) PasswordAgePolicyByOrg(context.Context, bool, string, bool) (*query.PasswordAgePolicy, error) {
 	return m.policy, nil
 }
 
@@ -291,21 +300,22 @@ func (m *mockIDPUserLinks) IDPUserLinks(ctx context.Context, queries *query.IDPU
 
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	type fields struct {
-		AuthRequests            cache.AuthRequestCache
-		View                    *view.View
-		userSessionViewProvider userSessionViewProvider
-		userViewProvider        userViewProvider
-		userEventProvider       userEventProvider
-		orgViewProvider         orgViewProvider
-		userGrantProvider       userGrantProvider
-		projectProvider         projectProvider
-		applicationProvider     applicationProvider
-		loginPolicyProvider     loginPolicyViewProvider
-		lockoutPolicyProvider   lockoutPolicyViewProvider
-		idpUserLinksProvider    idpUserLinksProvider
-		privacyPolicyProvider   privacyPolicyProvider
-		labelPolicyProvider     labelPolicyProvider
-		customTextProvider      customTextProvider
+		AuthRequests              cache.AuthRequestCache
+		View                      *view.View
+		userSessionViewProvider   userSessionViewProvider
+		userViewProvider          userViewProvider
+		userEventProvider         userEventProvider
+		orgViewProvider           orgViewProvider
+		userGrantProvider         userGrantProvider
+		projectProvider           projectProvider
+		applicationProvider       applicationProvider
+		loginPolicyProvider       loginPolicyViewProvider
+		lockoutPolicyProvider     lockoutPolicyViewProvider
+		idpUserLinksProvider      idpUserLinksProvider
+		privacyPolicyProvider     privacyPolicyProvider
+		labelPolicyProvider       labelPolicyProvider
+		passwordAgePolicyProvider passwordAgePolicyProvider
+		customTextProvider        customTextProvider
 	}
 	type args struct {
 		request       *domain.AuthRequest
@@ -528,6 +538,9 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				labelPolicyProvider: &mockLabelPolicy{
 					policy: &query.LabelPolicy{},
+				},
+				passwordAgePolicyProvider: &mockPasswordAgePolicy{
+					policy: &query.PasswordAgePolicy{},
 				},
 				customTextProvider: &mockCustomText{
 					texts: &query.CustomTexts{},
@@ -1305,6 +1318,48 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
+			"password change expired, password change step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:            true,
+					PasswordChangeRequired: false,
+					PasswordChanged:        testNow.Add(-50 * 24 * time.Hour),
+					IsEmailVerified:        true,
+					MFAMaxSetUp:            int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				passwordAgePolicyProvider: &mockPasswordAgePolicy{
+					policy: &query.PasswordAgePolicy{
+						MaxAgeDays: 30,
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
+			},
+			args{&domain.AuthRequest{
+				UserID: "UserID",
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeTOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
+				},
+				PasswordAgePolicy: &domain.PasswordAgePolicy{
+					MaxAgeDays: 30,
+				},
+			}, false},
+			[]domain.NextStep{&domain.ChangePasswordStep{Expired: true}},
+			nil,
+		},
+		{
 			"email verified and no password change required, redirect to callback step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
@@ -1662,6 +1717,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				IDPUserLinksProvider:      tt.fields.idpUserLinksProvider,
 				PrivacyPolicyProvider:     tt.fields.privacyPolicyProvider,
 				LabelPolicyProvider:       tt.fields.labelPolicyProvider,
+				PasswordAgePolicyProvider: tt.fields.passwordAgePolicyProvider,
 				CustomTextProvider:        tt.fields.customTextProvider,
 			}
 			got, err := repo.nextSteps(context.Background(), tt.args.request, tt.args.checkLoggedIn)

@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Zmiana hasła
   Description: Zmień swoje hasło. Wprowadź swoje stare i nowe hasło.
+  ExpiredDescription: Twoje hasło wygasło i musi zostać zmienione. Wprowadź swoje stare i nowe hasło.
   OldPasswordLabel: Stare hasło
   NewPasswordLabel: Nowe hasło
   NewPasswordConfirmLabel: Potwierdzenie hasła

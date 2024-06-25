@@ -73,6 +73,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			IDPUserLinksProvider:      queries,
 			LockoutPolicyViewProvider: queries,
 			LoginPolicyViewProvider:   queries,
+			PasswordAgePolicyProvider: queries,
 			UserGrantProvider:         queryView,
 			ProjectProvider:           queryView,
 			ApplicationProvider:       queries,

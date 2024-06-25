@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Změna hesla
   Description: Změňte si heslo. Zadejte své staré a nové heslo.
+  ExpiredDescription: Heslo vypršelo a musí být změněno. Zadejte své staré a nové heslo.
   OldPasswordLabel: Staré heslo
   NewPasswordLabel: Nové heslo
   NewPasswordConfirmLabel: Potvrzení hesla

@@ -8,11 +8,12 @@ ZITADEL supports the usage of scopes as way of requesting information from the I
 ## Standard Scopes
 
 | Scopes         | Description                                                                    |
-| :------------- | ------------------------------------------------------------------------------ |
+|:---------------|--------------------------------------------------------------------------------|
 | openid         | When using openid connect this is a mandatory scope                            |
 | profile        | Optional scope to request the profile of the subject                           |
 | email          | Optional scope to request the email of the subject                             |
 | address        | Optional scope to request the address of the subject                           |
+| phone          | Optional scope to request the phone of the subject                             |
 | offline_access | Optional scope to request a refresh_token (only possible when using code flow) |
 
 ## Custom Scopes
