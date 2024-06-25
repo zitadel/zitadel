@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Impostazioni dell'Istanza",
-        "DESCRIPTION": "Le impostazioni dell'istanza sono le impostazioni predefinite per tutte le organizzazioni. Con i permessi adeguati, alcune di esse possono essere sovrascritte nelle impostazioni dell'organizzazione."
+        "TITLE": "Impostazioni predefinite",
+        "DESCRIPTION": "Impostazioni predefinite per tutte le organizzazioni. Con le giuste autorizzazioni, alcuni di essi sono sovrascrivibili nelle impostazioni dell'organizzazione."
       },
       "ORG": {
         "TITLE": "Impostazioni dell'Organizzazione",
@@ -1317,10 +1317,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Impostazioni dell'istanza",
-      "DESCRIPTION": "Queste impostazioni si applicheranno a tutte le tue organizzazioni a meno che l'impostazione non venga sovrascritta."
-    },
     "LIST": {
       "ORGS": "Organizzazioni",
       "FEATURESETTINGS": "Impostazioni delle funzionalità",

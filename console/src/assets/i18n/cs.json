@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Nastavení instance",
-        "DESCRIPTION": "Nastavení instance jsou výchozí nastavení pro všechny organizace. S odpovídajícími oprávněními jsou některá z nich přepisovatelná v nastavení organizace."
+        "TITLE": "Výchozí nastavení",
+        "DESCRIPTION": "Výchozí nastavení pro všechny organizace. Se správnými oprávněními lze některá z nich přepsat v nastavení organizace."
       },
       "ORG": {
         "TITLE": "Nastavení organizace",
@@ -1317,10 +1317,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Nastavení instance",
-      "DESCRIPTION": "Tato nastavení se budou aplikovat na všechny vaše organizace, pokud nebyla přepsána."
-    },
     "LIST": {
       "ORGS": "Organizace",
       "FEATURESETTINGS": "Nastavení funkcí",

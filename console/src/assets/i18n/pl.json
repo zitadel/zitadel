@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Ustawienia instancji",
-        "DESCRIPTION": "Ustawienia instancji są domyślnymi ustawieniami dla wszystkich organizacji. Z odpowiednimi uprawnieniami niektóre z nich mogą być nadpisywane w ustawieniach organizacji."
+        "TITLE": "Ustawienia domyślne",
+        "DESCRIPTION": "Ustawienia domyślne dla wszystkich organizacji. Przy odpowiednich uprawnieniach niektóre z nich można zastąpić w ustawieniach organizacji."
       },
       "ORG": {
         "TITLE": "Ustawienia organizacji",
@@ -1316,10 +1316,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Ustawienia instancji",
-      "DESCRIPTION": "Te ustawienia będą dotyczyć wszystkich twoich organizacji, chyba że zostaną zastąpione."
-    },
     "LIST": {
       "ORGS": "Organizacje",
       "FEATURESETTINGS": "Ustawienia funkcji",

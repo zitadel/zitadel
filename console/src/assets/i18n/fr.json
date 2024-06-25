@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Paramètres de l'Instance",
-        "DESCRIPTION": "Les paramètres de l'instance sont les paramètres par défaut pour toutes les organisations. Avec les bonnes permissions, certains d'entre eux peuvent être remplacés dans les paramètres de l'organisation."
+        "TITLE": "Paramètres par défaut",
+        "DESCRIPTION": "Paramètres par défaut pour toutes les organisations. Avec les autorisations appropriées, certaines d’entre elles peuvent être remplacées dans les paramètres de l’organisation."
       },
       "ORG": {
         "TITLE": "Paramètres de l'Organisation",
@@ -1317,10 +1317,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Paramètres de l'instance",
-      "DESCRIPTION": "Ces paramètres s'appliqueront à toutes vos organisations, sauf s'ils ont été remplacés."
-    },
     "LIST": {
       "ORGS": "Organisations",
       "FEATURESETTINGS": "Paramètres de fonctionnalité",
