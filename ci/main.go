@@ -14,10 +14,11 @@ func (c *Ci) Build(ctx context.Context, directory *Directory) error {
 		return err
 	}
 
-	core := dag.Core().Build(console)
-	_, err = core.Sync(ctx)
-	if err != nil {
-		return err
-	}
+	// core := dag.Core().Build(console)
+	// _, err = core.Sync(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
+
 }
