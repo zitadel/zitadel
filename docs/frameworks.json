@@ -106,6 +106,12 @@
     "external": true
   },
   {
+    "title": "PHP",
+    "imgSrcDark": "/docs/img/tech/php.svg",
+    "docsLink": "https://github.com/RedstonePfalz/zitadel-php-client",
+    "external": true
+  },
+  {
     "title": "Rust",
     "imgSrcLight": "/docs/img/tech/rust.svg",
     "imgSrcDark": "/docs/img/tech/rustlight.svg",

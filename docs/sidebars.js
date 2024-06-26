@@ -98,6 +98,11 @@ module.exports = {
         },
         {
           type: "link",
+          label: "PHP",
+          href: "https://github.com/RedstonePfalz/zitadel-php-client"
+        },
+        {
+          type: "link",
           label: "Rust",
           href: "https://github.com/smartive/zitadel-rust",
         },
