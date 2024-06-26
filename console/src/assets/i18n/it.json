@@ -288,6 +288,10 @@
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "Disabilita Login Telefono",
             "DESCRIPTION": "Se questa opzione è attivata, i tuoi utenti non possono utilizzare i loro numeri di telefono per accedere. Attenzione se disattivi questa opzione, i numeri di telefono dei tuoi utenti devono essere unici in tutte le organizzazioni per poter accedere."
+          },
+          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+            "TITLE": "Utilizza l'URI di reindirizzamento predefinito per i collegamenti di notifica",
+            "DESCRIPTION": "Se questa opzione è attivata, l'URI di reindirizzamento predefinito verrà utilizzato come collegamento del pulsante per i messaggi di notifica e-mail (ad esempio il pulsante Accedi nel messaggio di modifica della password)"
           }
         }
       }
@@ -1695,7 +1699,6 @@
       "HASSYMBOL": "ha il simbolo",
       "HASLOWERCASE": "ha la minuscola",
       "HASUPPERCASE": "ha la maiuscola",
-      "SHOWLOCKOUTFAILURES": "mostra i fallimenti del blocco",
       "MAXPASSWORDATTEMPTS": "Massimo numero di tentativi di password",
       "MAXOTPATTEMPTS": "Massimo numero di tentativi di OTP",
       "EXPIREWARNDAYS": "Avviso di scadenza dopo giorni",
@@ -1706,17 +1709,12 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "L'indirizzo mittente SMTP corrisponde al dominio dell'istanza",
       "ALLOWUSERNAMEPASSWORD_DESC": "Autenticazione classica con nome utente e password è permessa.",
       "ALLOWEXTERNALIDP_DESC": "Il login è permesso per gli IDP sottostanti",
-      "ALLOWREGISTER_DESC": "Se l'opzione è selezionata, nel login apparirà un passo aggiuntivo per la registrazione di un utente.",
       "FORCEMFA": "Forza MFA",
       "FORCEMFALOCALONLY": "Forza MFA per gli utenti locali",
-      "FORCEMFALOCALONLY_DESC": "Se l'opzione è selezionata, gli utenti locali autenticati devono configurare un secondo fattore per l'accesso.",
       "HIDEPASSWORDRESET_DESC": "Se l'opzione è selezionata, l'utente non può resettare la sua password nel interfaccia login.",
       "HIDELOGINNAMESUFFIX": "Nascondi il suffisso del nome utente",
       "HIDELOGINNAMESUFFIX_DESC": "Nasconde il suffisso del nome di accesso nell'interfaccia di accesso",
-      "IGNOREUNKNOWNUSERNAMES_DESC": "Se l'opzione è selezionata, l'inserimento della password viene mostrato anche se nessun utente è stato trovato. Nota che dopo il controllo della password, non viene mostrato se il nome utente o la password erano errati.",
-      "ALLOWDOMAINDISCOVERY_DESC": "Se l'opzione è selezionata, il suffisso (@domain.com) di un nome utente sconosciuto inserito nel login verrà confrontato con i domini organizzazione e, in caso di successo, verrà reindirizzato alla registrazione di tale organizzazione",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
-      "DEFAULTREDIRECTURI_DESC": "Definisce dove verrà reindirizzato l'utente se l'accesso è stato avviato senza un contesto dell'app (ad es. dall' email)",
       "ERRORMSGPOPUP": "Mostra l'errore nella finestra di dialogo",
       "DISABLEWATERMARK": "Nascondi la filigrana",
       "DISABLEWATERMARK_DESC": "Nascondi filigrana Powered by ZITADEL nell'interfaccia di accesso"

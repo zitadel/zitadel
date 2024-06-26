@@ -252,6 +252,11 @@ message LoginPolicy {
             description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
         }
     ];
+    bool use_default_uri_for_notification_links = 23 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "if activated, the default redirect URI will be used as the button's link for notification messages"
+        }
+    ];
 }
 
 enum SecondFactorType {

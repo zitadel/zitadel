@@ -11,24 +11,25 @@ import (
 type LoginPolicyWriteModel struct {
 	eventstore.WriteModel
 
-	AllowUserNamePassword      bool
-	AllowRegister              bool
-	AllowExternalIDP           bool
-	ForceMFA                   bool
-	ForceMFALocalOnly          bool
-	HidePasswordReset          bool
-	IgnoreUnknownUsernames     bool
-	AllowDomainDiscovery       bool
-	DisableLoginWithEmail      bool
-	DisableLoginWithPhone      bool
-	PasswordlessType           domain.PasswordlessType
-	DefaultRedirectURI         string
-	PasswordCheckLifetime      time.Duration
-	ExternalLoginCheckLifetime time.Duration
-	MFAInitSkipLifetime        time.Duration
-	SecondFactorCheckLifetime  time.Duration
-	MultiFactorCheckLifetime   time.Duration
-	State                      domain.PolicyState
+	AllowUserNamePassword             bool
+	AllowRegister                     bool
+	AllowExternalIDP                  bool
+	ForceMFA                          bool
+	ForceMFALocalOnly                 bool
+	HidePasswordReset                 bool
+	IgnoreUnknownUsernames            bool
+	AllowDomainDiscovery              bool
+	DisableLoginWithEmail             bool
+	DisableLoginWithPhone             bool
+	PasswordlessType                  domain.PasswordlessType
+	DefaultRedirectURI                string
+	PasswordCheckLifetime             time.Duration
+	ExternalLoginCheckLifetime        time.Duration
+	MFAInitSkipLifetime               time.Duration
+	SecondFactorCheckLifetime         time.Duration
+	MultiFactorCheckLifetime          time.Duration
+	State                             domain.PolicyState
+	UseDefaultUriForNotificationLinks bool
 }
 
 func (wm *LoginPolicyWriteModel) Reduce() error {
@@ -53,6 +54,7 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			wm.SecondFactorCheckLifetime = e.SecondFactorCheckLifetime
 			wm.MultiFactorCheckLifetime = e.MultiFactorCheckLifetime
 			wm.State = domain.PolicyStateActive
+			wm.UseDefaultUriForNotificationLinks = e.UseDefaultUriForNotificationLinks
 		case *policy.LoginPolicyChangedEvent:
 			if e.AllowRegister != nil {
 				wm.AllowRegister = *e.AllowRegister
@@ -104,6 +106,9 @@ func (wm *LoginPolicyWriteModel) Reduce() error {
 			}
 			if e.DisableLoginWithPhone != nil {
 				wm.DisableLoginWithPhone = *e.DisableLoginWithPhone
+			}
+			if e.UseDefaultUriForNotificationLinks != nil {
+				wm.UseDefaultUriForNotificationLinks = *e.UseDefaultUriForNotificationLinks
 			}
 		case *policy.LoginPolicyRemovedEvent:
 			wm.State = domain.PolicyStateRemoved

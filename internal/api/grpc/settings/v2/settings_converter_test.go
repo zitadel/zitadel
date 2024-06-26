@@ -49,7 +49,8 @@ func Test_loginSettingsToPb(t *testing.T) {
 		MultiFactors: []domain.MultiFactorType{
 			domain.MultiFactorTypeU2FWithPIN,
 		},
-		IsDefault: true,
+		IsDefault:                         true,
+		UseDefaultUriForNotificationLinks: true,
 	}
 
 	want := &settings.LoginSettings{
@@ -79,7 +80,8 @@ func Test_loginSettingsToPb(t *testing.T) {
 		MultiFactors: []settings.MultiFactorType{
 			settings.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION,
 		},
-		ResourceOwnerType: settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
+		ResourceOwnerType:                 settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
+		UseDefaultUriForNotificationLinks: true,
 	}
 
 	got := loginSettingsToPb(arg)

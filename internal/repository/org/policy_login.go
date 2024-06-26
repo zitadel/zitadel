@@ -39,6 +39,7 @@ func NewLoginPolicyAddedEvent(
 	mfaInitSkipLifetime,
 	secondFactorCheckLifetime,
 	multiFactorCheckLifetime time.Duration,
+	useDefaultUriForNotificationLinks bool,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
 		LoginPolicyAddedEvent: *policy.NewLoginPolicyAddedEvent(
@@ -63,6 +64,7 @@ func NewLoginPolicyAddedEvent(
 			mfaInitSkipLifetime,
 			secondFactorCheckLifetime,
 			multiFactorCheckLifetime,
+			useDefaultUriForNotificationLinks,
 		),
 	}
 }

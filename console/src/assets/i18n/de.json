@@ -288,6 +288,10 @@
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "Telefon-Login deaktivieren",
             "DESCRIPTION": "Ist dies aktiviert, können deine Benutzer sich nicht mit ihren Telefonnummern einloggen. Beachte, dass, wenn du dies deaktivierst, die Telefonnummern deiner Benutzer einzigartig über alle Organisationen hinweg sein müssen, um sich einzuloggen."
+          },
+          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+            "TITLE": "Verwenden Sie den Standard-Umleitungs-URI für Benachrichtigungslinks",
+            "DESCRIPTION": "Wenn dies aktiviert ist, wird der Standard-Umleitungs-URI als Link der Schaltfläche für E-Mail-Benachrichtigungsnachrichten verwendet (z. B. Anmeldeschaltfläche in der Nachricht zur Passwortänderung)."
           }
         }
       }
@@ -1695,7 +1699,6 @@
       "HASSYMBOL": "erfordert Symbol/Satzzeichen",
       "HASLOWERCASE": "erfordert Kleinbuchstaben",
       "HASUPPERCASE": "erfordert Grossbuchstaben",
-      "SHOWLOCKOUTFAILURES": "Zeige Anzahl Anmeldeversuche",
       "MAXPASSWORDATTEMPTS": "Maximale Anzahl an Passwort Versuchen",
       "MAXOTPATTEMPTS": "Maximale Anzahl an OTP Versuchen",
       "EXPIREWARNDAYS": "Ablauf Warnung nach Tagen",
@@ -1706,17 +1709,12 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Adresse entspricht Instanzdomain",
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
       "ALLOWEXTERNALIDP_DESC": "Der Login wird für die darunter liegenden Identitätsanbieter erlaubt.",
-      "ALLOWREGISTER_DESC": "Ist die Option gewählt, erscheint im Login ein zusätzlicher Schritt zum Registrieren eines Benutzers.",
       "FORCEMFA": "MFA erzwingen",
       "FORCEMFALOCALONLY": "MFA für lokale Users erzwingen",
-      "FORCEMFALOCALONLY_DESC": "Ist die Option gewählt, müssen lokal authentifizierte Benutzer einen zweiten Faktor für den Login verwenden.",
       "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
       "HIDELOGINNAMESUFFIX": "Loginname Suffix ausblenden",
       "HIDELOGINNAMESUFFIX_DESC": "Blendet das Suffix des Login-Namens in der Login-Oberfläche aus",
-      "IGNOREUNKNOWNUSERNAMES_DESC": "Ist die Option gewählt, wird der Passwort Schritt im Login auch angezeigt wenn der User nicht gefunden wurde. Dem Benutzer wird auf bei der Passwortprüfung nicht angezeigt ob der Username oder das Passwort falsch war.",
-      "ALLOWDOMAINDISCOVERY_DESC": "Ist die Option gewählt, wird die Endung (@domain.com) eines unbekannten Benutzernamens im Login mit den Organisationsdomänen verglichen. Bei Übereinstimmung wird der Benutzer auf die Registrierung dieser Organisation weitergeleitet.",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
-      "DEFAULTREDIRECTURI_DESC": "Definiert, wohin der Benutzer umgeleitet wird, wenn die Anmeldung ohne App-Kontext gestartet wurde (z. B. von Mail)",
       "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
       "DISABLEWATERMARK": "Wasserzeichen ausblenden",
       "DISABLEWATERMARK_DESC": "Powered by ZITADEL Wasserzeichen in der Login-Oberfläche ausblenden"

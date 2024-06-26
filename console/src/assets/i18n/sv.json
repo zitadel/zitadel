@@ -288,6 +288,10 @@
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "Inaktivera telefoninloggning",
             "DESCRIPTION": "Om detta är aktiverat, kan dina användare inte använda sina telefonnummer för att logga in. Observera att om du inaktiverar detta, måste dina användares telefonnummer vara unika över alla organisationer för att kunna logga in."
+          },
+          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+            "TITLE": "Använd standard omdirigerings-URI för meddelandelänkar",
+            "DESCRIPTION": "Om detta är aktiverat, kommer standard omdirigerings-URI att användas som knappens länk för e-postmeddelanden (t.ex. Logga in-knappen i meddelande om lösenordsändringar)"
           }
         }
       }
@@ -1699,7 +1703,6 @@
       "HASSYMBOL": "måste inkludera en symbol",
       "HASLOWERCASE": "måste inkludera en gemen bokstav",
       "HASUPPERCASE": "måste inkludera en versal bokstav",
-      "SHOWLOCKOUTFAILURES": "visa låsning misslyckanden",
       "MAXPASSWORDATTEMPTS": "Maximalt antal lösenordsförsök",
       "MAXOTPATTEMPTS": "Maximalt antal OTP-försök",
       "EXPIREWARNDAYS": "Utgångsvarning efter dagar",
@@ -1710,17 +1713,12 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Avsändaradress matchar Instansdomän",
       "ALLOWUSERNAMEPASSWORD_DESC": "Den konventionella inloggningen med användarnamn och lösenord är tillåten.",
       "ALLOWEXTERNALIDP_DESC": "Inloggning är tillåten för de underliggande identitetsleverantörerna",
-      "ALLOWREGISTER_DESC": "Om alternativet är valt visas ett ytterligare steg för att registrera en användare i inloggningen.",
       "FORCEMFA": "Tvinga MFA",
       "FORCEMFALOCALONLY": "Tvinga MFA för lokalt autentiserade användare",
-      "FORCEMFALOCALONLY_DESC": "Om alternativet är valt måste lokalt autentiserade användare konfigurera en andra faktor för inloggning.",
       "HIDEPASSWORDRESET_DESC": "Om alternativet är valt kan användaren inte återställa sitt lösenord i inloggningsprocessen.",
       "HIDELOGINNAMESUFFIX": "Dölj inloggningsnamn suffix",
       "HIDELOGINNAMESUFFIX_DESC": "Döljer inloggningsnamn suffix i inloggningsgränssnittet",
-      "IGNOREUNKNOWNUSERNAMES_DESC": "Om alternativet är valt kommer lösenordsskärmen att visas i inloggningsprocessen även om användaren inte hittades. Felet vid lösenordskontrollen kommer inte att avslöja om användarnamnet eller lösenordet var fel.",
-      "ALLOWDOMAINDISCOVERY_DESC": "Om alternativet är valt kommer suffixet (@domain.com) av ett okänt användarnamn som anges på inloggningsskärmen att matchas mot organisationsdomänerna och omdirigeras till registreringen av den organisationen vid framgång.",
       "DEFAULTREDIRECTURI": "Standard omdirigerings-URI",
-      "DEFAULTREDIRECTURI_DESC": "Definierar vart användaren kommer att omdirigeras om inloggningen har startat utan en appkontext (t.ex. från e-post)",
       "ERRORMSGPOPUP": "Visa fel i dialog",
       "DISABLEWATERMARK": "Dölj Vattenstämpel",
       "DISABLEWATERMARK_DESC": "Dölj Powered by ZITADEL vattenstämpel i inloggningsgränssnittet"

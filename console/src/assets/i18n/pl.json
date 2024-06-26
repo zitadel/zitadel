@@ -288,6 +288,10 @@
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "Wyłącz logowanie telefoniczne",
             "DESCRIPTION": "Jeśli to zostanie aktywowane, użytkownicy nie mogą logować się za pomocą numerów telefonów. Uważaj, jeśli to dezaktywujesz, numery telefonów twoich użytkowników muszą być unikalne we wszystkich organizacjach, aby móc się zalogować."
+          },
+          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+            "TITLE": "Użyj domyślnego identyfikatora URI przekierowania dla linków powiadomień",
+            "DESCRIPTION": "Jeśli to zostanie aktywowane, domyślny identyfikator URI przekierowania będzie używany jako link przycisku do powiadomień e-mail (np. przycisk Zaloguj się w wiadomości o zmianie hasła)"
           }
         }
       }
@@ -1694,7 +1698,6 @@
       "HASSYMBOL": "zawiera symbol",
       "HASLOWERCASE": "zawiera małe litery",
       "HASUPPERCASE": "zawiera duże litery",
-      "SHOWLOCKOUTFAILURES": "pokaż blokady nieudanych prób",
       "MAXPASSWORDATTEMPTS": "Maksymalna liczba prób wprowadzenia hasła",
       "MAXOTPATTEMPTS": "Maksymalna liczba prób OTP",
       "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniach",
@@ -1705,17 +1708,12 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "Adres nadawcy SMTP pasuje do domeny instancji",
       "ALLOWUSERNAMEPASSWORD_DESC": "Zwykłe logowanie za pomocą nazwy użytkownika i hasła jest dozwolone.",
       "ALLOWEXTERNALIDP_DESC": "Logowanie jest dozwolone dla dostawców tożsamości podstawowych",
-      "ALLOWREGISTER_DESC": "Jeśli ta opcja jest zaznaczona, pojawi się dodatkowy krok rejestracji użytkownika w procesie logowania.",
       "FORCEMFA": "Wymuś MFA",
       "FORCEMFALOCALONLY": "Wymuś MFA dla lokalnych użytkowników",
-      "FORCEMFALOCALONLY_DESC": "Jeśli ta opcja jest zaznaczona, lokalni uwierzytelnieni użytkownicy muszą skonfigurować drugi czynnik logowania.",
       "HIDEPASSWORDRESET_DESC": "Jeśli ta opcja jest zaznaczona, użytkownik nie może zresetować swojego hasła w procesie logowania.",
       "HIDELOGINNAMESUFFIX": "Ukryj sufiks nazwy użytkownika",
       "HIDELOGINNAMESUFFIX_DESC": "Ukrywa sufiks nazwy użytkownika w interfejsie logowania",
-      "IGNOREUNKNOWNUSERNAMES_DESC": "Jeśli ta opcja jest zaznaczona, ekran hasła pojawi się w procesie logowania, nawet jeśli użytkownik nie zostanie znaleziony. Błąd podczas sprawdzania hasła nie ujawni, czy nazwa użytkownika lub hasło były błędne.",
-      "ALLOWDOMAINDISCOVERY_DESC": "Jeśli ta opcja jest zaznaczona, sufiks (@domain.com) nieznanej nazwy użytkownika podanej na ekranie logowania będzie dopasowywany do domen organizacji i po pomyślnym dopasowaniu przekieruje do rejestracji tej organizacji.",
       "DEFAULTREDIRECTURI": "Domyślny adres przekierowania URI",
-      "DEFAULTREDIRECTURI_DESC": "Określa, dokąd użytkownik zostanie przekierowany, jeśli logowanie rozpocznie się bez kontekstu aplikacji (np. z poczty e-mail)",
       "ERRORMSGPOPUP": "Pokazuj błąd w oknie dialogowym",
       "DISABLEWATERMARK": "Ukryj znak wodny",
       "DISABLEWATERMARK_DESC": "Ukrywa znak wodny 'Powered by ZITADEL' na interfejsie logowania"

@@ -434,6 +434,29 @@
       />
     </cnsl-form-field>
   </div>
+
+  <div class="login-policy-row">
+    <mat-checkbox
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS.DESCRIPTION' | translate }}"
+      [(ngModel)]="loginData.useDefaultUriForNotificationLinks"
+      [disabled]="
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+              ? 'policy.write'
+              : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS.TITLE' | translate }}
+    </mat-checkbox>
+  </div>
 </div>
 
 <br />

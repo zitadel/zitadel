@@ -10,27 +10,28 @@ import (
 type LoginPolicy struct {
 	models.ObjectRoot
 
-	Default                    bool
-	AllowUsernamePassword      bool
-	AllowRegister              bool
-	AllowExternalIDP           bool
-	IDPProviders               []*IDPProvider
-	ForceMFA                   bool
-	ForceMFALocalOnly          bool
-	SecondFactors              []SecondFactorType
-	MultiFactors               []MultiFactorType
-	PasswordlessType           PasswordlessType
-	HidePasswordReset          bool
-	IgnoreUnknownUsernames     bool
-	AllowDomainDiscovery       bool
-	DefaultRedirectURI         string
-	PasswordCheckLifetime      time.Duration
-	ExternalLoginCheckLifetime time.Duration
-	MFAInitSkipLifetime        time.Duration
-	SecondFactorCheckLifetime  time.Duration
-	MultiFactorCheckLifetime   time.Duration
-	DisableLoginWithEmail      bool
-	DisableLoginWithPhone      bool
+	Default                           bool
+	AllowUsernamePassword             bool
+	AllowRegister                     bool
+	AllowExternalIDP                  bool
+	IDPProviders                      []*IDPProvider
+	ForceMFA                          bool
+	ForceMFALocalOnly                 bool
+	SecondFactors                     []SecondFactorType
+	MultiFactors                      []MultiFactorType
+	PasswordlessType                  PasswordlessType
+	HidePasswordReset                 bool
+	IgnoreUnknownUsernames            bool
+	AllowDomainDiscovery              bool
+	DefaultRedirectURI                string
+	PasswordCheckLifetime             time.Duration
+	ExternalLoginCheckLifetime        time.Duration
+	MFAInitSkipLifetime               time.Duration
+	SecondFactorCheckLifetime         time.Duration
+	MultiFactorCheckLifetime          time.Duration
+	DisableLoginWithEmail             bool
+	DisableLoginWithPhone             bool
+	UseDefaultUriForNotificationLinks bool
 }
 
 func ValidateDefaultRedirectURI(rawURL string) bool {

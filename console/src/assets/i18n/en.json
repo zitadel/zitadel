@@ -288,6 +288,10 @@
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "Disable Phone Login",
             "DESCRIPTION": "If this is activated, your users can't use their phone numbers to log in. Beware that if you deactivate this, your users phone numbers must be unique accross all organizations in order to log in."
+          },
+          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+            "TITLE": "Use default redirect URI for notification links",
+            "DESCRIPTION": "If this is activated, the default redirect URI will be used as the button's link for e-mail notification messages (e.g Login button in password changes message)"
           }
         }
       }
@@ -1695,7 +1699,6 @@
       "HASSYMBOL": "must include a symbol",
       "HASLOWERCASE": "must include a lowercase letter",
       "HASUPPERCASE": "must include an uppercase letter",
-      "SHOWLOCKOUTFAILURES": "show lockout failures",
       "MAXPASSWORDATTEMPTS": "Password maximum attempts",
       "MAXOTPATTEMPTS": "OTP maximum attempts",
       "EXPIREWARNDAYS": "Expiration Warning after days",
@@ -1706,17 +1709,12 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Sender Address matches Instance Domain",
       "ALLOWUSERNAMEPASSWORD_DESC": "The conventional login with user name and password is allowed.",
       "ALLOWEXTERNALIDP_DESC": "The login is allowed for the underlying identity providers",
-      "ALLOWREGISTER_DESC": "If the option is selected, an additional step for registering a user appears in the login.",
       "FORCEMFA": "Force MFA",
       "FORCEMFALOCALONLY": "Force MFA for local authenticated users",
-      "FORCEMFALOCALONLY_DESC": "If the option is selected, local authenticated users have to configure a second factor for login.",
       "HIDEPASSWORDRESET_DESC": "If the option is selected, the user can't reset his password in the login process.",
       "HIDELOGINNAMESUFFIX": "Hide Loginname suffix",
       "HIDELOGINNAMESUFFIX_DESC": "Hides the login name suffix in the login interface",
-      "IGNOREUNKNOWNUSERNAMES_DESC": "If the option is selected, the password screen will be displayed in the login process even if the user was not found. The error on the password check will not disclose if the username or password was wrong.",
-      "ALLOWDOMAINDISCOVERY_DESC": "If the option is selected, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the organization domains and will redirect to the registration of that organisation on success.",
       "DEFAULTREDIRECTURI": "Default Redirect URI",
-      "DEFAULTREDIRECTURI_DESC": "Defines where the user will be redirected to if the login has started without an app context (e.g. from mail)",
       "ERRORMSGPOPUP": "Show Error in Dialog",
       "DISABLEWATERMARK": "Hide Watermark",
       "DISABLEWATERMARK_DESC": "Hide Powered by ZITADEL watermark in the login interface"

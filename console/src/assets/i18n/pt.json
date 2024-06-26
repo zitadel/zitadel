@@ -288,6 +288,10 @@
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "Desativar Login por Telefone",
             "DESCRIPTION": "Se isto for ativado, seus usuários não poderão usar seus números de telefone para fazer login. Tenha cuidado que se você desativar isso, os números de telefone dos seus usuários devem ser únicos entre todas as organizações para poderem fazer login."
+          },
+          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+            "TITLE": "Use o URI de redirecionamento padrão para links de notificação",
+            "DESCRIPTION": "Se isto for ativado, o URI de redirecionamento padrão será usado como link do botão para mensagens de notificação por e-mail (por exemplo, botão Login na mensagem de alteração de senha)"
           }
         }
       }
@@ -1696,7 +1700,6 @@
       "HASSYMBOL": "tem símbolo",
       "HASLOWERCASE": "tem letra minúscula",
       "HASUPPERCASE": "tem letra maiúscula",
-      "SHOWLOCKOUTFAILURES": "mostrar falhas de bloqueio",
       "MAXPASSWORDATTEMPTS": "Máximo de tentativas de senha",
       "MAXOTPATTEMPTS": "Máximo de tentativas de OTP",
       "EXPIREWARNDAYS": "Aviso de expiração após dias",
@@ -1707,15 +1710,11 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "O endereço do remetente do SMTP corresponde ao domínio da Instância",
       "ALLOWUSERNAMEPASSWORD_DESC": "O login convencional com nome de usuário e senha é permitido.",
       "ALLOWEXTERNALIDP_DESC": "O login é permitido para os provedores de identidade subjacentes",
-      "ALLOWREGISTER_DESC": "Se a opção estiver selecionada, uma etapa adicional para registrar um usuário aparecerá no login.",
       "FORCEMFA": "Forçar MFA",
       "HIDEPASSWORDRESET_DESC": "Se a opção estiver selecionada, o usuário não poderá redefinir sua senha no processo de login.",
       "HIDELOGINNAMESUFFIX": "Ocultar sufixo do nome de login",
       "HIDELOGINNAMESUFFIX_DESC": "Oculta o sufixo do nome de login na interface de login",
-      "IGNOREUNKNOWNUSERNAMES_DESC": "Se a opção estiver selecionada, a tela de senha será exibida no processo de login, mesmo se o usuário não for encontrado. O erro na verificação de senha não revelará se o nome de usuário ou a senha estavam incorretos.",
-      "ALLOWDOMAINDISCOVERY_DESC": "Se a opção estiver selecionada, o sufixo (@domain.com) de um nome de usuário desconhecido inserido na tela de login será comparado com os domínios da organização e será redirecionado para o registro dessa organização em caso de sucesso.",
       "DEFAULTREDIRECTURI": "URI de redirecionamento padrão",
-      "DEFAULTREDIRECTURI_DESC": "Define para onde o usuário será redirecionado se o login for iniciado sem um contexto de aplicativo (por exemplo, a partir do e-mail)",
       "ERRORMSGPOPUP": "Mostrar Erro em Diálogo",
       "DISABLEWATERMARK": "Ocultar Marca d'água",
       "DISABLEWATERMARK_DESC": "Ocultar a marca d'água Powered by ZITADEL na interface de login"

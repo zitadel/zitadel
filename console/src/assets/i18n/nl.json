@@ -288,6 +288,10 @@
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "Inloggen met telefoon uitschakelen",
             "DESCRIPTION": "Als dit geactiveerd is, kunnen je gebruikers niet inloggen met hun telefoonnummers. Let op dat als je dit deactiveert, de telefoonnummers van je gebruikers uniek moeten zijn over alle organisaties om in te kunnen loggen."
+          },
+          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+            "TITLE": "Gebruik de standaard omleidings-URI voor meldingslinks",
+            "DESCRIPTION": "Als dit geactiveerd is, wordt de standaard omleidings-URI gebruikt als de link van de knop voor e-mailmeldingen (bijvoorbeeld de knop Inloggen in het bericht over wachtwoordwijzigingen)"
           }
         }
       }
@@ -1695,7 +1699,6 @@
       "HASSYMBOL": "heeft symbool",
       "HASLOWERCASE": "heeft kleine letters",
       "HASUPPERCASE": "heeft hoofdletters",
-      "SHOWLOCKOUTFAILURES": "toon lockout mislukkingen",
       "MAXPASSWORDATTEMPTS": "Maximum pogingen voor wachtwoord",
       "MAXOTPATTEMPTS": "Maximale OTP-pogingen",
       "EXPIREWARNDAYS": "Waarschuwing voor verlopen na dagen",
@@ -1706,17 +1709,12 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "SMTP Afzender Adres komt overeen met Instantie Domein",
       "ALLOWUSERNAMEPASSWORD_DESC": "De conventionele login met gebruikersnaam en wachtwoord is toegestaan.",
       "ALLOWEXTERNALIDP_DESC": "De login is toegestaan voor de onderliggende identiteitsproviders",
-      "ALLOWREGISTER_DESC": "Als de optie is geselecteerd, verschijnt er een extra stap voor het registreren van een gebruiker in het login proces.",
       "FORCEMFA": "Forceer MFA",
       "FORCEMFALOCALONLY": "Forceer MFA voor lokaal geauthenticeerde gebruikers",
-      "FORCEMFALOCALONLY_DESC": "Als de optie is geselecteerd, moeten lokaal geauthenticeerde gebruikers een tweede factor configureren voor login.",
       "HIDEPASSWORDRESET_DESC": "Als de optie is geselecteerd, kan de gebruiker zijn wachtwoord niet resetten in het login proces.",
       "HIDELOGINNAMESUFFIX": "Verberg Inlognaam achtervoegsel",
       "HIDELOGINNAMESUFFIX_DESC": "Verbergt het inlognaam achtervoegsel in de login interface",
-      "IGNOREUNKNOWNUSERNAMES_DESC": "Als de optie is geselecteerd, zal het wachtwoordscherm worden weergegeven in het login proces, zelfs als de gebruiker niet is gevonden. De fout bij de wachtwoordcontrole zal niet onthullen of de gebruikersnaam of het wachtwoord verkeerd was.",
-      "ALLOWDOMAINDISCOVERY_DESC": "Als de optie is geselecteerd, zal het achtervoegsel (@domein.com) van een onbekende gebruikersnaam invoer op het login scherm worden gematcht tegen de organisatie domeinen en zal bij succes doorverwijzen naar de registratie van die organisatie.",
       "DEFAULTREDIRECTURI": "Standaard Doorverwijs URI",
-      "DEFAULTREDIRECTURI_DESC": "Definieert waar de gebruiker naar wordt doorverwezen als de login is gestart zonder een app context (bijv. vanuit mail)",
       "ERRORMSGPOPUP": "Toon Fout in Dialoog",
       "DISABLEWATERMARK": "Verberg Watermerk",
       "DISABLEWATERMARK_DESC": "Verberg Powered by ZITADEL watermerk in de login interface"

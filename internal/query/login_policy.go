@@ -20,31 +20,32 @@ import (
 )
 
 type LoginPolicy struct {
-	OrgID                      string
-	CreationDate               time.Time
-	ChangeDate                 time.Time
-	Sequence                   uint64
-	AllowRegister              bool
-	AllowUsernamePassword      bool
-	AllowExternalIDPs          bool
-	ForceMFA                   bool
-	ForceMFALocalOnly          bool
-	SecondFactors              database.NumberArray[domain.SecondFactorType]
-	MultiFactors               database.NumberArray[domain.MultiFactorType]
-	PasswordlessType           domain.PasswordlessType
-	IsDefault                  bool
-	HidePasswordReset          bool
-	IgnoreUnknownUsernames     bool
-	AllowDomainDiscovery       bool
-	DisableLoginWithEmail      bool
-	DisableLoginWithPhone      bool
-	DefaultRedirectURI         string
-	PasswordCheckLifetime      database.Duration
-	ExternalLoginCheckLifetime database.Duration
-	MFAInitSkipLifetime        database.Duration
-	SecondFactorCheckLifetime  database.Duration
-	MultiFactorCheckLifetime   database.Duration
-	IDPLinks                   []*IDPLoginPolicyLink
+	OrgID                             string
+	CreationDate                      time.Time
+	ChangeDate                        time.Time
+	Sequence                          uint64
+	AllowRegister                     bool
+	AllowUsernamePassword             bool
+	AllowExternalIDPs                 bool
+	ForceMFA                          bool
+	ForceMFALocalOnly                 bool
+	SecondFactors                     database.NumberArray[domain.SecondFactorType]
+	MultiFactors                      database.NumberArray[domain.MultiFactorType]
+	PasswordlessType                  domain.PasswordlessType
+	IsDefault                         bool
+	HidePasswordReset                 bool
+	IgnoreUnknownUsernames            bool
+	AllowDomainDiscovery              bool
+	DisableLoginWithEmail             bool
+	DisableLoginWithPhone             bool
+	DefaultRedirectURI                string
+	PasswordCheckLifetime             database.Duration
+	ExternalLoginCheckLifetime        database.Duration
+	MFAInitSkipLifetime               database.Duration
+	SecondFactorCheckLifetime         database.Duration
+	MultiFactorCheckLifetime          database.Duration
+	IDPLinks                          []*IDPLoginPolicyLink
+	UseDefaultUriForNotificationLinks bool
 }
 
 type SecondFactors struct {
@@ -164,6 +165,10 @@ var (
 	}
 	LoginPolicyColumnOwnerRemoved = Column{
 		name:  projection.LoginPolicyOwnerRemovedCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnUseDefaultUriForNotificationLinks = Column{
+		name:  projection.UseDefaultUriForNotificationLinksCol,
 		table: loginPolicyTable,
 	}
 )
@@ -384,6 +389,7 @@ func prepareLoginPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			LoginPolicyColumnMFAInitSkipLifetime.identifier(),
 			LoginPolicyColumnSecondFactorCheckLifetime.identifier(),
 			LoginPolicyColumnMultiFactorCheckLifetime.identifier(),
+			LoginPolicyColumnUseDefaultUriForNotificationLinks.identifier(),
 		).From(loginPolicyTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*LoginPolicy, error) {
@@ -415,6 +421,7 @@ func prepareLoginPolicyQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&p.MFAInitSkipLifetime,
 					&p.SecondFactorCheckLifetime,
 					&p.MultiFactorCheckLifetime,
+					&p.UseDefaultUriForNotificationLinks,
 				)
 				if err != nil {
 					return nil, zerrors.ThrowInternal(err, "QUERY-YcC53", "Errors.Internal")

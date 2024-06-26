@@ -212,6 +212,7 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
             mgmtreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
             mgmtreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
             mgmtreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+            mgmtreq.setUseDefaultUriForNotificationLinks(this.loginData.useDefaultUriForNotificationLinks);
 
             calls.push((this.service as ManagementService).updateCustomLoginPolicy(mgmtreq));
             break;
@@ -245,6 +246,7 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
           adminreq.setAllowDomainDiscovery(this.loginData.allowDomainDiscovery);
           adminreq.setIgnoreUnknownUsernames(this.loginData.ignoreUnknownUsernames);
           adminreq.setDefaultRedirectUri(this.loginData.defaultRedirectUri);
+          adminreq.setUseDefaultUriForNotificationLinks(this.loginData.useDefaultUriForNotificationLinks);
 
           calls.push((this.service as AdminService).setRestrictions(!this.allowOrgRegistration));
           calls.push((this.service as AdminService).updateLoginPolicy(adminreq));

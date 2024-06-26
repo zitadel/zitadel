@@ -97,6 +97,8 @@ export class LoginPolicyService {
     mgmtreq.setDisableLoginWithPhone(fromDefaultPolicy.disableLoginWithPhone);
     mgmtreq.setForceMfaLocalOnly(fromDefaultPolicy.forceMfaLocalOnly);
 
+    mgmtreq.setUseDefaultUriForNotificationLinks(fromDefaultPolicy.useDefaultUriForNotificationLinks);
+
     mgmtreq.setIdpsList(
       fromDefaultPolicy.idpsList.map((idp) => addIdpMessage(idp.idpId, IDPOwnerType.IDP_OWNER_TYPE_SYSTEM)),
     );

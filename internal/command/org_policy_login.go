@@ -16,26 +16,27 @@ import (
 )
 
 type AddLoginPolicy struct {
-	AllowUsernamePassword      bool
-	AllowRegister              bool
-	AllowExternalIDP           bool
-	IDPProviders               []*AddLoginPolicyIDP
-	ForceMFA                   bool
-	ForceMFALocalOnly          bool
-	SecondFactors              []domain.SecondFactorType
-	MultiFactors               []domain.MultiFactorType
-	PasswordlessType           domain.PasswordlessType
-	HidePasswordReset          bool
-	IgnoreUnknownUsernames     bool
-	AllowDomainDiscovery       bool
-	DefaultRedirectURI         string
-	PasswordCheckLifetime      time.Duration
-	ExternalLoginCheckLifetime time.Duration
-	MFAInitSkipLifetime        time.Duration
-	SecondFactorCheckLifetime  time.Duration
-	MultiFactorCheckLifetime   time.Duration
-	DisableLoginWithEmail      bool
-	DisableLoginWithPhone      bool
+	AllowUsernamePassword             bool
+	AllowRegister                     bool
+	AllowExternalIDP                  bool
+	IDPProviders                      []*AddLoginPolicyIDP
+	ForceMFA                          bool
+	ForceMFALocalOnly                 bool
+	SecondFactors                     []domain.SecondFactorType
+	MultiFactors                      []domain.MultiFactorType
+	PasswordlessType                  domain.PasswordlessType
+	HidePasswordReset                 bool
+	IgnoreUnknownUsernames            bool
+	AllowDomainDiscovery              bool
+	DefaultRedirectURI                string
+	PasswordCheckLifetime             time.Duration
+	ExternalLoginCheckLifetime        time.Duration
+	MFAInitSkipLifetime               time.Duration
+	SecondFactorCheckLifetime         time.Duration
+	MultiFactorCheckLifetime          time.Duration
+	DisableLoginWithEmail             bool
+	DisableLoginWithPhone             bool
+	UseDefaultUriForNotificationLinks bool
 }
 
 type AddLoginPolicyIDP struct {
@@ -44,23 +45,24 @@ type AddLoginPolicyIDP struct {
 }
 
 type ChangeLoginPolicy struct {
-	AllowUsernamePassword      bool
-	AllowRegister              bool
-	AllowExternalIDP           bool
-	ForceMFA                   bool
-	ForceMFALocalOnly          bool
-	PasswordlessType           domain.PasswordlessType
-	HidePasswordReset          bool
-	IgnoreUnknownUsernames     bool
-	AllowDomainDiscovery       bool
-	DefaultRedirectURI         string
-	PasswordCheckLifetime      time.Duration
-	ExternalLoginCheckLifetime time.Duration
-	MFAInitSkipLifetime        time.Duration
-	SecondFactorCheckLifetime  time.Duration
-	MultiFactorCheckLifetime   time.Duration
-	DisableLoginWithEmail      bool
-	DisableLoginWithPhone      bool
+	AllowUsernamePassword             bool
+	AllowRegister                     bool
+	AllowExternalIDP                  bool
+	ForceMFA                          bool
+	ForceMFALocalOnly                 bool
+	PasswordlessType                  domain.PasswordlessType
+	HidePasswordReset                 bool
+	IgnoreUnknownUsernames            bool
+	AllowDomainDiscovery              bool
+	DefaultRedirectURI                string
+	PasswordCheckLifetime             time.Duration
+	ExternalLoginCheckLifetime        time.Duration
+	MFAInitSkipLifetime               time.Duration
+	SecondFactorCheckLifetime         time.Duration
+	MultiFactorCheckLifetime          time.Duration
+	DisableLoginWithEmail             bool
+	DisableLoginWithPhone             bool
+	UseDefaultUriForNotificationLinks bool
 }
 
 func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *AddLoginPolicy) (_ *domain.ObjectDetails, err error) {
@@ -446,6 +448,7 @@ func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation
 				policy.MFAInitSkipLifetime,
 				policy.SecondFactorCheckLifetime,
 				policy.MultiFactorCheckLifetime,
+				policy.UseDefaultUriForNotificationLinks,
 			))
 			for _, factor := range policy.SecondFactors {
 				cmds = append(cmds, org.NewLoginPolicySecondFactorAddedEvent(ctx, &a.Aggregate, factor))
@@ -491,7 +494,8 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 				policy.ExternalLoginCheckLifetime,
 				policy.MFAInitSkipLifetime,
 				policy.SecondFactorCheckLifetime,
-				policy.MultiFactorCheckLifetime)
+				policy.MultiFactorCheckLifetime,
+				policy.UseDefaultUriForNotificationLinks)
 			if !hasChanged {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")
 			}

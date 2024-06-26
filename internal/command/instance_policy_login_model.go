@@ -77,6 +77,7 @@ func (wm *InstanceLoginPolicyWriteModel) NewChangedEvent(
 	mfaInitSkipLifetime,
 	secondFactorCheckLifetime,
 	multiFactorCheckLifetime time.Duration,
+	useDefaultUriForNotificationLinks bool,
 ) (*instance.LoginPolicyChangedEvent, bool) {
 
 	changes := make([]policy.LoginPolicyChanges, 0)
@@ -130,6 +131,9 @@ func (wm *InstanceLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.DisableLoginWithPhone != disableLoginWithPhone {
 		changes = append(changes, policy.ChangeDisableLoginWithPhone(disableLoginWithPhone))
+	}
+	if wm.UseDefaultUriForNotificationLinks != useDefaultUriForNotificationLinks {
+		changes = append(changes, policy.ChangeUseDefaultUriForNotificationLinks(useDefaultUriForNotificationLinks))
 	}
 	if len(changes) == 0 {
 		return nil, false

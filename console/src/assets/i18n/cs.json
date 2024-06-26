@@ -288,6 +288,10 @@
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "Zakázat přihlášení telefonem",
             "DESCRIPTION": "Pokud je tato možnost aktivována, tvoji uživatelé nemohou použít svá telefonní čísla pro přihlášení. Pozor, pokud toto deaktivuješ, telefonní čísla tvých uživatelů musí být jedinečná napříč všemi organizacemi, aby se mohli přihlásit."
+          },
+          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+            "TITLE": "Pro odkazy s upozorněním použijte výchozí URI přesměrování",
+            "DESCRIPTION": "Pokud je toto aktivováno, výchozí URI přesměrování bude použito jako odkaz tlačítka pro e-mailové upozornění (např. tlačítko Přihlásit se ve zprávě o změně hesla)"
           }
         }
       }
@@ -1695,7 +1699,6 @@
       "HASSYMBOL": "obsahuje symbol",
       "HASLOWERCASE": "obsahuje malá písmena",
       "HASUPPERCASE": "obsahuje velká písmena",
-      "SHOWLOCKOUTFAILURES": "zobrazit neúspěšné pokusy o uzamčení",
       "MAXPASSWORDATTEMPTS": "Maximální počet pokusů o heslo",
       "MAXOTPATTEMPTS": "Maximální počet pokusů o OTP",
       "EXPIREWARNDAYS": "Upozornění na uplynutí po dnech",
@@ -1707,17 +1710,12 @@
       "ALLOWREGISTER": "Registrace povolena",
       "ALLOWUSERNAMEPASSWORD_DESC": "Je povoleno klasické přihlášení s uživatelským jménem a heslem.",
       "ALLOWEXTERNALIDP_DESC": "Přihlášení je povoleno pro níže uvedené poskytovatele identity.",
-      "ALLOWREGISTER_DESC": "Pokud je možnost vybrána, objeví se při přihlášení další krok pro registraci uživatele.",
       "FORCEMFA": "Vynutit MFA",
       "FORCEMFALOCALONLY": "Vynutit MFA pouze pro lokálně ověřené uživatele",
-      "FORCEMFALOCALONLY_DESC": "Pokud je možnost vybrána, lokálně ověření uživatelé musí pro přihlášení nastavit druhý faktor.",
       "HIDEPASSWORDRESET_DESC": "Pokud je možnost vybrána, uživatel nemůže během přihlašovacího procesu resetovat své heslo.",
       "HIDELOGINNAMESUFFIX": "Skrýt příponu přihlašovacího jména",
       "HIDELOGINNAMESUFFIX_DESC": "Skryje příponu přihlašovacího jména v přihlašovacím rozhraní",
-      "IGNOREUNKNOWNUSERNAMES_DESC": "Pokud je možnost vybrána, obrazovka pro zadání hesla se zobrazí během přihlašovacího procesu i v případě, že nebyl uživatel nalezen. Chyba při kontrole hesla neodhalí, zda bylo špatné uživatelské jméno nebo heslo.",
-      "ALLOWDOMAINDISCOVERY_DESC": "Pokud je možnost vybrána, přípona (@domain.com) neznámého uživatelského jména zadávaného na přihlašovací obrazovce bude porovnána s doménami organizace a při úspěchu dojde k přesměrování na registraci dané organizace.",
       "DEFAULTREDIRECTURI": "Výchozí URI přesměrování",
-      "DEFAULTREDIRECTURI_DESC": "Definuje, kam bude uživatel přesměrován, pokud bylo přihlášení zahájeno bez kontextu aplikace (např. z e-mailu)",
       "ERRORMSGPOPUP": "Zobrazit chybu v dialogovém okně",
       "DISABLEWATERMARK": "Skrýt vodoznak",
       "DISABLEWATERMARK_DESC": "Skrýt vodoznak Powered by ZITADEL v přihlašovacím rozhraní"

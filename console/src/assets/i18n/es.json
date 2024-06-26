@@ -288,6 +288,10 @@
           "DISABLE_PHONE_LOGIN": {
             "TITLE": "Desactivar Inicio de Sesión con Teléfono",
             "DESCRIPTION": "Si esto está activado, tus usuarios no pueden usar sus números de teléfono para iniciar sesión. Ten en cuenta que si desactivas esto, los números de teléfono de tus usuarios deben ser únicos en todas las organizaciones para poder iniciar sesión."
+          },
+          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+            "TITLE": "Utiliza la URI de redireccionamiento predeterminado para los enlaces de notificación",
+            "DESCRIPTION": "Si esto está activado, la URI de redireccionamiento predeterminado se utilizará como enlace para el botón para los mensajes de notificación por correo electrónico (por ejemplo, el botón Iniciar sesión en el mensaje de cambio de contraseña)."
           }
         }
       }
@@ -1696,7 +1700,6 @@
       "HASSYMBOL": "tiene símbolos",
       "HASLOWERCASE": "tiene minúsculas",
       "HASUPPERCASE": "tiene mayúsculas",
-      "SHOWLOCKOUTFAILURES": "mostrar fallos de bloqueo",
       "MAXPASSWORDATTEMPTS": "Intentos máximos de contraseña",
       "MAXOTPATTEMPTS": "Intentos máximos de OTP",
       "EXPIREWARNDAYS": "Aviso de caducidad después de días",
@@ -1707,17 +1710,12 @@
       "SMTPSENDERADDRESSMATCHESINSTANCEDOMAIN": "La dirección del remitente SMTP coincide con el dominio de la instancia",
       "ALLOWUSERNAMEPASSWORD_DESC": "El inicio de sesión convencional con nombre de usuario y contraseña está permitido.",
       "ALLOWEXTERNALIDP_DESC": "El inicio de sesión está permitido para los proveedores de identidad subyacentes",
-      "ALLOWREGISTER_DESC": "Si esta opción es seleccionada, aparece un paso adicional durante el inicio de sesión para registrar un usuario.",
       "FORCEMFA": "Forzar MFA",
       "FORCEMFALOCALONLY": "Forzar MFA para usuarios locales",
-      "FORCEMFALOCALONLY_DESC": "Si esta opción es seleccionada, los usuarios autenticados localmente tendrán que configurar un doble factor para iniciar sesión",
       "HIDEPASSWORDRESET_DESC": "Si esta opción es seleccionada, el usuario no podrá restablecer su contraseña en el proceso de inicio de sesión.",
       "HIDELOGINNAMESUFFIX": "Ocultar sufijo del nombre de inicio de sesión",
       "HIDELOGINNAMESUFFIX_DESC": "Oculta el sufijo del nombre de inicio de sesión en la interfaz de acceso",
-      "IGNOREUNKNOWNUSERNAMES_DESC": "Si esta opción es seleccionada, la pantalla de contraseña se mostrará durante el proceso de inicio de sesión aunque no exista el usuario. El error en la comprobación de la contraseña no revelará si fue el usuario o la contraseña el que era incorrecto.",
-      "ALLOWDOMAINDISCOVERY_DESC": "Si esta opción es seleccionada, el sufijo (@dominio.com) de un nombre de usuario desconocido en la pantalla de inicio de sesión será comprobado contra los dominios de la organización y se redirigirá a la organización en cuestión en caso de éxito.",
       "DEFAULTREDIRECTURI": "URI de redirección por defecto",
-      "DEFAULTREDIRECTURI_DESC": "Define a dónde se redirigirá el usuario si el inicio de sesión ha comenzado sin un contexto de aplicación (p.e desde un email)",
       "ERRORMSGPOPUP": "Mostrar error en diálogo",
       "DISABLEWATERMARK": "Ocultar marca de agua",
       "DISABLEWATERMARK_DESC": "Ocultar la marca de agua Powered by ZITADEL en la interfaz de inicio de sesión"

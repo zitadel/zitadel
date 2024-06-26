@@ -204,7 +204,7 @@ func instancePoliciesEvents(ctx context.Context, instanceID string) []eventstore
 		instance.NewPasswordComplexityPolicyAddedEvent(ctx, &instanceAgg.Aggregate, 8, true, true, true, true),
 		instance.NewPasswordAgePolicyAddedEvent(ctx, &instanceAgg.Aggregate, 0, 0),
 		instance.NewDomainPolicyAddedEvent(ctx, &instanceAgg.Aggregate, false, false, false),
-		instance.NewLoginPolicyAddedEvent(ctx, &instanceAgg.Aggregate, true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240*time.Hour, 240*time.Hour, 720*time.Hour, 18*time.Hour, 12*time.Hour),
+		instance.NewLoginPolicyAddedEvent(ctx, &instanceAgg.Aggregate, true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240*time.Hour, 240*time.Hour, 720*time.Hour, 18*time.Hour, 12*time.Hour, false),
 		instance.NewLoginPolicySecondFactorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecondFactorTypeTOTP),
 		instance.NewLoginPolicySecondFactorAddedEvent(ctx, &instanceAgg.Aggregate, domain.SecondFactorTypeU2F),
 		instance.NewLoginPolicyMultiFactorAddedEvent(ctx, &instanceAgg.Aggregate, domain.MultiFactorTypeU2FWithPIN),
@@ -235,24 +235,25 @@ func instanceSetupPoliciesConfig() *InstanceSetup {
 			SMTPSenderAddressMatchesInstanceDomain bool
 		}{false, false, false},
 		LoginPolicy: struct {
-			AllowUsernamePassword      bool
-			AllowRegister              bool
-			AllowExternalIDP           bool
-			ForceMFA                   bool
-			ForceMFALocalOnly          bool
-			HidePasswordReset          bool
-			IgnoreUnknownUsername      bool
-			AllowDomainDiscovery       bool
-			DisableLoginWithEmail      bool
-			DisableLoginWithPhone      bool
-			PasswordlessType           domain.PasswordlessType
-			DefaultRedirectURI         string
-			PasswordCheckLifetime      time.Duration
-			ExternalLoginCheckLifetime time.Duration
-			MfaInitSkipLifetime        time.Duration
-			SecondFactorCheckLifetime  time.Duration
-			MultiFactorCheckLifetime   time.Duration
-		}{true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240 * time.Hour, 240 * time.Hour, 720 * time.Hour, 18 * time.Hour, 12 * time.Hour},
+			AllowUsernamePassword             bool
+			AllowRegister                     bool
+			AllowExternalIDP                  bool
+			ForceMFA                          bool
+			ForceMFALocalOnly                 bool
+			HidePasswordReset                 bool
+			IgnoreUnknownUsername             bool
+			AllowDomainDiscovery              bool
+			DisableLoginWithEmail             bool
+			DisableLoginWithPhone             bool
+			PasswordlessType                  domain.PasswordlessType
+			DefaultRedirectURI                string
+			PasswordCheckLifetime             time.Duration
+			ExternalLoginCheckLifetime        time.Duration
+			MfaInitSkipLifetime               time.Duration
+			SecondFactorCheckLifetime         time.Duration
+			MultiFactorCheckLifetime          time.Duration
+			UseDefaultUriForNotificationLinks bool
+		}{true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240 * time.Hour, 240 * time.Hour, 720 * time.Hour, 18 * time.Hour, 12 * time.Hour, false},
 		NotificationPolicy: struct {
 			PasswordChange bool
 		}{true},
