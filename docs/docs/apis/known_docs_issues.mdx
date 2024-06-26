@@ -1,0 +1,69 @@
+---
+title: Please Help
+---
+
+This page describes important known issues with our API documentation.
+If you have an idea that helps us fixing them efficiently,
+please file [an issue](https://github.com/zitadel/zitadel/issues/new/choose) or [start a discussion](https://github.com/zitadel/zitadel/discussions/new/choose) on GitHub.
+If you like, a ZITADEL shirt is headed your way once the issue is fixed based on your input :pray:
+
+## Generated Examples for oneOf Fields
+
+The generated examples for mutually exclusive oneOf fields are not correct.
+
+Let's take the [ListUserGrants docs](/docs/apis/resources/mgmt/management-service-list-user-grants) as an example.
+The example suggests that the `queries` field is an array that takes only one single object which in turn takes all the possible queries in its object properties:
+
+```json
+{
+  "query": {
+    "offset": "0",
+    "limit": 100,
+    "asc": true
+  },
+  "queries": [
+    {
+      "projectIdQuery": {
+        "projectId": "69629023906488334"
+      },
+      "userIdQuery": {
+        "userId": "69629023906488334"
+      },
+      "withGrantedQuery": {
+        "withGranted": true
+      }
+    }
+  ]
+}
+```
+
+However, the correct way to represent this is to have the queries as separate items in the queries array:
+
+```json
+{
+  "query": {
+    "offset": "0",
+    "limit": 100,
+    "asc": true
+  },
+  "queries": [
+    {
+      "projectIdQuery": {
+        "projectId": "69629023906488334"
+      }
+    }, {
+      "userIdQuery": {
+        "userId": "69629023906488334"
+      }
+    }, {
+      "withGrantedQuery": {
+        "withGranted": true
+      }
+    }
+  ]
+}
+```
+
+The [protoc grpc-gateway plugin generates OpenAPI v2 files](https://github.com/grpc-ecosystem/grpc-gateway/issues/441) that are used to generate the examples.
+[OpenAPI v3 supports the *oneOf* keyword](https://swagger.io/docs/specification/data-models/oneof-anyof-allof-not/) but OpenAPI v2 doesn't.
+The grpc-gateway plugin therefore just flattens the proto *oneof* fields into the messages properties where they are defined.
