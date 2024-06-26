@@ -21,6 +21,8 @@ var (
 	testdataOidcClientJWT string
 	//go:embed testdata/oidc_client_public.json
 	testdataOidcClientPublic string
+	//go:embed testdata/oidc_client_public_old_id.json
+	testdataOidcClientPublicOldId string
 	//go:embed testdata/oidc_client_secret.json
 	testdataOidcClientSecret string
 	//go:embed testdata/oidc_client_no_settings.json
@@ -97,6 +99,38 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				AppID:                    "236646457053020162",
 				State:                    domain.AppStateActive,
 				ClientID:                 "236646457053085698",
+				HashedSecret:             "",
+				RedirectURIs:             []string{"http://localhost:9999/auth/callback"},
+				ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ApplicationType:          domain.OIDCApplicationTypeWeb,
+				AuthMethodType:           domain.OIDCAuthMethodTypeNone,
+				PostLogoutRedirectURIs:   nil,
+				IsDevMode:                true,
+				AccessTokenType:          domain.OIDCTokenTypeBearer,
+				AccessTokenRoleAssertion: false,
+				IDTokenRoleAssertion:     false,
+				IDTokenUserinfoAssertion: false,
+				ClockSkew:                0,
+				AdditionalOrigins:        nil,
+				PublicKeys:               nil,
+				ProjectID:                "236645808328409090",
+				ProjectRoleAssertion:     true,
+				ProjectRoleKeys:          []string{"role1", "role2"},
+				Settings: &OIDCSettings{
+					AccessTokenLifetime: 43200000000000,
+					IdTokenLifetime:     43200000000000,
+				},
+			},
+		},
+		{
+			name: "public client",
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientPublicOldId}, "instanceID", "clientID", true),
+			want: &OIDCClient{
+				InstanceID:               "230690539048009730",
+				AppID:                    "236646457053020162",
+				State:                    domain.AppStateActive,
+				ClientID:                 "236646457053085698@tests",
 				HashedSecret:             "",
 				RedirectURIs:             []string{"http://localhost:9999/auth/callback"},
 				ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},

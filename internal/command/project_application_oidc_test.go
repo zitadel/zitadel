@@ -244,6 +244,71 @@ func TestAddOIDCApp(t *testing.T) {
 			},
 		},
 		{
+			name: "correct with old ID format",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "clientID@project"),
+			},
+			args: args{
+				app: &addOIDCApp{
+					AddApp: AddApp{
+						Aggregate: *agg,
+						ID:        "id",
+						Name:      "name",
+					},
+					GrantTypes:    []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes: []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					Version:       domain.OIDCVersionV1,
+
+					ApplicationType: domain.OIDCApplicationTypeWeb,
+					AuthMethodType:  domain.OIDCAuthMethodTypeNone,
+					AccessTokenType: domain.OIDCTokenTypeBearer,
+				},
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							project.NewProjectAddedEvent(
+								ctx,
+								&agg.Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						}, nil
+					}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					project.NewApplicationAddedEvent(ctx, &agg.Aggregate,
+						"id",
+						"name",
+					),
+					project.NewOIDCConfigAddedEvent(ctx, &agg.Aggregate,
+						domain.OIDCVersionV1,
+						"id",
+						"clientID@project",
+						"",
+						nil,
+						[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+						[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+						domain.OIDCApplicationTypeWeb,
+						domain.OIDCAuthMethodTypeNone,
+						nil,
+						false,
+						domain.OIDCTokenTypeBearer,
+						false,
+						false,
+						false,
+						0,
+						nil,
+						false,
+					),
+				},
+			},
+		},
+		{
 			name: "with secret",
 			fields: fields{
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "clientID"),

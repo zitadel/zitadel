@@ -286,6 +286,60 @@ func TestCommandSide_AddAPIApplication(t *testing.T) {
 			},
 		},
 		{
+			name: "create api app basic old ID format, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							project.NewProjectAddedEvent(context.Background(),
+								&project.NewAggregate("project1", "org1").Aggregate,
+								"project", true, true, true,
+								domain.PrivateLabelingSettingUnspecified),
+						),
+					),
+					expectPush(
+						project.NewApplicationAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"app",
+						),
+						project.NewAPIConfigAddedEvent(context.Background(),
+							&project.NewAggregate("project1", "org1").Aggregate,
+							"app1",
+							"client1@project1",
+							"secret",
+							domain.APIAuthMethodTypeBasic),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1@project1"),
+			},
+			args: args{
+				ctx: context.Background(),
+				apiApp: &domain.APIApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "project1",
+					},
+					AppName:        "app",
+					AuthMethodType: domain.APIAuthMethodTypeBasic,
+				},
+				resourceOwner: "org1",
+			},
+			res: res{
+				want: &domain.APIApp{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "project1",
+						ResourceOwner: "org1",
+					},
+					AppID:              "app1",
+					AppName:            "app",
+					ClientID:           "client1@project1",
+					ClientSecretString: "secret",
+					AuthMethodType:     domain.APIAuthMethodTypeBasic,
+					State:              domain.AppStateActive,
+				},
+			},
+		},
+		{
 			name: "create api app jwt, ok",
 			fields: fields{
 				eventstore: expectEventstore(
