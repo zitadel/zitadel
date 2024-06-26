@@ -102,7 +102,10 @@ type SecretGeneratorSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) InitEncryptionGenerator(ctx context.Context, generatorType domain.SecretGeneratorType, algorithm crypto.EncryptionAlgorithm) (crypto.Generator, error) {
+func (q *Queries) InitEncryptionGenerator(ctx context.Context, generatorType domain.SecretGeneratorType, algorithm crypto.EncryptionAlgorithm) (_ crypto.Generator, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	generatorConfig, err := q.SecretGeneratorByType(ctx, generatorType)
 	if err != nil {
 		return nil, err

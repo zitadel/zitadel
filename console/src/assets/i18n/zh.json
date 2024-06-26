@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "实例设置",
-        "DESCRIPTION": "实例设置是所有组织的默认设置。有适当的权限，其中一些可以在组织设置中被覆盖。"
+        "TITLE": "默认设置",
+        "DESCRIPTION": "所有组织的默认设置。有了正确的权限，其中一些权限在组织设置中是可以覆盖的。"
       },
       "ORG": {
         "TITLE": "组织设置",
@@ -485,6 +485,8 @@
     "NEXT": "下一页",
     "MORE": "更多",
     "STEP": "步",
+    "SETUP": "设置",
+    "TEST": "测试",
     "UNSAVEDCHANGES": "未保存的更改",
     "UNSAVED": {
       "DIALOG": {
@@ -1315,16 +1317,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "实例设置",
-      "DESCRIPTION": "这些设置将应用于您的所有组织，除非它们已被覆盖。"
-    },
     "LIST": {
       "ORGS": "组织",
       "FEATURESETTINGS": "功能设置",
       "LANGUAGES": "语言",
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
+      "AGE": "密码过期",
       "COMPLEXITY": "密码复杂性",
       "NOTIFICATIONS": "通知设置",
       "SMTP_PROVIDER": "SMTP 提供商",
@@ -1379,7 +1378,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1544,7 +1544,7 @@
     },
     "PWD_AGE": {
       "TITLE": "密码过期",
-      "DESCRIPTION": "您可以设置密码过期策略。此策略会在特定过期时间过后发出警告。"
+      "DESCRIPTION": "您可以设置密码过期策略。此策略将强制用户在密码过期后下次登录时更改密码。没有自动警告和通知。"
     },
     "PWD_LOCKOUT": {
       "TITLE": "锁定策略",
@@ -1607,7 +1607,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1696,8 +1697,8 @@
       "SHOWLOCKOUTFAILURES": "显示锁定失败",
       "MAXPASSWORDATTEMPTS": "密码最大尝试次数",
       "MAXOTPATTEMPTS": "最多尝试 OTP 次数",
-      "EXPIREWARNDAYS": "密码过期警告",
-      "MAXAGEDAYS": "Max Age in days",
+      "EXPIREWARNDAYS": "密码将在几天后过期",
+      "MAXAGEDAYS": "最大有效期 (天)",
       "USERLOGINMUSTBEDOMAIN": "用户名必须包含组织域名",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "如果启用此设置，所有登录名都将以组织域为后缀。如果禁用此设置，您必须确保用户名在所有组织中都是唯一的。",
       "VALIDATEORGDOMAINS": "组织域名验证需要 (DNS 或 HTTP 挑战)",
@@ -2234,6 +2235,7 @@
       "ACTIVATED": "活性",
       "ACTIVATE": "激活提供商",
       "DEACTIVATE": "停用提供商",
+      "TEST": "测试您的提供商",
       "TYPE": "类型",
       "DIALOG": {
         "ACTIVATED": "SMTP 配置已激活",
@@ -2257,7 +2259,6 @@
         "CURRENT_DESC_TITLE": "这些是您的 SMTP 设置",
         "PROVIDER_SETTINGS": "SMTP 提供商设置",
         "SENDER_SETTINGS": "发件人设置",
-        "TEST_SETTINGS": "测试 SMTP 设置",
         "NEXT_STEPS": "下一步",
         "ACTIVATE": {
           "TITLE": "激活您的 SMTP 提供商",
@@ -2266,6 +2267,12 @@
         "DEACTIVATE": {
           "TITLE": "停用您的 SMTP 提供商",
           "DESCRIPTION": "如果您停用此 SMTP 提供程序，Zitadel 将无法使用它发送通知，直到您再次激活它。"
+        },
+        "SAVE_SETTINGS": "保存您的设置",
+        "TEST": {
+          "TITLE": "测试您的设置",
+          "DESCRIPTION": "您可以测试您的 SMTP 提供商设置并在保存之前检查测试结果",
+          "RESULT": "您的电子邮件已成功发送"
         }
       }
     },
@@ -2540,7 +2547,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "添加管理者",

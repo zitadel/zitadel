@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instance Settings",
-        "DESCRIPTION": "The instance settings are the default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
+        "TITLE": "Default Settings",
+        "DESCRIPTION": "Default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
       },
       "ORG": {
         "TITLE": "Organization Settings",
@@ -486,6 +486,7 @@
     "MORE": "more",
     "STEP": "Step",
     "SETUP": "Setup",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Unsaved changes",
     "UNSAVED": {
       "DIALOG": {
@@ -526,7 +527,7 @@
       "TEXT": "All organization settings and tables in console are based on a selected organization. Click this button to switch organization or create a new one."
     },
     "INSTANCE": {
-      "TEXT": "Click here to get to the instance settings. Note that you have only access to this button if you have enhanced permissions."
+      "TEXT": "Click here to get to the default settings. Note that you have only access to this button if you have enhanced permissions."
     },
     "PROFILE": {
       "TEXT": "Here you can switch between your user accounts and manage your sessions and profile."
@@ -1316,16 +1317,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instance Settings",
-      "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
-    },
     "LIST": {
       "ORGS": "Organizations",
       "FEATURESETTINGS": "Features",
       "LANGUAGES": "Languages",
       "LOGIN": "Login Behavior and Security",
       "LOCKOUT": "Lockout",
+      "AGE": "Password expiry",
       "COMPLEXITY": "Password complexity",
       "NOTIFICATIONS": "Notifications",
       "SMTP_PROVIDER": "SMTP Provider",
@@ -1380,7 +1378,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1545,8 +1544,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Password Aging",
-      "DESCRIPTION": "You can set a policy for the aging of passwords. This policy emits a warning after the specific aging time has elapsed."
+      "TITLE": "Password Expiry",
+      "DESCRIPTION": "You can set a policy for the expiry of passwords. This policy will force the user to change the password on the next login after the expiration. There are no automatic warnings and notifications."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Lockout Policy",
@@ -1609,7 +1608,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email verification done",
@@ -1698,8 +1698,8 @@
       "SHOWLOCKOUTFAILURES": "show lockout failures",
       "MAXPASSWORDATTEMPTS": "Password maximum attempts",
       "MAXOTPATTEMPTS": "OTP maximum attempts",
-      "EXPIREWARNDAYS": "Expiration Warning after day",
-      "MAXAGEDAYS": "Max Age in days",
+      "EXPIREWARNDAYS": "Expiration Warning after days",
+      "MAXAGEDAYS": "Maximum validity in days",
       "USERLOGINMUSTBEDOMAIN": "Add organization domain as suffix to loginnames",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "If you enable this setting, all loginnames will be suffixed with the organization domain. If this settings is disabled, you have to ensure that usernames are unique over all organizations.",
       "VALIDATEORGDOMAINS": "Organization domain verification required (DNS or HTTP challenge)",
@@ -2256,6 +2256,7 @@
       "ACTIVATED": "Activated",
       "ACTIVATE": "Activate provider",
       "DEACTIVATE": "Deactivate provider",
+      "TEST": "Test your provider",
       "TYPE": "Type",
       "DIALOG": {
         "ACTIVATED": "SMTP config has been activated",
@@ -2267,7 +2268,11 @@
         "DELETE_TITLE": "Delete SMTP config",
         "DELETE_DESCRIPTION": "You are about to delete a configuration. Confirm this action typing the sender name",
         "DELETED": "SMTP config has been deleted",
-        "SENDER": "Type {{value}}, to delete this SMTP configuration."
+        "SENDER": "Type {{value}}, to delete this SMTP configuration.",
+        "TEST_TITLE": "Test your SMTP config",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result"
       }
     },
     "CREATE": {
@@ -2279,7 +2284,6 @@
         "CURRENT_DESC_TITLE": "These are your SMTP settings",
         "PROVIDER_SETTINGS": "SMTP Provider Settings",
         "SENDER_SETTINGS": "Sender Settings",
-        "TEST_SETTINGS": "Test SMTP Settings",
         "NEXT_STEPS": "Next Steps",
         "ACTIVATE": {
           "TITLE": "Activate your SMTP Provider",
@@ -2288,6 +2292,12 @@
         "DEACTIVATE": {
           "TITLE": "Deactivate your SMTP Provider",
           "DESCRIPTION": "If you deactivate this SMTP Provider, ZITADEL cannot use it to send notifications until you activate it again."
+        },
+        "SAVE_SETTINGS": "Save your settings",
+        "TEST": {
+          "TITLE": "Test your settings",
+          "DESCRIPTION": "You can test your SMTP provider settings and check the test result before saving them",
+          "RESULT": "Your email was succesfully sent"
         }
       }
     },
@@ -2562,7 +2572,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Add a Manager",

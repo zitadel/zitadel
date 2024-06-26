@@ -75,6 +75,7 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		Audience:         audience,
 		NeedRefreshToken: slices.Contains(scope, oidc.ScopeOfflineAccess),
 		ResponseType:     ResponseTypeToBusiness(req.ResponseType),
+		ResponseMode:     ResponseModeToBusiness(req.ResponseMode),
 		CodeChallenge:    CodeChallengeToBusiness(req.CodeChallenge, req.CodeChallengeMethod),
 		Prompt:           PromptToBusiness(req.Prompt),
 		UILocales:        UILocalesToBusiness(req.UILocales),

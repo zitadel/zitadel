@@ -35,7 +35,22 @@ func (s *Server) GetPasswordComplexitySettings(ctx context.Context, req *setting
 		return nil, err
 	}
 	return &settings.GetPasswordComplexitySettingsResponse{
-		Settings: passwordSettingsToPb(current),
+		Settings: passwordComplexitySettingsToPb(current),
+		Details: &object_pb.Details{
+			Sequence:      current.Sequence,
+			ChangeDate:    timestamppb.New(current.ChangeDate),
+			ResourceOwner: current.ResourceOwner,
+		},
+	}, nil
+}
+
+func (s *Server) GetPasswordExpirySettings(ctx context.Context, req *settings.GetPasswordExpirySettingsRequest) (*settings.GetPasswordExpirySettingsResponse, error) {
+	current, err := s.query.PasswordAgePolicyByOrg(ctx, true, object.ResourceOwnerFromReq(ctx, req.GetCtx()), false)
+	if err != nil {
+		return nil, err
+	}
+	return &settings.GetPasswordExpirySettingsResponse{
+		Settings: passwordExpirySettingsToPb(current),
 		Details: &object_pb.Details{
 			Sequence:      current.Sequence,
 			ChangeDate:    timestamppb.New(current.ChangeDate),

@@ -683,6 +683,7 @@ type passwordData struct {
 	HasLowercase string
 	HasNumber    string
 	HasSymbol    string
+	Expired      bool
 }
 
 type userSelectionData struct {

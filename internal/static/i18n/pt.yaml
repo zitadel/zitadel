@@ -53,11 +53,24 @@ Errors:
     NotFound: Configuração de SMS não encontrada
     AlreadyActive: Configuração de SMS já está ativa
     AlreadyDeactivated: Configuração de SMS já está desativada
+  SMTP:
+    NotEmailMessage: a mensagem não é EmailMessage
+    RequiredAttributes: assunto, destinatários e conteúdo devem ser definidos, mas alguns ou todos eles estão vazios
+    CouldNotSplit: não foi possível dividir o host e a porta para conectar ao smtp
+    CouldNotDial: não foi possível entrar em contato com o servidor SMTP, verificar a porta, problemas de firewall...
+    CouldNotDialTLS: não foi possível entrar em contato com o servidor SMTP usando TLS, verifique a porta, problemas de firewall...
+    CouldNotCreateClient: não foi possível criar o cliente smtp
+    CouldNotStartTLS: não foi possível iniciar o tls
+    CouldNotAuth: não foi possível adicionar autenticação smtp, verifique se seu usuário e senha estão corretos, se estiverem corretos, talvez seu provedor exija um método de autenticação não suportado pelo ZITADEL
+    CouldNotSetSender: não foi possível definir o remetente
+    CouldNotSetRecipient: não foi possível definir o destinatário
   SMTPConfig:
+    TestPassword: Senha para teste não encontrada
     NotFound: Configuração de SMTP não encontrada
     AlreadyExists: Configuração de SMTP já existe
     AlreadyDeactivated: Configuração SMTP já desativada
     SenderAdressNotCustomDomain: O endereço do remetente deve ser configurado como um domínio personalizado na instância.
+    TestEmailNotFound: Endereço de e-mail para teste não encontrado
   Notification:
     NoDomain: Nenhum domínio encontrado para a mensagem
   User:

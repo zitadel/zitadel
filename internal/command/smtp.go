@@ -285,6 +285,89 @@ func (c *Commands) RemoveSMTPConfig(ctx context.Context, instanceID, id string) 
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
+func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email string, config *smtp.Config) error {
+	password := config.SMTP.Password
+
+	if email == "" {
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-p9uy", "Errors.SMTPConfig.TestEmailNotFound")
+	}
+
+	if id == "" && password == "" {
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-p9kj", "Errors.SMTPConfig.TestPassword")
+	}
+
+	// If the password is not sent it'd mean that the password hasn't been changed for
+	// the stored configuration identified by its id so we can try to retrieve it
+	if id != "" && password == "" {
+		smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+		if err != nil {
+			return err
+		}
+		if !smtpConfigWriteModel.State.Exists() {
+			return zerrors.ThrowNotFound(nil, "SMTP-p9cc", "Errors.SMTPConfig.NotFound")
+		}
+
+		password, err = crypto.DecryptString(smtpConfigWriteModel.Password, c.smtpEncryption)
+		if err != nil {
+			return err
+		}
+	}
+
+	config.SMTP.Password = password
+
+	// Try to send an email
+	err := smtp.TestConfiguration(config, email)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Commands) TestSMTPConfigById(ctx context.Context, instanceID, id, email string) error {
+	if id == "" {
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-99oki", "Errors.IDMissing")
+	}
+
+	if email == "" {
+		return zerrors.ThrowInvalidArgument(nil, "SMTP-99yth", "Errors.SMTPConfig.TestEmailNotFound")
+	}
+
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+	if err != nil {
+		return err
+	}
+
+	if !smtpConfigWriteModel.State.Exists() {
+		return zerrors.ThrowNotFound(nil, "SMTP-99klw", "Errors.SMTPConfig.NotFound")
+	}
+
+	password, err := crypto.DecryptString(smtpConfigWriteModel.Password, c.smtpEncryption)
+	if err != nil {
+		return err
+	}
+
+	smtpConfig := &smtp.Config{
+		Description: smtpConfigWriteModel.Description,
+		Tls:         smtpConfigWriteModel.TLS,
+		From:        smtpConfigWriteModel.SenderAddress,
+		FromName:    smtpConfigWriteModel.SenderName,
+		SMTP: smtp.SMTP{
+			Host:     smtpConfigWriteModel.Host,
+			User:     smtpConfigWriteModel.User,
+			Password: password,
+		},
+	}
+
+	// Try to send an email
+	err = smtp.TestConfiguration(smtpConfig, email)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func checkSenderAddress(writeModel *IAMSMTPConfigWriteModel) error {
 	if !writeModel.smtpSenderAddressMatchesInstanceDomain {
 		return nil

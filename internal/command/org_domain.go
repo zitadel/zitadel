@@ -14,6 +14,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -22,7 +23,10 @@ func (c *Commands) prepareAddOrgDomain(a *org.Aggregate, addDomain string, userI
 		if addDomain = strings.TrimSpace(addDomain); addDomain == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument")
 		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
+			ctx, span := tracing.NewSpan(ctx)
+			defer func() { span.EndWithError(err) }()
+
 			existing, err := orgDomain(ctx, filter, a.ID, addDomain)
 			if err != nil && !errors.Is(err, zerrors.ThrowNotFound(nil, "", "")) {
 				return nil, err
@@ -101,7 +105,10 @@ func orgDomain(ctx context.Context, filter preparation.FilterToQueryReducer, org
 	return wm, nil
 }
 
-func (c *Commands) VerifyOrgDomain(ctx context.Context, orgID, domain string) (*domain.ObjectDetails, error) {
+func (c *Commands) VerifyOrgDomain(ctx context.Context, orgID, domain string) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgAgg := org.NewAggregate(orgID)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, verifyOrgDomain(orgAgg, domain))
 	if err != nil {
@@ -114,7 +121,10 @@ func (c *Commands) VerifyOrgDomain(ctx context.Context, orgID, domain string) (*
 	return pushedEventsToObjectDetails(pushedEvents), nil
 }
 
-func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claimedUserIDs []string) (*domain.ObjectDetails, error) {
+func (c *Commands) AddOrgDomain(ctx context.Context, orgID, domain string, claimedUserIDs []string) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgAgg := org.NewAggregate(orgID)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, c.prepareAddOrgDomain(orgAgg, domain, claimedUserIDs))
 	if err != nil {
@@ -220,7 +230,10 @@ func (c *Commands) ValidateOrgDomain(ctx context.Context, orgDomain *domain.OrgD
 	return nil, err
 }
 
-func (c *Commands) SetPrimaryOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain) (*domain.ObjectDetails, error) {
+func (c *Commands) SetPrimaryOrgDomain(ctx context.Context, orgDomain *domain.OrgDomain) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if orgDomain == nil || !orgDomain.IsValid() || orgDomain.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-SsDG2", "Errors.Org.InvalidDomain")
 	}
@@ -366,9 +379,12 @@ func (c *Commands) removeCustomDomains(ctx context.Context, orgID string) ([]eve
 	return events, nil
 }
 
-func (c *Commands) getOrgDomainWriteModel(ctx context.Context, orgID, domain string) (*OrgDomainWriteModel, error) {
+func (c *Commands) getOrgDomainWriteModel(ctx context.Context, orgID, domain string) (_ *OrgDomainWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	domainWriteModel := NewOrgDomainWriteModel(orgID, domain)
-	err := c.eventstore.FilterToQueryReducer(ctx, domainWriteModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, domainWriteModel)
 	if err != nil {
 		return nil, err
 	}

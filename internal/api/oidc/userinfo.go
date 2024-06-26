@@ -104,7 +104,8 @@ func (s *Server) userInfo(
 			defer func() { span.EndWithError(err) }()
 
 			roleAudience, requestedRoles = prepareRoles(ctx, scope, projectID, projectRoleAssertion, currentProjectOnly)
-			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience)
+			roleOrgIDs := domain.RoleOrgIDsFromScope(scope)
+			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience, roleOrgIDs...)
 			if err != nil {
 				return
 			}

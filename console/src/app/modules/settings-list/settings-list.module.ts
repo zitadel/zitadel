@@ -16,6 +16,7 @@ import { NotificationPolicyModule } from '../policies/notification-policy/notifi
 import { NotificationSMSProviderModule } from '../policies/notification-sms-provider/notification-sms-provider.module';
 import { OIDCConfigurationModule } from '../policies/oidc-configuration/oidc-configuration.module';
 import { PasswordComplexityPolicyModule } from '../policies/password-complexity-policy/password-complexity-policy.module';
+import { PasswordAgePolicyModule } from '../policies/password-age-policy/password-age-policy.module';
 import { PasswordLockoutPolicyModule } from '../policies/password-lockout-policy/password-lockout-policy.module';
 import { PrivacyPolicyModule } from '../policies/privacy-policy/privacy-policy.module';
 import { PrivateLabelingPolicyModule } from '../policies/private-labeling-policy/private-labeling-policy.module';
@@ -40,6 +41,7 @@ import OrgListModule from 'src/app/pages/org-list/org-list.module';
     LoginPolicyModule,
     CardModule,
     PasswordComplexityPolicyModule,
+    PasswordAgePolicyModule,
     PasswordLockoutPolicyModule,
     PrivateLabelingPolicyModule,
     LanguageSettingsModule,

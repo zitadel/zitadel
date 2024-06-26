@@ -480,11 +480,12 @@ SystemDefaults:
     #
     # Supported verifiers: (uncomment to enable)
     Verifiers: # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_VERIFIERS
-    #   - "argon2" # verifier for both argon2i and argon2id.
+    #   - "argon2"   # verifier for both argon2i and argon2id.
     #   - "bcrypt"
-    #   - "md5"
+    #   - "md5"      # md5Crypt with salt and password shuffling.
+    #   - "md5plain" # md5 digest of a password without salt
     #   - "scrypt"
-    #   - "pbkdf2" # verifier for all pbkdf2 hash modes.
+    #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
   SecretHasher:
     # Set hasher configuration for machine users, API and OIDC client secrets.
     Hasher:

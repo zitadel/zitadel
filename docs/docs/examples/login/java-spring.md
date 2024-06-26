@@ -162,7 +162,7 @@ java \
   -jar web/target/web-0.0.2-SNAPSHOT.jar
 ```
 
-If you then visit on <http://localhost:18080/webapp> you should directly be redirected to your ZITADEL instance.
+If you then visit on [http://localhost:18080/webapp](http://localhost:18080/webapp) you should directly be redirected to your ZITADEL instance.
 After login with your existing user you will be presented the profile page:
 
 ![Profile Page](/img/java-spring/app-profile.png)

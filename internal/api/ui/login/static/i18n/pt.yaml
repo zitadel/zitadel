@@ -186,6 +186,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Alterar senha
   Description: Altere sua senha. Insira sua senha antiga e nova.
+  ExpiredDescription: A sua palavra-passe expirou e tem de ser alterada. Insira sua senha antiga e nova.
   OldPasswordLabel: Senha antiga
   NewPasswordLabel: Nova senha
   NewPasswordConfirmLabel: Confirmação de senha
@@ -247,6 +248,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -286,6 +288,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -359,6 +362,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: Autorização de dispositivo

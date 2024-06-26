@@ -53,11 +53,24 @@ Errors:
     NotFound: SMS構成が見つかりません
     AlreadyActive: このSMS構成はすでにアクティブです
     AlreadyDeactivated: このSMS構成はすでに非アクティブです
+  SMTP:
+    NotEmailMessage: メッセージは EmailMessage ではありません
+    RequiredAttributes: 件名、受信者、コンテンツを設定する必要がありますが、一部またはすべてが空です
+    CouldNotSplit: smtp に接続するためにホストとポートを分割できませんでした
+    CouldNotDial: SMTP サーバーに接続できませんでした。ポート、ファイアウォールの問題を確認してください...
+    CouldNotDialTLS: TLS を使用して SMTP サーバーに接続できませんでした。ポート、ファイアウォールの問題を確認してください...
+    CouldNotCreateClient: SMTPクライアントを作成できませんでした
+    CouldNotStartTLS: TLSを開始できませんでした
+    CouldNotAuth: smtp 認証を追加できませんでした。ユーザーとパスワードの両方が正しいかどうかを確認してください。正しい場合は、プロバイダーが ZITADEL でサポートされていない認証方法を必要としている可能性があります。
+    CouldNotSetSender: 送信者を設定できませんでした
+    CouldNotSetRecipient: 受信者を設定できませんでした
   SMTPConfig:
+    TestPassword: テスト用のパスワードが見つかりません
     NotFound: SMTP構成が見つかりません
     AlreadyExists: すでに存在するSMTP構成です
     AlreadyDeactivated: SMTP設定はすでに無効化されています
     SenderAdressNotCustomDomain: 送信者アドレスは、インスタンスのカスタムドメインとして構成する必要があります。
+    TestEmailNotFound: テスト用のメールアドレスが見つかりません
   Notification:
     NoDomain: メッセージのドメインが見つかりません
   User:

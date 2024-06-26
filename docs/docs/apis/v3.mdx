@@ -2,35 +2,35 @@
 title: APIs V3 (Preview)
 ---
 
-import DocCardList from '@theme/DocCardList';
-import CodeBlock from '@theme/CodeBlock';
-import ActionServiceProto from '!!raw-loader!./_v3_action_service.proto'
-import ActionExecutionProto from '!!raw-loader!./_v3_action_execution.proto'
-import ActionTargetProto from '!!raw-loader!./_v3_action_target.proto'
-import ActionSearchProto from '!!raw-loader!./_v3_action_search.proto'
-import IDPServiceProto from '!!raw-loader!./_v3_idp_service.proto'
-import IDPProto from '!!raw-loader!./_v3_idp.proto'
-import IDPSearchProto from '!!raw-loader!./_v3_idp_search.proto'
-import IDPGitLabProto from '!!raw-loader!./_v3_idp_gitlab.proto'
-import LanguageServiceProto from '!!raw-loader!./_v3_language_service.proto'
-import LanguageProto from '!!raw-loader!./_v3_language.proto'
-import ObjectProto from '!!raw-loader!./_v3_object.proto'
-import ResourceObjectProto from '!!raw-loader!./_v3_resource_object.proto'
-import SettingsObjectProto from '!!raw-loader!./_v3_settings_object.proto'
+import DocCardList from "@theme/DocCardList";
+import CodeBlock from "@theme/CodeBlock";
+import ActionServiceProto from "!!raw-loader!./_v3_action_service.proto";
+import ActionExecutionProto from "!!raw-loader!./_v3_action_execution.proto";
+import ActionTargetProto from "!!raw-loader!./_v3_action_target.proto";
+import ActionSearchProto from "!!raw-loader!./_v3_action_search.proto";
+import IDPServiceProto from "!!raw-loader!./_v3_idp_service.proto";
+import IDPProto from "!!raw-loader!./_v3_idp.proto";
+import IDPSearchProto from "!!raw-loader!./_v3_idp_search.proto";
+import IDPGitLabProto from "!!raw-loader!./_v3_idp_gitlab.proto";
+import LanguageServiceProto from "!!raw-loader!./_v3_language_service.proto";
+import LanguageProto from "!!raw-loader!./_v3_language.proto";
+import ObjectProto from "!!raw-loader!./_v3_object.proto";
+import ResourceObjectProto from "!!raw-loader!./_v3_resource_object.proto";
+import SettingsObjectProto from "!!raw-loader!./_v3_settings_object.proto";
 
-The APIs described in this section are currently either in *Preview* stage or not implemented, yet.
+The APIs described in this section are currently either in _Preview_ stage or not implemented, yet.
 Before using these APIs, pleases consider the [API release policy below](#api-release-policy)
 
 ## We Appreciate your Help
 
 We invite you to...
-- ... join [the next office hours](https://zitadel.com/office-hours?event=1248016231936692274) and discuss the new API with us in person.
-- ... share your thoughts about the concepts [by opening discussions on GitHub](https://github.com/zitadel/zitadel/discussions/new/choose).
+
+- ... [discuss the concept with the ZITADEL community on GitHub](https://github.com/zitadel/zitadel/discussions/8125).
 - ... try the implementations and provide feedback [by filing issues on GitHub](https://github.com/zitadel/zitadel/issues/new/choose).
 
 ## The Ideas behind the New V3 APIs
 
-The current ZITADEL *GA* APIs are structured around contexts like System, Admin, Management, and Auth.
+The current ZITADEL _GA_ APIs are structured around contexts like System, Admin, Management, and Auth.
 This structure leads to duplicate methods and makes it hard to find the right API for the right task.
 Especially interacting with resources from multiple organizations is cumbersome.
 Also, the APIs evolved over time, which lead to inconsistencies and a lack of flexibility in development.
@@ -54,7 +54,7 @@ Also, it allows for faster development and independent versioning of the APIs.
 
 To improve managing and reusing resources and settings in multitenancy scenarios, we define some rules for the new APIs:
 
-- Single properties from instance settings are overridable (patchable) in organizations.
+- Single properties from default settings are overridable (patchable) in organizations.
 - Some settings support user-defined custom properties that are also overridable in organizations.
 - Improved experience with reusing resources in multiple organizations and instances.
 - Resources are searchable over all organizations with a single call by default.
@@ -62,6 +62,7 @@ To improve managing and reusing resources and settings in multitenancy scenarios
 ### HTTP and gRPC Consistency
 
 To make the APIs more consistent and easier to use, we follow the same patterns in all Proto files.
+
 - Patching is favored over updating resources and settings.
 - HTTP calls are mapped so that query parameters can be used as much as possible. We avoid the annotation `body: "*"`.
 - For search performance, we enforce query limits.
@@ -94,20 +95,20 @@ Reusable resources have the same behavior as standard resources with the followi
 
 - Reusable resources can be created in a given context level (system, instance, org).
 - For requests, that require a resource ID, no request context is needed.
-- Reusable resources are available in child contexts, even if their state is *inactive*.
+- Reusable resources are available in child contexts, even if their state is _inactive_.
 - The child context can control if an inherited resource should be active or inactive for itself using a state policy.
-- In child contexts, the state policy of a reused resource is *inherit* by default and can be changed to *activate*, *deactivate* or back to *inherit*.
+- In child contexts, the state policy of a reused resource is _inherit_ by default and can be changed to _activate_, _deactivate_ or back to _inherit_.
 - In child contexts, a reused resources configuration is read-only.
 - Child contexts can read at least the following properties of reused resources:
-    - ID
-    - name
-    - description
-    - state
-    - the state policy in the child context
-    - sequence
-    - last changed date
-    - parent context
-    - state in the immediate parent context.
+  - ID
+  - name
+  - description
+  - state
+  - the state policy in the child context
+  - sequence
+  - last changed date
+  - parent context
+  - state in the immediate parent context.
 - By default, search queries for reused resources return all resources from the given contexts, all inherited resources and all resources defined in all children contexts.
 
 Typically, a new resource is first designed and implemented as a non-reusable resource.
@@ -135,21 +136,21 @@ Additional to the standard CRUD methods:
 - ListAvailableExecutionMethods
 - ListAvailableExecutionFunctions
 
-<details><summary>action_service.proto</summary>
-    <CodeBlock language="protobuf">{ActionServiceProto}</CodeBlock>
-</details>
+\<details><summary>action_service.proto</summary>
+<CodeBlock language="protobuf">{ActionServiceProto}</CodeBlock>
+\</details>
 
-<details><summary>action_target.proto</summary>
-    <CodeBlock language="protobuf">{ActionTargetProto}</CodeBlock>
-</details>
+\<details><summary>action_target.proto</summary>
+<CodeBlock language="protobuf">{ActionTargetProto}</CodeBlock>
+\</details>
 
-<details><summary>action_execution.proto</summary>
-    <CodeBlock language="protobuf">{ActionExecutionProto}</CodeBlock>
-</details>
+\<details><summary>action_execution.proto</summary>
+<CodeBlock language="protobuf">{ActionExecutionProto}</CodeBlock>
+\</details>
 
-<details><summary>action_query.proto</summary>
-    <CodeBlock language="protobuf">{ActionSearchProto}</CodeBlock>
-</details>
+\<details><summary>action_query.proto</summary>
+<CodeBlock language="protobuf">{ActionSearchProto}</CodeBlock>
+\</details>
 
 ### ZITADELUsers
 
@@ -164,29 +165,29 @@ Standard CRUD methods
 - Standard CRUD and methods for all IDPs
 - Resources have additional properties for reusability capabilities.
 
-<details><summary>idp_service.proto</summary>
-    <CodeBlock language="protobuf">{IDPServiceProto}</CodeBlock>
-</details>
+\<details><summary>idp_service.proto</summary>
+<CodeBlock language="protobuf">{IDPServiceProto}</CodeBlock>
+\</details>
 
-<details><summary>idp.proto</summary>
-    <CodeBlock language="protobuf">{IDPProto}</CodeBlock>
-</details>
+\<details><summary>idp.proto</summary>
+<CodeBlock language="protobuf">{IDPProto}</CodeBlock>
+\</details>
 
-<details><summary>idp_search.proto</summary>
-    <CodeBlock language="protobuf">{IDPSearchProto}</CodeBlock>
-</details>
+\<details><summary>idp_search.proto</summary>
+<CodeBlock language="protobuf">{IDPSearchProto}</CodeBlock>
+\</details>
 
-<details><summary>idp_gitlab.proto</summary>
-    <CodeBlock language="protobuf">{IDPGitLabProto}</CodeBlock>
-</details>
+\<details><summary>idp_gitlab.proto</summary>
+<CodeBlock language="protobuf">{IDPGitLabProto}</CodeBlock>
+\</details>
 
-<details><summary>object.proto</summary>
-    <CodeBlock language="protobuf">{ObjectProto}</CodeBlock>
-</details>
+\<details><summary>object.proto</summary>
+<CodeBlock language="protobuf">{ObjectProto}</CodeBlock>
+\</details>
 
-<details><summary>resource_object.proto</summary>
-    <CodeBlock language="protobuf">{ResourceObjectProto}</CodeBlock>
-</details>
+\<details><summary>resource_object.proto</summary>
+<CodeBlock language="protobuf">{ResourceObjectProto}</CodeBlock>
+\</details>
 
 ### ZITADELInstances
 
@@ -253,7 +254,7 @@ These properties are inherited to from parent-contexts (instance) to child-conte
 
 Settings behave like this:
 
-- Setting and retrieving settings is always context-aware. By default, the context is the instance discovered by the requests *Host* header.
+- Setting and retrieving settings is always context-aware. By default, the context is the instance discovered by the requests _Host_ header.
 - All settings properties can be partially overridden in child-contexts.
 - All settings properties can be partially reset in child-contexts, so their values default to the parent contexts property values.
 - All settings properties returned by queries contain the value and if it is inherited, the context where it is inherited from.
@@ -266,21 +267,21 @@ For a full proto example, have a look at the [ZITADELLanguageSettings service](#
 
 Default language, restricted languages, supported languages
 
-<details><summary>language_service.proto</summary>
-    <CodeBlock language="protobuf">{LanguageServiceProto}</CodeBlock>
-</details>
+\<details><summary>language_service.proto</summary>
+<CodeBlock language="protobuf">{LanguageServiceProto}</CodeBlock>
+\</details>
 
-<details><summary>language.proto</summary>
-    <CodeBlock language="protobuf">{LanguageProto}</CodeBlock>
-</details>
+\<details><summary>language.proto</summary>
+<CodeBlock language="protobuf">{LanguageProto}</CodeBlock>
+\</details>
 
-<details><summary>object.proto</summary>
-    <CodeBlock language="protobuf">{ObjectProto}</CodeBlock>
-</details>
+\<details><summary>object.proto</summary>
+<CodeBlock language="protobuf">{ObjectProto}</CodeBlock>
+\</details>
 
-<details><summary>settings_object.proto</summary>
-    <CodeBlock language="protobuf">{SettingsObjectProto}</CodeBlock>
-</details>
+\<details><summary>settings_object.proto</summary>
+<CodeBlock language="protobuf">{SettingsObjectProto}</CodeBlock>
+\</details>
 
 ### ZITADELTextSettings
 
@@ -327,9 +328,9 @@ Replaces secret generators
 ## API Release Policy
 
 - Defined but not yet implemented APIs are subject to change without further notice.
-- Once an API definition is implemented, it is released as *Preview* and is available for testing.
-- When a *Preview* API is tested enough so the concepts are proven to work, a new *Beta* API is released.
-- When an API is feature-complete and stable enough, a new *GA* (General Availability) API is released.
+- Once an API definition is implemented, it is released as _Preview_ and is available for testing.
+- When a _Preview_ API is tested enough so the concepts are proven to work, a new _Beta_ API is released.
+- When an API is feature-complete and stable enough, a new _GA_ (General Availability) API is released.
 - In all stages, changes to already implemented APIs are done in a backwards-compatible way, if possible.
 - When we release a new stage for an API, we deprecate the previous stage and keep it available for a smooth transition.
 

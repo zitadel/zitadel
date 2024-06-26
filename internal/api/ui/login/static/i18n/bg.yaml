@@ -193,6 +193,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Промяна на паролата
   Description: 'Променете паролата си. '
+  ExpiredDescription: Паролата ви е изтекла и трябва да бъде променена. Въведете старата и новата си парола.
   OldPasswordLabel: Стара парола
   NewPasswordLabel: нова парола
   NewPasswordConfirmLabel: Потвърждение на парола
@@ -248,6 +249,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -286,6 +288,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -353,6 +356,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:
