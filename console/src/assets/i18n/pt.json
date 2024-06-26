@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Configurações da Instância",
-        "DESCRIPTION": "As configurações da instância são as configurações padrão para todas as organizações. Com as permissões corretas, algumas delas podem ser sobrescritas nas configurações da organização."
+        "TITLE": "Configurações padrão",
+        "DESCRIPTION": "Configurações padrão para todas as organizações. Com as permissões corretas, algumas delas podem ser substituídas nas configurações da organização."
       },
       "ORG": {
         "TITLE": "Configurações da Organização",
@@ -1318,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Configurações da Instância",
-      "DESCRIPTION": "Essas configurações serão aplicadas a todas as suas organizações, a menos que tenham sido substituídas."
-    },
     "LIST": {
       "ORGS": "Organizações",
       "FEATURESETTINGS": "Configurações de Recursos",

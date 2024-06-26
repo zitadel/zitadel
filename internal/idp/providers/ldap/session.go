@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-ldap/ldap/v3"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -172,12 +173,14 @@ func trySearchAndUserBind(
 		return nil, err
 	}
 	if len(sr.Entries) != 1 {
+		logging.WithFields("entries", len(sr.Entries)).Info("ldap: no single user found")
 		return nil, ErrNoSingleUser
 	}
 
 	user := sr.Entries[0]
 	// Bind as the user to verify their password
 	if err = conn.Bind(user.DN, password); err != nil {
+		logging.WithFields("userDN", user.DN).WithError(err).Info("ldap user bind failed")
 		return nil, ErrFailedLogin
 	}
 	return user, nil
