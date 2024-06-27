@@ -9,8 +9,15 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func (notify Notify) SendPasswordChange(ctx context.Context, user *query.NotifyUser) error {
-	url := console.LoginHintLink(http_utils.ComposedOrigin(ctx), user.PreferredLoginName)
+func (notify Notify) SendPasswordChange(ctx context.Context, user *query.NotifyUser, loginPolicy *query.LoginPolicy) error {
+	var url string
+
+	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultUriForNotificationLinks {
+		url = loginPolicy.DefaultRedirectURI
+	} else {
+		url = console.LoginHintLink(http_utils.ComposedOrigin(ctx), user.PreferredLoginName)
+	}
+
 	args := make(map[string]interface{})
 	return notify(url, args, domain.PasswordChangeMessageType, true)
 }

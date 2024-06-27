@@ -159,7 +159,13 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 		if err != nil {
 			return err
 		}
+
 		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.InitCodeMessageType)
+		if err != nil {
+			return err
+		}
+
+		loginPolicy, err := u.queries.LoginPolicyByID(ctx, true, e.Aggregate().ResourceOwner, false)
 		if err != nil {
 			return err
 		}
@@ -169,7 +175,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 			return err
 		}
 		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
-			SendUserInitCode(ctx, notifyUser, code, e.AuthRequestID)
+			SendUserInitCode(ctx, notifyUser, code, e.AuthRequestID, loginPolicy)
 		if err != nil {
 			return err
 		}
@@ -216,7 +222,13 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 		if err != nil {
 			return err
 		}
+
 		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.VerifyEmailMessageType)
+		if err != nil {
+			return err
+		}
+
+		loginPolicy, err := u.queries.LoginPolicyByID(ctx, true, e.Aggregate().ResourceOwner, false)
 		if err != nil {
 			return err
 		}
@@ -226,7 +238,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
-			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
+			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID, loginPolicy)
 		if err != nil {
 			return err
 		}
@@ -272,7 +284,13 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if err != nil {
 			return err
 		}
+
 		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.PasswordResetMessageType)
+		if err != nil {
+			return err
+		}
+
+		loginPolicy, err := u.queries.LoginPolicyByID(ctx, true, e.Aggregate().ResourceOwner, false)
 		if err != nil {
 			return err
 		}
@@ -285,7 +303,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if e.NotificationType == domain.NotificationTypeSms {
 			notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
 		}
-		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
+		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID, loginPolicy)
 		if err != nil {
 			return err
 		}
@@ -487,6 +505,10 @@ func (u *userNotifier) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
+	loginPolicy, err := u.queries.LoginPolicyByID(ctx, true, event.Aggregate().ResourceOwner, false)
+	if err != nil {
+		return nil, err
+	}
 	ctx, err = u.queries.Origin(ctx, event)
 	if err != nil {
 		return nil, err
@@ -494,6 +516,9 @@ func (u *userNotifier) reduceOTPEmail(
 	url, err := urlTmpl(plainCode, http_util.ComposedOrigin(ctx), notifyUser)
 	if err != nil {
 		return nil, err
+	}
+	if loginPolicy.UseDefaultUriForNotificationLinks {
+		url = loginPolicy.DefaultRedirectURI
 	}
 	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event)
 	err = notify.SendOTPEmailCode(ctx, url, plainCode, expiry)
@@ -536,7 +561,13 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 		if err != nil {
 			return err
 		}
+
 		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.DomainClaimedMessageType)
+		if err != nil {
+			return err
+		}
+
+		loginPolicy, err := u.queries.LoginPolicyByID(ctx, true, e.Aggregate().ResourceOwner, false)
 		if err != nil {
 			return err
 		}
@@ -546,7 +577,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 			return err
 		}
 		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
-			SendDomainClaimed(ctx, notifyUser, e.UserName)
+			SendDomainClaimed(ctx, notifyUser, e.UserName, loginPolicy)
 		if err != nil {
 			return err
 		}
@@ -590,7 +621,13 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 		if err != nil {
 			return err
 		}
+
 		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.PasswordlessRegistrationMessageType)
+		if err != nil {
+			return err
+		}
+
+		loginPolicy, err := u.queries.LoginPolicyByID(ctx, true, e.Aggregate().ResourceOwner, false)
 		if err != nil {
 			return err
 		}
@@ -600,7 +637,7 @@ func (u *userNotifier) reducePasswordlessCodeRequested(event eventstore.Event) (
 			return err
 		}
 		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
-			SendPasswordlessRegistrationLink(ctx, notifyUser, code, e.ID, e.URLTemplate)
+			SendPasswordlessRegistrationLink(ctx, notifyUser, code, e.ID, e.URLTemplate, loginPolicy)
 		if err != nil {
 			return err
 		}
@@ -650,16 +687,23 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 		if err != nil {
 			return err
 		}
+
 		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.PasswordChangeMessageType)
 		if err != nil {
 			return err
 		}
+
+		loginPolicy, err := u.queries.LoginPolicyByID(ctx, true, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return err
+		}
+
 		ctx, err = u.queries.Origin(ctx, e)
 		if err != nil {
 			return err
 		}
 		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
-			SendPasswordChange(ctx, notifyUser)
+			SendPasswordChange(ctx, notifyUser, loginPolicy)
 		if err != nil {
 			return err
 		}

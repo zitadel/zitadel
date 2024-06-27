@@ -10,16 +10,21 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func (notify Notify) SendEmailVerificationCode(ctx context.Context, user *query.NotifyUser, code string, urlTmpl, authRequestID string) error {
+func (notify Notify) SendEmailVerificationCode(ctx context.Context, user *query.NotifyUser, code string, urlTmpl, authRequestID string, loginPolicy *query.LoginPolicy) error {
 	var url string
-	if urlTmpl == "" {
-		url = login.MailVerificationLink(http_utils.ComposedOrigin(ctx), user.ID, code, user.ResourceOwner, authRequestID)
+
+	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultUriForNotificationLinks {
+		url = loginPolicy.DefaultRedirectURI
 	} else {
-		var buf strings.Builder
-		if err := domain.RenderConfirmURLTemplate(&buf, urlTmpl, user.ID, code, user.ResourceOwner); err != nil {
-			return err
+		if urlTmpl == "" {
+			url = login.MailVerificationLink(http_utils.ComposedOrigin(ctx), user.ID, code, user.ResourceOwner, authRequestID)
+		} else {
+			var buf strings.Builder
+			if err := domain.RenderConfirmURLTemplate(&buf, urlTmpl, user.ID, code, user.ResourceOwner); err != nil {
+				return err
+			}
+			url = buf.String()
 		}
-		url = buf.String()
 	}
 
 	args := make(map[string]interface{})

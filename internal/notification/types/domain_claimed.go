@@ -10,8 +10,15 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 )
 
-func (notify Notify) SendDomainClaimed(ctx context.Context, user *query.NotifyUser, username string) error {
-	url := login.LoginLink(http_utils.ComposedOrigin(ctx), user.ResourceOwner)
+func (notify Notify) SendDomainClaimed(ctx context.Context, user *query.NotifyUser, username string, loginPolicy *query.LoginPolicy) error {
+	var url string
+
+	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultUriForNotificationLinks {
+		url = loginPolicy.DefaultRedirectURI
+	} else {
+		url = login.LoginLink(http_utils.ComposedOrigin(ctx), user.ResourceOwner)
+	}
+
 	index := strings.LastIndex(user.LastEmail, "@")
 	args := make(map[string]interface{})
 	args["TempUsername"] = username
