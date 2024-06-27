@@ -130,6 +130,11 @@ func (es *Eventstore) AggregateTypes() []string {
 	return aggregateTypes
 }
 
+// FillFields implements the [Searcher] interface
+func (es *Eventstore) FillFields(ctx context.Context, events ...FillFieldsEvent) error {
+	return es.searcher.FillFields(ctx, events...)
+}
+
 // Search implements the [Searcher] interface
 func (es *Eventstore) Search(ctx context.Context, conditions ...map[FieldType]any) ([]*SearchResult, error) {
 	if len(conditions) == 0 {
@@ -274,6 +279,11 @@ type Pusher interface {
 	Push(ctx context.Context, commands ...Command) (_ []Event, err error)
 }
 
+type FillFieldsEvent interface {
+	Event
+	Fields() []*FieldOperation
+}
+
 type Searcher interface {
 	// Search allows to search for specific fields of objects
 	// The instance id is taken from the context
@@ -281,6 +291,8 @@ type Searcher interface {
 	// The search fields are combined with OR
 	// At least one must be defined
 	Search(ctx context.Context, conditions ...map[FieldType]any) (result []*SearchResult, err error)
+	// FillFields is to insert the fields of previously stored events
+	FillFields(ctx context.Context, events ...FillFieldsEvent) error
 }
 
 func appendEventType(typ EventType) {

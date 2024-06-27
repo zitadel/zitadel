@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 28.sql
-	addSearchTable string
+	addFieldTable string
 )
 
-type AddSearchTable struct {
+type AddFieldTable struct {
 	dbClient *database.DB
 }
 
-func (mig *AddSearchTable) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addSearchTable)
+func (mig *AddFieldTable) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addFieldTable)
 	return err
 }
 
-func (mig *AddSearchTable) String() string {
+func (mig *AddFieldTable) String() string {
 	return "28_add_search_table"
 }

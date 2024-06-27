@@ -24,6 +24,25 @@ func (value *fieldValue) Unmarshal(ptr any) error {
 	return json.Unmarshal(value.value, ptr)
 }
 
+func (es *Eventstore) FillFields(ctx context.Context, events ...eventstore.FillFieldsEvent) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer span.End()
+
+	tx, err := es.client.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+	}()
+
+	return handleFieldFillEvents(ctx, tx, events)
+}
+
 // Search implements the [eventstore.Search] method
 func (es *Eventstore) Search(ctx context.Context, conditions ...map[eventstore.FieldType]any) (result []*eventstore.SearchResult, err error) {
 	ctx, span := tracing.NewSpan(ctx)
@@ -119,6 +138,17 @@ func handleFieldCommands(ctx context.Context, tx *sql.Tx, commands []eventstore.
 	for _, command := range commands {
 		if len(command.Fields()) > 0 {
 			if err := handleFieldOperations(ctx, tx, command.Fields()); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func handleFieldFillEvents(ctx context.Context, tx *sql.Tx, events []eventstore.FillFieldsEvent) error {
+	for _, event := range events {
+		if len(event.Fields()) > 0 {
+			if err := handleFieldOperations(ctx, tx, event.Fields()); err != nil {
 				return err
 			}
 		}
