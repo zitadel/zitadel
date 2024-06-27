@@ -1,5 +1,6 @@
 CREATE TABLE eventstore.search (
-    instance_id TEXT NOT NULL
+    id TEXT NOT NULL DEFAULT gen_random_uuid()
+    , instance_id TEXT NOT NULL
     , resource_owner TEXT NOT NULL
 
     , aggregate_type TEXT NOT NULL
@@ -13,6 +14,7 @@ CREATE TABLE eventstore.search (
     , number_value NUMERIC
     , text_value TEXT
     
+    , PRIMARY KEY (instance_id, id)
     , CONSTRAINT one_of_values CHECK (num_nonnulls(number_value, text_value) = 1)
 );
 

@@ -242,6 +242,9 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 	}
 
 	projectAgg, state, err := c.projectAggregateByID(ctx, projectID, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
 
 	if state == domain.ProjectStateUnspecified || state == domain.ProjectStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-112M9", "Errors.Project.NotFound")

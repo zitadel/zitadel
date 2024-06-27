@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
+// Search implements the [eventstore.Search] method
 func (es *Eventstore) Search(ctx context.Context, conditions ...map[eventstore.SearchFieldType]any) (result []*eventstore.SearchResult, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer span.EndWithError(err)
@@ -80,10 +82,6 @@ func buildSearchStatement(ctx context.Context, builder *strings.Builder, conditi
 
 	builder.WriteString(searchQueryPrefix)
 
-	if len(conditions) == 0 {
-		return args
-	}
-
 	builder.WriteString(" AND (")
 
 	for i, condition := range conditions {
@@ -102,14 +100,20 @@ func buildSearchStatement(ctx context.Context, builder *strings.Builder, conditi
 func buildSearchCondition(builder *strings.Builder, index int, conditions map[eventstore.SearchFieldType]any) []any {
 	args := make([]any, 0, len(conditions))
 
-	for field, value := range conditions {
+	orderedCondition := make([]eventstore.SearchFieldType, 0, len(conditions))
+	for field := range conditions {
+		orderedCondition = append(orderedCondition, field)
+	}
+	slices.Sort(orderedCondition)
+
+	for _, field := range orderedCondition {
 		if len(args) > 0 {
 			builder.WriteString(" AND ")
 		}
 		builder.WriteString(searchFieldNameByType(field))
 		builder.WriteString(" = $")
 		builder.WriteString(strconv.Itoa(index + len(args)))
-		args = append(args, value)
+		args = append(args, conditions[field])
 	}
 
 	return args

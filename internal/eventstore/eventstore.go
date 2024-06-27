@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // Eventstore abstracts all functions needed to store valid events
@@ -129,7 +130,12 @@ func (es *Eventstore) AggregateTypes() []string {
 	return aggregateTypes
 }
 
+// Search implements the [Searcher] interface
 func (es *Eventstore) Search(ctx context.Context, conditions ...map[SearchFieldType]any) ([]*SearchResult, error) {
+	if len(conditions) == 0 {
+		return nil, zerrors.ThrowInvalidArgument(nil, "V3-5Xbr1", "no search conditions")
+	}
+
 	return es.searcher.Search(ctx, conditions...)
 }
 
@@ -269,8 +275,11 @@ type Pusher interface {
 }
 
 type Searcher interface {
-	// Search predefined results
-	// the instance is used from ctx
+	// Search allows to search for specific fields of objects
+	// The instance id is taken from the context
+	// The list of conditions are combined with AND
+	// The search fields are combined with OR
+	// At least one must be defined
 	Search(ctx context.Context, conditions ...map[SearchFieldType]any) (result []*SearchResult, err error)
 }
 
