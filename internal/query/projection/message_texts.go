@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	MessageTextTable = "projections.message_texts2"
+	MessageTextTable = "projections.message_texts3"
 
 	MessageTextAggregateIDCol  = "aggregate_id"
 	MessageTextInstanceIDCol   = "instance_id"
@@ -32,6 +32,7 @@ const (
 	MessageTextButtonTextCol   = "button_text"
 	MessageTextFooterCol       = "footer_text"
 	MessageTextOwnerRemovedCol = "owner_removed"
+	MessageTextButtonUrlCol    = "button_url"
 )
 
 type messageTextProjection struct{}
@@ -63,6 +64,7 @@ func (*messageTextProjection) Init() *old_handler.Check {
 			handler.NewColumn(MessageTextButtonTextCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(MessageTextFooterCol, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(MessageTextOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(MessageTextButtonUrlCol, handler.ColumnTypeText, handler.Nullable()),
 		},
 			handler.NewPrimaryKey(MessageTextInstanceIDCol, MessageTextAggregateIDCol, MessageTextTypeCol, MessageTextLanguageCol),
 			handler.WithIndex(handler.NewIndex("owner_removed", []string{MessageTextOwnerRemovedCol})),
@@ -162,6 +164,9 @@ func (p *messageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 	if isFooterText(templateEvent.Key) {
 		cols = append(cols, handler.NewCol(MessageTextFooterCol, templateEvent.Text))
 	}
+	if isButtonUrl(templateEvent.Key) {
+		cols = append(cols, handler.NewCol(MessageTextButtonUrlCol, templateEvent.Text))
+	}
 	return handler.NewUpsertStatement(
 		&templateEvent,
 		[]handler.Column{
@@ -211,6 +216,9 @@ func (p *messageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 	}
 	if isFooterText(templateEvent.Key) {
 		cols = append(cols, handler.NewCol(MessageTextFooterCol, ""))
+	}
+	if isButtonUrl(templateEvent.Key) {
+		cols = append(cols, handler.NewCol(MessageTextButtonUrlCol, ""))
 	}
 	return handler.NewUpdateStatement(
 		&templateEvent,
@@ -294,4 +302,7 @@ func isButtonText(key string) bool {
 }
 func isFooterText(key string) bool {
 	return key == domain.MessageFooterText
+}
+func isButtonUrl(key string) bool {
+	return key == domain.MessageButtonUrl
 }

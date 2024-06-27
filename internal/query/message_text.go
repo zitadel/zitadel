@@ -53,6 +53,7 @@ type MessageText struct {
 	Text       string
 	ButtonText string
 	Footer     string
+	ButtonUrl  string
 }
 
 var (
@@ -122,6 +123,10 @@ var (
 	}
 	MessageTextColOwnerRemoved = Column{
 		name:  projection.MessageTextOwnerRemovedCol,
+		table: messageTextTable,
+	}
+	MessageTextColButtonUrl = Column{
+		name:  projection.MessageTextButtonUrlCol,
 		table: messageTextTable,
 	}
 )
@@ -264,6 +269,7 @@ func prepareMessageTextQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			MessageTextColText.identifier(),
 			MessageTextColButtonText.identifier(),
 			MessageTextColFooter.identifier(),
+			MessageTextColButtonUrl.identifier(),
 		).
 			From(messageTextTable.identifier() + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
@@ -277,6 +283,7 @@ func prepareMessageTextQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			text := sql.NullString{}
 			buttonText := sql.NullString{}
 			footer := sql.NullString{}
+			buttonUrl := sql.NullString{}
 			err := row.Scan(
 				&msg.AggregateID,
 				&msg.Sequence,
@@ -292,6 +299,7 @@ func prepareMessageTextQuery(ctx context.Context, db prepareDatabase) (sq.Select
 				&text,
 				&buttonText,
 				&footer,
+				&buttonUrl,
 			)
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
@@ -307,6 +315,7 @@ func prepareMessageTextQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			msg.Text = text.String
 			msg.ButtonText = buttonText.String
 			msg.Footer = footer.String
+			msg.ButtonUrl = buttonUrl.String
 			return msg, nil
 		}
 }

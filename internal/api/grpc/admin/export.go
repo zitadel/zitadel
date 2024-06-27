@@ -1095,6 +1095,7 @@ func (s *Server) getCustomInitMessageTexts(ctx context.Context, org string, lang
 				Text:       text.Text,
 				ButtonText: text.ButtonText,
 				FooterText: text.Footer,
+				ButtonUrl:  text.ButtonUrl,
 			})
 		}
 	}
@@ -1120,6 +1121,7 @@ func (s *Server) getCustomPasswordResetMessageTexts(ctx context.Context, org str
 				Text:       text.Text,
 				ButtonText: text.ButtonText,
 				FooterText: text.Footer,
+				ButtonUrl:  text.ButtonUrl,
 			})
 		}
 	}
@@ -1145,6 +1147,7 @@ func (s *Server) getCustomVerifyEmailMessageTexts(ctx context.Context, org strin
 				Text:       text.Text,
 				ButtonText: text.ButtonText,
 				FooterText: text.Footer,
+				ButtonUrl:  text.ButtonUrl,
 			})
 		}
 	}
@@ -1170,6 +1173,7 @@ func (s *Server) getCustomVerifyPhoneMessageTexts(ctx context.Context, org strin
 				Text:       text.Text,
 				ButtonText: text.ButtonText,
 				FooterText: text.Footer,
+				ButtonUrl:  text.ButtonUrl,
 			})
 		}
 	}
@@ -1214,6 +1218,7 @@ func (s *Server) getCustomVerifyEmailOTPMessageTexts(ctx context.Context, org st
 				Text:       text.Text,
 				ButtonText: text.ButtonText,
 				FooterText: text.Footer,
+				ButtonUrl:  text.ButtonUrl,
 			})
 		}
 	}
@@ -1239,6 +1244,7 @@ func (s *Server) getCustomDomainClaimedMessageTexts(ctx context.Context, org str
 				Text:       text.Text,
 				ButtonText: text.ButtonText,
 				FooterText: text.Footer,
+				ButtonUrl:  text.ButtonUrl,
 			})
 		}
 	}
@@ -1264,6 +1270,7 @@ func (s *Server) getCustomPasswordlessRegistrationMessageTexts(ctx context.Conte
 				Text:       text.Text,
 				ButtonText: text.ButtonText,
 				FooterText: text.Footer,
+				ButtonUrl:  text.ButtonUrl,
 			})
 		}
 	}

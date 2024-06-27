@@ -27,7 +27,8 @@ func NewMailTextAddedEvent(
 	subject,
 	greeting,
 	text,
-	buttonText string,
+	buttonText,
+	buttonUrl string,
 ) *MailTextAddedEvent {
 	return &MailTextAddedEvent{
 		MailTextAddedEvent: *policy.NewMailTextAddedEvent(
@@ -39,7 +40,8 @@ func NewMailTextAddedEvent(
 			subject,
 			greeting,
 			text,
-			buttonText),
+			buttonText,
+			buttonUrl),
 	}
 }
 

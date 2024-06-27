@@ -95,6 +95,13 @@ func (c *Commands) setDefaultMessageText(ctx context.Context, instanceAgg *event
 			events = append(events, instance.NewCustomTextRemovedEvent(ctx, instanceAgg, msg.MessageTextType, domain.MessageFooterText, msg.Language))
 		}
 	}
+	if existingMessageText.ButtonUrl != msg.ButtonUrl {
+		if msg.ButtonUrl != "" {
+			events = append(events, instance.NewCustomTextSetEvent(ctx, instanceAgg, msg.MessageTextType, domain.MessageButtonUrl, msg.ButtonUrl, msg.Language))
+		} else {
+			events = append(events, instance.NewCustomTextRemovedEvent(ctx, instanceAgg, msg.MessageTextType, domain.MessageButtonUrl, msg.Language))
+		}
+	}
 	return events, existingMessageText, nil
 }
 
@@ -192,6 +199,13 @@ func prepareSetInstanceCustomMessageTexts(
 					cmds = append(cmds, instance.NewCustomTextSetEvent(ctx, &a.Aggregate, msg.MessageTextType, domain.MessageFooterText, msg.FooterText, msg.Language))
 				} else {
 					cmds = append(cmds, instance.NewCustomTextRemovedEvent(ctx, &a.Aggregate, msg.MessageTextType, domain.MessageFooterText, msg.Language))
+				}
+			}
+			if existing.ButtonUrl != msg.ButtonUrl {
+				if msg.ButtonUrl != "" {
+					cmds = append(cmds, instance.NewCustomTextSetEvent(ctx, &a.Aggregate, msg.MessageTextType, domain.MessageButtonUrl, msg.ButtonUrl, msg.Language))
+				} else {
+					cmds = append(cmds, instance.NewCustomTextRemovedEvent(ctx, &a.Aggregate, msg.MessageTextType, domain.MessageButtonUrl, msg.Language))
 				}
 			}
 			return cmds, nil

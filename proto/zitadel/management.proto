@@ -11160,6 +11160,13 @@ message SetCustomInitMessageTextRequest {
         }
     ];
     string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
+    string button_url = 9 [
+        (validate.rules).string = {max_len: 2048},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"URL associated with the button\""
+            max_length: 2048;
+        }
+    ];
 }
 
 message SetCustomInitMessageTextResponse {
@@ -11311,6 +11318,13 @@ message SetCustomPasswordResetMessageTextRequest {
         }
     ];
     string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
+    string button_url = 9 [
+        (validate.rules).string = {max_len: 2048},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"URL associated with the button\""
+            max_length: 2048;
+        }
+    ];
 }
 
 message SetCustomPasswordResetMessageTextResponse {
@@ -11391,6 +11405,13 @@ message SetCustomVerifyEmailMessageTextRequest {
         }
     ];
     string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
+    string button_url = 9 [
+        (validate.rules).string = {max_len: 2048},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"URL associated with the button\""
+            max_length: 2048;
+        }
+    ];
 }
 
 message SetCustomVerifyEmailMessageTextResponse {
@@ -11471,6 +11492,13 @@ message SetCustomVerifyPhoneMessageTextRequest {
         }
     ];
     string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
+    string button_url = 9 [
+        (validate.rules).string = {max_len: 2048},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"URL associated with the button\""
+            max_length: 2048;
+        }
+    ];
 }
 
 message SetCustomVerifyPhoneMessageTextResponse {
@@ -11595,6 +11623,13 @@ message SetCustomVerifyEmailOTPMessageTextRequest {
         }
     ];
     string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
+    string button_url = 9 [
+        (validate.rules).string = {max_len: 2048},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"URL associated with the button\""
+            max_length: 2048;
+        }
+    ];
 }
 
 message SetCustomVerifyEmailOTPMessageTextResponse {
@@ -11675,6 +11710,13 @@ message SetCustomDomainClaimedMessageTextRequest {
         }
     ];
     string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
+    string button_url = 9 [
+        (validate.rules).string = {max_len: 2048},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"URL associated with the button\""
+            max_length: 2048;
+        }
+    ];
 }
 
 message SetCustomDomainClaimedMessageTextResponse {
@@ -11756,6 +11798,13 @@ message SetCustomPasswordlessRegistrationMessageTextRequest {
         }
     ];
     string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
+    string button_url = 9 [
+        (validate.rules).string = {max_len: 2048},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"URL associated with the button\""
+            max_length: 2048;
+        }
+    ];
 }
 
 message SetCustomPasswordlessRegistrationMessageTextResponse {
@@ -11836,6 +11885,13 @@ message SetCustomPasswordChangeMessageTextRequest {
         }
     ];
     string footer_text = 8 [(validate.rules).string = {max_bytes: 8000}];
+    string button_url = 9 [
+        (validate.rules).string = {max_len: 2048},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"URL associated with the button\""
+            max_length: 2048;
+        }
+    ];
 }
 
 message SetCustomPasswordChangeMessageTextResponse {

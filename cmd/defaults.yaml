@@ -772,6 +772,7 @@ DefaultInstance:
       Greeting: Hallo {{.DisplayName}},
       Text: Dieser Benutzer wurde soeben im Zitadel erstellt. Mit dem Benutzernamen &lt;br&gt;&lt;strong&gt;{{.PreferredLoginName}}&lt;/strong&gt;&lt;br&gt; kannst du dich anmelden. Nutze den untenstehenden Button, um die Initialisierung abzuschliessen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es einfach ignorieren.
       ButtonText: Initialisierung abschliessen
+      ButtonURL:
     - MessageTextType: PasswordReset
       Language: de
       Title: Zitadel - Passwort zurücksetzen
@@ -780,6 +781,7 @@ DefaultInstance:
       Greeting: Hallo {{.DisplayName}},
       Text: Wir haben eine Anfrage für das Zurücksetzen deines Passwortes bekommen. Du kannst den untenstehenden Button verwenden, um dein Passwort zurückzusetzen &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du dieses Mail nicht angefordert hast, kannst du es ignorieren.
       ButtonText: Passwort zurücksetzen
+      ButtonURL:
     - MessageTextType: VerifyEmail
       Language: de
       Title: Zitadel - Email verifizieren
@@ -788,6 +790,7 @@ DefaultInstance:
       Greeting: Hallo {{.DisplayName}},
       Text: Eine neue E-Mail Adresse wurde hinzugefügt. Bitte verwende den untenstehenden Button um diese zu verifizieren &lt;br&gt;(Code &lt;strong&gt;{{.Code}}&lt;/strong&gt;).&lt;br&gt; Falls du deine E-Mail Adresse nicht selber hinzugefügt hast, kannst du dieses E-Mail ignorieren.
       ButtonText: Email verifizieren
+      ButtonURL:
     - MessageTextType: VerifyPhone
       Language: de
       Title: Zitadel - Telefonnummer verifizieren
@@ -796,6 +799,7 @@ DefaultInstance:
       Greeting: Hallo {{.DisplayName}},
       Text: Eine Telefonnummer wurde hinzugefügt. Bitte verifiziere diese in dem du folgenden Code eingibst (Code {{.Code}})
       ButtonText: Telefon verifizieren
+      ButtonURL:
     - MessageTextType: DomainClaimed
       Language: de
       Title: Zitadel - Domain wurde beansprucht
@@ -804,6 +808,7 @@ DefaultInstance:
       Greeting: Hallo {{.DisplayName}},
       Text: Die Domain {{.Domain}} wurde von einer Organisation beansprucht. Dein derzeitiger User {{.Username}} ist nicht Teil dieser Organisation. Daher musst du beim nächsten Login eine neue Email hinterlegen. Für diesen Login haben wir dir einen temporären Usernamen ({{.TempUsername}}) erstellt.
       ButtonText: Login
+      ButtonURL:
     - MessageTextType: PasswordChange
       Language: de
       Title: ZITADEL - Passwort von Benutzer wurde geändert
@@ -812,6 +817,7 @@ DefaultInstance:
       Greeting: Hallo {{.DisplayName}},
       Text: Das Password vom Benutzer wurde geändert. Wenn diese Änderung von jemand anderem gemacht wurde, empfehlen wir die sofortige Zurücksetzung ihres Passworts.
       ButtonText: Login
+      ButtonURL:
     - MessageTextType: InitCode
       Language: en
       Title: Zitadel - Initialize User
@@ -820,6 +826,7 @@ DefaultInstance:
       Greeting: Hello {{.DisplayName}},
       Text: This user was created in Zitadel. Use the username {{.PreferredLoginName}} to login. Please click the button below to finish the initialization process. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
       ButtonText: Finish initialization
+      ButtonURL:
     - MessageTextType: PasswordReset
       Language: en
       Title: Zitadel - Reset password
@@ -828,6 +835,7 @@ DefaultInstance:
       Greeting: Hello {{.DisplayName}},
       Text: We received a password reset request. Please use the button below to reset your password. (Code {{.Code}}) If you didn't ask for this mail, please ignore it.
       ButtonText: Reset password
+      ButtonURL:
     - MessageTextType: VerifyEmail
       Language: en
       Title: Zitadel - Verify email
@@ -836,6 +844,7 @@ DefaultInstance:
       Greeting: Hello {{.DisplayName}},
       Text: A new email has been added. Please use the button below to verify your email. (Code {{.Code}}) If you din't add a new email, please ignore this email.
       ButtonText: Verify email
+      ButtonURL:
     - MessageTextType: VerifyPhone
       Language: en
       Title: Zitadel - Verify phone
@@ -844,6 +853,7 @@ DefaultInstance:
       Greeting: Hello {{.DisplayName}},
       Text: A new phone number has been added. Please use the following code to verify it {{.Code}}.
       ButtonText: Verify phone
+      ButtonURL:
     - MessageTextType: DomainClaimed
       Language: en
       Title: Zitadel - Domain has been claimed
@@ -852,6 +862,7 @@ DefaultInstance:
       Greeting: Hello {{.DisplayName}},
       Text: The domain {{.Domain}} has been claimed by an organization. Your current user {{.UserName}} is not part of this organization. Therefore you'll have to change your email when you login. We have created a temporary username ({{.TempUsername}}) for this login.
       ButtonText: Login
+      ButtonURL:
     - MessageTextType: PasswordChange
       Language: en
       Title: ZITADEL - Password of user has changed
@@ -860,6 +871,7 @@ DefaultInstance:
       Greeting: Hello {{.DisplayName}},
       Text: The password of your user has changed. If this change was not done by you, please be advised to immediately reset your password.
       ButtonText: Login
+      ButtonURL:
 
   # Once a feature is set on the instance (true or false), system level feature settings
   # will be ignored until instance level features are reset.
