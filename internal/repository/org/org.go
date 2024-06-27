@@ -50,19 +50,25 @@ func (e *OrgAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddOrgNameUniqueConstraint(e.Name)}
 }
 
-func (e *OrgAddedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchTextField(
+func (e *OrgAddedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			orgSearchObject(e.Aggregate().ID),
 			OrgNameSearchField,
-			e.Name,
+			&eventstore.Value{
+				Value:       e.Name,
+				ShouldIndex: true,
+			},
 		),
-		eventstore.SetSearchNumericField(
+		eventstore.SetField(
 			e.Aggregate(),
 			orgSearchObject(e.Aggregate().ID),
 			OrgStateSearchField,
-			domain.OrgStateActive,
+			&eventstore.Value{
+				Value:       domain.OrgStateActive,
+				ShouldIndex: true,
+			},
 		),
 	}
 }
@@ -108,21 +114,24 @@ func (e *OrgChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	}
 }
 
-func (e *OrgChangedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchTextField(
+func (e *OrgChangedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			orgSearchObject(e.Aggregate().ID),
 			OrgNameSearchField,
-			e.Name,
+			&eventstore.Value{
+				Value:       e.Name,
+				ShouldIndex: true,
+			},
 
-			eventstore.SearchFieldTypeInstanceID,
-			eventstore.SearchFieldTypeResourceOwner,
-			eventstore.SearchFieldTypeAggregateType,
-			eventstore.SearchFieldTypeAggregateID,
-			eventstore.SearchFieldTypeObjectType,
-			eventstore.SearchFieldTypeObjectID,
-			eventstore.SearchFieldTypeFieldName,
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
@@ -163,21 +172,24 @@ func (e *OrgDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint
 	return nil
 }
 
-func (e *OrgDeactivatedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchNumericField(
+func (e *OrgDeactivatedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			orgSearchObject(e.Aggregate().ID),
 			OrgStateSearchField,
-			domain.OrgStateInactive,
+			&eventstore.Value{
+				Value:       domain.OrgStateInactive,
+				ShouldIndex: true,
+			},
 
-			eventstore.SearchFieldTypeInstanceID,
-			eventstore.SearchFieldTypeResourceOwner,
-			eventstore.SearchFieldTypeAggregateType,
-			eventstore.SearchFieldTypeAggregateID,
-			eventstore.SearchFieldTypeObjectType,
-			eventstore.SearchFieldTypeObjectID,
-			eventstore.SearchFieldTypeFieldName,
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
@@ -202,21 +214,24 @@ type OrgReactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
 
-func (e *OrgReactivatedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchNumericField(
+func (e *OrgReactivatedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			orgSearchObject(e.Aggregate().ID),
 			OrgStateSearchField,
-			domain.OrgStateActive,
+			&eventstore.Value{
+				Value:       domain.OrgStateActive,
+				ShouldIndex: true,
+			},
 
-			eventstore.SearchFieldTypeInstanceID,
-			eventstore.SearchFieldTypeResourceOwner,
-			eventstore.SearchFieldTypeAggregateType,
-			eventstore.SearchFieldTypeAggregateID,
-			eventstore.SearchFieldTypeObjectType,
-			eventstore.SearchFieldTypeObjectID,
-			eventstore.SearchFieldTypeFieldName,
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
@@ -278,19 +293,19 @@ func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return constraints
 }
 
-func (e *OrgRemovedEvent) SearchOperations() []*eventstore.SearchOperation {
+func (e *OrgRemovedEvent) Fields() []*eventstore.FieldOperation {
 	// TODO: project grants are currently not removed because we don't have the relationship between the granted org and the grant
-	return []*eventstore.SearchOperation{
-		eventstore.RemoveSearchFields(map[eventstore.SearchFieldType]any{
-			eventstore.SearchFieldTypeInstanceID:    e.Aggregate().InstanceID,
-			eventstore.SearchFieldTypeResourceOwner: e.Aggregate().ResourceOwner,
+	return []*eventstore.FieldOperation{
+		eventstore.RemoveSearchFields(map[eventstore.FieldType]any{
+			eventstore.FieldTypeInstanceID:    e.Aggregate().InstanceID,
+			eventstore.FieldTypeResourceOwner: e.Aggregate().ResourceOwner,
 		}),
-		eventstore.RemoveSearchFields(map[eventstore.SearchFieldType]any{
-			eventstore.SearchFieldTypeInstanceID:    e.Aggregate().InstanceID,
-			eventstore.SearchFieldTypeObjectType:    project.ProjectGrantSearchType,
-			eventstore.SearchFieldTypeFieldName:     project.ProjectGrantGrantedOrgIDSearchField,
-			eventstore.SearchFieldTypeTextValue:     e.Aggregate().ID,
-			eventstore.SearchFieldTypeResourceOwner: e.Aggregate().ResourceOwner,
+		eventstore.RemoveSearchFields(map[eventstore.FieldType]any{
+			eventstore.FieldTypeInstanceID:    e.Aggregate().InstanceID,
+			eventstore.FieldTypeObjectType:    project.ProjectGrantSearchType,
+			eventstore.FieldTypeFieldName:     project.ProjectGrantGrantedOrgIDSearchField,
+			eventstore.FieldTypeValue:         e.Aggregate().ID,
+			eventstore.FieldTypeResourceOwner: e.Aggregate().ResourceOwner,
 		}),
 	}
 }
@@ -317,8 +332,8 @@ func OrgRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}, nil
 }
 
-func orgSearchObject(id string) eventstore.SearchObject {
-	return eventstore.SearchObject{
+func orgSearchObject(id string) eventstore.Object {
+	return eventstore.Object{
 		Type:     OrgSearchType,
 		Revision: 1,
 		ID:       id,

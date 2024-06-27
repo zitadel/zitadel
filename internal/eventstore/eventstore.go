@@ -131,7 +131,7 @@ func (es *Eventstore) AggregateTypes() []string {
 }
 
 // Search implements the [Searcher] interface
-func (es *Eventstore) Search(ctx context.Context, conditions ...map[SearchFieldType]any) ([]*SearchResult, error) {
+func (es *Eventstore) Search(ctx context.Context, conditions ...map[FieldType]any) ([]*SearchResult, error) {
 	if len(conditions) == 0 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "V3-5Xbr1", "no search conditions")
 	}
@@ -280,7 +280,7 @@ type Searcher interface {
 	// The list of conditions are combined with AND
 	// The search fields are combined with OR
 	// At least one must be defined
-	Search(ctx context.Context, conditions ...map[SearchFieldType]any) (result []*SearchResult, err error)
+	Search(ctx context.Context, conditions ...map[FieldType]any) (result []*SearchResult, err error)
 }
 
 func appendEventType(typ EventType) {

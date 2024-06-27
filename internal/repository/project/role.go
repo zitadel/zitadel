@@ -51,25 +51,34 @@ func (e *RoleAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
 }
 
-func (e *RoleAddedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchTextField(
+func (e *RoleAddedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			projectRoleSearchObject(e.Key),
 			ProjectRoleKeySearchField,
-			e.Key,
+			&eventstore.Value{
+				Value:       e.Key,
+				ShouldIndex: true,
+			},
 		),
-		eventstore.SetSearchTextField(
+		eventstore.SetField(
 			e.Aggregate(),
 			projectRoleSearchObject(e.Key),
 			ProjectRoleDisplayNameSearchField,
-			e.DisplayName,
+			&eventstore.Value{
+				Value:       e.DisplayName,
+				ShouldIndex: true,
+			},
 		),
-		eventstore.SetSearchTextField(
+		eventstore.SetField(
 			e.Aggregate(),
 			projectRoleSearchObject(e.Key),
 			ProjectRoleGroupSearchField,
-			e.Group,
+			&eventstore.Value{
+				Value:       e.Group,
+				ShouldIndex: true,
+			},
 		),
 	}
 }
@@ -122,38 +131,44 @@ func (e *RoleChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func (e *RoleChangedEvent) SearchOperations() []*eventstore.SearchOperation {
-	operations := make([]*eventstore.SearchOperation, 0, 2)
+func (e *RoleChangedEvent) Fields() []*eventstore.FieldOperation {
+	operations := make([]*eventstore.FieldOperation, 0, 2)
 	if e.DisplayName != nil {
-		operations = append(operations, eventstore.SetSearchTextField(
+		operations = append(operations, eventstore.SetField(
 			e.Aggregate(),
 			projectRoleSearchObject(e.Key),
 			ProjectRoleDisplayNameSearchField,
-			*e.DisplayName,
+			&eventstore.Value{
+				Value:       *e.DisplayName,
+				ShouldIndex: true,
+			},
 
-			eventstore.SearchFieldTypeInstanceID,
-			eventstore.SearchFieldTypeResourceOwner,
-			eventstore.SearchFieldTypeAggregateType,
-			eventstore.SearchFieldTypeAggregateID,
-			eventstore.SearchFieldTypeObjectType,
-			eventstore.SearchFieldTypeObjectID,
-			eventstore.SearchFieldTypeFieldName,
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		))
 	}
 	if e.Group != nil {
-		operations = append(operations, eventstore.SetSearchTextField(
+		operations = append(operations, eventstore.SetField(
 			e.Aggregate(),
 			projectRoleSearchObject(e.Key),
 			ProjectRoleGroupSearchField,
-			*e.Group,
+			&eventstore.Value{
+				Value:       *e.Group,
+				ShouldIndex: true,
+			},
 
-			eventstore.SearchFieldTypeInstanceID,
-			eventstore.SearchFieldTypeResourceOwner,
-			eventstore.SearchFieldTypeAggregateType,
-			eventstore.SearchFieldTypeAggregateID,
-			eventstore.SearchFieldTypeObjectType,
-			eventstore.SearchFieldTypeObjectID,
-			eventstore.SearchFieldTypeFieldName,
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		))
 	}
 
@@ -229,8 +244,8 @@ func (e *RoleRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewRemoveProjectRoleUniqueConstraint(e.Key, e.Aggregate().ID)}
 }
 
-func (e *RoleRemovedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
+func (e *RoleRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
 		eventstore.RemoveSearchFieldsByAggregateAndObject(
 			e.Aggregate(),
 			projectRoleSearchObject(e.Key),
@@ -265,8 +280,8 @@ func RoleRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return e, nil
 }
 
-func projectRoleSearchObject(id string) eventstore.SearchObject {
-	return eventstore.SearchObject{
+func projectRoleSearchObject(id string) eventstore.Object {
+	return eventstore.Object{
 		Type:     ProjectRoleSearchType,
 		Revision: ProjectRoleRevision,
 		ID:       id,

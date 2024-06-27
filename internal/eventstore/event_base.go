@@ -124,6 +124,6 @@ func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventTyp
 	}
 }
 
-func (*BaseEvent) SearchOperations() []*SearchOperation {
+func (*BaseEvent) Fields() []*FieldOperation {
 	return nil
 }

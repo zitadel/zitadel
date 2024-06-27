@@ -168,18 +168,19 @@ func (c *Commands) getProjectByID(ctx context.Context, projectID, resourceOwner 
 func (c *Commands) projectAggregateByID(ctx context.Context, projectID, resourceOwner string) (*eventstore.Aggregate, domain.ProjectState, error) {
 	result, err := c.eventstore.Search(
 		ctx,
-		map[eventstore.SearchFieldType]any{
-			eventstore.SearchFieldTypeObjectType:     project.ProjectSearchType,
-			eventstore.SearchFieldTypeObjectID:       projectID,
-			eventstore.SearchFieldTypeObjectRevision: project.ProjectObjectRevision,
-			eventstore.SearchFieldTypeFieldName:      project.ProjectStateSearchField,
-			eventstore.SearchFieldTypeResourceOwner:  resourceOwner,
+		map[eventstore.FieldType]any{
+			eventstore.FieldTypeObjectType:     project.ProjectSearchType,
+			eventstore.FieldTypeObjectID:       projectID,
+			eventstore.FieldTypeObjectRevision: project.ProjectObjectRevision,
+			eventstore.FieldTypeFieldName:      project.ProjectStateSearchField,
+			eventstore.FieldTypeResourceOwner:  resourceOwner,
 		},
 	)
 	if err != nil || len(result) == 0 {
 		return nil, domain.ProjectStateUnspecified, zerrors.ThrowNotFound(err, "COMMA-NDQoF", "Errors.Project.NotFound")
 	}
-	state, err := eventstore.NumericResultValue[domain.ProjectState](result[0])
+	var state domain.ProjectState
+	err = result[0].Value.Unmarshal(&state)
 	if err != nil {
 		return nil, state, zerrors.ThrowNotFound(err, "COMMA-o4n6F", "Errors.Project.NotFound")
 	}

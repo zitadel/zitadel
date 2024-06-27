@@ -45,7 +45,7 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			return err
 		}
 
-		return handleSearchCommands(ctx, tx, commands)
+		return handleFieldCommands(ctx, tx, commands)
 	})
 
 	if err != nil {

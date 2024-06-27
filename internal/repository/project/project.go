@@ -54,19 +54,25 @@ func (e *ProjectAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddProjectNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
-func (e *ProjectAddedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchTextField(
+func (e *ProjectAddedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			projectSearchObject(e.Aggregate().ID),
 			ProjectNameSearchField,
-			e.Name,
+			&eventstore.Value{
+				Value:       e.Name,
+				ShouldIndex: true,
+			},
 		),
-		eventstore.SetSearchNumericField(
+		eventstore.SetField(
 			e.Aggregate(),
 			projectSearchObject(e.Aggregate().ID),
 			ProjectStateSearchField,
-			domain.ProjectStateActive,
+			&eventstore.Value{
+				Value:       domain.ProjectStateActive,
+				ShouldIndex: true,
+			},
 		),
 	}
 }
@@ -132,24 +138,27 @@ func (e *ProjectChangeEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 	return nil
 }
 
-func (e *ProjectChangeEvent) SearchOperations() []*eventstore.SearchOperation {
+func (e *ProjectChangeEvent) Fields() []*eventstore.FieldOperation {
 	if e.Name == nil {
 		return nil
 	}
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchTextField(
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			projectSearchObject(e.Aggregate().ID),
 			ProjectNameSearchField,
-			*e.Name,
+			&eventstore.Value{
+				Value:       *e.Name,
+				ShouldIndex: true,
+			},
 
-			eventstore.SearchFieldTypeInstanceID,
-			eventstore.SearchFieldTypeResourceOwner,
-			eventstore.SearchFieldTypeAggregateType,
-			eventstore.SearchFieldTypeAggregateID,
-			eventstore.SearchFieldTypeObjectType,
-			eventstore.SearchFieldTypeObjectID,
-			eventstore.SearchFieldTypeFieldName,
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
@@ -234,21 +243,24 @@ func (e *ProjectDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 	return nil
 }
 
-func (e *ProjectDeactivatedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchNumericField(
+func (e *ProjectDeactivatedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			projectSearchObject(e.Aggregate().ID),
 			ProjectStateSearchField,
-			domain.ProjectStateInactive,
+			&eventstore.Value{
+				Value:       domain.ProjectStateInactive,
+				ShouldIndex: true,
+			},
 
-			eventstore.SearchFieldTypeInstanceID,
-			eventstore.SearchFieldTypeResourceOwner,
-			eventstore.SearchFieldTypeAggregateType,
-			eventstore.SearchFieldTypeAggregateID,
-			eventstore.SearchFieldTypeObjectType,
-			eventstore.SearchFieldTypeObjectID,
-			eventstore.SearchFieldTypeFieldName,
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
@@ -281,21 +293,24 @@ func (e *ProjectReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 	return nil
 }
 
-func (e *ProjectReactivatedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchNumericField(
+func (e *ProjectReactivatedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			projectSearchObject(e.Aggregate().ID),
 			ProjectStateSearchField,
-			domain.ProjectStateActive,
+			&eventstore.Value{
+				Value:       domain.ProjectStateActive,
+				ShouldIndex: true,
+			},
 
-			eventstore.SearchFieldTypeInstanceID,
-			eventstore.SearchFieldTypeResourceOwner,
-			eventstore.SearchFieldTypeAggregateType,
-			eventstore.SearchFieldTypeAggregateID,
-			eventstore.SearchFieldTypeObjectType,
-			eventstore.SearchFieldTypeObjectID,
-			eventstore.SearchFieldTypeFieldName,
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
@@ -337,8 +352,8 @@ func (e *ProjectRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint
 	return constraints
 }
 
-func (e *ProjectRemovedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
+func (e *ProjectRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
 		eventstore.RemoveSearchFieldsByAggregate(e.Aggregate()),
 	}
 }
@@ -366,8 +381,8 @@ func ProjectRemovedEventMapper(event eventstore.Event) (eventstore.Event, error)
 	}, nil
 }
 
-func projectSearchObject(id string) eventstore.SearchObject {
-	return eventstore.SearchObject{
+func projectSearchObject(id string) eventstore.Object {
+	return eventstore.Object{
 		Type:     ProjectSearchType,
 		Revision: ProjectObjectRevision,
 		ID:       id,

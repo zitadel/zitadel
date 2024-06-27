@@ -42,7 +42,7 @@ func (m *mockCommand) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return m.constraints
 }
 
-func (e *mockCommand) SearchOperations() []*eventstore.SearchOperation {
+func (e *mockCommand) Fields() []*eventstore.FieldOperation {
 	return nil
 }
 

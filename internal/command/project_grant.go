@@ -251,25 +251,25 @@ func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGra
 	results, err := c.eventstore.Search(
 		ctx,
 		// project state query
-		map[eventstore.SearchFieldType]any{
-			eventstore.SearchFieldTypeAggregateType: project.AggregateType,
-			eventstore.SearchFieldTypeAggregateID:   projectGrant.AggregateID,
-			eventstore.SearchFieldTypeFieldName:     project.ProjectStateSearchField,
-			eventstore.SearchFieldTypeObjectType:    project.ProjectSearchType,
+		map[eventstore.FieldType]any{
+			eventstore.FieldTypeAggregateType: project.AggregateType,
+			eventstore.FieldTypeAggregateID:   projectGrant.AggregateID,
+			eventstore.FieldTypeFieldName:     project.ProjectStateSearchField,
+			eventstore.FieldTypeObjectType:    project.ProjectSearchType,
 		},
 		// granted org query
-		map[eventstore.SearchFieldType]any{
-			eventstore.SearchFieldTypeAggregateType: org.AggregateType,
-			eventstore.SearchFieldTypeAggregateID:   projectGrant.GrantedOrgID,
-			eventstore.SearchFieldTypeFieldName:     org.OrgStateSearchField,
-			eventstore.SearchFieldTypeObjectType:    org.OrgSearchType,
+		map[eventstore.FieldType]any{
+			eventstore.FieldTypeAggregateType: org.AggregateType,
+			eventstore.FieldTypeAggregateID:   projectGrant.GrantedOrgID,
+			eventstore.FieldTypeFieldName:     org.OrgStateSearchField,
+			eventstore.FieldTypeObjectType:    org.OrgSearchType,
 		},
 		// role query
-		map[eventstore.SearchFieldType]any{
-			eventstore.SearchFieldTypeAggregateType: project.AggregateType,
-			eventstore.SearchFieldTypeAggregateID:   projectGrant.AggregateID,
-			eventstore.SearchFieldTypeFieldName:     project.ProjectRoleKeySearchField,
-			eventstore.SearchFieldTypeObjectType:    project.ProjectRoleSearchType,
+		map[eventstore.FieldType]any{
+			eventstore.FieldTypeAggregateType: project.AggregateType,
+			eventstore.FieldTypeAggregateID:   projectGrant.AggregateID,
+			eventstore.FieldTypeFieldName:     project.ProjectRoleKeySearchField,
+			eventstore.FieldTypeObjectType:    project.ProjectRoleSearchType,
 		},
 	)
 	if err != nil {
@@ -285,19 +285,22 @@ func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGra
 	for _, result := range results {
 		switch result.Object.Type {
 		case project.ProjectRoleSearchType:
-			role, err := eventstore.TextResultValue[string](result)
+			var role string
+			err := result.Value.Unmarshal(&role)
 			if err != nil {
 				return err
 			}
 			existingRoleKeys = append(existingRoleKeys, role)
 		case org.OrgSearchType:
-			state, err := eventstore.NumericResultValue[domain.OrgState](result)
+			var state domain.OrgState
+			err := result.Value.Unmarshal(&state)
 			if err != nil {
 				return err
 			}
 			existsGrantedOrg = state.Valid()
 		case project.ProjectSearchType:
-			state, err := eventstore.NumericResultValue[domain.ProjectState](result)
+			var state domain.ProjectState
+			err := result.Value.Unmarshal(&state)
 			if err != nil {
 				return err
 			}

@@ -56,36 +56,48 @@ func (e *GrantAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddProjectGrantUniqueConstraint(e.GrantedOrgID, e.Aggregate().ID)}
 }
 
-func (e *GrantAddedEvent) SearchOperations() []*eventstore.SearchOperation {
-	fields := make([]*eventstore.SearchOperation, 0, len(e.RoleKeys)+3)
+func (e *GrantAddedEvent) Fields() []*eventstore.FieldOperation {
+	fields := make([]*eventstore.FieldOperation, 0, len(e.RoleKeys)+3)
 	fields = append(fields,
-		eventstore.SetSearchTextField(
+		eventstore.SetField(
 			e.Aggregate(),
 			grantSearchObject(e.GrantID),
 			ProjectGrantGrantIDSearchField,
-			e.GrantID,
+			&eventstore.Value{
+				Value:       e.GrantID,
+				ShouldIndex: true,
+			},
 		),
-		eventstore.SetSearchTextField(
+		eventstore.SetField(
 			e.Aggregate(),
 			grantSearchObject(e.GrantID),
 			ProjectGrantGrantedOrgIDSearchField,
-			e.GrantedOrgID,
+			&eventstore.Value{
+				Value:       e.GrantedOrgID,
+				ShouldIndex: true,
+			},
 		),
-		eventstore.SetSearchNumericField(
+		eventstore.SetField(
 			e.Aggregate(),
 			grantSearchObject(e.GrantID),
 			ProjectGrantStateSearchField,
-			domain.ProjectGrantStateActive,
+			&eventstore.Value{
+				Value:       domain.ProjectGrantStateActive,
+				ShouldIndex: true,
+			},
 		),
 	)
 
 	for _, roleKey := range e.RoleKeys {
 		fields = append(fields,
-			eventstore.SetSearchTextField(
+			eventstore.SetField(
 				e.Aggregate(),
 				grantSearchObject(e.GrantID),
 				ProjectGrantRoleKeySearchField,
-				roleKey,
+				&eventstore.Value{
+					Value:       roleKey,
+					ShouldIndex: true,
+				},
 			),
 		)
 	}
@@ -140,8 +152,8 @@ func (e *GrantChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func (e *GrantChangedEvent) SearchOperations() []*eventstore.SearchOperation {
-	fields := make([]*eventstore.SearchOperation, 0, len(e.RoleKeys)+1)
+func (e *GrantChangedEvent) Fields() []*eventstore.FieldOperation {
+	fields := make([]*eventstore.FieldOperation, 0, len(e.RoleKeys)+1)
 
 	fields = append(fields,
 		eventstore.RemoveSearchFieldsByAggregateAndObjectAndField(
@@ -154,12 +166,16 @@ func (e *GrantChangedEvent) SearchOperations() []*eventstore.SearchOperation {
 
 	for _, roleKey := range e.RoleKeys {
 		fields = append(fields,
-			eventstore.SetSearchTextField(
+			eventstore.SetField(
 				e.Aggregate(),
 				grantSearchObject(e.GrantID),
 
 				ProjectGrantRoleKeySearchField,
-				roleKey,
+
+				&eventstore.Value{
+					Value:       roleKey,
+					ShouldIndex: true,
+				},
 			),
 		)
 	}
@@ -212,8 +228,8 @@ func (e *GrantCascadeChangedEvent) UniqueConstraints() []*eventstore.UniqueConst
 	return nil
 }
 
-func (e *GrantCascadeChangedEvent) SearchOperations() []*eventstore.SearchOperation {
-	fields := make([]*eventstore.SearchOperation, 0, len(e.RoleKeys)+1)
+func (e *GrantCascadeChangedEvent) Fields() []*eventstore.FieldOperation {
+	fields := make([]*eventstore.FieldOperation, 0, len(e.RoleKeys)+1)
 
 	fields = append(fields,
 		eventstore.RemoveSearchFieldsByAggregateAndObjectAndField(
@@ -226,12 +242,15 @@ func (e *GrantCascadeChangedEvent) SearchOperations() []*eventstore.SearchOperat
 
 	for _, roleKey := range e.RoleKeys {
 		fields = append(fields,
-			eventstore.SetSearchTextField(
+			eventstore.SetField(
 				e.Aggregate(),
 				grantSearchObject(e.GrantID),
 
 				ProjectGrantRoleKeySearchField,
-				roleKey,
+				&eventstore.Value{
+					Value:       roleKey,
+					ShouldIndex: true,
+				},
 			),
 		)
 	}
@@ -283,22 +302,25 @@ func (e *GrantDeactivateEvent) UniqueConstraints() []*eventstore.UniqueConstrain
 	return nil
 }
 
-func (e *GrantDeactivateEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchNumericField(
+func (e *GrantDeactivateEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			grantSearchObject(e.GrantID),
 
 			ProjectGrantStateSearchField,
-			domain.ProjectGrantStateInactive,
+			&eventstore.Value{
+				Value:       domain.ProjectGrantStateInactive,
+				ShouldIndex: true,
+			},
 
-			eventstore.SearchFieldTypeInstanceID,
-			eventstore.SearchFieldTypeResourceOwner,
-			eventstore.SearchFieldTypeAggregateType,
-			eventstore.SearchFieldTypeAggregateID,
-			eventstore.SearchFieldTypeObjectType,
-			eventstore.SearchFieldTypeObjectID,
-			eventstore.SearchFieldTypeFieldName,
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
@@ -345,22 +367,25 @@ func (e *GrantReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstrai
 	return nil
 }
 
-func (e *GrantReactivatedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
-		eventstore.SetSearchNumericField(
+func (e *GrantReactivatedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
 			e.Aggregate(),
 			grantSearchObject(e.GrantID),
 
 			ProjectGrantStateSearchField,
-			domain.ProjectGrantStateActive,
+			&eventstore.Value{
+				Value:       domain.ProjectGrantStateActive,
+				ShouldIndex: true,
+			},
 
-			eventstore.SearchFieldTypeInstanceID,
-			eventstore.SearchFieldTypeResourceOwner,
-			eventstore.SearchFieldTypeAggregateType,
-			eventstore.SearchFieldTypeAggregateID,
-			eventstore.SearchFieldTypeObjectType,
-			eventstore.SearchFieldTypeObjectID,
-			eventstore.SearchFieldTypeFieldName,
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
@@ -408,8 +433,8 @@ func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.Aggregate().ID)}
 }
 
-func (e *GrantRemovedEvent) SearchOperations() []*eventstore.SearchOperation {
-	return []*eventstore.SearchOperation{
+func (e *GrantRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
 		eventstore.RemoveSearchFieldsByAggregateAndObject(
 			e.Aggregate(),
 			grantSearchObject(e.GrantID),
@@ -447,8 +472,8 @@ func GrantRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	return e, nil
 }
 
-func grantSearchObject(id string) eventstore.SearchObject {
-	return eventstore.SearchObject{
+func grantSearchObject(id string) eventstore.Object {
+	return eventstore.Object{
 		Type:     ProjectGrantSearchType,
 		Revision: 1,
 		ID:       id,
