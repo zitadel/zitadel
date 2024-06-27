@@ -217,6 +217,11 @@ func prepareChangeDefaultLoginPolicy(a *instance.Aggregate, policy *ChangeLoginP
 		if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "IAM-SFdqd", "Errors.IAM.LoginPolicy.RedirectURIInvalid")
 		}
+
+		if policy.UseDefaultUriForNotificationLinks && policy.DefaultRedirectURI == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "IAM-FGbqs", "Errors.IAM.LoginPolicy.RedirectURIMustBeSet")
+		}
+
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			wm := NewInstanceLoginPolicyWriteModel(ctx)
 			if err := queryAndReduce(ctx, filter, wm); err != nil {

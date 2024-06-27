@@ -241,6 +241,7 @@ Errors:
       NotFound: Přihlašovací politika nenalezena
       Invalid: Přihlašovací politika je neplatná
       RedirectURIInvalid: Výchozí URI přesměrování je neplatné
+      RedirectURIMustBeSet: Výchozí URI přesměrování musí být nastaveno, pokud bylo povoleno jeho použití pro odkazy s upozorněním
       NotExisting: Přihlašovací politika neexistuje
       AlreadyExists: Přihlašovací politika již existuje
       IdpProviderAlreadyExisting: Poskytovatel identity již existuje
@@ -364,6 +365,7 @@ Errors:
       NotExisting: Výchozí přihlašovací politika neexistuje
       AlreadyExists: Výchozí přihlašovací politika již existuje
       RedirectURIInvalid: Výchozí Redirect URI je neplatné
+      RedirectURIMustBeSet: Výchozí URI přesměrování musí být nastaveno, pokud bylo povoleno jeho použití pro odkazy s upozorněním
       MFA:
         AlreadyExists: Vícefaktorové ověřování již existuje
         NotExisting: Vícefaktorové ověřování neexistuje

@@ -241,6 +241,7 @@ Errors:
       NotFound: Login Policy not found
       Invalid: Login Policy is invalid
       RedirectURIInvalid: Default Redirect URI is invalid
+      RedirectURIMustBeSet: Default Redirect URI must be set if has been enabled its use for the notification links
       NotExisting: Login Policy not existing
       AlreadyExists: Login Policy already exists
       IdpProviderAlreadyExisting: Identity Provider already existing
@@ -364,6 +365,7 @@ Errors:
       NotExisting: Default Login Policy not existing
       AlreadyExists: Default Login Policy already exists
       RedirectURIInvalid: Default Redirect URI is invalid
+      RedirectURIMustBeSet: Default Redirect URI must be set if has been enabled its use for the notification links
       MFA:
         AlreadyExists: Multifactor already exists
         NotExisting: Multifactor not existing

@@ -113,6 +113,40 @@ func TestCommandSide_ChangeDefaultLoginPolicy(t *testing.T) {
 			},
 		},
 		{
+			name: "defaultRedirectURI must be set if its use in notification links has been enabled, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				policy: &ChangeLoginPolicy{
+					AllowRegister:                     false,
+					AllowUsernamePassword:             false,
+					AllowExternalIDP:                  false,
+					ForceMFA:                          false,
+					ForceMFALocalOnly:                 false,
+					HidePasswordReset:                 false,
+					IgnoreUnknownUsernames:            false,
+					AllowDomainDiscovery:              false,
+					DisableLoginWithEmail:             false,
+					DisableLoginWithPhone:             false,
+					PasswordlessType:                  domain.PasswordlessTypeAllowed,
+					DefaultRedirectURI:                "",
+					PasswordCheckLifetime:             time.Hour * 1,
+					ExternalLoginCheckLifetime:        time.Hour * 2,
+					MFAInitSkipLifetime:               time.Hour * 3,
+					SecondFactorCheckLifetime:         time.Hour * 4,
+					MultiFactorCheckLifetime:          time.Hour * 5,
+					UseDefaultUriForNotificationLinks: true,
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			name: "change, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(

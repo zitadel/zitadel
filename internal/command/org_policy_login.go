@@ -406,6 +406,9 @@ func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation
 		if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "Org-WSfdq", "Errors.Org.LoginPolicy.RedirectURIInvalid")
 		}
+		if policy.UseDefaultUriForNotificationLinks && policy.DefaultRedirectURI == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "Org-GFsqb", "Errors.Org.LoginPolicy.RedirectURIMustBeSet")
+		}
 		for _, factor := range policy.SecondFactors {
 			if !factor.Valid() {
 				return nil, zerrors.ThrowInvalidArgument(nil, "Org-SFeea", "Errors.Org.LoginPolicy.MFA.Unspecified")
@@ -468,6 +471,9 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 	return func() (preparation.CreateCommands, error) {
 		if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "Org-Sfd21", "Errors.Org.LoginPolicy.RedirectURIInvalid")
+		}
+		if policy.UseDefaultUriForNotificationLinks && policy.DefaultRedirectURI == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "Org-Sdf12", "Errors.Org.LoginPolicy.RedirectURIMustBeSet")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			wm := NewOrgLoginPolicyWriteModel(a.ID)

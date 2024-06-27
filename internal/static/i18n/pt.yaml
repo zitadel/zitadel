@@ -240,6 +240,7 @@ Errors:
       NotFound: Política de login não encontrada
       Invalid: Política de login é inválida
       RedirectURIInvalid: O URI de redirecionamento padrão é inválido
+      RedirectURIMustBeSet: O URI de redirecionamento padrão deve ser definido se tiver sido habilitado seu uso para os links de notificação
       NotExisting: Política de login não existe
       AlreadyExists: Política de login já existe
       IdpProviderAlreadyExisting: Provedor de identidade já existe
@@ -363,6 +364,7 @@ Errors:
       NotExisting: Política de Login padrão não existe
       AlreadyExists: Política de Login padrão já existe
       RedirectURIInvalid: O URI de redirecionamento padrão é inválido
+      RedirectURIMustBeSet: O URI de redirecionamento padrão deve ser definido se tiver sido habilitado seu uso para os links de notificação
       MFA:
         AlreadyExists: A autenticação multifator já existe
         NotExisting: A autenticação multifator não existe

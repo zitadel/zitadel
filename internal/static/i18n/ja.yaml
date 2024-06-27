@@ -233,6 +233,7 @@ Errors:
       NotFound: ログインポリシーが見つかりません
       Invalid: 無効なログインポリシーです
       RedirectURIInvalid: デフォルトのリダイレクトURIは無効です
+      RedirectURIMustBeSet: 通知リンクへの使用が有効になっている場合は、デフォルトのリダイレクト URI を設定する必要があります
       NotExisting: ログインポリシーは存在しません
       AlreadyExists: ログインポリシーはすでに存在します
       IdpProviderAlreadyExisting: すでに存在しているIDプロバイダーです
@@ -353,6 +354,7 @@ Errors:
       NotExisting: デフォルトログインポリシーは存在しません
       AlreadyExists: デフォルトログインポリシーはすでに存在します
       RedirectURIInvalid: 無効なデフォルトのリダイレクトURIです
+      RedirectURIMustBeSet: 通知リンクへの使用が有効になっている場合は、デフォルトのリダイレクト URI を設定する必要があります
       MFA:
         AlreadyExists: MFAはすでに存在します
         NotExisting: 存在しないMFAです

@@ -241,6 +241,7 @@ Errors:
       NotFound: 未找到登录策略
       Invalid: 登录策略无效
       RedirectURIInvalid: 默认重定向 URL 无效
+      RedirectURIMustBeSet: 如果已启用默认重定向 URI 用于通知链接，则必须设置默认重定向 URI
       NotExisting: 登录策略不存在
       AlreadyExists: 登录策略已存在
       IdpProviderAlreadyExisting: IDP 提供者已存在
@@ -364,6 +365,7 @@ Errors:
       NotExisting: 默认登录策略不存在
       AlreadyExists: 默认登录策略已存在
       RedirectURIInvalid: 默认重定向 URL 无效
+      RedirectURIMustBeSet: 如果已启用默认重定向 URI 用于通知链接，则必须设置默认重定向 URI
       MFA:
         AlreadyExists: MFA 已存在
         NotExisting: MFA 不存在

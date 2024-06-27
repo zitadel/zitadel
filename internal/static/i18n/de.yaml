@@ -241,6 +241,7 @@ Errors:
       NotFound: Login Policy konnte nicht gefunden werden
       Invalid: Login Policy ist ungültig
       RedirectURIInvalid: Default Redirect URI ist ungültig
+      RedirectURIMustBeSet: Der Standard-Umleitungs-URI muss festgelegt werden, wenn seine Verwendung für die Benachrichtigungslinks aktiviert wurde
       NotExisting: Login Policy existiert nicht auf dieser Organisation
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Identity Provider existiert bereits
@@ -364,6 +365,7 @@ Errors:
       NotExisting: Default Login Policy existiert nicht
       AlreadyExists: Default Login Policy existiert bereits
       RedirectURIInvalid: Default Redirect URI ist ungültig
+      RedirectURIMustBeSet: Der Standard-Umleitungs-URI muss festgelegt werden, wenn seine Verwendung für die Benachrichtigungslinks aktiviert wurde
       MFA:
         AlreadyExists: Multifaktor existiert bereits
         NotExisting: Multifaktor existiert nicht

@@ -419,6 +419,7 @@
       <input
         cnslInput
         placeholder="https://"
+        (keyup)="onDefaultRedirectUriChange()"
         [(ngModel)]="loginData.defaultRedirectUri"
         [disabled]="
           ([
@@ -443,6 +444,7 @@
       matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS.DESCRIPTION' | translate }}"
       [(ngModel)]="loginData.useDefaultUriForNotificationLinks"
       [disabled]="
+        !loginData.defaultRedirectUri ||
         ([
           serviceType === PolicyComponentServiceType.ADMIN
             ? 'iam.policy.write'

@@ -241,6 +241,7 @@ Errors:
       NotFound: Inloggningspolicyn hittades inte
       Invalid: Inloggningspolicyn är ogiltig
       RedirectURIInvalid: Standard-Redirect URI är ogiltig
+      RedirectURIMustBeSet: Standard omdirigerings-URI måste ställas in om dess användning har aktiverats för meddelandelänkarna
       NotExisting: Inloggningspolicyn finns inte
       AlreadyExists: Inloggningspolicyn finns redan
       IdpProviderAlreadyExisting: Identitetsleverantör finns redan
@@ -364,6 +365,7 @@ Errors:
       NotExisting: Standardinloggningspolicyn existerar inte
       AlreadyExists: Standardinloggningspolicyn finns redan
       RedirectURIInvalid: Standardomdirigerings-URI är ogiltig
+      RedirectURIMustBeSet: Standard omdirigerings-URI måste ställas in om dess användning har aktiverats för meddelandelänkarna
       MFA:
         AlreadyExists: Tvåfaktor finns redan
         NotExisting: Tvåfaktor existerar inte

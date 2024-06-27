@@ -241,6 +241,7 @@ Errors:
       NotFound: Política de inicio de sesión no encontrada
       Invalid: Política de inicio de sesión no es válida
       RedirectURIInvalid: La URI de redirección por defecto no es válida
+      RedirectURIMustBeSet: Se debe configurar la URI de redireccionamiento predeterminada si se ha habilitado su uso para los enlaces de notificación.
       NotExisting: Política de inicio de sesión no existente
       AlreadyExists: La política de inicio de sesión ya existe
       IdpProviderAlreadyExisting: El proveedor de identidad (IDP) ya existe
@@ -364,6 +365,7 @@ Errors:
       NotExisting: La política de inicio de sesión por defecto no existe
       AlreadyExists: La política de inicio de sesión por defecto ya existe
       RedirectURIInvalid: La URI de redirección no es válida
+      RedirectURIMustBeSet: Se debe configurar la URI de redireccionamiento predeterminada si se ha habilitado su uso para los enlaces de notificación.
       MFA:
         AlreadyExists: El Multifactor ya existe
         NotExisting: El Multifactor no existe

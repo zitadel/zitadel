@@ -10338,7 +10338,7 @@ message AddCustomLoginPolicyRequest {
     ];
     bool use_default_uri_for_notification_links = 21 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "if activated, the default redirect URI will be used as the button's link for notification messages"
+            description: "if activated and default_redirect_uri is not empty, the default redirect URI will be used as the button's link for notification messages"
         }
     ];
 }
@@ -10392,7 +10392,7 @@ message UpdateCustomLoginPolicyRequest {
     ];
     bool use_default_uri_for_notification_links = 18 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "if activated, the default redirect URI will be used as the button's link for notification messages"
+            description: "if activated and default_redirect_uri is not empty, the default redirect URI will be used as the button's link for notification messages"
         }
     ];
 }

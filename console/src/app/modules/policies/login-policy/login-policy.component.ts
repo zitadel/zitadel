@@ -392,4 +392,10 @@ export class LoginPolicyComponent implements OnInit, OnDestroy {
   public get multiFactorCheckLifetime(): AbstractControl | null {
     return this.lifetimeForm.get('multiFactorCheckLifetime');
   }
+
+  public onDefaultRedirectUriChange() {
+    if (this.loginData?.defaultRedirectUri === '') {
+      this.loginData.useDefaultUriForNotificationLinks = false;
+    }
+  }
 }
