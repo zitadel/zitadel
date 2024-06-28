@@ -373,10 +373,19 @@ func (u *userNotifier) reduceOTPSMS(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, event)
-	err = notify.SendOTPSMSCode(ctx, plainCode, expiry)
+	_, twilioConfig, err := u.channels.SMS(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	if twilioConfig.VerifyServiceSID != "" {
+
+	} else {
+		notify := types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, event)
+		err = notify.SendOTPSMSCode(ctx, plainCode, expiry)
+		if err != nil {
+			return nil, err
+		}
 	}
 	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner)
 	if err != nil {

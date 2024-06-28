@@ -4412,6 +4412,14 @@ message AddSMSProviderTwilioRequest {
             max_length: 200;
         }
     ];
+    string verify_service_sid = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"AB123b9e61d238abae7d3be7b65ecbc987\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
 }
 
 message AddSMSProviderTwilioResponse {
@@ -4433,6 +4441,14 @@ message UpdateSMSProviderTwilioRequest {
     string sender_number = 3 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"AB123b9e61d238abae7d3be7b65ecbc987\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string verify_service_sid = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"AB123b9e61d238abae7d3be7b65ecbc987\"";
             min_length: 1;

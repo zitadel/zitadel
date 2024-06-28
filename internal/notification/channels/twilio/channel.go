@@ -1,6 +1,9 @@
 package twilio
 
 import (
+	"context"
+	"net/url"
+
 	"github.com/kevinburke/twilio-go"
 	"github.com/zitadel/logging"
 
@@ -10,11 +13,41 @@ import (
 )
 
 func InitChannel(config Config) channels.NotificationChannel {
+	if config.VerifyServiceSID != "" {
+		return channels.HandleMessageFunc(func(message channels.Message) error {
+			// TODO: send verify message here
+			return nil
+		})
+	}
+
 	client := twilio.NewClient(config.SID, config.Token, nil)
 
 	logging.Debug("successfully initialized twilio sms channel")
-
 	return channels.HandleMessageFunc(func(message channels.Message) error {
+		if twilioMsg, ok := message.(*messages.TwilioVerify); ok {
+
+			// SEE: https://www.twilio.com/docs/verify/api/verification
+			body := url.Values{}
+			body.Add("To", twilioMsg.RecipientPhoneNumber)
+			body.Add("Channel", "sms")
+			// TODO: pass through custom message (but not code)
+			// body.Add("CustomMessage", twilioMsg.Message)
+			// TODO: pass through custom code (separate from message text)
+			// body.Add("CustomCode", twilioMsg.Code)
+
+			// TODO: need to pass in parent context
+			resp, err := client.Verifications.Create(
+				context.Background(),
+				twilioMsg.VerifyServiceSID,
+				body,
+			)
+			if err != nil {
+				return zerrors.ThrowInternal(err, "TWILI-0s9f2", "could not send verification")
+			}
+			logging.WithFields("sid", resp.Sid, "status", resp.Status).Debug("verification sent")
+			return nil
+		}
+
 		twilioMsg, ok := message.(*messages.SMS)
 		if !ok {
 			return zerrors.ThrowInternal(nil, "TWILI-s0pLc", "message is not SMS")

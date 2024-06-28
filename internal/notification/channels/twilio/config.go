@@ -1,9 +1,10 @@
 package twilio
 
 type Config struct {
-	SID          string
-	Token        string
-	SenderNumber string
+	SID              string
+	Token            string
+	SenderNumber     string
+	VerifyServiceSID string
 }
 
 func (t *Config) IsValid() bool {

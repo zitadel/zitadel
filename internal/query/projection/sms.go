@@ -24,12 +24,13 @@ const (
 	SMSColumnResourceOwner = "resource_owner"
 	SMSColumnInstanceID    = "instance_id"
 
-	smsTwilioTableSuffix              = "twilio"
-	SMSTwilioConfigColumnSMSID        = "sms_id"
-	SMSTwilioColumnInstanceID         = "instance_id"
-	SMSTwilioConfigColumnSID          = "sid"
-	SMSTwilioConfigColumnSenderNumber = "sender_number"
-	SMSTwilioConfigColumnToken        = "token"
+	smsTwilioTableSuffix                  = "twilio"
+	SMSTwilioConfigColumnSMSID            = "sms_id"
+	SMSTwilioColumnInstanceID             = "instance_id"
+	SMSTwilioConfigColumnSID              = "sid"
+	SMSTwilioConfigColumnSenderNumber     = "sender_number"
+	SMSTwilioConfigColumnToken            = "token"
+	SMSTwilioConfigColumnVerifyServiceSID = "verify_service_sid"
 )
 
 type smsConfigProjection struct{}
@@ -62,6 +63,7 @@ func (*smsConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMSTwilioConfigColumnSID, handler.ColumnTypeText),
 			handler.NewColumn(SMSTwilioConfigColumnSenderNumber, handler.ColumnTypeText),
 			handler.NewColumn(SMSTwilioConfigColumnToken, handler.ColumnTypeJSONB),
+			handler.NewColumn(SMSTwilioConfigColumnVerifyServiceSID, handler.ColumnTypeText),
 		},
 			handler.NewPrimaryKey(SMSTwilioColumnInstanceID, SMSTwilioConfigColumnSMSID),
 			smsTwilioTableSuffix,
@@ -135,6 +137,7 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 				handler.NewCol(SMSTwilioConfigColumnSID, e.SID),
 				handler.NewCol(SMSTwilioConfigColumnToken, e.Token),
 				handler.NewCol(SMSTwilioConfigColumnSenderNumber, e.SenderNumber),
+				handler.NewCol(SMSTwilioConfigColumnVerifyServiceSID, e.VerifyServiceSID),
 			},
 			handler.WithTableSuffix(smsTwilioTableSuffix),
 		),
@@ -152,6 +155,9 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 	}
 	if e.SenderNumber != nil {
 		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnSenderNumber, *e.SenderNumber))
+	}
+	if e.VerifyServiceSID != nil {
+		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnVerifyServiceSID, *e.VerifyServiceSID))
 	}
 
 	return handler.NewMultiStatement(
