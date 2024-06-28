@@ -284,7 +284,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
 
 		if e.NotificationType == domain.NotificationTypeSms {
-			twilioVerificationEnabled, err := u.checkTwilioVerificationAPIEnabled(ctx)
+			twilioVerificationEnabled, err := u.isTwilioVerificationAPIEnabled(ctx)
 			if err != nil {
 				return err
 			}
@@ -385,7 +385,7 @@ func (u *userNotifier) reduceOTPSMS(
 		return nil, err
 	}
 
-	twilioVerificationEnabled, err := u.checkTwilioVerificationAPIEnabled(ctx)
+	twilioVerificationEnabled, err := u.isTwilioVerificationAPIEnabled(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -733,7 +733,7 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 
-		twilioVerificationEnabled, err := u.checkTwilioVerificationAPIEnabled(ctx)
+		twilioVerificationEnabled, err := u.isTwilioVerificationAPIEnabled(ctx)
 		if err != nil {
 			return err
 		}
@@ -761,7 +761,7 @@ func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, e
 	return u.queries.IsAlreadyHandled(ctx, event, data, eventTypes...)
 }
 
-func (u *userNotifier) checkTwilioVerificationAPIEnabled(ctx context.Context) (enabled bool, err error) {
+func (u *userNotifier) isTwilioVerificationAPIEnabled(ctx context.Context) (bool, error) {
 	_, twilioConfig, err := u.channels.SMS(ctx)
 	if err != nil {
 		return false, err
