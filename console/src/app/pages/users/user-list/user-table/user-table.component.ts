@@ -119,7 +119,7 @@ export class UserTableComponent implements OnInit {
       queryParamsHandling: 'merge',
       skipLocationChange: false,
     });
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
+    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, this.searchQueries);
   }
 
   public isAllSelected(): boolean {
@@ -134,7 +134,7 @@ export class UserTableComponent implements OnInit {
 
   public changePage(event: PageEvent): void {
     this.selection.clear();
-    this.getData(event.pageSize, event.pageIndex * event.pageSize, this.type);
+    this.getData(event.pageSize, event.pageIndex * event.pageSize, this.type, this.searchQueries);
   }
 
   public deactivateSelectedUsers(): void {
