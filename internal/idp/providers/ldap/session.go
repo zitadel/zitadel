@@ -3,6 +3,7 @@ package ldap
 import (
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"errors"
 	"net"
 	"net/url"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-ldap/ldap/v3"
+	"github.com/google/uuid"
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
@@ -262,12 +264,12 @@ func mapLDAPEntryToUser(
 	}
 
 	return NewUser(
-		user.GetAttributeValue(idAttribute),
-		user.GetAttributeValue(firstNameAttribute),
-		user.GetAttributeValue(lastNameAttribute),
-		user.GetAttributeValue(displayNameAttribute),
-		user.GetAttributeValue(nickNameAttribute),
-		user.GetAttributeValue(preferredUsernameAttribute),
+		getAttributeValue(user, idAttribute),
+		getAttributeValue(user, firstNameAttribute),
+		getAttributeValue(user, lastNameAttribute),
+		getAttributeValue(user, displayNameAttribute),
+		getAttributeValue(user, nickNameAttribute),
+		getAttributeValue(user, preferredUsernameAttribute),
 		domain.EmailAddress(user.GetAttributeValue(emailAttribute)),
 		emailVerified,
 		domain.PhoneNumber(user.GetAttributeValue(phoneAttribute)),
@@ -276,4 +278,46 @@ func mapLDAPEntryToUser(
 		user.GetAttributeValue(avatarURLAttribute),
 		user.GetAttributeValue(profileAttribute),
 	), nil
+}
+
+func getAttributeValue(user *ldap.Entry, attribute string) string {
+	// return an empty string if no attribute is needed
+	if attribute == "" {
+		return ""
+	}
+
+	attributeRawValue := user.GetRawAttributeValue(attribute)
+	// try to parse byte to uuid, if parsable the value is not empty
+	if id := parseBytesToUUIDString(attributeRawValue); id != "" {
+		return id
+	}
+
+	// try to decode base64
+	buff := make([]byte, base64.StdEncoding.DecodedLen(len(attributeRawValue)))
+	if _, err := base64.StdEncoding.Decode(buff, attributeRawValue); err == nil {
+		// try to parse byte to uuid, if parsable the value is not equal empty
+		if id := parseBytesToUUIDString(buff); id != "" {
+			return id
+		}
+		// otherwise return the decoded data as string
+		return string(buff)
+	}
+
+	// if no decoding or parsing is possible return the attributeValue directly
+	return user.GetAttributeValue(attribute)
+}
+
+func parseBytesToUUIDString(data []byte) string {
+	// check if len == 16, which could be an uuid, otherwise return empty
+	if len(data) != 16 {
+		return ""
+	}
+	// fill uuid and try to make human-readable
+	id := uuid.UUID(data).String()
+	// id is empty if the uuid is invalid so return empty
+	if id == "" {
+		return ""
+	}
+	// return uuid in format 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+	return id
 }
