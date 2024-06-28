@@ -5,6 +5,7 @@ sidebar_label: Limit access to console
 
 ZITADEL includes a console that allows Managers to configure all resources. All uses, including end-users, by default, view and manage their profile information.
 In some use cases you want to prevent users from accessing the console, this could be:
+
 - User management is integrated into your own app
 - Users login via SSO and should not be able to change their data in the Console
 - Only managers should be able to access Console to manage their users
@@ -39,7 +40,7 @@ Start by granting the organization of your managers, that should be able to acce
    ![Project Settings: Default Project - Grants](/img/guides/solution-scenarios/console-zitadel-project-grants.png)
 
 2. On the next screen select the organization to which you want to give the grant
-  ![Project Settings: Grants - Choose Organization](/img/guides/solution-scenarios/console-create-project-grant-org.png)
+   ![Project Settings: Grants - Choose Organization](/img/guides/solution-scenarios/console-create-project-grant-org.png)
 
 3. You can skip the screen with the role selection, and click save
 4. Make sure the grant is in now in the overview and marked as active.
@@ -56,6 +57,7 @@ After that create a Personal Access Token (PAT) for the manager.
 More detailed information about creating a PAT and manager roles you can find [here](/docs/guides/integrate/service-users/personal-access-token)
 
 Then you have to send the following request:
+
 ```bash
 curl -L -X PUT "https://$CUSTOM_DOMAIN/management/v1/projects/$PROJECT_ID" \
 -H 'Content-Type: application/json' \
@@ -71,6 +73,7 @@ curl -L -X PUT "https://$CUSTOM_DOMAIN/management/v1/projects/$PROJECT_ID" \
 ```
 
 Where
+
 - CUSTOM_DOMAIN is your domain, f.e. mydemo.zitadel.cloud
 - PAT is your service user's personal access token
 - PROJECT_ID is the default-project's ID that can be found in Console, see screenshot above
@@ -80,3 +83,19 @@ All other users should see the following error message after authentication:
 
 ![Console access restricted](/img/guides/solution-scenarios/console-access-restricted.png)
 
+### Restricting Console access in notification messages
+
+Zitadel notifications template has a button that by default redirect users to the Zitadel console to perform an action (e.g verify an email, enter an init code...)
+
+You can avoid this redirect, setting which URL should be used for these buttons.
+
+You've two options that can be used combined or separately:
+
+- Use the default redirect URI for all notification messages buttons. Read more in [Settings - Default Redirect URI](/docs/guides/manage/console/default-settings#default-redirect-uri)
+- In the [**Message Texts**](#./default-settings#message-texts) section, you can also define the URL for specific messages and languages using the ButtonUrl text area. Note that the ButtonUrl value will override the use of the default redirect URI for the specified combination of message and language.
+
+<img
+  src="/docs//img/guides/solution-scenarios/set_buttonurl_in_message_texts.png"
+  alt="Message Texts: specify a button url"
+  width="600px"
+/>
