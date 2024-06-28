@@ -34,7 +34,7 @@
         <button mat-stroked-button type="button" (click)="reset()">{{ 'ACTIONS.RESET' | translate }}</button>
         <span class="filter-middle">{{ 'FILTER.TITLE' | translate }}</span>
         <button mat-raised-button color="primary" type="button" (click)="finish()" data-e2e="filter-finish-button">
-          {{ 'ACTIONS.FINISH' | translate }}
+          {{ 'ACTIONS.APPLY' | translate }}
         </button>
       </div>
       <form *ngIf="form" [formGroup]="form" (ngSubmit)="emitChange()">

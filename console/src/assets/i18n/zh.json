@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     },
-    "DOWNLOAD": "下载"
+    "DOWNLOAD": "下载",
+    "APPLY": "申请"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "控制整个实例，包括所有组织",

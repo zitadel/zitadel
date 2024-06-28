@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Afficher l'utilisateur {{value}}"
     },
-    "DOWNLOAD": "Télécharger"
+    "DOWNLOAD": "Télécharger",
+    "APPLY": "Appliquer"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "A le contrôle de toute l'instance, y compris toutes les organisations",
