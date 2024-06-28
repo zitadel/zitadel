@@ -441,8 +441,10 @@
       class="login-policy-toggle"
       color="primary"
       ngDefaultControl
-      matTooltip="{{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS.DESCRIPTION' | translate }}"
-      [(ngModel)]="loginData.useDefaultUriForNotificationLinks"
+      matTooltip="{{
+        'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS.DESCRIPTION' | translate
+      }}"
+      [(ngModel)]="loginData.useDefaultRedirectUriForNotificationLinks"
       [disabled]="
         !loginData.defaultRedirectUri ||
         ([
@@ -456,7 +458,7 @@
           | async) === false
       "
     >
-      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS.TITLE' | translate }}
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS.TITLE' | translate }}
     </mat-checkbox>
   </div>
 </div>

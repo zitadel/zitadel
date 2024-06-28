@@ -15,33 +15,33 @@ import (
 const (
 	LoginPolicyTable = "projections.login_policies6"
 
-	LoginPolicyIDCol                     = "aggregate_id"
-	LoginPolicyInstanceIDCol             = "instance_id"
-	LoginPolicyCreationDateCol           = "creation_date"
-	LoginPolicyChangeDateCol             = "change_date"
-	LoginPolicySequenceCol               = "sequence"
-	LoginPolicyIsDefaultCol              = "is_default"
-	LoginPolicyAllowRegisterCol          = "allow_register"
-	LoginPolicyAllowUsernamePasswordCol  = "allow_username_password"
-	LoginPolicyAllowExternalIDPsCol      = "allow_external_idps"
-	LoginPolicyForceMFACol               = "force_mfa"
-	LoginPolicyForceMFALocalOnlyCol      = "force_mfa_local_only"
-	LoginPolicy2FAsCol                   = "second_factors"
-	LoginPolicyMFAsCol                   = "multi_factors"
-	LoginPolicyPasswordlessTypeCol       = "passwordless_type"
-	LoginPolicyHidePWResetCol            = "hide_password_reset"
-	IgnoreUnknownUsernames               = "ignore_unknown_usernames"
-	AllowDomainDiscovery                 = "allow_domain_discovery"
-	DisableLoginWithEmail                = "disable_login_with_email"
-	DisableLoginWithPhone                = "disable_login_with_phone"
-	DefaultRedirectURI                   = "default_redirect_uri"
-	PasswordCheckLifetimeCol             = "password_check_lifetime"
-	ExternalLoginCheckLifetimeCol        = "external_login_check_lifetime"
-	MFAInitSkipLifetimeCol               = "mfa_init_skip_lifetime"
-	SecondFactorCheckLifetimeCol         = "second_factor_check_lifetime"
-	MultiFactorCheckLifetimeCol          = "multi_factor_check_lifetime"
-	LoginPolicyOwnerRemovedCol           = "owner_removed"
-	UseDefaultUriForNotificationLinksCol = "use_default_uri_for_notification_links"
+	LoginPolicyIDCol                             = "aggregate_id"
+	LoginPolicyInstanceIDCol                     = "instance_id"
+	LoginPolicyCreationDateCol                   = "creation_date"
+	LoginPolicyChangeDateCol                     = "change_date"
+	LoginPolicySequenceCol                       = "sequence"
+	LoginPolicyIsDefaultCol                      = "is_default"
+	LoginPolicyAllowRegisterCol                  = "allow_register"
+	LoginPolicyAllowUsernamePasswordCol          = "allow_username_password"
+	LoginPolicyAllowExternalIDPsCol              = "allow_external_idps"
+	LoginPolicyForceMFACol                       = "force_mfa"
+	LoginPolicyForceMFALocalOnlyCol              = "force_mfa_local_only"
+	LoginPolicy2FAsCol                           = "second_factors"
+	LoginPolicyMFAsCol                           = "multi_factors"
+	LoginPolicyPasswordlessTypeCol               = "passwordless_type"
+	LoginPolicyHidePWResetCol                    = "hide_password_reset"
+	IgnoreUnknownUsernames                       = "ignore_unknown_usernames"
+	AllowDomainDiscovery                         = "allow_domain_discovery"
+	DisableLoginWithEmail                        = "disable_login_with_email"
+	DisableLoginWithPhone                        = "disable_login_with_phone"
+	DefaultRedirectURI                           = "default_redirect_uri"
+	PasswordCheckLifetimeCol                     = "password_check_lifetime"
+	ExternalLoginCheckLifetimeCol                = "external_login_check_lifetime"
+	MFAInitSkipLifetimeCol                       = "mfa_init_skip_lifetime"
+	SecondFactorCheckLifetimeCol                 = "second_factor_check_lifetime"
+	MultiFactorCheckLifetimeCol                  = "multi_factor_check_lifetime"
+	LoginPolicyOwnerRemovedCol                   = "owner_removed"
+	UseDefaultRedirectUriForNotificationLinksCol = "use_default_redirect_uri_for_notification_links"
 )
 
 type loginPolicyProjection struct{}
@@ -83,7 +83,7 @@ func (*loginPolicyProjection) Init() *old_handler.Check {
 			handler.NewColumn(SecondFactorCheckLifetimeCol, handler.ColumnTypeInt64),
 			handler.NewColumn(MultiFactorCheckLifetimeCol, handler.ColumnTypeInt64),
 			handler.NewColumn(LoginPolicyOwnerRemovedCol, handler.ColumnTypeBool, handler.Default(false)),
-			handler.NewColumn(UseDefaultUriForNotificationLinksCol, handler.ColumnTypeBool, handler.Default(false)),
+			handler.NewColumn(UseDefaultRedirectUriForNotificationLinksCol, handler.ColumnTypeBool, handler.Default(false)),
 		},
 			handler.NewPrimaryKey(LoginPolicyInstanceIDCol, LoginPolicyIDCol),
 			handler.WithIndex(handler.NewIndex("owner_removed", []string{LoginPolicyOwnerRemovedCol})),
@@ -204,7 +204,7 @@ func (p *loginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(MFAInitSkipLifetimeCol, policyEvent.MFAInitSkipLifetime),
 		handler.NewCol(SecondFactorCheckLifetimeCol, policyEvent.SecondFactorCheckLifetime),
 		handler.NewCol(MultiFactorCheckLifetimeCol, policyEvent.MultiFactorCheckLifetime),
-		handler.NewCol(UseDefaultUriForNotificationLinksCol, policyEvent.UseDefaultUriForNotificationLinks),
+		handler.NewCol(UseDefaultRedirectUriForNotificationLinksCol, policyEvent.UseDefaultRedirectUriForNotificationLinks),
 	}), nil
 }
 
@@ -274,8 +274,8 @@ func (p *loginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	if policyEvent.MultiFactorCheckLifetime != nil {
 		cols = append(cols, handler.NewCol(MultiFactorCheckLifetimeCol, *policyEvent.MultiFactorCheckLifetime))
 	}
-	if policyEvent.UseDefaultUriForNotificationLinks != nil {
-		cols = append(cols, handler.NewCol(UseDefaultUriForNotificationLinksCol, *policyEvent.UseDefaultUriForNotificationLinks))
+	if policyEvent.UseDefaultRedirectUriForNotificationLinks != nil {
+		cols = append(cols, handler.NewCol(UseDefaultRedirectUriForNotificationLinksCol, *policyEvent.UseDefaultRedirectUriForNotificationLinks))
 	}
 
 	return handler.NewUpdateStatement(

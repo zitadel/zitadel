@@ -289,7 +289,7 @@
             "TITLE": "Désactiver la connexion par numéro de téléphone",
             "DESCRIPTION": "Si activé, vos utilisateurs ne pourront pas utiliser leur numéro de téléphone pour se connecter. Veuillez noter que si vous le désactivez, les numéros de téléphone devront être uniques à travers toutes les organisations afin de pouvoir se connecter."
           },
-          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+          "USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS": {
             "TITLE": "Utiliser l'URI de redirection par défaut pour les liens de notification",
             "DESCRIPTION": "Si activé, l'URI de redirection par défaut sera utilisé comme lien du bouton pour les messages de notification par e-mail (par exemple, le bouton de connexion dans le message de changement de mot de passe)"
           }

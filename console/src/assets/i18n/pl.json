@@ -289,7 +289,7 @@
             "TITLE": "Wyłącz logowanie telefoniczne",
             "DESCRIPTION": "Jeśli to zostanie aktywowane, użytkownicy nie mogą logować się za pomocą numerów telefonów. Uważaj, jeśli to dezaktywujesz, numery telefonów twoich użytkowników muszą być unikalne we wszystkich organizacjach, aby móc się zalogować."
           },
-          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+          "USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS": {
             "TITLE": "Użyj domyślnego identyfikatora URI przekierowania dla linków powiadomień",
             "DESCRIPTION": "Jeśli to zostanie aktywowane, domyślny identyfikator URI przekierowania będzie używany jako link przycisku do powiadomień e-mail (np. przycisk Zaloguj się w wiadomości o zmianie hasła)"
           }

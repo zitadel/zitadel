@@ -13,7 +13,7 @@ import (
 func (notify Notify) SendDomainClaimed(ctx context.Context, user *query.NotifyUser, username string, loginPolicy *query.LoginPolicy) error {
 	var url string
 
-	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultUriForNotificationLinks {
+	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultRedirectUriForNotificationLinks {
 		url = loginPolicy.DefaultRedirectURI
 	} else {
 		url = login.LoginLink(http_utils.ComposedOrigin(ctx), user.ResourceOwner)

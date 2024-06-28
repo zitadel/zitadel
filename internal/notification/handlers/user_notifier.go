@@ -517,7 +517,7 @@ func (u *userNotifier) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-	if loginPolicy.UseDefaultUriForNotificationLinks {
+	if loginPolicy.UseDefaultRedirectUriForNotificationLinks {
 		url = loginPolicy.DefaultRedirectURI
 	}
 	notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, event)

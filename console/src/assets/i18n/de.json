@@ -289,7 +289,7 @@
             "TITLE": "Telefon-Login deaktivieren",
             "DESCRIPTION": "Ist dies aktiviert, können deine Benutzer sich nicht mit ihren Telefonnummern einloggen. Beachte, dass, wenn du dies deaktivierst, die Telefonnummern deiner Benutzer einzigartig über alle Organisationen hinweg sein müssen, um sich einzuloggen."
           },
-          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+          "USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS": {
             "TITLE": "Verwenden Sie den Standard-Umleitungs-URI für Benachrichtigungslinks",
             "DESCRIPTION": "Wenn dies aktiviert ist, wird der Standard-Umleitungs-URI als Link der Schaltfläche für E-Mail-Benachrichtigungsnachrichten verwendet (z. B. Anmeldeschaltfläche in der Nachricht zur Passwortänderung)."
           }

@@ -289,7 +289,7 @@
             "TITLE": "Disable Phone Login",
             "DESCRIPTION": "If this is activated, your users can't use their phone numbers to log in. Beware that if you deactivate this, your users phone numbers must be unique accross all organizations in order to log in."
           },
-          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+          "USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS": {
             "TITLE": "Use default redirect URI for notification links",
             "DESCRIPTION": "If this is activated, the default redirect URI will be used as the button's link for e-mail notification messages (e.g Login button in password changes message)"
           }

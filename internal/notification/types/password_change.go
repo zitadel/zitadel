@@ -12,7 +12,7 @@ import (
 func (notify Notify) SendPasswordChange(ctx context.Context, user *query.NotifyUser, loginPolicy *query.LoginPolicy) error {
 	var url string
 
-	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultUriForNotificationLinks {
+	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultRedirectUriForNotificationLinks {
 		url = loginPolicy.DefaultRedirectURI
 	} else {
 		url = console.LoginHintLink(http_utils.ComposedOrigin(ctx), user.PreferredLoginName)

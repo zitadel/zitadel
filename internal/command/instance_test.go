@@ -235,24 +235,24 @@ func instanceSetupPoliciesConfig() *InstanceSetup {
 			SMTPSenderAddressMatchesInstanceDomain bool
 		}{false, false, false},
 		LoginPolicy: struct {
-			AllowUsernamePassword             bool
-			AllowRegister                     bool
-			AllowExternalIDP                  bool
-			ForceMFA                          bool
-			ForceMFALocalOnly                 bool
-			HidePasswordReset                 bool
-			IgnoreUnknownUsername             bool
-			AllowDomainDiscovery              bool
-			DisableLoginWithEmail             bool
-			DisableLoginWithPhone             bool
-			PasswordlessType                  domain.PasswordlessType
-			DefaultRedirectURI                string
-			PasswordCheckLifetime             time.Duration
-			ExternalLoginCheckLifetime        time.Duration
-			MfaInitSkipLifetime               time.Duration
-			SecondFactorCheckLifetime         time.Duration
-			MultiFactorCheckLifetime          time.Duration
-			UseDefaultUriForNotificationLinks bool
+			AllowUsernamePassword                     bool
+			AllowRegister                             bool
+			AllowExternalIDP                          bool
+			ForceMFA                                  bool
+			ForceMFALocalOnly                         bool
+			HidePasswordReset                         bool
+			IgnoreUnknownUsername                     bool
+			AllowDomainDiscovery                      bool
+			DisableLoginWithEmail                     bool
+			DisableLoginWithPhone                     bool
+			PasswordlessType                          domain.PasswordlessType
+			DefaultRedirectURI                        string
+			PasswordCheckLifetime                     time.Duration
+			ExternalLoginCheckLifetime                time.Duration
+			MfaInitSkipLifetime                       time.Duration
+			SecondFactorCheckLifetime                 time.Duration
+			MultiFactorCheckLifetime                  time.Duration
+			UseDefaultRedirectUriForNotificationLinks bool
 		}{true, true, true, false, false, false, false, true, false, false, domain.PasswordlessTypeAllowed, "", 240 * time.Hour, 240 * time.Hour, 720 * time.Hour, 18 * time.Hour, 12 * time.Hour, false},
 		NotificationPolicy: struct {
 			PasswordChange bool

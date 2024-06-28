@@ -289,7 +289,7 @@
             "TITLE": "Zakázat přihlášení telefonem",
             "DESCRIPTION": "Pokud je tato možnost aktivována, tvoji uživatelé nemohou použít svá telefonní čísla pro přihlášení. Pozor, pokud toto deaktivuješ, telefonní čísla tvých uživatelů musí být jedinečná napříč všemi organizacemi, aby se mohli přihlásit."
           },
-          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+          "USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS": {
             "TITLE": "Pro odkazy s upozorněním použijte výchozí URI přesměrování",
             "DESCRIPTION": "Pokud je toto aktivováno, výchozí URI přesměrování bude použito jako odkaz tlačítka pro e-mailové upozornění (např. tlačítko Přihlásit se ve zprávě o změně hesla)"
           }

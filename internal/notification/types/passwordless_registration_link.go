@@ -13,7 +13,7 @@ import (
 func (notify Notify) SendPasswordlessRegistrationLink(ctx context.Context, user *query.NotifyUser, code, codeID, urlTmpl string, loginPolicy *query.LoginPolicy) error {
 	var url string
 
-	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultUriForNotificationLinks {
+	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultRedirectUriForNotificationLinks {
 		url = loginPolicy.DefaultRedirectURI
 	} else {
 		if urlTmpl == "" {

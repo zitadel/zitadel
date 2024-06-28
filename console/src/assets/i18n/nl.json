@@ -289,7 +289,7 @@
             "TITLE": "Inloggen met telefoon uitschakelen",
             "DESCRIPTION": "Als dit geactiveerd is, kunnen je gebruikers niet inloggen met hun telefoonnummers. Let op dat als je dit deactiveert, de telefoonnummers van je gebruikers uniek moeten zijn over alle organisaties om in te kunnen loggen."
           },
-          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+          "USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS": {
             "TITLE": "Gebruik de standaard omleidings-URI voor meldingslinks",
             "DESCRIPTION": "Als dit geactiveerd is, wordt de standaard omleidings-URI gebruikt als de link van de knop voor e-mailmeldingen (bijvoorbeeld de knop Inloggen in het bericht over wachtwoordwijzigingen)"
           }

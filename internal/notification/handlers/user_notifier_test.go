@@ -1787,8 +1787,8 @@ func expectTemplateQueries(queries *mock.MockQueries, template string, useDefaul
 				MultiFactors: []domain.MultiFactorType{
 					domain.MultiFactorTypeU2FWithPIN,
 				},
-				IsDefault:                         true,
-				UseDefaultUriForNotificationLinks: true,
+				IsDefault: true,
+				UseDefaultRedirectUriForNotificationLinks: true,
 			}, nil)
 	} else {
 		queries.EXPECT().LoginPolicyByID(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(&query.LoginPolicy{}, nil)

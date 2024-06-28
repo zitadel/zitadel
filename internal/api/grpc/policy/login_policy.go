@@ -42,7 +42,7 @@ func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 			ChangeDate:    timestamppb.New(policy.ChangeDate),
 			ResourceOwner: policy.OrgID,
 		},
-		UseDefaultUriForNotificationLinks: policy.UseDefaultUriForNotificationLinks,
+		UseDefaultRedirectUriForNotificationLinks: policy.UseDefaultRedirectUriForNotificationLinks,
 	}
 }
 

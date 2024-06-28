@@ -289,7 +289,7 @@
             "TITLE": "Desactivar Inicio de Sesión con Teléfono",
             "DESCRIPTION": "Si esto está activado, tus usuarios no pueden usar sus números de teléfono para iniciar sesión. Ten en cuenta que si desactivas esto, los números de teléfono de tus usuarios deben ser únicos en todas las organizaciones para poder iniciar sesión."
           },
-          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+          "USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS": {
             "TITLE": "Utiliza la URI de redireccionamiento predeterminado para los enlaces de notificación",
             "DESCRIPTION": "Si esto está activado, la URI de redireccionamiento predeterminado se utilizará como enlace para el botón para los mensajes de notificación por correo electrónico (por ejemplo, el botón Iniciar sesión en el mensaje de cambio de contraseña)."
           }

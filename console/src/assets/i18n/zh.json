@@ -289,7 +289,7 @@
             "TITLE": "禁用电话登录",
             "DESCRIPTION": "如果此功能被激活，你的用户不能使用他们的电话号码登录。注意，如果你禁用此功能，你的用户的电话号码必须在所有组织中唯一，以便登录。"
           },
-          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+          "USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS": {
             "TITLE": "对通知链接使用默认重定向 URI",
             "DESCRIPTION": "如果激活此选项，默认重定向 URI 将用作电子邮件通知消息的按钮链接（例如密码更改消息中的登录按钮）"
           }

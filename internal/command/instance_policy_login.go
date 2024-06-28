@@ -218,7 +218,7 @@ func prepareChangeDefaultLoginPolicy(a *instance.Aggregate, policy *ChangeLoginP
 			return nil, zerrors.ThrowInvalidArgument(nil, "IAM-SFdqd", "Errors.IAM.LoginPolicy.RedirectURIInvalid")
 		}
 
-		if policy.UseDefaultUriForNotificationLinks && policy.DefaultRedirectURI == "" {
+		if policy.UseDefaultRedirectUriForNotificationLinks && policy.DefaultRedirectURI == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "IAM-FGbqs", "Errors.IAM.LoginPolicy.RedirectURIMustBeSet")
 		}
 
@@ -248,7 +248,7 @@ func prepareChangeDefaultLoginPolicy(a *instance.Aggregate, policy *ChangeLoginP
 				policy.MFAInitSkipLifetime,
 				policy.SecondFactorCheckLifetime,
 				policy.MultiFactorCheckLifetime,
-				policy.UseDefaultUriForNotificationLinks)
+				policy.UseDefaultRedirectUriForNotificationLinks)
 			if !hasChanged {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "INSTANCE-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")
 			}
@@ -276,7 +276,7 @@ func prepareAddDefaultLoginPolicy(
 	mfaInitSkipLifetime time.Duration,
 	secondFactorCheckLifetime time.Duration,
 	multiFactorCheckLifetime time.Duration,
-	useDefaultUriForNotificationLinks bool,
+	useDefaultRedirectUriForNotificationLinks bool,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
@@ -311,7 +311,7 @@ func prepareAddDefaultLoginPolicy(
 					mfaInitSkipLifetime,
 					secondFactorCheckLifetime,
 					multiFactorCheckLifetime,
-					useDefaultUriForNotificationLinks,
+					useDefaultRedirectUriForNotificationLinks,
 				),
 			}, nil
 		}, nil

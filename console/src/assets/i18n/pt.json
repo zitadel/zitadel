@@ -289,7 +289,7 @@
             "TITLE": "Desativar Login por Telefone",
             "DESCRIPTION": "Se isto for ativado, seus usuários não poderão usar seus números de telefone para fazer login. Tenha cuidado que se você desativar isso, os números de telefone dos seus usuários devem ser únicos entre todas as organizações para poderem fazer login."
           },
-          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+          "USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS": {
             "TITLE": "Use o URI de redirecionamento padrão para links de notificação",
             "DESCRIPTION": "Se isto for ativado, o URI de redirecionamento padrão será usado como link do botão para mensagens de notificação por e-mail (por exemplo, botão Login na mensagem de alteração de senha)"
           }

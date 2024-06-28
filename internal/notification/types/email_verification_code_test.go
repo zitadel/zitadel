@@ -68,8 +68,8 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 					MultiFactors: []domain.MultiFactorType{
 						domain.MultiFactorTypeU2FWithPIN,
 					},
-					IsDefault:                         true,
-					UseDefaultUriForNotificationLinks: false,
+					IsDefault: true,
+					UseDefaultRedirectUriForNotificationLinks: false,
 				},
 			},
 			want: &notifyResult{
@@ -117,8 +117,8 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 					MultiFactors: []domain.MultiFactorType{
 						domain.MultiFactorTypeU2FWithPIN,
 					},
-					IsDefault:                         true,
-					UseDefaultUriForNotificationLinks: false,
+					IsDefault: true,
+					UseDefaultRedirectUriForNotificationLinks: false,
 				},
 			},
 			want:    &notifyResult{},
@@ -162,8 +162,8 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 					MultiFactors: []domain.MultiFactorType{
 						domain.MultiFactorTypeU2FWithPIN,
 					},
-					IsDefault:                         true,
-					UseDefaultUriForNotificationLinks: false,
+					IsDefault: true,
+					UseDefaultRedirectUriForNotificationLinks: false,
 				},
 			},
 			want: &notifyResult{
@@ -211,8 +211,8 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 					MultiFactors: []domain.MultiFactorType{
 						domain.MultiFactorTypeU2FWithPIN,
 					},
-					IsDefault:                         true,
-					UseDefaultUriForNotificationLinks: true,
+					IsDefault: true,
+					UseDefaultRedirectUriForNotificationLinks: true,
 				},
 			},
 			want: &notifyResult{

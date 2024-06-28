@@ -289,7 +289,7 @@
             "TITLE": "Disabilita Login Telefono",
             "DESCRIPTION": "Se questa opzione è attivata, i tuoi utenti non possono utilizzare i loro numeri di telefono per accedere. Attenzione se disattivi questa opzione, i numeri di telefono dei tuoi utenti devono essere unici in tutte le organizzazioni per poter accedere."
           },
-          "USE_DEFAULT_URI_FOR_NOTIFICATION_LINKS": {
+          "USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS": {
             "TITLE": "Utilizza l'URI di reindirizzamento predefinito per i collegamenti di notifica",
             "DESCRIPTION": "Se questa opzione è attivata, l'URI di reindirizzamento predefinito verrà utilizzato come collegamento del pulsante per i messaggi di notifica e-mail (ad esempio il pulsante Accedi nel messaggio di modifica della password)"
           }

@@ -79,7 +79,7 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	mfaInitSkipLifetime,
 	secondFactorCheckLifetime,
 	multiFactorCheckLifetime time.Duration,
-	useDefaultUriForNotificationLinks bool,
+	useDefaultRedirectUriForNotificationLinks bool,
 ) (*org.LoginPolicyChangedEvent, bool) {
 
 	changes := make([]policy.LoginPolicyChanges, 0)
@@ -134,8 +134,8 @@ func (wm *OrgLoginPolicyWriteModel) NewChangedEvent(
 	if wm.DisableLoginWithPhone != disableLoginWithPhone {
 		changes = append(changes, policy.ChangeDisableLoginWithPhone(disableLoginWithPhone))
 	}
-	if wm.UseDefaultUriForNotificationLinks != useDefaultUriForNotificationLinks {
-		changes = append(changes, policy.ChangeUseDefaultUriForNotificationLinks(useDefaultUriForNotificationLinks))
+	if wm.UseDefaultRedirectUriForNotificationLinks != useDefaultRedirectUriForNotificationLinks {
+		changes = append(changes, policy.ChangeUseDefaultRedirectUriForNotificationLinks(useDefaultRedirectUriForNotificationLinks))
 	}
 	if len(changes) == 0 {
 		return nil, false

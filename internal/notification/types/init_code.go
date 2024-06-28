@@ -12,7 +12,7 @@ import (
 func (notify Notify) SendUserInitCode(ctx context.Context, user *query.NotifyUser, code, authRequestID string, loginPolicy *query.LoginPolicy) error {
 	var url string
 
-	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultUriForNotificationLinks {
+	if loginPolicy != nil && loginPolicy.DefaultRedirectURI != "" && loginPolicy.UseDefaultRedirectUriForNotificationLinks {
 		url = loginPolicy.DefaultRedirectURI
 	} else {
 		url = login.InitUserLink(http_utils.ComposedOrigin(ctx), user.ID, user.PreferredLoginName, code, user.ResourceOwner, user.PasswordSet, authRequestID)

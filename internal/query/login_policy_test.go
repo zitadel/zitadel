@@ -39,7 +39,7 @@ var (
 		` projections.login_policies6.mfa_init_skip_lifetime,` +
 		` projections.login_policies6.second_factor_check_lifetime,` +
 		` projections.login_policies6.multi_factor_check_lifetime,` +
-		` projections.login_policies6.use_default_uri_for_notification_links` +
+		` projections.login_policies6.use_default_redirect_uri_for_notification_links` +
 		` FROM projections.login_policies6` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	loginPolicyCols = []string{
@@ -67,7 +67,7 @@ var (
 		"mfa_init_skip_lifetime",
 		"second_factor_check_lifetime",
 		"multi_factor_check_lifetime",
-		"use_default_uri_for_notification_links",
+		"use_default_redirect_uri_for_notification_links",
 	}
 
 	prepareLoginPolicy2FAsStmt = `SELECT projections.login_policies6.second_factors` +
@@ -152,31 +152,31 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 				),
 			},
 			object: &LoginPolicy{
-				OrgID:                             "ro",
-				CreationDate:                      testNow,
-				ChangeDate:                        testNow,
-				Sequence:                          20211109,
-				AllowRegister:                     true,
-				AllowUsernamePassword:             true,
-				AllowExternalIDPs:                 true,
-				ForceMFA:                          true,
-				ForceMFALocalOnly:                 true,
-				SecondFactors:                     database.NumberArray[domain.SecondFactorType]{domain.SecondFactorTypeTOTP},
-				MultiFactors:                      database.NumberArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
-				PasswordlessType:                  domain.PasswordlessTypeAllowed,
-				IsDefault:                         true,
-				HidePasswordReset:                 true,
-				IgnoreUnknownUsernames:            true,
-				AllowDomainDiscovery:              true,
-				DisableLoginWithEmail:             true,
-				DisableLoginWithPhone:             true,
-				DefaultRedirectURI:                "https://example.com/redirect",
-				PasswordCheckLifetime:             database.Duration(duration),
-				ExternalLoginCheckLifetime:        database.Duration(duration),
-				MFAInitSkipLifetime:               database.Duration(duration),
-				SecondFactorCheckLifetime:         database.Duration(duration),
-				MultiFactorCheckLifetime:          database.Duration(duration),
-				UseDefaultUriForNotificationLinks: true,
+				OrgID:                      "ro",
+				CreationDate:               testNow,
+				ChangeDate:                 testNow,
+				Sequence:                   20211109,
+				AllowRegister:              true,
+				AllowUsernamePassword:      true,
+				AllowExternalIDPs:          true,
+				ForceMFA:                   true,
+				ForceMFALocalOnly:          true,
+				SecondFactors:              database.NumberArray[domain.SecondFactorType]{domain.SecondFactorTypeTOTP},
+				MultiFactors:               database.NumberArray[domain.MultiFactorType]{domain.MultiFactorTypeU2FWithPIN},
+				PasswordlessType:           domain.PasswordlessTypeAllowed,
+				IsDefault:                  true,
+				HidePasswordReset:          true,
+				IgnoreUnknownUsernames:     true,
+				AllowDomainDiscovery:       true,
+				DisableLoginWithEmail:      true,
+				DisableLoginWithPhone:      true,
+				DefaultRedirectURI:         "https://example.com/redirect",
+				PasswordCheckLifetime:      database.Duration(duration),
+				ExternalLoginCheckLifetime: database.Duration(duration),
+				MFAInitSkipLifetime:        database.Duration(duration),
+				SecondFactorCheckLifetime:  database.Duration(duration),
+				MultiFactorCheckLifetime:   database.Duration(duration),
+				UseDefaultRedirectUriForNotificationLinks: true,
 			},
 		},
 		{
