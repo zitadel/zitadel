@@ -13,16 +13,9 @@ import (
 )
 
 func InitChannel(config Config) channels.NotificationChannel {
-	if config.VerifyServiceSID != "" {
-		return channels.HandleMessageFunc(func(message channels.Message) error {
-			// TODO: send verify message here
-			return nil
-		})
-	}
-
 	client := twilio.NewClient(config.SID, config.Token, nil)
-
 	logging.Debug("successfully initialized twilio sms channel")
+
 	return channels.HandleMessageFunc(func(message channels.Message) error {
 		if twilioMsg, ok := message.(*messages.TwilioVerify); ok {
 
