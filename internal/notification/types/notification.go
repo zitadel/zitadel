@@ -87,6 +87,7 @@ func SendSMSTwilioVerifyRequest(
 			VerifyServiceSID:     twilioConfig.VerifyServiceSID,
 			RecipientPhoneNumber: user.VerifiedPhone,
 			TriggeringEvent:      triggeringEvent,
+			Code:                 args["Code"].(string),
 		}
 		return smsChannels.HandleMessage(message)
 	}

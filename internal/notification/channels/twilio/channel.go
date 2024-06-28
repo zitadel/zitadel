@@ -23,10 +23,11 @@ func InitChannel(config Config) channels.NotificationChannel {
 			body := url.Values{}
 			body.Add("To", twilioMsg.RecipientPhoneNumber)
 			body.Add("Channel", "sms")
+			// NB: by passing the code used by zitadel, we override the default code generation
+			// in twilio and therefore can (possibly) skip the seoncdary API call to verify the code
+			body.Add("CustomCode", twilioMsg.Code)
 			// TODO: pass through custom message (but not code)
 			// body.Add("CustomMessage", twilioMsg.Message)
-			// TODO: pass through custom code (separate from message text)
-			// body.Add("CustomCode", twilioMsg.Code)
 
 			// TODO: need to pass in parent context
 			resp, err := client.Verifications.Create(
