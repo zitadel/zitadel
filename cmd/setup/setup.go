@@ -157,7 +157,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s26AuthUsers3 = &AuthUsers3{dbClient: esPusherDBClient}
 	steps.s27IDPTemplate6SAMLNameIDFormat = &IDPTemplate6SAMLNameIDFormat{dbClient: esPusherDBClient}
 	steps.s28AddFieldTable = &AddFieldTable{dbClient: esPusherDBClient}
-	steps.s29FillFieldsForProjectGrant = &FillFieldsForProjectGrant{eventstore: eventstoreClient}
+	steps.s29FillFieldsForProjectGrant = &FillFieldsForProjectGrant{eventstore: eventstoreClient, config: steps.FillFields}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
