@@ -30,7 +30,6 @@ type TemplateData struct {
 	FontURL         string
 	FontFaceFamily  string
 	FontFamily      string
-	ButtonUrl       string
 
 	IncludeFooter bool
 	FooterText    string
@@ -43,7 +42,12 @@ func (data *TemplateData) Translate(translator *i18n.Translator, msgType string,
 	data.Greeting = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageGreeting), args, langs...)
 	data.Text = html.UnescapeString(translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageText), args, langs...))
 	data.ButtonText = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageButtonText), args, langs...)
-	data.ButtonUrl = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageButtonUrl), args, langs...)
+
+	// Ignore untranslated button url
+	if url := translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageButtonUrl), args, langs...); url != "" {
+		data.URL = url
+	}
+
 	// Footer text is neither included in i18n files nor defaults.yaml
 	footerText := fmt.Sprintf("%s.%s", msgType, domain.MessageFooterText)
 	data.FooterText = translator.Localize(footerText, args, langs...)

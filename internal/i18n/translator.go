@@ -3,6 +3,7 @@ package i18n
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -157,7 +158,9 @@ func localize(localizer *i18n.Localizer, id string, args map[string]interface{})
 		MessageID:    id,
 		TemplateData: args,
 	})
-	if err != nil {
+
+	// Ignore untranslated button url
+	if err != nil && !strings.HasSuffix(id, ".ButtonUrl") {
 		logging.WithFields("id", id, "args", args).WithError(err).Warnf("missing translation")
 		return id
 	}
