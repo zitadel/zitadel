@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instellingsinstellingen",
-        "DESCRIPTION": "De instellingsinstellingen zijn de standaardinstellingen voor alle organisaties. Met de juiste toestemmingen kunnen sommige hiervan worden overschreven in organisatie-instellingen."
+        "TITLE": "Standaard instellingen",
+        "DESCRIPTION": "Standaardinstellingen voor alle organisaties. Met de juiste machtigingen kunnen sommige ervan worden overschreven in de organisatie-instellingen."
       },
       "ORG": {
         "TITLE": "Organisatie-instellingen",
@@ -1318,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instantie Instellingen",
-      "DESCRIPTION": "Deze instellingen zijn van toepassing op al uw organisaties, tenzij ze zijn overschreven."
-    },
     "LIST": {
       "ORGS": "Organisaties",
       "FEATURESETTINGS": "Functie-instellingen",

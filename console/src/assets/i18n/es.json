@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Configuración de la Instancia",
-        "DESCRIPTION": "Las configuraciones de la instancia son las configuraciones predeterminadas para todas las organizaciones. Con los permisos adecuados, algunas de ellas pueden ser sobrescritas en la configuración de la organización."
+        "TITLE": "Configuración por defecto",
+        "DESCRIPTION": "Configuraciones predeterminadas para todas las organizaciones. Con los permisos adecuados, algunas de ellas se pueden anular en la configuración de la organización."
       },
       "ORG": {
         "TITLE": "Configuración de la Organización",
@@ -1319,10 +1319,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Ajustes de instancia",
-      "DESCRIPTION": "Estos ajustes se aplicará a todas tus organizaciones a menos que éstas los sobrescriban."
-    },
     "LIST": {
       "ORGS": "Organizaciones",
       "FEATURESETTINGS": "Ajustes de funcionalidades",

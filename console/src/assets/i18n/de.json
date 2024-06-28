@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instanzeinstellungen",
-        "DESCRIPTION": "Die Instanzeinstellungen sind die Standardeinstellungen für alle Organisationen. Mit den richtigen Berechtigungen sind einige davon in den Organisationseinstellungen überschreibbar."
+        "TITLE": "Standardeinstellungen",
+        "DESCRIPTION": "Standardeinstellungen für alle Organisationen. Mit den richtigen Berechtigungen können einige davon in den Organisationseinstellungen überschrieben werden."
       },
       "ORG": {
         "TITLE": "Organisationseinstellungen",
@@ -1318,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instanz Einstellungen",
-      "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewandt sofern die Einstellung nicht überschrieben wurde."
-    },
     "LIST": {
       "ORGS": "Organisationen",
       "FEATURESETTINGS": "Features",

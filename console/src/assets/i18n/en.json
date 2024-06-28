@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instance Settings",
-        "DESCRIPTION": "The instance settings are the default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
+        "TITLE": "Default Settings",
+        "DESCRIPTION": "Default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
       },
       "ORG": {
         "TITLE": "Organization Settings",
@@ -528,7 +528,7 @@
       "TEXT": "All organization settings and tables in console are based on a selected organization. Click this button to switch organization or create a new one."
     },
     "INSTANCE": {
-      "TEXT": "Click here to get to the instance settings. Note that you have only access to this button if you have enhanced permissions."
+      "TEXT": "Click here to get to the default settings. Note that you have only access to this button if you have enhanced permissions."
     },
     "PROFILE": {
       "TEXT": "Here you can switch between your user accounts and manage your sessions and profile."
@@ -1318,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instance Settings",
-      "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
-    },
     "LIST": {
       "ORGS": "Organizations",
       "FEATURESETTINGS": "Features",
