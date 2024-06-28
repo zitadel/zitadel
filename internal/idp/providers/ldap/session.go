@@ -9,9 +9,9 @@ import (
 	"net/url"
 	"strconv"
 	"time"
+	"unicode/utf8"
 
 	"github.com/go-ldap/ldap/v3"
-	"github.com/google/uuid"
 	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
@@ -285,39 +285,9 @@ func getAttributeValue(user *ldap.Entry, attribute string) string {
 	if attribute == "" {
 		return ""
 	}
-
-	attributeRawValue := user.GetRawAttributeValue(attribute)
-	// try to parse byte to uuid, if parsable the value is not empty
-	if id := parseBytesToUUIDString(attributeRawValue); id != "" {
-		return id
+	value := user.GetAttributeValue(attribute)
+	if utf8.ValidString(value) {
+		return value
 	}
-
-	// try to decode base64
-	buff := make([]byte, base64.StdEncoding.DecodedLen(len(attributeRawValue)))
-	if _, err := base64.StdEncoding.Decode(buff, attributeRawValue); err == nil {
-		// try to parse byte to uuid, if parsable the value is not equal empty
-		if id := parseBytesToUUIDString(buff); id != "" {
-			return id
-		}
-		// otherwise return the decoded data as string
-		return string(buff)
-	}
-
-	// if no decoding or parsing is possible return the attributeValue directly
-	return user.GetAttributeValue(attribute)
-}
-
-func parseBytesToUUIDString(data []byte) string {
-	// check if len == 16, which could be an uuid, otherwise return empty
-	if len(data) != 16 {
-		return ""
-	}
-	// fill uuid and try to make human-readable
-	id := uuid.UUID(data).String()
-	// id is empty if the uuid is invalid so return empty
-	if id == "" {
-		return ""
-	}
-	// return uuid in format 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
-	return id
+	return base64.StdEncoding.EncodeToString(user.GetRawAttributeValue(attribute))
 }
