@@ -133,8 +133,6 @@ services:
       timeout: 60s
       retries: 10
       start_period: 5s
-    ports:
-      - '5432:5432'
     networks:
       - 'zitadel'
     volumes:

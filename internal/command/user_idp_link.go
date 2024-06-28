@@ -12,6 +12,9 @@ import (
 )
 
 func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner string, link *AddLink) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")
 	}

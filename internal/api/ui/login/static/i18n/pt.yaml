@@ -32,15 +32,17 @@ Password:
   Title: Senha
   Description: Insira seus dados de login.
   PasswordLabel: Senha
-  MinLength: Comprimento mínimo
-  HasUppercase: Letra maiúscula
-  HasLowercase: Letra minúscula
-  HasNumber: Número
-  HasSymbol: Símbolo
-  Confirmation: Confirmação corresponde
-  ResetLinkText: redefinir senha
-  BackButtonText: voltar
-  NextButtonText: próximo
+  MinLength: Deve ter pelo menos
+  MinLengthp2: caracteres.
+  MaxLength: Deve ter menos de 70 caracteres.
+  HasUppercase: Deve incluir uma letra maiúscula.
+  HasLowercase: Deve incluir uma letra minúscula.
+  HasNumber: Deve incluir um número.
+  HasSymbol: Deve incluir um símbolo.
+  Confirmation: A confirmação da senha corresponde.
+  ResetLinkText: Redefinir senha
+  BackButtonText: Voltar
+  NextButtonText: Próximo
 
 UsernameChange:
   Title: Alterar nome de usuário
@@ -184,6 +186,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Alterar senha
   Description: Altere sua senha. Insira sua senha antiga e nova.
+  ExpiredDescription: A sua palavra-passe expirou e tem de ser alterada. Insira sua senha antiga e nova.
   OldPasswordLabel: Senha antiga
   NewPasswordLabel: Nova senha
   NewPasswordConfirmLabel: Confirmação de senha
@@ -245,6 +248,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Gênero
   Female: Feminino
   Male: Masculino
@@ -284,6 +288,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Termos e condições
   TosConfirm: Eu aceito os
   TosLinkText: termos de serviço
@@ -357,6 +362,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: Autorização de dispositivo

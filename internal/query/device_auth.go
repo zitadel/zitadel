@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
@@ -58,34 +57,6 @@ var (
 		table: deviceAuthRequestTable,
 	}
 )
-
-type DeviceAuth struct {
-	ClientID        string
-	DeviceCode      string
-	UserCode        string
-	Expires         time.Time
-	Scopes          []string
-	Audience        []string
-	State           domain.DeviceAuthState
-	Subject         string
-	UserAuthMethods []domain.UserAuthMethodType
-	AuthTime        time.Time
-}
-
-// DeviceAuthByDeviceCode gets the current state of a Device Authorization directly from the eventstore.
-func (q *Queries) DeviceAuthByDeviceCode(ctx context.Context, deviceCode string) (deviceAuth *DeviceAuth, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	model := NewDeviceAuthReadModel(deviceCode, authz.GetInstance(ctx).InstanceID())
-	if err := q.eventstore.FilterToQueryReducer(ctx, model); err != nil {
-		return nil, err
-	}
-	if !model.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "QUERY-eeR0e", "Errors.DeviceAuth.NotExisting")
-	}
-	return &model.DeviceAuth, nil
-}
 
 // DeviceAuthRequestByUserCode finds a Device Authorization request by User-Code from the `device_auth_requests` projection.
 func (q *Queries) DeviceAuthRequestByUserCode(ctx context.Context, userCode string) (authReq *domain.AuthRequestDevice, err error) {

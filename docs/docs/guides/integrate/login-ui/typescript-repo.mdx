@@ -76,12 +76,14 @@ The application can then request a token calling the /token endpoint of the logi
 - [ ] AuthRequest UI locales
 - Multifactor
   - [x] Passkeys
-  - [ ] TOTP
+  - [x] TOTP
+  - [x] OTP via email
+  - [x] OTP via SMS
 - Passwordless
   - [x] Passkeys
 - Security Prompts
   - [x] Setup Passkey as Passwordless method
-  - [ ] Setup TOTP as Multifactor
+  - [x] Setup TOTP as Multifactor
   - [ ] Password Change
 - Login
   - [x] Email Password
@@ -89,7 +91,7 @@ The application can then request a token calling the /token endpoint of the logi
   - [x] IDPs
     - [x] Google
     - [ ] GitHub
-    - [ ] GitLab
+    - [x] GitLab
     - [ ] Azure
     - [ ] Apple
 - Register
@@ -104,8 +106,12 @@ Authenticated users are directly able to self service their account.
 - [ ] Change user information
 - [ ] Password Change
 - [x] Setup Passkey
-- [ ] Setup Multifactor TOTP
-- [ ] Setup Multifactor Passkey (U2F)
+- [x] Setup Multifactor
+  - [x] Passkeys
+  - [x] TOTP
+  - [x] OTP via email
+  - [x] OTP via SMS
+- [x] Setup Multifactor Passkey (U2F)
 - [ ] Validate Account (email verification)
 
 ### Setup
@@ -126,7 +132,7 @@ After your domain has been verified, you can reconfigure your DNS settings in or
 
 To deploy your own version on Vercel, navigate to your instance and create a service user.
 Copy its id from the overview and set it as `ZITADEL_SERVICE_USER_ID`.
-Then create a personal access token (PAT), copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to your instance settings and make sure it gets `IAM_OWNER` permissions.
+Then create a personal access token (PAT), copy and set it as `ZITADEL_SERVICE_USER_TOKEN`, then navigate to Default settings and make sure it gets `IAM_OWNER` permissions.
 Finally set your instance url as `ZITADEL_API_URL`. Make sure to set it without trailing slash.
 
 ![Deploy to Vercel](/img/deploy-to-vercel.png)

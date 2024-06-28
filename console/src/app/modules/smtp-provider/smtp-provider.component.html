@@ -2,7 +2,7 @@
   title="{{
     id ? ('SMTP.DETAIL.TITLE' | translate) : ('SMTP.CREATE.STEPS.TITLE' | translate: { value: providerDefaultSetting.name })
   }}"
-  [createSteps]="2"
+  [createSteps]="4"
   [currentCreateStep]="currentCreateStep"
   (closed)="close()"
 >
@@ -93,7 +93,7 @@
           [disabled]="firstFormGroup.invalid"
           color="primary"
           matStepperNext
-          data-e2e="continue-button"
+          data-e2e="continue-to-2nd-form"
         >
           {{ 'ACTIONS.CONTINUE' | translate }}
         </button>
@@ -130,17 +130,148 @@
         <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
         <button
           mat-raised-button
-          class="create-button"
+          [disabled]="secondFormGroup.invalid"
           color="primary"
-          data-e2e="create-button"
-          (click)="savePolicy()"
-          [disabled]="
-            firstFormGroup.invalid || secondFormGroup.invalid || (['iam.policy.write'] | hasRole | async) === false
-          "
+          matStepperNext
+          data-e2e="continue-button"
         >
-          {{ !hasSMTPConfig ? ('ACTIONS.CREATE' | translate) : ('ACTIONS.SAVE' | translate) }}
+          {{ 'ACTIONS.CONTINUE' | translate }}
         </button>
       </div>
+    </mat-step>
+
+    <mat-step [editable]="true">
+      <form>
+        <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.SAVE_SETTINGS' | translate }}</ng-template>
+        <cnsl-info-section>
+          <div class="title-row">
+            <div class="left">
+              <h2 class="title">{{ 'SMTP.CREATE.STEPS.TEST.TITLE' | translate }}</h2>
+            </div>
+            <div class="right">
+              <button color="primary" mat-raised-button class="continue-button" (click)="testEmailConfiguration()">
+                {{ 'ACTIONS.TEST' | translate }}
+              </button>
+            </div>
+          </div>
+          <p class="cnsl-secondary-text description">{{ 'SMTP.CREATE.STEPS.TEST.DESCRIPTION' | translate }}</p>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'SMTP.LIST.DIALOG.TEST_EMAIL' | translate }}</cnsl-label>
+            <input
+              cnslInput
+              [(ngModel)]="email"
+              [ngModelOptions]="{ standalone: true }"
+              data-e2e="email-test-dialog-input"
+            />
+          </cnsl-form-field>
+
+          <div class="is-loading" *ngIf="isLoading()">
+            <mat-spinner diameter="50"></mat-spinner>
+          </div>
+
+          <cnsl-form-field class="formfield" *ngIf="testResult">
+            <cnsl-label>{{ 'SMTP.LIST.DIALOG.TEST_RESULT' | translate }}</cnsl-label>
+            <textarea
+              cnslInput
+              class="{{ resultClass }}"
+              [(ngModel)]="testResult"
+              [ngModelOptions]="{ standalone: true }"
+            ></textarea>
+          </cnsl-form-field>
+        </cnsl-info-section>
+
+        <div class="smtp-create-actions">
+          <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
+          <button
+            mat-raised-button
+            class="create-button"
+            color="primary"
+            data-e2e="create-button"
+            (click)="savePolicy(stepper)"
+            [disabled]="
+              firstFormGroup.invalid || secondFormGroup.invalid || (['iam.policy.write'] | hasRole | async) === false
+            "
+          >
+            {{ !hasSMTPConfig ? ('ACTIONS.CREATE' | translate) : ('ACTIONS.SAVE' | translate) }}
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [editable]="true">
+      <form>
+        <ng-template matStepLabel>{{ 'SMTP.CREATE.STEPS.NEXT_STEPS' | translate }}</ng-template>
+        <cnsl-info-section *ngIf="!isActive">
+          <div class="title-row">
+            <div class="left">
+              <h2 class="title">{{ 'SMTP.CREATE.STEPS.ACTIVATE.TITLE' | translate }}</h2>
+              <div>
+                <a
+                  mat-icon-button
+                  card-actions
+                  mat-icon-button
+                  href="https://zitadel.com/docs/guides/manage/console/default-settings#smtp"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <mat-icon class="next-icon">info_outline</mat-icon>
+                </a>
+              </div>
+            </div>
+            <div class="right">
+              <button
+                color="primary"
+                mat-raised-button
+                class="continue-button"
+                data-e2e="activate-button"
+                (click)="activateSMTPConfig(); $event.stopPropagation()"
+              >
+                {{ 'ACTIONS.ACTIVATE' | translate }}
+              </button>
+            </div>
+          </div>
+          <p class="cnsl-secondary-text description">{{ 'SMTP.CREATE.STEPS.ACTIVATE.DESCRIPTION' | translate }}</p>
+        </cnsl-info-section>
+
+        <cnsl-info-section *ngIf="isActive">
+          <div class="title-row">
+            <div class="left">
+              <h2 class="title">{{ 'SMTP.CREATE.STEPS.DEACTIVATE.TITLE' | translate }}</h2>
+              <div>
+                <a
+                  mat-icon-button
+                  card-actions
+                  mat-icon-button
+                  href="https://zitadel.com/docs/guides/manage/console/default-settings#smtp"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <mat-icon class="next-icon">info_outline</mat-icon>
+                </a>
+              </div>
+            </div>
+            <div class="right">
+              <button
+                color="primary"
+                mat-raised-button
+                class="continue-button"
+                data-e2e="deactivate-button"
+                (click)="deactivateSMTPConfig(); $event.stopPropagation()"
+              >
+                {{ 'ACTIONS.DEACTIVATE' | translate }}
+              </button>
+            </div>
+          </div>
+          <p class="cnsl-secondary-text description">{{ 'SMTP.CREATE.STEPS.DEACTIVATE.DESCRIPTION' | translate }}</p>
+        </cnsl-info-section>
+
+        <div class="smtp-create-actions">
+          <button mat-stroked-button matStepperPrevious class="bck-button">{{ 'ACTIONS.BACK' | translate }}</button>
+          <button mat-raised-button class="create-button" color="primary" data-e2e="close-button" (click)="this.close()">
+            {{ 'ACTIONS.CLOSE' | translate }}
+          </button>
+        </div>
+      </form>
     </mat-step>
 
     <ng-template matStepperIcon="edit">

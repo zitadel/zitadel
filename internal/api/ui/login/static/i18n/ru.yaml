@@ -29,17 +29,19 @@ SelectAccount:
 
 Password:
   Title: Пароль
-  Description: Введите ваши данные.
+  Description: Введите свои данные для входа.
   PasswordLabel: Пароль
-  MinLength: Минимальная длина
-  HasUppercase: Заглавная буква
-  HasLowercase: Строчная буква
-  HasNumber: Цифра
-  HasSymbol: Символ
-  Confirmation: Подтверждение пароля
-  ResetLinkText: сброс пароля
-  BackButtonText: назад
-  NextButtonText: далее
+  MinLength: Должно быть не менее
+  MinLengthp2: символов.
+  MaxLength: Должно быть меньше 70 символов.
+  HasUppercase: Должно содержать заглавную букву.
+  HasLowercase: Должно содержать строчную букву.
+  HasNumber: Должно содержать число.
+  HasSymbol: Должно содержать символ.
+  Confirmation: Подтверждение пароля совпадает.
+  ResetLinkText: Сбросить пароль
+  BackButtonText: Назад
+  NextButtonText: Вперед
 
 UsernameChange:
   Title: Изменение логина
@@ -187,6 +189,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Изменение пароля
   Description: Измените ваш пароль. Введите старый и новый пароли.
+  ExpiredDescription: Срок действия вашего пароля истек, и его необходимо изменить. Введите старый и новый пароль.
   OldPasswordLabel: Старый пароль
   NewPasswordLabel: Новый пароль
   NewPasswordConfirmLabel: Подтверждение пароля
@@ -248,6 +251,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Пол
   Female: Женский
   Male: Мужской
@@ -287,6 +291,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Условия использования
   TosConfirm: Я согласен с
   TosLinkText: Пользовательским соглашением
@@ -360,6 +365,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   
 DeviceAuth:
   Title: Авторизация устройства

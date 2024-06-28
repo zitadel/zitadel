@@ -20,8 +20,6 @@ services:
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=postgres
-    ports:
-      - '5432:5432'
     networks:
       - 'zitadel'
     healthcheck:

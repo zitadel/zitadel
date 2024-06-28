@@ -3,26 +3,9 @@ package domain
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
 )
-
-type Token struct {
-	es_models.ObjectRoot
-
-	TokenID           string
-	ApplicationID     string
-	UserAgentID       string
-	RefreshTokenID    string
-	Audience          []string
-	Expiration        time.Time
-	Scopes            []string
-	PreferredLanguage string
-	Reason            TokenReason
-	Actor             *TokenActor
-}
 
 func AddAudScopeToAudience(ctx context.Context, audience, scopes []string) []string {
 	for _, scope := range scopes {
@@ -36,6 +19,17 @@ func AddAudScopeToAudience(ctx context.Context, audience, scopes []string) []str
 		audience = addProjectID(audience, projectID)
 	}
 	return audience
+}
+
+// RoleOrgIDsFromScope parses orgIDs from [OrgRoleIDScope] prefixed scopes.
+func RoleOrgIDsFromScope(scopes []string) (orgIDs []string) {
+	for _, scope := range scopes {
+		orgID, found := strings.CutPrefix(scope, OrgRoleIDScope)
+		if found {
+			orgIDs = append(orgIDs, orgID)
+		}
+	}
+	return orgIDs
 }
 
 func addProjectID(audience []string, projectID string) []string {

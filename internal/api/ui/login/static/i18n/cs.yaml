@@ -32,12 +32,14 @@ Password:
   Title: Heslo
   Description: Zadejte své přihlašovací údaje.
   PasswordLabel: Heslo
-  MinLength: Minimální délka
-  HasUppercase: Velké písmeno
-  HasLowercase: Malé písmeno
-  HasNumber: Číslo
-  HasSymbol: Symbol
-  Confirmation: Potvrzení shody
+  MinLength: Musí být alespoň
+  MinLengthp2: znaků dlouhé.
+  MaxLength: Musí být kratší než 70 znaků.
+  HasUppercase: Musí obsahovat velké písmeno.
+  HasLowercase: Musí obsahovat malé písmeno.
+  HasNumber: Musí obsahovat číslo.
+  HasSymbol: Musí obsahovat symbol.
+  Confirmation: Potvrzení hesla odpovídá.
   ResetLinkText: Obnovit heslo
   BackButtonText: Zpět
   NextButtonText: Další
@@ -188,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Změna hesla
   Description: Změňte si heslo. Zadejte své staré a nové heslo.
+  ExpiredDescription: Heslo vypršelo a musí být změněno. Zadejte své staré a nové heslo.
   OldPasswordLabel: Staré heslo
   NewPasswordLabel: Nové heslo
   NewPasswordConfirmLabel: Potvrzení hesla
@@ -249,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Pohlaví
   Female: Žena
   Male: Muž
@@ -288,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Obchodní podmínky
   TosConfirm: Souhlasím s
   TosLinkText: obchodními podmínkami
@@ -361,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: Autorizace zařízení
   UserCode:

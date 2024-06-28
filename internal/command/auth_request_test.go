@@ -10,6 +10,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -53,12 +54,14 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
+								false,
 							),
 						),
 					),
@@ -87,6 +90,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 							[]string{"openid"},
 							[]string{"audience"},
 							domain.OIDCResponseTypeCode,
+							domain.OIDCResponseModeQuery,
 							&domain.OIDCCodeChallenge{
 								Challenge: "challenge",
 								Method:    domain.CodeChallengeMethodS256,
@@ -96,6 +100,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 							gu.Ptr(time.Duration(0)),
 							gu.Ptr("loginHint"),
 							gu.Ptr("hintUserID"),
+							false,
 						),
 					),
 				),
@@ -112,6 +117,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 					Scope:        []string{"openid"},
 					Audience:     []string{"audience"},
 					ResponseType: domain.OIDCResponseTypeCode,
+					ResponseMode: domain.OIDCResponseModeQuery,
 					CodeChallenge: &domain.OIDCCodeChallenge{
 						Challenge: "challenge",
 						Method:    domain.CodeChallengeMethodS256,
@@ -134,6 +140,7 @@ func TestCommands_AddAuthRequest(t *testing.T) {
 					Scope:        []string{"openid"},
 					Audience:     []string{"audience"},
 					ResponseType: domain.OIDCResponseTypeCode,
+					ResponseMode: domain.OIDCResponseModeQuery,
 					CodeChallenge: &domain.OIDCCodeChallenge{
 						Challenge: "challenge",
 						Method:    domain.CodeChallengeMethodS256,
@@ -217,12 +224,14 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
+								true,
 							),
 						),
 						eventFromEventPusher(
@@ -257,12 +266,14 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
+								true,
 							),
 						),
 					),
@@ -295,12 +306,14 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
+								true,
 							),
 						),
 					),
@@ -332,12 +345,14 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
+								true,
 							),
 						),
 					),
@@ -354,7 +369,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							)),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"userID", "org1", testNow.Add(-5*time.Minute)),
+								"userID", "org1", testNow.Add(-5*time.Minute), &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -392,12 +407,14 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
+								true,
 							),
 						),
 					),
@@ -441,12 +458,14 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
+								true,
 							),
 						),
 					),
@@ -463,7 +482,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							)),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"userID", "org1", testNow),
+								"userID", "org1", testNow, &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -504,6 +523,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						Scope:        []string{"openid"},
 						Audience:     []string{"audience"},
 						ResponseType: domain.OIDCResponseTypeCode,
+						ResponseMode: domain.OIDCResponseModeQuery,
 					},
 					SessionID:   "sessionID",
 					UserID:      "userID",
@@ -526,12 +546,14 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
+								true,
 							),
 						),
 					),
@@ -548,7 +570,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 							)),
 						eventFromEventPusher(
 							session.NewUserCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
-								"userID", "org1", testNow),
+								"userID", "org1", testNow, &language.Afrikaans),
 						),
 						eventFromEventPusher(
 							session.NewPasswordCheckedEvent(mockCtx, &session.NewAggregate("sessionID", "instance1").Aggregate,
@@ -590,6 +612,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 						Scope:        []string{"openid"},
 						Audience:     []string{"audience"},
 						ResponseType: domain.OIDCResponseTypeCode,
+						ResponseMode: domain.OIDCResponseModeQuery,
 					},
 					SessionID:   "sessionID",
 					UserID:      "userID",
@@ -668,12 +691,14 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
 								nil,
+								true,
 							),
 						),
 					),
@@ -701,6 +726,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 						Scope:        []string{"openid"},
 						Audience:     []string{"audience"},
 						ResponseType: domain.OIDCResponseTypeCode,
+						ResponseMode: domain.OIDCResponseModeQuery,
 					},
 				},
 			},
@@ -762,6 +788,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								&domain.OIDCCodeChallenge{
 									Challenge: "challenge",
 									Method:    domain.CodeChallengeMethodS256,
@@ -771,6 +798,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 								gu.Ptr(time.Duration(0)),
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
+								true,
 							),
 						),
 					),
@@ -798,6 +826,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 								[]string{"openid"},
 								[]string{"audience"},
 								domain.OIDCResponseTypeCode,
+								domain.OIDCResponseModeQuery,
 								&domain.OIDCCodeChallenge{
 									Challenge: "challenge",
 									Method:    domain.CodeChallengeMethodS256,
@@ -807,6 +836,7 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 								gu.Ptr(time.Duration(0)),
 								gu.Ptr("loginHint"),
 								gu.Ptr("hintUserID"),
+								true,
 							),
 						),
 						eventFromEventPusher(
@@ -838,169 +868,6 @@ func TestCommands_AddAuthRequestCode(t *testing.T) {
 			}
 			err := c.AddAuthRequestCode(tt.args.ctx, tt.args.id, tt.args.code)
 			assert.ErrorIs(t, tt.wantErr, err)
-		})
-	}
-}
-
-func TestCommands_ExchangeAuthCode(t *testing.T) {
-	mockCtx := authz.NewMockContext("instanceID", "orgID", "loginClient")
-	type fields struct {
-		eventstore *eventstore.Eventstore
-	}
-	type args struct {
-		ctx  context.Context
-		code string
-	}
-	type res struct {
-		authRequest *CurrentAuthRequest
-		err         error
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		res    res
-	}{
-		{
-			"empty code error",
-			fields{
-				eventstore: eventstoreExpect(t),
-			},
-			args{
-				ctx:  mockCtx,
-				code: "",
-			},
-			res{
-				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sf3g2", "Errors.AuthRequest.InvalidCode"),
-			},
-		},
-		{
-			"no code added error",
-			fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusher(
-							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
-								"loginClient",
-								"clientID",
-								"redirectURI",
-								"state",
-								"nonce",
-								[]string{"openid"},
-								[]string{"audience"},
-								domain.OIDCResponseTypeCode,
-								&domain.OIDCCodeChallenge{
-									Challenge: "challenge",
-									Method:    domain.CodeChallengeMethodS256,
-								},
-								[]domain.Prompt{domain.PromptNone},
-								[]string{"en", "de"},
-								gu.Ptr(time.Duration(0)),
-								gu.Ptr("loginHint"),
-								gu.Ptr("hintUserID"),
-							),
-						),
-					),
-				),
-			},
-			args{
-				ctx:  mockCtx,
-				code: "V2_authRequestID",
-			},
-			res{
-				err: zerrors.ThrowPreconditionFailed(nil, "COMMAND-SFwd2", "Errors.AuthRequest.NoCode"),
-			},
-		},
-		{
-			"code exchanged",
-			fields{
-				eventstore: eventstoreExpect(t,
-					expectFilter(
-						eventFromEventPusher(
-							authrequest.NewAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
-								"loginClient",
-								"clientID",
-								"redirectURI",
-								"state",
-								"nonce",
-								[]string{"openid"},
-								[]string{"audience"},
-								domain.OIDCResponseTypeCode,
-								&domain.OIDCCodeChallenge{
-									Challenge: "challenge",
-									Method:    domain.CodeChallengeMethodS256,
-								},
-								[]domain.Prompt{domain.PromptNone},
-								[]string{"en", "de"},
-								gu.Ptr(time.Duration(0)),
-								gu.Ptr("loginHint"),
-								gu.Ptr("hintUserID"),
-							),
-						),
-						eventFromEventPusher(
-							authrequest.NewSessionLinkedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate,
-								"sessionID",
-								"userID",
-								testNow,
-								[]domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-							),
-						),
-						eventFromEventPusher(
-							authrequest.NewCodeAddedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
-						),
-					),
-					expectPush(
-						authrequest.NewCodeExchangedEvent(mockCtx, &authrequest.NewAggregate("V2_authRequestID", "instanceID").Aggregate),
-					),
-				),
-			},
-			args{
-				ctx:  mockCtx,
-				code: "V2_authRequestID",
-			},
-			res{
-				authRequest: &CurrentAuthRequest{
-					AuthRequest: &AuthRequest{
-						ID:           "V2_authRequestID",
-						LoginClient:  "loginClient",
-						ClientID:     "clientID",
-						RedirectURI:  "redirectURI",
-						State:        "state",
-						Nonce:        "nonce",
-						Scope:        []string{"openid"},
-						Audience:     []string{"audience"},
-						ResponseType: domain.OIDCResponseTypeCode,
-						CodeChallenge: &domain.OIDCCodeChallenge{
-							Challenge: "challenge",
-							Method:    domain.CodeChallengeMethodS256,
-						},
-						Prompt:     []domain.Prompt{domain.PromptNone},
-						UILocales:  []string{"en", "de"},
-						MaxAge:     gu.Ptr(time.Duration(0)),
-						LoginHint:  gu.Ptr("loginHint"),
-						HintUserID: gu.Ptr("hintUserID"),
-					},
-					SessionID:   "sessionID",
-					UserID:      "userID",
-					AuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{
-				eventstore: tt.fields.eventstore,
-			}
-			got, err := c.ExchangeAuthCode(tt.args.ctx, tt.args.code)
-			assert.ErrorIs(t, tt.res.err, err)
-
-			if err == nil {
-				// equal on time won't work -> test separately and clear it before comparing the rest
-				assert.WithinRange(t, got.AuthTime, testNow, testNow)
-				got.AuthTime = time.Time{}
-			}
-			assert.Equal(t, tt.res.authRequest, got)
 		})
 	}
 }

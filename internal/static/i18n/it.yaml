@@ -53,11 +53,24 @@ Errors:
     NotFound: Configurazione SMS non trovata
     AlreadyActive: Configurazione SMS già attiva
     AlreadyDeactivated: Configurazione SMS già disattivata
+  SMTP:
+    NotEmailMessage: il messaggio non è EmailMessage
+    RequiredAttributes: oggetto, destinatari e contenuto devono essere impostati ma alcuni o tutti sono vuoti
+    CouldNotSplit: impossibile dividere l'host e la porta per la connessione a SMTP
+    CouldNotDial: impossibile contattare il server SMTP, controllare la porta, problemi con il firewall...
+    CouldNotDialTLS: Impossibile contattare con il server SMTP utilizzando TLS, controllare la porta, problemi di firewall ...
+    CouldNotCreateClient: impossibile creare il client SMTP
+    CouldNotStartTLS: impossibile avviare tls
+    CouldNotAuth: impossibile aggiungere l'autenticazione smtp, controlla se sia l'utente che la password sono corretti, se sono corretti forse il tuo provider richiede un metodo di autenticazione non supportato da ZITADEL
+    CouldNotSetSender: impossibile impostare il mittente
+    CouldNotSetRecipient: impossibile impostare il destinatario
   SMTPConfig:
+    TestPassword: Password per il test non trovata
     NotFound: Configurazione SMTP non trovata
     AlreadyExists: La configurazione SMTP esiste già
     AlreadyDeactivated: Configurazione SMTP già disattivata
     SenderAdressNotCustomDomain: L'indirizzo del mittente deve essere configurato come dominio personalizzato sull'istanza.
+    TestEmailNotFound: Indirizzo email per il test non trovato
   Notification:
     NoDomain: Nessun dominio trovato per il messaggio
   User:
@@ -516,6 +529,7 @@ Errors:
     IDPMissing: IDP mancante nella richiesta
     IDPInvalid: IDP non valido per la richiesta
     ResponseInvalid: La risposta dell'IDP non è valida
+    MissingSingleMappingAttribute: Non contiene l'attributo di mapping o ha più di un valore
     SuccessURLMissing: URL di successo mancante nella richiesta
     FailureURLMissing: URL di errore mancante nella richiesta
     StateMissing: parametro di stato mancante nella richiesta
@@ -614,6 +628,7 @@ EventTypes:
         failed: Controllo dell'inizializzazione fallito
     token:
       added: Access Token creato
+      v2.added: Access Token creato
     impersonated: Utente impersonificato
     username:
       reserved: Nome utente riservato

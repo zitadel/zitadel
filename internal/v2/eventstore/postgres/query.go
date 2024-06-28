@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"slices"
 
 	"github.com/zitadel/logging"
@@ -38,7 +39,7 @@ func executeQuery(ctx context.Context, tx database.Querier, stmt *database.State
 	}
 
 	err = database.MapRowsToObject(rows, func(scan func(dest ...any) error) error {
-		e := new(eventstore.Event[eventstore.StoragePayload])
+		e := new(eventstore.StorageEvent)
 
 		var payload sql.Null[[]byte]
 
@@ -59,7 +60,12 @@ func executeQuery(ctx context.Context, tx database.Querier, stmt *database.State
 		if err != nil {
 			return err
 		}
-		e.Payload = unmarshalPayload(payload.V)
+		e.Payload = func(ptr any) error {
+			if len(payload.V) == 0 {
+				return nil
+			}
+			return json.Unmarshal(payload.V, ptr)
+		}
 		eventCount++
 
 		return reducer.Reduce(e)
@@ -80,7 +86,7 @@ func writeQuery(stmt *database.Statement, query *eventstore.Query) {
 
 	stmt.WriteString(" FROM (")
 	writeFilters(stmt, query.Filters())
-	stmt.WriteRune(')')
+	stmt.WriteString(") sub")
 	writePagination(stmt, query.Pagination())
 }
 
@@ -188,6 +194,7 @@ func writeAggregateFilters(stmt *database.Statement, filters []*eventstore.Aggre
 
 func writeAggregateFilter(stmt *database.Statement, filter *eventstore.AggregateFilter) {
 	conditions := definedConditions([]*condition{
+		{column: "owner", condition: filter.Owners()},
 		{column: "aggregate_type", condition: filter.Type()},
 		{column: "aggregate_id", condition: filter.IDs()},
 	})

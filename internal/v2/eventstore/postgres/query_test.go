@@ -673,7 +673,7 @@ func Test_writeQuery(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 ORDER BY position, in_tx_order)) sub ORDER BY position, in_tx_order`,
 				args:  []any{"i1"},
 			},
 		},
@@ -694,7 +694,7 @@ func Test_writeQuery(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND aggregate_id = ANY($3)) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND aggregate_id = ANY($3)) ORDER BY position, in_tx_order)) sub ORDER BY position, in_tx_order`,
 				args:  []any{"i1", "user", []string{"a", "b"}},
 			},
 		},
@@ -723,7 +723,7 @@ func Test_writeQuery(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND aggregate_id = ANY($3)) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $4 AND (aggregate_type = $5 AND event_type = $6) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND aggregate_id = ANY($3)) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $4 AND (aggregate_type = $5 AND event_type = $6) ORDER BY position, in_tx_order)) sub ORDER BY position, in_tx_order`,
 				args:  []any{"i1", "user", []string{"a", "b"}, "i1", "org", "org.added"},
 			},
 		},
@@ -760,7 +760,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 ORDER BY position, in_tx_order)) sub ORDER BY position, in_tx_order`,
 				args: []any{
 					"instance",
 					"aggregate",
@@ -782,7 +782,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 ORDER BY position DESC, in_tx_order DESC)) ORDER BY position DESC, in_tx_order DESC`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 ORDER BY position DESC, in_tx_order DESC)) sub ORDER BY position DESC, in_tx_order DESC`,
 				args: []any{
 					"instance",
 					"aggregate",
@@ -807,7 +807,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $3 AND (aggregate_type = $4 OR aggregate_type = $5) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND aggregate_type = $2 ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $3 AND (aggregate_type = $4 OR aggregate_type = $5) ORDER BY position, in_tx_order)) sub ORDER BY position, in_tx_order`,
 				args: []any{
 					"instance",
 					"agg1",
@@ -835,7 +835,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND aggregate_id = $3) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $4 AND ((aggregate_type = $5 AND aggregate_id = $6) OR aggregate_type = $7) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND aggregate_id = $3) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $4 AND ((aggregate_type = $5 AND aggregate_id = $6) OR aggregate_type = $7) ORDER BY position, in_tx_order)) sub ORDER BY position, in_tx_order`,
 				args: []any{
 					"instance",
 					"agg1",
@@ -870,7 +870,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND ((aggregate_type = $2 AND aggregate_id = ANY($3)) OR (aggregate_type = $4 AND aggregate_id = $5) OR (aggregate_type = $6 AND aggregate_id = $7)) ORDER BY position, in_tx_order)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND ((aggregate_type = $2 AND aggregate_id = ANY($3)) OR (aggregate_type = $4 AND aggregate_id = $5) OR (aggregate_type = $6 AND aggregate_id = $7)) ORDER BY position, in_tx_order)) sub ORDER BY position, in_tx_order`,
 				args: []any{
 					"instance",
 					"agg1",
@@ -1037,7 +1037,7 @@ func Test_writeQueryUse_examples(t *testing.T) {
 				),
 			},
 			want: wantQuery{
-				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND event_type = $3) ORDER BY position, in_tx_order LIMIT $4) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $5 AND (aggregate_type = $6 AND event_type = $7) ORDER BY position, in_tx_order LIMIT $8) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $9 AND (aggregate_type = $10 AND (event_type = $11 AND NOT(creator = ANY($12)))) ORDER BY position, in_tx_order LIMIT $13) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $14 AND (aggregate_type = $15 AND (event_type = $16 AND NOT(creator = ANY($17)))) ORDER BY position, in_tx_order LIMIT $18) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $19 AND (aggregate_type = $20 AND (event_type = $21 AND NOT(creator = ANY($22)))) ORDER BY position, in_tx_order LIMIT $23) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $24 AND (aggregate_type = $25 AND event_type = $26) AND ((position = $27 AND in_tx_order > $28) OR position > $29) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $30 AND ((aggregate_type = $31 AND event_type = ANY($32)) OR (aggregate_type = $33 AND event_type = ANY($34))) ORDER BY position, in_tx_order LIMIT $35) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $36 AND ((aggregate_type = $37 AND event_type = $38) OR (aggregate_type = $39 AND event_type = $40)) ORDER BY position, in_tx_order LIMIT $41) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $42 AND (aggregate_type = $43 AND (event_type = $44 AND NOT(creator = ANY($45)))) ORDER BY position, in_tx_order LIMIT $46)) ORDER BY position, in_tx_order`,
+				query: `SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM ((SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $1 AND (aggregate_type = $2 AND event_type = $3) ORDER BY position, in_tx_order LIMIT $4) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $5 AND (aggregate_type = $6 AND event_type = $7) ORDER BY position, in_tx_order LIMIT $8) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $9 AND (aggregate_type = $10 AND (event_type = $11 AND NOT(creator = ANY($12)))) ORDER BY position, in_tx_order LIMIT $13) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $14 AND (aggregate_type = $15 AND (event_type = $16 AND NOT(creator = ANY($17)))) ORDER BY position, in_tx_order LIMIT $18) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $19 AND (aggregate_type = $20 AND (event_type = $21 AND NOT(creator = ANY($22)))) ORDER BY position, in_tx_order LIMIT $23) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $24 AND (aggregate_type = $25 AND event_type = $26) AND ((position = $27 AND in_tx_order > $28) OR position > $29) ORDER BY position, in_tx_order) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $30 AND ((aggregate_type = $31 AND event_type = ANY($32)) OR (aggregate_type = $33 AND event_type = ANY($34))) ORDER BY position, in_tx_order LIMIT $35) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $36 AND ((aggregate_type = $37 AND event_type = $38) OR (aggregate_type = $39 AND event_type = $40)) ORDER BY position, in_tx_order LIMIT $41) UNION ALL (SELECT created_at, event_type, "sequence", "position", in_tx_order, payload, creator, "owner", instance_id, aggregate_type, aggregate_id, revision FROM eventstore.events2 WHERE instance_id = $42 AND (aggregate_type = $43 AND (event_type = $44 AND NOT(creator = ANY($45)))) ORDER BY position, in_tx_order LIMIT $46)) sub ORDER BY position, in_tx_order`,
 				args: []any{
 					"instance",
 					"instance",
@@ -1143,7 +1143,7 @@ type testReducer struct {
 }
 
 // Reduce implements eventstore.Reducer.
-func (r *testReducer) Reduce(events ...*eventstore.Event[eventstore.StoragePayload]) error {
+func (r *testReducer) Reduce(events ...*eventstore.StorageEvent) error {
 	if r == nil {
 		return nil
 	}

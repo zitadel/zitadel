@@ -4,68 +4,70 @@ Login:
   TitleLinking: Login pour la liaison des utilisateurs
   DescriptionLinking: Entrez vos données de connexion pour lier votre utilisateur externe avec un utilisateur ZITADEL.
   LoginNameLabel: Identifiant
-  UsernamePlaceHolder: nom d'utilisateur
-  LoginnamePlaceHolder: nom d'utilisateur@domaine
+  UsernamePlaceHolder: Nom d'utilisateur
+  LoginnamePlaceHolder: Nom d'utilisateur
   ExternalUserDescription: Se connecter avec un utilisateur externe.
-  MustBeMemberOfOrg: L'utilisateur doit être membre de l'organisation {{.OrgName}} .
-  RegisterButtonText: s'inscrire
-  NextButtonText: suivant
+  MustBeMemberOfOrg: L'utilisateur doit être membre de l'organisation {{.OrgName}}.
+  RegisterButtonText: S'inscrire
+  NextButtonText: Suivant
 
 LDAP:
   Title: Connexion
   Description: Entrez vos données de connexion.
   LoginNameLabel: Identifiant
   PasswordLabel: Mot de passe
-  NextButtonText: suivant
+  NextButtonText: Suivant
 
 SelectAccount:
   Title: Sélectionner un compte
-  Description: Utilisez votre compte ZITADEL
+  Description: Utilisez votre compte ZITADEL.
   TitleLinking: Sélectionnez le compte pour le lien avec l'utilisateur
   DescriptionLinking: Sélectionnez votre compte pour établir un lien avec votre utilisateur externe.
   OtherUser: Autre utilisateur
-  SessionState0: actif
+  SessionState0: Actif
   SessionState1: Déconnecté
   MustBeMemberOfOrg: L'utilisateur doit être membre de l'organisation {{.OrgName}}.
 
 Password:
   Title: Mot de passe
-  Description: Entrez vos données de connexion.
+  Description: Entrez vos identifiants.
   PasswordLabel: Mot de passe
-  MinLength: Longueur minimale
-  HasUppercase: Lettre majuscule
-  HasLowercase: Lettre minuscule
-  HasNumber: Numéro
-  HasSymbol: Symbole
-  Confirmation: Correspondance de confirmation
-  ResetLinkText: réinitialiser le mot de passe
-  BackButtonText: retour
-  NextButtonText: suivant
+  MinLength: Doit contenir au moins
+  MinLengthp2: caractères.
+  MaxLength: Doit contenir moins de 70 caractères.
+  HasUppercase: Doit inclure une lettre majuscule.
+  HasLowercase: Doit inclure une lettre minuscule.
+  HasNumber: Doit inclure un chiffre.
+  HasSymbol: Doit inclure un symbole.
+  Confirmation: La confirmation du mot de passe correspond.
+  ResetLinkText: Réinitialiser le mot de passe
+  BackButtonText: Retour
+  NextButtonText: Suivant
 
 UsernameChange:
   Title: Modifier le nom d'utilisateur
-  Description: Définissez votre nouveau nom d'utilisateur
+  Description: Définissez votre nouveau nom d'utilisateur.
   UsernameLabel: Nom d'utilisateur
-  CancelButtonText: annuler
-  NextButtonText: suivant
+  CancelButtonText: Annuler
+  NextButtonText: Suivant
 
 UsernameChangeDone:
   Title: Nom d'utilisateur modifié
-  Description: Votre nom d'utilisateur a été changé avec succès.
-  NextButtonText: suivant
+  Description: Votre nom d'utilisateur a bien été modifié.
+  NextButtonText: Suivant
 
 InitPassword:
   Title: Définir un mot de passe
-  Description: Vous avez reçu un code, que vous devez saisir dans le formulaire ci-dessous, pour définir votre nouveau mot de passe.
+  Description: Vous avez reçu un code, que vous devez saisir dans le formulaire ci-dessous pour définir votre nouveau mot de passe.
   CodeLabel: Code
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirmLabel: Confirmer le mot de passe
-  ResendButtonText: renvoyer le code
-  NextButtonText: suivant
+  ResendButtonText: Renvoyer le code
+  NextButtonText: Suivant
 
 InitPasswordDone:
   Title: Mot de passe défini
-  Description: Mot de passe défini avec succès
+  Description: Mot de passe défini avec succès.
   NextButtonText: Suivant
   CancelButtonText: Annuler
 
@@ -76,17 +78,17 @@ InitUser:
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirm: Confirmer le mot de passe
   NextButtonText: Suivant
-  ResendButtonText: renvoyer le code
+  ResendButtonText: Renvoyer le code
 
 InitUserDone:
-  Title: User Utilisateur activé
-  Description: Email vérifié et mot de passe défini avec succès
+  Title: Utilisateur activé
+  Description: Email vérifié et mot de passe défini avec succès.
   NextButtonText: Suivant
-  CancelButtonText: annuler
+  CancelButtonText: Annuler
 
 InitMFAPrompt:
-  Title: Configuration à 2 facteurs
-  Description: L'authentification à deux facteurs vous offre une sécurité supplémentaire pour votre compte d'utilisateur. Vous êtes ainsi assuré d'être le seul à avoir accès à votre compte.
+  Title: Configuration authentification à 2 facteurs
+  Description: L'authentification authentification à 2 facteurs vous offre une sécurité supplémentaire pour votre compte d'utilisateur. Vous êtes ainsi assuré d'être le seul à avoir accès à votre compte.
   Provider0: Application d'authentification (par exemple, Google/Microsoft Authenticator, Authy)
   Provider1: Dépend de l'appareil (par ex. FaceID, Windows Hello, empreinte digitale)
   Provider3: OTP SMS
@@ -95,15 +97,15 @@ InitMFAPrompt:
   SkipButtonText: Passer
 
 InitMFAOTP:
-  Title: Vérification à deux facteurs
-  Description: Créez votre 2-facteurs. Téléchargez une application d'authentification si vous n'en avez pas déjà une.
+  Title: Vérification authentification à 2 facteurs
+  Description: Créez votre authentification à 2 facteurs. Téléchargez une application d'authentification si vous n'en avez pas déjà une.
   OTPDescription: Scannez le code avec votre application d'authentification (par exemple Google Authenticator) ou copiez le secret et insérez le code généré ci-dessous.
   SecretLabel: Secret
   CodeLabel: Code
   NextButtonText: Suivant
   CancelButtonText: Annuler
 
-InitMFASMS:
+InitMFAOTPSMS:
   Title: Vérification à deux facteurs
   DescriptionPhone: Créez votre 2-facteurs. Entrez votre numéro de téléphone pour le vérifier.
   DescriptionCode: Créez votre 2-facteurs. Entrez le code reçu pour vérifier votre numéro de téléphone.
@@ -118,12 +120,12 @@ InitMFAU2F:
   Description: Une clé de sécurité est une méthode de vérification qui peut être intégrée à votre téléphone, utiliser Bluetooth ou se brancher directement sur le port USB de votre ordinateur.
   TokenNameLabel: Nom de la clé de sécurité / de l'appareil
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
-  RegisterTokenButtonText: Enregistrez 2-facteurs
+  RegisterTokenButtonText: Enregistrez l'authentification à 2 facteurs
   ErrorRetry: Réessayez, créez un nouveau défi ou choisissez une autre méthode.
 
 InitMFADone:
   Title: Clé de sécurité ajoutée
-  Description: Génial! Vous venez de configurer avec succès votre facteur 2 et de rendre votre compte beaucoup plus sûr. Le facteur doit être saisi à chaque connexion.
+  Description: Génial! Vous venez de configurer avec succès votre authentification à 2 facteurs et de rendre votre compte beaucoup plus sûr. Le code doit être saisi à chaque connexion.
   NextButtonText: Suivant
   CancelButtonText: Annuler
 
@@ -132,105 +134,106 @@ MFAProvider:
   Provider1: Dépend de l'appareil (par ex. FaceID, Windows Hello, empreinte digitale)
   Provider3: OTP SMS
   Provider4: OTP e-mail
-  ChooseOther: ou choisissez une autre option
+  ChooseOther: Ou choisissez une autre option
 
 VerifyMFAOTP:
-  Title: Vérifier 2-Facteurs
-  Description: Vérifiez votre second facteur
+  Title: Vérifier authentification à 2 facteurs
+  Description: Vérifiez votre authentification à 2 facteurs
   CodeLabel: Code
   NextButtonText: Suivant
 
 VerifyOTP:
-  Title: Vérifier 2-Facteurs
-  Description: Vérifiez votre second facteur
+  Title: Vérifier authentification à 2 facteurs
+  Description: Vérifiez votre authentification à 2 facteurs
   CodeLabel: Code
   ResendButtonText: Renvoyer le code
   NextButtonText: Suivant
 
 VerifyMFAU2F:
-  Title: Vérifier 2-Facteurs
-  Description: Vérifiez votre facteur 2 avec l'appareil enregistré (par exemple FaceID, Windows Hello, empreinte digitale).
+  Title: Vérifier authentification à 2 facteurs
+  Description: Vérifiez votre authentification à 2 facteurs avec l'appareil enregistré (par exemple FaceID, Windows Hello, empreinte digitale).
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Assurez-vous que vous utilisez la dernière version ou changez votre navigateur pour un navigateur pris en charge (Chrome, Safari, Firefox).
-  ErrorRetry: Réessayer, créer une nouvelle demande ou choisir une autre méthode.
-  ValidateTokenButtonText: Vérifier 2-Facteurs
+  ErrorRetry: Réessayez, créez une nouvelle demande ou choisissez une autre méthode.
+  ValidateTokenButtonText: Vérifier l'authentification à 2 facteurs
 
 Passwordless:
   Title: Connexion sans mot de passe
   Description: Connectez-vous avec les méthodes d'authentification fournies par votre appareil, comme FaceID, Windows Hello ou les empreintes digitales.
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
   ErrorRetry: Réessayez, créez un nouveau défi ou choisissez une autre méthode.
-  LoginWithPwButtonText: Connectez-vous avec le mot de passe
+  LoginWithPwButtonText: Connexion avec mot de passe
   ValidateTokenButtonText: Connexion sans mot de passe
 
 PasswordlessPrompt:
-  Title: Configuration sans mot de passe
-  Description: Souhaitez-vous configurer une connexion sans mot de passe? Méthodes d'authentification de votre appareil comme FaceID, Windows Hello ou Fingerprint.
+  Title: Configuration connexion sans mot de passe
+  Description: Souhaitez-vous configurer une connexion sans mot de passe ? (Méthodes d'authentification de votre appareil comme FaceID, Windows Hello ou empreintes digitales)
   DescriptionInit: Vous devez configurer la connexion sans mot de passe. Utilisez le lien qui vous a été donné pour enregistrer votre appareil.
-  PasswordlessButtonText: Aller sans mot de passe
-  NextButtonText: suivant
+  PasswordlessButtonText: Configurer la connexion sans mot de passe
+  NextButtonText: Suivant
   SkipButtonText: Passer
 
 PasswordlessRegistration:
-  Title: Configuration sans mot de passe
-  Description: Ajoutez votre authentification en fournissant un nom (par exemple MyMobilePhone, MacBook, etc.) et cliquez ensuite sur le bouton "Register passwordless" ci-dessous.
+  Title: Configuration connexion sans mot de passe
+  Description: Ajoutez votre authentification en fournissant un nom (par exemple MyMobilePhone, MacBook, etc.) et cliquez ensuite sur le bouton "Enregistrer la connexion sans mot de passe" ci-dessous.
   TokenNameLabel: Nom de l'appareil
   NotSupported: WebAuthN n'est pas pris en charge par votre navigateur. Veuillez vous assurer qu'il est à jour ou utiliser un autre navigateur (par exemple Chrome, Safari, Firefox).
-  RegisterTokenButtonText: Enregistrement sans mot de passe
-  ErrorRetry: Réessayer, créer un nouveau défi ou choisir une autre méthode.
+  RegisterTokenButtonText: Enregistrer la connexion sans mot de passe
+  ErrorRetry: Réessayez, créez un nouveau défi ou choisissez une autre méthode.
 
 PasswordlessRegistrationDone:
-  Title: Configuration sans mot de passe
-  Description: Le dispositif sans mot de passe a été ajouté avec succès.
+  Title: Configuration connexion sans mot de passe
+  Description: Le dispositif de connexion sans mot de passe a été ajouté avec succès.
   DescriptionClose: Vous pouvez maintenant fermer cette fenêtre.
-  NextButtonText: suivant
-  CancelButtonText: annuler
+  NextButtonText: Suivant
+  CancelButtonText: Annuler
 
 PasswordChange:
   Title: Changer le mot de passe
   Description: Changez votre mot de passe. Entrez votre ancien et votre nouveau mot de passe.
+  ExpiredDescription: Votre mot de passe a expiré et doit être modifié. Entrez votre ancien et votre nouveau mot de passe.
   OldPasswordLabel: Ancien mot de passe
   NewPasswordLabel: Nouveau mot de passe
   NewPasswordConfirmLabel: Confirmation du mot de passe
-  CancelButtonText: annuler
-  NextButtonText: suivant
+  CancelButtonText: Annuler
+  NextButtonText: Suivant
   Footer: Bas de page
 
 PasswordChangeDone:
   Title: Changer le mot de passe
   Description: Votre mot de passe a été modifié avec succès.
-  NextButtonText: suivant
+  NextButtonText: Suivant
 
 PasswordResetDone:
   Title: Lien de réinitialisation du mot de passe envoyé
   Description: Vérifiez votre e-mail pour réinitialiser votre mot de passe.
-  NextButtonText: suivant
+  NextButtonText: Suivant
 
 EmailVerification:
-  Title: Vérification de l'email
+  Title: Vérification de l'e-mail
   Description: Nous vous avons envoyé un e-mail pour vérifier votre adresse. Veuillez saisir le code dans le formulaire ci-dessous.
   CodeLabel: Code
-  NextButtonText: suivant
-  ResendButtonText: renvoyer le code
+  NextButtonText: Suivant
+  ResendButtonText: Renvoyer le code
 
 EmailVerificationDone:
-  Title: E-Mail Verification
+  Title: E-mail Verification
   Description: Votre adresse électronique a été vérifiée avec succès.
-  NextButtonText: suivant
-  CancelButtonText: annuler
-  LoginButtonText: connexion
+  NextButtonText: Suivant
+  CancelButtonText: Annuler
+  LoginButtonText: Connexion
 
 RegisterOption:
   Title: Options d'enregistrement
-  Description: Choisissez comment vous souhaitez vous enregistrer
+  Description: Choisissez comment vous souhaitez vous enregistrer.
   RegisterUsernamePasswordButtonText: Avec nom d'utilisateur et mot de passe
-  ExternalLoginDescription: ou s'enregistrer avec un utilisateur externe
-  LoginButtonText: connexion
+  ExternalLoginDescription: Ou s'enregistrer avec un utilisateur externe
+  LoginButtonText: Connexion
 
 RegistrationUser:
   Title: Inscription
   Description: Entrez vos données d'utilisateur. Votre adresse e-mail sera utilisée comme nom de connexion.
   DescriptionOrgRegister: Entrez vos données d'utilisateur.
-  EmailLabel: E-Mail
+  EmailLabel: Email
   UsernameLabel: Identifiant
   FirstnameLabel: Prénom
   LastnameLabel: Nom de famille
@@ -249,25 +252,26 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Genre
   Female: Femme
   Male: Homme
-  Diverse: divers / X
+  Diverse: Divers / X
   PasswordLabel: Mot de passe
   PasswordConfirmLabel: Confirmation du mot de passe
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
   PrivacyConfirm: J'accepte les
-  PrivacyLinkText: politique de confidentialité
-  ExternalLogin: ou m'inscrire avec un utilisateur externe
-  BackButtonText: connexion
-  NextButtonText: suivant
+  PrivacyLinkText: Politique de confidentialité
+  ExternalLogin: Ou m'inscrire avec un utilisateur externe
+  BackButtonText: Connexion
+  NextButtonText: Suivant
 
 ExternalRegistrationUserOverview:
   Title: Enregistrement des utilisateurs externes
-  Description: Nous avons pris vos coordonnées d'utilisateur auprès du fournisseur sélectionné. Vous pouvez maintenant les modifier ou les compléter.
-  EmailLabel: E-Mail
+  Description: Nous avons récupéré vos coordonnées d'utilisateur auprès du fournisseur sélectionné. Vous pouvez maintenant les modifier ou les compléter.
+  EmailLabel: E-mail
   UsernameLabel: Identifiant
   FirstnameLabel: Prénom
   LastnameLabel: Nom de famille
@@ -288,20 +292,21 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
   PrivacyConfirm: J'accepte les
-  PrivacyLinkText: politique de confidentialité
-  ExternalLogin: ou m'inscrire avec un utilisateur externe
-  BackButtonText: retour
-  NextButtonText: enregistrer
+  PrivacyLinkText: Politique de confidentialité
+  ExternalLogin: Ou m'inscrire avec un utilisateur externe
+  BackButtonText: Retour
+  NextButtonText: Enregistrer
 
 RegistrationOrg:
   Title: Enregistrement de l'organisation
   Description: Entrez le nom de votre organisation et vos données d'utilisateur.
   OrgNameLabel: Nom de l'organisation
-  EmailLabel: E-Mail
+  EmailLabel: E-mail
   UsernameLabel: Nom d'utilisateur
   FirstnameLabel: Prénom
   LastnameLabel: Nom de famille
@@ -311,42 +316,42 @@ RegistrationOrg:
   TosConfirm: J'accepte les
   TosLinkText: TOS
   PrivacyConfirm: J'accepte les
-  PrivacyLinkText: politique de confidentialité
+  PrivacyLinkText: Politique de confidentialité
   SaveButtonText: Créer une organisation
 
 LoginSuccess:
   Title: Connexion réussie
   AutoRedirectDescription: Vous serez automatiquement redirigé vers votre application. Si ce n'est pas le cas, cliquez sur le bouton ci-dessous. Vous pouvez ensuite fermer la fenêtre.
   RedirectedDescription: Vous pouvez maintenant fermer cette fenêtre.
-  NextButtonText: suivant
+  NextButtonText: Suivant
 
 LogoutDone:
   Title: Déconnecté
   Description: Vous vous êtes déconnecté avec succès.
-  LoginButtonText: connexion
+  LoginButtonText: Connexion
 
 LinkingUserPrompt:
   Title: Utilisateur existant trouvé
-  Description: "Souhaitez-vous associer votre compte existant:"
+  Description: "Souhaitez-vous associer votre compte existant :"
   LinkButtonText: Lier
   OtherButtonText: Autres options
 
 LinkingUsersDone:
-  Title: Userlinking
+  Title: Lier utilisateur
   Description: Le lien avec l'utilisateur est terminé.
-  CancelButtonText: annuler
-  NextButtonText: suivant
+  CancelButtonText: Annuler
+  NextButtonText: Suivant
 
 ExternalNotFound:
   Title: Utilisateur externe introuvable
-  Description: Utilisateur externe non trouvé. Voulez-vous lier votre utilisateur ou enregistrer automatiquement un nouvel utilisateur.
+  Description: Utilisateur externe non trouvé. Voulez-vous lier votre utilisateur ou enregistrer automatiquement un nouvel utilisateur ?
   LinkButtonText: Lier
-  AutoRegisterButtonText: enregistrer
+  AutoRegisterButtonText: Enregistrer
   TosAndPrivacyLabel: Termes et conditions
   TosConfirm: J'accepte les
   TosLinkText: TOS
   PrivacyConfirm: J'accepte les
-  PrivacyLinkText: politique de confidentialité
+  PrivacyLinkText: Politique de confidentialité
   German: Deutsch
   English: English
   Italian: Italiano
@@ -361,20 +366,21 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: Autorisation de l'appareil
   UserCode:
     Label: Code d'utilisateur
     Description: Saisissez le code utilisateur présenté sur l'appareil.
-    ButtonNext: suivant
+    ButtonNext: Suivant
   Action:
     Description: Accordez l'accès à l'appareil.
     GrantDevice: vous êtes sur le point d'accorder un appareil
     AccessToScopes: accès aux périmètres suivants
     Button:
-      Allow: permettre
-      Deny: refuser
+      Allow: Autoriser
+      Deny: Refuser
   Done:
     Description: Fait.
     Approved: Autorisation de l'appareil approuvée. Vous pouvez maintenant retourner à l'appareil.
@@ -392,7 +398,7 @@ SignIn: Connexion avec {{.Provider}}
 Errors:
   Internal: Une erreur interne s'est produite
   AuthRequest:
-    NotFound: Impossible de trouver l'authrequest
+    NotFound: Impossible de trouver la requête d'authentification
     UserAgentNotCorresponding: L'agent utilisateur ne correspond pas
     UserAgentNotFound: L'ID de l'agent utilisateur n'a pas été trouvé
     TokenNotFound: Token non trouvé
@@ -404,7 +410,7 @@ Errors:
     Inactive: L'utilisateur est inactif
     NotFoundOnOrg: L'utilisateur n'a pas été trouvé dans l'organisation choisie
     NotAllowedOrg: L'utilisateur n'est pas membre de l'organisation requise
-    NotMatchingUserID: L'utilisateur et l'utilisateur dans l'authrequest ne correspondent pas.
+    NotMatchingUserID: L'utilisateur et l'utilisateur dans la requête d'authentification ne correspondent pas.
     UserIDMissing: UserID est vide
     Invalid: Données utilisateur non valides
     DomainNotAllowedAsUsername: Le domaine est déjà réservé et ne peut pas être utilisé.
@@ -418,7 +424,7 @@ Errors:
       IDMissing: Profil ID manquant
     Email:
       NotFound: Email non trouvé
-      Invalid: L'email n'est pas valide
+      Invalid: L'e-mail n'est pas valide
       AlreadyVerified: L'adresse électronique est déjà vérifiée
       NotChanged: L'adresse électronique n'a pas changé
       Empty: Email est vide
@@ -445,7 +451,7 @@ Errors:
     UsernameOrPassword:
       Invalid: Le nom d'utilisateur ou le mot de passe n'est pas valide
     PasswordComplexityPolicy:
-      NotFound: Politique de mot de passe non trouvée
+      NotFound: Politique des mots de passe non trouvée
       MinLength: Le mot de passe est trop court
       HasLower: Le mot de passe doit contenir une lettre minuscule
       HasUpper: Le mot de passe doit contenir une lettre majuscule

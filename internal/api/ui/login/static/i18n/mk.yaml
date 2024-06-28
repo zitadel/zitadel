@@ -32,15 +32,17 @@ Password:
   Title: Лозинка
   Description: Внесете ги вашите податоци за најава.
   PasswordLabel: Лозинка
-  MinLength: Минимална должина
-  HasUppercase: Голема буква
-  HasLowercase: Мала буква
-  HasNumber: Број
-  HasSymbol: Симбол
-  Confirmation: Потврда на лозинка
-  ResetLinkText: ресетирај лозинка
-  BackButtonText: назад
-  NextButtonText: следно
+  MinLength: Мора да биде најмалку
+  MinLengthp2: карактери долго.
+  MaxLength: Мора да биде помалку од 70 карактери.
+  HasUppercase: Мора да вклучи голема буква.
+  HasLowercase: Мора да вклучи мала буква.
+  HasNumber: Мора да вклучи број.
+  HasSymbol: Мора да вклучи симбол.
+  Confirmation: Потврдата за лозинката се совпаѓа.
+  ResetLinkText: Ресетирај лозинка
+  BackButtonText: Назад
+  NextButtonText: Напред
 
 UsernameChange:
   Title: Промена на корисничко име
@@ -188,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Промена на лозинка
   Description: Променете ја вашата лозинка. Внесете ја старата и новата лозинка.
+  ExpiredDescription: Вашата лозинка е истечена и мора да се смени. Внесете ја старата и новата лозинка.
   OldPasswordLabel: Стара лозинка
   NewPasswordLabel: Нова лозинка
   NewPasswordConfirmLabel: Потврда на лозинка
@@ -249,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Пол
   Female: Женски
   Male: Машки
@@ -288,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Правила и услови
   TosConfirm: Се согласувам со
   TosLinkText: правилата за користење
@@ -361,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: Овластување преку уред

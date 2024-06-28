@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -110,12 +112,14 @@ type LDAPProvider struct {
 }
 
 type SAMLProvider struct {
-	Name              string
-	Metadata          []byte
-	MetadataURL       string
-	Binding           string
-	WithSignedRequest bool
-	IDPOptions        idp.Options
+	Name                          string
+	Metadata                      []byte
+	MetadataURL                   string
+	Binding                       string
+	WithSignedRequest             bool
+	NameIDFormat                  *domain.SAMLNameIDFormat
+	TransientMappingAttributeName string
+	IDPOptions                    idp.Options
 }
 
 type AppleProvider struct {
@@ -130,6 +134,9 @@ type AppleProvider struct {
 
 // ExistsIDPOnOrgOrInstance query first org level IDPs and then instance level IDPs, no check if the IDP is active
 func ExistsIDPOnOrgOrInstance(ctx context.Context, filter preparation.FilterToQueryReducer, instanceID, orgID, id string) (exists bool, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	writeModel := NewOrgIDPRemoveWriteModel(orgID, id)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {

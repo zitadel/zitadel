@@ -29,15 +29,17 @@ SelectAccount:
   MustBeMemberOfOrg: Der Benutzer muss der Organisation {{.OrgName}} angehören.
 
 Password:
-  Title: Willkommen zurück!
-  Description: Gib deine Benutzerdaten ein.
+  Title: Passwort
+  Description: Geben Sie Ihre Anmeldedaten ein.
   PasswordLabel: Passwort
-  MinLength: Mindestlänge
-  HasUppercase: Großbuchstaben
-  HasLowercase: Kleinbuchstaben
-  HasNumber: Nummer
-  HasSymbol: Symbol
-  Confirmation: Wiederholung stimmt überein
+  MinLength: Muss mindestens
+  MinLengthp2: Zeichen lang sein.
+  MaxLength: Muss weniger als 70 Zeichen lang sein.
+  HasUppercase: Muss einen Großbuchstaben enthalten.
+  HasLowercase: Muss einen Kleinbuchstaben enthalten.
+  HasNumber: Muss eine Zahl enthalten.
+  HasSymbol: Muss ein Symbol enthalten.
+  Confirmation: Passwortbestätigung stimmt überein.
   ResetLinkText: Passwort zurücksetzen
   BackButtonText: Zurück
   NextButtonText: Weiter
@@ -188,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Passwort ändern
   Description: Ändere dein Passwort indem du dein altes und dann dein neues Passwort eingibst.
+  ExpiredDescription: Dein Passwort ist abgelaufen und muss geändert werden. Gib dein altes und neues Passwort ein.
   OldPasswordLabel: Altes Passwort
   NewPasswordLabel: Neues Passwort
   NewPasswordConfirmLabel: Passwort wiederholen
@@ -248,6 +251,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -287,6 +291,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGB
@@ -360,6 +365,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: Gerätezulassung
   UserCode:

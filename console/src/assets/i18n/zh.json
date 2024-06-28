@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "实例设置",
-        "DESCRIPTION": "实例设置是所有组织的默认设置。有适当的权限，其中一些可以在组织设置中被覆盖。"
+        "TITLE": "默认设置",
+        "DESCRIPTION": "所有组织的默认设置。有了正确的权限，其中一些权限在组织设置中是可以覆盖的。"
       },
       "ORG": {
         "TITLE": "组织设置",
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "外部链接",
-        "DESCRIPTION": "引导您的用户到登录页面上显示的自定义外部资源。用户需要在注册前接受服务条款和隐私政策。"
+        "DESCRIPTION": "引导您的用户访问登录页面上显示的自定义外部资源。用户需要先接受服务条款和隐私政策，然后才能注册。更改文档的链接或设置空字符串以在控制台中隐藏文档按钮。在控制台中添加自定义外部链接和该链接的自定义文本，或将它们设置为空以隐藏该按钮。"
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP设置",
@@ -485,6 +485,8 @@
     "NEXT": "下一页",
     "MORE": "更多",
     "STEP": "步",
+    "SETUP": "设置",
+    "TEST": "测试",
     "UNSAVEDCHANGES": "未保存的更改",
     "UNSAVED": {
       "DIALOG": {
@@ -496,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     },
-    "DOWNLOAD": "下载"
+    "DOWNLOAD": "下载",
+    "APPLY": "申请"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "控制整个实例，包括所有组织",
@@ -594,6 +597,7 @@
     "INVALID_FORMAT": "格式是无效的。",
     "NOTANEMAIL": "给定的值不是合法电子邮件地址。",
     "MINLENGTH": "长度必须至少是{{requiredLength}}字符。",
+    "MAXLENGTH": "必须少于{{requiredLength}}个字符.",
     "UPPERCASEMISSING": "密码必须包含大写字符。",
     "LOWERCASEMISSING": "密码必须包含小写字符。",
     "SYMBOLERROR": "密码必须包含符号或标点符号。",
@@ -879,7 +883,8 @@
       "SET": "设置新密码",
       "RESENDNOTIFICATION": "发送重置密码链接",
       "REQUIRED": "缺少必填字段。",
-      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。"
+      "MINLENGTHERROR": "密码长度必须至少为 {{value}} 个字符。",
+      "MAXLENGTHERROR": "必须少于{{value}}个字符"
     },
     "ID": "ID",
     "EMAIL": "电子邮件",
@@ -1313,16 +1318,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "实例设置",
-      "DESCRIPTION": "这些设置将应用于您的所有组织，除非它们已被覆盖。"
-    },
     "LIST": {
       "ORGS": "组织",
       "FEATURESETTINGS": "功能设置",
       "LANGUAGES": "语言",
       "LOGIN": "登录行为和安全",
       "LOCKOUT": "安全锁策略",
+      "AGE": "密码过期",
       "COMPLEXITY": "密码复杂性",
       "NOTIFICATIONS": "通知设置",
       "SMTP_PROVIDER": "SMTP 提供商",
@@ -1377,7 +1379,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1542,7 +1545,7 @@
     },
     "PWD_AGE": {
       "TITLE": "密码过期",
-      "DESCRIPTION": "您可以设置密码过期策略。此策略会在特定过期时间过后发出警告。"
+      "DESCRIPTION": "您可以设置密码过期策略。此策略将强制用户在密码过期后下次登录时更改密码。没有自动警告和通知。"
     },
     "PWD_LOCKOUT": {
       "TITLE": "锁定策略",
@@ -1569,6 +1572,9 @@
       "POLICYLINK": "链接到隐私政策",
       "HELPLINK": "链接到帮助",
       "SUPPORTEMAIL": "支持邮箱",
+      "DOCSLINK": "文档链接（Console）",
+      "CUSTOMLINK": "自定义链接（Console）",
+      "CUSTOMLINKTEXT": "自定义链接文本（Console）",
       "SAVED": "保存成功！",
       "RESET_TITLE": "恢复默认值",
       "RESET_DESCRIPTION": "您即将恢复 TOS 和隐私政策的默认链接。你真的要继续吗？"
@@ -1602,7 +1608,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1691,8 +1698,8 @@
       "SHOWLOCKOUTFAILURES": "显示锁定失败",
       "MAXPASSWORDATTEMPTS": "密码最大尝试次数",
       "MAXOTPATTEMPTS": "最多尝试 OTP 次数",
-      "EXPIREWARNDAYS": "密码过期警告",
-      "MAXAGEDAYS": "Max Age in days",
+      "EXPIREWARNDAYS": "密码将在几天后过期",
+      "MAXAGEDAYS": "最大有效期 (天)",
       "USERLOGINMUSTBEDOMAIN": "用户名必须包含组织域名",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "如果启用此设置，所有登录名都将以组织域为后缀。如果禁用此设置，您必须确保用户名在所有组织中都是唯一的。",
       "VALIDATEORGDOMAINS": "组织域名验证需要 (DNS 或 HTTP 挑战)",
@@ -2224,11 +2231,12 @@
   "SMTP": {
     "LIST": {
       "TITLE": "SMTP 提供商",
-      "DESCRIPTION": "这些是您的 Zitadel 实例的 SMTP 提供商。激活您想要用来向用户发送通知的通知。",
+      "DESCRIPTION": "这些是您的 ZITADEL 实例的 SMTP 提供商。激活您想要用来向用户发送通知的通知。",
       "EMPTY": "没有可用的 SMTP 提供商",
       "ACTIVATED": "活性",
       "ACTIVATE": "激活提供商",
       "DEACTIVATE": "停用提供商",
+      "TEST": "测试您的提供商",
       "TYPE": "类型",
       "DIALOG": {
         "ACTIVATED": "SMTP 配置已激活",
@@ -2252,7 +2260,21 @@
         "CURRENT_DESC_TITLE": "这些是您的 SMTP 设置",
         "PROVIDER_SETTINGS": "SMTP 提供商设置",
         "SENDER_SETTINGS": "发件人设置",
-        "TEST_SETTINGS": "测试 SMTP 设置"
+        "NEXT_STEPS": "下一步",
+        "ACTIVATE": {
+          "TITLE": "激活您的 SMTP 提供商",
+          "DESCRIPTION": "在您激活此 SMTP 提供程序之前，Zitadel 无法使用它来发送通知。如果您激活此提供程序，任何其他处于活动状态的提供程序现在都将被停用。"
+        },
+        "DEACTIVATE": {
+          "TITLE": "停用您的 SMTP 提供商",
+          "DESCRIPTION": "如果您停用此 SMTP 提供程序，Zitadel 将无法使用它发送通知，直到您再次激活它。"
+        },
+        "SAVE_SETTINGS": "保存您的设置",
+        "TEST": {
+          "TITLE": "测试您的设置",
+          "DESCRIPTION": "您可以测试您的 SMTP 提供商设置并在保存之前检查测试结果",
+          "RESULT": "您的电子邮件已成功发送"
+        }
       }
     },
     "DETAIL": {
@@ -2526,7 +2548,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "添加管理者",

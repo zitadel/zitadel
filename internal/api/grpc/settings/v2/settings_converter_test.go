@@ -213,7 +213,7 @@ func Test_multiFactorTypeToPb(t *testing.T) {
 	}
 }
 
-func Test_passwordSettingsToPb(t *testing.T) {
+func Test_passwordComplexitySettingsToPb(t *testing.T) {
 	arg := &query.PasswordComplexityPolicy{
 		MinLength:    12,
 		HasUppercase: true,
@@ -231,10 +231,29 @@ func Test_passwordSettingsToPb(t *testing.T) {
 		ResourceOwnerType: settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
 	}
 
-	got := passwordSettingsToPb(arg)
+	got := passwordComplexitySettingsToPb(arg)
 	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
 	if !proto.Equal(got, want) {
-		t.Errorf("passwordSettingsToPb() =\n%v\nwant\n%v", got, want)
+		t.Errorf("passwordComplexitySettingsToPb() =\n%v\nwant\n%v", got, want)
+	}
+}
+
+func Test_passwordExpirySettingsToPb(t *testing.T) {
+	arg := &query.PasswordAgePolicy{
+		ExpireWarnDays: 80,
+		MaxAgeDays:     90,
+		IsDefault:      true,
+	}
+	want := &settings.PasswordExpirySettings{
+		ExpireWarnDays:    80,
+		MaxAgeDays:        90,
+		ResourceOwnerType: settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
+	}
+
+	got := passwordExpirySettingsToPb(arg)
+	grpc.AllFieldsSet(t, got.ProtoReflect(), ignoreTypes...)
+	if !proto.Equal(got, want) {
+		t.Errorf("passwordExpirySettingsToPb() =\n%v\nwant\n%v", got, want)
 	}
 }
 
@@ -316,17 +335,23 @@ func Test_domainSettingsToPb(t *testing.T) {
 
 func Test_legalSettingsToPb(t *testing.T) {
 	arg := &query.PrivacyPolicy{
-		TOSLink:      "http://example.com/tos",
-		PrivacyLink:  "http://example.com/pricacy",
-		HelpLink:     "http://example.com/help",
-		SupportEmail: "support@zitadel.com",
-		IsDefault:    true,
+		TOSLink:        "http://example.com/tos",
+		PrivacyLink:    "http://example.com/pricacy",
+		HelpLink:       "http://example.com/help",
+		SupportEmail:   "support@zitadel.com",
+		IsDefault:      true,
+		DocsLink:       "http://example.com/docs",
+		CustomLink:     "http://example.com/custom",
+		CustomLinkText: "Custom",
 	}
 	want := &settings.LegalAndSupportSettings{
 		TosLink:           "http://example.com/tos",
 		PrivacyPolicyLink: "http://example.com/pricacy",
 		HelpLink:          "http://example.com/help",
 		SupportEmail:      "support@zitadel.com",
+		DocsLink:          "http://example.com/docs",
+		CustomLink:        "http://example.com/custom",
+		CustomLinkText:    "Custom",
 		ResourceOwnerType: settings.ResourceOwnerType_RESOURCE_OWNER_TYPE_INSTANCE,
 	}
 	got := legalAndSupportSettingsToPb(arg)
@@ -440,6 +465,10 @@ func Test_idpTypeToPb(t *testing.T) {
 		{
 			args: args{domain.IDPTypeGoogle},
 			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE,
+		},
+		{
+			args: args{domain.IDPTypeSAML},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML,
 		},
 		{
 			args: args{99},

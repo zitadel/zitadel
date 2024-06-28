@@ -104,28 +104,7 @@ func (c *Client) AccessTokenType() op.AccessTokenType {
 }
 
 func (c *Client) IsScopeAllowed(scope string) bool {
-	if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
-		return true
-	}
-	if strings.HasPrefix(scope, domain.OrgIDScope) {
-		return true
-	}
-	if strings.HasPrefix(scope, domain.ProjectIDScope) {
-		return true
-	}
-	if strings.HasPrefix(scope, domain.SelectIDPScope) {
-		return true
-	}
-	if scope == ScopeUserMetaData {
-		return true
-	}
-	if scope == ScopeResourceOwner {
-		return true
-	}
-	if scope == ScopeProjectsRoles {
-		return true
-	}
-	return slices.Contains(c.allowedScopes, scope)
+	return isScopeAllowed(scope, c.allowedScopes...)
 }
 
 func (c *Client) ClockSkew() time.Duration {
@@ -248,4 +227,32 @@ func clientIDFromCredentials(cc *op.ClientCredentials) (clientID string, asserti
 		return claims.Issuer, true, nil
 	}
 	return cc.ClientID, false, nil
+}
+
+func isScopeAllowed(scope string, allowedScopes ...string) bool {
+	if strings.HasPrefix(scope, domain.OrgDomainPrimaryScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.OrgIDScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.ProjectIDScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.SelectIDPScope) {
+		return true
+	}
+	if strings.HasPrefix(scope, domain.OrgRoleIDScope) {
+		return true
+	}
+	if scope == ScopeUserMetaData {
+		return true
+	}
+	if scope == ScopeResourceOwner {
+		return true
+	}
+	if scope == ScopeProjectsRoles {
+		return true
+	}
+	return slices.Contains(allowedScopes, scope)
 }

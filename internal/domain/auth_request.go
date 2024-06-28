@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"slices"
 	"strings"
 	"time"
 
@@ -34,6 +35,7 @@ type AuthRequest struct {
 	AvatarKey                string
 	PresignedAvatar          string
 	UserOrgID                string
+	PreferredLanguage        *language.Tag
 	RequestedOrgID           string
 	RequestedOrgName         string
 	RequestedPrimaryDomain   string
@@ -44,6 +46,7 @@ type AuthRequest struct {
 	LinkingUsers             []*ExternalUser
 	PossibleSteps            []NextStep `json:"-"`
 	PasswordVerified         bool
+	IDPLoginChecked          bool
 	MFAsVerified             []MFAType
 	Audience                 []string
 	AuthTime                 time.Time
@@ -53,6 +56,7 @@ type AuthRequest struct {
 	LabelPolicy              *LabelPolicy
 	PrivacyPolicy            *PrivacyPolicy
 	LockoutPolicy            *LockoutPolicy
+	PasswordAgePolicy        *PasswordAgePolicy
 	DefaultTranslations      []*CustomText
 	OrgTranslations          []*CustomText
 	SAMLRequestID            string
@@ -66,6 +70,20 @@ func (a *AuthRequest) SetPolicyOrgID(id string) {
 
 func (a *AuthRequest) PolicyOrgID() string {
 	return a.policyOrgID
+}
+
+func (a *AuthRequest) AuthMethods() []UserAuthMethodType {
+	list := make([]UserAuthMethodType, 0, len(a.MFAsVerified)+2)
+	if a.PasswordVerified {
+		list = append(list, UserAuthMethodTypePassword)
+	}
+	if a.IDPLoginChecked {
+		list = append(list, UserAuthMethodTypeIDP)
+	}
+	for _, mfa := range a.MFAsVerified {
+		list = append(list, mfa.UserAuthMethodType())
+	}
+	return slices.Compact(list)
 }
 
 type ExternalUser struct {

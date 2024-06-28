@@ -30,7 +30,7 @@ Cloudflare will return an error "User email was not returned. API permissions ar
 
 1. On the Cloudflare dashboard go to Zero Trust, click settings, and then select "Authentication"
 2. Add a new login method with the type "OpenID Connect"
-3. Fill in the required information. Check the discovery endpoint of your instance (https://{your_domain}/.well-known/openid-configuration) for the urls. As mentioned in the Cloudflare docs the Certificate Url is jwks_uri.
+3. Fill in the required information. Check the discovery endpoint of your instance `https://{your_domain}/.well-known/openid-configuration` for the urls. As mentioned in the Cloudflare docs the Certificate Url is jwks_uri.
 4. Disable PKCE (Cloudflare requires a client secret for PKCE, which is currently not supported)
 5. Add the following claims: "openid", "profile", "email"
 6. Test the connection

@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/zitadel/logging"
+	"golang.org/x/text/language"
+
 	"github.com/zitadel/zitadel/internal/activity"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -15,21 +18,18 @@ import (
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/repository/session"
 	"github.com/zitadel/zitadel/internal/repository/user"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-type SessionCommand func(ctx context.Context, cmd *SessionCommands) error
+type SessionCommand func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error)
 
 type SessionCommands struct {
 	sessionCommands []SessionCommand
 
-	sessionWriteModel  *SessionWriteModel
-	passwordWriteModel *HumanPasswordWriteModel
-	intentWriteModel   *IDPIntentWriteModel
-	totpWriteModel     *HumanTOTPWriteModel
-	eventstore         *eventstore.Eventstore
-	eventCommands      []eventstore.Command
+	sessionWriteModel *SessionWriteModel
+	intentWriteModel  *IDPIntentWriteModel
+	eventstore        *eventstore.Eventstore
+	eventCommands     []eventstore.Command
 
 	hasher      *crypto.Hasher
 	intentAlg   crypto.EncryptionAlgorithm
@@ -56,123 +56,101 @@ func (c *Commands) NewSessionCommands(cmds []SessionCommand, session *SessionWri
 }
 
 // CheckUser defines a user check to be executed for a session update
-func CheckUser(id string, resourceOwner string) SessionCommand {
-	return func(ctx context.Context, cmd *SessionCommands) error {
+func CheckUser(id string, resourceOwner string, preferredLanguage *language.Tag) SessionCommand {
+	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
 		if cmd.sessionWriteModel.UserID != "" && id != "" && cmd.sessionWriteModel.UserID != id {
-			return zerrors.ThrowInvalidArgument(nil, "", "user change not possible")
+			return nil, zerrors.ThrowInvalidArgument(nil, "", "user change not possible")
 		}
-		return cmd.UserChecked(ctx, id, resourceOwner, cmd.now())
+		return nil, cmd.UserChecked(ctx, id, resourceOwner, cmd.now(), preferredLanguage)
 	}
 }
 
 // CheckPassword defines a password check to be executed for a session update
 func CheckPassword(password string) SessionCommand {
-	return func(ctx context.Context, cmd *SessionCommands) error {
-		if cmd.sessionWriteModel.UserID == "" {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3f", "Errors.User.UserIDMissing")
-		}
-		cmd.passwordWriteModel = NewHumanPasswordWriteModel(cmd.sessionWriteModel.UserID, "")
-		err := cmd.eventstore.FilterToQueryReducer(ctx, cmd.passwordWriteModel)
+	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
+		commands, err := checkPassword(ctx, cmd.sessionWriteModel.UserID, password, cmd.eventstore, cmd.hasher, nil)
 		if err != nil {
-			return err
+			return commands, err
 		}
-		if cmd.passwordWriteModel.UserState == domain.UserStateUnspecified || cmd.passwordWriteModel.UserState == domain.UserStateDeleted {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4b3", "Errors.User.NotFound")
-		}
-
-		if cmd.passwordWriteModel.EncodedHash == "" {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-WEf3t", "Errors.User.Password.NotSet")
-		}
-		ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
-		updated, err := cmd.hasher.Verify(cmd.passwordWriteModel.EncodedHash, password)
-		spanPasswordComparison.EndWithError(err)
-		if err != nil {
-			//TODO: maybe we want to reset the session in the future https://github.com/zitadel/zitadel/issues/5807
-			return zerrors.ThrowInvalidArgument(err, "COMMAND-SAF3g", "Errors.User.Password.Invalid")
-		}
-		if updated != "" {
-			cmd.eventCommands = append(cmd.eventCommands, user.NewHumanPasswordHashUpdatedEvent(ctx, UserAggregateFromWriteModel(&cmd.passwordWriteModel.WriteModel), updated))
-		}
-
+		cmd.eventCommands = append(cmd.eventCommands, commands...)
 		cmd.PasswordChecked(ctx, cmd.now())
-		return nil
+		return nil, nil
 	}
 }
 
 // CheckIntent defines a check for a succeeded intent to be executed for a session update
 func CheckIntent(intentID, token string) SessionCommand {
-	return func(ctx context.Context, cmd *SessionCommands) error {
+	return func(ctx context.Context, cmd *SessionCommands) ([]eventstore.Command, error) {
 		if cmd.sessionWriteModel.UserID == "" {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3r", "Errors.User.UserIDMissing")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Sfw3r", "Errors.User.UserIDMissing")
 		}
 		if err := crypto.CheckToken(cmd.intentAlg, token, intentID); err != nil {
-			return err
+			return nil, err
 		}
 		cmd.intentWriteModel = NewIDPIntentWriteModel(intentID, "")
 		err := cmd.eventstore.FilterToQueryReducer(ctx, cmd.intentWriteModel)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if cmd.intentWriteModel.State != domain.IDPIntentStateSucceeded {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded")
+			return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Df4bw", "Errors.Intent.NotSucceeded")
 		}
 		if cmd.intentWriteModel.UserID != "" {
 			if cmd.intentWriteModel.UserID != cmd.sessionWriteModel.UserID {
-				return zerrors.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
 			}
 		} else {
-			linkWriteModel := NewUserIDPLinkWriteModel(cmd.sessionWriteModel.UserID, cmd.intentWriteModel.IDPID, cmd.intentWriteModel.IDPUserID, cmd.intentWriteModel.ResourceOwner)
+			linkWriteModel := NewUserIDPLinkWriteModel(cmd.sessionWriteModel.UserID, cmd.intentWriteModel.IDPID, cmd.intentWriteModel.IDPUserID, cmd.sessionWriteModel.UserResourceOwner)
 			err := cmd.eventstore.FilterToQueryReducer(ctx, linkWriteModel)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			if linkWriteModel.State != domain.UserIDPLinkStateActive {
-				return zerrors.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
+				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-O8xk3w", "Errors.Intent.OtherUser")
 			}
 		}
 		cmd.IntentChecked(ctx, cmd.now())
-		return nil
+		return nil, nil
 	}
 }
 
 func CheckTOTP(code string) SessionCommand {
-	return func(ctx context.Context, cmd *SessionCommands) (err error) {
-		if cmd.sessionWriteModel.UserID == "" {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Neil7", "Errors.User.UserIDMissing")
-		}
-		cmd.totpWriteModel = NewHumanTOTPWriteModel(cmd.sessionWriteModel.UserID, "")
-		err = cmd.eventstore.FilterToQueryReducer(ctx, cmd.totpWriteModel)
+	return func(ctx context.Context, cmd *SessionCommands) (_ []eventstore.Command, err error) {
+		commands, err := checkTOTP(
+			ctx,
+			cmd.sessionWriteModel.UserID,
+			"",
+			code,
+			cmd.eventstore.FilterToQueryReducer,
+			cmd.totpAlg,
+			nil,
+		)
 		if err != nil {
-			return err
+			return commands, err
 		}
-		if cmd.totpWriteModel.State != domain.MFAStateReady {
-			return zerrors.ThrowPreconditionFailed(nil, "COMMAND-eej1U", "Errors.User.MFA.OTP.NotReady")
-		}
-		err = domain.VerifyTOTP(code, cmd.totpWriteModel.Secret, cmd.totpAlg)
-		if err != nil {
-			return err
-		}
+		cmd.eventCommands = append(cmd.eventCommands, commands...)
 		cmd.TOTPChecked(ctx, cmd.now())
-		return nil
+		return nil, nil
 	}
 }
 
-// Exec will execute the commands specified and returns an error on the first occurrence
-func (s *SessionCommands) Exec(ctx context.Context) error {
+// Exec will execute the commands specified and returns an error on the first occurrence.
+// In case of an error there might be specific commands returned, e.g. a failed pw check will have to be stored.
+func (s *SessionCommands) Exec(ctx context.Context) ([]eventstore.Command, error) {
 	for _, cmd := range s.sessionCommands {
-		if err := cmd(ctx, s); err != nil {
-			return err
+		if cmds, err := cmd(ctx, s); err != nil {
+			return cmds, err
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 func (s *SessionCommands) Start(ctx context.Context, userAgent *domain.UserAgent) {
 	s.eventCommands = append(s.eventCommands, session.NewAddedEvent(ctx, s.sessionWriteModel.aggregate, userAgent))
 }
 
-func (s *SessionCommands) UserChecked(ctx context.Context, userID, resourceOwner string, checkedAt time.Time) error {
-	s.eventCommands = append(s.eventCommands, session.NewUserCheckedEvent(ctx, s.sessionWriteModel.aggregate, userID, resourceOwner, checkedAt))
+func (s *SessionCommands) UserChecked(ctx context.Context, userID, resourceOwner string, checkedAt time.Time, preferredLanguage *language.Tag) error {
+	s.eventCommands = append(s.eventCommands, session.NewUserCheckedEvent(ctx, s.sessionWriteModel.aggregate, userID, resourceOwner, checkedAt, preferredLanguage))
 	// set the userID so other checks can use it
 	s.sessionWriteModel.UserID = userID
 	s.sessionWriteModel.UserResourceOwner = resourceOwner
@@ -310,13 +288,10 @@ func (c *Commands) CreateSession(ctx context.Context, cmds []SessionCommand, met
 	return c.updateSession(ctx, cmd, metadata, lifetime)
 }
 
-func (c *Commands) UpdateSession(ctx context.Context, sessionID, sessionToken string, cmds []SessionCommand, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
+func (c *Commands) UpdateSession(ctx context.Context, sessionID string, cmds []SessionCommand, metadata map[string][]byte, lifetime time.Duration) (set *SessionChanged, err error) {
 	sessionWriteModel := NewSessionWriteModel(sessionID, authz.GetInstance(ctx).InstanceID())
 	err = c.eventstore.FilterToQueryReducer(ctx, sessionWriteModel)
 	if err != nil {
-		return nil, err
-	}
-	if err := c.sessionTokenVerifier(ctx, sessionToken, sessionWriteModel.AggregateID, sessionWriteModel.TokenID); err != nil {
 		return nil, err
 	}
 	cmd := c.NewSessionCommands(cmds, sessionWriteModel)
@@ -361,8 +336,11 @@ func (c *Commands) updateSession(ctx context.Context, checks *SessionCommands, m
 	if err = checks.sessionWriteModel.CheckNotInvalidated(); err != nil {
 		return nil, err
 	}
-	if err := checks.Exec(ctx); err != nil {
-		// TODO: how to handle failed checks (e.g. pw wrong) https://github.com/zitadel/zitadel/issues/5807
+	if cmds, err := checks.Exec(ctx); err != nil {
+		if len(cmds) > 0 {
+			_, pushErr := c.eventstore.Push(ctx, cmds...)
+			logging.OnError(pushErr).Error("unable to store check failures")
+		}
 		return nil, err
 	}
 	checks.ChangeMetadata(ctx, metadata)

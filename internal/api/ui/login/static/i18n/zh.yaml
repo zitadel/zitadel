@@ -32,15 +32,17 @@ Password:
   Title: 密码
   Description: 输入您的登录数据。
   PasswordLabel: 密码
-  MinLength: 密码
-  HasUppercase: 大写字母
-  HasLowercase: 小写字母
-  HasNumber: 数字
-  HasSymbol: 符号
-  Confirmation: 确认匹配
-  ResetLinkText: 重设密码
-  BackButtonText: 后退
-  NextButtonText: 继续
+  MinLength: 必须至少有
+  MinLengthp2: 个字符。
+  MaxLength: 必须少于70个字符。
+  HasUppercase: 必须包含一个大写字母。
+  HasLowercase: 必须包含一个小写字母。
+  HasNumber: 必须包含一个数字。
+  HasSymbol: 必须包含一个符号。
+  Confirmation: 密码确认匹配。
+  ResetLinkText: 重置密码
+  BackButtonText: 返回
+  NextButtonText: 下一步
 
 UsernameChange:
   Title: 更改用户名
@@ -188,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: 更改密码
   Description: 更改您的密码。输入您的旧密码和新密码。
+  ExpiredDescription: 您的密码已过期，需要更改。请输入您的新旧密码。
   OldPasswordLabel: 旧密码
   NewPasswordLabel: 新密码
   NewPasswordConfirmLabel: 确认密码
@@ -249,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -288,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -361,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: 设备授权
   UserCode:

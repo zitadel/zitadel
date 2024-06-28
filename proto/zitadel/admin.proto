@@ -62,6 +62,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "Failed Events"
         },
         {
+            name: "Feature Restrictions"
+        },
+        {
             name: "General"
         },
         {
@@ -500,6 +503,40 @@ service AdminService {
             tags: "SMTP";
             summary: "Remove SMTP Configuration";
             description: "Remove the SMTP configuration, be aware that the users will not get an E-Mail if no SMTP is set."
+        };
+    }
+
+    rpc TestSMTPConfigById(TestSMTPConfigByIdRequest) returns (TestSMTPConfigByIdResponse) {
+        option (google.api.http) = {
+            post: "/smtp/{id}/_test";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP Provider";
+            summary: "Test SMTP Provider ";
+            description: "Test an SMTP provider identified by its ID. After testing the provider, the users will receive information about the test results."
+        };
+    }
+
+    rpc TestSMTPConfig(TestSMTPConfigRequest) returns (TestSMTPConfigResponse) {
+        option (google.api.http) = {
+            post: "/smtp/_test";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "SMTP Provider";
+            summary: "Test SMTP Provider";
+            description: "Test an SMTP provider. After testing the provider, the users will receive information about the test results."
         };
     }
 
@@ -2655,7 +2692,7 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Password Age Settings";
-            description: "Not implemented"
+            description: "Returns the password age settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             responses: {
                 key: "200";
                 value: {
@@ -2679,7 +2716,7 @@ service AdminService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Update Password Age Settings";
-            description: "Not implemented"
+            description: "Updates the default password complexity settings configured on the instance. It affects all organizations, that do not have a custom setting configured. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             responses: {
                 key: "200";
                 value: {
@@ -4253,6 +4290,82 @@ message RemoveSMTPConfigRequest {
 message RemoveSMTPConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
+
+message TestSMTPConfigByIdRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+    string receiver_address = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"noreply@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+}
+
+// This is an empty response
+message TestSMTPConfigByIdResponse {}
+
+message TestSMTPConfigRequest {
+    string sender_address = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"noreply@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string sender_name = 2 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    bool tls = 3;
+    string host = 4 [
+        (validate.rules).string = {min_len: 1, max_len: 500},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"smtp.postmarkapp.com:587\"";
+            description: "Make sure to include the port.";
+            min_length: 1;
+            max_length: 500;
+        }
+    ];
+    string user = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"197f0117-529e-443d-bf6c-0292dd9a02b7\"";
+        }
+    ];
+    string password = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"this-is-my-password\"";
+        }
+    ];
+    string receiver_address = 7 [
+        (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"noreply@m.zitadel.cloud\"";
+            min_length: 1;
+            max_length: 200;
+        }
+    ];
+    string id = 8 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Zitadel SMTP provider id in case you are not sending the password and want to reuse the stored password";
+            example: "\"267191369515139464\"";
+        }
+    ];
+}
+
+// This is an empty response
+message TestSMTPConfigResponse {}
 
 message ListSMSProvidersRequest {
     //list limitations and ordering
@@ -6028,31 +6141,28 @@ message AddSAMLProviderRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     oneof metadata {
         option (validate.required) = true;
+        // Metadata of the SAML identity provider.
         bytes metadata_xml = 2 [
-            (validate.rules).bytes.max_len = 500000,
-            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "Metadata of the SAML identity provider";
-            }
+            (validate.rules).bytes.max_len = 500000
         ];
+        // Url to the metadata of the SAML identity provider.
         string metadata_url = 3 [
             (validate.rules).string.max_len = 200,
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 example: "\"https://test.com/saml/metadata\""
-                description: "Url to the metadata of the SAML identity provider";
             }
         ];
     }
-    zitadel.idp.v1.SAMLBinding binding = 4 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Binding which defines the type of communication with the identity provider";
-        }
-    ];
-    bool with_signed_request = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Boolean which defines if the authentication requests are signed";
-        }
-    ];
+    // Binding which defines the type of communication with the identity provider.
+    zitadel.idp.v1.SAMLBinding binding = 4;
+    // Boolean which defines if the authentication requests are signed.
+    bool with_signed_request = 5;
     zitadel.idp.v1.Options provider_options = 6;
+    // Optionally specify the `nameid-format` requested.
+    optional zitadel.idp.v1.SAMLNameIDFormat name_id_format = 7;
+    // Optionally specify the name of the attribute, which will be used to map the user
+    // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
+    optional string transient_mapping_attribute_name = 8;
 }
 
 message AddSAMLProviderResponse {
@@ -6063,33 +6173,30 @@ message AddSAMLProviderResponse {
 message UpdateSAMLProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    // Metadata of the SAML identity provider.
     oneof metadata {
         option (validate.required) = true;
         bytes metadata_xml = 3 [
-            (validate.rules).bytes.max_len = 500000,
-            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "Metadata of the SAML identity provider";
-            }
+            (validate.rules).bytes.max_len = 500000
         ];
+        // Url to the metadata of the SAML identity provider
         string metadata_url = 4 [
             (validate.rules).string.max_len = 200,
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 example: "\"https://test.com/saml/metadata\""
-                description: "Url to the metadata of the SAML identity provider";
             }
         ];
     }
-    zitadel.idp.v1.SAMLBinding binding = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Binding which defines the type of communication with the identity provider";
-        }
-    ];
-    bool with_signed_request = 6 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Boolean which defines if the authentication requests are signed";
-        }
-    ];
+    // Binding which defines the type of communication with the identity provider.
+    zitadel.idp.v1.SAMLBinding binding = 5;
+    // Boolean which defines if the authentication requests are signed
+    bool with_signed_request = 6;
     zitadel.idp.v1.Options provider_options = 7;
+    // Optionally specify the `nameid-format` requested.
+    optional zitadel.idp.v1.SAMLNameIDFormat name_id_format = 8;
+    // Optionally specify the name of the attribute, which will be used to map the user
+    // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
+    optional string transient_mapping_attribute_name = 9;
 }
 
 message UpdateSAMLProviderResponse {
@@ -6742,18 +6849,10 @@ message GetPasswordAgePolicyResponse {
 }
 
 message UpdatePasswordAgePolicyRequest {
-    uint32 max_age_days = 1 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Maximum days since last password change"
-            example: "\"365\""
-        }
-    ];
-    uint32 expire_warn_days = 2 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Days before the password expiry the user gets notified to change the password"
-            example: "\"10\""
-        }
-    ];
+    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
+    uint32 max_age_days = 1;
+    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
+    uint32 expire_warn_days = 2;
 }
 
 message UpdatePasswordAgePolicyResponse {
@@ -6815,6 +6914,23 @@ message UpdatePrivacyPolicyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"support-email@test.com\"";
             description: "help / support email address."
+        }
+    ];
+    string docs_link = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"https://zitadel.com/docs\"";
+        }
+    ];
+    string custom_link = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Link to an external resource that will be available to users in the console.";
+            example: "\"https://external.link\"";
+        }
+    ];
+    string custom_link_text = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The button text that would be shown in console pointing to custom link.";
+            example: "\"External\"";
         }
     ];
 }

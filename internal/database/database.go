@@ -75,7 +75,7 @@ func (db *DB) QueryRow(scan func(*sql.Row) error, query string, args ...any) (er
 
 func (db *DB) QueryRowContext(ctx context.Context, scan func(row *sql.Row) error, query string, args ...any) (err error) {
 	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
-	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{ReadOnly: true, Isolation: sql.LevelReadCommitted})
 	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return err

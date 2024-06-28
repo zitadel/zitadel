@@ -30,17 +30,19 @@ SelectAccount:
 
 Password:
   Title: Contraseña
-  Description: Introduce tus datos de inicio de sesión.
+  Description: Introduce tus datos de acceso.
   PasswordLabel: Contraseña
-  MinLength: Longitud mínima
-  HasUppercase: Una letra mayúscula
-  HasLowercase: Una letra minúscula
-  HasNumber: Número
-  HasSymbol: Símbolo
-  Confirmation: Las contraseñas coinciden
-  ResetLinkText: restablecer contraseña
-  BackButtonText: atrás
-  NextButtonText: siguiente
+  MinLength: Debe tener al menos
+  MinLengthp2: caracteres de longitud.
+  MaxLength: Debe tener menos de 70 caracteres de longitud.
+  HasUppercase: Debe incluir una letra mayúscula.
+  HasLowercase: Debe incluir una letra minúscula.
+  HasNumber: Debe incluir un número.
+  HasSymbol: Debe incluir un símbolo.
+  Confirmation: La confirmación de la contraseña coincide.
+  ResetLinkText: Restablecer contraseña
+  BackButtonText: Atrás
+  NextButtonText: Siguiente
 
 UsernameChange:
   Title: Cambiar nombre de usuario
@@ -188,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Cambiar contraseña
   Description: Cambia tu contraseña. Introduce tu contraseña anterior y la nueva.
+  ExpiredDescription: Tu contraseña ha caducado y tiene que cambiarla. Introduzca tu contraseña anterior y la nueva.
   OldPasswordLabel: Contraseña anterior
   NewPasswordLabel: Nueva contraseña
   NewPasswordConfirmLabel: Confirmación de contraseña
@@ -249,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Género
   Female: Mujer
   Male: Hombre
@@ -288,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Términos y condiciones
   TosConfirm: Acepto los
   TosLinkText: TDS
@@ -361,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   
 Footer:
   PoweredBy: Powered By

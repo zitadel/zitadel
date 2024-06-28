@@ -39,8 +39,6 @@ services:
       timeout: '30s'
       retries: 5
       start_period: '20s'
-    ports:
-      - '5432:5432'
 
 networks:
   zitadel:

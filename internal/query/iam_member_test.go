@@ -21,21 +21,21 @@ var (
 		", members.user_id" +
 		", members.roles" +
 		", projections.login_names3.login_name" +
-		", projections.users12_humans.email" +
-		", projections.users12_humans.first_name" +
-		", projections.users12_humans.last_name" +
-		", projections.users12_humans.display_name" +
-		", projections.users12_machines.name" +
-		", projections.users12_humans.avatar_key" +
-		", projections.users12.type" +
+		", projections.users13_humans.email" +
+		", projections.users13_humans.first_name" +
+		", projections.users13_humans.last_name" +
+		", projections.users13_humans.display_name" +
+		", projections.users13_machines.name" +
+		", projections.users13_humans.avatar_key" +
+		", projections.users13.type" +
 		", COUNT(*) OVER () " +
 		"FROM projections.instance_members4 AS members " +
-		"LEFT JOIN projections.users12_humans " +
-		"ON members.user_id = projections.users12_humans.user_id AND members.instance_id = projections.users12_humans.instance_id " +
-		"LEFT JOIN projections.users12_machines " +
-		"ON members.user_id = projections.users12_machines.user_id AND members.instance_id = projections.users12_machines.instance_id " +
-		"LEFT JOIN projections.users12 " +
-		"ON members.user_id = projections.users12.id AND members.instance_id = projections.users12.instance_id " +
+		"LEFT JOIN projections.users13_humans " +
+		"ON members.user_id = projections.users13_humans.user_id AND members.instance_id = projections.users13_humans.instance_id " +
+		"LEFT JOIN projections.users13_machines " +
+		"ON members.user_id = projections.users13_machines.user_id AND members.instance_id = projections.users13_machines.instance_id " +
+		"LEFT JOIN projections.users13 " +
+		"ON members.user_id = projections.users13.id AND members.instance_id = projections.users13.instance_id " +
 		"LEFT JOIN projections.login_names3 " +
 		"ON members.user_id = projections.login_names3.user_id AND members.instance_id = projections.login_names3.instance_id " +
 		"AS OF SYSTEM TIME '-1 ms' " +

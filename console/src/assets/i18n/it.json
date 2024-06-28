@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Impostazioni dell'Istanza",
-        "DESCRIPTION": "Le impostazioni dell'istanza sono le impostazioni predefinite per tutte le organizzazioni. Con i permessi adeguati, alcune di esse possono essere sovrascritte nelle impostazioni dell'organizzazione."
+        "TITLE": "Impostazioni predefinite",
+        "DESCRIPTION": "Impostazioni predefinite per tutte le organizzazioni. Con le giuste autorizzazioni, alcuni di essi sono sovrascrivibili nelle impostazioni dell'organizzazione."
       },
       "ORG": {
         "TITLE": "Impostazioni dell'Organizzazione",
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Link Esterni",
-        "DESCRIPTION": "Guida i tuoi utenti verso risorse esterne personalizzate mostrate nella pagina di login. Gli utenti devono accettare i Termini di Servizio e la Politica sulla Privacy prima che possano iscriversi."
+        "DESCRIPTION": "Guida i tuoi utenti alle risorse esterne personalizzate mostrate nella pagina di accesso. Gli utenti devono accettare i Termini di servizio e l'Informativa sulla privacy prima di potersi registrare. Cambia il collegamento alla tua documentazione o imposta una stringa vuota per nascondere il pulsante della documentazione dalla console. Aggiungi un collegamento esterno personalizzato e un testo personalizzato per quel collegamento nella console oppure impostali vuoti per nascondere quel pulsante."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Impostazioni SMTP",
@@ -485,6 +485,8 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
+    "SETUP": "Setup",
+    "TEST": "Test",
     "UNSAVED": {
       "DIALOG": {
         "DESCRIPTION": "Sei sicuro di voler eliminare questa nuova azione? La tua azione andrà persa",
@@ -495,7 +497,8 @@
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     },
-    "DOWNLOAD": "Scarica"
+    "DOWNLOAD": "Scarica",
+    "APPLY": "Applicare"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Ha il controllo sull'intera istanza, comprese tutte le organizzazioni",
@@ -593,6 +596,7 @@
     "INVALID_FORMAT": "Il formato non è valido.",
     "NOTANEMAIL": "Il valore dato non è un indirizzo e-mail.",
     "MINLENGTH": "Deve essere lunga almeno {{requiredLength}} caratteri.",
+    "MAXLENGTH": "Deve contenere meno di {{requiredLength}} caratteri.",
     "UPPERCASEMISSING": "Deve includere un carattere maiuscolo.",
     "LOWERCASEMISSING": "Deve includere un carattere minuscolo.",
     "SYMBOLERROR": "Deve includere un simbolo o un segno di punteggiatura.",
@@ -878,7 +882,8 @@
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
-      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri."
+      "MINLENGTHERROR": "Deve essere lunga almeno {{valore}} caratteri.",
+      "MAXLENGTHERROR": "Deve contenere meno di {{value}} caratteri"
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -1313,16 +1318,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Impostazioni dell'istanza",
-      "DESCRIPTION": "Queste impostazioni si applicheranno a tutte le tue organizzazioni a meno che l'impostazione non venga sovrascritta."
-    },
     "LIST": {
       "ORGS": "Organizzazioni",
       "FEATURESETTINGS": "Impostazioni delle funzionalità",
       "LANGUAGES": "Lingue",
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
+      "AGE": "Scadenza password",
       "COMPLEXITY": "Complessità della password",
       "NOTIFICATIONS": "Impostazioni di notifica",
       "SMTP_PROVIDER": "Fornitore SMTP",
@@ -1377,7 +1379,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1542,8 +1545,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Impostazioni di validità della password",
-      "DESCRIPTION": "È possibile impostare una impostazone per la validità delle password. Questa emette un avviso dopo che il tempo di invecchiamento specifico è trascorso."
+      "TITLE": "Scadenza password",
+      "DESCRIPTION": "Puoi impostare una policy per la scadenza delle password. Questa policy obbligherà l'utente a cambiare la password al prossimo accesso dopo la scadenza. Non ci sono avvisi e notifiche automatiche."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Impostazioni di blocco",
@@ -1570,6 +1573,9 @@
       "POLICYLINK": "Link all'informativa sulla privacy",
       "HELPLINK": "link per l'aiuto",
       "SUPPORTEMAIL": "e-mail di supporto",
+      "DOCSLINK": "Collegamento a Documenti (Console)",
+      "CUSTOMLINK": "Collegamento personalizzato (Console)",
+      "CUSTOMLINKTEXT": "Testo del collegamento personalizzato (Console)",
       "SAVED": "Salvato con successo!",
       "RESET_TITLE": "Ripristina i valori predefiniti",
       "RESET_DESCRIPTION": "Stai per ripristinare i link predefiniti per i TOS e l'informativa sulla privacy. Vuoi davvero continuare?"
@@ -1603,7 +1609,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1692,8 +1699,8 @@
       "SHOWLOCKOUTFAILURES": "mostra i fallimenti del blocco",
       "MAXPASSWORDATTEMPTS": "Massimo numero di tentativi di password",
       "MAXOTPATTEMPTS": "Massimo numero di tentativi di OTP",
-      "EXPIREWARNDAYS": "Avviso scadenza dopo il giorno",
-      "MAXAGEDAYS": "Lunghezza massima in giorni",
+      "EXPIREWARNDAYS": "Avviso di scadenza dopo giorni",
+      "MAXAGEDAYS": "Validità massima in giorni",
       "USERLOGINMUSTBEDOMAIN": "Nome utente deve contenere il dominio dell' organizzazione",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se abiliti questa impostazione, a tutti i nomi di accesso verrà aggiunto il suffisso del dominio dell'organizzazione. Se questa impostazione è disabilitata, devi assicurarti che i nomi utente siano univoci per tutte le organizzazioni.",
       "VALIDATEORGDOMAINS": "Verifica del dominio dell'organizzazione richiesta (challenge DNS o HTTP)",
@@ -2225,11 +2232,12 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Fornitore SMTP",
-      "DESCRIPTION": "Questi sono i provider SMTP per la tua istanza Zitadel. Attiva quello che desideri utilizzare per inviare notifiche ai tuoi utenti.",
+      "DESCRIPTION": "Questi sono i provider SMTP per la tua istanza ZITADEL. Attiva quello che desideri utilizzare per inviare notifiche ai tuoi utenti.",
       "EMPTY": "Nessun provider SMTP disponibile",
       "ACTIVATED": "Attivato",
       "ACTIVATE": "Attiva fornitore",
       "DEACTIVATE": "Disattiva fornitore",
+      "TEST": "Metti alla prova il tuo fornitore",
       "TYPE": "Tipo",
       "DIALOG": {
         "ACTIVATED": "La configurazione SMTP è stata attivata",
@@ -2253,7 +2261,21 @@
         "CURRENT_DESC_TITLE": "Queste sono le tue impostazioni SMTP",
         "PROVIDER_SETTINGS": "Impostazioni del provider SMTP",
         "SENDER_SETTINGS": "Impostazioni mittente",
-        "TEST_SETTINGS": "Testare le impostazioni SMTP"
+        "NEXT_STEPS": "Prossimi passi",
+        "ACTIVATE": {
+          "TITLE": "Attiva il tuo provider SMTP",
+          "DESCRIPTION": "ZITADEL non può utilizzare questo provider SMTP per inviare notifiche finché non lo attivi. Se attivi questo fornitore, qualsiasi altro fornitore che era attivo verrà ora disattivato."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Disattiva il tuo provider SMTP",
+          "DESCRIPTION": "Dopo aver disattivato l'archivio SMTP, la schermata non è disponibile per l'utente, il documento è nuovo e non è attivo."
+        },
+        "SAVE_SETTINGS": "Salva le tue impostazioni",
+        "TEST": {
+          "TITLE": "Metti alla prova le tue impostazioni",
+          "DESCRIPTION": "Puoi testare le impostazioni del tuo provider SMTP e controllare il risultato del test prima di salvarle",
+          "RESULT": "La tua email è stata inviata correttamente"
+        }
       }
     },
     "DETAIL": {
@@ -2527,7 +2549,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

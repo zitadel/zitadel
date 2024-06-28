@@ -127,7 +127,7 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 // handleExternalRegister is called when a user selects the idp on the register options page
 func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 	data := new(externalIDPData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -319,12 +319,11 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		sp, err := provider.(*saml.Provider).GetSP()
+		session, err = saml.NewSession(provider.(*saml.Provider), authReq.SAMLRequestID, r)
 		if err != nil {
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &saml.Session{ServiceProvider: sp, RequestID: authReq.SAMLRequestID, Request: r}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:
@@ -658,7 +657,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 // and either links or creates an externalUser
 func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(externalNotFoundOptionFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
 		return
@@ -1029,12 +1028,18 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]saml.ProviderOpts, 0, 2)
+	opts := make([]saml.ProviderOpts, 0, 6)
 	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
 		opts = append(opts, saml.WithSignedRequest())
 	}
 	if identityProvider.SAMLIDPTemplate.Binding != "" {
 		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
+	}
+	if identityProvider.SAMLIDPTemplate.NameIDFormat.Valid {
+		opts = append(opts, saml.WithNameIDFormat(identityProvider.SAMLIDPTemplate.NameIDFormat.V))
+	}
+	if identityProvider.SAMLIDPTemplate.TransientMappingAttributeName != "" {
+		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))
 	}
 	opts = append(opts,
 		saml.WithEntityID(http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure)+"/idps/"+identityProvider.ID+"/saml/metadata"),

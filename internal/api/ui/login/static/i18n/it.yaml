@@ -32,14 +32,16 @@ Password:
   Title: Password
   Description: Inserisci i tuoi dati di accesso.
   PasswordLabel: Password
-  MinLength: Lunghezza minima
-  HasUppercase: Lettera maiuscola
-  HasLowercase: Lettera minuscola
-  HasNumber: Numero
-  HasSymbol: Simbolo
-  Confirmation: Conferma password
-  ResetLinkText: Password dimenticata?
-  BackButtonText: indietro
+  MinLength: Deve contenere almeno
+  MinLengthp2: caratteri.
+  MaxLength: Deve contenere meno di 70 caratteri.
+  HasUppercase: Deve includere una lettera maiuscola.
+  HasLowercase: Deve includere una lettera minuscola.
+  HasNumber: Deve includere un numero.
+  HasSymbol: Deve includere un simbolo.
+  Confirmation: La conferma della password corrisponde.
+  ResetLinkText: Reimposta password
+  BackButtonText: Indietro
   NextButtonText: Avanti
 
 UsernameChange:
@@ -188,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Reimposta password
   Description: Cambia la tua password. Inserisci la tua vecchia e la nuova password.
+  ExpiredDescription: La password è scaduta e deve essere modificata. Inserisci la tua vecchia e la nuova password.
   OldPasswordLabel: Vecchia password
   NewPasswordLabel: Nuova password
   NewPasswordConfirmLabel: Conferma della password
@@ -249,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -288,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -361,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: Autorizzazione del dispositivo

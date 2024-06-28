@@ -27,19 +27,22 @@ SelectAccount:
   SessionState0: активен
   SessionState1: Не сте в профила си
   MustBeMemberOfOrg: 'Потребителят трябва да е член на {{.OrgName}} организация.'
+  
 Password:
   Title: Парола
-  Description: Въведете вашите данни за вход.
+  Description: Въведете данните си за вход.
   PasswordLabel: Парола
-  MinLength: Минимална дължина
-  HasUppercase: Главна буква
-  HasLowercase: Малка буква
-  HasNumber: Номер
-  HasSymbol: Символ
-  Confirmation: Съвпадение за потвърждение
-  ResetLinkText: нулиране на парола
-  BackButtonText: обратно
-  NextButtonText: следващия
+  MinLength: Трябва да е поне
+  MinLengthp2: символа дълга.
+  MaxLength: Трябва да е по-малко от 70 символа.
+  HasUppercase: Трябва да включва главна буква.
+  HasLowercase: Трябва да включва малка буква.
+  HasNumber: Трябва да включва число.
+  HasSymbol: Трябва да включва символ.
+  Confirmation: Потвърждението на паролата съвпада.
+  ResetLinkText: Нулиране на паролата
+  BackButtonText: Назад
+  NextButtonText: Напред
 UsernameChange:
   Title: Промяна на потребителското име
   Description: Задайте новото си потребителско име
@@ -190,6 +193,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Промяна на паролата
   Description: 'Променете паролата си. '
+  ExpiredDescription: Паролата ви е изтекла и трябва да бъде променена. Въведете старата и новата си парола.
   OldPasswordLabel: Стара парола
   NewPasswordLabel: нова парола
   NewPasswordConfirmLabel: Потвърждение на парола
@@ -245,6 +249,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Пол
   Female: Женски пол
   Male: Мъжки
@@ -283,6 +288,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Правила и условия
   TosConfirm: Приемам
   TosLinkText: TOS
@@ -350,6 +356,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: Упълномощаване на устройството
   UserCode:

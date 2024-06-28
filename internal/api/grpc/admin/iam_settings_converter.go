@@ -172,6 +172,7 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 		User:           smtp.User,
 		Details:        obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.ResourceOwner),
 		Id:             smtp.ID,
+		State:          settings_pb.SMTPConfigState(smtp.State),
 	}
 	return mapped
 }

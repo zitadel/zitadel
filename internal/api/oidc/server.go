@@ -37,7 +37,10 @@ type Server struct {
 	fallbackLogger      *slog.Logger
 	hasher              *crypto.Hasher
 	signingKeyAlgorithm string
-	assetAPIPrefix      func(ctx context.Context) string
+	encAlg              crypto.EncryptionAlgorithm
+	opCrypto            op.Crypto
+
+	assetAPIPrefix func(ctx context.Context) string
 }
 
 func endpoints(endpointConfig *EndpointConfig) op.Endpoints {
@@ -153,41 +156,6 @@ func (s *Server) DeviceAuthorization(ctx context.Context, r *op.ClientRequest[oi
 	return s.LegacyServer.DeviceAuthorization(ctx, r)
 }
 
-func (s *Server) CodeExchange(ctx context.Context, r *op.ClientRequest[oidc.AccessTokenRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.CodeExchange(ctx, r)
-}
-
-func (s *Server) RefreshToken(ctx context.Context, r *op.ClientRequest[oidc.RefreshTokenRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.RefreshToken(ctx, r)
-}
-
-func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGrantRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.JWTProfile(ctx, r)
-}
-
-func (s *Server) ClientCredentialsExchange(ctx context.Context, r *op.ClientRequest[oidc.ClientCredentialsRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.ClientCredentialsExchange(ctx, r)
-}
-
-func (s *Server) DeviceToken(ctx context.Context, r *op.ClientRequest[oidc.DeviceAccessTokenRequest]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.DeviceToken(ctx, r)
-}
-
 func (s *Server) Revocation(ctx context.Context, r *op.ClientRequest[oidc.RevocationRequest]) (_ *op.Response, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -205,23 +173,28 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
 	return &oidc.DiscoveryConfiguration{
-		Issuer:                                     issuer,
-		AuthorizationEndpoint:                      s.Endpoints().Authorization.Absolute(issuer),
-		TokenEndpoint:                              s.Endpoints().Token.Absolute(issuer),
-		IntrospectionEndpoint:                      s.Endpoints().Introspection.Absolute(issuer),
-		UserinfoEndpoint:                           s.Endpoints().Userinfo.Absolute(issuer),
-		RevocationEndpoint:                         s.Endpoints().Revocation.Absolute(issuer),
-		EndSessionEndpoint:                         s.Endpoints().EndSession.Absolute(issuer),
-		JwksURI:                                    s.Endpoints().JwksURI.Absolute(issuer),
-		DeviceAuthorizationEndpoint:                s.Endpoints().DeviceAuthorization.Absolute(issuer),
-		ScopesSupported:                            op.Scopes(s.Provider()),
-		ResponseTypesSupported:                     op.ResponseTypes(s.Provider()),
-		GrantTypesSupported:                        op.GrantTypes(s.Provider()),
-		SubjectTypesSupported:                      op.SubjectTypes(s.Provider()),
-		IDTokenSigningAlgValuesSupported:           []string{s.signingKeyAlgorithm},
-		RequestObjectSigningAlgValuesSupported:     op.RequestObjectSigAlgorithms(s.Provider()),
-		TokenEndpointAuthMethodsSupported:          op.AuthMethodsTokenEndpoint(s.Provider()),
-		TokenEndpointAuthSigningAlgValuesSupported: op.TokenSigAlgorithms(s.Provider()),
+		Issuer:                      issuer,
+		AuthorizationEndpoint:       s.Endpoints().Authorization.Absolute(issuer),
+		TokenEndpoint:               s.Endpoints().Token.Absolute(issuer),
+		IntrospectionEndpoint:       s.Endpoints().Introspection.Absolute(issuer),
+		UserinfoEndpoint:            s.Endpoints().Userinfo.Absolute(issuer),
+		RevocationEndpoint:          s.Endpoints().Revocation.Absolute(issuer),
+		EndSessionEndpoint:          s.Endpoints().EndSession.Absolute(issuer),
+		JwksURI:                     s.Endpoints().JwksURI.Absolute(issuer),
+		DeviceAuthorizationEndpoint: s.Endpoints().DeviceAuthorization.Absolute(issuer),
+		ScopesSupported:             op.Scopes(s.Provider()),
+		ResponseTypesSupported:      op.ResponseTypes(s.Provider()),
+		ResponseModesSupported: []string{
+			string(oidc.ResponseModeQuery),
+			string(oidc.ResponseModeFragment),
+			string(oidc.ResponseModeFormPost),
+		},
+		GrantTypesSupported:                                op.GrantTypes(s.Provider()),
+		SubjectTypesSupported:                              op.SubjectTypes(s.Provider()),
+		IDTokenSigningAlgValuesSupported:                   []string{s.signingKeyAlgorithm},
+		RequestObjectSigningAlgValuesSupported:             op.RequestObjectSigAlgorithms(s.Provider()),
+		TokenEndpointAuthMethodsSupported:                  op.AuthMethodsTokenEndpoint(s.Provider()),
+		TokenEndpointAuthSigningAlgValuesSupported:         op.TokenSigAlgorithms(s.Provider()),
 		IntrospectionEndpointAuthSigningAlgValuesSupported: op.IntrospectionSigAlgorithms(s.Provider()),
 		IntrospectionEndpointAuthMethodsSupported:          op.AuthMethodsIntrospectionEndpoint(s.Provider()),
 		RevocationEndpointAuthSigningAlgValuesSupported:    op.RevocationSigAlgorithms(s.Provider()),
@@ -231,4 +204,11 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		UILocalesSupported:                                 supportedUILocales,
 		RequestParameterSupported:                          s.Provider().RequestObjectSupported(),
 	}
+}
+
+func response(resp any, err error) (*op.Response, error) {
+	if err != nil {
+		return nil, err
+	}
+	return op.NewResponse(resp), nil
 }

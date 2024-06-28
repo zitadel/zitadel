@@ -2,14 +2,341 @@
 title: APIs V3 (Preview)
 ---
 
-import DocCardList from '@theme/DocCardList';
+import DocCardList from "@theme/DocCardList";
+import CodeBlock from "@theme/CodeBlock";
+import ActionServiceProto from "!!raw-loader!./_v3_action_service.proto";
+import ActionExecutionProto from "!!raw-loader!./_v3_action_execution.proto";
+import ActionTargetProto from "!!raw-loader!./_v3_action_target.proto";
+import ActionSearchProto from "!!raw-loader!./_v3_action_search.proto";
+import IDPServiceProto from "!!raw-loader!./_v3_idp_service.proto";
+import IDPProto from "!!raw-loader!./_v3_idp.proto";
+import IDPSearchProto from "!!raw-loader!./_v3_idp_search.proto";
+import IDPGitLabProto from "!!raw-loader!./_v3_idp_gitlab.proto";
+import LanguageServiceProto from "!!raw-loader!./_v3_language_service.proto";
+import LanguageProto from "!!raw-loader!./_v3_language.proto";
+import ObjectProto from "!!raw-loader!./_v3_object.proto";
+import ResourceObjectProto from "!!raw-loader!./_v3_resource_object.proto";
+import SettingsObjectProto from "!!raw-loader!./_v3_settings_object.proto";
 
-APIs (V3) organize access by resources (users, settings, etc.), unlike context-specific V1 APIs.
-This simplifies finding the right API, especially for multi-organization resources.
-V3 also offers more flexibility over the V2 API in these points:
-- User schema definition for custom user management.
-- Behavior customization (API call manipulation, webhooks).
+The APIs described in this section are currently either in _Preview_ stage or not implemented, yet.
+Before using these APIs, pleases consider the [API release policy below](#api-release-policy)
 
-**Note**: V3 is currently in [Preview](/support/software-release-cycles-support#preview) and not yet generally available (breaking changes possible). Check individual services for availability.
+## We Appreciate your Help
+
+We invite you to...
+
+- ... [discuss the concept with the ZITADEL community on GitHub](https://github.com/zitadel/zitadel/discussions/8125).
+- ... try the implementations and provide feedback [by filing issues on GitHub](https://github.com/zitadel/zitadel/issues/new/choose).
+
+## The Ideas behind the New V3 APIs
+
+The current ZITADEL _GA_ APIs are structured around contexts like System, Admin, Management, and Auth.
+This structure leads to duplicate methods and makes it hard to find the right API for the right task.
+Especially interacting with resources from multiple organizations is cumbersome.
+Also, the APIs evolved over time, which lead to inconsistencies and a lack of flexibility in development.
+
+We address these issues with the following new API categories:
+
+- [Standard Resources](#standard-resources)
+- [Reusable Resources](#reusable-resources)
+- [Settings](#settings)
+
+The designs for the new API categories aim for the following improvements:
+
+### Service Structure
+
+Instead of structuring the API methods around contexts, new APIs are structured around resources and settings.
+This means, eventually, we deprecate the old System-, Admin-, Management- and AuthAPIs in favor of User-, Action-, Language-, FeatureAPIs and so on.
+This change makes it easier to find the right API for the right task, especially for multi-organization resources.
+Also, it allows for faster development and independent versioning of the APIs.
+
+### Multitenancy Management and Consistency
+
+To improve managing and reusing resources and settings in multitenancy scenarios, we define some rules for the new APIs:
+
+- Single properties from default settings are overridable (patchable) in organizations.
+- Some settings support user-defined custom properties that are also overridable in organizations.
+- Improved experience with reusing resources in multiple organizations and instances.
+- Resources are searchable over all organizations with a single call by default.
+
+### HTTP and gRPC Consistency
+
+To make the APIs more consistent and easier to use, we follow the same patterns in all Proto files.
+
+- Patching is favored over updating resources and settings.
+- HTTP calls are mapped so that query parameters can be used as much as possible. We avoid the annotation `body: "*"`.
+- For search performance, we enforce query limits.
+
+## Standard Resources
+
+Standard resources exist in exactly one context.
+For example, a user is always assigned to exactly one organization.
+Or one SMS provider is always assigned to exactly one instance.
+
+Standard resource methods behave like this:
+
+- Search request results can be scoped to a RequestContext.
+- Search request results only contain results for which the requesting user has the necessary read permissions.
+- Search requests are limited to 100 by default. The limit can be increased by the caller up to 1000 by default.
+- Resource configurations are partially updatable. With HTTP, this is done via PATCH requests. If no changes were made, the response is successful.
+- Status changes or other actions on resources with side effects are done via POST requests. Their HTTP path ends with the underscore prefixed action name. For example `POST /resources/users/{id}/_unlock`.
+
+For a full proto example, have a look at the [ZITADELActions service](#zitadelactions).
+
+## Reusable Resources
+
+Reusable resources are like standard resources but can be reused in multiple contexts.
+For example, an external identity provider can be defined once on the instance.
+Each organization within this instance can then choose to use this identity provider or not.
+
+Additionally to the methods described for standard resources, reusable have the following capabilities:
+
+Reusable resources have the same behavior as standard resources with the following additions:
+
+- Reusable resources can be created in a given context level (system, instance, org).
+- For requests, that require a resource ID, no request context is needed.
+- Reusable resources are available in child contexts, even if their state is _inactive_.
+- The child context can control if an inherited resource should be active or inactive for itself using a state policy.
+- In child contexts, the state policy of a reused resource is _inherit_ by default and can be changed to _activate_, _deactivate_ or back to _inherit_.
+- In child contexts, a reused resources configuration is read-only.
+- Child contexts can read at least the following properties of reused resources:
+  - ID
+  - name
+  - description
+  - state
+  - the state policy in the child context
+  - sequence
+  - last changed date
+  - parent context
+  - state in the immediate parent context.
+- By default, search queries for reused resources return all resources from the given contexts, all inherited resources and all resources defined in all children contexts.
+
+Typically, a new resource is first designed and implemented as a non-reusable resource.
+If the community sees a benefit in reusing the resource in multiple contexts, reusability is added to the resource.
+
+For a full proto example, have a look at the [ZITADELIdentityProviders service](#zitadelidentityproviders).
+
+## Resource Services
+
+All resource services by default support the following CRUD operations [as described above](#standard-resources-behavior).
+
+- Create
+- Read (get, search)
+- Patch (partially update, success on no changes)
+- Delete
+
+### ZITADELActions
+
+- Standard CRUD methods for Targets
+- Standard CRUD methods for Executions except the PutExecution method replaces the CreateExecution and PatchExecution methods
+
+Additional to the standard CRUD methods:
+
+- ListAvailableExecutionServices
+- ListAvailableExecutionMethods
+- ListAvailableExecutionFunctions
+
+\<details><summary>action_service.proto</summary>
+<CodeBlock language="protobuf">{ActionServiceProto}</CodeBlock>
+\</details>
+
+\<details><summary>action_target.proto</summary>
+<CodeBlock language="protobuf">{ActionTargetProto}</CodeBlock>
+\</details>
+
+\<details><summary>action_execution.proto</summary>
+<CodeBlock language="protobuf">{ActionExecutionProto}</CodeBlock>
+\</details>
+
+\<details><summary>action_query.proto</summary>
+<CodeBlock language="protobuf">{ActionSearchProto}</CodeBlock>
+\</details>
+
+### ZITADELUsers
+
+Standard CRUD methods
+
+### ZITADELUserSchemas
+
+Standard CRUD methods
+
+### ZITADELIdentityProviders
+
+- Standard CRUD and methods for all IDPs
+- Resources have additional properties for reusability capabilities.
+
+\<details><summary>idp_service.proto</summary>
+<CodeBlock language="protobuf">{IDPServiceProto}</CodeBlock>
+\</details>
+
+\<details><summary>idp.proto</summary>
+<CodeBlock language="protobuf">{IDPProto}</CodeBlock>
+\</details>
+
+\<details><summary>idp_search.proto</summary>
+<CodeBlock language="protobuf">{IDPSearchProto}</CodeBlock>
+\</details>
+
+\<details><summary>idp_gitlab.proto</summary>
+<CodeBlock language="protobuf">{IDPGitLabProto}</CodeBlock>
+\</details>
+
+\<details><summary>object.proto</summary>
+<CodeBlock language="protobuf">{ObjectProto}</CodeBlock>
+\</details>
+
+\<details><summary>resource_object.proto</summary>
+<CodeBlock language="protobuf">{ResourceObjectProto}</CodeBlock>
+\</details>
+
+### ZITADELInstances
+
+Additional to the standard CRUD methods:
+
+- Limit (partial update of block and audit log retention)
+- BulkLimit (partial update of block and audit log retention for multiple instances)
+
+### ZITADELOrganizations
+
+Additional to the standard CRUD methods:
+
+- SetAsInstanceDefault
+- GetInstanceDefault
+
+### ZITADELDomains
+
+Additional to the standard CRUD methods:
+
+- SetAsPrimary
+- Validate
+
+### ZITADELSessions
+
+Standard CRUD methods
+
+### ZITADELProjects
+
+Standard CRUD methods
+
+### ZITADELApps
+
+Standard CRUD methods
+
+### ZITADELMemberships
+
+The given context defines the organization, instance or system where the membership is created.
+The context and the user ID together are unique.
+
+Additional to the standard CRUD methods:
+
+- ListAvailableRoles (context-aware)
+
+### ZITADELGrants
+
+- Standard CRUD methods for project grants
+- Standard CRUD methods for user grants
+- Standard CRUD methods for roles
+
+### ZITADELSMTPProviders
+
+Standard CRUD methods
+
+### ZITADELSMSProviders
+
+Standard CRUD methods
+
+## Settings
+
+Settings have no identity (ID) and are always context-aware.
+They also don't have a state like active or inactive.
+They only have properties that can be set and queried.
+These properties are inherited to from parent-contexts (instance) to child-contexts (organization).
+
+Settings behave like this:
+
+- Setting and retrieving settings is always context-aware. By default, the context is the instance discovered by the requests _Host_ header.
+- All settings properties can be partially overridden in child-contexts.
+- All settings properties can be partially reset in child-contexts, so their values default to the parent contexts property values.
+- All settings properties returned by queries contain the value and if it is inherited, the context where it is inherited from.
+
+For a full proto example, have a look at the [ZITADELLanguageSettings service](#zitadellanguagesettings).
+
+## Settings Services
+
+### ZITADELLanguageSettings
+
+Default language, restricted languages, supported languages
+
+\<details><summary>language_service.proto</summary>
+<CodeBlock language="protobuf">{LanguageServiceProto}</CodeBlock>
+\</details>
+
+\<details><summary>language.proto</summary>
+<CodeBlock language="protobuf">{LanguageProto}</CodeBlock>
+\</details>
+
+\<details><summary>object.proto</summary>
+<CodeBlock language="protobuf">{ObjectProto}</CodeBlock>
+\</details>
+
+\<details><summary>settings_object.proto</summary>
+<CodeBlock language="protobuf">{SettingsObjectProto}</CodeBlock>
+\</details>
+
+### ZITADELTextSettings
+
+Key-value pairs for localized login texts, previously known as login texts
+
+### ZITADELBrandingSettings
+
+Predefined branding settings and custom key-value pairs, previously known as label policy or branding settings
+
+### ZITADELLoginSettings
+
+Previously known as login policy
+
+### ZITADELLockoutSettings
+
+Previously known as lockout policy
+
+### ZITADELPasswordSettings
+
+Previously known as password complexity policy
+
+### ZITADELHelpSettings
+
+Previously known as legal and support settings or privacy policy
+
+### ZITADELDomainSettings
+
+Previously known as domain policy
+
+### ZITADELFeatureSettings
+
+Feature toggles
+
+Also contains disallow public org registrations on system and instance level.
+
+### ZITADELTemplatesSettings
+
+HTML and text templates for fully customizable emails and sms
+
+### ZITADELSecretSettings
+
+Replaces secret generators
+
+## API Release Policy
+
+- Defined but not yet implemented APIs are subject to change without further notice.
+- Once an API definition is implemented, it is released as _Preview_ and is available for testing.
+- When a _Preview_ API is tested enough so the concepts are proven to work, a new _Beta_ API is released.
+- When an API is feature-complete and stable enough, a new _GA_ (General Availability) API is released.
+- In all stages, changes to already implemented APIs are done in a backwards-compatible way, if possible.
+- When we release a new stage for an API, we deprecate the previous stage and keep it available for a smooth transition.
+
+## Preview APIs
+
+These APIs are ready for testing and feedback.
+Beware, they don't yet follow all the rules defined above.
 
 <DocCardList />

@@ -22,16 +22,18 @@ SelectAccount:
   MustBeMemberOfOrg: ユーザーは組織 {{.OrgName}} のメンバーである必要があります。
 
 Password:
-  Title: パスワードの入力
-  Description: ログインデータを入力します。
+  Title: パスワード
+  Description: ログインデータを入力してください。
   PasswordLabel: パスワード
-  MinLength: 文字列の長さ
-  HasUppercase: 大文字
-  HasLowercase: 小文字
-  HasNumber: 数字
-  HasSymbol: シンボル
-  Confirmation: パスワードの確認
-  ResetLinkText: パスワードを再設定する
+  MinLength: 少なくとも
+  MinLengthp2: 文字でなければなりません。
+  MaxLength: 70文字以下でなければなりません。
+  HasUppercase: 大文字を含む必要があります。
+  HasLowercase: 小文字を含む必要があります。
+  HasNumber: 数字を含む必要があります。
+  HasSymbol: 記号を含む必要があります。
+  Confirmation: パスワードの確認が一致しました。
+  ResetLinkText: パスワードをリセット
   BackButtonText: 戻る
   NextButtonText: 次へ
 
@@ -181,6 +183,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: パスワードの変更
   Description: 旧パスワードと新パスワードを入力し、パスワードを変更してください。
+  ExpiredDescription: パスワードの有効期限が切れたため、変更する必要があります。古いパスワードと新しいパスワードを入力してください。
   OldPasswordLabel: 旧パスワード
   NewPasswordLabel: 新パスワード
   NewPasswordConfirmLabel: 新パスワードの確認
@@ -241,6 +244,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: 性別
   Female: 女性
   Male: 男性
@@ -280,6 +284,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: 利用規約
   TosConfirm: 私は利用規約を承諾します。
   TosLinkText: TOS
@@ -353,6 +358,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: デバイス認証

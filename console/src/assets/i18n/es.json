@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Configuración de la Instancia",
-        "DESCRIPTION": "Las configuraciones de la instancia son las configuraciones predeterminadas para todas las organizaciones. Con los permisos adecuados, algunas de ellas pueden ser sobrescritas en la configuración de la organización."
+        "TITLE": "Configuración por defecto",
+        "DESCRIPTION": "Configuraciones predeterminadas para todas las organizaciones. Con los permisos adecuados, algunas de ellas se pueden anular en la configuración de la organización."
       },
       "ORG": {
         "TITLE": "Configuración de la Organización",
@@ -129,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Enlaces Externos",
-        "DESCRIPTION": "Guía a tus usuarios hacia recursos externos personalizados mostrados en la página de inicio de sesión. Los usuarios necesitan aceptar los Términos de Servicio y la Política de Privacidad antes de que puedan registrarse."
+        "DESCRIPTION": "Guía a tus usuarios a recursos externos personalizados que se muestran en la página de inicio de sesión. Los usuarios deben aceptar los Términos de servicio y la Política de privacidad antes de poder registrarse. Cambia el enlace a tu documentación o introduce una cadena de texto vacía para ocultar el botón de documentación de la consola. Agrega un enlace externo personalizado y un texto personalizado para dicho enlace en la consola, o déjalos vacíos para ocultar ese botón."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Configuración de SMTP",
@@ -486,6 +486,7 @@
     "MORE": "más",
     "STEP": "Paso",
     "SETUP": "Configurar",
+    "TEST": "Probar",
     "UNSAVEDCHANGES": "Cambios no guardados",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Mostrar usuario {{value}}"
     },
-    "DOWNLOAD": "Descargar"
+    "DOWNLOAD": "Descargar",
+    "APPLY": "Aplicar"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Tiene control sobre toda la instancia, incluyendo todas las organizaciones",
@@ -595,6 +597,7 @@
     "INVALID_FORMAT": "El formato no es valido.",
     "NOTANEMAIL": "El valor proporcionado no es una dirección de email.",
     "MINLENGTH": "Debe tener al menos {{requiredLength}} caracteres de longitud.",
+    "MAXLENGTH": "Debe tener menos de {{requiredLength}} caracteres.",
     "UPPERCASEMISSING": "Debe incluir un carácter en mayúscula.",
     "LOWERCASEMISSING": "Debe incluir un carácter en minúscula.",
     "SYMBOLERROR": "Debe incluir un símbolo o un signo de puntuación.",
@@ -880,7 +883,8 @@
       "SET": "Establecer nueva contraseña",
       "RESENDNOTIFICATION": "Enviar enlace para restablecer la contraseña",
       "REQUIRED": "Faltan algunos campos requeridos.",
-      "MINLENGTHERROR": "Debe tener al menos {{value}} caracteres de longitud."
+      "MINLENGTHERROR": "Debe tener al menos {{value}} caracteres de longitud.",
+      "MAXLENGTHERROR": "Debe tener menos de {{value}} caracteres"
     },
     "ID": "ID",
     "EMAIL": "Email",
@@ -1315,16 +1319,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Ajustes de instancia",
-      "DESCRIPTION": "Estos ajustes se aplicará a todas tus organizaciones a menos que éstas los sobrescriban."
-    },
     "LIST": {
       "ORGS": "Organizaciones",
       "FEATURESETTINGS": "Ajustes de funcionalidades",
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamiento del inicio de sesión y de la seguridad",
       "LOCKOUT": "Bloqueo",
+      "AGE": "Caducidad de la contraseña",
       "COMPLEXITY": "Complejidad de contraseña",
       "NOTIFICATIONS": "Ajustes de notificación",
       "SMTP_PROVIDER": "Proveedor SMTP",
@@ -1379,7 +1380,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1544,8 +1546,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Antigüedad de la contraseña",
-      "DESCRIPTION": "Puedes establecer una política para la antigüedad de las contraseñas. Esta política emite un aviso después de que la antigüedad máxima se haya superado."
+      "TITLE": "Caducidad de la contraseña",
+      "DESCRIPTION": "Puedes establecer una política para la caducidad de las contraseñas. Esta política obligará al usuario a cambiar la contraseña en el próximo inicio de sesión después de la caducidad. No hay avisos ni notificaciones automáticos."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Política de bloqueo",
@@ -1572,6 +1574,9 @@
       "POLICYLINK": "Enlace a Política de privacidad",
       "HELPLINK": "Enlace de ayuda",
       "SUPPORTEMAIL": "Email de soporte",
+      "DOCSLINK": "Enlace de documentos (Console)",
+      "CUSTOMLINK": "Enlace personalizado (Console)",
+      "CUSTOMLINKTEXT": "Texto de enlace personalizado (Console)",
       "SAVED": "¡Se guardó con éxito!",
       "RESET_TITLE": "Restaurar valores por defecto",
       "RESET_DESCRIPTION": "Estás a punto de restaurar los enlaces por defecto para los TDS y la política de privacida. ¿Quieres continuar?"
@@ -1605,7 +1610,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificación de email realizada",
@@ -1694,8 +1700,8 @@
       "SHOWLOCKOUTFAILURES": "mostrar fallos de bloqueo",
       "MAXPASSWORDATTEMPTS": "Intentos máximos de contraseña",
       "MAXOTPATTEMPTS": "Intentos máximos de OTP",
-      "EXPIREWARNDAYS": "Aviso de expiración después de estos días: ",
-      "MAXAGEDAYS": "Antigüedad máxima en días",
+      "EXPIREWARNDAYS": "Aviso de caducidad después de días",
+      "MAXAGEDAYS": "Validez máxima en días",
       "USERLOGINMUSTBEDOMAIN": "Añadir el dominio de la organización como sufijo de los nombres de inicio de sesión",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si activas esta opción, todos los nombres de inicio de sesión tendrán como sufijo el dominio de esta organización. Si esta opción está desactivada, tendrás que asegurarte de que los nombres de usuario son únicos para todas las organizaciones.",
       "VALIDATEORGDOMAINS": "Verificación de dominio de la organización requerida (desafío DNS o HTTP)",
@@ -2222,11 +2228,12 @@
   "SMTP": {
     "LIST": {
       "TITLE": "Proveedor SMTP",
-      "DESCRIPTION": "Estos son los proveedores SMTP para tu instancia de Zitadel. Activa el que quieras utilizar para enviar notificaciones a tus usuarios.",
+      "DESCRIPTION": "Estos son los proveedores SMTP para tu instancia de ZITADEL. Activa el que quieras utilizar para enviar notificaciones a tus usuarios.",
       "EMPTY": "No hay ningún proveedor SMTP disponible",
       "ACTIVATED": "Activado",
       "ACTIVATE": "Activar proveedor",
       "DEACTIVATE": "Desactivar proveedor",
+      "TEST": "Prueba tu proveedor",
       "TYPE": "Tipo",
       "DIALOG": {
         "ACTIVATED": "Tu configuración SMTP ha sido activada",
@@ -2250,7 +2257,21 @@
         "CURRENT_DESC_TITLE": "Estas son tus configuraciones SMTP",
         "PROVIDER_SETTINGS": "Configuración del proveedor SMTP",
         "SENDER_SETTINGS": "Configuración del remitente",
-        "TEST_SETTINGS": "Probar la configuración SMTP"
+        "NEXT_STEPS": "Pŕoximos pasos",
+        "ACTIVATE": {
+          "TITLE": "Activa tu proveedor SMTP",
+          "DESCRIPTION": "ZITADEL no puede usar este proveedor SMTP para enviar notificaciones hasta que lo actives. Si activas este proveedor cualquier otro proveedor que estuviera activado será desactivado ahora."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Desactiva tu proveedor SMTP",
+          "DESCRIPTION": "Si desactivas este proveedor SMTP, ZITADEL no puede utilizarlo para enviar notificationes hasta que lo actives otra vez."
+        },
+        "SAVE_SETTINGS": "Guarda tu configuración",
+        "TEST": {
+          "TITLE": "Prueba tu configuración",
+          "DESCRIPTION": "Puedes probar tu configuración SMTP y revisar el resultado de la prueba antes de guardar la configuración",
+          "RESULT": "Tu email fue enviado con éxito"
+        }
       }
     },
     "DETAIL": {
@@ -2524,7 +2545,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Añadir un Mánager",

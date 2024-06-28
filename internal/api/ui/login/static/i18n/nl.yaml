@@ -32,13 +32,15 @@ Password:
   Title: Wachtwoord
   Description: Voer uw inloggegevens in.
   PasswordLabel: Wachtwoord
-  MinLength: Minimum lengte
-  HasUppercase: Hoofdletter
-  HasLowercase: Kleine letter
-  HasNumber: Nummer
-  HasSymbol: Symbool
-  Confirmation: Bevestiging komt overeen
-  ResetLinkText: Reset Wachtwoord
+  MinLength: Moet minstens
+  MinLengthp2: tekens lang zijn.
+  MaxLength: Moet minder dan 70 tekens lang zijn.
+  HasUppercase: Moet een hoofdletter bevatten.
+  HasLowercase: Moet een kleine letter bevatten.
+  HasNumber: Moet een nummer bevatten.
+  HasSymbol: Moet een symbool bevatten.
+  Confirmation: Wachtwoordbevestiging komt overeen.
+  ResetLinkText: Wachtwoord resetten
   BackButtonText: Terug
   NextButtonText: Volgende
 
@@ -188,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Verander Wachtwoord
   Description: Verander uw wachtwoord. Voer uw oude en nieuwe wachtwoord in.
+  ExpiredDescription: Je wachtwoord is verlopen en moet worden gewijzigd. Voer uw oude en nieuwe wachtwoord in.
   OldPasswordLabel: Oud Wachtwoord
   NewPasswordLabel: Nieuw Wachtwoord
   NewPasswordConfirmLabel: Bevestig Wachtwoord
@@ -249,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -288,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Nederlands: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -361,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:

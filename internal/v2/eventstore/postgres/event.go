@@ -2,8 +2,8 @@ package postgres
 
 import (
 	"encoding/json"
-
-	"github.com/zitadel/logging"
+	"reflect"
+	"time"
 
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -13,52 +13,52 @@ func intentToCommands(intent *intent) (commands []*command, err error) {
 	commands = make([]*command, len(intent.Commands()))
 
 	for i, cmd := range intent.Commands() {
-		var payload unmarshalPayload
-		if cmd.Payload() != nil {
-			payload, err = json.Marshal(cmd.Payload())
-			if err != nil {
-				logging.WithError(err).Warn("marshal payload failed")
-				return nil, zerrors.ThrowInternal(err, "POSTG-MInPK", "Errors.Internal")
-			}
+		payload, err := marshalPayload(cmd.Payload)
+		if err != nil {
+			return nil, zerrors.ThrowInternal(err, "POSTG-MInPK", "Errors.Internal")
 		}
-
 		commands[i] = &command{
-			Event: &eventstore.Event[eventstore.StoragePayload]{
-				Aggregate: *intent.Aggregate(),
-				Creator:   cmd.Creator(),
-				Revision:  cmd.Revision(),
-				Type:      cmd.Type(),
-				// always add at least 1 to the currently stored sequence
-				Sequence: intent.sequence + uint32(i) + 1,
-				Payload:  payload,
-			},
-			intent:            intent,
-			uniqueConstraints: cmd.UniqueConstraints(),
+			Command:  cmd,
+			intent:   intent,
+			sequence: intent.nextSequence(),
+			payload:  payload,
 		}
 	}
 
 	return commands, nil
 }
 
-type command struct {
-	*eventstore.Event[eventstore.StoragePayload]
-
-	intent            *intent
-	uniqueConstraints []*eventstore.UniqueConstraint
+func marshalPayload(payload any) ([]byte, error) {
+	if payload == nil || reflect.ValueOf(payload).IsZero() {
+		return nil, nil
+	}
+	return json.Marshal(payload)
 }
 
-var _ eventstore.StoragePayload = (unmarshalPayload)(nil)
+type command struct {
+	*eventstore.Command
 
-type unmarshalPayload []byte
+	intent *intent
 
-// Unmarshal implements eventstore.StoragePayload.
-func (p unmarshalPayload) Unmarshal(ptr any) error {
-	if len(p) == 0 {
-		return nil
+	payload   []byte
+	position  eventstore.GlobalPosition
+	createdAt time.Time
+	sequence  uint32
+}
+
+func (cmd *command) toEvent() *eventstore.StorageEvent {
+	return &eventstore.StorageEvent{
+		Action: eventstore.Action[eventstore.Unmarshal]{
+			Creator:  cmd.Creator,
+			Type:     cmd.Type,
+			Revision: cmd.Revision,
+			Payload: func(ptr any) error {
+				return json.Unmarshal(cmd.payload, ptr)
+			},
+		},
+		Aggregate: *cmd.intent.Aggregate(),
+		Sequence:  cmd.intent.sequence,
+		Position:  cmd.position,
+		CreatedAt: cmd.createdAt,
 	}
-	if err := json.Unmarshal(p, ptr); err != nil {
-		return zerrors.ThrowInternal(err, "POSTG-u8qVo", "Errors.Internal")
-	}
-
-	return nil
 }

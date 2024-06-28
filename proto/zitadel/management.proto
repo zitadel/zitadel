@@ -4742,7 +4742,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc GetPasswordAgePolicy(GetPasswordAgePolicyRequest) returns (GetPasswordAgePolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/age"
@@ -4756,7 +4755,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Password Age Settings";
-            description: "Not implemented";
+            description: "Returns the password age settings configured on the organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4768,7 +4767,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc GetDefaultPasswordAgePolicy(GetDefaultPasswordAgePolicyRequest) returns (GetDefaultPasswordAgePolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/password/age"
@@ -4782,7 +4780,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Default Password Age Settings";
-            description: "Not implemented";
+            description: "Returns the default password age settings configured on the instance. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4794,7 +4792,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc AddCustomPasswordAgePolicy(AddCustomPasswordAgePolicyRequest) returns (AddCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
             post: "/policies/password/age"
@@ -4809,7 +4806,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Add Password Age Settings";
-            description: "Not implemented";
+            description: "Create new password age settings for the organization. This will overwrite the settings of the instance for this organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4821,7 +4818,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc UpdateCustomPasswordAgePolicy(UpdateCustomPasswordAgePolicyRequest) returns (UpdateCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/age"
@@ -4836,7 +4832,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Update Password Age Settings";
-            description: "Not implemented";
+            description: "Update the password age settings of the organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4848,7 +4844,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc ResetPasswordAgePolicyToDefault(ResetPasswordAgePolicyToDefaultRequest) returns (ResetPasswordAgePolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/password/age"
@@ -4862,7 +4857,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Reset Password Age Settings to Default";
-            description: "Not implemented";
+            description: "Remove the password age settings of the organization and therefore use the default settings on the instance.. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -6803,6 +6798,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "List Identity Providers";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6820,6 +6823,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Get Identity Provider By ID";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6838,6 +6849,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Generic OAuth Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6856,6 +6875,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Generic OAuth Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6874,6 +6901,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Generic OIDC Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6892,6 +6927,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Generic OIDC Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6910,6 +6953,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Migrate Generic OIDC Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6928,6 +6979,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add JWT Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6946,6 +7005,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update JWT Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6964,6 +7031,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Azure AD Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -6982,6 +7057,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Azure AD Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7000,6 +7083,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitHub Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7018,6 +7109,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitHub Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7036,6 +7135,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitHub Enterprise Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7054,6 +7161,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitHub Enterprise Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7072,6 +7187,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitLab Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7090,6 +7213,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitLab Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7108,6 +7239,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add GitLab Selfhosted Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7126,6 +7265,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update GitLab Selfhosted Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7144,6 +7291,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Google Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7162,6 +7317,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Google Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7180,6 +7343,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add LDAP Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7198,6 +7369,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update LDAP Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7216,6 +7395,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add Apple Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7234,6 +7421,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update Apple Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7252,6 +7447,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Add SAML Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7270,6 +7473,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Update SAML Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7288,6 +7499,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Regenerate SAML Identity Provider Certificate";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -7306,6 +7525,14 @@ service ManagementService {
             tags: "Identity Providers";
             summary: "Delete Identity Provider";
             description: "";
+            parameters: {
+                headers: {
+                    name: "x-zitadel-orgid";
+                    description: "The default is always the organization of the requesting user. If you like to get/set a result of another organization include the header. Make sure the user has permission to access the requested data.";
+                    type: STRING,
+                    required: false;
+                };
+            };
         };
     }
 
@@ -10372,7 +10599,9 @@ message GetDefaultPasswordAgePolicyResponse {
 }
 
 message AddCustomPasswordAgePolicyRequest {
+    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
+    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -10381,7 +10610,9 @@ message AddCustomPasswordAgePolicyResponse {
 }
 
 message UpdateCustomPasswordAgePolicyRequest {
+    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
+    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -10495,6 +10726,24 @@ message AddCustomPrivacyPolicyRequest {
             description: "help / support email address."
         }
     ];
+    string docs_link = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Link to documentation to be shown in the console.";
+            example: "\"https://zitadel.com/docs\"";
+        }
+    ];
+    string custom_link = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Link to an external resource that will be available to users in the console.";
+            example: "\"https://external.link\"";
+        }
+    ];
+    string custom_link_text = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The button text that would be shown in console pointing to custom link.";
+            example: "\"External\"";
+        }
+    ];
 }
 
 message AddCustomPrivacyPolicyResponse {
@@ -10525,6 +10774,24 @@ message UpdateCustomPrivacyPolicyRequest {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"support-email@test.com\"";
             description: "help / support email address."
+        }
+    ];
+    string docs_link = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Link to documentation to be shown in the console.";
+            example: "\"https://zitadel.com/docs\"";
+        }
+    ];
+    string custom_link = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "Link to an external resource that will be available to users in the console.";
+            example: "\"https://external.link\"";
+        }
+    ];
+    string custom_link_text = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "The button text that would be shown in console pointing to custom link.";
+            example: "\"External\"";
         }
     ];
 }
@@ -12731,31 +12998,28 @@ message AddSAMLProviderRequest {
     string name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     oneof metadata {
         option (validate.required) = true;
+        // Metadata of the SAML identity provider.
         bytes metadata_xml = 2 [
-            (validate.rules).bytes.max_len = 500000,
-            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "Metadata of the SAML identity provider";
-            }
+            (validate.rules).bytes.max_len = 500000
         ];
+        // Url to the metadata of the SAML identity provider.
         string metadata_url = 3 [
             (validate.rules).string.max_len = 200,
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 example: "\"https://test.com/saml/metadata\""
-                description: "Url to the metadata of the SAML identity provider";
             }
         ];
     }
-    zitadel.idp.v1.SAMLBinding binding = 4 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Binding which defines the type of communication with the identity provider";
-        }
-    ];
-    bool with_signed_request = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Boolean which defines if the authentication requests are signed";
-        }
-    ];
+    // Binding which defines the type of communication with the identity provider.
+    zitadel.idp.v1.SAMLBinding binding = 4;
+    // Boolean which defines if the authentication requests are signed.
+    bool with_signed_request = 5;
     zitadel.idp.v1.Options provider_options = 6;
+    // Optionally specify the `nameid-format` requested.
+    optional zitadel.idp.v1.SAMLNameIDFormat name_id_format = 7;
+    // Optionally specify the name of the attribute, which will be used to map the user
+    // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
+    optional string transient_mapping_attribute_name = 8;
 }
 
 message AddSAMLProviderResponse {
@@ -12766,33 +13030,30 @@ message AddSAMLProviderResponse {
 message UpdateSAMLProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    // Metadata of the SAML identity provider.
     oneof metadata {
         option (validate.required) = true;
         bytes metadata_xml = 3 [
-            (validate.rules).bytes.max_len = 500000,
-            (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-                description: "Metadata of the SAML identity provider";
-            }
+            (validate.rules).bytes.max_len = 500000
         ];
+        // Url to the metadata of the SAML identity provider.
         string metadata_url = 4 [
             (validate.rules).string.max_len = 200,
             (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
                 example: "\"https://test.com/saml/metadata\""
-                description: "Url to the metadata of the SAML identity provider";
             }
         ];
     }
-    zitadel.idp.v1.SAMLBinding binding = 5 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Binding which defines the type of communication with the identity provider";
-        }
-    ];
-    bool with_signed_request = 6 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Boolean which defines if the authentication requests are signed";
-        }
-    ];
+    // Binding which defines the type of communication with the identity provider.
+    zitadel.idp.v1.SAMLBinding binding = 5;
+    // Boolean which defines if the authentication requests are signed.
+    bool with_signed_request = 6;
     zitadel.idp.v1.Options provider_options = 7;
+    // Optionally specify the `nameid-format` requested.
+    optional zitadel.idp.v1.SAMLNameIDFormat name_id_format = 8;
+    // Optionally specify the name of the attribute, which will be used to map the user
+    // in case the nameid-format returned is `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`.
+    optional string transient_mapping_attribute_name = 9;
 }
 
 message UpdateSAMLProviderResponse {
