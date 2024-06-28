@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "实例设置",
-        "DESCRIPTION": "实例设置是所有组织的默认设置。有适当的权限，其中一些可以在组织设置中被覆盖。"
+        "TITLE": "默认设置",
+        "DESCRIPTION": "所有组织的默认设置。有了正确的权限，其中一些权限在组织设置中是可以覆盖的。"
       },
       "ORG": {
         "TITLE": "组织设置",
@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     },
-    "DOWNLOAD": "下载"
+    "DOWNLOAD": "下载",
+    "APPLY": "申请"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "控制整个实例，包括所有组织",
@@ -1317,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "实例设置",
-      "DESCRIPTION": "这些设置将应用于您的所有组织，除非它们已被覆盖。"
-    },
     "LIST": {
       "ORGS": "组织",
       "FEATURESETTINGS": "功能设置",
