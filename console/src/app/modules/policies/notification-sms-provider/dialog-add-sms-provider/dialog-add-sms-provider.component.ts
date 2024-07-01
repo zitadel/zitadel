@@ -41,7 +41,7 @@ export class DialogAddSMSProviderComponent {
   ) {
     this.twilioForm = this.fb.group({
       sid: ['', [requiredValidator]],
-      senderNumber: ['', [requiredValidator]],
+      senderNumber: [''],
       // NB: not required if not using verification service
       verifyServiceSid: [''],
     });

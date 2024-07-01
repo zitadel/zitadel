@@ -28,7 +28,6 @@ type TwilioVerify struct {
 	VerifyServiceSID     string
 	RecipientPhoneNumber string
 	TriggeringEvent      eventstore.Event
-	Code                 string
 }
 
 func (msg *TwilioVerify) GetContent() (string, error) {
