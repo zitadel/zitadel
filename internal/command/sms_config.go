@@ -35,7 +35,9 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, co
 		id,
 		config.SID,
 		config.SenderNumber,
-		token))
+		token,
+		config.VerifyServiceSID,
+	))
 	if err != nil {
 		return "", nil, err
 	}
@@ -64,7 +66,9 @@ func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, instanceID, id str
 		iamAgg,
 		id,
 		config.SID,
-		config.SenderNumber)
+		config.SenderNumber,
+		config.VerifyServiceSID,
+	)
 	if err != nil {
 		return nil, err
 	}

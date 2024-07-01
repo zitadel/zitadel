@@ -282,9 +282,20 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 			return err
 		}
 		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
+
 		if e.NotificationType == domain.NotificationTypeSms {
-			notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
+			twilioVerificationEnabled, err := u.isTwilioVerificationAPIEnabled(ctx)
+			if err != nil {
+				return err
+			}
+
+			if twilioVerificationEnabled {
+				notify = types.SendSMSTwilioVerifyRequest(ctx, u.channels, notifyUser, e)
+			} else {
+				notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
+			}
 		}
+
 		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err
@@ -373,11 +384,24 @@ func (u *userNotifier) reduceOTPSMS(
 	if err != nil {
 		return nil, err
 	}
-	notify := types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, event)
+
+	twilioVerificationEnabled, err := u.isTwilioVerificationAPIEnabled(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var notify types.Notify
+	if twilioVerificationEnabled {
+		notify = types.SendSMSTwilioVerifyRequest(ctx, u.channels, notifyUser, event)
+	} else {
+		notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, event)
+	}
+
 	err = notify.SendOTPSMSCode(ctx, plainCode, expiry)
 	if err != nil {
 		return nil, err
 	}
+
 	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner)
 	if err != nil {
 		return nil, err
@@ -704,16 +728,28 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 		if err != nil {
 			return err
 		}
-
 		ctx, err = u.queries.Origin(ctx, e)
 		if err != nil {
 			return err
 		}
-		err = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e).
-			SendPhoneVerificationCode(ctx, code)
+
+		twilioVerificationEnabled, err := u.isTwilioVerificationAPIEnabled(ctx)
 		if err != nil {
 			return err
 		}
+
+		var notify types.Notify
+		if twilioVerificationEnabled {
+			notify = types.SendSMSTwilioVerifyRequest(ctx, u.channels, notifyUser, e)
+		} else {
+			notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
+		}
+
+		err = notify.SendPhoneVerificationCode(ctx, code)
+		if err != nil {
+			return err
+		}
+
 		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
 	}), nil
 }
@@ -723,4 +759,12 @@ func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, e
 		return true, nil
 	}
 	return u.queries.IsAlreadyHandled(ctx, event, data, eventTypes...)
+}
+
+func (u *userNotifier) isTwilioVerificationAPIEnabled(ctx context.Context) (bool, error) {
+	_, twilioConfig, err := u.channels.SMS(ctx)
+	if err != nil {
+		return false, err
+	}
+	return twilioConfig.VerifyServiceSID != "", nil
 }

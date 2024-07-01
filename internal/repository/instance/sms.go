@@ -22,10 +22,11 @@ const (
 type SMSConfigTwilioAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID           string              `json:"id,omitempty"`
-	SID          string              `json:"sid,omitempty"`
-	Token        *crypto.CryptoValue `json:"token,omitempty"`
-	SenderNumber string              `json:"senderNumber,omitempty"`
+	ID               string              `json:"id,omitempty"`
+	SID              string              `json:"sid,omitempty"`
+	Token            *crypto.CryptoValue `json:"token,omitempty"`
+	SenderNumber     string              `json:"senderNumber,omitempty"`
+	VerifyServiceSID string              `json:"verfiyServiceSid,omitempty"`
 }
 
 func NewSMSConfigTwilioAddedEvent(
@@ -35,6 +36,7 @@ func NewSMSConfigTwilioAddedEvent(
 	sid,
 	senderNumber string,
 	token *crypto.CryptoValue,
+	verifyServiceSid string,
 ) *SMSConfigTwilioAddedEvent {
 	return &SMSConfigTwilioAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -42,10 +44,11 @@ func NewSMSConfigTwilioAddedEvent(
 			aggregate,
 			SMSConfigTwilioAddedEventType,
 		),
-		ID:           id,
-		SID:          sid,
-		Token:        token,
-		SenderNumber: senderNumber,
+		ID:               id,
+		SID:              sid,
+		Token:            token,
+		SenderNumber:     senderNumber,
+		VerifyServiceSID: verifyServiceSid,
 	}
 }
 
@@ -72,9 +75,10 @@ func SMSConfigTwilioAddedEventMapper(event eventstore.Event) (eventstore.Event, 
 type SMSConfigTwilioChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID           string  `json:"id,omitempty"`
-	SID          *string `json:"sid,omitempty"`
-	SenderNumber *string `json:"senderNumber,omitempty"`
+	ID               string  `json:"id,omitempty"`
+	SID              *string `json:"sid,omitempty"`
+	SenderNumber     *string `json:"senderNumber,omitempty"`
+	VerifyServiceSID *string `json:"verifyServiceSid,omitempty"`
 }
 
 func NewSMSConfigTwilioChangedEvent(
@@ -111,6 +115,12 @@ func ChangeSMSConfigTwilioSID(sid string) func(event *SMSConfigTwilioChangedEven
 func ChangeSMSConfigTwilioSenderNumber(senderNumber string) func(event *SMSConfigTwilioChangedEvent) {
 	return func(e *SMSConfigTwilioChangedEvent) {
 		e.SenderNumber = &senderNumber
+	}
+}
+
+func ChangeSMSConfigTwilioVerifyServiceSID(verifyServiceSID string) func(event *SMSConfigTwilioChangedEvent) {
+	return func(e *SMSConfigTwilioChangedEvent) {
+		e.VerifyServiceSID = &verifyServiceSID
 	}
 }
 
