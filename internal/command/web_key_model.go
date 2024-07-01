@@ -9,13 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/webkey"
 )
 
-type WebKey struct {
-	KeyID      string
-	State      domain.WebKeyState
-	PrivateKey *crypto.CryptoValue
-	PublicKey  *jose.JSONWebKey
-}
-
 type WebKeyWriteModel struct {
 	eventstore.WriteModel
 	State      domain.WebKeyState
@@ -92,10 +85,13 @@ func (models *webKeyWriteModels) AppendEvents(events ...eventstore.Event) {
 func (models *webKeyWriteModels) Reduce() error {
 	for _, event := range models.events {
 		aggregate := event.Aggregate()
+		if models.keys[aggregate.ID] == nil {
+			models.keys[aggregate.ID] = NewWebKeyWriteModel(aggregate.ID, aggregate.ResourceOwner)
+		}
 
 		switch event.(type) {
 		case *webkey.AddedEvent:
-			models.keys[aggregate.ID] = NewWebKeyWriteModel(aggregate.ID, aggregate.ResourceOwner)
+			break
 		case *webkey.ActivatedEvent:
 			models.activeID = aggregate.ID
 		case *webkey.DeactivatedEvent:

@@ -26,9 +26,10 @@ const (
 type AddedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	PrivateKey *crypto.CryptoValue `json:"privateKey"`
-	PublicKey  *jose.JSONWebKey    `json:"publicKey"`
-	Config     json.RawMessage     `json:"config"`
+	PrivateKey *crypto.CryptoValue     `json:"privateKey"`
+	PublicKey  *jose.JSONWebKey        `json:"publicKey"`
+	Config     json.RawMessage         `json:"config"`
+	ConfigType crypto.WebKeyConfigType `json:"configType"`
 }
 
 func (e *AddedEvent) Payload() interface{} {
@@ -65,6 +66,7 @@ func NewAddedEvent(
 		PrivateKey: privateKey,
 		PublicKey:  publicKey,
 		Config:     configJson,
+		ConfigType: config.Type(),
 	}, nil
 }
 
