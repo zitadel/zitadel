@@ -11,7 +11,12 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) GenerateWebKey(ctx context.Context, conf crypto.WebKeyConfig) (*domain.ObjectDetails, error) {
+type WebKeyDetails struct {
+	KeyID         string
+	ObjectDetails *domain.ObjectDetails
+}
+
+func (c *Commands) GenerateWebKey(ctx context.Context, conf crypto.WebKeyConfig) (*WebKeyDetails, error) {
 	_, activeID, err := c.getAllWebKeys(ctx)
 	if err != nil {
 		return nil, err
@@ -41,7 +46,10 @@ func (c *Commands) GenerateWebKey(ctx context.Context, conf crypto.WebKeyConfig)
 	if err != nil {
 		return nil, err
 	}
-	return pushedEventsToObjectDetails(events), nil
+	return &WebKeyDetails{
+		KeyID:         keyID,
+		ObjectDetails: pushedEventsToObjectDetails(events),
+	}, nil
 }
 
 func (c *Commands) ActivateWebKey(ctx context.Context, keyID string) (_ *domain.ObjectDetails, err error) {
@@ -79,12 +87,12 @@ func (c *Commands) getAllWebKeys(ctx context.Context) (_ map[string]*WebKeyWrite
 	return models.keys, models.activeID, nil
 }
 
-func (c *Commands) RemoveWebKey(ctx context.Context, keyID string) (_ *domain.ObjectDetails, err error) {
+func (c *Commands) DeleteWebKey(ctx context.Context, keyID string) (_ *domain.ObjectDetails, err error) {
 	model := NewWebKeyWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	if err = c.eventstore.FilterToQueryReducer(ctx, model); err != nil {
 		return nil, err
 	}
-	if model.State == domain.WebKeyStateUndefined {
+	if model.State == domain.WebKeyStateUnspecified {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ooCa7", "Errors.WebKey.NotFound")
 	}
 	if model.State == domain.WebKeyStateActive {

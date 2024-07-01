@@ -30,7 +30,7 @@ func (q *Queries) GetPublicWebKeyByID(ctx context.Context, keyID string) (webKey
 	if err = q.eventstore.FilterToQueryReducer(ctx, model); err != nil {
 		return nil, err
 	}
-	if model.State == domain.WebKeyStateUndefined || model.State == domain.WebWeyStateRemoved {
+	if model.State == domain.WebKeyStateUnspecified || model.State == domain.WebWeyStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "QUERY-AiCh0", "Errors.WebKey.NotFound")
 	}
 	return model.PublicKey, nil

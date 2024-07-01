@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package zitadel.webkey.v3alpha;
+
+import "google/protobuf/timestamp.proto";
+import "zitadel/webkey/v3alpha/config.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha";
+
+enum WebKeyState {
+  STATE_UNSPECIFIED = 0;
+  STATE_INACTIVE = 1;
+  STATE_ACTIVE = 2;
+  STATE_REMOVED = 3;
+}
+
+message WebKeyDetails {
+  // unique identifier of this web key
+  string key_id = 1;
+  // creation timestamp of this web key
+  google.protobuf.Timestamp created_date = 2;
+  // updated timestamp of this web key
+  google.protobuf.Timestamp change_date = 3;
+  // sequence of the last event for the web key aggregate
+  int64 sequence = 4;
+  // current state of this webkey
+  WebKeyState state = 5;
+
+  // config with which this web key was generated
+  oneof config {
+    WebKeyRSAConfig rsa = 6;
+    WebKeyECDSAConfig ecdsa = 7;
+    WebKeyED25519Config ed25519 = 8;
+  }
+}
