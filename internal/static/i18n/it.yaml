@@ -241,6 +241,7 @@ Errors:
       NotFound: Impostazioni di accesso non trovati
       Invalid: Impostazioni di accesso non sono validi
       RedirectURIInvalid: Default Redirect URI non valido
+      RedirectURIMustBeSet: È necessario impostare l'URI di reindirizzamento predefinito se è stato abilitato il suo utilizzo per i collegamenti di notifica
       NotExisting: Impostazioni di accesso non esistenti
       AlreadyExists: Impostazioni di accesso già esistenti
       IdpProviderAlreadyExisting: IDP già esistente
@@ -364,6 +365,7 @@ Errors:
       NotExisting: Impostazioni di accesso predefinite non esistenti
       AlreadyExists: Impostazioni di accesso predefinite già esistenti
       RedirectURIInvalid: Default Redirect URI non valido
+      RedirectURIMustBeSet: È necessario impostare l'URI di reindirizzamento predefinito se è stato abilitato il suo utilizzo per i collegamenti di notifica
       MFA:
         AlreadyExists: Multifattore già esistente
         NotExisting: Multifattore non esistente

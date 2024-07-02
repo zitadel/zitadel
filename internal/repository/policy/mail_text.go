@@ -39,6 +39,7 @@ type MailTextAddedEvent struct {
 	Greeting     string `json:"greeting,omitempty"`
 	Text         string `json:"text,omitempty"`
 	ButtonText   string `json:"buttonText,omitempty"`
+	ButtonUrl    string `json:"buttonUrl,omitempty"`
 }
 
 func (e *MailTextAddedEvent) Payload() interface{} {
@@ -58,7 +59,8 @@ func NewMailTextAddedEvent(
 	subject,
 	greeting,
 	text,
-	buttonText string,
+	buttonText,
+	buttonUrl string,
 ) *MailTextAddedEvent {
 	return &MailTextAddedEvent{
 		BaseEvent:    *base,
@@ -70,6 +72,7 @@ func NewMailTextAddedEvent(
 		Greeting:     greeting,
 		Text:         text,
 		ButtonText:   buttonText,
+		ButtonUrl:    buttonUrl,
 	}
 }
 
@@ -97,6 +100,7 @@ type MailTextChangedEvent struct {
 	Greeting     *string `json:"greeting,omitempty"`
 	Text         *string `json:"text,omitempty"`
 	ButtonText   *string `json:"buttonText,omitempty"`
+	ButtonUrl    *string `json:"buttonUrl,omitempty"`
 }
 
 func (e *MailTextChangedEvent) Payload() interface{} {
@@ -162,6 +166,12 @@ func ChangeText(text string) func(*MailTextChangedEvent) {
 func ChangeButtonText(buttonText string) func(*MailTextChangedEvent) {
 	return func(e *MailTextChangedEvent) {
 		e.ButtonText = &buttonText
+	}
+}
+
+func ChangeButtonUrl(buttonUrl string) func(*MailTextChangedEvent) {
+	return func(e *MailTextChangedEvent) {
+		e.ButtonUrl = &buttonUrl
 	}
 }
 

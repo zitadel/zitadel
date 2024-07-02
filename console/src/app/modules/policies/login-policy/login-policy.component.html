@@ -419,6 +419,7 @@
       <input
         cnslInput
         placeholder="https://"
+        (keyup)="onDefaultRedirectUriChange()"
         [(ngModel)]="loginData.defaultRedirectUri"
         [disabled]="
           ([
@@ -433,6 +434,32 @@
         "
       />
     </cnsl-form-field>
+  </div>
+
+  <div class="login-policy-row">
+    <mat-checkbox
+      class="login-policy-toggle"
+      color="primary"
+      ngDefaultControl
+      matTooltip="{{
+        'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS.DESCRIPTION' | translate
+      }}"
+      [(ngModel)]="loginData.useDefaultRedirectUriForNotificationLinks"
+      [disabled]="
+        !loginData.defaultRedirectUri ||
+        ([
+          serviceType === PolicyComponentServiceType.ADMIN
+            ? 'iam.policy.write'
+            : serviceType === PolicyComponentServiceType.MGMT
+              ? 'policy.write'
+              : ''
+        ]
+          | hasRole
+          | async) === false
+      "
+    >
+      {{ 'DESCRIPTIONS.SETTINGS.LOGIN.FORM.USE_DEFAULT_REDIRECT_URI_FOR_NOTIFICATION_LINKS.TITLE' | translate }}
+    </mat-checkbox>
   </div>
 </div>
 

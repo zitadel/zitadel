@@ -59,23 +59,24 @@ type InstanceSetup struct {
 		SMTPSenderAddressMatchesInstanceDomain bool
 	}
 	LoginPolicy struct {
-		AllowUsernamePassword      bool
-		AllowRegister              bool
-		AllowExternalIDP           bool
-		ForceMFA                   bool
-		ForceMFALocalOnly          bool
-		HidePasswordReset          bool
-		IgnoreUnknownUsername      bool
-		AllowDomainDiscovery       bool
-		DisableLoginWithEmail      bool
-		DisableLoginWithPhone      bool
-		PasswordlessType           domain.PasswordlessType
-		DefaultRedirectURI         string
-		PasswordCheckLifetime      time.Duration
-		ExternalLoginCheckLifetime time.Duration
-		MfaInitSkipLifetime        time.Duration
-		SecondFactorCheckLifetime  time.Duration
-		MultiFactorCheckLifetime   time.Duration
+		AllowUsernamePassword                     bool
+		AllowRegister                             bool
+		AllowExternalIDP                          bool
+		ForceMFA                                  bool
+		ForceMFALocalOnly                         bool
+		HidePasswordReset                         bool
+		IgnoreUnknownUsername                     bool
+		AllowDomainDiscovery                      bool
+		DisableLoginWithEmail                     bool
+		DisableLoginWithPhone                     bool
+		PasswordlessType                          domain.PasswordlessType
+		DefaultRedirectURI                        string
+		PasswordCheckLifetime                     time.Duration
+		ExternalLoginCheckLifetime                time.Duration
+		MfaInitSkipLifetime                       time.Duration
+		SecondFactorCheckLifetime                 time.Duration
+		MultiFactorCheckLifetime                  time.Duration
+		UseDefaultRedirectUriForNotificationLinks bool
 	}
 	NotificationPolicy struct {
 		PasswordChange bool
@@ -328,6 +329,7 @@ func setupInstanceElements(instanceAgg *instance.Aggregate, setup *InstanceSetup
 			setup.LoginPolicy.MfaInitSkipLifetime,
 			setup.LoginPolicy.SecondFactorCheckLifetime,
 			setup.LoginPolicy.MultiFactorCheckLifetime,
+			setup.LoginPolicy.UseDefaultRedirectUriForNotificationLinks,
 		),
 		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeTOTP),
 		prepareAddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),

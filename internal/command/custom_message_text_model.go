@@ -20,6 +20,7 @@ type CustomMessageTextReadModel struct {
 	Text            string
 	ButtonText      string
 	FooterText      string
+	ButtonUrl       string
 
 	State domain.PolicyState
 }
@@ -52,6 +53,9 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 			if e.Key == domain.MessageFooterText {
 				wm.FooterText = e.Text
 			}
+			if e.Key == domain.MessageButtonUrl {
+				wm.ButtonUrl = e.Text
+			}
 			wm.State = domain.PolicyStateActive
 		case *policy.CustomTextRemovedEvent:
 			if e.Template != wm.MessageTextType || wm.Language != e.Language {
@@ -78,6 +82,9 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 			if e.Key == domain.MessageFooterText {
 				wm.FooterText = ""
 			}
+			if e.Key == domain.MessageButtonUrl {
+				wm.ButtonUrl = ""
+			}
 		case *policy.CustomTextTemplateRemovedEvent:
 			if e.Template != wm.MessageTextType || wm.Language != e.Language {
 				continue
@@ -90,6 +97,7 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 			wm.ButtonText = ""
 			wm.FooterText = ""
 			wm.State = domain.PolicyStateRemoved
+			wm.ButtonUrl = ""
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -110,6 +118,7 @@ type CustomText struct {
 	Text       string
 	ButtonText string
 	FooterText string
+	ButtonUrl  string
 	State      domain.PolicyState
 }
 
@@ -141,6 +150,9 @@ func (wm *CustomMessageTemplatesReadModel) Reduce() error {
 			if e.Key == domain.MessageFooterText {
 				wm.CustomMessageTemplate[e.Template+e.Language.String()].FooterText = e.Text
 			}
+			if e.Key == domain.MessageButtonUrl {
+				wm.CustomMessageTemplate[e.Template+e.Language.String()].ButtonUrl = e.Text
+			}
 			wm.CustomMessageTemplate[e.Template+e.Language.String()].State = domain.PolicyStateActive
 		case *policy.CustomTextRemovedEvent:
 			if _, ok := wm.CustomMessageTemplate[e.Template+e.Language.String()]; !ok {
@@ -166,6 +178,9 @@ func (wm *CustomMessageTemplatesReadModel) Reduce() error {
 			}
 			if e.Key == domain.MessageFooterText {
 				wm.CustomMessageTemplate[e.Template+e.Language.String()].FooterText = ""
+			}
+			if e.Key == domain.MessageButtonUrl {
+				wm.CustomMessageTemplate[e.Template+e.Language.String()].ButtonUrl = ""
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
 			delete(wm.CustomMessageTemplate, e.Template+e.Language.String())

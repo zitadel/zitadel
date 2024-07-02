@@ -15,21 +15,22 @@ import (
 )
 
 var (
-	prepareMessageTextStmt = `SELECT projections.message_texts2.aggregate_id,` +
-		` projections.message_texts2.sequence,` +
-		` projections.message_texts2.creation_date,` +
-		` projections.message_texts2.change_date,` +
-		` projections.message_texts2.state,` +
-		` projections.message_texts2.type,` +
-		` projections.message_texts2.language,` +
-		` projections.message_texts2.title,` +
-		` projections.message_texts2.pre_header,` +
-		` projections.message_texts2.subject,` +
-		` projections.message_texts2.greeting,` +
-		` projections.message_texts2.text,` +
-		` projections.message_texts2.button_text,` +
-		` projections.message_texts2.footer_text` +
-		` FROM projections.message_texts2` +
+	prepareMessageTextStmt = `SELECT projections.message_texts3.aggregate_id,` +
+		` projections.message_texts3.sequence,` +
+		` projections.message_texts3.creation_date,` +
+		` projections.message_texts3.change_date,` +
+		` projections.message_texts3.state,` +
+		` projections.message_texts3.type,` +
+		` projections.message_texts3.language,` +
+		` projections.message_texts3.title,` +
+		` projections.message_texts3.pre_header,` +
+		` projections.message_texts3.subject,` +
+		` projections.message_texts3.greeting,` +
+		` projections.message_texts3.text,` +
+		` projections.message_texts3.button_text,` +
+		` projections.message_texts3.footer_text,` +
+		` projections.message_texts3.button_url` +
+		` FROM projections.message_texts3` +
 		` AS OF SYSTEM TIME '-1 ms'`
 	prepareMessgeTextCols = []string{
 		"aggregate_id",
@@ -46,6 +47,7 @@ var (
 		"text",
 		"button_text",
 		"footer_text",
+		"button_url",
 	}
 )
 
@@ -100,6 +102,7 @@ func Test_MessageTextPrepares(t *testing.T) {
 						"text",
 						"button_text",
 						"footer_text",
+						"button_url",
 					},
 				),
 			},
@@ -118,6 +121,7 @@ func Test_MessageTextPrepares(t *testing.T) {
 				Text:         "text",
 				ButtonText:   "button_text",
 				Footer:       "footer_text",
+				ButtonUrl:    "button_url",
 			},
 		},
 		{

@@ -16,26 +16,27 @@ import (
 )
 
 type AddLoginPolicy struct {
-	AllowUsernamePassword      bool
-	AllowRegister              bool
-	AllowExternalIDP           bool
-	IDPProviders               []*AddLoginPolicyIDP
-	ForceMFA                   bool
-	ForceMFALocalOnly          bool
-	SecondFactors              []domain.SecondFactorType
-	MultiFactors               []domain.MultiFactorType
-	PasswordlessType           domain.PasswordlessType
-	HidePasswordReset          bool
-	IgnoreUnknownUsernames     bool
-	AllowDomainDiscovery       bool
-	DefaultRedirectURI         string
-	PasswordCheckLifetime      time.Duration
-	ExternalLoginCheckLifetime time.Duration
-	MFAInitSkipLifetime        time.Duration
-	SecondFactorCheckLifetime  time.Duration
-	MultiFactorCheckLifetime   time.Duration
-	DisableLoginWithEmail      bool
-	DisableLoginWithPhone      bool
+	AllowUsernamePassword                     bool
+	AllowRegister                             bool
+	AllowExternalIDP                          bool
+	IDPProviders                              []*AddLoginPolicyIDP
+	ForceMFA                                  bool
+	ForceMFALocalOnly                         bool
+	SecondFactors                             []domain.SecondFactorType
+	MultiFactors                              []domain.MultiFactorType
+	PasswordlessType                          domain.PasswordlessType
+	HidePasswordReset                         bool
+	IgnoreUnknownUsernames                    bool
+	AllowDomainDiscovery                      bool
+	DefaultRedirectURI                        string
+	PasswordCheckLifetime                     time.Duration
+	ExternalLoginCheckLifetime                time.Duration
+	MFAInitSkipLifetime                       time.Duration
+	SecondFactorCheckLifetime                 time.Duration
+	MultiFactorCheckLifetime                  time.Duration
+	DisableLoginWithEmail                     bool
+	DisableLoginWithPhone                     bool
+	UseDefaultRedirectUriForNotificationLinks bool
 }
 
 type AddLoginPolicyIDP struct {
@@ -44,23 +45,24 @@ type AddLoginPolicyIDP struct {
 }
 
 type ChangeLoginPolicy struct {
-	AllowUsernamePassword      bool
-	AllowRegister              bool
-	AllowExternalIDP           bool
-	ForceMFA                   bool
-	ForceMFALocalOnly          bool
-	PasswordlessType           domain.PasswordlessType
-	HidePasswordReset          bool
-	IgnoreUnknownUsernames     bool
-	AllowDomainDiscovery       bool
-	DefaultRedirectURI         string
-	PasswordCheckLifetime      time.Duration
-	ExternalLoginCheckLifetime time.Duration
-	MFAInitSkipLifetime        time.Duration
-	SecondFactorCheckLifetime  time.Duration
-	MultiFactorCheckLifetime   time.Duration
-	DisableLoginWithEmail      bool
-	DisableLoginWithPhone      bool
+	AllowUsernamePassword                     bool
+	AllowRegister                             bool
+	AllowExternalIDP                          bool
+	ForceMFA                                  bool
+	ForceMFALocalOnly                         bool
+	PasswordlessType                          domain.PasswordlessType
+	HidePasswordReset                         bool
+	IgnoreUnknownUsernames                    bool
+	AllowDomainDiscovery                      bool
+	DefaultRedirectURI                        string
+	PasswordCheckLifetime                     time.Duration
+	ExternalLoginCheckLifetime                time.Duration
+	MFAInitSkipLifetime                       time.Duration
+	SecondFactorCheckLifetime                 time.Duration
+	MultiFactorCheckLifetime                  time.Duration
+	DisableLoginWithEmail                     bool
+	DisableLoginWithPhone                     bool
+	UseDefaultRedirectUriForNotificationLinks bool
 }
 
 func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *AddLoginPolicy) (_ *domain.ObjectDetails, err error) {
@@ -404,6 +406,9 @@ func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation
 		if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "Org-WSfdq", "Errors.Org.LoginPolicy.RedirectURIInvalid")
 		}
+		if policy.UseDefaultRedirectUriForNotificationLinks && policy.DefaultRedirectURI == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "Org-GFsqb", "Errors.Org.LoginPolicy.RedirectURIMustBeSet")
+		}
 		for _, factor := range policy.SecondFactors {
 			if !factor.Valid() {
 				return nil, zerrors.ThrowInvalidArgument(nil, "Org-SFeea", "Errors.Org.LoginPolicy.MFA.Unspecified")
@@ -446,6 +451,7 @@ func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation
 				policy.MFAInitSkipLifetime,
 				policy.SecondFactorCheckLifetime,
 				policy.MultiFactorCheckLifetime,
+				policy.UseDefaultRedirectUriForNotificationLinks,
 			))
 			for _, factor := range policy.SecondFactors {
 				cmds = append(cmds, org.NewLoginPolicySecondFactorAddedEvent(ctx, &a.Aggregate, factor))
@@ -465,6 +471,9 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 	return func() (preparation.CreateCommands, error) {
 		if ok := domain.ValidateDefaultRedirectURI(policy.DefaultRedirectURI); !ok {
 			return nil, zerrors.ThrowInvalidArgument(nil, "Org-Sfd21", "Errors.Org.LoginPolicy.RedirectURIInvalid")
+		}
+		if policy.UseDefaultRedirectUriForNotificationLinks && policy.DefaultRedirectURI == "" {
+			return nil, zerrors.ThrowInvalidArgument(nil, "Org-Sdf12", "Errors.Org.LoginPolicy.RedirectURIMustBeSet")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			wm := NewOrgLoginPolicyWriteModel(a.ID)
@@ -491,7 +500,8 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 				policy.ExternalLoginCheckLifetime,
 				policy.MFAInitSkipLifetime,
 				policy.SecondFactorCheckLifetime,
-				policy.MultiFactorCheckLifetime)
+				policy.MultiFactorCheckLifetime,
+				policy.UseDefaultRedirectUriForNotificationLinks)
 			if !hasChanged {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")
 			}

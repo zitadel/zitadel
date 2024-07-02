@@ -23,6 +23,7 @@ func ModelCustomMessageTextToPb(msg *query.MessageText) *text_pb.MessageCustomTe
 			msg.AggregateID,
 		),
 		IsDefault: msg.IsDefault,
+		ButtonUrl: msg.ButtonUrl,
 	}
 }
 

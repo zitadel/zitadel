@@ -241,6 +241,7 @@ Errors:
       NotFound: Politique de connexion non trouvée
       Invalid: La politique de connexion n'est pas valide
       RedirectURIInvalid: L'URI de redirection par défaut n'est pas valide
+      RedirectURIMustBeSet: L'URI de redirection par défaut doit être défini si son utilisation pour les liens de notification a été activée.
       NotExisting: La politique de connexion n'existe pas
       AlreadyExists: La politique de connexion existe déjà
       IdpProviderAlreadyExisting: Idp Provider existe déjà
@@ -364,6 +365,7 @@ Errors:
       NotExisting: La politique de connexion par défaut n'existe pas
       AlreadyExists: La politique de connexion par défaut existe déjà
       RedirectURIInvalid: L'URI de redirection par défaut n'est pas valide
+      RedirectURIMustBeSet: L'URI de redirection par défaut doit être défini si son utilisation pour les liens de notification a été activée.
       MFA:
         AlreadyExists: Le multifacteur existe déjà
         NotExisting: Multifacteur non existant

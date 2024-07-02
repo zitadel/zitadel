@@ -24,6 +24,7 @@ const (
 	MessageText                         = "Text"
 	MessageButtonText                   = "ButtonText"
 	MessageFooterText                   = "Footer"
+	MessageButtonUrl                    = "ButtonUrl"
 )
 
 type MessageTexts struct {
@@ -50,6 +51,7 @@ type CustomMessageText struct {
 	Text            string
 	ButtonText      string
 	FooterText      string
+	ButtonUrl       string
 }
 
 func (m *CustomMessageText) IsValid(supportedLanguages []language.Tag) error {

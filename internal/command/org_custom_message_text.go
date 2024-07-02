@@ -99,6 +99,13 @@ func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Agg
 			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType, domain.MessageFooterText, message.Language))
 		}
 	}
+	if existingMessageText.ButtonUrl != message.ButtonUrl {
+		if message.ButtonUrl != "" {
+			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType, domain.MessageButtonUrl, message.ButtonUrl, message.Language))
+		} else {
+			events = append(events, org.NewCustomTextRemovedEvent(ctx, orgAgg, message.MessageTextType, domain.MessageButtonUrl, message.Language))
+		}
+	}
 	return events, existingMessageText, nil
 }
 

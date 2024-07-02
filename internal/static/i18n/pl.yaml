@@ -241,6 +241,7 @@ Errors:
       NotFound: Polityka logowania nie znaleziona
       Invalid: Polityka logowania jest nieprawidłowa
       RedirectURIInvalid: Domyślny URI przekierowania jest nieprawidłowy
+      RedirectURIMustBeSet: Domyślny identyfikator URI przekierowania musi być ustawiony, jeśli włączono jego użycie dla łączy powiadomień
       NotExisting: Polityka logowania nie istnieje
       AlreadyExists: Polityka logowania już istnieje
       IdpProviderAlreadyExisting: Dostawca tożsamości już istnieje
@@ -364,6 +365,7 @@ Errors:
       NotExisting: Domyślna polityka logowania nie istnieje
       AlreadyExists: Domyślna polityka logowania już istnieje
       RedirectURIInvalid: Domyślny URI przekierowania jest nieprawidłowy
+      RedirectURIMustBeSet: Domyślny identyfikator URI przekierowania musi być ustawiony, jeśli włączono jego użycie dla łączy powiadomień
       MFA:
         AlreadyExists: Wielopoziomowe uwierzytelnianie już istnieje
         NotExisting: Wielopoziomowe uwierzytelnianie nie istnieje

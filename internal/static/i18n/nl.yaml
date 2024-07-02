@@ -241,6 +241,7 @@ Errors:
       NotFound: Login Beleid niet gevonden
       Invalid: Login Beleid is ongeldig
       RedirectURIInvalid: Standaard Redirect URI is ongeldig
+      RedirectURIMustBeSet: De standaard omleidings-URI moet worden ingesteld als het gebruik ervan voor de meldingslinks is ingeschakeld
       NotExisting: Login Beleid bestaat niet
       AlreadyExists: Login Beleid bestaat al
       IdpProviderAlreadyExisting: Identiteitsprovider bestaat al
@@ -364,6 +365,7 @@ Errors:
       NotExisting: Standaard Login Beleid bestaat niet
       AlreadyExists: Standaard Login Beleid bestaat al
       RedirectURIInvalid: Standaard Redirect URI is ongeldig
+      RedirectURIMustBeSet: De standaard omleidings-URI moet worden ingesteld als het gebruik ervan voor de meldingslinks is ingeschakeld
       MFA:
         AlreadyExists: Multifactor bestaat al
         NotExisting: Multifactor bestaat niet

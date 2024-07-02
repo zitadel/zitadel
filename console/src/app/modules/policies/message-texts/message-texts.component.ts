@@ -84,6 +84,7 @@ const REQUESTMAP = {
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomPasswordChangeMessageTextRequest => {
         const req = new SetCustomPasswordChangeMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -101,6 +102,7 @@ const REQUESTMAP = {
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomInitMessageTextRequest => {
         const req = new SetCustomInitMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -118,6 +120,7 @@ const REQUESTMAP = {
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomVerifyEmailMessageTextRequest => {
         const req = new SetCustomVerifyEmailMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -135,6 +138,7 @@ const REQUESTMAP = {
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetCustomVerifyPhoneMessageTextRequest => {
         const req = new SetCustomVerifyPhoneMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -181,6 +185,7 @@ const REQUESTMAP = {
       ): SetCustomPasswordResetMessageTextRequest => {
         const req = new SetCustomPasswordResetMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -200,6 +205,7 @@ const REQUESTMAP = {
       ): SetCustomDomainClaimedMessageTextRequest => {
         const req = new SetCustomDomainClaimedMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -219,6 +225,7 @@ const REQUESTMAP = {
       ): SetCustomPasswordlessRegistrationMessageTextRequest => {
         const req = new SetCustomPasswordlessRegistrationMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -237,6 +244,7 @@ const REQUESTMAP = {
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultPasswordChangeMessageTextRequest => {
         const req = new SetDefaultPasswordChangeMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -253,6 +261,7 @@ const REQUESTMAP = {
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultInitMessageTextRequest => {
         const req = new SetDefaultInitMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -269,6 +278,7 @@ const REQUESTMAP = {
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifyEmailMessageTextRequest => {
         const req = new SetDefaultVerifyEmailMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -285,6 +295,7 @@ const REQUESTMAP = {
       setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifyPhoneMessageTextRequest => {
         const req = new SetDefaultVerifyPhoneMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -328,6 +339,7 @@ const REQUESTMAP = {
       ): SetDefaultPasswordResetMessageTextRequest => {
         const req = new SetDefaultPasswordResetMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -346,6 +358,7 @@ const REQUESTMAP = {
       ): SetDefaultDomainClaimedMessageTextRequest => {
         const req = new SetDefaultDomainClaimedMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -364,6 +377,7 @@ const REQUESTMAP = {
       ): SetDefaultPasswordlessRegistrationMessageTextRequest => {
         const req = new SetDefaultPasswordlessRegistrationMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
+        req.setButtonUrl(map.buttonUrl ?? '');
         req.setFooterText(map.footerText ?? '');
         req.setGreeting(map.greeting ?? '');
         req.setPreHeader(map.preHeader ?? '');
@@ -783,7 +797,16 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
   }
 
   private stripSMS(prom: Promise<any>): Promise<any> {
-    return this.strip(prom, ['details', 'buttonText', 'footerText', 'greeting', 'preHeader', 'subject', 'title']);
+    return this.strip(prom, [
+      'details',
+      'buttonText',
+      'buttonUrl',
+      'footerText',
+      'greeting',
+      'preHeader',
+      'subject',
+      'title',
+    ]);
   }
 
   public ngOnDestroy(): void {

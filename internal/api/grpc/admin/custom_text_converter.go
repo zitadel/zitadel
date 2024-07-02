@@ -20,6 +20,7 @@ func SetInitCustomTextToDomain(msg *admin_pb.SetDefaultInitMessageTextRequest) *
 		Text:            msg.Text,
 		ButtonText:      msg.ButtonText,
 		FooterText:      msg.FooterText,
+		ButtonUrl:       msg.ButtonUrl,
 	}
 }
 
@@ -35,6 +36,7 @@ func SetPasswordResetCustomTextToDomain(msg *admin_pb.SetDefaultPasswordResetMes
 		Text:            msg.Text,
 		ButtonText:      msg.ButtonText,
 		FooterText:      msg.FooterText,
+		ButtonUrl:       msg.ButtonUrl,
 	}
 }
 
@@ -50,6 +52,7 @@ func SetVerifyEmailCustomTextToDomain(msg *admin_pb.SetDefaultVerifyEmailMessage
 		Text:            msg.Text,
 		ButtonText:      msg.ButtonText,
 		FooterText:      msg.FooterText,
+		ButtonUrl:       msg.ButtonUrl,
 	}
 }
 
@@ -65,6 +68,7 @@ func SetVerifyPhoneCustomTextToDomain(msg *admin_pb.SetDefaultVerifyPhoneMessage
 		Text:            msg.Text,
 		ButtonText:      msg.ButtonText,
 		FooterText:      msg.FooterText,
+		ButtonUrl:       msg.ButtonUrl,
 	}
 }
 
@@ -89,6 +93,7 @@ func SetVerifyEmailOTPCustomTextToDomain(msg *admin_pb.SetDefaultVerifyEmailOTPM
 		Text:            msg.Text,
 		ButtonText:      msg.ButtonText,
 		FooterText:      msg.FooterText,
+		ButtonUrl:       msg.ButtonUrl,
 	}
 }
 
@@ -104,6 +109,7 @@ func SetDomainClaimedCustomTextToDomain(msg *admin_pb.SetDefaultDomainClaimedMes
 		Text:            msg.Text,
 		ButtonText:      msg.ButtonText,
 		FooterText:      msg.FooterText,
+		ButtonUrl:       msg.ButtonUrl,
 	}
 }
 
@@ -119,6 +125,7 @@ func SetPasswordChangeCustomTextToDomain(msg *admin_pb.SetDefaultPasswordChangeM
 		Text:            msg.Text,
 		ButtonText:      msg.ButtonText,
 		FooterText:      msg.FooterText,
+		ButtonUrl:       msg.ButtonUrl,
 	}
 }
 
@@ -134,6 +141,7 @@ func SetPasswordlessRegistrationCustomTextToDomain(msg *admin_pb.SetDefaultPassw
 		Text:            msg.Text,
 		ButtonText:      msg.ButtonText,
 		FooterText:      msg.FooterText,
+		ButtonUrl:       msg.ButtonUrl,
 	}
 }
 

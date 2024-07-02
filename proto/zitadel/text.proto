@@ -53,6 +53,13 @@ message MessageCustomText {
         }
     ];
     bool is_default = 9;
+    string button_url = 10 [
+        (validate.rules) .string = {max_len: 2048},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"URL associated with the button\""
+            max_length: 2048;
+        }
+    ];
 }
 
 message LoginCustomText {
