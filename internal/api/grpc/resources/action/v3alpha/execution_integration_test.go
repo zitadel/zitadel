@@ -11,8 +11,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	settings_object "github.com/zitadel/zitadel/pkg/grpc/settings/object/v3alpha"
 )
 
 func executionTargetsSingleTarget(id string) []*action.ExecutionTargetType {
@@ -57,7 +58,9 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						Request: &action.RequestExecution{},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			wantErr: true,
 		},
@@ -74,7 +77,9 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			wantErr: true,
 		},
@@ -91,12 +96,17 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -113,7 +123,9 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			wantErr: true,
 		},
@@ -130,12 +142,17 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -152,12 +169,17 @@ func TestServer_SetExecution_Request(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -171,7 +193,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			integration.AssertDetails(t, tt.want, got)
+			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
 			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
@@ -193,7 +215,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 	}
 	Tester.SetExecution(CTX, t,
 		executionCond,
-		executionTargetsSingleTarget(targetResp.GetId()),
+		executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
 	)
 
 	circularExecutionService := &action.Condition{
@@ -235,7 +257,9 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			ctx:  CTX,
 			req: &action.SetExecutionRequest{
 				Condition: circularExecutionService,
-				Targets:   executionTargetsSingleInclude(circularExecutionMethod),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleInclude(circularExecutionMethod),
+				},
 			},
 			wantErr: true,
 		},
@@ -252,12 +276,18 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleInclude(executionCond),
+				Execution: &action.Execution{
+
+					Targets: executionTargetsSingleInclude(executionCond),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -274,12 +304,18 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleInclude(executionCond),
+				Execution: &action.Execution{
+
+					Targets: executionTargetsSingleInclude(executionCond),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -293,175 +329,10 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			integration.AssertDetails(t, tt.want, got)
+			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
 			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
-		})
-	}
-}
-
-func TestServer_DeleteExecution_Request(t *testing.T) {
-	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
-
-	tests := []struct {
-		name    string
-		ctx     context.Context
-		dep     func(ctx context.Context, request *action.DeleteExecutionRequest) error
-		req     *action.DeleteExecutionRequest
-		want    *action.DeleteExecutionResponse
-		wantErr bool
-	}{
-		{
-			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Request{
-						Request: &action.RequestExecution{
-							Condition: &action.RequestExecution_All{All: true},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "no condition, error",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Request{
-						Request: &action.RequestExecution{},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "method, not existing",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Request{
-						Request: &action.RequestExecution{
-							Condition: &action.RequestExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/NotExisting",
-							},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "method, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
-				return nil
-			},
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Request{
-						Request: &action.RequestExecution{
-							Condition: &action.RequestExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/GetSession",
-							},
-						},
-					},
-				},
-			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-		{
-			name: "service, not existing",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Request{
-						Request: &action.RequestExecution{
-							Condition: &action.RequestExecution_Service{
-								Service: "NotExistingService",
-							},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "service, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
-				return nil
-			},
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Request{
-						Request: &action.RequestExecution{
-							Condition: &action.RequestExecution_Service{
-								Service: "zitadel.user.v2beta.UserService",
-							},
-						},
-					},
-				},
-			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-		{
-			name: "all, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
-				return nil
-			},
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Request{
-						Request: &action.RequestExecution{
-							Condition: &action.RequestExecution_All{
-								All: true,
-							},
-						},
-					},
-				},
-			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.dep != nil {
-				err := tt.dep(tt.ctx, tt.req)
-				require.NoError(t, err)
-			}
-
-			got, err := Client.DeleteExecution(tt.ctx, tt.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-
-			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }
@@ -500,7 +371,9 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						Response: &action.ResponseExecution{},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			wantErr: true,
 		},
@@ -517,7 +390,9 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			wantErr: true,
 		},
@@ -534,12 +409,17 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -556,7 +436,9 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			wantErr: true,
 		},
@@ -573,12 +455,17 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -595,12 +482,17 @@ func TestServer_SetExecution_Response(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -614,177 +506,10 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			integration.AssertDetails(t, tt.want, got)
+			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
 			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
-		})
-	}
-}
-
-func TestServer_DeleteExecution_Response(t *testing.T) {
-	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
-
-	tests := []struct {
-		name    string
-		ctx     context.Context
-		dep     func(ctx context.Context, request *action.DeleteExecutionRequest) error
-		req     *action.DeleteExecutionRequest
-		want    *action.DeleteExecutionResponse
-		wantErr bool
-	}{
-		{
-			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Response{
-						Response: &action.ResponseExecution{
-							Condition: &action.ResponseExecution_All{
-								All: true,
-							},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "no condition, error",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Response{
-						Response: &action.ResponseExecution{},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "method, not existing",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Response{
-						Response: &action.ResponseExecution{
-							Condition: &action.ResponseExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/NotExisting",
-							},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "method, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
-				return nil
-			},
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Response{
-						Response: &action.ResponseExecution{
-							Condition: &action.ResponseExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/GetSession",
-							},
-						},
-					},
-				},
-			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-		{
-			name: "service, not existing",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Response{
-						Response: &action.ResponseExecution{
-							Condition: &action.ResponseExecution_Service{
-								Service: "NotExistingService",
-							},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "service, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
-				return nil
-			},
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Response{
-						Response: &action.ResponseExecution{
-							Condition: &action.ResponseExecution_Service{
-								Service: "zitadel.user.v2beta.UserService",
-							},
-						},
-					},
-				},
-			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-		{
-			name: "all, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
-				return nil
-			},
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Response{
-						Response: &action.ResponseExecution{
-							Condition: &action.ResponseExecution_All{
-								All: true,
-							},
-						},
-					},
-				},
-			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.dep != nil {
-				err := tt.dep(tt.ctx, tt.req)
-				require.NoError(t, err)
-			}
-
-			got, err := Client.DeleteExecution(tt.ctx, tt.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-
-			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }
@@ -825,7 +550,9 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						Event: &action.EventExecution{},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			wantErr: true,
 		},
@@ -863,12 +590,17 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -906,12 +638,17 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -928,12 +665,17 @@ func TestServer_SetExecution_Event(t *testing.T) {
 						},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -947,196 +689,10 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			integration.AssertDetails(t, tt.want, got)
+			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
 			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
-		})
-	}
-}
-
-func TestServer_DeleteExecution_Event(t *testing.T) {
-	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
-
-	tests := []struct {
-		name    string
-		ctx     context.Context
-		dep     func(ctx context.Context, request *action.DeleteExecutionRequest) error
-		req     *action.DeleteExecutionRequest
-		want    *action.DeleteExecutionResponse
-		wantErr bool
-	}{
-		{
-			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Event{
-						Event: &action.EventExecution{
-							Condition: &action.EventExecution_All{
-								All: true,
-							},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "no condition, error",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Event{
-						Event: &action.EventExecution{},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		/*
-			//TODO: add when check is implemented
-			{
-				name: "event, not existing",
-				ctx:  CTX,
-				req: &action.DeleteExecutionRequest{
-					Condition: &action.Condition{
-						ConditionType: &action.Condition_Event{
-							Event: &action.EventExecution{
-								Condition: &action.EventExecution_Event{
-									Event: "xxx",
-								},
-							},
-						},
-					},
-				},
-				wantErr: true,
-			},
-		*/
-		{
-			name: "event, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
-				return nil
-			},
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Event{
-						Event: &action.EventExecution{
-							Condition: &action.EventExecution_Event{
-								Event: "xxx",
-							},
-						},
-					},
-				},
-			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-		{
-			name: "group, not existing",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Event{
-						Event: &action.EventExecution{
-							Condition: &action.EventExecution_Group{
-								Group: "xxx",
-							},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "group, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
-				return nil
-			},
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Event{
-						Event: &action.EventExecution{
-							Condition: &action.EventExecution_Group{
-								Group: "xxx",
-							},
-						},
-					},
-				},
-			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-		{
-			name: "all, not existing",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Event{
-						Event: &action.EventExecution{
-							Condition: &action.EventExecution_All{
-								All: true,
-							},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "all, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
-				return nil
-			},
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Event{
-						Event: &action.EventExecution{
-							Condition: &action.EventExecution_All{
-								All: true,
-							},
-						},
-					},
-				},
-			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.dep != nil {
-				err := tt.dep(tt.ctx, tt.req)
-				require.NoError(t, err)
-			}
-
-			got, err := Client.DeleteExecution(tt.ctx, tt.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-
-			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }
@@ -1175,7 +731,9 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Response: &action.ResponseExecution{},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			wantErr: true,
 		},
@@ -1188,7 +746,9 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Function: &action.FunctionExecution{Name: "xxx"},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			wantErr: true,
 		},
@@ -1201,12 +761,17 @@ func TestServer_SetExecution_Function(t *testing.T) {
 						Function: &action.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
 					},
 				},
-				Targets: executionTargetsSingleTarget(targetResp.GetId()),
+				Execution: &action.Execution{
+					Targets: executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
+				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+				Details: &settings_object.Details{
+					ChangeDate: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -1220,103 +785,10 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			integration.AssertDetails(t, tt.want, got)
+			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
 			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
-		})
-	}
-}
-
-func TestServer_DeleteExecution_Function(t *testing.T) {
-	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
-
-	tests := []struct {
-		name    string
-		ctx     context.Context
-		dep     func(ctx context.Context, request *action.DeleteExecutionRequest) error
-		req     *action.DeleteExecutionRequest
-		want    *action.DeleteExecutionResponse
-		wantErr bool
-	}{
-		{
-			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Response{
-						Response: &action.ResponseExecution{
-							Condition: &action.ResponseExecution_All{
-								All: true,
-							},
-						},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "no condition, error",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Response{
-						Response: &action.ResponseExecution{},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "function, not existing",
-			ctx:  CTX,
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Function{
-						Function: &action.FunctionExecution{Name: "xxx"},
-					},
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "function, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.DeleteExecutionRequest) error {
-				Tester.SetExecution(ctx, t, request.GetCondition(), executionTargetsSingleTarget(targetResp.GetId()))
-				return nil
-			},
-			req: &action.DeleteExecutionRequest{
-				Condition: &action.Condition{
-					ConditionType: &action.Condition_Function{
-						Function: &action.FunctionExecution{Name: "Action.Flow.Type.ExternalAuthentication.Action.TriggerType.PostAuthentication"},
-					},
-				},
-			},
-			want: &action.DeleteExecutionResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.dep != nil {
-				err := tt.dep(tt.ctx, tt.req)
-				require.NoError(t, err)
-			}
-
-			got, err := Client.DeleteExecution(tt.ctx, tt.req)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-
-			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }

@@ -84,7 +84,7 @@ func createTargetToCommand(req *action.CreateTargetRequest) *command.AddTarget {
 
 func patchTargetToCommand(req *action.PatchTargetRequest) *command.ChangeTarget {
 	reqTarget := req.GetTarget()
-	if req == nil {
+	if reqTarget == nil {
 		return nil
 	}
 	target := &command.ChangeTarget{

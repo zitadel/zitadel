@@ -9,15 +9,15 @@ import (
 	"time"
 
 	"github.com/muhlemmer/gu"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
 func TestServer_CreateTarget(t *testing.T) {
@@ -25,14 +25,14 @@ func TestServer_CreateTarget(t *testing.T) {
 	tests := []struct {
 		name    string
 		ctx     context.Context
-		req     *action.CreateTargetRequest
-		want    *action.CreateTargetResponse
+		req     *action.Target
+		want    *resource_object.Details
 		wantErr bool
 	}{
 		{
 			name: "missing permission",
 			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name: fmt.Sprint(time.Now().UnixNano() + 1),
 			},
 			wantErr: true,
@@ -40,7 +40,7 @@ func TestServer_CreateTarget(t *testing.T) {
 		{
 			name: "empty name",
 			ctx:  CTX,
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name: "",
 			},
 			wantErr: true,
@@ -48,7 +48,7 @@ func TestServer_CreateTarget(t *testing.T) {
 		{
 			name: "empty type",
 			ctx:  CTX,
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name:       fmt.Sprint(time.Now().UnixNano() + 1),
 				TargetType: nil,
 			},
@@ -57,9 +57,9 @@ func TestServer_CreateTarget(t *testing.T) {
 		{
 			name: "empty webhook url",
 			ctx:  CTX,
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name: fmt.Sprint(time.Now().UnixNano() + 1),
-				TargetType: &action.CreateTargetRequest_RestWebhook{
+				TargetType: &action.Target_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{},
 				},
 			},
@@ -68,9 +68,9 @@ func TestServer_CreateTarget(t *testing.T) {
 		{
 			name: "empty request response url",
 			ctx:  CTX,
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name: fmt.Sprint(time.Now().UnixNano() + 1),
-				TargetType: &action.CreateTargetRequest_RestCall{
+				TargetType: &action.Target_RestCall{
 					RestCall: &action.SetRESTCall{},
 				},
 			},
@@ -79,10 +79,10 @@ func TestServer_CreateTarget(t *testing.T) {
 		{
 			name: "empty timeout",
 			ctx:  CTX,
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
 				Endpoint: "https://example.com",
-				TargetType: &action.CreateTargetRequest_RestWebhook{
+				TargetType: &action.Target_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{},
 				},
 				Timeout: nil,
@@ -92,78 +92,82 @@ func TestServer_CreateTarget(t *testing.T) {
 		{
 			name: "async, ok",
 			ctx:  CTX,
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
 				Endpoint: "https://example.com",
-				TargetType: &action.CreateTargetRequest_RestAsync{
+				TargetType: &action.Target_RestAsync{
 					RestAsync: &action.SetRESTAsync{},
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &action.CreateTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
 		{
 			name: "webhook, ok",
 			ctx:  CTX,
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
 				Endpoint: "https://example.com",
-				TargetType: &action.CreateTargetRequest_RestWebhook{
+				TargetType: &action.Target_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{
 						InterruptOnError: false,
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &action.CreateTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
 		{
 			name: "webhook, interrupt on error, ok",
 			ctx:  CTX,
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
 				Endpoint: "https://example.com",
-				TargetType: &action.CreateTargetRequest_RestWebhook{
+				TargetType: &action.Target_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{
 						InterruptOnError: true,
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &action.CreateTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
 		{
 			name: "call, ok",
 			ctx:  CTX,
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
 				Endpoint: "https://example.com",
-				TargetType: &action.CreateTargetRequest_RestCall{
+				TargetType: &action.Target_RestCall{
 					RestCall: &action.SetRESTCall{
 						InterruptOnError: false,
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &action.CreateTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
@@ -171,35 +175,34 @@ func TestServer_CreateTarget(t *testing.T) {
 		{
 			name: "call, interruptOnError, ok",
 			ctx:  CTX,
-			req: &action.CreateTargetRequest{
+			req: &action.Target{
 				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
 				Endpoint: "https://example.com",
-				TargetType: &action.CreateTargetRequest_RestCall{
+				TargetType: &action.Target_RestCall{
 					RestCall: &action.SetRESTCall{
 						InterruptOnError: true,
 					},
 				},
 				Timeout: durationpb.New(10 * time.Second),
 			},
-			want: &action.CreateTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.CreateTarget(tt.ctx, tt.req)
+			got, err := Client.CreateTarget(tt.ctx, &action.CreateTargetRequest{Target: tt.req})
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
-
-			integration.AssertDetails(t, tt.want, got)
-			assert.NotEmpty(t, got.GetId())
+			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }
@@ -208,147 +211,166 @@ func TestServer_UpdateTarget(t *testing.T) {
 	ensureFeatureEnabled(t)
 	type args struct {
 		ctx context.Context
-		req *action.UpdateTargetRequest
+		req *action.PatchTargetRequest
 	}
 	tests := []struct {
 		name    string
-		prepare func(request *action.UpdateTargetRequest) error
+		prepare func(request *action.PatchTargetRequest) error
 		args    args
-		want    *action.UpdateTargetResponse
+		want    *resource_object.Details
 		wantErr bool
 	}{
 		{
 			name: "missing permission",
-			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
-				request.TargetId = targetID
+			prepare: func(request *action.PatchTargetRequest) error {
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				request.Id = targetID
 				return nil
 			},
 			args: args{
 				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-				req: &action.UpdateTargetRequest{
-					Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+				req: &action.PatchTargetRequest{
+					Target: &action.PatchTarget{
+						Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+					},
 				},
 			},
 			wantErr: true,
 		},
 		{
 			name: "not existing",
-			prepare: func(request *action.UpdateTargetRequest) error {
-				request.TargetId = "notexisting"
+			prepare: func(request *action.PatchTargetRequest) error {
+				request.Id = "notexisting"
 				return nil
 			},
 			args: args{
 				ctx: CTX,
-				req: &action.UpdateTargetRequest{
-					Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+				req: &action.PatchTargetRequest{
+					Target: &action.PatchTarget{
+						Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+					},
 				},
 			},
 			wantErr: true,
 		},
 		{
 			name: "change name, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
-				request.TargetId = targetID
+			prepare: func(request *action.PatchTargetRequest) error {
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				request.Id = targetID
 				return nil
 			},
 			args: args{
 				ctx: CTX,
-				req: &action.UpdateTargetRequest{
-					Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+				req: &action.PatchTargetRequest{
+					Target: &action.PatchTarget{
+						Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+					},
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
 		{
 			name: "change type, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
-				request.TargetId = targetID
+			prepare: func(request *action.PatchTargetRequest) error {
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				request.Id = targetID
 				return nil
 			},
 			args: args{
 				ctx: CTX,
-				req: &action.UpdateTargetRequest{
-					TargetType: &action.UpdateTargetRequest_RestCall{
-						RestCall: &action.SetRESTCall{
-							InterruptOnError: true,
+				req: &action.PatchTargetRequest{
+					Target: &action.PatchTarget{
+						TargetType: &action.PatchTarget_RestCall{
+							RestCall: &action.SetRESTCall{
+								InterruptOnError: true,
+							},
 						},
 					},
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
 		{
 			name: "change url, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
-				request.TargetId = targetID
+			prepare: func(request *action.PatchTargetRequest) error {
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				request.Id = targetID
 				return nil
 			},
 			args: args{
 				ctx: CTX,
-				req: &action.UpdateTargetRequest{
-					Endpoint: gu.Ptr("https://example.com/hooks/new"),
+				req: &action.PatchTargetRequest{
+					Target: &action.PatchTarget{
+						Endpoint: gu.Ptr("https://example.com/hooks/new"),
+					},
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
 		{
 			name: "change timeout, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetId()
-				request.TargetId = targetID
+			prepare: func(request *action.PatchTargetRequest) error {
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				request.Id = targetID
 				return nil
 			},
 			args: args{
 				ctx: CTX,
-				req: &action.UpdateTargetRequest{
-					Timeout: durationpb.New(20 * time.Second),
+				req: &action.PatchTargetRequest{
+					Target: &action.PatchTarget{
+						Timeout: durationpb.New(20 * time.Second),
+					},
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
 		{
 			name: "change type async, ok",
-			prepare: func(request *action.UpdateTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeAsync, false).GetId()
-				request.TargetId = targetID
+			prepare: func(request *action.PatchTargetRequest) error {
+				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeAsync, false).GetDetails().GetId()
+				request.Id = targetID
 				return nil
 			},
 			args: args{
 				ctx: CTX,
-				req: &action.UpdateTargetRequest{
-					TargetType: &action.UpdateTargetRequest_RestAsync{
-						RestAsync: &action.SetRESTAsync{},
+				req: &action.PatchTargetRequest{
+					Target: &action.PatchTarget{
+						TargetType: &action.PatchTarget_RestAsync{
+							RestAsync: &action.SetRESTAsync{},
+						},
 					},
 				},
 			},
-			want: &action.UpdateTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
@@ -358,13 +380,13 @@ func TestServer_UpdateTarget(t *testing.T) {
 			err := tt.prepare(tt.args.req)
 			require.NoError(t, err)
 
-			got, err := Client.UpdateTarget(tt.args.ctx, tt.args.req)
+			got, err := Client.PatchTarget(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
-			integration.AssertDetails(t, tt.want, got)
+			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }
@@ -376,14 +398,14 @@ func TestServer_DeleteTarget(t *testing.T) {
 		name    string
 		ctx     context.Context
 		req     *action.DeleteTargetRequest
-		want    *action.DeleteTargetResponse
+		want    *resource_object.Details
 		wantErr bool
 	}{
 		{
 			name: "missing permission",
 			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
 			req: &action.DeleteTargetRequest{
-				TargetId: target.GetId(),
+				Id: target.GetDetails().GetId(),
 			},
 			wantErr: true,
 		},
@@ -391,7 +413,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 			name: "empty id",
 			ctx:  CTX,
 			req: &action.DeleteTargetRequest{
-				TargetId: "",
+				Id: "",
 			},
 			wantErr: true,
 		},
@@ -399,12 +421,13 @@ func TestServer_DeleteTarget(t *testing.T) {
 			name: "delete target",
 			ctx:  CTX,
 			req: &action.DeleteTargetRequest{
-				TargetId: target.GetId(),
+				Id: target.GetDetails().GetId(),
 			},
-			want: &action.DeleteTargetResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+			want: &resource_object.Details{
+				ChangeDate: timestamppb.Now(),
+				Owner: &object.Owner{
+					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+					Id:   Tester.Instance.InstanceID(),
 				},
 			},
 		},
@@ -417,7 +440,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 				return
 			}
 			require.NoError(t, err)
-			integration.AssertDetails(t, tt.want, got)
+			integration.AssertResourceDetails(t, tt.want, got.Details)
 		})
 	}
 }

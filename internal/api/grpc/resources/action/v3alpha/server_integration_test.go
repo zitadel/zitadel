@@ -13,14 +13,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
 var (
 	CTX    context.Context
 	Tester *integration.Tester
-	Client action.ActionServiceClient
+	Client action.ZITADELActionsClient
 )
 
 func TestMain(m *testing.M) {
