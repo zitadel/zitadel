@@ -6,8 +6,10 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -144,10 +146,12 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	if grantID == "" || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
 	}
+
 	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
-		return details, err
+		return nil, err
 	}
+
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
 	if err != nil {
 		return details, err
@@ -172,10 +176,12 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 	if grantID == "" || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
 	}
+
 	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
-		return details, err
+		return nil, err
 	}
+
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
 	if err != nil {
 		return details, err
@@ -199,10 +205,12 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	if grantID == "" || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-1m9fJ", "Errors.IDMissing")
 	}
+
 	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
-		return details, zerrors.ThrowPreconditionFailed(err, "PROJECT-6mf9s", "Errors.Project.NotFound")
+		return nil, err
 	}
+
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
 	if err != nil {
 		return details, err
@@ -248,6 +256,9 @@ func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, proj
 }
 
 func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGrant *domain.ProjectGrant) error {
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProjectGrant) {
+		return c.checkProjectGrantPreConditionOld(ctx, projectGrant)
+	}
 	results, err := c.eventstore.Search(
 		ctx,
 		// project state query

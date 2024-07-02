@@ -6,9 +6,11 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -204,6 +206,10 @@ func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOw
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProject) {
+		return c.checkProjectExistsOld(ctx, projectID, resourceOwner)
+	}
+
 	_, state, err := c.projectAggregateByID(ctx, projectID, resourceOwner)
 	if err != nil || !state.Valid() {
 		return zerrors.ThrowPreconditionFailed(err, "COMMA-VCnwD", "Errors.Project.NotFound")
@@ -214,6 +220,10 @@ func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOw
 func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Project, resourceOwner string) (*domain.Project, error) {
 	if !projectChange.IsValid() || projectChange.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-4m9vS", "Errors.Project.Invalid")
+	}
+
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProject) {
+		return c.changeProjectOld(ctx, projectChange, resourceOwner)
 	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectChange.AggregateID, resourceOwner)
@@ -253,6 +263,10 @@ func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Proj
 func (c *Commands) DeactivateProject(ctx context.Context, projectID string, resourceOwner string) (*domain.ObjectDetails, error) {
 	if projectID == "" || resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-88iF0", "Errors.Project.ProjectIDMissing")
+	}
+
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProject) {
+		return c.deactivateProjectOld(ctx, projectID, resourceOwner)
 	}
 
 	projectAgg, state, err := c.projectAggregateByID(ctx, projectID, resourceOwner)
@@ -295,6 +309,10 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-3ihsF", "Errors.Project.ProjectIDMissing")
 	}
 
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProject) {
+		return c.reactivateProjectOld(ctx, projectID, resourceOwner)
+	}
+
 	projectAgg, state, err := c.projectAggregateByID(ctx, projectID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -334,6 +352,10 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner string, cascadingUserGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if projectID == "" || resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-66hM9", "Errors.Project.ProjectIDMissing")
+	}
+
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProject) {
+		return c.removeProjectOld(ctx, projectID, resourceOwner)
 	}
 
 	existingProject, err := c.getProjectWriteModelByID(ctx, projectID, resourceOwner)
