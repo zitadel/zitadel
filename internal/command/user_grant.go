@@ -291,21 +291,14 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	preConditions := NewUserGrantPreConditionReadModel(usergrant.UserID, usergrant.ProjectID, usergrant.ProjectGrantID, resourceOwner)
-	err = c.eventstore.FilterToQueryReducer(ctx, preConditions)
+	if err := c.checkUserExists(ctx, usergrant.UserID, ""); err != nil {
+		return err
+	}
+	existingRoleKeys, err := c.searchProjectGrantState(ctx, usergrant.AggregateID, resourceOwner)
 	if err != nil {
 		return err
 	}
-	if !preConditions.UserExists {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4f8sg", "Errors.User.NotFound")
-	}
-	if usergrant.ProjectGrantID == "" && !preConditions.ProjectExists {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
-	}
-	if usergrant.ProjectGrantID != "" && !preConditions.ProjectGrantExists {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4m9ff", "Errors.Project.Grant.NotFound")
-	}
-	if usergrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
+	if usergrant.HasInvalidRoles(existingRoleKeys) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
 	}
 	return nil

@@ -8,7 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-var (
+const (
 	UniqueRoleType      = "project_role"
 	roleEventTypePrefix = projectEventTypePrefix + "role."
 	RoleAddedType       = roleEventTypePrefix + "added"
