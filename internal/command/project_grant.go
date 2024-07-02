@@ -259,38 +259,48 @@ func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGra
 	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProjectGrant) {
 		return c.checkProjectGrantPreConditionOld(ctx, projectGrant)
 	}
+	existingRoleKeys, err := c.searchProjectGrantState(ctx, projectGrant.AggregateID, projectGrant.GrantedOrgID)
+	if err != nil {
+		return err
+	}
+	if projectGrant.HasInvalidRoles(existingRoleKeys) {
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
+	}
+	return nil
+}
+
+func (c *Commands) searchProjectGrantState(ctx context.Context, projectID, grantedOrgID string) (existingRoleKeys []string, err error) {
 	results, err := c.eventstore.Search(
 		ctx,
 		// project state query
 		map[eventstore.FieldType]any{
 			eventstore.FieldTypeAggregateType: project.AggregateType,
-			eventstore.FieldTypeAggregateID:   projectGrant.AggregateID,
+			eventstore.FieldTypeAggregateID:   projectID,
 			eventstore.FieldTypeFieldName:     project.ProjectStateSearchField,
 			eventstore.FieldTypeObjectType:    project.ProjectSearchType,
 		},
 		// granted org query
 		map[eventstore.FieldType]any{
 			eventstore.FieldTypeAggregateType: org.AggregateType,
-			eventstore.FieldTypeAggregateID:   projectGrant.GrantedOrgID,
+			eventstore.FieldTypeAggregateID:   grantedOrgID,
 			eventstore.FieldTypeFieldName:     org.OrgStateSearchField,
 			eventstore.FieldTypeObjectType:    org.OrgSearchType,
 		},
 		// role query
 		map[eventstore.FieldType]any{
 			eventstore.FieldTypeAggregateType: project.AggregateType,
-			eventstore.FieldTypeAggregateID:   projectGrant.AggregateID,
+			eventstore.FieldTypeAggregateID:   projectID,
 			eventstore.FieldTypeFieldName:     project.ProjectRoleKeySearchField,
 			eventstore.FieldTypeObjectType:    project.ProjectRoleSearchType,
 		},
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var (
 		existsProject    bool
 		existsGrantedOrg bool
-		existingRoleKeys []string
 	)
 
 	for _, result := range results {
@@ -299,34 +309,31 @@ func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGra
 			var role string
 			err := result.Value.Unmarshal(&role)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			existingRoleKeys = append(existingRoleKeys, role)
 		case org.OrgSearchType:
 			var state domain.OrgState
 			err := result.Value.Unmarshal(&state)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			existsGrantedOrg = state.Valid() && state != domain.OrgStateRemoved
 		case project.ProjectSearchType:
 			var state domain.ProjectState
 			err := result.Value.Unmarshal(&state)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			existsProject = state.Valid() && state != domain.ProjectStateRemoved
 		}
 	}
 
 	if !existsProject {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
 	}
 	if !existsGrantedOrg {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
 	}
-	if projectGrant.HasInvalidRoles(existingRoleKeys) {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
-	}
-	return nil
+	return existingRoleKeys, nil
 }
