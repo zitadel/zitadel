@@ -627,6 +627,7 @@ func (c *Commands) prepareAddOrgOAuthProvider(a *org.Aggregate, writeModel *OrgO
 					provider.UserEndpoint,
 					provider.IDAttribute,
 					provider.Scopes,
+					provider.UsePkce,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -682,6 +683,7 @@ func (c *Commands) prepareUpdateOrgOAuthProvider(a *org.Aggregate, writeModel *O
 				provider.UserEndpoint,
 				provider.IDAttribute,
 				provider.Scopes,
+				provider.UsePkce,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -730,6 +732,7 @@ func (c *Commands) prepareAddOrgOIDCProvider(a *org.Aggregate, writeModel *OrgOI
 					secret,
 					provider.Scopes,
 					provider.IsIDTokenMapping,
+					provider.UsePkce,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -774,6 +777,7 @@ func (c *Commands) prepareUpdateOrgOIDCProvider(a *org.Aggregate, writeModel *Or
 				c.idpConfigEncryption,
 				provider.Scopes,
 				provider.IsIDTokenMapping,
+				provider.UsePkce,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {

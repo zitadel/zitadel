@@ -482,6 +482,7 @@ func startAPIs(
 		keys.User,
 		keys.IDPConfig,
 		keys.CSRFCookieKey,
+		keys.OIDCKey,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login: %w", err)

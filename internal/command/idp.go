@@ -20,6 +20,7 @@ type GenericOAuthProvider struct {
 	UserEndpoint          string
 	Scopes                []string
 	IDAttribute           string
+	UsePkce               bool
 	IDPOptions            idp.Options
 }
 
@@ -30,6 +31,7 @@ type GenericOIDCProvider struct {
 	ClientSecret     string
 	Scopes           []string
 	IsIDTokenMapping bool
+	UsePkce          bool
 	IDPOptions       idp.Options
 }
 

@@ -655,6 +655,7 @@ func (c *Commands) prepareAddInstanceOAuthProvider(a *instance.Aggregate, writeM
 					provider.UserEndpoint,
 					provider.IDAttribute,
 					provider.Scopes,
+					provider.UsePkce,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -710,6 +711,7 @@ func (c *Commands) prepareUpdateInstanceOAuthProvider(a *instance.Aggregate, wri
 				provider.UserEndpoint,
 				provider.IDAttribute,
 				provider.Scopes,
+				provider.UsePkce,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
@@ -758,6 +760,7 @@ func (c *Commands) prepareAddInstanceOIDCProvider(a *instance.Aggregate, writeMo
 					secret,
 					provider.Scopes,
 					provider.IsIDTokenMapping,
+					provider.UsePkce,
 					provider.IDPOptions,
 				),
 			}, nil
@@ -802,6 +805,7 @@ func (c *Commands) prepareUpdateInstanceOIDCProvider(a *instance.Aggregate, writ
 				c.idpConfigEncryption,
 				provider.Scopes,
 				provider.IsIDTokenMapping,
+				provider.UsePkce,
 				provider.IDPOptions,
 			)
 			if err != nil || event == nil {
