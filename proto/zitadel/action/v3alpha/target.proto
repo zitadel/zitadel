@@ -56,7 +56,6 @@ message Target {
       example: "\"10s\"";
     }
   ];
-
   string endpoint = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"https://example.com/hooks/ip_check\"";

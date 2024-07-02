@@ -10,36 +10,40 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
+import "zitadel/resources/object/v3alpha/object.proto";
+import "google/protobuf/timestamp.proto";
+import "zitadel/object/v3alpha/object.proto";
+
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
 message Execution {
   Condition condition = 1;
-  // Target IDs which are called when the defined conditions trigger.
-  repeated string targets = 2;
-  // Included executions with the same condition-types.
-  repeated string includes = 3;
+  // Ordered list of targets/includes called during the execution.
+  repeated ExecutionTargetType targets = 2;
 }
 
-message PatchExecution {
-  optional Condition condition = 1;
-  // Target IDs which are called when the defined conditions trigger.
-  repeated string targets = 2;
-  // Included executions with the same condition-types.
-  repeated string includes = 3;
+message ExecutionTargetType {
+  oneof type {
+    option (validate.required) = true;
+    // Unique identifier of existing target to call.
+    string target = 1;
+    // Unique identifier of existing execution to include targets of.
+    Condition include = 2;
+  }
 }
 
 message Condition {
-  // Condition-types under which conditions the execution should trigger. Only one is possible.
+  // Condition-types under which conditions the execution should happen, only one possible.
   oneof condition_type {
     option (validate.required) = true;
 
-    // Condition-type to execute after a request on the defined API point is received.
+    // Condition-type to execute if a request on the defined API point happens.
     RequestExecution request = 1;
-    // Condition-type to execute before a response on the defined API point is returned.
+    // Condition-type to execute on response if a request on the defined API point happens.
     ResponseExecution response = 2;
-    // Condition-type to execute when a function is used, replaces actions v1.
-    string function = 3;
-    // Condition-type to execute after an event is created in the system.
+    // Condition-type to execute if function is used, replaces actions v1.
+    FunctionExecution function = 3;
+    // Condition-type to execute if an event is created in the system.
     EventExecution event = 4;
   }
 }
@@ -47,6 +51,7 @@ message Condition {
 message RequestExecution {
   // Condition for the request execution. Only one is possible.
   oneof condition{
+    option (validate.required) = true;
     // GRPC-method as condition.
     string method = 1 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
@@ -66,13 +71,14 @@ message RequestExecution {
       }
     ];
     // All calls to any available services and methods as condition.
-    bool all = 3;
+    bool all = 3 [(validate.rules).bool = {const: true}];
   }
 }
 
 message ResponseExecution {
   // Condition for the response execution. Only one is possible.
   oneof condition{
+    option (validate.required) = true;
     // GRPC-method as condition.
     string method = 1 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
@@ -92,13 +98,19 @@ message ResponseExecution {
       }
     ];
     // All calls to any available services and methods as condition.
-    bool all = 3;
+    bool all = 3 [(validate.rules).bool = {const: true}];
   }
+}
+
+// Executed on the specified function
+message FunctionExecution {
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 1000}];
 }
 
 message EventExecution {
   // Condition for the event execution. Only one is possible.
   oneof condition{
+    option (validate.required) = true;
     // Event name as condition.
     string event = 1 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
@@ -118,7 +130,33 @@ message EventExecution {
       }
     ];
     // all events as condition.
-    bool all = 3;
+    bool all = 3 [(validate.rules).bool = {const: true}];
   }
 }
 
+// An executions identity is defined by its condition.
+message ExecutionDetails {
+  Condition condition = 1;
+  //sequence represents the order of events. It's always counting
+  //
+  // on read: the sequence of the last event reduced by the projection
+  //
+  // on manipulation: the timestamp of the event(s) added by the manipulation
+  uint64 sequence = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"2\"";
+    }
+  ];
+  //change_date is the timestamp when the object was changed
+  //
+  // on read: the timestamp of the last event reduced by the projection
+  //
+  // on manipulation: the timestamp of the event(s) added by the manipulation
+  google.protobuf.Timestamp change_date = 3;
+  //resource_owner represents the context an object belongs to
+  zitadel.object.v3alpha.Owner resource_owner = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\"";
+    }
+  ];
+}
