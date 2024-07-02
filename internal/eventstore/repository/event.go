@@ -120,3 +120,7 @@ func (e *Event) Payload() any {
 func (e *Event) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return e.Constraints
 }
+
+func (e *Event) Fields() []*eventstore.FieldOperation {
+	return nil
+}

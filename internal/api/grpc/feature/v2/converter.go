@@ -109,6 +109,10 @@ func improvedPerformanceTypeToPb(typ feature.ImprovedPerformanceType) feature_pb
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED
 	case feature.ImprovedPerformanceTypeOrgByID:
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID
+	case feature.ImprovedPerformanceTypeProjectGrant:
+		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT
+	case feature.ImprovedPerformanceTypeProject:
+		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT
 	default:
 		return feature_pb.ImprovedPerformance(typ)
 	}
@@ -133,6 +137,10 @@ func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.Imp
 		return feature.ImprovedPerformanceTypeUnknown
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID:
 		return feature.ImprovedPerformanceTypeOrgByID
+	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT:
+		return feature.ImprovedPerformanceTypeProjectGrant
+	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT:
+		return feature.ImprovedPerformanceTypeProject
 	default:
 		return feature.ImprovedPerformanceTypeUnknown
 	}

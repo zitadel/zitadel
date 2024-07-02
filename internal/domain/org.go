@@ -36,4 +36,10 @@ const (
 	OrgStateActive
 	OrgStateInactive
 	OrgStateRemoved
+
+	orgStateMax
 )
+
+func (s OrgState) Valid() bool {
+	return s > OrgStateUnspecified && s < orgStateMax
+}

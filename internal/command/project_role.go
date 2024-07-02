@@ -41,7 +41,7 @@ func (c *Commands) AddProjectRole(ctx context.Context, projectRole *domain.Proje
 func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOwner string, projectRoles []*domain.ProjectRole) (details *domain.ObjectDetails, err error) {
 	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
-		return details, err
+		return nil, err
 	}
 
 	roleWriteModel := NewProjectRoleWriteModel(projectID, resourceOwner)

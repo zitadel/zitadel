@@ -31,6 +31,8 @@ type Command interface {
 	Payload() any
 	// UniqueConstraints should be added for unique attributes of an event, if nil constraints will not be checked
 	UniqueConstraints() []*UniqueConstraint
+	// Fields should be added for fields which should be indexed for lookup, if nil fields will not be indexed
+	Fields() []*FieldOperation
 }
 
 // Event is a stored activity
