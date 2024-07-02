@@ -296,17 +296,23 @@ func (e *OrgRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 func (e *OrgRemovedEvent) Fields() []*eventstore.FieldOperation {
 	// TODO: project grants are currently not removed because we don't have the relationship between the granted org and the grant
 	return []*eventstore.FieldOperation{
-		eventstore.RemoveSearchFields(map[eventstore.FieldType]any{
-			eventstore.FieldTypeInstanceID:    e.Aggregate().InstanceID,
-			eventstore.FieldTypeResourceOwner: e.Aggregate().ResourceOwner,
-		}),
-		eventstore.RemoveSearchFields(map[eventstore.FieldType]any{
-			eventstore.FieldTypeInstanceID:    e.Aggregate().InstanceID,
-			eventstore.FieldTypeObjectType:    project.ProjectGrantSearchType,
-			eventstore.FieldTypeFieldName:     project.ProjectGrantGrantedOrgIDSearchField,
-			eventstore.FieldTypeValue:         e.Aggregate().ID,
-			eventstore.FieldTypeResourceOwner: e.Aggregate().ResourceOwner,
-		}),
+		eventstore.SetField(
+			e.Aggregate(),
+			orgSearchObject(e.Aggregate().ID),
+			OrgStateSearchField,
+			&eventstore.Value{
+				Value:       domain.OrgStateRemoved,
+				ShouldIndex: true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
 	}
 }
 

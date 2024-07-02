@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -166,7 +167,28 @@ func (c *Commands) getProjectByID(ctx context.Context, projectID, resourceOwner 
 }
 
 func (c *Commands) projectAggregateByID(ctx context.Context, projectID, resourceOwner string) (*eventstore.Aggregate, domain.ProjectState, error) {
-	result, err := c.eventstore.Search(
+	result, err := c.projectState(ctx, projectID, resourceOwner)
+	if err != nil {
+		return nil, domain.ProjectStateUnspecified, zerrors.ThrowNotFound(err, "COMMA-NDQoF", "Errors.Project.NotFound")
+	}
+	if len(result) == 0 {
+		_ = projection.ProjectGrantFields.Trigger(ctx)
+		result, err = c.projectState(ctx, projectID, resourceOwner)
+		if err != nil || len(result) == 0 {
+			return nil, domain.ProjectStateUnspecified, zerrors.ThrowNotFound(err, "COMMA-U1nza", "Errors.Project.NotFound")
+		}
+	}
+
+	var state domain.ProjectState
+	err = result[0].Value.Unmarshal(&state)
+	if err != nil {
+		return nil, state, zerrors.ThrowNotFound(err, "COMMA-o4n6F", "Errors.Project.NotFound")
+	}
+	return &result[0].Aggregate, state, nil
+}
+
+func (c *Commands) projectState(ctx context.Context, projectID, resourceOwner string) ([]*eventstore.SearchResult, error) {
+	return c.eventstore.Search(
 		ctx,
 		map[eventstore.FieldType]any{
 			eventstore.FieldTypeObjectType:     project.ProjectSearchType,
@@ -176,15 +198,6 @@ func (c *Commands) projectAggregateByID(ctx context.Context, projectID, resource
 			eventstore.FieldTypeResourceOwner:  resourceOwner,
 		},
 	)
-	if err != nil || len(result) == 0 {
-		return nil, domain.ProjectStateUnspecified, zerrors.ThrowNotFound(err, "COMMA-NDQoF", "Errors.Project.NotFound")
-	}
-	var state domain.ProjectState
-	err = result[0].Value.Unmarshal(&state)
-	if err != nil {
-		return nil, state, zerrors.ThrowNotFound(err, "COMMA-o4n6F", "Errors.Project.NotFound")
-	}
-	return &result[0].Aggregate, state, nil
 }
 
 func (c *Commands) checkProjectExists(ctx context.Context, projectID, resourceOwner string) (err error) {

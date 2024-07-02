@@ -435,9 +435,23 @@ func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 func (e *GrantRemovedEvent) Fields() []*eventstore.FieldOperation {
 	return []*eventstore.FieldOperation{
-		eventstore.RemoveSearchFieldsByAggregateAndObject(
+		eventstore.SetField(
 			e.Aggregate(),
 			grantSearchObject(e.GrantID),
+
+			ProjectGrantStateSearchField,
+			&eventstore.Value{
+				Value:       domain.ProjectGrantStateRemoved,
+				ShouldIndex: true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }

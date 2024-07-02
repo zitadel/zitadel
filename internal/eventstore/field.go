@@ -23,24 +23,6 @@ type SearchResult struct {
 }
 
 // // NumericResultValue marshals the value to the given type
-// func NumericResultValue[T constraints.Integer | constraints.Float](res *SearchResult) (T, error) {
-// 	if res.ValueType != SearchValueTypeNumeric {
-// 		return 0, zerrors.ThrowInvalidArgument(nil, "EVENT-JBhtu", "value is not numeric")
-// 	}
-// 	var value T
-// 	if err := json.Unmarshal(res.Value, &value); err != nil {
-// 		return 0, zerrors.ThrowInternal(err, "EVENT-2M9fs", "unable to unmarshal numeric value")
-// 	}
-// 	return value, nil
-// }
-
-// // TextResultValue marshals the value to the given type
-// func TextResultValue[T ~string](res *SearchResult) (T, error) {
-// 	if res.ValueType != SearchValueTypeString {
-// 		return "", zerrors.ThrowInvalidArgument(nil, "EVENT-ywqg5", "value is not text")
-// 	}
-// 	return T(string(res.Value)), nil
-// }
 
 type Object struct {
 	// Type of the object
@@ -71,19 +53,6 @@ type Value struct {
 	// If ShouldIndex is true the value must be a primitive type
 	ShouldIndex bool
 }
-
-// type SearchValue struct {
-// 	ValueType SearchValueType
-// 	Value     any
-// }
-
-// func (v *SearchValue) IsNumeric() bool {
-// 	return v.ValueType == SearchValueTypeNumeric
-// }
-
-// func (v *SearchValue) IsText() bool {
-// 	return v.ValueType == SearchValueTypeString
-// }
 
 type SearchValueType int8
 

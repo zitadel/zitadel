@@ -297,14 +297,14 @@ func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGra
 			if err != nil {
 				return err
 			}
-			existsGrantedOrg = state.Valid()
+			existsGrantedOrg = state.Valid() && state != domain.OrgStateRemoved
 		case project.ProjectSearchType:
 			var state domain.ProjectState
 			err := result.Value.Unmarshal(&state)
 			if err != nil {
 				return err
 			}
-			existsProject = state.Valid()
+			existsProject = state.Valid() && state != domain.ProjectStateRemoved
 		}
 	}
 

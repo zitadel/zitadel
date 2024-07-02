@@ -3,10 +3,11 @@ package setup
 import (
 	"context"
 	_ "embed"
-	"math"
-	"slices"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query/projection"
+	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
 type FillFieldsForProjectGrant struct {
@@ -15,65 +16,29 @@ type FillFieldsForProjectGrant struct {
 }
 
 func (mig *FillFieldsForProjectGrant) Execute(ctx context.Context, _ eventstore.Event) error {
-	// TODO: query instance ids first
-	filler := &fieldFiller{
-		eventstore: mig.eventstore,
-		batchSize:  mig.config.BatchSize,
-	}
-
-	return filler.fillInstance(
+	instances, err := mig.eventstore.InstanceIDs(
 		ctx,
-		eventstore.
-			NewSearchQueryBuilder(eventstore.ColumnsEvent).
-			AddQuery().AggregateTypes("project", "org").
-			Builder().
-			Limit(uint64(mig.config.BatchSize)).
-			OrderAsc(),
+		0,
+		true,
+		eventstore.NewSearchQueryBuilder(eventstore.ColumnsInstanceIDs).
+			OrderDesc().
+			AddQuery().
+			AggregateTypes("instance").
+			EventTypes(instance.InstanceAddedEventType).
+			Builder(),
 	)
-}
-
-func (mig *FillFieldsForProjectGrant) String() string {
-	return "29_fill_fields_for_project_grant"
-}
-
-type fieldFiller struct {
-	eventstore *eventstore.Eventstore
-	batchSize  uint32
-
-	events []eventstore.FillFieldsEvent
-}
-
-func (filler *fieldFiller) Reduce() error {
+	if err != nil {
+		return err
+	}
+	for _, instance := range instances {
+		ctx := authz.WithInstanceID(ctx, instance)
+		if err := projection.ProjectGrantFields.Trigger(ctx); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-func (filler *fieldFiller) fillInstance(ctx context.Context, query *eventstore.SearchQueryBuilder) error {
-	var position float64
-	for {
-		err := filler.eventstore.FilterToReducer(
-			ctx,
-			query.PositionAfter(position).Limit(uint64(filler.batchSize)),
-			filler,
-		)
-		if err != nil {
-			return err
-		}
-		err = filler.eventstore.FillFields(ctx, filler.events...)
-		if err != nil {
-			return err
-		}
-		if len(filler.events) < int(filler.batchSize) {
-			return nil
-		}
-		// the math is needed because eventstore only provides position after filter and we need to ensure to miss any events
-		position = math.Float64frombits(math.Float64bits(filler.events[len(filler.events)-1].Position()) - 10)
-		filler.events = nil
-	}
-}
-
-func (filler *fieldFiller) AppendEvents(events ...eventstore.Event) {
-	filler.events = slices.Grow(filler.events, len(events))
-	for _, event := range events {
-		filler.events = append(filler.events, event.(eventstore.FillFieldsEvent))
-	}
+func (mig *FillFieldsForProjectGrant) String() string {
+	return "29_init_fields_for_project_grant"
 }

@@ -300,7 +300,7 @@ func (e *ProjectReactivatedEvent) Fields() []*eventstore.FieldOperation {
 			projectSearchObject(e.Aggregate().ID),
 			ProjectStateSearchField,
 			&eventstore.Value{
-				Value:       domain.ProjectStateActive,
+				Value:       domain.ProjectStateRemoved,
 				ShouldIndex: true,
 			},
 
