@@ -17,9 +17,8 @@ import "zitadel/object/v3alpha/object.proto";
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
 message Execution {
-  Condition condition = 1;
   // Ordered list of targets/includes called during the execution.
-  repeated ExecutionTargetType targets = 2;
+  repeated ExecutionTargetType targets = 1;
 }
 
 message ExecutionTargetType {
@@ -132,31 +131,4 @@ message EventExecution {
     // all events as condition.
     bool all = 3 [(validate.rules).bool = {const: true}];
   }
-}
-
-// An executions identity is defined by its condition.
-message ExecutionDetails {
-  Condition condition = 1;
-  //sequence represents the order of events. It's always counting
-  //
-  // on read: the sequence of the last event reduced by the projection
-  //
-  // on manipulation: the timestamp of the event(s) added by the manipulation
-  uint64 sequence = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"2\"";
-    }
-  ];
-  //change_date is the timestamp when the object was changed
-  //
-  // on read: the timestamp of the last event reduced by the projection
-  //
-  // on manipulation: the timestamp of the event(s) added by the manipulation
-  google.protobuf.Timestamp change_date = 3;
-  //resource_owner represents the context an object belongs to
-  zitadel.object.v3alpha.Owner resource_owner = 4 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"69629023906488334\"";
-    }
-  ];
 }
