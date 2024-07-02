@@ -64,6 +64,14 @@ func (e *ProjectAddedEvent) Fields() []*eventstore.FieldOperation {
 				Value:       e.Name,
 				ShouldIndex: true,
 			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeObjectRevision,
+			eventstore.FieldTypeFieldName,
 		),
 		eventstore.SetField(
 			e.Aggregate(),
@@ -73,6 +81,14 @@ func (e *ProjectAddedEvent) Fields() []*eventstore.FieldOperation {
 				Value:       domain.ProjectStateActive,
 				ShouldIndex: true,
 			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeObjectRevision,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
@@ -151,7 +167,6 @@ func (e *ProjectChangeEvent) Fields() []*eventstore.FieldOperation {
 				Value:       *e.Name,
 				ShouldIndex: true,
 			},
-
 			eventstore.FieldTypeInstanceID,
 			eventstore.FieldTypeResourceOwner,
 			eventstore.FieldTypeAggregateType,

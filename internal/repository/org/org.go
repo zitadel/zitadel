@@ -60,6 +60,13 @@ func (e *OrgAddedEvent) Fields() []*eventstore.FieldOperation {
 				Value:       e.Name,
 				ShouldIndex: true,
 			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 		eventstore.SetField(
 			e.Aggregate(),
@@ -69,6 +76,13 @@ func (e *OrgAddedEvent) Fields() []*eventstore.FieldOperation {
 				Value:       domain.OrgStateActive,
 				ShouldIndex: true,
 			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
