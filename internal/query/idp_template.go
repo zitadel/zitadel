@@ -64,6 +64,7 @@ type OAuthIDPTemplate struct {
 	UserEndpoint          string
 	Scopes                database.TextArray[string]
 	IDAttribute           string
+	UsePkce               bool
 }
 
 type OIDCIDPTemplate struct {
@@ -73,6 +74,7 @@ type OIDCIDPTemplate struct {
 	Issuer           string
 	Scopes           database.TextArray[string]
 	IsIDTokenMapping bool
+	UsePkce          bool
 }
 
 type JWTIDPTemplate struct {
@@ -277,6 +279,10 @@ var (
 		name:  projection.OAuthIDAttributeCol,
 		table: oauthIdpTemplateTable,
 	}
+	OAuthCodeChallengeParamsCol = Column{
+		name:  projection.OAuthCodeChallengeParamsCol,
+		table: oauthIdpTemplateTable,
+	}
 )
 
 var (
@@ -310,6 +316,10 @@ var (
 	}
 	OIDCIDTokenMappingCol = Column{
 		name:  projection.OIDCIDTokenMappingCol,
+		table: oidcIdpTemplateTable,
+	}
+	OIDCCodeChallengeParamsCol = Column{
+		name:  projection.OIDCCodeChallengeParamsCol,
 		table: oidcIdpTemplateTable,
 	}
 )
@@ -837,6 +847,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OAuthUserEndpointCol.identifier(),
 			OAuthScopesCol.identifier(),
 			OAuthIDAttributeCol.identifier(),
+			OAuthCodeChallengeParamsCol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -844,6 +855,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
+			OIDCCodeChallengeParamsCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -953,6 +965,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oauthUserEndpoint := sql.NullString{}
 			oauthScopes := database.TextArray[string]{}
 			oauthIDAttribute := sql.NullString{}
+			oauthCodeChallengeParams := sql.NullBool{}
 
 			oidcID := sql.NullString{}
 			oidcIssuer := sql.NullString{}
@@ -960,6 +973,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 			oidcClientSecret := new(crypto.CryptoValue)
 			oidcScopes := database.TextArray[string]{}
 			oidcIDTokenMapping := sql.NullBool{}
+			oidcCodeChallengeParams := sql.NullBool{}
 
 			jwtID := sql.NullString{}
 			jwtIssuer := sql.NullString{}
@@ -1067,6 +1081,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oauthUserEndpoint,
 				&oauthScopes,
 				&oauthIDAttribute,
+				&oauthCodeChallengeParams,
 				// oidc
 				&oidcID,
 				&oidcIssuer,
@@ -1074,6 +1089,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 				&oidcClientSecret,
 				&oidcScopes,
 				&oidcIDTokenMapping,
+				&oidcCodeChallengeParams,
 				// jwt
 				&jwtID,
 				&jwtIssuer,
@@ -1176,6 +1192,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					UserEndpoint:          oauthUserEndpoint.String,
 					Scopes:                oauthScopes,
 					IDAttribute:           oauthIDAttribute.String,
+					UsePkce:               oauthCodeChallengeParams.Bool,
 				}
 			}
 			if oidcID.Valid {
@@ -1186,6 +1203,7 @@ func prepareIDPTemplateByIDQuery(ctx context.Context, db prepareDatabase) (sq.Se
 					Issuer:           oidcIssuer.String,
 					Scopes:           oidcScopes,
 					IsIDTokenMapping: oidcIDTokenMapping.Bool,
+					UsePkce:          oidcCodeChallengeParams.Bool,
 				}
 			}
 			if jwtID.Valid {
@@ -1332,6 +1350,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OAuthUserEndpointCol.identifier(),
 			OAuthScopesCol.identifier(),
 			OAuthIDAttributeCol.identifier(),
+			OAuthCodeChallengeParamsCol.identifier(),
 			// oidc
 			OIDCIDCol.identifier(),
 			OIDCIssuerCol.identifier(),
@@ -1339,6 +1358,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 			OIDCClientSecretCol.identifier(),
 			OIDCScopesCol.identifier(),
 			OIDCIDTokenMappingCol.identifier(),
+			OIDCCodeChallengeParamsCol.identifier(),
 			// jwt
 			JWTIDCol.identifier(),
 			JWTIssuerCol.identifier(),
@@ -1453,6 +1473,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oauthUserEndpoint := sql.NullString{}
 				oauthScopes := database.TextArray[string]{}
 				oauthIDAttribute := sql.NullString{}
+				oauthCodeChallengeParams := sql.NullBool{}
 
 				oidcID := sql.NullString{}
 				oidcIssuer := sql.NullString{}
@@ -1460,6 +1481,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 				oidcClientSecret := new(crypto.CryptoValue)
 				oidcScopes := database.TextArray[string]{}
 				oidcIDTokenMapping := sql.NullBool{}
+				oidcCodeChallengeParams := sql.NullBool{}
 
 				jwtID := sql.NullString{}
 				jwtIssuer := sql.NullString{}
@@ -1567,6 +1589,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oauthUserEndpoint,
 					&oauthScopes,
 					&oauthIDAttribute,
+					&oauthCodeChallengeParams,
 					// oidc
 					&oidcID,
 					&oidcIssuer,
@@ -1574,6 +1597,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 					&oidcClientSecret,
 					&oidcScopes,
 					&oidcIDTokenMapping,
+					&oidcCodeChallengeParams,
 					// jwt
 					&jwtID,
 					&jwtIssuer,
@@ -1675,6 +1699,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						UserEndpoint:          oauthUserEndpoint.String,
 						Scopes:                oauthScopes,
 						IDAttribute:           oauthIDAttribute.String,
+						UsePkce:               oauthCodeChallengeParams.Bool,
 					}
 				}
 				if oidcID.Valid {
@@ -1685,6 +1710,7 @@ func prepareIDPTemplatesQuery(ctx context.Context, db prepareDatabase) (sq.Selec
 						Issuer:           oidcIssuer.String,
 						Scopes:           oidcScopes,
 						IsIDTokenMapping: oidcIDTokenMapping.Bool,
+						UsePkce:          oidcCodeChallengeParams.Bool,
 					}
 				}
 				if jwtID.Valid {

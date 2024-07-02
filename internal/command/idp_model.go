@@ -44,6 +44,7 @@ type OAuthIDPWriteModel struct {
 	UserEndpoint          string
 	Scopes                []string
 	IDAttribute           string
+	UsePkce               bool
 	idp.Options
 
 	State domain.IDPState
@@ -72,6 +73,7 @@ func (wm *OAuthIDPWriteModel) reduceAddedEvent(e *idp.OAuthIDPAddedEvent) {
 	wm.UserEndpoint = e.UserEndpoint
 	wm.Scopes = e.Scopes
 	wm.IDAttribute = e.IDAttribute
+	wm.UsePkce = e.UsePkce
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -101,6 +103,9 @@ func (wm *OAuthIDPWriteModel) reduceChangedEvent(e *idp.OAuthIDPChangedEvent) {
 	if e.IDAttribute != nil {
 		wm.IDAttribute = *e.IDAttribute
 	}
+	if e.UsePkce != nil {
+		wm.UsePkce = *e.UsePkce
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -114,6 +119,7 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	userEndpoint,
 	idAttribute string,
 	scopes []string,
+	codeChallengeParams bool,
 	options idp.Options,
 ) ([]idp.OAuthIDPChanges, error) {
 	changes := make([]idp.OAuthIDPChanges, 0)
@@ -146,6 +152,9 @@ func (wm *OAuthIDPWriteModel) NewChanges(
 	}
 	if wm.IDAttribute != idAttribute {
 		changes = append(changes, idp.ChangeOAuthIDAttribute(idAttribute))
+	}
+	if wm.UsePkce != codeChallengeParams {
+		changes = append(changes, idp.ChangeOAuthIsCodeChallengeParams(codeChallengeParams))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {
@@ -207,6 +216,7 @@ type OIDCIDPWriteModel struct {
 	ClientSecret     *crypto.CryptoValue
 	Scopes           []string
 	IsIDTokenMapping bool
+	UsePkce          bool
 	idp.Options
 
 	State domain.IDPState
@@ -247,6 +257,7 @@ func (wm *OIDCIDPWriteModel) reduceAddedEvent(e *idp.OIDCIDPAddedEvent) {
 	wm.ClientSecret = e.ClientSecret
 	wm.Scopes = e.Scopes
 	wm.IsIDTokenMapping = e.IsIDTokenMapping
+	wm.UsePkce = e.UsePkce
 	wm.Options = e.Options
 	wm.State = domain.IDPStateActive
 }
@@ -270,6 +281,9 @@ func (wm *OIDCIDPWriteModel) reduceChangedEvent(e *idp.OIDCIDPChangedEvent) {
 	if e.IsIDTokenMapping != nil {
 		wm.IsIDTokenMapping = *e.IsIDTokenMapping
 	}
+	if e.UsePkce != nil {
+		wm.UsePkce = *e.UsePkce
+	}
 	wm.Options.ReduceChanges(e.OptionChanges)
 }
 
@@ -280,7 +294,7 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	clientSecretString string,
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
-	idTokenMapping bool,
+	idTokenMapping, codeChallengeParams bool,
 	options idp.Options,
 ) ([]idp.OIDCIDPChanges, error) {
 	changes := make([]idp.OIDCIDPChanges, 0)
@@ -307,6 +321,9 @@ func (wm *OIDCIDPWriteModel) NewChanges(
 	}
 	if wm.IsIDTokenMapping != idTokenMapping {
 		changes = append(changes, idp.ChangeOIDCIsIDTokenMapping(idTokenMapping))
+	}
+	if wm.UsePkce != codeChallengeParams {
+		changes = append(changes, idp.ChangeOIDCIsCodeChallengeParams(codeChallengeParams))
 	}
 	opts := wm.Options.Changes(options)
 	if !opts.IsZero() {

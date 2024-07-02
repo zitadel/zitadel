@@ -2,6 +2,7 @@ package idp
 
 import (
 	"context"
+	"math/rand"
 
 	"golang.org/x/text/language"
 
@@ -49,3 +50,15 @@ func (p UserAgentID) setValue() {}
 type LoginHintParam string
 
 func (p LoginHintParam) setValue() {}
+
+func CodeVerifier() string {
+	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._~"
+
+	nChar := rand.Intn(128-43) + 43
+
+	b := make([]byte, nChar)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
+}

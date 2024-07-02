@@ -338,6 +338,7 @@ message OAuthConfig {
             description: "defines how the attribute is called where ZITADEL can get the id of the user";
         }
     ];
+    bool use_pkce = 7;
 }
 
 message GenericOIDCConfig {
@@ -363,6 +364,12 @@ message GenericOIDCConfig {
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "true";
             description: "if true, provider information get mapped from the id token, not from the userinfo endpoint";
+        }
+    ];
+    bool use_pkce = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "true";
+            description: "if true, the code_challenge and code_challenge_method params are included in the auth request";
         }
     ];
 }

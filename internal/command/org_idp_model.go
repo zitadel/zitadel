@@ -70,6 +70,7 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 	userEndpoint,
 	idAttribute string,
 	scopes []string,
+	codeChallengeParams bool,
 	options idp.Options,
 ) (*org.OAuthIDPChangedEvent, error) {
 
@@ -83,6 +84,7 @@ func (wm *OrgOAuthIDPWriteModel) NewChangedEvent(
 		userEndpoint,
 		idAttribute,
 		scopes,
+		codeChallengeParams,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
@@ -176,7 +178,7 @@ func (wm *OrgOIDCIDPWriteModel) NewChangedEvent(
 	clientSecretString string,
 	secretCrypto crypto.EncryptionAlgorithm,
 	scopes []string,
-	idTokenMapping bool,
+	idTokenMapping, codeChallengeParams bool,
 	options idp.Options,
 ) (*org.OIDCIDPChangedEvent, error) {
 
@@ -188,6 +190,7 @@ func (wm *OrgOIDCIDPWriteModel) NewChangedEvent(
 		secretCrypto,
 		scopes,
 		idTokenMapping,
+		codeChallengeParams,
 		options,
 	)
 	if err != nil || len(changes) == 0 {
