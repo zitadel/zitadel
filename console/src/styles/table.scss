@@ -76,6 +76,10 @@
     padding: 0 0.5rem !important;
   }
 
+  .mat-calendar-table-header tr th {
+    height: 14px;
+  }
+
   td .mat-mdc-checkbox,
   th .mat-checkbox {
     margin-left: 1rem;
