@@ -18,6 +18,11 @@
       <input cnslInput name="senderNumber" formControlName="senderNumber" />
     </cnsl-form-field>
 
+    <cnsl-form-field class="sms-form-field" label="Verification Service Sid">
+      <cnsl-label>{{ 'SETTING.SMS.TWILIO.VERIFYSERVICESID' | translate }}</cnsl-label>
+      <input cnslInput name="verifyServiceSid" formControlName="verifyServiceSid" />
+    </cnsl-form-field>
+
     <button *ngIf="twilio" type="button" mat-stroked-button (click)="changeToken()" data-e2e="edit-sms-token-button">
       {{ 'SETTING.SMS.TWILIO.CHANGETOKEN' | translate }}
     </button>

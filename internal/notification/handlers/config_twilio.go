@@ -28,8 +28,9 @@ func (n *NotificationQueries) GetTwilioConfig(ctx context.Context) (*twilio.Conf
 		return nil, err
 	}
 	return &twilio.Config{
-		SID:          config.TwilioConfig.SID,
-		Token:        token,
-		SenderNumber: config.TwilioConfig.SenderNumber,
+		SID:              config.TwilioConfig.SID,
+		Token:            token,
+		SenderNumber:     config.TwilioConfig.SenderNumber,
+		VerifyServiceSID: config.TwilioConfig.VerifyServiceSID,
 	}, nil
 }

@@ -37,7 +37,8 @@ func TestSMSProjection_reduces(t *testing.T) {
 							"keyId": "key-id",
 							"crypted": "Y3J5cHRlZA=="
 						},
-						"senderNumber": "sender-number"
+						"senderNumber": "sender-number",
+						"verifyServiceSid": "verify-service-sid"
 					}`),
 					), instance.SMSConfigTwilioAddedEventMapper),
 			},
@@ -89,7 +90,8 @@ func TestSMSProjection_reduces(t *testing.T) {
 						[]byte(`{
 						"id": "id",
 						"sid": "sid",
-						"senderNumber": "sender-number"
+						"senderNumber": "sender-number",
+						"verifyServiceSid": "verify-service-sid"
 					}`),
 					), instance.SMSConfigTwilioChangedEventMapper),
 			},
