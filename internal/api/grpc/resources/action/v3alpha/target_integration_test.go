@@ -207,7 +207,7 @@ func TestServer_CreateTarget(t *testing.T) {
 	}
 }
 
-func TestServer_UpdateTarget(t *testing.T) {
+func TestServer_PatchTarget(t *testing.T) {
 	ensureFeatureEnabled(t)
 	type args struct {
 		ctx context.Context
@@ -379,7 +379,8 @@ func TestServer_UpdateTarget(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.prepare(tt.args.req)
 			require.NoError(t, err)
-
+			// We want to have the same response no matter how often we call the function
+			Client.PatchTarget(tt.args.ctx, tt.args.req)
 			got, err := Client.PatchTarget(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)

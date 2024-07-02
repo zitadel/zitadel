@@ -186,11 +186,14 @@ func TestServer_SetExecution_Request(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// We want to have the same response no matter how often we call the function
+			Client.SetExecution(tt.ctx, tt.req)
 			got, err := Client.SetExecution(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
+
 			require.NoError(t, err)
 
 			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
@@ -322,6 +325,8 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// We want to have the same response no matter how often we call the function
+			Client.SetExecution(tt.ctx, tt.req)
 			got, err := Client.SetExecution(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -499,6 +504,8 @@ func TestServer_SetExecution_Response(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// We want to have the same response no matter how often we call the function
+			Client.SetExecution(tt.ctx, tt.req)
 			got, err := Client.SetExecution(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -682,6 +689,8 @@ func TestServer_SetExecution_Event(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// We want to have the same response no matter how often we call the function
+			Client.SetExecution(tt.ctx, tt.req)
 			got, err := Client.SetExecution(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -778,6 +787,8 @@ func TestServer_SetExecution_Function(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// We want to have the same response no matter how often we call the function
+			Client.SetExecution(tt.ctx, tt.req)
 			got, err := Client.SetExecution(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
