@@ -153,9 +153,8 @@ func (p *Provider) BeginAuth(ctx context.Context, state string, params ...idp.Pa
 
 	if p.RelyingParty.IsPKCE() {
 		codeChallenge := oidc.NewSHACodeChallenge(idp.CodeVerifier())
-		if state != "testState" {
+		if state == "testState" {
 			codeChallenge = "pkceOIDCVerifier"
-
 		}
 		opts = append(opts, rp.WithCodeChallenge(codeChallenge))
 	}
