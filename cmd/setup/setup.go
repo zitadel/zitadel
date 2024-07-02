@@ -182,7 +182,6 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s2AssetsTable,
 		steps.s28AddFieldTable,
 		steps.FirstInstance,
-		steps.s29FillFieldsForProjectGrant,
 		steps.s5LastFailed,
 		steps.s6OwnerRemoveColumns,
 		steps.s7LogstoreTables,
@@ -198,6 +197,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s23CorrectGlobalUniqueConstraints,
 		steps.s24AddActorToAuthTokens,
 		steps.s26AuthUsers3,
+		steps.s29FillFieldsForProjectGrant,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
