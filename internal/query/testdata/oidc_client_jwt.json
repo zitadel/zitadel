@@ -2,7 +2,7 @@
   "instance_id": "230690539048009730",
   "app_id": "236647088211886082",
   "state": 1,
-  "client_id": "236647088211951618@tests",
+  "client_id": "236647088211951618",
   "client_secret": null,
   "redirect_uris": ["http://localhost:9999/auth/callback"],
   "response_types": [0],

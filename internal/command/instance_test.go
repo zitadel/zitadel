@@ -63,7 +63,7 @@ func projectAddedEvents(ctx context.Context, instanceID, orgID, id, owner string
 	events = append(events, apiAppEvents(ctx, orgID, id, "auth-id", "Auth-API")...)
 
 	consoleAppID := "console-id"
-	consoleClientID := "clientID@zitadel"
+	consoleClientID := "clientID"
 	events = append(events, oidcAppEvents(ctx, orgID, id, consoleAppID, "Console", consoleClientID, externalSecure)...)
 	events = append(events,
 		instance.NewIAMConsoleSetEvent(ctx,
@@ -90,7 +90,7 @@ func apiAppEvents(ctx context.Context, orgID, projectID, id, name string) []even
 		project.NewAPIConfigAddedEvent(ctx,
 			&project.NewAggregate(projectID, orgID).Aggregate,
 			id,
-			"clientID@zitadel",
+			"clientID",
 			"",
 			domain.APIAuthMethodTypePrivateKeyJWT,
 		),

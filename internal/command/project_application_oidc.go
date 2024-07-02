@@ -68,7 +68,7 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 				return nil, zerrors.ThrowNotFound(err, "PROJE-6swVG", "Errors.Project.NotFound")
 			}
 
-			app.ClientID, err = domain.NewClientID(c.idGenerator, project.Name)
+			app.ClientID, err = c.idGenerator.Next()
 			if err != nil {
 				return nil, zerrors.ThrowInternal(err, "V2-VMSQ1", "Errors.Internal")
 			}
@@ -126,19 +126,19 @@ func (c *Commands) AddOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 		return nil, zerrors.ThrowPreconditionFailed(nil, "PROJECT-lxowmp", "Errors.Project.App.AlreadyExisting")
 	}
 
-	project, err := c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
+	_, err = c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-3m9s2", "Errors.Project.NotFound")
 	}
 
-	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, project, appID)
+	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID)
 }
 
 func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string) (_ *domain.OIDCApp, err error) {
 	if oidcApp == nil || oidcApp.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Project.App.Invalid")
 	}
-	project, err := c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
+	_, err = c.getProjectByID(ctx, oidcApp.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "PROJECT-3m9ss", "Errors.Project.NotFound")
 	}
@@ -152,10 +152,10 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 		return nil, err
 	}
 
-	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, project, appID)
+	return c.addOIDCApplicationWithID(ctx, oidcApp, resourceOwner, appID)
 }
 
-func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string, project *domain.Project, appID string) (_ *domain.OIDCApp, err error) {
+func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain.OIDCApp, resourceOwner string, appID string) (_ *domain.OIDCApp, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -169,7 +169,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	}
 
 	var plain string
-	err = domain.SetNewClientID(oidcApp, c.idGenerator, project)
+	err = domain.SetNewClientID(oidcApp, c.idGenerator)
 	if err != nil {
 		return nil, err
 	}

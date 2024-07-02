@@ -21,6 +21,8 @@ var (
 	testdataOidcClientJWT string
 	//go:embed testdata/oidc_client_public.json
 	testdataOidcClientPublic string
+	//go:embed testdata/oidc_client_public_old_id.json
+	testdataOidcClientPublicOldId string
 	//go:embed testdata/oidc_client_secret.json
 	testdataOidcClientSecret string
 	//go:embed testdata/oidc_client_no_settings.json
@@ -64,7 +66,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				InstanceID:               "230690539048009730",
 				AppID:                    "236647088211886082",
 				State:                    domain.AppStateActive,
-				ClientID:                 "236647088211951618@tests",
+				ClientID:                 "236647088211951618",
 				HashedSecret:             "",
 				RedirectURIs:             []string{"http://localhost:9999/auth/callback"},
 				ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
@@ -92,6 +94,38 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 		{
 			name: "public client",
 			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientPublic}, "instanceID", "clientID", true),
+			want: &OIDCClient{
+				InstanceID:               "230690539048009730",
+				AppID:                    "236646457053020162",
+				State:                    domain.AppStateActive,
+				ClientID:                 "236646457053085698",
+				HashedSecret:             "",
+				RedirectURIs:             []string{"http://localhost:9999/auth/callback"},
+				ResponseTypes:            []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+				GrantTypes:               []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+				ApplicationType:          domain.OIDCApplicationTypeWeb,
+				AuthMethodType:           domain.OIDCAuthMethodTypeNone,
+				PostLogoutRedirectURIs:   nil,
+				IsDevMode:                true,
+				AccessTokenType:          domain.OIDCTokenTypeBearer,
+				AccessTokenRoleAssertion: false,
+				IDTokenRoleAssertion:     false,
+				IDTokenUserinfoAssertion: false,
+				ClockSkew:                0,
+				AdditionalOrigins:        nil,
+				PublicKeys:               nil,
+				ProjectID:                "236645808328409090",
+				ProjectRoleAssertion:     true,
+				ProjectRoleKeys:          []string{"role1", "role2"},
+				Settings: &OIDCSettings{
+					AccessTokenLifetime: 43200000000000,
+					IdTokenLifetime:     43200000000000,
+				},
+			},
+		},
+		{
+			name: "public client",
+			mock: mockQuery(expQuery, cols, []driver.Value{testdataOidcClientPublicOldId}, "instanceID", "clientID", true),
 			want: &OIDCClient{
 				InstanceID:               "230690539048009730",
 				AppID:                    "236646457053020162",
@@ -128,7 +162,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				InstanceID:               "230690539048009730",
 				AppID:                    "236646858984783874",
 				State:                    domain.AppStateActive,
-				ClientID:                 "236646858984849410@tests",
+				ClientID:                 "236646858984849410",
 				HashedSecret:             "$2a$14$OzZ0XEZZEtD13py/EPba2evsS6WcKZ5orVMj9pWHEGEHmLu2h3PFq",
 				RedirectURIs:             []string{"http://localhost:9999/auth/callback"},
 				ResponseTypes:            []domain.OIDCResponseType{0},
@@ -160,7 +194,7 @@ low2kyJov38V4Uk2I8kuXpLcnrpw5Tio2ooiUE27b0vHZqBKOei9Uo88qCrn3EKx
 				InstanceID:   "239520764275982338",
 				AppID:        "239520764276441090",
 				State:        domain.AppStateActive,
-				ClientID:     "239520764779364354@zitadel",
+				ClientID:     "239520764779364354",
 				HashedSecret: "",
 				RedirectURIs: []string{
 					"http://test2-qucuh5.localhost:9000/ui/console/auth/callback",
