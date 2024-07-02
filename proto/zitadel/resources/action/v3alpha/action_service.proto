@@ -194,7 +194,7 @@ service ZITADELActions {
   // Setting an empty list of targets will remove all targets from the execution, making it a noop.
   rpc SetExecution (SetExecutionRequest) returns (SetExecutionResponse) {
     option (google.api.http) = {
-      patch: "/executions"
+      put: "/executions"
       body: "*"
     };
 
