@@ -2,13 +2,13 @@ package action
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/zerrors"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	settings_object "github.com/zitadel/zitadel/internal/api/grpc/settings/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/execution"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )

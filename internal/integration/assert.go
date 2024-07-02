@@ -1,7 +1,6 @@
 package integration
 
 import (
-	settings_object "github.com/zitadel/zitadel/pkg/grpc/settings/object/v3alpha"
 	"testing"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	resources_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
+	settings_object "github.com/zitadel/zitadel/pkg/grpc/settings/object/v3alpha"
 )
 
 // Details is the interface that covers both v1 and v2 proto generated object details.
