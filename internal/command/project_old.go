@@ -39,6 +39,7 @@ func (c *Commands) changeProjectOld(ctx context.Context, projectChange *domain.P
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 
+	//nolint: contextcheck
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
 	changedEvent, hasChanged, err := existingProject.NewChangedEvent(
 		ctx,
@@ -77,6 +78,7 @@ func (c *Commands) deactivateProjectOld(ctx context.Context, projectID string, r
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-mki55", "Errors.Project.NotActive")
 	}
 
+	//nolint: contextcheck
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
 	if err != nil {
@@ -101,6 +103,7 @@ func (c *Commands) reactivateProjectOld(ctx context.Context, projectID string, r
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-5M9bs", "Errors.Project.NotInactive")
 	}
 
+	//nolint: contextcheck
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
 	if err != nil {
@@ -132,6 +135,7 @@ func (c *Commands) removeProjectOld(ctx context.Context, projectID, resourceOwne
 		uniqueConstraints[i] = project.NewRemoveSAMLConfigEntityIDUniqueConstraint(entityID.EntityID)
 	}
 
+	//nolint: contextcheck
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
 	events := []eventstore.Command{
 		project.NewProjectRemovedEvent(ctx, projectAgg, existingProject.Name, uniqueConstraints),
@@ -140,7 +144,7 @@ func (c *Commands) removeProjectOld(ctx context.Context, projectID, resourceOwne
 	for _, grantID := range cascadingUserGrantIDs {
 		event, _, err := c.removeUserGrant(ctx, grantID, "", true)
 		if err != nil {
-			logging.LogWithFields("COMMAND-b8Djf", "usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
+			logging.WithFields("usergrantid", grantID).WithError(err).Warn("could not cascade remove user grant")
 			continue
 		}
 		events = append(events, event)

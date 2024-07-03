@@ -7,16 +7,6 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
-type fillFields struct {
-	eventstore handler.EventStore
-}
-
-type fillProjectGrantFields struct{}
-
-func (*fillProjectGrantFields) Name() string {
-	return "project_grant_fields"
-}
-
 func newFillProjectGrantFields(config handler.Config) *handler.FieldHandler {
 	return handler.NewFieldHandler(
 		&config,
