@@ -467,6 +467,10 @@ func Test_idpTypeToPb(t *testing.T) {
 			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE,
 		},
 		{
+			args: args{domain.IDPTypeSAML},
+			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML,
+		},
+		{
 			args: args{99},
 			want: settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED,
 		},

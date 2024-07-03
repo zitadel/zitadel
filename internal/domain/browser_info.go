@@ -23,14 +23,15 @@ func BrowserInfoFromRequest(r *net_http.Request) *BrowserInfo {
 	}
 }
 
-func (b *BrowserInfo) ToUserAgent() *UserAgent {
-	if b == nil {
-		return nil
+func (a *AuthRequest) ToUserAgent() *UserAgent {
+	agent := &UserAgent{
+		FingerprintID: &a.AgentID,
 	}
-	return &UserAgent{
-		FingerprintID: &b.UserAgent,
-		IP:            b.RemoteIP,
-		Description:   &b.UserAgent,
-		Header:        b.Header,
+	if a.BrowserInfo == nil {
+		return agent
 	}
+	agent.IP = a.BrowserInfo.RemoteIP
+	agent.Description = &a.BrowserInfo.UserAgent
+	agent.Header = a.BrowserInfo.Header
+	return agent
 }

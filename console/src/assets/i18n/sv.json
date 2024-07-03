@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instansinställningar",
-        "DESCRIPTION": "Instansinställningarna är standardinställningarna för alla organisationer. Med rätt behörigheter kan vissa av dem åsidosättas i organisationsinställningarna."
+        "TITLE": "Standardinställningar",
+        "DESCRIPTION": "Standardinställningar för alla organisationer. Med rätt behörigheter kan vissa av dem åsidosättas i organisationsinställningar."
       },
       "ORG": {
         "TITLE": "Organisationsinställningar",
@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Visa användare {{value}}"
     },
-    "DOWNLOAD": "Ladda ner"
+    "DOWNLOAD": "Ladda ner",
+    "APPLY": "Tillämpa"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Har kontroll över hela instansen, inklusive alla organisationer",
