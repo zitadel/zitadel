@@ -97,17 +97,25 @@ func buildSearchStatement(ctx context.Context, builder *strings.Builder, conditi
 
 	builder.WriteString(searchQueryPrefix)
 
-	builder.WriteString(" AND (")
-
+	builder.WriteString(" AND ")
+	if len(conditions) > 1 {
+		builder.WriteRune('(')
+	}
 	for i, condition := range conditions {
 		if i > 0 {
 			builder.WriteString(" OR ")
 		}
-		builder.WriteRune('(')
+		if len(condition) > 1 {
+			builder.WriteRune('(')
+		}
 		args = append(args, buildSearchCondition(builder, len(args)+1, condition)...)
+		if len(condition) > 1 {
+			builder.WriteRune(')')
+		}
+	}
+	if len(conditions) > 1 {
 		builder.WriteRune(')')
 	}
-	builder.WriteRune(')')
 
 	return args
 }
@@ -220,24 +228,9 @@ func handleSearchUpsert(ctx context.Context, tx *sql.Tx, field *eventstore.Field
 		return zerrors.ThrowInvalidArgument(err, "V3-fcrW1", "unable to marshal field value")
 	}
 
-	var builder strings.Builder
-
-	builder.WriteString(fieldsUpsertPrefix)
-	for i, fieldName := range field.UpsertConflictFields {
-		if i > 0 {
-			builder.WriteString(" AND ")
-		}
-		name, index := searchFieldNameAndIndexByTypeForPush(fieldName)
-
-		builder.WriteString(name)
-		builder.WriteString(" = ")
-		builder.WriteString(index)
-	}
-	builder.WriteString(fieldsUpsertSuffix)
-
 	_, err = tx.ExecContext(
 		ctx,
-		builder.String(),
+		writeUpsertField(field.UpsertConflictFields),
 
 		field.Aggregate.InstanceID,
 		field.Aggregate.ResourceOwner,
@@ -254,28 +247,62 @@ func handleSearchUpsert(ctx context.Context, tx *sql.Tx, field *eventstore.Field
 	return err
 }
 
+func writeUpsertField(fields []eventstore.FieldType) string {
+	var builder strings.Builder
+
+	builder.WriteString(fieldsUpsertPrefix)
+	for i, fieldName := range fields {
+		if i > 0 {
+			builder.WriteString(" AND ")
+		}
+		name, index := searchFieldNameAndIndexByTypeForPush(fieldName)
+
+		builder.WriteString(name)
+		builder.WriteString(" = ")
+		builder.WriteString(index)
+	}
+	builder.WriteString(fieldsUpsertSuffix)
+
+	return builder.String()
+}
+
 const removeSearch = `DELETE FROM eventstore.fields WHERE `
 
 func handleSearchDelete(ctx context.Context, tx *sql.Tx, clauses map[eventstore.FieldType]any) error {
+	if len(clauses) == 0 {
+		return zerrors.ThrowInvalidArgument(nil, "V3-oqlBZ", "no conditions")
+	}
+	stmt, args := writeDeleteField(clauses)
+	_, err := tx.ExecContext(ctx, stmt, args...)
+	return err
+}
+
+func writeDeleteField(clauses map[eventstore.FieldType]any) (string, []any) {
 	var (
 		builder strings.Builder
 		args    = make([]any, 0, len(clauses))
 	)
 	builder.WriteString(removeSearch)
 
-	for fieldName, value := range clauses {
+	orderedCondition := make([]eventstore.FieldType, 0, len(clauses))
+	for field := range clauses {
+		orderedCondition = append(orderedCondition, field)
+	}
+	slices.Sort(orderedCondition)
+
+	for _, fieldName := range orderedCondition {
 		if len(args) > 0 {
 			builder.WriteString(" AND ")
 		}
-		builder.WriteString(fieldNameByType(fieldName, value))
+		builder.WriteString(fieldNameByType(fieldName, clauses[fieldName]))
 
 		builder.WriteString(" = $")
 		builder.WriteString(strconv.Itoa(len(args) + 1))
 
-		args = append(args, value)
+		args = append(args, clauses[fieldName])
 	}
-	_, err := tx.ExecContext(ctx, builder.String(), args...)
-	return err
+
+	return builder.String(), args
 }
 
 func fieldNameByType(typ eventstore.FieldType, value any) string {
