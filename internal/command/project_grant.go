@@ -263,6 +263,7 @@ func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGra
 	if err != nil {
 		return err
 	}
+
 	if projectGrant.HasInvalidRoles(existingRoleKeys) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
 	}
