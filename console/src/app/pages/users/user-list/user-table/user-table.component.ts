@@ -96,7 +96,10 @@ export class UserTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      this.getData(this.INITIAL_PAGE_SIZE, 0, this.type);
+      if (!params['filter']) {
+        this.getData(this.INITIAL_PAGE_SIZE, 0, this.type, this.searchQueries);
+      }
+
       if (params['deferredReload']) {
         setTimeout(() => {
           this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
@@ -116,7 +119,7 @@ export class UserTableComponent implements OnInit {
       queryParamsHandling: 'merge',
       skipLocationChange: false,
     });
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
+    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, this.searchQueries);
   }
 
   public isAllSelected(): boolean {
@@ -131,7 +134,7 @@ export class UserTableComponent implements OnInit {
 
   public changePage(event: PageEvent): void {
     this.selection.clear();
-    this.getData(event.pageSize, event.pageIndex * event.pageSize, this.type);
+    this.getData(event.pageSize, event.pageIndex * event.pageSize, this.type, this.searchQueries);
   }
 
   public deactivateSelectedUsers(): void {
