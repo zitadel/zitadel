@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -401,21 +402,33 @@ func (c *Commands) searchOrgDomainVerifiedByDomain(ctx context.Context, domain s
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	results, err := c.eventstore.Search(ctx,
-		map[eventstore.FieldType]any{
+	conditions := []map[eventstore.FieldType]any{
+		{
 			eventstore.FieldTypeAggregateType: org.AggregateType,
 			eventstore.FieldTypeObjectType:    org.OrgDomainSearchType,
 			eventstore.FieldTypeFieldName:     org.OrgDomainDomainSearchField,
 			eventstore.FieldTypeValue:         domain,
 		},
-		map[eventstore.FieldType]any{
+		{
 			eventstore.FieldTypeAggregateType: org.AggregateType,
 			eventstore.FieldTypeObjectType:    org.OrgDomainSearchType,
 			eventstore.FieldTypeFieldName:     org.OrgDomainVerifiedSearchField,
 		},
-	)
-	orgDomain := new(OrgDomainVerified)
+	}
 
+	results, err := c.eventstore.Search(ctx, conditions...)
+	if err != nil {
+		return nil, err
+	}
+	if len(results) == 0 {
+		_ = projection.OrgDomainVerifiedFields.Trigger(ctx)
+		results, err = c.eventstore.Search(ctx, conditions...)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	orgDomain := new(OrgDomainVerified)
 	for _, result := range results {
 		orgDomain.OrgID = result.Aggregate.ID
 		switch result.FieldName {
