@@ -4,8 +4,10 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -288,6 +290,10 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 }
 
 func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (err error) {
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProjectGrant) {
+		return c.checkUserGrantPreConditionOld(ctx, usergrant, resourceOwner)
+	}
+
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -299,6 +305,30 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 		return err
 	}
 	if usergrant.HasInvalidRoles(existingRoleKeys) {
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
+	}
+	return nil
+}
+
+func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	preConditions := NewUserGrantPreConditionReadModel(usergrant.UserID, usergrant.ProjectID, usergrant.ProjectGrantID, resourceOwner)
+	err = c.eventstore.FilterToQueryReducer(ctx, preConditions)
+	if err != nil {
+		return err
+	}
+	if !preConditions.UserExists {
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4f8sg", "Errors.User.NotFound")
+	}
+	if usergrant.ProjectGrantID == "" && !preConditions.ProjectExists {
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3n77S", "Errors.Project.NotFound")
+	}
+	if usergrant.ProjectGrantID != "" && !preConditions.ProjectGrantExists {
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-4m9ff", "Errors.Project.Grant.NotFound")
+	}
+	if usergrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
 	}
 	return nil
