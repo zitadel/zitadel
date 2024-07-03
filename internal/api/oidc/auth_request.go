@@ -555,7 +555,7 @@ func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorize
 		authReq.AuthTime,
 		authReq.GetNonce(),
 		authReq.PreferredLanguage,
-		authReq.BrowserInfo.ToUserAgent(),
+		authReq.ToUserAgent(),
 		domain.TokenReasonAuthRequest,
 		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),
