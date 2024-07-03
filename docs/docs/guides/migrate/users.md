@@ -129,9 +129,8 @@ The snippets in the sections below are parts from the bulk import endpoint, to c
 
 ### Passwords
 
-Passwords are stored only as hash.
-You can transfer the hashes as long as ZITADEL [supports the same hash algorithm](/docs/concepts/architecture/secrets#hashed-secrets).
-Password change on the next sign-in can be enforced.
+Passwords are never stored in clear text, but only only as irreversible hash.
+Existing hashed passwords can be imported into ZITADEL, as long as they use one of the supported [hash algorithms](/docs/concepts/architecture/secrets#hashed-secrets) 
 
 _snippet from [bulk-import](#bulk-import) example:_
 ```json
@@ -147,13 +146,15 @@ _snippet from [bulk-import](#bulk-import) example:_
 }
 ```
 
+Password change on the next sign-in can be enforced by setting `passwordChangeRequired` to `true`.
+With this option users can authenticated with their existing password, and then will be prompted to change their password after a successful login.
+Password change can be used for example for existing, but insecure hash algorithms such as md5.
+ZITADEL will use the md5 hashed password for the first authentication, and then use a configured algorithm to create the new password hash.
+
 In case the hashes can't be transferred directly, you always have the option to create a user in ZITADEL without password and prompt users to create a new password.
 
-If your legacy system receives the passwords in clear text (eg, login form) you could also directly create users via ZITADEL API. We will explain this pattern in more detail in this guide.
-
-:::info
-In case the hash algorithm you are using is not supported by ZITADEL, please let us know after searching our discussions, issues, and chat for similar requests.
-:::
+If your legacy system receives the passwords in clear text (eg, login form) you could also directly create users via ZITADEL API.
+We will explain this pattern in more detail in this guide.
 
 ### One-time-passwords (OTP)
 
