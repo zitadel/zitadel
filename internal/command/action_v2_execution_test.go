@@ -182,6 +182,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, method target",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -229,6 +230,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, service target",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -276,6 +278,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, all target",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -322,7 +325,8 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push not found, method include",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(),
+					expectFilter(), // execution doesn't exist yet
+					expectFilter(), // target doesn't exist
 				),
 				grpcMethodExists: existsMock(true),
 			},
@@ -348,6 +352,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, method include",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
@@ -403,7 +408,8 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push not found, service include",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(),
+					expectFilter(), // execution doesn't exist yet
+					expectFilter(), // target doesn't exist
 				),
 				grpcServiceExists: existsMock(true),
 			},
@@ -429,6 +435,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, service include",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
@@ -484,7 +491,8 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push not found, all include",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(),
+					expectFilter(), // execution doesn't exist yet
+					expectFilter(), // target doesn't exist
 				),
 			},
 			args{
@@ -509,6 +517,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, all include",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
@@ -550,6 +559,83 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					Targets: []*execution.Target{
 						{Type: domain.ExecutionTargetTypeInclude, Target: "request/include"},
 					},
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instance",
+				},
+			},
+		},
+		{
+			"push ok, remove all targets",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter( // exection has targets
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPush(
+						execution.NewSetEventV2(context.Background(),
+							execution.NewAggregate("request", "instance"),
+							[]*execution.Target{},
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"",
+					true,
+				},
+				set: &SetExecution{
+					Targets: []*execution.Target{},
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instance",
+				},
+			},
+		},
+		{
+			"push ok, unchanged execution",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter( // exection has targets
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"",
+					true,
+				},
+				set: &SetExecution{
+					Targets: []*execution.Target{{
+						Type:   domain.ExecutionTargetTypeTarget,
+						Target: "target",
+					}},
 				},
 				resourceOwner: "instance",
 			},
