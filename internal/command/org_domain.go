@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -399,6 +400,10 @@ type OrgDomainVerified struct {
 }
 
 func (c *Commands) searchOrgDomainVerifiedByDomain(ctx context.Context, domain string) (_ *OrgDomainVerified, err error) {
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeOrgDomainVerified) {
+		return c.searchOrgDomainVerifiedByDomainOld(ctx, domain)
+	}
+
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -443,4 +448,21 @@ func (c *Commands) searchOrgDomainVerifiedByDomain(ctx context.Context, domain s
 	}
 
 	return orgDomain, nil
+}
+
+func (c *Commands) searchOrgDomainVerifiedByDomainOld(ctx context.Context, domain string) (_ *OrgDomainVerified, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	writeModel := NewOrgDomainVerifiedWriteModel(domain)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OrgDomainVerified{
+		OrgID:    writeModel.ResourceOwner,
+		Domain:   writeModel.Domain,
+		Verified: writeModel.Verified,
+	}, nil
 }
