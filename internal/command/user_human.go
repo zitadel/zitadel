@@ -362,7 +362,7 @@ func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQue
 	return nil
 }
 
-func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string, username string, mustBeDomain bool) error {
+func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string, username string, mustBeDomain bool) (err error) {
 	if mustBeDomain {
 		return nil
 	}
@@ -372,12 +372,12 @@ func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string,
 		return nil
 	}
 
-	domainCheck, err := c.orgDomainVerifiedWriteModel(ctx, username[index+1:])
+	domainCheck, err := c.searchOrgDomainVerifiedByDomain(ctx, username[index+1:])
 	if err != nil {
 		return err
 	}
 
-	if domainCheck.Verified && domainCheck.ResourceOwner != resourceOwner {
+	if domainCheck.Verified && domainCheck.OrgID != resourceOwner {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
 	}
 
@@ -506,7 +506,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	}
 	human.Username = strings.TrimSpace(human.Username)
 	human.EmailAddress = human.EmailAddress.Normalize()
-	if err = c.checkUserHasDomain(ctx, orgID, human, domainPolicy); err != nil {
+	if err = c.userValidateDomain(ctx, orgID, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
 		return nil, nil, err
 	}
 
@@ -568,26 +568,6 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	}
 
 	return events, addedHuman, nil
-}
-
-func (c *Commands) checkUserHasDomain(ctx context.Context, orgID string, human *domain.Human, domainPolicy *domain.DomainPolicy) (err error) {
-	if !domainPolicy.UserLoginMustBeDomain {
-		ctx, span := tracing.NewSpan(ctx)
-		defer func() { span.EndWithError(err) }()
-
-		index := strings.LastIndex(human.Username, "@")
-		if index > 1 {
-			domainCheck := NewOrgDomainVerifiedWriteModel(human.Username[index+1:])
-			if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
-				return err
-			}
-			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-				return zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
-			}
-		}
-	}
-
-	return nil
 }
 
 func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner string) (err error) {

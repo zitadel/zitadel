@@ -390,3 +390,44 @@ func (c *Commands) getOrgDomainWriteModel(ctx context.Context, orgID, domain str
 	}
 	return domainWriteModel, nil
 }
+
+type OrgDomainVerified struct {
+	OrgID    string
+	Domain   string
+	Verified bool
+}
+
+func (c *Commands) searchOrgDomainVerifiedByDomain(ctx context.Context, domain string) (_ *OrgDomainVerified, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	results, err := c.eventstore.Search(ctx,
+		map[eventstore.FieldType]any{
+			eventstore.FieldTypeAggregateType: org.AggregateType,
+			eventstore.FieldTypeObjectType:    org.OrgDomainSearchType,
+			eventstore.FieldTypeFieldName:     org.OrgDomainDomainSearchField,
+			eventstore.FieldTypeValue:         domain,
+		},
+		map[eventstore.FieldType]any{
+			eventstore.FieldTypeAggregateType: org.AggregateType,
+			eventstore.FieldTypeObjectType:    org.OrgDomainSearchType,
+			eventstore.FieldTypeFieldName:     org.OrgDomainVerifiedSearchField,
+		},
+	)
+	orgDomain := new(OrgDomainVerified)
+
+	for _, result := range results {
+		orgDomain.OrgID = result.Aggregate.ID
+		switch result.FieldName {
+		case org.OrgDomainDomainSearchField:
+			err = result.Value.Unmarshal(&orgDomain.Domain)
+		case org.OrgDomainVerifiedSearchField:
+			err = result.Value.Unmarshal(&orgDomain.Verified)
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return orgDomain, nil
+}
