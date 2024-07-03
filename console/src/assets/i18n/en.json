@@ -2047,7 +2047,7 @@
         "DESCRIPTION": "Enter the credentials for your Apple Provider"
       },
       "SAML": {
-        "TITLE": "Sign in with SAML IdP",
+        "TITLE": "Sign in with SAML",
         "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
