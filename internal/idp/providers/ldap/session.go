@@ -3,13 +3,16 @@ package ldap
 import (
 	"context"
 	"crypto/tls"
+	"encoding/base64"
 	"errors"
 	"net"
 	"net/url"
 	"strconv"
 	"time"
+	"unicode/utf8"
 
 	"github.com/go-ldap/ldap/v3"
+	"github.com/zitadel/logging"
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/domain"
@@ -172,12 +175,14 @@ func trySearchAndUserBind(
 		return nil, err
 	}
 	if len(sr.Entries) != 1 {
+		logging.WithFields("entries", len(sr.Entries)).Info("ldap: no single user found")
 		return nil, ErrNoSingleUser
 	}
 
 	user := sr.Entries[0]
 	// Bind as the user to verify their password
 	if err = conn.Bind(user.DN, password); err != nil {
+		logging.WithFields("userDN", user.DN).WithError(err).Info("ldap user bind failed")
 		return nil, ErrFailedLogin
 	}
 	return user, nil
@@ -259,12 +264,12 @@ func mapLDAPEntryToUser(
 	}
 
 	return NewUser(
-		user.GetAttributeValue(idAttribute),
-		user.GetAttributeValue(firstNameAttribute),
-		user.GetAttributeValue(lastNameAttribute),
-		user.GetAttributeValue(displayNameAttribute),
-		user.GetAttributeValue(nickNameAttribute),
-		user.GetAttributeValue(preferredUsernameAttribute),
+		getAttributeValue(user, idAttribute),
+		getAttributeValue(user, firstNameAttribute),
+		getAttributeValue(user, lastNameAttribute),
+		getAttributeValue(user, displayNameAttribute),
+		getAttributeValue(user, nickNameAttribute),
+		getAttributeValue(user, preferredUsernameAttribute),
 		domain.EmailAddress(user.GetAttributeValue(emailAttribute)),
 		emailVerified,
 		domain.PhoneNumber(user.GetAttributeValue(phoneAttribute)),
@@ -273,4 +278,16 @@ func mapLDAPEntryToUser(
 		user.GetAttributeValue(avatarURLAttribute),
 		user.GetAttributeValue(profileAttribute),
 	), nil
+}
+
+func getAttributeValue(user *ldap.Entry, attribute string) string {
+	// return an empty string if no attribute is needed
+	if attribute == "" {
+		return ""
+	}
+	value := user.GetAttributeValue(attribute)
+	if utf8.ValidString(value) {
+		return value
+	}
+	return base64.StdEncoding.EncodeToString(user.GetRawAttributeValue(attribute))
 }

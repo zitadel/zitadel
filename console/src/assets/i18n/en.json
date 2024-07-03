@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instance Settings",
-        "DESCRIPTION": "The instance settings are the default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
+        "TITLE": "Default Settings",
+        "DESCRIPTION": "Default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
       },
       "ORG": {
         "TITLE": "Organization Settings",
@@ -486,6 +486,7 @@
     "MORE": "more",
     "STEP": "Step",
     "SETUP": "Setup",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Unsaved changes",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     },
-    "DOWNLOAD": "Download"
+    "DOWNLOAD": "Download",
+    "APPLY": "Apply"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Has control over the whole instance, including all organizations",
@@ -526,7 +528,7 @@
       "TEXT": "All organization settings and tables in console are based on a selected organization. Click this button to switch organization or create a new one."
     },
     "INSTANCE": {
-      "TEXT": "Click here to get to the instance settings. Note that you have only access to this button if you have enhanced permissions."
+      "TEXT": "Click here to get to the default settings. Note that you have only access to this button if you have enhanced permissions."
     },
     "PROFILE": {
       "TEXT": "Here you can switch between your user accounts and manage your sessions and profile."
@@ -1316,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instance Settings",
-      "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
-    },
     "LIST": {
       "ORGS": "Organizations",
       "FEATURESETTINGS": "Features",
@@ -2050,7 +2048,7 @@
         "DESCRIPTION": "Enter the credentials for your Apple Provider"
       },
       "SAML": {
-        "TITLE": "Sign in with SAML SP",
+        "TITLE": "Sign in with SAML",
         "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },
@@ -2260,6 +2258,7 @@
       "ACTIVATED": "Activated",
       "ACTIVATE": "Activate provider",
       "DEACTIVATE": "Deactivate provider",
+      "TEST": "Test your provider",
       "TYPE": "Type",
       "DIALOG": {
         "ACTIVATED": "SMTP config has been activated",
@@ -2271,7 +2270,11 @@
         "DELETE_TITLE": "Delete SMTP config",
         "DELETE_DESCRIPTION": "You are about to delete a configuration. Confirm this action typing the sender name",
         "DELETED": "SMTP config has been deleted",
-        "SENDER": "Type {{value}}, to delete this SMTP configuration."
+        "SENDER": "Type {{value}}, to delete this SMTP configuration.",
+        "TEST_TITLE": "Test your SMTP config",
+        "TEST_DESCRIPTION": "Specify an email address to test your SMTP configuration for this provider",
+        "TEST_EMAIL": "Email address",
+        "TEST_RESULT": "Test result"
       }
     },
     "CREATE": {
@@ -2283,7 +2286,6 @@
         "CURRENT_DESC_TITLE": "These are your SMTP settings",
         "PROVIDER_SETTINGS": "SMTP Provider Settings",
         "SENDER_SETTINGS": "Sender Settings",
-        "TEST_SETTINGS": "Test SMTP Settings",
         "NEXT_STEPS": "Next Steps",
         "ACTIVATE": {
           "TITLE": "Activate your SMTP Provider",
@@ -2292,6 +2294,12 @@
         "DEACTIVATE": {
           "TITLE": "Deactivate your SMTP Provider",
           "DESCRIPTION": "If you deactivate this SMTP Provider, ZITADEL cannot use it to send notifications until you activate it again."
+        },
+        "SAVE_SETTINGS": "Save your settings",
+        "TEST": {
+          "TITLE": "Test your settings",
+          "DESCRIPTION": "You can test your SMTP provider settings and check the test result before saving them",
+          "RESULT": "Your email was succesfully sent"
         }
       }
     },

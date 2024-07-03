@@ -4,7 +4,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
@@ -70,4 +73,37 @@ func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
 		wantCD := time.Now()
 		assert.WithinRange(t, gotCD, wantCD.Add(-time.Minute), wantCD.Add(time.Minute))
 	}
+}
+
+// EqualProto is inspired by [assert.Equal], only that it tests equality of a proto message.
+// A message diff is printed on the error test log if the messages are not equal.
+//
+// As [assert.Equal] is based on reflection, comparing 2 proto messages sometimes fails,
+// due to their internal state.
+// Expected messages are usually with a vanilla state, eg only exported fields contain data.
+// Actual messages obtained from the gRPC client had unexported fields with data.
+// This makes them hard to compare.
+func EqualProto(t testing.TB, expected, actual proto.Message) bool {
+	t.Helper()
+	if proto.Equal(expected, actual) {
+		return true
+	}
+	t.Errorf("Proto messages not equal: %s", diffProto(expected, actual))
+	return false
+}
+
+func diffProto(expected, actual proto.Message) string {
+	diff, err := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+		A:        difflib.SplitLines(protojson.Format(expected)),
+		B:        difflib.SplitLines(protojson.Format(actual)),
+		FromFile: "Expected",
+		FromDate: "",
+		ToFile:   "Actual",
+		ToDate:   "",
+		Context:  1,
+	})
+	if err != nil {
+		panic(err)
+	}
+	return "\n\nDiff:\n" + diff
 }

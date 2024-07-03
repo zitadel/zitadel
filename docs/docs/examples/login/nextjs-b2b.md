@@ -22,7 +22,7 @@ First we need to create an organization that holds the Vendor's users, projects 
 
 ### Vendor Organization
 
-Navigate to `https://{YourDomain}.zitadel.cloud/ui/console/orgs` (replace {YourDomain}), and click on the button "New".
+Navigate to `https://{YourDomain}.zitadel.cloud/ui/console/orgs` (replace \{YourDomain}), and click on the button "New".
 Toggle the setting "Use your personal account as organization owner".
 
 Enter the name `Demo-Vendor`, and click "Create". Then click on that organization.

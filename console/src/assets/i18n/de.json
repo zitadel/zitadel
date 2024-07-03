@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instanzeinstellungen",
-        "DESCRIPTION": "Die Instanzeinstellungen sind die Standardeinstellungen für alle Organisationen. Mit den richtigen Berechtigungen sind einige davon in den Organisationseinstellungen überschreibbar."
+        "TITLE": "Standardeinstellungen",
+        "DESCRIPTION": "Standardeinstellungen für alle Organisationen. Mit den richtigen Berechtigungen können einige davon in den Organisationseinstellungen überschrieben werden."
       },
       "ORG": {
         "TITLE": "Organisationseinstellungen",
@@ -485,6 +485,8 @@
     "NEXT": "Weiter",
     "MORE": "mehr",
     "STEP": "Schritt",
+    "SETUP": "Aufstellen",
+    "TEST": "Prüfen",
     "UNSAVEDCHANGES": "Nicht gespeicherte Änderungen",
     "UNSAVED": {
       "DIALOG": {
@@ -496,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
     },
-    "DOWNLOAD": "Herunterladen"
+    "DOWNLOAD": "Herunterladen",
+    "APPLY": "Anwenden"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Hat die Kontrolle über die gesamte Instanz, einschließlich aller Organisationen",
@@ -1315,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instanz Einstellungen",
-      "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewandt sofern die Einstellung nicht überschrieben wurde."
-    },
     "LIST": {
       "ORGS": "Organisationen",
       "FEATURESETTINGS": "Features",
@@ -2237,6 +2236,7 @@
       "ACTIVATED": "Aktiviert",
       "ACTIVATE": "Anbieter aktivieren",
       "DEACTIVATE": "Anbieter deaktivieren",
+      "TEST": "Testen Sie Ihren Anbieter",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "Die SMTP-Konfiguration wurde aktiviert",
@@ -2260,7 +2260,6 @@
         "CURRENT_DESC_TITLE": "Dies sind Ihre SMTP-Einstellungen",
         "PROVIDER_SETTINGS": "SMTP-Anbietereinstellungen",
         "SENDER_SETTINGS": "Absendereinstellungen",
-        "TEST_SETTINGS": "Testen Sie die SMTP-Einstellungen",
         "NEXT_STEPS": "Nächste Schritte",
         "ACTIVATE": {
           "TITLE": "Aktivieren Sie Ihren SMTP-Anbieter",
@@ -2269,6 +2268,12 @@
         "DEACTIVATE": {
           "TITLE": "Deaktivieren Sie Ihren SMTP-Anbieter",
           "DESCRIPTION": "Wenn Sie diesen SMTP-Anbieter deaktivieren, kann ZITADEL ihn nicht zum Versenden von Benachrichtigungen verwenden, bis Sie ihn erneut aktivieren."
+        },
+        "SAVE_SETTINGS": "Speichern Sie Ihre Einstellungen",
+        "TEST": {
+          "TITLE": "Testen Sie Ihre Einstellungen",
+          "DESCRIPTION": "Sie können die Einstellungen Ihres SMTP-Anbieters testen und das Testergebnis überprüfen, bevor Sie sie speichern",
+          "RESULT": "Deine E-Mail wurde erfolgreich versandt"
         }
       }
     },
