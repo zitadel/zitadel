@@ -1478,6 +1478,10 @@
         "DISABLED": "Inaktiverad"
       },
       "INHERITED_DESCRIPTION": "Detta ställer in värdet till systemets standardvärde.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Aktiverad\" ärvs",
+        "DISABLED": "\"Inaktiverad\" ärvs"
+      },
       "RESET": "Återställ allt till arv"
     },
     "DIALOG": {

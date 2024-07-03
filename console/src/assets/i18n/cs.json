@@ -1478,6 +1478,10 @@
         "DISABLED": "Zakázáno"
       },
       "INHERITED_DESCRIPTION": "Toto nastavení nastaví hodnotu na výchozí hodnotu systému.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Povoleno“ je zděděno",
+        "DISABLED": "„Zakázáno“ je zděděno"
+      },
       "RESET": "Nastavit vše na děděné"
     },
     "DIALOG": {

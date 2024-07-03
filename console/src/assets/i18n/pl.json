@@ -1477,6 +1477,10 @@
         "DISABLED": "Wyłączony"
       },
       "INHERITED_DESCRIPTION": "To ustawienie przypisuje wartość do wartości domyślnej systemu.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Włączony” jest dziedziczone",
+        "DISABLED": "„Wyłączony” jest dziedziczone"
+      },
       "RESET": "Ustaw wszystko na dziedziczone"
     },
     "DIALOG": {

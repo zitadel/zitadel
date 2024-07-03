@@ -1478,6 +1478,10 @@
         "DISABLED": "Uitgeschakeld"
       },
       "INHERITED_DESCRIPTION": "Deze instelling stelt de waarde in op de standaardwaarde van het systeem.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Ingeschakeld\" wordt overgenomen",
+        "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
+      },
       "RESET": "Alles instellen op overgenomen"
     },
     "DIALOG": {

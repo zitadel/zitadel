@@ -1479,6 +1479,10 @@
         "DISABLED": "Deshabilitado"
       },
       "INHERITED_DESCRIPTION": "Esta configuración establece el valor al valor predeterminado del sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Habilitado\" se hereda",
+        "DISABLED": "\"Deshabilitado\" se hereda"
+      },
       "RESET": "Establecer todo a heredado"
     },
     "DIALOG": {
