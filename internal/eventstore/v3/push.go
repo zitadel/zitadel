@@ -45,6 +45,13 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			return err
 		}
 
+		if es.client.Type() == "cockroach" {
+			_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
+			if err != nil {
+				return err
+			}
+		}
+
 		return handleFieldCommands(ctx, tx, commands)
 	})
 
