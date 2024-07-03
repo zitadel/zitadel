@@ -2,7 +2,6 @@ package setup
 
 import (
 	"context"
-	_ "embed"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -12,7 +11,6 @@ import (
 
 type FillFieldsForProjectGrant struct {
 	eventstore *eventstore.Eventstore
-	config     *FillFields
 }
 
 func (mig *FillFieldsForProjectGrant) Execute(ctx context.Context, _ eventstore.Event) error {

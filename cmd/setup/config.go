@@ -113,7 +113,6 @@ type Steps struct {
 	s27IDPTemplate6SAMLNameIDFormat        *IDPTemplate6SAMLNameIDFormat
 	s28AddFieldTable                       *AddFieldTable
 	s29FillFieldsForProjectGrant           *FillFieldsForProjectGrant
-	FillFields                             *FillFields
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
@@ -142,8 +141,4 @@ func MustNewSteps(v *viper.Viper) *Steps {
 	)
 	logging.OnError(err).Fatal("unable to read steps")
 	return steps
-}
-
-type FillFields struct {
-	BatchSize uint32
 }
