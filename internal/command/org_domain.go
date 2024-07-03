@@ -407,27 +407,21 @@ func (c *Commands) searchOrgDomainVerifiedByDomain(ctx context.Context, domain s
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	conditions := []map[eventstore.FieldType]any{
-		{
-			eventstore.FieldTypeAggregateType: org.AggregateType,
-			eventstore.FieldTypeObjectType:    org.OrgDomainSearchType,
-			eventstore.FieldTypeFieldName:     org.OrgDomainDomainSearchField,
-			eventstore.FieldTypeValue:         domain,
-		},
-		{
-			eventstore.FieldTypeAggregateType: org.AggregateType,
-			eventstore.FieldTypeObjectType:    org.OrgDomainSearchType,
-			eventstore.FieldTypeFieldName:     org.OrgDomainVerifiedSearchField,
-		},
+	condition := map[eventstore.FieldType]any{
+		eventstore.FieldTypeAggregateType:  org.AggregateType,
+		eventstore.FieldTypeObjectType:     org.OrgDomainSearchType,
+		eventstore.FieldTypeObjectID:       domain,
+		eventstore.FieldTypeObjectRevision: org.OrgDomainObjectRevision,
+		eventstore.FieldTypeFieldName:      org.OrgDomainVerifiedSearchField,
 	}
 
-	results, err := c.eventstore.Search(ctx, conditions...)
+	results, err := c.eventstore.Search(ctx, condition)
 	if err != nil {
 		return nil, err
 	}
 	if len(results) == 0 {
 		_ = projection.OrgDomainVerifiedFields.Trigger(ctx)
-		results, err = c.eventstore.Search(ctx, conditions...)
+		results, err = c.eventstore.Search(ctx, condition)
 		if err != nil {
 			return nil, err
 		}
@@ -436,13 +430,7 @@ func (c *Commands) searchOrgDomainVerifiedByDomain(ctx context.Context, domain s
 	orgDomain := new(OrgDomainVerified)
 	for _, result := range results {
 		orgDomain.OrgID = result.Aggregate.ID
-		switch result.FieldName {
-		case org.OrgDomainDomainSearchField:
-			err = result.Value.Unmarshal(&orgDomain.Domain)
-		case org.OrgDomainVerifiedSearchField:
-			err = result.Value.Unmarshal(&orgDomain.Verified)
-		}
-		if err != nil {
+		if err = result.Value.Unmarshal(&orgDomain.Verified); err != nil {
 			return nil, err
 		}
 	}

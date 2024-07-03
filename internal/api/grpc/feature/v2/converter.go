@@ -143,6 +143,8 @@ func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.Imp
 		return feature.ImprovedPerformanceTypeProjectGrant
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT:
 		return feature.ImprovedPerformanceTypeProject
+	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED:
+		return feature.ImprovedPerformanceTypeOrgDomainVerified
 	default:
 		return feature.ImprovedPerformanceTypeUnknown
 	}

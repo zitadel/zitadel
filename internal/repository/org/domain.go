@@ -20,7 +20,6 @@ const (
 	OrgDomainRemovedEventType            = domainEventPrefix + "removed"
 
 	OrgDomainSearchType          = "org_domain"
-	OrgDomainDomainSearchField   = "domain"
 	OrgDomainVerifiedSearchField = "verified"
 	OrgDomainObjectRevision      = uint8(1)
 )
@@ -57,21 +56,10 @@ func (e *DomainAddedEvent) Fields() []*eventstore.FieldOperation {
 		eventstore.SetField(
 			e.Aggregate(),
 			domainSearchObject(e.Domain),
-			OrgDomainDomainSearchField,
-			&eventstore.Value{
-				Value:        e.Domain,
-				ShouldIndex:  true,
-				MustBeUnique: true,
-			},
-		),
-		eventstore.SetField(
-			e.Aggregate(),
-			domainSearchObject(e.Domain),
 			OrgDomainVerifiedSearchField,
 			&eventstore.Value{
-				Value:        false,
-				ShouldIndex:  false,
-				MustBeUnique: false,
+				Value:       e.Domain,
+				ShouldIndex: false,
 			},
 		),
 	}
@@ -300,11 +288,6 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 
 func (e *DomainRemovedEvent) Fields() []*eventstore.FieldOperation {
 	return []*eventstore.FieldOperation{
-		eventstore.RemoveSearchFieldsByAggregateAndObjectAndField(
-			e.Aggregate(),
-			domainSearchObject(e.Domain),
-			OrgDomainDomainSearchField,
-		),
 		eventstore.RemoveSearchFieldsByAggregateAndObjectAndField(
 			e.Aggregate(),
 			domainSearchObject(e.Domain),
