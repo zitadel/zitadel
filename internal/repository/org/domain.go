@@ -58,9 +58,17 @@ func (e *DomainAddedEvent) Fields() []*eventstore.FieldOperation {
 			domainSearchObject(e.Domain),
 			OrgDomainVerifiedSearchField,
 			&eventstore.Value{
-				Value:       e.Domain,
+				Value:       false,
 				ShouldIndex: false,
 			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
@@ -192,9 +200,8 @@ func (e *DomainVerifiedEvent) Fields() []*eventstore.FieldOperation {
 			domainSearchObject(e.Domain),
 			OrgDomainVerifiedSearchField,
 			&eventstore.Value{
-				Value:        true,
-				ShouldIndex:  false,
-				MustBeUnique: false,
+				Value:       true,
+				ShouldIndex: false,
 			},
 
 			eventstore.FieldTypeInstanceID,
@@ -288,10 +295,22 @@ func (e *DomainRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint 
 
 func (e *DomainRemovedEvent) Fields() []*eventstore.FieldOperation {
 	return []*eventstore.FieldOperation{
-		eventstore.RemoveSearchFieldsByAggregateAndObjectAndField(
+		eventstore.SetField(
 			e.Aggregate(),
 			domainSearchObject(e.Domain),
 			OrgDomainVerifiedSearchField,
+			&eventstore.Value{
+				Value:       false,
+				ShouldIndex: false,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
 		),
 	}
 }
