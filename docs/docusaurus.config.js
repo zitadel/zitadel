@@ -283,7 +283,7 @@ module.exports = {
             outputDir: "docs/apis/resources/user_service",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           session: {
