@@ -299,7 +299,7 @@ module.exports = {
             outputDir: "docs/apis/resources/oidc_service",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           settings: {
