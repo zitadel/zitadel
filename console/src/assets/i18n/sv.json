@@ -1684,7 +1684,8 @@
         "username": "Användarnamn",
         "tempUsername": "Tillfälligt användarnamn",
         "otp": "Engångslösenord",
-        "verifyUrl": "Verifiera Engångslösenord URL"
+        "verifyUrl": "Verifiera Engångslösenord URL",
+        "expiry": "Utgångsdatum"
       },
       "TOAST": {
         "UPDATED": "Anpassade Texter sparade."

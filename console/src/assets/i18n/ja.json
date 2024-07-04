@@ -1676,7 +1676,8 @@
         "username": "ユーザー名",
         "tempUsername": "一時ユーザー名",
         "otp": "ワンタイムパスワード",
-        "verifyUrl": "ワンタイムパスワードを確認するURL"
+        "verifyUrl": "ワンタイムパスワードを確認するURL",
+        "expiry": "有効期限"
       },
       "TOAST": {
         "UPDATED": "カスタムテキストが保存されました。"
