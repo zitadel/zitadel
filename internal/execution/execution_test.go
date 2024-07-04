@@ -3,7 +3,6 @@ package execution
 import (
 	"context"
 	"encoding/json"
-	"github.com/zitadel/zitadel/internal/domain"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -12,6 +11,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 var _ Target = &mockTarget{}
