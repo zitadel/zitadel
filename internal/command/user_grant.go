@@ -312,6 +312,8 @@ func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *do
 	return nil
 }
 
+// this code needs to be rewritten anyways as soon as we improved the fields handling
+// nolint: gocognit
 func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (existingRoleKeys []string, err error) {
 	criteria := []map[eventstore.FieldType]any{
 		// project state query
