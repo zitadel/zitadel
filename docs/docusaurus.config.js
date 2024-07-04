@@ -71,13 +71,13 @@ module.exports = {
           label: "🚀 Quick Start",
           docId: "guides/start/quickstart",
           position: "left",
-        }, 
+        },
         {
           type: "doc",
           label: "Documentation",
           docId: "guides/overview",
           position: "left",
-        }, 
+        },
         {
           type: "doc",
           label: "APIs",
@@ -174,7 +174,7 @@ module.exports = {
             {
               label: "Status",
               href: "https://status.zitadel.com/",
-            }
+            },
           ],
         },
       ],
@@ -187,7 +187,16 @@ module.exports = {
       selector: "div#",
     },
     prism: {
-      additionalLanguages: ["csharp", "dart", "groovy", "regex", "java", "php", "python", "protobuf"],
+      additionalLanguages: [
+        "csharp",
+        "dart",
+        "groovy",
+        "regex",
+        "java",
+        "php",
+        "python",
+        "protobuf",
+      ],
     },
     colorMode: {
       defaultMode: "dark",
@@ -197,22 +206,22 @@ module.exports = {
   },
   webpack: {
     jsLoader: (isServer) => ({
-      loader: require.resolve('swc-loader'),
+      loader: require.resolve("swc-loader"),
       options: {
         jsc: {
           parser: {
-            syntax: 'typescript',
+            syntax: "typescript",
             tsx: true,
           },
           transform: {
             react: {
-              runtime: 'automatic',
+              runtime: "automatic",
             },
           },
-          target: 'es2017',
+          target: "es2017",
         },
         module: {
-          type: isServer ? 'commonjs' : 'es6',
+          type: isServer ? "commonjs" : "es6",
         },
       },
     }),
@@ -229,21 +238,19 @@ module.exports = {
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
-          
-          docItemComponent:  '@theme/ApiItem'
+          docItemComponent: "@theme/ApiItem",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
-      })
+      }),
     ],
-
   ],
   plugins: [
     [
-      'docusaurus-plugin-openapi-docs',
+      "docusaurus-plugin-openapi-docs",
       {
-        id: "apiDocs",
+        id: "api",
         docsPluginId: "classic",
         config: {
           auth: {
@@ -279,7 +286,8 @@ module.exports = {
             },
           },
           user: {
-            specPath: ".artifacts/openapi/zitadel/user/v2beta/user_service.swagger.json",
+            specPath:
+              ".artifacts/openapi/zitadel/user/v2beta/user_service.swagger.json",
             outputDir: "docs/apis/resources/user_service",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -287,7 +295,8 @@ module.exports = {
             },
           },
           session: {
-            specPath: ".artifacts/openapi/zitadel/session/v2beta/session_service.swagger.json",
+            specPath:
+              ".artifacts/openapi/zitadel/session/v2beta/session_service.swagger.json",
             outputDir: "docs/apis/resources/session_service",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -295,7 +304,8 @@ module.exports = {
             },
           },
           oidc: {
-            specPath: ".artifacts/openapi/zitadel/oidc/v2beta/oidc_service.swagger.json",
+            specPath:
+              ".artifacts/openapi/zitadel/oidc/v2beta/oidc_service.swagger.json",
             outputDir: "docs/apis/resources/oidc_service",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -303,7 +313,8 @@ module.exports = {
             },
           },
           settings: {
-            specPath: ".artifacts/openapi/zitadel/settings/v2beta/settings_service.swagger.json",
+            specPath:
+              ".artifacts/openapi/zitadel/settings/v2beta/settings_service.swagger.json",
             outputDir: "docs/apis/resources/settings_service",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -311,7 +322,8 @@ module.exports = {
             },
           },
           user_schema: {
-            specPath: ".artifacts/openapi/zitadel/user/schema/v3alpha/user_schema_service.swagger.json",
+            specPath:
+              ".artifacts/openapi/zitadel/user/schema/v3alpha/user_schema_service.swagger.json",
             outputDir: "docs/apis/resources/user_schema_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -319,7 +331,8 @@ module.exports = {
             },
           },
           user_v3: {
-            specPath: ".artifacts/openapi/zitadel/user/v3alpha/user_service.swagger.json",
+            specPath:
+              ".artifacts/openapi/zitadel/user/v3alpha/user_service.swagger.json",
             outputDir: "docs/apis/resources/user_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -327,19 +340,21 @@ module.exports = {
             },
           },
           action_v3: {
-            specPath: ".artifacts/openapi/zitadel/action/v3alpha/action_service.swagger.json",
+            specPath:
+              ".artifacts/openapi/zitadel/action/v3alpha/action_service.swagger.json",
             outputDir: "docs/apis/resources/action_service_v3",
             sidebarOptions: {
-                groupPathsBy: "tag",
-                categoryLinkSource: "tag",
+              groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
           feature_v2: {
-            specPath: ".artifacts/openapi/zitadel/feature/v2beta/feature_service.swagger.json",
+            specPath:
+              ".artifacts/openapi/zitadel/feature/v2beta/feature_service.swagger.json",
             outputDir: "docs/apis/resources/feature_service_v2",
             sidebarOptions: {
-                groupPathsBy: "tag",
-                categoryLinkSource: "tag",
+              groupPathsBy: "tag",
+              categoryLinkSource: "tag",
             },
           },
         },
@@ -358,5 +373,8 @@ module.exports = {
       };
     },
   ],
-  themes: ["@saucelabs/theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  themes: [
+    "@saucelabs/theme-github-codeblock",
+    "docusaurus-theme-openapi-docs",
+  ],
 };
