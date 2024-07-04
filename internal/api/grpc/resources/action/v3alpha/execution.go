@@ -94,6 +94,24 @@ func conditionToInclude(cond *action.Condition) (string, error) {
 	}
 }
 
+func (s *Server) ListExecutionFunctions(_ context.Context, _ *action.ListExecutionFunctionsRequest) (*action.ListExecutionFunctionsResponse, error) {
+	return &action.ListExecutionFunctionsResponse{
+		Functions: s.ListActionFunctions(),
+	}, nil
+}
+
+func (s *Server) ListExecutionMethods(_ context.Context, _ *action.ListExecutionMethodsRequest) (*action.ListExecutionMethodsResponse, error) {
+	return &action.ListExecutionMethodsResponse{
+		Methods: s.ListGRPCMethods(),
+	}, nil
+}
+
+func (s *Server) ListExecutionServices(_ context.Context, _ *action.ListExecutionServicesRequest) (*action.ListExecutionServicesResponse, error) {
+	return &action.ListExecutionServicesResponse{
+		Services: s.ListGRPCServices(),
+	}, nil
+}
+
 func executionConditionFromRequest(request *action.RequestExecution) *command.ExecutionAPICondition {
 	return &command.ExecutionAPICondition{
 		Method:  request.GetMethod(),
