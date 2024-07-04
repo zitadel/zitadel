@@ -39,7 +39,10 @@ func (s *Server) RemoveOrg(ctx context.Context, req *admin_pb.RemoveOrgRequest) 
 
 func (s *Server) GetDefaultOrg(ctx context.Context, _ *admin_pb.GetDefaultOrgRequest) (*admin_pb.GetDefaultOrgResponse, error) {
 	org, err := s.query.OrgByID(ctx, true, authz.GetInstance(ctx).DefaultOrganisationID())
-	return &admin_pb.GetDefaultOrgResponse{Org: org_grpc.OrgToPb(org)}, err
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetDefaultOrgResponse{Org: org_grpc.OrgToPb(org)}, nil
 }
 
 func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest) (*admin_pb.GetOrgByIDResponse, error) {
