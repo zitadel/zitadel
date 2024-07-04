@@ -53,11 +53,24 @@ Errors:
     NotFound: SMS-konfiguration hittades inte
     AlreadyActive: SMS-konfiguration redan aktiv
     AlreadyDeactivated: SMS-konfiguration redan avaktiverad
+  SMTP:
+    NotEmailMessage: meddelandet är inte EmailMessage
+    RequiredAttributes: Ämne, mottagare och innehåll måste anges men några eller alla är tomma
+    CouldNotSplit: kunde inte dela värd och port för anslutning till smtp
+    CouldNotDial: kunde inte kontakta SMTP-servern, kontrollera porten, brandväggsproblem...
+    CouldNotDialTLS: kunde inte kontakta SMTP-servern med TLS, kontrollera porten, brandväggsproblem...
+    CouldNotCreateClient: kunde inte skapa smtp-klient
+    CouldNotStartTLS: kunde inte starta tls
+    CouldNotAuth: kunde inte lägga till smtp auth, kontrollera om både din användare och lösenord är korrekta, om de är korrekta kanske din leverantör kräver en auth-metod som inte stöds av ZITADEL
+    CouldNotSetSender: kunde inte ställa in avsändare
+    CouldNotSetRecipient: kunde inte ange mottagare
   SMTPConfig:
+    TestPassword: Lösenordet för testet hittades inte
     NotFound: SMTP-konfiguration hittades inte
     AlreadyExists: SMTP-konfiguration finns redan
     AlreadyDeactivated: SMTP-konfiguration redan avaktiverad
     SenderAdressNotCustomDomain: Avsändaradressen måste sättas som kundanpassad domän på instansen.
+    TestEmailNotFound: E-postadressen för testet hittades inte
   Notification:
     NoDomain: Ingen domän hittades för meddelandet
   User:
@@ -1340,4 +1353,3 @@ Action:
     PreUserinfoCreation: Före skapande av användarinformation
     PreAccessTokenCreation: Före skapande av åtkomsttoken
     PreSAMLResponseCreation: Före skapande av SAMLResponse
-    

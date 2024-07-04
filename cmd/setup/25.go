@@ -23,5 +23,5 @@ func (mig *User11AddLowerFieldsToVerifiedEmail) Execute(ctx context.Context, _ e
 }
 
 func (mig *User11AddLowerFieldsToVerifiedEmail) String() string {
-	return "25_user12_add_lower_fields_to_verified_email"
+	return "25_user13_add_lower_fields_to_verified_email"
 }

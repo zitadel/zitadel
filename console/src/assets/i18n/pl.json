@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Ustawienia instancji",
-        "DESCRIPTION": "Ustawienia instancji są domyślnymi ustawieniami dla wszystkich organizacji. Z odpowiednimi uprawnieniami niektóre z nich mogą być nadpisywane w ustawieniach organizacji."
+        "TITLE": "Ustawienia domyślne",
+        "DESCRIPTION": "Ustawienia domyślne dla wszystkich organizacji. Przy odpowiednich uprawnieniach niektóre z nich można zastąpić w ustawieniach organizacji."
       },
       "ORG": {
         "TITLE": "Ustawienia organizacji",
@@ -486,6 +486,7 @@
     "MORE": "więcej",
     "STEP": "Krok",
     "UNSAVEDCHANGES": "Niezapisane zmiany",
+    "TEST": "Test",
     "UNSAVED": {
       "DIALOG": {
         "DESCRIPTION": "Czy na pewno chcesz odrzucić to nowe działanie? Twoje działanie zostanie utracone",
@@ -496,7 +497,8 @@
     "TABLE": {
       "SHOWUSER": "Pokaż użytkownika {{value}}"
     },
-    "DOWNLOAD": "Pobierz"
+    "DOWNLOAD": "Pobierz",
+    "APPLY": "Stosować"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Ma kontrolę nad całą instancją, włącznie z wszystkimi organizacjami",
@@ -1315,16 +1317,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Ustawienia instancji",
-      "DESCRIPTION": "Te ustawienia będą dotyczyć wszystkich twoich organizacji, chyba że zostaną zastąpione."
-    },
     "LIST": {
       "ORGS": "Organizacje",
       "FEATURESETTINGS": "Ustawienia funkcji",
       "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",
+      "AGE": "Wygaśnięcie hasła",
       "COMPLEXITY": "Złożoność hasła",
       "NOTIFICATIONS": "Ustawienia powiadomień",
       "SMTP_PROVIDER": "Dostawca SMTP",
@@ -1545,8 +1544,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Starzenie się hasła",
-      "DESCRIPTION": "Możesz ustawić politykę dotyczącą starzenia się haseł. Ta polityka emituje ostrzeżenie po upływie określonego czasu starzenia."
+      "TITLE": "Wygaśnięcie hasła",
+      "DESCRIPTION": "Możesz ustawić zasady wygasania haseł. Ta zasada zmusi użytkownika do zmiany hasła przy następnym logowaniu po jego wygaśnięciu. Nie ma automatycznych ostrzeżeń i powiadomień."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Polityka blokowania",
@@ -1699,8 +1698,8 @@
       "SHOWLOCKOUTFAILURES": "pokaż blokady nieudanych prób",
       "MAXPASSWORDATTEMPTS": "Maksymalna liczba prób wprowadzenia hasła",
       "MAXOTPATTEMPTS": "Maksymalna liczba prób OTP",
-      "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniu",
-      "MAXAGEDAYS": "Maksymalny wiek w dniach",
+      "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniach",
+      "MAXAGEDAYS": "Maksymalna ważność w dniach",
       "USERLOGINMUSTBEDOMAIN": "Dodaj domenę organizacji jako przyrostek do nazw logowania",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Jeśli włączysz to ustawienie, wszystkie nazwy logowania będą miały przyrostek z domeną organizacji. Jeśli to ustawienie jest wyłączone, musisz zapewnić unikalność nazw użytkowników we wszystkich organizacjach.",
       "VALIDATEORGDOMAINS": "Weryfikacja domeny organizacji jest wymagana (wyzwanie DNS lub HTTP)",
@@ -2237,6 +2236,7 @@
       "ACTIVATED": "Aktywowany",
       "ACTIVATE": "Aktywuj dostawcę",
       "DEACTIVATE": "Dezaktywuj dostawcę",
+      "TEST": "Przetestuj swojego dostawcę",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "Konfiguracja SMTP została aktywowana",
@@ -2260,7 +2260,6 @@
         "CURRENT_DESC_TITLE": "To są Twoje ustawienia SMTP",
         "PROVIDER_SETTINGS": "Ustawienia dostawcy SMTP",
         "SENDER_SETTINGS": "Ustawienia nadawcy",
-        "TEST_SETTINGS": "Przetestuj ustawienia SMTP",
         "NEXT_STEPS": "Następne kroki",
         "ACTIVATE": {
           "TITLE": "Aktywuj swojego dostawcę SMTP",
@@ -2269,6 +2268,12 @@
         "DEACTIVATE": {
           "TITLE": "Dezaktywuj swojego dostawcę SMTP",
           "DESCRIPTION": "Jeśli dezaktywujesz tego dostawcę SMTP, ZITADEL nie będzie mógł go używać do wysyłania powiadomień, dopóki nie aktywujesz go ponownie."
+        },
+        "SAVE_SETTINGS": "Zapisz swoje ustawienia",
+        "TEST": {
+          "TITLE": "Przetestuj swoje ustawienia",
+          "DESCRIPTION": "Możesz przetestować ustawienia dostawcy SMTP i sprawdzić wynik testu przed ich zapisaniem",
+          "RESULT": "Twój email został wysłany"
         }
       }
     },

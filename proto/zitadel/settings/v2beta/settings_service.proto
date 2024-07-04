@@ -204,6 +204,30 @@ service SettingsService {
     };
   }
 
+  // Get the password expiry settings
+  rpc GetPasswordExpirySettings (GetPasswordExpirySettingsRequest) returns (GetPasswordExpirySettingsResponse) {
+    option (google.api.http) = {
+      get: "/v2beta/settings/password/expiry"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "policy.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get the password expiry settings";
+      description: "Return the password expiry settings for the requested context"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
   // Get the current active branding settings
   rpc GetBrandingSettings (GetBrandingSettingsRequest) returns (GetBrandingSettingsResponse) {
     option (google.api.http) = {
@@ -356,6 +380,15 @@ message GetPasswordComplexitySettingsRequest {
 message GetPasswordComplexitySettingsResponse {
   zitadel.object.v2beta.Details details = 1;
   zitadel.settings.v2beta.PasswordComplexitySettings settings = 2;
+}
+
+message GetPasswordExpirySettingsRequest {
+  zitadel.object.v2beta.RequestContext ctx = 1;
+}
+
+message GetPasswordExpirySettingsResponse {
+  zitadel.object.v2beta.Details details = 1;
+  zitadel.settings.v2beta.PasswordExpirySettings settings = 2;
 }
 
 message GetBrandingSettingsRequest {

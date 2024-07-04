@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instansinställningar",
-        "DESCRIPTION": "Instansinställningarna är standardinställningarna för alla organisationer. Med rätt behörigheter kan vissa av dem åsidosättas i organisationsinställningarna."
+        "TITLE": "Standardinställningar",
+        "DESCRIPTION": "Standardinställningar för alla organisationer. Med rätt behörigheter kan vissa av dem åsidosättas i organisationsinställningar."
       },
       "ORG": {
         "TITLE": "Organisationsinställningar",
@@ -486,6 +486,7 @@
     "MORE": "mer",
     "STEP": "Steg",
     "SETUP": "Inställning",
+    "TEST": "Testa",
     "UNSAVEDCHANGES": "Osparade ändringar",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Visa användare {{value}}"
     },
-    "DOWNLOAD": "Ladda ner"
+    "DOWNLOAD": "Ladda ner",
+    "APPLY": "Tillämpa"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Har kontroll över hela instansen, inklusive alla organisationer",
@@ -1326,6 +1328,7 @@
       "LANGUAGES": "Språk",
       "LOGIN": "Inloggningsbeteende och säkerhet",
       "LOCKOUT": "Låsning",
+      "AGE": "Lösenordets utgång",
       "COMPLEXITY": "Lösenordskomplexitet",
       "NOTIFICATIONS": "Meddelanden",
       "SMTP_PROVIDER": "SMTP-leverantör",
@@ -1546,8 +1549,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Lösenordsåldrande",
-      "DESCRIPTION": "Du kan ställa in en policy för lösenordsåldrande. Denna policy avger en varning efter den specifika åldringstiden har passerat."
+      "TITLE": "Lösenordets utgång",
+      "DESCRIPTION": "Du kan ställa in en policy för utgångsdatum för lösenord.  Den här policyn tvingar användaren att byta lösenord vid nästa inloggning efter att lösenordet har löpt ut. Det finns inga automatiska varningar eller meddelanden."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Låsning av lösenordspolicy",
@@ -1700,8 +1703,8 @@
       "SHOWLOCKOUTFAILURES": "visa låsning misslyckanden",
       "MAXPASSWORDATTEMPTS": "Maximalt antal lösenordsförsök",
       "MAXOTPATTEMPTS": "Maximalt antal OTP-försök",
-      "EXPIREWARNDAYS": "Utgångsvarning efter dag",
-      "MAXAGEDAYS": "Max ålder i dagar",
+      "EXPIREWARNDAYS": "Utgångsvarning efter dagar",
+      "MAXAGEDAYS": "Maximal giltighetstid i dagar",
       "USERLOGINMUSTBEDOMAIN": "Lägg till organisationsdomän som suffix till inloggningsnamn",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Om du aktiverar denna inställning kommer alla inloggningsnamn att ha organisationsdomänen som suffix. Om denna inställning är inaktiverad måste du säkerställa att användarnamn är unika över alla organisationer.",
       "VALIDATEORGDOMAINS": "Organisationsdomänverifiering krävs (DNS eller HTTP-utmaning)",
@@ -2258,6 +2261,7 @@
       "ACTIVATED": "Aktiverad",
       "ACTIVATE": "Aktivera leverantör",
       "DEACTIVATE": "Inaktivera leverantör",
+      "TEST": "Testa din leverantör",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "SMTP-konfigurationen har aktiverats",
@@ -2269,7 +2273,11 @@
         "DELETE_TITLE": "Radera SMTP-konfiguration",
         "DELETE_DESCRIPTION": "Du håller på att radera en konfiguration. Bekräfta denna åtgärd genom att skriva avsändarnamnet",
         "DELETED": "SMTP-konfigurationen har raderats",
-        "SENDER": "Skriv {{value}}, för att radera denna SMTP-konfiguration."
+        "SENDER": "Skriv {{value}}, för att radera denna SMTP-konfiguration.",
+        "TEST_TITLE": "Testa din SMTP-konfiguration",
+        "TEST_DESCRIPTION": "Ange en e-postadress för att testa din SMTP-konfiguration för den här leverantören",
+        "TEST_EMAIL": "E-postadress",
+        "TEST_RESULT": "Testresultat"
       }
     },
     "CREATE": {
@@ -2281,7 +2289,6 @@
         "CURRENT_DESC_TITLE": "Dessa är dina SMTP-inställningar",
         "PROVIDER_SETTINGS": "SMTP-leverantörsinställningar",
         "SENDER_SETTINGS": "Avsändarinställningar",
-        "TEST_SETTINGS": "Testa SMTP-inställningar",
         "NEXT_STEPS": "Nästa steg",
         "ACTIVATE": {
           "TITLE": "Aktivera din SMTP-leverantör",
@@ -2290,6 +2297,12 @@
         "DEACTIVATE": {
           "TITLE": "Inaktivera din SMTP-leverantör",
           "DESCRIPTION": "Om du inaktiverar denna SMTP-leverantör kan ZITADEL inte använda den för att skicka meddelanden förrän du aktiverar den igen."
+        },
+        "SAVE_SETTINGS": "Spara dina inställningar",
+        "TEST": {
+          "TITLE": "Testa dina inställningar",
+          "DESCRIPTION": "Du kan testa inställningarna för din SMTP-leverantör och kontrollera testresultatet innan du sparar dem",
+          "RESULT": "Ditt e-postmeddelande har skickats"
         }
       }
     },

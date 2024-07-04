@@ -183,6 +183,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: パスワードの変更
   Description: 旧パスワードと新パスワードを入力し、パスワードを変更してください。
+  ExpiredDescription: パスワードの有効期限が切れたため、変更する必要があります。古いパスワードと新しいパスワードを入力してください。
   OldPasswordLabel: 旧パスワード
   NewPasswordLabel: 新パスワード
   NewPasswordConfirmLabel: 新パスワードの確認

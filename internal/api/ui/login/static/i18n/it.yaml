@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Reimposta password
   Description: Cambia la tua password. Inserisci la tua vecchia e la nuova password.
+  ExpiredDescription: La password è scaduta e deve essere modificata. Inserisci la tua vecchia e la nuova password.
   OldPasswordLabel: Vecchia password
   NewPasswordLabel: Nuova password
   NewPasswordConfirmLabel: Conferma della password

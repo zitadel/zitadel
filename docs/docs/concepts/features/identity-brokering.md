@@ -75,4 +75,4 @@ To address this, ZITADEL provides generic templates that enable connection to vi
 
 * [Detailed integration guide for many identity providers](/guides/integrate/identity-providers/introduction)
 * [Setup identity providers with Console](/guides/manage/console/default-settings#identity-providers)
-* [Configure identity providers with the ZITADEL API](/docs/category/apis/resources/mgmt/identity-providers)
+* [Configure identity providers with the ZITADEL API](/docs/apis/resources/mgmt/identity-providers)

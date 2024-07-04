@@ -28,7 +28,7 @@ SelectAccount:
   SessionState1: Utloggad
   MustBeMemberOfOrg: Användaren måste finnas i organisationen {{.OrgName}}.
 
-Lösenord:
+Password:
   Title: Lösenord
   Description: Ange dina användaruppgifter.
   PasswordLabel: Lösenord
@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Ändra lösenord
   Description: Ändra diit lösenord. Ange både ditt gamla och det nya lösenordet.
+  ExpiredDescription: Ditt lösenord har gått ut och måste bytas ut. Ange ditt gamla och nya lösenord.
   OldPasswordLabel: Gammalt lösenord
   NewPasswordLabel: Nytt lösenord
   NewPasswordConfirmLabel: Nytt lösenord igen

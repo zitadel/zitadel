@@ -23,34 +23,34 @@ MockSAML is not intended for any production environment, only for test purposes
 ### Download metadata
 
 You can either download the metadata under [https://mocksaml.com/api/saml/metadata?download=true](https://mocksaml.com/api/saml/metadata?download=true) or skip this step and
-fill in the URL when creating the SAML SP in ZITADEL.
+fill in the URL when creating the SAML Provider in ZITADEL.
 
 ## ZITADEL configuration
 
 ### Go to the IdP providers overview
 
-<IDPsOverview templates="SAML SP"/>
+<IDPsOverview templates="SAML"/>
 
 ### Create a new SAML ServiceProvider
 
-The SAML SP provider template has everything you need preconfigured.
+The SAML provider template has everything you need preconfigured.
 Add the metadata.xml or the URL to the metadata which are accessible by you ZITADEL instance.
 All the necessary configuration is contained in the metadata which has to be exchanged by the ServiceProvider and the IdentityProvider.
 
 <GeneralConfigDescription provider_account="SAML account" />
 
-![SAML SP Provider](/img/guides/zitadel_saml_create_provider.png)
+![SAML Provider](/img/guides/zitadel_saml_create_provider.png)
 
 ### Download metadata
 
 Normally, you would need to download the ServiceProvider metadata from ZITADEL to upload to the IdentityProvider.
-They are available under [https://{CUSTOMDOMAIN}/idps/{ID of the provider in ZITADEL}/saml/metadata], but this step can be skipped due to the fact that MockSAML is only for testing purposes.
+They are available under `https://${CUSTOMDOMAIN}/idps/\{ID of the provider in ZITADEL}/saml/metadata`, but this step can be skipped due to the fact that MockSAML is only for testing purposes.
 
 ### Activate IdP
 
 <Activate/>
 
-![Activate the SAML SP Provider](/img/guides/zitadel_activate_saml.png)
+![Activate the SAML Provider](/img/guides/zitadel_activate_saml.png)
 
 ### Ensure your Login Policy allows External IDPs
 
@@ -58,11 +58,11 @@ They are available under [https://{CUSTOMDOMAIN}/idps/{ID of the provider in ZIT
 
 ## Test the setup
 
-<TestSetup loginscreen="your SAML SP login"/>
+<TestSetup loginscreen="your SAML login"/>
 
-![SAML SP Button](/img/guides/zitadel_login_saml.png)
+![SAML Button](/img/guides/zitadel_login_saml.png)
 
-![SAML SP Login](/img/guides/mocksaml_login.png)
+![SAML Login](/img/guides/mocksaml_login.png)
 
 ## Optional: Add ZITADEL action to autofill userdata
 

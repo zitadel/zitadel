@@ -49,3 +49,7 @@ func (m *mockEventStore) Push(ctx context.Context, cmds ...eventstore.Command) (
 	m.pushCounter++
 	return m.pushResponse[m.pushCounter-1], nil
 }
+
+func (m *mockEventStore) FillFields(ctx context.Context, events ...eventstore.FillFieldsEvent) error {
+	return nil
+}

@@ -1,6 +1,8 @@
 package user
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -48,6 +50,10 @@ func UserTypeToPb(user *query.User, assetPrefix string) user_pb.UserType {
 }
 
 func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
+	var passwordChanged *timestamppb.Timestamp
+	if !view.PasswordChanged.IsZero() {
+		passwordChanged = timestamppb.New(view.PasswordChanged)
+	}
 	return &user_pb.Human{
 		Profile: &user_pb.Profile{
 			FirstName:         view.FirstName,
@@ -66,6 +72,7 @@ func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
 			Phone:           string(view.Phone),
 			IsPhoneVerified: view.IsPhoneVerified,
 		},
+		PasswordChanged: passwordChanged,
 	}
 }
 

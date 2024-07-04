@@ -193,6 +193,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Промяна на паролата
   Description: 'Променете паролата си. '
+  ExpiredDescription: Паролата ви е изтекла и трябва да бъде променена. Въведете старата и новата си парола.
   OldPasswordLabel: Стара парола
   NewPasswordLabel: нова парола
   NewPasswordConfirmLabel: Потвърждение на парола

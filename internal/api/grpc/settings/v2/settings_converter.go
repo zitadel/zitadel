@@ -91,13 +91,21 @@ func multiFactorTypeToPb(typ domain.MultiFactorType) settings.MultiFactorType {
 	}
 }
 
-func passwordSettingsToPb(current *query.PasswordComplexityPolicy) *settings.PasswordComplexitySettings {
+func passwordComplexitySettingsToPb(current *query.PasswordComplexityPolicy) *settings.PasswordComplexitySettings {
 	return &settings.PasswordComplexitySettings{
 		MinLength:         current.MinLength,
 		RequiresUppercase: current.HasUppercase,
 		RequiresLowercase: current.HasLowercase,
 		RequiresNumber:    current.HasNumber,
 		RequiresSymbol:    current.HasSymbol,
+		ResourceOwnerType: isDefaultToResourceOwnerTypePb(current.IsDefault),
+	}
+}
+
+func passwordExpirySettingsToPb(current *query.PasswordAgePolicy) *settings.PasswordExpirySettings {
+	return &settings.PasswordExpirySettings{
+		MaxAgeDays:        current.MaxAgeDays,
+		ExpireWarnDays:    current.ExpireWarnDays,
 		ResourceOwnerType: isDefaultToResourceOwnerTypePb(current.IsDefault),
 	}
 }
@@ -208,6 +216,8 @@ func idpTypeToPb(idpType domain.IDPType) settings.IdentityProviderType {
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED
 	case domain.IDPTypeGoogle:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE
+	case domain.IDPTypeSAML:
+		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML
 	default:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED
 	}

@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instellingsinstellingen",
-        "DESCRIPTION": "De instellingsinstellingen zijn de standaardinstellingen voor alle organisaties. Met de juiste toestemmingen kunnen sommige hiervan worden overschreven in organisatie-instellingen."
+        "TITLE": "Standaard instellingen",
+        "DESCRIPTION": "Standaardinstellingen voor alle organisaties. Met de juiste machtigingen kunnen sommige ervan worden overschreven in de organisatie-instellingen."
       },
       "ORG": {
         "TITLE": "Organisatie-instellingen",
@@ -486,6 +486,7 @@
     "MORE": "meer",
     "STEP": "Stap",
     "SETUP": "Instellen",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Niet-opgeslagen wijzigingen",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Toon gebruiker {{value}}"
     },
-    "DOWNLOAD": "Download"
+    "DOWNLOAD": "Download",
+    "APPLY": "Toepassen"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
@@ -1316,16 +1318,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instantie Instellingen",
-      "DESCRIPTION": "Deze instellingen zijn van toepassing op al uw organisaties, tenzij ze zijn overschreven."
-    },
     "LIST": {
       "ORGS": "Organisaties",
       "FEATURESETTINGS": "Functie-instellingen",
       "LANGUAGES": "Talen",
       "LOGIN": "Login Gedrag en Beveiliging",
       "LOCKOUT": "Lockout",
+      "AGE": "Wachtwoord verloopt",
       "COMPLEXITY": "Wachtwoord complexiteit",
       "NOTIFICATIONS": "Notificaties",
       "SMTP_PROVIDER": "SMTP Provider",
@@ -1546,8 +1545,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Wachtwoord Veroudering",
-      "DESCRIPTION": "U kunt een beleid instellen voor de veroudering van wachtwoorden. Dit beleid geeft een waarschuwing nadat de specifieke verouderingstijd is verstreken."
+      "TITLE": "Wachtwoord verloopt",
+      "DESCRIPTION": "U kunt een beleid instellen voor het verlopen van wachtwoorden. Dit beleid dwingt de gebruiker om het wachtwoord te wijzigen bij de volgende aanmelding na het verlopen. Er zijn geen automatische waarschuwingen en meldingen."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Lockout Beleid",
@@ -1700,8 +1699,8 @@
       "SHOWLOCKOUTFAILURES": "toon lockout mislukkingen",
       "MAXPASSWORDATTEMPTS": "Maximum pogingen voor wachtwoord",
       "MAXOTPATTEMPTS": "Maximale OTP-pogingen",
-      "EXPIREWARNDAYS": "Vervaldatum Waarschuwing na dag",
-      "MAXAGEDAYS": "Maximale Leeftijd in dagen",
+      "EXPIREWARNDAYS": "Waarschuwing voor verlopen na dagen",
+      "MAXAGEDAYS": "Maximale geldigheid in dagen",
       "USERLOGINMUSTBEDOMAIN": "Voeg organisatie domein toe als achtervoegsel aan inlognamen",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Als u deze instelling inschakelt, worden alle inlognamen voorzien van een achtervoegsel met het domein van de organisatie. Als deze instelling is uitgeschakeld, moet u ervoor zorgen dat gebruikersnamen uniek zijn over alle organisaties.",
       "VALIDATEORGDOMAINS": "Verificatie van organisatiedomeinen vereist (DNS of HTTP-uitdaging)",
@@ -2255,6 +2254,7 @@
       "ACTIVATED": "Geactiveerd",
       "ACTIVATE": "Aanbieder activeren",
       "DEACTIVATE": "Aanbieder deactiveren",
+      "TEST": "Test uw aanbieder",
       "TYPE": "Type",
       "DIALOG": {
         "ACTIVATED": "SMTP-configuratie is geactiveerd",
@@ -2278,7 +2278,6 @@
         "CURRENT_DESC_TITLE": "Dit zijn uw SMTP-instellingen",
         "PROVIDER_SETTINGS": "SMTP-providerinstellingen",
         "SENDER_SETTINGS": "Afzenderinstellingen",
-        "TEST_SETTINGS": "SMTP-instellingen testen",
         "NEXT_STEPS": "Volgende stappen",
         "ACTIVATE": {
           "TITLE": "Activeer uw SMTP-provider",
@@ -2287,6 +2286,12 @@
         "DEACTIVATE": {
           "TITLE": "Deactiveer uw SMTP-provider",
           "DESCRIPTION": "Als u deze SMTP-provider deactiveert, kan ZITADEL deze niet gebruiken om meldingen te verzenden totdat u deze opnieuw activeert."
+        },
+        "SAVE_SETTINGS": "Sla uw instellingen op",
+        "TEST": {
+          "TITLE": "Test uw instellingen",
+          "DESCRIPTION": "U kunt de instellingen van uw SMTP-provider testen en het testresultaat controleren voordat u deze opslaat",
+          "RESULT": "Je email is succesvol verzonden"
         }
       }
     },
