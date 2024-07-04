@@ -11,7 +11,6 @@ FirstInstance:
   Org:
     Name: ZITADEL # ZITADEL_FIRSTINSTANCE_ORG_NAME
     # In the FirstInstance.Org.Human section, the initial organization's admin user with the role IAM_OWNER is defined.
-    # ZITADEL either creates a human user or a machine user.
     # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
     Human:
       # In case UserLoginMustBeDomain is false (default) and you don't overwrite the username with an email,
@@ -34,7 +33,6 @@ FirstInstance:
       Password: Password1! # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD
       PasswordChangeRequired: true # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED
     # In the FirstInstance.Org.Machine section, the initial organization's admin user with the role IAM_OWNER is defined.
-    # ZITADEL either creates a human user or a machine user.
     # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
     Machine:
       Machine:
