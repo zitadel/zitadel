@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -17,6 +18,13 @@ var (
 	GrantDeactivatedType    = grantEventTypePrefix + "deactivated"
 	GrantReactivatedType    = grantEventTypePrefix + "reactivated"
 	GrantRemovedType        = grantEventTypePrefix + "removed"
+
+	ProjectGrantSearchType              = "project_grant"
+	ProjectGrantGrantIDSearchField      = "grant_id"
+	ProjectGrantGrantedOrgIDSearchField = "granted_org_id"
+	ProjectGrantStateSearchField        = "state"
+	ProjectGrantRoleKeySearchField      = "role_key"
+	ProjectGrantObjectRevision          = uint8(1)
 )
 
 func NewAddProjectGrantUniqueConstraint(grantedOrgID, projectID string) *eventstore.UniqueConstraint {
@@ -46,6 +54,76 @@ func (e *GrantAddedEvent) Payload() interface{} {
 
 func (e *GrantAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewAddProjectGrantUniqueConstraint(e.GrantedOrgID, e.Aggregate().ID)}
+}
+
+func (e *GrantAddedEvent) Fields() []*eventstore.FieldOperation {
+	fields := make([]*eventstore.FieldOperation, 0, len(e.RoleKeys)+3)
+	fields = append(fields,
+		eventstore.SetField(
+			e.Aggregate(),
+			grantSearchObject(e.GrantID),
+			ProjectGrantGrantIDSearchField,
+			&eventstore.Value{
+				Value:       e.GrantID,
+				ShouldIndex: true,
+			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+		eventstore.SetField(
+			e.Aggregate(),
+			grantSearchObject(e.GrantID),
+			ProjectGrantGrantedOrgIDSearchField,
+			&eventstore.Value{
+				Value:       e.GrantedOrgID,
+				ShouldIndex: true,
+			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+		eventstore.SetField(
+			e.Aggregate(),
+			grantSearchObject(e.GrantID),
+			ProjectGrantStateSearchField,
+			&eventstore.Value{
+				Value:       domain.ProjectGrantStateActive,
+				ShouldIndex: true,
+			},
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+	)
+
+	for _, roleKey := range e.RoleKeys {
+		fields = append(fields,
+			eventstore.SetField(
+				e.Aggregate(),
+				grantSearchObject(e.GrantID),
+				ProjectGrantRoleKeySearchField,
+				&eventstore.Value{
+					Value:       roleKey,
+					ShouldIndex: true,
+				},
+			),
+		)
+	}
+
+	return fields
 }
 
 func NewGrantAddedEvent(
@@ -95,6 +173,37 @@ func (e *GrantChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
+func (e *GrantChangedEvent) Fields() []*eventstore.FieldOperation {
+	fields := make([]*eventstore.FieldOperation, 0, len(e.RoleKeys)+1)
+
+	fields = append(fields,
+		eventstore.RemoveSearchFieldsByAggregateAndObjectAndField(
+			e.Aggregate(),
+			grantSearchObject(e.GrantID),
+
+			ProjectGrantRoleKeySearchField,
+		),
+	)
+
+	for _, roleKey := range e.RoleKeys {
+		fields = append(fields,
+			eventstore.SetField(
+				e.Aggregate(),
+				grantSearchObject(e.GrantID),
+
+				ProjectGrantRoleKeySearchField,
+
+				&eventstore.Value{
+					Value:       roleKey,
+					ShouldIndex: true,
+				},
+			),
+		)
+	}
+
+	return fields
+}
+
 func NewGrantChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -138,6 +247,43 @@ func (e *GrantCascadeChangedEvent) Payload() interface{} {
 
 func (e *GrantCascadeChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *GrantCascadeChangedEvent) Fields() []*eventstore.FieldOperation {
+	fields := make([]*eventstore.FieldOperation, 0, len(e.RoleKeys)+1)
+
+	fields = append(fields,
+		eventstore.RemoveSearchFieldsByAggregateAndObjectAndField(
+			e.Aggregate(),
+			grantSearchObject(e.GrantID),
+
+			ProjectGrantRoleKeySearchField,
+		),
+	)
+
+	for _, roleKey := range e.RoleKeys {
+		fields = append(fields,
+			eventstore.SetField(
+				e.Aggregate(),
+				grantSearchObject(e.GrantID),
+
+				ProjectGrantRoleKeySearchField,
+				&eventstore.Value{
+					Value:       roleKey,
+					ShouldIndex: true,
+				},
+				eventstore.FieldTypeInstanceID,
+				eventstore.FieldTypeResourceOwner,
+				eventstore.FieldTypeAggregateType,
+				eventstore.FieldTypeAggregateID,
+				eventstore.FieldTypeObjectType,
+				eventstore.FieldTypeObjectID,
+				eventstore.FieldTypeFieldName,
+			),
+		)
+	}
+
+	return fields
 }
 
 func NewGrantCascadeChangedEvent(
@@ -184,6 +330,29 @@ func (e *GrantDeactivateEvent) UniqueConstraints() []*eventstore.UniqueConstrain
 	return nil
 }
 
+func (e *GrantDeactivateEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
+			e.Aggregate(),
+			grantSearchObject(e.GrantID),
+
+			ProjectGrantStateSearchField,
+			&eventstore.Value{
+				Value:       domain.ProjectGrantStateInactive,
+				ShouldIndex: true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+	}
+}
+
 func NewGrantDeactivateEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -224,6 +393,29 @@ func (e *GrantReactivatedEvent) Payload() interface{} {
 
 func (e *GrantReactivatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
+}
+
+func (e *GrantReactivatedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
+			e.Aggregate(),
+			grantSearchObject(e.GrantID),
+
+			ProjectGrantStateSearchField,
+			&eventstore.Value{
+				Value:       domain.ProjectGrantStateActive,
+				ShouldIndex: true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+	}
 }
 
 func NewGrantReactivatedEvent(
@@ -269,6 +461,29 @@ func (e *GrantRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return []*eventstore.UniqueConstraint{NewRemoveProjectGrantUniqueConstraint(e.grantedOrgID, e.Aggregate().ID)}
 }
 
+func (e *GrantRemovedEvent) Fields() []*eventstore.FieldOperation {
+	return []*eventstore.FieldOperation{
+		eventstore.SetField(
+			e.Aggregate(),
+			grantSearchObject(e.GrantID),
+
+			ProjectGrantStateSearchField,
+			&eventstore.Value{
+				Value:       domain.ProjectGrantStateRemoved,
+				ShouldIndex: true,
+			},
+
+			eventstore.FieldTypeInstanceID,
+			eventstore.FieldTypeResourceOwner,
+			eventstore.FieldTypeAggregateType,
+			eventstore.FieldTypeAggregateID,
+			eventstore.FieldTypeObjectType,
+			eventstore.FieldTypeObjectID,
+			eventstore.FieldTypeFieldName,
+		),
+	}
+}
+
 func NewGrantRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -297,4 +512,12 @@ func GrantRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 
 	return e, nil
+}
+
+func grantSearchObject(id string) eventstore.Object {
+	return eventstore.Object{
+		Type:     ProjectGrantSearchType,
+		Revision: 1,
+		ID:       id,
+	}
 }
