@@ -1475,6 +1475,10 @@
         "DISABLED": "Disabilitato"
       },
       "INHERITED_DESCRIPTION": "Questa impostazione imposta il valore predefinito del sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Abilitato\" viene ereditato",
+        "DISABLED": "\"Disabilitato\" viene ereditato"
+      },
       "RESET": "Imposta tutto su predefinito"
     },
     "DIALOG": {
