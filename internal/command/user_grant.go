@@ -383,10 +383,7 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 			case project.ProjectGrantGrantedOrgIDSearchField:
 				var orgID string
 				err := result.Value.Unmarshal(&orgID)
-				if err != nil {
-					return nil, err
-				}
-				if orgID != resourceOwner {
+				if err != nil || orgID != resourceOwner {
 					return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
 				}
 			case project.ProjectGrantStateSearchField:
@@ -406,10 +403,7 @@ func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGra
 			case project.ProjectGrantGrantIDSearchField:
 				var grantID string
 				err := result.Value.Unmarshal(&grantID)
-				if err != nil {
-					return nil, err
-				}
-				if grantID != userGrant.ProjectGrantID {
+				if err != nil || grantID != userGrant.ProjectGrantID {
 					return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-huvKF", "Errors.Project.Grant.NotFound")
 				}
 			}
