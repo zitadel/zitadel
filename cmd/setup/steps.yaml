@@ -52,3 +52,6 @@ CorrectCreationDate:
 
 AddEventCreatedAt:
   BulkAmount: 100 # ZITADEL_ADDEVENTCREATEDAT_BULKAMOUNT
+
+FillFields:
+  BatchSize: 1000 # ZITADEL_EVENTSTORE_FILLFIELDS_BULKLIMIT
