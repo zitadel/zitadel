@@ -2,6 +2,7 @@ package execution_test
 
 import (
 	"context"
+	"fmt"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/execution"
 	"io"
@@ -85,11 +86,11 @@ func Test_Call(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			respBody, err := testServer(t,
 				&callTestServer{
-					method:     tt.args.method,
-					body:       tt.args.body,
-					timeout:    tt.args.sleep,
-					statusCode: tt.args.statusCode,
-					respBody:   tt.args.respBody,
+					method:      tt.args.method,
+					expectBody:  tt.args.body,
+					timeout:     tt.args.sleep,
+					statusCode:  tt.args.statusCode,
+					respondBody: tt.args.respBody,
 				},
 				testCall(tt.args.ctx, tt.args.timeout, tt.args.body),
 			)
@@ -107,6 +108,7 @@ func Test_Call(t *testing.T) {
 func Test_CallTarget(t *testing.T) {
 	type args struct {
 		ctx    context.Context
+		info   *middleware.ContextInfoRequest
 		server *callTestServer
 		target *mockTarget
 	}
@@ -122,13 +124,14 @@ func Test_CallTarget(t *testing.T) {
 		{
 			"unknown targettype, error",
 			args{
-				ctx: context.Background(),
+				ctx:  context.Background(),
+				info: requestContextInfo1,
 				server: &callTestServer{
-					method:     http.MethodPost,
-					body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respBody:   []byte("{\"request\":\"content2\"}"),
-					timeout:    time.Second,
-					statusCode: http.StatusInternalServerError,
+					method:      http.MethodPost,
+					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
+					respondBody: []byte("{\"request\":\"content2\"}"),
+					timeout:     time.Second,
+					statusCode:  http.StatusInternalServerError,
 				},
 				target: &mockTarget{
 					TargetType: 4,
@@ -141,13 +144,14 @@ func Test_CallTarget(t *testing.T) {
 		{
 			"webhook, error",
 			args{
-				ctx: context.Background(),
+				ctx:  context.Background(),
+				info: requestContextInfo1,
 				server: &callTestServer{
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respBody:   []byte("{\"request\":\"content2\"}"),
-					statusCode: http.StatusInternalServerError,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
+					respondBody: []byte("{\"request\":\"content2\"}"),
+					statusCode:  http.StatusInternalServerError,
 				},
 				target: &mockTarget{
 					TargetType: domain.TargetTypeWebhook,
@@ -161,13 +165,14 @@ func Test_CallTarget(t *testing.T) {
 		{
 			"webhook, ok",
 			args{
-				ctx: context.Background(),
+				ctx:  context.Background(),
+				info: requestContextInfo1,
 				server: &callTestServer{
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respBody:   []byte("{\"request\":\"content2\"}"),
-					statusCode: http.StatusOK,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
+					respondBody: []byte("{\"request\":\"content2\"}"),
+					statusCode:  http.StatusOK,
 				},
 				target: &mockTarget{
 					TargetType: domain.TargetTypeWebhook,
@@ -181,13 +186,14 @@ func Test_CallTarget(t *testing.T) {
 		{
 			"request response, error",
 			args{
-				ctx: context.Background(),
+				ctx:  context.Background(),
+				info: requestContextInfo1,
 				server: &callTestServer{
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respBody:   []byte("{\"request\":\"content2\"}"),
-					statusCode: http.StatusInternalServerError,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
+					respondBody: []byte("{\"request\":\"content2\"}"),
+					statusCode:  http.StatusInternalServerError,
 				},
 				target: &mockTarget{
 					TargetType: domain.TargetTypeCall,
@@ -201,13 +207,14 @@ func Test_CallTarget(t *testing.T) {
 		{
 			"request response, ok",
 			args{
-				ctx: context.Background(),
+				ctx:  context.Background(),
+				info: requestContextInfo1,
 				server: &callTestServer{
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       []byte("{\"request\":{\"request\":\"content1\"}}"),
-					respBody:   []byte("{\"request\":\"content2\"}"),
-					statusCode: http.StatusOK,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  []byte("{\"request\":{\"request\":\"content1\"}}"),
+					respondBody: []byte("{\"request\":\"content2\"}"),
+					statusCode:  http.StatusOK,
 				},
 				target: &mockTarget{
 					TargetType: domain.TargetTypeCall,
@@ -221,7 +228,7 @@ func Test_CallTarget(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			respBody, err := testServer(t, tt.args.server, testCallTarget(tt.args.ctx, tt.args.target))
+			respBody, err := testServer(t, tt.args.server, testCallTarget(tt.args.ctx, tt.args.info, tt.args.target))
 			if tt.res.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -235,11 +242,12 @@ func Test_CallTarget(t *testing.T) {
 func Test_CallTargets(t *testing.T) {
 	type args struct {
 		ctx     context.Context
+		info    *middleware.ContextInfoRequest
 		servers []*callTestServer
 		targets []*mockTarget
 	}
 	type res struct {
-		body    []byte
+		ret     interface{}
 		wantErr bool
 	}
 	tests := []struct {
@@ -250,19 +258,20 @@ func Test_CallTargets(t *testing.T) {
 		{
 			"interrupt on status",
 			args{
-				ctx: context.Background(),
+				ctx:  context.Background(),
+				info: requestContextInfo1,
 				servers: []*callTestServer{{
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       requestContextInfoBody1,
-					respBody:   requestContextInfoBody2,
-					statusCode: http.StatusInternalServerError,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  requestContextInfoBody1,
+					respondBody: requestContextInfoBody2,
+					statusCode:  http.StatusInternalServerError,
 				}, {
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       requestContextInfoBody1,
-					respBody:   requestContextInfoBody2,
-					statusCode: http.StatusInternalServerError,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  requestContextInfoBody1,
+					respondBody: requestContextInfoBody2,
+					statusCode:  http.StatusInternalServerError,
 				}},
 				targets: []*mockTarget{
 					{InterruptOnError: false},
@@ -276,19 +285,20 @@ func Test_CallTargets(t *testing.T) {
 		{
 			"continue on status",
 			args{
-				ctx: context.Background(),
+				ctx:  context.Background(),
+				info: requestContextInfo1,
 				servers: []*callTestServer{{
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       requestContextInfoBody1,
-					respBody:   requestContextInfoBody2,
-					statusCode: http.StatusInternalServerError,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  requestContextInfoBody1,
+					respondBody: requestContextInfoBody2,
+					statusCode:  http.StatusInternalServerError,
 				}, {
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       requestContextInfoBody1,
-					respBody:   requestContextInfoBody2,
-					statusCode: http.StatusInternalServerError,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  requestContextInfoBody1,
+					respondBody: requestContextInfoBody2,
+					statusCode:  http.StatusInternalServerError,
 				}},
 				targets: []*mockTarget{
 					{InterruptOnError: false},
@@ -296,25 +306,26 @@ func Test_CallTargets(t *testing.T) {
 				},
 			},
 			res{
-				body: requestContextInfoBody2,
+				ret: requestContextInfo1.GetContent(),
 			},
 		},
 		{
 			"interrupt on json error",
 			args{
-				ctx: context.Background(),
+				ctx:  context.Background(),
+				info: requestContextInfo1,
 				servers: []*callTestServer{{
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       requestContextInfoBody1,
-					respBody:   requestContextInfoBody2,
-					statusCode: http.StatusOK,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  requestContextInfoBody1,
+					respondBody: requestContextInfoBody2,
+					statusCode:  http.StatusOK,
 				}, {
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       requestContextInfoBody1,
-					respBody:   []byte("just a string, not json"),
-					statusCode: http.StatusOK,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  requestContextInfoBody1,
+					respondBody: []byte("just a string, not json"),
+					statusCode:  http.StatusOK,
 				}},
 				targets: []*mockTarget{
 					{InterruptOnError: false},
@@ -328,26 +339,27 @@ func Test_CallTargets(t *testing.T) {
 		{
 			"continue on json error",
 			args{
-				ctx: context.Background(),
+				ctx:  context.Background(),
+				info: requestContextInfo1,
 				servers: []*callTestServer{{
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       requestContextInfoBody1,
-					respBody:   requestContextInfoBody2,
-					statusCode: http.StatusOK,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  requestContextInfoBody1,
+					respondBody: requestContextInfoBody2,
+					statusCode:  http.StatusOK,
 				}, {
-					timeout:    time.Second,
-					method:     http.MethodPost,
-					body:       requestContextInfoBody1,
-					respBody:   []byte("just a string, not json"),
-					statusCode: http.StatusOK,
+					timeout:     time.Second,
+					method:      http.MethodPost,
+					expectBody:  requestContextInfoBody1,
+					respondBody: []byte("just a string, not json"),
+					statusCode:  http.StatusOK,
 				}},
 				targets: []*mockTarget{
 					{InterruptOnError: false},
 					{InterruptOnError: false},
 				}},
 			res{
-				body: []byte{},
+				ret: requestContextInfo1.GetContent(),
 			},
 		},
 	}
@@ -355,14 +367,15 @@ func Test_CallTargets(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			respBody, err := testServers(t,
 				tt.args.servers,
-				testCallTargets(tt.args.ctx, tt.args.targets),
+				testCallTargets(tt.args.ctx, tt.args.info, tt.args.targets),
 			)
 			if tt.res.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 			}
-			assert.Equal(t, tt.res.body, respBody, string(tt.res.body))
+			fmt.Println(respBody)
+			assert.Equal(t, tt.res.ret, respBody)
 		})
 	}
 }
@@ -396,11 +409,11 @@ func (e *mockTarget) GetTimeout() time.Duration {
 }
 
 type callTestServer struct {
-	method     string
-	body       []byte
-	timeout    time.Duration
-	statusCode int
-	respBody   []byte
+	method      string
+	expectBody  []byte
+	timeout     time.Duration
+	statusCode  int
+	respondBody []byte
 }
 
 func testServers(
@@ -432,7 +445,7 @@ func listen(
 	c *callTestServer,
 ) (url string, close func()) {
 	handler := func(w http.ResponseWriter, r *http.Request) {
-		checkRequest(t, r, c.method, c.body)
+		checkRequest(t, r, c.method, c.expectBody)
 
 		if c.statusCode != http.StatusOK {
 			http.Error(w, "error", c.statusCode)
@@ -442,7 +455,7 @@ func listen(
 		time.Sleep(c.timeout)
 
 		w.Header().Set("Content-Type", "application/json")
-		if _, err := io.WriteString(w, string(c.respBody)); err != nil {
+		if _, err := io.WriteString(w, string(c.respondBody)); err != nil {
 			http.Error(w, "error", http.StatusInternalServerError)
 			return
 		}
@@ -465,15 +478,17 @@ func testCall(ctx context.Context, timeout time.Duration, body []byte) func(stri
 }
 
 func testCallTarget(ctx context.Context,
+	info *middleware.ContextInfoRequest,
 	target *mockTarget,
 ) func(string) ([]byte, error) {
 	return func(url string) (r []byte, err error) {
 		target.Endpoint = url
-		return execution.CallTarget(ctx, target, requestContextInfo)
+		return execution.CallTarget(ctx, target, info)
 	}
 }
 
 func testCallTargets(ctx context.Context,
+	info *middleware.ContextInfoRequest,
 	target []*mockTarget,
 ) func([]string) (interface{}, error) {
 	return func(urls []string) (interface{}, error) {
@@ -482,13 +497,13 @@ func testCallTargets(ctx context.Context,
 			t.Endpoint = urls[i]
 			targets[i] = t
 		}
-		return execution.CallTargets(ctx, targets, requestContextInfo)
+		return execution.CallTargets(ctx, targets, info)
 	}
 }
 
-var requestContextInfo = &middleware.ContextInfoRequest{
+var requestContextInfo1 = &middleware.ContextInfoRequest{
 	Request: &request{
-		Request: "request",
+		Request: "content1",
 	},
 }
 
