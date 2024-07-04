@@ -44,6 +44,7 @@ const (
 	ImprovedPerformanceTypeOrgByID
 	ImprovedPerformanceTypeProjectGrant
 	ImprovedPerformanceTypeProject
+	ImprovedPerformanceTypeUserGrant
 )
 
 func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool {

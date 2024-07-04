@@ -59,4 +59,5 @@ enum ImprovedPerformance {
   // correctnes of data.
   IMPROVED_PERFORMANCE_PROJECT_GRANT = 2;
   IMPROVED_PERFORMANCE_PROJECT = 3;
+  IMPROVED_PERFORMANCE_USER_GRANT = 4;
 }

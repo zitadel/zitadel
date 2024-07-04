@@ -292,7 +292,7 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 }
 
 func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (err error) {
-	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProjectGrant) {
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeUserGrant) {
 		return c.checkUserGrantPreConditionOld(ctx, usergrant, resourceOwner)
 	}
 
