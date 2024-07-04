@@ -572,7 +572,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, remove all targets",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter( // exection has targets
+					expectFilter( // execution has targets
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("request", "instance"),
@@ -612,7 +612,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, unchanged execution",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter( // exection has targets
+					expectFilter( // execution has targets
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("request", "instance"),
@@ -1000,7 +1000,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			"push ok, remove all targets",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter( // exection has targets
+					expectFilter( // execution has targets
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("response", "instance"),
@@ -1040,7 +1040,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			"push ok, unchanged execution",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter( // exection has targets
+					expectFilter( // execution has targets
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("response", "instance"),
@@ -1412,7 +1412,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			"push ok, remove all targets",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter( // exection has targets
+					expectFilter( // execution has targets
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("event", "instance"),
@@ -1452,7 +1452,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			"push ok, unchanged execution",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter( // exection has targets
+					expectFilter( // execution has targets
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("event", "instance"),
@@ -1744,7 +1744,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			fields{
 				actionFunctionExists: existsMock(true),
 				eventstore: expectEventstore(
-					expectFilter( // exection has targets
+					expectFilter( // execution has targets
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
 								execution.NewAggregate("function/function", "instance"),
