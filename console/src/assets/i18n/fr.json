@@ -1684,7 +1684,8 @@
         "username": "Nom d'utilisateur",
         "tempUsername": "Nom d'utilisateur temporaire",
         "otp": "Mot de passe à usage unique",
-        "verifyUrl": "URL pour vérifier le mot de passe à usage unique"
+        "verifyUrl": "URL pour vérifier le mot de passe à usage unique",
+        "expiry": "Expiration"
       },
       "TOAST": {
         "UPDATED": "Textes personnalisés enregistrés."

@@ -1684,7 +1684,8 @@
         "username": "Uživatelské jméno",
         "tempUsername": "Dočasné uživatelské jméno",
         "otp": "Jednorázové heslo",
-        "verifyUrl": "Ověřovací URL jednorázového hesla"
+        "verifyUrl": "Ověřovací URL jednorázového hesla",
+        "expiry": "Expirace"
       },
       "TOAST": {
         "UPDATED": "Vlastní texty uloženy."

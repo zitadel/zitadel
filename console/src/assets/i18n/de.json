@@ -1684,7 +1684,8 @@
         "username": "Username",
         "tempUsername": "Temp. Username",
         "otp": "Einmalpasswort",
-        "verifyUrl": "URL zur Überprüfung des Einmalpassworts"
+        "verifyUrl": "URL zur Überprüfung des Einmalpassworts",
+        "expiry": "Ablauf"
       },
       "TOAST": {
         "UPDATED": "Benutzerdefinierte Texte gespeichert."

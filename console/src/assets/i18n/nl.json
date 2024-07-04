@@ -1684,7 +1684,8 @@
         "username": "Gebruikersnaam",
         "tempUsername": "Tijdelijke gebruikersnaam",
         "otp": "Eenmalig wachtwoord",
-        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL"
+        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL",
+        "expiry": "Vervaldatum"
       },
       "TOAST": {
         "UPDATED": "Aangepaste Teksten opgeslagen."

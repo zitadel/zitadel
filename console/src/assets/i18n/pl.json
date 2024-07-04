@@ -1683,7 +1683,8 @@
         "username": "Nazwa użytkownika",
         "tempUsername": "Tymczasowa nazwa użytkownika",
         "otp": "Hasło jednorazowe",
-        "verifyUrl": "URL do weryfikacji hasła jednorazowego"
+        "verifyUrl": "URL do weryfikacji hasła jednorazowego",
+        "expiry": "Wygaśnięcie"
       },
       "TOAST": {
         "UPDATED": "Teksty niestandardowe zapisane."
