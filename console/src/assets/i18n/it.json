@@ -1681,7 +1681,7 @@
         "tempUsername": "Nome utente temporaneo",
         "otp": "Password monouso",
         "verifyUrl": "URL per verificare la password monouso",
-        "expiry": "Scadenza",
+        "expiry": "Scadenza"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."
