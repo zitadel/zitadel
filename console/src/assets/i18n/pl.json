@@ -1474,6 +1474,10 @@
         "DISABLED": "Wyłączony"
       },
       "INHERITED_DESCRIPTION": "To ustawienie przypisuje wartość do wartości domyślnej systemu.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Włączony” jest dziedziczone",
+        "DISABLED": "„Wyłączony” jest dziedziczone"
+      },
       "RESET": "Ustaw wszystko na dziedziczone"
     },
     "DIALOG": {
@@ -1679,7 +1683,8 @@
         "username": "Nazwa użytkownika",
         "tempUsername": "Tymczasowa nazwa użytkownika",
         "otp": "Hasło jednorazowe",
-        "verifyUrl": "URL do weryfikacji hasła jednorazowego"
+        "verifyUrl": "URL do weryfikacji hasła jednorazowego",
+        "expiry": "Wygaśnięcie"
       },
       "TOAST": {
         "UPDATED": "Teksty niestandardowe zapisane."

@@ -46,6 +46,7 @@ const (
 	ImprovedPerformanceTypeOrgByID
 	ImprovedPerformanceTypeProjectGrant
 	ImprovedPerformanceTypeProject
+	ImprovedPerformanceTypeUserGrant
 	ImprovedPerformanceTypeOrgDomainVerified
 )
 

@@ -21,6 +21,7 @@ When you configure your default settings, you can set the following:
 - [**Login Behavior and Access**](#login-behavior-and-access): Multifactor Authentication Options and Enforcement, Define whether Passwordless authentication methods are allowed or not, Set Login Lifetimes and advanced behavour for the login interface.
 - [**Identity Providers**](#identity-providers): Define IDPs which are available for all organizations
 - [**Password Complexity**](#password-complexity): Requirements for Passwords ex. Symbols, Numbers, min length and more.
+- [**Password Expiry**](#password-expiry): Set an expiry for passwords. After the expiration, a user will be prompted to change their password during the next login.
 - [**Lockout**](#lockout): Set the maximum attempts a user can try to enter the password or any (T)OTP method. When the number is exceeded, the user gets locked out and has to be unlocked.
 - [**Domain settings**](#domain-settings): Whether users use their email or the generated username to login. Other Validation, SMTP settings
 - [**Branding**](#branding): Appearance of the login interface.
@@ -219,6 +220,24 @@ The following properties can be set:
 <img
   src="/docs/img/guides/console/complexity.png"
   alt="Password Complexity"
+  width="600px"
+/>
+
+## Password Expiry
+
+With the password expiry policy you can set an expiration for user password.
+After the expiration, a user will be prompted to change their password during the next authentication.
+
+Note, that ZITADEL will not warn or notify the user about the expiry, yet. If you want your users to be notified, you can read this setting and send the notification yourself.
+
+The following properties can be set:
+
+- Maximum validity in days
+- Expiration warning after days
+
+<img
+  src="/docs/img/guides/console/expiry.png"
+  alt="Password Expiry Policy"
   width="600px"
 />
 

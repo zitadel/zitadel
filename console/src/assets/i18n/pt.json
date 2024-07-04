@@ -1476,6 +1476,10 @@
         "DISABLED": "Desabilitado"
       },
       "INHERITED_DESCRIPTION": "Essa configuração define o valor para o padrão do sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Habilitado\" é herdado",
+        "DISABLED": "\"Desabilitado\" é herdado"
+      },
       "RESET": "Definir tudo para herdar"
     },
     "DIALOG": {
@@ -1681,7 +1685,8 @@
         "username": "Nome de usuário",
         "tempUsername": "Nome de usuário temporário",
         "otp": "Senha de uso único",
-        "verifyUrl": "URL para verificar a senha de uso único"
+        "verifyUrl": "URL para verificar a senha de uso único",
+        "expiry": "Data de expiração"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados salvos."

@@ -2,7 +2,7 @@
   "instance_id": "239520764275982338",
   "app_id": "239520764276441090",
   "state": 1,
-  "client_id": "239520764779364354@zitadel",
+  "client_id": "239520764779364354",
   "client_secret": null,
   "redirect_uris": [
     "http://test2-qucuh5.localhost:9000/ui/console/auth/callback",
