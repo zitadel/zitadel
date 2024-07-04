@@ -110,6 +110,9 @@ func (s *Server) userInfo(
 			}
 			rawUserInfo = userInfoToOIDC(qu, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
 		})
+		if err != nil {
+			return nil, err
+		}
 		// copy the userinfo to make sure the assert roles and actions use their own copy (e.g. map)
 		userInfo := &oidc.UserInfo{
 			Subject:         rawUserInfo.Subject,
