@@ -1475,6 +1475,10 @@
         "DISABLED": "Deaktiviert"
       },
       "INHERITED_DESCRIPTION": "Diese Einstellung setzt den Wert auf den Standardwert des Systems.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Aktiviert“ wird vererbt",
+        "DISABLED": "„Deaktiviert“ wird vererbt"
+      },
       "RESET": "Alle auf Erben setzen"
     },
     "DIALOG": {
@@ -1680,7 +1684,8 @@
         "username": "Username",
         "tempUsername": "Temp. Username",
         "otp": "Einmalpasswort",
-        "verifyUrl": "URL zur Überprüfung des Einmalpassworts"
+        "verifyUrl": "URL zur Überprüfung des Einmalpassworts",
+        "expiry": "Ablauf"
       },
       "TOAST": {
         "UPDATED": "Benutzerdefinierte Texte gespeichert."

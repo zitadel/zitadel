@@ -1475,6 +1475,10 @@
         "DISABLED": "無効"
       },
       "INHERITED_DESCRIPTION": "この設定は、値をシステムのデフォルト値に設定します。",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "有効は継承されます",
+        "DISABLED": "無効は継承されます"
+      },
       "RESET": "すべて継承に設定"
     },
     "DIALOG": {
@@ -1676,7 +1680,8 @@
         "username": "ユーザー名",
         "tempUsername": "一時ユーザー名",
         "otp": "ワンタイムパスワード",
-        "verifyUrl": "ワンタイムパスワードを確認するURL"
+        "verifyUrl": "ワンタイムパスワードを確認するURL",
+        "expiry": "有効期限"
       },
       "TOAST": {
         "UPDATED": "カスタムテキストが保存されました。"
