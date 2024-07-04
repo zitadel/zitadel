@@ -1475,6 +1475,10 @@
         "DISABLED": "Désactivé"
       },
       "INHERITED_DESCRIPTION": "Ce paramètre définit la valeur par défaut du système.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Activé\" est hérité",
+        "DISABLED": "\"Désactivé\" est hérité"
+      },
       "RESET": "Réinitialiser tout sur hérité"
     },
     "DIALOG": {
