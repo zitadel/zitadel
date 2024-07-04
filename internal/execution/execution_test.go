@@ -3,8 +3,6 @@ package execution_test
 import (
 	"context"
 	"fmt"
-	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
-	"github.com/zitadel/zitadel/internal/execution"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -14,7 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/execution"
 )
 
 func Test_Call(t *testing.T) {
