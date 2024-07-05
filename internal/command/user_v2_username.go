@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"strings"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -19,17 +18,8 @@ func (c *Commands) changeUsername(ctx context.Context, cmds []eventstore.Command
 	if err != nil {
 		return cmds, zerrors.ThrowPreconditionFailed(err, "COMMAND-79pv6e1q62", "Errors.Org.DomainPolicy.NotExisting")
 	}
-	if !domainPolicy.UserLoginMustBeDomain {
-		index := strings.LastIndex(userName, "@")
-		if index > 1 {
-			domainCheck := NewOrgDomainVerifiedWriteModel(userName[index+1:])
-			if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
-				return cmds, err
-			}
-			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-				return cmds, zerrors.ThrowInvalidArgument(nil, "COMMAND-Di2ei", "Errors.User.DomainNotAllowedAsUsername")
-			}
-		}
+	if err = c.userValidateDomain(ctx, orgID, userName, domainPolicy.UserLoginMustBeDomain); err != nil {
+		return cmds, err
 	}
 	return append(cmds,
 		user.NewUsernameChangedEvent(ctx, &wm.Aggregate().Aggregate, wm.UserName, userName, domainPolicy.UserLoginMustBeDomain),
