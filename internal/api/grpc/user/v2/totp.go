@@ -35,3 +35,11 @@ func (s *Server) VerifyTOTPRegistration(ctx context.Context, req *user.VerifyTOT
 		Details: object.DomainToDetailsPb(objectDetails),
 	}, nil
 }
+
+func (s *Server) RemoveTOTP(ctx context.Context, req *user.RemoveTOTPRequest) (*user.RemoveTOTPResponse, error) {
+	objectDetails, err := s.command.HumanRemoveTOTP(ctx, req.GetUserId(), "")
+	if err != nil {
+		return nil, err
+	}
+	return &user.RemoveTOTPResponse{Details: object.DomainToDetailsPb(objectDetails)}, nil
+}
