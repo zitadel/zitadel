@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"crypto"
 	"crypto/rsa"
 	"database/sql"
 	"database/sql/driver"
@@ -18,7 +19,7 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/crypto"
+	zcrypto "github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
@@ -215,8 +216,8 @@ func Test_KeyPrepares(t *testing.T) {
 							use:           domain.KeyUsageSigning,
 						},
 						expiry: testNow,
-						privateKey: &crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
+						privateKey: &zcrypto.CryptoValue{
+							CryptoType: zcrypto.TypeEncryption,
 							Algorithm:  "enc",
 							KeyID:      "id",
 							Crypted:    []byte("privateKey"),
@@ -276,7 +277,7 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 	tests := []struct {
 		name       string
 		eventstore func(*testing.T) *eventstore.Eventstore
-		encryption func(*testing.T) *crypto.MockEncryptionAlgorithm
+		encryption func(*testing.T) *zcrypto.MockEncryptionAlgorithm
 		want       *rsaPublicKey
 		wantErr    error
 	}{
@@ -307,14 +308,14 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 							Version:       key_repo.AggregateVersion,
 						},
 						domain.KeyUsageSigning, "alg",
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
+						&zcrypto.CryptoValue{
+							CryptoType: zcrypto.TypeEncryption,
 							Algorithm:  "alg",
 							KeyID:      "keyID",
 							Crypted:    []byte("private"),
 						},
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
+						&zcrypto.CryptoValue{
+							CryptoType: zcrypto.TypeEncryption,
 							Algorithm:  "alg",
 							KeyID:      "keyID",
 							Crypted:    []byte("public"),
@@ -324,8 +325,8 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 					)),
 				),
 			),
-			encryption: func(t *testing.T) *crypto.MockEncryptionAlgorithm {
-				encryption := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+			encryption: func(t *testing.T) *zcrypto.MockEncryptionAlgorithm {
+				encryption := zcrypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
 				expect := encryption.EXPECT()
 				expect.Algorithm().Return("alg")
 				expect.DecryptionKeyIDs().Return([]string{})
@@ -346,14 +347,14 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 							Version:       key_repo.AggregateVersion,
 						},
 						domain.KeyUsageSigning, "alg",
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
+						&zcrypto.CryptoValue{
+							CryptoType: zcrypto.TypeEncryption,
 							Algorithm:  "alg",
 							KeyID:      "keyID",
 							Crypted:    []byte("private"),
 						},
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
+						&zcrypto.CryptoValue{
+							CryptoType: zcrypto.TypeEncryption,
 							Algorithm:  "alg",
 							KeyID:      "keyID",
 							Crypted:    []byte("public"),
@@ -363,8 +364,8 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 					)),
 				),
 			),
-			encryption: func(t *testing.T) *crypto.MockEncryptionAlgorithm {
-				encryption := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+			encryption: func(t *testing.T) *zcrypto.MockEncryptionAlgorithm {
+				encryption := zcrypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
 				expect := encryption.EXPECT()
 				expect.Algorithm().Return("alg")
 				expect.DecryptionKeyIDs().Return([]string{"keyID"})
@@ -386,14 +387,14 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 							Version:       key_repo.AggregateVersion,
 						},
 						domain.KeyUsageSigning, "alg",
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
+						&zcrypto.CryptoValue{
+							CryptoType: zcrypto.TypeEncryption,
 							Algorithm:  "alg",
 							KeyID:      "keyID",
 							Crypted:    []byte("private"),
 						},
-						&crypto.CryptoValue{
-							CryptoType: crypto.TypeEncryption,
+						&zcrypto.CryptoValue{
+							CryptoType: zcrypto.TypeEncryption,
 							Algorithm:  "alg",
 							KeyID:      "keyID",
 							Crypted:    []byte("public"),
@@ -403,8 +404,8 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 					)),
 				),
 			),
-			encryption: func(t *testing.T) *crypto.MockEncryptionAlgorithm {
-				encryption := crypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
+			encryption: func(t *testing.T) *zcrypto.MockEncryptionAlgorithm {
+				encryption := zcrypto.NewMockEncryptionAlgorithm(gomock.NewController(t))
 				expect := encryption.EXPECT()
 				expect.Algorithm().Return("alg")
 				expect.DecryptionKeyIDs().Return([]string{"keyID"})
@@ -419,8 +420,8 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 					use:           domain.KeyUsageSigning,
 				},
 				expiry: future,
-				publicKey: func() *rsa.PublicKey {
-					publicKey, err := crypto.BytesToPublicKey([]byte(pubKey))
+				publicKey: func() crypto.PublicKey {
+					publicKey, err := zcrypto.BytesToPublicKey([]byte(pubKey))
 					if err != nil {
 						panic(err)
 					}

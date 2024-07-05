@@ -2,7 +2,7 @@ package authz
 
 import (
 	"context"
-	"crypto/rsa"
+	"crypto"
 	"errors"
 	"os"
 	"sync"
@@ -11,7 +11,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/internal/crypto"
+	zcrypto "github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -44,7 +44,7 @@ func StartSystemTokenVerifierFromConfig(issuer string, keys map[string]*SystemAP
 		systemJWTProfile: op.NewJWTProfileVerifier(
 			&systemJWTStorage{
 				keys:       keys,
-				cachedKeys: make(map[string]*rsa.PublicKey),
+				cachedKeys: make(map[string]crypto.PublicKey),
 			},
 			issuer,
 			1*time.Hour,
@@ -77,7 +77,7 @@ func (s *SystemTokenVerifierFromConfig) VerifySystemToken(ctx context.Context, t
 type systemJWTStorage struct {
 	keys       map[string]*SystemAPIUser
 	mutex      sync.Mutex
-	cachedKeys map[string]*rsa.PublicKey
+	cachedKeys map[string]crypto.PublicKey
 }
 
 type SystemAPIUser struct {
@@ -86,7 +86,7 @@ type SystemAPIUser struct {
 	Memberships Memberships
 }
 
-func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
+func (s *SystemAPIUser) readKey() (crypto.PublicKey, error) {
 	if s.Path != "" {
 		var err error
 		s.KeyData, err = os.ReadFile(s.Path)
@@ -94,7 +94,7 @@ func (s *SystemAPIUser) readKey() (*rsa.PublicKey, error) {
 			return nil, zerrors.ThrowInternal(err, "AUTHZ-JK31F", "Errors.NotFound")
 		}
 	}
-	return crypto.BytesToPublicKey(s.KeyData)
+	return zcrypto.BytesToPublicKey(s.KeyData)
 }
 
 func (s *systemJWTStorage) GetKeyByIDAndClientID(_ context.Context, _, userID string) (*jose.JSONWebKey, error) {

@@ -2,7 +2,7 @@ package query
 
 import (
 	"context"
-	"crypto/rsa"
+	"crypto"
 	"database/sql"
 	"time"
 
@@ -10,7 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
-	"github.com/zitadel/zitadel/internal/crypto"
+	zcrypto "github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -29,7 +29,7 @@ type Key interface {
 type PrivateKey interface {
 	Key
 	Expiry() time.Time
-	Key() *crypto.CryptoValue
+	Key() *zcrypto.CryptoValue
 }
 
 type PublicKey interface {
@@ -77,21 +77,21 @@ func (k *key) Sequence() uint64 {
 type privateKey struct {
 	key
 	expiry     time.Time
-	privateKey *crypto.CryptoValue
+	privateKey *zcrypto.CryptoValue
 }
 
 func (k *privateKey) Expiry() time.Time {
 	return k.expiry
 }
 
-func (k *privateKey) Key() *crypto.CryptoValue {
+func (k *privateKey) Key() *zcrypto.CryptoValue {
 	return k.privateKey
 }
 
 type rsaPublicKey struct {
 	key
 	expiry    time.Time
-	publicKey *rsa.PublicKey
+	publicKey crypto.PublicKey
 }
 
 func (r *rsaPublicKey) Expiry() time.Time {
@@ -281,7 +281,7 @@ func preparePublicKeysQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				if err != nil {
 					return nil, err
 				}
-				k.publicKey, err = crypto.BytesToPublicKey(keyValue)
+				k.publicKey, err = zcrypto.BytesToPublicKey(keyValue)
 				if err != nil {
 					return nil, err
 				}
@@ -356,7 +356,7 @@ type PublicKeyReadModel struct {
 	eventstore.ReadModel
 
 	Algorithm string
-	Key       *crypto.CryptoValue
+	Key       *zcrypto.CryptoValue
 	Expiry    time.Time
 	Usage     domain.KeyUsage
 }
@@ -410,11 +410,11 @@ func (q *Queries) GetPublicKeyByID(ctx context.Context, keyID string) (_ PublicK
 	if model.Algorithm == "" || model.Key == nil {
 		return nil, zerrors.ThrowNotFound(err, "QUERY-Ahf7x", "Errors.Key.NotFound")
 	}
-	keyValue, err := crypto.Decrypt(model.Key, q.keyEncryptionAlgorithm)
+	keyValue, err := zcrypto.Decrypt(model.Key, q.keyEncryptionAlgorithm)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Ie4oh", "Errors.Internal")
 	}
-	publicKey, err := crypto.BytesToPublicKey(keyValue)
+	publicKey, err := zcrypto.BytesToPublicKey(keyValue)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-Kai2Z", "Errors.Internal")
 	}

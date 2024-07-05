@@ -2,6 +2,9 @@ package crypto
 
 import (
 	"bytes"
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -169,8 +172,9 @@ func BytesToPrivateKey(priv []byte) (*rsa.PrivateKey, error) {
 }
 
 var ErrEmpty = errors.New("cannot decode, empty data")
+var ErrNoPublicKey = errors.New("key is no supported public key type")
 
-func BytesToPublicKey(pub []byte) (*rsa.PublicKey, error) {
+func BytesToPublicKey(pub []byte) (crypto.PublicKey, error) {
 	if len(pub) == 0 {
 		return nil, ErrEmpty
 	}
@@ -178,15 +182,18 @@ func BytesToPublicKey(pub []byte) (*rsa.PublicKey, error) {
 	if block == nil {
 		return nil, ErrEmpty
 	}
-	ifc, err := x509.ParsePKIXPublicKey(block.Bytes)
+	key, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}
-	key, ok := ifc.(*rsa.PublicKey)
-	if !ok {
-		return nil, err
+	switch key.(type) {
+	case *rsa.PublicKey,
+		*ecdsa.PublicKey,
+		ed25519.PublicKey:
+		return key, nil
+	default:
+		return nil, ErrNoPublicKey
 	}
-	return key, nil
 }
 
 func EncryptKeys(privateKey *rsa.PrivateKey, publicKey *rsa.PublicKey, alg EncryptionAlgorithm) (*CryptoValue, *CryptoValue, error) {
