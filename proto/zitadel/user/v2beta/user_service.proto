@@ -967,7 +967,7 @@ message GetUserByIDRequest {
 }
 
 message GetUserByIDResponse {
-  zitadel.object.v2beta.Details details = 1;
+  reserved  1;
   zitadel.user.v2beta.User user = 2;
 }
 

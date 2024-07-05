@@ -23,7 +23,7 @@ func TestServer_GetUserByID(t *testing.T) {
 	type args struct {
 		ctx context.Context
 		req *user.GetUserByIDRequest
-		dep func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*timestamppb.Timestamp, error)
+		dep func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*userAttr, error)
 	}
 	tests := []struct {
 		name    string
@@ -38,7 +38,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				&user.GetUserByIDRequest{
 					UserId: "",
 				},
-				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*timestamppb.Timestamp, error) {
+				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*userAttr, error) {
 					return nil, nil
 				},
 			},
@@ -51,7 +51,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				&user.GetUserByIDRequest{
 					UserId: "unknown",
 				},
-				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*timestamppb.Timestamp, error) {
+				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*userAttr, error) {
 					return nil, nil
 				},
 			},
@@ -62,10 +62,10 @@ func TestServer_GetUserByID(t *testing.T) {
 			args: args{
 				IamCTX,
 				&user.GetUserByIDRequest{},
-				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*timestamppb.Timestamp, error) {
+				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*userAttr, error) {
 					resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 					request.UserId = resp.GetUserId()
-					return nil, nil
+					return &userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}, nil
 				},
 			},
 			want: &user.GetUserByIDResponse{
@@ -95,10 +95,6 @@ func TestServer_GetUserByID(t *testing.T) {
 						},
 					},
 				},
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: orgResp.OrganizationId,
-				},
 			},
 		},
 		{
@@ -106,11 +102,11 @@ func TestServer_GetUserByID(t *testing.T) {
 			args: args{
 				IamCTX,
 				&user.GetUserByIDRequest{},
-				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*timestamppb.Timestamp, error) {
+				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*userAttr, error) {
 					resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 					request.UserId = resp.GetUserId()
 					details := Tester.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
-					return details.GetChangeDate(), nil
+					return &userAttr{resp.GetUserId(), username, details.GetChangeDate(), resp.GetDetails()}, nil
 				},
 			},
 			want: &user.GetUserByIDResponse{
@@ -142,17 +138,13 @@ func TestServer_GetUserByID(t *testing.T) {
 						},
 					},
 				},
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: orgResp.OrganizationId,
-				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			username := fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())
-			changed, err := tt.args.dep(tt.args.ctx, username, tt.args.req)
+			userAttr, err := tt.args.dep(tt.args.ctx, username, tt.args.req)
 			require.NoError(t, err)
 			retryDuration := time.Minute
 			if ctxDeadline, ok := CTX.Deadline(); ok {
@@ -168,18 +160,18 @@ func TestServer_GetUserByID(t *testing.T) {
 				if getErr != nil {
 					return
 				}
-				tt.want.User.UserId = tt.args.req.GetUserId()
-				tt.want.User.Username = username
-				tt.want.User.PreferredLoginName = username
-				tt.want.User.LoginNames = []string{username}
+				tt.want.User.Details = userAttr.Details
+				tt.want.User.UserId = userAttr.UserID
+				tt.want.User.Username = userAttr.Username
+				tt.want.User.PreferredLoginName = userAttr.Username
+				tt.want.User.LoginNames = []string{userAttr.Username}
 				if human := tt.want.User.GetHuman(); human != nil {
-					human.Email.Email = username
+					human.Email.Email = userAttr.Username
 					if tt.want.User.GetHuman().GetPasswordChanged() != nil {
-						human.PasswordChanged = changed
+						human.PasswordChanged = userAttr.Changed
 					}
 				}
 				assert.Equal(ttt, tt.want.User, got.User)
-				integration.AssertDetails(t, tt.want, got)
 			}, retryDuration, time.Second)
 		})
 	}
@@ -232,10 +224,6 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 						},
 					},
 				},
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(timeNow),
-					ResourceOwner: newOrg.GetOrganizationId(),
-				},
 			},
 		},
 		{
@@ -269,10 +257,6 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 							Phone: &user.HumanPhone{},
 						},
 					},
-				},
-				Details: &object.Details{
-					ChangeDate:    timestamppb.New(timeNow),
-					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
 		},
@@ -311,6 +295,9 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 				if human := tt.want.User.GetHuman(); human != nil {
 					human.Email.Email = newOrgOwnerEmail
 				}
+				// details tested in GetUserByID
+				tt.want.User.Details = got.User.GetDetails()
+
 				assert.Equal(t, tt.want.User, got.User)
 			}
 		})
@@ -923,8 +910,6 @@ func TestServer_ListUsers(t *testing.T) {
 					}
 					tt.want.Result[i].Details = infos[i].Details
 				}
-				fmt.Println(tt.want.Result)
-				fmt.Println(got.Result)
 				for i := range tt.want.Result {
 					assert.Contains(ttt, got.Result, tt.want.Result[i])
 				}
