@@ -59,4 +59,10 @@ enum ImprovedPerformance {
   // correctnes of data.
   IMPROVED_PERFORMANCE_PROJECT_GRANT = 2;
   IMPROVED_PERFORMANCE_PROJECT = 3;
+  IMPROVED_PERFORMANCE_USER_GRANT = 4;
+
+  // Improve performance on write side when
+  // users are checked against verified domains
+  // from other organizations.
+  IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED = 5;
 }

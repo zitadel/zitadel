@@ -1475,6 +1475,10 @@
         "DISABLED": "Disabled"
       },
       "INHERITED_DESCRIPTION": "This sets the value to the default value of the system.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Enabled\" is inherited",
+        "DISABLED": "\"Disabled\" is inherited"
+      },
       "RESET": "Set all to inherit"
     },
     "DIALOG": {
@@ -1680,7 +1684,8 @@
         "username": "Username",
         "tempUsername": "Temp username",
         "otp": "One-time password",
-        "verifyUrl": "Verify One-time-password URL"
+        "verifyUrl": "Verify One-time-password URL",
+        "expiry": "Expiry"
       },
       "TOAST": {
         "UPDATED": "Custom Texts saved."
