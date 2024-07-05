@@ -109,8 +109,8 @@ func TestServer_GetUserByID(t *testing.T) {
 				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*timestamppb.Timestamp, error) {
 					resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 					request.UserId = resp.GetUserId()
-					changed := Tester.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
-					return changed, nil
+					details := Tester.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
+					return details.GetChangeDate(), nil
 				},
 			},
 			want: &user.GetUserByIDResponse{
@@ -321,6 +321,7 @@ type userAttr struct {
 	UserID   string
 	Username string
 	Changed  *timestamppb.Timestamp
+	Details  *object.Details
 }
 
 func TestServer_ListUsers(t *testing.T) {
@@ -374,7 +375,7 @@ func TestServer_ListUsers(t *testing.T) {
 					for i, username := range usernames {
 						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						userIDs[i] = resp.GetUserId()
-						infos[i] = userAttr{resp.GetUserId(), username, nil}
+						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 					}
 					request.Queries = append(request.Queries, InUserIDsQuery(userIDs))
 					return infos, nil
@@ -428,8 +429,8 @@ func TestServer_ListUsers(t *testing.T) {
 					for i, username := range usernames {
 						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						userIDs[i] = resp.GetUserId()
-						changed := Tester.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
-						infos[i] = userAttr{resp.GetUserId(), username, changed}
+						details := Tester.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
+						infos[i] = userAttr{resp.GetUserId(), username, details.GetChangeDate(), resp.GetDetails()}
 					}
 					request.Queries = append(request.Queries, InUserIDsQuery(userIDs))
 					return infos, nil
@@ -485,7 +486,7 @@ func TestServer_ListUsers(t *testing.T) {
 					for i, username := range usernames {
 						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						userIDs[i] = resp.GetUserId()
-						infos[i] = userAttr{resp.GetUserId(), username, nil}
+						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 					}
 					request.Queries = append(request.Queries, InUserIDsQuery(userIDs))
 					return infos, nil
@@ -581,7 +582,7 @@ func TestServer_ListUsers(t *testing.T) {
 					for i, username := range usernames {
 						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						userIDs[i] = resp.GetUserId()
-						infos[i] = userAttr{resp.GetUserId(), username, nil}
+						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 						request.Queries = append(request.Queries, UsernameQuery(username))
 					}
 					return infos, nil
@@ -633,7 +634,7 @@ func TestServer_ListUsers(t *testing.T) {
 					infos := make([]userAttr, len(usernames))
 					for i, username := range usernames {
 						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
-						infos[i] = userAttr{resp.GetUserId(), username, nil}
+						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 					}
 					request.Queries = append(request.Queries, InUserEmailsQuery(usernames))
 					return infos, nil
@@ -685,7 +686,7 @@ func TestServer_ListUsers(t *testing.T) {
 					infos := make([]userAttr, len(usernames))
 					for i, username := range usernames {
 						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
-						infos[i] = userAttr{resp.GetUserId(), username, nil}
+						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 					}
 					request.Queries = append(request.Queries, InUserEmailsQuery(usernames))
 					return infos, nil
@@ -800,7 +801,7 @@ func TestServer_ListUsers(t *testing.T) {
 					infos := make([]userAttr, len(usernames))
 					for i, username := range usernames {
 						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
-						infos[i] = userAttr{resp.GetUserId(), username, nil}
+						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 					}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))
 					request.Queries = append(request.Queries, InUserEmailsQuery(usernames))
@@ -920,7 +921,10 @@ func TestServer_ListUsers(t *testing.T) {
 							human.PasswordChanged = infos[i].Changed
 						}
 					}
+					tt.want.Result[i].Details = infos[i].Details
 				}
+				fmt.Println(tt.want.Result)
+				fmt.Println(got.Result)
 				for i := range tt.want.Result {
 					assert.Contains(ttt, got.Result, tt.want.Result[i])
 				}
