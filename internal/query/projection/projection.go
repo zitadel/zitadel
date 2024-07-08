@@ -78,6 +78,9 @@ var (
 	ExecutionProjection                 *handler.Handler
 	UserSchemaProjection                *handler.Handler
 	WebKeyProjection                    *handler.Handler
+
+	ProjectGrantFields      *handler.FieldHandler
+	OrgDomainVerifiedFields *handler.FieldHandler
 )
 
 type projection interface {
@@ -160,6 +163,10 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	ExecutionProjection = newExecutionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["executions"]))
 	UserSchemaProjection = newUserSchemaProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_schemas"]))
 	WebKeyProjection = newWebKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["web_keys"]))
+
+	ProjectGrantFields = newFillProjectGrantFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsProjectGrant]))
+	OrgDomainVerifiedFields = newFillOrgDomainVerifiedFields(applyCustomConfig(projectionConfig, config.Customizations[fieldsOrgDomainVerified]))
+
 	newProjectionsList()
 	return nil
 }
