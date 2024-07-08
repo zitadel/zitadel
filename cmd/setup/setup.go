@@ -158,7 +158,8 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s28AddFieldTable = &AddFieldTable{dbClient: esPusherDBClient}
 	steps.s29FillFieldsForProjectGrant = &FillFieldsForProjectGrant{eventstore: eventstoreClient}
 	steps.s30FillFieldsForOrgDomainVerified = &FillFieldsForOrgDomainVerified{eventstore: eventstoreClient}
-	steps.s31SMSConfigs2TwilioAddVerifyServiceSid = &SMSConfigs2TwilioAddVerifyServiceSid{dbClient: esPusherDBClient}
+	steps.s31AddAggregateIndexToFields = &AddAggregateIndexToFields{dbClient: esPusherDBClient}
+	steps.s32SMSConfigs2TwilioAddVerifyServiceSid = &SMSConfigs2TwilioAddVerifyServiceSid{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -182,6 +183,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s1ProjectionTable,
 		steps.s2AssetsTable,
 		steps.s28AddFieldTable,
+		steps.s31AddAggregateIndexToFields,
 		steps.FirstInstance,
 		steps.s5LastFailed,
 		steps.s6OwnerRemoveColumns,
@@ -214,7 +216,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s21AddBlockFieldToLimits,
 		steps.s25User11AddLowerFieldsToVerifiedEmail,
 		steps.s27IDPTemplate6SAMLNameIDFormat,
-		steps.s31SMSConfigs2TwilioAddVerifyServiceSid,
+		steps.s32SMSConfigs2TwilioAddVerifyServiceSid,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}

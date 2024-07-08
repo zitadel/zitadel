@@ -1,1 +1,1 @@
-ALTER TABLE IF EXISTS projections.sms_configs2_twilio ADD COLUMN IF NOT EXISTS verify_service_sid TEXT not null;
+CREATE INDEX CONCURRENTLY IF NOT EXISTS f_aggregate_object_type_idx ON eventstore.fields (aggregate_type, aggregate_id, object_type);

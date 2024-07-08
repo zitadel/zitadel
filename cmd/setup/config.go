@@ -114,7 +114,8 @@ type Steps struct {
 	s28AddFieldTable                        *AddFieldTable
 	s29FillFieldsForProjectGrant            *FillFieldsForProjectGrant
 	s30FillFieldsForOrgDomainVerified       *FillFieldsForOrgDomainVerified
-	s31SMSConfigs2TwilioAddVerifyServiceSid *SMSConfigs2TwilioAddVerifyServiceSid
+	s31AddAggregateIndexToFields            *AddAggregateIndexToFields
+	s32SMSConfigs2TwilioAddVerifyServiceSid *SMSConfigs2TwilioAddVerifyServiceSid
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

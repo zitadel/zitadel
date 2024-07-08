@@ -10,18 +10,18 @@ import (
 
 var (
 	//go:embed 31.sql
-	addTwilioVerifyServiceSID string
+	addAggregateIndexToFields string
 )
 
-type SMSConfigs2TwilioAddVerifyServiceSid struct {
+type AddAggregateIndexToFields struct {
 	dbClient *database.DB
 }
 
-func (mig *SMSConfigs2TwilioAddVerifyServiceSid) Execute(ctx context.Context, _ eventstore.Event) error {
-	_, err := mig.dbClient.ExecContext(ctx, addTwilioVerifyServiceSID)
+func (mig *AddAggregateIndexToFields) Execute(ctx context.Context, _ eventstore.Event) error {
+	_, err := mig.dbClient.ExecContext(ctx, addAggregateIndexToFields)
 	return err
 }
 
-func (mig *SMSConfigs2TwilioAddVerifyServiceSid) String() string {
-	return "28_sms_configs2_twilio_add_verification_sid"
+func (mig *AddAggregateIndexToFields) String() string {
+	return "31_add_aggregate_index_to_fields"
 }
