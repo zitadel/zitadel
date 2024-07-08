@@ -118,7 +118,7 @@ In this SAML request:
   	- **SignatureValue** provides the actual digital signature.
   	- **KeyInfo** containing the X.509 certificate, which holds the public key used to verify the signature.
 
-These XMLs are stringified, encoded, and passed in the query string to the identity provider, where the user is authenticated, and the SAML response is prepared, which will be received by the SP as an encoded string. 
+These XMLs are stringified, encoded, and transmitted according to the SAML binding used. For instance, in HTTP Redirect Binding, the request is sent as URL parameters, while in HTTP POST Binding, it is included in the request body. The signature's transmission method also depends on the binding used, ensuring the integrity and authenticity of the SAML message across different communication channels.
 
 
 **Sample SAML response**
@@ -204,7 +204,7 @@ In this SAML response:
 - **IssueInstant** (2024-06-11T04:17:41Z) is the timestamp of the response.
 - **Destination** (http://127.0.0.1:5000/acs) confirms that the response is intended for the service provider's Assertion Consumer Service URL.
 - **Issuer** (https://my-instance-xtzfbc.zitadel.cloud/saml/v2/metadata) is the identity provider's unique string, used to verify the response's origin.
-- **StatusCode** indicates the status of the authentication process, with a value of Success.
+- **StatusCode** indicates the status of the authentication process, with a value of "Success." If the status is not "Success," it means there was a problem with the login, such as incorrect credentials or other authentication issues.
 - **Signature** ensures the integrity and authenticity of the SAML response. It includes:
 	- **SignedInfo** contains details about the canonicalization and signature methods.
 	- **Reference** points to the signed data and including transforms and a digest method.
@@ -223,7 +223,8 @@ In this SAML response:
 - **Initial Authentication Request**: A user attempts to access a service (SP1) that is protected by an IdP (IdP1).
 - **Redirection to IdP1**: The user is redirected to IdP1 for authentication. If IdP1 trusts another IdP (IdP2) for authentication, it will redirect the user to IdP2.
 - **Authentication at IdP2**: The user authenticates with IdP2, which generates a SAML assertion containing the user's identity and attributes.
-- **Assertion Transfer**: IdP2 sends the SAML assertion back to IdP1. IdP1 processes this assertion and may add additional attributes or modify the assertion based on its own policies.
+- **Assertion Processing**: ZITADEL (IdP1) processes the SAML assertion from IdP2. ZITADEL then creates an independent SAML assertion based on the information received and its own policies.
+- **Response to SP1**: ZITADEL (IdP1) sends this newly created SAML assertion to SP1, completing the authentication process.
 - **Access Granted to SP1**:IdP1 then sends a final SAML assertion to SP1, which grants the user access to the requested service.
 
 See [Let Users Login with Preferred Identity Provider](https://zitadel.com/docs/guides/integrate/identity-providers/introduction) for more information.
