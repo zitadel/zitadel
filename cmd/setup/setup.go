@@ -3,7 +3,6 @@ package setup
 import (
 	"context"
 	"embed"
-	_ "embed"
 	"net/http"
 
 	"github.com/spf13/cobra"
@@ -153,7 +152,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s25User11AddLowerFieldsToVerifiedEmail = &User11AddLowerFieldsToVerifiedEmail{dbClient: esPusherDBClient}
 	steps.s26AuthUsers3 = &AuthUsers3{dbClient: esPusherDBClient}
 	steps.s27IDPTemplate6SAMLNameIDFormat = &IDPTemplate6SAMLNameIDFormat{dbClient: esPusherDBClient}
-	steps.s28SMSConfigs2TwilioAddVerifyServiceSid = &SMSConfigs2TwilioAddVerifyServiceSid{dbClient: esPusherDBClient}
+	steps.s31SMSConfigs2TwilioAddVerifyServiceSid = &SMSConfigs2TwilioAddVerifyServiceSid{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -206,7 +205,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s21AddBlockFieldToLimits,
 		steps.s25User11AddLowerFieldsToVerifiedEmail,
 		steps.s27IDPTemplate6SAMLNameIDFormat,
-		steps.s28SMSConfigs2TwilioAddVerifyServiceSid,
+		steps.s31SMSConfigs2TwilioAddVerifyServiceSid,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}

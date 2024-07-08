@@ -111,7 +111,7 @@ type Steps struct {
 	s25User11AddLowerFieldsToVerifiedEmail  *User11AddLowerFieldsToVerifiedEmail
 	s26AuthUsers3                           *AuthUsers3
 	s27IDPTemplate6SAMLNameIDFormat         *IDPTemplate6SAMLNameIDFormat
-	s28SMSConfigs2TwilioAddVerifyServiceSid *SMSConfigs2TwilioAddVerifyServiceSid
+	s31SMSConfigs2TwilioAddVerifyServiceSid *SMSConfigs2TwilioAddVerifyServiceSid
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

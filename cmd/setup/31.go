@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	//go:embed 28.sql
+	//go:embed 31.sql
 	addTwilioVerifyServiceSID string
 )
 
