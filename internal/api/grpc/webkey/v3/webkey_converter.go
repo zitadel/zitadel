@@ -58,7 +58,7 @@ func webKeyECDSAConfigToCrypto(config *v3alpha.WebKeyECDSAConfig) *crypto.WebKey
 	out := new(crypto.WebKeyECDSAConfig)
 
 	switch config.GetCurve() {
-	case v3alpha.WebKeyECDSAConfig_ECDSA_CRURVE_UNSPECIFIED:
+	case v3alpha.WebKeyECDSAConfig_ECDSA_CURVE_UNSPECIFIED:
 		out.Curve = crypto.EllipticCurveP256
 	case v3alpha.WebKeyECDSAConfig_ECDSA_CURVE_P256:
 		out.Curve = crypto.EllipticCurveP256
@@ -116,7 +116,7 @@ func webKeyStateToPb(state domain.WebKeyState) v3alpha.WebKeyState {
 		return v3alpha.WebKeyState_STATE_INACTIVE
 	case domain.WebKeyStateActive:
 		return v3alpha.WebKeyState_STATE_ACTIVE
-	case domain.WebWeyStateRemoved:
+	case domain.WebKeyStateRemoved:
 		return v3alpha.WebKeyState_STATE_REMOVED
 	default:
 		return v3alpha.WebKeyState_STATE_UNSPECIFIED

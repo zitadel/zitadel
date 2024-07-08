@@ -41,7 +41,7 @@ func (wm *WebKeyWriteModel) Reduce() error {
 		case *webkey.DeactivatedEvent:
 			wm.State = domain.WebKeyStateInactive
 		case *webkey.RemovedEvent:
-			wm.State = domain.WebWeyStateRemoved
+			wm.State = domain.WebKeyStateRemoved
 			wm.PrivateKey = nil
 			wm.PublicKey = nil
 		}

@@ -6,5 +6,5 @@ const (
 	WebKeyStateUnspecified WebKeyState = iota
 	WebKeyStateInactive
 	WebKeyStateActive
-	WebWeyStateRemoved
+	WebKeyStateRemoved
 )

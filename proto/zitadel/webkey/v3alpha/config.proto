@@ -29,7 +29,7 @@ message WebKeyRSAConfig {
 
 message WebKeyECDSAConfig {
   enum ECDSACurve {
-    ECDSA_CRURVE_UNSPECIFIED = 0;
+    ECDSA_CURVE_UNSPECIFIED = 0;
     ECDSA_CURVE_P256 = 1;
     ECDSA_CURVE_P384 = 2;
     ECDSA_CURVE_P512 = 3;
