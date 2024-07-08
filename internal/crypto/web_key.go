@@ -7,7 +7,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"encoding/json"
-	"io"
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/muhlemmer/gu"
@@ -159,18 +158,26 @@ func (WebKeyED25519Config) Type() WebKeyConfigType {
 }
 
 func GenerateEncryptedWebKey(keyID string, alg EncryptionAlgorithm, genConfig WebKeyConfig) (encryptedPrivate *CryptoValue, public *jose.JSONWebKey, err error) {
-	return generateEncryptedWebKey(rand.Reader, keyID, alg, genConfig)
+	private, public, err := generateWebKey(keyID, genConfig)
+	if err != nil {
+		return nil, nil, err
+	}
+	encryptedPrivate, err = EncryptJSON(private, alg)
+	if err != nil {
+		return nil, nil, err
+	}
+	return encryptedPrivate, public, nil
 }
 
-func generateEncryptedWebKey(reader io.Reader, keyID string, alg EncryptionAlgorithm, genConfig WebKeyConfig) (encryptedWebKey *CryptoValue, public *jose.JSONWebKey, err error) {
+func generateWebKey(keyID string, genConfig WebKeyConfig) (private, public *jose.JSONWebKey, err error) {
 	var key any
 	switch conf := genConfig.(type) {
-	case WebKeyRSAConfig:
-		key, err = rsa.GenerateKey(reader, int(conf.Bits))
-	case WebKeyECDSAConfig:
-		key, err = ecdsa.GenerateKey(conf.GetCurve(), reader)
-	case WebKeyED25519Config:
-		_, key, err = ed25519.GenerateKey(reader)
+	case *WebKeyRSAConfig:
+		key, err = rsa.GenerateKey(rand.Reader, int(conf.Bits))
+	case *WebKeyECDSAConfig:
+		key, err = ecdsa.GenerateKey(conf.GetCurve(), rand.Reader)
+	case *WebKeyED25519Config:
+		_, key, err = ed25519.GenerateKey(rand.Reader)
 	default:
 		err = zerrors.ThrowInternalf(nil, "CRYPT-aeW6x", "Errors.Internal")
 	}
@@ -178,12 +185,8 @@ func generateEncryptedWebKey(reader io.Reader, keyID string, alg EncryptionAlgor
 		return nil, nil, err
 	}
 
-	webKey := newJSONWebkey(key, keyID, genConfig.Alg())
-	encryptedWebKey, err = EncryptJSON(webKey, alg)
-	if err != nil {
-		return nil, nil, err
-	}
-	return encryptedWebKey, gu.Ptr(webKey.Public()), err
+	private = newJSONWebkey(key, keyID, genConfig.Alg())
+	return private, gu.Ptr(private.Public()), err
 }
 
 func newJSONWebkey(key any, keyID string, algorithm jose.SignatureAlgorithm) *jose.JSONWebKey {
