@@ -12,7 +12,6 @@ func (s *Server) RegisterTOTP(ctx context.Context, req *user.RegisterTOTPRequest
 	return totpDetailsToPb(
 		s.command.AddUserTOTP(ctx, req.GetUserId(), ""),
 	)
-
 }
 
 func totpDetailsToPb(totp *domain.TOTP, err error) (*user.RegisterTOTPResponse, error) {

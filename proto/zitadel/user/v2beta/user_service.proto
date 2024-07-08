@@ -667,7 +667,7 @@ service UserService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Remove TOTP generator from a user";
-      description: "Remove the configured TOTP generator of the authenticated user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second-factor afterward."
+      description: "Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second-factor afterward."
       responses: {
         key: "200"
         value: {
@@ -712,7 +712,7 @@ service UserService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Remove One-Time-Password (OTP) SMS from a user";
-      description: "Remove the configured One-Time-Password (OTP) SMS factor of the authenticated user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
+      description: "Remove the configured One-Time-Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
       responses: {
         key: "200"
         value: {
@@ -757,7 +757,7 @@ service UserService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Remove One-Time-Password (OTP) Email from a user";
-      description: "Remove the configured One-Time-Password (OTP) Email factor of the authenticated user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
+      description: "Remove the configured One-Time-Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
       responses: {
         key: "200"
         value: {
