@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Mostrar usuario {{value}}"
     },
-    "DOWNLOAD": "Descargar"
+    "DOWNLOAD": "Descargar",
+    "APPLY": "Aplicar"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Tiene control sobre toda la instancia, incluyendo todas las organizaciones",
@@ -1475,6 +1476,10 @@
         "DISABLED": "Deshabilitado"
       },
       "INHERITED_DESCRIPTION": "Esta configuración establece el valor al valor predeterminado del sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Habilitado\" se hereda",
+        "DISABLED": "\"Deshabilitado\" se hereda"
+      },
       "RESET": "Establecer todo a heredado"
     },
     "DIALOG": {
@@ -1680,7 +1685,8 @@
         "username": "Nombre de usuario",
         "tempUsername": "Nombre de usuario temporal",
         "otp": "Contraseña de un solo uso",
-        "verifyUrl": "URL para verificar la contraseña de un solo uso"
+        "verifyUrl": "URL para verificar la contraseña de un solo uso",
+        "expiry": "Expiración"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados guardados."

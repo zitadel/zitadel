@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Visa användare {{value}}"
     },
-    "DOWNLOAD": "Ladda ner"
+    "DOWNLOAD": "Ladda ner",
+    "APPLY": "Tillämpa"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Har kontroll över hela instansen, inklusive alla organisationer",
@@ -1478,6 +1479,10 @@
         "DISABLED": "Inaktiverad"
       },
       "INHERITED_DESCRIPTION": "Detta ställer in värdet till systemets standardvärde.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Aktiverad\" ärvs",
+        "DISABLED": "\"Inaktiverad\" ärvs"
+      },
       "RESET": "Återställ allt till arv"
     },
     "DIALOG": {
@@ -1683,7 +1688,8 @@
         "username": "Användarnamn",
         "tempUsername": "Tillfälligt användarnamn",
         "otp": "Engångslösenord",
-        "verifyUrl": "Verifiera Engångslösenord URL"
+        "verifyUrl": "Verifiera Engångslösenord URL",
+        "expiry": "Utgångsdatum"
       },
       "TOAST": {
         "UPDATED": "Anpassade Texter sparade."

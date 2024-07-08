@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     },
-    "DOWNLOAD": "Download"
+    "DOWNLOAD": "Download",
+    "APPLY": "Apply"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Has control over the whole instance, including all organizations",
@@ -1474,6 +1475,10 @@
         "DISABLED": "Disabled"
       },
       "INHERITED_DESCRIPTION": "This sets the value to the default value of the system.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Enabled\" is inherited",
+        "DISABLED": "\"Disabled\" is inherited"
+      },
       "RESET": "Set all to inherit"
     },
     "DIALOG": {
@@ -1679,7 +1684,8 @@
         "username": "Username",
         "tempUsername": "Temp username",
         "otp": "One-time password",
-        "verifyUrl": "Verify One-time-password URL"
+        "verifyUrl": "Verify One-time-password URL",
+        "expiry": "Expiry"
       },
       "TOAST": {
         "UPDATED": "Custom Texts saved."
@@ -2046,7 +2052,7 @@
         "DESCRIPTION": "Enter the credentials for your Apple Provider"
       },
       "SAML": {
-        "TITLE": "Sign in with SAML SP",
+        "TITLE": "Sign in with SAML",
         "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },

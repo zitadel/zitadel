@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Afficher l'utilisateur {{value}}"
     },
-    "DOWNLOAD": "Télécharger"
+    "DOWNLOAD": "Télécharger",
+    "APPLY": "Appliquer"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "A le contrôle de toute l'instance, y compris toutes les organisations",
@@ -1474,6 +1475,10 @@
         "DISABLED": "Désactivé"
       },
       "INHERITED_DESCRIPTION": "Ce paramètre définit la valeur par défaut du système.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Activé\" est hérité",
+        "DISABLED": "\"Désactivé\" est hérité"
+      },
       "RESET": "Réinitialiser tout sur hérité"
     },
     "DIALOG": {
@@ -1679,7 +1684,8 @@
         "username": "Nom d'utilisateur",
         "tempUsername": "Nom d'utilisateur temporaire",
         "otp": "Mot de passe à usage unique",
-        "verifyUrl": "URL pour vérifier le mot de passe à usage unique"
+        "verifyUrl": "URL pour vérifier le mot de passe à usage unique",
+        "expiry": "Expiration"
       },
       "TOAST": {
         "UPDATED": "Textes personnalisés enregistrés."

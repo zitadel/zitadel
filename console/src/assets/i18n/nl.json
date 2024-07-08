@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Toon gebruiker {{value}}"
     },
-    "DOWNLOAD": "Download"
+    "DOWNLOAD": "Download",
+    "APPLY": "Toepassen"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
@@ -1474,6 +1475,10 @@
         "DISABLED": "Uitgeschakeld"
       },
       "INHERITED_DESCRIPTION": "Deze instelling stelt de waarde in op de standaardwaarde van het systeem.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Ingeschakeld\" wordt overgenomen",
+        "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
+      },
       "RESET": "Alles instellen op overgenomen"
     },
     "DIALOG": {
@@ -1679,7 +1684,8 @@
         "username": "Gebruikersnaam",
         "tempUsername": "Tijdelijke gebruikersnaam",
         "otp": "Eenmalig wachtwoord",
-        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL"
+        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL",
+        "expiry": "Vervaldatum"
       },
       "TOAST": {
         "UPDATED": "Aangepaste Teksten opgeslagen."

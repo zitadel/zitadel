@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     },
-    "DOWNLOAD": "下载"
+    "DOWNLOAD": "下载",
+    "APPLY": "申请"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "控制整个实例，包括所有组织",
@@ -1474,6 +1475,10 @@
         "DISABLED": "已禁用"
       },
       "INHERITED_DESCRIPTION": "此设置将值设置为系统默认值。",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "“已启用” 是继承的",
+        "DISABLED": "“已禁用” 是继承的"
+      },
       "RESET": "全部设置为继承"
     },
     "DIALOG": {
@@ -1678,7 +1683,8 @@
         "username": "用户名",
         "tempUsername": "临时用户名",
         "otp": "一次性密码",
-        "verifyUrl": "验证一次性密码的URL"
+        "verifyUrl": "验证一次性密码的URL",
+        "expiry": "过期时间"
       },
       "TOAST": {
         "UPDATED": "自定义文本已保存。"
