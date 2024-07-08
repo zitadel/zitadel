@@ -237,7 +237,7 @@ func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner st
 		return nil, err
 	}
 	if userID != authz.GetCtxData(ctx).UserID {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingOTP.WriteModel.ResourceOwner, userID); err != nil {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingOTP.ResourceOwner, userID); err != nil {
 			return nil, err
 		}
 	}
