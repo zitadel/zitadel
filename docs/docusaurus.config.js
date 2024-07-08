@@ -194,6 +194,12 @@ module.exports = {
       disableSwitch: false,
       respectPrefersColorScheme: true,
     },
+    codeblock: {
+      showGithubLink: true,
+      githubLinkLabel: 'View on GitHub',
+      showRunmeLink: false,
+      runmeLinkLabel: 'Checkout via Runme'
+    },
   },
   webpack: {
     jsLoader: (isServer) => ({
@@ -358,5 +364,5 @@ module.exports = {
       };
     },
   ],
-  themes: ["@saucelabs/theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
 };

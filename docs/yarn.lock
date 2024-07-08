@@ -1670,7 +1670,7 @@
     fs-extra "^11.1.1"
     tslib "^2.6.0"
 
-"@docusaurus/types@3.4.0":
+"@docusaurus/types@3.4.0", "@docusaurus/types@^3.0.0":
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/@docusaurus/types/-/types-3.4.0.tgz#237c3f737e9db3f7c1a5935a3ef48d6eadde8292"
   integrity sha512-4jcDO8kXi5Cf9TcyikB/yKmz14f2RZ2qTRerbHAsS+5InE9ZgSLBNLsewtFTcTOXSVcbU3FoGOzcNWAmU1TR0A==
@@ -1981,11 +1981,6 @@
     redux "^4.2.1"
     redux-thunk "^2.4.2"
     reselect "^4.1.8"
-
-"@saucelabs/theme-github-codeblock@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@saucelabs/theme-github-codeblock/-/theme-github-codeblock-0.2.3.tgz#706a43292f600532271979941b0155db667c2c21"
-  integrity sha512-GSl3Lr/jOWm4OP3BPX2vXxc8FMSOXj1mJnls6cUqMwlGOfKQ1Ia9pq1O9/ES+5TrZHIzAws/n5FFSn1OkGJw/Q==
 
 "@sideway/address@^4.1.5":
   version "4.1.5"
@@ -4643,6 +4638,13 @@ docusaurus-plugin-sass@^0.2.3:
   integrity sha512-Z+D0fLFUKcFpM+bqSUmqKIU+vO+YF1xoEQh5hoFreg2eMf722+siwXDD+sqtwU8E4MvVpuvsQfaHwODNlxJAEg==
   dependencies:
     sass-loader "^10.1.1"
+
+docusaurus-theme-github-codeblock@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/docusaurus-theme-github-codeblock/-/docusaurus-theme-github-codeblock-2.0.2.tgz#88b7044b81f9091330e8e4a07a1bdc9114a9fb93"
+  integrity sha512-H2WoQPWOLjGZO6KS58Gsd+eUVjTFJemkReiSSu9chqokyLc/3Ih3+zPRYfuEZ/HsDvSMIarf7CNcp+Vt+/G+ig==
+  dependencies:
+    "@docusaurus/types" "^3.0.0"
 
 docusaurus-theme-openapi-docs@3.0.1:
   version "3.0.1"
