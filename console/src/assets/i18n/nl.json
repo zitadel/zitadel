@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instellingsinstellingen",
-        "DESCRIPTION": "De instellingsinstellingen zijn de standaardinstellingen voor alle organisaties. Met de juiste toestemmingen kunnen sommige hiervan worden overschreven in organisatie-instellingen."
+        "TITLE": "Standaard instellingen",
+        "DESCRIPTION": "Standaardinstellingen voor alle organisaties. Met de juiste machtigingen kunnen sommige ervan worden overschreven in de organisatie-instellingen."
       },
       "ORG": {
         "TITLE": "Organisatie-instellingen",
@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Toon gebruiker {{value}}"
     },
-    "DOWNLOAD": "Download"
+    "DOWNLOAD": "Download",
+    "APPLY": "Toepassen"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
@@ -1317,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instantie Instellingen",
-      "DESCRIPTION": "Deze instellingen zijn van toepassing op al uw organisaties, tenzij ze zijn overschreven."
-    },
     "LIST": {
       "ORGS": "Organisaties",
       "FEATURESETTINGS": "Functie-instellingen",
@@ -1478,6 +1475,10 @@
         "DISABLED": "Uitgeschakeld"
       },
       "INHERITED_DESCRIPTION": "Deze instelling stelt de waarde in op de standaardwaarde van het systeem.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Ingeschakeld\" wordt overgenomen",
+        "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
+      },
       "RESET": "Alles instellen op overgenomen"
     },
     "DIALOG": {
@@ -1683,7 +1684,8 @@
         "username": "Gebruikersnaam",
         "tempUsername": "Tijdelijke gebruikersnaam",
         "otp": "Eenmalig wachtwoord",
-        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL"
+        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL",
+        "expiry": "Vervaldatum"
       },
       "TOAST": {
         "UPDATED": "Aangepaste Teksten opgeslagen."

@@ -1,6 +1,6 @@
 ---
 title: Configure OKTA as a SAML Identity Provider in ZITADEL
-sidebar_label: OKTA SAML SP
+sidebar_label: OKTA SAML
 id: okta-saml
 ---
 
@@ -18,12 +18,12 @@ import TestSetup from './_test_setup.mdx';
 
 ### Go to the IdP Providers Overview
 
-<IDPsOverview templates="SAML SP"/>
+<IDPsOverview templates="SAML"/>
 
-### Create a new SAML Service Provider (SP)
+### Create a new SAML Provider
 
 To be able to create the application in OKTA we need the provider id from ZITADEL.
-1. Create a new SAML SP with a name and a random text in the Metadata Xml field.
+1. Create a new SAML Provider with a name and a random text in the Metadata Xml field.
 We will fill that as soon as we have done the configuration in OKTA.
 2. Save Configuration
 
@@ -33,7 +33,7 @@ As an alternative you can add the SAML identity provider through the API, either
 
 ![OKTA Provider Empty](/img/guides/zitadel_okta_saml_provider_empty.png)
 
-After you created the SAML SP in ZITADEL, you can copy the URLs you need to configure in your OKTA application.
+After you created the SAML Provider in ZITADEL, you can copy the URLs you need to configure in your OKTA application.
 
 ![OKTA SAML App URLs](/img/guides/zitadel_okta_saml_provider_urls.png)
 

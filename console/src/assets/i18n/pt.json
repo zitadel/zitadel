@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Configurações da Instância",
-        "DESCRIPTION": "As configurações da instância são as configurações padrão para todas as organizações. Com as permissões corretas, algumas delas podem ser sobrescritas nas configurações da organização."
+        "TITLE": "Configurações padrão",
+        "DESCRIPTION": "Configurações padrão para todas as organizações. Com as permissões corretas, algumas delas podem ser substituídas nas configurações da organização."
       },
       "ORG": {
         "TITLE": "Configurações da Organização",
@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Mostrar usuário {{value}}"
     },
-    "DOWNLOAD": "Baixar"
+    "DOWNLOAD": "Baixar",
+    "APPLY": "Aplicar"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Tem controle sobre toda a instância, incluindo todas as organizações",
@@ -1318,10 +1319,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Configurações da Instância",
-      "DESCRIPTION": "Essas configurações serão aplicadas a todas as suas organizações, a menos que tenham sido substituídas."
-    },
     "LIST": {
       "ORGS": "Organizações",
       "FEATURESETTINGS": "Configurações de Recursos",
@@ -1479,6 +1476,10 @@
         "DISABLED": "Desabilitado"
       },
       "INHERITED_DESCRIPTION": "Essa configuração define o valor para o padrão do sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Habilitado\" é herdado",
+        "DISABLED": "\"Desabilitado\" é herdado"
+      },
       "RESET": "Definir tudo para herdar"
     },
     "DIALOG": {
@@ -1684,7 +1685,8 @@
         "username": "Nome de usuário",
         "tempUsername": "Nome de usuário temporário",
         "otp": "Senha de uso único",
-        "verifyUrl": "URL para verificar a senha de uso único"
+        "verifyUrl": "URL para verificar a senha de uso único",
+        "expiry": "Data de expiração"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados salvos."

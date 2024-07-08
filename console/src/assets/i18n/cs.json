@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Nastavení instance",
-        "DESCRIPTION": "Nastavení instance jsou výchozí nastavení pro všechny organizace. S odpovídajícími oprávněními jsou některá z nich přepisovatelná v nastavení organizace."
+        "TITLE": "Výchozí nastavení",
+        "DESCRIPTION": "Výchozí nastavení pro všechny organizace. Se správnými oprávněními lze některá z nich přepsat v nastavení organizace."
       },
       "ORG": {
         "TITLE": "Nastavení organizace",
@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Zobrazit uživatele {{value}}"
     },
-    "DOWNLOAD": "Stáhnout"
+    "DOWNLOAD": "Stáhnout",
+    "APPLY": "Platit"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Má kontrolu nad celou instancí, včetně všech organizací",
@@ -1317,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Nastavení instance",
-      "DESCRIPTION": "Tato nastavení se budou aplikovat na všechny vaše organizace, pokud nebyla přepsána."
-    },
     "LIST": {
       "ORGS": "Organizace",
       "FEATURESETTINGS": "Nastavení funkcí",
@@ -1478,6 +1475,10 @@
         "DISABLED": "Zakázáno"
       },
       "INHERITED_DESCRIPTION": "Toto nastavení nastaví hodnotu na výchozí hodnotu systému.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Povoleno“ je zděděno",
+        "DISABLED": "„Zakázáno“ je zděděno"
+      },
       "RESET": "Nastavit vše na děděné"
     },
     "DIALOG": {
@@ -1683,7 +1684,8 @@
         "username": "Uživatelské jméno",
         "tempUsername": "Dočasné uživatelské jméno",
         "otp": "Jednorázové heslo",
-        "verifyUrl": "Ověřovací URL jednorázového hesla"
+        "verifyUrl": "Ověřovací URL jednorázového hesla",
+        "expiry": "Expirace"
       },
       "TOAST": {
         "UPDATED": "Vlastní texty uloženy."
