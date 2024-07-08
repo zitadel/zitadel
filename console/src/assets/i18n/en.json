@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instance Settings",
-        "DESCRIPTION": "The instance settings are the default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
+        "TITLE": "Default Settings",
+        "DESCRIPTION": "Default settings for all organizations. With the right permissions, some of them are overridable in organization settings."
       },
       "ORG": {
         "TITLE": "Organization Settings",
@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Show user {{value}}"
     },
-    "DOWNLOAD": "Download"
+    "DOWNLOAD": "Download",
+    "APPLY": "Apply"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Has control over the whole instance, including all organizations",
@@ -527,7 +528,7 @@
       "TEXT": "All organization settings and tables in console are based on a selected organization. Click this button to switch organization or create a new one."
     },
     "INSTANCE": {
-      "TEXT": "Click here to get to the instance settings. Note that you have only access to this button if you have enhanced permissions."
+      "TEXT": "Click here to get to the default settings. Note that you have only access to this button if you have enhanced permissions."
     },
     "PROFILE": {
       "TEXT": "Here you can switch between your user accounts and manage your sessions and profile."
@@ -1317,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instance Settings",
-      "DESCRIPTION": "These settings will apply to all your organizations unless they have been overridden."
-    },
     "LIST": {
       "ORGS": "Organizations",
       "FEATURESETTINGS": "Features",
@@ -1479,6 +1476,10 @@
         "DISABLED": "Disabled"
       },
       "INHERITED_DESCRIPTION": "This sets the value to the default value of the system.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Enabled\" is inherited",
+        "DISABLED": "\"Disabled\" is inherited"
+      },
       "RESET": "Set all to inherit"
     },
     "DIALOG": {
@@ -1684,7 +1685,8 @@
         "username": "Username",
         "tempUsername": "Temp username",
         "otp": "One-time password",
-        "verifyUrl": "Verify One-time-password URL"
+        "verifyUrl": "Verify One-time-password URL",
+        "expiry": "Expiry"
       },
       "TOAST": {
         "UPDATED": "Custom Texts saved."
@@ -2051,7 +2053,7 @@
         "DESCRIPTION": "Enter the credentials for your Apple Provider"
       },
       "SAML": {
-        "TITLE": "Sign in with SAML SP",
+        "TITLE": "Sign in with SAML",
         "DESCRIPTION": "Enter the credentials for your SAML Provider"
       }
     },

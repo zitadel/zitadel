@@ -40,17 +40,8 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 	if err != nil {
 		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}
-	if !domainPolicy.UserLoginMustBeDomain {
-		index := strings.LastIndex(userName, "@")
-		if index > 1 {
-			domainCheck := NewOrgDomainVerifiedWriteModel(userName[index+1:])
-			if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
-				return nil, err
-			}
-			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-				return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Di2ei", "Errors.User.DomainNotAllowedAsUsername")
-			}
-		}
+	if err = c.userValidateDomain(ctx, orgID, userName, domainPolicy.UserLoginMustBeDomain); err != nil {
+		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 
