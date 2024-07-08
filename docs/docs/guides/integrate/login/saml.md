@@ -113,10 +113,10 @@ In this SAML request:
 - **AssertionConsumerServiceURL** (http://127.0.0.1:5000/acs) indicates where the response should be sent after user authentication.
 - **Issuer** (https://zitadel-test.sp/metadata) is a predefined string formatted as a URL, matching what the identity provider expects.
 - **Signature** ensures the integrity and authenticity of the SAML request. It includes:
-- **SignedInfo** contains details about the canonicalization and signature methods.
-- **Reference** points to the signed data and includes a transform and digest method.
-- **SignatureValue** provides the actual digital signature.
-- **KeyInfo** containing the X.509 certificate, which holds the public key used to verify the signature.
+	- **SignedInfo** contains details about the canonicalization and signature methods.
+  	- **Reference** points to the signed data and includes a transform and digest method.
+  	- **SignatureValue** provides the actual digital signature.
+  	- **KeyInfo** containing the X.509 certificate, which holds the public key used to verify the signature.
 
 These XMLs are stringified, encoded, and passed in the query string to the identity provider, where the user is authenticated, and the SAML response is prepared, which will be received by the SP as an encoded string. 
 
@@ -206,10 +206,10 @@ In this SAML response:
 - **Issuer** (https://my-instance-xtzfbc.zitadel.cloud/saml/v2/metadata) is the identity provider's unique string, used to verify the response's origin.
 - **StatusCode** indicates the status of the authentication process, with a value of Success.
 - **Signature** ensures the integrity and authenticity of the SAML response. It includes:
-- **SignedInfo** contains details about the canonicalization and signature methods.
-- **Reference** points to the signed data and including transforms and a digest method.
-- **SignatureValue** provides the actual digital signature.
-- **KeyInfo** contains the X.509 certificate, which holds the public key used to verify the signature.
+	- **SignedInfo** contains details about the canonicalization and signature methods.
+	- **Reference** points to the signed data and including transforms and a digest method.
+	- **SignatureValue** provides the actual digital signature.
+	- **KeyInfo** contains the X.509 certificate, which holds the public key used to verify the signature.
 - **Assertion** includes user information, such as email, surname, first name, full name, username, user ID etc.
 - **Subject** contains the user's unique identifier.
 - **Conditions** specify the response's validity window.
