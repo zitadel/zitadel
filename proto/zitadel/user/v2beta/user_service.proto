@@ -967,7 +967,8 @@ message GetUserByIDRequest {
 }
 
 message GetUserByIDResponse {
-  reserved  1;
+  //deprecated: details is moved into user
+  zitadel.object.v2beta.Details details = 1;
   zitadel.user.v2beta.User user = 2;
 }
 

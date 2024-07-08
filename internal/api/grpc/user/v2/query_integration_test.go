@@ -95,6 +95,10 @@ func TestServer_GetUserByID(t *testing.T) {
 						},
 					},
 				},
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: orgResp.OrganizationId,
+				},
 			},
 		},
 		{
@@ -138,6 +142,10 @@ func TestServer_GetUserByID(t *testing.T) {
 						},
 					},
 				},
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: orgResp.OrganizationId,
+				},
 			},
 		},
 	}
@@ -172,6 +180,7 @@ func TestServer_GetUserByID(t *testing.T) {
 					}
 				}
 				assert.Equal(ttt, tt.want.User, got.User)
+				integration.AssertDetails(t, tt.want, got)
 			}, retryDuration, time.Second)
 		})
 	}
@@ -224,6 +233,10 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 						},
 					},
 				},
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(timeNow),
+					ResourceOwner: newOrg.GetOrganizationId(),
+				},
 			},
 		},
 		{
@@ -257,6 +270,10 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 							Phone: &user.HumanPhone{},
 						},
 					},
+				},
+				Details: &object.Details{
+					ChangeDate:    timestamppb.New(timeNow),
+					ResourceOwner: newOrg.GetOrganizationId(),
 				},
 			},
 		},
