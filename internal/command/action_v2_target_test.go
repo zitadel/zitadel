@@ -11,8 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	"github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -20,7 +20,7 @@ import (
 func TestCommands_AddTarget(t *testing.T) {
 	type fields struct {
 		eventstore  func(t *testing.T) *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		ctx           context.Context
@@ -242,9 +242,9 @@ func TestCommands_AddTarget(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:  tt.fields.eventstore(t),
-				idGenerator: tt.fields.idGenerator,
+				eventstore: tt.fields.eventstore(t),
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			details, err := c.AddTarget(tt.args.ctx, tt.args.add, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

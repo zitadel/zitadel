@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
 
@@ -22,7 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -41,7 +40,6 @@ type Commands struct {
 
 	eventstore     *eventstore.Eventstore
 	static         static.Storage
-	idGenerator    id.Generator
 	zitadelRoles   []authz.RoleMapping
 	externalDomain string
 	externalSecure bool
@@ -107,7 +105,6 @@ func StartCommands(
 	if externalDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Df21s", "no external domain specified")
 	}
-	idGenerator := id.SonyFlakeGenerator()
 	// reuse the oidcEncryption to be able to handle both tokens in the interceptor later on
 	sessionAlg := oidcEncryption
 
@@ -122,7 +119,6 @@ func StartCommands(
 	repo = &Commands{
 		eventstore:                      es,
 		static:                          staticStore,
-		idGenerator:                     idGenerator,
 		zitadelRoles:                    zitadelRoles,
 		externalDomain:                  externalDomain,
 		externalSecure:                  externalSecure,
@@ -150,7 +146,7 @@ func StartCommands(
 		checkPermission:                 permissionCheck,
 		newEncryptedCode:                newEncryptedCode,
 		newEncryptedCodeWithDefault:     newEncryptedCodeWithDefaultConfig,
-		sessionTokenCreator:             sessionTokenCreator(idGenerator, sessionAlg),
+		sessionTokenCreator:             sessionTokenCreator(sessionAlg),
 		sessionTokenVerifier:            sessionTokenVerifier,
 		defaultAccessTokenLifetime:      defaultAccessTokenLifetime,
 		defaultRefreshTokenLifetime:     defaultRefreshTokenLifetime,
@@ -230,13 +226,13 @@ func samlCertificateAndKeyGenerator(keySize int, lifetime time.Duration) func(id
 			return nil, nil, err
 		}
 
-		serial, err := strconv.Atoi(id)
+		serial, err := id_generator.NumericFromID(id)
 		if err != nil {
 			return nil, nil, err
 		}
 		now := time.Now()
 		template := x509.Certificate{
-			SerialNumber: big.NewInt(int64(serial)),
+			SerialNumber: big.NewInt(serial),
 			Subject: pkix.Name{
 				Organization: []string{"ZITADEL"},
 				SerialNumber: id,

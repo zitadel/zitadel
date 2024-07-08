@@ -10,13 +10,14 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddOrgGenericOAuthProvider(ctx context.Context, resourceOwner string, provider GenericOAuthProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -56,7 +57,7 @@ func (c *Commands) UpdateOrgGenericOAuthProvider(ctx context.Context, resourceOw
 
 func (c *Commands) AddOrgGenericOIDCProvider(ctx context.Context, resourceOwner string, provider GenericOIDCProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -129,7 +130,7 @@ func (c *Commands) migrateOrgGenericOIDC(ctx context.Context, resourceOwner, id 
 
 func (c *Commands) AddOrgJWTProvider(ctx context.Context, resourceOwner string, provider JWTProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -168,7 +169,7 @@ func (c *Commands) UpdateOrgJWTProvider(ctx context.Context, resourceOwner, id s
 }
 func (c *Commands) AddOrgAzureADProvider(ctx context.Context, resourceOwner string, provider AzureADProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -208,7 +209,7 @@ func (c *Commands) UpdateOrgAzureADProvider(ctx context.Context, resourceOwner, 
 
 func (c *Commands) AddOrgGitHubProvider(ctx context.Context, resourceOwner string, provider GitHubProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -248,7 +249,7 @@ func (c *Commands) UpdateOrgGitHubProvider(ctx context.Context, resourceOwner, i
 
 func (c *Commands) AddOrgGitHubEnterpriseProvider(ctx context.Context, resourceOwner string, provider GitHubEnterpriseProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -288,7 +289,7 @@ func (c *Commands) UpdateOrgGitHubEnterpriseProvider(ctx context.Context, resour
 
 func (c *Commands) AddOrgGitLabProvider(ctx context.Context, resourceOwner string, provider GitLabProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -328,7 +329,7 @@ func (c *Commands) UpdateOrgGitLabProvider(ctx context.Context, resourceOwner, i
 
 func (c *Commands) AddOrgGitLabSelfHostedProvider(ctx context.Context, resourceOwner string, provider GitLabSelfHostedProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -368,7 +369,7 @@ func (c *Commands) UpdateOrgGitLabSelfHostedProvider(ctx context.Context, resour
 
 func (c *Commands) AddOrgGoogleProvider(ctx context.Context, resourceOwner string, provider GoogleProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -408,7 +409,7 @@ func (c *Commands) UpdateOrgGoogleProvider(ctx context.Context, resourceOwner, i
 
 func (c *Commands) AddOrgLDAPProvider(ctx context.Context, resourceOwner string, provider LDAPProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -448,7 +449,7 @@ func (c *Commands) UpdateOrgLDAPProvider(ctx context.Context, resourceOwner, id 
 
 func (c *Commands) AddOrgSAMLProvider(ctx context.Context, resourceOwner string, provider SAMLProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -510,7 +511,7 @@ func (c *Commands) RegenerateOrgSAMLProviderCertificate(ctx context.Context, res
 
 func (c *Commands) AddOrgAppleProvider(ctx context.Context, resourceOwner string, provider AppleProvider) (string, *domain.ObjectDetails, error) {
 	orgAgg := org.NewAggregate(resourceOwner)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}

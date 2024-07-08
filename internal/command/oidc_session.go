@@ -15,7 +15,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	TokenDelimiter            = "-"
+	TokenDelimiter            = "."
 	AccessTokenPrefix         = "at_"
 	RefreshTokenPrefix        = "rt_"
 	oidcTokenSubjectDelimiter = ":"
@@ -269,14 +269,13 @@ func (c *Commands) newOIDCSessionAddEvents(ctx context.Context, resourceOwner st
 	if err != nil {
 		return nil, err
 	}
-	sessionID, err := c.idGenerator.Next()
+	sessionID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}
 	sessionID = IDPrefixV2 + sessionID
 	return &OIDCSessionEvents{
 		eventstore:               c.eventstore,
-		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
 		events:                   pending,
 		oidcSessionWriteModel:    NewOIDCSessionWriteModel(sessionID, resourceOwner),
@@ -326,7 +325,6 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 	}
 	return &OIDCSessionEvents{
 		eventstore:               c.eventstore,
-		idGenerator:              c.idGenerator,
 		encryptionAlg:            c.keyAlgorithm,
 		oidcSessionWriteModel:    sessionWriteModel,
 		accessTokenLifetime:      accessTokenLifetime,
@@ -337,7 +335,6 @@ func (c *Commands) newOIDCSessionUpdateEvents(ctx context.Context, refreshToken 
 
 type OIDCSessionEvents struct {
 	eventstore            *eventstore.Eventstore
-	idGenerator           id.Generator
 	encryptionAlg         crypto.EncryptionAlgorithm
 	events                []eventstore.Command
 	oidcSessionWriteModel *OIDCSessionWriteModel
@@ -401,7 +398,7 @@ func (c *OIDCSessionEvents) SetAuthRequestFailed(ctx context.Context, authReques
 }
 
 func (c *OIDCSessionEvents) AddAccessToken(ctx context.Context, scope []string, userID, resourceOwner string, reason domain.TokenReason, actor *domain.TokenActor) error {
-	accessTokenID, err := c.idGenerator.Next()
+	accessTokenID, err := id_generator.Next()
 	if err != nil {
 		return err
 	}
@@ -437,7 +434,7 @@ func (c *OIDCSessionEvents) UserImpersonated(ctx context.Context, userID, resour
 }
 
 func (c *OIDCSessionEvents) generateRefreshToken(userID string) (refreshTokenID, refreshToken string, err error) {
-	refreshTokenID, err = c.idGenerator.Next()
+	refreshTokenID, err = id_generator.Next()
 	if err != nil {
 		return "", "", err
 	}
@@ -476,7 +473,7 @@ func (c *OIDCSessionEvents) PushEvents(ctx context.Context) (*OIDCSession, error
 	}
 	if c.accessTokenID != "" {
 		// prefix the returned id with the oidcSessionID so that we can retrieve it later on
-		// we need to use `-` as a delimiter because the OIDC library uses `:` and will check for a length of 2 parts
+		// we need to use `.` as a delimiter because the OIDC library uses `:` and will check for a length of 2 parts
 		session.TokenID = c.oidcSessionWriteModel.AggregateID + TokenDelimiter + c.accessTokenID
 	}
 	activity.Trigger(ctx, c.oidcSessionWriteModel.UserResourceOwner, c.oidcSessionWriteModel.UserID, tokenReasonToActivityMethodType(c.oidcSessionWriteModel.AccessTokenReason), c.eventstore.FilterToQueryReducer)

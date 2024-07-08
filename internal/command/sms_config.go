@@ -5,13 +5,14 @@ import (
 
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddSMSConfigTwilio(ctx context.Context, instanceID string, config *twilio.Config) (string, *domain.ObjectDetails, error) {
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}

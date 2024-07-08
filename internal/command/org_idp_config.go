@@ -6,6 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	org_repo "github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -32,7 +33,7 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 	if config.OIDCConfig == nil && config.JWTConfig == nil {
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
 	}
-	idpConfigID, err := c.idGenerator.Next()
+	idpConfigID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}

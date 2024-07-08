@@ -15,8 +15,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -27,7 +27,7 @@ func TestAddDomain(t *testing.T) {
 		a              *org.Aggregate
 		domain         string
 		claimedUserIDs []string
-		idGenerator    id.Generator
+		idGenerator    id_generator.Generator
 		filter         preparation.FilterToQueryReducer
 	}
 
@@ -130,10 +130,11 @@ func TestAddDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			id_generator.SetGenerator(tt.args.idGenerator)
 			AssertValidation(
 				t,
 				authz.WithRequestedDomain(context.Background(), "domain"),
-				(&Commands{idGenerator: tt.args.idGenerator}).prepareAddOrgDomain(tt.args.a, tt.args.domain, tt.args.claimedUserIDs),
+				(&Commands{}).prepareAddOrgDomain(tt.args.a, tt.args.domain, tt.args.claimedUserIDs),
 				tt.args.filter,
 				tt.want,
 			)
@@ -674,7 +675,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 	type fields struct {
 		eventstore           *eventstore.Eventstore
-		idGenerator          id.Generator
+		idGenerator          id_generator.Generator
 		secretGenerator      crypto.Generator
 		alg                  crypto.EncryptionAlgorithm
 		domainValidationFunc func(domain, token, verifier string, checkType http.CheckType) error
@@ -1104,8 +1105,8 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				domainVerificationGenerator: tt.fields.secretGenerator,
 				domainVerificationAlg:       tt.fields.alg,
 				domainVerificationValidator: tt.fields.domainValidationFunc,
-				idGenerator:                 tt.fields.idGenerator,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := r.ValidateOrgDomain(authz.WithRequestedDomain(tt.args.ctx, "zitadel.ch"), tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/idpconfig"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -23,7 +23,7 @@ import (
 func TestCommandSide_AddIDPConfig(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -211,9 +211,9 @@ func TestCommandSide_AddIDPConfig(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:          tt.fields.eventstore,
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := r.AddIDPConfig(tt.args.ctx, tt.args.config, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

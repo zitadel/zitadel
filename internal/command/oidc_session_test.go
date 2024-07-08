@@ -18,8 +18,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	"github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -40,7 +40,7 @@ func mockAuthRequestComplianceChecker(returnErr error) AuthRequestComplianceChec
 func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 	type fields struct {
 		eventstore                      func(*testing.T) *eventstore.Eventstore
-		idGenerator                     id.Generator
+		idGenerator                     id_generator.Generator
 		defaultAccessTokenLifetime      time.Duration
 		defaultRefreshTokenLifetime     time.Duration
 		defaultRefreshTokenIdleLifetime time.Duration
@@ -302,7 +302,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 			res{
 				session: &OIDCSession{
 					SessionID:         "sessionID",
-					TokenID:           "V2_oidcSessionID-at_accessTokenID",
+					TokenID:           "V2_oidcSessionID.at_accessTokenID",
 					ClientID:          "clientID",
 					UserID:            "userID",
 					Audience:          []string{"audience"},
@@ -319,7 +319,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 						Header:        http.Header{"foo": []string{"bar"}},
 					},
 					Reason:       domain.TokenReasonAuthRequest,
-					RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+					RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC5ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID.rt_refreshTokenID:userID
 				},
 				state: "state",
 			},
@@ -434,12 +434,12 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:                      tt.fields.eventstore(t),
-				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			gotSession, gotState, err := c.CreateOIDCSessionFromAuthRequest(tt.args.ctx, tt.args.authRequestID, tt.args.complianceCheck, tt.args.needRefreshToken)
 			require.ErrorIs(t, err, tt.res.err)
 
@@ -457,7 +457,7 @@ func TestCommands_CreateOIDCSessionFromAuthRequest(t *testing.T) {
 func TestCommands_CreateOIDCSession(t *testing.T) {
 	type fields struct {
 		eventstore                      func(*testing.T) *eventstore.Eventstore
-		idGenerator                     id.Generator
+		idGenerator                     id_generator.Generator
 		defaultAccessTokenLifetime      time.Duration
 		defaultRefreshTokenLifetime     time.Duration
 		defaultRefreshTokenIdleLifetime time.Duration
@@ -578,7 +578,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				needRefreshToken: false,
 			},
 			want: &OIDCSession{
-				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				TokenID:           "V2_oidcSessionID.at_accessTokenID",
 				ClientID:          "clientID",
 				UserID:            "userID",
 				Audience:          []string{"audience"},
@@ -660,7 +660,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				needRefreshToken: true,
 			},
 			want: &OIDCSession{
-				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				TokenID:           "V2_oidcSessionID.at_accessTokenID",
 				ClientID:          "clientID",
 				UserID:            "userID",
 				Audience:          []string{"audience"},
@@ -681,7 +681,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 					UserID: "user2",
 					Issuer: "foo.com",
 				},
-				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC5ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID.rt_refreshTokenID:userID
 			},
 		},
 		{
@@ -790,7 +790,7 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 				needRefreshToken: false,
 			},
 			want: &OIDCSession{
-				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				TokenID:           "V2_oidcSessionID.at_accessTokenID",
 				ClientID:          "clientID",
 				UserID:            "userID",
 				Audience:          []string{"audience"},
@@ -818,13 +818,13 @@ func TestCommands_CreateOIDCSession(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:                      tt.fields.eventstore(t),
-				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 				checkPermission:                 tt.fields.checkPermission,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := c.CreateOIDCSession(tt.args.ctx,
 				tt.args.userID,
 				tt.args.resourceOwner,
@@ -866,7 +866,7 @@ func mockRefreshTokenComplianceChecker(returnErr error) RefreshTokenComplianceCh
 func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 	type fields struct {
 		eventstore                      func(*testing.T) *eventstore.Eventstore
-		idGenerator                     id.Generator
+		idGenerator                     id_generator.Generator
 		defaultAccessTokenLifetime      time.Duration
 		defaultRefreshTokenLifetime     time.Duration
 		defaultRefreshTokenIdleLifetime time.Duration
@@ -913,7 +913,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC5ydF9yZWZyZXNoVG9rZW5JRDp1c2Vy", //V2_oidcSessionID.rt_refreshTokenID:user
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -942,7 +942,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC5ydF9yZWZyZXNoVG9rZW5JRDp1c2Vy", //V2_oidcSessionID.rt_refreshTokenID:user
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -975,7 +975,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC5ydF9yZWZyZXNoVG9rZW5JRDp1c2Vy", //V2_oidcSessionID.rt_refreshTokenID:user
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
@@ -1020,18 +1020,18 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 			},
 			args{
 				ctx:             authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID:rt_refreshTokenID:userID
+				refreshToken:    "VjJfb2lkY1Nlc3Npb25JRC5ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID.rt_refreshTokenID:userID
 				scope:           []string{"openid", "offline_access"},
 				complianceCheck: mockRefreshTokenComplianceChecker(nil),
 			},
 			res{
 				session: &OIDCSession{
 					SessionID:         "sessionID",
-					TokenID:           "V2_oidcSessionID-at_accessTokenID",
+					TokenID:           "V2_oidcSessionID.at_accessTokenID",
 					ClientID:          "clientID",
 					UserID:            "userID",
 					Audience:          []string{"audience"},
-					RefreshToken:      "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDI6dXNlcklE", // V2_oidcSessionID-rt_refreshTokenID2:userID%
+					RefreshToken:      "VjJfb2lkY1Nlc3Npb25JRC5ydF9yZWZyZXNoVG9rZW5JRDI6dXNlcklE", // V2_oidcSessionID.rt_refreshTokenID2:userID
 					Expiration:        time.Time{}.Add(time.Hour),
 					Scope:             []string{"openid", "profile", "offline_access"},
 					AuthMethods:       []domain.UserAuthMethodType{domain.UserAuthMethodTypePassword},
@@ -1048,12 +1048,12 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:                      tt.fields.eventstore(t),
-				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := c.ExchangeOIDCSessionRefreshAndAccessToken(tt.args.ctx, tt.args.refreshToken, tt.args.scope, tt.args.complianceCheck)
 			require.ErrorIs(t, err, tt.res.err)
 			if got != nil {
@@ -1069,7 +1069,7 @@ func TestCommands_ExchangeOIDCSessionRefreshAndAccessToken(t *testing.T) {
 func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 	type fields struct {
 		eventstore                      *eventstore.Eventstore
-		idGenerator                     id.Generator
+		idGenerator                     id_generator.Generator
 		defaultAccessTokenLifetime      time.Duration
 		defaultRefreshTokenLifetime     time.Duration
 		defaultRefreshTokenIdleLifetime time.Duration
@@ -1113,7 +1113,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 			},
 			args{
 				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
+				refreshToken: "V2_oidcSessionID.rt_refreshTokenID:userID",
 			},
 			res{
 				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-s3hjk", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -1141,7 +1141,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 			},
 			args{
 				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
+				refreshToken: "V2_oidcSessionID.rt_refreshTokenID:userID",
 			},
 			res{
 				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-28ubl", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -1173,7 +1173,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 			},
 			args{
 				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
+				refreshToken: "V2_oidcSessionID.rt_refreshTokenID:userID",
 			},
 			res{
 				err: zerrors.ThrowPreconditionFailed(nil, "OIDCS-3jt2w", "Errors.OIDCSession.RefreshTokenInvalid"),
@@ -1205,7 +1205,7 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 			},
 			args{
 				ctx:          authz.WithInstanceID(context.Background(), "instanceID"),
-				refreshToken: "V2_oidcSessionID-rt_refreshTokenID:userID",
+				refreshToken: "V2_oidcSessionID.rt_refreshTokenID:userID",
 			},
 			res{
 				model: &OIDCSessionWriteModel{
@@ -1232,12 +1232,12 @@ func TestCommands_OIDCSessionByRefreshToken(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:                      tt.fields.eventstore,
-				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := c.OIDCSessionByRefreshToken(tt.args.ctx, tt.args.refreshToken)
 			require.ErrorIs(t, err, tt.res.err)
 			if tt.res.err == nil {
@@ -1312,7 +1312,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 			},
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
-				token:    "V2_oidcSessionID-rt_refreshTokenID",
+				token:    "V2_oidcSessionID.rt_refreshTokenID",
 				clientID: "clientID",
 			},
 			res{
@@ -1337,7 +1337,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 			},
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
-				token:    "V2_oidcSessionID-rt_refreshTokenID",
+				token:    "V2_oidcSessionID.rt_refreshTokenID",
 				clientID: "clientID",
 			},
 			res{
@@ -1373,7 +1373,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 			},
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
-				token:    "V2_oidcSessionID-rt_refreshTokenID",
+				token:    "V2_oidcSessionID.rt_refreshTokenID",
 				clientID: "clientID",
 			},
 			res{
@@ -1398,7 +1398,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 			},
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
-				token:    "V2_oidcSessionID-at_accessTokenID",
+				token:    "V2_oidcSessionID.at_accessTokenID",
 				clientID: "clientID",
 			},
 			res{
@@ -1423,7 +1423,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 			},
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
-				token:    "V2_oidcSessionID-at_accessTokenID",
+				token:    "V2_oidcSessionID.at_accessTokenID",
 				clientID: "clientID",
 			},
 			res{
@@ -1459,7 +1459,7 @@ func TestCommands_RevokeOIDCSessionToken(t *testing.T) {
 			},
 			args{
 				ctx:      authz.WithInstanceID(context.Background(), "instanceID"),
-				token:    "V2_oidcSessionID-at_accessTokenID",
+				token:    "V2_oidcSessionID.at_accessTokenID",
 				clientID: "clientID",
 			},
 			res{

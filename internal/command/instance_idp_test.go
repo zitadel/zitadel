@@ -15,8 +15,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -25,7 +25,7 @@ import (
 func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -289,9 +289,9 @@ func TestCommandSide_AddInstanceGenericOAuthIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceGenericOAuthProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -628,7 +628,7 @@ func TestCommandSide_UpdateInstanceGenericOAuthIDP(t *testing.T) {
 func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -817,9 +817,9 @@ func TestCommandSide_AddInstanceGenericOIDCIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceGenericOIDCProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -1529,7 +1529,7 @@ func TestCommandSide_MigrateInstanceOIDCToGoogleIDP(t *testing.T) {
 func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -1697,9 +1697,9 @@ func TestCommandSide_AddInstanceAzureADIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceAzureADProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -1938,7 +1938,7 @@ func TestCommandSide_UpdateInstanceAzureADIDP(t *testing.T) {
 func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -2080,9 +2080,9 @@ func TestCommandSide_AddInstanceGitHubIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceGitHubProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -2293,7 +2293,7 @@ func TestCommandSide_UpdateInstanceGitHubIDP(t *testing.T) {
 func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -2530,9 +2530,9 @@ func TestCommandSide_AddInstanceGitHubEnterpriseIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceGitHubEnterpriseProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -2841,7 +2841,7 @@ func TestCommandSide_UpdateInstanceGitHubEnterpriseIDP(t *testing.T) {
 func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -2982,9 +2982,9 @@ func TestCommandSide_AddInstanceGitLabIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceGitLabProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -3193,7 +3193,7 @@ func TestCommandSide_UpdateInstanceGitLabIDP(t *testing.T) {
 func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -3379,9 +3379,9 @@ func TestCommandSide_AddInstanceGitLabSelfHostedIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceGitLabSelfHostedProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -3637,7 +3637,7 @@ func TestCommandSide_UpdateInstanceGitLabSelfHostedIDP(t *testing.T) {
 func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -3778,9 +3778,9 @@ func TestCommandSide_AddInstanceGoogleIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceGoogleProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -3989,7 +3989,7 @@ func TestCommandSide_UpdateInstanceGoogleIDP(t *testing.T) {
 func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -4317,9 +4317,9 @@ func TestCommandSide_AddInstanceLDAPIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceLDAPProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -4726,7 +4726,7 @@ func TestCommandSide_UpdateInstanceLDAPIDP(t *testing.T) {
 func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -4914,9 +4914,9 @@ func TestCommandSide_AddInstanceAppleIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceAppleProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -5174,7 +5174,7 @@ func TestCommandSide_UpdateInstanceAppleIDP(t *testing.T) {
 func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 	type fields struct {
 		eventstore                 func(*testing.T) *eventstore.Eventstore
-		idGenerator                id.Generator
+		idGenerator                id_generator.Generator
 		secretCrypto               crypto.EncryptionAlgorithm
 		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	}
@@ -5329,10 +5329,10 @@ func TestCommandSide_AddInstanceSAMLIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:                     tt.fields.eventstore(t),
-				idGenerator:                    tt.fields.idGenerator,
 				idpConfigEncryption:            tt.fields.secretCrypto,
 				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddInstanceSAMLProvider(tt.args.ctx, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

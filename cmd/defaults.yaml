@@ -163,6 +163,11 @@ Database:
         Cert: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_CERT
         Key: # ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_KEY
 
+# The IDGenerator defines the type of ID generator used by ZITADEL.
+# The default is GeneratorTypeSonyFlake.
+IDGenerator: 0 # ZITADEL_IDGENERATOR (0: GeneratorTypeSonyFlake, 1: GeneratorTypeUUIDv7)
+
+# When using GeneratorTypeSonyFlake, the following settings are available:
 Machine:
   # Cloud-hosted VMs need to specify their metadata endpoint so that the machine can be uniquely identified.
   Identification:

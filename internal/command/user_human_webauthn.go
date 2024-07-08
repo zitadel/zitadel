@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	usr_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -167,7 +168,7 @@ func (c *Commands) addHumanWebAuthN(ctx context.Context, userID, resourceowner, 
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	tokenID, err := c.idGenerator.Next()
+	tokenID, err := id_generator.Next()
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -526,7 +527,7 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 		return nil, nil, "", zerrors.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
 	}
 
-	codeID, err := c.idGenerator.Next()
+	codeID, err := id_generator.Next()
 	if err != nil {
 		return nil, nil, "", err
 	}

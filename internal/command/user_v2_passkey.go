@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -129,7 +130,7 @@ func (c *Commands) AddUserPasskeyCodeReturn(ctx context.Context, userID, resourc
 }
 
 func (c *Commands) addUserPasskeyCode(ctx context.Context, userID, resourceOwner string, alg crypto.EncryptionAlgorithm, urlTmpl string, returnCode bool) (*domain.PasskeyCodeDetails, error) {
-	codeID, err := c.idGenerator.Next()
+	codeID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	domain_schema "github.com/zitadel/zitadel/internal/domain/schema"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/user/schema"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -66,7 +67,7 @@ func (c *Commands) CreateUserSchema(ctx context.Context, userSchema *CreateUserS
 	if userSchema.ResourceOwner == "" {
 		return "", nil, zerrors.ThrowInvalidArgument(nil, "COMMA-J3hhj", "Errors.ResourceOwnerMissing")
 	}
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}

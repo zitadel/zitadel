@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
 )
 
@@ -19,7 +20,7 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 	if err != nil {
 		return err
 	}
-	keyID, err := c.idGenerator.Next()
+	keyID, err := id_generator.Next()
 	if err != nil {
 		return err
 	}
@@ -58,7 +59,7 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context, algorithm stri
 	if err != nil {
 		return err
 	}
-	keyID, err := c.idGenerator.Next()
+	keyID, err := id_generator.Next()
 	if err != nil {
 		return err
 	}
@@ -104,7 +105,7 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, algorith
 	if err != nil {
 		return err
 	}
-	keyID, err := c.idGenerator.Next()
+	keyID, err := id_generator.Next()
 	if err != nil {
 		return err
 	}
@@ -149,7 +150,7 @@ func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, algorith
 	if err != nil {
 		return err
 	}
-	keyID, err := c.idGenerator.Next()
+	keyID, err := id_generator.Next()
 	if err != nil {
 		return err
 	}

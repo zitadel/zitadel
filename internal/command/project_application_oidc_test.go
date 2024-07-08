@@ -16,15 +16,15 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestAddOIDCApp(t *testing.T) {
 	type fields struct {
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		app    *addOIDCApp
@@ -377,12 +377,12 @@ func TestAddOIDCApp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := Commands{
-				idGenerator:     tt.fields.idGenerator,
 				newHashedSecret: mockHashedSecret("secret"),
 				defaultSecretGenerators: &SecretGenerators{
 					ClientSecret: emptyConfig,
 				},
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			AssertValidation(t,
 				context.Background(),
 				c.AddOIDCAppCommand(
@@ -395,7 +395,7 @@ func TestAddOIDCApp(t *testing.T) {
 func TestCommandSide_AddOIDCApplication(t *testing.T) {
 	type fields struct {
 		eventstore  func(t *testing.T) *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		ctx           context.Context
@@ -678,12 +678,12 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:      tt.fields.eventstore(t),
-				idGenerator:     tt.fields.idGenerator,
 				newHashedSecret: mockHashedSecret("secret"),
 				defaultSecretGenerators: &SecretGenerators{
 					ClientSecret: emptyConfig,
 				},
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := r.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

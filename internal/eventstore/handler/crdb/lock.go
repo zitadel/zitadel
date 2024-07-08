@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/database"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -36,7 +36,7 @@ type locker struct {
 }
 
 func NewLocker(client *sql.DB, lockTable, projectionName string) Locker {
-	workerName, err := id.SonyFlakeGenerator().Next()
+	workerName, err := id_generator.Next()
 	logging.OnError(err).Panic("unable to generate lockID")
 	return &locker{
 		client: client,

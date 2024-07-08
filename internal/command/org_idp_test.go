@@ -14,8 +14,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -24,7 +24,7 @@ import (
 func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -298,9 +298,9 @@ func TestCommandSide_AddOrgGenericOAuthIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgGenericOAuthProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -648,7 +648,7 @@ func TestCommandSide_UpdateOrgGenericOAuthIDP(t *testing.T) {
 func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -844,9 +844,9 @@ func TestCommandSide_AddOrgGenericOIDCIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgGenericOIDCProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -1575,7 +1575,7 @@ func TestCommandSide_MigrateOrgOIDCToGoogleIDP(t *testing.T) {
 func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -1749,9 +1749,9 @@ func TestCommandSide_AddOrgAzureADIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgAzureADProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -1997,7 +1997,7 @@ func TestCommandSide_UpdateOrgAzureADIDP(t *testing.T) {
 func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -2144,9 +2144,9 @@ func TestCommandSide_AddOrgGitHubIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgGitHubProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -2363,7 +2363,7 @@ func TestCommandSide_UpdateOrgGitHubIDP(t *testing.T) {
 func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -2609,9 +2609,9 @@ func TestCommandSide_AddOrgGitHubEnterpriseIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgGitHubEnterpriseProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -2930,7 +2930,7 @@ func TestCommandSide_UpdateOrgGitHubEnterpriseIDP(t *testing.T) {
 func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -3076,9 +3076,9 @@ func TestCommandSide_AddOrgGitLabIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgGitLabProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -3293,7 +3293,7 @@ func TestCommandSide_UpdateOrgGitLabIDP(t *testing.T) {
 func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -3486,9 +3486,9 @@ func TestCommandSide_AddOrgGitLabSelfHostedIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgGitLabSelfHostedProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -3752,7 +3752,7 @@ func TestCommandSide_UpdateOrgGitLabSelfHostedIDP(t *testing.T) {
 func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -3898,9 +3898,9 @@ func TestCommandSide_AddOrgGoogleIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgGoogleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -4115,7 +4115,7 @@ func TestCommandSide_UpdateOrgGoogleIDP(t *testing.T) {
 func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -4454,9 +4454,9 @@ func TestCommandSide_AddOrgLDAPIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgLDAPProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -4874,7 +4874,7 @@ func TestCommandSide_UpdateOrgLDAPIDP(t *testing.T) {
 func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 	type fields struct {
 		eventstore   func(*testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -5069,9 +5069,9 @@ func TestCommandSide_AddOrgAppleIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          tt.fields.eventstore(t),
-				idGenerator:         tt.fields.idGenerator,
 				idpConfigEncryption: tt.fields.secretCrypto,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgAppleProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -5341,7 +5341,7 @@ func stringPointer(s string) *string {
 func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 	type fields struct {
 		eventstore                 func(*testing.T) *eventstore.Eventstore
-		idGenerator                id.Generator
+		idGenerator                id_generator.Generator
 		secretCrypto               crypto.EncryptionAlgorithm
 		certificateAndKeyGenerator func(id string) ([]byte, []byte, error)
 	}
@@ -5500,10 +5500,10 @@ func TestCommandSide_AddOrgSAMLIDP(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:                     tt.fields.eventstore(t),
-				idGenerator:                    tt.fields.idGenerator,
 				idpConfigEncryption:            tt.fields.secretCrypto,
 				samlCertificateAndKeyGenerator: tt.fields.certificateAndKeyGenerator,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			id, got, err := c.AddOrgSAMLProvider(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

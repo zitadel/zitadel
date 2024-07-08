@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/limits"
@@ -153,51 +153,51 @@ type ZitadelConfig struct {
 	restrictionsID string
 }
 
-func (s *InstanceSetup) generateIDs(idGenerator id.Generator) (err error) {
-	s.zitadel.instanceID, err = idGenerator.Next()
+func (s *InstanceSetup) generateIDs() (err error) {
+	s.zitadel.instanceID, err = id_generator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.orgID, err = idGenerator.Next()
+	s.zitadel.orgID, err = id_generator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.projectID, err = idGenerator.Next()
+	s.zitadel.projectID, err = id_generator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.mgmtAppID, err = idGenerator.Next()
+	s.zitadel.mgmtAppID, err = id_generator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.adminAppID, err = idGenerator.Next()
+	s.zitadel.adminAppID, err = id_generator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.authAppID, err = idGenerator.Next()
+	s.zitadel.authAppID, err = id_generator.Next()
 	if err != nil {
 		return err
 	}
 
-	s.zitadel.consoleAppID, err = idGenerator.Next()
+	s.zitadel.consoleAppID, err = id_generator.Next()
 	if err != nil {
 		return err
 	}
-	s.zitadel.limitsID, err = idGenerator.Next()
+	s.zitadel.limitsID, err = id_generator.Next()
 	if err != nil {
 		return err
 	}
-	s.zitadel.restrictionsID, err = idGenerator.Next()
+	s.zitadel.restrictionsID, err = id_generator.Next()
 	return err
 }
 
 func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (string, string, *MachineKey, *domain.ObjectDetails, error) {
-	if err := setup.generateIDs(c.idGenerator); err != nil {
+	if err := setup.generateIDs(); err != nil {
 		return "", "", nil, nil, err
 	}
 	ctx = contextWithInstanceSetupInfo(ctx, setup.zitadel.instanceID, setup.zitadel.projectID, setup.zitadel.consoleAppID, c.externalDomain)
@@ -377,7 +377,7 @@ func setupQuotas(commands *Commands, validations *[]preparation.Validation, setQ
 		return nil
 	}
 	for _, q := range setQuotas.Items {
-		quotaId, err := commands.idGenerator.Next()
+		quotaId, err := id_generator.Next()
 		if err != nil {
 			return err
 		}
@@ -548,7 +548,7 @@ func setupAdmins(commands *Commands,
 	}
 
 	if machine != nil && machine.Machine != nil && !machine.Machine.IsZero() {
-		machineUserID, err := commands.idGenerator.Next()
+		machineUserID, err := id_generator.Next()
 		if err != nil {
 			return "", nil, nil, err
 		}
@@ -562,7 +562,7 @@ func setupAdmins(commands *Commands,
 		setupAdminMembers(commands, validations, instanceAgg, orgAgg, machineUserID)
 	}
 	if human != nil {
-		humanUserID, err := commands.idGenerator.Next()
+		humanUserID, err := id_generator.Next()
 		if err != nil {
 			return "", nil, nil, err
 		}
@@ -584,7 +584,7 @@ func setupMachineAdmin(commands *Commands, validations *[]preparation.Validation
 	)
 	if machine.Pat != nil {
 		pat = NewPersonalAccessToken(orgID, userID, machine.Pat.ExpirationDate, machine.Pat.Scopes, domain.UserTypeMachine)
-		pat.TokenID, err = commands.idGenerator.Next()
+		pat.TokenID, err = id_generator.Next()
 		if err != nil {
 			return nil, nil, err
 		}
@@ -592,7 +592,7 @@ func setupMachineAdmin(commands *Commands, validations *[]preparation.Validation
 	}
 	if machine.MachineKey != nil {
 		machineKey = NewMachineKey(orgID, userID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
-		machineKey.KeyID, err = commands.idGenerator.Next()
+		machineKey.KeyID, err = id_generator.Next()
 		if err != nil {
 			return nil, nil, err
 		}

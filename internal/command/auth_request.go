@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/authrequest"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -42,7 +43,7 @@ type CurrentAuthRequest struct {
 const IDPrefixV2 = "V2_"
 
 func (c *Commands) AddAuthRequest(ctx context.Context, authRequest *AuthRequest) (_ *CurrentAuthRequest, err error) {
-	authRequestID, err := c.idGenerator.Next()
+	authRequestID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}

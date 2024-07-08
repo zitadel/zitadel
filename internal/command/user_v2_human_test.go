@@ -15,8 +15,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -26,7 +26,7 @@ import (
 func TestCommandSide_AddUserHuman(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
-		idGenerator        id.Generator
+		idGenerator        id_generator.Generator
 		userPasswordHasher *crypto.Hasher
 		newCode            encrypedCodeFunc
 		checkPermission    domain.PermissionCheck
@@ -1549,7 +1549,6 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			r := &Commands{
 				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
-				idGenerator:        tt.fields.idGenerator,
 				newEncryptedCode:   tt.fields.newCode,
 				checkPermission:    tt.fields.checkPermission,
 				multifactors: domain.MultifactorConfigs{
@@ -1559,6 +1558,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 					},
 				},
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			err := r.AddUserHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail, tt.args.codeAlg)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {

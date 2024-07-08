@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/milestone"
 )
 
@@ -13,7 +14,7 @@ func (c *Commands) MilestonePushed(
 	endpoints []string,
 	primaryDomain string,
 ) error {
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return err
 	}

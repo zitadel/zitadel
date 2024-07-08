@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -50,7 +50,7 @@ var testMetadataChangedEntityID = []byte(`<?xml version="1.0"?>
 func TestCommandSide_AddSAMLApplication(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 		httpClient  *http.Client
 	}
 	type args struct {
@@ -326,11 +326,10 @@ func TestCommandSide_AddSAMLApplication(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
-				httpClient:  tt.fields.httpClient,
+				eventstore: tt.fields.eventstore,
+				httpClient: tt.fields.httpClient,
 			}
-
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := r.AddSAMLApplication(tt.args.ctx, tt.args.samlApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

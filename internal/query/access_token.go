@@ -107,7 +107,7 @@ func (q *Queries) ActiveAccessTokenByToken(ctx context.Context, token string) (m
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	split := strings.Split(token, "-")
+	split := strings.Split(token, ".")
 	if len(split) != 2 {
 		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-LJK2W", "Errors.OIDCSession.Token.Invalid")
 	}

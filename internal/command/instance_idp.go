@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -18,7 +19,7 @@ import (
 func (c *Commands) AddInstanceGenericOAuthProvider(ctx context.Context, provider GenericOAuthProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -60,7 +61,7 @@ func (c *Commands) UpdateInstanceGenericOAuthProvider(ctx context.Context, id st
 func (c *Commands) AddInstanceGenericOIDCProvider(ctx context.Context, provider GenericOIDCProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -136,7 +137,7 @@ func (c *Commands) migrateInstanceGenericOIDC(ctx context.Context, id string, pr
 func (c *Commands) AddInstanceJWTProvider(ctx context.Context, provider JWTProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -178,7 +179,7 @@ func (c *Commands) UpdateInstanceJWTProvider(ctx context.Context, id string, pro
 func (c *Commands) AddInstanceAzureADProvider(ctx context.Context, provider AzureADProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -220,7 +221,7 @@ func (c *Commands) UpdateInstanceAzureADProvider(ctx context.Context, id string,
 func (c *Commands) AddInstanceGitHubProvider(ctx context.Context, provider GitHubProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -262,7 +263,7 @@ func (c *Commands) UpdateInstanceGitHubProvider(ctx context.Context, id string, 
 func (c *Commands) AddInstanceGitHubEnterpriseProvider(ctx context.Context, provider GitHubEnterpriseProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -304,7 +305,7 @@ func (c *Commands) UpdateInstanceGitHubEnterpriseProvider(ctx context.Context, i
 func (c *Commands) AddInstanceGitLabProvider(ctx context.Context, provider GitLabProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -346,7 +347,7 @@ func (c *Commands) UpdateInstanceGitLabProvider(ctx context.Context, id string, 
 func (c *Commands) AddInstanceGitLabSelfHostedProvider(ctx context.Context, provider GitLabSelfHostedProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -388,7 +389,7 @@ func (c *Commands) UpdateInstanceGitLabSelfHostedProvider(ctx context.Context, i
 func (c *Commands) AddInstanceGoogleProvider(ctx context.Context, provider GoogleProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -430,7 +431,7 @@ func (c *Commands) UpdateInstanceGoogleProvider(ctx context.Context, id string, 
 func (c *Commands) AddInstanceLDAPProvider(ctx context.Context, provider LDAPProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -472,7 +473,7 @@ func (c *Commands) UpdateInstanceLDAPProvider(ctx context.Context, id string, pr
 func (c *Commands) AddInstanceAppleProvider(ctx context.Context, provider AppleProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -514,7 +515,7 @@ func (c *Commands) UpdateInstanceAppleProvider(ctx context.Context, id string, p
 func (c *Commands) AddInstanceSAMLProvider(ctx context.Context, provider SAMLProvider) (string, *domain.ObjectDetails, error) {
 	instanceID := authz.GetInstance(ctx).InstanceID()
 	instanceAgg := instance.NewAggregate(instanceID)
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}

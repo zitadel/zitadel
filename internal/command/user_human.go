@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -325,7 +326,7 @@ func (c *Commands) addHumanCommandPhone(ctx context.Context, filter preparation.
 // Deprecated: use commands.NewUserHumanWriteModel, to remove deprecated eventstore.Filter
 func (c *Commands) addHumanCommandCheckID(ctx context.Context, filter preparation.FilterToQueryReducer, human *AddHuman, orgID string) (err error) {
 	if human.ID == "" {
-		human.ID, err = c.idGenerator.Next()
+		human.ID, err = id_generator.Next()
 		if err != nil {
 			return err
 		}
@@ -511,7 +512,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	}
 
 	if human.AggregateID == "" {
-		userID, err := c.idGenerator.Next()
+		userID, err := id_generator.Next()
 		if err != nil {
 			return nil, nil, err
 		}

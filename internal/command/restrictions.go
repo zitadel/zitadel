@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -49,7 +50,7 @@ func (c *Commands) SetInstanceRestrictions(
 	}
 	aggregateId := wm.AggregateID
 	if aggregateId == "" {
-		aggregateId, err = c.idGenerator.Next()
+		aggregateId, err = id_generator.Next()
 		if err != nil {
 			return nil, err
 		}

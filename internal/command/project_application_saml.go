@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -63,7 +64,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 		return nil, zerrors.ThrowInvalidArgument(err, "SAML-bquso", "Errors.Project.App.SAMLMetadataFormat")
 	}
 
-	samlApp.AppID, err = c.idGenerator.Next()
+	samlApp.AppID, err = id_generator.Next()
 	if err != nil {
 		return nil, err
 	}

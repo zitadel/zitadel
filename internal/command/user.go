@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -269,7 +270,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 		return nil, nil, err
 	}
 
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -297,7 +298,7 @@ func (c *Commands) prepareUserDomainClaimed(ctx context.Context, filter preparat
 	}
 	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
 
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}

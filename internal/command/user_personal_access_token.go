@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -79,7 +80,7 @@ func (pat *PersonalAccessToken) checkAggregate(ctx context.Context, filter prepa
 
 func (c *Commands) AddPersonalAccessToken(ctx context.Context, pat *PersonalAccessToken) (_ *domain.ObjectDetails, err error) {
 	if pat.TokenID == "" {
-		pat.TokenID, err = c.idGenerator.Next()
+		pat.TokenID, err = id_generator.Next()
 		if err != nil {
 			return nil, err
 		}

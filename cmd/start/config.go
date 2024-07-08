@@ -25,7 +25,8 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	"github.com/zitadel/zitadel/internal/id_generator/sonyflake"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
@@ -63,7 +64,8 @@ type Config struct {
 	AuditLogRetention time.Duration
 	SystemAPIUsers    map[string]*internal_authz.SystemAPIUser
 	CustomerPortal    string
-	Machine           *id.Config
+	IDGenerator       id_generator.GeneratorType
+	Machine           *sonyflake.Config
 	Actions           *actions.Config
 	Eventstore        *eventstore.Config
 	LogStore          *logstore.Configs
@@ -111,7 +113,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 	err = config.Metrics.NewMeter()
 	logging.OnError(err).Fatal("unable to set meter")
 
-	id.Configure(config.Machine)
+	id_generator.SetGeneratorWithConfig(config.IDGenerator, config.Machine)
 	actions.SetHTTPConfig(&config.Actions.HTTP)
 
 	return config

@@ -15,7 +15,8 @@ import (
 	"github.com/zitadel/zitadel/internal/config/hook"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	"github.com/zitadel/zitadel/internal/id_generator/sonyflake"
 )
 
 type Migration struct {
@@ -24,8 +25,9 @@ type Migration struct {
 
 	EventBulkSize uint32
 
-	Log     *logging.Config
-	Machine *id.Config
+	Log         *logging.Config
+	IDGenerator id_generator.GeneratorType
+	Machine     *sonyflake.Config
 }
 
 var (
@@ -40,7 +42,7 @@ func mustNewMigrationConfig(v *viper.Viper) *Migration {
 	err := config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
 
-	id.Configure(config.Machine)
+	id_generator.SetGeneratorWithConfig(config.IDGenerator, config.Machine)
 
 	return config
 }
@@ -52,7 +54,7 @@ func mustNewProjectionsConfig(v *viper.Viper) *ProjectionsConfig {
 	err := config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
 
-	id.Configure(config.Machine)
+	id_generator.SetGeneratorWithConfig(config.IDGenerator, config.Machine)
 
 	return config
 }

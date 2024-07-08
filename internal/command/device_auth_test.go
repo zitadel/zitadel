@@ -19,8 +19,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	"github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/deviceauth"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -386,7 +386,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 
 	type fields struct {
 		eventstore                      func(*testing.T) *eventstore.Eventstore
-		idGenerator                     id.Generator
+		idGenerator                     id_generator.Generator
 		defaultAccessTokenLifetime      time.Duration
 		defaultRefreshTokenLifetime     time.Duration
 		defaultRefreshTokenIdleLifetime time.Duration
@@ -642,7 +642,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				"123",
 			},
 			want: &OIDCSession{
-				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				TokenID:           "V2_oidcSessionID.at_accessTokenID",
 				ClientID:          "clientID",
 				UserID:            "userID",
 				Audience:          []string{"audience"},
@@ -725,7 +725,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 				"123",
 			},
 			want: &OIDCSession{
-				TokenID:           "V2_oidcSessionID-at_accessTokenID",
+				TokenID:           "V2_oidcSessionID.at_accessTokenID",
 				ClientID:          "clientID",
 				UserID:            "userID",
 				Audience:          []string{"audience"},
@@ -741,7 +741,7 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 					Header:        http.Header{"foo": []string{"bar"}},
 				},
 				Reason:       domain.TokenReasonAuthRequest,
-				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC1ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID-rt_refreshTokenID:userID
+				RefreshToken: "VjJfb2lkY1Nlc3Npb25JRC5ydF9yZWZyZXNoVG9rZW5JRDp1c2VySUQ", //V2_oidcSessionID.rt_refreshTokenID:userID
 			},
 		},
 	}
@@ -749,12 +749,12 @@ func TestCommands_CreateOIDCSessionFromDeviceAuth(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:                      tt.fields.eventstore(t),
-				idGenerator:                     tt.fields.idGenerator,
 				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
 				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
 				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
 				keyAlgorithm:                    tt.fields.keyAlgorithm,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := c.CreateOIDCSessionFromDeviceAuth(tt.args.ctx, tt.args.deviceCode)
 			c.jobs.Wait()
 

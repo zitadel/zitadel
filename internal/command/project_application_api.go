@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	project_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -35,7 +36,7 @@ func (c *Commands) AddAPIAppCommand(app *addAPIApp) preparation.Validation {
 				return nil, zerrors.ThrowNotFound(err, "PROJE-Sf2gb", "Errors.Project.NotFound")
 			}
 
-			app.ClientID, err = c.idGenerator.Next()
+			app.ClientID, err = id_generator.Next()
 			if err != nil {
 				return nil, zerrors.ThrowInternal(err, "V2-f0pgP", "Errors.Internal")
 			}
@@ -99,7 +100,7 @@ func (c *Commands) AddAPIApplication(ctx context.Context, apiApp *domain.APIApp,
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Project.App.Invalid")
 	}
 
-	appID, err := c.idGenerator.Next()
+	appID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +122,7 @@ func (c *Commands) addAPIApplicationWithID(ctx context.Context, apiApp *domain.A
 	}
 
 	var plain string
-	err = domain.SetNewClientID(apiApp, c.idGenerator)
+	err = domain.SetNewClientID(apiApp)
 	if err != nil {
 		return nil, err
 	}

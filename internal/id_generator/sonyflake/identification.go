@@ -1,13 +1,4 @@
-package id
-
-const (
-	DefaultWebhookPath = "http://metadata.google.internal/computeMetadata/v1/instance/id"
-)
-
-type Config struct {
-	// Configuration for the identification of machines.
-	Identification Identification
-}
+package sonyflake
 
 type Identification struct {
 	// Configuration for using private IP to identify a machine.
@@ -37,10 +28,4 @@ type Webhook struct {
 	JPath *string
 	// (Optional) Headers to pass in the metadata request
 	Headers *map[string]string
-}
-
-func Configure(config *Config) {
-	if config != nil {
-		GeneratorConfig = config
-	}
 }

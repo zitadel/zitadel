@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
@@ -43,7 +44,7 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 	if err != nil {
 		return nil, nil, err
 	}
-	userGrant.AggregateID, err = c.idGenerator.Next()
+	userGrant.AggregateID, err = id_generator.Next()
 	if err != nil {
 		return nil, nil, err
 	}

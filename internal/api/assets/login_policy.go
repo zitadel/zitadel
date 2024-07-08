@@ -7,29 +7,28 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
 )
 
 func (h *Handler) UploadDefaultLabelPolicyLogo() Uploader {
-	return &labelPolicyLogoUploader{h.idGenerator, false, true, []string{"image/"}, 1 << 19}
+	return &labelPolicyLogoUploader{false, true, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadDefaultLabelPolicyLogoDark() Uploader {
-	return &labelPolicyLogoUploader{h.idGenerator, true, true, []string{"image/"}, 1 << 19}
+	return &labelPolicyLogoUploader{true, true, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadOrgLabelPolicyLogo() Uploader {
-	return &labelPolicyLogoUploader{h.idGenerator, false, false, []string{"image/"}, 1 << 19}
+	return &labelPolicyLogoUploader{false, false, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadOrgLabelPolicyLogoDark() Uploader {
-	return &labelPolicyLogoUploader{h.idGenerator, true, false, []string{"image/"}, 1 << 19}
+	return &labelPolicyLogoUploader{true, false, []string{"image/"}, 1 << 19}
 }
 
 type labelPolicyLogoUploader struct {
-	idGenerator   id.Generator
 	darkMode      bool
 	defaultPolicy bool
 	contentTypes  []string
@@ -54,7 +53,7 @@ func (l *labelPolicyLogoUploader) MaxFileSize() int64 {
 }
 
 func (l *labelPolicyLogoUploader) ObjectName(_ authz.CtxData) (string, error) {
-	suffixID, err := l.idGenerator.Next()
+	suffixID, err := id_generator.Next()
 	if err != nil {
 		return "", err
 	}
@@ -144,23 +143,22 @@ func (l *labelPolicyLogoDownloader) ResourceOwner(ctx context.Context, _ string)
 }
 
 func (h *Handler) UploadDefaultLabelPolicyIcon() Uploader {
-	return &labelPolicyIconUploader{h.idGenerator, false, true, []string{"image/"}, 1 << 19}
+	return &labelPolicyIconUploader{false, true, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadDefaultLabelPolicyIconDark() Uploader {
-	return &labelPolicyIconUploader{h.idGenerator, true, true, []string{"image/"}, 1 << 19}
+	return &labelPolicyIconUploader{true, true, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadOrgLabelPolicyIcon() Uploader {
-	return &labelPolicyIconUploader{h.idGenerator, false, false, []string{"image/"}, 1 << 19}
+	return &labelPolicyIconUploader{false, false, []string{"image/"}, 1 << 19}
 }
 
 func (h *Handler) UploadOrgLabelPolicyIconDark() Uploader {
-	return &labelPolicyIconUploader{h.idGenerator, true, false, []string{"image/"}, 1 << 19}
+	return &labelPolicyIconUploader{true, false, []string{"image/"}, 1 << 19}
 }
 
 type labelPolicyIconUploader struct {
-	idGenerator   id.Generator
 	darkMode      bool
 	defaultPolicy bool
 	contentTypes  []string
@@ -185,7 +183,7 @@ func (l *labelPolicyIconUploader) MaxFileSize() int64 {
 }
 
 func (l *labelPolicyIconUploader) ObjectName(_ authz.CtxData) (string, error) {
-	suffixID, err := l.idGenerator.Next()
+	suffixID, err := id_generator.Next()
 	if err != nil {
 		return "", err
 	}
@@ -276,15 +274,14 @@ func (l *labelPolicyIconDownloader) ResourceOwner(ctx context.Context, _ string)
 }
 
 func (h *Handler) UploadDefaultLabelPolicyFont() Uploader {
-	return &labelPolicyFontUploader{h.idGenerator, true, []string{"font/", "application/octet-stream"}, 1 << 19}
+	return &labelPolicyFontUploader{true, []string{"font/", "application/octet-stream"}, 1 << 19}
 }
 
 func (h *Handler) UploadOrgLabelPolicyFont() Uploader {
-	return &labelPolicyFontUploader{h.idGenerator, false, []string{"font/", "application/octet-stream"}, 1 << 19}
+	return &labelPolicyFontUploader{false, []string{"font/", "application/octet-stream"}, 1 << 19}
 }
 
 type labelPolicyFontUploader struct {
-	idGenerator   id.Generator
 	defaultPolicy bool
 	contentTypes  []string
 	maxSize       int64
@@ -308,7 +305,7 @@ func (l *labelPolicyFontUploader) MaxFileSize() int64 {
 }
 
 func (l *labelPolicyFontUploader) ObjectName(_ authz.CtxData) (string, error) {
-	suffixID, err := l.idGenerator.Next()
+	suffixID, err := id_generator.Next()
 	if err != nil {
 		return "", err
 	}

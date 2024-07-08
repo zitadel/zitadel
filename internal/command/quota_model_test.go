@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -25,7 +25,7 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 		notifications []*quota.SetEventNotification
 	}
 	type args struct {
-		idGenerator   id.Generator
+		idGenerator   id_generator.Generator
 		createNew     bool
 		amount        uint64
 		from          time.Time
@@ -373,7 +373,8 @@ func TestQuotaWriteModel_NewChanges(t *testing.T) {
 				limit:         tt.fields.limit,
 				notifications: tt.fields.notifications,
 			}
-			gotChanges, err := wm.NewChanges(tt.args.idGenerator, tt.args.createNew, tt.args.amount, tt.args.from, tt.args.resetInterval, tt.args.limit, tt.args.notifications...)
+			id_generator.SetGenerator(tt.args.idGenerator)
+			gotChanges, err := wm.NewChanges(tt.args.createNew, tt.args.amount, tt.args.from, tt.args.resetInterval, tt.args.limit, tt.args.notifications...)
 			assert.Len(t, gotChanges, tt.wantChanges)
 			if tt.wantErr != nil {
 				tt.wantErr(t, err, fmt.Sprintf("NewChanges(%v, %v, %v, %v, %v, %v)", tt.args.createNew, tt.args.amount, tt.args.from, tt.args.resetInterval, tt.args.limit, tt.args.notifications))

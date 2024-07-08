@@ -35,7 +35,8 @@ import (
 	old_es "github.com/zitadel/zitadel/internal/eventstore/repository/sql"
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	"github.com/zitadel/zitadel/internal/id_generator/sonyflake"
 	"github.com/zitadel/zitadel/internal/notification"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query"
@@ -75,8 +76,9 @@ type ProjectionsConfig struct {
 	Admin admin_es.Config
 	Auth  auth_es.Config
 
-	Log     *logging.Config
-	Machine *id.Config
+	Log         *logging.Config
+	IDGenerator id_generator.GeneratorType
+	Machine     *sonyflake.Config
 
 	ExternalPort    uint16
 	ExternalDomain  string

@@ -13,8 +13,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -22,7 +22,7 @@ import (
 func TestCommands_AddPersonalAccessToken(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		keyAlgorithm crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -259,9 +259,9 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:   tt.fields.eventstore,
-				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := c.AddPersonalAccessToken(tt.args.ctx, tt.args.pat)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

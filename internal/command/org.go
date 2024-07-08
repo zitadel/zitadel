@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -95,7 +96,7 @@ func (c *orgSetupCommands) setupOrgAdmin(admin *OrgSetupAdmin, allowInitialMail 
 		c.validations = append(c.validations, c.commands.AddOrgMemberCommand(c.aggregate, admin.ID, orgAdminRoles(admin.Roles)...))
 		return nil
 	}
-	userID, err := c.commands.idGenerator.Next()
+	userID, err := id_generator.Next()
 	if err != nil {
 		return err
 	}
@@ -119,7 +120,7 @@ func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *
 	var machineKey *MachineKey
 	if machine.Pat != nil {
 		pat = NewPersonalAccessToken(orgAgg.ID, machine.Machine.AggregateID, machine.Pat.ExpirationDate, machine.Pat.Scopes, domain.UserTypeMachine)
-		tokenID, err := c.commands.idGenerator.Next()
+		tokenID, err := id_generator.Next()
 		if err != nil {
 			return err
 		}
@@ -129,7 +130,7 @@ func (c *orgSetupCommands) setupOrgAdminMachine(orgAgg *org.Aggregate, machine *
 	}
 	if machine.MachineKey != nil {
 		machineKey = NewMachineKey(orgAgg.ID, machine.Machine.AggregateID, machine.MachineKey.ExpirationDate, machine.MachineKey.Type)
-		keyID, err := c.commands.idGenerator.Next()
+		keyID, err := id_generator.Next()
 		if err != nil {
 			return err
 		}
@@ -224,7 +225,7 @@ func (c *orgSetupCommands) createdMachineAdmin(admin *OrgSetupAdmin) *CreatedOrg
 }
 
 func (c *Commands) SetUpOrg(ctx context.Context, o *OrgSetup, allowInitialMail bool, userIDs ...string) (*CreatedOrg, error) {
-	orgID, err := c.idGenerator.Next()
+	orgID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -296,7 +297,7 @@ func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner strin
 		return nil, zerrors.ThrowInvalidArgument(nil, "EVENT-Mf9sd", "Errors.Org.Invalid")
 	}
 
-	orgID, err := c.idGenerator.Next()
+	orgID, err := id_generator.Next()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "COMMA-OwciI", "Errors.Internal")
 	}

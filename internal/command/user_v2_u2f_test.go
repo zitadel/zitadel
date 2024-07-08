@@ -11,8 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -30,7 +30,7 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
 		eventstore      func(t *testing.T) *eventstore.Eventstore
-		idGenerator     id.Generator
+		idGenerator     id_generator.Generator
 		permissionCheck domain.PermissionCheck
 	}
 	type args struct {
@@ -131,10 +131,10 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:      tt.fields.eventstore(t),
-				idGenerator:     tt.fields.idGenerator,
 				checkPermission: tt.fields.permissionCheck,
 				webauthnConfig:  webauthnConfig,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			_, err := c.RegisterUserU2F(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.rpID)
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful case can't be tested due to random challenge.
@@ -217,8 +217,8 @@ func TestCommands_pushUserU2F(t *testing.T) {
 			c := &Commands{
 				eventstore:     eventstoreExpect(t, prep...),
 				webauthnConfig: webauthnConfig,
-				idGenerator:    id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			}
+			id_generator.SetGenerator(id_mock.NewIDGeneratorExpectIDs(t, "123"))
 			wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, "user1", "org1", "rpID", domain.AuthenticatorAttachmentCrossPlattform)
 			require.NoError(t, err)
 

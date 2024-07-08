@@ -17,8 +17,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -634,7 +634,7 @@ func testSetup(ctx context.Context, c *Commands, validations []preparation.Valid
 func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 	type fields struct {
 		eventstore  func(t *testing.T) *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		ctx         context.Context
@@ -687,9 +687,9 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore(t),
-				idGenerator: tt.fields.idGenerator,
+				eventstore: tt.fields.eventstore(t),
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			validations := make([]preparation.Validation, 0)
 			setupMinimalInterfaces(r, &validations, tt.args.instanceAgg, tt.args.orgAgg, tt.args.owner, tt.args.ids)
 
@@ -707,7 +707,7 @@ func TestCommandSide_setupMinimalInterfaces(t *testing.T) {
 func TestCommandSide_setupAdmins(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
-		idGenerator        id.Generator
+		idGenerator        id_generator.Generator
 		userPasswordHasher *crypto.Hasher
 		roles              []authz.RoleMapping
 		keyAlgorithm       crypto.EncryptionAlgorithm
@@ -863,11 +863,11 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:         tt.fields.eventstore(t),
-				idGenerator:        tt.fields.idGenerator,
 				zitadelRoles:       tt.fields.roles,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				keyAlgorithm:       tt.fields.keyAlgorithm,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			validations := make([]preparation.Validation, 0)
 			owner, pat, mk, err := setupAdmins(r, &validations, tt.args.instanceAgg, tt.args.orgAgg, tt.args.machine, tt.args.human)
 			if tt.res.err == nil {
@@ -901,7 +901,7 @@ func TestCommandSide_setupAdmins(t *testing.T) {
 func TestCommandSide_setupDefaultOrg(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
-		idGenerator        id.Generator
+		idGenerator        id_generator.Generator
 		userPasswordHasher *crypto.Hasher
 		roles              []authz.RoleMapping
 		keyAlgorithm       crypto.EncryptionAlgorithm
@@ -1016,11 +1016,11 @@ func TestCommandSide_setupDefaultOrg(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:         tt.fields.eventstore(t),
-				idGenerator:        tt.fields.idGenerator,
 				zitadelRoles:       tt.fields.roles,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				keyAlgorithm:       tt.fields.keyAlgorithm,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			validations := make([]preparation.Validation, 0)
 			pat, mk, err := setupDefaultOrg(tt.args.ctx, r, &validations, tt.args.instanceAgg, tt.args.orgName, tt.args.machine, tt.args.human, tt.args.ids)
 			if tt.res.err == nil {
@@ -1117,7 +1117,7 @@ func TestCommandSide_setupInstanceElements(t *testing.T) {
 func TestCommandSide_setUpInstance(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
-		idGenerator        id.Generator
+		idGenerator        id_generator.Generator
 		userPasswordHasher *crypto.Hasher
 		roles              []authz.RoleMapping
 		keyAlgorithm       crypto.EncryptionAlgorithm
@@ -1185,13 +1185,12 @@ func TestCommandSide_setUpInstance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:         tt.fields.eventstore(t),
-				idGenerator:        tt.fields.idGenerator,
 				zitadelRoles:       tt.fields.roles,
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				keyAlgorithm:       tt.fields.keyAlgorithm,
 				GenerateDomain:     tt.fields.generateDomain,
 			}
-
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			validations, pat, mk, err := setUpInstance(tt.args.ctx, r, tt.args.setup)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

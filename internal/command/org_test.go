@@ -15,8 +15,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -73,7 +73,7 @@ func TestAddOrg(t *testing.T) {
 func TestCommandSide_AddOrg(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		zitadelRoles []authz.RoleMapping
 	}
 	type args struct {
@@ -453,9 +453,9 @@ func TestCommandSide_AddOrg(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:   tt.fields.eventstore,
-				idGenerator:  tt.fields.idGenerator,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := r.AddOrg(tt.args.ctx, tt.args.name, tt.args.userID, tt.args.resourceOwner, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -721,7 +721,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 func TestCommandSide_DeactivateOrg(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 		iamDomain   string
 	}
 	type args struct {
@@ -837,9 +837,9 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				eventstore: tt.fields.eventstore,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			_, err := r.DeactivateOrg(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -854,7 +854,7 @@ func TestCommandSide_DeactivateOrg(t *testing.T) {
 func TestCommandSide_ReactivateOrg(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 		iamDomain   string
 	}
 	type args struct {
@@ -975,9 +975,9 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				eventstore: tt.fields.eventstore,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			_, err := r.ReactivateOrg(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -992,7 +992,7 @@ func TestCommandSide_ReactivateOrg(t *testing.T) {
 func TestCommandSide_RemoveOrg(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		ctx   context.Context
@@ -1242,9 +1242,9 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				eventstore: tt.fields.eventstore,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			_, err := r.RemoveOrg(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -1259,7 +1259,7 @@ func TestCommandSide_RemoveOrg(t *testing.T) {
 func TestCommandSide_SetUpOrg(t *testing.T) {
 	type fields struct {
 		eventstore   func(t *testing.T) *eventstore.Eventstore
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		newCode      encrypedCodeFunc
 		keyAlgorithm crypto.EncryptionAlgorithm
 	}
@@ -1671,7 +1671,6 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore:       tt.fields.eventstore(t),
-				idGenerator:      tt.fields.idGenerator,
 				newEncryptedCode: tt.fields.newCode,
 				keyAlgorithm:     tt.fields.keyAlgorithm,
 				zitadelRoles: []authz.RoleMapping{
@@ -1680,6 +1679,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 					},
 				},
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := r.SetUpOrg(tt.args.ctx, tt.args.setupOrg, tt.args.allowInitialMail, tt.args.userIDs...)
 			assert.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.createdOrg, got)

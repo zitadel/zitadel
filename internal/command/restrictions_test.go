@@ -11,14 +11,14 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/restrictions"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestSetRestrictions(t *testing.T) {
-	type fields func(*testing.T) (*eventstore.Eventstore, id.Generator)
+	type fields func(*testing.T) (*eventstore.Eventstore, id_generator.Generator)
 	type args struct {
 		setRestrictions *SetRestrictions
 	}
@@ -34,7 +34,7 @@ func TestSetRestrictions(t *testing.T) {
 	}{
 		{
 			name: "set new restrictions",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(),
@@ -67,7 +67,7 @@ func TestSetRestrictions(t *testing.T) {
 		},
 		{
 			name: "change restrictions",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(
@@ -111,7 +111,7 @@ func TestSetRestrictions(t *testing.T) {
 		},
 		{
 			name: "set restrictions idempotency",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(
@@ -142,7 +142,7 @@ func TestSetRestrictions(t *testing.T) {
 		},
 		{
 			name: "no restrictions defined",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
@@ -167,7 +167,7 @@ func TestSetRestrictions(t *testing.T) {
 		},
 		{
 			name: "unsupported language restricted",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
@@ -194,7 +194,7 @@ func TestSetRestrictions(t *testing.T) {
 		},
 		{
 			name: "default language not allowed",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
@@ -222,8 +222,9 @@ func TestSetRestrictions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := new(Commands)
-			r.eventstore, r.idGenerator = tt.fields(t)
+			_eventstore, _id_generator := tt.fields(t)
+			r := &Commands{eventstore: _eventstore}
+			id_generator.SetGenerator(_id_generator)
 			got, err := r.SetInstanceRestrictions(authz.WithInstance(context.Background(), &mockInstance{}), tt.args.setRestrictions)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

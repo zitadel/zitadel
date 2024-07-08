@@ -19,8 +19,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	"github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/idpintent"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/session"
@@ -145,7 +145,7 @@ func TestSessionCommands_getHumanWriteModel(t *testing.T) {
 
 func TestCommands_CreateSession(t *testing.T) {
 	type fields struct {
-		idGenerator  id.Generator
+		idGenerator  id_generator.Generator
 		tokenCreator func(sessionID string) (string, string, error)
 	}
 	type args struct {
@@ -273,9 +273,9 @@ func TestCommands_CreateSession(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:          expectEventstore(tt.expect...)(t),
-				idGenerator:         tt.fields.idGenerator,
 				sessionTokenCreator: tt.fields.tokenCreator,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := c.CreateSession(tt.args.ctx, tt.args.checks, tt.args.metadata, tt.args.userAgent, tt.args.lifetime)
 			require.ErrorIs(t, err, tt.res.err)
 			assert.Equal(t, tt.res.want, got)

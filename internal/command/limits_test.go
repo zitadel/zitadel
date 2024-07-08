@@ -12,14 +12,14 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/limits"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func TestLimits_SetLimits(t *testing.T) {
-	type fields func(*testing.T) (*eventstore.Eventstore, id.Generator)
+	type fields func(*testing.T) (*eventstore.Eventstore, id_generator.Generator)
 	type args struct {
 		ctx       context.Context
 		setLimits *SetLimits
@@ -36,7 +36,7 @@ func TestLimits_SetLimits(t *testing.T) {
 	}{
 		{
 			name: "create limits, ok",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(),
@@ -70,7 +70,7 @@ func TestLimits_SetLimits(t *testing.T) {
 		},
 		{
 			name: "update limits audit log retention, ok",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(
@@ -115,7 +115,7 @@ func TestLimits_SetLimits(t *testing.T) {
 		},
 		{
 			name: "update limits unblock, ok",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(
@@ -161,7 +161,7 @@ func TestLimits_SetLimits(t *testing.T) {
 		},
 		{
 			name: "set limits after resetting limits, ok",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(
@@ -213,8 +213,9 @@ func TestLimits_SetLimits(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := new(Commands)
-			r.eventstore, r.idGenerator = tt.fields(t)
+			_eventstore, _id_generator := tt.fields(t)
+			r := &Commands{eventstore: _eventstore}
+			id_generator.SetGenerator(_id_generator)
 			got, err := r.SetLimits(tt.args.ctx, tt.args.setLimits)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -230,7 +231,7 @@ func TestLimits_SetLimits(t *testing.T) {
 }
 
 func TestLimits_SetLimitsBulk(t *testing.T) {
-	type fields func(*testing.T) (*eventstore.Eventstore, id.Generator)
+	type fields func(*testing.T) (*eventstore.Eventstore, id_generator.Generator)
 	type args struct {
 		ctx           context.Context
 		setLimitsBulk []*SetInstanceLimitsBulk
@@ -248,7 +249,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 	}{
 		{
 			name: "create limits, ok",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(),
@@ -286,7 +287,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 		},
 		{
 			name: "update limits audit log retention, ok",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(
@@ -335,7 +336,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 		},
 		{
 			name: "update limits unblock, ok",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(
@@ -385,7 +386,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 		},
 		{
 			name: "set limits after resetting limits, ok",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(
@@ -441,7 +442,7 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 		},
 		{
 			name: "set many limits, ok",
-			fields: func(*testing.T) (*eventstore.Eventstore, id.Generator) {
+			fields: func(*testing.T) (*eventstore.Eventstore, id_generator.Generator) {
 				return eventstoreExpect(
 						t,
 						expectFilter(
@@ -616,8 +617,9 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := new(Commands)
-			r.eventstore, r.idGenerator = tt.fields(t)
+			_eventstore, _id_generator := tt.fields(t)
+			r := &Commands{eventstore: _eventstore}
+			id_generator.SetGenerator(_id_generator)
 			gotDetails, gotTargetDetails, err := r.SetInstanceLimitsBulk(tt.args.ctx, tt.args.setLimitsBulk)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

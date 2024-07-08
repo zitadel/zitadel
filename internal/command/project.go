@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -36,7 +37,7 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
 	}
 
-	projectID, err := c.idGenerator.Next()
+	projectID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}

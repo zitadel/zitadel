@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
 )
 
 type oAuthApplication interface {
@@ -11,8 +11,8 @@ type oAuthApplication interface {
 }
 
 // ClientID random_number (eg. 495894098234)
-func SetNewClientID(a oAuthApplication, idGenerator id.Generator) error {
-	clientID, err := idGenerator.Next()
+func SetNewClientID(a oAuthApplication) error {
+	clientID, err := id_generator.Next()
 	if err != nil {
 		return err
 	}

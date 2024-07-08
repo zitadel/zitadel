@@ -11,8 +11,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -20,7 +20,7 @@ import (
 func TestQuota_AddQuota(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		ctx      context.Context
@@ -264,9 +264,9 @@ func TestQuota_AddQuota(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				eventstore: tt.fields.eventstore,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := r.AddQuota(tt.args.ctx, tt.args.setQuota)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -284,7 +284,7 @@ func TestQuota_AddQuota(t *testing.T) {
 func TestQuota_SetQuota(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		ctx      context.Context
@@ -530,9 +530,9 @@ func TestQuota_SetQuota(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				eventstore: tt.fields.eventstore,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := r.SetQuota(tt.args.ctx, tt.args.setQuota)
 			if tt.res.err == nil {
 				assert.NoError(t, err)

@@ -15,8 +15,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	webauthn_helper "github.com/zitadel/zitadel/internal/webauthn"
@@ -34,7 +34,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		userID        string
@@ -118,9 +118,9 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:     tt.fields.eventstore,
-				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			_, err := c.RegisterUserPasskey(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.rpID, tt.args.authenticator)
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful case can't be tested due to random challenge.
@@ -143,7 +143,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 	userAgg := &user.NewAggregate("user1", "org1").Aggregate
 	type fields struct {
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		userID        string
@@ -220,9 +220,9 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
 				eventstore:     tt.fields.eventstore,
-				idGenerator:    tt.fields.idGenerator,
 				webauthnConfig: webauthnConfig,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			_, err := c.RegisterUserPasskeyWithCode(ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authenticator, tt.args.codeID, tt.args.code, tt.args.rpID, alg)
 			require.ErrorIs(t, err, tt.wantErr)
 			// successful case can't be tested due to random challenge.
@@ -435,8 +435,8 @@ func TestCommands_pushUserPasskey(t *testing.T) {
 			c := &Commands{
 				eventstore:     eventstoreExpect(t, prep...),
 				webauthnConfig: webauthnConfig,
-				idGenerator:    id_mock.NewIDGeneratorExpectIDs(t, "123"),
 			}
+			id_generator.SetGenerator(id_mock.NewIDGeneratorExpectIDs(t, "123"))
 			wm, userAgg, webAuthN, err := c.createUserPasskey(ctx, "user1", "org1", "rpID", domain.AuthenticatorAttachmentCrossPlattform)
 			require.NoError(t, err)
 
@@ -459,7 +459,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 	type fields struct {
 		newCode     encrypedCodeFunc
 		eventstore  func(t *testing.T) *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		userID        string
@@ -532,8 +532,8 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 			c := &Commands{
 				newEncryptedCode: tt.fields.newCode,
 				eventstore:       tt.fields.eventstore(t),
-				idGenerator:      tt.fields.idGenerator,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := c.AddUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
@@ -548,7 +548,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 	type fields struct {
 		newCode     encrypedCodeFunc
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		userID        string
@@ -640,8 +640,8 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 			c := &Commands{
 				newEncryptedCode: tt.fields.newCode,
 				eventstore:       tt.fields.eventstore,
-				idGenerator:      tt.fields.idGenerator,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := c.AddUserPasskeyCodeURLTemplate(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
@@ -655,7 +655,7 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 	type fields struct {
 		newCode     encrypedCodeFunc
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		userID        string
@@ -732,8 +732,8 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 			c := &Commands{
 				newEncryptedCode: tt.fields.newCode,
 				eventstore:       tt.fields.eventstore,
-				idGenerator:      tt.fields.idGenerator,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := c.AddUserPasskeyCodeReturn(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
@@ -747,7 +747,7 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 	type fields struct {
 		newCode     encrypedCodeFunc
 		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		userID        string
@@ -892,8 +892,8 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 			c := &Commands{
 				newEncryptedCode: tt.fields.newCode,
 				eventstore:       tt.fields.eventstore,
-				idGenerator:      tt.fields.idGenerator,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			got, err := c.addUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, "", false)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)

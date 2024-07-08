@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -113,7 +114,7 @@ func (c *Commands) AddUserHuman(ctx context.Context, resourceOwner string, human
 	}
 
 	if human.ID == "" {
-		human.ID, err = c.idGenerator.Next()
+		human.ID, err = id_generator.Next()
 		if err != nil {
 			return err
 		}

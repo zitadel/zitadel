@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -41,7 +42,7 @@ func (c *Commands) AddApplicationKey(ctx context.Context, key *domain.Applicatio
 	if !application.State.Exists() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-sak25", "Errors.Project.App.NotFound")
 	}
-	key.KeyID, err = c.idGenerator.Next()
+	key.KeyID, err = id_generator.Next()
 	if err != nil {
 		return nil, err
 	}

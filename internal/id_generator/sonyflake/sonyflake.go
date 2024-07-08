@@ -1,4 +1,4 @@
-package id
+package sonyflake
 
 import (
 	"encoding/json"
@@ -16,14 +16,20 @@ import (
 	"github.com/drone/envsubst"
 	"github.com/jarcoal/jpath"
 	"github.com/sony/sonyflake"
+
 	"github.com/zitadel/logging"
 )
 
-type sonyflakeGenerator struct {
+type Config struct {
+	// Configuration for the identification of machines.
+	Identification Identification
+}
+
+type Generator struct {
 	*sonyflake.Sonyflake
 }
 
-func (s *sonyflakeGenerator) Next() (string, error) {
+func (s *Generator) Next() (string, error) {
 	id, err := s.NextID()
 	if err != nil {
 		return "", err
@@ -31,27 +37,31 @@ func (s *sonyflakeGenerator) Next() (string, error) {
 	return strconv.FormatUint(id, 10), nil
 }
 
-var (
-	GeneratorConfig    *Config   = nil
-	sonyFlakeGenerator Generator = nil
-)
-
-// SonyFlakeGenerator creates a new id generator
-// the function panics if the generator cannot be created
-func SonyFlakeGenerator() Generator {
-	if sonyFlakeGenerator == nil {
-		sfg := Generator(&sonyflakeGenerator{
-			sonyflake.NewSonyflake(sonyflake.Settings{
-				MachineID: machineID,
-				StartTime: time.Date(2019, 4, 29, 0, 0, 0, 0, time.UTC),
-			}),
-		})
-
-		sonyFlakeGenerator = sfg
+func New(c *Config) *Generator {
+	if c != nil {
+		config = c
+	} else {
+		// Default configuration if none is provided.
+		config = &Config{
+			Identification: Identification{
+				PrivateIp: PrivateIp{Enabled: true},
+				Hostname:  Hostname{Enabled: false},
+				Webhook:   Webhook{Enabled: false},
+			},
+		}
 	}
 
-	return sonyFlakeGenerator
+	return &Generator{
+		sonyflake.NewSonyflake(sonyflake.Settings{
+			MachineID: machineID,
+			StartTime: time.Date(2019, 4, 29, 0, 0, 0, 0, time.UTC),
+		}),
+	}
 }
+
+var (
+	config *Config = nil
+)
 
 // the following is a copy of sonyflake (https://github.com/sony/sonyflake/blob/master/sonyflake.go)
 // with the change of using the "POD-IP" if no private ip is found
@@ -90,15 +100,15 @@ func isPrivateIPv4(ip net.IP) bool {
 }
 
 func MachineIdentificationMethod() string {
-	if GeneratorConfig.Identification.PrivateIp.Enabled {
+	if config.Identification.PrivateIp.Enabled {
 		return "Private Ip"
 	}
 
-	if GeneratorConfig.Identification.Hostname.Enabled {
+	if config.Identification.Hostname.Enabled {
 		return "Hostname"
 	}
 
-	if GeneratorConfig.Identification.Webhook.Enabled {
+	if config.Identification.Webhook.Enabled {
 		return "Webhook"
 	}
 
@@ -106,12 +116,8 @@ func MachineIdentificationMethod() string {
 }
 
 func machineID() (uint16, error) {
-	if GeneratorConfig == nil {
-		logging.Panic("cannot create a unique id for the machine, generator has not been configured")
-	}
-
 	errors := []string{}
-	if GeneratorConfig.Identification.PrivateIp.Enabled {
+	if config.Identification.PrivateIp.Enabled {
 		ip, err := lower16BitPrivateIP()
 		if err == nil {
 			return ip, nil
@@ -119,7 +125,7 @@ func machineID() (uint16, error) {
 		errors = append(errors, fmt.Sprintf("failed to get Private IP address %s", err))
 	}
 
-	if GeneratorConfig.Identification.Hostname.Enabled {
+	if config.Identification.Hostname.Enabled {
 		hn, err := hostname()
 		if err == nil {
 			return hn, nil
@@ -127,7 +133,7 @@ func machineID() (uint16, error) {
 		errors = append(errors, fmt.Sprintf("failed to get Hostname %s", err))
 	}
 
-	if GeneratorConfig.Identification.Webhook.Enabled {
+	if config.Identification.Webhook.Enabled {
 		cid, err := metadataWebhookID()
 		if err == nil {
 			return cid, nil
@@ -169,7 +175,7 @@ func hostname() (uint16, error) {
 }
 
 func metadataWebhookID() (uint16, error) {
-	webhook := GeneratorConfig.Identification.Webhook
+	webhook := config.Identification.Webhook
 	url, err := envsubst.EvalEnv(webhook.Url)
 	if err != nil {
 		url = webhook.Url

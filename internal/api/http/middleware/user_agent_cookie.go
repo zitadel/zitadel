@@ -10,7 +10,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -32,7 +32,6 @@ type UserAgent struct {
 type userAgentHandler struct {
 	cookieHandler   *http_utils.CookieHandler
 	cookieName      string
-	idGenerator     id.Generator
 	nextHandler     http.Handler
 	ignoredPrefixes []string
 }
@@ -42,7 +41,7 @@ type UserAgentCookieConfig struct {
 	MaxAge time.Duration
 }
 
-func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, idGenerator id.Generator, externalSecure bool, ignoredPrefixes ...string) (func(http.Handler) http.Handler, error) {
+func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, externalSecure bool, ignoredPrefixes ...string) (func(http.Handler) http.Handler, error) {
 	opts := []http_utils.CookieHandlerOpt{
 		http_utils.WithEncryption(cookieKey, cookieKey),
 		http_utils.WithMaxAge(int(config.MaxAge.Seconds())),
@@ -56,7 +55,6 @@ func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, idGene
 			nextHandler:     handler,
 			cookieName:      config.Name,
 			cookieHandler:   http_utils.NewCookieHandler(opts...),
-			idGenerator:     idGenerator,
 			ignoredPrefixes: ignoredPrefixes,
 		}
 	}, nil
@@ -85,7 +83,7 @@ func (ua *userAgentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ua *userAgentHandler) newUserAgent() (*UserAgent, error) {
-	agentID, err := ua.idGenerator.Next()
+	agentID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}

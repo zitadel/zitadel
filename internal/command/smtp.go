@@ -10,13 +10,14 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config *smtp.Config) (string, *domain.ObjectDetails, error) {
-	id, err := c.idGenerator.Next()
+	id, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}
@@ -402,7 +403,7 @@ func (c *Commands) prepareAddAndActivateSMTPConfig(a *instance.Aggregate, descri
 			return nil, zerrors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			id, err := c.idGenerator.Next()
+			id, err := id_generator.Next()
 			if err != nil {
 				return nil, zerrors.ThrowInternal(nil, "INST-9JdRe", "Errors.Invalid.Argument")
 			}

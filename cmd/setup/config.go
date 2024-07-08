@@ -21,7 +21,8 @@ import (
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	"github.com/zitadel/zitadel/internal/id_generator/sonyflake"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
@@ -38,7 +39,8 @@ type Config struct {
 	Log             *logging.Config
 	EncryptionKeys  *encryption.EncryptionKeyConfig
 	DefaultInstance command.InstanceSetup
-	Machine         *id.Config
+	IDGenerator     id_generator.GeneratorType
+	Machine         *sonyflake.Config
 	Projections     projection.Config
 	Eventstore      *eventstore.Config
 
@@ -81,7 +83,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 	err = config.Log.SetLogger()
 	logging.OnError(err).Fatal("unable to set logger")
 
-	id.Configure(config.Machine)
+	id_generator.SetGeneratorWithConfig(config.IDGenerator, config.Machine)
 
 	return config
 }

@@ -18,7 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/query"
 	user_repo "github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -53,8 +53,6 @@ type AuthRequestRepo struct {
 	ApplicationProvider       applicationProvider
 	CustomTextProvider        customTextProvider
 	PasswordReset             passwordReset
-
-	IdGenerator id.Generator
 }
 
 type labelPolicyProvider interface {
@@ -138,7 +136,7 @@ func (repo *AuthRequestRepo) Health(ctx context.Context) error {
 func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *domain.AuthRequest) (_ *domain.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	reqID, err := repo.IdGenerator.Next()
+	reqID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}

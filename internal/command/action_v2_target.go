@@ -7,6 +7,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/target"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -46,7 +47,7 @@ func (c *Commands) AddTarget(ctx context.Context, add *AddTarget, resourceOwner 
 	}
 
 	if add.AggregateID == "" {
-		add.AggregateID, err = c.idGenerator.Next()
+		add.AggregateID, err = id_generator.Next()
 		if err != nil {
 			return nil, err
 		}

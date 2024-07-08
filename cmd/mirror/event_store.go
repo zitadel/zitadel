@@ -15,7 +15,7 @@ import (
 
 	db "github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/database/dialect"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/v2/database"
 	"github.com/zitadel/zitadel/internal/v2/eventstore"
 	"github.com/zitadel/zitadel/internal/v2/eventstore/postgres"
@@ -72,7 +72,7 @@ func copyEvents(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	start := time.Now()
 	reader, writer := io.Pipe()
 
-	migrationID, err := id.SonyFlakeGenerator().Next()
+	migrationID, err := id_generator.Next()
 	logging.OnError(err).Fatal("unable to generate migration id")
 
 	sourceConn, err := source.Conn(ctx)

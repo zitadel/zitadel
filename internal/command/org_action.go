@@ -6,6 +6,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/action"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
@@ -32,7 +33,7 @@ func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, reso
 		return "", nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
 	}
 
-	actionID, err := c.idGenerator.Next()
+	actionID, err := id_generator.Next()
 	if err != nil {
 		return "", nil, err
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	project_repo "github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -68,7 +69,7 @@ func (c *Commands) AddOIDCAppCommand(app *addOIDCApp) preparation.Validation {
 				return nil, zerrors.ThrowNotFound(err, "PROJE-6swVG", "Errors.Project.NotFound")
 			}
 
-			app.ClientID, err = c.idGenerator.Next()
+			app.ClientID, err = id_generator.Next()
 			if err != nil {
 				return nil, zerrors.ThrowInternal(err, "V2-VMSQ1", "Errors.Internal")
 			}
@@ -147,7 +148,7 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, oidcApp *domain.OIDCA
 		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Project.App.Invalid")
 	}
 
-	appID, err := c.idGenerator.Next()
+	appID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +170,7 @@ func (c *Commands) addOIDCApplicationWithID(ctx context.Context, oidcApp *domain
 	}
 
 	var plain string
-	err = domain.SetNewClientID(oidcApp, c.idGenerator)
+	err = domain.SetNewClientID(oidcApp)
 	if err != nil {
 		return nil, err
 	}

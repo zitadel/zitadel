@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -16,7 +17,7 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 	if config.OIDCConfig == nil && config.JWTConfig == nil {
 		return nil, zerrors.ThrowInvalidArgument(nil, "IDP-s8nn3", "Errors.IDPConfig.Invalid")
 	}
-	idpConfigID, err := c.idGenerator.Next()
+	idpConfigID, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}

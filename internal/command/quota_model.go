@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -85,7 +85,6 @@ func (wm *quotaWriteModel) Reduce() error {
 // NewChanges returns all changes that need to be applied to the aggregate.
 // If createNew is true, all quota properties are set.
 func (wm *quotaWriteModel) NewChanges(
-	idGenerator id.Generator,
 	createNew bool,
 	amount uint64,
 	from time.Time,
@@ -93,7 +92,7 @@ func (wm *quotaWriteModel) NewChanges(
 	limit bool,
 	notifications ...*QuotaNotification,
 ) (changes []quota.QuotaChange, err error) {
-	setEventNotifications, err := QuotaNotifications(notifications).newSetEventNotifications(idGenerator)
+	setEventNotifications, err := QuotaNotifications(notifications).newSetEventNotifications()
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +144,7 @@ func (wm *quotaWriteModel) NewChanges(
 }
 
 // newSetEventNotifications returns quota.SetEventNotification elements with generated IDs.
-func (q QuotaNotifications) newSetEventNotifications(idGenerator id.Generator) (setNotifications []*quota.SetEventNotification, err error) {
+func (q QuotaNotifications) newSetEventNotifications() (setNotifications []*quota.SetEventNotification, err error) {
 	if q == nil {
 		return make([]*quota.SetEventNotification, 0), nil
 	}
@@ -156,7 +155,7 @@ func (q QuotaNotifications) newSetEventNotifications(idGenerator id.Generator) (
 			Repeat:  notification.Repeat,
 			CallURL: notification.CallURL,
 		}
-		notifications[idx].ID, err = idGenerator.Next()
+		notifications[idx].ID, err = id_generator.Next()
 		if err != nil {
 			return nil, err
 		}

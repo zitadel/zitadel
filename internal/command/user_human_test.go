@@ -16,8 +16,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	"github.com/zitadel/zitadel/internal/id"
-	id_mock "github.com/zitadel/zitadel/internal/id/mock"
+	"github.com/zitadel/zitadel/internal/id_generator"
+	id_mock "github.com/zitadel/zitadel/internal/id_generator/mock"
 	"github.com/zitadel/zitadel/internal/repository/idp"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
@@ -27,7 +27,7 @@ import (
 func TestCommandSide_AddHuman(t *testing.T) {
 	type fields struct {
 		eventstore         func(t *testing.T) *eventstore.Eventstore
-		idGenerator        id.Generator
+		idGenerator        id_generator.Generator
 		userPasswordHasher *crypto.Hasher
 		codeAlg            crypto.EncryptionAlgorithm
 		newCode            encrypedCodeFunc
@@ -1249,9 +1249,9 @@ func TestCommandSide_AddHuman(t *testing.T) {
 				eventstore:         tt.fields.eventstore(t),
 				userPasswordHasher: tt.fields.userPasswordHasher,
 				userEncryption:     tt.fields.codeAlg,
-				idGenerator:        tt.fields.idGenerator,
 				newEncryptedCode:   tt.fields.newCode,
 			}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.allowInitMail)
 			if tt.res.err == nil {
 				if !assert.NoError(t, err) {
@@ -1273,7 +1273,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 func TestCommandSide_ImportHuman(t *testing.T) {
 	type fields struct {
 		eventstore         *eventstore.Eventstore
-		idGenerator        id.Generator
+		idGenerator        id_generator.Generator
 		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
@@ -2474,9 +2474,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			f, a := tt.given(t)
 			r := &Commands{
 				eventstore:         f.eventstore,
-				idGenerator:        f.idGenerator,
 				userPasswordHasher: f.userPasswordHasher,
 			}
+			id_generator.SetGenerator(f.idGenerator)
 			gotHuman, gotCode, err := r.ImportHuman(a.ctx, a.orgID, a.human, a.passwordless, a.links, a.secretGenerator, a.secretGenerator, a.secretGenerator, a.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
@@ -2845,7 +2845,7 @@ func newRegisterHumanEvent(username, password string, changeRequired, userLoginM
 
 func TestAddHumanCommand(t *testing.T) {
 	type fields struct {
-		idGenerator id.Generator
+		idGenerator id_generator.Generator
 	}
 	type args struct {
 		human         *AddHuman
@@ -3267,9 +3267,8 @@ func TestAddHumanCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Commands{
-				idGenerator: tt.fields.idGenerator,
-			}
+			c := &Commands{}
+			id_generator.SetGenerator(tt.fields.idGenerator)
 			AssertValidation(t, context.Background(), c.AddHumanCommand(tt.args.human, tt.args.orgID, tt.args.hasher, tt.args.codeAlg, tt.args.allowInitMail), tt.args.filter, tt.want)
 		})
 	}

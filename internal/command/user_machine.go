@@ -7,6 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -72,7 +73,7 @@ func (c *Commands) AddMachine(ctx context.Context, machine *Machine) (_ *domain.
 	defer func() { span.EndWithError(err) }()
 
 	if machine.AggregateID == "" {
-		userID, err := c.idGenerator.Next()
+		userID, err := id_generator.Next()
 		if err != nil {
 			return nil, err
 		}

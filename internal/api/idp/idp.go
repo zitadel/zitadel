@@ -35,7 +35,7 @@ import (
 const (
 	HandlerPrefix = "/idps"
 
-	idpPrefix = "/{" + varIDPID + ":[0-9]+}"
+	idpPrefix = "/{" + varIDPID + ":[0-9]+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}}"
 
 	callbackPath    = "/callback"
 	metadataPath    = idpPrefix + "/saml/metadata"

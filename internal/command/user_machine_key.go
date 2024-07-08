@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -102,7 +103,7 @@ func (c *Commands) AddUserMachineKey(ctx context.Context, machineKey *MachineKey
 	defer func() { span.EndWithError(err) }()
 
 	if machineKey.KeyID == "" {
-		keyID, err := c.idGenerator.Next()
+		keyID, err := id_generator.Next()
 		if err != nil {
 			return nil, err
 		}

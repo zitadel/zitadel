@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/id_generator"
 	"github.com/zitadel/zitadel/internal/repository/quota"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -45,7 +46,7 @@ func (c *Commands) AddQuota(
 	if wm.AggregateID != "" {
 		return nil, zerrors.ThrowAlreadyExists(nil, "COMMAND-WDfFf", "Errors.Quota.AlreadyExists")
 	}
-	aggregateId, err := c.idGenerator.Next()
+	aggregateId, err := id_generator.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +78,7 @@ func (c *Commands) SetQuota(
 	aggregateId := wm.AggregateID
 	createNewQuota := aggregateId == ""
 	if aggregateId == "" {
-		aggregateId, err = c.idGenerator.Next()
+		aggregateId, err = id_generator.Next()
 		if err != nil {
 			return nil, err
 		}
@@ -179,7 +180,7 @@ func (c *Commands) SetQuotaCommand(a *quota.Aggregate, wm *quotaWriteModel, crea
 			return nil, err
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (cmd []eventstore.Command, err error) {
-				changes, err := wm.NewChanges(c.idGenerator, createNew, q.Amount, q.From, q.ResetInterval, q.Limit, q.Notifications...)
+				changes, err := wm.NewChanges(createNew, q.Amount, q.From, q.ResetInterval, q.Limit, q.Notifications...)
 				if len(changes) == 0 {
 					return nil, err
 				}

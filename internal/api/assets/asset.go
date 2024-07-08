@@ -20,7 +20,6 @@ import (
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/i18n"
-	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/static"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -35,7 +34,6 @@ type Handler struct {
 	storage         static.Storage
 	commands        *command.Commands
 	authInterceptor *http_mw.AuthInterceptor
-	idGenerator     id.Generator
 	query           *query.Queries
 }
 
@@ -94,14 +92,13 @@ func DefaultErrorHandler(translator *i18n.Translator) func(w http.ResponseWriter
 	}
 }
 
-func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
+func NewHandler(commands *command.Commands, verifier authz.APITokenVerifier, authConfig authz.Config, storage static.Storage, queries *query.Queries, callDurationInterceptor, instanceInterceptor, assetCacheInterceptor, accessInterceptor func(handler http.Handler) http.Handler) http.Handler {
 	translator, err := i18n.NewZitadelTranslator(language.English)
 	logging.OnError(err).Panic("unable to get translator")
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler(translator),
 		authInterceptor: http_mw.AuthorizationInterceptor(verifier, authConfig),
-		idGenerator:     idGenerator,
 		storage:         storage,
 		query:           queries,
 	}
