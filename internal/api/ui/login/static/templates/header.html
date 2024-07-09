@@ -1,5 +1,6 @@
 {{define "header"}}
 <header class="lgn-header">
+    <div id="ludo-circle"></div>
     {{ if hasCustomPolicy .LabelPolicy }}
         {{ $logo := customLogoResource .PrivateLabelingOrgID .LabelPolicy .DarkMode }}
         {{if $logo}}

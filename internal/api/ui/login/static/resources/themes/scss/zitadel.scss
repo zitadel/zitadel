@@ -1,6 +1,7 @@
 @import 'styles/vars';
 @import 'main';
 @import 'bundle';
+@import 'ludocare';
 
 // Include non-theme styles for core. -> mainly background of the login
 @include lgn-core();

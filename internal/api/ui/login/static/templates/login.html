@@ -32,6 +32,8 @@
 
     {{template "error-message" .}}
 
+    <a class="block sub-formfield-link" id="ludo-lost-identity">J'ai perdu mon identifiant</a>
+
     <div class="lgn-actions lgn-reverse-order">
         <a class="lgn-icon-button lgn-left-action" id="back-button" href="#">
             <i class="lgn-icon-arrow-left-solid"></i>
@@ -65,6 +67,17 @@
     {{end}}
 </form>
 
+<div id="ludo-overlay"></div>
+
+<div id="ludo-popin">
+  <button id="ludo-close-popin">X</button>
+  <h2>Vous avez perdu votre identifiant ?</h2>
+  <p>Contactez-nous pour que nous puissions vous venir en aide.</p>
+  <p><strong>Téléphone :</strong> <a href="tel:0481899001"> 04 81 89 90 01</a></p>
+  <p><strong>Email :</strong> <a href="mailto:"> contact@ludocare.com</a></p>
+</div>
+
+<script src="{{ resourceUrl "scripts/lost_id.js" }}"></script>
 <script src="{{ resourceUrl "scripts/form_submit.js" }}"></script>
 <script src="{{ resourceUrl "scripts/default_form_validation.js" }}"></script>
 <script src="{{ resourceUrl "scripts/input_suffix_offset.js" }}"></script>
