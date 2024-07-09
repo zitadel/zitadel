@@ -36,6 +36,9 @@ Before you run the tests you need an initialized user. The tests don't implement
 * `make machine_pat_login`  
   setup: creates machines and a pat for each machine  
   test: calls user info endpoint with the given pats
+* `make machine_client_credentials_login`  
+  setup: creates machines and a client credential secret for each machine  
+  test: calls token endpoint with the `client_credentials` grant type.
 * `make user_info`  
   setup: creates human users and signs them in  
   test: calls user info endpoint using the given humans
