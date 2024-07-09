@@ -10,6 +10,13 @@ Login:
   MustBeMemberOfOrg: The user must be member of the {{.OrgName}} organization.
   RegisterButtonText: Register
   NextButtonText: Next
+  LostMyId: I lost my ID
+
+LoginLostIdPopin:
+  Title: Did you lose your ID?
+  Description: Contact us at the following email address or phone number to recover your ID.
+  Email: Email
+  Phone: Phone
 
 LDAP:
   Title: Login

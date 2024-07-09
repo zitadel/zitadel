@@ -10,6 +10,13 @@ Login:
   MustBeMemberOfOrg: L'utilisateur doit être membre de l'organisation {{.OrgName}}.
   RegisterButtonText: S'inscrire
   NextButtonText: Suivant
+  LostMyId: J'ai perdu mon identifiant
+
+LoginLostIdPopin:
+  Title: Avez-vous perdu votre identifiant ?
+  Description: Contactez-nous pour que nous puissions vous venir en aide.
+  Email: Email
+  Phone: Téléphone
 
 LDAP:
   Title: Connexion
