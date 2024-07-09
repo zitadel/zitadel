@@ -405,7 +405,7 @@ func setupWebKeys(c *Commands, validations *[]preparation.Validation, instanceID
 	var conf crypto.WebKeyConfig
 	switch setup.WebKeys.Type {
 	case crypto.WebKeyConfigTypeUnspecified:
-		return nil
+		return nil // config disabled, skip
 	case crypto.WebKeyConfigTypeRSA:
 		conf = &crypto.WebKeyRSAConfig{
 			Bits:   setup.WebKeys.Config.RSABits,
