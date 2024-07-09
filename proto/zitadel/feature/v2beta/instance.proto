@@ -58,6 +58,12 @@ message SetInstanceFeaturesRequest{
       description: "Improves performance of specified execution paths.";
     }
   ];
+  optional bool web_key = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable the webkey/v3alpha API. The first time this feature is enabled, web keys are generated and activated.";
+    }
+  ];
 }
 
 message SetInstanceFeaturesResponse {
@@ -127,6 +133,13 @@ message GetInstanceFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[1]";
       description: "Improves performance of specified execution paths.";
+    }
+  ];
+
+  FeatureFlag web_key = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable the webkey/v3alpha API. The first time this feature is enabled, web keys are generated and activated.";
     }
   ];
 }

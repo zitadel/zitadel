@@ -3,8 +3,11 @@ package command
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/feature"
@@ -20,6 +23,7 @@ type InstanceFeatures struct {
 	TokenExchange                   *bool
 	Actions                         *bool
 	ImprovedPerformance             []feature.ImprovedPerformanceType
+	WebKey                          *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
@@ -41,6 +45,9 @@ func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures)
 	if err := c.eventstore.FilterToQueryReducer(ctx, wm); err != nil {
 		return nil, err
 	}
+	if err := c.setupWebKeyFeature(ctx, wm, f); err != nil {
+		return nil, err
+	}
 	commands := wm.setCommands(ctx, f)
 	if len(commands) == 0 {
 		return writeModelToObjectDetails(wm.WriteModel), nil
@@ -59,6 +66,21 @@ func prepareSetFeatures(instanceID string, f *InstanceFeatures) preparation.Vali
 			return wm.setCommands(ctx, f), nil
 		}, nil
 	}
+}
+
+// setupWebKeyFeature generates the initial web keys for the instance,
+// if the feature is enabled in the request and the feature wasn't enabled already in the writeModel.
+// [Commands.GenerateInitialWebKeys] checks if keys already exist and does nothing if that's the case.
+// The default config of a RSA key with 2048 and the SHA256 hasher is assumed.
+// Users can customize this after using the webkey/v3 API.
+func (c *Commands) setupWebKeyFeature(ctx context.Context, wm *InstanceFeaturesWriteModel, f *InstanceFeatures) error {
+	if !gu.Value(f.WebKey) || gu.Value(wm.WebKey) {
+		return nil
+	}
+	return c.GenerateInitialWebKeys(ctx, &crypto.WebKeyRSAConfig{
+		Bits:   crypto.RSABits2048,
+		Hasher: crypto.RSAHasherSHA256,
+	})
 }
 
 func (c *Commands) ResetInstanceFeatures(ctx context.Context) (*domain.ObjectDetails, error) {
