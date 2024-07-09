@@ -1,6 +1,7 @@
 package initialise
 
 import (
+	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/zitadel/logging"
 
@@ -17,7 +18,10 @@ type Config struct {
 func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
 	err := v.Unmarshal(config,
-		viper.DecodeHook(database.DecodeHook),
+		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+			database.DecodeHook,
+			mapstructure.TextUnmarshallerHookFunc(),
+		)),
 	)
 	logging.OnError(err).Fatal("unable to read config")
 

@@ -23,9 +23,17 @@ func TestUnmarshalWebKeyConfig(t *testing.T) {
 		wantErr    error
 	}{
 		{
+			name: "unspecified",
+			args: args{
+				[]byte(`{}`),
+				WebKeyConfigTypeUnspecified,
+			},
+			wantErr: zerrors.ThrowInternal(nil, "CRYPT-Ii3AiH", "Errors.Internal"),
+		},
+		{
 			name: "rsa",
 			args: args{
-				[]byte(`{"bits":2048, "hasher":0}`),
+				[]byte(`{"bits":"2048", "hasher":"sha256"}`),
 				WebKeyConfigTypeRSA,
 			},
 			wantConfig: &WebKeyRSAConfig{
@@ -36,7 +44,7 @@ func TestUnmarshalWebKeyConfig(t *testing.T) {
 		{
 			name: "ecdsa",
 			args: args{
-				[]byte(`{"curve":0}`),
+				[]byte(`{"curve":"p256"}`),
 				WebKeyConfigTypeECDSA,
 			},
 			wantConfig: &WebKeyECDSAConfig{
@@ -87,6 +95,13 @@ func TestWebKeyRSAConfig_Alg(t *testing.T) {
 		want   jose.SignatureAlgorithm
 	}{
 		{
+			name: "unspecified",
+			fields: fields{
+				Hasher: RSAHasherUnspecified,
+			},
+			want: "",
+		},
+		{
 			name: "SHA256",
 			fields: fields{
 				Hasher: RSAHasherSHA256,
@@ -112,7 +127,7 @@ func TestWebKeyRSAConfig_Alg(t *testing.T) {
 			fields: fields{
 				Hasher: 99,
 			},
-			want: jose.RS256,
+			want: "",
 		},
 	}
 	for _, tt := range tests {
@@ -135,6 +150,13 @@ func TestWebKeyECDSAConfig_Alg(t *testing.T) {
 		fields fields
 		want   jose.SignatureAlgorithm
 	}{
+		{
+			name: "unspecified",
+			fields: fields{
+				Curve: EllipticCurveUnspecified,
+			},
+			want: "",
+		},
 		{
 			name: "P256",
 			fields: fields{
@@ -161,7 +183,7 @@ func TestWebKeyECDSAConfig_Alg(t *testing.T) {
 			fields: fields{
 				Curve: 99,
 			},
-			want: jose.ES256,
+			want: "",
 		},
 	}
 	for _, tt := range tests {
@@ -185,6 +207,11 @@ func TestWebKeyECDSAConfig_GetCurve(t *testing.T) {
 		want   elliptic.Curve
 	}{
 		{
+			name:   "unspecified",
+			fields: fields{EllipticCurveUnspecified},
+			want:   nil,
+		},
+		{
 			name:   "P256",
 			fields: fields{EllipticCurveP256},
 			want:   elliptic.P256(),
@@ -202,7 +229,7 @@ func TestWebKeyECDSAConfig_GetCurve(t *testing.T) {
 		{
 			name:   "default",
 			fields: fields{99},
-			want:   elliptic.P256(),
+			want:   nil,
 		},
 	}
 	for _, tt := range tests {
@@ -228,6 +255,17 @@ func Test_generateEncryptedWebKey(t *testing.T) {
 		assertPublic  func(t *testing.T, got *jose.JSONWebKey)
 		wantErr       error
 	}{
+		{
+			name: "invalid",
+			args: args{
+				keyID: "keyID",
+				genConfig: &WebKeyRSAConfig{
+					Bits:   RSABitsUnspecified,
+					Hasher: RSAHasherSHA256,
+				},
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "CRYPTO-eaz3T", "Errors.WebKey.Config"),
+		},
 		{
 			name: "RSA",
 			args: args{
@@ -259,14 +297,6 @@ func Test_generateEncryptedWebKey(t *testing.T) {
 			},
 			assertPrivate: assertJSONWebKey("keyID", "EdDSA", "sig", false),
 			assertPublic:  assertJSONWebKey("keyID", "EdDSA", "sig", true),
-		},
-		{
-			name: "invalid config",
-			args: args{
-				keyID:     "keyID",
-				genConfig: nil,
-			},
-			wantErr: zerrors.ThrowInternalf(nil, "CRYPT-aeW6x", "Errors.Internal"),
 		},
 	}
 	for _, tt := range tests {

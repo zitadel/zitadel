@@ -36,12 +36,20 @@ const (
 )
 
 type InstanceSetup struct {
-	zitadel                  ZitadelConfig
-	InstanceName             string
-	CustomDomain             string
-	DefaultLanguage          language.Tag
-	Org                      InstanceOrgSetup
-	SecretGenerators         *SecretGenerators
+	zitadel          ZitadelConfig
+	InstanceName     string
+	CustomDomain     string
+	DefaultLanguage  language.Tag
+	Org              InstanceOrgSetup
+	SecretGenerators *SecretGenerators
+	WebKeys          struct {
+		Type   crypto.WebKeyConfigType
+		Config struct {
+			RSABits       crypto.RSABits
+			RSAHasher     crypto.RSAHasher
+			EllipticCurve crypto.EllipticCurve
+		}
+	}
 	PasswordComplexityPolicy struct {
 		MinLength    uint64
 		HasLowercase bool
@@ -269,6 +277,7 @@ func setUpInstance(ctx context.Context, c *Commands, setup *InstanceSetup) (vali
 		return nil, nil, nil, err
 	}
 	setupSMTPSettings(c, &validations, setup.SMTPConfiguration, instanceAgg)
+	setupWebKeys(c, &validations, setup.zitadel.instanceID, setup)
 	setupOIDCSettings(c, &validations, setup.OIDCSettings, instanceAgg)
 	setupFeatures(&validations, setup.Features, setup.zitadel.instanceID)
 	setupLimits(c, &validations, limits.NewAggregate(setup.zitadel.limitsID, setup.zitadel.instanceID), setup.Limits)
@@ -390,6 +399,29 @@ func setupFeatures(validations *[]preparation.Validation, features *InstanceFeat
 	if features != nil {
 		*validations = append(*validations, prepareSetFeatures(instanceID, features))
 	}
+}
+
+func setupWebKeys(c *Commands, validations *[]preparation.Validation, instanceID string, setup *InstanceSetup) error {
+	var conf crypto.WebKeyConfig
+	switch setup.WebKeys.Type {
+	case crypto.WebKeyConfigTypeUnspecified:
+		return nil
+	case crypto.WebKeyConfigTypeRSA:
+		conf = &crypto.WebKeyRSAConfig{
+			Bits:   setup.WebKeys.Config.RSABits,
+			Hasher: setup.WebKeys.Config.RSAHasher,
+		}
+	case crypto.WebKeyConfigTypeECDSA:
+		conf = &crypto.WebKeyECDSAConfig{
+			Curve: setup.WebKeys.Config.EllipticCurve,
+		}
+	case crypto.WebKeyConfigTypeED25519:
+		conf = &crypto.WebKeyED25519Config{}
+	default:
+		return zerrors.ThrowInternalf(nil, "COMMAND-sieX0", "Errors.Internal unknown web key type %q", setup.WebKeys.Type)
+	}
+	*validations = append(*validations, c.prepareGenerateInitialWebKeys(instanceID, conf))
+	return nil
 }
 
 func setupOIDCSettings(commands *Commands, validations *[]preparation.Validation, oidcSettings *OIDCSettings, instanceAgg *instance.Aggregate) {

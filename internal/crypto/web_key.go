@@ -37,34 +37,42 @@ func (u KeyUsage) String() string {
 	return ""
 }
 
+//go:generate enumer -type WebKeyConfigType -trimprefix WebKeyConfigType -text -json -linecomment
 type WebKeyConfigType int
 
 const (
-	WebKeyConfigTypeRSA WebKeyConfigType = iota
+	WebKeyConfigTypeUnspecified WebKeyConfigType = iota //
+	WebKeyConfigTypeRSA
 	WebKeyConfigTypeECDSA
 	WebKeyConfigTypeED25519
 )
 
+//go:generate enumer -type RSABits -trimprefix RSABits -text -json -linecomment
 type RSABits int
 
 const (
-	RSABits2048 RSABits = 2048
-	RSABits3072 RSABits = 3072
-	RSABits4096 RSABits = 4096
+	RSABitsUnspecified RSABits = 0 //
+	RSABits2048        RSABits = 2048
+	RSABits3072        RSABits = 3072
+	RSABits4096        RSABits = 4096
 )
 
 type RSAHasher int
 
+//go:generate enumer -type RSAHasher -trimprefix RSAHasher -text -json -linecomment
 const (
-	RSAHasherSHA256 RSAHasher = iota
+	RSAHasherUnspecified RSAHasher = iota //
+	RSAHasherSHA256
 	RSAHasherSHA384
 	RSAHasherSHA512
 )
 
 type EllipticCurve int
 
+//go:generate enumer -type EllipticCurve -trimprefix EllipticCurve -text -json -linecomment
 const (
-	EllipticCurveP256 EllipticCurve = iota
+	EllipticCurveUnspecified EllipticCurve = iota //
+	EllipticCurveP256
 	EllipticCurveP384
 	EllipticCurveP512
 )
@@ -72,10 +80,13 @@ const (
 type WebKeyConfig interface {
 	Alg() jose.SignatureAlgorithm
 	Type() WebKeyConfigType // Type is needed to make Unmarshal work
+	IsValid() error
 }
 
 func UnmarshalWebKeyConfig(data []byte, configType WebKeyConfigType) (config WebKeyConfig, err error) {
 	switch configType {
+	case WebKeyConfigTypeUnspecified:
+		return nil, zerrors.ThrowInternal(nil, "CRYPT-Ii3AiH", "Errors.Internal")
 	case WebKeyConfigTypeRSA:
 		config = new(WebKeyRSAConfig)
 	case WebKeyConfigTypeECDSA:
@@ -86,7 +97,7 @@ func UnmarshalWebKeyConfig(data []byte, configType WebKeyConfigType) (config Web
 		return nil, zerrors.ThrowInternal(nil, "CRYPT-Eig8ho", "Errors.Internal")
 	}
 	if err = json.Unmarshal(data, config); err != nil {
-		return nil, zerrors.ThrowInternal(nil, "CRYPT-waeR0N", "Errors.Internal")
+		return nil, zerrors.ThrowInternal(err, "CRYPT-waeR0N", "Errors.Internal")
 	}
 	return config, nil
 }
@@ -98,6 +109,8 @@ type WebKeyRSAConfig struct {
 
 func (c WebKeyRSAConfig) Alg() jose.SignatureAlgorithm {
 	switch c.Hasher {
+	case RSAHasherUnspecified:
+		return ""
 	case RSAHasherSHA256:
 		return jose.RS256
 	case RSAHasherSHA384:
@@ -105,12 +118,22 @@ func (c WebKeyRSAConfig) Alg() jose.SignatureAlgorithm {
 	case RSAHasherSHA512:
 		return jose.RS512
 	default:
-		return jose.RS256
+		return ""
 	}
 }
 
 func (WebKeyRSAConfig) Type() WebKeyConfigType {
 	return WebKeyConfigTypeRSA
+}
+
+func (c WebKeyRSAConfig) IsValid() error {
+	if !c.Bits.IsARSABits() || c.Bits == RSABitsUnspecified {
+		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-eaz3T", "Errors.WebKey.Config")
+	}
+	if !c.Hasher.IsARSAHasher() || c.Hasher == RSAHasherUnspecified {
+		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-eaz3T", "Errors.WebKey.Config")
+	}
+	return nil
 }
 
 type WebKeyECDSAConfig struct {
@@ -119,6 +142,8 @@ type WebKeyECDSAConfig struct {
 
 func (c WebKeyECDSAConfig) Alg() jose.SignatureAlgorithm {
 	switch c.Curve {
+	case EllipticCurveUnspecified:
+		return ""
 	case EllipticCurveP256:
 		return jose.ES256
 	case EllipticCurveP384:
@@ -126,7 +151,7 @@ func (c WebKeyECDSAConfig) Alg() jose.SignatureAlgorithm {
 	case EllipticCurveP512:
 		return jose.ES512
 	default:
-		return jose.ES256
+		return ""
 	}
 }
 
@@ -134,8 +159,17 @@ func (WebKeyECDSAConfig) Type() WebKeyConfigType {
 	return WebKeyConfigTypeECDSA
 }
 
+func (c WebKeyECDSAConfig) IsValid() error {
+	if !c.Curve.IsAEllipticCurve() || c.Curve == EllipticCurveUnspecified {
+		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-eaz3T", "Errors.WebKey.Config")
+	}
+	return nil
+}
+
 func (c WebKeyECDSAConfig) GetCurve() elliptic.Curve {
 	switch c.Curve {
+	case EllipticCurveUnspecified:
+		return nil
 	case EllipticCurveP256:
 		return elliptic.P256()
 	case EllipticCurveP384:
@@ -143,7 +177,7 @@ func (c WebKeyECDSAConfig) GetCurve() elliptic.Curve {
 	case EllipticCurveP512:
 		return elliptic.P521()
 	default:
-		return elliptic.P256()
+		return nil
 	}
 }
 
@@ -155,6 +189,10 @@ func (WebKeyED25519Config) Alg() jose.SignatureAlgorithm {
 
 func (WebKeyED25519Config) Type() WebKeyConfigType {
 	return WebKeyConfigTypeED25519
+}
+
+func (WebKeyED25519Config) IsValid() error {
+	return nil
 }
 
 func GenerateEncryptedWebKey(keyID string, alg EncryptionAlgorithm, genConfig WebKeyConfig) (encryptedPrivate *CryptoValue, public *jose.JSONWebKey, err error) {
@@ -170,6 +208,9 @@ func GenerateEncryptedWebKey(keyID string, alg EncryptionAlgorithm, genConfig We
 }
 
 func generateWebKey(keyID string, genConfig WebKeyConfig) (private, public *jose.JSONWebKey, err error) {
+	if err = genConfig.IsValid(); err != nil {
+		return nil, nil, err
+	}
 	var key any
 	switch conf := genConfig.(type) {
 	case *WebKeyRSAConfig:
@@ -178,8 +219,6 @@ func generateWebKey(keyID string, genConfig WebKeyConfig) (private, public *jose
 		key, err = ecdsa.GenerateKey(conf.GetCurve(), rand.Reader)
 	case *WebKeyED25519Config:
 		_, key, err = ed25519.GenerateKey(rand.Reader)
-	default:
-		err = zerrors.ThrowInternalf(nil, "CRYPT-aeW6x", "Errors.Internal")
 	}
 	if err != nil {
 		return nil, nil, err
