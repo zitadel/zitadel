@@ -28,6 +28,7 @@ type EventStore interface {
 	FilterToQueryReducer(ctx context.Context, reducer eventstore.QueryReducer) error
 	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
 	Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error)
+	FillFields(ctx context.Context, events ...eventstore.FillFieldsEvent) error
 }
 
 type Config struct {
@@ -542,7 +543,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return []*Statement{stmt}, false, nil
 	}
 
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState))
+	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil {
 		h.log().WithError(err).Debug("filter eventstore failed")
 		return nil, false, err
@@ -554,7 +555,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return nil, false, err
 	}
 
-	idx := skipPreviouslyReduced(statements, currentState)
+	idx := skipPreviouslyReducedStatements(statements, currentState)
 	if idx+1 == len(statements) {
 		currentState.position = statements[len(statements)-1].Position
 		currentState.offset = statements[len(statements)-1].offset
@@ -576,7 +577,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	return statements, additionalIteration, nil
 }
 
-func skipPreviouslyReduced(statements []*Statement, currentState *state) int {
+func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
 	for i, statement := range statements {
 		if statement.Position == currentState.position &&
 			statement.AggregateID == currentState.aggregateID &&
@@ -655,12 +656,11 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 	}
 
 	for aggregateType, eventTypes := range h.eventTypes {
-		query := builder.
+		builder = builder.
 			AddQuery().
 			AggregateTypes(aggregateType).
-			EventTypes(eventTypes...)
-
-		builder = query.Builder()
+			EventTypes(eventTypes...).
+			Builder()
 	}
 
 	return builder

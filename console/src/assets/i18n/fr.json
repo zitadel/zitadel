@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Paramètres de l'Instance",
-        "DESCRIPTION": "Les paramètres de l'instance sont les paramètres par défaut pour toutes les organisations. Avec les bonnes permissions, certains d'entre eux peuvent être remplacés dans les paramètres de l'organisation."
+        "TITLE": "Paramètres par défaut",
+        "DESCRIPTION": "Paramètres par défaut pour toutes les organisations. Avec les autorisations appropriées, certaines d’entre elles peuvent être remplacées dans les paramètres de l’organisation."
       },
       "ORG": {
         "TITLE": "Paramètres de l'Organisation",
@@ -498,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Afficher l'utilisateur {{value}}"
     },
-    "DOWNLOAD": "Télécharger"
+    "DOWNLOAD": "Télécharger",
+    "APPLY": "Appliquer"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "A le contrôle de toute l'instance, y compris toutes les organisations",
@@ -1317,10 +1318,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Paramètres de l'instance",
-      "DESCRIPTION": "Ces paramètres s'appliqueront à toutes vos organisations, sauf s'ils ont été remplacés."
-    },
     "LIST": {
       "ORGS": "Organisations",
       "FEATURESETTINGS": "Paramètres de fonctionnalité",
@@ -1478,6 +1475,10 @@
         "DISABLED": "Désactivé"
       },
       "INHERITED_DESCRIPTION": "Ce paramètre définit la valeur par défaut du système.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Activé\" est hérité",
+        "DISABLED": "\"Désactivé\" est hérité"
+      },
       "RESET": "Réinitialiser tout sur hérité"
     },
     "DIALOG": {
@@ -1683,7 +1684,8 @@
         "username": "Nom d'utilisateur",
         "tempUsername": "Nom d'utilisateur temporaire",
         "otp": "Mot de passe à usage unique",
-        "verifyUrl": "URL pour vérifier le mot de passe à usage unique"
+        "verifyUrl": "URL pour vérifier le mot de passe à usage unique",
+        "expiry": "Expiration"
       },
       "TOAST": {
         "UPDATED": "Textes personnalisés enregistrés."

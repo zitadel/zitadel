@@ -111,6 +111,10 @@ type Steps struct {
 	s25User11AddLowerFieldsToVerifiedEmail *User11AddLowerFieldsToVerifiedEmail
 	s26AuthUsers3                          *AuthUsers3
 	s27IDPTemplate6SAMLNameIDFormat        *IDPTemplate6SAMLNameIDFormat
+	s28AddFieldTable                       *AddFieldTable
+	s29FillFieldsForProjectGrant           *FillFieldsForProjectGrant
+	s30FillFieldsForOrgDomainVerified      *FillFieldsForOrgDomainVerified
+	s31AddAggregateIndexToFields           *AddAggregateIndexToFields
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

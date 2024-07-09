@@ -443,6 +443,7 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if a.ID == instance.DefaultOrganisationID() {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-wG9p1", "Errors.Org.DefaultOrgNotDeletable")
 			}
+
 			err := c.checkProjectExists(ctx, instance.ProjectID(), a.ID)
 			// if there is no error, the ZITADEL project was found on the org to be deleted
 			if err == nil {
