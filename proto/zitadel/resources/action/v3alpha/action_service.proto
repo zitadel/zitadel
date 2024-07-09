@@ -189,6 +189,67 @@ service ZITADELActions {
     };
   }
 
+  // List targets
+  //
+  // List all matching targets. By default, we will return all targets of your instance.
+  // Make sure to include a limit and sorting for pagination.
+  rpc ListTargets (ListTargetsRequest) returns (ListTargetsResponse) {
+    option (google.api.http) = {
+      post: "/v3alpha/targets/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all targets matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+  // Target by ID
+  //
+  // Returns the target identified by the requested ID.
+  rpc GetTargetByID (GetTargetByIDRequest) returns (GetTargetByIDResponse) {
+    option (google.api.http) = {
+      get: "/v3alpha/targets/{target_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Target successfully retrieved";
+        }
+      };
+    };
+  }
+
   // Sets an execution to call a target or include the targets of another execution.
   //
   // Setting an empty list of targets will remove all targets from the execution, making it a noop.
@@ -222,6 +283,43 @@ service ZITADELActions {
     };
   }
 
+  // List executions
+  //
+  // List all matching executions. By default, we will return all executions of your instance.
+  // Make sure to include a limit and sorting for pagination.
+  rpc ListExecutions (ListExecutionsRequest) returns (ListExecutionsResponse) {
+    option (google.api.http) = {
+      post: "/v3alpha/executions/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all executions matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+  
   // List all available functions
   //
   // List all available functions which can be used as condition for executions.
