@@ -306,20 +306,21 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  public showUser(grant: UserGrant.AsObject) {
-    const org: Org.AsObject = {
-      id: grant.grantedOrgId,
-      name: grant.grantedOrgName,
-      state: OrgState.ORG_STATE_ACTIVE,
-      primaryDomain: grant.grantedOrgDomain,
-    };
+  // TODO: Implement orgId filter on listMyProjectOrgs
 
-    // Check if user has permissions for that org before changing active org
-    if (this.myOrgs.find((org) => org.id === grant.grantedOrgId)) {
-      this.authService.setActiveOrg(org);
-      this.router.navigate(['/users', grant.userId]);
-    } else {
-      this.toast.showInfo('GRANTS.TOAST.CANTSHOWINFO', true);
-    }
-  }
+  // public showUser(grant: UserGrant.AsObject) {
+  //   const org: Org.AsObject = {
+  //     id: grant.grantedOrgId,
+  //     name: grant.grantedOrgName,
+  //     state: OrgState.ORG_STATE_ACTIVE,
+  //     primaryDomain: grant.grantedOrgDomain,
+  //   };
+
+  //   if (this.myOrgs.find((org) => org.id === grant.grantedOrgId)) {
+  //     this.authService.setActiveOrg(org);
+  //     this.router.navigate(['/users', grant.userId]);
+  //   } else {
+  //     this.toast.showInfo('GRANTS.TOAST.CANTSHOWINFO', true);
+  //   }
+  // }
 }
