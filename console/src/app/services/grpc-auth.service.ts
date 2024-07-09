@@ -103,6 +103,8 @@ import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/ge
 import { GrpcService } from './grpc.service';
 import { StorageKey, StorageLocation, StorageService } from './storage.service';
 
+const ORG_LIMIT = 10;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -249,7 +251,7 @@ export class GrpcAuthService {
         this.setActiveOrg(find);
         return Promise.resolve(find);
       } else {
-        const orgs = (await this.listMyProjectOrgs(10, 0)).resultList;
+        const orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
         this.cachedOrgs.next(orgs);
         const toFind = orgs.find((tmp) => tmp.id === id);
         if (toFind) {
@@ -262,7 +264,7 @@ export class GrpcAuthService {
     } else {
       let orgs = this.cachedOrgs.getValue();
       if (orgs.length === 0) {
-        orgs = (await this.listMyProjectOrgs()).resultList;
+        orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
         this.cachedOrgs.next(orgs);
       }
 
@@ -396,7 +398,7 @@ export class GrpcAuthService {
   }
 
   public async revalidateOrgs() {
-    const orgs = (await this.listMyProjectOrgs()).resultList;
+    const orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
     this.cachedOrgs.next(orgs);
   }
 
