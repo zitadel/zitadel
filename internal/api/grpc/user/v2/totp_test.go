@@ -9,9 +9,10 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+
 	"github.com/zitadel/zitadel/internal/domain"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func Test_totpDetailsToPb(t *testing.T) {

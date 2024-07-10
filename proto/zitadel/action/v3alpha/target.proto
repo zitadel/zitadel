@@ -8,7 +8,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2beta/object.proto";
+import "zitadel/object/v2/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha;action";
@@ -36,7 +36,7 @@ message Target {
     }
   ];
   // Details provide some base information (such as the last change date) of the target.
-  zitadel.object.v2beta.Details details = 2;
+  zitadel.object.v2.Details details = 2;
 
   // Unique name of the target.
   string name = 3 [

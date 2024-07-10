@@ -5,13 +5,14 @@ import (
 
 	"google.golang.org/grpc"
 
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var _ user.UserServiceServer = (*Server)(nil)
