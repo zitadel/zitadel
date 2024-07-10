@@ -29,8 +29,8 @@ func ActivityInterceptor() grpc.UnaryServerInterceptor {
 var resourcePrefixes = []string{
 	"/zitadel.management.v1.ManagementService/",
 	"/zitadel.admin.v1.AdminService/",
-	"/zitadel.user.v2beta.UserService/",
-	"/zitadel.settings.v2beta.SettingsService/",
+	"/zitadel.user.v2.UserService/",
+	"/zitadel.settings.v2.SettingsService/",
 	"/zitadel.auth.v1.AuthService/",
 }
 

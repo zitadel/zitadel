@@ -3,9 +3,10 @@ package user
 import (
 	"context"
 
+	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func (s *Server) RegisterTOTP(ctx context.Context, req *user.RegisterTOTPRequest) (*user.RegisterTOTPResponse, error) {

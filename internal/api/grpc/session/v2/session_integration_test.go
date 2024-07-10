@@ -23,9 +23,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 var (
