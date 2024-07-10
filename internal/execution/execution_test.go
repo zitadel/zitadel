@@ -1,8 +1,10 @@
 package execution
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -13,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 var _ Target = &mockTarget{}
@@ -344,4 +347,78 @@ func Test_CallTarget(t *testing.T) {
 			assert.Equal(t, tt.res.body, respBody)
 		})
 	}
+}
+
+func Test_handleResponse(t *testing.T) {
+	type args struct {
+		resp *http.Response
+	}
+	type res struct {
+		data    []byte
+		wantErr func(error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			"response, statuscode > 400",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusForbidden,
+					Body:       io.NopCloser(bytes.NewReader([]byte(""))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+				},
+			},
+		},
+		{
+			"response, statuscode > 400 and body",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusForbidden,
+					Body:       io.NopCloser(bytes.NewReader([]byte("body"))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+				}},
+		},
+		{
+			"response, statuscode = 200 and body",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewReader([]byte("body"))),
+				},
+			},
+			res{
+				data:    []byte("body"),
+				wantErr: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			respBody, err := handleResponse(
+				tt.args.resp,
+			)
+
+			if tt.res.wantErr == nil {
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+			} else if !tt.res.wantErr(err) {
+				t.Errorf("got wrong err: %v", err)
+				return
+			}
+			assert.Equal(t, tt.res.data, respBody)
+		})
+	}
+
 }
