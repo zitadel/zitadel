@@ -7,7 +7,7 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2beta/object.proto";
+import "zitadel/object/v2/object.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v3alpha";
 
@@ -167,7 +167,7 @@ message AuthenticationKey {
       example: "\"69629023906488334\"";
     }
   ];
-  zitadel.object.v2beta.Details details = 2;
+  zitadel.object.v2.Details details = 2;
   // the file type of the key
   AuthNKeyType type = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

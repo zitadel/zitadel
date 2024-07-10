@@ -8,7 +8,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2beta/object.proto";
+import "zitadel/object/v2/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/user/schema/v3alpha/user_schema.proto";
 
@@ -299,7 +299,7 @@ service UserSchemaService {
 
 message ListUserSchemasRequest {
   // list limitations and ordering.
-  zitadel.object.v2beta.ListQuery query = 1;
+  zitadel.object.v2.ListQuery query = 1;
   // the field the result is sorted.
   zitadel.user.schema.v3alpha.FieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -312,7 +312,7 @@ message ListUserSchemasRequest {
 
 message ListUserSchemasResponse {
   // Details provides information about the returned result including total amount found.
-  zitadel.object.v2beta.ListDetails details = 1;
+  zitadel.object.v2.ListDetails details = 1;
   // States by which field the results are sorted.
   zitadel.user.schema.v3alpha.FieldName sorting_column = 2;
   // The result contains the user schemas, which matched the queries.
@@ -376,7 +376,7 @@ message CreateUserSchemaResponse {
   // ID is the read-only unique identifier of the schema.
   string id = 1;
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2beta.Details details = 2;
+  zitadel.object.v2.Details details = 2;
 }
 
 
@@ -416,7 +416,7 @@ message UpdateUserSchemaRequest {
 
 message UpdateUserSchemaResponse {
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message DeactivateUserSchemaRequest {
@@ -426,7 +426,7 @@ message DeactivateUserSchemaRequest {
 
 message DeactivateUserSchemaResponse {
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message ReactivateUserSchemaRequest {
@@ -436,7 +436,7 @@ message ReactivateUserSchemaRequest {
 
 message ReactivateUserSchemaResponse {
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message DeleteUserSchemaRequest {
@@ -446,7 +446,7 @@ message DeleteUserSchemaRequest {
 
 message DeleteUserSchemaResponse {
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 

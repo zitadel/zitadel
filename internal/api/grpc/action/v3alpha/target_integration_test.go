@@ -17,7 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 )
 
 func TestServer_CreateTarget(t *testing.T) {

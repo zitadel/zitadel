@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package zitadel.user.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+message SetHumanEmail {
+  string email = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200, email: true},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"mini@mouse.com\"";
+    }
+  ];
+  // if no verification is specified, an email is sent with the default url
+  oneof verification {
+    SendEmailVerificationCode send_code = 2;
+    ReturnEmailVerificationCode return_code = 3;
+    bool is_verified = 4 [(validate.rules).bool.const = true];
+  }
+}
+
+message HumanEmail {
+  string email = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"mini@mouse.com\"";
+    }
+  ];
+  bool is_verified = 2;
+}
+
+message SendEmailVerificationCode {
+  optional string url_template = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}\"";
+      description: "\"Optionally set a url_template, which will be used in the verification mail sent by ZITADEL to guide the user to your verification page. If no template is set, the default ZITADEL url will be used.\""
+    }
+  ];
+}
+
+message ReturnEmailVerificationCode {}
+

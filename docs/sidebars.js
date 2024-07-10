@@ -612,7 +612,7 @@ module.exports = {
         },
         {
           type: "category",
-          label: "V2 (Beta)",
+          label: "V2 (General Available)",
           collapsed: false,
           link: {
             type: "doc",
@@ -621,71 +621,61 @@ module.exports = {
           items: [
             {
               type: "category",
-              label: "User Lifecycle (Beta)",
+              label: "User Lifecycle",
               link: {
                 type: "generated-index",
-                title: "User Service API (Beta)",
+                title: "User Service API",
                 slug: "/apis/resources/user_service",
                 description:
-                  "This API is intended to manage users in a ZITADEL instance.\n" +
-                  "\n" +
-                  "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+                  "This API is intended to manage users in a ZITADEL instance.\n"
               },
               items: require("./docs/apis/resources/user_service/sidebar.ts"),
             },
             {
               type: "category",
-              label: "Session Lifecycle (Beta)",
+              label: "Session Lifecycle",
               link: {
                 type: "generated-index",
-                title: "Session Service API (Beta)",
+                title: "Session Service API",
                 slug: "/apis/resources/session_service",
                 description:
-                  "This API is intended to manage sessions in a ZITADEL instance.\n" +
-                  "\n" +
-                  "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+                  "This API is intended to manage sessions in a ZITADEL instance.\n"
               },
               items: require("./docs/apis/resources/session_service/sidebar.ts"),
             },
             {
               type: "category",
-              label: "OIDC Lifecycle (Beta)",
+              label: "OIDC Lifecycle",
               link: {
                 type: "generated-index",
-                title: "OIDC Service API (Beta)",
+                title: "OIDC Service API",
                 slug: "/apis/resources/oidc_service",
                 description:
-                  "Get OIDC Auth Request details and create callback URLs.\n" +
-                  "\n" +
-                  "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
+                  "Get OIDC Auth Request details and create callback URLs.\n"
               },
               items: require("./docs/apis/resources/oidc_service/sidebar.ts"),
             },
             {
               type: "category",
-              label: "Settings Lifecycle (Beta)",
+              label: "Settings Lifecycle",
               link: {
                 type: "generated-index",
-                title: "Settings Service API (Beta)",
+                title: "Settings Service API",
                 slug: "/apis/resources/settings_service",
                 description:
-                  "This API is intended to manage settings in a ZITADEL instance.\n" +
-                  "\n" +
-                  "This project is in beta state. It can AND will continue to break until the services provide the same functionality as the current login.",
+                  "This API is intended to manage settings in a ZITADEL instance.\n"
               },
               items: require("./docs/apis/resources/settings_service/sidebar.ts"),
             },
             {
               type: "category",
-              label: "Feature Lifecycle (Beta)",
+              label: "Feature Lifecycle",
               link: {
                 type: "generated-index",
-                title: "Feature Service API (Beta)",
+                title: "Feature Service API",
                 slug: "/apis/resources/feature_service",
                 description:
-                  'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n' +
-                  "\n" +
-                  "This project is in beta state. It can AND will continue breaking until a stable version is released.",
+                  'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n'
               },
               items: require("./docs/apis/resources/feature_service_v2/sidebar.ts"),
             },

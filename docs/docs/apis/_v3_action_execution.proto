@@ -52,7 +52,7 @@ message RequestExecution {
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
         max_length: 1000,
-        example: "\"/zitadel.session.v2beta.SessionService/ListSessions\"";
+        example: "\"/zitadel.session.v2.SessionService/ListSessions\"";
       }
     ];
     // GRPC-service as condition.
@@ -61,7 +61,7 @@ message RequestExecution {
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
         max_length: 1000,
-        example: "\"zitadel.session.v2beta.SessionService\"";
+        example: "\"zitadel.session.v2.SessionService\"";
       }
     ];
     // All calls to any available services and methods as condition.
@@ -78,7 +78,7 @@ message ResponseExecution {
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
         max_length: 1000,
-        example: "\"/zitadel.session.v2beta.SessionService/ListSessions\"";
+        example: "\"/zitadel.session.v2.SessionService/ListSessions\"";
       }
     ];
     // GRPC-service as condition.
@@ -87,7 +87,7 @@ message ResponseExecution {
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
         max_length: 1000,
-        example: "\"zitadel.session.v2beta.SessionService\"";
+        example: "\"zitadel.session.v2.SessionService\"";
       }
     ];
     // All calls to any available services and methods as condition.
