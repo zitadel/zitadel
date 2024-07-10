@@ -12,7 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 )
 
 func executionTargetsSingleTarget(id string) []*action.ExecutionTargetType {
@@ -69,7 +69,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Method{
-								Method: "/zitadel.session.v2beta.NotExistingService/List",
+								Method: "/zitadel.session.v2.NotExistingService/List",
 							},
 						},
 					},
@@ -86,7 +86,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/ListSessions",
+								Method: "/zitadel.session.v2.SessionService/ListSessions",
 							},
 						},
 					},
@@ -125,7 +125,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Service{
-								Service: "zitadel.session.v2beta.SessionService",
+								Service: "zitadel.session.v2.SessionService",
 							},
 						},
 					},
@@ -200,7 +200,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 		ConditionType: &action.Condition_Request{
 			Request: &action.RequestExecution{
 				Condition: &action.RequestExecution_Service{
-					Service: "zitadel.session.v2beta.SessionService",
+					Service: "zitadel.session.v2.SessionService",
 				},
 			},
 		},
@@ -213,7 +213,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 		ConditionType: &action.Condition_Request{
 			Request: &action.RequestExecution{
 				Condition: &action.RequestExecution_Method{
-					Method: "/zitadel.session.v2beta.SessionService/ListSessions",
+					Method: "/zitadel.session.v2.SessionService/ListSessions",
 				},
 			},
 		},
@@ -247,7 +247,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/ListSessions",
+								Method: "/zitadel.session.v2.SessionService/ListSessions",
 							},
 						},
 					},
@@ -269,7 +269,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Service{
-								Service: "zitadel.session.v2beta.SessionService",
+								Service: "zitadel.session.v2.SessionService",
 							},
 						},
 					},
@@ -347,7 +347,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/NotExisting",
+								Method: "/zitadel.session.v2.SessionService/NotExisting",
 							},
 						},
 					},
@@ -367,7 +367,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/GetSession",
+								Method: "/zitadel.session.v2.SessionService/GetSession",
 							},
 						},
 					},
@@ -408,7 +408,7 @@ func TestServer_DeleteExecution_Request(t *testing.T) {
 					ConditionType: &action.Condition_Request{
 						Request: &action.RequestExecution{
 							Condition: &action.RequestExecution_Service{
-								Service: "zitadel.user.v2beta.UserService",
+								Service: "zitadel.user.v2.UserService",
 							},
 						},
 					},
@@ -512,7 +512,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ConditionType: &action.Condition_Response{
 						Response: &action.ResponseExecution{
 							Condition: &action.ResponseExecution_Method{
-								Method: "/zitadel.session.v2beta.NotExistingService/List",
+								Method: "/zitadel.session.v2.NotExistingService/List",
 							},
 						},
 					},
@@ -529,7 +529,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ConditionType: &action.Condition_Response{
 						Response: &action.ResponseExecution{
 							Condition: &action.ResponseExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/ListSessions",
+								Method: "/zitadel.session.v2.SessionService/ListSessions",
 							},
 						},
 					},
@@ -568,7 +568,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ConditionType: &action.Condition_Response{
 						Response: &action.ResponseExecution{
 							Condition: &action.ResponseExecution_Service{
-								Service: "zitadel.session.v2beta.SessionService",
+								Service: "zitadel.session.v2.SessionService",
 							},
 						},
 					},
@@ -670,7 +670,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 					ConditionType: &action.Condition_Response{
 						Response: &action.ResponseExecution{
 							Condition: &action.ResponseExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/NotExisting",
+								Method: "/zitadel.session.v2.SessionService/NotExisting",
 							},
 						},
 					},
@@ -690,7 +690,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 					ConditionType: &action.Condition_Response{
 						Response: &action.ResponseExecution{
 							Condition: &action.ResponseExecution_Method{
-								Method: "/zitadel.session.v2beta.SessionService/GetSession",
+								Method: "/zitadel.session.v2.SessionService/GetSession",
 							},
 						},
 					},
@@ -731,7 +731,7 @@ func TestServer_DeleteExecution_Response(t *testing.T) {
 					ConditionType: &action.Condition_Response{
 						Response: &action.ResponseExecution{
 							Condition: &action.ResponseExecution_Service{
-								Service: "zitadel.user.v2beta.UserService",
+								Service: "zitadel.user.v2.UserService",
 							},
 						},
 					},

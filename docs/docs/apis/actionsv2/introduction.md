@@ -70,16 +70,16 @@ The API documentation to set an Execution can be found [here](/apis/resources/ac
 ### Condition Best Match
 
 As the conditions can be defined on different levels, ZITADEL tries to find out which Execution is the best match.
-This means that for example if you have an Execution defined on `all requests`, on the service `zitadel.user.v2beta.UserService` and on `/zitadel.user.v2beta.UserService/AddHumanUser`,
-ZITADEL would with a call on the `/zitadel.user.v2beta.UserService/AddHumanUser` use the Executions with the following priority:
+This means that for example if you have an Execution defined on `all requests`, on the service `zitadel.user.v2.UserService` and on `/zitadel.user.v2.UserService/AddHumanUser`,
+ZITADEL would with a call on the `/zitadel.user.v2.UserService/AddHumanUser` use the Executions with the following priority:
 
-1. `/zitadel.user.v2beta.UserService/AddHumanUser`
-2. `zitadel.user.v2beta.UserService`
+1. `/zitadel.user.v2.UserService/AddHumanUser`
+2. `zitadel.user.v2.UserService`
 3. `all`
 
-If you then have a call on `/zitadel.user.v2beta.UserService/UpdateHumanUser` the following priority would be found:
+If you then have a call on `/zitadel.user.v2.UserService/UpdateHumanUser` the following priority would be found:
 
-1. `zitadel.user.v2beta.UserService`
+1. `zitadel.user.v2.UserService`
 2. `all`
 
 And if you use a different service, for example `zitadel.session.v2.SessionService`, then the `all` Execution would still be used.
@@ -100,7 +100,7 @@ If you define 2 Executions as follows:
 {
   "condition": {
     "request": {
-      "service": "zitadel.user.v2beta.UserService"
+      "service": "zitadel.user.v2.UserService"
     }
   },
   "targets": [
@@ -115,7 +115,7 @@ If you define 2 Executions as follows:
 {
   "condition": {
     "request": {
-      "method": "/zitadel.user.v2beta.UserService/AddHumanUser"
+      "method": "/zitadel.user.v2.UserService/AddHumanUser"
     }
   },
   "targets": [
@@ -125,7 +125,7 @@ If you define 2 Executions as follows:
     {
       "include": {
         "request": {
-          "service": "zitadel.user.v2beta.UserService"
+          "service": "zitadel.user.v2.UserService"
         }
       }
     }
@@ -133,7 +133,7 @@ If you define 2 Executions as follows:
 }
 ```
 
-The called Targets on "/zitadel.user.v2beta.UserService/AddHumanUser" would be, in order:
+The called Targets on "/zitadel.user.v2.UserService/AddHumanUser" would be, in order:
 
 1. `<TargetID2>`
 2. `<TargetID1>`
@@ -147,8 +147,8 @@ For Request and Response there are 3 levels the condition can be defined:
 - `All`, handling any request or response under the ZITADEL API
 
 The available conditions can be found under:
-- [All available Methods](/apis/resources/action_service_v3/action-service-list-execution-methods), for example `/zitadel.user.v2beta.UserService/AddHumanUser`
-- [All available Services](/apis/resources/action_service_v3/action-service-list-execution-services), for example `zitadel.user.v2beta.UserService`
+- [All available Methods](/apis/resources/action_service_v3/action-service-list-execution-methods), for example `/zitadel.user.v2.UserService/AddHumanUser`
+- [All available Services](/apis/resources/action_service_v3/action-service-list-execution-services), for example `zitadel.user.v2.UserService`
 
 ### Condition for Functions
 

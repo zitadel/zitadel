@@ -279,7 +279,7 @@ module.exports = {
             },
           },
           user: {
-            specPath: ".artifacts/openapi/zitadel/user/v2beta/user_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/user/v2/user_service.swagger.json",
             outputDir: "docs/apis/resources/user_service",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -287,7 +287,7 @@ module.exports = {
             },
           },
           session: {
-            specPath: ".artifacts/openapi/zitadel/session/v2beta/session_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/session/v2/session_service.swagger.json",
             outputDir: "docs/apis/resources/session_service",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -295,7 +295,7 @@ module.exports = {
             },
           },
           oidc: {
-            specPath: ".artifacts/openapi/zitadel/oidc/v2beta/oidc_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/oidc/v2/oidc_service.swagger.json",
             outputDir: "docs/apis/resources/oidc_service",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -303,7 +303,7 @@ module.exports = {
             },
           },
           settings: {
-            specPath: ".artifacts/openapi/zitadel/settings/v2beta/settings_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/settings/v2/settings_service.swagger.json",
             outputDir: "docs/apis/resources/settings_service",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -335,7 +335,7 @@ module.exports = {
             },
           },
           feature_v2: {
-            specPath: ".artifacts/openapi/zitadel/feature/v2beta/feature_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/feature/v2/feature_service.swagger.json",
             outputDir: "docs/apis/resources/feature_service_v2",
             sidebarOptions: {
                 groupPathsBy: "tag",

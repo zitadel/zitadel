@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package zitadel.user.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+message SetHumanPhone {
+    string phone = 1 [
+        (validate.rules).string = {min_len: 0, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"+41791234567\"";
+        }
+    ];
+    oneof verification {
+        SendPhoneVerificationCode send_code = 2;
+        ReturnPhoneVerificationCode return_code = 3;
+        bool is_verified = 4 [(validate.rules).bool.const = true];
+    }
+}
+
+message HumanPhone {
+    string phone = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"+41791234567\"";
+        }
+    ];
+    bool is_verified = 2;
+}
+
+message SendPhoneVerificationCode {}
+
+message ReturnPhoneVerificationCode {}
+
