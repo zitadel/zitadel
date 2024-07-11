@@ -356,7 +356,11 @@ service UserService {
 
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
     option (google.api.http) = {
+<<<<<<<< HEAD:proto/zitadel/user/v2beta/user_service.proto
       put: "/v2beta/users/{user_id}"
+========
+      put: "/v2/users/human/{user_id}"
+>>>>>>>> 382cfd053 (feat: api v2beta to api v2):proto/zitadel/user/v2/user_service.proto
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
