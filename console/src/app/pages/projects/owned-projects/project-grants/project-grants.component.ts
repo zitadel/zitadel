@@ -6,15 +6,13 @@ import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
-import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
+import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { ProjectGrantsDataSource } from './project-grants-datasource';
-
-const ROUTEPARAM = 'projectid';
 
 @Component({
   selector: 'cnsl-project-grants',
@@ -28,7 +26,9 @@ const ROUTEPARAM = 'projectid';
     ]),
   ],
 })
-export class ProjectGrantsComponent implements OnInit, AfterViewInit {
+export class ProjectGrantsComponent implements OnInit {
+  public INITIAL_PAGESIZE: number = 10;
+
   @Input() public projectId: string = '';
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<GrantedProject.AsObject>;
@@ -51,16 +51,12 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
   }
 
   public ngOnInit(): void {
-    this.dataSource.loadGrants(this.projectId, 0, 25, 'asc');
+    this.dataSource.loadGrants(this.projectId, 0, this.INITIAL_PAGESIZE);
     this.getRoleOptions(this.projectId);
   }
 
-  public ngAfterViewInit(): void {
-    this.paginator.page.pipe(tap(() => this.loadGrantsPage())).subscribe();
-  }
-
-  public loadGrantsPage(pageIndex?: number, pageSize?: number): void {
-    this.dataSource.loadGrants(this.projectId, pageIndex ?? this.paginator.pageIndex, pageSize ?? this.paginator.pageSize);
+  public loadGrantsPage(event: PageEvent): void {
+    this.dataSource.loadGrants(this.projectId, event.pageIndex, event.pageSize);
   }
 
   public isAllSelected(): boolean {
@@ -90,6 +86,11 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
       .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  public refreshPage(): void {
+    this.selection.clear();
+    this.dataSource.loadGrants(this.projectId, this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
   public deleteGrant(grant: GrantedProject.AsObject): void {
