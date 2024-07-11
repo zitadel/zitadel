@@ -1,16 +1,16 @@
 syntax = "proto3";
 
-package zitadel.user.v2;
+package zitadel.user.v2beta;
 
-import "zitadel/object/v2/object.proto";
+import "zitadel/object/v2beta/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/user/v2/auth.proto";
-import "zitadel/user/v2/email.proto";
-import "zitadel/user/v2/phone.proto";
-import "zitadel/user/v2/idp.proto";
-import "zitadel/user/v2/password.proto";
-import "zitadel/user/v2/user.proto";
-import "zitadel/user/v2/query.proto";
+import "zitadel/user/v2beta/auth.proto";
+import "zitadel/user/v2beta/email.proto";
+import "zitadel/user/v2beta/phone.proto";
+import "zitadel/user/v2beta/idp.proto";
+import "zitadel/user/v2beta/password.proto";
+import "zitadel/user/v2beta/user.proto";
+import "zitadel/user/v2beta/query.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
@@ -18,13 +18,13 @@ import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2beta;user";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
-    version: "2.0";
-    description: "This API is intended to manage users in a ZITADEL instance.";
+    version: "2.0-beta";
+    description: "This API is intended to manage users in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -113,7 +113,7 @@ service UserService {
   // Create a new human user
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
     option (google.api.http) = {
-      post: "/v2/users/human"
+      post: "/v2beta/users/human"
       body: "*"
     };
 
@@ -142,7 +142,7 @@ service UserService {
 
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
     option (google.api.http) = {
-      get: "/v2/users/{user_id}"
+      get: "/v2beta/users/{user_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -168,7 +168,7 @@ service UserService {
 
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option (google.api.http) = {
-      post: "/v2/users"
+      post: "/v2beta/users"
       body: "*"
     };
 
@@ -207,7 +207,7 @@ service UserService {
   // Change the email of a user
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/email"
+      post: "/v2beta/users/{user_id}/email"
       body: "*"
     };
 
@@ -233,7 +233,7 @@ service UserService {
   // Resend code to verify user email
   rpc ResendEmailCode (ResendEmailCodeRequest) returns (ResendEmailCodeResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/email/resend"
+      post: "/v2beta/users/{user_id}/email/resend"
       body: "*"
     };
 
@@ -258,7 +258,7 @@ service UserService {
   // Verify the email with the provided code
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/email/verify"
+      post: "/v2beta/users/{user_id}/email/verify"
       body: "*"
     };
 
@@ -283,7 +283,7 @@ service UserService {
   // Change the phone of a user
   rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/phone"
+      post: "/v2beta/users/{user_id}/phone"
       body: "*"
     };
 
@@ -307,7 +307,7 @@ service UserService {
 
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/phone/resend"
+      post: "/v2beta/users/{user_id}/phone/resend"
       body: "*"
     };
 
@@ -332,7 +332,7 @@ service UserService {
   // Verify the phone with the provided code
   rpc VerifyPhone (VerifyPhoneRequest) returns (VerifyPhoneResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/phone/verify"
+      post: "/v2beta/users/{user_id}/phone/verify"
       body: "*"
     };
 
@@ -356,7 +356,7 @@ service UserService {
 
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
     option (google.api.http) = {
-      put: "/v2/users/human/{user_id}"
+      put: "/v2beta/users/{user_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -379,7 +379,7 @@ service UserService {
 
   rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/deactivate"
+      post: "/v2beta/users/{user_id}/deactivate"
       body: "*"
     };
 
@@ -403,7 +403,7 @@ service UserService {
 
   rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/reactivate"
+      post: "/v2beta/users/{user_id}/reactivate"
       body: "*"
     };
 
@@ -427,7 +427,7 @@ service UserService {
 
   rpc LockUser(LockUserRequest) returns (LockUserResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/lock"
+      post: "/v2beta/users/{user_id}/lock"
       body: "*"
     };
 
@@ -451,7 +451,7 @@ service UserService {
 
   rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/unlock"
+      post: "/v2beta/users/{user_id}/unlock"
       body: "*"
     };
 
@@ -475,7 +475,7 @@ service UserService {
 
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
-      delete: "/v2/users/{user_id}"
+      delete: "/v2beta/users/{user_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -498,7 +498,7 @@ service UserService {
 
   rpc RegisterPasskey (RegisterPasskeyRequest) returns (RegisterPasskeyResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/passkeys"
+      post: "/v2beta/users/{user_id}/passkeys"
       body: "*"
     };
 
@@ -520,7 +520,7 @@ service UserService {
   }
   rpc VerifyPasskeyRegistration (VerifyPasskeyRegistrationRequest) returns (VerifyPasskeyRegistrationResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/passkeys/{passkey_id}"
+      post: "/v2beta/users/{user_id}/passkeys/{passkey_id}"
       body: "*"
     };
 
@@ -542,7 +542,7 @@ service UserService {
   }
   rpc CreatePasskeyRegistrationLink (CreatePasskeyRegistrationLinkRequest) returns (CreatePasskeyRegistrationLinkResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/passkeys/registration_link"
+      post: "/v2beta/users/{user_id}/passkeys/registration_link"
       body: "*"
     };
 
@@ -565,7 +565,7 @@ service UserService {
 
   rpc RegisterU2F (RegisterU2FRequest) returns (RegisterU2FResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/u2f"
+      post: "/v2beta/users/{user_id}/u2f"
       body: "*"
     };
 
@@ -588,7 +588,7 @@ service UserService {
 
   rpc VerifyU2FRegistration (VerifyU2FRegistrationRequest) returns (VerifyU2FRegistrationResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/u2f/{u2f_id}"
+      post: "/v2beta/users/{user_id}/u2f/{u2f_id}"
       body: "*"
     };
 
@@ -611,7 +611,7 @@ service UserService {
 
   rpc RegisterTOTP (RegisterTOTPRequest) returns (RegisterTOTPResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/totp"
+      post: "/v2beta/users/{user_id}/totp"
       body: "*"
     };
 
@@ -634,7 +634,7 @@ service UserService {
 
   rpc VerifyTOTPRegistration (VerifyTOTPRegistrationRequest) returns (VerifyTOTPRegistrationResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/totp/verify"
+      post: "/v2beta/users/{user_id}/totp/verify"
       body: "*"
     };
 
@@ -657,7 +657,7 @@ service UserService {
 
   rpc RemoveTOTP (RemoveTOTPRequest) returns (RemoveTOTPResponse) {
     option (google.api.http) = {
-      delete: "/v2/users/{user_id}/totp"
+      delete: "/v2beta/users/{user_id}/totp"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -679,7 +679,7 @@ service UserService {
 
   rpc AddOTPSMS (AddOTPSMSRequest) returns (AddOTPSMSResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/otp_sms"
+      post: "/v2beta/users/{user_id}/otp_sms"
       body: "*"
     };
 
@@ -702,7 +702,7 @@ service UserService {
 
   rpc RemoveOTPSMS (RemoveOTPSMSRequest) returns (RemoveOTPSMSResponse) {
     option (google.api.http) = {
-      delete: "/v2/users/{user_id}/otp_sms"
+      delete: "/v2beta/users/{user_id}/otp_sms"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -724,7 +724,7 @@ service UserService {
 
   rpc AddOTPEmail (AddOTPEmailRequest) returns (AddOTPEmailResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/otp_email"
+      post: "/v2beta/users/{user_id}/otp_email"
       body: "*"
     };
 
@@ -747,7 +747,7 @@ service UserService {
 
   rpc RemoveOTPEmail (RemoveOTPEmailRequest) returns (RemoveOTPEmailResponse) {
     option (google.api.http) = {
-      delete: "/v2/users/{user_id}/otp_email"
+      delete: "/v2beta/users/{user_id}/otp_email"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -770,7 +770,7 @@ service UserService {
   // Start an IDP authentication (for external login, registration or linking)
   rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v2/idp_intents"
+      post: "/v2beta/idp_intents"
       body: "*"
     };
 
@@ -794,7 +794,7 @@ service UserService {
 
   rpc RetrieveIdentityProviderIntent (RetrieveIdentityProviderIntentRequest) returns (RetrieveIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v2/idp_intents/{idp_intent_id}"
+      post: "/v2beta/idp_intents/{idp_intent_id}"
       body: "*"
     };
 
@@ -819,7 +819,7 @@ service UserService {
   // Link an IDP to an existing user
   rpc AddIDPLink (AddIDPLinkRequest) returns (AddIDPLinkResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/links"
+      post: "/v2beta/users/{user_id}/links"
       body: "*"
     };
 
@@ -844,7 +844,7 @@ service UserService {
   // Request password reset
   rpc PasswordReset (PasswordResetRequest) returns (PasswordResetResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/password_reset"
+      post: "/v2beta/users/{user_id}/password_reset"
       body: "*"
     };
 
@@ -869,7 +869,7 @@ service UserService {
   // Change password
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
-      post: "/v2/users/{user_id}/password"
+      post: "/v2beta/users/{user_id}/password"
       body: "*"
     };
 
@@ -894,7 +894,7 @@ service UserService {
   // List all possible authentication methods of a user
   rpc ListAuthenticationMethodTypes (ListAuthenticationMethodTypesRequest) returns (ListAuthenticationMethodTypesResponse) {
     option (google.api.http) = {
-      get: "/v2/users/{user_id}/authentication_methods"
+      get: "/v2beta/users/{user_id}/authentication_methods"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -937,7 +937,7 @@ message AddHumanUserRequest{
       example: "\"minnie-mouse\"";
     }
   ];
-  zitadel.object.v2.Organization organization = 11;
+  zitadel.object.v2beta.Organization organization = 11;
   SetHumanProfile profile = 4 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED
@@ -968,7 +968,7 @@ message AddHumanUserRequest{
 
 message AddHumanUserResponse {
   string user_id = 1;
-  zitadel.object.v2.Details details = 2;
+  zitadel.object.v2beta.Details details = 2;
   optional string email_code = 3;
   optional string phone_code = 4;
 }
@@ -990,23 +990,23 @@ message GetUserByIDRequest {
 
 message GetUserByIDResponse {
   //deprecated: details is moved into user
-  zitadel.object.v2.Details details = 1;
-  zitadel.user.v2.User user = 2;
+  zitadel.object.v2beta.Details details = 1;
+  zitadel.user.v2beta.User user = 2;
 }
 
 message ListUsersRequest {
   //list limitations and ordering
-  zitadel.object.v2.ListQuery query = 1;
+  zitadel.object.v2beta.ListQuery query = 1;
   // the field the result is sorted
-  zitadel.user.v2.UserFieldName sorting_column = 2;
+  zitadel.user.v2beta.UserFieldName sorting_column = 2;
   //criteria the client is looking for
-  repeated zitadel.user.v2.SearchQuery queries = 3;
+  repeated zitadel.user.v2beta.SearchQuery queries = 3;
 }
 
 message ListUsersResponse {
-  zitadel.object.v2.ListDetails details = 1;
-  zitadel.user.v2.UserFieldName sorting_column = 2;
-  repeated zitadel.user.v2.User result = 3;
+  zitadel.object.v2beta.ListDetails details = 1;
+  zitadel.user.v2beta.UserFieldName sorting_column = 2;
+  repeated zitadel.user.v2beta.User result = 3;
 }
 
 message SetEmailRequest{
@@ -1037,7 +1037,7 @@ message SetEmailRequest{
 }
 
 message SetEmailResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -1060,7 +1060,7 @@ message ResendEmailCodeRequest{
 }
 
 message ResendEmailCodeResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -1088,7 +1088,7 @@ message VerifyEmailRequest{
 }
 
 message VerifyEmailResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message SetPhoneRequest{
@@ -1119,7 +1119,7 @@ message SetPhoneRequest{
 }
 
 message SetPhoneResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -1142,7 +1142,7 @@ message ResendPhoneCodeRequest{
 }
 
 message ResendPhoneCodeResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -1170,7 +1170,7 @@ message VerifyPhoneRequest{
 }
 
 message VerifyPhoneResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message DeleteUserRequest {
@@ -1185,7 +1185,7 @@ message DeleteUserRequest {
 }
 
 message DeleteUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message UpdateHumanUserRequest{
@@ -1212,7 +1212,7 @@ message UpdateHumanUserRequest{
 }
 
 message UpdateHumanUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   optional string email_code = 2;
   optional string phone_code = 3;
 }
@@ -1230,7 +1230,7 @@ message DeactivateUserRequest {
 }
 
 message DeactivateUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 
@@ -1247,7 +1247,7 @@ message ReactivateUserRequest {
 }
 
 message ReactivateUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message LockUserRequest {
@@ -1263,7 +1263,7 @@ message LockUserRequest {
 }
 
 message LockUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message UnlockUserRequest {
@@ -1279,7 +1279,7 @@ message UnlockUserRequest {
 }
 
 message UnlockUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message RegisterPasskeyRequest{
@@ -1310,7 +1310,7 @@ message RegisterPasskeyRequest{
 }
 
 message RegisterPasskeyResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   string passkey_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432705\""
@@ -1365,7 +1365,7 @@ message VerifyPasskeyRegistrationRequest{
 }
 
 message VerifyPasskeyRegistrationResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message RegisterU2FRequest{
@@ -1386,7 +1386,7 @@ message RegisterU2FRequest{
 }
 
 message RegisterU2FResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   string u2f_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432705\""
@@ -1441,7 +1441,7 @@ message VerifyU2FRegistrationRequest{
 }
 
 message VerifyU2FRegistrationResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message RegisterTOTPRequest {
@@ -1457,7 +1457,7 @@ message RegisterTOTPRequest {
 }
 
 message RegisterTOTPResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   string uri = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"otpauth://totp/ZITADEL:gigi@acme.zitadel.cloud?algorithm=SHA1&digits=6&issuer=ZITADEL&period=30&secret=TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
@@ -1491,7 +1491,7 @@ message VerifyTOTPRegistrationRequest {
 }
 
 message VerifyTOTPRegistrationResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message RemoveTOTPRequest {
@@ -1507,7 +1507,7 @@ message RemoveTOTPRequest {
 }
 
 message RemoveTOTPResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message AddOTPSMSRequest {
@@ -1523,7 +1523,7 @@ message AddOTPSMSRequest {
 }
 
 message AddOTPSMSResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message RemoveOTPSMSRequest {
@@ -1539,7 +1539,7 @@ message RemoveOTPSMSRequest {
 }
 
 message RemoveOTPSMSResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message AddOTPEmailRequest {
@@ -1555,7 +1555,7 @@ message AddOTPEmailRequest {
 }
 
 message AddOTPEmailResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message RemoveOTPEmailRequest {
@@ -1571,7 +1571,7 @@ message RemoveOTPEmailRequest {
 }
 
 message RemoveOTPEmailResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message CreatePasskeyRegistrationLinkRequest{
@@ -1592,7 +1592,7 @@ message CreatePasskeyRegistrationLinkRequest{
 }
 
 message CreatePasskeyRegistrationLinkResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   // in case the medium was set to return_code, the code will be returned
   optional PasskeyRegistrationCode code = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1619,7 +1619,7 @@ message StartIdentityProviderIntentRequest{
 }
 
 message StartIdentityProviderIntentResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   oneof next_step {
     string auth_url = 2 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1662,7 +1662,7 @@ message RetrieveIdentityProviderIntentRequest{
 }
 
 message RetrieveIdentityProviderIntentResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   IDPInformation idp_information = 2;
   string user_id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1686,7 +1686,7 @@ message AddIDPLinkRequest{
 }
 
 message AddIDPLinkResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 
@@ -1708,7 +1708,7 @@ message PasswordResetRequest{
 }
 
 message PasswordResetResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
   // in case the medium was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -1750,7 +1750,7 @@ message SetPasswordRequest{
 }
 
 message SetPasswordResponse{
-  zitadel.object.v2.Details details = 1;
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message ListAuthenticationMethodTypesRequest{
@@ -1766,7 +1766,7 @@ message ListAuthenticationMethodTypesRequest{
 }
 
 message ListAuthenticationMethodTypesResponse{
-  zitadel.object.v2.ListDetails details = 1;
+  zitadel.object.v2beta.ListDetails details = 1;
   repeated AuthenticationMethodType auth_method_types = 2;
 }
 

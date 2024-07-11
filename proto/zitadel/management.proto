@@ -280,6 +280,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/ListUsers, with InUserIDQuery
     rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
         option (google.api.http) = {
             get: "/users/{id}"
@@ -293,6 +294,7 @@ service ManagementService {
             summary: "User by ID";
             description: "Returns the full user object (human or machine) including the profile, email, etc."
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -310,6 +312,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/ListUsers, with LoginNameQuery
     rpc GetUserByLoginNameGlobal(GetUserByLoginNameGlobalRequest) returns (GetUserByLoginNameGlobalResponse) {
         option (google.api.http) = {
             get: "/global/users/_by_login_name"
@@ -324,6 +327,7 @@ service ManagementService {
             description: "Get a user by login name searched over all organizations. The request only returns data if the login name matches exactly."
             tags: "Users";
             tags: "Global";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -333,6 +337,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/ListUsers
     rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
         option (google.api.http) = {
             post: "/users/_search"
@@ -345,6 +350,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
+            deprecated: true;
             summary: "Search Users";
             description: "Search for users within an organization. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination."
             parameters: {
@@ -400,6 +406,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/ListUsers, is unique when no user is returned
     rpc IsUserUnique(IsUserUniqueRequest) returns (IsUserUniqueResponse) {
         option (google.api.http) = {
             get: "/users/_is_unique"
@@ -411,6 +418,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users";
+            deprecated: true;
             summary: "Check for existing user";
             description: "Returns if a user with the requested email or username is unique. So you can create the user."
             parameters: {
@@ -451,6 +459,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/AddHumanUser
     rpc ImportHumanUser(ImportHumanUserRequest) returns (ImportHumanUserResponse) {
         option (google.api.http) = {
             post: "/users/human/_import"
@@ -466,6 +475,7 @@ service ManagementService {
             description: "Create/import a new user with the type human. The newly created user will get an initialization email if either the email address is not marked as verified or no password is set. If a password is set the user will not be requested to set a new one on the first login."
             tags: "Users";
             tags: "User Human"
+            deprecated: true;
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -477,6 +487,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/AddMachineUser
     rpc AddMachineUser(AddMachineUserRequest) returns (AddMachineUserResponse) {
         option (google.api.http) = {
             post: "/users/machine"
@@ -492,6 +503,7 @@ service ManagementService {
             description: "Create a new user with the type machine for your API, service or device. These users are used for non-interactive authentication flows."
             tags: "Users";
             tags: "User Machine";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -509,6 +521,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/DeactivateUser
     rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_deactivate"
@@ -523,6 +536,7 @@ service ManagementService {
             summary: "Deactivate user";
             description: "The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data."
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -540,6 +554,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/ReactivateUser
     rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_reactivate"
@@ -554,6 +569,7 @@ service ManagementService {
             summary: "Reactivate user";
             description: "Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'."
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -571,6 +587,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/LockUser
     rpc LockUser(LockUserRequest) returns (LockUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_lock"
@@ -585,6 +602,7 @@ service ManagementService {
             summary: "Lock user";
             description: "The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)"
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -602,6 +620,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/UnlockUser
     rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
         option (google.api.http) = {
             post: "/users/{id}/_unlock"
@@ -616,6 +635,7 @@ service ManagementService {
             summary: "Unlock user";
             description: "Unlock a user with the state 'locked'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'locked'."
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -633,6 +653,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/RemoveUser
     rpc RemoveUser(RemoveUserRequest) returns (RemoveUserResponse) {
         option (google.api.http) = {
             delete: "/users/{id}"
@@ -646,6 +667,7 @@ service ManagementService {
             summary: "Delete user";
             description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found"
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -663,6 +685,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/UpdateHumanUser
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/username"
@@ -677,6 +700,7 @@ service ManagementService {
             summary: "Change user name";
             description: "Change the username of the user. Be aware that the user has to log in with the newly added username afterward."
             tags: "Users";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -848,6 +872,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/GetUserByID
     rpc GetHumanProfile(GetHumanProfileRequest) returns (GetHumanProfileResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/profile"
@@ -862,6 +887,7 @@ service ManagementService {
             description: "Get basic information like first_name and last_name of a user."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -879,6 +905,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/UpdateHumanUser
     rpc UpdateHumanProfile(UpdateHumanProfileRequest) returns (UpdateHumanProfileResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/profile"
@@ -894,6 +921,7 @@ service ManagementService {
             description: "Update the profile information from a user. The profile includes basic information like first_name and last_name."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -911,6 +939,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/GetUserByID
     rpc GetHumanEmail(GetHumanEmailRequest) returns (GetHumanEmailResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/email"
@@ -925,6 +954,7 @@ service ManagementService {
             description: "Get the email address and the verification state of the address."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -942,6 +972,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/SetEmail
     rpc UpdateHumanEmail(UpdateHumanEmailRequest) returns (UpdateHumanEmailResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/email"
@@ -957,6 +988,7 @@ service ManagementService {
             description: "Change the email address of a user. If the state is set to not verified, the user will get a verification email."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -974,6 +1006,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: not used anymore in user state
     rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/_resend_initialization"
@@ -989,6 +1022,7 @@ service ManagementService {
             description: "A newly created user will get an initialization email to verify the email address and set a password. Resend the email with this request to the user's email address, or a newly added address."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1006,6 +1040,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/ResendEmailCode
     rpc ResendHumanEmailVerification(ResendHumanEmailVerificationRequest) returns (ResendHumanEmailVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/email/_resend_verification"
@@ -1021,6 +1056,7 @@ service ManagementService {
             description: "Resend the email verification notification to the given email address of the user."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1038,6 +1074,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/GetUserByID
     rpc GetHumanPhone(GetHumanPhoneRequest) returns (GetHumanPhoneResponse) {
         option (google.api.http) = {
             get: "/users/{user_id}/phone"
@@ -1052,6 +1089,7 @@ service ManagementService {
             description: "Get the phone number and the verification state of the number. The phone number is only for informational purposes and to send messages, not for Authentication (2FA)."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1069,6 +1107,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/SetPhone
     rpc UpdateHumanPhone(UpdateHumanPhoneRequest) returns (UpdateHumanPhoneResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/phone"
@@ -1084,6 +1123,7 @@ service ManagementService {
             description: "Change the phone number of a user. If the state is set to not verified, the user will get an SMS to verify (if a notification provider is configured). The phone number is only for informational purposes and to send messages, not for Authentication (2FA)."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1101,6 +1141,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/SetPhone
     rpc RemoveHumanPhone(RemoveHumanPhoneRequest) returns (RemoveHumanPhoneResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/phone"
@@ -1115,6 +1156,7 @@ service ManagementService {
             description: "Remove the configured phone number of a user."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1132,6 +1174,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/ResendPhoneCode
     rpc ResendHumanPhoneVerification(ResendHumanPhoneVerificationRequest) returns (ResendHumanPhoneVerificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/phone/_resend_verification"
@@ -1147,6 +1190,7 @@ service ManagementService {
             description: "Resend the notification for the verification of the phone number, to the number stored on the user."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1195,7 +1239,7 @@ service ManagementService {
         };
     }
 
-    // deprecated: use SetHumanPassword
+    // deprecated: use /zitadel.user.v2.UserService/SetPassword
     rpc SetHumanInitialPassword(SetHumanInitialPasswordRequest) returns (SetHumanInitialPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_initialize"
@@ -1222,6 +1266,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/SetPassword
     rpc SetHumanPassword(SetHumanPasswordRequest) returns (SetHumanPasswordResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password"
@@ -1237,6 +1282,7 @@ service ManagementService {
             description: "Set a new password for a user. Per default, the user has to change the password on the next login. You can set no_change_required to true, to avoid the change on the next login."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1254,6 +1300,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/PasswordReset
     rpc SendHumanResetPasswordNotification(SendHumanResetPasswordNotificationRequest) returns (SendHumanResetPasswordNotificationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/password/_reset"
@@ -1269,6 +1316,7 @@ service ManagementService {
             description: "The user will receive an email with a link to change the password."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1286,6 +1334,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/ListAuthenticationMethodTypes
     rpc ListHumanAuthFactors(ListHumanAuthFactorsRequest) returns (ListHumanAuthFactorsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/auth_factors/_search"
@@ -1300,6 +1349,7 @@ service ManagementService {
             description: "Get a list of authentication factors the user has set. Including Second-Factors (2FA) and Multi-Factors (MFA)."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1317,6 +1367,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/RemoveTOTP
     rpc RemoveHumanAuthFactorOTP(RemoveHumanAuthFactorOTPRequest) returns (RemoveHumanAuthFactorOTPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp"
@@ -1331,6 +1382,7 @@ service ManagementService {
             description: "Remove the configured One-Time-Password (OTP) as a factor from the user. OTP is an authentication app, like Authy or Google/Microsoft Authenticator."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1379,6 +1431,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/RemoveOTPSMS
     rpc RemoveHumanAuthFactorOTPSMS(RemoveHumanAuthFactorOTPSMSRequest) returns (RemoveHumanAuthFactorOTPSMSResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_sms"
@@ -1393,6 +1446,7 @@ service ManagementService {
             description: "Remove the configured One-Time-Password (OTP) SMS as a factor from the user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1410,6 +1464,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/RemoveOTPEmail
     rpc RemoveHumanAuthFactorOTPEmail(RemoveHumanAuthFactorOTPEmailRequest) returns (RemoveHumanAuthFactorOTPEmailResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/otp_email"
@@ -1424,6 +1479,7 @@ service ManagementService {
             description: "Remove the configured One-Time-Password (OTP) Email as a factor from the user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1472,6 +1528,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/RegisterPasskey
     rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_link"
@@ -1485,6 +1542,7 @@ service ManagementService {
             description: "Adds a new passwordless/passkey authenticator link to the user and returns it in the response. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
@@ -1502,6 +1560,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/RegisterPasskey
     rpc SendPasswordlessRegistration(SendPasswordlessRegistrationRequest) returns (SendPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_send_link"
@@ -1516,6 +1575,7 @@ service ManagementService {
             description: "Adds a new passwordless/passkey authenticator link to the user and sends it to the user per email. The link enables the user to register a new device if current passwordless/passkey devices are all platform authenticators. e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone"
             tags: "Users";
             tags: "User Human";
+            deprecated: true;
             responses: {
                 key: "200"
                 value: {
