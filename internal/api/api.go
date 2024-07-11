@@ -180,7 +180,7 @@ func (a *API) RouteGRPC() {
 		Name("grpc")
 	http2Route.
 		Methods(http.MethodPost).
-		Headers("Content-Type", "application/grpc").
+		HeadersRegexp(http_util.ContentType, `application\/grpc(\+proto|\+json)?`).
 		Handler(a.grpcServer)
 
 	a.routeGRPCWeb()
