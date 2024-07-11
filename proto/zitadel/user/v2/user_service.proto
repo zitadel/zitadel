@@ -563,6 +563,53 @@ service UserService {
     };
   }
 
+  // List passkeys of a human user
+  rpc ListPasskeys (ListPasskeysRequest) returns (ListPasskeysResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/passkeys/_search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "List passkeys of an user";
+      description: "List passkeys of an user";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc RemovePasskey (RemovePasskeyRequest) returns (RemovePasskeyResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/passkeys/{passkey_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Remove passkey from a user";
+      description: "Remove passkey from a user"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
   rpc RegisterU2F (RegisterU2FRequest) returns (RegisterU2FResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/u2f"
@@ -600,6 +647,28 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Verify a u2f token for a user";
       description: "Verify the u2f token registration with the public key credential."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc RemoveU2F (RemoveU2FRequest) returns (RemoveU2FResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/u2f/{u2f_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Remove u2f token from a user";
+      description: "Remove u2f token from a user"
       responses: {
         key: "200"
         value: {
@@ -832,6 +901,56 @@ service UserService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Add link to an identity provider to an user";
       description: "Add link to an identity provider to an user";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // List IDP links of a human user
+  rpc ListIDPLinks (ListIDPLinksRequest) returns (ListIDPLinksResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/links/_search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "List links to an identity provider of an user";
+      description: "List links to an identity provider of an user";
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Remove link of an IDP to an user
+  rpc RemoveIDPLink (RemoveIDPLinkRequest) returns (RemoveIDPLinkResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/links/{idp_id}/{linked_user_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Remove link of an identity provider to an user";
+      description: "Remove link of an identity provider to an user";
       responses: {
         key: "200"
         value: {
@@ -1444,6 +1563,31 @@ message VerifyU2FRegistrationResponse{
   zitadel.object.v2.Details details = 1;
 }
 
+message RemoveU2FRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string u2f_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message RemoveU2FResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
 message RegisterTOTPRequest {
   string user_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1601,6 +1745,47 @@ message CreatePasskeyRegistrationLinkResponse{
   ];
 }
 
+message ListPasskeysRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message ListPasskeysResponse {
+  repeated Passkey result = 1;
+}
+
+message RemovePasskeyRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string passkey_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message RemovePasskeyResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
 message StartIdentityProviderIntentRequest{
   string idp_id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -1689,6 +1874,50 @@ message AddIDPLinkResponse {
   zitadel.object.v2.Details details = 1;
 }
 
+message ListIDPLinksRequest{
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  //list limitations and ordering
+  zitadel.object.v2.ListQuery query = 2;
+}
+
+message ListIDPLinksResponse{
+  zitadel.object.v2.ListDetails details = 1;
+  repeated IDPLink result = 2;
+}
+
+message RemoveIDPLinkRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string idp_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string linked_user_id = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message RemoveIDPLinkResponse {
+  zitadel.object.v2.Details details = 1;
+}
 
 message PasswordResetRequest{
   string user_id = 1 [

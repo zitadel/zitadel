@@ -254,3 +254,31 @@ enum UserState {
   USER_STATE_LOCKED = 4;
   USER_STATE_INITIAL = 5;
 }
+
+
+message Passkey {
+  string id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"69629023906488334\""
+    }
+  ];
+  AuthFactorState state = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "current state of the passkey";
+    }
+  ];
+  string name = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"fido key\""
+    }
+  ];
+}
+
+enum AuthFactorState {
+  AUTH_FACTOR_STATE_UNSPECIFIED = 0;
+  AUTH_FACTOR_STATE_NOT_READY = 1;
+  AUTH_FACTOR_STATE_READY = 2;
+  AUTH_FACTOR_STATE_REMOVED = 3;
+}
