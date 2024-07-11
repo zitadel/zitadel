@@ -13,6 +13,7 @@ import {
   Checks,
   AuthenticationMethodType,
 } from "@zitadel/server";
+import BackButton from "./BackButton";
 
 type Inputs = {
   password: string;
@@ -213,9 +214,7 @@ export default function PasswordForm({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
-        {/* <Button type="button" variant={ButtonVariants.Secondary}>
-          back
-        </Button> */}
+        <BackButton />
         <span className="flex-grow"></span>
         <Button
           type="submit"
