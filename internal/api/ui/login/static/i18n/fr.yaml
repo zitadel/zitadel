@@ -144,14 +144,14 @@ MFAProvider:
   ChooseOther: Ou choisissez une autre option
 
 VerifyMFAOTP:
-  Title: Vérifier authentification à 2 facteurs
-  Description: Vérifiez votre authentification à 2 facteurs
+  Title: Double authentification
+  Description: Saisissez le code à usage unique
   CodeLabel: Code
   NextButtonText: Suivant
 
 VerifyOTP:
-  Title: Vérifier authentification à 2 facteurs
-  Description: Vérifiez votre authentification à 2 facteurs
+  Title: Double authentification
+  Description: Saisissez le code à usage unique
   CodeLabel: Code
   ResendButtonText: Renvoyer le code
   NextButtonText: Suivant
