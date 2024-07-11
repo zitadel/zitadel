@@ -17,7 +17,7 @@
 
     <div class="fields">
         <label class="lgn-label" for="code">{{t "EmailVerification.CodeLabel"}}</label>
-        <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" autofocus required>
+        <input class="lgn-input" type="text" id="code" name="code" autocomplete="off" value="{{ .Code }}" {{if not .Code}}autofocus{{end}} required>
     </div>
 
     {{ if .PasswordInit }}

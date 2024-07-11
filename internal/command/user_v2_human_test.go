@@ -474,18 +474,6 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(
-						eventFromEventPusher(
-							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								1,
-								false,
-								false,
-								false,
-								false,
-							),
-						),
-					),
 					expectPush(
 						newAddHumanEvent("", false, true, "", language.English),
 						user.NewHumanEmailCodeAddedEventV2(context.Background(),

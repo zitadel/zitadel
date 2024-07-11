@@ -138,7 +138,7 @@ func (s *ChangeUsernameStep) Type() NextStepType {
 }
 
 type VerifyEMailStep struct {
-	PasswordSet bool //TODO: any other auth method set?
+	InitPassword bool
 }
 
 func (s *VerifyEMailStep) Type() NextStepType {

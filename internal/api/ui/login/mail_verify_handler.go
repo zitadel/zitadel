@@ -1,19 +1,21 @@
 package login
 
 import (
+	"context"
 	"net/http"
 	"net/url"
-	"strconv"
+
+	"github.com/zitadel/logging"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
-	queryCode         = "code"
-	queryUserID       = "userID"
-	queryPasswordInit = "passwordInit"
+	queryCode   = "code"
+	queryUserID = "userID"
 
 	tmplMailVerification = "mail_verification"
 	tmplMailVerified     = "mail_verified"
@@ -32,6 +34,7 @@ type mailVerificationData struct {
 	baseData
 	profileData
 	UserID       string
+	Code         string
 	PasswordInit bool
 	MinLength    uint64
 	HasUppercase string
@@ -53,12 +56,32 @@ func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
 	authReq := l.checkOptionalAuthRequestOfEmailLinks(r)
 	userID := r.FormValue(queryUserID)
 	code := r.FormValue(queryCode)
-	passwordInit, _ := strconv.ParseBool(r.FormValue(queryPasswordInit))
+	if userID == "" && authReq == nil {
+		l.renderError(w, r, authReq, nil)
+		return
+	}
+	if userID == "" {
+		userID = authReq.UserID
+	}
+	passwordInit := l.checkUserNoFirstFactor(r.Context(), userID)
 	if code != "" && !passwordInit {
 		l.checkMailCode(w, r, authReq, userID, code, "")
 		return
 	}
-	l.renderMailVerification(w, r, authReq, userID, passwordInit, nil)
+	l.renderMailVerification(w, r, authReq, userID, code, passwordInit, nil)
+}
+
+func (l *Login) checkUserNoFirstFactor(ctx context.Context, userID string) bool {
+	userIDQuery, err := query.NewUserAuthMethodUserIDSearchQuery(userID)
+	logging.WithFields("userID", userID).OnError(err).Warn("error creating NewUserAuthMethodUserIDSearchQuery")
+	authMethodsQuery, err := query.NewUserAuthMethodTypesSearchQuery(domain.UserAuthMethodTypeIDP, domain.UserAuthMethodTypePassword, domain.UserAuthMethodTypePasswordless)
+	logging.WithFields("userID", userID).OnError(err).Warn("error creating NewUserAuthMethodTypesSearchQuery")
+	authMethods, err := l.query.SearchUserAuthMethods(ctx, &query.UserAuthMethodSearchQueries{Queries: []query.SearchQuery{userIDQuery, authMethodsQuery}}, false)
+	if err != nil {
+		logging.WithFields("userID", userID).OnError(err).Warn("unable to load user's auth methods for mail verification")
+		return false
+	}
+	return len(authMethods.AuthMethods) == 0
 }
 
 func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +94,7 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 	if !data.Resend {
 		if data.PasswordInit && data.Password != data.PasswordConfirm {
 			err := zerrors.ThrowInvalidArgument(nil, "VIEW-fsdfd", "Errors.User.Password.ConfirmationWrong")
-			l.renderMailVerification(w, r, authReq, data.UserID, data.PasswordInit, err)
+			l.renderMailVerification(w, r, authReq, data.UserID, data.Code, data.PasswordInit, err)
 			return
 		}
 		l.checkMailCode(w, r, authReq, data.UserID, data.Code, data.Password)
@@ -84,11 +107,11 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 	}
 	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
 	if err != nil {
-		l.renderMailVerification(w, r, authReq, data.UserID, data.PasswordInit, err)
+		l.renderMailVerification(w, r, authReq, data.UserID, "", data.PasswordInit, err)
 		return
 	}
 	_, err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg, emailCodeGenerator, authReqID)
-	l.renderMailVerification(w, r, authReq, data.UserID, data.PasswordInit, err)
+	l.renderMailVerification(w, r, authReq, data.UserID, "", data.PasswordInit, err)
 }
 
 func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code, password string) {
@@ -99,19 +122,19 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *d
 	}
 	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
 	if err != nil {
-		l.renderMailVerification(w, r, authReq, userID, password != "", err)
+		l.renderMailVerification(w, r, authReq, userID, "", password != "", err)
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	_, err = l.command.VerifyHumanEmail(setContext(r.Context(), userOrg), userID, code, userOrg, password, userAgentID, emailCodeGenerator)
 	if err != nil {
-		l.renderMailVerification(w, r, authReq, userID, password != "", err)
+		l.renderMailVerification(w, r, authReq, userID, "", password != "", err)
 		return
 	}
 	l.renderMailVerified(w, r, authReq, userOrg)
 }
 
-func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID string, passwordInit bool, err error) {
+func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, userID, code string, passwordInit bool, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -125,6 +148,7 @@ func (l *Login) renderMailVerification(w http.ResponseWriter, r *http.Request, a
 		baseData:     l.getBaseData(r, authReq, translator, "EmailVerification.Title", "EmailVerification.Description", errID, errMessage),
 		UserID:       userID,
 		profileData:  l.getProfileData(authReq),
+		Code:         code,
 		PasswordInit: passwordInit,
 	}
 	if passwordInit {

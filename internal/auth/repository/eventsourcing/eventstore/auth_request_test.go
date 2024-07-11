@@ -929,11 +929,32 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"password not set, init password step",
+			"password not set (email not verified), init password step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},
 				userViewProvider: &mockViewUser{
 					PasswordInitRequired: true,
+				},
+				userEventProvider: &mockEventUser{},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
+				idpUserLinksProvider: &mockIDPUserLinks{},
+			},
+			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
+			[]domain.NextStep{&domain.VerifyEMailStep{InitPassword: true}},
+			nil,
+		},
+		{
+			"password not set (email verified), init password step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordInitRequired: true,
+					IsEmailVerified:      true,
 				},
 				userEventProvider: &mockEventUser{},
 				lockoutPolicyProvider: &mockLockoutPolicy{
