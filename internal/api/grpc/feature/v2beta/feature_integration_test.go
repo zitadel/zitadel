@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 		OrgCTX = Tester.WithAuthorization(ctx, integration.OrgOwner)
 
 		defer Tester.Done()
-		Client = Tester.Client.FeatureV2
+		Client = Tester.Client.FeatureV2beta
 
 		return m.Run()
 	}())

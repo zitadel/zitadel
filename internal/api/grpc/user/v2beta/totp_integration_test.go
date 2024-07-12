@@ -215,7 +215,7 @@ func TestServer_RemoveTOTP(t *testing.T) {
 	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
 	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
 	userVerifiedCtx := Tester.WithAuthorizationToken(context.Background(), sessionTokenVerified)
-	_, err := Tester.Client.UserV2.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
+	_, err := Client.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
 		UserId:           userVerified.GetUserId(),
 		VerificationCode: userVerified.GetPhoneCode(),
 	})

@@ -48,7 +48,7 @@ func TestMain(m *testing.M) {
 		IamCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
 		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
 		CTX, ErrCTX = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
-		Client = Tester.Client.UserV2
+		Client = Tester.Client.UserV2beta
 		return m.Run()
 	}())
 }
@@ -2424,7 +2424,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 		OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
 	})
 	require.NoError(t, err)
-	idpLink, err := Tester.Client.UserV2.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
+	idpLink, err := Client.AddIDPLink(CTX, &user.AddIDPLinkRequest{UserId: userMultipleAuth, IdpLink: &user.IDPLink{
 		IdpId:    provider.GetId(),
 		UserId:   "external-id",
 		UserName: "displayName",

@@ -14,9 +14,18 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	object_v2beta "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
+
+func detailsV2ToV2beta(obj *object.Details) *object_v2beta.Details {
+	return &object_v2beta.Details{
+		Sequence:      obj.GetSequence(),
+		ChangeDate:    obj.GetChangeDate(),
+		ResourceOwner: obj.GetResourceOwner(),
+	}
+}
 
 func TestServer_GetUserByID(t *testing.T) {
 	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
@@ -95,7 +104,7 @@ func TestServer_GetUserByID(t *testing.T) {
 						},
 					},
 				},
-				Details: &object.Details{
+				Details: &object_v2beta.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: orgResp.OrganizationId,
 				},
@@ -142,7 +151,7 @@ func TestServer_GetUserByID(t *testing.T) {
 						},
 					},
 				},
-				Details: &object.Details{
+				Details: &object_v2beta.Details{
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: orgResp.OrganizationId,
 				},
@@ -168,7 +177,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				if getErr != nil {
 					return
 				}
-				tt.want.User.Details = userAttr.Details
+				tt.want.User.Details = detailsV2ToV2beta(userAttr.Details)
 				tt.want.User.UserId = userAttr.UserID
 				tt.want.User.Username = userAttr.Username
 				tt.want.User.PreferredLoginName = userAttr.Username
@@ -233,7 +242,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 						},
 					},
 				},
-				Details: &object.Details{
+				Details: &object_v2beta.Details{
 					ChangeDate:    timestamppb.New(timeNow),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
@@ -271,7 +280,7 @@ func TestServer_GetUserByID_Permission(t *testing.T) {
 						},
 					},
 				},
-				Details: &object.Details{
+				Details: &object_v2beta.Details{
 					ChangeDate:    timestamppb.New(timeNow),
 					ResourceOwner: newOrg.GetOrganizationId(),
 				},
@@ -355,7 +364,7 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
+				Details: &object_v2beta.ListDetails{
 					TotalResult: 0,
 					Timestamp:   timestamppb.Now(),
 				},
@@ -386,7 +395,7 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
+				Details: &object_v2beta.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
@@ -441,7 +450,7 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
+				Details: &object_v2beta.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
@@ -497,7 +506,7 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
+				Details: &object_v2beta.ListDetails{
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
@@ -593,7 +602,7 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
+				Details: &object_v2beta.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
@@ -645,7 +654,7 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
+				Details: &object_v2beta.ListDetails{
 					TotalResult: 1,
 					Timestamp:   timestamppb.Now(),
 				},
@@ -697,7 +706,7 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
+				Details: &object_v2beta.ListDetails{
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
@@ -785,7 +794,7 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
+				Details: &object_v2beta.ListDetails{
 					TotalResult: 0,
 					Timestamp:   timestamppb.Now(),
 				},
@@ -813,7 +822,7 @@ func TestServer_ListUsers(t *testing.T) {
 				},
 			},
 			want: &user.ListUsersResponse{
-				Details: &object.ListDetails{
+				Details: &object_v2beta.ListDetails{
 					TotalResult: 3,
 					Timestamp:   timestamppb.Now(),
 				},
@@ -925,7 +934,7 @@ func TestServer_ListUsers(t *testing.T) {
 							human.PasswordChanged = infos[i].Changed
 						}
 					}
-					tt.want.Result[i].Details = infos[i].Details
+					tt.want.Result[i].Details = detailsV2ToV2beta(infos[i].Details)
 				}
 				for i := range tt.want.Result {
 					assert.Contains(ttt, got.Result, tt.want.Result[i])
