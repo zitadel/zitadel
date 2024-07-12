@@ -121,7 +121,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "list user by id, no permission",
+			name: "list links, no permission",
 			args: args{
 				UserCTX,
 				&user.ListIDPLinksRequest{
@@ -137,7 +137,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 			},
 		},
 		{
-			name: "list user by id, no permission, org",
+			name: "list links, no permission, org",
 			args: args{
 				CTX,
 				&user.ListIDPLinksRequest{
@@ -247,6 +247,112 @@ func TestServer_ListIDPLinks(t *testing.T) {
 				}
 				integration.AssertListDetails(t, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected idplinks result")
+		})
+	}
+}
+
+func TestServer_RemoveIDPLink(t *testing.T) {
+	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+
+	instanceIdpID := Tester.AddGenericOAuthProvider(t, IamCTX)
+	userInstanceResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	Tester.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
+
+	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
+	userOrgResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	Tester.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
+
+	userNoLinkResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+
+	type args struct {
+		ctx context.Context
+		req *user.RemoveIDPLinkRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.RemoveIDPLinkResponse
+		wantErr bool
+	}{
+		{
+			name: "remove link, no permission",
+			args: args{
+				UserCTX,
+				&user.RemoveIDPLinkRequest{
+					UserId:       userOrgResp.GetUserId(),
+					IdpId:        orgIdpID,
+					LinkedUserId: "external_org",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "remove link, no permission, org",
+			args: args{
+				CTX,
+				&user.RemoveIDPLinkRequest{
+					UserId:       userOrgResp.GetUserId(),
+					IdpId:        orgIdpID,
+					LinkedUserId: "external_org",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "remove link, org, ok",
+			args: args{
+				IamCTX,
+				&user.RemoveIDPLinkRequest{
+					UserId:       userOrgResp.GetUserId(),
+					IdpId:        orgIdpID,
+					LinkedUserId: "external_org",
+				},
+			},
+			want: &user.RemoveIDPLinkResponse{
+				Details: &object.Details{
+					ResourceOwner: orgResp.GetOrganizationId(),
+					ChangeDate:    timestamppb.Now(),
+				},
+			},
+		},
+		{
+			name: "remove link, instance, ok",
+			args: args{
+				IamCTX,
+				&user.RemoveIDPLinkRequest{
+					UserId:       userInstanceResp.GetUserId(),
+					IdpId:        instanceIdpID,
+					LinkedUserId: "external_instance",
+				},
+			},
+			want: &user.RemoveIDPLinkResponse{
+				Details: &object.Details{
+					ResourceOwner: orgResp.GetOrganizationId(),
+					ChangeDate:    timestamppb.Now(),
+				},
+			},
+		},
+		{
+			name: "remove link, no link, error",
+			args: args{
+				IamCTX,
+				&user.RemoveIDPLinkRequest{
+					UserId: userNoLinkResp.GetUserId(),
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.RemoveIDPLink(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }
