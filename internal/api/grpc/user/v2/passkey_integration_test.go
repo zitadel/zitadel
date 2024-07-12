@@ -12,8 +12,8 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 
 	"github.com/zitadel/zitadel/internal/integration"
 )
@@ -139,19 +139,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 }
 
 func TestServer_VerifyPasskeyRegistration(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
-		UserId: userID,
-		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
-	})
-	require.NoError(t, err)
-	pkr, err := Client.RegisterPasskey(CTX, &user.RegisterPasskeyRequest{
-		UserId: userID,
-		Code:   reg.GetCode(),
-	})
-	require.NoError(t, err)
-	require.NotEmpty(t, pkr.GetPasskeyId())
-	require.NotEmpty(t, pkr.GetPublicKeyCredentialCreationOptions())
+	userID, pkr := userWithPasskeyRegistered(t)
 
 	attestationResponse, err := Tester.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	require.NoError(t, err)
@@ -315,6 +303,145 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 				assert.NotEmpty(t, got.GetCode().GetId())
 				assert.NotEmpty(t, got.GetCode().GetId())
 			}
+		})
+	}
+}
+
+func userWithPasskeyRegistered(t *testing.T) (string, *user.RegisterPasskeyResponse) {
+	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
+		UserId: userID,
+		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
+	})
+	require.NoError(t, err)
+	pkr, err := Client.RegisterPasskey(CTX, &user.RegisterPasskeyRequest{
+		UserId: userID,
+		Code:   reg.GetCode(),
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, pkr.GetPasskeyId())
+	require.NotEmpty(t, pkr.GetPublicKeyCredentialCreationOptions())
+
+	return userID, pkr
+}
+
+func userWithPasskeyVerified(t *testing.T) (string, string) {
+	userID, pkr := userWithPasskeyRegistered(t)
+
+	attestationResponse, err := Tester.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
+	require.NoError(t, err)
+
+	_, err = Client.VerifyPasskeyRegistration(CTX, &user.VerifyPasskeyRegistrationRequest{
+		UserId:              userID,
+		PasskeyId:           pkr.GetPasskeyId(),
+		PublicKeyCredential: attestationResponse,
+		PasskeyName:         "nice name",
+	})
+	require.NoError(t, err)
+	return userID, pkr.GetPasskeyId()
+}
+
+func TestServer_RemovePasskey(t *testing.T) {
+	userIDWithout := Tester.CreateHumanUser(CTX).GetUserId()
+	userIDRegistered, pkrRegistered := userWithPasskeyRegistered(t)
+	userIDVerified, passkeyIDVerified := userWithPasskeyVerified(t)
+	userIDVerifiedPermission, passkeyIDVerifiedPermission := userWithPasskeyVerified(t)
+
+	type args struct {
+		ctx context.Context
+		req *user.RemovePasskeyRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.RemovePasskeyResponse
+		wantErr bool
+	}{
+		{
+			name: "missing user id",
+			args: args{
+				ctx: IamCTX,
+				req: &user.RemovePasskeyRequest{
+					PasskeyId: "123",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "missing passkey id",
+			args: args{
+				ctx: IamCTX,
+				req: &user.RemovePasskeyRequest{
+					UserId: "123",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "success, registered",
+			args: args{
+				ctx: IamCTX,
+				req: &user.RemovePasskeyRequest{
+					UserId:    userIDRegistered,
+					PasskeyId: pkrRegistered.GetPasskeyId(),
+				},
+			},
+			want: &user.RemovePasskeyResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "no passkey, error",
+			args: args{
+				ctx: IamCTX,
+				req: &user.RemovePasskeyRequest{
+					UserId:    userIDWithout,
+					PasskeyId: pkrRegistered.GetPasskeyId(),
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "success, verified",
+			args: args{
+				ctx: IamCTX,
+				req: &user.RemovePasskeyRequest{
+					UserId:    userIDVerified,
+					PasskeyId: passkeyIDVerified,
+				},
+			},
+			want: &user.RemovePasskeyResponse{
+				Details: &object.Details{
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+		{
+			name: "verified, permission error",
+			args: args{
+				ctx: UserCTX,
+				req: &user.RemovePasskeyRequest{
+					UserId:    userIDVerifiedPermission,
+					PasskeyId: passkeyIDVerifiedPermission,
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.RemovePasskey(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.NotNil(t, got)
+			integration.AssertDetails(t, tt.want, got)
 		})
 	}
 }
