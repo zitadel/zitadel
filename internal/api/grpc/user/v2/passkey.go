@@ -6,7 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 
 	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -115,5 +115,15 @@ func passkeyCodeDetailsToPb(details *domain.PasskeyCodeDetails, err error) (*use
 			Id:   details.CodeID,
 			Code: details.Code,
 		},
+	}, nil
+}
+
+func (s *Server) RemovePasskey(ctx context.Context, req *user.RemovePasskeyRequest) (*user.RemovePasskeyResponse, error) {
+	objectDetails, err := s.command.HumanRemovePasswordless(ctx, req.GetUserId(), req.GetPasskeyId(), "")
+	if err != nil {
+		return nil, err
+	}
+	return &user.RemovePasskeyResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
 	}, nil
 }
