@@ -43,7 +43,7 @@ func (s *Server) VerifyU2FRegistration(ctx context.Context, req *user.VerifyU2FR
 }
 
 func (s *Server) RemoveU2F(ctx context.Context, req *user.RemoveU2FRequest) (*user.RemoveU2FResponse, error) {
-	objectDetails, err := s.command.HumanRemoveU2F(ctx, req.UserId, req.GetU2FId(), "")
+	objectDetails, err := s.command.HumanRemoveU2F(ctx, req.GetUserId(), req.GetU2FId(), "")
 	if err != nil {
 		return nil, err
 	}
