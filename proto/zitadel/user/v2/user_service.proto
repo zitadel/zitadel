@@ -1758,7 +1758,8 @@ message ListPasskeysRequest {
 }
 
 message ListPasskeysResponse {
-  repeated Passkey result = 1;
+  zitadel.object.v2.ListDetails details = 1;
+  repeated Passkey result = 2;
 }
 
 message RemovePasskeyRequest {

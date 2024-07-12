@@ -5,6 +5,7 @@ package user_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
@@ -309,6 +310,15 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 
 func userWithPasskeyRegistered(t *testing.T) (string, *user.RegisterPasskeyResponse) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	return userID, passkeyRegister(t, userID)
+}
+
+func userWithPasskeyVerified(t *testing.T) (string, string) {
+	userID, pkr := userWithPasskeyRegistered(t)
+	return userID, passkeyVerify(t, userID, pkr)
+}
+
+func passkeyRegister(t *testing.T, userID string) *user.RegisterPasskeyResponse {
 	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
@@ -321,13 +331,10 @@ func userWithPasskeyRegistered(t *testing.T) (string, *user.RegisterPasskeyRespo
 	require.NoError(t, err)
 	require.NotEmpty(t, pkr.GetPasskeyId())
 	require.NotEmpty(t, pkr.GetPublicKeyCredentialCreationOptions())
-
-	return userID, pkr
+	return pkr
 }
 
-func userWithPasskeyVerified(t *testing.T) (string, string) {
-	userID, pkr := userWithPasskeyRegistered(t)
-
+func passkeyVerify(t *testing.T, userID string, pkr *user.RegisterPasskeyResponse) string {
 	attestationResponse, err := Tester.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	require.NoError(t, err)
 
@@ -338,7 +345,7 @@ func userWithPasskeyVerified(t *testing.T) (string, string) {
 		PasskeyName:         "nice name",
 	})
 	require.NoError(t, err)
-	return userID, pkr.GetPasskeyId()
+	return pkr.GetPasskeyId()
 }
 
 func TestServer_RemovePasskey(t *testing.T) {
@@ -442,6 +449,149 @@ func TestServer_RemovePasskey(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, got)
 			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestServer_ListPasskeys(t *testing.T) {
+	userIDWithout := Tester.CreateHumanUser(CTX).GetUserId()
+	userIDRegistered, _ := userWithPasskeyRegistered(t)
+	userIDVerified, passkeyIDVerified := userWithPasskeyVerified(t)
+
+	userIDMulti, passkeyIDMulti1 := userWithPasskeyVerified(t)
+	passkeyIDMulti2 := passkeyVerify(t, userIDMulti, passkeyRegister(t, userIDMulti))
+
+	type args struct {
+		ctx context.Context
+		req *user.ListPasskeysRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.ListPasskeysResponse
+		wantErr bool
+	}{
+		{
+			name: "list passkeys, no permission",
+			args: args{
+				UserCTX,
+				&user.ListPasskeysRequest{
+					UserId: userIDVerified,
+				},
+			},
+			want: &user.ListPasskeysResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				Result: []*user.Passkey{},
+			},
+		},
+		{
+			name: "list passkeys, none",
+			args: args{
+				UserCTX,
+				&user.ListPasskeysRequest{
+					UserId: userIDWithout,
+				},
+			},
+			want: &user.ListPasskeysResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				Result: []*user.Passkey{},
+			},
+		},
+		{
+			name: "list passkeys, registered",
+			args: args{
+				UserCTX,
+				&user.ListPasskeysRequest{
+					UserId: userIDRegistered,
+				},
+			},
+			want: &user.ListPasskeysResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				Result: []*user.Passkey{},
+			},
+		},
+		{
+			name: "list passkeys, ok",
+			args: args{
+				IamCTX,
+				&user.ListPasskeysRequest{
+					UserId: userIDVerified,
+				},
+			},
+			want: &user.ListPasskeysResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				Result: []*user.Passkey{
+					{
+						Id:    passkeyIDVerified,
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Name:  "nice name",
+					},
+				},
+			},
+		},
+		{
+			name: "list idp links, multi, ok",
+			args: args{
+				IamCTX,
+				&user.ListPasskeysRequest{
+					UserId: userIDMulti,
+				},
+			},
+			want: &user.ListPasskeysResponse{
+				Details: &object.ListDetails{
+					TotalResult: 2,
+					Timestamp:   timestamppb.Now(),
+				},
+				Result: []*user.Passkey{
+					{
+						Id:    passkeyIDMulti1,
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Name:  "nice name",
+					},
+					{
+						Id:    passkeyIDMulti2,
+						State: user.AuthFactorState_AUTH_FACTOR_STATE_READY,
+						Name:  "nice name",
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			retryDuration := time.Minute
+			if ctxDeadline, ok := CTX.Deadline(); ok {
+				retryDuration = time.Until(ctxDeadline)
+			}
+			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
+				got, listErr := Client.ListPasskeys(tt.args.ctx, tt.args.req)
+				assertErr := assert.NoError
+				if tt.wantErr {
+					assertErr = assert.Error
+				}
+				assertErr(ttt, listErr)
+				if listErr != nil {
+					return
+				}
+				// always first check length, otherwise its failed anyway
+				assert.Len(ttt, got.Result, len(tt.want.Result))
+				for i := range tt.want.Result {
+					assert.Contains(ttt, got.Result, tt.want.Result[i])
+				}
+				integration.AssertListDetails(t, tt.want, got)
+			}, retryDuration, time.Millisecond*100, "timeout waiting for expected idplinks result")
 		})
 	}
 }
