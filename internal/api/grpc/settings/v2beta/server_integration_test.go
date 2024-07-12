@@ -28,7 +28,7 @@ func TestMain(m *testing.M) {
 
 		CTX = ctx
 		AdminCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
-		Client = Tester.Client.SettingsV2
+		Client = Tester.Client.SettingsV2beta
 		return m.Run()
 	}())
 }

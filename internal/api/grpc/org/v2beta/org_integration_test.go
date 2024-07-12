@@ -15,7 +15,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var (
@@ -32,7 +33,7 @@ func TestMain(m *testing.M) {
 
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
-		Client = Tester.Client.OrgV2
+		Client = Tester.Client.OrgV2beta
 
 		CTX, _ = Tester.WithAuthorization(ctx, integration.IAMOwner), errCtx
 		User = Tester.CreateHumanUser(CTX)
@@ -87,15 +88,15 @@ func TestServer_AddOrganization(t *testing.T) {
 				Admins: []*org.AddOrganizationRequest_Admin{
 					{
 						UserType: &org.AddOrganizationRequest_Admin_Human{
-							Human: &user.AddHumanUserRequest{
-								Profile: &user.SetHumanProfile{
+							Human: &user_v2beta.AddHumanUserRequest{
+								Profile: &user_v2beta.SetHumanProfile{
 									GivenName:  "firstname",
 									FamilyName: "lastname",
 								},
-								Email: &user.SetHumanEmail{
+								Email: &user_v2beta.SetHumanEmail{
 									Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
-									Verification: &user.SetHumanEmail_ReturnCode{
-										ReturnCode: &user.ReturnEmailVerificationCode{},
+									Verification: &user_v2beta.SetHumanEmail_ReturnCode{
+										ReturnCode: &user_v2beta.ReturnEmailVerificationCode{},
 									},
 								},
 							},
@@ -125,18 +126,18 @@ func TestServer_AddOrganization(t *testing.T) {
 					},
 					{
 						UserType: &org.AddOrganizationRequest_Admin_Human{
-							Human: &user.AddHumanUserRequest{
-								Profile: &user.SetHumanProfile{
+							Human: &user_v2beta.AddHumanUserRequest{
+								Profile: &user_v2beta.SetHumanProfile{
 									GivenName:  "firstname",
 									FamilyName: "lastname",
 								},
-								Email: &user.SetHumanEmail{
+								Email: &user_v2beta.SetHumanEmail{
 									Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
-									Verification: &user.SetHumanEmail_IsVerified{
+									Verification: &user_v2beta.SetHumanEmail_IsVerified{
 										IsVerified: true,
 									},
 								},
-								IdpLinks: []*user.IDPLink{
+								IdpLinks: []*user_v2beta.IDPLink{
 									{
 										IdpId:    idpID,
 										UserId:   "userID",
