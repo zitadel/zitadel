@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -38,6 +38,16 @@ func (s *Server) VerifyU2FRegistration(ctx context.Context, req *user.VerifyU2FR
 		return nil, err
 	}
 	return &user.VerifyU2FRegistrationResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) RemoveU2F(ctx context.Context, req *user.RemoveU2FRequest) (*user.RemoveU2FResponse, error) {
+	objectDetails, err := s.command.HumanRemoveU2F(ctx, req.UserId, req.GetU2FId(), "")
+	if err != nil {
+		return nil, err
+	}
+	return &user.RemoveU2FResponse{
 		Details: object.DomainToDetailsPb(objectDetails),
 	}, nil
 }
