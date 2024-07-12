@@ -102,7 +102,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 	userInstanceResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
 	Tester.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
 
-	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, IamCTX, Tester.Organisation.ID)
+	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
 	userOrgResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
 	Tester.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
 
@@ -137,9 +137,25 @@ func TestServer_ListIDPLinks(t *testing.T) {
 			},
 		},
 		{
-			name: "list idp links, org, ok",
+			name: "list user by id, no permission, org",
 			args: args{
 				CTX,
+				&user.ListIDPLinksRequest{
+					UserId: userOrgResp.GetUserId(),
+				},
+			},
+			want: &user.ListIDPLinksResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				Result: []*user.IDPLink{},
+			},
+		},
+		{
+			name: "list idp links, org, ok",
+			args: args{
+				IamCTX,
 				&user.ListIDPLinksRequest{
 					UserId: userOrgResp.GetUserId(),
 				},
@@ -161,7 +177,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 		{
 			name: "list idp links, instance, ok",
 			args: args{
-				CTX,
+				IamCTX,
 				&user.ListIDPLinksRequest{
 					UserId: userInstanceResp.GetUserId(),
 				},
@@ -183,7 +199,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 		{
 			name: "list idp links, multi, ok",
 			args: args{
-				CTX,
+				IamCTX,
 				&user.ListIDPLinksRequest{
 					UserId: userMultipleResp.GetUserId(),
 				},
