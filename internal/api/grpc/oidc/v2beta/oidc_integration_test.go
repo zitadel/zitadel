@@ -19,7 +19,7 @@ import (
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 var (
@@ -42,7 +42,7 @@ func TestMain(m *testing.M) {
 
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
-		Client = Tester.Client.OIDCv2
+		Client = Tester.Client.OIDCv2beta
 
 		CTX = Tester.WithAuthorization(ctx, integration.OrgOwner)
 		User = Tester.CreateHumanUser(CTX)
@@ -99,7 +99,7 @@ func TestServer_CreateCallback(t *testing.T) {
 	require.NoError(t, err)
 	client, err := Tester.CreateOIDCNativeClient(CTX, redirectURI, logoutRedirectURI, project.GetId(), false)
 	require.NoError(t, err)
-	sessionResp, err := Tester.Client.SessionV2.CreateSession(CTX, &session.CreateSessionRequest{
+	sessionResp, err := Tester.Client.SessionV2beta.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
 				Search: &session.CheckUser_UserId{
