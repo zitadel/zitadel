@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Excluir Ações Selecionadas?",
         "DESCRIPTION": "Tem certeza de que deseja excluir as ações selecionadas do fluxo?"
-      }
+      },
+      "ABOUTNAME": "O nome da ação e o nome da função no javascript devem ser iguais"
     },
     "TOAST": {
       "ACTIONSSET": "Ações definidas",

@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "删除选定的操作？",
         "DESCRIPTION": "您确定要从流中删除选定的操作吗？"
-      }
+      },
+      "ABOUTNAME": "javascript 中的操作名称和函数名称必须相同"
     },
     "TOAST": {
       "ACTIONSSET": "动作设置",
