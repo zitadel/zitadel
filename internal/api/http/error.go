@@ -50,7 +50,7 @@ func HTTPStatusCodeToZitadelError(statusCode int, id string, message string) err
 	if statusCode == http.StatusOK {
 		return nil
 	}
-	errorFunc := zerrors.ThrowError
+	var errorFunc func(parent error, id, message string) error
 	switch statusCode {
 	case http.StatusConflict:
 		errorFunc = zerrors.ThrowAlreadyExists
