@@ -1400,6 +1400,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/RemoveU2F
     rpc RemoveHumanAuthFactorU2F(RemoveHumanAuthFactorU2FRequest) returns (RemoveHumanAuthFactorU2FResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/auth_factors/u2f/{token_id}"
@@ -1411,6 +1412,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Remove Multi-Factor U2F";
+            deprecated: true,
             description: "Remove the configured Universal-Second-Factor (U2F) as a factor from the user. U2F is a device-dependent factor like FingerPrint, Windows-Hello, etc."
             tags: "Users";
             tags: "User Human";
@@ -1497,6 +1499,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/ListPasskeys
     rpc ListHumanPasswordless(ListHumanPasswordlessRequest) returns (ListHumanPasswordlessResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_search"
@@ -1508,6 +1511,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Search Passwordless/Passkey authentication";
+            deprecated: true,
             description: "Get a list of configured passwordless/passkey authentication methods from the user. Passwordless/passkey is a device-dependent authentication like FingerScan, WindowsHello or a Hardware Token."
             tags: "Users";
             tags: "User Human";
@@ -1593,6 +1597,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/RemovePasskey
     rpc RemoveHumanPasswordless(RemoveHumanPasswordlessRequest) returns (RemoveHumanPasswordlessResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/passwordless/{token_id}"
@@ -1604,6 +1609,7 @@ service ManagementService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             summary: "Delete Passwordless/Passkey";
+            deprecated: true,
             description: "Remove a configured passwordless/passkey authentication method from the user. (e.g FaceID, FingerScane, WindowsHello, etc.)"
             tags: "Users";
             tags: "User Human";
@@ -1971,6 +1977,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/ListLinkedIDPs
     rpc ListHumanLinkedIDPs(ListHumanLinkedIDPsRequest) returns (ListHumanLinkedIDPsResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/idps/_search"
@@ -1984,6 +1991,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users"
             summary: "List Social Logins";
+            deprecated: true,
             description: "Returns a list of all linked identity providers/social logins of the user. (e. Google, Microsoft, AzureAD, etc.)"
             parameters: {
                 headers: {
@@ -1996,6 +2004,7 @@ service ManagementService {
         };
     }
 
+    // deprecated: use /zitadel.user.v2.UserService/RemoveLinkedIDP
     rpc RemoveHumanLinkedIDP(RemoveHumanLinkedIDPRequest) returns (RemoveHumanLinkedIDPResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/idps/{idp_id}/{linked_user_id}"
@@ -2008,6 +2017,7 @@ service ManagementService {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Users"
             summary: "Remove Social Login";
+            deprecated: true,
             description: "Remove a configured social logins/identity providers of the user (e.g. Google, Microsoft, AzureAD, etc.). The user will not be able to log in with the given provider afterward. Make sure the user does have other possibilities to authenticate."
             parameters: {
                 headers: {
