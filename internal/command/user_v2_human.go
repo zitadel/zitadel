@@ -434,15 +434,3 @@ func (c *Commands) userHumanWriteModel(ctx context.Context, userID string, profi
 	}
 	return writeModel, nil
 }
-
-func (c *Commands) orgDomainVerifiedWriteModel(ctx context.Context, domain string) (writeModel *OrgDomainVerifiedWriteModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	writeModel = NewOrgDomainVerifiedWriteModel(domain)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return nil, err
-	}
-	return writeModel, nil
-}
