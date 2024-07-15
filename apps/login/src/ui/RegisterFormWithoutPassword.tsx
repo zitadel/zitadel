@@ -12,6 +12,7 @@ import AuthenticationMethodRadio, {
   methods,
 } from "./AuthenticationMethodRadio";
 import Alert from "./Alert";
+import BackButton from "./BackButton";
 
 type Inputs =
   | {
@@ -166,13 +167,7 @@ export default function RegisterFormWithoutPassword({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center justify-between">
-        <Button
-          type="button"
-          variant={ButtonVariants.Secondary}
-          onClick={() => router.back()}
-        >
-          back
-        </Button>
+        <BackButton />
         <Button
           type="submit"
           variant={ButtonVariants.Primary}

@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { ProviderSlug } from "@/lib/demos";
 import Alert from "./Alert";
+import BackButton from "./BackButton";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -141,6 +142,10 @@ export function SignInWithIDP({
           <Alert>{error}</Alert>
         </div>
       )}
+      <div className="mt-8 flex w-full flex-row items-center">
+        <BackButton />
+        <span className="flex-grow"></span>
+      </div>
     </div>
   );
 }

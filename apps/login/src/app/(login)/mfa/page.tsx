@@ -5,6 +5,7 @@ import {
   server,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
+import BackButton from "@/ui/BackButton";
 import ChooseSecondFactor from "@/ui/ChooseSecondFactor";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
@@ -96,6 +97,11 @@ export default async function Page({
         ) : (
           <Alert>No second factors available to setup.</Alert>
         )}
+
+        <div className="mt-8 flex w-full flex-row items-center">
+          <BackButton />
+          <span className="flex-grow"></span>
+        </div>
       </div>
     </DynamicTheme>
   );

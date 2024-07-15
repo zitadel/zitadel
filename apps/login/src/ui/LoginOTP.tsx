@@ -10,6 +10,7 @@ import { Checks } from "@zitadel/server";
 import { useForm } from "react-hook-form";
 import { TextInput } from "./Input";
 import { Challenges } from "@zitadel/server";
+import BackButton from "./BackButton";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -228,6 +229,7 @@ export default function LoginOTP({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
+        <BackButton />
         <span className="flex-grow"></span>
         <Button
           type="submit"
