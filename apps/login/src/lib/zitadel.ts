@@ -475,6 +475,28 @@ export async function setEmail(
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
+export async function passwordReset(
+  server: ZitadelServer,
+  userId: string,
+): Promise<any> {
+  const userservice = user.getUser(server);
+  return userservice.passwordReset(
+    {
+      userId,
+      sendLink: {
+        notificationType: 1, // email
+      },
+    },
+    {},
+  );
+}
+
+/**
+ *
+ * @param server
+ * @param userId the id of the user where the email should be set
+ * @returns the newly set email
+ */
 export async function createPasskeyRegistrationLink(
   userId: string,
   token?: string,
