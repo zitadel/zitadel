@@ -1197,7 +1197,7 @@ func (l *Login) appleProvider(ctx context.Context, identityProvider *query.IDPTe
 		identityProvider.AppleIDPTemplate.ClientID,
 		identityProvider.AppleIDPTemplate.TeamID,
 		identityProvider.AppleIDPTemplate.KeyID,
-		l.baseURL(ctx)+EndpointExternalLoginCallbackFormPost,
+		idp_api.CallbackURL(l.externalSecure)(ctx),
 		privateKey,
 		identityProvider.AppleIDPTemplate.Scopes,
 	)
