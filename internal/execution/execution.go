@@ -3,13 +3,13 @@ package execution
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/zitadel/logging"
 
+	zhttp "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -127,5 +127,5 @@ func handleResponse(resp *http.Response) ([]byte, error) {
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
 		return data, nil
 	}
-	return nil, zerrors.ThrowUnknown(fmt.Errorf("StatusCode: %d, Response: \"%s\"", resp.StatusCode, string(data)), "EXEC-dra6yamk98", "Errors.Execution.Failed")
+	return nil, zhttp.HTTPStatusCodeToZitadelError(resp.StatusCode, "EXEC-dra6yamk98", string(data))
 }

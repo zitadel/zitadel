@@ -372,7 +372,7 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", ""))
 				},
 			},
 		},
@@ -386,7 +386,7 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "body"))
 				}},
 		},
 		{

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -133,6 +135,132 @@ func TestZitadelErrorToHTTPStatusCode(t *testing.T) {
 			if gotOk != tt.wantOk {
 				t.Errorf("ZitadelErrorToHTTPStatusCode() gotOk = %v, want %v", gotOk, tt.wantOk)
 			}
+		})
+	}
+}
+
+func TestHTTPStatusCodeToZitadelError(t *testing.T) {
+	type args struct {
+		statusCode int
+		id         string
+		message    string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr error
+	}{
+		{
+			name: "StatusOK",
+			args: args{
+				statusCode: http.StatusOK,
+			},
+			wantErr: nil,
+		},
+		{
+			name: "StatusConflict",
+			args: args{
+				statusCode: http.StatusConflict,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowAlreadyExists(nil, "id", "message"),
+		},
+		{
+			name: "StatusGatewayTimeout",
+			args: args{
+				statusCode: http.StatusGatewayTimeout,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowDeadlineExceeded(nil, "id", "message"),
+		},
+		{
+			name: "StatusInternalServerError",
+			args: args{
+				statusCode: http.StatusInternalServerError,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowInternal(nil, "id", "message"),
+		},
+		{
+			name: "StatusBadRequest",
+			args: args{
+				statusCode: http.StatusBadRequest,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowInvalidArgument(nil, "id", "message"),
+		},
+		{
+			name: "StatusNotFound",
+			args: args{
+				statusCode: http.StatusNotFound,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowNotFound(nil, "id", "message"),
+		},
+		{
+			name: "StatusForbidden",
+			args: args{
+				statusCode: http.StatusForbidden,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowPermissionDenied(nil, "id", "message"),
+		},
+		{
+			name: "StatusUnauthorized",
+			args: args{
+				statusCode: http.StatusUnauthorized,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowUnauthenticated(nil, "id", "message"),
+		},
+		{
+			name: "StatusServiceUnavailable",
+			args: args{
+				statusCode: http.StatusServiceUnavailable,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowUnavailable(nil, "id", "message"),
+		},
+		{
+			name: "StatusNotImplemented",
+			args: args{
+				statusCode: http.StatusNotImplemented,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowUnimplemented(nil, "id", "message"),
+		},
+		{
+			name: "StatusTooManyRequests",
+			args: args{
+				statusCode: http.StatusTooManyRequests,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowResourceExhausted(nil, "id", "message"),
+		},
+		{
+			name: "Unknown",
+			args: args{
+				statusCode: 1000,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowUnknown(nil, "id", "message"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := HTTPStatusCodeToZitadelError(tt.args.statusCode, tt.args.id, tt.args.message)
+			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
 }
