@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
