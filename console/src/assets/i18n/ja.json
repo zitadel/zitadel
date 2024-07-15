@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "選択したアクションの削除",
         "DESCRIPTION": "フローから選択したアクションを削除してよろしいですか？"
-      }
+      },
+      "ABOUTNAME": "アクションの名前とJavaScript内の関数の名前は同じである必要があります"
     },
     "TOAST": {
       "ACTIONSSET": "アクションセット",

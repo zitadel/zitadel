@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Radera valda åtgärder?",
         "DESCRIPTION": "Är du säker på att du vill radera de valda åtgärderna från flödet?"
-      }
+      },
+      "ABOUTNAME": "Namnet på åtgärden och namnet på funktionen i javascriptet måste vara detsamma"
     },
     "TOAST": {
       "ACTIONSSET": "Åtgärder sparade",

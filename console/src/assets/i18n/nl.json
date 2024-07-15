@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Geselecteerde acties verwijderen?",
         "DESCRIPTION": "Weet u zeker dat u de geselecteerde acties uit de flow wilt verwijderen?"
-      }
+      },
+      "ABOUTNAME": "De naam van de actie en de naam van de functie in het javascript moeten hetzelfde zijn"
     },
     "TOAST": {
       "ACTIONSSET": "Acties ingesteld",

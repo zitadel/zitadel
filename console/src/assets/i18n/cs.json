@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Smazat vybrané akce?",
         "DESCRIPTION": "Jste si jisti, že chcete smazat vybrané akce z toku?"
-      }
+      },
+      "ABOUTNAME": "Název akce a název funkce v javascriptu musí být stejný"
     },
     "TOAST": {
       "ACTIONSSET": "Akce nastaveny",

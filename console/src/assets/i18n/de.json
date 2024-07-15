@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Ausgewählte Aktionen löschen?",
         "DESCRIPTION": "Wollen Sie die gewählten Aktionen wirklich löschen?"
-      }
+      },
+      "ABOUTNAME": "Der Name der Aktion und der Name der Funktion im Javascript müssen identisch sein"
     },
     "TOAST": {
       "ACTIONSSET": "Aktionen gesetzt",
