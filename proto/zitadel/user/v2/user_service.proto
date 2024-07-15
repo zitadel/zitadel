@@ -111,6 +111,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service UserService {
 
   // Create a new human user
+  //
+  // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
     option (google.api.http) = {
       post: "/v2/users/human"
@@ -128,8 +130,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Create a user (Human)";
-      description: "Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned."
       responses: {
         key: "200"
         value: {
@@ -139,7 +139,9 @@ service UserService {
     };
   }
 
-
+  // User by ID
+  //
+  // Returns the full user object (human or machine) including the profile, email, etc..
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
     option (google.api.http) = {
       get: "/v2/users/{user_id}"
@@ -155,8 +157,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "User by ID";
-      description: "Returns the full user object (human or machine) including the profile, email, etc."
       responses: {
         key: "200"
         value: {
@@ -166,6 +166,9 @@ service UserService {
     };
   }
 
+  // Search Users
+  //
+  // Search for users. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination..
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option (google.api.http) = {
       post: "/v2/users"
@@ -182,8 +185,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Search Users";
-      description: "Search for users. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination."
       responses: {
         key: "200";
         value: {
@@ -204,7 +205,9 @@ service UserService {
     };
   }
 
-  // Change the email of a user
+  // Change the user email
+  //
+  // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email..
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email"
@@ -218,8 +221,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Change the user email";
-      description: "Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email."
       responses: {
         key: "200"
         value: {
@@ -229,8 +230,9 @@ service UserService {
     };
   }
 
-
   // Resend code to verify user email
+  //
+  // Resend code to verify user email.
   rpc ResendEmailCode (ResendEmailCodeRequest) returns (ResendEmailCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email/resend"
@@ -244,8 +246,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Resend code to verify user email";
-      description: "Resend code to verify user email."
       responses: {
         key: "200"
         value: {
@@ -255,7 +255,9 @@ service UserService {
     };
   }
 
-  // Verify the email with the provided code
+  // Verify the email
+  //
+  // Verify the email with the generated code..
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/email/verify"
@@ -269,8 +271,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Verify the email";
-      description: "Verify the email with the generated code."
       responses: {
         key: "200"
         value: {
@@ -280,7 +280,9 @@ service UserService {
     };
   }
 
-  // Change the phone of a user
+  // Set the user phone
+  //
+  // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms..
   rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone"
@@ -294,8 +296,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Set the user phone";
-      description: "Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms."
       responses: {
         key: "200"
         value: {
@@ -305,6 +305,9 @@ service UserService {
     };
   }
 
+  // Resend code to verify user phone
+  //
+  // Resend code to verify user phone.
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/resend"
@@ -318,8 +321,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Resend code to verify user phone";
-      description: "Resend code to verify user phone."
       responses: {
         key: "200"
         value: {
@@ -329,7 +330,9 @@ service UserService {
     };
   }
 
-  // Verify the phone with the provided code
+  // Verify the phone
+  //
+  // Verify the phone with the generated code..
   rpc VerifyPhone (VerifyPhoneRequest) returns (VerifyPhoneResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/phone/verify"
@@ -343,8 +346,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Verify the phone";
-      description: "Verify the phone with the generated code."
       responses: {
         key: "200"
         value: {
@@ -354,6 +355,9 @@ service UserService {
     };
   }
 
+  // Update User
+  //
+  // Update all information from a user..
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
     option (google.api.http) = {
       put: "/v2/users/human/{user_id}"
@@ -366,8 +370,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Update User";
-      description: "Update all information from a user."
       responses: {
         key: "200"
         value: {
@@ -377,6 +379,9 @@ service UserService {
     };
   }
 
+  // Deactivate user
+  //
+  // The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data..
   rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/deactivate"
@@ -390,8 +395,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Deactivate user";
-      description: "The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data."
       responses: {
         key: "200"
         value: {
@@ -401,6 +404,9 @@ service UserService {
     };
   }
 
+  // Reactivate user
+  //
+  // Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'..
   rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/reactivate"
@@ -414,8 +420,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Reactivate user";
-      description: "Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'."
       responses: {
         key: "200"
         value: {
@@ -425,6 +429,9 @@ service UserService {
     };
   }
 
+  // Lock user
+  //
+  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)..
   rpc LockUser(LockUserRequest) returns (LockUserResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/lock"
@@ -438,8 +445,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Lock user";
-      description: "The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)"
       responses: {
         key: "200"
         value: {
@@ -449,6 +454,9 @@ service UserService {
     };
   }
 
+  // Unlock user
+  //
+  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)..
   rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/unlock"
@@ -462,8 +470,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Unlock user";
-      description: "Unlock a user with the state 'locked'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'locked'."
       responses: {
         key: "200"
         value: {
@@ -473,6 +479,9 @@ service UserService {
     };
   }
 
+  // Delete user
+  //
+  // The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found..
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}"
@@ -485,8 +494,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Delete user";
-      description: "The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found"
       responses: {
         key: "200"
         value: {
@@ -496,6 +503,9 @@ service UserService {
     };
   }
 
+  // Start the registration of passkey for a user
+  //
+  // Start the registration of a passkey for a user, as a response the public key credential creation options are returned, which are used to verify the passkey..
   rpc RegisterPasskey (RegisterPasskeyRequest) returns (RegisterPasskeyResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/passkeys"
@@ -508,8 +518,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Start the registration of passkey for a user";
-      description: "Start the registration of a passkey for a user, as a response the public key credential creation options are returned, which are used to verify the passkey."
       responses: {
         key: "200"
         value: {
@@ -518,6 +526,10 @@ service UserService {
       };
     };
   }
+
+  // Verify a passkey for a user
+  //
+  // Verify the passkey registration with the public key credential..
   rpc VerifyPasskeyRegistration (VerifyPasskeyRegistrationRequest) returns (VerifyPasskeyRegistrationResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/passkeys/{passkey_id}"
@@ -530,8 +542,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Verify a passkey for a user";
-      description: "Verify the passkey registration with the public key credential."
       responses: {
         key: "200"
         value: {
@@ -540,6 +550,10 @@ service UserService {
       };
     };
   }
+
+  // Create a passkey registration link for a user
+  //
+  // Create a passkey registration link which includes a code and either return it or send it to the user..
   rpc CreatePasskeyRegistrationLink (CreatePasskeyRegistrationLinkRequest) returns (CreatePasskeyRegistrationLinkResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/passkeys/registration_link"
@@ -552,8 +566,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Create a passkey registration link for a user";
-      description: "Create a passkey registration link which includes a code and either return it or send it to the user."
       responses: {
         key: "200"
         value: {
@@ -563,7 +575,9 @@ service UserService {
     };
   }
 
-  // List passkeys of a human user
+  // List passkeys of an user
+  //
+  // List passkeys of an user
   rpc ListPasskeys (ListPasskeysRequest) returns (ListPasskeysResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/passkeys/_search"
@@ -577,8 +591,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "List passkeys of an user";
-      description: "List passkeys of an user";
       responses: {
         key: "200"
         value: {
@@ -588,6 +600,9 @@ service UserService {
     };
   }
 
+  // Remove passkey from a user
+  //
+  // Remove passkey from a user.
   rpc RemovePasskey (RemovePasskeyRequest) returns (RemovePasskeyResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/passkeys/{passkey_id}"
@@ -599,8 +614,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Remove passkey from a user";
-      description: "Remove passkey from a user"
       responses: {
         key: "200"
         value: {
@@ -610,6 +623,9 @@ service UserService {
     };
   }
 
+  // Start the registration of a u2f token for a user
+  //
+  // Start the registration of a u2f token for a user, as a response the public key credential creation options are returned, which are used to verify the u2f token..
   rpc RegisterU2F (RegisterU2FRequest) returns (RegisterU2FResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/u2f"
@@ -622,8 +638,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Start the registration of a u2f token for a user";
-      description: "Start the registration of a u2f token for a user, as a response the public key credential creation options are returned, which are used to verify the u2f token."
       responses: {
         key: "200"
         value: {
@@ -633,6 +647,9 @@ service UserService {
     };
   }
 
+  // Verify a u2f token for a user
+  //
+  // Verify the u2f token registration with the public key credential..
   rpc VerifyU2FRegistration (VerifyU2FRegistrationRequest) returns (VerifyU2FRegistrationResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/u2f/{u2f_id}"
@@ -645,8 +662,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Verify a u2f token for a user";
-      description: "Verify the u2f token registration with the public key credential."
       responses: {
         key: "200"
         value: {
@@ -656,6 +671,9 @@ service UserService {
     };
   }
 
+  // Remove u2f token from a user
+  //
+  // Remove u2f token from a user.
   rpc RemoveU2F (RemoveU2FRequest) returns (RemoveU2FResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/u2f/{u2f_id}"
@@ -678,6 +696,9 @@ service UserService {
     };
   }
 
+  // Start the registration of a TOTP generator for a user
+  //
+  // Start the registration of a TOTP generator for a user, as a response a secret returned, which is used to initialize a TOTP app or device..
   rpc RegisterTOTP (RegisterTOTPRequest) returns (RegisterTOTPResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/totp"
@@ -690,8 +711,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Start the registration of a TOTP generator for a user";
-      description: "Start the registration of a TOTP generator for a user, as a response a secret returned, which is used to initialize a TOTP app or device."
       responses: {
         key: "200"
         value: {
@@ -701,6 +720,9 @@ service UserService {
     };
   }
 
+  // Verify a TOTP generator for a user
+  //
+  // Verify the TOTP registration with a generated code..
   rpc VerifyTOTPRegistration (VerifyTOTPRegistrationRequest) returns (VerifyTOTPRegistrationResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/totp/verify"
@@ -713,8 +735,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Verify a TOTP generator for a user";
-      description: "Verify the TOTP registration with a generated code."
       responses: {
         key: "200"
         value: {
@@ -724,6 +744,9 @@ service UserService {
     };
   }
 
+  // Remove TOTP generator from a user
+  //
+  // Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second-factor afterward..
   rpc RemoveTOTP (RemoveTOTPRequest) returns (RemoveTOTPResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/totp"
@@ -735,8 +758,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Remove TOTP generator from a user";
-      description: "Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second-factor afterward."
       responses: {
         key: "200"
         value: {
@@ -746,6 +767,9 @@ service UserService {
     };
   }
 
+  // Add OTP SMS for a user
+  //
+  // Add a new One-Time-Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor..
   rpc AddOTPSMS (AddOTPSMSRequest) returns (AddOTPSMSResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/otp_sms"
@@ -758,8 +782,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Add OTP SMS for a user";
-      description: "Add a new One-Time-Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor."
       responses: {
         key: "200"
         value: {
@@ -769,6 +791,9 @@ service UserService {
     };
   }
 
+  // Remove One-Time-Password (OTP) SMS from a user
+  //
+  // Remove the configured One-Time-Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward..
   rpc RemoveOTPSMS (RemoveOTPSMSRequest) returns (RemoveOTPSMSResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/otp_sms"
@@ -780,8 +805,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Remove One-Time-Password (OTP) SMS from a user";
-      description: "Remove the configured One-Time-Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
       responses: {
         key: "200"
         value: {
@@ -791,6 +814,9 @@ service UserService {
     };
   }
 
+  // Add OTP Email for a user
+  //
+  // Add a new One-Time-Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor..
   rpc AddOTPEmail (AddOTPEmailRequest) returns (AddOTPEmailResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/otp_email"
@@ -803,8 +829,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Add OTP Email for a user";
-      description: "Add a new One-Time-Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor."
       responses: {
         key: "200"
         value: {
@@ -814,6 +838,9 @@ service UserService {
     };
   }
 
+  // Remove One-Time-Password (OTP) Email from a user
+  //
+  // Remove the configured One-Time-Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward..
   rpc RemoveOTPEmail (RemoveOTPEmailRequest) returns (RemoveOTPEmailResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/otp_email"
@@ -825,8 +852,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Remove One-Time-Password (OTP) Email from a user";
-      description: "Remove the configured One-Time-Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
       responses: {
         key: "200"
         value: {
@@ -836,7 +861,9 @@ service UserService {
     };
   }
 
-  // Start an IDP authentication (for external login, registration or linking)
+  // Start flow with an identity provider
+  //
+  // Start a flow with an identity provider, for external login, registration or linking..
   rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
       post: "/v2/idp_intents"
@@ -850,8 +877,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Start flow with an identity provider";
-      description: "Start a flow with an identity provider, for external login, registration or linking";
       responses: {
         key: "200"
         value: {
@@ -861,6 +886,9 @@ service UserService {
     };
   }
 
+  // Retrieve the information returned by the identity provider
+  //
+  // Retrieve the information returned by the identity provider for registration or updating an existing user with new information..
   rpc RetrieveIdentityProviderIntent (RetrieveIdentityProviderIntentRequest) returns (RetrieveIdentityProviderIntentResponse) {
     option (google.api.http) = {
       post: "/v2/idp_intents/{idp_intent_id}"
@@ -874,8 +902,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Retrieve the information returned by the identity provider";
-      description: "Retrieve the information returned by the identity provider for registration or updating an existing user with new information";
       responses: {
         key: "200"
         value: {
@@ -885,7 +911,9 @@ service UserService {
     };
   }
 
-  // Link an IDP to an existing user
+  // Add link to an identity provider to an user
+  //
+  // Add link to an identity provider to an user..
   rpc AddIDPLink (AddIDPLinkRequest) returns (AddIDPLinkResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/links"
@@ -899,8 +927,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Add link to an identity provider to an user";
-      description: "Add link to an identity provider to an user";
       responses: {
         key: "200"
         value: {
@@ -910,7 +936,9 @@ service UserService {
     };
   }
 
-  // List IDP links of a human user
+  // List links to an identity provider of an user
+  //
+  // List links to an identity provider of an user.
   rpc ListIDPLinks (ListIDPLinksRequest) returns (ListIDPLinksResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/links/_search"
@@ -924,8 +952,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "List links to an identity provider of an user";
-      description: "List links to an identity provider of an user";
       responses: {
         key: "200"
         value: {
@@ -935,7 +961,9 @@ service UserService {
     };
   }
 
-  // Remove link of an IDP to an user
+  // Remove link of an identity provider to an user
+  //
+  // Remove link of an identity provider to an user.
   rpc RemoveIDPLink (RemoveIDPLinkRequest) returns (RemoveIDPLinkResponse) {
     option (google.api.http) = {
       delete: "/v2/users/{user_id}/links/{idp_id}/{linked_user_id}"
@@ -949,8 +977,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Remove link of an identity provider to an user";
-      description: "Remove link of an identity provider to an user";
       responses: {
         key: "200"
         value: {
@@ -960,7 +986,9 @@ service UserService {
     };
   }
 
-  // Request password reset
+  // Request a code to reset a password
+  //
+  // Request a code to reset a password..
   rpc PasswordReset (PasswordResetRequest) returns (PasswordResetResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/password_reset"
@@ -974,8 +1002,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Request a code to reset a password";
-      description: "Request a code to reset a password";
       responses: {
         key: "200"
         value: {
@@ -986,6 +1012,8 @@ service UserService {
   }
 
   // Change password
+  //
+  // Change the password of a user with either a verification code or the current password..
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
       post: "/v2/users/{user_id}/password"
@@ -999,8 +1027,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Change password";
-      description: "Change the password of a user with either a verification code or the current password.";
       responses: {
         key: "200"
         value: {
@@ -1011,6 +1037,8 @@ service UserService {
   }
 
   // List all possible authentication methods of a user
+  //
+  // List all possible authentication methods of a user like password, passwordless, (T)OTP and more..
   rpc ListAuthenticationMethodTypes (ListAuthenticationMethodTypesRequest) returns (ListAuthenticationMethodTypesResponse) {
     option (google.api.http) = {
       get: "/v2/users/{user_id}/authentication_methods"
@@ -1023,8 +1051,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "List all possible authentication methods of a user";
-      description: "List all possible authentication methods of a user like password, passwordless, (T)OTP and more";
       responses: {
         key: "200"
         value: {
