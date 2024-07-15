@@ -60,7 +60,7 @@ func (h *locker) handleLock(ctx context.Context, errs chan error, lockDuration t
 		select {
 		case <-renewLock.C:
 			errs <- h.renewLock(ctx, lockDuration, instanceIDs...)
-			//refresh the lock 500ms before it times out. 500ms should be enough for one transaction
+			// refresh the lock 500ms before it times out. 500ms should be enough for one transaction
 			renewLock.Reset(lockDuration - (500 * time.Millisecond))
 		case <-ctx.Done():
 			close(errs)
@@ -95,7 +95,7 @@ func (h *locker) lockStatement(lockDuration time.Duration, instanceIDs database.
 	valueQueries := make([]string, len(instanceIDs))
 	values := make([]interface{}, len(instanceIDs)+4)
 	values[0] = h.workerName
-	//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
+	// the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
 	values[1] = lockDuration
 	values[2] = h.projectionName
 	for i, instanceID := range instanceIDs {
