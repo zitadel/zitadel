@@ -359,17 +359,10 @@ export async function setEmail(userId: string) {
  * @param userId the id of the user where the email should be set
  * @returns the newly set email
  */
-export async function passwordReset(
-  server: ZitadelServer,
-  userId: string,
-): Promise<any> {
-  const userservice = user.getUser(server);
-  return userservice.passwordReset(
+export async function passwordReset(userId: string): Promise<any> {
+  return userService.passwordReset(
     {
       userId,
-      sendLink: {
-        notificationType: 1, // email
-      },
     },
     {},
   );
