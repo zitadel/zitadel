@@ -7,6 +7,7 @@ import {
   server,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
+import BackButton from "@/ui/BackButton";
 import { Button, ButtonVariants } from "@/ui/Button";
 import DynamicTheme from "@/ui/DynamicTheme";
 import { Spinner } from "@/ui/Spinner";
@@ -154,6 +155,7 @@ export default async function Page({
             </p>
 
             <div className="mt-8 flex w-full flex-row items-center">
+              <BackButton />
               <span className="flex-grow"></span>
               <Link
                 href={

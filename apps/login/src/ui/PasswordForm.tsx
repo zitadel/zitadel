@@ -13,6 +13,7 @@ import {
   Checks,
   AuthenticationMethodType,
 } from "@zitadel/server";
+import BackButton from "./BackButton";
 
 type Inputs = {
   password: string;
@@ -60,6 +61,33 @@ export default function PasswordForm({
         checks: {
           password: { password: values.password },
         } as Checks,
+        authRequestId,
+      }),
+    });
+
+    const response = await res.json();
+
+    setLoading(false);
+    if (!res.ok) {
+      console.log(response.details.details);
+      setError(response.details?.details ?? "Could not verify password");
+      return Promise.reject(response.details);
+    }
+    return response;
+  }
+
+  async function resetPassword() {
+    setError("");
+    setLoading(true);
+
+    const res = await fetch("/api/resetpassword", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        loginName,
+        organization,
         authRequestId,
       }),
     });
@@ -200,6 +228,13 @@ export default function PasswordForm({
           label="Password"
           //   error={errors.username?.message as string}
         />
+        <button
+          className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
+          onClick={() => resetPassword()}
+          disabled={loading}
+        >
+          Reset Password
+        </button>
 
         {loginName && (
           <input type="hidden" name="loginName" value={loginName} />
@@ -213,9 +248,7 @@ export default function PasswordForm({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
-        {/* <Button type="button" variant={ButtonVariants.Secondary}>
-          back
-        </Button> */}
+        <BackButton />
         <span className="flex-grow"></span>
         <Button
           type="submit"

@@ -8,6 +8,7 @@ import { Spinner } from "./Spinner";
 import Alert from "./Alert";
 import { AuthRequest, RegisterPasskeyResponse } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
+import BackButton from "./BackButton";
 type Inputs = {};
 
 type Props = {
@@ -216,13 +217,7 @@ export default function RegisterPasskey({
             skip
           </Button>
         ) : (
-          <Button
-            type="button"
-            variant={ButtonVariants.Secondary}
-            onClick={() => router.back()}
-          >
-            back
-          </Button>
+          <BackButton />
         )}
 
         <span className="flex-grow"></span>

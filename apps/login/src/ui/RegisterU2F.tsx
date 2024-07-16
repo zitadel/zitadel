@@ -8,6 +8,7 @@ import { Spinner } from "./Spinner";
 import Alert from "./Alert";
 import { RegisterU2FResponse } from "@zitadel/server";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
+import BackButton from "./BackButton";
 type Inputs = {};
 
 type Props = {
@@ -191,13 +192,7 @@ export default function RegisterU2F({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
-        <Button
-          type="button"
-          variant={ButtonVariants.Secondary}
-          onClick={() => router.back()}
-        >
-          back
-        </Button>
+        <BackButton />
 
         <span className="flex-grow"></span>
         <Button
