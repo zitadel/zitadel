@@ -1,7 +1,7 @@
 "use server";
 
 import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
-import { getSession, server, verifyTOTPRegistration } from "./zitadel";
+import { getSession, verifyTOTPRegistration } from "./zitadel";
 
 export async function verifyTOTP(
   code: string,
@@ -10,7 +10,7 @@ export async function verifyTOTP(
 ) {
   return getMostRecentCookieWithLoginname(loginName, organization)
     .then((recent) => {
-      return getSession(server, recent.id, recent.token).then((response) => {
+      return getSession(recent.id, recent.token).then((response) => {
         return { session: response?.session, token: recent.token };
       });
     })

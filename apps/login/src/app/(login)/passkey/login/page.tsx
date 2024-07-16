@@ -1,4 +1,4 @@
-import { getBrandingSettings, getSession, server } from "@/lib/zitadel";
+import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import LoginPasskey from "@/ui/LoginPasskey";
@@ -32,7 +32,7 @@ export default async function Page({
       loginName,
       organization,
     );
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }
@@ -41,14 +41,14 @@ export default async function Page({
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById(sessionId, organization);
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }
     });
   }
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>

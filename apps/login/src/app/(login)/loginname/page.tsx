@@ -2,29 +2,17 @@ import {
   getBrandingSettings,
   getLegalAndSupportSettings,
   getLoginSettings,
-  server,
+  settingsService,
 } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import { SignInWithIDP } from "@/ui/SignInWithIDP";
 import UsernameForm from "@/ui/UsernameForm";
-import {
-  GetActiveIdentityProvidersResponse,
-  IdentityProvider,
-  ZitadelServer,
-  settings,
-} from "@zitadel/server";
+import { makeReqCtx } from "@zitadel/client2/v2beta";
 
-function getIdentityProviders(
-  server: ZitadelServer,
-  orgId?: string,
-): Promise<IdentityProvider[] | undefined> {
-  const settingsService = settings.getSettings(server);
+function getIdentityProviders(orgId?: string) {
   return settingsService
-    .getActiveIdentityProviders(
-      orgId ? { ctx: { orgId } } : { ctx: { instance: true } },
-      {},
-    )
-    .then((resp: GetActiveIdentityProvidersResponse) => {
+    .getActiveIdentityProviders({ ctx: makeReqCtx(orgId) }, {})
+    .then((resp) => {
       return resp.identityProviders;
     });
 }
@@ -39,16 +27,16 @@ export default async function Page({
   const organization = searchParams?.organization;
   const submit: boolean = searchParams?.submit === "true";
 
-  const loginSettings = await getLoginSettings(server, organization);
-  const legal = await getLegalAndSupportSettings(server);
+  const loginSettings = await getLoginSettings(organization);
+  const legal = await getLegalAndSupportSettings();
 
-  const identityProviders = await getIdentityProviders(server, organization);
+  const identityProviders = await getIdentityProviders(organization);
 
   const host = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : "http://localhost:3000";
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>

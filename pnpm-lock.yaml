@@ -45,26 +45,29 @@ importers:
   apps/login:
     dependencies:
       '@headlessui/react':
-        specifier: ^1.7.14
+        specifier: ^1.7.18
         version: 1.7.19(react-dom@18.3.1)(react@18.3.1)
       '@heroicons/react':
-        specifier: 2.0.13
-        version: 2.0.13(react@18.3.1)
+        specifier: 2.1.3
+        version: 2.1.3(react@18.3.1)
       '@tailwindcss/forms':
-        specifier: 0.5.3
-        version: 0.5.3(tailwindcss@3.2.4)
+        specifier: 0.5.7
+        version: 0.5.7(tailwindcss@3.2.4)
       '@vercel/analytics':
-        specifier: ^1.0.0
+        specifier: ^1.2.2
         version: 1.2.2(next@14.2.3)(react@18.3.1)
-      '@zitadel/client':
+      '@zitadel/client2':
         specifier: workspace:*
-        version: link:../../packages/zitadel-client
+        version: link:../../packages/zitadel-client2
+      '@zitadel/node':
+        specifier: workspace:*
+        version: link:../../packages/zitadel-node
+      '@zitadel/proto':
+        specifier: workspace:*
+        version: link:../../packages/zitadel-proto
       '@zitadel/react':
         specifier: workspace:*
         version: link:../../packages/zitadel-react
-      '@zitadel/server':
-        specifier: workspace:*
-        version: link:../../packages/zitadel-server
       clsx:
         specifier: 1.2.1
         version: 1.2.1
@@ -257,6 +260,9 @@ importers:
 
   packages/zitadel-next:
     dependencies:
+      '@zitadel/node':
+        specifier: workspace:*
+        version: link:../zitadel-node
       '@zitadel/react':
         specifier: workspace:*
         version: link:../zitadel-react
@@ -270,9 +276,6 @@ importers:
       '@types/react':
         specifier: ^17.0.13
         version: 17.0.80
-      '@zitadel/server':
-        specifier: workspace:*
-        version: link:../zitadel-server
       '@zitadel/tsconfig':
         specifier: workspace:*
         version: link:../zitadel-tsconfig
@@ -294,10 +297,16 @@ importers:
       '@connectrpc/connect-node':
         specifier: ^1.4.0
         version: 1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0)
+      '@connectrpc/connect-web':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0)
       jose:
         specifier: ^5.3.0
         version: 5.3.0
     devDependencies:
+      '@types/node':
+        specifier: ^20.14.2
+        version: 20.14.2
       '@zitadel/client2':
         specifier: workspace:*
         version: link:../zitadel-client2
@@ -323,15 +332,15 @@ importers:
   packages/zitadel-react:
     dependencies:
       react:
-        specifier: 18.2.0
-        version: 18.2.0
+        specifier: ^18.2.0
+        version: 18.3.1
     devDependencies:
       '@testing-library/jest-dom':
         specifier: ^6.4.5
         version: 6.4.5(vitest@1.6.0)
       '@testing-library/react':
         specifier: ^14.0.0
-        version: 14.3.1(react-dom@18.3.1)(react@18.2.0)
+        version: 14.3.1(react-dom@18.3.1)(react@18.3.1)
       '@types/react':
         specifier: ^18.2.17
         version: 18.3.2
@@ -1006,6 +1015,16 @@ packages:
       undici: 5.28.4
     dev: false
 
+  /@connectrpc/connect-web@1.4.0(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.4.0):
+    resolution: {integrity: sha512-13aO4psFbbm7rdOFGV0De2Za64DY/acMspgloDlcOKzLPPs0yZkhp1OOzAQeiAIr7BM/VOHIA3p8mF0inxCYTA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.4.2
+      '@connectrpc/connect': 1.4.0
+    dependencies:
+      '@bufbuild/protobuf': 1.10.0
+      '@connectrpc/connect': 1.4.0(@bufbuild/protobuf@1.10.0)
+    dev: false
+
   /@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.10.0):
     resolution: {integrity: sha512-vZeOkKaAjyV4+RH3+rJZIfDFJAfr+7fyYr6sLDKbYX3uuTVszhFe9/YKf5DNqrDb5cKdKVlYkGn6DTDqMitAnA==}
     peerDependencies:
@@ -1550,8 +1569,8 @@ packages:
       react-dom: 18.3.1(react@18.3.1)
     dev: false
 
-  /@heroicons/react@2.0.13(react@18.3.1):
-    resolution: {integrity: sha512-iSN5XwmagrnirWlYEWNPdCDj9aRYVD/lnK3JlsC9/+fqGF80k8C7rl+1HCvBX0dBoagKqOFBs6fMhJJ1hOg1EQ==}
+  /@heroicons/react@2.1.3(react@18.3.1):
+    resolution: {integrity: sha512-fEcPfo4oN345SoqdlCDdSa4ivjaKbk0jTd+oubcgNxnNgAfzysfwWfQUr+51wigiWHQQRiZNd1Ao0M5Y3M2EGg==}
     peerDependencies:
       react: '>= 16'
     dependencies:
@@ -2011,6 +2030,16 @@ packages:
     dependencies:
       mini-svg-data-uri: 1.4.4
       tailwindcss: 3.2.4(postcss@8.4.21)
+    dev: true
+
+  /@tailwindcss/forms@0.5.7(tailwindcss@3.2.4):
+    resolution: {integrity: sha512-QE7X69iQI+ZXwldE+rzasvbJiyV/ju1FGHH0Qn2W3FKbuYtqp8LKcy6iSw79fVUT5/Vvf+0XgLCeYVG+UV6hOw==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
+    dependencies:
+      mini-svg-data-uri: 1.4.4
+      tailwindcss: 3.2.4(postcss@8.4.21)
+    dev: false
 
   /@tanstack/react-virtual@3.5.0(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-rtvo7KwuIvqK9zb0VZ5IL7fiJAEnG+0EiFZz8FUOs+2mhGqdGmjKIaT1XU7Zq0eFqL0jonLlhbayJI/J2SA/Bw==}
@@ -2087,7 +2116,7 @@ packages:
       vitest: 1.6.0
     dev: true
 
-  /@testing-library/react@14.3.1(react-dom@18.3.1)(react@18.2.0):
+  /@testing-library/react@14.3.1(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-H99XjUhWQw0lTgyMN05W3xQG1Nh4lq574D8keFf1dDoNTJgp66VbJozRaczoF+wsiaPJNt/TcnfpLGufGxSrZQ==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -2097,8 +2126,8 @@ packages:
       '@babel/runtime': 7.22.3
       '@testing-library/dom': 9.3.4
       '@types/react-dom': 18.3.0
-      react: 18.2.0
-      react-dom: 18.3.1(react@18.2.0)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
     dev: true
 
   /@testing-library/react@15.0.7(@types/react@18.2.8)(react-dom@18.3.1)(react@18.3.1):
@@ -6820,6 +6849,7 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.2
+    dev: false
 
   /react-dom@18.3.1(react@18.3.1):
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
@@ -6861,6 +6891,7 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       loose-envify: 1.4.0
+    dev: false
 
   /react@18.3.1:
     resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}

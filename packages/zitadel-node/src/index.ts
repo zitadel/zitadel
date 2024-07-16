@@ -1,6 +1,6 @@
 import { NewAuthorizationBearerInterceptor } from "@zitadel/client2";
 import {
-  createGrpcWebTransport,
+  createGrpcTransport,
   GrpcTransportOptions,
 } from "@connectrpc/connect-node";
 import { importPKCS8, SignJWT } from "jose";
@@ -14,7 +14,7 @@ export function createServerTransport(
   token: string,
   opts: GrpcTransportOptions,
 ) {
-  return createGrpcWebTransport({
+  return createGrpcTransport({
     ...opts,
     interceptors: [
       ...(opts.interceptors || []),

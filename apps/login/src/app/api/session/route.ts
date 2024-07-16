@@ -1,5 +1,4 @@
 import {
-  server,
   deleteSession,
   getSession,
   getUserByID,
@@ -17,7 +16,6 @@ import {
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "@/utils/session";
-import { Challenges, Checks, RequestChallenges } from "@zitadel/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -104,27 +102,23 @@ export async function PUT(request: NextRequest) {
           challenges &&
           (challenges.otpEmail === "" || challenges.otpSms === "")
         ) {
-          const sessionResponse = await getSession(
-            server,
-            recent.id,
-            recent.token,
-          );
+          const sessionResponse = await getSession(recent.id, recent.token);
+
           if (sessionResponse && sessionResponse.session?.factors?.user?.id) {
             const userResponse = await getUserByID(
               sessionResponse.session.factors.user.id,
             );
-            if (
-              challenges.otpEmail === "" &&
-              userResponse.user?.human?.email?.email
-            ) {
-              challenges.otpEmail = userResponse.user?.human?.email?.email;
+            const humanUser =
+              userResponse.user?.type.case === "human"
+                ? userResponse.user?.type.value
+                : undefined;
+
+            if (challenges.otpEmail === "" && humanUser?.email?.email) {
+              challenges.otpEmail = humanUser?.email?.email;
             }
 
-            if (
-              challenges.otpSms === "" &&
-              userResponse.user?.human?.phone?.phone
-            ) {
-              challenges.otpSms = userResponse.user?.human?.phone?.phone;
+            if (challenges.otpSms === "" && humanUser?.phone?.phone) {
+              challenges.otpSms = humanUser?.phone?.phone;
             }
           }
         }
@@ -176,7 +170,7 @@ export async function DELETE(request: NextRequest) {
   if (id) {
     const session = await getSessionCookieById(id);
 
-    return deleteSession(server, session.id, session.token)
+    return deleteSession(session.id, session.token)
       .then(() => {
         return removeSessionFromCookie(session)
           .then(() => {

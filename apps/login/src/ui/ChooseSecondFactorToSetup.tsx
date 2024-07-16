@@ -1,7 +1,8 @@
 "use client";
 
-import { AuthenticationMethodType, LoginSettings } from "@zitadel/server";
 import { EMAIL, SMS, TOTP, U2F } from "./AuthMethods";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
 
 type Props = {
   loginName?: string;
@@ -48,13 +49,25 @@ export default function ChooseSecondFactorToSetup({
     <div className="grid grid-cols-1 gap-5 w-full pt-4">
       {loginSettings.secondFactors.map((factor, i) => {
         return factor === 1
-          ? TOTP(userMethods.includes(4), "/otp/time-based/set?" + params)
+          ? TOTP(
+              userMethods.includes(AuthenticationMethodType.TOTP),
+              "/otp/time-based/set?" + params,
+            )
           : factor === 2
-            ? U2F(userMethods.includes(5), "/u2f/set?" + params)
+            ? U2F(
+                userMethods.includes(AuthenticationMethodType.U2F),
+                "/u2f/set?" + params,
+              )
             : factor === 3 && emailVerified
-              ? EMAIL(userMethods.includes(7), "/otp/email/set?" + params)
+              ? EMAIL(
+                  userMethods.includes(AuthenticationMethodType.OTP_EMAIL),
+                  "/otp/email/set?" + params,
+                )
               : factor === 4 && phoneVerified
-                ? SMS(userMethods.includes(6), "/otp/sms/set?" + params)
+                ? SMS(
+                    userMethods.includes(AuthenticationMethodType.OTP_SMS),
+                    "/otp/sms/set?" + params,
+                  )
                 : null;
       })}
     </div>

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Checkbox } from "./Checkbox";
-import { LegalAndSupportSettings } from "@zitadel/server";
+import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2beta/legal_settings_pb";
 
 type Props = {
   legal: LegalAndSupportSettings;

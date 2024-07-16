@@ -2,7 +2,6 @@ import {
   getBrandingSettings,
   getLoginSettings,
   getSession,
-  server,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
@@ -22,7 +21,7 @@ export default async function Page({
 }) {
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   const sessionFactors = sessionId
     ? await loadSessionById(sessionId, organization)
@@ -36,7 +35,7 @@ export default async function Page({
       loginName,
       organization,
     );
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }
@@ -45,7 +44,7 @@ export default async function Page({
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById(sessionId, organization);
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }

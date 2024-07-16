@@ -6,8 +6,6 @@ import { LayoutProviders } from "@/ui/LayoutProviders";
 import { Analytics } from "@vercel/analytics/react";
 import ThemeWrapper from "@/ui/ThemeWrapper";
 import { getBrandingSettings } from "@/lib/zitadel";
-import { server } from "../lib/zitadel";
-import { BrandingSettings } from "@zitadel/server";
 import ThemeProvider from "@/ui/ThemeProvider";
 import Theme from "@/ui/Theme";
 
