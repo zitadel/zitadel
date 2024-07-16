@@ -1,5 +1,7 @@
 package feature
 
+import "slices"
+
 //go:generate enumer -type Key -transform snake -trimprefix Key
 type Key int
 
@@ -45,13 +47,9 @@ const (
 	ImprovedPerformanceTypeProjectGrant
 	ImprovedPerformanceTypeProject
 	ImprovedPerformanceTypeUserGrant
+	ImprovedPerformanceTypeOrgDomainVerified
 )
 
 func (f Features) ShouldUseImprovedPerformance(typ ImprovedPerformanceType) bool {
-	for _, improvedType := range f.ImprovedPerformance {
-		if improvedType == typ {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(f.ImprovedPerformance, typ)
 }

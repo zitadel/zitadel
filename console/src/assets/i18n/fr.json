@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Supprimer les actions sélectionnées ?",
         "DESCRIPTION": "Voulez-vous vraiment supprimer les actions sélectionnées du flux ?"
-      }
+      },
+      "ABOUTNAME": "Le nom de l'action et le nom de la fonction dans le javascript doivent être identiques"
     },
     "TOAST": {
       "ACTIONSSET": "Actions définies",
