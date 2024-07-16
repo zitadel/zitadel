@@ -94,6 +94,7 @@ export async function createSessionForUserIdAndUpdateCookie(
   );
 
   if (createdSession) {
+    console.log("cs", createdSession);
     return getSession(
       server,
       createdSession.sessionId,

@@ -69,7 +69,6 @@ export default function PasswordForm({
 
     setLoading(false);
     if (!res.ok) {
-      console.log(response.details.details);
       setError(response.details?.details ?? "Could not verify password");
       return Promise.reject(response.details);
     }
@@ -127,7 +126,40 @@ export default function PasswordForm({
         }
 
         const factor = availableSecondFactors[0];
-        if (factor === 4) {
+        // passwordless
+        if (factor === 2 && isAlternative) {
+          // with OIDC flow
+          if (resp.sessionId && authRequestId) {
+            const params = new URLSearchParams({
+              sessionId: resp.sessionId,
+              authRequest: authRequestId,
+            });
+
+            if (organization) {
+              params.append("organization", organization);
+            }
+
+            return router.push(`/login?` + params);
+          } else {
+            // without OIDC flow
+            const params = new URLSearchParams(
+              authRequestId
+                ? {
+                    loginName: resp.factors.user.loginName,
+                    authRequestId,
+                  }
+                : {
+                    loginName: resp.factors.user.loginName,
+                  },
+            );
+
+            if (organization) {
+              params.append("organization", organization);
+            }
+
+            return router.push(`/signedin?` + params);
+          }
+        } else if (factor === 4) {
           return router.push(`/otp/time-based?` + params);
         } else if (factor === 6) {
           return router.push(`/otp/sms?` + params);
@@ -185,7 +217,7 @@ export default function PasswordForm({
         }
 
         return router.push(`/passkey/add?` + params);
-      } else if (authRequestId && resp && resp.sessionId) {
+      } else if (authRequestId && resp.sessionId) {
         const params = new URLSearchParams({
           sessionId: resp.sessionId,
           authRequest: authRequestId,
