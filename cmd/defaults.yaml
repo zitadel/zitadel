@@ -231,6 +231,13 @@ Projections:
     custom_texts:
       TransactionDuration: 2s
       BulkLimit: 400
+    project_grant_fields:
+      TransactionDuration: 0s
+      BulkLimit: 2000
+    org_domain_verified_fields:
+      TransactionDuration: 0s
+      BulkLimit: 2000
+    
     # The Notifications projection is used for sending emails and SMS to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
