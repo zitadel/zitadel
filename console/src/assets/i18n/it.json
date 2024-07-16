@@ -231,7 +231,7 @@
           "LABEL": "Durata Massima in ore",
           "PW_CHECK": {
             "TITLE": "Controllo Password",
-            "DESCRIPTION": "I tuoi utenti devono cambiare le loro password in questi periodi."
+            "DESCRIPTION": "Gli utenti dovranno ri-autentificarsi con la password dopo questo periodo."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Controllo Login Esterno",
