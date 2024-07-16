@@ -231,7 +231,7 @@
           "LABEL": "Durée de vie maximale en heures",
           "PW_CHECK": {
             "TITLE": "Vérification de Mot de Passe",
-            "DESCRIPTION": "Vos utilisateurs doivent changer leurs mots de passe pendant ces périodes."
+            "DESCRIPTION": "Les utilisateurs devront se réauthentifier avec leur mot de passe après cette période."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Vérification de Connexion Externe",
