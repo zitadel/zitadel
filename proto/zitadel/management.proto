@@ -8182,6 +8182,15 @@ message AddMachineUserRequest {
     zitadel.user.v1.AccessTokenType access_token_type = 4 [
         (validate.rules).enum = {defined_only: true}
     ];
+
+    // optionally set your own id unique for the user.
+    optional string user_id = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"316b7fa5-0535-4adb-9e93-963a91b1010c\"";
+        }
+    ];
 }
 
 message AddMachineUserResponse {

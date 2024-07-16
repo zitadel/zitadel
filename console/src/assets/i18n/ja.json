@@ -231,7 +231,7 @@
           "LABEL": "最大寿命（時間）",
           "PW_CHECK": {
             "TITLE": "パスワードチェック",
-            "DESCRIPTION": "ユーザーは、これらの期間中にパスワードを変更する必要があります。"
+            "DESCRIPTION": "この期間の後、ユーザーはパスワードで再認証する必要があります。"
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "外部ログインチェック",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "選択したアクションの削除",
         "DESCRIPTION": "フローから選択したアクションを削除してよろしいですか？"
-      }
+      },
+      "ABOUTNAME": "アクションの名前とJavaScript内の関数の名前は同じである必要があります"
     },
     "TOAST": {
       "ACTIONSSET": "アクションセット",
