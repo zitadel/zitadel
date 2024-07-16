@@ -245,3 +245,38 @@ func TestServer_VerifyPhone(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_RemovePhone(t *testing.T) {
+	userResp := Tester.CreateHumanUser(CTX)
+	tests := []struct {
+		name    string
+		req     *user.RemovePhoneRequest
+		want    *user.RemovePhoneResponse
+		wantErr bool
+	}{
+		{
+			name: "remove phone",
+			req: &user.RemovePhoneRequest{
+				UserId:           userResp.GetUserId(),
+			},
+			want: &user.RemovePhoneResponse{
+				Details: &object.Details{
+					Sequence:      1,
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.RemovePhone(CTX, tt.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}

@@ -140,6 +140,25 @@ func (c *Commands) verifyUserPhoneWithGenerator(ctx context.Context, userID, cod
 	return writeModelToObjectDetails(&cmd.model.WriteModel), nil
 }
 
+func (c *Commands) RemoveUserPhone(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+	return c.removeUserPhone(ctx, userID)
+}
+
+func (c *Commands) removeUserPhone(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+	cmd, err := c.NewUserPhoneEvents(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if err = c.checkPermission(ctx, domain.PermissionUserWrite, cmd.aggregate.ResourceOwner, userID); err != nil {
+		return nil, err
+	}
+	cmd.Remove(ctx)
+	if _, err = cmd.Push(ctx); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&cmd.model.WriteModel), nil
+}
+
 // UserPhoneEvents allows step-by-step additions of events,
 // operating on the Human Phone Model.
 type UserPhoneEvents struct {
@@ -189,6 +208,10 @@ func (c *UserPhoneEvents) Change(ctx context.Context, phone domain.PhoneNumber) 
 	}
 	c.events = append(c.events, event)
 	return nil
+}
+
+func (c *UserPhoneEvents) Remove(ctx context.Context) {
+	c.events = append(c.events, user.NewHumanPhoneRemovedEvent(ctx, c.aggregate))
 }
 
 // SetVerified sets the phone number to verified.
