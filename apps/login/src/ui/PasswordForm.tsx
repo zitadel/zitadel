@@ -263,6 +263,7 @@ export default function PasswordForm({
         <button
           className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
           onClick={() => resetPassword()}
+          type="button"
           disabled={loading}
         >
           Reset Password
