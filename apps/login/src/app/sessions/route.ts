@@ -1,11 +1,10 @@
-import { listSessions, server } from "@/lib/zitadel";
+import { listSessions } from "@/lib/zitadel";
 import { SessionCookie, getAllSessions } from "@/utils/cookies";
-import { Session } from "@zitadel/server";
+import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
 import { NextRequest, NextResponse } from "next/server";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(
-    server,
     ids.filter((id: string | undefined) => !!id),
   );
 

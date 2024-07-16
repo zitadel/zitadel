@@ -1,4 +1,4 @@
-import { setEmail, server, listUsers, passwordReset } from "@/lib/zitadel";
+import { listUsers, passwordReset } from "@/lib/zitadel";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -8,12 +8,12 @@ export async function POST(request: NextRequest) {
     return listUsers(loginName, organization).then((users) => {
       if (
         users.details &&
-        users.details.totalResult == 1 &&
+        Number(users.details.totalResult) == 1 &&
         users.result[0].userId
       ) {
         const userId = users.result[0].userId;
 
-        return passwordReset(server, userId)
+        return passwordReset(userId)
           .then((resp) => {
             return NextResponse.json(resp);
           })
