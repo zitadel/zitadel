@@ -693,7 +693,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	data := new(externalNotFoundOptionFormData)
 	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 
