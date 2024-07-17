@@ -95,13 +95,11 @@ Database:
   # MaxOpenConns and MaxIdleConns are used to push events and spool projections.
   # Remaining connection are used for queries (search).
   # Values may not be negative and the sum of the ratios must always be less than 1.
-  # For example this defaults define 40 MaxOpenConns overall.
-  # - 40*0.2=8 connections are allocated to the event pusher;
-  # - 40*0.2=8 connections are allocated to the projection spooler;
-  # - 40-(8+8)=24 connections are remaining for queries;
-  # 3 connections by default
+  # For example this defaults define 15 MaxOpenConns overall.
+  # - 15*0.2=3 connections are allocated to the event pusher;
+  # - 15*0.135=2 connections are allocated to the projection spooler;
+  # - 15-(3+2)=10 connections are remaining for queries;
   EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
-  # 2 connections by default
   ProjectionSpoolerConnRatio: 0.135 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
   # CockroachDB is the default database of ZITADEL
   cockroach:
