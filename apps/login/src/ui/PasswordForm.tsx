@@ -105,11 +105,13 @@ export default function PasswordForm({
       // if mfa is forced and user has no mfa -> /mfa/set
       // if no passwordless -> /passkey/add
 
-      // exclude password
+      // exclude password and passwordless
       const availableSecondFactors = resp.authMethods?.filter(
         (m: AuthenticationMethodType) =>
-          m !== AuthenticationMethodType.PASSWORD,
+          m !== AuthenticationMethodType.PASSWORD &&
+          m !== AuthenticationMethodType.PASSKEY,
       );
+
       if (availableSecondFactors.length == 1) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
@@ -124,46 +126,14 @@ export default function PasswordForm({
         }
 
         const factor = availableSecondFactors[0];
-        // passwordless
-        if (factor === 2 && isAlternative) {
-          // with OIDC flow
-          if (resp.sessionId && authRequestId) {
-            const params = new URLSearchParams({
-              sessionId: resp.sessionId,
-              authRequest: authRequestId,
-            });
-
-            if (organization) {
-              params.append("organization", organization);
-            }
-
-            return router.push(`/login?` + params);
-          } else {
-            // without OIDC flow
-            const params = new URLSearchParams(
-              authRequestId
-                ? {
-                    loginName: resp.factors.user.loginName,
-                    authRequestId,
-                  }
-                : {
-                    loginName: resp.factors.user.loginName,
-                  },
-            );
-
-            if (organization) {
-              params.append("organization", organization);
-            }
-
-            return router.push(`/signedin?` + params);
-          }
-        } else if (factor === 4) {
+        // if passwordless is other method, but user selected password as alternative, perform a login
+        if (factor === AuthenticationMethodType.TOTP) {
           return router.push(`/otp/time-based?` + params);
-        } else if (factor === 6) {
+        } else if (factor === AuthenticationMethodType.OTP_SMS) {
           return router.push(`/otp/sms?` + params);
-        } else if (factor === 7) {
+        } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
           return router.push(`/otp/email?` + params);
-        } else if (factor === 5) {
+        } else if (factor === AuthenticationMethodType.U2F) {
           return router.push(`/u2f?` + params);
         }
       } else if (availableSecondFactors.length >= 1) {
@@ -201,6 +171,7 @@ export default function PasswordForm({
 
         return router.push(`/passkey/add?` + params);
       } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
+        console.log("force setup mfa");
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
           checkAfter: "true", // this defines if the check is directly made after the setup
