@@ -3,7 +3,7 @@ package execution
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"encoding/json"
 	"io"
 	"net/http"
 	"time"
@@ -129,13 +129,26 @@ func handleResponse(resp *http.Response) ([]byte, error) {
 		return data, nil
 	}
 
+	message, err := json.Marshal(&errorResponse{
+		StatusCode: resp.StatusCode,
+		Body:       string(data),
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	return nil, zhttp.HTTPStatusCodeToZitadelError(
 		zerrors.ThrowError(nil,
 			"EXEC-1n27xlas",
-			fmt.Sprintf("status: %d, body: '%s'", resp.StatusCode, string(data)),
+			string(message),
 		),
 		resp.StatusCode,
 		"EXEC-dra6yamk98",
 		"Errors.Execution.Failed",
 	)
+}
+
+type errorResponse struct {
+	StatusCode int    `json:"status_code,omitempty"`
+	Body       string `json:"body,omitempty"`
 }
