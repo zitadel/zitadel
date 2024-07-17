@@ -398,6 +398,9 @@ func WithMaxPosition(position float64) TriggerOpt {
 }
 
 func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Context, err error) {
+	ctx, span := tracing.NewNamedSpan(ctx, "handler.Trigger."+h.ProjectionName())
+	defer span.EndWithError(err)
+
 	config := new(triggerConfig)
 	for _, opt := range opts {
 		opt(config)
