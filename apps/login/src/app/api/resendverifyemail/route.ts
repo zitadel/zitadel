@@ -1,13 +1,13 @@
-import { setEmail } from "@/lib/zitadel";
+import { resendEmailCode } from "@/lib/zitadel";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
-    const { userId, code } = body;
+    const { userId } = body;
 
     // replace with resend Mail method once its implemented
-    return setEmail(userId)
+    return resendEmailCode(userId)
       .then((resp) => {
         return NextResponse.json(resp);
       })
