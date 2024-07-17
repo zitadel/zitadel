@@ -3,6 +3,7 @@
 package user_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -248,16 +249,24 @@ func TestServer_VerifyPhone(t *testing.T) {
 
 func TestServer_RemovePhone(t *testing.T) {
 	userResp := Tester.CreateHumanUser(CTX)
+	failResp := Tester.CreateHumanUserNoPhone(CTX)
+	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
+
+	Tester.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+
 	tests := []struct {
 		name    string
+		ctx     context.Context
 		req     *user.RemovePhoneRequest
 		want    *user.RemovePhoneResponse
 		wantErr bool
 	}{
 		{
 			name: "remove phone",
+			ctx:  CTX,
 			req: &user.RemovePhoneRequest{
-				UserId:           userResp.GetUserId(),
+				UserId: userResp.GetUserId(),
 			},
 			want: &user.RemovePhoneResponse{
 				Details: &object.Details{
@@ -267,10 +276,40 @@ func TestServer_RemovePhone(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "user without phone",
+			ctx:  CTX,
+			req: &user.RemovePhoneRequest{
+				UserId: failResp.GetUserId(),
+			},
+			wantErr: true,
+		},
+		{
+			name: "remove previously deleted phone",
+			ctx:  CTX,
+			req: &user.RemovePhoneRequest{
+				UserId: userResp.GetUserId(),
+			},
+			wantErr: true,
+		},
+		{
+			name:    "no user id",
+			ctx:     CTX,
+			req:     &user.RemovePhoneRequest{},
+			wantErr: true,
+		},
+		{
+			name: "other user, no permission",
+			ctx:  Tester.WithAuthorizationToken(CTX, sessionTokenOtherUser),
+			req: &user.RemovePhoneRequest{
+				UserId: userResp.GetUserId(),
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.RemovePhone(CTX, tt.req)
+			got, err := Client.RemovePhone(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

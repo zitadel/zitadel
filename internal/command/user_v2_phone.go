@@ -149,10 +149,14 @@ func (c *Commands) removeUserPhone(ctx context.Context, userID string) (*domain.
 	if err != nil {
 		return nil, err
 	}
-	if err = c.checkPermission(ctx, domain.PermissionUserWrite, cmd.aggregate.ResourceOwner, userID); err != nil {
+	if authz.GetCtxData(ctx).UserID != userID {
+		if err = c.checkPermission(ctx, domain.PermissionUserWrite, cmd.aggregate.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
+	}
+	if err = cmd.Remove(ctx); err != nil {
 		return nil, err
 	}
-	cmd.Remove(ctx)
 	if _, err = cmd.Push(ctx); err != nil {
 		return nil, err
 	}
@@ -210,8 +214,12 @@ func (c *UserPhoneEvents) Change(ctx context.Context, phone domain.PhoneNumber) 
 	return nil
 }
 
-func (c *UserPhoneEvents) Remove(ctx context.Context) {
+func (c *UserPhoneEvents) Remove(ctx context.Context) error {
+	if c.model.State == domain.PhoneStateRemoved || c.model.State == domain.PhoneStateUnspecified {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-ieJ2e", "Errors.User.Phone.NotFound")
+	}
 	c.events = append(c.events, user.NewHumanPhoneRemovedEvent(ctx, c.aggregate))
+	return nil
 }
 
 // SetVerified sets the phone number to verified.
