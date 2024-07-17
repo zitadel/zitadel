@@ -20,7 +20,6 @@ import (
 	"github.com/zitadel/zitadel/internal/migration"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/pseudo"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type EventStore interface {
@@ -476,9 +475,7 @@ func (h *Handler) processEvents(ctx context.Context, config *triggerConfig) (add
 		defer cancel()
 	}
 
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := h.client.BeginTx(txCtx, nil)
-	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return false, err
 	}
