@@ -113,6 +113,8 @@ type Steps struct {
 	s27IDPTemplate6SAMLNameIDFormat        *IDPTemplate6SAMLNameIDFormat
 	s28AddFieldTable                       *AddFieldTable
 	s29FillFieldsForProjectGrant           *FillFieldsForProjectGrant
+	s30FillFieldsForOrgDomainVerified      *FillFieldsForOrgDomainVerified
+	s31AddAggregateIndexToFields           *AddAggregateIndexToFields
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

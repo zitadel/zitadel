@@ -231,7 +231,7 @@
           "LABEL": "Duração Máxima em horas",
           "PW_CHECK": {
             "TITLE": "Verificação de Senha",
-            "DESCRIPTION": "Seus usuários devem mudar suas senhas nesses períodos."
+            "DESCRIPTION": "Os usuários serão obrigados a reautentificar-se com sua senha após este período."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Verificação de Login Externo",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Excluir Ações Selecionadas?",
         "DESCRIPTION": "Tem certeza de que deseja excluir as ações selecionadas do fluxo?"
-      }
+      },
+      "ABOUTNAME": "O nome da ação e o nome da função no javascript devem ser iguais"
     },
     "TOAST": {
       "ACTIONSSET": "Ações definidas",

@@ -194,6 +194,12 @@ module.exports = {
       disableSwitch: false,
       respectPrefersColorScheme: true,
     },
+    codeblock: {
+      showGithubLink: true,
+      githubLinkLabel: 'View on GitHub',
+      showRunmeLink: false,
+      runmeLinkLabel: 'Checkout via Runme'
+    },
   },
   webpack: {
     jsLoader: (isServer) => ({
@@ -283,7 +289,7 @@ module.exports = {
             outputDir: "docs/apis/resources/user_service",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           session: {
@@ -291,7 +297,7 @@ module.exports = {
             outputDir: "docs/apis/resources/session_service",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           oidc: {
@@ -299,7 +305,7 @@ module.exports = {
             outputDir: "docs/apis/resources/oidc_service",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           settings: {
@@ -307,7 +313,7 @@ module.exports = {
             outputDir: "docs/apis/resources/settings_service",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           user_schema: {
@@ -315,7 +321,7 @@ module.exports = {
             outputDir: "docs/apis/resources/user_schema_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           user_v3: {
@@ -323,7 +329,7 @@ module.exports = {
             outputDir: "docs/apis/resources/user_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           action_v3: {
@@ -331,7 +337,7 @@ module.exports = {
             outputDir: "docs/apis/resources/action_service_v3",
             sidebarOptions: {
                 groupPathsBy: "tag",
-                categoryLinkSource: "tag",
+                categoryLinkSource: "auto",
             },
           },
           feature_v2: {
@@ -339,7 +345,7 @@ module.exports = {
             outputDir: "docs/apis/resources/feature_service_v2",
             sidebarOptions: {
                 groupPathsBy: "tag",
-                categoryLinkSource: "tag",
+                categoryLinkSource: "auto",
             },
           },
         },
@@ -358,5 +364,5 @@ module.exports = {
       };
     },
   ],
-  themes: ["@saucelabs/theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
 };

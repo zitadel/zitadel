@@ -231,7 +231,7 @@
           "LABEL": "Maximal livslängd i timmar",
           "PW_CHECK": {
             "TITLE": "Lösenordskontroll",
-            "DESCRIPTION": "Dina användare måste ändra sina lösenord under dessa perioder."
+            "DESCRIPTION": "Användare kommer att behöva autentisera om med sitt lösenord efter denna period."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Extern inloggningskontroll",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Radera valda åtgärder?",
         "DESCRIPTION": "Är du säker på att du vill radera de valda åtgärderna från flödet?"
-      }
+      },
+      "ABOUTNAME": "Namnet på åtgärden och namnet på funktionen i javascriptet måste vara detsamma"
     },
     "TOAST": {
       "ACTIONSSET": "Åtgärder sparade",

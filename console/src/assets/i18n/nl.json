@@ -231,7 +231,7 @@
           "LABEL": "Maximale Levensduur in uren",
           "PW_CHECK": {
             "TITLE": "Wachtwoord Controle",
-            "DESCRIPTION": "Je gebruikers moeten hun wachtwoorden in deze perioden wijzigen."
+            "DESCRIPTION": "Gebruikers moeten na deze periode opnieuw worden geverifieerd met hun wachtwoord."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Externe Login Controle",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Geselecteerde acties verwijderen?",
         "DESCRIPTION": "Weet u zeker dat u de geselecteerde acties uit de flow wilt verwijderen?"
-      }
+      },
+      "ABOUTNAME": "De naam van de actie en de naam van de functie in het javascript moeten hetzelfde zijn"
     },
     "TOAST": {
       "ACTIONSSET": "Acties ingesteld",
