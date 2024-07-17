@@ -231,7 +231,7 @@
           "LABEL": "Duración Máxima en horas",
           "PW_CHECK": {
             "TITLE": "Verificación de Contraseña",
-            "DESCRIPTION": "Tus usuarios tienen que cambiar sus contraseñas en estos períodos."
+            "DESCRIPTION": "Los usuarios deberán volver a autenticarse con su contraseña después de este período."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Verificación de Inicio de Sesión Externo",
