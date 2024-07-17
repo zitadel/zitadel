@@ -7,7 +7,10 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+import {
+  LoginSettings,
+  PasskeysType,
+} from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
 
 type Inputs = {
   loginName: string;
@@ -77,6 +80,7 @@ export default function UsernameForm({
     values: Inputs,
     organization?: string,
   ) {
+    console.log(loginSettings);
     return submitLoginName(values, organization).then((response) => {
       if (response.authMethodTypes.length == 1) {
         const method = response.authMethodTypes[0];
@@ -90,8 +94,13 @@ export default function UsernameForm({
               paramsPassword.organization = organization;
             }
 
-            if (loginSettings?.passkeysType === 1) {
-              paramsPassword.promptPasswordless = `true`; // PasskeysType.PASSKEYS_TYPE_ALLOWED,
+            if (
+              loginSettings?.passkeysType &&
+              (loginSettings?.passkeysType === PasskeysType.ALLOWED ||
+                (loginSettings.passkeysType as string) ===
+                  "PASSKEYS_TYPE_ALLOWED")
+            ) {
+              paramsPassword.promptPasswordless = `true`;
             }
 
             if (authRequestId) {

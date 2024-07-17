@@ -171,7 +171,6 @@ export default function PasswordForm({
 
         return router.push(`/passkey/add?` + params);
       } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
-        console.log("force setup mfa");
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
           checkAfter: "true", // this defines if the check is directly made after the setup
