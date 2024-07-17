@@ -232,7 +232,7 @@ module.exports = {
                 "guides/integrate/login/oidc/logout",
               ],
             },
-              "guides/integrate/login/saml",
+            "guides/integrate/login/saml",
           ],
         },
         {
@@ -568,7 +568,7 @@ module.exports = {
                 description:
                   "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
               },
-              items: require("./docs/apis/resources/auth/sidebar.ts"),
+              items: require("./docs/apis/resources/auth/sidebar.js"),
             },
             {
               type: "category",
@@ -580,7 +580,7 @@ module.exports = {
                 description:
                   "The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights. To identify the current organization you can send a header x-zitadel-orgid or if no header is set, the organization of the authenticated user is set.",
               },
-              items: require("./docs/apis/resources/mgmt/sidebar.ts"),
+              items: require("./docs/apis/resources/mgmt/sidebar.js"),
             },
             {
               type: "category",
@@ -592,7 +592,7 @@ module.exports = {
                 description:
                   "This API is intended to configure and manage one ZITADEL instance itself.",
               },
-              items: require("./docs/apis/resources/admin/sidebar.ts"),
+              items: require("./docs/apis/resources/admin/sidebar.js"),
             },
             {
               type: "category",
@@ -606,7 +606,7 @@ module.exports = {
                   "\n" +
                   "Checkout the guide how to access the ZITADEL System API.",
               },
-              items: require("./docs/apis/resources/system/sidebar.ts"),
+              items: require("./docs/apis/resources/system/sidebar.js"),
             },
           ],
         },
@@ -631,7 +631,7 @@ module.exports = {
                   "\n" +
                   "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
               },
-              items: require("./docs/apis/resources/user_service/sidebar.ts"),
+              items: require("./docs/apis/resources/user_service/sidebar.js"),
             },
             {
               type: "category",
@@ -645,7 +645,7 @@ module.exports = {
                   "\n" +
                   "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
               },
-              items: require("./docs/apis/resources/session_service/sidebar.ts"),
+              items: require("./docs/apis/resources/session_service/sidebar.js"),
             },
             {
               type: "category",
@@ -659,7 +659,7 @@ module.exports = {
                   "\n" +
                   "This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.",
               },
-              items: require("./docs/apis/resources/oidc_service/sidebar.ts"),
+              items: require("./docs/apis/resources/oidc_service/sidebar.js"),
             },
             {
               type: "category",
@@ -673,7 +673,7 @@ module.exports = {
                   "\n" +
                   "This project is in beta state. It can AND will continue to break until the services provide the same functionality as the current login.",
               },
-              items: require("./docs/apis/resources/settings_service/sidebar.ts"),
+              items: require("./docs/apis/resources/settings_service/sidebar.js"),
             },
             {
               type: "category",
@@ -687,7 +687,7 @@ module.exports = {
                   "\n" +
                   "This project is in beta state. It can AND will continue breaking until a stable version is released.",
               },
-              items: require("./docs/apis/resources/feature_service_v2/sidebar.ts"),
+              items: require("./docs/apis/resources/feature_service_v2/sidebar.js"),
             },
           ],
         },
@@ -712,7 +712,7 @@ module.exports = {
                   "\n" +
                   "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
               },
-              items: require("./docs/apis/resources/user_schema_service_v3/sidebar.ts"),
+              items: require("./docs/apis/resources/user_schema_service_v3/sidebar.js"),
             },
             {
               type: "category",
@@ -726,7 +726,7 @@ module.exports = {
                   "\n" +
                   "This project is in Preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.",
               },
-              items: require("./docs/apis/resources/user_service_v3/sidebar.ts"),
+              items: require("./docs/apis/resources/user_service_v3/sidebar.js"),
             },
             {
               type: "category",
@@ -740,7 +740,7 @@ module.exports = {
                   "\n" +
                   "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
               },
-              items: require("./docs/apis/resources/action_service_v3/sidebar.ts"),
+              items: require("./docs/apis/resources/action_service_v3/sidebar.js"),
             },
           ],
         },
