@@ -95,7 +95,8 @@ func createEncryptionKeys(ctx context.Context, db *database.DB) error {
 		return err
 	}
 	if _, err = tx.Exec(createEncryptionKeysStmt); err != nil {
-		tx.Rollback()
+		rollbackErr := tx.Rollback()
+		logging.OnError(rollbackErr).Debug("rollback failed")
 		return err
 	}
 
