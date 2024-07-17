@@ -3,6 +3,7 @@ package http
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -46,7 +47,7 @@ func ZitadelErrorToHTTPStatusCode(err error) (statusCode int, ok bool) {
 	}
 }
 
-func HTTPStatusCodeToZitadelError(statusCode int, id string, message string) error {
+func HTTPStatusCodeToZitadelError(parent error, statusCode int, id string, message string) error {
 	if statusCode == http.StatusOK {
 		return nil
 	}
@@ -73,8 +74,10 @@ func HTTPStatusCodeToZitadelError(statusCode int, id string, message string) err
 	case http.StatusTooManyRequests:
 		errorFunc = zerrors.ThrowResourceExhausted
 	default:
-		errorFunc = zerrors.ThrowUnknown
+		errorFunc = func(parent error, id, message string) error {
+			return zerrors.ThrowUnknown(zerrors.ThrowError(parent, "HTTP-dra6yamk98", strconv.Itoa(statusCode)), id, message)
+		}
 	}
 
-	return errorFunc(nil, id, message)
+	return errorFunc(parent, id, message)
 }

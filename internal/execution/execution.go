@@ -3,6 +3,7 @@ package execution
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -127,5 +128,10 @@ func handleResponse(resp *http.Response) ([]byte, error) {
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
 		return data, nil
 	}
-	return nil, zhttp.HTTPStatusCodeToZitadelError(resp.StatusCode, "EXEC-dra6yamk98", string(data))
+
+	var parentErr error
+	if len(data) != 0 {
+		parentErr = errors.New(string(data))
+	}
+	return nil, zhttp.HTTPStatusCodeToZitadelError(parentErr, resp.StatusCode, "EXEC-dra6yamk98", "Errors.Execution.Failed")
 }

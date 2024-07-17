@@ -363,7 +363,27 @@ func Test_handleResponse(t *testing.T) {
 		res  res
 	}{
 		{
-			"response, statuscode > 400",
+			"response, statuscode unknown and body",
+			args{
+				resp: &http.Response{
+					StatusCode: 1000,
+					Body:       io.NopCloser(bytes.NewReader([]byte("body"))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					if errors.Unwrap(errors.Unwrap(errors.Unwrap(err))).Error() != "body" {
+						return false
+					}
+					if !errors.Is(err, zerrors.ThrowError(nil, "HTTP-dra6yamk98", "1000")) {
+						return false
+					}
+					return errors.Is(err, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", ""))
+				},
+			},
+		},
+		{
+			"response, statuscode > 400 and no body",
 			args{
 				resp: &http.Response{
 					StatusCode: http.StatusForbidden,
@@ -386,7 +406,10 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "body"))
+					if errors.Unwrap(errors.Unwrap(err)).Error() != "body" {
+						return false
+					}
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
 				}},
 		},
 		{
@@ -399,6 +422,19 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				data:    []byte("body"),
+				wantErr: nil,
+			},
+		},
+		{
+			"response, statuscode = 200 no body",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewReader([]byte(""))),
+				},
+			},
+			res{
+				data:    []byte(""),
 				wantErr: nil,
 			},
 		},

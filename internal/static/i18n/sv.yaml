@@ -563,6 +563,7 @@ Errors:
     NotFound: Exekveringen hittades inte
     IncludeNotFound: Inkluderingen hittades inte
     NoTargets: Inga mål definierade
+    Failed: Utförande misslyckades
   UserSchema:
     NotEnabled: Funktionen "Användarschema" är inte aktiverad
     Type:

@@ -144,6 +144,7 @@ func TestHTTPStatusCodeToZitadelError(t *testing.T) {
 		statusCode int
 		id         string
 		message    string
+		parent     error
 	}
 	tests := []struct {
 		name    string
@@ -256,11 +257,33 @@ func TestHTTPStatusCodeToZitadelError(t *testing.T) {
 			},
 			wantErr: zerrors.ThrowUnknown(nil, "id", "message"),
 		},
+		{
+			name: "Unknown, test for statuscode",
+			args: args{
+				statusCode: 1000,
+				id:         "id",
+				message:    "message",
+			},
+			wantErr: zerrors.ThrowError(nil, "HTTP-dra6yamk98", "1000"),
+		},
+		{
+			name: "Unknown with parent",
+			args: args{
+				statusCode: 1000,
+				id:         "id",
+				message:    "message",
+				parent:     errors.New("parent error"),
+			},
+			wantErr: zerrors.ThrowUnknown(nil, "id", "message"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := HTTPStatusCodeToZitadelError(tt.args.statusCode, tt.args.id, tt.args.message)
+			err := HTTPStatusCodeToZitadelError(tt.args.parent, tt.args.statusCode, tt.args.id, tt.args.message)
 			assert.ErrorIs(t, err, tt.wantErr)
+			if tt.args.parent != nil {
+				assert.ErrorIs(t, err, tt.args.parent)
+			}
 		})
 	}
 }
