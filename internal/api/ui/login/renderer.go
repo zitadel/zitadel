@@ -313,7 +313,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.ChangePasswordStep:
 		l.renderChangePassword(w, r, authReq, err)
 	case *domain.VerifyEMailStep:
-		l.renderMailVerification(w, r, authReq, "", err)
+		l.renderMailVerification(w, r, authReq, authReq.UserID, "", step.InitPassword, err)
 	case *domain.MFAPromptStep:
 		l.renderMFAPrompt(w, r, authReq, step, err)
 	case *domain.InitUserStep:

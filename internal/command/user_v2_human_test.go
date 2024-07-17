@@ -319,7 +319,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "add human (with initial code), ok",
+			name: "add human (email not verified, no password), ok (init code)",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
@@ -389,7 +389,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "add human (with password and initial code), ok",
+			name: "add human (email not verified, with password), ok (init code)",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
@@ -450,6 +450,65 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				},
 				secretGenerator: GetMockSecretGenerator(t),
 				allowInitMail:   true,
+				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				wantID: "user1",
+			},
+		},
+		{
+			name: "add human (email not verified, no password, no allowInitMail), ok (email verification with passwordInit)",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewDomainPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								true,
+								true,
+								true,
+							),
+						),
+					),
+					expectPush(
+						newAddHumanEvent("", false, true, "", language.English),
+						user.NewHumanEmailCodeAddedEventV2(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("emailverify"),
+							},
+							1*time.Hour,
+							"",
+							false,
+							"",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+				newCode:         mockEncryptedCode("emailverify", time.Hour),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &AddHuman{
+					Username:  "username",
+					FirstName: "firstname",
+					LastName:  "lastname",
+					Email: Email{
+						Address: "email@test.ch",
+					},
+					PreferredLanguage: language.English,
+				},
+				secretGenerator: GetMockSecretGenerator(t),
+				allowInitMail:   false,
 				codeAlg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			res: res{
@@ -609,7 +668,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "add human email verified, ok",
+			name: "add human email verified and password, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),
@@ -1084,8 +1143,9 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				},
 				wantID: "user1",
 			},
-		}, {
-			name: "add human (with return code), ok",
+		},
+		{
+			name: "add human (with phone return code), ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(),

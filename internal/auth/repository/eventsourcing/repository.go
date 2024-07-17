@@ -78,6 +78,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			ProjectProvider:           queryView,
 			ApplicationProvider:       queries,
 			CustomTextProvider:        queries,
+			PasswordReset:             command,
 			IdGenerator:               id.SonyFlakeGenerator(),
 		},
 		eventstore.TokenRepo{
