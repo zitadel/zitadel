@@ -281,6 +281,10 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (or
 	return orgs, err
 }
 
+func NewOrgIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(OrgColumnID, value, TextEquals)
+}
+
 func NewOrgDomainSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(OrgColumnDomain, value, method)
 }

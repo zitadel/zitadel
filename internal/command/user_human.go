@@ -362,7 +362,7 @@ func addHumanCommandPassword(ctx context.Context, filter preparation.FilterToQue
 	return nil
 }
 
-func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string, username string, mustBeDomain bool) error {
+func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string, username string, mustBeDomain bool) (err error) {
 	if mustBeDomain {
 		return nil
 	}
@@ -372,12 +372,12 @@ func (c *Commands) userValidateDomain(ctx context.Context, resourceOwner string,
 		return nil
 	}
 
-	domainCheck, err := c.orgDomainVerifiedWriteModel(ctx, username[index+1:])
+	domainCheck, err := c.searchOrgDomainVerifiedByDomain(ctx, username[index+1:])
 	if err != nil {
 		return err
 	}
 
-	if domainCheck.Verified && domainCheck.ResourceOwner != resourceOwner {
+	if domainCheck.Verified && domainCheck.OrgID != resourceOwner {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
 	}
 
@@ -479,7 +479,7 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 	if orgID == "" {
 		return nil, nil, nil, "", zerrors.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.Org.Empty")
 	}
-	if err := human.Normalize(); err != nil {
+	if err = human.Normalize(); err != nil {
 		return nil, nil, nil, "", err
 	}
 	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, links, passwordless, domainPolicy, pwPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
@@ -497,24 +497,17 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 	return events, humanWriteModel, passwordlessCodeWriteModel, code, nil
 }
 
-//nolint:gocognit
 func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, links []*domain.UserIDPLink, passwordless bool, domainPolicy *domain.DomainPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator crypto.Generator) (events []eventstore.Command, addedHuman *HumanWriteModel, err error) {
-	if err := human.CheckDomainPolicy(domainPolicy); err != nil {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if err = human.CheckDomainPolicy(domainPolicy); err != nil {
 		return nil, nil, err
 	}
 	human.Username = strings.TrimSpace(human.Username)
 	human.EmailAddress = human.EmailAddress.Normalize()
-	if !domainPolicy.UserLoginMustBeDomain {
-		index := strings.LastIndex(human.Username, "@")
-		if index > 1 {
-			domainCheck := NewOrgDomainVerifiedWriteModel(human.Username[index+1:])
-			if err := c.eventstore.FilterToQueryReducer(ctx, domainCheck); err != nil {
-				return nil, nil, err
-			}
-			if domainCheck.Verified && domainCheck.ResourceOwner != orgID {
-				return nil, nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-SFd21", "Errors.User.DomainNotAllowedAsUsername")
-			}
-		}
+	if err = c.userValidateDomain(ctx, orgID, human.Username, domainPolicy.UserLoginMustBeDomain); err != nil {
+		return nil, nil, err
 	}
 
 	if human.AggregateID == "" {

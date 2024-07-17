@@ -231,7 +231,7 @@
           "LABEL": "Maksymalny czas życia w godzinach",
           "PW_CHECK": {
             "TITLE": "Sprawdzenie Hasła",
-            "DESCRIPTION": "Twoi użytkownicy muszą zmienić swoje hasła w tych okresach."
+            "DESCRIPTION": "Po tym okresie użytkownicy będą zobowiązani do ponownej autoryzacji za pomocą hasła."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Sprawdzenie Logowania Zewnętrznego",
@@ -1085,7 +1085,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Usunąć wybrane działanie?",
         "DESCRIPTION": "Czy na pewno chcesz usunąć wybrane działania z przepływu?"
-      }
+      },
+      "ABOUTNAME": "Nazwa akcji i nazwa funkcji w JavaScript muszą być takie same"
     },
     "TOAST": {
       "ACTIONSSET": "Ustawiono działanie",
@@ -1474,6 +1475,10 @@
         "DISABLED": "Wyłączony"
       },
       "INHERITED_DESCRIPTION": "To ustawienie przypisuje wartość do wartości domyślnej systemu.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Włączony” jest dziedziczone",
+        "DISABLED": "„Wyłączony” jest dziedziczone"
+      },
       "RESET": "Ustaw wszystko na dziedziczone"
     },
     "DIALOG": {
@@ -1679,7 +1684,8 @@
         "username": "Nazwa użytkownika",
         "tempUsername": "Tymczasowa nazwa użytkownika",
         "otp": "Hasło jednorazowe",
-        "verifyUrl": "URL do weryfikacji hasła jednorazowego"
+        "verifyUrl": "URL do weryfikacji hasła jednorazowego",
+        "expiry": "Wygaśnięcie"
       },
       "TOAST": {
         "UPDATED": "Teksty niestandardowe zapisane."

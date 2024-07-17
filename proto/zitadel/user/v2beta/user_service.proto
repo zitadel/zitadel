@@ -655,6 +655,28 @@ service UserService {
     };
   }
 
+  rpc RemoveTOTP (RemoveTOTPRequest) returns (RemoveTOTPResponse) {
+    option (google.api.http) = {
+      delete: "/v2beta/users/{user_id}/totp"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Remove TOTP generator from a user";
+      description: "Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second-factor afterward."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
   rpc AddOTPSMS (AddOTPSMSRequest) returns (AddOTPSMSResponse) {
     option (google.api.http) = {
       post: "/v2beta/users/{user_id}/otp_sms"
@@ -690,7 +712,7 @@ service UserService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Remove One-Time-Password (OTP) SMS from a user";
-      description: "Remove the configured One-Time-Password (OTP) SMS factor of the authenticated user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
+      description: "Remove the configured One-Time-Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward."
       responses: {
         key: "200"
         value: {
@@ -735,7 +757,7 @@ service UserService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Remove One-Time-Password (OTP) Email from a user";
-      description: "Remove the configured One-Time-Password (OTP) Email factor of the authenticated user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
+      description: "Remove the configured One-Time-Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward."
       responses: {
         key: "200"
         value: {
@@ -967,6 +989,7 @@ message GetUserByIDRequest {
 }
 
 message GetUserByIDResponse {
+  //deprecated: details is moved into user
   zitadel.object.v2beta.Details details = 1;
   zitadel.user.v2beta.User user = 2;
 }
@@ -1468,6 +1491,22 @@ message VerifyTOTPRegistrationRequest {
 }
 
 message VerifyTOTPRegistrationResponse {
+  zitadel.object.v2beta.Details details = 1;
+}
+
+message RemoveTOTPRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+}
+
+message RemoveTOTPResponse {
   zitadel.object.v2beta.Details details = 1;
 }
 

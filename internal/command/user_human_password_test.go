@@ -1111,14 +1111,14 @@ func TestCommandSide_ChangePassword(t *testing.T) {
 func TestCommandSide_RequestSetPassword(t *testing.T) {
 	type fields struct {
 		eventstore func(*testing.T) *eventstore.Eventstore
+		newCode    encrypedCodeFunc
 	}
 	type args struct {
-		ctx             context.Context
-		userID          string
-		resourceOwner   string
-		notifyType      domain.NotificationType
-		secretGenerator crypto.Generator
-		authRequestID   string
+		ctx           context.Context
+		userID        string
+		resourceOwner string
+		notifyType    domain.NotificationType
+		authRequestID string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1251,12 +1251,12 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 						),
 					),
 				),
+				newCode: mockEncryptedCode("a", 1*time.Hour),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1307,13 +1307,13 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 						),
 					),
 				),
+				newCode: mockEncryptedCode("a", 1*time.Hour),
 			},
 			args: args{
-				ctx:             context.Background(),
-				userID:          "user1",
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
-				authRequestID:   "authRequestID",
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				authRequestID: "authRequestID",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1325,9 +1325,10 @@ func TestCommandSide_RequestSetPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:       tt.fields.eventstore(t),
+				newEncryptedCode: tt.fields.newCode,
 			}
-			got, err := r.RequestSetPassword(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.notifyType, tt.args.secretGenerator, tt.args.authRequestID)
+			got, err := r.RequestSetPassword(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.notifyType, tt.args.authRequestID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

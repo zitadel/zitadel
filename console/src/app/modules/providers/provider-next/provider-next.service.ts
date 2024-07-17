@@ -85,7 +85,7 @@ export class ProviderNextService {
       map((env) => [
         {
           label: 'ZITADEL Callback URL',
-          url: `${env.issuer}/ui/login/login/externalidp/callback`,
+          url: `${env.issuer}/idps/callback`,
         },
       ]),
     );

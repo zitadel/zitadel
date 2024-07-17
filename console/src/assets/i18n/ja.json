@@ -231,7 +231,7 @@
           "LABEL": "最大寿命（時間）",
           "PW_CHECK": {
             "TITLE": "パスワードチェック",
-            "DESCRIPTION": "ユーザーは、これらの期間中にパスワードを変更する必要があります。"
+            "DESCRIPTION": "この期間の後、ユーザーはパスワードで再認証する必要があります。"
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "外部ログインチェック",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "選択したアクションの削除",
         "DESCRIPTION": "フローから選択したアクションを削除してよろしいですか？"
-      }
+      },
+      "ABOUTNAME": "アクションの名前とJavaScript内の関数の名前は同じである必要があります"
     },
     "TOAST": {
       "ACTIONSSET": "アクションセット",
@@ -1475,6 +1476,10 @@
         "DISABLED": "無効"
       },
       "INHERITED_DESCRIPTION": "この設定は、値をシステムのデフォルト値に設定します。",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "有効は継承されます",
+        "DISABLED": "無効は継承されます"
+      },
       "RESET": "すべて継承に設定"
     },
     "DIALOG": {
@@ -1676,7 +1681,8 @@
         "username": "ユーザー名",
         "tempUsername": "一時ユーザー名",
         "otp": "ワンタイムパスワード",
-        "verifyUrl": "ワンタイムパスワードを確認するURL"
+        "verifyUrl": "ワンタイムパスワードを確認するURL",
+        "expiry": "有効期限"
       },
       "TOAST": {
         "UPDATED": "カスタムテキストが保存されました。"
