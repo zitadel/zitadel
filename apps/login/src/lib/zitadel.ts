@@ -17,6 +17,13 @@ import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2beta/oidc_s
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2beta/object_pb";
 import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2beta/idp_pb";
 import { PlainMessage } from "@zitadel/client2";
+import { ProviderSlug } from "./demos";
+import { AddHumanUserRequest } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
+import {
+  IDPInformation,
+  IDPLink,
+} from "@zitadel/proto/zitadel/user/v2beta/idp_pb";
+import { PartialMessage } from "@zitadel/client2";
 
 const SESSION_LIFETIME_S = 3000;
 
@@ -352,6 +359,107 @@ export async function resendEmailCode(userId: string) {
     },
     {},
   );
+}
+
+export function retrieveIDPIntent(id: string, token: string) {
+  return userService.retrieveIdentityProviderIntent(
+    { idpIntentId: id, idpIntentToken: token },
+    {},
+  );
+}
+
+export function addIDPLink(
+  idp: {
+    id: string;
+    userId: string;
+    userName: string;
+  },
+  userId: string,
+) {
+  return userService.addIDPLink(
+    {
+      idpLink: {
+        userId: idp.userId,
+        idpId: idp.id,
+        userName: idp.userName,
+      },
+      userId,
+    },
+    {},
+  );
+}
+
+const PROVIDER_MAPPING: {
+  [provider: string]: (
+    rI: IDPInformation,
+  ) => PartialMessage<AddHumanUserRequest>;
+} = {
+  [ProviderSlug.GOOGLE]: (idp: IDPInformation) => {
+    const rawInfo = idp.rawInformation?.toJson() as {
+      User: {
+        email: string;
+        name?: string;
+        given_name?: string;
+        family_name?: string;
+      };
+    };
+
+    const idpLink: PartialMessage<IDPLink> = {
+      idpId: idp.idpId,
+      userId: idp.userId,
+      userName: idp.userName,
+    };
+
+    const req: PartialMessage<AddHumanUserRequest> = {
+      username: idp.userName,
+      email: {
+        email: rawInfo.User?.email,
+        verification: { case: "isVerified", value: true },
+      },
+      // organisation: Organisation | undefined;
+      profile: {
+        displayName: rawInfo.User?.name ?? "",
+        givenName: rawInfo.User?.given_name ?? "",
+        familyName: rawInfo.User?.family_name ?? "",
+      },
+      idpLinks: [idpLink],
+    };
+    return req;
+  },
+  [ProviderSlug.GITHUB]: (idp: IDPInformation) => {
+    const rawInfo = idp.rawInformation?.toJson() as {
+      email: string;
+      name: string;
+    };
+    const idpLink: PartialMessage<IDPLink> = {
+      idpId: idp.idpId,
+      userId: idp.userId,
+      userName: idp.userName,
+    };
+    const req: PartialMessage<AddHumanUserRequest> = {
+      username: idp.userName,
+      email: {
+        email: rawInfo?.email,
+        verification: { case: "isVerified", value: true },
+      },
+      // organisation: Organisation | undefined;
+      profile: {
+        displayName: rawInfo?.name ?? "",
+        givenName: rawInfo?.name ?? "",
+        familyName: rawInfo?.name ?? "",
+      },
+      idpLinks: [idpLink],
+    };
+    return req;
+  },
+};
+
+export function createUser(
+  provider: ProviderSlug,
+  info: IDPInformation,
+): Promise<string> {
+  const userData = PROVIDER_MAPPING[provider](info);
+  return userService.addHumanUser(userData, {}).then((resp) => resp.userId);
 }
 
 /**
