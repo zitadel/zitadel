@@ -4,9 +4,6 @@ module.exports = {
   trailingSlash: false,
   url: "https://zitadel.com",
   baseUrl: "/docs",
-  onBrokenLinks: "warn",
-  onBrokenAnchors: "warn",
-  onBrokenMarkdownLinks: "throw",
   favicon: "img/favicon.ico",
   organizationName: "zitadel",
   projectName: "zitadel",
@@ -244,7 +241,7 @@ module.exports = {
           showLastUpdateTime: true,
           editUrl: "https://github.com/zitadel/zitadel/edit/main/docs/",
           remarkPlugins: [require("mdx-mermaid")],
-
+          docLayoutComponent: "@theme/DocPage",
           docItemComponent: "@theme/ApiItem",
         },
         theme: {
