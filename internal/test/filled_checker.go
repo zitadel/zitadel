@@ -77,43 +77,35 @@ func isPublicField(fieldName string) bool {
 }
 
 func isFieldFilled(val reflect.Value) bool {
-	if isLengthMeasurable(val) {
-		switch val.Kind() {
-		case reflect.Slice:
-			if val.IsNil() {
-				return false
-			}
-			fallthrough
-		case reflect.Array:
-			if val.Len() == 0 {
-				return false
-			}
-			for i := 0; i < val.Len(); i++ {
-				if val.Index(i).IsZero() {
-					return false
-				}
-			}
-			return true
-		case reflect.Map:
-			if val.Len() == 0 {
-				return false
-			}
-			for _, key := range val.MapKeys() {
-				if val.MapIndex(key).IsZero() {
-					return false
-				}
-			}
-			return true
+	switch val.Kind() {
+	case reflect.Slice:
+		if val.IsNil() {
+			return false
 		}
+		fallthrough
+	case reflect.Array:
+		if val.Len() == 0 {
+			return false
+		}
+		for i := 0; i < val.Len(); i++ {
+			if val.Index(i).IsZero() {
+				return false
+			}
+		}
+		return true
+	case reflect.Map:
+		if val.Len() == 0 {
+			return false
+		}
+		for _, key := range val.MapKeys() {
+			if val.MapIndex(key).IsZero() {
+				return false
+			}
+		}
+		return true
+	default:
+		return !val.IsZero()
 	}
-
-	return !val.IsZero()
-}
-
-func isLengthMeasurable(val reflect.Value) bool {
-	return val.Kind() == reflect.Slice ||
-		val.Kind() == reflect.Array ||
-		val.Kind() == reflect.Map
 }
 
 func validateEmptyFields(fields map[string]bool, emptyFields []string) (notEmptyFields []string) {

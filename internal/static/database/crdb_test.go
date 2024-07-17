@@ -294,17 +294,6 @@ func prepareDB(t *testing.T, expectations ...expectation) db {
 
 type expectation func(m sqlmock.Sqlmock)
 
-func expectExists(query string, value bool, args ...driver.Value) expectation {
-	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(args...).WillReturnRows(m.NewRows([]string{"exists"}).AddRow(value))
-	}
-}
-
-func expectQueryErr(query string, err error, args ...driver.Value) expectation {
-	return func(m sqlmock.Sqlmock) {
-		m.ExpectQuery(regexp.QuoteMeta(query)).WithArgs(args...).WillReturnError(err)
-	}
-}
 func expectQuery(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) {
 	return func(m sqlmock.Sqlmock) {
 		q := m.ExpectQuery(regexp.QuoteMeta(stmt)).WithArgs(args...)
@@ -329,32 +318,5 @@ func expectExec(stmt string, err error, args ...driver.Value) expectation {
 			return
 		}
 		query.WillReturnResult(sqlmock.NewResult(1, 1))
-	}
-}
-
-func expectBegin(err error) expectation {
-	return func(m sqlmock.Sqlmock) {
-		query := m.ExpectBegin()
-		if err != nil {
-			query.WillReturnError(err)
-		}
-	}
-}
-
-func expectCommit(err error) expectation {
-	return func(m sqlmock.Sqlmock) {
-		query := m.ExpectCommit()
-		if err != nil {
-			query.WillReturnError(err)
-		}
-	}
-}
-
-func expectRollback(err error) expectation {
-	return func(m sqlmock.Sqlmock) {
-		query := m.ExpectRollback()
-		if err != nil {
-			query.WillReturnError(err)
-		}
 	}
 }
