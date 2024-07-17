@@ -231,7 +231,7 @@
           "LABEL": "最大有效期（小时）",
           "PW_CHECK": {
             "TITLE": "密码检查",
-            "DESCRIPTION": "您的用户必须在这些时期内更改他们的密码。"
+            "DESCRIPTION": "此期间后，用户将需要使用密码重新验证。"
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "外部登录检查",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "删除选定的操作？",
         "DESCRIPTION": "您确定要从流中删除选定的操作吗？"
-      }
+      },
+      "ABOUTNAME": "javascript 中的操作名称和函数名称必须相同"
     },
     "TOAST": {
       "ACTIONSSET": "动作设置",

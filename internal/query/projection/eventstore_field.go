@@ -7,13 +7,32 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/project"
 )
 
+const (
+	fieldsProjectGrant      = "project_grant_fields"
+	fieldsOrgDomainVerified = "org_domain_verified_fields"
+)
+
 func newFillProjectGrantFields(config handler.Config) *handler.FieldHandler {
 	return handler.NewFieldHandler(
 		&config,
-		"project_grant_fields",
+		fieldsProjectGrant,
 		map[eventstore.AggregateType][]eventstore.EventType{
 			org.AggregateType:     nil,
 			project.AggregateType: nil,
+		},
+	)
+}
+
+func newFillOrgDomainVerifiedFields(config handler.Config) *handler.FieldHandler {
+	return handler.NewFieldHandler(
+		&config,
+		fieldsOrgDomainVerified,
+		map[eventstore.AggregateType][]eventstore.EventType{
+			org.AggregateType: {
+				org.OrgDomainAddedEventType,
+				org.OrgDomainVerifiedEventType,
+				org.OrgDomainRemovedEventType,
+			},
 		},
 	)
 }

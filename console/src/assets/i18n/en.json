@@ -231,7 +231,7 @@
           "LABEL": "Maximum Lifetime in hours",
           "PW_CHECK": {
             "TITLE": "Password Check",
-            "DESCRIPTION": "Your users have to change their passwords in these periods."
+            "DESCRIPTION": "Users will be required to re-authenticate with their password after this period."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "External Login Check",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Delete selected Actions?",
         "DESCRIPTION": "Are you sure you want to delete the selected actions from the flow?"
-      }
+      },
+      "ABOUTNAME": "The name of the action and the name of the function in the javascript have to be the same"
     },
     "TOAST": {
       "ACTIONSSET": "Actions set",

@@ -228,7 +228,7 @@ func (c *Commands) checkPasswordComplexity(ctx context.Context, newPassword stri
 }
 
 // RequestSetPassword generate and send out new code to change password for a specific user
-func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType, passwordVerificationCode crypto.Generator, authRequestID string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType, authRequestID string) (objectDetails *domain.ObjectDetails, err error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-M00oL", "Errors.User.UserIDMissing")
 	}
@@ -244,11 +244,11 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.NotInitialised")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
-	passwordCode, err := domain.NewPasswordCode(passwordVerificationCode)
+	passwordCode, err := c.newEncryptedCode(ctx, c.eventstore.Filter, domain.SecretGeneratorTypePasswordResetCode, c.userEncryption) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPasswordCodeAddedEvent(ctx, userAgg, passwordCode.Code, passwordCode.Expiry, notifyType, authRequestID))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPasswordCodeAddedEvent(ctx, userAgg, passwordCode.Crypted, passwordCode.Expiry, notifyType, authRequestID))
 	if err != nil {
 		return nil, err
 	}

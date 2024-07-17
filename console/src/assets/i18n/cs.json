@@ -231,7 +231,7 @@
           "LABEL": "Maximální doba životnosti v hodinách",
           "PW_CHECK": {
             "TITLE": "Kontrola hesla",
-            "DESCRIPTION": "Tví uživatelé musí v těchto obdobích změnit svá hesla."
+            "DESCRIPTION": "Po uplynutí této doby budou uživatelé vyzváni k opětovné autentizaci pomocí hesla."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Kontrola externího přihlášení",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Smazat vybrané akce?",
         "DESCRIPTION": "Jste si jisti, že chcete smazat vybrané akce z toku?"
-      }
+      },
+      "ABOUTNAME": "Název akce a název funkce v javascriptu musí být stejný"
     },
     "TOAST": {
       "ACTIONSSET": "Akce nastaveny",

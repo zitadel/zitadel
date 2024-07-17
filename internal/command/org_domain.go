@@ -13,6 +13,8 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -389,4 +391,66 @@ func (c *Commands) getOrgDomainWriteModel(ctx context.Context, orgID, domain str
 		return nil, err
 	}
 	return domainWriteModel, nil
+}
+
+type OrgDomainVerified struct {
+	OrgID    string
+	Domain   string
+	Verified bool
+}
+
+func (c *Commands) searchOrgDomainVerifiedByDomain(ctx context.Context, domain string) (_ *OrgDomainVerified, err error) {
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeOrgDomainVerified) {
+		return c.searchOrgDomainVerifiedByDomainOld(ctx, domain)
+	}
+
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	condition := map[eventstore.FieldType]any{
+		eventstore.FieldTypeAggregateType:  org.AggregateType,
+		eventstore.FieldTypeObjectType:     org.OrgDomainSearchType,
+		eventstore.FieldTypeObjectID:       domain,
+		eventstore.FieldTypeObjectRevision: org.OrgDomainObjectRevision,
+		eventstore.FieldTypeFieldName:      org.OrgDomainVerifiedSearchField,
+	}
+
+	results, err := c.eventstore.Search(ctx, condition)
+	if err != nil {
+		return nil, err
+	}
+	if len(results) == 0 {
+		_ = projection.OrgDomainVerifiedFields.Trigger(ctx)
+		results, err = c.eventstore.Search(ctx, condition)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	orgDomain := new(OrgDomainVerified)
+	for _, result := range results {
+		orgDomain.OrgID = result.Aggregate.ID
+		if err = result.Value.Unmarshal(&orgDomain.Verified); err != nil {
+			return nil, err
+		}
+	}
+
+	return orgDomain, nil
+}
+
+func (c *Commands) searchOrgDomainVerifiedByDomainOld(ctx context.Context, domain string) (_ *OrgDomainVerified, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	writeModel := NewOrgDomainVerifiedWriteModel(domain)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OrgDomainVerified{
+		OrgID:    writeModel.ResourceOwner,
+		Domain:   writeModel.Domain,
+		Verified: writeModel.Verified,
+	}, nil
 }

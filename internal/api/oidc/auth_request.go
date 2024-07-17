@@ -513,6 +513,11 @@ func (s *Server) authorizeCallbackHandler(w http.ResponseWriter, r *http.Request
 		return authReq, s.authResponse(authReq, authorizer, w, r)
 	}(r.Context())
 	if err != nil {
+		// we need to make sure there's no empty interface passed
+		if authReq == nil {
+			op.AuthRequestError(w, r, nil, err, authorizer)
+			return
+		}
 		op.AuthRequestError(w, r, authReq, err, authorizer)
 	}
 }
