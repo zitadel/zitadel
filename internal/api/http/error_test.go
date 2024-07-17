@@ -264,7 +264,7 @@ func TestHTTPStatusCodeToZitadelError(t *testing.T) {
 				id:         "id",
 				message:    "message",
 			},
-			wantErr: zerrors.ThrowError(nil, "HTTP-dra6yamk98", "1000"),
+			wantErr: zerrors.ThrowError(nil, "id", "message"),
 		},
 		{
 			name: "Unknown with parent",

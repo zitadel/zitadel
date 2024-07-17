@@ -3,7 +3,7 @@ package execution
 import (
 	"bytes"
 	"context"
-	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -129,9 +129,13 @@ func handleResponse(resp *http.Response) ([]byte, error) {
 		return data, nil
 	}
 
-	var parentErr error
-	if len(data) != 0 {
-		parentErr = errors.New(string(data))
-	}
-	return nil, zhttp.HTTPStatusCodeToZitadelError(parentErr, resp.StatusCode, "EXEC-dra6yamk98", "Errors.Execution.Failed")
+	return nil, zhttp.HTTPStatusCodeToZitadelError(
+		zerrors.ThrowError(nil,
+			"EXEC-1n27xlas",
+			fmt.Sprintf("status: %d, body: '%s'", resp.StatusCode, string(data)),
+		),
+		resp.StatusCode,
+		"EXEC-dra6yamk98",
+		"Errors.Execution.Failed",
+	)
 }
