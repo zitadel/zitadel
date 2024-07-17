@@ -50,6 +50,7 @@ export default async function Page({
           authRequestId={authRequestId}
           organization={organization}
           submit={submit}
+          allowRegister={!!loginSettings?.allowRegister}
         />
 
         {legal && identityProviders && process.env.ZITADEL_API_URL && (

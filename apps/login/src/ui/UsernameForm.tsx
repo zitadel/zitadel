@@ -22,6 +22,7 @@ type Props = {
   authRequestId: string | undefined;
   organization?: string;
   submit: boolean;
+  allowRegister: boolean;
 };
 
 export default function UsernameForm({
@@ -30,6 +31,7 @@ export default function UsernameForm({
   authRequestId,
   organization,
   submit,
+  allowRegister,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -217,6 +219,16 @@ export default function UsernameForm({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
+        {allowRegister && (
+          <Button
+            type="button"
+            className="self-end"
+            variant={ButtonVariants.Secondary}
+            onClick={() => router.push("/register")}
+          >
+            register
+          </Button>
+        )}
         <span className="flex-grow"></span>
         <Button
           type="submit"
