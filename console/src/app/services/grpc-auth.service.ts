@@ -266,24 +266,34 @@ export class GrpcAuthService {
       }
     } else {
       let orgs = this.cachedOrgs.getValue();
-      if (orgs.length === 0) {
-        orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
-        this.cachedOrgs.next(orgs);
-      }
 
       const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
-      if (org && orgs.find((tmp) => tmp.id === org.id)) {
-        this.storage.setItem(StorageKey.organization, org, StorageLocation.session);
-        this.setActiveOrg(org);
-        return Promise.resolve(org);
+
+      if (org) {
+        const orgQuery = new OrgQuery();
+        const orgIdQuery = new OrgIDQuery();
+        orgIdQuery.setId(org.id);
+        orgQuery.setIdQuery(orgIdQuery);
+
+        const specificOrg = (await this.listMyProjectOrgs(ORG_LIMIT, 0, [orgQuery])).resultList;
+        if (specificOrg.length === 1) {
+          this.setActiveOrg(specificOrg[0]);
+          return Promise.resolve(specificOrg[0]);
+        } else {
+          orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
+          this.cachedOrgs.next(orgs);
+        }
+      } else {
+        orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
+        this.cachedOrgs.next(orgs);
       }
 
       if (orgs.length === 0) {
         this._activeOrgChanged.next(undefined);
         return Promise.reject(new Error('No organizations found!'));
       }
-      const orgToSet = orgs.find((element) => element.id !== '0' && element.name !== '');
 
+      const orgToSet = orgs.find((element) => element.id !== '0' && element.name !== '');
       if (orgToSet) {
         this.setActiveOrg(orgToSet);
         return Promise.resolve(orgToSet);
