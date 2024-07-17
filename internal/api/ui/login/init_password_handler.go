@@ -97,12 +97,7 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 		userID = authReq.UserID
 		authReqID = authReq.ID
 	}
-	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.userCodeAlg)
-	if err != nil {
-		l.renderInitPassword(w, r, authReq, userID, "", err)
-		return
-	}
-	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), userID, userOrg, domain.NotificationTypeEmail, passwordCodeGenerator, authReqID)
+	_, err := l.command.RequestSetPassword(setContext(r.Context(), userOrg), userID, userOrg, domain.NotificationTypeEmail, authReqID)
 	l.renderInitPassword(w, r, authReq, userID, "", err)
 }
 
