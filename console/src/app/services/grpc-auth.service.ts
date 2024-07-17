@@ -97,7 +97,7 @@ import {
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
-import { Org, OrgFieldName, OrgQuery } from '../proto/generated/zitadel/org_pb';
+import { Org, OrgFieldName, OrgIDQuery, OrgQuery } from '../proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from '../proto/generated/zitadel/policy_pb';
 import { Gender, MembershipQuery, User, WebAuthNVerification } from '../proto/generated/zitadel/user_pb';
 import { GrpcService } from './grpc.service';
@@ -251,12 +251,15 @@ export class GrpcAuthService {
         this.setActiveOrg(find);
         return Promise.resolve(find);
       } else {
-        const orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
-        this.cachedOrgs.next(orgs);
-        const toFind = orgs.find((tmp) => tmp.id === id);
-        if (toFind) {
-          this.setActiveOrg(toFind);
-          return Promise.resolve(toFind);
+        const orgQuery = new OrgQuery();
+        const orgIdQuery = new OrgIDQuery();
+        orgIdQuery.setId(id);
+        orgQuery.setIdQuery(orgIdQuery);
+
+        const orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0, [orgQuery])).resultList;
+        if (orgs.length === 1) {
+          this.setActiveOrg(orgs[0]);
+          return Promise.resolve(orgs[0]);
         } else {
           return Promise.reject(new Error('requested organization not found'));
         }
