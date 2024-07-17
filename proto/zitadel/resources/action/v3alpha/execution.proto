@@ -21,6 +21,11 @@ message Execution {
   repeated ExecutionTargetType targets = 1;
 }
 
+message GetExecution {
+  zitadel.resources.object.v3alpha.Details details = 1;
+  Execution execution = 2;
+}
+
 message ExecutionTargetType {
   oneof type {
     option (validate.required) = true;
