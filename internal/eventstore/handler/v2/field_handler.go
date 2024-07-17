@@ -149,8 +149,8 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 
 func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState *state) (_ []eventstore.FillFieldsEvent, additionalIteration bool, err error) {
 	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
-	if err != nil {
-		h.log().WithError(err).Debug("filter eventstore failed")
+	if err != nil || len(events) == 0 {
+		h.log().OnError(err).Debug("filter eventstore failed")
 		return nil, false, err
 	}
 	eventAmount := len(events)

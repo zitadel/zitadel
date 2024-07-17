@@ -491,6 +491,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.expiry', value: '{{.Expiry}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.domain', value: '{{.Domain}}' },
     ],
     [MESSAGETYPES.VERIFYEMAILOTP]: [
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.otp', value: '{{.OTP}}' },
@@ -507,6 +509,8 @@ export class MessageTextsComponent implements OnInit, OnDestroy {
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.expiry', value: '{{.Expiry}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.domain', value: '{{.Domain}}' },
     ],
     [MESSAGETYPES.PASSWORDLESS]: [
       { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },

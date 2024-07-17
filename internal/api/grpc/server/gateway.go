@@ -20,8 +20,10 @@ import (
 
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (
@@ -206,7 +208,10 @@ func addInterceptors(
 	// For some non-obvious reason, the exhaustedCookieInterceptor sends the SetCookie header
 	// only if it follows the http_mw.DefaultTelemetryHandler
 	handler = exhaustedCookieInterceptor(handler, accessInterceptor)
-	handler = http_mw.DefaultMetricsHandler(handler)
+	handler = http_mw.MetricsHandler([]metrics.MetricType{
+		metrics.MetricTypeTotalCount,
+		metrics.MetricTypeStatusCode,
+	}, http_utils.Probes...)(handler)
 	return handler
 }
 

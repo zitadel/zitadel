@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/crewjam/saml/samlsp"
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/client/rp"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -13,8 +14,8 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	idp_api "github.com/zitadel/zitadel/internal/api/idp"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -37,6 +38,8 @@ import (
 const (
 	queryIDPConfigID           = "idpConfigID"
 	tmplExternalNotFoundOption = "externalnotfoundoption"
+
+	prefixLoginState = "LOGIN_"
 )
 
 type externalIDPData struct {
@@ -96,6 +99,36 @@ type externalRegisterFormData struct {
 	Phone                  domain.PhoneNumber  `schema:"phone"`
 	Language               string              `schema:"language"`
 	TermsConfirm           bool                `schema:"terms-confirm"`
+}
+
+// IDPCallbackRedirect checks if the state parameter was set by the login UI
+// and redirects the request to the login UI idp callback handlers (GET and POST).
+// The function is used in the /idps/callback endpoint to distinguish between requests
+// starte in the login UI and IdP intents.
+func IDPCallbackRedirect(w http.ResponseWriter, r *http.Request, state string) bool {
+	state, loginUI := authRequestIDFromState(state)
+	if !loginUI {
+		return false
+	}
+	callback := EndpointExternalLoginCallback
+	if r.Method == http.MethodPost {
+		callback = EndpointExternalLoginCallbackFormPost
+	}
+	target := gu.PtrCopy(r.URL)
+	target.Path = HandlerPrefix + callback
+	q := target.Query()
+	q.Set("state", state)
+	target.RawQuery = q.Encode()
+	http.Redirect(w, r, target.String(), http.StatusTemporaryRedirect)
+	return true
+}
+
+func stateFromAuthRequest(authRequestID string) string {
+	return prefixLoginState + authRequestID
+}
+
+func authRequestIDFromState(state string) (string, bool) {
+	return strings.CutPrefix(state, prefixLoginState)
 }
 
 // handleExternalLoginStep is called as nextStep
@@ -187,7 +220,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 	params := l.sessionParamsFromAuthRequest(r.Context(), authReq, identityProvider.ID)
-	session, err := provider.BeginAuth(r.Context(), authReq.ID, params...)
+	state := stateFromAuthRequest(authReq.ID)
+	session, err := provider.BeginAuth(r.Context(), state, params...)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -659,7 +693,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	data := new(externalNotFoundOptionFormData)
 	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
+		l.renderError(w, r, authReq, err)
 		return
 	}
 
@@ -961,7 +995,7 @@ func (l *Login) googleProvider(ctx context.Context, identityProvider *query.IDPT
 	return google.New(
 		identityProvider.GoogleIDPTemplate.ClientID,
 		secret,
-		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		idp_api.CallbackURL(l.externalSecure)(ctx),
 		identityProvider.GoogleIDPTemplate.Scopes,
 	)
 }
@@ -980,7 +1014,7 @@ func (l *Login) oidcProvider(ctx context.Context, identityProvider *query.IDPTem
 		identityProvider.OIDCIDPTemplate.Issuer,
 		identityProvider.OIDCIDPTemplate.ClientID,
 		secret,
-		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		idp_api.CallbackURL(l.externalSecure)(ctx),
 		identityProvider.OIDCIDPTemplate.Scopes,
 		openid.DefaultMapper,
 		opts...,
@@ -1010,7 +1044,7 @@ func (l *Login) oauthProvider(ctx context.Context, identityProvider *query.IDPTe
 			AuthURL:  identityProvider.OAuthIDPTemplate.AuthorizationEndpoint,
 			TokenURL: identityProvider.OAuthIDPTemplate.TokenEndpoint,
 		},
-		RedirectURL: l.baseURL(ctx) + EndpointExternalLoginCallback,
+		RedirectURL: idp_api.CallbackURL(l.externalSecure)(ctx),
 		Scopes:      identityProvider.OAuthIDPTemplate.Scopes,
 	}
 	return oauth.New(
@@ -1028,6 +1062,7 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
+	rootURL := idp_api.SAMLRootURL(l.externalSecure)(ctx, identityProvider.ID)
 	opts := make([]saml.ProviderOpts, 0, 6)
 	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
 		opts = append(opts, saml.WithSignedRequest())
@@ -1042,11 +1077,12 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))
 	}
 	opts = append(opts,
-		saml.WithEntityID(http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure)+"/idps/"+identityProvider.ID+"/saml/metadata"),
+		saml.WithEntityID(rootURL+"saml/metadata"),
 		saml.WithCustomRequestTracker(
 			requesttracker.New(
-				func(ctx context.Context, authRequestID, samlRequestID string) error {
+				func(ctx context.Context, state, samlRequestID string) error {
 					useragent, _ := http_mw.UserAgentIDFromCtx(ctx)
+					authRequestID, _ := authRequestIDFromState(state)
 					return l.authRepo.SaveSAMLRequestID(ctx, authRequestID, samlRequestID, useragent)
 				},
 				func(ctx context.Context, authRequestID string) (*samlsp.TrackedRequest, error) {
@@ -1064,7 +1100,7 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 		))
 	return saml.New(
 		identityProvider.Name,
-		l.baseURL(ctx)+EndpointExternalLogin+"/",
+		rootURL,
 		identityProvider.SAMLIDPTemplate.Metadata,
 		identityProvider.SAMLIDPTemplate.Certificate,
 		key,
@@ -1088,7 +1124,7 @@ func (l *Login) azureProvider(ctx context.Context, identityProvider *query.IDPTe
 		identityProvider.Name,
 		identityProvider.AzureADIDPTemplate.ClientID,
 		secret,
-		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		idp_api.CallbackURL(l.externalSecure)(ctx),
 		identityProvider.AzureADIDPTemplate.Scopes,
 		opts...,
 	)
@@ -1102,7 +1138,7 @@ func (l *Login) githubProvider(ctx context.Context, identityProvider *query.IDPT
 	return github.New(
 		identityProvider.GitHubIDPTemplate.ClientID,
 		secret,
-		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		idp_api.CallbackURL(l.externalSecure)(ctx),
 		identityProvider.GitHubIDPTemplate.Scopes,
 	)
 }
@@ -1116,7 +1152,7 @@ func (l *Login) githubEnterpriseProvider(ctx context.Context, identityProvider *
 		identityProvider.Name,
 		identityProvider.GitHubIDPTemplate.ClientID,
 		secret,
-		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		idp_api.CallbackURL(l.externalSecure)(ctx),
 		identityProvider.GitHubEnterpriseIDPTemplate.AuthorizationEndpoint,
 		identityProvider.GitHubEnterpriseIDPTemplate.TokenEndpoint,
 		identityProvider.GitHubEnterpriseIDPTemplate.UserEndpoint,
@@ -1132,7 +1168,7 @@ func (l *Login) gitlabProvider(ctx context.Context, identityProvider *query.IDPT
 	return gitlab.New(
 		identityProvider.GitLabIDPTemplate.ClientID,
 		secret,
-		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		idp_api.CallbackURL(l.externalSecure)(ctx),
 		identityProvider.GitLabIDPTemplate.Scopes,
 	)
 }
@@ -1147,7 +1183,7 @@ func (l *Login) gitlabSelfHostedProvider(ctx context.Context, identityProvider *
 		identityProvider.GitLabSelfHostedIDPTemplate.Issuer,
 		identityProvider.GitLabSelfHostedIDPTemplate.ClientID,
 		secret,
-		l.baseURL(ctx)+EndpointExternalLoginCallback,
+		idp_api.CallbackURL(l.externalSecure)(ctx),
 		identityProvider.GitLabSelfHostedIDPTemplate.Scopes,
 	)
 }
@@ -1161,7 +1197,7 @@ func (l *Login) appleProvider(ctx context.Context, identityProvider *query.IDPTe
 		identityProvider.AppleIDPTemplate.ClientID,
 		identityProvider.AppleIDPTemplate.TeamID,
 		identityProvider.AppleIDPTemplate.KeyID,
-		l.baseURL(ctx)+EndpointExternalLoginCallbackFormPost,
+		idp_api.CallbackURL(l.externalSecure)(ctx),
 		privateKey,
 		identityProvider.AppleIDPTemplate.Scopes,
 	)

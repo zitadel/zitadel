@@ -841,7 +841,8 @@ func TestCommands_HumanCheckMFATOTPSetup(t *testing.T) {
 
 func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 	type fields struct {
-		eventstore func(t *testing.T) *eventstore.Eventstore
+		eventstore      func(t *testing.T) *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type (
 		args struct {
@@ -891,7 +892,31 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 			},
 		},
 		{
-			name: "otp not existing, not found error",
+			name: "otp, no permission error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanOTPAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								nil,
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx:    context.Background(),
+				orgID:  "org1",
+				userID: "user1",
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
+			},
+		},
+		{
+			name: "otp remove, ok",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -908,6 +933,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -924,7 +950,8 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:      tt.fields.eventstore(t),
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.HumanRemoveTOTP(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
