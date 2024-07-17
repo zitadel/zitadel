@@ -123,3 +123,7 @@ func NewBaseEventForPush(ctx context.Context, aggregate *Aggregate, typ EventTyp
 		EventType: typ,
 	}
 }
+
+func (*BaseEvent) Fields() []*FieldOperation {
+	return nil
+}
