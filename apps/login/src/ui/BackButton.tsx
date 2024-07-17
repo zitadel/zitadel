@@ -1,15 +1,17 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Button, ButtonVariants } from "./Button";
 
 export default function BackButton() {
-  return history && history.length > 1 ? (
+  const router = useRouter();
+  return (
     <Button
-      onClick={() => history.back()}
+      onClick={() => router.back()}
       type="button"
       variant={ButtonVariants.Secondary}
     >
       back
     </Button>
-  ) : null;
+  );
 }
