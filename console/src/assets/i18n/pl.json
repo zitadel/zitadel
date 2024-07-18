@@ -1437,9 +1437,7 @@
         "7": "Hasło jednorazowe (OTP) - SMS",
         "8": "Hasło jednorazowe (OTP) — e-mail"
       },
-      "ADDGENERATOR": "Zdefiniuj wygląd sekretu",
-      "GENERATORTYPE": "Typ",
-      "EXPIRY": "Wygaśnięcie (w godzinach)",
+      "EXPIRY": "Wygaśnięcie (w minutach)",
       "INCLUDEDIGITS": "Dołącz cyfry",
       "INCLUDESYMBOLS": "Dołącz symbole",
       "INCLUDELOWERLETTERS": "Dołącz małe litery",

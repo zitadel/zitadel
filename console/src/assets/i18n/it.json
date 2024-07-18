@@ -1438,9 +1438,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Imposta il generatore di password",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Scadenza (in ore)",
+      "EXPIRY": "Scadenza (in minuti)",
       "INCLUDEDIGITS": "Contiene numeri",
       "INCLUDESYMBOLS": "Contiene simboli",
       "INCLUDELOWERLETTERS": "Contiene lettere minuscole",

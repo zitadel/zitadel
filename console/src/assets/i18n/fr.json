@@ -1438,9 +1438,7 @@
         "7": "Mot de passe à usage unique (OTP) - SMS",
         "8": "Mot de passe à usage unique (OTP) -e-mail"
       },
-      "ADDGENERATOR": "Configurer générateur de mot de passe",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Expiration (en heures)",
+      "EXPIRY": "Expiration (en minutes)",
       "INCLUDEDIGITS": "Inclure les chiffres",
       "INCLUDESYMBOLS": "Inclure les symboles",
       "INCLUDELOWERLETTERS": "Inclure les lettres minuscules",
