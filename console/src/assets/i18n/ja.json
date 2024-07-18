@@ -1438,9 +1438,7 @@
         "7": "ワンタイムパスワード (OTP) - SMS",
         "8": "ワンタイムパスワード (OTP) - 電子メール"
       },
-      "ADDGENERATOR": "シークレットの設定を定義する",
-      "GENERATORTYPE": "タイプ",
-      "EXPIRY": "有効期限（時間単位）",
+      "EXPIRY": "有効期限 (分単位)",
       "INCLUDEDIGITS": "数字を含める",
       "INCLUDESYMBOLS": "シンボルを含める",
       "INCLUDELOWERLETTERS": "小文字を含める",
