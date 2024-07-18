@@ -1438,9 +1438,7 @@
         "7": "Jednorázové heslo (OTP) - SMS",
         "8": "Jednorázové heslo (OTP) - E-mail"
       },
-      "ADDGENERATOR": "Definovat generátor tajemství",
-      "GENERATORTYPE": "Typ",
-      "EXPIRY": "Expirace (v hodinách)",
+      "EXPIRY": "Expirace (v minutách)",
       "INCLUDEDIGITS": "Zahrnout čísla",
       "INCLUDESYMBOLS": "Zahrnout symboly",
       "INCLUDELOWERLETTERS": "Zahrnout malá písmena",
