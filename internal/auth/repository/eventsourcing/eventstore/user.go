@@ -10,7 +10,9 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/repository/user"
 	usr_view "github.com/zitadel/zitadel/internal/user/repository/view"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type UserRepo struct {
@@ -45,4 +47,41 @@ func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, changeDate 
 		return nil, err
 	}
 	return repo.Eventstore.Filter(ctx, query) //nolint:staticcheck
+}
+
+type passwordCodeCheck struct {
+	userID string
+
+	exists bool
+	events int
+}
+
+func (p *passwordCodeCheck) Reduce() error {
+	p.exists = p.events > 0
+	return nil
+}
+
+func (p *passwordCodeCheck) AppendEvents(events ...eventstore.Event) {
+	p.events += len(events)
+}
+
+func (p *passwordCodeCheck) Query() *eventstore.SearchQueryBuilder {
+	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(p.userID).
+		EventTypes(user.UserV1PasswordCodeAddedType, user.UserV1PasswordCodeSentType,
+			user.HumanPasswordCodeAddedType, user.HumanPasswordCodeSentType).
+		Builder()
+}
+
+func (repo *UserRepo) PasswordCodeExists(ctx context.Context, userID string) (exists bool, err error) {
+	model := &passwordCodeCheck{
+		userID: userID,
+	}
+	err = repo.Eventstore.FilterToQueryReducer(ctx, model)
+	if err != nil {
+		return false, zerrors.ThrowPermissionDenied(err, "EVENT-SJ642", "Errors.Internal")
+	}
+	return model.exists, nil
 }

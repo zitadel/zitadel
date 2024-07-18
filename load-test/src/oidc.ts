@@ -72,3 +72,35 @@ export function introspect(jwt: string, token: string) {
 
   introspectTrend.add(res.timings.duration);
 }
+
+const clientCredentialsTrend = new Trend('oidc_client_credentials_duration', true);
+export function clientCredentials(clientId: string, clientSecret: string): Promise<Tokens> {
+  return new Promise((resolve, reject) => {
+  const response = http.asyncRequest('POST', configuration().token_endpoint,
+      {
+        grant_type: "client_credentials",
+        scope: 'openid profile urn:zitadel:iam:org:project:id:zitadel:aud',
+        client_id: clientId,
+        client_secret: clientSecret,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+  );
+    response.then((res) => {
+      check(res, {
+        'client credentials status ok': (r) => r.status === 200,
+      }) || reject(`client credentials request failed (client id: ${clientId}) status: ${res.status} body: ${res.body}`);
+
+      clientCredentialsTrend.add(res.timings.duration);
+      const tokens = new Tokens(res.json() as JSONObject)
+      check(tokens, {
+        'client credentials token ok': (t) => t.accessToken !== undefined,
+      }) || reject(`client credentials access token missing (client id: ${clientId}`);
+
+      resolve(tokens)
+    });
+  });
+}
