@@ -1438,9 +1438,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Define Secret Generator",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Expiration (in hours)",
+      "EXPIRY": "Expiration (in minutes)",
       "INCLUDEDIGITS": "Include Numbers",
       "INCLUDESYMBOLS": "Include Symbols",
       "INCLUDELOWERLETTERS": "Include Lower letters",
