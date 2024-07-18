@@ -465,8 +465,7 @@ message SearchTargetsRequest {
 
 message SearchTargetsResponse {
   zitadel.resources.object.v3alpha.ListDetails details = 1;
-  TargetFieldName sorting_column = 2;
-  repeated GetTarget result = 3;
+  repeated GetTarget result = 2;
 }
 
 message SetExecutionRequest {
