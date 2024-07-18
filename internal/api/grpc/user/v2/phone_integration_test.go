@@ -251,6 +251,7 @@ func TestServer_RemovePhone(t *testing.T) {
 	userResp := Tester.CreateHumanUser(CTX)
 	failResp := Tester.CreateHumanUserNoPhone(CTX)
 	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
+	doubleRemoveUser := Tester.CreateHumanUser(CTX)
 
 	Tester.RegisterUserPasskey(CTX, otherUser)
 	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
@@ -288,7 +289,14 @@ func TestServer_RemovePhone(t *testing.T) {
 			name: "remove previously deleted phone",
 			ctx:  CTX,
 			req: &user.RemovePhoneRequest{
-				UserId: userResp.GetUserId(),
+				UserId: doubleRemoveUser.GetUserId(),
+			},
+			want: &user.RemovePhoneResponse{
+				Details: &object.Details{
+					Sequence:      1,
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
 			},
 			wantErr: true,
 		},
@@ -310,6 +318,11 @@ func TestServer_RemovePhone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.RemovePhone(tt.ctx, tt.req)
+
+			if tt.name == "remove previously deleted phone" {
+				_, err = Client.RemovePhone(tt.ctx, tt.req)
+			}
+
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
