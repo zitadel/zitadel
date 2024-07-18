@@ -1442,9 +1442,7 @@
         "7": "Engångslösenord (OTP) - SMS",
         "8": "Engångslösenord (OTP) - E-post"
       },
-      "ADDGENERATOR": "Definiera hemlighetsgenerator",
-      "GENERATORTYPE": "Typ",
-      "EXPIRY": "Utgång (i timmar)",
+      "EXPIRY": "Utgång (på minuter)",
       "INCLUDEDIGITS": "Inkludera siffror",
       "INCLUDESYMBOLS": "Inkludera symboler",
       "INCLUDELOWERLETTERS": "Inkludera små bokstäver",
