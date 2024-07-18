@@ -10,7 +10,6 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 )
 
 type FieldHandler struct {
@@ -98,9 +97,7 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		defer cancel()
 	}
 
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := h.client.BeginTx(txCtx, nil)
-	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return false, err
 	}

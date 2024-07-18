@@ -9,13 +9,11 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/crewjam/saml"
 	"github.com/gorilla/mux"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/api/ui/login"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/form"
@@ -53,13 +51,13 @@ const (
 )
 
 type Handler struct {
-	commands            *command.Commands
-	queries             *query.Queries
-	parser              *form.Parser
-	encryptionAlgorithm crypto.EncryptionAlgorithm
-	callbackURL         func(ctx context.Context) string
-	samlRootURL         func(ctx context.Context, idpID string) string
-	loginSAMLRootURL    func(ctx context.Context) string
+	commands                *command.Commands
+	queries                 *query.Queries
+	parser                  *form.Parser
+	encryptionAlgorithm     crypto.EncryptionAlgorithm
+	callbackURL             func(ctx context.Context) string
+	samlRootURL             func(ctx context.Context, idpID string) string
+	loginUICallbackRedirect func(w http.ResponseWriter, r *http.Request, state string) bool
 }
 
 type externalIDPCallbackData struct {
@@ -91,27 +89,22 @@ func SAMLRootURL(externalSecure bool) func(ctx context.Context, idpID string) st
 	}
 }
 
-func LoginSAMLRootURL(externalSecure bool) func(ctx context.Context) string {
-	return func(ctx context.Context) string {
-		return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + login.HandlerPrefix + login.EndpointSAMLACS
-	}
-}
-
 func NewHandler(
 	commands *command.Commands,
 	queries *query.Queries,
 	encryptionAlgorithm crypto.EncryptionAlgorithm,
 	externalSecure bool,
 	instanceInterceptor func(next http.Handler) http.Handler,
+	loginUICallbackRedirect func(w http.ResponseWriter, r *http.Request, state string) bool,
 ) http.Handler {
 	h := &Handler{
-		commands:            commands,
-		queries:             queries,
-		parser:              form.NewParser(),
-		encryptionAlgorithm: encryptionAlgorithm,
-		callbackURL:         CallbackURL(externalSecure),
-		samlRootURL:         SAMLRootURL(externalSecure),
-		loginSAMLRootURL:    LoginSAMLRootURL(externalSecure),
+		commands:                commands,
+		queries:                 queries,
+		parser:                  form.NewParser(),
+		encryptionAlgorithm:     encryptionAlgorithm,
+		callbackURL:             CallbackURL(externalSecure),
+		loginUICallbackRedirect: loginUICallbackRedirect,
+		samlRootURL:             SAMLRootURL(externalSecure),
 	}
 
 	router := mux.NewRouter()
@@ -189,22 +182,6 @@ func (h *Handler) handleMetadata(w http.ResponseWriter, r *http.Request) {
 	}
 	metadata := sp.ServiceProvider.Metadata()
 
-	for i, spDesc := range metadata.SPSSODescriptors {
-		spDesc.AssertionConsumerServices = append(
-			spDesc.AssertionConsumerServices,
-			saml.IndexedEndpoint{
-				Binding:  saml.HTTPPostBinding,
-				Location: h.loginSAMLRootURL(ctx),
-				Index:    len(spDesc.AssertionConsumerServices) + 1,
-			}, saml.IndexedEndpoint{
-				Binding:  saml.HTTPArtifactBinding,
-				Location: h.loginSAMLRootURL(ctx),
-				Index:    len(spDesc.AssertionConsumerServices) + 2,
-			},
-		)
-		metadata.SPSSODescriptors[i] = spDesc
-	}
-
 	buf, _ := xml.MarshalIndent(metadata, "", "  ")
 	w.Header().Set("Content-Type", "application/samlmetadata+xml")
 	_, err = w.Write(buf)
@@ -218,6 +195,9 @@ func (h *Handler) handleACS(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	data := parseSAMLRequest(r)
 
+	if h.loginUICallbackRedirect(w, r, data.RelayState) {
+		return
+	}
 	provider, err := h.getProvider(ctx, data.IDPID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -270,6 +250,9 @@ func (h *Handler) handleCallback(w http.ResponseWriter, r *http.Request) {
 	data, err := h.parseCallbackRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if h.loginUICallbackRedirect(w, r, data.State) {
 		return
 	}
 	intent, err := h.commands.GetActiveIntent(ctx, data.State)

@@ -231,7 +231,7 @@
           "LABEL": "Maximale Lebensdauer in Stunden",
           "PW_CHECK": {
             "TITLE": "Passwortüberprüfung",
-            "DESCRIPTION": "Deine Benutzer müssen ihre Passwörter in diesen Zeiträumen ändern."
+            "DESCRIPTION": "Nach diesem Zeitraum müssen sich Benutzer erneut mit ihrem Passwort authentifizieren."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Externe Login-Überprüfung",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Ausgewählte Aktionen löschen?",
         "DESCRIPTION": "Wollen Sie die gewählten Aktionen wirklich löschen?"
-      }
+      },
+      "ABOUTNAME": "Der Name der Aktion und der Name der Funktion im Javascript müssen identisch sein"
     },
     "TOAST": {
       "ACTIONSSET": "Aktionen gesetzt",

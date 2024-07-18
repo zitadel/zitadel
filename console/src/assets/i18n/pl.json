@@ -231,7 +231,7 @@
           "LABEL": "Maksymalny czas życia w godzinach",
           "PW_CHECK": {
             "TITLE": "Sprawdzenie Hasła",
-            "DESCRIPTION": "Twoi użytkownicy muszą zmienić swoje hasła w tych okresach."
+            "DESCRIPTION": "Po tym okresie użytkownicy będą zobowiązani do ponownej autoryzacji za pomocą hasła."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Sprawdzenie Logowania Zewnętrznego",
@@ -1085,7 +1085,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Usunąć wybrane działanie?",
         "DESCRIPTION": "Czy na pewno chcesz usunąć wybrane działania z przepływu?"
-      }
+      },
+      "ABOUTNAME": "Nazwa akcji i nazwa funkcji w JavaScript muszą być takie same"
     },
     "TOAST": {
       "ACTIONSSET": "Ustawiono działanie",

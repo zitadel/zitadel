@@ -231,7 +231,7 @@
           "LABEL": "Duración Máxima en horas",
           "PW_CHECK": {
             "TITLE": "Verificación de Contraseña",
-            "DESCRIPTION": "Tus usuarios tienen que cambiar sus contraseñas en estos períodos."
+            "DESCRIPTION": "Los usuarios deberán volver a autenticarse con su contraseña después de este período."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Verificación de Inicio de Sesión Externo",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "¿Borrar acciones seleccionadas?",
         "DESCRIPTION": "¿Estás seguro que quieres borrar las acciones seleccionadas del flujo?"
-      }
+      },
+      "ABOUTNAME": "El nombre de la acción y el nombre de la función en javascript tienen que ser el mismo"
     },
     "TOAST": {
       "ACTIONSSET": "Acciones establecidas",

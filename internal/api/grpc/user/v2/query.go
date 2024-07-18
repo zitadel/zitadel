@@ -60,7 +60,12 @@ func UsersToPb(users []*query.User, assetPrefix string) []*user.User {
 
 func userToPb(userQ *query.User, assetPrefix string) *user.User {
 	return &user.User{
-		UserId:             userQ.ID,
+		UserId: userQ.ID,
+		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
+			Sequence:      userQ.Sequence,
+			EventDate:     userQ.ChangeDate,
+			ResourceOwner: userQ.ResourceOwner,
+		}),
 		State:              userStateToPb(userQ.State),
 		Username:           userQ.Username,
 		LoginNames:         userQ.LoginNames,
