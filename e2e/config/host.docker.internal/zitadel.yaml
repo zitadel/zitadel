@@ -9,8 +9,8 @@ Database:
     # This makes the e2e config reusable with an out-of-docker zitadel process and an /etc/hosts entry
     Host:  host.docker.internal
     EventPushConnRatio: 0.2
-    MaxOpenConns: 40
-    MaxIdleConns: 20
+    MaxOpenConns: 15
+    MaxIdleConns: 10
 
 TLS:
   Enabled: false

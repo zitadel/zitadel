@@ -25,15 +25,7 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderPasswordResetDone(w, r, authReq, err)
 		return
 	}
-	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.userCodeAlg)
-	if err != nil {
-		if authReq.LoginPolicy.IgnoreUnknownUsernames && zerrors.IsNotFound(err) {
-			err = nil
-		}
-		l.renderPasswordResetDone(w, r, authReq, err)
-		return
-	}
-	_, err = l.command.RequestSetPassword(setContext(r.Context(), authReq.UserOrgID), user.ID, authReq.UserOrgID, domain.NotificationTypeEmail, passwordCodeGenerator, authReq.ID)
+	_, err = l.command.RequestSetPassword(setContext(r.Context(), authReq.UserOrgID), user.ID, authReq.UserOrgID, domain.NotificationTypeEmail, authReq.ID)
 	l.renderPasswordResetDone(w, r, authReq, err)
 }
 
