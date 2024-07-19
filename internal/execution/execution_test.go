@@ -372,10 +372,7 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					if !errors.Is(err, zerrors.ThrowError(nil, "EXEC-1n27xlas", "{\"status_code\":1000,\"body\":\"body\"}")) {
-						return false
-					}
-					return errors.Is(err, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+					return errors.Is(err, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed {\"status_code\":1000,\"body\":\"body\"}"))
 				},
 			},
 		},
@@ -389,10 +386,7 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					if !errors.Is(err, zerrors.ThrowError(nil, "EXEC-1n27xlas", "{\"status_code\":403}")) {
-						return false
-					}
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", ""))
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed {\"status_code\":403}"))
 				},
 			},
 		},
@@ -406,10 +400,7 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					if !errors.Is(err, zerrors.ThrowError(nil, "EXEC-1n27xlas", "{\"status_code\":403,\"body\":\"body\"}")) {
-						return false
-					}
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed {\"status_code\":403,\"body\":\"body\"}"))
 				}},
 		},
 		{

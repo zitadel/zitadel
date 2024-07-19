@@ -136,16 +136,7 @@ func handleResponse(resp *http.Response) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	return nil, zhttp.HTTPStatusCodeToZitadelError(
-		zerrors.ThrowError(nil,
-			"EXEC-1n27xlas",
-			string(message),
-		),
-		resp.StatusCode,
-		"EXEC-dra6yamk98",
-		"Errors.Execution.Failed",
-	)
+	return nil, zhttp.HTTPStatusCodeToZitadelError(nil, resp.StatusCode, "EXEC-dra6yamk98", "Errors.Execution.Failed "+string(message))
 }
 
 type errorResponse struct {
