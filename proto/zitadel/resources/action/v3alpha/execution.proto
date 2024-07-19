@@ -18,12 +18,13 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alph
 
 message Execution {
   // Ordered list of targets/includes called during the execution.
-  repeated ExecutionTargetType targets = 1;
+  repeated ExecutionTargetType targets = 2;
 }
 
 message GetExecution {
   zitadel.resources.object.v3alpha.Details details = 1;
-  Execution execution = 2;
+  Condition condition = 2;
+  Execution execution = 3;
 }
 
 message ExecutionTargetType {

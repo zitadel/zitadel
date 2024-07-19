@@ -15,7 +15,7 @@ import (
 )
 
 func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetRequest) (*action.CreateTargetResponse, error) {
-	if err := checkExecutionEnabled(ctx); err != nil {
+	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
 	add := createTargetToCommand(req)
@@ -30,7 +30,7 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 }
 
 func (s *Server) PatchTarget(ctx context.Context, req *action.PatchTargetRequest) (*action.PatchTargetResponse, error) {
-	if err := checkExecutionEnabled(ctx); err != nil {
+	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
 	instance := targetOwnerInstance(ctx)
@@ -44,7 +44,7 @@ func (s *Server) PatchTarget(ctx context.Context, req *action.PatchTargetRequest
 }
 
 func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetRequest) (*action.DeleteTargetResponse, error) {
-	if err := checkExecutionEnabled(ctx); err != nil {
+	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
 	instance := targetOwnerInstance(ctx)

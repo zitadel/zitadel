@@ -2,16 +2,21 @@ package action
 
 import (
 	"context"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	"strings"
+
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
+	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
 func (s *Server) GetTarget(ctx context.Context, req *action.GetTargetRequest) (*action.GetTargetResponse, error) {
-	if err := checkExecutionEnabled(ctx); err != nil {
+	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
 
@@ -25,11 +30,11 @@ func (s *Server) GetTarget(ctx context.Context, req *action.GetTargetRequest) (*
 }
 
 func (s *Server) SearchTargets(ctx context.Context, req *action.SearchTargetsRequest) (*action.SearchTargetsResponse, error) {
-	if err := checkExecutionEnabled(ctx); err != nil {
+	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
 
-	queries, err := listTargetsRequestToModel(req)
+	queries, err := searchTargetsRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
@@ -39,12 +44,12 @@ func (s *Server) SearchTargets(ctx context.Context, req *action.SearchTargetsReq
 	}
 	return &action.SearchTargetsResponse{
 		Result:  targetsToPb(resp.Targets),
-		Details: object.ToListDetails(resp.SearchResponse),
+		Details: resource_object.ToListDetails(queries.SearchRequest, resp.SearchResponse),
 	}, nil
 }
 
 func (s *Server) SearchExecutions(ctx context.Context, req *action.SearchExecutionsRequest) (*action.SearchExecutionsResponse, error) {
-	if err := checkExecutionEnabled(ctx); err != nil {
+	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
 
@@ -58,13 +63,21 @@ func (s *Server) SearchExecutions(ctx context.Context, req *action.SearchExecuti
 	}
 	return &action.SearchExecutionsResponse{
 		Result:  executionsToPb(resp.Executions),
-		Details: object.ToListDetails(resp.SearchResponse),
+		Details: resource_object.ToListDetails(queries.SearchRequest, resp.SearchResponse),
 	}, nil
+}
+
+func targetsToPb(targets []*query.Target) []*action.GetTarget {
+	t := make([]*action.GetTarget, len(targets))
+	for i, target := range targets {
+		t[i] = targetToPb(target)
+	}
+	return t
 }
 
 func targetToPb(t *query.Target) *action.GetTarget {
 	target := &action.GetTarget{
-		Details: object.DomainToDetailsPb(&t.ObjectDetails),
+		Details: resource_object.DomainToDetailsPb(&t.ObjectDetails, &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: t.ResourceOwner}, t.ID),
 		Target: &action.Target{
 			Name:     t.Name,
 			Timeout:  durationpb.New(t.Timeout),
@@ -82,4 +95,272 @@ func targetToPb(t *query.Target) *action.GetTarget {
 		target.Target.TargetType = nil
 	}
 	return target
+}
+
+func searchTargetsRequestToModel(req *action.SearchTargetsRequest) (*query.TargetSearchQueries, error) {
+	offset, limit, asc := resource_object.ListQueryToQuery(req.Query)
+	queries, err := targetQueriesToQuery(req.Filters)
+	if err != nil {
+		return nil, err
+	}
+	return &query.TargetSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: targetFieldNameToSortingColumn(req.SortingColumn),
+		},
+		Queries: queries,
+	}, nil
+}
+
+func targetQueriesToQuery(queries []*action.TargetSearchFilter) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, qry := range queries {
+		q[i], err = targetQueryToQuery(qry)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func targetQueryToQuery(filter *action.TargetSearchFilter) (query.SearchQuery, error) {
+	switch q := filter.Filter.(type) {
+	case *action.TargetSearchFilter_TargetNameFilter:
+		return targetNameQueryToQuery(q.TargetNameFilter)
+	case *action.TargetSearchFilter_InTargetIdsFilter:
+		return targetInTargetIdsQueryToQuery(q.InTargetIdsFilter)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
+	}
+}
+
+func targetNameQueryToQuery(q *action.TargetNameFilter) (query.SearchQuery, error) {
+	return query.NewTargetNameSearchQuery(resource_object.TextMethodToQuery(q.Method), q.GetTargetName())
+}
+
+func targetInTargetIdsQueryToQuery(q *action.InTargetIDsFilter) (query.SearchQuery, error) {
+	return query.NewTargetInIDsSearchQuery(q.GetTargetIds())
+}
+
+func targetFieldNameToSortingColumn(field action.TargetFieldName) query.Column {
+	switch field {
+	case action.TargetFieldName_TARGET_FIELD_NAME_UNSPECIFIED:
+		return query.TargetColumnID
+	case action.TargetFieldName_TARGET_FIELD_NAME_ID:
+		return query.TargetColumnID
+	case action.TargetFieldName_TARGET_FIELD_NAME_CREATION_DATE:
+		return query.TargetColumnCreationDate
+	case action.TargetFieldName_TARGET_FIELD_NAME_CHANGE_DATE:
+		return query.TargetColumnChangeDate
+	case action.TargetFieldName_TARGET_FIELD_NAME_NAME:
+		return query.TargetColumnName
+	case action.TargetFieldName_TARGET_FIELD_NAME_TARGET_TYPE:
+		return query.TargetColumnTargetType
+	case action.TargetFieldName_TARGET_FIELD_NAME_URL:
+		return query.TargetColumnURL
+	case action.TargetFieldName_TARGET_FIELD_NAME_TIMEOUT:
+		return query.TargetColumnTimeout
+	case action.TargetFieldName_TARGET_FIELD_NAME_INTERRUPT_ON_ERROR:
+		return query.TargetColumnInterruptOnError
+	default:
+		return query.TargetColumnID
+	}
+}
+
+func listExecutionsRequestToModel(req *action.SearchExecutionsRequest) (*query.ExecutionSearchQueries, error) {
+	offset, limit, asc := resource_object.ListQueryToQuery(req.Query)
+	queries, err := executionQueriesToQuery(req.Filters)
+	if err != nil {
+		return nil, err
+	}
+	return &query.ExecutionSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
+}
+
+func executionQueriesToQuery(queries []*action.ExecutionSearchFilter) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = executionQueryToQuery(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func executionQueryToQuery(searchQuery *action.ExecutionSearchFilter) (query.SearchQuery, error) {
+	switch q := searchQuery.Filter.(type) {
+	case *action.ExecutionSearchFilter_InConditionsFilter:
+		return inConditionsQueryToQuery(q.InConditionsFilter)
+	case *action.ExecutionSearchFilter_ExecutionTypeFilter:
+		return executionTypeToQuery(q.ExecutionTypeFilter)
+	case *action.ExecutionSearchFilter_IncludeFilter:
+		include, err := conditionToInclude(q.IncludeFilter.GetInclude())
+		if err != nil {
+			return nil, err
+		}
+		return query.NewIncludeSearchQuery(include)
+	case *action.ExecutionSearchFilter_TargetFilter:
+		return query.NewTargetSearchQuery(q.TargetFilter.GetTargetId())
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
+	}
+}
+
+func executionTypeToQuery(q *action.ExecutionTypeFilter) (query.SearchQuery, error) {
+	switch q.ExecutionType {
+	case action.ExecutionType_EXECUTION_TYPE_UNSPECIFIED:
+		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeUnspecified)
+	case action.ExecutionType_EXECUTION_TYPE_REQUEST:
+		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeRequest)
+	case action.ExecutionType_EXECUTION_TYPE_RESPONSE:
+		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeResponse)
+	case action.ExecutionType_EXECUTION_TYPE_EVENT:
+		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeEvent)
+	case action.ExecutionType_EXECUTION_TYPE_FUNCTION:
+		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeFunction)
+	default:
+		return query.NewExecutionTypeSearchQuery(domain.ExecutionTypeUnspecified)
+	}
+}
+
+func inConditionsQueryToQuery(q *action.InConditionsFilter) (query.SearchQuery, error) {
+	values := make([]string, len(q.GetConditions()))
+	for i, condition := range q.GetConditions() {
+		id, err := conditionToID(condition)
+		if err != nil {
+			return nil, err
+		}
+		values[i] = id
+	}
+	return query.NewExecutionInIDsSearchQuery(values)
+}
+
+func conditionToID(q *action.Condition) (string, error) {
+	switch t := q.GetConditionType().(type) {
+	case *action.Condition_Request:
+		cond := &command.ExecutionAPICondition{
+			Method:  t.Request.GetMethod(),
+			Service: t.Request.GetService(),
+			All:     t.Request.GetAll(),
+		}
+		return cond.ID(domain.ExecutionTypeRequest), nil
+	case *action.Condition_Response:
+		cond := &command.ExecutionAPICondition{
+			Method:  t.Response.GetMethod(),
+			Service: t.Response.GetService(),
+			All:     t.Response.GetAll(),
+		}
+		return cond.ID(domain.ExecutionTypeResponse), nil
+	case *action.Condition_Event:
+		cond := &command.ExecutionEventCondition{
+			Event: t.Event.GetEvent(),
+			Group: t.Event.GetGroup(),
+			All:   t.Event.GetAll(),
+		}
+		return cond.ID(), nil
+	case *action.Condition_Function:
+		return command.ExecutionFunctionCondition(t.Function.GetName()).ID(), nil
+	default:
+		return "", zerrors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
+	}
+}
+
+func executionsToPb(executions []*query.Execution) []*action.GetExecution {
+	e := make([]*action.GetExecution, len(executions))
+	for i, execution := range executions {
+		e[i] = executionToPb(execution)
+	}
+	return e
+}
+
+func executionToPb(e *query.Execution) *action.GetExecution {
+	targets := make([]*action.ExecutionTargetType, len(e.Targets))
+	for i := range e.Targets {
+		switch e.Targets[i].Type {
+		case domain.ExecutionTargetTypeInclude:
+			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Include{Include: executionIDToCondition(e.Targets[i].Target)}}
+		case domain.ExecutionTargetTypeTarget:
+			targets[i] = &action.ExecutionTargetType{Type: &action.ExecutionTargetType_Target{Target: e.Targets[i].Target}}
+		case domain.ExecutionTargetTypeUnspecified:
+			continue
+		default:
+			continue
+		}
+	}
+
+	return &action.GetExecution{
+		Details: resource_object.DomainToDetailsPb(&e.ObjectDetails, &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: e.ResourceOwner}, e.ID),
+		Execution: &action.Execution{
+			Targets: targets,
+		},
+	}
+}
+
+func executionIDToCondition(include string) *action.Condition {
+	if strings.HasPrefix(include, domain.ExecutionTypeRequest.String()) {
+		return includeRequestToCondition(strings.TrimPrefix(include, domain.ExecutionTypeRequest.String()))
+	}
+	if strings.HasPrefix(include, domain.ExecutionTypeResponse.String()) {
+		return includeResponseToCondition(strings.TrimPrefix(include, domain.ExecutionTypeResponse.String()))
+	}
+	if strings.HasPrefix(include, domain.ExecutionTypeEvent.String()) {
+		return includeEventToCondition(strings.TrimPrefix(include, domain.ExecutionTypeEvent.String()))
+	}
+	if strings.HasPrefix(include, domain.ExecutionTypeFunction.String()) {
+		return includeFunctionToCondition(strings.TrimPrefix(include, domain.ExecutionTypeFunction.String()))
+	}
+	return nil
+}
+
+func includeRequestToCondition(id string) *action.Condition {
+	switch strings.Count(id, "/") {
+	case 2:
+		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Method{Method: id}}}}
+	case 1:
+		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Service{Service: strings.TrimPrefix(id, "/")}}}}
+	case 0:
+		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_All{All: true}}}}
+	default:
+		return nil
+	}
+}
+func includeResponseToCondition(id string) *action.Condition {
+	switch strings.Count(id, "/") {
+	case 2:
+		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Method{Method: id}}}}
+	case 1:
+		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Service{Service: strings.TrimPrefix(id, "/")}}}}
+	case 0:
+		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_All{All: true}}}}
+	default:
+		return nil
+	}
+}
+
+func includeEventToCondition(id string) *action.Condition {
+	switch strings.Count(id, "/") {
+	case 1:
+		if strings.HasSuffix(id, command.EventGroupSuffix) {
+			return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: strings.TrimSuffix(strings.TrimPrefix(id, "/"), command.EventGroupSuffix)}}}}
+		} else {
+			return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Event{Event: strings.TrimPrefix(id, "/")}}}}
+		}
+	case 0:
+		return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_All{All: true}}}}
+	default:
+		return nil
+	}
+}
+
+func includeFunctionToCondition(id string) *action.Condition {
+	return &action.Condition{ConditionType: &action.Condition_Function{Function: &action.FunctionExecution{Name: strings.TrimPrefix(id, "/")}}}
 }

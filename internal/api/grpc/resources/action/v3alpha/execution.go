@@ -14,7 +14,7 @@ import (
 )
 
 func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionRequest) (*action.SetExecutionResponse, error) {
-	if err := checkExecutionEnabled(ctx); err != nil {
+	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
 	reqTargets := req.GetExecution().GetTargets()

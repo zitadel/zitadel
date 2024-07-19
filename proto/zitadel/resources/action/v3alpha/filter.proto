@@ -53,7 +53,7 @@ message IncludeFilter {
 }
 
 message TargetSearchFilter {
-  oneof query {
+  oneof filter {
     option (validate.required) = true;
 
     TargetNameFilter target_name_filter = 1;
@@ -106,6 +106,5 @@ enum TargetFieldName {
   TARGET_FIELD_NAME_TARGET_TYPE = 5;
   TARGET_FIELD_NAME_URL = 6;
   TARGET_FIELD_NAME_TIMEOUT = 7;
-  TARGET_FIELD_NAME_ASYNC = 8;
-  TARGET_FIELD_NAME_INTERRUPT_ON_ERROR = 9;
+  TARGET_FIELD_NAME_INTERRUPT_ON_ERROR = 8;
 }

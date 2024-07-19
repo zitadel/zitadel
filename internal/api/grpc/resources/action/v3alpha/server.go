@@ -62,7 +62,7 @@ func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 	return action.RegisterZITADELActionsHandler
 }
 
-func checkExecutionEnabled(ctx context.Context) error {
+func checkActionsEnabled(ctx context.Context) error {
 	if authz.GetInstance(ctx).Features().Actions {
 		return nil
 	}

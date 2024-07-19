@@ -469,8 +469,18 @@ message SearchTargetsResponse {
 }
 
 message SetExecutionRequest {
-  Condition condition = 1;
-  Execution execution = 2;
+  oneof id {
+    Condition condition = 1;
+    string condition_string = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1,
+        max_length: 200,
+        example: "\"69629026806489455\"";
+      }
+    ];
+  }
+  Execution execution = 3;
 }
 
 message SetExecutionResponse {
