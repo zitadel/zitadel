@@ -116,7 +116,7 @@ func GetOrgID(r *http.Request) string {
 }
 
 func GetForwardedFor(headers http.Header) (string, bool) {
-	forwarded, ok := headers[http.CanonicalHeaderKey(ForwardedFor)]
+	forwarded, ok := headers[ForwardedFor]
 	if ok {
 		ip := strings.TrimSpace(strings.Split(forwarded[0], ",")[0])
 		if ip != "" {

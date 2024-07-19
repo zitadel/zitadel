@@ -31,6 +31,8 @@ var resourcePrefixes = []string{
 	"/zitadel.admin.v1.AdminService/",
 	"/zitadel.user.v2.UserService/",
 	"/zitadel.settings.v2.SettingsService/",
+	"/zitadel.user.v2beta.UserService/",
+	"/zitadel.settings.v2beta.SettingsService/",
 	"/zitadel.auth.v1.AuthService/",
 }
 
