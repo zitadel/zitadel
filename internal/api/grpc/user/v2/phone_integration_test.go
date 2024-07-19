@@ -262,6 +262,7 @@ func TestServer_RemovePhone(t *testing.T) {
 		req     *user.RemovePhoneRequest
 		want    *user.RemovePhoneResponse
 		wantErr bool
+		dep func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error)
 	}{
 		{
 			name: "remove phone",
@@ -276,6 +277,9 @@ func TestServer_RemovePhone(t *testing.T) {
 					ResourceOwner: Tester.Organisation.ID,
 				},
 			},
+			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
+				return nil, nil
+			},
 		},
 		{
 			name: "user without phone",
@@ -284,6 +288,9 @@ func TestServer_RemovePhone(t *testing.T) {
 				UserId: failResp.GetUserId(),
 			},
 			wantErr: true,
+			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
+				return nil, nil
+			},
 		},
 		{
 			name: "remove previously deleted phone",
@@ -291,20 +298,21 @@ func TestServer_RemovePhone(t *testing.T) {
 			req: &user.RemovePhoneRequest{
 				UserId: doubleRemoveUser.GetUserId(),
 			},
-			want: &user.RemovePhoneResponse{
-				Details: &object.Details{
-					Sequence:      1,
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
-				},
-			},
 			wantErr: true,
+			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
+				return Client.RemovePhone(ctx, &user.RemovePhoneRequest{
+					UserId: doubleRemoveUser.GetUserId(),
+				});
+			},
 		},
 		{
 			name:    "no user id",
 			ctx:     CTX,
 			req:     &user.RemovePhoneRequest{},
 			wantErr: true,
+			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
+				return nil, nil
+			},
 		},
 		{
 			name: "other user, no permission",
@@ -313,15 +321,17 @@ func TestServer_RemovePhone(t *testing.T) {
 				UserId: userResp.GetUserId(),
 			},
 			wantErr: true,
+			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
+				return nil, nil
+			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.RemovePhone(tt.ctx, tt.req)
+			_, depErr := tt.dep(tt.ctx, tt.req.UserId)
+			require.NoError(t, depErr)
 
-			if tt.name == "remove previously deleted phone" {
-				_, err = Client.RemovePhone(tt.ctx, tt.req)
-			}
+			got, err := Client.RemovePhone(tt.ctx, tt.req)
 
 			if tt.wantErr {
 				require.Error(t, err)
