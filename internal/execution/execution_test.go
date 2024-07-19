@@ -349,6 +349,12 @@ func Test_CallTarget(t *testing.T) {
 	}
 }
 
+func testErrorBody(code int, message string) []byte {
+	body := &errorBody{ForwardedStatusCode: code, ForwardedErrorMessage: message}
+	data, _ := json.Marshal(body)
+	return data
+}
+
 func Test_handleResponse(t *testing.T) {
 	type args struct {
 		resp *http.Response
@@ -367,12 +373,12 @@ func Test_handleResponse(t *testing.T) {
 			args{
 				resp: &http.Response{
 					StatusCode: 1000,
-					Body:       io.NopCloser(bytes.NewReader([]byte("body"))),
+					Body:       io.NopCloser(bytes.NewReader([]byte(""))),
 				},
 			},
 			res{
 				wantErr: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed {\"status_code\":1000,\"body\":\"body\"}"))
+					return errors.Is(err, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
 				},
 			},
 		},
@@ -386,7 +392,7 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed {\"status_code\":403}"))
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
 				},
 			},
 		},
@@ -400,7 +406,7 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed {\"status_code\":403,\"body\":\"body\"}"))
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
 				}},
 		},
 		{
@@ -427,6 +433,20 @@ func Test_handleResponse(t *testing.T) {
 			res{
 				data:    []byte(""),
 				wantErr: nil,
+			},
+		},
+		{
+			"response, statuscode = 200 error body",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusForbidden, "forbidden"))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-reUaUZCzCp", "forbidden"))
+				},
 			},
 		},
 	}

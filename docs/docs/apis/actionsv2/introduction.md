@@ -170,3 +170,16 @@ For event there are 3 levels the condition can be defined:
 - All, handling any event in ZITADEL
 
 The concept of events can be found under [Events](/concepts/architecture/software#events)
+
+### Error forwarding
+
+If you want to forward a specific error from the Target through ZITADEL, you can provide a response from the Target with status code 200 and a JSON in the following format:
+
+```json
+{
+  "forwardedStatusCode": 403,
+  "forwardedErrorMessage": "Call is forbidden through the IP AllowList definition"
+}
+```
+
+If the Target returns any other status code than >= 400, the execution is looked at as failed, and and the status code is forwarded as is.

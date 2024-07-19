@@ -126,20 +126,22 @@ func handleResponse(resp *http.Response) ([]byte, error) {
 	}
 	// Check for success between 200 and 299, redirect 300 to 399 is handled by the client, return error with statusCode >= 400
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
+		var errorBody errorBody
+		if err := json.Unmarshal(data, &errorBody); err != nil {
+			// if json unmarshal fails, body has no errorBody information, so will be taken as successful response
+			return data, nil
+		}
+		if errorBody.ForwardedStatusCode != 0 || errorBody.ForwardedErrorMessage != "" {
+			return nil, zhttp.HTTPStatusCodeToZitadelError(nil, errorBody.ForwardedStatusCode, "EXEC-reUaUZCzCp", errorBody.ForwardedErrorMessage)
+		}
+		// no errorBody filled in response, so will be taken as successful response
 		return data, nil
 	}
 
-	message, err := json.Marshal(&errorResponse{
-		StatusCode: resp.StatusCode,
-		Body:       string(data),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return nil, zhttp.HTTPStatusCodeToZitadelError(nil, resp.StatusCode, "EXEC-dra6yamk98", "Errors.Execution.Failed "+string(message))
+	return nil, zhttp.HTTPStatusCodeToZitadelError(nil, resp.StatusCode, "EXEC-dra6yamk98", "Errors.Execution.Failed")
 }
 
-type errorResponse struct {
-	StatusCode int    `json:"status_code,omitempty"`
-	Body       string `json:"body,omitempty"`
+type errorBody struct {
+	ForwardedStatusCode   int    `json:"forwardedStatusCode,omitempty"`
+	ForwardedErrorMessage string `json:"forwardedErrorMessage,omitempty"`
 }
