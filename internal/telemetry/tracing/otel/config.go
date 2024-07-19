@@ -6,6 +6,7 @@ import (
 
 	otlpgrpc "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	sdk_trace "go.opentelemetry.io/otel/sdk/trace"
+	api_trace "go.opentelemetry.io/otel/trace"
 
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -47,7 +48,7 @@ func FractionFromConfig(i interface{}) (float64, error) {
 }
 
 func (c *Config) NewTracer() error {
-	sampler := sdk_trace.ParentBased(sdk_trace.TraceIDRatioBased(c.Fraction))
+	sampler := NewSampler(sdk_trace.TraceIDRatioBased(c.Fraction))
 	exporter, err := otlpgrpc.New(context.Background(), otlpgrpc.WithEndpoint(c.Endpoint), otlpgrpc.WithInsecure())
 	if err != nil {
 		return err
@@ -55,4 +56,11 @@ func (c *Config) NewTracer() error {
 
 	tracing.T, err = NewTracer(sampler, exporter)
 	return err
+}
+
+func NewSampler(sampler sdk_trace.Sampler) sdk_trace.Sampler {
+	return sdk_trace.ParentBased(
+		tracing.SpanKindBased(sampler, api_trace.SpanKindServer),
+		sdk_trace.WithRemoteParentNotSampled(sampler),
+	)
 }
