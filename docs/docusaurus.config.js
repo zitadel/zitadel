@@ -284,28 +284,12 @@ module.exports = {
               categoryLinkSource: "tag",
             },
           },
-          user_v2beta: {
-            specPath: ".artifacts/openapi/zitadel/user/v2beta/user_service.swagger.json",
-            outputDir: "docs/apis/resources/user_service_v2beta",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
           user_v2: {
             specPath: ".artifacts/openapi/zitadel/user/v2/user_service.swagger.json",
             outputDir: "docs/apis/resources/user_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "tag",
-            },
-          },
-          session_v2beta: {
-            specPath: ".artifacts/openapi/zitadel/session/v2beta/session_service.swagger.json",
-            outputDir: "docs/apis/resources/session_service_v2beta",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
             },
           },
           session_v2: {
@@ -316,28 +300,12 @@ module.exports = {
               categoryLinkSource: "tag",
             },
           },
-          oidc_v2beta: {
-            specPath: ".artifacts/openapi/zitadel/oidc/v2beta/oidc_service.swagger.json",
-            outputDir: "docs/apis/resources/oidc_service_v2beta",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
-            },
-          },
           oidc_v2: {
             specPath: ".artifacts/openapi/zitadel/oidc/v2/oidc_service.swagger.json",
             outputDir: "docs/apis/resources/oidc_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "tag",
-            },
-          },
-          settings_v2beta: {
-            specPath: ".artifacts/openapi/zitadel/settings/v2beta/settings_service.swagger.json",
-            outputDir: "docs/apis/resources/settings_service_v2beta",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "auto",
             },
           },
           settings_v2: {
@@ -370,14 +338,6 @@ module.exports = {
             sidebarOptions: {
                 groupPathsBy: "tag",
                 categoryLinkSource: "auto",
-            },
-          },
-          feature_v2beta: {
-            specPath: ".artifacts/openapi/zitadel/feature/v2beta/feature_service.swagger.json",
-            outputDir: "docs/apis/resources/feature_service_v2beta",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "tag",
             },
           },
           feature_v2: {
