@@ -72,10 +72,6 @@ func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) checkUserNoFirstFactor(ctx context.Context, userID string) bool {
-	//userIDQuery, err := query.NewUserAuthMethodUserIDSearchQuery(userID)
-	//logging.WithFields("userID", userID).OnError(err).Warn("error creating NewUserAuthMethodUserIDSearchQuery")
-	//authMethodsQuery, err := query.NewUserAuthMethodTypesSearchQuery(domain.UserAuthMethodTypeIDP, domain.UserAuthMethodTypePassword, domain.UserAuthMethodTypePasswordless)
-	//logging.WithFields("userID", userID).OnError(err).Warn("error creating NewUserAuthMethodTypesSearchQuery")
 	authMethods, err := l.query.ListUserAuthMethodTypes(setUserContext(ctx, userID, ""), userID, false)
 	if err != nil {
 		logging.WithFields("userID", userID).OnError(err).Warn("unable to load user's auth methods for mail verification")
@@ -86,7 +82,6 @@ func (l *Login) checkUserNoFirstFactor(ctx context.Context, userID string) bool 
 			m == domain.UserAuthMethodTypePassword ||
 			m == domain.UserAuthMethodTypePasswordless
 	})
-	//, })
 }
 
 func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Request) {
