@@ -40,6 +40,18 @@ If you are unfamiliar with git have a look at Github's documentation on [creatin
 Please draft the pull request as soon as possible.
 Go through the following checklist before you submit the final pull request:
 
+### Basic Development Workflow
+
+A description of the basic development workflow, which is then used in [Submit a pull request (PR)](#submit-a-pull-request-pr) to submit a contribution.
+
+1. A developer clones the main repository and creates a local feature branch.
+2. The developer implements the new feature or bug fix on the codebase.
+3. The developer commits their changes regularly with clear and concise commit messages describing the specific changes made.
+4. Once development is complete, the developer pushes their local branch to the remote repository and creates a pull request.
+5. Other developers review the pull request code and provide feedback or suggest improvements.
+6. The pull request author addresses any feedback and makes necessary changes.
+7. Once the pull request is approved by reviewers, it can be merged into the master branch, integrating the changes into the main codebase.
+
 ### Submit a pull request (PR)
 
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the [zitadel/zitadel](https://github.com/zitadel/zitadel) repository on GitHub
@@ -67,6 +79,13 @@ Go through the following checklist before you submit the final pull request:
 
 The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
 If we ask you for changes in the code, you can follow the [GitHub Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request) to incorporate feedback in your pull request.
+
+Each PR requires review from at least one other developer familiar with the codebase and the specific area being modified. Reviews focus on:
+- Code Quality and Style: Adherence to defined coding style guides ensures code readability and maintainability across the codebase.
+- Functionality and Logic: Reviewers check for potential bugs, logical errors, and edge cases that might not have been considered.
+- Overall Design and Maintainability: The review process also assesses the overall design choices and the maintainability of the introduced code.
+- Constructive Feedback: Reviews should provide constructive feedback to help the developer improve the code and ensure it meets quality standards.
+
 
 <!-- TODO: how to do this via git -->
 <!-- TODO: change commit message via git -->
