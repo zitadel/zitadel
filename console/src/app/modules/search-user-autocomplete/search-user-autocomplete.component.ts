@@ -26,7 +26,7 @@ export enum UserTarget {
   EXTERNAL = 'external',
 }
 
-const USER_LIMIT = 100;
+const USER_LIMIT = 25;
 
 @Component({
   selector: 'cnsl-search-user-autocomplete',
