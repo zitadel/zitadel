@@ -81,7 +81,11 @@ func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpo
 	if err != nil {
 		return nil, err
 	}
-	config.MaxConns = int32(connConfig.MaxOpenConns)
+
+	if connConfig.MaxOpenConns != 0 {
+		config.MaxConns = int32(connConfig.MaxOpenConns)
+	}
+
 	config.MaxConnLifetime = c.MaxConnLifetime
 	config.MaxConnIdleTime = c.MaxConnIdleTime
 
