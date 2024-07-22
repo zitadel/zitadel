@@ -28,7 +28,7 @@
     "@fortawesome/angular-fontawesome": "^0.13.0",
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
     "@fortawesome/free-brands-svg-icons": "^6.4.2",
-    "@grpc/grpc-js": "^1.9.3",
+    "@grpc/grpc-js": "^1.11.1",
     "@netlify/framework-info": "^9.8.10",
     "@ngx-translate/core": "^15.0.0",
     "angular-oauth2-oidc": "^15.0.1",
