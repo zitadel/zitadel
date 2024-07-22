@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"slices"
 
 	"github.com/zitadel/logging"
 
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -72,16 +72,16 @@ func (l *Login) handleMailVerification(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Login) checkUserNoFirstFactor(ctx context.Context, userID string) bool {
-	userIDQuery, err := query.NewUserAuthMethodUserIDSearchQuery(userID)
-	logging.WithFields("userID", userID).OnError(err).Warn("error creating NewUserAuthMethodUserIDSearchQuery")
-	authMethodsQuery, err := query.NewUserAuthMethodTypesSearchQuery(domain.UserAuthMethodTypeIDP, domain.UserAuthMethodTypePassword, domain.UserAuthMethodTypePasswordless)
-	logging.WithFields("userID", userID).OnError(err).Warn("error creating NewUserAuthMethodTypesSearchQuery")
-	authMethods, err := l.query.SearchUserAuthMethods(ctx, &query.UserAuthMethodSearchQueries{Queries: []query.SearchQuery{userIDQuery, authMethodsQuery}}, false)
+	authMethods, err := l.query.ListUserAuthMethodTypes(setUserContext(ctx, userID, ""), userID, false)
 	if err != nil {
 		logging.WithFields("userID", userID).OnError(err).Warn("unable to load user's auth methods for mail verification")
 		return false
 	}
-	return len(authMethods.AuthMethods) == 0
+	return !slices.ContainsFunc(authMethods.AuthMethodTypes, func(m domain.UserAuthMethodType) bool {
+		return m == domain.UserAuthMethodTypeIDP ||
+			m == domain.UserAuthMethodTypePassword ||
+			m == domain.UserAuthMethodTypePasswordless
+	})
 }
 
 func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Request) {
