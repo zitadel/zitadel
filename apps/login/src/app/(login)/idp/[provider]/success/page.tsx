@@ -24,10 +24,8 @@ export default async function Page({
     return retrieveIDPIntent(id, token)
       .then((resp) => {
         const { idpInformation, userId } = resp;
-        console.log("provider", provider, idpInformation, "userId", userId);
 
         if (idpInformation) {
-          // handle login
           if (userId) {
             return (
               <DynamicTheme branding={branding}>
@@ -44,7 +42,6 @@ export default async function Page({
               </DynamicTheme>
             );
           } else {
-            // handle register
             return createUser(provider, idpInformation)
               .then((userId) => {
                 return (

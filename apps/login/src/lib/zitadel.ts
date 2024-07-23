@@ -39,6 +39,7 @@ export const sessionService = createSessionServiceClient(transport);
 export const managementService = createManagementServiceClient(transport);
 export const userService = createUserServiceClient(transport);
 export const oidcService = createOIDCServiceClient(transport);
+
 export const settingsService = createSettingsServiceClient(transport);
 
 export async function getBrandingSettings(organization?: string) {
