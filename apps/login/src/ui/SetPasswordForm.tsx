@@ -42,6 +42,11 @@ export default function SetPasswordForm({
 }: Props) {
   const { register, handleSubmit, watch, formState } = useForm<Inputs>({
     mode: "onBlur",
+    defaultValues: {
+      email: email ?? "",
+      firstname: firstname ?? "",
+      lastname: lastname ?? "",
+    },
   });
 
   const [loading, setLoading] = useState<boolean>(false);
