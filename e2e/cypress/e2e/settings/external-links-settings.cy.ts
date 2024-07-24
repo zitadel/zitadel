@@ -55,8 +55,8 @@ describe('instance external link settings', () => {
 describe('instance external link settings', () => {
   const externalLinkSettingsPath = `/org-settings?id=privacypolicy`;
 
-  const tosLink = 'https://zitadel.com/docs/legal/terms-of-service';
-  const privacyPolicyLink = 'https://zitadel.com/docs/legal/privacy-policy';
+  const tosLink = '';
+  const privacyPolicyLink = '';
   const helpLink = '';
   const supportEmail = '';
   const customLink = '';
