@@ -14,14 +14,11 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) (events []eventstore.Event, err error) {
-	ctx, spanBeginTx := tracing.NewNamedSpan(ctx, "db.BeginTx")
 	tx, err := es.client.BeginTx(ctx, nil)
-	spanBeginTx.EndWithError(err)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +38,20 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			return err
 		}
 
-		return handleUniqueConstraints(ctx, tx, commands)
+		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+			return err
+		}
+
+		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
+		// Thats why we enable it manually
+		if es.client.Type() == "cockroach" {
+			_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
+			if err != nil {
+				return err
+			}
+		}
+
+		return handleFieldCommands(ctx, tx, commands)
 	})
 
 	if err != nil {

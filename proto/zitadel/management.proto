@@ -4742,7 +4742,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc GetPasswordAgePolicy(GetPasswordAgePolicyRequest) returns (GetPasswordAgePolicyResponse) {
         option (google.api.http) = {
             get: "/policies/password/age"
@@ -4756,7 +4755,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Password Age Settings";
-            description: "Not implemented";
+            description: "Returns the password age settings configured on the organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4768,7 +4767,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc GetDefaultPasswordAgePolicy(GetDefaultPasswordAgePolicyRequest) returns (GetDefaultPasswordAgePolicyResponse) {
         option (google.api.http) = {
             get: "/policies/default/password/age"
@@ -4782,7 +4780,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Get Default Password Age Settings";
-            description: "Not implemented";
+            description: "Returns the default password age settings configured on the instance. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4794,7 +4792,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc AddCustomPasswordAgePolicy(AddCustomPasswordAgePolicyRequest) returns (AddCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
             post: "/policies/password/age"
@@ -4809,7 +4806,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Add Password Age Settings";
-            description: "Not implemented";
+            description: "Create new password age settings for the organization. This will overwrite the settings of the instance for this organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4821,7 +4818,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc UpdateCustomPasswordAgePolicy(UpdateCustomPasswordAgePolicyRequest) returns (UpdateCustomPasswordAgePolicyResponse) {
         option (google.api.http) = {
             put: "/policies/password/age"
@@ -4836,7 +4832,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Update Password Age Settings";
-            description: "Not implemented";
+            description: "Update the password age settings of the organization. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -4848,7 +4844,6 @@ service ManagementService {
         };
     }
 
-    // The password age policy is not used at the moment
     rpc ResetPasswordAgePolicyToDefault(ResetPasswordAgePolicyToDefaultRequest) returns (ResetPasswordAgePolicyToDefaultResponse) {
         option (google.api.http) = {
             delete: "/policies/password/age"
@@ -4862,7 +4857,7 @@ service ManagementService {
             tags: "Settings";
             tags: "Password Settings";
             summary: "Reset Password Age Settings to Default";
-            description: "Not implemented";
+            description: "Remove the password age settings of the organization and therefore use the default settings on the instance.. The settings specify the expiry of password, after which a user is forced to change it on the next login.";
             parameters: {
                 headers: {
                     name: "x-zitadel-orgid";
@@ -8187,6 +8182,15 @@ message AddMachineUserRequest {
     zitadel.user.v1.AccessTokenType access_token_type = 4 [
         (validate.rules).enum = {defined_only: true}
     ];
+
+    // optionally set your own id unique for the user.
+    optional string user_id = 5 [
+        (validate.rules).string = {min_len: 1, max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            max_length: 200;
+            example: "\"316b7fa5-0535-4adb-9e93-963a91b1010c\"";
+        }
+    ];
 }
 
 message AddMachineUserResponse {
@@ -10604,7 +10608,9 @@ message GetDefaultPasswordAgePolicyResponse {
 }
 
 message AddCustomPasswordAgePolicyRequest {
+    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
+    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
     uint32 expire_warn_days = 2;
 }
 
@@ -10613,7 +10619,9 @@ message AddCustomPasswordAgePolicyResponse {
 }
 
 message UpdateCustomPasswordAgePolicyRequest {
+    // Amount of days after which a password will expire. The user will be forced to change the password on the following authentication.
     uint32 max_age_days = 1;
+    // Amount of days after which the user should be notified of the upcoming expiry. ZITADEL will not notify the user.
     uint32 expire_warn_days = 2;
 }
 

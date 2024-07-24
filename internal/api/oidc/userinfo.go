@@ -104,12 +104,16 @@ func (s *Server) userInfo(
 			defer func() { span.EndWithError(err) }()
 
 			roleAudience, requestedRoles = prepareRoles(ctx, scope, projectID, projectRoleAssertion, currentProjectOnly)
-			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience)
+			roleOrgIDs := domain.RoleOrgIDsFromScope(scope)
+			qu, err = s.query.GetOIDCUserInfo(ctx, userID, roleAudience, roleOrgIDs...)
 			if err != nil {
 				return
 			}
 			rawUserInfo = userInfoToOIDC(qu, userInfoAssertion, scope, s.assetAPIPrefix(ctx))
 		})
+		if err != nil {
+			return nil, err
+		}
 		// copy the userinfo to make sure the assert roles and actions use their own copy (e.g. map)
 		userInfo := &oidc.UserInfo{
 			Subject:         rawUserInfo.Subject,

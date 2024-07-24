@@ -86,7 +86,7 @@ func writeQuery(stmt *database.Statement, query *eventstore.Query) {
 
 	stmt.WriteString(" FROM (")
 	writeFilters(stmt, query.Filters())
-	stmt.WriteRune(')')
+	stmt.WriteString(") sub")
 	writePagination(stmt, query.Pagination())
 }
 

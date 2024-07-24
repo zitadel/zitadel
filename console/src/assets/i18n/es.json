@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Configuración de la Instancia",
-        "DESCRIPTION": "Las configuraciones de la instancia son las configuraciones predeterminadas para todas las organizaciones. Con los permisos adecuados, algunas de ellas pueden ser sobrescritas en la configuración de la organización."
+        "TITLE": "Configuración por defecto",
+        "DESCRIPTION": "Configuraciones predeterminadas para todas las organizaciones. Con los permisos adecuados, algunas de ellas se pueden anular en la configuración de la organización."
       },
       "ORG": {
         "TITLE": "Configuración de la Organización",
@@ -231,7 +231,7 @@
           "LABEL": "Duración Máxima en horas",
           "PW_CHECK": {
             "TITLE": "Verificación de Contraseña",
-            "DESCRIPTION": "Tus usuarios tienen que cambiar sus contraseñas en estos períodos."
+            "DESCRIPTION": "Los usuarios deberán volver a autenticarse con su contraseña después de este período."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Verificación de Inicio de Sesión Externo",
@@ -486,6 +486,7 @@
     "MORE": "más",
     "STEP": "Paso",
     "SETUP": "Configurar",
+    "TEST": "Probar",
     "UNSAVEDCHANGES": "Cambios no guardados",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Mostrar usuario {{value}}"
     },
-    "DOWNLOAD": "Descargar"
+    "DOWNLOAD": "Descargar",
+    "APPLY": "Aplicar"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Tiene control sobre toda la instancia, incluyendo todas las organizaciones",
@@ -1084,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "¿Borrar acciones seleccionadas?",
         "DESCRIPTION": "¿Estás seguro que quieres borrar las acciones seleccionadas del flujo?"
-      }
+      },
+      "ABOUTNAME": "El nombre de la acción y el nombre de la función en javascript tienen que ser el mismo"
     },
     "TOAST": {
       "ACTIONSSET": "Acciones establecidas",
@@ -1317,16 +1320,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Ajustes de instancia",
-      "DESCRIPTION": "Estos ajustes se aplicará a todas tus organizaciones a menos que éstas los sobrescriban."
-    },
     "LIST": {
       "ORGS": "Organizaciones",
       "FEATURESETTINGS": "Ajustes de funcionalidades",
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamiento del inicio de sesión y de la seguridad",
       "LOCKOUT": "Bloqueo",
+      "AGE": "Caducidad de la contraseña",
       "COMPLEXITY": "Complejidad de contraseña",
       "NOTIFICATIONS": "Ajustes de notificación",
       "SMTP_PROVIDER": "Proveedor SMTP",
@@ -1381,7 +1381,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1438,9 +1439,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Configurar generador del secreto",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Caducidad (en horas)",
+      "EXPIRY": "Caducidad (en minutos)",
       "INCLUDEDIGITS": "Incluir números",
       "INCLUDESYMBOLS": "Incluir símbolos",
       "INCLUDELOWERLETTERS": "Incluir letras minúsculas",
@@ -1476,6 +1475,10 @@
         "DISABLED": "Deshabilitado"
       },
       "INHERITED_DESCRIPTION": "Esta configuración establece el valor al valor predeterminado del sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Habilitado\" se hereda",
+        "DISABLED": "\"Deshabilitado\" se hereda"
+      },
       "RESET": "Establecer todo a heredado"
     },
     "DIALOG": {
@@ -1546,8 +1549,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Antigüedad de la contraseña",
-      "DESCRIPTION": "Puedes establecer una política para la antigüedad de las contraseñas. Esta política emite un aviso después de que la antigüedad máxima se haya superado."
+      "TITLE": "Caducidad de la contraseña",
+      "DESCRIPTION": "Puedes establecer una política para la caducidad de las contraseñas. Esta política obligará al usuario a cambiar la contraseña en el próximo inicio de sesión después de la caducidad. No hay avisos ni notificaciones automáticos."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Política de bloqueo",
@@ -1610,7 +1613,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificación de email realizada",
@@ -1680,7 +1684,8 @@
         "username": "Nombre de usuario",
         "tempUsername": "Nombre de usuario temporal",
         "otp": "Contraseña de un solo uso",
-        "verifyUrl": "URL para verificar la contraseña de un solo uso"
+        "verifyUrl": "URL para verificar la contraseña de un solo uso",
+        "expiry": "Expiración"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados guardados."
@@ -1699,8 +1704,8 @@
       "SHOWLOCKOUTFAILURES": "mostrar fallos de bloqueo",
       "MAXPASSWORDATTEMPTS": "Intentos máximos de contraseña",
       "MAXOTPATTEMPTS": "Intentos máximos de OTP",
-      "EXPIREWARNDAYS": "Aviso de expiración después de estos días: ",
-      "MAXAGEDAYS": "Antigüedad máxima en días",
+      "EXPIREWARNDAYS": "Aviso de caducidad después de días",
+      "MAXAGEDAYS": "Validez máxima en días",
       "USERLOGINMUSTBEDOMAIN": "Añadir el dominio de la organización como sufijo de los nombres de inicio de sesión",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Si activas esta opción, todos los nombres de inicio de sesión tendrán como sufijo el dominio de esta organización. Si esta opción está desactivada, tendrás que asegurarte de que los nombres de usuario son únicos para todas las organizaciones.",
       "VALIDATEORGDOMAINS": "Verificación de dominio de la organización requerida (desafío DNS o HTTP)",
@@ -2232,6 +2237,7 @@
       "ACTIVATED": "Activado",
       "ACTIVATE": "Activar proveedor",
       "DEACTIVATE": "Desactivar proveedor",
+      "TEST": "Prueba tu proveedor",
       "TYPE": "Tipo",
       "DIALOG": {
         "ACTIVATED": "Tu configuración SMTP ha sido activada",
@@ -2255,7 +2261,6 @@
         "CURRENT_DESC_TITLE": "Estas son tus configuraciones SMTP",
         "PROVIDER_SETTINGS": "Configuración del proveedor SMTP",
         "SENDER_SETTINGS": "Configuración del remitente",
-        "TEST_SETTINGS": "Probar la configuración SMTP",
         "NEXT_STEPS": "Pŕoximos pasos",
         "ACTIVATE": {
           "TITLE": "Activa tu proveedor SMTP",
@@ -2264,6 +2269,12 @@
         "DEACTIVATE": {
           "TITLE": "Desactiva tu proveedor SMTP",
           "DESCRIPTION": "Si desactivas este proveedor SMTP, ZITADEL no puede utilizarlo para enviar notificationes hasta que lo actives otra vez."
+        },
+        "SAVE_SETTINGS": "Guarda tu configuración",
+        "TEST": {
+          "TITLE": "Prueba tu configuración",
+          "DESCRIPTION": "Puedes probar tu configuración SMTP y revisar el resultado de la prueba antes de guardar la configuración",
+          "RESULT": "Tu email fue enviado con éxito"
         }
       }
     },
@@ -2538,7 +2549,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Añadir un Mánager",

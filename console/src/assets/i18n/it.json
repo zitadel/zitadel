@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Impostazioni dell'Istanza",
-        "DESCRIPTION": "Le impostazioni dell'istanza sono le impostazioni predefinite per tutte le organizzazioni. Con i permessi adeguati, alcune di esse possono essere sovrascritte nelle impostazioni dell'organizzazione."
+        "TITLE": "Impostazioni predefinite",
+        "DESCRIPTION": "Impostazioni predefinite per tutte le organizzazioni. Con le giuste autorizzazioni, alcuni di essi sono sovrascrivibili nelle impostazioni dell'organizzazione."
       },
       "ORG": {
         "TITLE": "Impostazioni dell'Organizzazione",
@@ -231,7 +231,7 @@
           "LABEL": "Durata Massima in ore",
           "PW_CHECK": {
             "TITLE": "Controllo Password",
-            "DESCRIPTION": "I tuoi utenti devono cambiare le loro password in questi periodi."
+            "DESCRIPTION": "Gli utenti dovranno ri-autentificarsi con la password dopo questo periodo."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Controllo Login Esterno",
@@ -485,6 +485,8 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
+    "SETUP": "Setup",
+    "TEST": "Test",
     "UNSAVED": {
       "DIALOG": {
         "DESCRIPTION": "Sei sicuro di voler eliminare questa nuova azione? La tua azione andrà persa",
@@ -495,7 +497,8 @@
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     },
-    "DOWNLOAD": "Scarica"
+    "DOWNLOAD": "Scarica",
+    "APPLY": "Applicare"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Ha il controllo sull'intera istanza, comprese tutte le organizzazioni",
@@ -1082,7 +1085,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Elimina le azioni selezionate?",
         "DESCRIPTION": "Sei sicuro di voler eliminare le azioni selezionate dal processo?"
-      }
+      },
+      "ABOUTNAME": "Il nome dell'azione e il nome della funzione nel javascript devono essere gli stessi"
     },
     "TOAST": {
       "ACTIONSSET": "Azioni salvate!",
@@ -1315,16 +1319,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Impostazioni dell'istanza",
-      "DESCRIPTION": "Queste impostazioni si applicheranno a tutte le tue organizzazioni a meno che l'impostazione non venga sovrascritta."
-    },
     "LIST": {
       "ORGS": "Organizzazioni",
       "FEATURESETTINGS": "Impostazioni delle funzionalità",
       "LANGUAGES": "Lingue",
       "LOGIN": "Comportamento login e sicurezza",
       "LOCKOUT": "Meccanismi di bloccaggio",
+      "AGE": "Scadenza password",
       "COMPLEXITY": "Complessità della password",
       "NOTIFICATIONS": "Impostazioni di notifica",
       "SMTP_PROVIDER": "Fornitore SMTP",
@@ -1379,7 +1380,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1436,9 +1438,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Imposta il generatore di password",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Scadenza (in ore)",
+      "EXPIRY": "Scadenza (in minuti)",
       "INCLUDEDIGITS": "Contiene numeri",
       "INCLUDESYMBOLS": "Contiene simboli",
       "INCLUDELOWERLETTERS": "Contiene lettere minuscole",
@@ -1474,6 +1474,10 @@
         "DISABLED": "Disabilitato"
       },
       "INHERITED_DESCRIPTION": "Questa impostazione imposta il valore predefinito del sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Abilitato\" viene ereditato",
+        "DISABLED": "\"Disabilitato\" viene ereditato"
+      },
       "RESET": "Imposta tutto su predefinito"
     },
     "DIALOG": {
@@ -1544,8 +1548,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Impostazioni di validità della password",
-      "DESCRIPTION": "È possibile impostare una impostazone per la validità delle password. Questa emette un avviso dopo che il tempo di invecchiamento specifico è trascorso."
+      "TITLE": "Scadenza password",
+      "DESCRIPTION": "Puoi impostare una policy per la scadenza delle password. Questa policy obbligherà l'utente a cambiare la password al prossimo accesso dopo la scadenza. Non ci sono avvisi e notifiche automatiche."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Impostazioni di blocco",
@@ -1608,7 +1612,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verifica dell'e-mail terminata con successo.",
@@ -1678,7 +1683,8 @@
         "username": "Nome utente",
         "tempUsername": "Nome utente temporaneo",
         "otp": "Password monouso",
-        "verifyUrl": "URL per verificare la password monouso"
+        "verifyUrl": "URL per verificare la password monouso",
+        "expiry": "Scadenza"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."
@@ -1697,8 +1703,8 @@
       "SHOWLOCKOUTFAILURES": "mostra i fallimenti del blocco",
       "MAXPASSWORDATTEMPTS": "Massimo numero di tentativi di password",
       "MAXOTPATTEMPTS": "Massimo numero di tentativi di OTP",
-      "EXPIREWARNDAYS": "Avviso scadenza dopo il giorno",
-      "MAXAGEDAYS": "Lunghezza massima in giorni",
+      "EXPIREWARNDAYS": "Avviso di scadenza dopo giorni",
+      "MAXAGEDAYS": "Validità massima in giorni",
       "USERLOGINMUSTBEDOMAIN": "Nome utente deve contenere il dominio dell' organizzazione",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se abiliti questa impostazione, a tutti i nomi di accesso verrà aggiunto il suffisso del dominio dell'organizzazione. Se questa impostazione è disabilitata, devi assicurarti che i nomi utente siano univoci per tutte le organizzazioni.",
       "VALIDATEORGDOMAINS": "Verifica del dominio dell'organizzazione richiesta (challenge DNS o HTTP)",
@@ -2235,6 +2241,7 @@
       "ACTIVATED": "Attivato",
       "ACTIVATE": "Attiva fornitore",
       "DEACTIVATE": "Disattiva fornitore",
+      "TEST": "Metti alla prova il tuo fornitore",
       "TYPE": "Tipo",
       "DIALOG": {
         "ACTIVATED": "La configurazione SMTP è stata attivata",
@@ -2258,7 +2265,6 @@
         "CURRENT_DESC_TITLE": "Queste sono le tue impostazioni SMTP",
         "PROVIDER_SETTINGS": "Impostazioni del provider SMTP",
         "SENDER_SETTINGS": "Impostazioni mittente",
-        "TEST_SETTINGS": "Testare le impostazioni SMTP",
         "NEXT_STEPS": "Prossimi passi",
         "ACTIVATE": {
           "TITLE": "Attiva il tuo provider SMTP",
@@ -2267,6 +2273,12 @@
         "DEACTIVATE": {
           "TITLE": "Disattiva il tuo provider SMTP",
           "DESCRIPTION": "Dopo aver disattivato l'archivio SMTP, la schermata non è disponibile per l'utente, il documento è nuovo e non è attivo."
+        },
+        "SAVE_SETTINGS": "Salva le tue impostazioni",
+        "TEST": {
+          "TITLE": "Metti alla prova le tue impostazioni",
+          "DESCRIPTION": "Puoi testare le impostazioni del tuo provider SMTP e controllare il risultato del test prima di salvarle",
+          "RESULT": "La tua email è stata inviata correttamente"
         }
       }
     },
@@ -2541,7 +2553,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Aggiungi un manager",

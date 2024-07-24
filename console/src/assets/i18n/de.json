@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instanzeinstellungen",
-        "DESCRIPTION": "Die Instanzeinstellungen sind die Standardeinstellungen für alle Organisationen. Mit den richtigen Berechtigungen sind einige davon in den Organisationseinstellungen überschreibbar."
+        "TITLE": "Standardeinstellungen",
+        "DESCRIPTION": "Standardeinstellungen für alle Organisationen. Mit den richtigen Berechtigungen können einige davon in den Organisationseinstellungen überschrieben werden."
       },
       "ORG": {
         "TITLE": "Organisationseinstellungen",
@@ -231,7 +231,7 @@
           "LABEL": "Maximale Lebensdauer in Stunden",
           "PW_CHECK": {
             "TITLE": "Passwortüberprüfung",
-            "DESCRIPTION": "Deine Benutzer müssen ihre Passwörter in diesen Zeiträumen ändern."
+            "DESCRIPTION": "Nach diesem Zeitraum müssen sich Benutzer erneut mit ihrem Passwort authentifizieren."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Externe Login-Überprüfung",
@@ -485,6 +485,8 @@
     "NEXT": "Weiter",
     "MORE": "mehr",
     "STEP": "Schritt",
+    "SETUP": "Aufstellen",
+    "TEST": "Prüfen",
     "UNSAVEDCHANGES": "Nicht gespeicherte Änderungen",
     "UNSAVED": {
       "DIALOG": {
@@ -496,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Zeige Benutzer {{value}}"
     },
-    "DOWNLOAD": "Herunterladen"
+    "DOWNLOAD": "Herunterladen",
+    "APPLY": "Anwenden"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Hat die Kontrolle über die gesamte Instanz, einschließlich aller Organisationen",
@@ -1083,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Ausgewählte Aktionen löschen?",
         "DESCRIPTION": "Wollen Sie die gewählten Aktionen wirklich löschen?"
-      }
+      },
+      "ABOUTNAME": "Der Name der Aktion und der Name der Funktion im Javascript müssen identisch sein"
     },
     "TOAST": {
       "ACTIONSSET": "Aktionen gesetzt",
@@ -1315,16 +1319,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instanz Einstellungen",
-      "DESCRIPTION": "Diese Einstellungen werden auf all Ihren Organisationen angewandt sofern die Einstellung nicht überschrieben wurde."
-    },
     "LIST": {
       "ORGS": "Organisationen",
       "FEATURESETTINGS": "Features",
       "LANGUAGES": "Sprachen",
       "LOGIN": "Loginverhalten und Sicherheit",
       "LOCKOUT": "Sperrmechanismen",
+      "AGE": "Passwortgültigkeitsdauer",
       "COMPLEXITY": "Passwordkomplexität",
       "NOTIFICATIONS": "Benachrichtigungseinstellungen",
       "SMTP_PROVIDER": "SMTP-Anbieter",
@@ -1379,7 +1380,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1436,9 +1438,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - Email"
       },
-      "ADDGENERATOR": "Passwort Generator definieren",
-      "GENERATORTYPE": "Typ",
-      "EXPIRY": "Ablauf (in Stunden)",
+      "EXPIRY": "Ablauf (in Minuten)",
       "INCLUDEDIGITS": "Enthält Zahlen",
       "INCLUDESYMBOLS": "Enthält Symbole",
       "INCLUDELOWERLETTERS": "Enthält Kleinbuchstaben",
@@ -1474,6 +1474,10 @@
         "DISABLED": "Deaktiviert"
       },
       "INHERITED_DESCRIPTION": "Diese Einstellung setzt den Wert auf den Standardwert des Systems.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Aktiviert“ wird vererbt",
+        "DISABLED": "„Deaktiviert“ wird vererbt"
+      },
       "RESET": "Alle auf Erben setzen"
     },
     "DIALOG": {
@@ -1545,7 +1549,7 @@
     },
     "PWD_AGE": {
       "TITLE": "Gültigkeitsdauer für Passwörter",
-      "DESCRIPTION": "Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie löst eine Warnung nach Ablauf einer festgelegten Gültigkeitsdauer aus."
+      "DESCRIPTION": "Du kannst eine Richtlinie für die maximale Gültigkeitsdauer von Passwörtern festlegen. Diese Richtlinie zwingt den Benutzer dazu, das Passwort bei der nächsten Anmeldung nach dem Ablauf zu ändern. Es gibt keine automatischen Warnungen und Benachrichtigungen."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Passwortsperre",
@@ -1608,7 +1612,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1678,7 +1683,8 @@
         "username": "Username",
         "tempUsername": "Temp. Username",
         "otp": "Einmalpasswort",
-        "verifyUrl": "URL zur Überprüfung des Einmalpassworts"
+        "verifyUrl": "URL zur Überprüfung des Einmalpassworts",
+        "expiry": "Ablauf"
       },
       "TOAST": {
         "UPDATED": "Benutzerdefinierte Texte gespeichert."
@@ -2234,6 +2240,7 @@
       "ACTIVATED": "Aktiviert",
       "ACTIVATE": "Anbieter aktivieren",
       "DEACTIVATE": "Anbieter deaktivieren",
+      "TEST": "Testen Sie Ihren Anbieter",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "Die SMTP-Konfiguration wurde aktiviert",
@@ -2257,7 +2264,6 @@
         "CURRENT_DESC_TITLE": "Dies sind Ihre SMTP-Einstellungen",
         "PROVIDER_SETTINGS": "SMTP-Anbietereinstellungen",
         "SENDER_SETTINGS": "Absendereinstellungen",
-        "TEST_SETTINGS": "Testen Sie die SMTP-Einstellungen",
         "NEXT_STEPS": "Nächste Schritte",
         "ACTIVATE": {
           "TITLE": "Aktivieren Sie Ihren SMTP-Anbieter",
@@ -2266,6 +2272,12 @@
         "DEACTIVATE": {
           "TITLE": "Deaktivieren Sie Ihren SMTP-Anbieter",
           "DESCRIPTION": "Wenn Sie diesen SMTP-Anbieter deaktivieren, kann ZITADEL ihn nicht zum Versenden von Benachrichtigungen verwenden, bis Sie ihn erneut aktivieren."
+        },
+        "SAVE_SETTINGS": "Speichern Sie Ihre Einstellungen",
+        "TEST": {
+          "TITLE": "Testen Sie Ihre Einstellungen",
+          "DESCRIPTION": "Sie können die Einstellungen Ihres SMTP-Anbieters testen und das Testergebnis überprüfen, bevor Sie sie speichern",
+          "RESULT": "Deine E-Mail wurde erfolgreich versandt"
         }
       }
     },
@@ -2540,7 +2552,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

@@ -75,6 +75,7 @@ func (o *OPStorage) createAuthRequestLoginClient(ctx context.Context, req *oidc.
 		Audience:         audience,
 		NeedRefreshToken: slices.Contains(scope, oidc.ScopeOfflineAccess),
 		ResponseType:     ResponseTypeToBusiness(req.ResponseType),
+		ResponseMode:     ResponseModeToBusiness(req.ResponseMode),
 		CodeChallenge:    CodeChallengeToBusiness(req.CodeChallenge, req.CodeChallengeMethod),
 		Prompt:           PromptToBusiness(req.Prompt),
 		UILocales:        UILocalesToBusiness(req.UILocales),
@@ -512,6 +513,11 @@ func (s *Server) authorizeCallbackHandler(w http.ResponseWriter, r *http.Request
 		return authReq, s.authResponse(authReq, authorizer, w, r)
 	}(r.Context())
 	if err != nil {
+		// we need to make sure there's no empty interface passed
+		if authReq == nil {
+			op.AuthRequestError(w, r, nil, err, authorizer)
+			return
+		}
 		op.AuthRequestError(w, r, authReq, err, authorizer)
 	}
 }
@@ -554,7 +560,7 @@ func (s *Server) authResponseToken(authReq *AuthRequest, authorizer op.Authorize
 		authReq.AuthTime,
 		authReq.GetNonce(),
 		authReq.PreferredLanguage,
-		authReq.BrowserInfo.ToUserAgent(),
+		authReq.ToUserAgent(),
 		domain.TokenReasonAuthRequest,
 		nil,
 		slices.Contains(scope, oidc.ScopeOfflineAccess),

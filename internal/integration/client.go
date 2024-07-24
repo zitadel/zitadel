@@ -311,8 +311,8 @@ func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user u2f")
 }
 
-func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) {
-	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
+func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) *object.Details {
+	resp, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
 		UserId: userID,
 		NewPassword: &user.Password{
 			Password:       password,
@@ -320,6 +320,7 @@ func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, c
 		},
 	})
 	logging.OnError(err).Fatal("set user password")
+	return resp.GetDetails()
 }
 
 func (s *Tester) AddGenericOAuthProvider(t *testing.T, ctx context.Context) string {

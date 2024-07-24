@@ -126,7 +126,8 @@ func (c *Commands) GetActiveIntent(ctx context.Context, intentID string) (*IDPIn
 		return nil, zerrors.ThrowNotFound(nil, "IDP-gy3ctgkqe7", "Errors.Intent.NotStarted")
 	}
 	if intent.State != domain.IDPIntentStateStarted {
-		return nil, zerrors.ThrowInvalidArgument(nil, "IDP-Sfrgs", "Errors.Intent.NotStarted")
+		// we still need to return the intent to be able to redirect to the failure url
+		return intent, zerrors.ThrowInvalidArgument(nil, "IDP-Sfrgs", "Errors.Intent.NotStarted")
 	}
 	return intent, nil
 }

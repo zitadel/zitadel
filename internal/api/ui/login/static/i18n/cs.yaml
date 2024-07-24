@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Změna hesla
   Description: Změňte si heslo. Zadejte své staré a nové heslo.
+  ExpiredDescription: Heslo vypršelo a musí být změněno. Zadejte své staré a nové heslo.
   OldPasswordLabel: Staré heslo
   NewPasswordLabel: Nové heslo
   NewPasswordConfirmLabel: Potvrzení hesla
@@ -251,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Pohlaví
   Female: Žena
   Male: Muž
@@ -290,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Obchodní podmínky
   TosConfirm: Souhlasím s
   TosLinkText: obchodními podmínkami
@@ -363,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: Autorizace zařízení
   UserCode:

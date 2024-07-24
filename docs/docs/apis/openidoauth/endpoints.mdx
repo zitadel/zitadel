@@ -12,13 +12,13 @@ import TokenExchangeTypes from "./_token_exchange_types.mdx";
 ## OpenID Connect 1.0 Discovery
 
 The OpenID Connect Discovery Endpoint is located within the issuer domain.
-This would give us {your_domain}/.well-known/openid-configuration.
+This would give us `{your_domain}/.well-known/openid-configuration`.
 
 **Link to spec.** [OpenID Connect Discovery 1.0 incorporating errata set 1](https://openid.net/specs/openid-connect-discovery-1_0.html)
 
 ## authorization_endpoint
 
-{your_domain}/oauth/v2/authorize
+`{your_domain}/oauth/v2/authorize`
 
 :::note
 The authorization_endpoint is located with the login page, due to the need of accessing the same cookie domain
@@ -104,6 +104,22 @@ no additional parameters required
 | prompt        | If the Auth Server prompts the user for (re)authentication. <br />no prompt: the user will have to choose a session if more than one session exists<br />`none`: user must be authenticated without interaction, an error is returned otherwise <br />`login`: user must reauthenticate / provide a user name <br />`select_account`: user is prompted to select one of the existing sessions or create a new one <br />`create`: the registration form will be displayed to the user directly |
 | state         | Opaque value used to maintain state between the request and the callback. Used for Cross-Site Request Forgery (CSRF) mitigation as well, therefore highly **recommended**.                                                                                                                                                                                                                                                                                                                     |
 | ui_locales    | Spaces delimited list of preferred locales for the login UI, e.g. `de-CH de en`. If none is provided or matches the possible locales provided by the login UI, the `accept-language` header of the browser will be taken into account.                                                                                                                                                                                                                                                         |
+| response_mode | The mechanism to be used for returning parameters to the application. See [response modes](#response-modes) for valid values. Invalid values are ignored.                                                                                                                                                                                                                                                                                                                                      |
+
+#### Response modes
+
+ZITADEL supports the following `response_mode` values. When no response mode is requested, the response mode is choosen based on the configured Response Type of the application.
+As per [OpenID Connect Core 1.0, Section 3.1.2.1](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest):
+
+> The use of this parameter is NOT RECOMMENDED when the Response Mode that would be requested is the default mode specified for the Response Type.
+
+| Response Mode | Description                                                                                                                                                                                                                                                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| query         | Encode the returned parameters in the URL query string. This is the default when the Response type is `code`, for example [Web applications](/docs/guides/manage/console/applications#web).                                                                                                                                     |
+| fragment      | Encode the returned parameters in the URL fragment. This is the default when the Response Type is `id_token`, for example implicit [User Agent apps](/docs/guides/manage/console/applications#user-agent). This mode will not work for server-side applications, because fragments are never sent by the browser to the server. |
+| form_post[^1] | ZITADEL serves a small JavaScript to the browser which will send the returned parameters to the `redirect_uri` using HTTP POST. This mode only works for server-side applications and user agents which support / allow JavaScript.                                                                                             |
+
+[^1]: Implements [OAuth 2.0 Form Post Response Mode](https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html)
 
 ### Successful code response
 
@@ -156,7 +172,7 @@ the error will be display directly to the user on the auth server
 
 ## token_endpoint
 
-{your_domain}/oauth/v2/token
+`{your_domain}/oauth/v2/token`
 
 The token_endpoint will as the name suggests return various tokens (access, id and refresh) depending on the used `grant_type`.
 When using [`authorization_code`](#authorization-code-grant-code-exchange) flow call this endpoint after receiving the code from the authorization_endpoint.
@@ -455,7 +471,7 @@ Send a `client_assertion` as JWT for us to validate the signature against the re
 
 ## introspection_endpoint
 
-{your_domain}/oauth/v2/introspect
+`{your_domain}/oauth/v2/introspect`
 
 This endpoint enables clients to validate an `acccess_token`, either opaque or JWT. Unlike client side JWT validation,
 this endpoint will check if the token is not revoked (by client or logout).
@@ -538,7 +554,7 @@ If the authorization fails, an HTTP 401 with `invalid_client` will be returned.
 
 ## userinfo_endpoint
 
-{your_domain}/oidc/v1/userinfo
+`{your_domain}/oidc/v1/userinfo`
 
 This endpoint will return information about the authorized user.
 
@@ -561,7 +577,7 @@ If the token is invalid or expired, an HTTP 401 will be returned.
 
 ## revocation_endpoint
 
-{your_domain}/oauth/v2/revoke
+`{your_domain}/oauth/v2/revoke`
 
 This endpoint enables clients to revoke an `access_token` or `refresh_token` they have been granted.
 
@@ -633,7 +649,7 @@ curl --request POST \
 
 ## end_session_endpoint
 
-{your_domain}/oidc/v1/end_session
+`{your_domain}/oidc/v1/end_session`
 
 The endpoint has to be opened in the user agent (browser) to terminate the user sessions.
 
@@ -651,7 +667,7 @@ If both parameters are provided, they must be equal.
 
 ## jwks_uri
 
-{your_domain}/oauth/v2/keys
+`{your_domain}/oauth/v2/keys`
 
 The endpoint returns a JSON Web Key Set (JWKS) containing the public keys that can be used to locally validate JWTs you received from ZITADEL.
 The alternative would be to validate tokens with the [introspection endpoint](#introspection_endpoint).

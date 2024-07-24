@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instellingsinstellingen",
-        "DESCRIPTION": "De instellingsinstellingen zijn de standaardinstellingen voor alle organisaties. Met de juiste toestemmingen kunnen sommige hiervan worden overschreven in organisatie-instellingen."
+        "TITLE": "Standaard instellingen",
+        "DESCRIPTION": "Standaardinstellingen voor alle organisaties. Met de juiste machtigingen kunnen sommige ervan worden overschreven in de organisatie-instellingen."
       },
       "ORG": {
         "TITLE": "Organisatie-instellingen",
@@ -231,7 +231,7 @@
           "LABEL": "Maximale Levensduur in uren",
           "PW_CHECK": {
             "TITLE": "Wachtwoord Controle",
-            "DESCRIPTION": "Je gebruikers moeten hun wachtwoorden in deze perioden wijzigen."
+            "DESCRIPTION": "Gebruikers moeten na deze periode opnieuw worden geverifieerd met hun wachtwoord."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Externe Login Controle",
@@ -486,6 +486,7 @@
     "MORE": "meer",
     "STEP": "Stap",
     "SETUP": "Instellen",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Niet-opgeslagen wijzigingen",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Toon gebruiker {{value}}"
     },
-    "DOWNLOAD": "Download"
+    "DOWNLOAD": "Download",
+    "APPLY": "Toepassen"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
@@ -1084,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Geselecteerde acties verwijderen?",
         "DESCRIPTION": "Weet u zeker dat u de geselecteerde acties uit de flow wilt verwijderen?"
-      }
+      },
+      "ABOUTNAME": "De naam van de actie en de naam van de functie in het javascript moeten hetzelfde zijn"
     },
     "TOAST": {
       "ACTIONSSET": "Acties ingesteld",
@@ -1316,16 +1319,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instantie Instellingen",
-      "DESCRIPTION": "Deze instellingen zijn van toepassing op al uw organisaties, tenzij ze zijn overschreven."
-    },
     "LIST": {
       "ORGS": "Organisaties",
       "FEATURESETTINGS": "Functie-instellingen",
       "LANGUAGES": "Talen",
       "LOGIN": "Login Gedrag en Beveiliging",
       "LOCKOUT": "Lockout",
+      "AGE": "Wachtwoord verloopt",
       "COMPLEXITY": "Wachtwoord complexiteit",
       "NOTIFICATIONS": "Notificaties",
       "SMTP_PROVIDER": "SMTP Provider",
@@ -1380,7 +1380,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1437,9 +1438,7 @@
         "7": "Eenmalig Wachtwoord (OTP) - SMS",
         "8": "Eenmalig Wachtwoord (OTP) - Email"
       },
-      "ADDGENERATOR": "Definieer Secret Generator",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Vervaldatum (in uren)",
+      "EXPIRY": "Vervaldatum (in minuten)",
       "INCLUDEDIGITS": "Inclusief Nummers",
       "INCLUDESYMBOLS": "Inclusief Symbolen",
       "INCLUDELOWERLETTERS": "Inclusief Kleinletters",
@@ -1475,6 +1474,10 @@
         "DISABLED": "Uitgeschakeld"
       },
       "INHERITED_DESCRIPTION": "Deze instelling stelt de waarde in op de standaardwaarde van het systeem.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Ingeschakeld\" wordt overgenomen",
+        "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
+      },
       "RESET": "Alles instellen op overgenomen"
     },
     "DIALOG": {
@@ -1545,8 +1548,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Wachtwoord Veroudering",
-      "DESCRIPTION": "U kunt een beleid instellen voor de veroudering van wachtwoorden. Dit beleid geeft een waarschuwing nadat de specifieke verouderingstijd is verstreken."
+      "TITLE": "Wachtwoord verloopt",
+      "DESCRIPTION": "U kunt een beleid instellen voor het verlopen van wachtwoorden. Dit beleid dwingt de gebruiker om het wachtwoord te wijzigen bij de volgende aanmelding na het verlopen. Er zijn geen automatische waarschuwingen en meldingen."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Lockout Beleid",
@@ -1609,7 +1612,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -1679,7 +1683,8 @@
         "username": "Gebruikersnaam",
         "tempUsername": "Tijdelijke gebruikersnaam",
         "otp": "Eenmalig wachtwoord",
-        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL"
+        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL",
+        "expiry": "Vervaldatum"
       },
       "TOAST": {
         "UPDATED": "Aangepaste Teksten opgeslagen."
@@ -1698,8 +1703,8 @@
       "SHOWLOCKOUTFAILURES": "toon lockout mislukkingen",
       "MAXPASSWORDATTEMPTS": "Maximum pogingen voor wachtwoord",
       "MAXOTPATTEMPTS": "Maximale OTP-pogingen",
-      "EXPIREWARNDAYS": "Vervaldatum Waarschuwing na dag",
-      "MAXAGEDAYS": "Maximale Leeftijd in dagen",
+      "EXPIREWARNDAYS": "Waarschuwing voor verlopen na dagen",
+      "MAXAGEDAYS": "Maximale geldigheid in dagen",
       "USERLOGINMUSTBEDOMAIN": "Voeg organisatie domein toe als achtervoegsel aan inlognamen",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Als u deze instelling inschakelt, worden alle inlognamen voorzien van een achtervoegsel met het domein van de organisatie. Als deze instelling is uitgeschakeld, moet u ervoor zorgen dat gebruikersnamen uniek zijn over alle organisaties.",
       "VALIDATEORGDOMAINS": "Verificatie van organisatiedomeinen vereist (DNS of HTTP-uitdaging)",
@@ -2253,6 +2258,7 @@
       "ACTIVATED": "Geactiveerd",
       "ACTIVATE": "Aanbieder activeren",
       "DEACTIVATE": "Aanbieder deactiveren",
+      "TEST": "Test uw aanbieder",
       "TYPE": "Type",
       "DIALOG": {
         "ACTIVATED": "SMTP-configuratie is geactiveerd",
@@ -2276,7 +2282,6 @@
         "CURRENT_DESC_TITLE": "Dit zijn uw SMTP-instellingen",
         "PROVIDER_SETTINGS": "SMTP-providerinstellingen",
         "SENDER_SETTINGS": "Afzenderinstellingen",
-        "TEST_SETTINGS": "SMTP-instellingen testen",
         "NEXT_STEPS": "Volgende stappen",
         "ACTIVATE": {
           "TITLE": "Activeer uw SMTP-provider",
@@ -2285,6 +2290,12 @@
         "DEACTIVATE": {
           "TITLE": "Deactiveer uw SMTP-provider",
           "DESCRIPTION": "Als u deze SMTP-provider deactiveert, kan ZITADEL deze niet gebruiken om meldingen te verzenden totdat u deze opnieuw activeert."
+        },
+        "SAVE_SETTINGS": "Sla uw instellingen op",
+        "TEST": {
+          "TITLE": "Test uw instellingen",
+          "DESCRIPTION": "U kunt de instellingen van uw SMTP-provider testen en het testresultaat controleren voordat u deze opslaat",
+          "RESULT": "Je email is succesvol verzonden"
         }
       }
     },
@@ -2559,7 +2570,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",
