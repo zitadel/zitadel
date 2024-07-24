@@ -4,8 +4,8 @@ import { apiAuth } from '../../support/api/apiauth';
 describe('instance external link settings', () => {
   const externalLinkSettingsPath = `/instance?id=privacypolicy`;
 
-  const tosLink = 'https://zitadel.com/docs/legal/terms-of-service';
-  const privacyPolicyLink = 'https://zitadel.com/docs/legal/privacy-policy';
+  const tosLink = '';
+  const privacyPolicyLink = '';
   const helpLink = '';
   const supportEmail = '';
   const customLink = '';
