@@ -17,7 +17,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/command"
@@ -147,6 +146,30 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 			Phone: "+41791234567",
 			Verification: &user.SetHumanPhone_ReturnCode{
 				ReturnCode: &user.ReturnPhoneVerificationCode{},
+			},
+		},
+	})
+	logging.OnError(err).Fatal("create human user")
+	return resp
+}
+
+func (s *Tester) CreateHumanUserNoPhone(ctx context.Context) *user.AddHumanUserResponse {
+	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
+		Organization: &object.Organization{
+			Org: &object.Organization_OrgId{
+				OrgId: s.Organisation.ID,
+			},
+		},
+		Profile: &user.SetHumanProfile{
+			GivenName:         "Mickey",
+			FamilyName:        "Mouse",
+			PreferredLanguage: gu.Ptr("nl"),
+			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
+		},
+		Email: &user.SetHumanEmail{
+			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+			Verification: &user.SetHumanEmail_ReturnCode{
+				ReturnCode: &user.ReturnEmailVerificationCode{},
 			},
 		},
 	})
@@ -312,7 +335,7 @@ func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user u2f")
 }
 
-func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) *timestamppb.Timestamp {
+func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) *object.Details {
 	resp, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
 		UserId: userID,
 		NewPassword: &user.Password{
@@ -321,7 +344,7 @@ func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, c
 		},
 	})
 	logging.OnError(err).Fatal("set user password")
-	return resp.GetDetails().GetChangeDate()
+	return resp.GetDetails()
 }
 
 func (s *Tester) AddGenericOAuthProvider(t *testing.T, ctx context.Context) string {

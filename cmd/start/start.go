@@ -551,15 +551,17 @@ func showBasicInformation(startConfig *Config) {
 
 	consoleURL := fmt.Sprintf("%s://%s:%v/ui/console\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
 	healthCheckURL := fmt.Sprintf("%s://%s:%v/debug/healthz\n", http, startConfig.ExternalDomain, startConfig.ExternalPort)
+	machineIdMethod := id.MachineIdentificationMethod()
 
 	insecure := !startConfig.TLS.Enabled && !startConfig.ExternalSecure
 
 	fmt.Printf(" ===============================================================\n\n")
-	fmt.Printf(" Version          : %s\n", build.Version())
-	fmt.Printf(" TLS enabled      : %v\n", startConfig.TLS.Enabled)
-	fmt.Printf(" External Secure  : %v\n", startConfig.ExternalSecure)
-	fmt.Printf(" Console URL      : %s", color.BlueString(consoleURL))
-	fmt.Printf(" Health Check URL : %s", color.BlueString(healthCheckURL))
+	fmt.Printf(" Version          	: %s\n", build.Version())
+	fmt.Printf(" TLS enabled      	: %v\n", startConfig.TLS.Enabled)
+	fmt.Printf(" External Secure 	: %v\n", startConfig.ExternalSecure)
+	fmt.Printf(" Machine Id Method	: %v\n", machineIdMethod)
+	fmt.Printf(" Console URL      	: %s", color.BlueString(consoleURL))
+	fmt.Printf(" Health Check URL 	: %s", color.BlueString(healthCheckURL))
 	if insecure {
 		fmt.Printf("\n %s: you're using plain http without TLS. Be aware this is \n", color.RedString("Warning"))
 		fmt.Printf(" not a secure setup and should only be used for test systems.         \n")
