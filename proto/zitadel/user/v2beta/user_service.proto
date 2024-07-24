@@ -305,6 +305,30 @@ service UserService {
     };
   }
 
+  rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
+    option (google.api.http) = {
+      delete: "/v2beta/users/{user_id}/phone"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete the user phone";
+      description: "Delete the phone number of a user."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
       post: "/v2beta/users/{user_id}/phone/resend"
@@ -1122,6 +1146,22 @@ message SetPhoneResponse{
   zitadel.object.v2beta.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
+}
+
+message RemovePhoneRequest{
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message RemovePhoneResponse{
+  zitadel.object.v2beta.Details details = 1;
 }
 
 message ResendPhoneCodeRequest{
