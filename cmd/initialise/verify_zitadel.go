@@ -96,7 +96,7 @@ func createEncryptionKeys(ctx context.Context, db *database.DB) error {
 	}
 	if _, err = tx.Exec(createEncryptionKeysStmt); err != nil {
 		rollbackErr := tx.Rollback()
-		logging.OnError(rollbackErr).Debug("rollback failed")
+		logging.OnError(rollbackErr).Error("rollback failed")
 		return err
 	}
 
@@ -111,7 +111,7 @@ func createEvents(ctx context.Context, db *database.DB) (err error) {
 	defer func() {
 		if err != nil {
 			rollbackErr := tx.Rollback()
-			logging.OnError(rollbackErr).Debug("rollback failed")
+			logging.OnError(rollbackErr).Error("rollback failed")
 			return
 		}
 		err = tx.Commit()
