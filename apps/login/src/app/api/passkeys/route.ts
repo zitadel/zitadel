@@ -2,7 +2,6 @@ import {
   createPasskeyRegistrationLink,
   getSession,
   registerPasskey,
-  server,
 } from "@/lib/zitadel";
 import { getSessionCookieById } from "@/utils/cookies";
 import { NextRequest, NextResponse } from "next/server";
@@ -14,11 +13,7 @@ export async function POST(request: NextRequest) {
 
     const sessionCookie = await getSessionCookieById(sessionId);
 
-    const session = await getSession(
-      server,
-      sessionCookie.id,
-      sessionCookie.token,
-    );
+    const session = await getSession(sessionCookie.id, sessionCookie.token);
 
     const domain: string = request.nextUrl.hostname;
 
@@ -29,6 +24,9 @@ export async function POST(request: NextRequest) {
       return createPasskeyRegistrationLink(userId)
         .then((resp) => {
           const code = resp.code;
+          if (!code) {
+            throw new Error("Missing code in response");
+          }
           return registerPasskey(userId, code, domain).then((resp) => {
             return NextResponse.json(resp);
           });

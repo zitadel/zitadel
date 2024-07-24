@@ -7,12 +7,10 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import {
-  LoginSettings,
-  AuthFactor,
-  Checks,
-  AuthenticationMethodType,
-} from "@zitadel/server";
+import BackButton from "./BackButton";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
 
 type Inputs = {
   password: string;
@@ -68,6 +66,32 @@ export default function PasswordForm({
 
     setLoading(false);
     if (!res.ok) {
+      setError(response.details?.details ?? "Could not verify password");
+      return Promise.reject(response.details);
+    }
+    return response;
+  }
+
+  async function resetPassword() {
+    setError("");
+    setLoading(true);
+
+    const res = await fetch("/api/resetpassword", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        loginName,
+        organization,
+        authRequestId,
+      }),
+    });
+
+    const response = await res.json();
+
+    setLoading(false);
+    if (!res.ok) {
       console.log(response.details.details);
       setError(response.details?.details ?? "Could not verify password");
       return Promise.reject(response.details);
@@ -81,10 +105,13 @@ export default function PasswordForm({
       // if mfa is forced and user has no mfa -> /mfa/set
       // if no passwordless -> /passkey/add
 
-      // exclude password
+      // exclude password and passwordless
       const availableSecondFactors = resp.authMethods?.filter(
-        (m: AuthenticationMethodType) => m !== 1,
+        (m: AuthenticationMethodType) =>
+          m !== AuthenticationMethodType.PASSWORD &&
+          m !== AuthenticationMethodType.PASSKEY,
       );
+
       if (availableSecondFactors.length == 1) {
         const params = new URLSearchParams({
           loginName: resp.factors.user.loginName,
@@ -99,13 +126,14 @@ export default function PasswordForm({
         }
 
         const factor = availableSecondFactors[0];
-        if (factor === 4) {
+        // if passwordless is other method, but user selected password as alternative, perform a login
+        if (factor === AuthenticationMethodType.TOTP) {
           return router.push(`/otp/time-based?` + params);
-        } else if (factor === 6) {
+        } else if (factor === AuthenticationMethodType.OTP_SMS) {
           return router.push(`/otp/sms?` + params);
-        } else if (factor === 7) {
+        } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
           return router.push(`/otp/email?` + params);
-        } else if (factor === 5) {
+        } else if (factor === AuthenticationMethodType.U2F) {
           return router.push(`/u2f?` + params);
         }
       } else if (availableSecondFactors.length >= 1) {
@@ -122,21 +150,6 @@ export default function PasswordForm({
         }
 
         return router.push(`/mfa?` + params);
-      } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
-        const params = new URLSearchParams({
-          loginName: resp.factors.user.loginName,
-          checkAfter: "true", // this defines if the check is directly made after the setup
-        });
-
-        if (authRequestId) {
-          params.append("authRequestId", authRequestId);
-        }
-
-        if (organization) {
-          params.append("organization", organization);
-        }
-
-        return router.push(`/mfa/set?` + params);
       } else if (
         resp.factors &&
         !resp.factors.passwordless && // if session was not verified with a passkey
@@ -157,7 +170,22 @@ export default function PasswordForm({
         }
 
         return router.push(`/passkey/add?` + params);
-      } else if (authRequestId && resp && resp.sessionId) {
+      } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
+        const params = new URLSearchParams({
+          loginName: resp.factors.user.loginName,
+          checkAfter: "true", // this defines if the check is directly made after the setup
+        });
+
+        if (authRequestId) {
+          params.append("authRequestId", authRequestId);
+        }
+
+        if (organization) {
+          params.append("organization", organization);
+        }
+
+        return router.push(`/mfa/set?` + params);
+      } else if (authRequestId && resp.sessionId) {
         const params = new URLSearchParams({
           sessionId: resp.sessionId,
           authRequest: authRequestId,
@@ -200,6 +228,14 @@ export default function PasswordForm({
           label="Password"
           //   error={errors.username?.message as string}
         />
+        <button
+          className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
+          onClick={() => resetPassword()}
+          type="button"
+          disabled={loading}
+        >
+          Reset Password
+        </button>
 
         {loginName && (
           <input type="hidden" name="loginName" value={loginName} />
@@ -213,9 +249,7 @@ export default function PasswordForm({
       )}
 
       <div className="mt-8 flex w-full flex-row items-center">
-        {/* <Button type="button" variant={ButtonVariants.Secondary}>
-          back
-        </Button> */}
+        <BackButton />
         <span className="flex-grow"></span>
         <Button
           type="submit"

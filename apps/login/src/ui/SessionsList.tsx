@@ -1,9 +1,9 @@
 "use client";
 
-import { Session } from "@zitadel/server";
 import SessionItem from "./SessionItem";
 import Alert from "./Alert";
 import { useEffect, useState } from "react";
+import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
 
 type Props = {
   sessions: Session[];

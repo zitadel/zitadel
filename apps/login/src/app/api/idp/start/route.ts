@@ -1,4 +1,4 @@
-import { server, startIdentityProviderFlow } from "@/lib/zitadel";
+import { startIdentityProviderFlow } from "@/lib/zitadel";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   if (body) {
     let { idpId, successUrl, failureUrl } = body;
 
-    return startIdentityProviderFlow(server, {
+    return startIdentityProviderFlow({
       idpId,
       urls: {
         successUrl,

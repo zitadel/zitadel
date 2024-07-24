@@ -6,7 +6,7 @@
     },
     "build": {
       "outputs": ["dist/**"],
-      "dependsOn": ["@zitadel/react#build", "@zitadel/server#build"]
+      "dependsOn": ["@zitadel/react#build"]
     }
   }
 }

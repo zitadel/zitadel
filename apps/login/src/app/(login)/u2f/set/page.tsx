@@ -1,4 +1,4 @@
-import { getBrandingSettings, getSession, server } from "@/lib/zitadel";
+import { getBrandingSettings, getSession } from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterPasskey from "@/ui/RegisterPasskey";
@@ -20,7 +20,7 @@ export default async function Page({
       loginName,
       organization,
     );
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;
       }
@@ -30,7 +30,7 @@ export default async function Page({
   const description =
     "Your device will ask for your fingerprint, face, or screen lock";
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>

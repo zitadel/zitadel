@@ -6,7 +6,8 @@ import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
 import { Button, ButtonVariants } from "./Button";
 import Alert from "./Alert";
 import { Spinner } from "./Spinner";
-import { Checks } from "@zitadel/server";
+import BackButton from "./BackButton";
+import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -250,13 +251,7 @@ export default function LoginPasskey({
             use password
           </Button>
         ) : (
-          <Button
-            type="button"
-            variant={ButtonVariants.Secondary}
-            onClick={() => router.back()}
-          >
-            back
-          </Button>
+          <BackButton />
         )}
 
         <span className="flex-grow"></span>

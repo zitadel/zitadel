@@ -1,9 +1,4 @@
-import {
-  createCallback,
-  getBrandingSettings,
-  getSession,
-  server,
-} from "@/lib/zitadel";
+import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
@@ -13,14 +8,17 @@ async function loadSession(loginName: string, authRequestId?: string) {
   const recent = await getMostRecentCookieWithLoginname(`${loginName}`);
 
   if (authRequestId) {
-    return createCallback(server, {
+    return createCallback({
       authRequestId,
-      session: { sessionId: recent.id, sessionToken: recent.token },
+      callbackKind: {
+        case: "session",
+        value: { sessionId: recent.id, sessionToken: recent.token },
+      },
     }).then(({ callbackUrl }) => {
       return redirect(callbackUrl);
     });
   }
-  return getSession(server, recent.id, recent.token).then((response) => {
+  return getSession(recent.id, recent.token).then((response) => {
     if (response?.session) {
       return response.session;
     }
@@ -31,7 +29,7 @@ export default async function Page({ searchParams }: { searchParams: any }) {
   const { loginName, authRequestId, organization } = searchParams;
   const sessionFactors = await loadSession(loginName, authRequestId);
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>

@@ -2,9 +2,9 @@ import {
   getBrandingSettings,
   getSession,
   listAuthenticationMethodTypes,
-  server,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
+import BackButton from "@/ui/BackButton";
 import ChooseSecondFactor from "@/ui/ChooseSecondFactor";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
@@ -33,7 +33,7 @@ export default async function Page({
       loginName,
       organization,
     );
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes(
           response.session.factors.user.id,
@@ -49,7 +49,7 @@ export default async function Page({
 
   async function loadSessionById(sessionId: string, organization?: string) {
     const recent = await getSessionCookieById(sessionId, organization);
-    return getSession(server, recent.id, recent.token).then((response) => {
+    return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes(
           response.session.factors.user.id,
@@ -63,7 +63,7 @@ export default async function Page({
     });
   }
 
-  const branding = await getBrandingSettings(server, organization);
+  const branding = await getBrandingSettings(organization);
 
   return (
     <DynamicTheme branding={branding}>
@@ -96,6 +96,11 @@ export default async function Page({
         ) : (
           <Alert>No second factors available to setup.</Alert>
         )}
+
+        <div className="mt-8 flex w-full flex-row items-center">
+          <BackButton />
+          <span className="flex-grow"></span>
+        </div>
       </div>
     </DynamicTheme>
   );

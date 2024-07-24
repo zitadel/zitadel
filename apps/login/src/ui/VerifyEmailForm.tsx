@@ -68,7 +68,7 @@ export default function VerifyEmailForm({
 
     setLoading(false);
     if (!res.ok) {
-      setError(response.details);
+      setError(response.rawMessage);
       return Promise.reject(response);
     } else {
       return response;
@@ -82,6 +82,9 @@ export default function VerifyEmailForm({
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        userId,
+      }),
     });
 
     const response = await res.json();

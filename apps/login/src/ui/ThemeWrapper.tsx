@@ -1,11 +1,12 @@
 "use client";
 
-import { BrandingSettings } from "@zitadel/server";
 import { setTheme } from "@/utils/colors";
 import { useEffect } from "react";
+import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2beta/branding_settings_pb";
+import { PartialMessage } from "@zitadel/client2";
 
 type Props = {
-  branding: Partial<BrandingSettings> | undefined;
+  branding: PartialMessage<BrandingSettings> | undefined;
   children: React.ReactNode;
 };
 

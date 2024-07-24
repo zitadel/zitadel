@@ -3,7 +3,6 @@ import {
   getSession,
   registerPasskey,
   registerU2F,
-  server,
 } from "@/lib/zitadel";
 import { getSessionCookieById } from "@/utils/cookies";
 import { NextRequest, NextResponse } from "next/server";
@@ -15,11 +14,7 @@ export async function POST(request: NextRequest) {
 
     const sessionCookie = await getSessionCookieById(sessionId);
 
-    const session = await getSession(
-      server,
-      sessionCookie.id,
-      sessionCookie.token,
-    );
+    const session = await getSession(sessionCookie.id, sessionCookie.token);
 
     const domain: string = request.nextUrl.hostname;
 
