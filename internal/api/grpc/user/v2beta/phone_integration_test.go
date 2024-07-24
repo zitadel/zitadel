@@ -3,6 +3,7 @@
 package user_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -236,6 +237,102 @@ func TestServer_VerifyPhone(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.VerifyPhone(CTX, tt.req)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestServer_RemovePhone(t *testing.T) {
+	userResp := Tester.CreateHumanUser(CTX)
+	failResp := Tester.CreateHumanUserNoPhone(CTX)
+	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
+	doubleRemoveUser := Tester.CreateHumanUser(CTX)
+
+	Tester.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+
+	tests := []struct {
+		name    string
+		ctx     context.Context
+		req     *user.RemovePhoneRequest
+		want    *user.RemovePhoneResponse
+		wantErr bool
+		dep     func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error)
+	}{
+		{
+			name: "remove phone",
+			ctx:  CTX,
+			req: &user.RemovePhoneRequest{
+				UserId: userResp.GetUserId(),
+			},
+			want: &user.RemovePhoneResponse{
+				Details: &object.Details{
+					Sequence:      1,
+					ChangeDate:    timestamppb.Now(),
+					ResourceOwner: Tester.Organisation.ID,
+				},
+			},
+			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
+				return nil, nil
+			},
+		},
+		{
+			name: "user without phone",
+			ctx:  CTX,
+			req: &user.RemovePhoneRequest{
+				UserId: failResp.GetUserId(),
+			},
+			wantErr: true,
+			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
+				return nil, nil
+			},
+		},
+		{
+			name: "remove previously deleted phone",
+			ctx:  CTX,
+			req: &user.RemovePhoneRequest{
+				UserId: doubleRemoveUser.GetUserId(),
+			},
+			wantErr: true,
+			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
+				return Client.RemovePhone(ctx, &user.RemovePhoneRequest{
+					UserId: doubleRemoveUser.GetUserId(),
+				})
+			},
+		},
+		{
+			name:    "no user id",
+			ctx:     CTX,
+			req:     &user.RemovePhoneRequest{},
+			wantErr: true,
+			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
+				return nil, nil
+			},
+		},
+		{
+			name: "other user, no permission",
+			ctx:  Tester.WithAuthorizationToken(CTX, sessionTokenOtherUser),
+			req: &user.RemovePhoneRequest{
+				UserId: userResp.GetUserId(),
+			},
+			wantErr: true,
+			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
+				return nil, nil
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, depErr := tt.dep(tt.ctx, tt.req.UserId)
+			require.NoError(t, depErr)
+
+			got, err := Client.RemovePhone(tt.ctx, tt.req)
+
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {
