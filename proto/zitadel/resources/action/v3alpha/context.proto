@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package zitadel.resources.action.v3alpha;
+
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
+
+message TargetRequestContext {
+  reserved 1; // system
+  oneof owner {
+    option (validate.required) = true;
+    string instance_id = 2;
+    string instance_domain = 3;
+  }
+}
+
+message ExecutionRequestContext {
+  reserved 1; // system
+  oneof owner {
+    option (validate.required) = true;
+    string instance_id = 2;
+    string instance_domain = 3;
+  }
+}

@@ -13,6 +13,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/resources/action/v3alpha/target.proto";
 import "zitadel/resources/action/v3alpha/execution.proto";
 import "zitadel/resources/action/v3alpha/filter.proto";
+import "zitadel/resources/action/v3alpha/context.proto";
 import "zitadel/resources/object/v3alpha/object.proto";
 import "zitadel/settings/object/v3alpha/object.proto";
 
@@ -45,7 +46,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$ZITADEL_DOMAIN";
+  host: "${ZITADEL_DOMAIN}";
   base_path: "/resources/v3alpha/actions";
 
   external_docs: {
@@ -58,8 +59,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "${ZITADEL_DOMAIN}/oauth/v2/authorize";
+        token_url: "${ZITADEL_DOMAIN}/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -393,7 +394,8 @@ service ZITADELActions {
 }
 
 message CreateTargetRequest {
-  Target target = 1;
+  optional TargetRequestContext context = 1;
+  Target target = 2;
 }
 
 message CreateTargetResponse {
@@ -451,16 +453,17 @@ message GetTargetResponse {
 }
 
 message SearchTargetsRequest {
+  optional TargetRequestContext context = 1;
   // list limitations and ordering.
-  zitadel.resources.object.v3alpha.ListQuery query = 1;
+  zitadel.resources.object.v3alpha.ListQuery query = 2;
   // the field the result is sorted.
-  TargetFieldName sorting_column = 2 [
+  TargetFieldName sorting_column = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"FIELD_NAME_SCHEMA_TYPE\""
     }
   ];
   // Define the criteria to query for.
-  repeated TargetSearchFilter filters = 3;
+  repeated TargetSearchFilter filters = 4;
 }
 
 message SearchTargetsResponse {
@@ -469,9 +472,10 @@ message SearchTargetsResponse {
 }
 
 message SetExecutionRequest {
+  optional ExecutionRequestContext context = 1;
   oneof id {
-    Condition condition = 1;
-    string condition_string = 2 [
+    Condition condition = 2;
+    string condition_string = 3 [
       (validate.rules).string = {min_len: 1, max_len: 200},
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
@@ -480,7 +484,7 @@ message SetExecutionRequest {
       }
     ];
   }
-  Execution execution = 3;
+  Execution execution = 4;
 }
 
 message SetExecutionResponse {
@@ -488,10 +492,11 @@ message SetExecutionResponse {
 }
 
 message SearchExecutionsRequest {
+  optional ExecutionRequestContext context = 1;
   // list limitations and ordering.
-  zitadel.resources.object.v3alpha.ListQuery query = 1;
+  zitadel.resources.object.v3alpha.ListQuery query = 2;
   // Define the criteria to query for.
-  repeated ExecutionSearchFilter filters = 2;
+  repeated ExecutionSearchFilter filters = 3;
 }
 
 message SearchExecutionsResponse {
