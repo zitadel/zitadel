@@ -83,8 +83,8 @@ export default function UsernameForm({
     organization?: string,
   ) {
     return submitLoginName(values, organization).then((response) => {
-      if (response.nextUrl) {
-        return router.push(response.nextUrl);
+      if (response.nextStep) {
+        return router.push(response.nextStep);
       } else if (response.authMethodTypes.length == 1) {
         const method = response.authMethodTypes[0];
         switch (method) {

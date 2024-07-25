@@ -181,6 +181,10 @@ export async function GET(request: NextRequest) {
                 `${host}/idp/${provider}/failure?` +
                 new URLSearchParams(params),
             },
+          }).then((resp: any) => {
+            if (resp.authUrl) {
+              return NextResponse.redirect(resp.authUrl);
+            }
           });
         }
       }

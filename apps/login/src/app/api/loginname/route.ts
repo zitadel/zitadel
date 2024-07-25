@@ -99,6 +99,10 @@ export async function POST(request: NextRequest) {
                   `${host}/idp/${provider}/failure?` +
                   new URLSearchParams(params),
               },
+            }).then((resp: any) => {
+              if (resp.authUrl) {
+                return NextResponse.json({ nextStep: resp.authUrl });
+              }
             });
           }
         } else if (
@@ -119,7 +123,7 @@ export async function POST(request: NextRequest) {
           );
 
           return NextResponse.json({
-            nextUrl: registerUrl,
+            nextStep: registerUrl,
             status: 200,
           });
         }
