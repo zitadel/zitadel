@@ -453,12 +453,10 @@ SystemDefaults:
     # Passwords previously hashed with a different algorithm
     # or cost are automatically re-hashed using this config,
     # upon password validation or update.
-    # Configure the Hasher config by environment variable using JSON notation:
-    # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER='{"Algorithm":"pbkdf2","Rounds":290000,"Hash":"sha256"}'
     Hasher:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
       # Depending on the algorithm, different configuration options take effect.
-      Algorithm: bcrypt
+      Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
       # Cost takes effect for the algorithms bcrypt and scrypt
       Cost: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
       # Time takes effect for the algorithms argon2i and argon2id
@@ -498,7 +496,7 @@ SystemDefaults:
     Hasher:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
       # Depending on the algorithm, different configuration options take effect.
-      Algorithm: bcrypt
+      Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_ALGORITHM
       # Cost takes effect for the algorithms bcrypt and scrypt
       Cost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_COST
       # Time takes effect for the algorithms argon2i and argon2id
@@ -714,8 +712,8 @@ DefaultInstance:
     SecondFactorCheckLifetime: 18h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_SECONDFACTORCHECKLIFETIME
     MultiFactorCheckLifetime: 12h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_MULTIFACTORCHECKLIFETIME
   PrivacyPolicy:
-    TOSLink: https://zitadel.com/docs/legal/terms-of-service # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_TOSLINK
-    PrivacyLink: https://zitadel.com/docs/legal/privacy-policy # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_PRIVACYLINK
+    TOSLink: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_TOSLINK
+    PrivacyLink: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_PRIVACYLINK
     HelpLink: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_HELPLINK
     SupportEmail: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_SUPPORTEMAIL
     DocsLink: https://zitadel.com/docs # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_DOCSLINK
