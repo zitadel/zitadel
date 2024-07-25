@@ -84,7 +84,11 @@ export class ProviderSamlSpComponent {
               downloadable: true,
             },
             {
-              label: 'ZITADEL ACS',
+              label: 'ZITADEL ACS Login Form',
+              url: `${environment.issuer}/ui/login/login/externalidp/saml/acs`,
+            },
+            {
+              label: 'ZITADEL ACS Intent API',
               url: `${idpBase}/acs`,
             },
             {

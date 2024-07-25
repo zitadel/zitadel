@@ -40,6 +40,23 @@ func (s *Server) SetPhone(ctx context.Context, req *user.SetPhoneRequest) (resp 
 	}, nil
 }
 
+func (s *Server) RemovePhone(ctx context.Context, req *user.RemovePhoneRequest) (resp *user.RemovePhoneResponse, err error) {
+	details, err := s.command.RemoveUserPhone(ctx,
+		req.GetUserId(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user.RemovePhoneResponse{
+		Details: &object.Details{
+			Sequence:      details.Sequence,
+			ChangeDate:    timestamppb.New(details.EventDate),
+			ResourceOwner: details.ResourceOwner,
+		},
+	}, nil
+}
+
 func (s *Server) ResendPhoneCode(ctx context.Context, req *user.ResendPhoneCodeRequest) (resp *user.ResendPhoneCodeResponse, err error) {
 	var phone *domain.Phone
 	switch v := req.GetVerification().(type) {
