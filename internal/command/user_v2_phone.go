@@ -140,6 +140,29 @@ func (c *Commands) verifyUserPhoneWithGenerator(ctx context.Context, userID, cod
 	return writeModelToObjectDetails(&cmd.model.WriteModel), nil
 }
 
+func (c *Commands) RemoveUserPhone(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+	return c.removeUserPhone(ctx, userID)
+}
+
+func (c *Commands) removeUserPhone(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+	cmd, err := c.NewUserPhoneEvents(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if authz.GetCtxData(ctx).UserID != userID {
+		if err = c.checkPermission(ctx, domain.PermissionUserWrite, cmd.aggregate.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
+	}
+	if err = cmd.Remove(ctx); err != nil {
+		return nil, err
+	}
+	if _, err = cmd.Push(ctx); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&cmd.model.WriteModel), nil
+}
+
 // UserPhoneEvents allows step-by-step additions of events,
 // operating on the Human Phone Model.
 type UserPhoneEvents struct {
@@ -188,6 +211,14 @@ func (c *UserPhoneEvents) Change(ctx context.Context, phone domain.PhoneNumber) 
 		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Uch5e", "Errors.User.Phone.NotChanged")
 	}
 	c.events = append(c.events, event)
+	return nil
+}
+
+func (c *UserPhoneEvents) Remove(ctx context.Context) error {
+	if c.model.State == domain.PhoneStateRemoved || c.model.State == domain.PhoneStateUnspecified {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-ieJ2e", "Errors.User.Phone.NotFound")
+	}
+	c.events = append(c.events, user.NewHumanPhoneRemovedEvent(ctx, c.aggregate))
 	return nil
 }
 
