@@ -1438,9 +1438,7 @@
         "7": "Eenmalig Wachtwoord (OTP) - SMS",
         "8": "Eenmalig Wachtwoord (OTP) - Email"
       },
-      "ADDGENERATOR": "Definieer Secret Generator",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Vervaldatum (in uren)",
+      "EXPIRY": "Vervaldatum (in minuten)",
       "INCLUDEDIGITS": "Inclusief Nummers",
       "INCLUDESYMBOLS": "Inclusief Symbolen",
       "INCLUDELOWERLETTERS": "Inclusief Kleinletters",

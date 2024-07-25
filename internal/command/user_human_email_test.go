@@ -12,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -387,14 +388,17 @@ func TestCommandSide_ChangeHumanEmail(t *testing.T) {
 
 func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 	type fields struct {
-		eventstore func(*testing.T) *eventstore.Eventstore
+		eventstore         func(*testing.T) *eventstore.Eventstore
+		userPasswordHasher *crypto.Hasher
 	}
 	type args struct {
-		ctx             context.Context
-		userID          string
-		code            string
-		resourceOwner   string
-		secretGenerator crypto.Generator
+		ctx                 context.Context
+		userID              string
+		code                string
+		resourceOwner       string
+		optionalUserAgentID string
+		optionalPassword    string
+		secretGenerator     crypto.Generator
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -587,13 +591,96 @@ func TestCommandSide_VerifyHumanEmail(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "valid code (with password and user agent), ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusherWithCreationDateNow(
+							user.NewHumanEmailCodeAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("a"),
+								},
+								time.Hour*1,
+								"",
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectPush(
+						user.NewHumanEmailVerifiedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+						),
+						user.NewHumanPasswordChangedEvent(context.Background(),
+							&user.NewAggregate("user1", "org1").Aggregate,
+							"$plain$x$password",
+							false,
+							"userAgentID",
+						),
+					),
+				),
+				userPasswordHasher: mockPasswordHasher("x"),
+			},
+			args: args{
+				ctx:                 context.Background(),
+				userID:              "user1",
+				code:                "a",
+				resourceOwner:       "org1",
+				optionalPassword:    "password",
+				optionalUserAgentID: "userAgentID",
+				secretGenerator:     GetMockSecretGenerator(t),
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore(t),
+				eventstore:         tt.fields.eventstore(t),
+				userPasswordHasher: tt.fields.userPasswordHasher,
 			}
-			got, err := r.VerifyHumanEmail(tt.args.ctx, tt.args.userID, tt.args.code, tt.args.resourceOwner, tt.args.secretGenerator)
+			got, err := r.VerifyHumanEmail(
+				tt.args.ctx,
+				tt.args.userID,
+				tt.args.code,
+				tt.args.resourceOwner,
+				tt.args.optionalPassword,
+				tt.args.optionalUserAgentID,
+				tt.args.secretGenerator,
+			)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
