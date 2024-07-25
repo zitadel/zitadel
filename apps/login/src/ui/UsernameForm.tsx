@@ -93,7 +93,8 @@ export default function UsernameForm({
               loginName: response.factors.user.loginName,
             };
 
-            // TODO: think about a method to skip org discovery from the session
+            // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
+
             if (organization || response.factors.user.organizationId) {
               paramsPassword.organization =
                 organization ?? response.factors.user.organizationId;

@@ -1,9 +1,15 @@
+import { ProviderSlug } from "@/lib/demos";
 import {
+  getActiveIdentityProviders,
   getLoginSettings,
   listAuthenticationMethodTypes,
   listUsers,
+  PROVIDER_NAME_MAPPING,
+  startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
+import { makeReqCtx } from "@zitadel/client2/v2beta";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -43,8 +49,62 @@ export async function POST(request: NextRequest) {
       } else if (organization) {
         const loginSettings = await getLoginSettings(organization);
 
+        // TODO: check if allowDomainDiscovery has to be allowed too, to redirect to the register page
         // user not found, check if register is enabled on organization
-        if (loginSettings?.allowRegister) {
+
+        if (
+          loginSettings?.allowRegister &&
+          !loginSettings?.allowUsernamePassword
+        ) {
+          // TODO redirect to loginname page with idp hint
+          const identityProviders = await getActiveIdentityProviders(
+            organization,
+          ).then((resp) => {
+            return resp.identityProviders;
+          });
+
+          if (identityProviders.length === 1) {
+            const host = request.nextUrl.origin;
+
+            const provider =
+              identityProviders[0].type === IdentityProviderType.GITHUB
+                ? "github"
+                : identityProviders[0].type === IdentityProviderType.GOOGLE
+                  ? "google"
+                  : identityProviders[0].type === IdentityProviderType.AZURE_AD
+                    ? "azure"
+                    : identityProviders[0].type === IdentityProviderType.SAML
+                      ? "saml"
+                      : identityProviders[0].type === IdentityProviderType.OIDC
+                        ? "oidc"
+                        : "oidc";
+
+            const params = new URLSearchParams();
+
+            if (authRequestId) {
+              params.set("authRequestId", authRequestId);
+            }
+
+            if (organization) {
+              params.set("organization", organization);
+            }
+
+            return startIdentityProviderFlow({
+              idpId: identityProviders[0].id,
+              urls: {
+                successUrl:
+                  `${host}/idp/${provider}/success?` +
+                  new URLSearchParams(params),
+                failureUrl:
+                  `${host}/idp/${provider}/failure?` +
+                  new URLSearchParams(params),
+              },
+            });
+          }
+        } else if (
+          loginSettings?.allowRegister &&
+          loginSettings?.allowUsernamePassword
+        ) {
           const params: any = { organization };
           if (authRequestId) {
             params.authRequestId = authRequestId;
@@ -62,12 +122,12 @@ export async function POST(request: NextRequest) {
             nextUrl: registerUrl,
             status: 200,
           });
-        } else {
-          return NextResponse.json(
-            { message: "Could not find user" },
-            { status: 404 },
-          );
         }
+
+        return NextResponse.json(
+          { message: "Could not find user" },
+          { status: 404 },
+        );
       }
     });
   } else {

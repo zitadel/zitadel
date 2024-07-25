@@ -19,18 +19,13 @@ export interface SignInWithIDPProps {
   identityProviders: IdentityProvider[];
   authRequestId?: string;
   organization?: string;
-  startIDPFlowPath?: (idpId: string) => string;
 }
-
-const START_IDP_FLOW_PATH = (idpId: string) =>
-  `/v2beta/users/idps/${idpId}/start`;
 
 export function SignInWithIDP({
   host,
   identityProviders,
   authRequestId,
   organization,
-  startIDPFlowPath = START_IDP_FLOW_PATH,
 }: SignInWithIDPProps) {
   // TODO: remove casting when bufbuild/protobuf-es@v2 is released
   identityProviders = identityProviders.map((idp) =>

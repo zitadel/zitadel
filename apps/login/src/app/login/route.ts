@@ -1,8 +1,10 @@
 import {
   createCallback,
+  getActiveIdentityProviders,
   getAuthRequest,
   getOrgByDomain,
   listSessions,
+  startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { SessionCookie, getAllSessions } from "@/utils/cookies";
 import { NextRequest, NextResponse } from "next/server";
@@ -11,6 +13,7 @@ import {
   AuthRequest,
   Prompt,
 } from "@zitadel/proto/zitadel/oidc/v2beta/authorization_pb";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(
@@ -22,6 +25,7 @@ async function loadSessions(ids: string[]): Promise<Session[]> {
 
 const ORG_SCOPE_REGEX = /urn:zitadel:iam:org:id:([0-9]+)/;
 const ORG_DOMAIN_SCOPE_REGEX = /urn:zitadel:iam:org:domain:primary:(.+)/; // TODO: check regex for all domain character options
+const IDP_SCOPE_REGEX = /urn:zitadel:iam:org:idp:id:(.+)/;
 
 function findSession(
   sessions: Session[],
@@ -100,10 +104,15 @@ export async function GET(request: NextRequest) {
     const { authRequest } = await getAuthRequest({ authRequestId });
 
     let organization = "";
+    let idpId = "";
 
     if (authRequest?.scope) {
       const orgScope = authRequest.scope.find((s: string) =>
         ORG_SCOPE_REGEX.test(s),
+      );
+
+      const idpScope = authRequest.scope.find((s: string) =>
+        IDP_SCOPE_REGEX.test(s),
       );
 
       if (orgScope) {
@@ -121,6 +130,58 @@ export async function GET(request: NextRequest) {
             const org = await getOrgByDomain(orgDomain);
             organization = org?.org?.id ?? "";
           }
+        }
+      }
+
+      if (idpScope) {
+        const matched = IDP_SCOPE_REGEX.exec(idpScope);
+        idpId = matched?.[1] ?? "";
+
+        const identityProviders = await getActiveIdentityProviders(
+          organization,
+        ).then((resp) => {
+          return resp.identityProviders;
+        });
+
+        const idp = identityProviders.find((idp) => idp.id === idpId);
+
+        if (idp) {
+          const host = request.nextUrl.origin;
+
+          const provider =
+            idp.type === IdentityProviderType.GITHUB
+              ? "github"
+              : identityProviders[0].type === IdentityProviderType.GOOGLE
+                ? "google"
+                : identityProviders[0].type === IdentityProviderType.AZURE_AD
+                  ? "azure"
+                  : identityProviders[0].type === IdentityProviderType.SAML
+                    ? "saml"
+                    : identityProviders[0].type === IdentityProviderType.OIDC
+                      ? "oidc"
+                      : "oidc";
+
+          const params = new URLSearchParams();
+
+          if (authRequestId) {
+            params.set("authRequestId", authRequestId);
+          }
+
+          if (organization) {
+            params.set("organization", organization);
+          }
+
+          return startIdentityProviderFlow({
+            idpId,
+            urls: {
+              successUrl:
+                `${host}/idp/${provider}/success?` +
+                new URLSearchParams(params),
+              failureUrl:
+                `${host}/idp/${provider}/failure?` +
+                new URLSearchParams(params),
+            },
+          });
         }
       }
     }
