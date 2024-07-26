@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package zitadel.user.v2beta;
+package zitadel.user.v2;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2beta;user";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 
 import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";

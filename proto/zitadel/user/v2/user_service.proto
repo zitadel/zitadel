@@ -1,16 +1,16 @@
 syntax = "proto3";
 
-package zitadel.user.v2beta;
+package zitadel.user.v2;
 
-import "zitadel/object/v2beta/object.proto";
+import "zitadel/object/v2/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/user/v2beta/auth.proto";
-import "zitadel/user/v2beta/email.proto";
-import "zitadel/user/v2beta/phone.proto";
-import "zitadel/user/v2beta/idp.proto";
-import "zitadel/user/v2beta/password.proto";
-import "zitadel/user/v2beta/user.proto";
-import "zitadel/user/v2beta/query.proto";
+import "zitadel/user/v2/auth.proto";
+import "zitadel/user/v2/email.proto";
+import "zitadel/user/v2/phone.proto";
+import "zitadel/user/v2/idp.proto";
+import "zitadel/user/v2/password.proto";
+import "zitadel/user/v2/user.proto";
+import "zitadel/user/v2/query.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/duration.proto";
@@ -18,13 +18,13 @@ import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2beta;user";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
-    version: "2.0-beta";
-    description: "This API is intended to manage users in a ZITADEL instance. This project is in beta state. It can AND will continue breaking until the services provide the same functionality as the current login.";
+    version: "2.0";
+    description: "This API is intended to manage users in a ZITADEL instance.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -113,11 +113,9 @@ service UserService {
   // Create a new human user
   //
   // Create/import a new user with the type human. The newly created user will get a verification email if either the email address is not marked as verified and you did not request the verification to be returned.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA)
   rpc AddHumanUser (AddHumanUserRequest) returns (AddHumanUserResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/human"
+      post: "/v2/users/human"
       body: "*"
     };
 
@@ -132,7 +130,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -144,12 +141,10 @@ service UserService {
 
   // User by ID
   //
-  // Returns the full user object (human or machine) including the profile, email, etc.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Returns the full user object (human or machine) including the profile, email, etc..
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {
     option (google.api.http) = {
-      get: "/v2beta/users/{user_id}"
+      get: "/v2/users/{user_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -162,7 +157,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -174,12 +168,10 @@ service UserService {
 
   // Search Users
   //
-  // Search for users. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Search for users. By default, we will return users of your organization. Make sure to include a limit and sorting for pagination..
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users"
+      post: "/v2/users"
       body: "*"
     };
 
@@ -193,7 +185,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200";
         value: {
@@ -216,12 +207,10 @@ service UserService {
 
   // Change the user email
   //
-  // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Change the email address of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by email..
   rpc SetEmail (SetEmailRequest) returns (SetEmailResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/email"
+      post: "/v2/users/{user_id}/email"
       body: "*"
     };
 
@@ -232,7 +221,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -244,12 +232,10 @@ service UserService {
 
   // Resend code to verify user email
   //
-  // Resend code to verify user email
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Resend code to verify user email.
   rpc ResendEmailCode (ResendEmailCodeRequest) returns (ResendEmailCodeResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/email/resend"
+      post: "/v2/users/{user_id}/email/resend"
       body: "*"
     };
 
@@ -260,7 +246,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -272,12 +257,10 @@ service UserService {
 
   // Verify the email
   //
-  // Verify the email with the generated code.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Verify the email with the generated code..
   rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/email/verify"
+      post: "/v2/users/{user_id}/email/verify"
       body: "*"
     };
 
@@ -288,7 +271,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -300,12 +282,10 @@ service UserService {
 
   // Set the user phone
   //
-  // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Set the phone number of a user. If the state is set to not verified, a verification code will be generated, which can be either returned or sent to the user by sms..
   rpc SetPhone(SetPhoneRequest) returns (SetPhoneResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/phone"
+      post: "/v2/users/{user_id}/phone"
       body: "*"
     };
 
@@ -316,7 +296,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -329,11 +308,9 @@ service UserService {
   // Remove the user phone
   //
   // Remove the user phone
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
   rpc RemovePhone(RemovePhoneRequest) returns (RemovePhoneResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/users/{user_id}/phone"
+      delete: "/v2/users/{user_id}/phone"
       body: "*"
     };
 
@@ -344,7 +321,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       summary: "Delete the user phone";
       description: "Delete the phone number of a user."
       responses: {
@@ -358,12 +334,10 @@ service UserService {
 
   // Resend code to verify user phone
   //
-  // Resend code to verify user phone
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Resend code to verify user phone.
   rpc ResendPhoneCode (ResendPhoneCodeRequest) returns (ResendPhoneCodeResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/phone/resend"
+      post: "/v2/users/{user_id}/phone/resend"
       body: "*"
     };
 
@@ -374,7 +348,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -386,12 +359,10 @@ service UserService {
 
   // Verify the phone
   //
-  // Verify the phone with the generated code.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Verify the phone with the generated code..
   rpc VerifyPhone (VerifyPhoneRequest) returns (VerifyPhoneResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/phone/verify"
+      post: "/v2/users/{user_id}/phone/verify"
       body: "*"
     };
 
@@ -402,7 +373,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -414,12 +384,10 @@ service UserService {
 
   // Update User
   //
-  // Update all information from a user.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Update all information from a user..
   rpc UpdateHumanUser(UpdateHumanUserRequest) returns (UpdateHumanUserResponse) {
     option (google.api.http) = {
-      put: "/v2beta/users/{user_id}"
+      put: "/v2/users/human/{user_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -429,7 +397,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -441,12 +408,10 @@ service UserService {
 
   // Deactivate user
   //
-  // The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // The state of the user will be changed to 'deactivated'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'deactivated'. Use deactivate user when the user should not be able to use the account anymore, but you still need access to the user data..
   rpc DeactivateUser(DeactivateUserRequest) returns (DeactivateUserResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/deactivate"
+      post: "/v2/users/{user_id}/deactivate"
       body: "*"
     };
 
@@ -457,7 +422,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -469,12 +433,10 @@ service UserService {
 
   // Reactivate user
   //
-  // Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Reactivate a user with the state 'deactivated'. The user will be able to log in again afterward. The endpoint returns an error if the user is not in the state 'deactivated'..
   rpc ReactivateUser(ReactivateUserRequest) returns (ReactivateUserResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/reactivate"
+      post: "/v2/users/{user_id}/reactivate"
       body: "*"
     };
 
@@ -485,7 +447,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -497,12 +458,10 @@ service UserService {
 
   // Lock user
   //
-  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.).
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)..
   rpc LockUser(LockUserRequest) returns (LockUserResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/lock"
+      post: "/v2/users/{user_id}/lock"
       body: "*"
     };
 
@@ -513,7 +472,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -525,12 +483,10 @@ service UserService {
 
   // Unlock user
   //
-  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.).
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // The state of the user will be changed to 'locked'. The user will not be able to log in anymore. The endpoint returns an error if the user is already in the state 'locked'. Use this endpoint if the user should not be able to log in temporarily because of an event that happened (wrong password, etc.)..
   rpc UnlockUser(UnlockUserRequest) returns (UnlockUserResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/unlock"
+      post: "/v2/users/{user_id}/unlock"
       body: "*"
     };
 
@@ -541,7 +497,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -553,12 +508,10 @@ service UserService {
 
   // Delete user
   //
-  // The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // The state of the user will be changed to 'deleted'. The user will not be able to log in anymore. Endpoints requesting this user will return an error 'User not found..
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/users/{user_id}"
+      delete: "/v2/users/{user_id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -568,7 +521,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -580,12 +532,10 @@ service UserService {
 
   // Start the registration of passkey for a user
   //
-  // Start the registration of a passkey for a user, as a response the public key credential creation options are returned, which are used to verify the passkey.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Start the registration of a passkey for a user, as a response the public key credential creation options are returned, which are used to verify the passkey..
   rpc RegisterPasskey (RegisterPasskeyRequest) returns (RegisterPasskeyResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/passkeys"
+      post: "/v2/users/{user_id}/passkeys"
       body: "*"
     };
 
@@ -595,7 +545,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -607,12 +556,10 @@ service UserService {
 
   // Verify a passkey for a user
   //
-  // Verify the passkey registration with the public key credential.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Verify the passkey registration with the public key credential..
   rpc VerifyPasskeyRegistration (VerifyPasskeyRegistrationRequest) returns (VerifyPasskeyRegistrationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/passkeys/{passkey_id}"
+      post: "/v2/users/{user_id}/passkeys/{passkey_id}"
       body: "*"
     };
 
@@ -622,7 +569,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -634,12 +580,10 @@ service UserService {
 
   // Create a passkey registration link for a user
   //
-  // Create a passkey registration link which includes a code and either return it or send it to the user.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Create a passkey registration link which includes a code and either return it or send it to the user..
   rpc CreatePasskeyRegistrationLink (CreatePasskeyRegistrationLinkRequest) returns (CreatePasskeyRegistrationLinkResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/passkeys/registration_link"
+      post: "/v2/users/{user_id}/passkeys/registration_link"
       body: "*"
     };
 
@@ -649,7 +593,54 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // List passkeys of an user
+  //
+  // List passkeys of an user
+  rpc ListPasskeys (ListPasskeysRequest) returns (ListPasskeysResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/passkeys/_search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Remove passkey from a user
+  //
+  // Remove passkey from a user.
+  rpc RemovePasskey (RemovePasskeyRequest) returns (RemovePasskeyResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/passkeys/{passkey_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
         key: "200"
         value: {
@@ -661,12 +652,10 @@ service UserService {
 
   // Start the registration of a u2f token for a user
   //
-  // Start the registration of a u2f token for a user, as a response the public key credential creation options are returned, which are used to verify the u2f token.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Start the registration of a u2f token for a user, as a response the public key credential creation options are returned, which are used to verify the u2f token..
   rpc RegisterU2F (RegisterU2FRequest) returns (RegisterU2FResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/u2f"
+      post: "/v2/users/{user_id}/u2f"
       body: "*"
     };
 
@@ -676,7 +665,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -688,12 +676,10 @@ service UserService {
 
   // Verify a u2f token for a user
   //
-  // Verify the u2f token registration with the public key credential.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Verify the u2f token registration with the public key credential..
   rpc VerifyU2FRegistration (VerifyU2FRegistrationRequest) returns (VerifyU2FRegistrationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/u2f/{u2f_id}"
+      post: "/v2/users/{user_id}/u2f/{u2f_id}"
       body: "*"
     };
 
@@ -703,7 +689,31 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Remove u2f token from a user
+  //
+  // Remove u2f token from a user.
+  rpc RemoveU2F (RemoveU2FRequest) returns (RemoveU2FResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/u2f/{u2f_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Remove u2f token from a user";
+      description: "Remove u2f token from a user"
       responses: {
         key: "200"
         value: {
@@ -715,12 +725,10 @@ service UserService {
 
   // Start the registration of a TOTP generator for a user
   //
-  // Start the registration of a TOTP generator for a user, as a response a secret returned, which is used to initialize a TOTP app or device.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Start the registration of a TOTP generator for a user, as a response a secret returned, which is used to initialize a TOTP app or device..
   rpc RegisterTOTP (RegisterTOTPRequest) returns (RegisterTOTPResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/totp"
+      post: "/v2/users/{user_id}/totp"
       body: "*"
     };
 
@@ -730,7 +738,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -742,12 +749,10 @@ service UserService {
 
   // Verify a TOTP generator for a user
   //
-  // Verify the TOTP registration with a generated code.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Verify the TOTP registration with a generated code..
   rpc VerifyTOTPRegistration (VerifyTOTPRegistrationRequest) returns (VerifyTOTPRegistrationResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/totp/verify"
+      post: "/v2/users/{user_id}/totp/verify"
       body: "*"
     };
 
@@ -757,7 +762,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -769,12 +773,10 @@ service UserService {
 
   // Remove TOTP generator from a user
   //
-  // Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second-factor afterward.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Remove the configured TOTP generator of a user. As only one TOTP generator per user is allowed, the user will not have TOTP as a second-factor afterward..
   rpc RemoveTOTP (RemoveTOTPRequest) returns (RemoveTOTPResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/users/{user_id}/totp"
+      delete: "/v2/users/{user_id}/totp"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -783,7 +785,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -795,12 +796,10 @@ service UserService {
 
   // Add OTP SMS for a user
   //
-  // Add a new One-Time-Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Add a new One-Time-Password (OTP) SMS factor to the authenticated user. OTP SMS will enable the user to verify a OTP with the latest verified phone number. The phone number has to be verified to add the second factor..
   rpc AddOTPSMS (AddOTPSMSRequest) returns (AddOTPSMSResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/otp_sms"
+      post: "/v2/users/{user_id}/otp_sms"
       body: "*"
     };
 
@@ -810,7 +809,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -822,12 +820,10 @@ service UserService {
 
   // Remove One-Time-Password (OTP) SMS from a user
   //
-  // Remove the configured One-Time-Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Remove the configured One-Time-Password (OTP) SMS factor of a user. As only one OTP SMS per user is allowed, the user will not have OTP SMS as a second-factor afterward..
   rpc RemoveOTPSMS (RemoveOTPSMSRequest) returns (RemoveOTPSMSResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/users/{user_id}/otp_sms"
+      delete: "/v2/users/{user_id}/otp_sms"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -836,7 +832,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -848,12 +843,10 @@ service UserService {
 
   // Add OTP Email for a user
   //
-  // Add a new One-Time-Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Add a new One-Time-Password (OTP) Email factor to the authenticated user. OTP Email will enable the user to verify a OTP with the latest verified email. The email has to be verified to add the second factor..
   rpc AddOTPEmail (AddOTPEmailRequest) returns (AddOTPEmailResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/otp_email"
+      post: "/v2/users/{user_id}/otp_email"
       body: "*"
     };
 
@@ -863,7 +856,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -875,12 +867,10 @@ service UserService {
 
   // Remove One-Time-Password (OTP) Email from a user
   //
-  // Remove the configured One-Time-Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Remove the configured One-Time-Password (OTP) Email factor of a user. As only one OTP Email per user is allowed, the user will not have OTP Email as a second-factor afterward..
   rpc RemoveOTPEmail (RemoveOTPEmailRequest) returns (RemoveOTPEmailResponse) {
     option (google.api.http) = {
-      delete: "/v2beta/users/{user_id}/otp_email"
+      delete: "/v2/users/{user_id}/otp_email"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -889,7 +879,6 @@ service UserService {
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -901,12 +890,10 @@ service UserService {
 
   // Start flow with an identity provider
   //
-  // Start a flow with an identity provider, for external login, registration or linking.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Start a flow with an identity provider, for external login, registration or linking..
   rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v2beta/idp_intents"
+      post: "/v2/idp_intents"
       body: "*"
     };
 
@@ -917,7 +904,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -929,12 +915,10 @@ service UserService {
 
   // Retrieve the information returned by the identity provider
   //
-  // Retrieve the information returned by the identity provider for registration or updating an existing user with new information.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Retrieve the information returned by the identity provider for registration or updating an existing user with new information..
   rpc RetrieveIdentityProviderIntent (RetrieveIdentityProviderIntentRequest) returns (RetrieveIdentityProviderIntentResponse) {
     option (google.api.http) = {
-      post: "/v2beta/idp_intents/{idp_intent_id}"
+      post: "/v2/idp_intents/{idp_intent_id}"
       body: "*"
     };
 
@@ -945,7 +929,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -957,12 +940,10 @@ service UserService {
 
   // Add link to an identity provider to an user
   //
-  // Add link to an identity provider to an user.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Add link to an identity provider to an user..
   rpc AddIDPLink (AddIDPLinkRequest) returns (AddIDPLinkResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/links"
+      post: "/v2/users/{user_id}/links"
       body: "*"
     };
 
@@ -973,7 +954,56 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // List links to an identity provider of an user
+  //
+  // List links to an identity provider of an user.
+  rpc ListIDPLinks (ListIDPLinksRequest) returns (ListIDPLinksResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/links/_search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Remove link of an identity provider to an user
+  //
+  // Remove link of an identity provider to an user.
+  rpc RemoveIDPLink (RemoveIDPLinkRequest) returns (RemoveIDPLinkResponse) {
+    option (google.api.http) = {
+      delete: "/v2/users/{user_id}/links/{idp_id}/{linked_user_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       responses: {
         key: "200"
         value: {
@@ -985,12 +1015,10 @@ service UserService {
 
   // Request a code to reset a password
   //
-  // Request a code to reset a password.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Request a code to reset a password..
   rpc PasswordReset (PasswordResetRequest) returns (PasswordResetResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/password_reset"
+      post: "/v2/users/{user_id}/password_reset"
       body: "*"
     };
 
@@ -1001,7 +1029,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -1013,12 +1040,10 @@ service UserService {
 
   // Change password
   //
-  // Change the password of a user with either a verification code or the current password.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // Change the password of a user with either a verification code or the current password..
   rpc SetPassword (SetPasswordRequest) returns (SetPasswordResponse) {
     option (google.api.http) = {
-      post: "/v2beta/users/{user_id}/password"
+      post: "/v2/users/{user_id}/password"
       body: "*"
     };
 
@@ -1029,7 +1054,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -1041,12 +1065,10 @@ service UserService {
 
   // List all possible authentication methods of a user
   //
-  // List all possible authentication methods of a user like password, passwordless, (T)OTP and more.
-  //
-  // Deprecated: please move to the corresponding endpoint under user service v2 (GA).
+  // List all possible authentication methods of a user like password, passwordless, (T)OTP and more..
   rpc ListAuthenticationMethodTypes (ListAuthenticationMethodTypesRequest) returns (ListAuthenticationMethodTypesResponse) {
     option (google.api.http) = {
-      get: "/v2beta/users/{user_id}/authentication_methods"
+      get: "/v2/users/{user_id}/authentication_methods"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1056,7 +1078,6 @@ service UserService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      deprecated: true;
       responses: {
         key: "200"
         value: {
@@ -1088,7 +1109,7 @@ message AddHumanUserRequest{
       example: "\"minnie-mouse\"";
     }
   ];
-  zitadel.object.v2beta.Organization organization = 11;
+  zitadel.object.v2.Organization organization = 11;
   SetHumanProfile profile = 4 [
     (validate.rules).message.required = true,
     (google.api.field_behavior) = REQUIRED
@@ -1119,7 +1140,7 @@ message AddHumanUserRequest{
 
 message AddHumanUserResponse {
   string user_id = 1;
-  zitadel.object.v2beta.Details details = 2;
+  zitadel.object.v2.Details details = 2;
   optional string email_code = 3;
   optional string phone_code = 4;
 }
@@ -1141,23 +1162,23 @@ message GetUserByIDRequest {
 
 message GetUserByIDResponse {
   //deprecated: details is moved into user
-  zitadel.object.v2beta.Details details = 1;
-  zitadel.user.v2beta.User user = 2;
+  zitadel.object.v2.Details details = 1;
+  zitadel.user.v2.User user = 2;
 }
 
 message ListUsersRequest {
   //list limitations and ordering
-  zitadel.object.v2beta.ListQuery query = 1;
+  zitadel.object.v2.ListQuery query = 1;
   // the field the result is sorted
-  zitadel.user.v2beta.UserFieldName sorting_column = 2;
+  zitadel.user.v2.UserFieldName sorting_column = 2;
   //criteria the client is looking for
-  repeated zitadel.user.v2beta.SearchQuery queries = 3;
+  repeated zitadel.user.v2.SearchQuery queries = 3;
 }
 
 message ListUsersResponse {
-  zitadel.object.v2beta.ListDetails details = 1;
-  zitadel.user.v2beta.UserFieldName sorting_column = 2;
-  repeated zitadel.user.v2beta.User result = 3;
+  zitadel.object.v2.ListDetails details = 1;
+  zitadel.user.v2.UserFieldName sorting_column = 2;
+  repeated zitadel.user.v2.User result = 3;
 }
 
 message SetEmailRequest{
@@ -1188,7 +1209,7 @@ message SetEmailRequest{
 }
 
 message SetEmailResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -1211,7 +1232,7 @@ message ResendEmailCodeRequest{
 }
 
 message ResendEmailCodeResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -1239,7 +1260,7 @@ message VerifyEmailRequest{
 }
 
 message VerifyEmailResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message SetPhoneRequest{
@@ -1270,7 +1291,7 @@ message SetPhoneRequest{
 }
 
 message SetPhoneResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -1288,7 +1309,7 @@ message RemovePhoneRequest{
 }
 
 message RemovePhoneResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message ResendPhoneCodeRequest{
@@ -1309,7 +1330,7 @@ message ResendPhoneCodeRequest{
 }
 
 message ResendPhoneCodeResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   // in case the verification was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -1337,7 +1358,7 @@ message VerifyPhoneRequest{
 }
 
 message VerifyPhoneResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message DeleteUserRequest {
@@ -1352,7 +1373,7 @@ message DeleteUserRequest {
 }
 
 message DeleteUserResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message UpdateHumanUserRequest{
@@ -1379,7 +1400,7 @@ message UpdateHumanUserRequest{
 }
 
 message UpdateHumanUserResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   optional string email_code = 2;
   optional string phone_code = 3;
 }
@@ -1397,7 +1418,7 @@ message DeactivateUserRequest {
 }
 
 message DeactivateUserResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 
@@ -1414,7 +1435,7 @@ message ReactivateUserRequest {
 }
 
 message ReactivateUserResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message LockUserRequest {
@@ -1430,7 +1451,7 @@ message LockUserRequest {
 }
 
 message LockUserResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message UnlockUserRequest {
@@ -1446,7 +1467,7 @@ message UnlockUserRequest {
 }
 
 message UnlockUserResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message RegisterPasskeyRequest{
@@ -1477,7 +1498,7 @@ message RegisterPasskeyRequest{
 }
 
 message RegisterPasskeyResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   string passkey_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432705\""
@@ -1532,7 +1553,7 @@ message VerifyPasskeyRegistrationRequest{
 }
 
 message VerifyPasskeyRegistrationResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message RegisterU2FRequest{
@@ -1553,7 +1574,7 @@ message RegisterU2FRequest{
 }
 
 message RegisterU2FResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   string u2f_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"163840776835432705\""
@@ -1608,7 +1629,32 @@ message VerifyU2FRegistrationRequest{
 }
 
 message VerifyU2FRegistrationResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
+}
+
+message RemoveU2FRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string u2f_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message RemoveU2FResponse {
+  zitadel.object.v2.Details details = 1;
 }
 
 message RegisterTOTPRequest {
@@ -1624,7 +1670,7 @@ message RegisterTOTPRequest {
 }
 
 message RegisterTOTPResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   string uri = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"otpauth://totp/ZITADEL:gigi@acme.zitadel.cloud?algorithm=SHA1&digits=6&issuer=ZITADEL&period=30&secret=TJOPWSDYILLHXFV4MLKNNJOWFG7VSDCK\"";
@@ -1658,7 +1704,7 @@ message VerifyTOTPRegistrationRequest {
 }
 
 message VerifyTOTPRegistrationResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message RemoveTOTPRequest {
@@ -1674,7 +1720,7 @@ message RemoveTOTPRequest {
 }
 
 message RemoveTOTPResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message AddOTPSMSRequest {
@@ -1690,7 +1736,7 @@ message AddOTPSMSRequest {
 }
 
 message AddOTPSMSResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message RemoveOTPSMSRequest {
@@ -1706,7 +1752,7 @@ message RemoveOTPSMSRequest {
 }
 
 message RemoveOTPSMSResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message AddOTPEmailRequest {
@@ -1722,7 +1768,7 @@ message AddOTPEmailRequest {
 }
 
 message AddOTPEmailResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message RemoveOTPEmailRequest {
@@ -1738,7 +1784,7 @@ message RemoveOTPEmailRequest {
 }
 
 message RemoveOTPEmailResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message CreatePasskeyRegistrationLinkRequest{
@@ -1759,13 +1805,55 @@ message CreatePasskeyRegistrationLinkRequest{
 }
 
 message CreatePasskeyRegistrationLinkResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   // in case the medium was set to return_code, the code will be returned
   optional PasskeyRegistrationCode code = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "\"one time code generated by ZITADEL; required to start the passkey registration without user authentication\"";
     }
   ];
+}
+
+message ListPasskeysRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message ListPasskeysResponse {
+  zitadel.object.v2.ListDetails details = 1;
+  repeated Passkey result = 2;
+}
+
+message RemovePasskeyRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string passkey_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message RemovePasskeyResponse {
+  zitadel.object.v2.Details details = 1;
 }
 
 message StartIdentityProviderIntentRequest{
@@ -1786,7 +1874,7 @@ message StartIdentityProviderIntentRequest{
 }
 
 message StartIdentityProviderIntentResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   oneof next_step {
     string auth_url = 2 [
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1829,7 +1917,7 @@ message RetrieveIdentityProviderIntentRequest{
 }
 
 message RetrieveIdentityProviderIntentResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   IDPInformation idp_information = 2;
   string user_id = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1853,9 +1941,53 @@ message AddIDPLinkRequest{
 }
 
 message AddIDPLinkResponse {
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
+message ListIDPLinksRequest{
+  string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+  //list limitations and ordering
+  zitadel.object.v2.ListQuery query = 2;
+}
+
+message ListIDPLinksResponse{
+  zitadel.object.v2.ListDetails details = 1;
+  repeated IDPLink result = 2;
+}
+
+message RemoveIDPLinkRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string idp_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  string linked_user_id = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message RemoveIDPLinkResponse {
+  zitadel.object.v2.Details details = 1;
+}
 
 message PasswordResetRequest{
   string user_id = 1 [
@@ -1875,7 +2007,7 @@ message PasswordResetRequest{
 }
 
 message PasswordResetResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
   // in case the medium was set to return_code, the code will be returned
   optional string verification_code = 2;
 }
@@ -1917,7 +2049,7 @@ message SetPasswordRequest{
 }
 
 message SetPasswordResponse{
-  zitadel.object.v2beta.Details details = 1;
+  zitadel.object.v2.Details details = 1;
 }
 
 message ListAuthenticationMethodTypesRequest{
@@ -1933,7 +2065,7 @@ message ListAuthenticationMethodTypesRequest{
 }
 
 message ListAuthenticationMethodTypesResponse{
-  zitadel.object.v2beta.ListDetails details = 1;
+  zitadel.object.v2.ListDetails details = 1;
   repeated AuthenticationMethodType auth_method_types = 2;
 }
 

@@ -9,7 +9,7 @@ The list of session IDs can be sent in the “search sessions” request to get 
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions/search \
+  --url https://$ZITADEL_DOMAIN/v2/sessions/search \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
