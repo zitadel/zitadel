@@ -1,37 +1,55 @@
 {
   "name": "@zitadel/client",
   "version": "0.0.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "sideEffects": false,
   "license": "MIT",
+  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./v1": {
+      "import": "./dist/v1.js",
+      "require": "./dist/v1.cjs",
+      "types": "./dist/v1.d.ts"
+    },
+    "./v2beta": {
+      "import": "./dist/v2beta.js",
+      "require": "./dist/v2beta.cjs",
+      "types": "./dist/v2beta.d.ts"
+    },
+    "./v3alpha": {
+      "import": "./dist/v3alpha.js",
+      "require": "./dist/v3alpha.cjs",
+      "types": "./dist/v3alpha.d.ts"
+    }
+  },
   "files": [
     "dist/**"
   ],
+  "sideEffects": false,
   "scripts": {
-    "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
-    "build": "tsup --dts",
+    "build": "tsup",
     "test": "pnpm test:unit",
     "test:watch": "pnpm test:unit:watch",
     "test:unit": "vitest",
     "test:unit:watch": "vitest --watch",
     "dev": "tsup --watch --dts",
     "lint": "eslint \"src/**/*.ts*\"",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf src/proto"
-  },
-  "devDependencies": {
-    "@bufbuild/buf": "^1.14.0",
-    "@zitadel/tsconfig": "workspace:*",
-    "eslint-config-zitadel": "workspace:*",
-    "ts-proto": "^1.139.0"
-  },
-  "publishConfig": {
-    "access": "public"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
-    "jose": "^4.13.1",
-    "nice-grpc-web": "^3.2.3",
-    "protobufjs": "^7.2.3"
+    "@zitadel/proto": "workspace:*",
+    "@bufbuild/protobuf": "^1.10.0",
+    "@connectrpc/connect": "^1.4.0"
+  },
+  "devDependencies": {
+    "@zitadel/tsconfig": "workspace:*",
+    "eslint-config-zitadel": "workspace:*"
   }
 }

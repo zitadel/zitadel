@@ -17,7 +17,7 @@ import {
 } from "@zitadel/proto/zitadel/session/v2beta/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
-import { PlainMessage } from "@zitadel/client2";
+import { PlainMessage } from "@zitadel/client";
 
 export async function createSessionAndUpdateCookie(
   loginName: string,

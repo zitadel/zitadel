@@ -11,6 +11,6 @@
     "@typescript-eslint/parser": "^7.9.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.34.1",
-    "eslint-config-turbo": "^1.13.3"
+    "eslint-config-turbo": "^2.0.9"
   }
 }

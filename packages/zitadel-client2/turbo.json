@@ -1,9 +1,0 @@
-{
-  "extends": ["//"],
-  "pipeline": {
-    "build": {
-      "outputs": ["dist/**"],
-      "dependsOn": ["@zitadel/proto#generate"]
-    }
-  }
-}
