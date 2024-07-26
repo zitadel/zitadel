@@ -624,7 +624,8 @@ func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.Authenticatio
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_SMS
 	case domain.UserAuthMethodTypeOTPEmail:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_OTP_EMAIL
-	case domain.UserAuthMethodTypeUnspecified:
+	case domain.UserAuthMethodTypeUnspecified, domain.UserAuthMethodTypeOTP, domain.UserAuthMethodTypePrivateKey:
+		// Handle all remaining cases so the linter succeeds
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
 	default:
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED

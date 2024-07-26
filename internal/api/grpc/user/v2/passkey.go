@@ -5,13 +5,12 @@ import (
 
 	"google.golang.org/protobuf/types/known/structpb"
 
-	"github.com/zitadel/zitadel/internal/query"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
-
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyRequest) (resp *user.RegisterPasskeyResponse, err error) {
@@ -176,6 +175,9 @@ func mfaStateToPb(state domain.MFAState) user.AuthFactorState {
 		return user.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY
 	case domain.MFAStateReady:
 		return user.AuthFactorState_AUTH_FACTOR_STATE_READY
+	case domain.MFAStateUnspecified, domain.MFAStateRemoved:
+		// Handle all remaining cases so the linter succeeds
+		return user.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
 	default:
 		return user.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
 	}

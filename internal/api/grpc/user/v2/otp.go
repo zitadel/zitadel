@@ -3,9 +3,8 @@ package user
 import (
 	"context"
 
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
-
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) AddOTPSMS(ctx context.Context, req *user.AddOTPSMSRequest) (*user.AddOTPSMSResponse, error) {
