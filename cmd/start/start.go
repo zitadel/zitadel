@@ -37,15 +37,21 @@ import (
 	action_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/action/v3alpha"
 	"github.com/zitadel/zitadel/internal/api/grpc/admin"
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
-	"github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
+	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
+	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
-	"github.com/zitadel/zitadel/internal/api/grpc/org/v2"
-	"github.com/zitadel/zitadel/internal/api/grpc/session/v2"
-	"github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
+	oidc_v2beta "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2beta"
+	org_v2 "github.com/zitadel/zitadel/internal/api/grpc/org/v2"
+	org_v2beta "github.com/zitadel/zitadel/internal/api/grpc/org/v2beta"
+	session_v2 "github.com/zitadel/zitadel/internal/api/grpc/session/v2"
+	session_v2beta "github.com/zitadel/zitadel/internal/api/grpc/session/v2beta"
+	settings_v2 "github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
+	settings_v2beta "github.com/zitadel/zitadel/internal/api/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/internal/api/grpc/system"
 	user_schema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/user/schema/v3alpha"
 	user_v2 "github.com/zitadel/zitadel/internal/api/grpc/user/v2"
+	user_v2beta "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/idp"
@@ -399,20 +405,34 @@ func startAPIs(
 	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, keys.User, config.ExternalSecure), tlsConfig); err != nil {
 		return nil, err
 	}
+	if err := apis.RegisterService(ctx, user_v2beta.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure), idp.SAMLRootURL(config.ExternalSecure), assets.AssetAPI(config.ExternalSecure), permissionCheck)); err != nil {
+		return nil, err
+	}
 	if err := apis.RegisterService(ctx, user_v2.CreateServer(commands, queries, keys.User, keys.IDPConfig, idp.CallbackURL(config.ExternalSecure), idp.SAMLRootURL(config.ExternalSecure), assets.AssetAPI(config.ExternalSecure), permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, session.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
-
-	if err := apis.RegisterService(ctx, settings.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
+	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, org.CreateServer(commands, queries, permissionCheck)); err != nil {
+	if err := apis.RegisterService(ctx, org_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, feature.CreateServer(commands, queries)); err != nil {
+	if err := apis.RegisterService(ctx, feature_v2beta.CreateServer(commands, queries)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, session_v2.CreateServer(commands, queries)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, settings_v2.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, org_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, feature_v2.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, action_v3_alpha.CreateServer(commands, queries, domain.AllFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
@@ -491,6 +511,9 @@ func startAPIs(
 	apis.HandleFunc(login.EndpointDeviceAuth, login.RedirectDeviceAuthToPrefix)
 
 	// After OIDC provider so that the callback endpoint can be used
+	if err := apis.RegisterService(ctx, oidc_v2beta.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
+		return nil, err
+	}
 	if err := apis.RegisterService(ctx, oidc_v2.CreateServer(commands, queries, oidcServer, config.ExternalSecure)); err != nil {
 		return nil, err
 	}

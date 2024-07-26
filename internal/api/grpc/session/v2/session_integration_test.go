@@ -23,9 +23,9 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 var (
@@ -860,7 +860,7 @@ func TestServer_SetSession_expired(t *testing.T) {
 
 	// ensure session expires and does not work anymore
 	time.Sleep(20 * time.Second)
-	_, err = Tester.Client.SessionV2.SetSession(CTX, &session.SetSessionRequest{
+	_, err = Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId: createResp.GetSessionId(),
 		Lifetime:  durationpb.New(20 * time.Second),
 	})
@@ -944,7 +944,7 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", fmt.Sprintf("Bearer %s", createResp.GetSessionToken()))
-	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: createResp.GetSessionId()})
+	sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: createResp.GetSessionId()})
 	require.Error(t, err)
 	require.Nil(t, sessionResp)
 }
@@ -953,7 +953,7 @@ func Test_ZITADEL_API_success(t *testing.T) {
 	id, token, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, User.GetUserId())
 
 	ctx := Tester.WithAuthorizationToken(context.Background(), token)
-	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.NoError(t, err)
 
 	webAuthN := sessionResp.GetSession().GetFactors().GetWebAuthN()
@@ -966,17 +966,17 @@ func Test_ZITADEL_API_session_not_found(t *testing.T) {
 
 	// test session token works
 	ctx := Tester.WithAuthorizationToken(context.Background(), token)
-	_, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.NoError(t, err)
 
 	//terminate the session and test it does not work anymore
-	_, err = Tester.Client.SessionV2.DeleteSession(CTX, &session.DeleteSessionRequest{
+	_, err = Client.DeleteSession(CTX, &session.DeleteSessionRequest{
 		SessionId:    id,
 		SessionToken: gu.Ptr(token),
 	})
 	require.NoError(t, err)
 	ctx = Tester.WithAuthorizationToken(context.Background(), token)
-	_, err = Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	_, err = Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.Error(t, err)
 }
 
@@ -985,12 +985,12 @@ func Test_ZITADEL_API_session_expired(t *testing.T) {
 
 	// test session token works
 	ctx := Tester.WithAuthorizationToken(context.Background(), token)
-	_, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	_, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.NoError(t, err)
 
 	// ensure session expires and does not work anymore
 	time.Sleep(20 * time.Second)
-	sessionResp, err := Tester.Client.SessionV2.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
+	sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
 	require.Error(t, err)
 	require.Nil(t, sessionResp)
 }
