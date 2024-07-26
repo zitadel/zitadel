@@ -548,7 +548,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 									ConditionType: &action.Condition_Request{
 										Request: &action.RequestExecution{
 											Condition: &action.RequestExecution_Method{
-												Method: "/zitadel.session.v2beta.SessionService/GetSession",
+												Method: "/zitadel.session.v2.SessionService/GetSession",
 											},
 										},
 									},
@@ -571,7 +571,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 							ConditionType: &action.Condition_Request{
 								Request: &action.RequestExecution{
 									Condition: &action.RequestExecution_Method{
-										Method: "/zitadel.session.v2beta.SessionService/GetSession",
+										Method: "/zitadel.session.v2.SessionService/GetSession",
 									},
 								},
 							},
@@ -747,7 +747,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 										ConditionType: &action.Condition_Request{
 											Request: &action.RequestExecution{
 												Condition: &action.RequestExecution_Method{
-													Method: "/zitadel.session.v2beta.SessionService/GetSession",
+													Method: "/zitadel.session.v2.SessionService/GetSession",
 												},
 											},
 										},
@@ -756,7 +756,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 										ConditionType: &action.Condition_Request{
 											Request: &action.RequestExecution{
 												Condition: &action.RequestExecution_Method{
-													Method: "/zitadel.session.v2beta.SessionService/CreateSession",
+													Method: "/zitadel.session.v2.SessionService/CreateSession",
 												},
 											},
 										},
@@ -765,7 +765,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 										ConditionType: &action.Condition_Request{
 											Request: &action.RequestExecution{
 												Condition: &action.RequestExecution_Method{
-													Method: "/zitadel.session.v2beta.SessionService/SetSession",
+													Method: "/zitadel.session.v2.SessionService/SetSession",
 												},
 											},
 										},
@@ -823,11 +823,11 @@ func TestServer_SearchExecutions(t *testing.T) {
 						Filter: &action.ExecutionSearchFilter_InConditionsFilter{
 							InConditionsFilter: &action.InConditionsFilter{
 								Conditions: []*action.Condition{
-									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Method{Method: "/zitadel.session.v2beta.SessionService/GetSession"}}}},
-									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Service{Service: "zitadel.session.v2beta.SessionService"}}}},
+									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Method{Method: "/zitadel.session.v2.SessionService/GetSession"}}}},
+									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Service{Service: "zitadel.session.v2.SessionService"}}}},
 									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_All{All: true}}}},
-									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Method{Method: "/zitadel.session.v2beta.SessionService/GetSession"}}}},
-									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Service{Service: "zitadel.session.v2beta.SessionService"}}}},
+									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Method{Method: "/zitadel.session.v2.SessionService/GetSession"}}}},
+									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Service{Service: "zitadel.session.v2.SessionService"}}}},
 									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_All{All: true}}}},
 									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Event{Event: "user.added"}}}},
 									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: "user"}}}},

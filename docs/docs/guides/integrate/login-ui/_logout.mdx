@@ -16,7 +16,7 @@ Make sure that the provided token is from the authenticated user, resp. the mana
 
 ```bash
 curl --request DELETE \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions/218480890961985793 \
+  --url https://$ZITADEL_DOMAIN/v2/sessions/218480890961985793 \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json'
@@ -28,7 +28,7 @@ Send the session token in the body of the request:
 
 ```bash
 curl --request DELETE \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions/218480890961985793 \
+  --url https://$ZITADEL_DOMAIN/v2/sessions/218480890961985793 \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \

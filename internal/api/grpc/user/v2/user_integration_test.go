@@ -18,12 +18,13 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+
 	"github.com/zitadel/zitadel/internal/api/grpc"
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/idp"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 var (
@@ -1792,86 +1793,6 @@ func TestServer_DeleteUser(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
-			integration.AssertDetails(t, tt.want, got)
-		})
-	}
-}
-
-func TestServer_AddIDPLink(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, CTX)
-	type args struct {
-		ctx context.Context
-		req *user.AddIDPLinkRequest
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *user.AddIDPLinkResponse
-		wantErr bool
-	}{
-		{
-			name: "user does not exist",
-			args: args{
-				CTX,
-				&user.AddIDPLinkRequest{
-					UserId: "userID",
-					IdpLink: &user.IDPLink{
-						IdpId:    idpID,
-						UserId:   "userID",
-						UserName: "username",
-					},
-				},
-			},
-			want:    nil,
-			wantErr: true,
-		},
-		{
-			name: "idp does not exist",
-			args: args{
-				CTX,
-				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
-					IdpLink: &user.IDPLink{
-						IdpId:    "idpID",
-						UserId:   "userID",
-						UserName: "username",
-					},
-				},
-			},
-			want:    nil,
-			wantErr: true,
-		},
-		{
-			name: "add link",
-			args: args{
-				CTX,
-				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
-					IdpLink: &user.IDPLink{
-						IdpId:    idpID,
-						UserId:   "userID",
-						UserName: "username",
-					},
-				},
-			},
-			want: &user.AddIDPLinkResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
-				},
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.AddIDPLink(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
-
 			integration.AssertDetails(t, tt.want, got)
 		})
 	}

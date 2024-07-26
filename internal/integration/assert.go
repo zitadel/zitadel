@@ -6,13 +6,11 @@ import (
 
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
+	resources_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
+	settings_object "github.com/zitadel/zitadel/pkg/grpc/settings/object/v3alpha"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
-
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	resources_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
-	settings_object "github.com/zitadel/zitadel/pkg/grpc/settings/object/v3alpha"
 )
 
 // Details is the interface that covers both v1 and v2 proto generated object details.
@@ -28,8 +26,14 @@ type DetailsMsg[D Details] interface {
 	GetDetails() D
 }
 
-type ListDetailsMsg interface {
-	GetDetails() *object.ListDetails
+type ListDetails interface {
+	comparable
+	GetTotalResult() uint64
+	GetTimestamp() *timestamppb.Timestamp
+}
+
+type ListDetailsMsg[L ListDetails] interface {
+	GetDetails() L
 }
 
 type ResourceListDetailsMsg interface {
@@ -90,13 +94,13 @@ func AssertSettingsDetails(t testing.TB, expected *settings_object.Details, actu
 	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
 }
 
-func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
+func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t testing.TB, expected, actual D) {
 	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
-	if wantDetails == nil {
+	var nilDetails L
+	if wantDetails == nilDetails {
 		assert.Nil(t, gotDetails)
 		return
 	}
-
 	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
 
 	if wantDetails.GetTimestamp() != nil {
