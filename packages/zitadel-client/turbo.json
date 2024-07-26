@@ -2,19 +2,13 @@
   "extends": [
     "//"
   ],
-  "pipeline": {
-    "generate": {
-      "outputs": [
-        "src/proto/**"
-      ],
-      "cache": true
-    },
+  "tasks": {
     "build": {
       "outputs": [
         "dist/**"
       ],
       "dependsOn": [
-        "generate"
+        "@zitadel/proto#generate"
       ]
     }
   }

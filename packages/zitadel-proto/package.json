@@ -13,7 +13,7 @@
     "clean": "rm -rf .turbo && rm -rf node_modules"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^1.9.0"
+    "@bufbuild/protobuf": "^1.10.0"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.32.1"

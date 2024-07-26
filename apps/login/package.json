@@ -37,7 +37,7 @@
     "@tailwindcss/forms": "0.5.7",
     "@vercel/analytics": "^1.2.2",
     "@zitadel/proto": "workspace:*",
-    "@zitadel/client2": "workspace:*",
+    "@zitadel/client": "workspace:*",
     "@zitadel/react": "workspace:*",
     "@zitadel/node": "workspace:*",
     "clsx": "1.2.1",

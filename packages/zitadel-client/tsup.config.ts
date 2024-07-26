@@ -1,13 +1,13 @@
 import { defineConfig, Options } from "tsup";
 
 export default defineConfig((options: Options) => ({
-  treeshake: true,
-  splitting: true,
-  publicDir: true,
-  entry: ["src/index.ts", "src/**/index.ts"],
+  entry: ["src/index.ts", "src/v1.ts", "src/v2beta.ts", "src/v3alpha.ts"],
   format: ["esm", "cjs"],
+  treeshake: false,
+  splitting: true,
   dts: true,
-  minify: true,
+  minify: false,
   clean: true,
+  sourcemap: true,
   ...options,
 }));
