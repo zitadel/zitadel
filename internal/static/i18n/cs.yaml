@@ -561,6 +561,7 @@ Errors:
     NotFound: Provedení nenalezeno
     IncludeNotFound: Zahrnout nenalezeno
     NoTargets: Nejsou definovány žádné cíle
+    Failed: Provedení se nezdařilo
   UserSchema:
     NotEnabled: Funkce "Uživatelské schéma" není povolena
     Type:

@@ -563,6 +563,7 @@ Errors:
     NotFound: Exécution introuvable
     IncludeNotFound: Inclure introuvable
     NoTargets: Aucune cible définie
+    Failed: Exécution échouée
   UserSchema:
     NotEnabled: La fonctionnalité "Schéma utilisateur" n'est pas activée
     Type:

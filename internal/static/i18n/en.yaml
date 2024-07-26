@@ -563,6 +563,7 @@ Errors:
     NotFound: Execution not found
     IncludeNotFound: Include not found
     NoTargets: No targets defined
+    Failed: Execution failed
   UserSchema:
     NotEnabled: Feature "User Schema" is not enabled
     Type:

@@ -552,6 +552,7 @@ Errors:
     NotFound: Исполнение не найдено
     IncludeNotFound: Включить не найдено
     NoTargets: Цели не определены
+    Failed: Выполнение не удалось
   UserSchema:
     NotEnabled: Функция «Пользовательская схема» не включена
     Type:

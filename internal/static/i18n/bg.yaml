@@ -580,6 +580,7 @@ Errors:
     NotFound: Изпълнението не е намерено
     IncludeNotFound: Включването не е намерено
     NoTargets: Няма определени цели
+    Failed: неуспешно изпълнение
   UserSchema:
     NotEnabled: Функцията „Потребителска схема“ не е активирана
     Type:

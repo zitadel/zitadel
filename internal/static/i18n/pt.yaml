@@ -558,6 +558,7 @@ Errors:
     NotFound: Execução não encontrada
     IncludeNotFound: Incluir não encontrado
     NoTargets: Nenhuma meta definida
+    Failed: Falha na execução
   UserSchema:
     NotEnabled: O recurso "Esquema do usuário" não está habilitado
     Type:
