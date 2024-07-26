@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
 var _ settings.SettingsServiceServer = (*Server)(nil)

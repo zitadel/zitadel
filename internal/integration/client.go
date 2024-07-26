@@ -28,51 +28,69 @@ import (
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
-	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
+	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
+	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
+	settings_v2beta "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 type Client struct {
-	CC           *grpc.ClientConn
-	Admin        admin.AdminServiceClient
-	Mgmt         mgmt.ManagementServiceClient
-	Auth         auth.AuthServiceClient
-	UserV2       user.UserServiceClient
-	SessionV2    session.SessionServiceClient
-	SettingsV2   settings.SettingsServiceClient
-	OIDCv2       oidc_pb.OIDCServiceClient
-	OrgV2        organisation.OrganizationServiceClient
-	System       system.SystemServiceClient
-	ActionV3     action.ActionServiceClient
-	FeatureV2    feature.FeatureServiceClient
-	UserSchemaV3 schema.UserSchemaServiceClient
+	CC             *grpc.ClientConn
+	Admin          admin.AdminServiceClient
+	Mgmt           mgmt.ManagementServiceClient
+	Auth           auth.AuthServiceClient
+	UserV2beta     user_v2beta.UserServiceClient
+	UserV2         user.UserServiceClient
+	SessionV2beta  session_v2beta.SessionServiceClient
+	SessionV2      session.SessionServiceClient
+	SettingsV2beta settings_v2beta.SettingsServiceClient
+	SettingsV2     settings.SettingsServiceClient
+	OIDCv2beta     oidc_pb_v2beta.OIDCServiceClient
+	OIDCv2         oidc_pb.OIDCServiceClient
+	OrgV2beta      org_v2beta.OrganizationServiceClient
+	OrgV2          organisation.OrganizationServiceClient
+	System         system.SystemServiceClient
+	ActionV3       action.ActionServiceClient
+	FeatureV2beta  feature_v2beta.FeatureServiceClient
+	FeatureV2      feature.FeatureServiceClient
+	UserSchemaV3   schema.UserSchemaServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
 	return Client{
-		CC:           cc,
-		Admin:        admin.NewAdminServiceClient(cc),
-		Mgmt:         mgmt.NewManagementServiceClient(cc),
-		Auth:         auth.NewAuthServiceClient(cc),
-		UserV2:       user.NewUserServiceClient(cc),
-		SessionV2:    session.NewSessionServiceClient(cc),
-		SettingsV2:   settings.NewSettingsServiceClient(cc),
-		OIDCv2:       oidc_pb.NewOIDCServiceClient(cc),
-		OrgV2:        organisation.NewOrganizationServiceClient(cc),
-		System:       system.NewSystemServiceClient(cc),
-		ActionV3:     action.NewActionServiceClient(cc),
-		FeatureV2:    feature.NewFeatureServiceClient(cc),
-		UserSchemaV3: schema.NewUserSchemaServiceClient(cc),
+		CC:             cc,
+		Admin:          admin.NewAdminServiceClient(cc),
+		Mgmt:           mgmt.NewManagementServiceClient(cc),
+		Auth:           auth.NewAuthServiceClient(cc),
+		UserV2beta:     user_v2beta.NewUserServiceClient(cc),
+		UserV2:         user.NewUserServiceClient(cc),
+		SessionV2beta:  session_v2beta.NewSessionServiceClient(cc),
+		SessionV2:      session.NewSessionServiceClient(cc),
+		SettingsV2beta: settings_v2beta.NewSettingsServiceClient(cc),
+		SettingsV2:     settings.NewSettingsServiceClient(cc),
+		OIDCv2beta:     oidc_pb_v2beta.NewOIDCServiceClient(cc),
+		OIDCv2:         oidc_pb.NewOIDCServiceClient(cc),
+		OrgV2beta:      org_v2beta.NewOrganizationServiceClient(cc),
+		OrgV2:          organisation.NewOrganizationServiceClient(cc),
+		System:         system.NewSystemServiceClient(cc),
+		ActionV3:       action.NewActionServiceClient(cc),
+		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
+		FeatureV2:      feature.NewFeatureServiceClient(cc),
+		UserSchemaV3:   schema.NewUserSchemaServiceClient(cc),
 	}
 }
 

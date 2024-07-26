@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) PasswordReset(ctx context.Context, req *user.PasswordResetRequest) (_ *user.PasswordResetResponse, err error) {

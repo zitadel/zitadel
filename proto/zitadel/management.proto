@@ -1005,6 +1005,7 @@ service ManagementService {
     }
 
     // Deprecated: not used anymore in user state
+    // To resend a verification email use the user service v2 ResendEmailCode
     rpc ResendHumanInitialization(ResendHumanInitializationRequest) returns (ResendHumanInitializationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/_resend_initialization"
