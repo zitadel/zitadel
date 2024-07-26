@@ -34,7 +34,7 @@ Send either the sendLink or the returnCode (empty message) in the request body, 
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/passkeys/registration_link \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/passkeys/registration_link \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -81,7 +81,7 @@ The code only has to be filled if the user did get a registration code.
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/passkeys \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/passkeys \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -185,7 +185,7 @@ Example Request:
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/passkeys/$PASSKEY_ID \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/passkeys/$PASSKEY_ID \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -223,7 +223,7 @@ More detailed information about the API: [Create Session Documentation](/apis/re
 Example Request:
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
+  --url https://$ZITADEL_DOMAIN/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \

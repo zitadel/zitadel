@@ -85,7 +85,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v3alpha/executions' \
 --data-raw '{
     "condition": {
         "request": {
-            "method": "/zitadel.user.v2beta.UserService/AddHumanUser"
+            "method": "/zitadel.user.v2.UserService/AddHumanUser"
         }
     },
     "targets": [
@@ -98,10 +98,10 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v3alpha/executions' \
 
 ## Example call
 
-Now on every call on `/zitadel.user.v2beta.UserService/AddHumanUser` the local server prints out the received body of the request:
+Now on every call on `/zitadel.user.v2.UserService/AddHumanUser` the local server prints out the received body of the request:
 
 ```shell
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/users/human' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/users/human' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -119,7 +119,7 @@ curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/users/human' \
 Should print out something like, also described under [Sent information Request](./introduction#sent-information-request):
 ```shell
 {
-  "fullMethod": "/zitadel.user.v2beta.UserService/AddHumanUser",
+  "fullMethod": "/zitadel.user.v2.UserService/AddHumanUser",
   "instanceID": "262851882718855632",
   "orgID": "262851882718921168",
   "projectID": "262851882719052240",
