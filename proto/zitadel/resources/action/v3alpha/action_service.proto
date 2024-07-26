@@ -475,7 +475,7 @@ message SearchTargetsResponse {
 }
 
 message SetExecutionRequest {
-  optional zitadel.object.v3alpha.Instance instance = 1;
+  optional zitadel.object.v3alpha.Instance instance = 1 [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { default: "\"domain from HOST or :authority header\""}];
   oneof id {
     option (validate.required) = true;
     Condition condition = 2;
