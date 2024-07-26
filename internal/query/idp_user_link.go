@@ -89,6 +89,29 @@ var (
 	}
 )
 
+func (l *IDPUserLinks) RemoveNoPermission(ctx context.Context, permissionCheck domain.PermissionCheck) {
+	removableIndexes := make([]int, 0)
+	for i := range l.Links {
+		ctxData := authz.GetCtxData(ctx)
+		if ctxData.UserID != l.Links[i].UserID {
+			if err := permissionCheck(ctx, domain.PermissionUserRead, l.Links[i].ResourceOwner, l.Links[i].UserID); err != nil {
+				removableIndexes = append(removableIndexes, i)
+			}
+		}
+	}
+	removed := 0
+	for _, removeIndex := range removableIndexes {
+		l.Links = removeIDPLink(l.Links, removeIndex-removed)
+		removed++
+	}
+	// reset count as some users could be removed
+	l.SearchResponse.Count = uint64(len(l.Links))
+}
+
+func removeIDPLink(slice []*IDPUserLink, s int) []*IDPUserLink {
+	return append(slice[:s], slice[s+1:]...)
+}
+
 func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery, withOwnerRemoved bool) (idps *IDPUserLinks, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()

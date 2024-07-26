@@ -14,8 +14,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 )
 
 var (
