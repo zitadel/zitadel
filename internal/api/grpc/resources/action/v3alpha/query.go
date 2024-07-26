@@ -29,11 +29,19 @@ func (s *Server) GetTarget(ctx context.Context, req *action.GetTargetRequest) (*
 	}, nil
 }
 
+type InstanceContext interface {
+	GetInstanceId() string
+	GetInstanceDomain() string
+}
+
+type Context interface {
+	GetOwner() InstanceContext
+}
+
 func (s *Server) SearchTargets(ctx context.Context, req *action.SearchTargetsRequest) (*action.SearchTargetsResponse, error) {
 	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
-
 	queries, err := searchTargetsRequestToModel(req)
 	if err != nil {
 		return nil, err
