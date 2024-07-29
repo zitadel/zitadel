@@ -94,7 +94,7 @@ func NewActivatedEvent(
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			AddedEventType,
+			ActivatedEventType,
 		),
 	}
 }
@@ -123,7 +123,7 @@ func NewDeactivatedEvent(
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			AddedEventType,
+			DeactivatedEventType,
 		),
 	}
 }
@@ -154,7 +154,7 @@ func NewRemovedEvent(
 		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			AddedEventType,
+			RemovedEventType,
 		),
 	}
 }

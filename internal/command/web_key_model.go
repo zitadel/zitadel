@@ -102,8 +102,14 @@ func (models *webKeyWriteModels) Reduce() error {
 			delete(models.keys, aggregate.ID)
 			continue
 		}
-		models.keys[aggregate.ID].AppendEvents(event)
+
+		model := models.keys[aggregate.ID]
+		model.AppendEvents(event)
+		if err := model.Reduce(); err != nil {
+			return err
+		}
 	}
+	models.events = models.events[0:0]
 	return nil
 }
 

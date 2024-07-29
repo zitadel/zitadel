@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/webkey"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -19,7 +20,10 @@ type WebKeyDetails struct {
 
 // GenerateWebKey creates one web key pair for the instance.
 // If the instance does not have an active key, the new key is activated.
-func (c *Commands) GenerateWebKey(ctx context.Context, conf crypto.WebKeyConfig) (*WebKeyDetails, error) {
+func (c *Commands) GenerateWebKey(ctx context.Context, conf crypto.WebKeyConfig) (_ *WebKeyDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	_, activeID, err := c.getAllWebKeys(ctx)
 	if err != nil {
 		return nil, err
@@ -45,7 +49,10 @@ func (c *Commands) GenerateWebKey(ctx context.Context, conf crypto.WebKeyConfig)
 // GenerateInitialWebKeys creates 2 web key pairs for the instance.
 // The first key is activated for signing use.
 // If the instance already has keys, this is noop.
-func (c *Commands) GenerateInitialWebKeys(ctx context.Context, conf crypto.WebKeyConfig) error {
+func (c *Commands) GenerateInitialWebKeys(ctx context.Context, conf crypto.WebKeyConfig) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	keys, _, err := c.getAllWebKeys(ctx)
 	if err != nil {
 		return err
@@ -61,7 +68,10 @@ func (c *Commands) GenerateInitialWebKeys(ctx context.Context, conf crypto.WebKe
 	return err
 }
 
-func (c *Commands) generateInitialWebKeysCommands(ctx context.Context, instanceID string, conf crypto.WebKeyConfig) ([]eventstore.Command, error) {
+func (c *Commands) generateInitialWebKeysCommands(ctx context.Context, instanceID string, conf crypto.WebKeyConfig) (_ []eventstore.Command, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	commands := make([]eventstore.Command, 0, 3)
 	for i := 0; i < 2; i++ {
 		addedCmd, aggregate, err := c.generateWebKeyCommand(ctx, instanceID, conf)
@@ -76,12 +86,15 @@ func (c *Commands) generateInitialWebKeysCommands(ctx context.Context, instanceI
 	return commands, nil
 }
 
-func (c *Commands) generateWebKeyCommand(ctx context.Context, instanceID string, conf crypto.WebKeyConfig) (eventstore.Command, *eventstore.Aggregate, error) {
+func (c *Commands) generateWebKeyCommand(ctx context.Context, instanceID string, conf crypto.WebKeyConfig) (_ eventstore.Command, _ *eventstore.Aggregate, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	keyID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, nil, err
 	}
-	encryptedPrivate, public, err := crypto.GenerateEncryptedWebKey(keyID, c.keyAlgorithm, conf)
+	encryptedPrivate, public, err := c.webKeyGenerator(keyID, c.keyAlgorithm, conf)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -96,9 +109,15 @@ func (c *Commands) generateWebKeyCommand(ctx context.Context, instanceID string,
 // ActivateWebKey activates the key identified by keyID.
 // Any previously activated key on the current instance is deactivated.
 func (c *Commands) ActivateWebKey(ctx context.Context, keyID string) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	keys, activeID, err := c.getAllWebKeys(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if activeID == keyID {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ahv0Ah", "Errors.NoChangesFound")
 	}
 	nextActive, ok := keys[keyID]
 	if !ok {
@@ -125,6 +144,9 @@ func (c *Commands) ActivateWebKey(ctx context.Context, keyID string) (_ *domain.
 // getAllWebKeys searches for all web keys on the instance and returns a map of key IDs.
 // activeID is the id of the currently active key.
 func (c *Commands) getAllWebKeys(ctx context.Context) (_ map[string]*WebKeyWriteModel, activeID string, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	models := newWebKeyWriteModels(authz.GetInstance(ctx).InstanceID())
 	if err = c.eventstore.FilterToQueryReducer(ctx, models); err != nil {
 		return nil, "", err
@@ -133,6 +155,9 @@ func (c *Commands) getAllWebKeys(ctx context.Context) (_ map[string]*WebKeyWrite
 }
 
 func (c *Commands) DeleteWebKey(ctx context.Context, keyID string) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	model := NewWebKeyWriteModel(keyID, authz.GetInstance(ctx).InstanceID())
 	if err = c.eventstore.FilterToQueryReducer(ctx, model); err != nil {
 		return nil, err
