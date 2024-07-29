@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
 var (

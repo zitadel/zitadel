@@ -115,6 +115,7 @@ type Steps struct {
 	s28AddFieldTable                       *AddFieldTable
 	s29FillFieldsForProjectGrant           *FillFieldsForProjectGrant
 	s30FillFieldsForOrgDomainVerified      *FillFieldsForOrgDomainVerified
+	s31AddAggregateIndexToFields           *AddAggregateIndexToFields
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

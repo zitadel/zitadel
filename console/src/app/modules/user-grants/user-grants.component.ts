@@ -18,7 +18,7 @@ import { PageEvent, PaginatorComponent } from '../paginator/paginator.component'
 import { UserGrantRoleDialogComponent } from '../user-grant-role-dialog/user-grant-role-dialog.component';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
-import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
+import { Org, OrgIDQuery, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 
 export enum UserGrantListSearchKey {
   DISPLAY_NAME,
@@ -306,17 +306,15 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  public showUser(grant: UserGrant.AsObject) {
-    const org: Org.AsObject = {
-      id: grant.grantedOrgId,
-      name: grant.grantedOrgName,
-      state: OrgState.ORG_STATE_ACTIVE,
-      primaryDomain: grant.grantedOrgDomain,
-    };
+  public async showUser(grant: UserGrant.AsObject) {
+    const orgQuery = new OrgQuery();
+    const orgIdQuery = new OrgIDQuery();
+    orgIdQuery.setId(grant.grantedOrgId);
+    orgQuery.setIdQuery(orgIdQuery);
 
-    // Check if user has permissions for that org before changing active org
-    if (this.myOrgs.find((org) => org.id === grant.grantedOrgId)) {
-      this.authService.setActiveOrg(org);
+    const orgs = (await this.authService.listMyProjectOrgs(1, 0, [orgQuery])).resultList;
+    if (orgs.length === 1) {
+      this.authService.setActiveOrg(orgs[0]);
       this.router.navigate(['/users', grant.userId]);
     } else {
       this.toast.showInfo('GRANTS.TOAST.CANTSHOWINFO', true);

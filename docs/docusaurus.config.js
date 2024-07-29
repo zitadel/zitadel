@@ -194,6 +194,12 @@ module.exports = {
       disableSwitch: false,
       respectPrefersColorScheme: true,
     },
+    codeblock: {
+      showGithubLink: true,
+      githubLinkLabel: 'View on GitHub',
+      showRunmeLink: false,
+      runmeLinkLabel: 'Checkout via Runme'
+    },
   },
   webpack: {
     jsLoader: (isServer) => ({
@@ -278,44 +284,44 @@ module.exports = {
               categoryLinkSource: "tag",
             },
           },
-          user: {
-            specPath: ".artifacts/openapi/zitadel/user/v2beta/user_service.swagger.json",
-            outputDir: "docs/apis/resources/user_service",
+          user_v2: {
+            specPath: ".artifacts/openapi/zitadel/user/v2/user_service.swagger.json",
+            outputDir: "docs/apis/resources/user_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "tag",
             },
           },
-          session: {
-            specPath: ".artifacts/openapi/zitadel/session/v2beta/session_service.swagger.json",
-            outputDir: "docs/apis/resources/session_service",
+          session_v2: {
+            specPath: ".artifacts/openapi/zitadel/session/v2/session_service.swagger.json",
+            outputDir: "docs/apis/resources/session_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "tag",
             },
           },
-          oidc: {
-            specPath: ".artifacts/openapi/zitadel/oidc/v2beta/oidc_service.swagger.json",
-            outputDir: "docs/apis/resources/oidc_service",
+          oidc_v2: {
+            specPath: ".artifacts/openapi/zitadel/oidc/v2/oidc_service.swagger.json",
+            outputDir: "docs/apis/resources/oidc_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "tag",
             },
           },
-          settings: {
-            specPath: ".artifacts/openapi/zitadel/settings/v2beta/settings_service.swagger.json",
-            outputDir: "docs/apis/resources/settings_service",
+          settings_v2: {
+            specPath: ".artifacts/openapi/zitadel/settings/v2/settings_service.swagger.json",
+            outputDir: "docs/apis/resources/settings_service_v2",
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: "tag",
             },
           },
-          user_schema: {
+          user_schema_v3: {
             specPath: ".artifacts/openapi/zitadel/user/schema/v3alpha/user_schema_service.swagger.json",
             outputDir: "docs/apis/resources/user_schema_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           user_v3: {
@@ -323,7 +329,7 @@ module.exports = {
             outputDir: "docs/apis/resources/user_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
-              categoryLinkSource: "tag",
+              categoryLinkSource: "auto",
             },
           },
           action_v3: {
@@ -331,15 +337,15 @@ module.exports = {
             outputDir: "docs/apis/resources/action_service_v3",
             sidebarOptions: {
                 groupPathsBy: "tag",
-                categoryLinkSource: "tag",
+                categoryLinkSource: "auto",
             },
           },
           feature_v2: {
-            specPath: ".artifacts/openapi/zitadel/feature/v2beta/feature_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/feature/v2/feature_service.swagger.json",
             outputDir: "docs/apis/resources/feature_service_v2",
             sidebarOptions: {
                 groupPathsBy: "tag",
-                categoryLinkSource: "tag",
+                categoryLinkSource: "auto",
             },
           },
         },
@@ -358,5 +364,5 @@ module.exports = {
       };
     },
   ],
-  themes: ["@saucelabs/theme-github-codeblock", "docusaurus-theme-openapi-docs"],
+  themes: [ "docusaurus-theme-github-codeblock", "docusaurus-theme-openapi-docs"],
 };

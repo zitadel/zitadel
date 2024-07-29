@@ -5,7 +5,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query"
-	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 )
 
 func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.SystemFeatures {

@@ -14,7 +14,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
-	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 )
 
 var (

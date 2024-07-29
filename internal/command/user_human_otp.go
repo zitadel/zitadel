@@ -239,6 +239,11 @@ func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner st
 	if existingOTP.State == domain.MFAStateUnspecified || existingOTP.State == domain.MFAStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
 	}
+	if userID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingOTP.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
+	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))
 	if err != nil {

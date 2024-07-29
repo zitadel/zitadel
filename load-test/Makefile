@@ -12,6 +12,10 @@ human_password_login: bundle
 machine_pat_login: bundle
 	k6 run dist/machine_pat_login.js --vus ${VUS} --duration ${DURATION}
 
+.PHONY: machine_client_credentials_login
+machine_client_credentials_login: bundle
+	k6 run dist/machine_client_credentials_login.js --vus ${VUS} --duration ${DURATION}
+
 .PHONY: user_info
 user_info: bundle
 	k6 run dist/user_info.js --vus ${VUS} --duration ${DURATION}
@@ -25,6 +29,10 @@ introspect: ensure_modules bundle
 	go install go.k6.io/xk6/cmd/xk6@latest
 	cd ../../xk6-modules && xk6 build --with xk6-zitadel=.
 	./../../xk6-modules/k6 run dist/introspection.js --vus ${VUS} --duration ${DURATION}
+
+.PHONY: add_session
+add_session: bundle
+	k6 run dist/session.js --vus ${VUS} --duration ${DURATION}
 
 .PHONY: lint
 lint:

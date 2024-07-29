@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package zitadel.settings.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/settings/v2;settings";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "zitadel/settings/v2/settings.proto";
+import "google/protobuf/duration.proto";
+
+message LoginSettings {
+  bool allow_username_password = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a user is allowed to log in with username and password";
+    }
+  ];
+  bool allow_register = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a person is allowed to register a user on this organization";
+    }
+  ];
+  bool allow_external_idp = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a user is allowed to add a defined identity provider. E.g. Google auth";
+    }
+  ];
+  bool force_mfa = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if a user MUST use a multi-factor to log in";
+    }
+  ];
+  PasskeysType passkeys_type = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if passkeys are allowed for users"
+    }
+  ];
+  bool hide_password_reset = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if password reset link should be shown in the login screen"
+    }
+  ];
+  bool ignore_unknown_usernames = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if unknown username on login screen directly returns an error or always displays the password screen"
+    }
+  ];
+  string default_redirect_uri = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines where the user will be redirected to if the login is started without app context (e.g. from mail)";
+      example: "\"https://acme.com/ui/console\"";
+    }
+  ];
+  google.protobuf.Duration password_check_lifetime = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how much time the user has to re-authenticate with the password.";
+      example: "\"864000s\"";
+    }
+  ];
+  google.protobuf.Duration external_login_check_lifetime = 10 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how much time the user has to re-authenticate with an external provider.";
+      example: "\"864000s\"";
+    }
+  ];
+  google.protobuf.Duration mfa_init_skip_lifetime = 11 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how much time the mfa prompt will be shown again.";
+      example: "\"2592000s\"";
+    }
+  ];
+  google.protobuf.Duration second_factor_check_lifetime = 12 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines after how long the second-factor check is valid.";
+      example: "\"64800s\"";
+    }
+  ];
+  google.protobuf.Duration multi_factor_check_lifetime = 13 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Defines how long the multi-factor check is valid.";
+      example: "\"43200s\"";
+    }
+  ];
+  repeated SecondFactorType second_factors = 14;
+  repeated MultiFactorType multi_factors = 15;
+  // If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success.
+  bool allow_domain_discovery = 16 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "If set to true, the suffix (@domain.com) of an unknown username input on the login screen will be matched against the org domains and will redirect to the registration of that organization on success."
+    }
+  ];
+  bool disable_login_with_email = 17 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if the user can additionally (to the login name) be identified by their verified email address"
+    }
+  ];
+  bool disable_login_with_phone = 18 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "defines if the user can additionally (to the login name) be identified by their verified phone number"
+    }
+  ];
+  // resource_owner_type returns if the settings is managed on the organization or on the instance
+  ResourceOwnerType resource_owner_type = 19 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "resource_owner_type returns if the settings is managed on the organization or on the instance";
+    }
+  ];
+  bool force_mfa_local_only = 22 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "if activated, only local authenticated users are forced to use MFA. Authentication through IDPs won't prompt a MFA step in the login."
+    }
+  ];
+}
+
+enum SecondFactorType {
+  SECOND_FACTOR_TYPE_UNSPECIFIED = 0;
+  // This is the type for TOTP
+  SECOND_FACTOR_TYPE_OTP = 1;
+  SECOND_FACTOR_TYPE_U2F = 2;
+  SECOND_FACTOR_TYPE_OTP_EMAIL = 3;
+  SECOND_FACTOR_TYPE_OTP_SMS = 4;
+}
+
+enum MultiFactorType {
+  MULTI_FACTOR_TYPE_UNSPECIFIED = 0;
+  MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION = 1;
+}
+
+enum PasskeysType {
+  PASSKEYS_TYPE_NOT_ALLOWED = 0;
+  PASSKEYS_TYPE_ALLOWED = 1;
+}
+
+message IdentityProvider {
+  string id = 1;
+  string name = 2;
+  IdentityProviderType type = 3;
+}
+
+enum IdentityProviderType {
+  IDENTITY_PROVIDER_TYPE_UNSPECIFIED = 0;
+  IDENTITY_PROVIDER_TYPE_OIDC = 1;
+  IDENTITY_PROVIDER_TYPE_JWT = 2;
+  IDENTITY_PROVIDER_TYPE_LDAP = 3;
+  IDENTITY_PROVIDER_TYPE_OAUTH = 4;
+  IDENTITY_PROVIDER_TYPE_AZURE_AD = 5;
+  IDENTITY_PROVIDER_TYPE_GITHUB = 6;
+  IDENTITY_PROVIDER_TYPE_GITHUB_ES = 7;
+  IDENTITY_PROVIDER_TYPE_GITLAB = 8;
+  IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED = 9;
+  IDENTITY_PROVIDER_TYPE_GOOGLE = 10;
+  IDENTITY_PROVIDER_TYPE_SAML=11;
+}
