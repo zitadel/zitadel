@@ -206,7 +206,7 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 
 	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
 	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
-	instance, scan := scanAuthzInstance(instanceDomain, publicDomain)
+	instance, scan := scanAuthzInstance()
 	err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain, publicDomain)
 	return instance, err
 }
@@ -216,7 +216,7 @@ func (q *Queries) InstanceByID(ctx context.Context) (_ authz.Instance, err error
 	defer func() { span.EndWithError(err) }()
 
 	instanceID := authz.GetInstance(ctx).InstanceID()
-	instance, scan := scanAuthzInstance("", "")
+	instance, scan := scanAuthzInstance()
 	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, instanceID)
 	logging.OnError(err).WithField("instance_id", instanceID).Warn("instance by ID")
 	return instance, err
@@ -484,11 +484,8 @@ func (i *authzInstance) Features() feature.Features {
 	return i.features
 }
 
-func scanAuthzInstance(host, domain string) (*authzInstance, func(row *sql.Row) error) {
-	instance := &authzInstance{
-		host:   host,
-		domain: domain,
-	}
+func scanAuthzInstance() (*authzInstance, func(row *sql.Row) error) {
+	instance := &authzInstance{}
 	return instance, func(row *sql.Row) error {
 		var (
 			lang                  string
