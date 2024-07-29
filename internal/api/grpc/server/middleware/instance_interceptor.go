@@ -67,14 +67,13 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 }
 
 func addInstanceByID(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, id string) (interface{}, error) {
-	ctx = authz.WithInstanceID(ctx, id)
-	instance, err := verifier.InstanceByID(ctx)
+	instance, err := verifier.InstanceByID(ctx, id)
 	if err != nil {
 		notFoundErr := new(zerrors.ZitadelError)
 		if errors.As(err, &notFoundErr) {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
-		return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using id %s: %w", id, notFoundErr))
+		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using id %s: %w", id, notFoundErr).Error())
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }
@@ -86,7 +85,7 @@ func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.Unar
 		if errors.As(err, &notFoundErr) {
 			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
 		}
-		return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using domain %s: %w", domain, notFoundErr))
+		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using domain %s: %w", domain, notFoundErr).Error())
 	}
 	return handler(authz.WithInstance(ctx, instance), req)
 }

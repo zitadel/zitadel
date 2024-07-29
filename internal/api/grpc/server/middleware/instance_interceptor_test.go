@@ -13,6 +13,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/feature"
+	object_v3 "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 )
 
 func Test_hostNameFromContext(t *testing.T) {
@@ -110,7 +111,7 @@ func Test_setInstance(t *testing.T) {
 			args{
 				ctx:        metadata.NewIncomingContext(context.Background(), metadata.Pairs("header", "host2")),
 				req:        &mockRequest{},
-				verifier:   &mockInstanceVerifier{"host"},
+				verifier:   &mockInstanceVerifier{host: "host"},
 				headerName: "header",
 			},
 			res{
@@ -123,7 +124,7 @@ func Test_setInstance(t *testing.T) {
 			args{
 				ctx:        metadata.NewIncomingContext(context.Background(), metadata.Pairs("header", "host")),
 				req:        &mockRequest{},
-				verifier:   &mockInstanceVerifier{"host"},
+				verifier:   &mockInstanceVerifier{host: "host"},
 				headerName: "header",
 				handler: func(ctx context.Context, req interface{}) (interface{}, error) {
 					return req, nil
@@ -132,6 +133,138 @@ func Test_setInstance(t *testing.T) {
 			res{
 				want: &mockRequest{},
 				err:  false,
+			},
+		},
+		{
+			"explicit instance unset, hostname not found, error",
+			args{
+				ctx:        metadata.NewIncomingContext(context.Background(), metadata.Pairs("header", "host2")),
+				req:        &mockRequestWithExplicitInstance{},
+				verifier:   &mockInstanceVerifier{host: "host"},
+				headerName: "header",
+			},
+			res{
+				want: nil,
+				err:  true,
+			},
+		},
+		{
+			"explicit instance unset, invalid host, error",
+			args{
+				ctx:        metadata.NewIncomingContext(context.Background(), metadata.Pairs("header", "host2")),
+				req:        &mockRequestWithExplicitInstance{},
+				verifier:   &mockInstanceVerifier{host: "host"},
+				headerName: "header",
+			},
+			res{
+				want: nil,
+				err:  true,
+			},
+		},
+		{
+			"explicit instance unset, valid host",
+			args{
+				ctx:        metadata.NewIncomingContext(context.Background(), metadata.Pairs("header", "host")),
+				req:        &mockRequestWithExplicitInstance{},
+				verifier:   &mockInstanceVerifier{host: "host"},
+				headerName: "header",
+				handler: func(ctx context.Context, req interface{}) (interface{}, error) {
+					return req, nil
+				},
+			},
+			res{
+				want: &mockRequestWithExplicitInstance{},
+				err:  false,
+			},
+		},
+		{
+			name: "explicit instance set, id not found, error",
+			args: args{
+				ctx: context.Background(),
+				req: &mockRequestWithExplicitInstance{
+					instance: object_v3.Instance{
+						Property: &object_v3.Instance_Id{
+							Id: "not existing instance id",
+						},
+					},
+				},
+				verifier: &mockInstanceVerifier{id: "existing instance id"},
+			},
+			res: res{
+				want: nil,
+				err:  true,
+			},
+		},
+		{
+			name: "explicit instance set, id found, ok",
+			args: args{
+				ctx: context.Background(),
+				req: &mockRequestWithExplicitInstance{
+					instance: object_v3.Instance{
+						Property: &object_v3.Instance_Id{
+							Id: "existing instance id",
+						},
+					},
+				},
+				verifier: &mockInstanceVerifier{id: "existing instance id"},
+				handler: func(ctx context.Context, req interface{}) (interface{}, error) {
+					return req, nil
+				},
+			},
+			res: res{
+				want: &mockRequestWithExplicitInstance{
+					instance: object_v3.Instance{
+						Property: &object_v3.Instance_Id{
+							Id: "existing instance id",
+						},
+					},
+				},
+				err: false,
+			},
+		},
+		{
+			name: "explicit instance set, domain not found, error",
+			args: args{
+				ctx: context.Background(),
+				req: &mockRequestWithExplicitInstance{
+					instance: object_v3.Instance{
+						Property: &object_v3.Instance_Domain{
+							Domain: "not existing instance domain",
+						},
+					},
+				},
+				verifier: &mockInstanceVerifier{host: "existing instance domain"},
+			},
+			res: res{
+				want: nil,
+				err:  true,
+			},
+		},
+		{
+			name: "explicit instance set, domain found, ok",
+			args: args{
+				ctx: context.Background(),
+				req: &mockRequestWithExplicitInstance{
+					instance: object_v3.Instance{
+						Property: &object_v3.Instance_Domain{
+							Domain: "existing instance domain",
+						},
+					},
+				},
+				verifier: &mockInstanceVerifier{host: "existing instance domain"},
+				handler: func(ctx context.Context, req interface{}) (interface{}, error) {
+					return req, nil
+				},
+			},
+			res: res{
+				want: &mockRequestWithExplicitInstance{
+					instance: object_v3.Instance{
+						Property: &object_v3.Instance_Domain{
+							Domain: "existing instance domain",
+						},
+					},
+				},
+				err: false,
 			},
 		},
 	}
@@ -151,7 +284,16 @@ func Test_setInstance(t *testing.T) {
 
 type mockRequest struct{}
 
+type mockRequestWithExplicitInstance struct {
+	instance object_v3.Instance
+}
+
+func (m *mockRequestWithExplicitInstance) GetInstance() *object_v3.Instance {
+	return &m.instance
+}
+
 type mockInstanceVerifier struct {
+	id   string
 	host string
 }
 
@@ -162,7 +304,12 @@ func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, host string) (a
 	return &mockInstance{}, nil
 }
 
-func (m *mockInstanceVerifier) InstanceByID(context.Context) (authz.Instance, error) { return nil, nil }
+func (m *mockInstanceVerifier) InstanceByID(_ context.Context, id string) (authz.Instance, error) {
+	if id != m.id {
+		return nil, fmt.Errorf("not found")
+	}
+	return &mockInstance{}, nil
+}
 
 type mockInstance struct{}
 
