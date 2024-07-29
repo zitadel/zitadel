@@ -188,7 +188,7 @@ These preparation steps are needed for all Token Exchange interaction, including
 As Token Exchange is still a beta feature, the feature needs to be enabled for your instance by an `IAM_OWNER` first:
 
 ```bash
-curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2beta/features/instance' \
+curl -L -X PUT 'https://$CUSTOM-DOMAIN/v2/features/instance' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <IAM_OWNER_TOKEN>' \

@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package zitadel.feature.v2;
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+import "zitadel/object/v2/object.proto";
+import "zitadel/feature/v2/feature.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
+
+message SetInstanceFeaturesRequest{
+  optional bool login_default_org = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "The login UI will use the settings of the default org (and not from the instance) if no organization context is set";
+    }
+  ];
+  optional bool oidc_trigger_introspection_projections = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future. Please raise an issue if you needed to enable this feature.";
+    }
+  ];
+  optional bool oidc_legacy_introspection = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise. Please raise an issue if you needed to enable this feature.";
+    }
+  ];
+
+  optional bool user_schema = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  optional bool oidc_token_exchange = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
+    }
+  ];
+  optional bool actions = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Actions allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  repeated ImprovedPerformance improved_performance = 7 [
+    (validate.rules).repeated.unique = true,
+    (validate.rules).repeated.items.enum = {defined_only:  true, not_in: [0]},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[1]";
+      description: "Improves performance of specified execution paths.";
+    }
+  ];
+}
+
+message SetInstanceFeaturesResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message ResetInstanceFeaturesRequest {}
+
+message ResetInstanceFeaturesResponse {
+  zitadel.object.v2.Details details = 1;
+}
+
+message GetInstanceFeaturesRequest {
+  bool inheritance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Inherit unset features from the resource owners. This option is recursive: if the flag is set, the resource's ancestors are consulted up to system defaults. If this option is disabled and the feature is not set on the instance, it will be omitted from the response or Not Found is returned when the instance has no features flags at all.";
+    }
+  ];
+}
+
+message GetInstanceFeaturesResponse {
+  zitadel.object.v2.Details details = 1;
+  FeatureFlag login_default_org = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "The login UI will use the settings of the default org (and not from the instance) if no organization context is set";
+    }
+  ];
+
+  FeatureFlag oidc_trigger_introspection_projections = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable projection triggers during an introspection request. This can act as workaround if there are noticeable consistency issues in the introspection response but can have an impact on performance. We are planning to remove triggers for introspection requests in the future. Please raise an issue if you needed to enable this feature.";
+    }
+  ];
+
+  FeatureFlag oidc_legacy_introspection = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "We have recently refactored the introspection endpoint for performance reasons. This feature can be used to rollback to the legacy implementation if unexpected bugs arise. Please raise an issue if you needed to enable this feature.";
+    }
+  ];
+
+  FeatureFlag user_schema = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "User Schemas allow to manage data schemas of user. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  FeatureFlag oidc_token_exchange = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enable the experimental `urn:ietf:params:oauth:grant-type:token-exchange` grant type for the OIDC token endpoint. Token exchange can be used to request tokens with a lesser scope or impersonate other users. See the security policy to allow impersonation on an instance.";
+    }
+  ];
+
+  FeatureFlag actions = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Actions v2 allow to manage data executions and targets. If the flag is enabled, you'll be able to use the new API and its features. Note that it is still in an early stage.";
+    }
+  ];
+
+  ImprovedPerformanceFeatureFlag improved_performance = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "[1]";
+      description: "Improves performance of specified execution paths.";
+    }
+  ];
+}

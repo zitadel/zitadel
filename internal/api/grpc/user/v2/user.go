@@ -18,11 +18,12 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
+
 	human, err := AddUserRequestToAddHuman(req)
 	if err != nil {
 		return nil, err
@@ -257,20 +258,6 @@ func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
 		EncodedPasswordHash: password.GetHashedPassword().GetHash(),
 		ChangeRequired:      password.GetPassword().GetChangeRequired() || password.GetHashedPassword().GetChangeRequired(),
 	}
-}
-
-func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
-	details, err := s.command.AddUserIDPLink(ctx, req.UserId, "", &command.AddLink{
-		IDPID:         req.GetIdpLink().GetIdpId(),
-		DisplayName:   req.GetIdpLink().GetUserName(),
-		IDPExternalID: req.GetIdpLink().GetUserId(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &user.AddIDPLinkResponse{
-		Details: object.DomainToDetailsPb(details),
-	}, nil
 }
 
 func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {

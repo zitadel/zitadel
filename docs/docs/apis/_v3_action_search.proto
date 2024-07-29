@@ -47,7 +47,7 @@ message IncludeFilter {
   string include = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "the id of the include"
-      example: "\"request.zitadel.session.v2beta.SessionService\"";
+      example: "\"request.zitadel.session.v2.SessionService\"";
     }
   ];
 }

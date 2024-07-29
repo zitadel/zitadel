@@ -98,6 +98,29 @@ type AuthMethods struct {
 	AuthMethods []*AuthMethod
 }
 
+func (l *AuthMethods) RemoveNoPermission(ctx context.Context, permissionCheck domain.PermissionCheck) {
+	removableIndexes := make([]int, 0)
+	for i := range l.AuthMethods {
+		ctxData := authz.GetCtxData(ctx)
+		if ctxData.UserID != l.AuthMethods[i].UserID {
+			if err := permissionCheck(ctx, domain.PermissionUserRead, l.AuthMethods[i].ResourceOwner, l.AuthMethods[i].UserID); err != nil {
+				removableIndexes = append(removableIndexes, i)
+			}
+		}
+	}
+	removed := 0
+	for _, removeIndex := range removableIndexes {
+		l.AuthMethods = removeAuthMethod(l.AuthMethods, removeIndex-removed)
+		removed++
+	}
+	// reset count as some users could be removed
+	l.SearchResponse.Count = uint64(len(l.AuthMethods))
+}
+
+func removeAuthMethod(slice []*AuthMethod, s int) []*AuthMethod {
+	return append(slice[:s], slice[s+1:]...)
+}
+
 type AuthMethod struct {
 	UserID        string
 	CreationDate  time.Time
