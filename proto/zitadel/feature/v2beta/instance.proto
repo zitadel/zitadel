@@ -58,6 +58,7 @@ message SetInstanceFeaturesRequest{
       description: "Improves performance of specified execution paths.";
     }
   ];
+
   optional bool web_key = 8 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "true";
