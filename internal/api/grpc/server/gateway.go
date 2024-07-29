@@ -19,10 +19,8 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
-	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
@@ -90,14 +88,12 @@ var (
 
 type Gateway struct {
 	mux               *runtime.ServeMux
-	http1HostName     string
 	connection        *grpc.ClientConn
 	accessInterceptor *http_mw.AccessInterceptor
-	queries           *query.Queries
 }
 
 func (g *Gateway) Handler() http.Handler {
-	return addInterceptors(g.mux, g.http1HostName, g.accessInterceptor, g.queries)
+	return addInterceptors(g.mux, g.accessInterceptor)
 }
 
 type CustomHTTPResponse interface {
@@ -110,9 +106,7 @@ func CreateGatewayWithPrefix(
 	ctx context.Context,
 	g WithGatewayPrefix,
 	port uint16,
-	http1HostName string,
 	accessInterceptor *http_mw.AccessInterceptor,
-	queries *query.Queries,
 	tlsConfig *tls.Config,
 ) (http.Handler, string, error) {
 	runtimeMux := runtime.NewServeMux(serveMuxOptions...)
@@ -131,13 +125,12 @@ func CreateGatewayWithPrefix(
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to register grpc gateway: %w", err)
 	}
-	return addInterceptors(runtimeMux, http1HostName, accessInterceptor, queries), g.GatewayPathPrefix(), nil
+	return addInterceptors(runtimeMux, accessInterceptor), g.GatewayPathPrefix(), nil
 }
 
 func CreateGateway(
 	ctx context.Context,
 	port uint16,
-	http1HostName string,
 	accessInterceptor *http_mw.AccessInterceptor,
 	tlsConfig *tls.Config,
 ) (*Gateway, error) {
@@ -156,7 +149,6 @@ func CreateGateway(
 	runtimeMux := runtime.NewServeMux(append(serveMuxOptions, runtime.WithHealthzEndpoint(healthpb.NewHealthClient(connection)))...)
 	return &Gateway{
 		mux:               runtimeMux,
-		http1HostName:     http1HostName,
 		connection:        connection,
 		accessInterceptor: accessInterceptor,
 	}, nil
@@ -195,12 +187,9 @@ func dial(ctx context.Context, port uint16, opts []grpc.DialOption) (*grpc.Clien
 
 func addInterceptors(
 	handler http.Handler,
-	http1HostName string,
 	accessInterceptor *http_mw.AccessInterceptor,
-	queries *query.Queries,
 ) http.Handler {
 	handler = http_mw.CallDurationHandler(handler)
-	handler = http1Host(handler, http1HostName)
 	handler = http_mw.CORSInterceptor(handler)
 	handler = http_mw.RobotsTagHandler(handler)
 	handler = http_mw.DefaultTelemetryHandler(handler)
@@ -213,18 +202,6 @@ func addInterceptors(
 		metrics.MetricTypeStatusCode,
 	}, http_utils.Probes...)(handler)
 	return handler
-}
-
-func http1Host(next http.Handler, http1HostName string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		host, err := http_mw.HostFromRequest(r, http1HostName)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusForbidden)
-			return
-		}
-		r.Header.Set(middleware.HTTP1Host, host)
-		next.ServeHTTP(w, r)
-	})
 }
 
 func exhaustedCookieInterceptor(

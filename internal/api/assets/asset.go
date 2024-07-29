@@ -55,9 +55,9 @@ func (h *Handler) Storage() static.Storage {
 	return h.storage
 }
 
-func AssetAPI(externalSecure bool) func(context.Context) string {
+func AssetAPI() func(context.Context) string {
 	return func(ctx context.Context) string {
-		return http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), externalSecure) + HandlerPrefix
+		return http_util.DomainContext(ctx).Origin() + HandlerPrefix
 	}
 }
 

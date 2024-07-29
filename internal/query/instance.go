@@ -195,19 +195,19 @@ var (
 	instanceByIDQuery string
 )
 
-func (q *Queries) InstanceByHost(ctx context.Context, host string) (_ authz.Instance, err error) {
+func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
 		if err != nil {
-			err = fmt.Errorf("unable to get instance by host %s: %w", host, err)
+			err = fmt.Errorf("unable to get instance by host: instanceHost %s, publicHost %s: %w", instanceHost, publicHost, err)
 		}
 		span.EndWithError(err)
 	}()
 
-	domain := strings.Split(host, ":")[0] // remove possible port
-	instance, scan := scanAuthzInstance(host, domain)
-	err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, domain)
-	logging.OnError(err).WithField("host", host).WithField("domain", domain).Warn("instance by host")
+	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
+	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
+	instance, scan := scanAuthzInstance(instanceDomain, publicDomain)
+	err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain, publicDomain)
 	return instance, err
 }
 
@@ -451,14 +451,6 @@ func (i *authzInstance) ConsoleClientID() string {
 
 func (i *authzInstance) ConsoleApplicationID() string {
 	return i.consoleAppID
-}
-
-func (i *authzInstance) RequestedDomain() string {
-	return strings.Split(i.host, ":")[0]
-}
-
-func (i *authzInstance) RequestedHost() string {
-	return i.host
 }
 
 func (i *authzInstance) DefaultLanguage() language.Tag {
