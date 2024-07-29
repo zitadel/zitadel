@@ -121,4 +121,6 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceRemovedEventType, InstanceRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, NotificationPolicyAddedEventType, NotificationPolicyAddedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, NotificationPolicyChangedEventType, NotificationPolicyChangedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, AllowedDomainAddedEventType, eventstore.GenericEventMapper[AllowedDomainAddedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, AllowedDomainRemovedEventType, eventstore.GenericEventMapper[AllowedDomainRemovedEvent])
 }

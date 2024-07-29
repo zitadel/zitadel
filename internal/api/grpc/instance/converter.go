@@ -115,3 +115,43 @@ func DomainToPb(d *query.InstanceDomain) *instance_pb.Domain {
 		),
 	}
 }
+
+func AllowedDomainQueriesToModel(queries []*instance_pb.AllowedDomainSearchQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
+	for i, query := range queries {
+		q[i], err = AllowedDomainQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
+func AllowedDomainQueryToModel(searchQuery *instance_pb.AllowedDomainSearchQuery) (query.SearchQuery, error) {
+	switch q := searchQuery.Query.(type) {
+	case *instance_pb.AllowedDomainSearchQuery_DomainQuery:
+		return query.NewInstanceAllowedDomainDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
+	default:
+		return nil, zerrors.ThrowInvalidArgument(nil, "INST-Ags42", "List.Query.Invalid")
+	}
+}
+
+func AllowedDomainsToPb(domains []*query.InstanceAllowedDomain) []*instance_pb.AllowedDomain {
+	d := make([]*instance_pb.AllowedDomain, len(domains))
+	for i, domain := range domains {
+		d[i] = AllowedDomainToPb(domain)
+	}
+	return d
+}
+
+func AllowedDomainToPb(d *query.InstanceAllowedDomain) *instance_pb.AllowedDomain {
+	return &instance_pb.AllowedDomain{
+		Domain: d.Domain,
+		Details: object.ToViewDetailsPb(
+			d.Sequence,
+			d.CreationDate,
+			d.ChangeDate,
+			d.InstanceID,
+		),
+	}
+}

@@ -39,3 +39,20 @@ func fieldNameToInstanceDomainColumn(fieldName instance.DomainFieldName) query.C
 		return query.Column{}
 	}
 }
+
+func ListInstanceAllowedDomainsRequestToModel(req *admin_pb.ListInstanceAllowedDomainsRequest) (*query.InstanceAllowedDomainSearchQueries, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := instance_grpc.AllowedDomainQueriesToModel(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	return &query.InstanceAllowedDomainSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: fieldNameToInstanceDomainColumn(req.SortingColumn),
+		},
+		Queries: queries,
+	}, nil
+}

@@ -37,3 +37,42 @@ func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInst
 		),
 	}, nil
 }
+
+func (s *Server) ListInstanceAllowedDomains(ctx context.Context, req *admin_pb.ListInstanceAllowedDomainsRequest) (*admin_pb.ListInstanceAllowedDomainsResponse, error) {
+	queries, err := ListInstanceAllowedDomainsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	domains, err := s.query.SearchInstanceAllowedDomains(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ListInstanceAllowedDomainsResponse{
+		Result: instance_grpc.AllowedDomainsToPb(domains.Domains),
+		Details: object.ToListDetails(
+			domains.Count,
+			domains.Sequence,
+			domains.LastRun,
+		),
+	}, nil
+}
+
+func (s *Server) AddInstanceAllowedDomain(ctx context.Context, req *admin_pb.AddInstanceAllowedDomainRequest) (*admin_pb.AddInstanceAllowedDomainResponse, error) {
+	details, err := s.command.AddAllowedDomain(ctx, req.Domain)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddInstanceAllowedDomainResponse{
+		Details: object.DomainToAddDetailsPb(details),
+	}, nil
+}
+
+func (s *Server) RemoveInstanceAllowedDomain(ctx context.Context, req *admin_pb.RemoveInstanceAllowedDomainRequest) (*admin_pb.RemoveInstanceAllowedDomainResponse, error) {
+	details, err := s.command.RemoveAllowedDomain(ctx, req.Domain)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.RemoveInstanceAllowedDomainResponse{
+		Details: object.DomainToChangeDetailsPb(details),
+	}, nil
+}
