@@ -101,7 +101,7 @@
             class="state"
             [ngClass]="{
               active: idp.state === IDPState.IDP_STATE_ACTIVE,
-              inactive: idp.state === IDPState.IDP_STATE_INACTIVE
+              inactive: idp.state === IDPState.IDP_STATE_INACTIVE,
             }"
             >{{ 'IDP.STATES.' + idp.state | translate }}</span
           >
@@ -142,7 +142,7 @@
                     ? 'iam.idp.write'
                     : serviceType === PolicyComponentServiceType.MGMT
                       ? 'org.idp.write'
-                      : ''
+                      : '',
                 ]
                   | hasRole
                   | async) === false
@@ -162,7 +162,7 @@
                     ? 'iam.idp.write'
                     : serviceType === PolicyComponentServiceType.MGMT
                       ? 'org.idp.write'
-                      : ''
+                      : '',
                 ]
                   | hasRole
                   | async) === false
@@ -186,7 +186,7 @@
                     ? 'iam.idp.write'
                     : serviceType === PolicyComponentServiceType.MGMT
                       ? 'org.idp.write'
-                      : ''
+                      : '',
                 ]
                   | hasRole
                   | async) === false
