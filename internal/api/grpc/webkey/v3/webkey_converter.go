@@ -127,6 +127,8 @@ func webKeyRSAConfigToPb(config *crypto.WebKeyRSAConfig) *webkey.WebKeyRSAConfig
 	out := new(webkey.WebKeyRSAConfig)
 
 	switch config.Bits {
+	case crypto.RSABitsUnspecified:
+		out.Bits = webkey.WebKeyRSAConfig_RSA_BITS_UNSPECIFIED
 	case crypto.RSABits2048:
 		out.Bits = webkey.WebKeyRSAConfig_RSA_BITS_2048
 	case crypto.RSABits3072:
@@ -136,6 +138,8 @@ func webKeyRSAConfigToPb(config *crypto.WebKeyRSAConfig) *webkey.WebKeyRSAConfig
 	}
 
 	switch config.Hasher {
+	case crypto.RSAHasherUnspecified:
+		out.Hasher = webkey.WebKeyRSAConfig_RSA_HASHER_UNSPECIFIED
 	case crypto.RSAHasherSHA256:
 		out.Hasher = webkey.WebKeyRSAConfig_RSA_HASHER_SHA256
 	case crypto.RSAHasherSHA384:
@@ -151,6 +155,8 @@ func webKeyECDSAConfigToPb(config *crypto.WebKeyECDSAConfig) *webkey.WebKeyECDSA
 	out := new(webkey.WebKeyECDSAConfig)
 
 	switch config.Curve {
+	case crypto.EllipticCurveUnspecified:
+		out.Curve = webkey.WebKeyECDSAConfig_ECDSA_CURVE_UNSPECIFIED
 	case crypto.EllipticCurveP256:
 		out.Curve = webkey.WebKeyECDSAConfig_ECDSA_CURVE_P256
 	case crypto.EllipticCurveP384:

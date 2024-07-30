@@ -277,7 +277,9 @@ func setUpInstance(ctx context.Context, c *Commands, setup *InstanceSetup) (vali
 		return nil, nil, nil, err
 	}
 	setupSMTPSettings(c, &validations, setup.SMTPConfiguration, instanceAgg)
-	setupWebKeys(c, &validations, setup.zitadel.instanceID, setup)
+	if err := setupWebKeys(c, &validations, setup.zitadel.instanceID, setup); err != nil {
+		return nil, nil, nil, err
+	}
 	setupOIDCSettings(c, &validations, setup.OIDCSettings, instanceAgg)
 	setupFeatures(&validations, setup.Features, setup.zitadel.instanceID)
 	setupLimits(c, &validations, limits.NewAggregate(setup.zitadel.limitsID, setup.zitadel.instanceID), setup.Limits)
