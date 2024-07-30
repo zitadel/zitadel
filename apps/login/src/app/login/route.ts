@@ -106,6 +106,8 @@ export async function GET(request: NextRequest) {
     let organization = "";
     let idpId = "";
 
+    console.log(`AuthRequest: ${JSON.stringify(authRequest)}`);
+
     if (authRequest?.scope) {
       const orgScope = authRequest.scope.find((s: string) =>
         ORG_SCOPE_REGEX.test(s),
