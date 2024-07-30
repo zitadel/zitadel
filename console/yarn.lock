@@ -2592,7 +2592,7 @@
     "@material/theme" "15.0.0-canary.bc9ae6c9c.0"
     tslib "^2.1.0"
 
-"@netlify/framework-info@^9.8.10":
+"@netlify/framework-info@^9.8.13":
   version "9.8.13"
   resolved "https://registry.yarnpkg.com/@netlify/framework-info/-/framework-info-9.8.13.tgz#0a4cc2be4c2439089f9b630e19d73e2f4b09289d"
   integrity sha512-ZZXCggokY/y5Sz93XYbl/Lig1UAUSWPMBiQRpkVfbrrkjmW2ZPkYS/BgrM2/MxwXRvYhc/TQpZX6y5JPe3quQg==
