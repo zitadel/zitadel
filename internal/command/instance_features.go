@@ -34,7 +34,8 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.TokenExchange == nil &&
 		m.Actions == nil &&
 		// nil check to allow unset improvements
-		m.ImprovedPerformance == nil
+		m.ImprovedPerformance == nil &&
+		m.WebKey == nil
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {

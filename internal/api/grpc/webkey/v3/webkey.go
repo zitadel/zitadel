@@ -5,11 +5,15 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha"
 )
 
 func (s *Server) GenerateWebKey(ctx context.Context, req *v3alpha.GenerateWebKeyRequest) (_ *v3alpha.GenerateWebKeyResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if err = checkWebKeyFeature(ctx); err != nil {
 		return nil, err
 	}
@@ -25,6 +29,9 @@ func (s *Server) GenerateWebKey(ctx context.Context, req *v3alpha.GenerateWebKey
 }
 
 func (s *Server) ActivateWebKey(ctx context.Context, req *v3alpha.ActivateWebKeyRequest) (_ *v3alpha.ActivateWebKeyResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if err = checkWebKeyFeature(ctx); err != nil {
 		return nil, err
 	}
@@ -39,6 +46,9 @@ func (s *Server) ActivateWebKey(ctx context.Context, req *v3alpha.ActivateWebKey
 }
 
 func (s *Server) DeleteWebKey(ctx context.Context, req *v3alpha.DeleteWebKeyRequest) (_ *v3alpha.DeleteWebKeyResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if err = checkWebKeyFeature(ctx); err != nil {
 		return nil, err
 	}
@@ -53,6 +63,9 @@ func (s *Server) DeleteWebKey(ctx context.Context, req *v3alpha.DeleteWebKeyRequ
 }
 
 func (s *Server) ListWebKeys(ctx context.Context, req *v3alpha.ListWebKeysRequest) (_ *v3alpha.ListWebKeysResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if err = checkWebKeyFeature(ctx); err != nil {
 		return nil, err
 	}
@@ -67,7 +80,7 @@ func (s *Server) ListWebKeys(ctx context.Context, req *v3alpha.ListWebKeysReques
 }
 
 func checkWebKeyFeature(ctx context.Context) error {
-	if !authz.GetFeatures(ctx).TokenExchange {
+	if !authz.GetFeatures(ctx).WebKey {
 		return zerrors.ThrowPreconditionFailed(nil, "WEBKEY-Ohx6E", "Errors.WebKey.FeatureDisabled")
 	}
 	return nil

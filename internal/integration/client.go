@@ -46,6 +46,7 @@ import (
 	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha"
 )
 
 type Client struct {
@@ -68,6 +69,7 @@ type Client struct {
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
 	UserSchemaV3   schema.UserSchemaServiceClient
+	WebKeyV3Alpha  webkey_v3alpha.WebKeyServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -91,6 +93,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:   schema.NewUserSchemaServiceClient(cc),
+		WebKeyV3Alpha:  webkey_v3alpha.NewWebKeyServiceClient(cc),
 	}
 }
 
