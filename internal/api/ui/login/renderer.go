@@ -83,6 +83,7 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		tmplLDAPLogin:                    "ldap_login.html",
 		tmplDeviceAuthUserCode:           "device_usercode.html",
 		tmplDeviceAuthAction:             "device_action.html",
+		tmplLinkingUserPrompt:            "link_user_prompt.html",
 	}
 	funcs := map[string]interface{}{
 		"resourceUrl": func(file string) string {
@@ -235,6 +236,9 @@ func CreateRenderer(pathPrefix string, staticStorage static.Storage, cookieName 
 		"ldapUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLDAPCallback)
 		},
+		"linkingUserPromptUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointLinkingUserPrompt)
+		},
 	}
 	var err error
 	r.Renderer, err = renderer.NewRenderer(
@@ -309,7 +313,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.ChangePasswordStep:
 		l.renderChangePassword(w, r, authReq, err)
 	case *domain.VerifyEMailStep:
-		l.renderMailVerification(w, r, authReq, "", err)
+		l.renderMailVerification(w, r, authReq, authReq.UserID, "", step.InitPassword, err)
 	case *domain.MFAPromptStep:
 		l.renderMFAPrompt(w, r, authReq, step, err)
 	case *domain.InitUserStep:
@@ -338,7 +342,11 @@ func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, auth
 		if authReq != nil {
 			log = log.WithField("auth_req_id", authReq.ID)
 		}
-		log.Error()
+		if zerrors.IsInternal(err) {
+			log.Error()
+		} else {
+			log.Info()
+		}
 
 		_, msg = l.getErrorMessage(r, err)
 	}
@@ -675,6 +683,7 @@ type passwordData struct {
 	HasLowercase string
 	HasNumber    string
 	HasSymbol    string
+	Expired      bool
 }
 
 type userSelectionData struct {

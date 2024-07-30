@@ -13,7 +13,7 @@ import (
 )
 
 // ResendInitialMail resend initial mail and changes email if provided
-func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email domain.EmailAddress, resourceOwner string, initCodeGenerator crypto.Generator) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email domain.EmailAddress, resourceOwner string, initCodeGenerator crypto.Generator, authRequestID string) (objectDetails *domain.ObjectDetails, err error) {
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
 	}
@@ -38,7 +38,10 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID string, email d
 	if err != nil {
 		return nil, err
 	}
-	events = append(events, user.NewHumanInitialCodeAddedEvent(ctx, userAgg, initCode.Code, initCode.Expiry))
+	if authRequestID == "" {
+		authRequestID = existingCode.AuthRequestID
+	}
+	events = append(events, user.NewHumanInitialCodeAddedEvent(ctx, userAgg, initCode.Code, initCode.Expiry, authRequestID))
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
@@ -67,7 +70,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, initCodeGenerator)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, initCodeGenerator.Alg())
 	if err != nil {
 		_, err = c.eventstore.Push(ctx, user.NewHumanInitializedCheckFailedEvent(ctx, userAgg))
 		logging.WithFields("userID", userAgg.ID).OnError(err).Error("NewHumanInitializedCheckFailedEvent push failed")
@@ -80,7 +83,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 		commands = append(commands, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 	}
 	if password != "" {
-		passwordCommand, err := c.setPasswordCommand(ctx, userAgg, domain.UserStateActive, password, userAgentID, false, false)
+		passwordCommand, err := c.setPasswordCommand(ctx, userAgg, domain.UserStateActive, password, "", userAgentID, false, nil)
 		if err != nil {
 			return err
 		}

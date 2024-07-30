@@ -1,9 +1,10 @@
 package user
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/query"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 )
@@ -48,6 +49,10 @@ func UserTypeToPb(user *query.User, assetPrefix string) user_pb.UserType {
 }
 
 func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
+	var passwordChanged *timestamppb.Timestamp
+	if !view.PasswordChanged.IsZero() {
+		passwordChanged = timestamppb.New(view.PasswordChanged)
+	}
 	return &user_pb.Human{
 		Profile: &user_pb.Profile{
 			FirstName:         view.FirstName,
@@ -66,6 +71,7 @@ func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
 			Phone:           string(view.Phone),
 			IsPhoneVerified: view.IsPhoneVerified,
 		},
+		PasswordChanged: passwordChanged,
 	}
 }
 
@@ -73,7 +79,7 @@ func MachineToPb(view *query.Machine) *user_pb.Machine {
 	return &user_pb.Machine{
 		Name:            view.Name,
 		Description:     view.Description,
-		HasSecret:       view.Secret != nil,
+		HasSecret:       view.EncodedSecret != "",
 		AccessTokenType: AccessTokenTypeToPb(view.AccessTokenType),
 	}
 }
@@ -246,22 +252,6 @@ func UserAuthMethodToWebAuthNTokenPb(token *query.AuthMethod) *user_pb.WebAuthNT
 		State: MFAStateToPb(token.State),
 		Name:  token.Name,
 	}
-}
-
-func ExternalIDPViewsToExternalIDPs(externalIDPs []*query.IDPUserLink) []*domain.UserIDPLink {
-	idps := make([]*domain.UserIDPLink, len(externalIDPs))
-	for i, idp := range externalIDPs {
-		idps[i] = &domain.UserIDPLink{
-			ObjectRoot: models.ObjectRoot{
-				AggregateID:   idp.UserID,
-				ResourceOwner: idp.ResourceOwner,
-			},
-			IDPConfigID:    idp.IDPID,
-			ExternalUserID: idp.ProvidedUserID,
-			DisplayName:    idp.ProvidedUsername,
-		}
-	}
-	return idps
 }
 
 func TypeToPb(userType domain.UserType) user_pb.Type {

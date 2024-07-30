@@ -203,7 +203,7 @@ func reset(ctx context.Context, tx *sql.Tx, tables []string, projectionName stri
 	if err != nil {
 		return zerrors.ThrowInternal(err, "QUERY-Ff3tw", "Errors.RemoveFailed")
 	}
-	_, err = tx.Exec(update, args...)
+	_, err = tx.ExecContext(ctx, update, args...)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "QUERY-NFiws", "Errors.RemoveFailed")
 	}

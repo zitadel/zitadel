@@ -6,168 +6,29 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"io"
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
+	db_mock "github.com/zitadel/zitadel/internal/database/mock"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/repository/deviceauth"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
-
-func TestQueries_DeviceAuthByDeviceCode(t *testing.T) {
-	ctx := authz.NewMockContext("inst1", "org1", "user1")
-	timestamp := time.Date(2015, 12, 15, 22, 13, 45, 0, time.UTC)
-	tests := []struct {
-		name       string
-		eventstore func(t *testing.T) *eventstore.Eventstore
-		want       *DeviceAuth
-		wantErr    error
-	}{
-		{
-			name: "filter error",
-			eventstore: expectEventstore(
-				expectFilterError(io.ErrClosedPipe),
-			),
-			wantErr: io.ErrClosedPipe,
-		},
-		{
-			name: "not found",
-			eventstore: expectEventstore(
-				expectFilter(),
-			),
-			wantErr: zerrors.ThrowNotFound(nil, "QUERY-eeR0e", "Errors.DeviceAuth.NotExisting"),
-		},
-		{
-			name: "ok, initiated",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(deviceauth.NewAddedEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
-					)),
-				),
-			),
-			want: &DeviceAuth{
-				ClientID:   "client1",
-				DeviceCode: "device1",
-				UserCode:   "user-code",
-				Expires:    timestamp,
-				Scopes:     []string{"foo", "bar"},
-				State:      domain.DeviceAuthStateInitiated,
-			},
-		},
-		{
-			name: "ok, approved",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(deviceauth.NewAddedEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
-					)),
-					eventFromEventPusher(deviceauth.NewApprovedEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						"user1", []domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
-						timestamp,
-					)),
-				),
-			),
-			want: &DeviceAuth{
-				ClientID:        "client1",
-				DeviceCode:      "device1",
-				UserCode:        "user-code",
-				Expires:         timestamp,
-				Scopes:          []string{"foo", "bar"},
-				State:           domain.DeviceAuthStateApproved,
-				Subject:         "user1",
-				UserAuthMethods: []domain.UserAuthMethodType{domain.UserAuthMethodTypePasswordless},
-				AuthTime:        timestamp,
-			},
-		},
-		{
-			name: "ok, denied",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(deviceauth.NewAddedEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
-					)),
-					eventFromEventPusher(deviceauth.NewCanceledEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						domain.DeviceAuthCanceledDenied,
-					)),
-				),
-			),
-			want: &DeviceAuth{
-				ClientID:   "client1",
-				DeviceCode: "device1",
-				UserCode:   "user-code",
-				Expires:    timestamp,
-				Scopes:     []string{"foo", "bar"},
-				State:      domain.DeviceAuthStateDenied,
-			},
-		},
-		{
-			name: "ok, expired",
-			eventstore: expectEventstore(
-				expectFilter(
-					eventFromEventPusher(deviceauth.NewAddedEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						"client1", "device1", "user-code", timestamp, []string{"foo", "bar"},
-					)),
-					eventFromEventPusher(deviceauth.NewCanceledEvent(
-						ctx,
-						deviceauth.NewAggregate("device1", "instance1"),
-						domain.DeviceAuthCanceledExpired,
-					)),
-				),
-			),
-			want: &DeviceAuth{
-				ClientID:   "client1",
-				DeviceCode: "device1",
-				UserCode:   "user-code",
-				Expires:    timestamp,
-				Scopes:     []string{"foo", "bar"},
-				State:      domain.DeviceAuthStateExpired,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			q := &Queries{
-				eventstore: tt.eventstore(t),
-			}
-			got, err := q.DeviceAuthByDeviceCode(ctx, "device1")
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
 
 const (
 	expectedDeviceAuthQueryC = `SELECT` +
-		` projections.device_auth_requests.client_id,` +
-		` projections.device_auth_requests.device_code,` +
-		` projections.device_auth_requests.user_code,` +
-		` projections.device_auth_requests.scopes` +
-		` FROM projections.device_auth_requests`
+		` projections.device_auth_requests2.client_id,` +
+		` projections.device_auth_requests2.device_code,` +
+		` projections.device_auth_requests2.user_code,` +
+		` projections.device_auth_requests2.scopes,` +
+		` projections.device_auth_requests2.audience` +
+		` FROM projections.device_auth_requests2`
 	expectedDeviceAuthWhereUserCodeQueryC = expectedDeviceAuthQueryC +
-		` WHERE projections.device_auth_requests.instance_id = $1` +
-		` AND projections.device_auth_requests.user_code = $2`
+		` WHERE projections.device_auth_requests2.instance_id = $1` +
+		` AND projections.device_auth_requests2.user_code = $2`
 )
 
 var (
@@ -178,17 +39,19 @@ var (
 		"device1",
 		"user-code",
 		database.TextArray[string]{"a", "b", "c"},
+		[]string{"projectID", "clientID"},
 	}
 	expectedDeviceAuth = &domain.AuthRequestDevice{
 		ClientID:   "client-id",
 		DeviceCode: "device1",
 		UserCode:   "user-code",
 		Scopes:     []string{"a", "b", "c"},
+		Audience:   []string{"projectID", "clientID"},
 	}
 )
 
 func TestQueries_DeviceAuthRequestByUserCode(t *testing.T) {
-	client, mock, err := sqlmock.New()
+	client, mock, err := sqlmock.New(sqlmock.ValueConverterOption(new(db_mock.TypeConverter)))
 	if err != nil {
 		t.Fatalf("failed to build mock client: %v", err)
 	}
@@ -196,7 +59,7 @@ func TestQueries_DeviceAuthRequestByUserCode(t *testing.T) {
 
 	mock.ExpectBegin()
 	mock.ExpectQuery(expectedDeviceAuthWhereUserCodeQuery).WillReturnRows(
-		sqlmock.NewRows(deviceAuthSelectColumns).AddRow(expectedDeviceAuthValues...),
+		mock.NewRows(deviceAuthSelectColumns).AddRow(expectedDeviceAuthValues...),
 	)
 	mock.ExpectCommit()
 	q := Queries{

@@ -4,7 +4,6 @@ package system_test
 
 import (
 	"context"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"math/rand"
 	"sync"
 	"testing"
@@ -13,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
@@ -21,7 +21,7 @@ import (
 )
 
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
-	_, instanceID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	_, instanceID, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t)
 	beforeTime := time.Now()
 	farPast := timestamppb.New(beforeTime.Add(-10 * time.Hour).UTC())

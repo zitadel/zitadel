@@ -34,7 +34,7 @@ func (msg *Email) GetContent() (string, error) {
 	headers := make(map[string]string)
 	from := msg.SenderEmail
 	if msg.SenderName != "" {
-		from = fmt.Sprintf("%s <%s>", msg.SenderName, msg.SenderEmail)
+		from = fmt.Sprintf("%s <%s>", bEncodeWord(msg.SenderName), msg.SenderEmail)
 	}
 	headers["From"] = from
 	if msg.ReplyToAddress != "" {
@@ -51,11 +51,11 @@ func (msg *Email) GetContent() (string, error) {
 	}
 
 	//default mime-type is html
-	mime := "MIME-version: 1.0;" + lineBreak + "Content-Type: text/html; charset=\"UTF-8\";" + lineBreak + lineBreak
+	mime := "MIME-Version: 1.0" + lineBreak + "Content-Type: text/html; charset=\"UTF-8\"" + lineBreak + lineBreak
 	if !isHTML(msg.Content) {
-		mime = "MIME-version: 1.0;" + lineBreak + "Content-Type: text/plain; charset=\"UTF-8\";" + lineBreak + lineBreak
+		mime = "MIME-Version: 1.0" + lineBreak + "Content-Type: text/plain; charset=\"UTF-8\"" + lineBreak + lineBreak
 	}
-	subject := "Subject: " + bEncodeSubject(msg.Subject) + lineBreak
+	subject := "Subject: " + bEncodeWord(msg.Subject) + lineBreak
 	message += subject + mime + lineBreak + msg.Content
 
 	return message, nil
@@ -70,6 +70,6 @@ func isHTML(input string) bool {
 }
 
 // returns a RFC1342 "B" encoded string to allow non-ascii characters
-func bEncodeSubject(subject string) string {
-	return mime.BEncoding.Encode("UTF-8", subject)
+func bEncodeWord(word string) string {
+	return mime.BEncoding.Encode("UTF-8", word)
 }

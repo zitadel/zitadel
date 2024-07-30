@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/repository/feature/feature_v2"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -12,14 +13,21 @@ type SystemFeatures struct {
 	LoginDefaultOrg                 *bool
 	TriggerIntrospectionProjections *bool
 	LegacyIntrospection             *bool
+	TokenExchange                   *bool
 	UserSchema                      *bool
+	Actions                         *bool
+	ImprovedPerformance             []feature.ImprovedPerformanceType
 }
 
 func (m *SystemFeatures) isEmpty() bool {
 	return m.LoginDefaultOrg == nil &&
 		m.TriggerIntrospectionProjections == nil &&
 		m.LegacyIntrospection == nil &&
-		m.UserSchema == nil
+		m.UserSchema == nil &&
+		m.TokenExchange == nil &&
+		m.Actions == nil &&
+		// nil check to allow unset improvements
+		m.ImprovedPerformance == nil
 }
 
 func (c *Commands) SetSystemFeatures(ctx context.Context, f *SystemFeatures) (*domain.ObjectDetails, error) {

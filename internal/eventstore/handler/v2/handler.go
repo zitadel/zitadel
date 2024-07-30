@@ -10,8 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/jackc/pgconn"
-
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -28,6 +27,7 @@ type EventStore interface {
 	FilterToQueryReducer(ctx context.Context, reducer eventstore.QueryReducer) error
 	Filter(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
 	Push(ctx context.Context, cmds ...eventstore.Command) ([]eventstore.Event, error)
+	FillFields(ctx context.Context, events ...eventstore.FillFieldsEvent) error
 }
 
 type Config struct {
@@ -259,9 +259,6 @@ func (h *Handler) triggerInstances(ctx context.Context, instances []string, trig
 		for ; err != nil; _, err = h.Trigger(instanceCtx, triggerOpts...) {
 			time.Sleep(h.retryFailedAfter)
 			h.log().WithField("instance", instance).OnError(err).Debug("trigger failed")
-			if err == nil {
-				break
-			}
 		}
 	}
 }
@@ -331,7 +328,7 @@ func (ai *existingInstances) AppendEvents(events ...eventstore.Event) {
 		case instance.InstanceAddedEventType:
 			*ai = append(*ai, event.Aggregate().InstanceID)
 		case instance.InstanceRemovedEventType:
-			slices.DeleteFunc(*ai, func(s string) bool {
+			*ai = slices.DeleteFunc(*ai, func(s string) bool {
 				return s == event.Aggregate().InstanceID
 			})
 		}
@@ -421,7 +418,7 @@ func (h *Handler) Trigger(ctx context.Context, opts ...TriggerOpt) (_ context.Co
 	}
 }
 
-// lockInstances tries to lock the instance.
+// lockInstance tries to lock the instance.
 // If the instance is already locked from another process no cancel function is returned
 // the instance can be skipped then
 // If the instance is locked, an unlock deferrable function is returned
@@ -543,7 +540,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return []*Statement{stmt}, false, nil
 	}
 
-	events, err := h.es.Filter(ctx, h.eventQuery(currentState))
+	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil {
 		h.log().WithError(err).Debug("filter eventstore failed")
 		return nil, false, err
@@ -555,7 +552,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return nil, false, err
 	}
 
-	idx := skipPreviouslyReduced(statements, currentState)
+	idx := skipPreviouslyReducedStatements(statements, currentState)
 	if idx+1 == len(statements) {
 		currentState.position = statements[len(statements)-1].Position
 		currentState.offset = statements[len(statements)-1].offset
@@ -577,7 +574,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 	return statements, additionalIteration, nil
 }
 
-func skipPreviouslyReduced(statements []*Statement, currentState *state) int {
+func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
 	for i, statement := range statements {
 		if statement.Position == currentState.position &&
 			statement.AggregateID == currentState.aggregateID &&
@@ -656,12 +653,11 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 	}
 
 	for aggregateType, eventTypes := range h.eventTypes {
-		query := builder.
+		builder = builder.
 			AddQuery().
 			AggregateTypes(aggregateType).
-			EventTypes(eventTypes...)
-
-		builder = query.Builder()
+			EventTypes(eventTypes...).
+			Builder()
 	}
 
 	return builder

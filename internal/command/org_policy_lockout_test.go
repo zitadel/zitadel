@@ -44,6 +44,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 				ctx: context.Background(),
 				policy: &domain.LockoutPolicy{
 					MaxPasswordAttempts: 10,
+					MaxOTPAttempts:      10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -61,6 +62,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 							org.NewLockoutPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
 								10,
+								10,
 								true,
 							),
 						),
@@ -72,6 +74,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.LockoutPolicy{
 					MaxPasswordAttempts: 10,
+					MaxOTPAttempts:      10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -89,6 +92,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 						org.NewLockoutPolicyAddedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate,
 							10,
+							10,
 							true,
 						),
 					),
@@ -99,6 +103,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.LockoutPolicy{
 					MaxPasswordAttempts: 10,
+					MaxOTPAttempts:      10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -109,6 +114,7 @@ func TestCommandSide_AddPasswordLockoutPolicy(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					MaxPasswordAttempts: 10,
+					MaxOTPAttempts:      10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -163,6 +169,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 				ctx: context.Background(),
 				policy: &domain.LockoutPolicy{
 					MaxPasswordAttempts: 10,
+					MaxOTPAttempts:      10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -183,6 +190,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.LockoutPolicy{
 					MaxPasswordAttempts: 10,
+					MaxOTPAttempts:      10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -200,6 +208,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 							org.NewLockoutPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
 								10,
+								10,
 								true,
 							),
 						),
@@ -211,6 +220,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.LockoutPolicy{
 					MaxPasswordAttempts: 10,
+					MaxOTPAttempts:      10,
 					ShowLockOutFailures: true,
 				},
 			},
@@ -228,12 +238,13 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 							org.NewLockoutPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
 								10,
+								10,
 								true,
 							),
 						),
 					),
 					expectPush(
-						newPasswordLockoutPolicyChangedEvent(context.Background(), "org1", 5, false),
+						newPasswordLockoutPolicyChangedEvent(context.Background(), "org1", 5, 5, false),
 					),
 				),
 			},
@@ -242,6 +253,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 				orgID: "org1",
 				policy: &domain.LockoutPolicy{
 					MaxPasswordAttempts: 5,
+					MaxOTPAttempts:      5,
 					ShowLockOutFailures: false,
 				},
 			},
@@ -252,6 +264,7 @@ func TestCommandSide_ChangePasswordLockoutPolicy(t *testing.T) {
 						ResourceOwner: "org1",
 					},
 					MaxPasswordAttempts: 5,
+					MaxOTPAttempts:      5,
 					ShowLockOutFailures: false,
 				},
 			},
@@ -334,6 +347,7 @@ func TestCommandSide_RemovePasswordLockoutPolicy(t *testing.T) {
 							org.NewLockoutPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate,
 								10,
+								10,
 								true,
 							),
 						),
@@ -371,11 +385,12 @@ func TestCommandSide_RemovePasswordLockoutPolicy(t *testing.T) {
 	}
 }
 
-func newPasswordLockoutPolicyChangedEvent(ctx context.Context, orgID string, maxAttempts uint64, showLockoutFailure bool) *org.LockoutPolicyChangedEvent {
+func newPasswordLockoutPolicyChangedEvent(ctx context.Context, orgID string, maxPasswordAttempts, maxOTPAttempts uint64, showLockoutFailure bool) *org.LockoutPolicyChangedEvent {
 	event, _ := org.NewLockoutPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID).Aggregate,
 		[]policy.LockoutPolicyChanges{
-			policy.ChangeMaxAttempts(maxAttempts),
+			policy.ChangeMaxPasswordAttempts(maxPasswordAttempts),
+			policy.ChangeMaxOTPAttempts(maxOTPAttempts),
 			policy.ChangeShowLockOutFailures(showLockoutFailure),
 		},
 	)

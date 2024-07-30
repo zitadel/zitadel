@@ -5,11 +5,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
@@ -27,15 +28,18 @@ import (
 )
 
 const (
-	ScopeProjectRolePrefix  = "urn:zitadel:iam:org:project:role:"
-	ScopeProjectsRoles      = "urn:zitadel:iam:org:projects:roles"
-	ClaimProjectRoles       = "urn:zitadel:iam:org:project:roles"
-	ClaimProjectRolesFormat = "urn:zitadel:iam:org:project:%s:roles"
-	ScopeUserMetaData       = "urn:zitadel:iam:user:metadata"
-	ClaimUserMetaData       = ScopeUserMetaData
-	ScopeResourceOwner      = "urn:zitadel:iam:user:resourceowner"
-	ClaimResourceOwner      = ScopeResourceOwner + ":"
-	ClaimActionLogFormat    = "urn:zitadel:iam:action:%s:log"
+	ClaimPrefix                     = "urn:zitadel:iam"
+	ScopeProjectRolePrefix          = "urn:zitadel:iam:org:project:role:"
+	ScopeProjectsRoles              = "urn:zitadel:iam:org:projects:roles"
+	ClaimProjectRoles               = "urn:zitadel:iam:org:project:roles"
+	ClaimProjectRolesFormat         = "urn:zitadel:iam:org:project:%s:roles"
+	ScopeUserMetaData               = "urn:zitadel:iam:user:metadata"
+	ClaimUserMetaData               = ScopeUserMetaData
+	ScopeResourceOwner              = "urn:zitadel:iam:user:resourceowner"
+	ClaimResourceOwnerID            = ScopeResourceOwner + ":id"
+	ClaimResourceOwnerName          = ScopeResourceOwner + ":name"
+	ClaimResourceOwnerPrimaryDomain = ScopeResourceOwner + ":primary_domain"
+	ClaimActionLogFormat            = "urn:zitadel:iam:action:%s:log"
 
 	oidcCtx = "oidc"
 )
@@ -66,7 +70,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 		err = oidcError(err)
 		span.EndWithError(err)
 	}()
-	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer, false)
+	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer)
 	if err != nil {
 		return nil, err
 	}
@@ -487,25 +491,16 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 						return object.UserMetadataListFromQuery(c, metadata)
 					}
 				}),
-				actions.SetFields("grants", func(c *actions.FieldConfig) interface{} {
-					return object.UserGrantsFromQuery(c, userGrants)
-				}),
+				actions.SetFields("grants",
+					func(c *actions.FieldConfig) interface{} {
+						return object.UserGrantsFromQuery(ctx, o.query, c, userGrants)
+					},
+				),
 			),
 			actions.SetFields("org",
 				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
 					return func(goja.FunctionCall) goja.Value {
-						metadata, err := o.query.SearchOrgMetadata(
-							ctx,
-							true,
-							user.ResourceOwner,
-							&query.OrgMetadataSearchQueries{},
-							false,
-						)
-						if err != nil {
-							logging.WithError(err).Info("unable to get org metadata in action")
-							panic(err)
-						}
-						return object.OrgMetadataListFromQuery(c, metadata)
+						return object.GetOrganizationMetadata(ctx, o.query, c, user.ResourceOwner)
 					}
 				}),
 			),
@@ -520,6 +515,9 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 			actions.SetFields("v1",
 				actions.SetFields("userinfo",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if userInfo.Claims[key] == nil {
 							userInfo.AppendClaims(key, value)
 							return
@@ -532,6 +530,9 @@ func (o *OPStorage) userinfoFlows(ctx context.Context, user *query.User, userGra
 				),
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if userInfo.Claims[key] == nil {
 							userInfo.AppendClaims(key, value)
 							return
@@ -705,24 +706,13 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 					}
 				}),
 				actions.SetFields("grants", func(c *actions.FieldConfig) interface{} {
-					return object.UserGrantsFromQuery(c, userGrants)
+					return object.UserGrantsFromQuery(ctx, o.query, c, userGrants)
 				}),
 			),
 			actions.SetFields("org",
 				actions.SetFields("getMetadata", func(c *actions.FieldConfig) interface{} {
 					return func(goja.FunctionCall) goja.Value {
-						metadata, err := o.query.SearchOrgMetadata(
-							ctx,
-							true,
-							user.ResourceOwner,
-							&query.OrgMetadataSearchQueries{},
-							false,
-						)
-						if err != nil {
-							logging.WithError(err).Info("unable to get org metadata in action")
-							panic(err)
-						}
-						return object.OrgMetadataListFromQuery(c, metadata)
+						return object.GetOrganizationMetadata(ctx, o.query, c, user.ResourceOwner)
 					}
 				}),
 			),
@@ -737,6 +727,9 @@ func (o *OPStorage) privateClaimsFlows(ctx context.Context, userID string, userG
 			actions.SetFields("v1",
 				actions.SetFields("claims",
 					actions.SetFields("setClaim", func(key string, value interface{}) {
+						if strings.HasPrefix(key, ClaimPrefix) {
+							return
+						}
 						if _, ok := claims[key]; !ok {
 							claims = appendClaim(claims, key, value)
 							return
@@ -868,9 +861,9 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 		return nil, err
 	}
 	return map[string]string{
-		ClaimResourceOwner + "id":             resourceOwner.ID,
-		ClaimResourceOwner + "name":           resourceOwner.Name,
-		ClaimResourceOwner + "primary_domain": resourceOwner.Domain,
+		ClaimResourceOwnerID:            resourceOwner.ID,
+		ClaimResourceOwnerName:          resourceOwner.Name,
+		ClaimResourceOwnerPrimaryDomain: resourceOwner.Domain,
 	}, nil
 }
 
@@ -1038,8 +1031,36 @@ func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClien
 	if secret == "" {
 		return oidc.ErrInvalidClient().WithDescription("empty client secret")
 	}
-	if err = crypto.CompareHash(client.ClientSecret, []byte(secret), s.hashAlg); err != nil {
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
+	updated, err := s.hasher.Verify(client.HashedSecret, secret)
+	spanPasswordComparison.EndWithError(err)
+	if err != nil {
+		s.command.OIDCSecretCheckFailed(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner)
 		return oidc.ErrInvalidClient().WithParent(err).WithDescription("invalid secret")
 	}
+	s.command.OIDCSecretCheckSucceeded(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner, updated)
 	return nil
+}
+
+func (s *Server) checkOrgScopes(ctx context.Context, user *query.User, scopes []string) ([]string, error) {
+	if slices.ContainsFunc(scopes, func(scope string) bool {
+		return strings.HasPrefix(scope, domain.OrgDomainPrimaryScope)
+	}) {
+		org, err := s.query.OrgByID(ctx, false, user.ResourceOwner)
+		if err != nil {
+			return nil, err
+		}
+		scopes = slices.DeleteFunc(scopes, func(scope string) bool {
+			if domain, ok := strings.CutPrefix(scope, domain.OrgDomainPrimaryScope); ok {
+				return domain != org.Domain
+			}
+			return false
+		})
+	}
+	return slices.DeleteFunc(scopes, func(scope string) bool {
+		if orgID, ok := strings.CutPrefix(scope, domain.OrgIDScope); ok {
+			return orgID != user.ResourceOwner
+		}
+		return false
+	}), nil
 }

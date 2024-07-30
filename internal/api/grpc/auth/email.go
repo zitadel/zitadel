@@ -50,7 +50,7 @@ func (s *Server) VerifyMyEmail(ctx context.Context, req *auth_pb.VerifyMyEmailRe
 		return nil, err
 	}
 	ctxData := authz.GetCtxData(ctx)
-	objectDetails, err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner, emailCodeGenerator)
+	objectDetails, err := s.command.VerifyHumanEmail(ctx, ctxData.UserID, req.Code, ctxData.ResourceOwner, "", "", emailCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (s *Server) ResendMyEmailVerification(ctx context.Context, _ *auth_pb.Resen
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner, emailCodeGenerator)
+	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, ctxData.UserID, ctxData.ResourceOwner, emailCodeGenerator, "")
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/jonboulle/clockwork"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/op"
@@ -311,7 +311,7 @@ func (o *OPStorage) SigningKey(ctx context.Context) (key op.SigningKey, err erro
 			return err
 		}
 		if key == nil {
-			return zerrors.ThrowInternal(nil, "test", "test")
+			return zerrors.ThrowNotFound(nil, "OIDC-ve4Qu", "Errors.Internal")
 		}
 		return nil
 	})

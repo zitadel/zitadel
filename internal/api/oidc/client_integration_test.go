@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/oidc/v3/pkg/client"
@@ -21,39 +20,8 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/user"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
-
-func TestOPStorage_SetUserinfoFromToken(t *testing.T) {
-	clientID := createClient(t)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
-	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
-		AuthRequestId: authRequestID,
-		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
-			Session: &oidc_pb.Session{
-				SessionId:    sessionID,
-				SessionToken: sessionToken,
-			},
-		},
-	})
-	require.NoError(t, err)
-
-	// code exchange
-	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
-	require.NoError(t, err)
-	assertTokens(t, tokens, true)
-	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
-
-	// test actual userinfo
-	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
-	require.NoError(t, err)
-	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
-	require.NoError(t, err)
-	assertUserinfo(t, userinfo)
-}
 
 func TestServer_Introspect(t *testing.T) {
 	project, err := Tester.CreateProject(CTX)
@@ -154,7 +122,7 @@ func TestServer_Introspect(t *testing.T) {
 			tokens, err := exchangeTokens(t, app.GetClientId(), code, redirectURI)
 			require.NoError(t, err)
 			assertTokens(t, tokens, true)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
 
 			// test actual introspection
 			introspection, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
@@ -172,15 +140,13 @@ func TestServer_Introspect(t *testing.T) {
 	}
 }
 
-func assertUserinfo(t *testing.T, userinfo *oidc.UserInfo) {
-	assert.Equal(t, User.GetUserId(), userinfo.Subject)
-	assert.Equal(t, "Mickey", userinfo.GivenName)
-	assert.Equal(t, "Mouse", userinfo.FamilyName)
-	assert.Equal(t, "Mickey Mouse", userinfo.Name)
-	assert.NotEmpty(t, userinfo.PreferredUsername)
-	assert.Equal(t, userinfo.PreferredUsername, userinfo.Email)
-	assert.False(t, bool(userinfo.EmailVerified))
-	assertOIDCTime(t, userinfo.UpdatedAt, User.GetDetails().GetChangeDate().AsTime())
+func TestServer_Introspect_invalid_auth_invalid_token(t *testing.T) {
+	// ensure that when an invalid authentication and token is sent, the authentication error is returned
+	// https://github.com/zitadel/zitadel/pull/8133
+	resourceServer, err := Tester.CreateResourceServerClientCredentials(CTX, "xxxxx", "xxxxx")
+	require.NoError(t, err)
+	_, err = rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, "xxxxx")
+	require.Error(t, err)
 }
 
 func assertIntrospection(
@@ -213,9 +179,9 @@ func assertIntrospection(
 	assertOIDCTime(t, introspection.UpdatedAt, User.GetDetails().GetChangeDate().AsTime())
 
 	require.NotNil(t, introspection.Claims)
-	assert.Equal(t, User.Details.ResourceOwner, introspection.Claims[oidc_api.ClaimResourceOwner+"id"])
-	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwner+"name"])
-	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwner+"primary_domain"])
+	assert.Equal(t, User.Details.ResourceOwner, introspection.Claims[oidc_api.ClaimResourceOwnerID])
+	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwnerName])
+	assert.NotEmpty(t, introspection.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
 }
 
 // TestServer_VerifyClient tests verification by running code flow tests
@@ -360,7 +326,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assertTokens(t, tokens, false)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
 		})
 	}
 }
@@ -386,74 +352,4 @@ func createInvalidKeyData(t testing.TB, client *management.AddOIDCAppResponse) [
 	data, err := key.Detail()
 	require.NoError(t, err)
 	return data
-}
-
-func TestServer_CreateAccessToken_ClientCredentials(t *testing.T) {
-	clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
-	require.NoError(t, err)
-
-	type clientDetails struct {
-		clientID     string
-		clientSecret string
-		keyData      []byte
-	}
-	tests := []struct {
-		name         string
-		clientID     string
-		clientSecret string
-		wantErr      bool
-	}{
-		{
-			name:         "missing client ID error",
-			clientID:     "",
-			clientSecret: clientSecret,
-			wantErr:      true,
-		},
-		{
-			name:         "client not found error",
-			clientID:     "foo",
-			clientSecret: clientSecret,
-			wantErr:      true,
-		},
-		{
-			name: "machine user without secret error",
-			clientID: func() string {
-				name := gofakeit.Username()
-				_, err := Tester.Client.Mgmt.AddMachineUser(CTX, &management.AddMachineUserRequest{
-					Name:            name,
-					UserName:        name,
-					AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
-				})
-				require.NoError(t, err)
-				return name
-			}(),
-			clientSecret: clientSecret,
-			wantErr:      true,
-		},
-		{
-			name:         "wrong secret error",
-			clientID:     clientID,
-			clientSecret: "bar",
-			wantErr:      true,
-		},
-		{
-			name:         "success",
-			clientID:     clientID,
-			clientSecret: clientSecret,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			provider, err := rp.NewRelyingPartyOIDC(CTX, Tester.OIDCIssuer(), tt.clientID, tt.clientSecret, redirectURI, []string{oidc.ScopeOpenID})
-			require.NoError(t, err)
-			tokens, err := rp.ClientCredentials(CTX, provider, nil)
-			if tt.wantErr {
-				require.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			assert.NotNil(t, tokens)
-			assert.NotEmpty(t, tokens.AccessToken)
-		})
-	}
 }

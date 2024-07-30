@@ -10,16 +10,20 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
 	client_middleware "github.com/zitadel/zitadel/internal/api/grpc/client/middleware"
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
+	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/metrics"
 )
 
 const (
@@ -36,6 +40,23 @@ var (
 		},
 	}
 
+	httpErrorHandler = runtime.RoutingErrorHandlerFunc(
+		func(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, httpStatus int) {
+			if httpStatus != http.StatusMethodNotAllowed {
+				runtime.DefaultRoutingErrorHandler(ctx, mux, marshaler, w, r, httpStatus)
+				return
+			}
+
+			// Use HTTPStatusError to customize the DefaultHTTPErrorHandler status code
+			err := &runtime.HTTPStatusError{
+				HTTPStatus: httpStatus,
+				Err:        status.Error(codes.Unimplemented, http.StatusText(httpStatus)),
+			}
+
+			runtime.DefaultHTTPErrorHandler(ctx, mux, marshaler, w, r, err)
+		},
+	)
+
 	serveMuxOptions = []runtime.ServeMuxOption{
 		runtime.WithMarshalerOption(jsonMarshaler.ContentType(nil), jsonMarshaler),
 		runtime.WithMarshalerOption(mimeWildcard, jsonMarshaler),
@@ -43,6 +64,7 @@ var (
 		runtime.WithIncomingHeaderMatcher(headerMatcher),
 		runtime.WithOutgoingHeaderMatcher(runtime.DefaultHeaderMatcher),
 		runtime.WithForwardResponseOption(responseForwarder),
+		runtime.WithRoutingErrorHandler(httpErrorHandler),
 	}
 
 	headerMatcher = runtime.HeaderMatcherFunc(
@@ -186,7 +208,10 @@ func addInterceptors(
 	// For some non-obvious reason, the exhaustedCookieInterceptor sends the SetCookie header
 	// only if it follows the http_mw.DefaultTelemetryHandler
 	handler = exhaustedCookieInterceptor(handler, accessInterceptor)
-	handler = http_mw.DefaultMetricsHandler(handler)
+	handler = http_mw.MetricsHandler([]metrics.MetricType{
+		metrics.MetricTypeTotalCount,
+		metrics.MetricTypeStatusCode,
+	}, http_utils.Probes...)(handler)
 	return handler
 }
 

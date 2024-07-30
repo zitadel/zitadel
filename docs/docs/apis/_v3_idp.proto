@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package zitadel.resources.idp.v3alpha;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/idp/v3alpha;idp";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+import "zitadel/resources/object/v3alpha/object.proto";
+
+message IDP {
+  string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"GitLab\"";
+    }
+  ];
+  zitadel.resources.object.v3alpha.StatePolicy state_policy = 2;
+  Options options = 3;
+}
+
+message PatchIDP {
+  optional string name = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"GitLab\"";
+    }
+  ];
+  optional zitadel.resources.object.v3alpha.StatePolicy state_policy = 2;
+  optional Options options = 3;
+}
+
+
+message GetIDP {
+  zitadel.resources.object.v3alpha.Details details = 1;
+  optional zitadel.resources.object.v3alpha.Parent parent = 2;
+  zitadel.resources.object.v3alpha.State state = 3;
+  ProviderType type = 4;
+  IDP idp = 5;
+}
+
+enum ProviderType {
+  PROVIDER_TYPE_UNSPECIFIED = 0;
+  PROVIDER_TYPE_OIDC = 1;
+  PROVIDER_TYPE_JWT = 2;
+  PROVIDER_TYPE_LDAP = 3;
+  PROVIDER_TYPE_OAUTH = 4;
+  PROVIDER_TYPE_AZURE_AD = 5;
+  PROVIDER_TYPE_GITHUB = 6;
+  PROVIDER_TYPE_GITHUB_ES = 7;
+  PROVIDER_TYPE_GITLAB = 8;
+  PROVIDER_TYPE_GITLAB_SELF_HOSTED = 9;
+  PROVIDER_TYPE_GOOGLE = 10;
+  PROVIDER_TYPE_APPLE = 11;
+  PROVIDER_TYPE_SAML = 12;
+}
+
+
+enum AutoLinkingOption {
+  // AUTO_LINKING_OPTION_UNSPECIFIED disables the auto linking prompt.
+  AUTO_LINKING_OPTION_UNSPECIFIED = 0;
+  // AUTO_LINKING_OPTION_USERNAME will use the username of the external user to check for a corresponding ZITADEL user.
+  AUTO_LINKING_OPTION_USERNAME = 1;
+  // AUTO_LINKING_OPTION_EMAIL  will use the email of the external user to check for a corresponding ZITADEL user with the same verified email
+  // Note that in case multiple users match, no prompt will be shown.
+  AUTO_LINKING_OPTION_EMAIL = 2;
+}
+
+message Options {
+  bool is_linking_allowed = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Enable if users should be able to link an existing ZITADEL user with an external account.";
+    }
+  ];
+  bool is_creation_allowed = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Enable if users should be able to create a new account in ZITADEL when using an external account.";
+    }
+  ];
+  bool is_auto_creation = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Enable if a new account in ZITADEL should be created automatically when login with an external account.";
+    }
+  ];
+  bool is_auto_update = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Enable if a the ZITADEL account fields should be updated automatically on each login.";
+    }
+  ];
+  AutoLinkingOption auto_linking = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Enable if users should get prompted to link an existing ZITADEL user to an external account if the selected attribute matches.";
+    }
+  ];
+}

@@ -186,6 +186,7 @@ type CustomLoginTextReadModel struct {
 
 	PasswordChangeTitle                   string
 	PasswordChangeDescription             string
+	PasswordChangeExpiredDescription      string
 	PasswordChangeOldPasswordLabel        string
 	PasswordChangeNewPasswordLabel        string
 	PasswordChangeNewPasswordConfirmLabel string
@@ -261,6 +262,11 @@ type CustomLoginTextReadModel struct {
 	RegisterOrgPrivacyConfirm       string
 	RegisterOrgPrivacyLinkText      string
 	RegisterOrgSaveButtonText       string
+
+	LinkingUserPromptTitle           string
+	LinkingUserPromptDescription     string
+	LinkingUserPromptLinkButtonText  string
+	LinkingUserPromptOtherButtonText string
 
 	LinkingUserDoneTitle            string
 	LinkingUserDoneDescription      string
@@ -416,6 +422,10 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 				wm.handleRegistrationOrgScreenSetEvent(e)
 				continue
 			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyLinkingUserPrompt) {
+				wm.handleLinkingUserPromptScreenSetEvent(e)
+				continue
+			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyLinkingUserDone) {
 				wm.handleLinkingUserDoneScreenSetEvent(e)
 				continue
@@ -554,6 +564,10 @@ func (wm *CustomLoginTextReadModel) Reduce() error {
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyRegistrationOrg) {
 				wm.handleRegistrationOrgScreenRemoveEvent(e)
+				continue
+			}
+			if strings.HasPrefix(e.Key, domain.LoginKeyLinkingUserPrompt) {
+				wm.handleLinkingUserPromptRemoveEvent(e)
 				continue
 			}
 			if strings.HasPrefix(e.Key, domain.LoginKeyLinkingUserDone) {
@@ -1754,6 +1768,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordChangeScreenSetEvent(e *policy
 		wm.PasswordChangeDescription = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyPasswordChangeExpiredDescription {
+		wm.PasswordChangeExpiredDescription = e.Text
+		return
+	}
 	if e.Key == domain.LoginKeyPasswordChangeOldPasswordLabel {
 		wm.PasswordChangeOldPasswordLabel = e.Text
 		return
@@ -1783,6 +1801,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordChangeScreenRemoveEvent(e *pol
 	}
 	if e.Key == domain.LoginKeyPasswordChangeDescription {
 		wm.PasswordChangeDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordChangeExpiredDescription {
+		wm.PasswordChangeExpiredDescription = ""
 		return
 	}
 	if e.Key == domain.LoginKeyPasswordChangeOldPasswordLabel {
@@ -2323,6 +2345,25 @@ func (wm *CustomLoginTextReadModel) handleRegistrationOrgScreenRemoveEvent(e *po
 	}
 }
 
+func (wm *CustomLoginTextReadModel) handleLinkingUserPromptScreenSetEvent(e *policy.CustomTextSetEvent) {
+	if e.Key == domain.LoginKeyLinkingUserPromptTitle {
+		wm.LinkingUserPromptTitle = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyLinkingUserPromptDescription {
+		wm.LinkingUserPromptDescription = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyLinkingUserPromptLinkButtonText {
+		wm.LinkingUserPromptLinkButtonText = e.Text
+		return
+	}
+	if e.Key == domain.LoginKeyLinkingUserPromptOtherButtonText {
+		wm.LinkingUserPromptOtherButtonText = e.Text
+		return
+	}
+}
+
 func (wm *CustomLoginTextReadModel) handleLinkingUserDoneScreenSetEvent(e *policy.CustomTextSetEvent) {
 	if e.Key == domain.LoginKeyLinkingUserDoneTitle {
 		wm.LinkingUserDoneTitle = e.Text
@@ -2338,6 +2379,25 @@ func (wm *CustomLoginTextReadModel) handleLinkingUserDoneScreenSetEvent(e *polic
 	}
 	if e.Key == domain.LoginKeyLinkingUserDoneNextButtonText {
 		wm.LinkingUserDoneNextButtonText = e.Text
+		return
+	}
+}
+
+func (wm *CustomLoginTextReadModel) handleLinkingUserPromptRemoveEvent(e *policy.CustomTextRemovedEvent) {
+	if e.Key == domain.LoginKeyLinkingUserPromptTitle {
+		wm.LinkingUserPromptTitle = ""
+		return
+	}
+	if e.Key == domain.LoginKeyLinkingUserPromptDescription {
+		wm.LinkingUserPromptDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyLinkingUserPromptLinkButtonText {
+		wm.LinkingUserPromptLinkButtonText = ""
+		return
+	}
+	if e.Key == domain.LoginKeyLinkingUserPromptOtherButtonText {
+		wm.LinkingUserPromptOtherButtonText = ""
 		return
 	}
 }

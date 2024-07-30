@@ -53,14 +53,27 @@ Errors:
     NotFound: SMS構成が見つかりません
     AlreadyActive: このSMS構成はすでにアクティブです
     AlreadyDeactivated: このSMS構成はすでに非アクティブです
+  SMTP:
+    NotEmailMessage: メッセージは EmailMessage ではありません
+    RequiredAttributes: 件名、受信者、コンテンツを設定する必要がありますが、一部またはすべてが空です
+    CouldNotSplit: smtp に接続するためにホストとポートを分割できませんでした
+    CouldNotDial: SMTP サーバーに接続できませんでした。ポート、ファイアウォールの問題を確認してください...
+    CouldNotDialTLS: TLS を使用して SMTP サーバーに接続できませんでした。ポート、ファイアウォールの問題を確認してください...
+    CouldNotCreateClient: SMTPクライアントを作成できませんでした
+    CouldNotStartTLS: TLSを開始できませんでした
+    CouldNotAuth: smtp 認証を追加できませんでした。ユーザーとパスワードの両方が正しいかどうかを確認してください。正しい場合は、プロバイダーが ZITADEL でサポートされていない認証方法を必要としている可能性があります。
+    CouldNotSetSender: 送信者を設定できませんでした
+    CouldNotSetRecipient: 受信者を設定できませんでした
   SMTPConfig:
+    TestPassword: テスト用のパスワードが見つかりません
     NotFound: SMTP構成が見つかりません
     AlreadyExists: すでに存在するSMTP構成です
+    AlreadyDeactivated: SMTP設定はすでに無効化されています
     SenderAdressNotCustomDomain: 送信者アドレスは、インスタンスのカスタムドメインとして構成する必要があります。
+    TestEmailNotFound: テスト用のメールアドレスが見つかりません
   Notification:
     NoDomain: メッセージのドメインが見つかりません
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: ユーザーが見つかりません
     AlreadyExists: 既に存在するユーザーです
     NotFoundOnOrg: ユーザーが選択した組織内で見つかりません
@@ -102,6 +115,7 @@ Errors:
       Key:
         NotFound: マシーンキーが見つかりません
         AlreadyExisting: すでに存在しているマシーンキーです
+        Invalid: 公開キーは、PEM エンコードを使用した PKIX 形式の有効な RSA 公開キーではありません
       Secret:
         NotExisting: シークレットは存在しません
         Invalid: 無効なシークレットです
@@ -127,7 +141,7 @@ Errors:
       Invalid: 無効なパスワードです
       NotSet: パスワードが未設置です
       NotChanged: 新しいパスワードは現在のパスワードと同じにすることはできません
-      NotSupported: パスワードハッシュエンコードはサポートされていません
+      NotSupported: パスワードハッシュエンコードはサポートされていません。 https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets を参照してください。
     PasswordComplexityPolicy:
       NotFound: パスワードポリシーが見つかりません
       MinLength: パスワードが短すぎます
@@ -458,6 +472,7 @@ Errors:
     NotActive: アクションはアクティブではありません
     NotInactive: アクションは非アクティブではありません
     MaxAllowed: 追加のアクティブアクションは許可されていません
+    NotEnabled: 機能「アクション」が有効になっていません
   Flow:
     FlowTypeMissing: フロータイプがありません
     Empty: フローはすでに空です
@@ -468,6 +483,7 @@ Errors:
     CloseRows: SQLステートメントの終了に失敗しました
     SQLStatement: SQLステートメントの作成に失敗しました
     InvalidRequest: 無効なリクエストです
+    TooManyNestingLevels: クエリのネスト レベルが多すぎます (最大 20)
   Quota:
     AlreadyExists: このユニットにはすでにクォータが存在しています
     NotFound: このユニットにはクォータが見つかりません
@@ -502,6 +518,7 @@ Errors:
     IDPMissing: リクエストにIDP IDが含まれていません
     IDPInvalid: リクエストのIDPが無効
     ResponseInvalid: IDPの回答は無効
+    MissingSingleMappingAttribute: マッピング属性が含まれていない、または複数の値がある
     SuccessURLMissing: リクエストに成功時の URL がありません
     FailureURLMissing: リクエストに失敗の URL がありません
     StateMissing: リクエストに State パラメータがありません
@@ -545,6 +562,17 @@ Errors:
     NotActive: ユーザースキーマがアクティブではありません
     NotInactive: ユーザースキーマが非アクティブではありません
     NotExists: ユーザースキーマが存在しません
+  TokenExchange:
+    FeatureDisabled: インスタンスではトークン交換機能が無効になっています。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: トークンがありません
+      Invalid: トークンが無効です
+      TypeMissing: トークンの種類がありません
+      TypeNotAllowed: トークンの種類は許可されていません
+      TypeNotSupported: トークンタイプはサポートされていません
+      NotForAPI: 偽装されたトークンは API では許可されません
+    Impersonation:
+      PolicyDisabled: インスタンスのセキュリティ ポリシーで偽装が無効になっています
 
 AggregateTypes:
   action: アクション
@@ -559,6 +587,15 @@ AggregateTypes:
   target: 目標
   execution: 実行
   user_schema: ユーザースキーマ
+  auth_request: 認証リクエスト
+  device_auth: デバイス認証
+  idpintent: IDPインテント
+  limits: 制限
+  milestone: マイルストーン
+  oidc_session: OIDCセッション
+  restrictions: 制限
+  system: システム
+  session: セッション
 
 EventTypes:
   execution:
@@ -580,7 +617,9 @@ EventTypes:
         failed: 初期化チェックの失敗
     token:
       added: アクセストークンの作成
+      v2.added: アクセストークンの作成
       removed: アクセストークンの削除
+    impersonated: ユーザーがなりすました
     username:
       reserved: ユーザー名の予約
       released: ユーザー名の解放
@@ -603,6 +642,7 @@ EventTypes:
         removed: キーの削除
       secret:
         set: シークレットのセット
+        updated: 秘密のハッシュが更新されました
         removed: シークレットの削除
         check:
           succeeded: シークレットチェックの成功
@@ -977,6 +1017,11 @@ EventTypes:
           check:
             succeeded: OIDCクライアントシークレットチェックの成功
             failed: OIDCクライアントシークレットチェックの失敗
+      api:
+        secret:
+          check:
+            succeeded: APIシークレットチェックに成功しました
+            failed: APIシークレットチェックに失敗しました
         key:
           added: アプリケーションキーの追加
           removed: アプリケーションキーの削除
@@ -989,11 +1034,13 @@ EventTypes:
           changed: OIDC構成の変更
           secret:
             changed: OIDCシークレットの変更
+            updated: OIDC シークレットハッシュが更新されました
         api:
           added: API構成の追加
           changed: API構成の変更
           secret:
             changed: APIのシークレットの変更
+            updated: API シークレット ハッシュが更新されました
   policy:
     password:
       complexity:
@@ -1088,6 +1135,9 @@ EventTypes:
       config:
         added: SMTP構成の追加
         changed: SMTP構成の変更
+        activated: SMTP設定が有効化されました
+        deactivated: SMTP設定が無効化されました
+        removed: SMTP設定が削除されました
         password:
           changed: SMTP構成シークレットの変更
     sms:
@@ -1233,6 +1283,8 @@ EventTypes:
       config:
         added: SMTP構成の追加
         changed: SMTP構成の変更
+        activated: SMTP設定が有効化されました
+        deactivated: SMTP設定が無効化されました
         password:
           changed: SMTP構成パスワードの変更
         removed: SMTP構成の削除

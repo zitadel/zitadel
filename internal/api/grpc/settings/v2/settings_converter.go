@@ -1,12 +1,14 @@
 package settings
 
 import (
+	"time"
+
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
 func loginSettingsToPb(current *query.LoginPolicy) *settings.LoginSettings {
@@ -32,11 +34,11 @@ func loginSettingsToPb(current *query.LoginPolicy) *settings.LoginSettings {
 		DisableLoginWithEmail:      current.DisableLoginWithEmail,
 		DisableLoginWithPhone:      current.DisableLoginWithPhone,
 		DefaultRedirectUri:         current.DefaultRedirectURI,
-		PasswordCheckLifetime:      durationpb.New(current.PasswordCheckLifetime),
-		ExternalLoginCheckLifetime: durationpb.New(current.ExternalLoginCheckLifetime),
-		MfaInitSkipLifetime:        durationpb.New(current.MFAInitSkipLifetime),
-		SecondFactorCheckLifetime:  durationpb.New(current.SecondFactorCheckLifetime),
-		MultiFactorCheckLifetime:   durationpb.New(current.MultiFactorCheckLifetime),
+		PasswordCheckLifetime:      durationpb.New(time.Duration(current.PasswordCheckLifetime)),
+		ExternalLoginCheckLifetime: durationpb.New(time.Duration(current.ExternalLoginCheckLifetime)),
+		MfaInitSkipLifetime:        durationpb.New(time.Duration(current.MFAInitSkipLifetime)),
+		SecondFactorCheckLifetime:  durationpb.New(time.Duration(current.SecondFactorCheckLifetime)),
+		MultiFactorCheckLifetime:   durationpb.New(time.Duration(current.MultiFactorCheckLifetime)),
 		SecondFactors:              second,
 		MultiFactors:               multi,
 		ResourceOwnerType:          isDefaultToResourceOwnerTypePb(current.IsDefault),
@@ -89,13 +91,21 @@ func multiFactorTypeToPb(typ domain.MultiFactorType) settings.MultiFactorType {
 	}
 }
 
-func passwordSettingsToPb(current *query.PasswordComplexityPolicy) *settings.PasswordComplexitySettings {
+func passwordComplexitySettingsToPb(current *query.PasswordComplexityPolicy) *settings.PasswordComplexitySettings {
 	return &settings.PasswordComplexitySettings{
 		MinLength:         current.MinLength,
 		RequiresUppercase: current.HasUppercase,
 		RequiresLowercase: current.HasLowercase,
 		RequiresNumber:    current.HasNumber,
 		RequiresSymbol:    current.HasSymbol,
+		ResourceOwnerType: isDefaultToResourceOwnerTypePb(current.IsDefault),
+	}
+}
+
+func passwordExpirySettingsToPb(current *query.PasswordAgePolicy) *settings.PasswordExpirySettings {
+	return &settings.PasswordExpirySettings{
+		MaxAgeDays:        current.MaxAgeDays,
+		ExpireWarnDays:    current.ExpireWarnDays,
 		ResourceOwnerType: isDefaultToResourceOwnerTypePb(current.IsDefault),
 	}
 }
@@ -152,12 +162,16 @@ func legalAndSupportSettingsToPb(current *query.PrivacyPolicy) *settings.LegalAn
 		HelpLink:          current.HelpLink,
 		SupportEmail:      string(current.SupportEmail),
 		ResourceOwnerType: isDefaultToResourceOwnerTypePb(current.IsDefault),
+		DocsLink:          current.DocsLink,
+		CustomLink:        current.CustomLink,
+		CustomLinkText:    current.CustomLinkText,
 	}
 }
 
 func lockoutSettingsToPb(current *query.LockoutPolicy) *settings.LockoutSettings {
 	return &settings.LockoutSettings{
 		MaxPasswordAttempts: current.MaxPasswordAttempts,
+		MaxOtpAttempts:      current.MaxOTPAttempts,
 		ResourceOwnerType:   isDefaultToResourceOwnerTypePb(current.IsDefault),
 	}
 }
@@ -202,6 +216,8 @@ func idpTypeToPb(idpType domain.IDPType) settings.IdentityProviderType {
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GITLAB_SELF_HOSTED
 	case domain.IDPTypeGoogle:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_GOOGLE
+	case domain.IDPTypeSAML:
+		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_SAML
 	default:
 		return settings.IdentityProviderType_IDENTITY_PROVIDER_TYPE_UNSPECIFIED
 	}

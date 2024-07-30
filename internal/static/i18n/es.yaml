@@ -53,14 +53,27 @@ Errors:
     NotFound: configuración SMS no encontrada
     AlreadyActive: la configuración SMS ya está activa
     AlreadyDeactivated: la configuracion SMS ya está desactivada
+  SMTP:
+    NotEmailMessage: el mensaje no es EmailMessage
+    RequiredAttributes: Se deben configurar el asunto, los destinatarios y el contenido, pero algunos o todos están vacíos.
+    CouldNotSplit: No se pudo dividir el host y el puerto para conectarse a SMTP
+    CouldNotDial: No se pudo contactar con el servidor SMTP, verifique el puerto, problemas con el firewall...
+    CouldNotDialTLS: No se pudo contactar con el servidor SMTP usando TLS, verifique el puerto, problemas con el firewall...
+    CouldNotCreateClient: no se pudo crear el cliente smtp
+    CouldNotStartTLS: no se pudo iniciar TLS
+    CouldNotAuth: no se pudo agregar la autenticación smtp, verifique si tanto su usuario como su contraseña son correctos, si son correctos tal vez su proveedor requiera un método de autenticación no admitido por ZITADEL
+    CouldNotSetSender: no se pudo configurar el remitente
+    CouldNotSetRecipient: No se pudo establecer el destinatario
   SMTPConfig:
+    TestPassword: Contraseña para la prueba no encontrada
     NotFound: configuración SMTP no encontrada
     AlreadyExists: la configuración SMTP ya existe
+    AlreadyDeactivated: la configuración SMTP ya está desactivada
     SenderAdressNotCustomDomain: La dirección del remitente debe configurarse como un dominio personalizado en la instancia.
+    TestEmailNotFound: Dirección de correo electrónico para la prueba no encontrada
   Notification:
     NoDomain: No se encontró el dominio para el mensaje
   User:
-    TooManyNestingLevels: Too many query nesting levels (Max 20).
     NotFound: El usuario no pudo encontrarse
     AlreadyExists: El usuario ya existe
     NotFoundOnOrg: El usuario no pudo encontrarse en la organización elegida
@@ -109,6 +122,7 @@ Errors:
       Key:
         NotFound: Clave de máquina no encontrada
         AlreadyExisting: La clave de máquina ya existe
+        Invalid: La clave pública no es una clave pública RSA válida en formato PKIX con codificación PEM
       Secret:
         NotExisting: El secreto no existe
         Invalid: El secret no es válido
@@ -135,7 +149,7 @@ Errors:
       Invalid: La contraseña no es válida
       NotSet: El usuario no ha establecido una contraseña
       NotChanged: La nueva contraseña no puede coincidir con la contraseña actual
-      NotSupported: No se admite la codificación hash de contraseña
+      NotSupported: No se admite la codificación hash de contraseña. Consulte https://zitadel.com/docs/concepts/architecture/secrets#hashed-secrets
     PasswordComplexityPolicy:
       NotFound: Política de contraseñas no encontrada
       MinLength: La contraseña es demasiado corta
@@ -469,6 +483,7 @@ Errors:
     NotActive: La acción no está activa
     NotInactive: La acción no está inactiva
     MaxAllowed: No hay acciones adicionales activas permitidas
+    NotEnabled: La función "Acción" no está habilitada
   Flow:
     FlowTypeMissing: Falta el tipo de flujo
     Empty: El flujo ya está vacío
@@ -479,6 +494,7 @@ Errors:
     CloseRows: La sentencia SQL no pudo finalizarse
     SQLStatement: La sentencia SQL no pudo crearse
     InvalidRequest: La solicitud no es válida
+    TooManyNestingLevels: Demasiados niveles de anidamiento de consultas (máximo 20)
   Quota:
     AlreadyExists: La cuota ya existe para esta unidad
     NotFound: Cuota no encontrada para esta unidad
@@ -513,6 +529,7 @@ Errors:
     IDPMissing: Falta IDP en la solicitud
     IDPInvalid: IDP no válido para la solicitud
     ResponseInvalid: La respuesta del IDP no es válida
+    MissingSingleMappingAttribute: No contiene el atributo de asignación o tiene más de un valor
     SuccessURLMissing: Falta la URL de éxito en la solicitud
     FailureURLMissing: Falta la URL de error en la solicitud
     StateMissing: Falta un parámetro de estado en la solicitud
@@ -556,6 +573,17 @@ Errors:
     NotActive: Esquema de usuario no activo
     NotInactive: Esquema de usuario no inactivo
     NotExists: El esquema de usuario no existe
+  TokenExchange:
+    FeatureDisabled: La función de intercambio de tokens está deshabilitada para su instancia. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
+    Token:
+      Missing: Falta la ficha
+      Invalid: El token no es válido
+      TypeMissing: Falta el tipo de token
+      TypeNotAllowed: El tipo de token no está permitido
+      TypeNotSupported: El tipo de token no es compatible
+      NotForAPI: Tokens suplantados no permitidos para API
+    Impersonation:
+      PolicyDisabled: La suplantación está deshabilitada en la política de seguridad de la instancia.
 
 AggregateTypes:
   action: Acción
@@ -570,6 +598,15 @@ AggregateTypes:
   target: Objectivo
   execution: Ejecución
   user_schema: Esquema de usuario
+  auth_request: Solicitud de autenticación
+  device_auth: Autenticación de dispositivo
+  idpintent: Intento de IDP
+  limits: Límites
+  milestone: Hito
+  oidc_session: Sesión OIDC
+  restrictions: Restricciones
+  system: Sistema
+  session: Sesión
 
 EventTypes:
   execution:
@@ -591,7 +628,9 @@ EventTypes:
         failed: La comprobación de inicialización falló
     token:
       added: Token de acceso creado
+      v2.added: Token de acceso creado
       removed: Token de acceso eliminado
+    impersonated: Usuario suplantado
     username:
       reserved: Nombre de usuario reservado
       released: Nombre de usuario liberado
@@ -614,6 +653,7 @@ EventTypes:
         removed: Clave eliminada
       secret:
         set: Secreto establecido
+        updated: Hash secreto actualizado
         removed: Secreto eliminado
         check:
           succeeded: Comprobación exitosa del secreto
@@ -989,6 +1029,14 @@ EventTypes:
             succeeded: Comprobación con éxito del secreto del cliente OIDC
             failed: Comprobación fallida del secreto del cliente OIDC
         key:
+          added: OIDC App Key añadida
+          removed: OIDC App Key eliminada
+      api:
+        secret:
+          check:
+            succeeded: La verificación del secreto de API fue exitosa
+            failed: Error en la comprobación del secreto de API
+        key:
           added: Clave de aplicación añadida
           removed: Clave de aplicación eliminada
       config:
@@ -1000,11 +1048,13 @@ EventTypes:
           changed: Configuracion OIDC modificada
           secret:
             changed: Secreto OIDC modificado
+            updated: Hash secreto OIDC actualizado
         api:
           added: Configuración API añadida
           changed: Configuración API modificada
           secret:
             changed: Configuración de secreto API modificada
+            updated: Hash secreto de API actualizado
   policy:
     password:
       complexity:
@@ -1099,6 +1149,9 @@ EventTypes:
       config:
         added: Configuración SMTP añadida
         changed: Configuración SMTP modificada
+        activated: Configuración SMTP activada
+        deactivated: Configuración SMTP desactivada
+        removed: Configuración SMTP eliminada
         password:
           changed: Configuración de secreto SMTP modificada
     sms:
@@ -1244,6 +1297,8 @@ EventTypes:
       config:
         added: Configuración SMTP añadida
         changed: Configuración SMTP modificada
+        activated: Configuración SMTP activada
+        deactivated: Configuración SMTP desactivada
         password:
           changed: Contraseña de configuración SMTP modificada
         removed: Configuración SMTP eliminada

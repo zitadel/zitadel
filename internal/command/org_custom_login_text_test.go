@@ -56,7 +56,6 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectPush(),
 				),
 			},
 			args: args{
@@ -765,6 +764,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 							),
 						),
@@ -1085,6 +1089,26 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptLinkButtonText, "LinkButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptOtherButtonText, "OtherButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneTitle, "Title", language.English,
 							),
 						),
@@ -1387,6 +1411,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					PasswordChange: domain.PasswordChangeScreenText{
 						Title:                   "Title",
 						Description:             "Description",
+						ExpiredDescription:      "ExpiredDescription",
 						OldPasswordLabel:        "OldPasswordLabel",
 						NewPasswordLabel:        "NewPasswordLabel",
 						NewPasswordConfirmLabel: "NewPasswordConfirmLabel",
@@ -1463,6 +1488,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						PrivacyConfirm:       "PrivacyConfirm",
 						PrivacyLinkText:      "PrivacyLinkText",
 						SaveButtonText:       "SaveButtonText",
+					},
+					LinkingUserPrompt: domain.LinkingUserPromptScreenText{
+						Title:           "Title",
+						Description:     "Description",
+						LinkButtonText:  "LinkButtonText",
+						OtherButtonText: "OtherButtonText",
 					},
 					LinkingUsersDone: domain.LinkingUserDoneScreenText{
 						Title:            "Title",
@@ -2169,6 +2200,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 							),
 						),
@@ -2485,6 +2521,26 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, "SaveButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptLinkButtonText, "LinkButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptOtherButtonText, "OtherButtonText", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -3003,6 +3059,9 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, language.English,
 						),
 						org.NewCustomTextRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, language.English,
+						),
+						org.NewCustomTextRemovedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, language.English,
 						),
 						org.NewCustomTextRemovedEvent(context.Background(),
@@ -3195,6 +3254,18 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, language.English,
 						),
 						org.NewCustomTextRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptTitle, language.English,
+						),
+						org.NewCustomTextRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptDescription, language.English,
+						),
+						org.NewCustomTextRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptLinkButtonText, language.English,
+						),
+						org.NewCustomTextRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptOtherButtonText, language.English,
+						),
+						org.NewCustomTextRemovedEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneTitle, language.English,
 						),
 						org.NewCustomTextRemovedEvent(context.Background(),
@@ -3303,6 +3374,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					ExternalRegistrationUserOverview: domain.ExternalRegistrationUserOverviewScreenText{},
 					RegistrationUser:                 domain.RegistrationUserScreenText{},
 					RegistrationOrg:                  domain.RegistrationOrgScreenText{},
+					LinkingUserPrompt:                domain.LinkingUserPromptScreenText{},
 					LinkingUsersDone:                 domain.LinkingUserDoneScreenText{},
 					ExternalNotFound:                 domain.ExternalUserNotFoundScreenText{},
 					LoginSuccess:                     domain.SuccessLoginScreenText{},
@@ -3979,6 +4051,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 							),
 						),
@@ -4295,6 +4372,26 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, "SaveButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptLinkButtonText, "LinkButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptOtherButtonText, "OtherButtonText", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5074,6 +5171,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextRemovedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, language.English,
 							),
 						),
@@ -5390,6 +5492,26 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
 								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptTitle, language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptDescription, language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptLinkButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextRemovedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptOtherButtonText, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5908,6 +6030,9 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeDescription, "Description", language.English,
 						),
 						org.NewCustomTextSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeExpiredDescription, "ExpiredDescription", language.English,
+						),
+						org.NewCustomTextSetEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeOldPasswordLabel, "OldPasswordLabel", language.English,
 						),
 						org.NewCustomTextSetEvent(context.Background(),
@@ -6098,6 +6223,18 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						org.NewCustomTextSetEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgSaveButtonText, "SaveButtonText", language.English,
+						),
+						org.NewCustomTextSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptTitle, "Title", language.English,
+						),
+						org.NewCustomTextSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptDescription, "Description", language.English,
+						),
+						org.NewCustomTextSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptLinkButtonText, "LinkButtonText", language.English,
+						),
+						org.NewCustomTextSetEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserPromptOtherButtonText, "OtherButtonText", language.English,
 						),
 						org.NewCustomTextSetEvent(context.Background(),
 							&org.NewAggregate("org1").Aggregate, domain.LoginCustomText, domain.LoginKeyLinkingUserDoneTitle, "Title", language.English,
@@ -6355,6 +6492,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					PasswordChange: domain.PasswordChangeScreenText{
 						Title:                   "Title",
 						Description:             "Description",
+						ExpiredDescription:      "ExpiredDescription",
 						OldPasswordLabel:        "OldPasswordLabel",
 						NewPasswordLabel:        "NewPasswordLabel",
 						NewPasswordConfirmLabel: "NewPasswordConfirmLabel",
@@ -6431,6 +6569,12 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						PrivacyConfirm:       "PrivacyConfirm",
 						PrivacyLinkText:      "PrivacyLinkText",
 						SaveButtonText:       "SaveButtonText",
+					},
+					LinkingUserPrompt: domain.LinkingUserPromptScreenText{
+						Title:           "Title",
+						Description:     "Description",
+						LinkButtonText:  "LinkButtonText",
+						OtherButtonText: "OtherButtonText",
 					},
 					LinkingUsersDone: domain.LinkingUserDoneScreenText{
 						Title:            "Title",

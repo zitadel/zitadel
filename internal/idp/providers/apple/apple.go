@@ -5,7 +5,7 @@ import (
 	"encoding/pem"
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/oidc/v3/pkg/crypto"
 	openid "github.com/zitadel/oidc/v3/pkg/oidc"
 
@@ -56,7 +56,7 @@ func clientSecretFromPrivateKey(key []byte, teamID, clientID, keyID string) (str
 	if err != nil {
 		return "", err
 	}
-	iat := time.Now()
+	iat := time.Now().Add(-2 * time.Second)
 	exp := iat.Add(time.Hour)
 	return crypto.Sign(&openid.JWTTokenRequest{
 		Issuer:    teamID,

@@ -42,6 +42,8 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, UserReactivatedType, UserReactivatedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, UserRemovedType, UserRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, UserTokenAddedType, UserTokenAddedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, UserTokenV2AddedType, eventstore.GenericEventMapper[UserTokenV2AddedEvent])
+	eventstore.RegisterFilterEventMapper(AggregateType, UserImpersonatedType, eventstore.GenericEventMapper[UserImpersonatedEvent])
 	eventstore.RegisterFilterEventMapper(AggregateType, UserTokenRemovedType, UserTokenRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, UserDomainClaimedType, DomainClaimedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, UserDomainClaimedSentType, DomainClaimedSentEventMapper)
@@ -134,4 +136,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretRemovedType, MachineSecretRemovedEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretCheckSucceededType, MachineSecretCheckSucceededEventMapper)
 	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretCheckFailedType, MachineSecretCheckFailedEventMapper)
+	eventstore.RegisterFilterEventMapper(AggregateType, MachineSecretHashUpdatedType, eventstore.GenericEventMapper[MachineSecretHashUpdatedEvent])
 }

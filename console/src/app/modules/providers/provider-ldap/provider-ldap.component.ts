@@ -3,13 +3,13 @@ import { Component, Injector, Type } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Duration } from 'google-protobuf/google/protobuf/duration_pb';
-import { take } from 'rxjs';
+import { BehaviorSubject, take } from 'rxjs';
 import {
   AddLDAPProviderRequest as AdminAddLDAPProviderRequest,
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateLDAPProviderRequest as AdminUpdateLDAPProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { LDAPAttributes, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { AutoLinkingOption, LDAPAttributes, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddLDAPProviderRequest as MgmtAddLDAPProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -23,6 +23,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { minArrayLengthValidator, requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
   selector: 'cnsl-provider-ldap',
@@ -31,10 +32,16 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 export class ProviderLDAPComponent {
   public updateBindPassword: boolean = false;
   public showOptional: boolean = false;
-  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  public options: Options = new Options()
+    .setIsCreationAllowed(true)
+    .setIsLinkingAllowed(true)
+    .setAutoLinking(AutoLinkingOption.AUTO_LINKING_OPTION_UNSPECIFIED);
   public attributes: LDAPAttributes = new LDAPAttributes();
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
 
   public form!: FormGroup;
@@ -43,6 +50,20 @@ export class ProviderLDAPComponent {
 
   public provider?: Provider.AsObject;
 
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/google#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -50,6 +71,7 @@ export class ProviderLDAPComponent {
     private injector: Injector,
     private _location: Location,
     private breadcrumbService: BreadcrumbService,
+    private nextSvc: ProviderNextService,
   ) {
     this.form = new FormGroup({
       name: new FormControl('', [requiredValidator]),
@@ -116,6 +138,10 @@ export class ProviderLDAPComponent {
     });
   }
 
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
+  }
+
   private getData(id: string): void {
     const req =
       this.serviceType === PolicyComponentServiceType.ADMIN
@@ -179,11 +205,9 @@ export class ProviderLDAPComponent {
     this.loading = true;
     (this.service as ManagementService)
       .addLDAPProvider(req)
-      .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.close();
-        }, 2000);
+      .then((addedIDP) => {
+        this.justCreated$.next(addedIDP.id);
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);

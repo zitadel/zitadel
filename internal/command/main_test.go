@@ -23,6 +23,7 @@ import (
 
 type expect func(mockRepository *mock.MockRepository)
 
+// Deprecated: use expectEventstore
 func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	m := mock.NewRepo(t)
 	for _, e := range expects {
@@ -37,6 +38,9 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	return es
 }
 
+// expectEventstore defines expectations for the Eventstore and is initialized within the scope of a (sub) test.
+// This allows proper reporting of the test name, instead of reporting on the top-level
+// of the Test function being run.
 func expectEventstore(expects ...expect) func(*testing.T) *eventstore.Eventstore {
 	return func(t *testing.T) *eventstore.Eventstore {
 		return eventstoreExpect(t, expects...)
@@ -275,8 +279,8 @@ func (h plainHasher) Verify(encoded, password string) (verifier.Result, error) {
 //
 // With `x` set to "foo", the following encoded string would be produced by Hash:
 // $plain$foo$password
-func mockPasswordHasher(x string) *crypto.PasswordHasher {
-	return &crypto.PasswordHasher{
+func mockPasswordHasher(x string) *crypto.Hasher {
+	return &crypto.Hasher{
 		Swapper:  passwap.NewSwapper(plainHasher{x: x}),
 		Prefixes: []string{"$plain$"},
 	}

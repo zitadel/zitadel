@@ -10,6 +10,7 @@ import (
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -69,7 +70,7 @@ func TestCommands_RequestPasswordReset(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second),
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second, ""),
 						),
 					),
 				),
@@ -167,7 +168,7 @@ func TestCommands_RequestPasswordResetReturnCode(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second),
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second, ""),
 						),
 					),
 				),
@@ -279,7 +280,7 @@ func TestCommands_RequestPasswordResetURLTemplate(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second),
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second, ""),
 						),
 					),
 				),
@@ -330,7 +331,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 		checkPermission domain.PermissionCheck
 		eventstore      func(t *testing.T) *eventstore.Eventstore
 		userEncryption  crypto.EncryptionAlgorithm
-		newCode         cryptoCodeFunc
+		newCode         encrypedCodeFunc
 	}
 	type args struct {
 		ctx              context.Context
@@ -390,7 +391,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(context.Background(), &user.NewAggregate("userID", "org1").Aggregate,
-								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second),
+								&crypto.CryptoValue{CryptoType: crypto.TypeEncryption, Algorithm: "enc", KeyID: "keyID", Crypted: []byte("code")}, 10*time.Second, ""),
 						),
 					),
 				),
@@ -452,7 +453,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockCode("code", 10*time.Minute),
+				newCode:         mockEncryptedCode("code", 10*time.Minute),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -492,7 +493,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockCode("code", 10*time.Minute),
+				newCode:         mockEncryptedCode("code", 10*time.Minute),
 			},
 			args: args{
 				ctx:     context.Background(),
@@ -533,7 +534,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockCode("code", 10*time.Minute),
+				newCode:         mockEncryptedCode("code", 10*time.Minute),
 			},
 			args: args{
 				ctx:              context.Background(),
@@ -575,7 +576,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
-				newCode:         mockCode("code", 10*time.Minute),
+				newCode:         mockEncryptedCode("code", 10*time.Minute),
 			},
 			args: args{
 				ctx:        context.Background(),
@@ -593,10 +594,10 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				checkPermission: tt.fields.checkPermission,
-				eventstore:      tt.fields.eventstore(t),
-				userEncryption:  tt.fields.userEncryption,
-				newCode:         tt.fields.newCode,
+				checkPermission:  tt.fields.checkPermission,
+				eventstore:       tt.fields.eventstore(t),
+				userEncryption:   tt.fields.userEncryption,
+				newEncryptedCode: tt.fields.newCode,
 			}
 			got, gotPlainCode, err := c.requestPasswordReset(tt.args.ctx, tt.args.userID, tt.args.returnCode, tt.args.urlTmpl, tt.args.notificationType)
 			require.ErrorIs(t, err, tt.res.err)

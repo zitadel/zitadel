@@ -1,25 +1,18 @@
 package domain
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/zitadel/logging"
-
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/id"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 type oAuthApplication interface {
 	setClientID(clientID string)
-	setClientSecret(secret *crypto.CryptoValue)
+	setClientSecret(encodedHash string)
 	requiresClientSecret() bool
 }
 
-// ClientID random_number@projectname (eg. 495894098234@zitadel)
-func SetNewClientID(a oAuthApplication, idGenerator id.Generator, project *Project) error {
-	clientID, err := NewClientID(idGenerator, project.Name)
+// ClientID random_number (eg. 495894098234)
+func SetNewClientID(a oAuthApplication, idGenerator id.Generator) error {
+	clientID, err := idGenerator.Next()
 	if err != nil {
 		return err
 	}
@@ -28,32 +21,14 @@ func SetNewClientID(a oAuthApplication, idGenerator id.Generator, project *Proje
 	return nil
 }
 
-func NewClientID(idGenerator id.Generator, projectName string) (string, error) {
-	rndID, err := idGenerator.Next()
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%s@%s", rndID, strings.ReplaceAll(strings.ToLower(projectName), " ", "_")), nil
-}
-
-func SetNewClientSecretIfNeeded(a oAuthApplication, generator crypto.Generator) (string, error) {
+func SetNewClientSecretIfNeeded(a oAuthApplication, generate func() (encodedHash, plain string, err error)) (string, error) {
 	if !a.requiresClientSecret() {
 		return "", nil
 	}
-	clientSecret, secretString, err := NewClientSecret(generator)
+	encodedHash, plain, err := generate()
 	if err != nil {
 		return "", err
 	}
-	a.setClientSecret(clientSecret)
-	return secretString, nil
-}
-
-func NewClientSecret(generator crypto.Generator) (*crypto.CryptoValue, string, error) {
-	cryptoValue, stringSecret, err := crypto.NewCode(generator)
-	if err != nil {
-		logging.Log("MODEL-UpnTI").OnError(err).Error("unable to create client secret")
-		return nil, "", zerrors.ThrowInternal(err, "MODEL-gH2Wl", "Errors.Project.CouldNotGenerateClientSecret")
-	}
-	return cryptoValue, stringSecret, nil
+	a.setClientSecret(encodedHash)
+	return plain, nil
 }

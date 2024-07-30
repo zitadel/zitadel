@@ -260,15 +260,16 @@ func appendIfNotExists(array []string, value string) []string {
 
 func ListMyProjectOrgsRequestToQuery(req *auth_pb.ListMyProjectOrgsRequest) (*query.OrgSearchQueries, error) {
 	offset, limit, asc := obj_grpc.ListQueryToModel(req.Query)
-	queries, err := org.OrgQueriesToQuery(req.Queries)
+	queries, err := org.OrgQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
 	return &query.OrgSearchQueries{
 		SearchRequest: query.SearchRequest{
-			Offset: offset,
-			Limit:  limit,
-			Asc:    asc,
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: org.FieldNameToOrgColumn(req.SortingColumn),
 		},
 		Queries: queries,
 	}, nil

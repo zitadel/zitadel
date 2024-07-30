@@ -127,7 +127,7 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 // handleExternalRegister is called when a user selects the idp on the register options page
 func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 	data := new(externalIDPData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -319,12 +319,11 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		sp, err := provider.(*saml.Provider).GetSP()
+		session, err = saml.NewSession(provider.(*saml.Provider), authReq.SAMLRequestID, r)
 		if err != nil {
 			l.externalAuthFailed(w, r, authReq, nil, nil, err)
 			return
 		}
-		session = &saml.Session{ServiceProvider: sp, RequestID: authReq.SAMLRequestID, Request: r}
 	case domain.IDPTypeJWT,
 		domain.IDPTypeLDAP,
 		domain.IDPTypeUnspecified:
@@ -336,6 +335,10 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 
 	user, err := session.FetchUser(r.Context())
 	if err != nil {
+		logging.WithFields(
+			"instance", authz.GetInstance(r.Context()).InstanceID(),
+			"providerID", identityProvider.ID,
+		).WithError(err).Info("external authentication failed")
 		l.externalAuthFailed(w, r, authReq, tokens(session), user, err)
 		return
 	}
@@ -449,6 +452,59 @@ func (l *Login) handleExternalUserAuthenticated(
 	callback(w, r, authReq)
 }
 
+// checkAutoLinking checks if a user with the provided information (username or email) already exists within ZITADEL.
+// The decision, which information will be checked is based on the IdP template option.
+// The function returns a boolean whether a user was found or not.
+func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, provider *query.IDPTemplate, externalUser *domain.ExternalUser) bool {
+	queries := make([]query.SearchQuery, 0, 2)
+	var user *query.NotifyUser
+	switch provider.AutoLinking {
+	case domain.AutoLinkingOptionUnspecified:
+		// is auto linking is disable, we shouldn't even get here, but in case we do we can directly return
+		return false
+	case domain.AutoLinkingOptionUsername:
+		// if we're checking for usernames there are to options:
+		//
+		// If no specific org has been requested (by id or domain scope), we'll check the provided username against
+		// all existing loginnames and directly use that result to either prompt or continue with other idp options.
+		if authReq.RequestedOrgID == "" {
+			user, err := l.query.GetNotifyUserByLoginName(r.Context(), false, externalUser.PreferredUsername)
+			if err != nil {
+				return false
+			}
+			l.renderLinkingUserPrompt(w, r, authReq, user, nil)
+			return true
+		}
+		// If a specific org has been requested, we'll check the provided username against usernames (of that org).
+		usernameQuery, err := query.NewUserUsernameSearchQuery(externalUser.PreferredUsername, query.TextEqualsIgnoreCase)
+		if err != nil {
+			return false
+		}
+		queries = append(queries, usernameQuery)
+	case domain.AutoLinkingOptionEmail:
+		// Email will always be checked against verified email addresses.
+		emailQuery, err := query.NewUserVerifiedEmailSearchQuery(string(externalUser.Email))
+		if err != nil {
+			return false
+		}
+		queries = append(queries, emailQuery)
+	}
+	// restrict the possible organization if needed (for email and usernames)
+	if authReq.RequestedOrgID != "" {
+		resourceOwnerQuery, err := query.NewUserResourceOwnerSearchQuery(authReq.RequestedOrgID, query.TextEquals)
+		if err != nil {
+			return false
+		}
+		queries = append(queries, resourceOwnerQuery)
+	}
+	user, err := l.query.GetNotifyUser(r.Context(), false, queries...)
+	if err != nil {
+		return false
+	}
+	l.renderLinkingUserPrompt(w, r, authReq, user, nil)
+	return true
+}
+
 // externalUserNotExisting is called if an externalAuthentication couldn't find a corresponding externalID
 // possible solutions are:
 //
@@ -470,6 +526,13 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 	}
 
 	human, idpLink, _ := mapExternalUserToLoginUser(externalUser, orgIAMPolicy.UserLoginMustBeDomain)
+	// let's check if auto-linking is enabled and if the user would be found by the corresponding option
+	if provider.AutoLinking != domain.AutoLinkingOptionUnspecified {
+		if l.checkAutoLinking(w, r, authReq, provider, externalUser) {
+			return
+		}
+	}
+
 	// if auto creation or creation itself is disabled, send the user to the notFoundOption
 	if !provider.IsCreationAllowed || !provider.IsAutoCreation {
 		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
@@ -594,7 +657,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 // and either links or creates an externalUser
 func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http.Request) {
 	data := new(externalNotFoundOptionFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, err)
 		return
@@ -965,12 +1028,18 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 	if err != nil {
 		return nil, err
 	}
-	opts := make([]saml.ProviderOpts, 0, 2)
+	opts := make([]saml.ProviderOpts, 0, 6)
 	if identityProvider.SAMLIDPTemplate.WithSignedRequest {
 		opts = append(opts, saml.WithSignedRequest())
 	}
 	if identityProvider.SAMLIDPTemplate.Binding != "" {
 		opts = append(opts, saml.WithBinding(identityProvider.SAMLIDPTemplate.Binding))
+	}
+	if identityProvider.SAMLIDPTemplate.NameIDFormat.Valid {
+		opts = append(opts, saml.WithNameIDFormat(identityProvider.SAMLIDPTemplate.NameIDFormat.V))
+	}
+	if identityProvider.SAMLIDPTemplate.TransientMappingAttributeName != "" {
+		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))
 	}
 	opts = append(opts,
 		saml.WithEntityID(http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure)+"/idps/"+identityProvider.ID+"/saml/metadata"),

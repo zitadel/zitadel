@@ -15,10 +15,13 @@ const (
 type PrivacyPolicyAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TOSLink      string              `json:"tosLink,omitempty"`
-	PrivacyLink  string              `json:"privacyLink,omitempty"`
-	HelpLink     string              `json:"helpLink,omitempty"`
-	SupportEmail domain.EmailAddress `json:"supportEmail,omitempty"`
+	TOSLink        string              `json:"tosLink,omitempty"`
+	PrivacyLink    string              `json:"privacyLink,omitempty"`
+	HelpLink       string              `json:"helpLink,omitempty"`
+	SupportEmail   domain.EmailAddress `json:"supportEmail,omitempty"`
+	DocsLink       string              `json:"docsLink,omitempty"`
+	CustomLink     string              `json:"customLink,omitempty"`
+	CustomLinkText string              `json:"customLinkText,omitempty"`
 }
 
 func (e *PrivacyPolicyAddedEvent) Payload() interface{} {
@@ -35,13 +38,17 @@ func NewPrivacyPolicyAddedEvent(
 	privacyLink,
 	helpLink string,
 	supportEmail domain.EmailAddress,
+	docsLink, customLink, customLinkText string,
 ) *PrivacyPolicyAddedEvent {
 	return &PrivacyPolicyAddedEvent{
-		BaseEvent:    *base,
-		TOSLink:      tosLink,
-		PrivacyLink:  privacyLink,
-		HelpLink:     helpLink,
-		SupportEmail: supportEmail,
+		BaseEvent:      *base,
+		TOSLink:        tosLink,
+		PrivacyLink:    privacyLink,
+		HelpLink:       helpLink,
+		SupportEmail:   supportEmail,
+		DocsLink:       docsLink,
+		CustomLink:     customLink,
+		CustomLinkText: customLinkText,
 	}
 }
 
@@ -60,10 +67,13 @@ func PrivacyPolicyAddedEventMapper(event eventstore.Event) (eventstore.Event, er
 type PrivacyPolicyChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TOSLink      *string              `json:"tosLink,omitempty"`
-	PrivacyLink  *string              `json:"privacyLink,omitempty"`
-	HelpLink     *string              `json:"helpLink,omitempty"`
-	SupportEmail *domain.EmailAddress `json:"supportEmail,omitempty"`
+	TOSLink        *string              `json:"tosLink,omitempty"`
+	PrivacyLink    *string              `json:"privacyLink,omitempty"`
+	HelpLink       *string              `json:"helpLink,omitempty"`
+	SupportEmail   *domain.EmailAddress `json:"supportEmail,omitempty"`
+	DocsLink       *string              `json:"docsLink,omitempty"`
+	CustomLink     *string              `json:"customLink,omitempty"`
+	CustomLinkText *string              `json:"customLinkText,omitempty"`
 }
 
 func (e *PrivacyPolicyChangedEvent) Payload() interface{} {
@@ -113,6 +123,24 @@ func ChangeHelpLink(helpLink string) func(*PrivacyPolicyChangedEvent) {
 func ChangeSupportEmail(supportEmail domain.EmailAddress) func(*PrivacyPolicyChangedEvent) {
 	return func(e *PrivacyPolicyChangedEvent) {
 		e.SupportEmail = &supportEmail
+	}
+}
+
+func ChangeDocsLink(docsLink string) func(*PrivacyPolicyChangedEvent) {
+	return func(e *PrivacyPolicyChangedEvent) {
+		e.DocsLink = &docsLink
+	}
+}
+
+func ChangeCustomLink(customLink string) func(*PrivacyPolicyChangedEvent) {
+	return func(e *PrivacyPolicyChangedEvent) {
+		e.CustomLink = &customLink
+	}
+}
+
+func ChangeCustomLinkText(customLinkText string) func(*PrivacyPolicyChangedEvent) {
+	return func(e *PrivacyPolicyChangedEvent) {
+		e.CustomLinkText = &customLinkText
 	}
 }
 

@@ -63,7 +63,10 @@ type ChangeLoginPolicy struct {
 	DisableLoginWithPhone      bool
 }
 
-func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *AddLoginPolicy) (*domain.ObjectDetails, error) {
+func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, policy *AddLoginPolicy) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	orgAgg := org.NewAggregate(resourceOwner)
 	cmds, err := preparation.PrepareCommands(ctx, c.eventstore.Filter, prepareAddLoginPolicy(orgAgg, policy))
 	if err != nil {
@@ -411,12 +414,15 @@ func prepareAddLoginPolicy(a *org.Aggregate, policy *AddLoginPolicy) preparation
 				return nil, zerrors.ThrowInvalidArgument(nil, "Org-WSfrg", "Errors.Org.LoginPolicy.MFA.Unspecified")
 			}
 		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) (_ []eventstore.Command, err error) {
+			ctx, span := tracing.NewSpan(ctx)
+			defer func() { span.EndWithError(err) }()
+
 			if exists, err := exists(ctx, filter, NewOrgLoginPolicyWriteModel(a.ID)); exists || err != nil {
 				return nil, zerrors.ThrowAlreadyExists(nil, "Org-Dgfb2", "Errors.Org.LoginPolicy.AlreadyExists")
 			}
 			for _, idp := range policy.IDPProviders {
-				exists, err := idpExists(ctx, filter, idp)
+				exists, err := ExistsIDPOnOrgOrInstance(ctx, filter, authz.GetInstance(ctx).InstanceID(), a.ResourceOwner, idp.ConfigID)
 				if !exists || err != nil {
 					return nil, zerrors.ThrowPreconditionFailed(err, "Org-FEd32", "Errors.IDPConfig.NotExisting")
 				}
@@ -492,11 +498,4 @@ func prepareChangeLoginPolicy(a *org.Aggregate, policy *ChangeLoginPolicy) prepa
 			return []eventstore.Command{changedEvent}, nil
 		}, nil
 	}
-}
-
-func idpExists(ctx context.Context, filter preparation.FilterToQueryReducer, idp *AddLoginPolicyIDP) (bool, error) {
-	if idp.Type == domain.IdentityProviderTypeSystem {
-		return exists(ctx, filter, NewInstanceIDPConfigWriteModel(ctx, idp.ConfigID))
-	}
-	return exists(ctx, filter, NewOrgIDPConfigWriteModel(idp.ConfigID, authz.GetCtxData(ctx).ResourceOwner))
 }

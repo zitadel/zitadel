@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"golang.org/x/text/language"
@@ -75,7 +76,7 @@ func (a *AuthRequest) GetResponseType() oidc.ResponseType {
 }
 
 func (a *AuthRequest) GetResponseMode() oidc.ResponseMode {
-	return ""
+	return ResponseModeToOIDC(a.oidc().ResponseMode)
 }
 
 func (a *AuthRequest) GetScopes() []string {
@@ -94,14 +95,14 @@ func (a *AuthRequest) oidc() *domain.AuthRequestOIDC {
 	return a.Request.(*domain.AuthRequestOIDC)
 }
 
-func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ op.AuthRequest, err error) {
+func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ *AuthRequest, err error) {
 	if _, ok := authReq.Request.(*domain.AuthRequestOIDC); !ok {
 		return nil, zerrors.ThrowInvalidArgument(nil, "OIDC-Haz7A", "auth request is not of type oidc")
 	}
 	return &AuthRequest{authReq}, nil
 }
 
-func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string) *domain.AuthRequest {
+func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest, userAgentID, userID string, audience []string) *domain.AuthRequest {
 	return &domain.AuthRequest{
 		CreationDate:        time.Now(),
 		AgentID:             userAgentID,
@@ -117,9 +118,11 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 		MaxAuthAge:          MaxAgeToBusiness(authReq.MaxAge),
 		UserID:              userID,
 		InstanceID:          authz.GetInstance(ctx).InstanceID(),
+		Audience:            audience,
 		Request: &domain.AuthRequestOIDC{
 			Scopes:        authReq.Scopes,
 			ResponseType:  ResponseTypeToBusiness(authReq.ResponseType),
+			ResponseMode:  ResponseModeToBusiness(authReq.ResponseMode),
 			Nonce:         authReq.Nonce,
 			CodeChallenge: CodeChallengeToBusiness(authReq.CodeChallenge, authReq.CodeChallengeMethod),
 		},
@@ -231,6 +234,27 @@ func ResponseTypeToOIDC(responseType domain.OIDCResponseType) oidc.ResponseType 
 	}
 }
 
+// ResponseModeToBusiness returns the OIDCResponseMode enum value from the domain package.
+// An empty or invalid value defaults to unspecified.
+func ResponseModeToBusiness(responseMode oidc.ResponseMode) domain.OIDCResponseMode {
+	if responseMode == "" {
+		return domain.OIDCResponseModeUnspecified
+	}
+	out, err := domain.OIDCResponseModeString(string(responseMode))
+	logging.OnError(err).Debugln("invalid oidc response_mode, using default")
+	return out
+}
+
+// ResponseModeToOIDC return the oidc string representation of the enum value from the domain package.
+// When responseMode is `0 - unspecified`, an empty string is returned.
+// This allows the oidc package to pick the appropriate response mode based on the response type.
+func ResponseModeToOIDC(responseMode domain.OIDCResponseMode) oidc.ResponseMode {
+	if responseMode == domain.OIDCResponseModeUnspecified || !responseMode.IsAOIDCResponseMode() {
+		return ""
+	}
+	return oidc.ResponseMode(responseMode.String())
+}
+
 func CodeChallengeToBusiness(challenge string, method oidc.CodeChallengeMethod) *domain.OIDCCodeChallenge {
 	if challenge == "" {
 		return nil
@@ -307,4 +331,8 @@ func (r *RefreshTokenRequest) GetSubject() string {
 
 func (r *RefreshTokenRequest) SetCurrentScopes(scopes []string) {
 	r.Scopes = scopes
+}
+
+func (r *RefreshTokenRequest) GetActor() *oidc.ActorClaims {
+	return actorDomainToClaims(r.Actor)
 }

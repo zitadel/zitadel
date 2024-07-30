@@ -17,8 +17,9 @@ import (
 )
 
 type Config struct {
-	SearchLimit uint64
-	Spooler     auth_handler.Config
+	SearchLimit                uint64
+	Spooler                    auth_handler.Config
+	AmountOfCachedAuthRequests uint16
 }
 
 type EsRepository struct {
@@ -39,7 +40,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 	auth_handler.Register(ctx, conf.Spooler, view, queries)
 	auth_handler.Start(ctx)
 
-	authReq := cache.Start(dbClient)
+	authReq := cache.Start(dbClient, conf.AmountOfCachedAuthRequests)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:    conf.SearchLimit,
@@ -72,10 +73,12 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 			IDPUserLinksProvider:      queries,
 			LockoutPolicyViewProvider: queries,
 			LoginPolicyViewProvider:   queries,
+			PasswordAgePolicyProvider: queries,
 			UserGrantProvider:         queryView,
 			ProjectProvider:           queryView,
 			ApplicationProvider:       queries,
 			CustomTextProvider:        queries,
+			PasswordReset:             command,
 			IdGenerator:               id.SonyFlakeGenerator(),
 		},
 		eventstore.TokenRepo{

@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -28,7 +29,9 @@ func (c *Commands) orgPrivacyPolicyWriteModelByID(ctx context.Context, orgID str
 	return policy, nil
 }
 
-func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
+func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, policy *domain.PrivacyPolicy) (_ *domain.PrivacyPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
 	if policy.SupportEmail != "" {
 		if err := policy.SupportEmail.Validate(); err != nil {
@@ -41,7 +44,7 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-MMk9fs", "Errors.ResourceOwnerMissing")
 	}
 	addedPolicy := NewOrgPrivacyPolicyWriteModel(resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
+	err = c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +61,10 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 			policy.TOSLink,
 			policy.PrivacyLink,
 			policy.HelpLink,
-			policy.SupportEmail))
+			policy.SupportEmail,
+			policy.DocsLink,
+			policy.CustomLink,
+			policy.CustomLinkText))
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +97,7 @@ func (c *Commands) ChangePrivacyPolicy(ctx context.Context, resourceOwner string
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink, policy.SupportEmail)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink, policy.SupportEmail, policy.DocsLink, policy.CustomLink, policy.CustomLinkText)
 	if !hasChanged {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "Org-4N9fs", "Errors.Org.PrivacyPolicy.NotChanged")
 	}

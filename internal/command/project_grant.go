@@ -6,21 +6,19 @@ import (
 
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/repository/org"
 	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddProjectGrantWithID(ctx context.Context, grant *domain.ProjectGrant, grantID string, resourceOwner string) (_ *domain.ProjectGrant, err error) {
-	existingMember, err := c.projectGrantWriteModelByID(ctx, grantID, grant.AggregateID, resourceOwner)
-	if err != nil && !zerrors.IsNotFound(err) {
-		return nil, err
-	}
-	if existingMember != nil && existingMember.State != domain.ProjectGrantStateUnspecified {
-		return nil, zerrors.ThrowInvalidArgument(nil, "PROJECT-2b8fs", "Errors.Project.Grant.AlreadyExisting")
-	}
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
 
 	return c.addProjectGrantWithID(ctx, grant, grantID, resourceOwner)
 }
@@ -148,10 +146,12 @@ func (c *Commands) DeactivateProjectGrant(ctx context.Context, projectID, grantI
 	if grantID == "" || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
 	}
+
 	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
-		return details, err
+		return nil, err
 	}
+
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
 	if err != nil {
 		return details, err
@@ -176,10 +176,12 @@ func (c *Commands) ReactivateProjectGrant(ctx context.Context, projectID, grantI
 	if grantID == "" || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-p0s4V", "Errors.IDMissing")
 	}
+
 	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
-		return details, err
+		return nil, err
 	}
+
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
 	if err != nil {
 		return details, err
@@ -203,10 +205,12 @@ func (c *Commands) RemoveProjectGrant(ctx context.Context, projectID, grantID, r
 	if grantID == "" || projectID == "" {
 		return details, zerrors.ThrowInvalidArgument(nil, "PROJECT-1m9fJ", "Errors.IDMissing")
 	}
+
 	err = c.checkProjectExists(ctx, projectID, resourceOwner)
 	if err != nil {
-		return details, zerrors.ThrowPreconditionFailed(err, "PROJECT-6mf9s", "Errors.Project.NotFound")
+		return nil, err
 	}
+
 	existingGrant, err := c.projectGrantWriteModelByID(ctx, grantID, projectID, resourceOwner)
 	if err != nil {
 		return details, err
@@ -252,19 +256,85 @@ func (c *Commands) projectGrantWriteModelByID(ctx context.Context, grantID, proj
 }
 
 func (c *Commands) checkProjectGrantPreCondition(ctx context.Context, projectGrant *domain.ProjectGrant) error {
-	preConditions := NewProjectGrantPreConditionReadModel(projectGrant.AggregateID, projectGrant.GrantedOrgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeProjectGrant) {
+		return c.checkProjectGrantPreConditionOld(ctx, projectGrant)
+	}
+	existingRoleKeys, err := c.searchProjectGrantState(ctx, projectGrant.AggregateID, projectGrant.GrantedOrgID)
 	if err != nil {
 		return err
 	}
-	if !preConditions.ProjectExists {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
-	}
-	if !preConditions.GrantedOrgExists {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
-	}
-	if projectGrant.HasInvalidRoles(preConditions.ExistingRoleKeys) {
+
+	if projectGrant.HasInvalidRoles(existingRoleKeys) {
 		return zerrors.ThrowPreconditionFailed(err, "COMMAND-6m9gd", "Errors.Project.Role.NotFound")
 	}
 	return nil
+}
+
+func (c *Commands) searchProjectGrantState(ctx context.Context, projectID, grantedOrgID string) (existingRoleKeys []string, err error) {
+	results, err := c.eventstore.Search(
+		ctx,
+		// project state query
+		map[eventstore.FieldType]any{
+			eventstore.FieldTypeAggregateType: project.AggregateType,
+			eventstore.FieldTypeAggregateID:   projectID,
+			eventstore.FieldTypeFieldName:     project.ProjectStateSearchField,
+			eventstore.FieldTypeObjectType:    project.ProjectSearchType,
+		},
+		// granted org query
+		map[eventstore.FieldType]any{
+			eventstore.FieldTypeAggregateType: org.AggregateType,
+			eventstore.FieldTypeAggregateID:   grantedOrgID,
+			eventstore.FieldTypeFieldName:     org.OrgStateSearchField,
+			eventstore.FieldTypeObjectType:    org.OrgSearchType,
+		},
+		// role query
+		map[eventstore.FieldType]any{
+			eventstore.FieldTypeAggregateType: project.AggregateType,
+			eventstore.FieldTypeAggregateID:   projectID,
+			eventstore.FieldTypeFieldName:     project.ProjectRoleKeySearchField,
+			eventstore.FieldTypeObjectType:    project.ProjectRoleSearchType,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	var (
+		existsProject    bool
+		existsGrantedOrg bool
+	)
+
+	for _, result := range results {
+		switch result.Object.Type {
+		case project.ProjectRoleSearchType:
+			var role string
+			err := result.Value.Unmarshal(&role)
+			if err != nil {
+				return nil, err
+			}
+			existingRoleKeys = append(existingRoleKeys, role)
+		case org.OrgSearchType:
+			var state domain.OrgState
+			err := result.Value.Unmarshal(&state)
+			if err != nil {
+				return nil, err
+			}
+			existsGrantedOrg = state.Valid() && state != domain.OrgStateRemoved
+		case project.ProjectSearchType:
+			var state domain.ProjectState
+			err := result.Value.Unmarshal(&state)
+			if err != nil {
+				return nil, err
+			}
+			existsProject = state.Valid() && state != domain.ProjectStateRemoved
+		}
+	}
+
+	if !existsProject {
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
+	}
+	if !existsGrantedOrg {
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
+	}
+	return existingRoleKeys, nil
 }

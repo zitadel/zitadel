@@ -11,12 +11,13 @@ import (
 )
 
 const (
-	DeviceAuthRequestProjectionTable = "projections.device_auth_requests"
+	DeviceAuthRequestProjectionTable = "projections.device_auth_requests2"
 
 	DeviceAuthRequestColumnClientID     = "client_id"
 	DeviceAuthRequestColumnDeviceCode   = "device_code"
 	DeviceAuthRequestColumnUserCode     = "user_code"
 	DeviceAuthRequestColumnScopes       = "scopes"
+	DeviceAuthRequestColumnAudience     = "audience"
 	DeviceAuthRequestColumnCreationDate = "creation_date"
 	DeviceAuthRequestColumnChangeDate   = "change_date"
 	DeviceAuthRequestColumnSequence     = "sequence"
@@ -43,7 +44,8 @@ func (*deviceAuthRequestProjection) Init() *old_handler.Check {
 			handler.NewColumn(DeviceAuthRequestColumnClientID, handler.ColumnTypeText),
 			handler.NewColumn(DeviceAuthRequestColumnDeviceCode, handler.ColumnTypeText),
 			handler.NewColumn(DeviceAuthRequestColumnUserCode, handler.ColumnTypeText),
-			handler.NewColumn(DeviceAuthRequestColumnScopes, handler.ColumnTypeTextArray),
+			handler.NewColumn(DeviceAuthRequestColumnScopes, handler.ColumnTypeTextArray, handler.Nullable()),
+			handler.NewColumn(DeviceAuthRequestColumnAudience, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(DeviceAuthRequestColumnCreationDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(DeviceAuthRequestColumnChangeDate, handler.ColumnTypeTimestamp),
 			handler.NewColumn(DeviceAuthRequestColumnSequence, handler.ColumnTypeInt64),
@@ -72,6 +74,10 @@ func (p *deviceAuthRequestProjection) Reducers() []handler.AggregateReducer {
 					Event:  deviceauth.CanceledEventType,
 					Reduce: p.reduceDoneEvents,
 				},
+				{
+					Event:  deviceauth.DoneEventType,
+					Reduce: p.reduceDoneEvents,
+				},
 			},
 		},
 	}
@@ -89,6 +95,7 @@ func (p *deviceAuthRequestProjection) reduceAdded(event eventstore.Event) (*hand
 			handler.NewCol(DeviceAuthRequestColumnDeviceCode, e.DeviceCode),
 			handler.NewCol(DeviceAuthRequestColumnUserCode, e.UserCode),
 			handler.NewCol(DeviceAuthRequestColumnScopes, e.Scopes),
+			handler.NewCol(DeviceAuthRequestColumnAudience, e.Audience),
 			handler.NewCol(DeviceAuthRequestColumnCreationDate, e.CreationDate()),
 			handler.NewCol(DeviceAuthRequestColumnChangeDate, e.CreationDate()),
 			handler.NewCol(DeviceAuthRequestColumnSequence, e.Sequence()),
@@ -100,7 +107,7 @@ func (p *deviceAuthRequestProjection) reduceAdded(event eventstore.Event) (*hand
 // reduceDoneEvents removes the device auth request from the projection.
 func (p *deviceAuthRequestProjection) reduceDoneEvents(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
-	case *deviceauth.ApprovedEvent, *deviceauth.CanceledEvent:
+	case *deviceauth.ApprovedEvent, *deviceauth.CanceledEvent, *deviceauth.DoneEvent:
 		return handler.NewDeleteStatement(event,
 			[]handler.Condition{
 				handler.NewCond(DeviceAuthRequestColumnInstanceID, event.Aggregate().InstanceID),

@@ -9,7 +9,7 @@ import {
   GetProviderByIDRequest as AdminGetProviderByIDRequest,
   UpdateJWTProviderRequest as AdminUpdateJWTProviderRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
+import { AutoLinkingOption, Options, Provider } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddJWTProviderRequest as MgmtAddJWTProviderRequest,
   GetProviderByIDRequest as MgmtGetProviderByIDRequest,
@@ -23,6 +23,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { requiredValidator } from '../../form-field/validators/validators';
 
 import { PolicyComponentServiceType } from '../../policies/policy-component-types.enum';
+import { BehaviorSubject } from 'rxjs';
+import { ProviderNextService } from '../provider-next/provider-next.service';
 
 @Component({
   selector: 'cnsl-provider-jwt',
@@ -30,10 +32,16 @@ import { PolicyComponentServiceType } from '../../policies/policy-component-type
 })
 export class ProviderJWTComponent {
   public showOptional: boolean = false;
-  public options: Options = new Options().setIsCreationAllowed(true).setIsLinkingAllowed(true);
+  public options: Options = new Options()
+    .setIsCreationAllowed(true)
+    .setIsLinkingAllowed(true)
+    .setAutoLinking(AutoLinkingOption.AUTO_LINKING_OPTION_UNSPECIFIED);
 
+  // DEPRECATED: use id$ instead
   public id: string | null = '';
+  // DEPRECATED: assert service$ instead
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
+  // DEPRECATED: use service$ instead
   private service!: ManagementService | AdminService;
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -42,6 +50,24 @@ export class ProviderJWTComponent {
 
   public provider?: Provider.AsObject;
 
+  public justCreated$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public justActivated$ = new BehaviorSubject<boolean>(false);
+
+  private service$ = this.nextSvc.service(this.route.data);
+  private id$ = this.nextSvc.id(this.route.paramMap, this.justCreated$);
+  public exists$ = this.nextSvc.exists(this.id$);
+  public autofillLink$ = this.nextSvc.autofillLink(
+    this.id$,
+    `https://zitadel.com/docs/guides/integrate/identity-providers/additional-information`,
+  );
+  public activateLink$ = this.nextSvc.activateLink(
+    this.id$,
+    this.justActivated$,
+    'https://zitadel.com/docs/guides/integrate/identity-providers/okta-oidc#activate-idp',
+    this.service$,
+  );
+  public expandWhatNow$ = this.nextSvc.expandWhatNow(this.id$, this.activateLink$, this.justCreated$);
+
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -49,6 +75,7 @@ export class ProviderJWTComponent {
     private injector: Injector,
     private _location: Location,
     breadcrumbService: BreadcrumbService,
+    private nextSvc: ProviderNextService,
   ) {
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.serviceType = data['serviceType'];
@@ -108,6 +135,10 @@ export class ProviderJWTComponent {
       });
   }
 
+  public activate() {
+    this.nextSvc.activate(this.id$, this.justActivated$, this.service$);
+  }
+
   private getData(id: string): void {
     const req =
       this.serviceType === PolicyComponentServiceType.ADMIN
@@ -131,7 +162,7 @@ export class ProviderJWTComponent {
   }
 
   public submitForm(): void {
-    this.provider ? this.updateJWTProvider() : this.addJWTProvider();
+    this.provider || this.justCreated$.value ? this.updateJWTProvider() : this.addJWTProvider();
   }
 
   public addJWTProvider(): void {
@@ -149,11 +180,9 @@ export class ProviderJWTComponent {
     this.loading = true;
     this.service
       .addJWTProvider(req)
-      .then((idp) => {
-        setTimeout(() => {
-          this.loading = false;
-          this.close();
-        }, 2000);
+      .then((addedIDP) => {
+        this.justCreated$.next(addedIDP.id);
+        this.loading = false;
       })
       .catch((error) => {
         this.toast.showError(error);
@@ -162,12 +191,12 @@ export class ProviderJWTComponent {
   }
 
   public updateJWTProvider(): void {
-    if (this.provider) {
+    if (this.provider || this.justCreated$.value) {
       const req =
         this.serviceType === PolicyComponentServiceType.MGMT
           ? new MgmtUpdateJWTProviderRequest()
           : new AdminUpdateJWTProviderRequest();
-      req.setId(this.provider.id);
+      req.setId(this.provider?.id || this.justCreated$.value);
       req.setName(this.name?.value);
       req.setHeaderName(this.headerName?.value);
       req.setIssuer(this.issuer?.value);

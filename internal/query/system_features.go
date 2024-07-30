@@ -12,6 +12,11 @@ type FeatureSource[T any] struct {
 	Value T
 }
 
+func (f *FeatureSource[T]) set(level feature.Level, value any) {
+	f.Level = level
+	f.Value = value.(T)
+}
+
 type SystemFeatures struct {
 	Details *domain.ObjectDetails
 
@@ -19,6 +24,9 @@ type SystemFeatures struct {
 	TriggerIntrospectionProjections FeatureSource[bool]
 	LegacyIntrospection             FeatureSource[bool]
 	UserSchema                      FeatureSource[bool]
+	TokenExchange                   FeatureSource[bool]
+	Actions                         FeatureSource[bool]
+	ImprovedPerformance             FeatureSource[[]feature.ImprovedPerformanceType]
 }
 
 func (q *Queries) GetSystemFeatures(ctx context.Context) (_ *SystemFeatures, err error) {

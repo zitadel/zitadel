@@ -10,6 +10,15 @@ export const ORGANIZATIONS: SidenavSetting = {
   },
 };
 
+export const FEATURESETTINGS: SidenavSetting = {
+  id: 'features',
+  i18nKey: 'SETTINGS.LIST.FEATURESETTINGS',
+  groupI18nKey: 'SETTINGS.GROUPS.GENERAL',
+  requiredRoles: {
+    [PolicyComponentServiceType.ADMIN]: ['iam.restrictions.read'],
+  },
+};
+
 export const LANGUAGES: SidenavSetting = {
   id: 'languages',
   i18nKey: 'SETTINGS.LIST.LANGUAGES',
@@ -108,6 +117,16 @@ export const LOCKOUT: SidenavSetting = {
   },
 };
 
+export const AGE: SidenavSetting = {
+  id: 'age',
+  i18nKey: 'SETTINGS.LIST.AGE',
+  groupI18nKey: 'SETTINGS.GROUPS.LOGIN',
+  requiredRoles: {
+    [PolicyComponentServiceType.MGMT]: ['policy.read'],
+    [PolicyComponentServiceType.ADMIN]: ['iam.policy.read'],
+  },
+};
+
 export const COMPLEXITY: SidenavSetting = {
   id: 'complexity',
   i18nKey: 'SETTINGS.LIST.COMPLEXITY',
@@ -178,7 +197,7 @@ export const LOGINTEXTS: SidenavSetting = {
 
 export const PRIVACYPOLICY: SidenavSetting = {
   id: 'privacypolicy',
-  i18nKey: 'SETTINGS.LIST.PRIVACYPOLICY',
+  i18nKey: 'DESCRIPTIONS.SETTINGS.PRIVACY_POLICY.TITLE',
   groupI18nKey: 'SETTINGS.GROUPS.OTHER',
   requiredRoles: {
     [PolicyComponentServiceType.MGMT]: ['policy.read'],

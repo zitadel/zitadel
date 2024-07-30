@@ -169,7 +169,7 @@ func (u *userNotifier) reduceInitCodeAdded(event eventstore.Event) (*handler.Sta
 			return err
 		}
 		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
-			SendUserInitCode(ctx, notifyUser, code)
+			SendUserInitCode(ctx, notifyUser, code, e.AuthRequestID)
 		if err != nil {
 			return err
 		}
@@ -226,7 +226,7 @@ func (u *userNotifier) reduceEmailCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 		err = types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e).
-			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate)
+			SendEmailVerificationCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err
 		}
@@ -285,7 +285,7 @@ func (u *userNotifier) reducePasswordCodeAdded(event eventstore.Event) (*handler
 		if e.NotificationType == domain.NotificationTypeSms {
 			notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
 		}
-		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate)
+		err = notify.SendPasswordCode(ctx, notifyUser, code, e.URLTemplate, e.AuthRequestID)
 		if err != nil {
 			return err
 		}
@@ -378,7 +378,7 @@ func (u *userNotifier) reduceOTPSMS(
 	if err != nil {
 		return nil, err
 	}
-	err = sentCommand(ctx, userID, resourceOwner)
+	err = sentCommand(ctx, event.Aggregate().ID, event.Aggregate().ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -514,7 +514,7 @@ func (u *userNotifier) reduceDomainClaimed(event eventstore.Event) (*handler.Sta
 	}
 	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
 		ctx := HandlerContext(event.Aggregate())
-		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.AggregateType,
+		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil,
 			user.UserDomainClaimedType, user.UserDomainClaimedSentType)
 		if err != nil {
 			return err
@@ -616,7 +616,7 @@ func (u *userNotifier) reducePasswordChanged(event eventstore.Event) (*handler.S
 
 	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
 		ctx := HandlerContext(event.Aggregate())
-		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.AggregateType, user.HumanPasswordChangeSentType)
+		alreadyHandled, err := u.queries.IsAlreadyHandled(ctx, event, nil, user.HumanPasswordChangeSentType)
 		if err != nil {
 			return err
 		}
@@ -722,5 +722,5 @@ func (u *userNotifier) checkIfCodeAlreadyHandledOrExpired(ctx context.Context, e
 	if event.CreatedAt().Add(expiry).Before(time.Now().UTC()) {
 		return true, nil
 	}
-	return u.queries.IsAlreadyHandled(ctx, event, data, user.AggregateType, eventTypes...)
+	return u.queries.IsAlreadyHandled(ctx, event, data, eventTypes...)
 }

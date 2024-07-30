@@ -23,6 +23,7 @@ type AuthRequestWriteModel struct {
 	Scope            []string
 	Audience         []string
 	ResponseType     domain.OIDCResponseType
+	ResponseMode     domain.OIDCResponseMode
 	CodeChallenge    *domain.OIDCCodeChallenge
 	Prompt           []domain.Prompt
 	UILocales        []string
@@ -34,6 +35,7 @@ type AuthRequestWriteModel struct {
 	AuthTime         time.Time
 	AuthMethods      []domain.UserAuthMethodType
 	AuthRequestState domain.AuthRequestState
+	NeedRefreshToken bool
 }
 
 func NewAuthRequestWriteModel(ctx context.Context, id string) *AuthRequestWriteModel {
@@ -57,6 +59,7 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.Scope = e.Scope
 			m.Audience = e.Audience
 			m.ResponseType = e.ResponseType
+			m.ResponseMode = e.ResponseMode
 			m.CodeChallenge = e.CodeChallenge
 			m.Prompt = e.Prompt
 			m.UILocales = e.UILocales
@@ -64,6 +67,7 @@ func (m *AuthRequestWriteModel) Reduce() error {
 			m.LoginHint = e.LoginHint
 			m.HintUserID = e.HintUserID
 			m.AuthRequestState = domain.AuthRequestStateAdded
+			m.NeedRefreshToken = e.NeedRefreshToken
 		case *authrequest.SessionLinkedEvent:
 			m.SessionID = e.SessionID
 			m.UserID = e.UserID

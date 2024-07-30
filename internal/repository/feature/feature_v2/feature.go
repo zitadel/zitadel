@@ -16,12 +16,18 @@ var (
 	SystemTriggerIntrospectionProjectionsEventType = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTriggerIntrospectionProjections)
 	SystemLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyLegacyIntrospection)
 	SystemUserSchemaEventType                      = setEventTypeFromFeature(feature.LevelSystem, feature.KeyUserSchema)
+	SystemTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelSystem, feature.KeyTokenExchange)
+	SystemActionsEventType                         = setEventTypeFromFeature(feature.LevelSystem, feature.KeyActions)
+	SystemImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelSystem, feature.KeyImprovedPerformance)
 
 	InstanceResetEventType                           = resetEventTypeFromFeature(feature.LevelInstance)
 	InstanceLoginDefaultOrgEventType                 = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLoginDefaultOrg)
 	InstanceTriggerIntrospectionProjectionsEventType = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTriggerIntrospectionProjections)
 	InstanceLegacyIntrospectionEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyLegacyIntrospection)
 	InstanceUserSchemaEventType                      = setEventTypeFromFeature(feature.LevelInstance, feature.KeyUserSchema)
+	InstanceTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTokenExchange)
+	InstanceActionsEventType                         = setEventTypeFromFeature(feature.LevelInstance, feature.KeyActions)
+	InstanceImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyImprovedPerformance)
 )
 
 const (

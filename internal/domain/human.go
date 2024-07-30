@@ -4,8 +4,11 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/net/context"
+
 	"github.com/zitadel/zitadel/internal/crypto"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -102,10 +105,13 @@ func (u *Human) EnsureDisplayName() {
 	u.DisplayName = u.Username
 }
 
-func (u *Human) HashPasswordIfExisting(policy *PasswordComplexityPolicy, hasher *crypto.PasswordHasher, onetime bool) error {
+func (u *Human) HashPasswordIfExisting(ctx context.Context, policy *PasswordComplexityPolicy, hasher *crypto.Hasher, onetime bool) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if u.Password != nil {
 		u.Password.ChangeRequired = onetime
-		return u.Password.HashPasswordIfExisting(policy, hasher)
+		return u.Password.HashPasswordIfExisting(ctx, policy, hasher)
 	}
 	return nil
 }

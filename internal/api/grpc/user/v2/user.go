@@ -18,11 +18,12 @@ import (
 	"github.com/zitadel/zitadel/internal/idp/providers/ldap"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) AddHumanUser(ctx context.Context, req *user.AddHumanUserRequest) (_ *user.AddHumanUserResponse, err error) {
+
 	human, err := AddUserRequestToAddHuman(req)
 	if err != nil {
 		return nil, err
@@ -95,6 +96,7 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		Register:               false,
 		Metadata:               metadata,
 		Links:                  links,
+		TOTPSecret:             req.GetTotpSecret(),
 	}, nil
 }
 
@@ -249,49 +251,13 @@ func SetHumanPasswordToPassword(password *user.SetPassword) *command.Password {
 	if password == nil {
 		return nil
 	}
-	var changeRequired bool
-	var passwordStr *string
-	if password.GetPassword() != nil {
-		passwordStr = &password.GetPassword().Password
-		changeRequired = password.GetPassword().GetChangeRequired()
-	}
-	var hash *string
-	if password.GetHashedPassword() != nil {
-		hash = &password.GetHashedPassword().Hash
-		changeRequired = password.GetHashedPassword().GetChangeRequired()
-	}
-	var code *string
-	if password.GetVerificationCode() != "" {
-		codeT := password.GetVerificationCode()
-		code = &codeT
-	}
-	var oldPassword *string
-	if password.GetCurrentPassword() != "" {
-		oldPasswordT := password.GetCurrentPassword()
-		oldPassword = &oldPasswordT
-	}
 	return &command.Password{
-		PasswordCode:        code,
-		OldPassword:         oldPassword,
-		Password:            passwordStr,
-		EncodedPasswordHash: hash,
-		ChangeRequired:      changeRequired,
+		PasswordCode:        password.GetVerificationCode(),
+		OldPassword:         password.GetCurrentPassword(),
+		Password:            password.GetPassword().GetPassword(),
+		EncodedPasswordHash: password.GetHashedPassword().GetHash(),
+		ChangeRequired:      password.GetPassword().GetChangeRequired() || password.GetHashedPassword().GetChangeRequired(),
 	}
-}
-
-func (s *Server) AddIDPLink(ctx context.Context, req *user.AddIDPLinkRequest) (_ *user.AddIDPLinkResponse, err error) {
-	orgID := authz.GetCtxData(ctx).OrgID
-	details, err := s.command.AddUserIDPLink(ctx, req.UserId, orgID, &command.AddLink{
-		IDPID:         req.GetIdpLink().GetIdpId(),
-		DisplayName:   req.GetIdpLink().GetUserName(),
-		IDPExternalID: req.GetIdpLink().GetUserId(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	return &user.AddIDPLinkResponse{
-		Details: object.DomainToDetailsPb(details),
-	}, nil
 }
 
 func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {
@@ -392,7 +358,7 @@ func (s *Server) StartIdentityProviderIntent(ctx context.Context, req *user.Star
 }
 
 func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.RedirectURLs) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetCtxData(ctx).OrgID)
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, urls.GetSuccessUrl(), urls.GetFailureUrl(), authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -416,7 +382,7 @@ func (s *Server) startIDPIntent(ctx context.Context, idpID string, urls *user.Re
 }
 
 func (s *Server) startLDAPIntent(ctx context.Context, idpID string, ldapCredentials *user.LDAPCredentials) (*user.StartIdentityProviderIntentResponse, error) {
-	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetCtxData(ctx).OrgID)
+	intentWriteModel, details, err := s.command.CreateIntent(ctx, idpID, "", "", authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
@@ -495,7 +461,7 @@ func (s *Server) ldapLogin(ctx context.Context, idpID, username, password string
 }
 
 func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.RetrieveIdentityProviderIntentRequest) (_ *user.RetrieveIdentityProviderIntentResponse, err error) {
-	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), authz.GetCtxData(ctx).OrgID)
+	intent, err := s.command.GetIntentWriteModel(ctx, req.GetIdpIntentId(), "")
 	if err != nil {
 		return nil, err
 	}
@@ -503,7 +469,7 @@ func (s *Server) RetrieveIdentityProviderIntent(ctx context.Context, req *user.R
 		return nil, err
 	}
 	if intent.State != domain.IDPIntentStateSucceeded {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-Hk38e", "Errors.Intent.NotSucceeded")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IDP-nme4gszsvx", "Errors.Intent.NotSucceeded")
 	}
 	return idpIntentToIDPIntentPb(intent, s.idpAlg)
 }
@@ -611,7 +577,7 @@ func (s *Server) checkIntentToken(token string, intentID string) error {
 }
 
 func (s *Server) ListAuthenticationMethodTypes(ctx context.Context, req *user.ListAuthenticationMethodTypesRequest) (*user.ListAuthenticationMethodTypesResponse, error) {
-	authMethods, err := s.query.ListActiveUserAuthMethodTypes(ctx, req.GetUserId())
+	authMethods, err := s.query.ListUserAuthMethodTypes(ctx, req.GetUserId(), true)
 	if err != nil {
 		return nil, err
 	}

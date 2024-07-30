@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"testing"
 	"time"
@@ -13,6 +14,7 @@ import (
 	cache "github.com/zitadel/zitadel/internal/auth_request/repository"
 	"github.com/zitadel/zitadel/internal/auth_request/repository/mock"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	es_models "github.com/zitadel/zitadel/internal/eventstore/v1/models"
@@ -74,11 +76,11 @@ type mockUser struct {
 
 func (m *mockViewUserSession) UserSessionByIDs(string, string, string) (*user_view_model.UserSessionView, error) {
 	return &user_view_model.UserSessionView{
-		ExternalLoginVerification: m.ExternalLoginVerification,
-		PasswordlessVerification:  m.PasswordlessVerification,
-		PasswordVerification:      m.PasswordVerification,
-		SecondFactorVerification:  m.SecondFactorVerification,
-		MultiFactorVerification:   m.MultiFactorVerification,
+		ExternalLoginVerification: sql.NullTime{Time: m.ExternalLoginVerification},
+		PasswordlessVerification:  sql.NullTime{Time: m.PasswordlessVerification},
+		PasswordVerification:      sql.NullTime{Time: m.PasswordVerification},
+		SecondFactorVerification:  sql.NullTime{Time: m.SecondFactorVerification},
+		MultiFactorVerification:   sql.NullTime{Time: m.MultiFactorVerification},
 	}, nil
 }
 
@@ -87,9 +89,9 @@ func (m *mockViewUserSession) UserSessionsByAgentID(string, string) ([]*user_vie
 	for i, user := range m.Users {
 		sessions[i] = &user_view_model.UserSessionView{
 			ResourceOwner: user.ResourceOwner,
-			State:         int32(user.SessionState),
+			State:         sql.Null[domain.UserSessionState]{V: user.SessionState},
 			UserID:        user.UserID,
-			LoginName:     user.LoginName,
+			LoginName:     sql.NullString{String: user.LoginName},
 		}
 	}
 	return sessions, nil
@@ -106,7 +108,8 @@ func (m *mockViewNoUser) UserByID(string, string) (*user_view_model.UserView, er
 }
 
 type mockEventUser struct {
-	Event eventstore.Event
+	Event      eventstore.Event
+	CodeExists bool
 }
 
 func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, changeDate time.Time, types []eventstore.EventType) ([]eventstore.Event, error) {
@@ -114,6 +117,10 @@ func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, changeDat
 		return []eventstore.Event{m.Event}, nil
 	}
 	return nil, nil
+}
+
+func (m *mockEventUser) PasswordCodeExists(ctx context.Context, userID string) (bool, error) {
+	return m.CodeExists, nil
 }
 
 func (m *mockEventUser) GetLatestUserSessionSequence(ctx context.Context, instanceID string) (*query.CurrentState, error) {
@@ -130,14 +137,15 @@ func (m *mockEventErrUser) UserEventsByID(ctx context.Context, id string, change
 	return nil, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
-func (m *mockEventErrUser) BulkAddExternalIDPs(ctx context.Context, userID string, externalIDPs []*user_model.ExternalIDP) error {
-	return zerrors.ThrowInternal(nil, "id", "internal error")
+func (m *mockEventErrUser) PasswordCodeExists(ctx context.Context, userID string) (bool, error) {
+	return false, zerrors.ThrowInternal(nil, "id", "internal error")
 }
 
 type mockViewUser struct {
 	InitRequired             bool
 	PasswordInitRequired     bool
 	PasswordSet              bool
+	PasswordChanged          time.Time
 	PasswordChangeRequired   bool
 	IsEmailVerified          bool
 	OTPState                 int32
@@ -183,7 +191,15 @@ type mockLockoutPolicy struct {
 	policy *query.LockoutPolicy
 }
 
-func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string, bool) (*query.LockoutPolicy, error) {
+func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error) {
+	return m.policy, nil
+}
+
+type mockPasswordAgePolicy struct {
+	policy *query.PasswordAgePolicy
+}
+
+func (m *mockPasswordAgePolicy) PasswordAgePolicyByOrg(context.Context, bool, string, bool) (*query.PasswordAgePolicy, error) {
 	return m.policy, nil
 }
 
@@ -287,23 +303,47 @@ func (m *mockIDPUserLinks) IDPUserLinks(ctx context.Context, queries *query.IDPU
 	return &query.IDPUserLinks{Links: m.idps}, nil
 }
 
+type mockPasswordReset struct {
+	t          *testing.T
+	expectCall bool
+}
+
+func newMockPasswordReset(expectCall bool) func(*testing.T) passwordReset {
+	return func(t *testing.T) passwordReset {
+		return &mockPasswordReset{
+			t:          t,
+			expectCall: expectCall,
+		}
+	}
+}
+
+func (m *mockPasswordReset) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType, authRequestID string) (objectDetails *domain.ObjectDetails, err error) {
+	if !m.expectCall {
+		m.t.Error("unexpected call to RequestSetPassword")
+		return nil, nil
+	}
+	return nil, err
+}
+
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	type fields struct {
-		AuthRequests            cache.AuthRequestCache
-		View                    *view.View
-		userSessionViewProvider userSessionViewProvider
-		userViewProvider        userViewProvider
-		userEventProvider       userEventProvider
-		orgViewProvider         orgViewProvider
-		userGrantProvider       userGrantProvider
-		projectProvider         projectProvider
-		applicationProvider     applicationProvider
-		loginPolicyProvider     loginPolicyViewProvider
-		lockoutPolicyProvider   lockoutPolicyViewProvider
-		idpUserLinksProvider    idpUserLinksProvider
-		privacyPolicyProvider   privacyPolicyProvider
-		labelPolicyProvider     labelPolicyProvider
-		customTextProvider      customTextProvider
+		AuthRequests              cache.AuthRequestCache
+		View                      *view.View
+		userSessionViewProvider   userSessionViewProvider
+		userViewProvider          userViewProvider
+		userEventProvider         userEventProvider
+		orgViewProvider           orgViewProvider
+		userGrantProvider         userGrantProvider
+		projectProvider           projectProvider
+		applicationProvider       applicationProvider
+		loginPolicyProvider       loginPolicyViewProvider
+		lockoutPolicyProvider     lockoutPolicyViewProvider
+		idpUserLinksProvider      idpUserLinksProvider
+		privacyPolicyProvider     privacyPolicyProvider
+		labelPolicyProvider       labelPolicyProvider
+		passwordAgePolicyProvider passwordAgePolicyProvider
+		customTextProvider        customTextProvider
+		passwordReset             func(t *testing.T) passwordReset
 	}
 	type args struct {
 		request       *domain.AuthRequest
@@ -465,7 +505,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"user not set, prompt select account, no active session, select account step",
+			"user not set, prompt select account, no active session, login step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{
 					Users: nil,
@@ -474,9 +514,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			},
 			args{&domain.AuthRequest{Prompt: []domain.Prompt{domain.PromptSelectAccount}}, false},
 			[]domain.NextStep{
-				&domain.SelectUserStep{
-					Users: []domain.UserSelection{},
-				}},
+				&domain.LoginStep{}},
 			nil,
 		},
 		{
@@ -485,6 +523,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				AuthRequests: func() cache.AuthRequestCache {
 					m := mock.NewMockAuthRequestCache(gomock.NewController(t))
 					m.EXPECT().UpdateAuthRequest(gomock.Any(), gomock.Any())
+					m.EXPECT().CacheAuthRequest(gomock.Any(), gomock.Any())
 					return m
 				}(),
 				userSessionViewProvider: &mockViewUserSession{
@@ -518,8 +557,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
 						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeTOTP},
-						PasswordCheckLifetime:     10 * 24 * time.Hour,
-						SecondFactorCheckLifetime: 18 * time.Hour,
+						PasswordCheckLifetime:     database.Duration(10 * 24 * time.Hour),
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
 					},
 				},
 				privacyPolicyProvider: &mockPrivacyPolicy{
@@ -527,6 +566,9 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				labelPolicyProvider: &mockLabelPolicy{
 					policy: &query.LabelPolicy{},
+				},
+				passwordAgePolicyProvider: &mockPasswordAgePolicy{
+					policy: &query.PasswordAgePolicy{},
 				},
 				customTextProvider: &mockCustomText{
 					texts: &query.CustomTexts{},
@@ -673,7 +715,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userViewProvider: &mockViewUser{},
 				userEventProvider: &mockEventUser{
-					&es_models.Event{
+					Event: &es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Typ:           user_repo.UserDeactivatedType,
 					},
@@ -695,7 +737,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userViewProvider: &mockViewUser{},
 				userEventProvider: &mockEventUser{
-					&es_models.Event{
+					Event: &es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Typ:           user_repo.UserLockedType,
 					},
@@ -820,7 +862,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						MultiFactorCheckLifetime: 10 * time.Hour,
+						MultiFactorCheckLifetime: database.Duration(10 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{},
@@ -845,7 +887,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						MultiFactorCheckLifetime: 10 * time.Hour,
+						MultiFactorCheckLifetime: database.Duration(10 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{},
@@ -871,7 +913,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						MultiFactorCheckLifetime: 10 * time.Hour,
+						MultiFactorCheckLifetime: database.Duration(10 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{},
@@ -915,7 +957,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			nil,
 		},
 		{
-			"password not set, init password step",
+			"password not set (email not verified), init password step",
 			fields{
 				userSessionViewProvider: &mockViewUserSession{},
 				userViewProvider: &mockViewUser{
@@ -929,6 +971,54 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
 				idpUserLinksProvider: &mockIDPUserLinks{},
+			},
+			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
+			[]domain.NextStep{&domain.VerifyEMailStep{InitPassword: true}},
+			nil,
+		},
+		{
+			"password not set (email verified), init password step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordInitRequired: true,
+					IsEmailVerified:      true,
+				},
+				userEventProvider: &mockEventUser{
+					CodeExists: true,
+				},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
+				idpUserLinksProvider: &mockIDPUserLinks{},
+				passwordReset:        newMockPasswordReset(false),
+			},
+			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
+			[]domain.NextStep{&domain.InitPasswordStep{}},
+			nil,
+		},
+		{
+			"password not set (email verified, password code not exists), create code, init password step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{},
+				userViewProvider: &mockViewUser{
+					PasswordInitRequired: true,
+					IsEmailVerified:      true,
+				},
+				userEventProvider: &mockEventUser{
+					CodeExists: false,
+				},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				orgViewProvider:      &mockViewOrg{State: domain.OrgStateActive},
+				idpUserLinksProvider: &mockIDPUserLinks{},
+				passwordReset:        newMockPasswordReset(true),
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			[]domain.NextStep{&domain.InitPasswordStep{}},
@@ -953,7 +1043,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						SecondFactorCheckLifetime: 18 * time.Hour,
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{},
@@ -986,7 +1076,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						SecondFactorCheckLifetime: 18 * time.Hour,
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{
@@ -1054,7 +1144,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						PasswordCheckLifetime: 10 * 24 * time.Hour,
+						PasswordCheckLifetime: database.Duration(10 * 24 * time.Hour),
 					},
 				},
 				idpUserLinksProvider: &mockIDPUserLinks{},
@@ -1301,6 +1391,48 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 			}, false},
 			[]domain.NextStep{&domain.ChangePasswordStep{}, &domain.VerifyEMailStep{}},
+			nil,
+		},
+		{
+			"password change expired, password change step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:     testNow.Add(-5 * time.Minute),
+					SecondFactorVerification: testNow.Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:            true,
+					PasswordChangeRequired: false,
+					PasswordChanged:        testNow.Add(-50 * 24 * time.Hour),
+					IsEmailVerified:        true,
+					MFAMaxSetUp:            int32(domain.MFALevelSecondFactor),
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				passwordAgePolicyProvider: &mockPasswordAgePolicy{
+					policy: &query.PasswordAgePolicy{
+						MaxAgeDays: 30,
+					},
+				},
+				idpUserLinksProvider: &mockIDPUserLinks{},
+			},
+			args{&domain.AuthRequest{
+				UserID: "UserID",
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeTOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
+				},
+				PasswordAgePolicy: &domain.PasswordAgePolicy{
+					MaxAgeDays: 30,
+				},
+			}, false},
+			[]domain.NextStep{&domain.ChangePasswordStep{Expired: true}},
 			nil,
 		},
 		{
@@ -1591,7 +1723,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{
-						SecondFactorCheckLifetime: 18 * time.Hour,
+						SecondFactorCheckLifetime: database.Duration(18 * time.Hour),
 					},
 				},
 				userEventProvider:    &mockEventUser{},
@@ -1661,7 +1793,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				IDPUserLinksProvider:      tt.fields.idpUserLinksProvider,
 				PrivacyPolicyProvider:     tt.fields.privacyPolicyProvider,
 				LabelPolicyProvider:       tt.fields.labelPolicyProvider,
+				PasswordAgePolicyProvider: tt.fields.passwordAgePolicyProvider,
 				CustomTextProvider:        tt.fields.customTextProvider,
+			}
+			if tt.fields.passwordReset != nil {
+				repo.PasswordReset = tt.fields.passwordReset(t)
 			}
 			got, err := repo.nextSteps(context.Background(), tt.args.request, tt.args.checkLoggedIn)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
@@ -1681,11 +1817,12 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		isInternal  bool
 	}
 	tests := []struct {
-		name        string
-		args        args
-		want        domain.NextStep
-		wantChecked bool
-		errFunc     func(err error) bool
+		name            string
+		args            args
+		want            domain.NextStep
+		wantChecked     bool
+		errFunc         func(err error) bool
+		wantMFAVerified []domain.MFAType
 	}{
 		//{
 		//	"required, prompt and false", //TODO: enable when LevelsOfAssurance is checked
@@ -1717,6 +1854,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			nil,
 			false,
 			zerrors.IsPreconditionFailed,
+			nil,
 		},
 		{
 			"not set up, no mfas configured, no prompt and true",
@@ -1735,6 +1873,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			nil,
 			true,
+			nil,
 			nil,
 		},
 		{
@@ -1759,6 +1898,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				},
 			},
 			false,
+			nil,
 			nil,
 		},
 		{
@@ -1786,6 +1926,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			false,
 			nil,
+			nil,
 		},
 		{
 			"not set up and skipped, true",
@@ -1805,6 +1946,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			nil,
 			true,
+			nil,
 			nil,
 		},
 		{
@@ -1828,6 +1970,38 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			nil,
 			true,
 			nil,
+			[]domain.MFAType{domain.MFATypeTOTP},
+		},
+		{
+			"checked passwordless, true",
+			args{
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeTOTP},
+						SecondFactorCheckLifetime: 18 * time.Hour,
+						MultiFactors:              []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+						MultiFactorCheckLifetime:  18 * time.Hour,
+					},
+					MFAsVerified: []domain.MFAType{domain.MFATypeU2FUserVerification},
+				},
+				user: &user_model.UserView{
+					HumanView: &user_model.HumanView{
+						MFAMaxSetUp: domain.MFALevelMultiFactor,
+						PasswordlessTokens: []*user_model.WebAuthNView{
+							{
+								TokenID: "tokenID",
+								State:   user_model.MFAStateReady,
+							},
+						},
+					},
+				},
+				userSession: &user_model.UserSessionView{PasswordlessVerification: testNow.Add(-5 * time.Hour)},
+				isInternal:  true,
+			},
+			nil,
+			true,
+			nil,
+			[]domain.MFAType{domain.MFATypeU2FUserVerification},
 		},
 		{
 			"not checked, check and false",
@@ -1853,6 +2027,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			false,
 			nil,
+			nil,
 		},
 		{
 			"external not checked or forced but set up, want step",
@@ -1877,6 +2052,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			false,
 			nil,
+			nil,
 		},
 		{
 			"external not forced but checked",
@@ -1899,6 +2075,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			nil,
 			true,
 			nil,
+			[]domain.MFAType{domain.MFATypeTOTP},
 		},
 		{
 			"external not checked but required, want step",
@@ -1926,6 +2103,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			},
 			false,
 			nil,
+			nil,
 		},
 		{
 			"external not checked but local required",
@@ -1949,6 +2127,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 			nil,
 			true,
 			nil,
+			nil,
 		},
 	}
 	for _, tt := range tests {
@@ -1963,6 +2142,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 				t.Errorf("mfaChecked() checked = %v, want %v", ok, tt.wantChecked)
 			}
 			assert.Equal(t, tt.want, got)
+			assert.ElementsMatch(t, tt.args.request.MFAsVerified, tt.wantMFAVerified)
 		})
 	}
 }
@@ -2100,7 +2280,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventUser{
-					&es_models.Event{
+					Event: &es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
 						CreationDate:  testNow,
@@ -2123,7 +2303,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id"},
 				eventProvider: &mockEventUser{
-					&es_models.Event{
+					Event: &es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
 						CreationDate:  testNow,
@@ -2150,7 +2330,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventUser{
-					&es_models.Event{
+					Event: &es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
 						CreationDate:  testNow,
@@ -2177,7 +2357,7 @@ func Test_userSessionByIDs(t *testing.T) {
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id"},
 				eventProvider: &mockEventUser{
-					&es_models.Event{
+					Event: &es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Typ:           user_repo.UserRemovedType,
 					},
@@ -2266,7 +2446,7 @@ func Test_userByID(t *testing.T) {
 					PasswordChangeRequired: true,
 				},
 				eventProvider: &mockEventUser{
-					&es_models.Event{
+					Event: &es_models.Event{
 						AggregateType: user_repo.AggregateType,
 						Typ:           user_repo.UserV1PasswordChangedType,
 						CreationDate:  testNow,

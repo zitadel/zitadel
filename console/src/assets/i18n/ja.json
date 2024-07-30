@@ -48,13 +48,13 @@
       "TITLE": "ユーザー",
       "DESCRIPTION": "ユーザーは、あなたのアプリケーションにアクセスできる人間または機械です。",
       "HUMANS": {
-        "TITLE": "人間",
-        "DESCRIPTION": "人間は、ログインプロンプトを伴うブラウザセッションで対話的に認証します。",
+        "TITLE": "ユーザー",
+        "DESCRIPTION": "ユーザーは、ログイン プロンプトを使用してブラウザ セッションで対話的に認証を行います。",
         "METADATA": "部門のようなユーザーにカスタム属性を追加してください。この情報をあなたのアクションで使用できます。"
       },
       "MACHINES": {
-        "TITLE": "マシン",
-        "DESCRIPTION": "マシンは、プライベートキーで署名されたJWTベアラートークンを使用して非対話的に認証します。パーソナルアクセストークンも使用できます。",
+        "TITLE": "サービス利用者",
+        "DESCRIPTION": "サービス ユーザーは、秘密キーで署名された JWT ベアラー トークンを使用して非対話的に認証されます。個人のアクセス トークンを使用することもできます。",
         "METADATA": "認証システムのようなユーザーにカスタム属性を追加してください。この情報をあなたのアクションで使用できます。"
       },
       "SELF": {
@@ -79,16 +79,45 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "インスタンス設定",
-        "DESCRIPTION": "インスタンス設定は、すべての組織のデフォルト設定です。適切な権限があれば、いくつかは組織の設定で上書き可能です。"
+        "TITLE": "デフォルトの設定",
+        "DESCRIPTION": "すべての組織のデフォルト設定。適切な権限があれば、一部の権限は組織設定で上書きできます。"
       },
       "ORG": {
         "TITLE": "組織設定",
         "DESCRIPTION": "組織の設定をカスタマイズします。"
       },
+      "FEATURES": {
+        "TITLE": "機能設定",
+        "DESCRIPTION": "インスタンスの機能のロックを解除します。"
+      },
       "IDPS": {
         "TITLE": "IDプロバイダー",
-        "DESCRIPTION": "外部IDプロバイダーを作成してアクティブにします。よく知られたプロバイダーを選択するか、他のOIDC、OAuth、SAML互換プロバイダーを設定します。既存のJWTトークンを連合アイデンティティとして使用するために、JWT IDプロバイダーを設定することもできます。"
+        "DESCRIPTION": "外部IDプロバイダーを作成してアクティブにします。よく知られたプロバイダーを選択するか、他のOIDC、OAuth、SAML互換プロバイダーを設定します。既存のJWTトークンを連合アイデンティティとして使用するために、JWT IDプロバイダーを設定することもできます。",
+        "NEXT": "次は？",
+        "SAML": {
+          "TITLE": "SAML IDプロバイダーを設定する",
+          "DESCRIPTION": "ZITADELは設定されました。次に、SAML IDプロバイダーの設定が必要です。ほとんどのプロバイダーでは、ZITADELのメタデータXML全体をアップロードするだけで済みます。他のプロバイダーでは、エンティティID（メタデータURL）、Assertion Consumer Service (ACS) URL、またはシングルログアウトURLなど、特定のURLのみを提供するよう求められる場合があります。"
+        },
+        "CALLBACK": {
+          "TITLE": "{{ provider }} IDプロバイダーを設定する",
+          "DESCRIPTION": "ZITADELを設定する前に、このURLをIDプロバイダーに渡して、認証後にブラウザがZITADELにリダイレクトするようにしてください。"
+        },
+        "JWT": {
+          "TITLE": "JWTをフェデレーテッドアイデンティティとして使用する",
+          "DESCRIPTION": "JWT IDプロバイダーを使用すると、既存のJWTトークンをフェデレーテッドアイデンティティとして使用できます。JWTの発行者がすでにある場合に便利な機能です。JWT IdPを使用すると、これらのJWTを使用してZITADELでユーザーを即座に作成および更新できます。"
+        },
+        "LDAP": {
+          "TITLE": "LDAP IDプロバイダーに接続するためにZITADELを設定する",
+          "DESCRIPTION": "LDAPサーバーへの接続詳細を提供し、LDAP属性をZITADEL属性にマッピングする設定を行ってください。"
+        },
+        "AUTOFILL": {
+          "TITLE": "ユーザーデータの自動入力",
+          "DESCRIPTION": "アクションを使用してユーザーの体験を向上させます。IDプロバイダーからの値でZITADELの登録フォームを事前に入力することができます。"
+        },
+        "ACTIVATE": {
+          "TITLE": "IdPを有効にする",
+          "DESCRIPTION": "IdPはまだ有効ではありません。有効にして、ユーザーがログインできるようにしてください。"
+        }
       },
       "PW_COMPLEXITY": {
         "TITLE": "パスワードの複雑さ",
@@ -100,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "外部リンク",
-        "DESCRIPTION": "ログインページに表示されるカスタム外部リソースへのユーザーガイドです。ユーザーは、サインアップする前に利用規約とプライバシーポリシーを受け入れる必要があります。"
+        "DESCRIPTION": "ログイン ページに表示されるカスタム外部リソースにユーザーを誘導します。ユーザーはサインアップする前に、サービス利用規約とプライバシー ポリシーに同意する必要があります。ドキュメントへのリンクを変更するか、空の文字列を設定してコンソールからドキュメント ボタンを非表示にします。カスタム外部リンクとそのリンクのカスタム テキストをコンソールに追加するか、それらを空に設定してそのボタンを非表示にします。"
       },
       "SMTP_PROVIDER": {
         "TITLE": "SMTP設定",
@@ -202,7 +231,7 @@
           "LABEL": "最大寿命（時間）",
           "PW_CHECK": {
             "TITLE": "パスワードチェック",
-            "DESCRIPTION": "ユーザーは、これらの期間中にパスワードを変更する必要があります。"
+            "DESCRIPTION": "この期間の後、ユーザーはパスワードで再認証する必要があります。"
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "外部ログインチェック",
@@ -240,9 +269,9 @@
             "TITLE": "外部ログインが許可",
             "DESCRIPTION": "ユーザーがZITADELユーザーを使用する代わりに外部IDプロバイダーでログインできるようにします。"
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "パスワードリセットが許可",
-            "DESCRIPTION": "ユーザーがパスワードをリセットできるようにします。"
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "パスワードリセットは非表示です",
+            "DESCRIPTION": "ユーザーがパスワードをリセットできないようにしてください。"
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "ドメインディスカバリーが許可",
@@ -457,6 +486,7 @@
     "MORE": "さらに",
     "STEP": "ステップ",
     "SETUP": "セットアップ",
+    "TEST": "テスト",
     "UNSAVEDCHANGES": "未保存の変更",
     "UNSAVED": {
       "DIALOG": {
@@ -467,7 +497,9 @@
     },
     "TABLE": {
       "SHOWUSER": "ユーザー {{value}} を表示する"
-    }
+    },
+    "DOWNLOAD": "ダウンロード",
+    "APPLY": "アプライ"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "すべての組織を含むインスタンス全体を管理する権限を持ちます",
@@ -565,6 +597,7 @@
     "INVALID_FORMAT": "不正なフォーマットです",
     "NOTANEMAIL": "入力された値がメールアドレスではありません。",
     "MINLENGTH": "{{requiredLength}} 文字以上の文字列が必要です。",
+    "MAXLENGTH": "{{requiredLength}}文字以下でなければなりません.",
     "UPPERCASEMISSING": "大文字を含める必要があります。",
     "LOWERCASEMISSING": "小文字を含める必要があります。",
     "SYMBOLERROR": "記号を含める必要があります。",
@@ -850,7 +883,8 @@
       "SET": "新しいパスワードを設定する",
       "RESENDNOTIFICATION": "パスワードリセットのリンクを送信する",
       "REQUIRED": "一部の必須項目が不足しています。",
-      "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。"
+      "MINLENGTHERROR": "最小で{{value}}文字の長さが必要です。",
+      "MAXLENGTHERROR": "{{value}}文字以下でなければなりません"
     },
     "ID": "id",
     "EMAIL": "Eメール",
@@ -1052,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "選択したアクションの削除",
         "DESCRIPTION": "フローから選択したアクションを削除してよろしいですか？"
-      }
+      },
+      "ABOUTNAME": "アクションの名前とJavaScript内の関数の名前は同じである必要があります"
     },
     "TOAST": {
       "ACTIONSSET": "アクションセット",
@@ -1262,6 +1297,7 @@
       "MEMBERCHANGED": "マネージャーが変更されました。",
       "SETPRIMARY": "プライマリドメインが設定されました。",
       "DELETED": "組織が正常に削除されました。",
+      "DEFAULTORGNOTFOUND": "デフォルトの組織が見つかりませんでした",
       "ORG_WAS_DELETED": "組織が削除されました。"
     },
     "DIALOG": {
@@ -1283,15 +1319,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "インスタンス設定",
-      "DESCRIPTION": "これらの設定は上書きされていない限り、すべての組織に適用されます。"
-    },
     "LIST": {
       "ORGS": "組織",
+      "FEATURESETTINGS": "機能設定",
       "LANGUAGES": "一般設定",
       "LOGIN": "ログイン動作とセキュリティ",
       "LOCKOUT": "ロックアウト",
+      "AGE": "パスワードの有効期限",
       "COMPLEXITY": "パスワードの複雑さ",
       "NOTIFICATIONS": "通知設定",
       "SMTP_PROVIDER": "SMTPプロバイダー",
@@ -1346,10 +1380,13 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
+      "TITLE": "SMTP設定",
+      "DESCRIPTION": "説明",
       "SENDERADDRESS": "送信者のメールアドレス",
       "SENDERNAME": "送信者名",
       "REPLYTOADDRESS": "返信先アドレス",
@@ -1360,6 +1397,7 @@
       "PASSWORDSET": "SMTPパスワードは正常に設定されました。",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "正常に保存されました！",
+      "NOCHANGES": "変更はありません!",
       "REQUIREDWARN": "ドメインから通知を送信するには、SMTP情報を入力する必要があります。"
     },
     "SMS": {
@@ -1400,9 +1438,7 @@
         "7": "ワンタイムパスワード (OTP) - SMS",
         "8": "ワンタイムパスワード (OTP) - 電子メール"
       },
-      "ADDGENERATOR": "シークレットの設定を定義する",
-      "GENERATORTYPE": "タイプ",
-      "EXPIRY": "有効期限（時間単位）",
+      "EXPIRY": "有効期限 (分単位)",
       "INCLUDEDIGITS": "数字を含める",
       "INCLUDESYMBOLS": "シンボルを含める",
       "INCLUDELOWERLETTERS": "小文字を含める",
@@ -1418,6 +1454,31 @@
       "IMPERSONATIONTITLE": "偽装",
       "IMPERSONATIONENABLED": "偽装を許可します",
       "IMPERSONATIONDESCRIPTION": "この設定では、原則として偽装を使用できます。偽装者には、適切な `*_IMPERSONATOR` ロールも割り当てられている必要があることに注意してください。"
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "ログイン時の既定組織",
+      "LOGINDEFAULTORG_DESCRIPTION": "組織コンテキストが設定されていない場合、ログイン UI は既定の組織の設定を使用します (インスタンスの設定ではなく)",
+      "OIDCLEGACYINTROSPECTION": "OIDC レガシーイントロスペクション",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "パフォーマンス上の理由から最近イントロスペクション エンドポイントをリファクタリングしました。この機能は、予期しないバグが発生した場合にレガシー実装にロールバックするために使用できます。",
+      "OIDCTOKENEXCHANGE": "OIDC トークン交換",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "OIDC トークン エンドポイント用に実験的な urn:ietf:params:oauth:grant-type:token-exchange 付与タイプを有効にします。トークン交換は、より少ないスコープを持つトークンを要求するか、他のユーザーになりすますために使用できます。インスタンスでのなりすましを許可するには、セキュリティポリシーを参照してください。",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "OIDC トリガーイントロスペクションプロジェクション",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "イントロスペクション要求中にプロジェクショントリガーを有効にします。これは、イントロスペクションレスポンスに顕著な整合性問題がある場合の回避策として機能しますが、パフォーマンスに影響を与える可能性があります。今後、イントロスペクション要求のトリガーを削除する予定です。",
+      "USERSCHEMA": "ユーザー スキーマ",
+      "USERSCHEMA_DESCRIPTION": "ユーザー スキーマを使用すると、ユーザーのデータスキーマを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "ACTIONS": "アクション",
+      "ACTIONS_DESCRIPTION": "Actions v2は、データの実行とターゲットを管理できます。フラグが有効になっている場合、新しい APIとその機能を使用できます。",
+      "STATES": {
+        "INHERITED": "継承",
+        "ENABLED": "有効",
+        "DISABLED": "無効"
+      },
+      "INHERITED_DESCRIPTION": "この設定は、値をシステムのデフォルト値に設定します。",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "有効は継承されます",
+        "DISABLED": "無効は継承されます"
+      },
+      "RESET": "すべて継承に設定"
     },
     "DIALOG": {
       "RESET": {
@@ -1483,8 +1544,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "パスワードエージング",
-      "DESCRIPTION": "パスワードエージングに関するポリシーを設定できます。このポリシーは、特定のエージング時間が経過した後に警告を発します。"
+      "TITLE": "パスワードの有効期限",
+      "DESCRIPTION": "パスワードの有効期限ポリシーを設定できます。 このポリシーにより、有効期限が切れた後にユーザーは次回のログイン時にパスワードを変更することを求められます。 自動的な警告や通知はない。"
     },
     "PWD_LOCKOUT": {
       "TITLE": "ロックアウトポリシー",
@@ -1502,13 +1563,18 @@
       "DESCRIPTIONCREATEADMIN": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。",
       "DESCRIPTIONCREATEMGMT": "ユーザーは、以下の利用可能なIDプロバイダーから選択できます。注：システムセットプロバイダーと、組織用に設定されたプロバイダーのみを使用できます。",
       "LIFETIME_INVALID": "フォームに無効な値が含まれています。",
-      "SAVED": "正常に保存されました！"
+      "SAVED": "正常に保存されました！",
+      "PROVIDER_ADDED": "IDプロバイダーが有効化されました。"
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "プライバシーポリシーと利用規約リンクを設定します。",
       "TOSLINK": "利用規約へのリンク",
       "POLICYLINK": "プライバシーポリシーへのリンク",
       "HELPLINK": "ヘルプへのリンク",
+      "SUPPORTEMAIL": "サポートメール",
+      "DOCSLINK": "ドキュメントリンク (Console)",
+      "CUSTOMLINK": "カスタムリンク(Console)",
+      "CUSTOMLINKTEXT": "カスタム リンク テキスト (Console)",
       "SAVED": "正常に保存されました！",
       "RESET_TITLE": "デフォルト値を復元する",
       "RESET_DESCRIPTION": "TOSおよびプライバシーポリシーのデフォルトリンクを復元しようとしています。本当によろしいですか？"
@@ -1542,7 +1608,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "メール認証が完了しました",
@@ -1557,6 +1624,7 @@
         "initPasswordText": "パスワードを初期化する",
         "initializeDoneText": "ユーザーの初期化が完了しました",
         "initializeUserText": "ユーザーを初期化する",
+        "linkingUserPromptText": "ユーザーのリンクプロンプト",
         "linkingUserDoneText": "ユーザーのリンクが完了しました",
         "loginText": "ログイン",
         "logoutText": "ログアウト",
@@ -1611,7 +1679,8 @@
         "username": "ユーザー名",
         "tempUsername": "一時ユーザー名",
         "otp": "ワンタイムパスワード",
-        "verifyUrl": "ワンタイムパスワードを確認するURL"
+        "verifyUrl": "ワンタイムパスワードを確認するURL",
+        "expiry": "有効期限"
       },
       "TOAST": {
         "UPDATED": "カスタムテキストが保存されました。"
@@ -1628,9 +1697,10 @@
       "HASLOWERCASE": "小文字を含める",
       "HASUPPERCASE": "大文字を含める",
       "SHOWLOCKOUTFAILURES": "ロックアウトの失敗を表示する",
-      "MAXATTEMPTS": "パスワードの最大試行",
-      "EXPIREWARNDAYS": "有効期限の翌日以降の警告",
-      "MAXAGEDAYS": "最大有効期限",
+      "MAXPASSWORDATTEMPTS": "パスワードの最大試行",
+      "MAXOTPATTEMPTS": "最大OTP試行回数",
+      "EXPIREWARNDAYS": "数日後に有効期限が切れます",
+      "MAXAGEDAYS": "最大有効期限 (日数)",
       "USERLOGINMUSTBEDOMAIN": "ログイン名の接尾辞として組織ドメインを追加する",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "この設定を有効にすると、すべてのログイン名が組織ドメインで接尾辞が付けられます。この設定が無効になっている場合、ユーザー名がすべての組織で一意であることを確認する必要があります。",
       "VALIDATEORGDOMAINS": "組織のドメイン検証が必要です (DNSまたはHTTPチャレンジ)",
@@ -1987,7 +2057,13 @@
       "ISCREATIONALLOWED": "アカウント作成を許可",
       "ISCREATIONALLOWED_DESC": "アカウントを作成できるかどうかを決めます。",
       "ISLINKINGALLOWED": "アカウントリンクを許可",
-      "ISLINKINGALLOWED_DESC": "IDを既存のアカウントにリンクできるかどうかを決めます。"
+      "ISLINKINGALLOWED_DESC": "IDを既存のアカウントにリンクできるかどうかを決めます。",
+      "AUTOLINKING_DESC": "アイデンティティが既存のアカウントにリンクされるように促されるかどうかを決定します。",
+      "AUTOLINKINGTYPE": {
+        "0": "無効",
+        "1": "既存のユーザー名のチェック",
+        "2": "既存のメールアドレスのチェック"
+      }
     },
     "OWNERTYPES": {
       "0": "不明",
@@ -2148,6 +2224,63 @@
       "1": "有効"
     }
   },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "SMTPプロバイダー",
+      "DESCRIPTION": "これらは、ZITADEL インスタンスの SMTP プロバイダーです。ユーザーに通知を送信するために使用するものをアクティブにします。",
+      "EMPTY": "使用可能な SMTP プロバイダーがありません",
+      "ACTIVATED": "アクティブ化された",
+      "ACTIVATE": "プロバイダーをアクティブ化する",
+      "DEACTIVATE": "プロバイダーを非アクティブ化する",
+      "TEST": "プロバイダーをテストする",
+      "TYPE": "タイプ",
+      "DIALOG": {
+        "ACTIVATED": "SMTP設定が有効化されました",
+        "ACTIVATE_WARN_TITLE": "SMTP設定を有効にする",
+        "ACTIVATE_WARN_DESCRIPTION": "SMTP 構成をアクティブにしようとしています。まず、現在アクティブなプロバイダーを非アクティブ化してから、この構成をアクティブ化します。本気ですか？",
+        "DEACTIVATE_WARN_TITLE": "SMTP設定を無効にする",
+        "DEACTIVATE_WARN_DESCRIPTION": "SMTP 構成を非アクティブ化しようとしています。本気ですか？",
+        "DEACTIVATED": "SMTP設定が無効化されました",
+        "DELETE_TITLE": "SMTP設定を削除する",
+        "DELETE_DESCRIPTION": "構成を削除しようとしています。送信者名を入力してこのアクションを確認します",
+        "DELETED": "SMTP設定が削除されました",
+        "SENDER": "この SMTP 構成を削除するには、「{{ value }}」と入力します。"
+      }
+    },
+    "CREATE": {
+      "TITLE": "SMTPプロバイダーの追加",
+      "DESCRIPTION": "次のプロバイダーから 1 つ以上を選択します。",
+      "STEPS": {
+        "TITLE": "{{ value }} SMTP プロバイダーを追加",
+        "CREATE_DESC_TITLE": "{{ value }} SMTP 設定をステップごとに入力します",
+        "CURRENT_DESC_TITLE": "これらは SMTP 設定です",
+        "PROVIDER_SETTINGS": "SMTPプロバイダーの設定",
+        "SENDER_SETTINGS": "送信者の設定",
+        "NEXT_STEPS": "次のステップ",
+        "ACTIVATE": {
+          "TITLE": "SMTP プロバイダーをアクティブ化する",
+          "DESCRIPTION": "ZITADEL は、アクティブ化するまで、この SMTP プロバイダーを使用して通知を送信できません。このプロバイダーをアクティブ化すると、アクティブだった他のプロバイダーは非アクティブ化されます。"
+        },
+        "DEACTIVATE": {
+          "TITLE": "SMTPプロバイダーを非アクティブ化します",
+          "DESCRIPTION": "この SMTP プロバイダーを非アクティブ化すると、再度アクティブ化するまで、Zitadel はそれを使用して通知を送信できなくなります。"
+        },
+        "SAVE_SETTINGS": "設定を保存する",
+        "TEST": {
+          "TITLE": "設定をテストする",
+          "DESCRIPTION": "SMTP プロバイダーの設定をテストし、保存する前にテスト結果を確認できます。",
+          "RESULT": "あなたの電子メールが正常に送信されました"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "SMTPプロバイダーの設定"
+    },
+    "EMPTY": "使用可能な SMTP プロバイダーがありません",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
   "APP": {
     "LIST": "アプリケーション",
     "COMPLIANCE": "OIDCコンプライアンス",
@@ -2271,7 +2404,8 @@
         "0": "Authorization Code",
         "1": "Implicit",
         "2": "Refresh Token",
-        "3": "Device Code"
+        "3": "Device Code",
+        "4": "Token Exchange"
       },
       "AUTHMETHOD": {
         "0": "Basic",
@@ -2410,7 +2544,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "マネージャーを追加する",

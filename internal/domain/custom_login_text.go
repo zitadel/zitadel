@@ -185,6 +185,7 @@ const (
 	LoginKeyPasswordChange                        = "PasswordChange."
 	LoginKeyPasswordChangeTitle                   = LoginKeyPasswordChange + "Title"
 	LoginKeyPasswordChangeDescription             = LoginKeyPasswordChange + "Description"
+	LoginKeyPasswordChangeExpiredDescription      = LoginKeyPasswordChange + "ExpiredDescription"
 	LoginKeyPasswordChangeOldPasswordLabel        = LoginKeyPasswordChange + "OldPasswordLabel"
 	LoginKeyPasswordChangeNewPasswordLabel        = LoginKeyPasswordChange + "NewPasswordLabel"
 	LoginKeyPasswordChangeNewPasswordConfirmLabel = LoginKeyPasswordChange + "NewPasswordConfirmLabel"
@@ -264,6 +265,12 @@ const (
 	LoginKeyRegisterOrgSaveButtonText       = LoginKeyRegistrationOrg + "SaveButtonText"
 	LoginKeyRegisterOrgBackButtonText       = LoginKeyRegistrationOrg + "BackButtonText"
 
+	LoginKeyLinkingUserPrompt                = "LinkingUserPrompt."
+	LoginKeyLinkingUserPromptTitle           = LoginKeyLinkingUserPrompt + "Title"
+	LoginKeyLinkingUserPromptDescription     = LoginKeyLinkingUserPrompt + "Description"
+	LoginKeyLinkingUserPromptLinkButtonText  = LoginKeyLinkingUserPrompt + "LinkButtonText"
+	LoginKeyLinkingUserPromptOtherButtonText = LoginKeyLinkingUserPrompt + "OtherButtonText"
+
 	LoginKeyLinkingUserDone                 = "LinkingUsersDone."
 	LoginKeyLinkingUserDoneTitle            = LoginKeyLinkingUserDone + "Title"
 	LoginKeyLinkingUserDoneDescription      = LoginKeyLinkingUserDone + "Description"
@@ -336,6 +343,7 @@ type CustomLoginText struct {
 	RegistrationUser                 RegistrationUserScreenText
 	ExternalRegistrationUserOverview ExternalRegistrationUserOverviewScreenText
 	RegistrationOrg                  RegistrationOrgScreenText
+	LinkingUserPrompt                LinkingUserPromptScreenText
 	LinkingUsersDone                 LinkingUserDoneScreenText
 	ExternalNotFound                 ExternalUserNotFoundScreenText
 	LoginSuccess                     SuccessLoginScreenText
@@ -522,6 +530,7 @@ type PasswordlessScreenText struct {
 type PasswordChangeScreenText struct {
 	Title                   string
 	Description             string
+	ExpiredDescription      string
 	OldPasswordLabel        string
 	NewPasswordLabel        string
 	NewPasswordConfirmLabel string
@@ -605,6 +614,13 @@ type RegistrationOrgScreenText struct {
 	PrivacyConfirm       string
 	PrivacyLinkText      string
 	SaveButtonText       string
+}
+
+type LinkingUserPromptScreenText struct {
+	Title           string
+	Description     string
+	LinkButtonText  string
+	OtherButtonText string
 }
 
 type LinkingUserDoneScreenText struct {

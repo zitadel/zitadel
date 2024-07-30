@@ -2,10 +2,13 @@ package eventstore
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"time"
 
+	"github.com/muhlemmer/gu"
 	"github.com/zitadel/logging"
+	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
@@ -41,6 +44,7 @@ type AuthRequestRepo struct {
 	OrgViewProvider           orgViewProvider
 	LoginPolicyViewProvider   loginPolicyViewProvider
 	LockoutPolicyViewProvider lockoutPolicyViewProvider
+	PasswordAgePolicyProvider passwordAgePolicyProvider
 	PrivacyPolicyProvider     privacyPolicyProvider
 	IDPProviderViewProvider   idpProviderViewProvider
 	IDPUserLinksProvider      idpUserLinksProvider
@@ -48,6 +52,7 @@ type AuthRequestRepo struct {
 	ProjectProvider           projectProvider
 	ApplicationProvider       applicationProvider
 	CustomTextProvider        customTextProvider
+	PasswordReset             passwordReset
 
 	IdGenerator id.Generator
 }
@@ -75,7 +80,11 @@ type loginPolicyViewProvider interface {
 }
 
 type lockoutPolicyViewProvider interface {
-	LockoutPolicyByOrg(context.Context, bool, string, bool) (*query.LockoutPolicy, error)
+	LockoutPolicyByOrg(context.Context, bool, string) (*query.LockoutPolicy, error)
+}
+
+type passwordAgePolicyProvider interface {
+	PasswordAgePolicyByOrg(context.Context, bool, string, bool) (*query.PasswordAgePolicy, error)
 }
 
 type idpProviderViewProvider interface {
@@ -88,6 +97,7 @@ type idpUserLinksProvider interface {
 
 type userEventProvider interface {
 	UserEventsByID(ctx context.Context, id string, changeDate time.Time, eventTypes []eventstore.EventType) ([]eventstore.Event, error)
+	PasswordCodeExists(ctx context.Context, userID string) (exists bool, err error)
 }
 
 type userCommandProvider interface {
@@ -117,6 +127,10 @@ type customTextProvider interface {
 	CustomTextListByTemplate(ctx context.Context, aggregateID string, text string, withOwnerRemoved bool) (texts *query.CustomTexts, err error)
 }
 
+type passwordReset interface {
+	RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType, authRequestID string) (objectDetails *domain.ObjectDetails, err error)
+}
+
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
 	return repo.AuthRequests.Health(ctx)
 }
@@ -133,15 +147,6 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err != nil {
 		return nil, err
 	}
-	projectIDQuery, err := query.NewAppProjectIDSearchQuery(project.ID)
-	if err != nil {
-		return nil, err
-	}
-	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}}, false)
-	if err != nil {
-		return nil, err
-	}
-	request.Audience = appIDs
 	request.AppendAudIfNotExisting(project.ID)
 	request.ApplicationResourceOwner = project.ResourceOwner
 	request.PrivateLabelingSetting = project.PrivateLabelingSetting
@@ -276,6 +281,7 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 		return err
 	}
 
+	request.IDPLoginChecked = true
 	err = repo.Command.UserIDPLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
@@ -313,10 +319,10 @@ func (repo *AuthRequestRepo) setLinkingUser(ctx context.Context, request *domain
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) SelectUser(ctx context.Context, id, userID, userAgentID string) (err error) {
+func (repo *AuthRequestRepo) SelectUser(ctx context.Context, authReqID, userID, userAgentID string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	request, err := repo.getAuthRequest(ctx, id, userAgentID)
+	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
 	if err != nil {
 		return err
 	}
@@ -345,11 +351,7 @@ func (repo *AuthRequestRepo) VerifyPassword(ctx context.Context, authReqID, user
 		}
 		return err
 	}
-	policy, err := repo.getLockoutPolicy(ctx, resourceOwner)
-	if err != nil {
-		return err
-	}
-	err = repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info), lockoutPolicyToDomain(policy))
+	err = repo.Command.HumanCheckPassword(ctx, resourceOwner, userID, password, request.WithCurrentInfo(info))
 	if isIgnoreUserInvalidPasswordError(err, request) {
 		return zerrors.ThrowInvalidArgument(nil, "EVENT-Jsf32", "Errors.User.UsernameOrPassword.Invalid")
 	}
@@ -375,6 +377,7 @@ func lockoutPolicyToDomain(policy *query.LockoutPolicy) *domain.LockoutPolicy {
 		},
 		Default:             policy.IsDefault,
 		MaxPasswordAttempts: policy.MaxPasswordAttempts,
+		MaxOTPAttempts:      policy.MaxOTPAttempts,
 		ShowLockOutFailures: policy.ShowFailures,
 	}
 }
@@ -455,7 +458,7 @@ func (repo *AuthRequestRepo) VerifyMFAU2F(ctx context.Context, userID, resourceO
 func (repo *AuthRequestRepo) BeginPasswordlessSetup(ctx context.Context, userID, resourceOwner string, authenticatorPlatform domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.Command.HumanAddPasswordlessSetup(ctx, userID, resourceOwner, true, authenticatorPlatform)
+	return repo.Command.HumanAddPasswordlessSetup(ctx, userID, resourceOwner, authenticatorPlatform)
 }
 
 func (repo *AuthRequestRepo) VerifyPasswordlessSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName string, credentialData []byte) (err error) {
@@ -522,6 +525,7 @@ func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, u
 		return err
 	}
 	request.LinkingUsers = nil
+	request.IDPLoginChecked = true
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
@@ -551,26 +555,22 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if err != nil {
 		return err
 	}
-	initCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, repo.UserCodeAlg)
+	addMetadata := make([]*command.AddMetadataEntry, len(metadatas))
+	for i, metadata := range metadatas {
+		addMetadata[i] = &command.AddMetadataEntry{
+			Key:   metadata.Key,
+			Value: metadata.Value,
+		}
+	}
+	human := command.AddHumanFromDomain(registerUser, metadatas, request, externalIDP)
+	err = repo.Command.AddUserHuman(ctx, resourceOwner, human, false, repo.UserCodeAlg)
 	if err != nil {
 		return err
 	}
-	emailCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, repo.UserCodeAlg)
-	if err != nil {
-		return err
-	}
-	phoneCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, repo.UserCodeAlg)
-	if err != nil {
-		return err
-	}
-	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, emailCodeGenerator, phoneCodeGenerator)
-	if err != nil {
-		return err
-	}
-	request.UserID = human.AggregateID
-	request.UserOrgID = human.ResourceOwner
+	request.SetUserInfo(human.ID, human.Username, human.Username, human.DisplayName, "", resourceOwner)
 	request.SelectedIDPConfigID = externalIDP.IDPConfigID
 	request.LinkingUsers = nil
+	request.IDPLoginChecked = true
 	err = repo.Command.UserIDPLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
@@ -665,39 +665,60 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		}
 	}
 
-	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
-	if err != nil {
-		return err
+	if request.LoginPolicy == nil || len(request.AllowedExternalIDPs) == 0 || request.PolicyOrgID() != orgID {
+		loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
+		if len(idpProviders) > 0 {
+			request.AllowedExternalIDPs = idpProviders
+		}
 	}
-	request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
-	if idpProviders != nil {
-		request.AllowedExternalIDPs = idpProviders
+	if request.LockoutPolicy == nil || request.PolicyOrgID() != orgID {
+		lockoutPolicy, err := repo.getLockoutPolicy(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.LockoutPolicy = lockoutPolicyToDomain(lockoutPolicy)
 	}
-	lockoutPolicy, err := repo.getLockoutPolicy(ctx, orgID)
-	if err != nil {
-		return err
+	if request.PrivacyPolicy == nil || request.PolicyOrgID() != orgID {
+		privacyPolicy, err := repo.GetPrivacyPolicy(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.PrivacyPolicy = privacyPolicy
 	}
-	request.LockoutPolicy = lockoutPolicyToDomain(lockoutPolicy)
-	privacyPolicy, err := repo.GetPrivacyPolicy(ctx, orgID)
-	if err != nil {
-		return err
+	if request.LabelPolicy == nil || request.PolicyOrgID() != orgID {
+		labelPolicy, err := repo.getLabelPolicy(ctx, request.PrivateLabelingOrgID(orgID))
+		if err != nil {
+			return err
+		}
+		request.LabelPolicy = labelPolicy
 	}
-	request.PrivacyPolicy = privacyPolicy
-	labelPolicy, err := repo.getLabelPolicy(ctx, request.PrivateLabelingOrgID(orgID))
-	if err != nil {
-		return err
+	if request.PasswordAgePolicy == nil || request.PolicyOrgID() != orgID {
+		passwordPolicy, err := repo.getPasswordAgePolicy(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.PasswordAgePolicy = passwordPolicy
 	}
-	request.LabelPolicy = labelPolicy
-	defaultLoginTranslations, err := repo.getLoginTexts(ctx, instance.InstanceID())
-	if err != nil {
-		return err
+	if len(request.DefaultTranslations) == 0 {
+		defaultLoginTranslations, err := repo.getLoginTexts(ctx, instance.InstanceID())
+		if err != nil {
+			return err
+		}
+		request.DefaultTranslations = defaultLoginTranslations
 	}
-	request.DefaultTranslations = defaultLoginTranslations
-	orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
-	if err != nil {
-		return err
+	if len(request.OrgTranslations) == 0 || request.PolicyOrgID() != orgID {
+		orgLoginTranslations, err := repo.getLoginTexts(ctx, orgID)
+		if err != nil {
+			return err
+		}
+		request.OrgTranslations = orgLoginTranslations
 	}
-	request.OrgTranslations = orgLoginTranslations
+	request.SetPolicyOrgID(orgID)
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return nil
 }
 
@@ -810,6 +831,7 @@ func (repo *AuthRequestRepo) checkDomainDiscovery(ctx context.Context, request *
 	}
 	request.LoginHint = loginName
 	request.Prompt = append(request.Prompt, domain.PromptCreate) // to trigger registration
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return true, nil
 }
 
@@ -881,22 +903,25 @@ func (repo *AuthRequestRepo) checkLoginNameInputForResourceOwner(ctx context.Con
 	return nil, err
 }
 
-func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, resourceOwner string) error {
-	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, resourceOwner)
-	if err != nil {
-		return err
+func (repo *AuthRequestRepo) checkLoginPolicyWithResourceOwner(ctx context.Context, request *domain.AuthRequest, resourceOwner string) (err error) {
+	if request.LoginPolicy == nil || request.PolicyOrgID() != resourceOwner {
+		loginPolicy, idps, err := repo.getLoginPolicyAndIDPProviders(ctx, resourceOwner)
+		if err != nil {
+			return err
+		}
+		request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
+		request.AllowedExternalIDPs = idps
 	}
-	if len(request.LinkingUsers) != 0 && !loginPolicy.AllowExternalIDPs {
+	if len(request.LinkingUsers) != 0 && !request.LoginPolicy.AllowExternalIDP {
 		return zerrors.ThrowInvalidArgument(nil, "LOGIN-s9sio", "Errors.User.NotAllowedToLink")
 	}
 	if len(request.LinkingUsers) != 0 {
-		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, idpProviders)
+		exists := linkingIDPConfigExistingInAllowedIDPs(request.LinkingUsers, request.AllowedExternalIDPs)
 		if !exists {
 			return zerrors.ThrowInvalidArgument(nil, "LOGIN-Dj89o", "Errors.User.NotAllowedToLink")
 		}
 	}
-	request.LoginPolicy = queryLoginPolicyToDomain(loginPolicy)
-	request.AllowedExternalIDPs = idpProviders
+	repo.AuthRequests.CacheAuthRequest(ctx, request)
 	return nil
 }
 
@@ -922,11 +947,11 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 		IgnoreUnknownUsernames:     policy.IgnoreUnknownUsernames,
 		AllowDomainDiscovery:       policy.AllowDomainDiscovery,
 		DefaultRedirectURI:         policy.DefaultRedirectURI,
-		PasswordCheckLifetime:      policy.PasswordCheckLifetime,
-		ExternalLoginCheckLifetime: policy.ExternalLoginCheckLifetime,
-		MFAInitSkipLifetime:        policy.MFAInitSkipLifetime,
-		SecondFactorCheckLifetime:  policy.SecondFactorCheckLifetime,
-		MultiFactorCheckLifetime:   policy.MultiFactorCheckLifetime,
+		PasswordCheckLifetime:      time.Duration(policy.PasswordCheckLifetime),
+		ExternalLoginCheckLifetime: time.Duration(policy.ExternalLoginCheckLifetime),
+		MFAInitSkipLifetime:        time.Duration(policy.MFAInitSkipLifetime),
+		SecondFactorCheckLifetime:  time.Duration(policy.SecondFactorCheckLifetime),
+		MultiFactorCheckLifetime:   time.Duration(policy.MultiFactorCheckLifetime),
 		DisableLoginWithEmail:      policy.DisableLoginWithEmail,
 		DisableLoginWithPhone:      policy.DisableLoginWithPhone,
 	}
@@ -1011,24 +1036,23 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 	request.DisplayName = userSession.DisplayName
 	request.AvatarKey = userSession.AvatarKey
+	if user.HumanView != nil && user.HumanView.PreferredLanguage != "" {
+		request.PreferredLanguage = gu.Ptr(language.Make(user.HumanView.PreferredLanguage))
+	}
 
 	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
 	idps, err := checkExternalIDPsOfUser(ctx, repo.IDPUserLinksProvider, user.ID)
 	if err != nil {
 		return nil, err
 	}
-	if (!isInternalLogin || len(idps.Links) > 0) && len(request.LinkingUsers) == 0 && !checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, request.LoginPolicy.ExternalLoginCheckLifetime, request) {
-		selectedIDPConfigID := request.SelectedIDPConfigID
-		if selectedIDPConfigID == "" {
-			selectedIDPConfigID = userSession.SelectedIDPConfigID
+	if (!isInternalLogin || len(idps.Links) > 0) && len(request.LinkingUsers) == 0 {
+		step := repo.idpChecked(request, idps.Links, userSession)
+		if step != nil {
+			return append(steps, step), nil
 		}
-		if selectedIDPConfigID == "" {
-			selectedIDPConfigID = idps.Links[0].IDPID
-		}
-		return append(steps, &domain.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}), nil
 	}
 	if isInternalLogin || (!isInternalLogin && len(request.LinkingUsers) > 0) {
-		step := repo.firstFactorChecked(request, user, userSession)
+		step := repo.firstFactorChecked(ctx, request, user, userSession)
 		if step != nil {
 			return append(steps, step), nil
 		}
@@ -1042,17 +1066,20 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return append(steps, step), nil
 	}
 
-	if user.PasswordChangeRequired {
-		steps = append(steps, &domain.ChangePasswordStep{})
+	expired := passwordAgeChangeRequired(request.PasswordAgePolicy, user.PasswordChanged)
+	if expired || user.PasswordChangeRequired {
+		steps = append(steps, &domain.ChangePasswordStep{Expired: expired})
 	}
 	if !user.IsEmailVerified {
-		steps = append(steps, &domain.VerifyEMailStep{})
+		steps = append(steps, &domain.VerifyEMailStep{
+			InitPassword: !user.PasswordSet,
+		})
 	}
 	if user.UsernameChangeRequired {
 		steps = append(steps, &domain.ChangeUsernameStep{})
 	}
 
-	if user.PasswordChangeRequired || !user.IsEmailVerified || user.UsernameChangeRequired {
+	if expired || user.PasswordChangeRequired || !user.IsEmailVerified || user.UsernameChangeRequired {
 		return steps, nil
 	}
 
@@ -1087,6 +1114,14 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	return append(steps, &domain.RedirectToCallbackStep{}), nil
 }
 
+func passwordAgeChangeRequired(policy *domain.PasswordAgePolicy, changed time.Time) bool {
+	if policy == nil || policy.MaxAgeDays == 0 {
+		return false
+	}
+	maxDays := time.Duration(policy.MaxAgeDays) * 24 * time.Hour
+	return time.Now().Add(-maxDays).After(changed)
+}
+
 func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.AuthRequest) (_ []domain.NextStep, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -1103,19 +1138,24 @@ func (repo *AuthRequestRepo) nextStepsUser(ctx context.Context, request *domain.
 	if len(request.Prompt) > 0 && !domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
 		return append(steps, new(domain.LoginStep)), nil
 	} else {
-		// if no user was specified, no prompt or select_account was provided,
+		// if no user was specified, either select_account or no prompt was provided,
 		// then check the active user sessions (of the user agent)
 		users, err := repo.usersForUserSelection(ctx, request)
 		if err != nil {
 			return nil, err
 		}
-		if domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) {
+		// in case select_account was specified ignore it if there aren't any user sessions
+		if domain.IsPrompt(request.Prompt, domain.PromptSelectAccount) && len(users) > 0 {
 			steps = append(steps, &domain.SelectUserStep{Users: users})
 		}
+		// If we get here, either no sessions were found for select_account
+		// or no prompt was provided.
+		// In either case if there was a specific idp is selected (scope), directly redirect
 		if request.SelectedIDPConfigID != "" {
 			steps = append(steps, &domain.RedirectToExternalIDPStep{})
 		}
-		if len(request.Prompt) == 0 && len(users) == 0 {
+		// or there aren't any sessions to use, present the login page (https://github.com/zitadel/zitadel/issues/7213)
+		if len(users) == 0 {
 			steps = append(steps, new(domain.LoginStep))
 		}
 		// if no prompt was provided, but there are multiple user sessions, then the user must decide which to use
@@ -1172,7 +1212,7 @@ func (repo *AuthRequestRepo) usersForUserSelection(ctx context.Context, request 
 	return users, nil
 }
 
-func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, user *user_model.UserView, userSession *user_model.UserSessionView) domain.NextStep {
+func (repo *AuthRequestRepo) firstFactorChecked(ctx context.Context, request *domain.AuthRequest, user *user_model.UserView, userSession *user_model.UserSessionView) domain.NextStep {
 	if user.InitRequired {
 		return &domain.InitUserStep{PasswordSet: user.PasswordSet}
 	}
@@ -1180,6 +1220,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 	var step domain.NextStep
 	if request.LoginPolicy.PasswordlessType != domain.PasswordlessTypeNotAllowed && user.IsPasswordlessReady() {
 		if checkVerificationTimeMaxAge(userSession.PasswordlessVerification, request.LoginPolicy.MultiFactorCheckLifetime, request) {
+			request.MFAsVerified = append(request.MFAsVerified, domain.MFATypeU2FUserVerification)
 			request.AuthTime = userSession.PasswordlessVerification
 			return nil
 		}
@@ -1193,6 +1234,15 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 	}
 
 	if user.PasswordInitRequired {
+		if !user.IsEmailVerified {
+			return &domain.VerifyEMailStep{InitPassword: true}
+		}
+		exists, err := repo.UserEventProvider.PasswordCodeExists(ctx, user.ID)
+		logging.WithFields("userID", user.ID).OnError(err).Error("unable to check if password code exists")
+		if err == nil && !exists {
+			_, err = repo.PasswordReset.RequestSetPassword(ctx, user.ID, user.ResourceOwner, domain.NotificationTypeEmail, request.ID)
+			logging.WithFields("userID", user.ID).OnError(err).Error("unable to create password code")
+		}
 		return &domain.InitPasswordStep{}
 	}
 
@@ -1207,8 +1257,27 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 	return &domain.PasswordStep{}
 }
 
+func (repo *AuthRequestRepo) idpChecked(request *domain.AuthRequest, idps []*query.IDPUserLink, userSession *user_model.UserSessionView) domain.NextStep {
+	if checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, request.LoginPolicy.ExternalLoginCheckLifetime, request) {
+		request.IDPLoginChecked = true
+		request.AuthTime = userSession.ExternalLoginVerification
+		return nil
+	}
+	selectedIDPConfigID := request.SelectedIDPConfigID
+	if selectedIDPConfigID == "" {
+		selectedIDPConfigID = userSession.SelectedIDPConfigID
+	}
+	if selectedIDPConfigID == "" && len(idps) > 0 {
+		selectedIDPConfigID = idps[0].IDPID
+	}
+	return &domain.ExternalLoginStep{SelectedIDPConfigID: selectedIDPConfigID}
+}
+
 func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView, request *domain.AuthRequest, user *user_model.UserView, isInternalAuthentication bool) (domain.NextStep, bool, error) {
 	mfaLevel := request.MFALevel()
+	if slices.Contains(request.MFAsVerified, domain.MFATypeU2FUserVerification) {
+		return nil, true, nil
+	}
 	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy, isInternalAuthentication)
 	promptRequired := (user.MFAMaxSetUp < mfaLevel) || (len(allowedProviders) == 0 && required)
 	if promptRequired || !repo.mfaSkippedOrSetUp(user, request) {
@@ -1281,17 +1350,20 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 			CreationDate:  p.CreationDate,
 			ChangeDate:    p.ChangeDate,
 		},
-		State:        p.State,
-		Default:      p.IsDefault,
-		TOSLink:      p.TOSLink,
-		PrivacyLink:  p.PrivacyLink,
-		HelpLink:     p.HelpLink,
-		SupportEmail: p.SupportEmail,
+		State:          p.State,
+		Default:        p.IsDefault,
+		TOSLink:        p.TOSLink,
+		PrivacyLink:    p.PrivacyLink,
+		HelpLink:       p.HelpLink,
+		SupportEmail:   p.SupportEmail,
+		DocsLink:       p.DocsLink,
+		CustomLink:     p.CustomLink,
+		CustomLinkText: p.CustomLinkText,
 	}
 }
 
 func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*query.LockoutPolicy, error) {
-	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID, false)
+	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, false, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -1334,6 +1406,28 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 		ErrorMsgPopup:       p.ShouldErrorPopup,
 		DisableWatermark:    p.WatermarkDisabled,
 		ThemeMode:           p.ThemeMode,
+	}
+}
+
+func (repo *AuthRequestRepo) getPasswordAgePolicy(ctx context.Context, orgID string) (*domain.PasswordAgePolicy, error) {
+	policy, err := repo.PasswordAgePolicyProvider.PasswordAgePolicyByOrg(ctx, false, orgID, false)
+	if err != nil {
+		return nil, err
+	}
+	return passwordAgePolicyToDomain(policy), nil
+}
+
+func passwordAgePolicyToDomain(policy *query.PasswordAgePolicy) *domain.PasswordAgePolicy {
+	return &domain.PasswordAgePolicy{
+		ObjectRoot: es_models.ObjectRoot{
+			AggregateID:   policy.ID,
+			Sequence:      policy.Sequence,
+			ResourceOwner: policy.ResourceOwner,
+			CreationDate:  policy.CreationDate,
+			ChangeDate:    policy.ChangeDate,
+		},
+		MaxAgeDays:     policy.MaxAgeDays,
+		ExpireWarnDays: policy.ExpireWarnDays,
 	}
 }
 
@@ -1499,12 +1593,12 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			user_repo.HumanPasswordlessTokenCheckFailedType,
 			user_repo.HumanU2FTokenCheckSucceededType,
 			user_repo.HumanU2FTokenCheckFailedType:
-			eventData, err := user_view_model.UserSessionFromEvent(event)
+			userAgentID, err := user_view_model.UserAgentIDFromEvent(event)
 			if err != nil {
 				logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Debug("error getting event data")
 				return user_view_model.UserSessionToModel(session), nil
 			}
-			if eventData.UserAgentID != agentID {
+			if userAgentID != agentID {
 				continue
 			}
 		case user_repo.UserRemovedType:

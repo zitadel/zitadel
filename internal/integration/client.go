@@ -25,58 +25,76 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/idp"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
-	execution "github.com/zitadel/zitadel/pkg/grpc/execution/v3alpha"
-	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
+	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
+	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
+	settings_v2beta "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 type Client struct {
-	CC           *grpc.ClientConn
-	Admin        admin.AdminServiceClient
-	Mgmt         mgmt.ManagementServiceClient
-	Auth         auth.AuthServiceClient
-	UserV2       user.UserServiceClient
-	SessionV2    session.SessionServiceClient
-	SettingsV2   settings.SettingsServiceClient
-	OIDCv2       oidc_pb.OIDCServiceClient
-	OrgV2        organisation.OrganizationServiceClient
-	System       system.SystemServiceClient
-	ExecutionV3  execution.ExecutionServiceClient
-	FeatureV2    feature.FeatureServiceClient
-	UserSchemaV3 schema.UserSchemaServiceClient
+	CC             *grpc.ClientConn
+	Admin          admin.AdminServiceClient
+	Mgmt           mgmt.ManagementServiceClient
+	Auth           auth.AuthServiceClient
+	UserV2beta     user_v2beta.UserServiceClient
+	UserV2         user.UserServiceClient
+	SessionV2beta  session_v2beta.SessionServiceClient
+	SessionV2      session.SessionServiceClient
+	SettingsV2beta settings_v2beta.SettingsServiceClient
+	SettingsV2     settings.SettingsServiceClient
+	OIDCv2beta     oidc_pb_v2beta.OIDCServiceClient
+	OIDCv2         oidc_pb.OIDCServiceClient
+	OrgV2beta      org_v2beta.OrganizationServiceClient
+	OrgV2          organisation.OrganizationServiceClient
+	System         system.SystemServiceClient
+	ActionV3       action.ActionServiceClient
+	FeatureV2beta  feature_v2beta.FeatureServiceClient
+	FeatureV2      feature.FeatureServiceClient
+	UserSchemaV3   schema.UserSchemaServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
 	return Client{
-		CC:           cc,
-		Admin:        admin.NewAdminServiceClient(cc),
-		Mgmt:         mgmt.NewManagementServiceClient(cc),
-		Auth:         auth.NewAuthServiceClient(cc),
-		UserV2:       user.NewUserServiceClient(cc),
-		SessionV2:    session.NewSessionServiceClient(cc),
-		SettingsV2:   settings.NewSettingsServiceClient(cc),
-		OIDCv2:       oidc_pb.NewOIDCServiceClient(cc),
-		OrgV2:        organisation.NewOrganizationServiceClient(cc),
-		System:       system.NewSystemServiceClient(cc),
-		ExecutionV3:  execution.NewExecutionServiceClient(cc),
-		FeatureV2:    feature.NewFeatureServiceClient(cc),
-		UserSchemaV3: schema.NewUserSchemaServiceClient(cc),
+		CC:             cc,
+		Admin:          admin.NewAdminServiceClient(cc),
+		Mgmt:           mgmt.NewManagementServiceClient(cc),
+		Auth:           auth.NewAuthServiceClient(cc),
+		UserV2beta:     user_v2beta.NewUserServiceClient(cc),
+		UserV2:         user.NewUserServiceClient(cc),
+		SessionV2beta:  session_v2beta.NewSessionServiceClient(cc),
+		SessionV2:      session.NewSessionServiceClient(cc),
+		SettingsV2beta: settings_v2beta.NewSettingsServiceClient(cc),
+		SettingsV2:     settings.NewSettingsServiceClient(cc),
+		OIDCv2beta:     oidc_pb_v2beta.NewOIDCServiceClient(cc),
+		OIDCv2:         oidc_pb.NewOIDCServiceClient(cc),
+		OrgV2beta:      org_v2beta.NewOrganizationServiceClient(cc),
+		OrgV2:          organisation.NewOrganizationServiceClient(cc),
+		System:         system.NewSystemServiceClient(cc),
+		ActionV3:       action.NewActionServiceClient(cc),
+		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
+		FeatureV2:      feature.NewFeatureServiceClient(cc),
+		UserSchemaV3:   schema.NewUserSchemaServiceClient(cc),
 	}
 }
 
-func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId string, authenticatedIamOwnerCtx context.Context) {
+func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx context.Context) (primaryDomain, instanceId, adminID string, authenticatedIamOwnerCtx context.Context) {
 	primaryDomain = RandString(5) + ".integration.localhost"
 	instance, err := t.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
 		InstanceName: "testinstance",
@@ -89,20 +107,23 @@ func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx conte
 			},
 		},
 	})
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(tt, err)
 	t.createClientConn(iamOwnerCtx, fmt.Sprintf("%s:%d", primaryDomain, t.Config.Port))
 	instanceId = instance.GetInstanceId()
+	owner, err := t.Queries.GetUserByLoginName(authz.WithInstanceID(iamOwnerCtx, instanceId), true, "owner@"+primaryDomain)
+	require.NoError(tt, err)
 	t.Users.Set(instanceId, IAMOwner, &User{
+		User:  owner,
 		Token: instance.GetPat(),
 	})
 	newCtx := t.WithInstanceAuthorization(iamOwnerCtx, IAMOwner, instanceId)
+	var adminUser *mgmt.ImportHumanUserResponse
 	// the following serves two purposes:
 	// 1. it ensures that the instance is ready to be used
 	// 2. it enables a normal login with the default admin user credentials
 	require.EventuallyWithT(tt, func(collectT *assert.CollectT) {
-		_, importErr := t.Client.Mgmt.ImportHumanUser(newCtx, &mgmt.ImportHumanUserRequest{
+		var importErr error
+		adminUser, importErr = t.Client.Mgmt.ImportHumanUser(newCtx, &mgmt.ImportHumanUserRequest{
 			UserName: "zitadel-admin@zitadel.localhost",
 			Email: &mgmt.ImportHumanUserRequest_Email{
 				Email:           "zitadel-admin@zitadel.localhost",
@@ -117,7 +138,7 @@ func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx conte
 		})
 		assert.NoError(collectT, importErr)
 	}, 2*time.Minute, 100*time.Millisecond, "instance not ready")
-	return primaryDomain, instanceId, newCtx
+	return primaryDomain, instanceId, adminUser.GetUserId(), newCtx
 }
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
@@ -145,6 +166,61 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 				ReturnCode: &user.ReturnPhoneVerificationCode{},
 			},
 		},
+	})
+	logging.OnError(err).Fatal("create human user")
+	return resp
+}
+
+func (s *Tester) CreateHumanUserNoPhone(ctx context.Context) *user.AddHumanUserResponse {
+	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
+		Organization: &object.Organization{
+			Org: &object.Organization_OrgId{
+				OrgId: s.Organisation.ID,
+			},
+		},
+		Profile: &user.SetHumanProfile{
+			GivenName:         "Mickey",
+			FamilyName:        "Mouse",
+			PreferredLanguage: gu.Ptr("nl"),
+			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
+		},
+		Email: &user.SetHumanEmail{
+			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+			Verification: &user.SetHumanEmail_ReturnCode{
+				ReturnCode: &user.ReturnEmailVerificationCode{},
+			},
+		},
+	})
+	logging.OnError(err).Fatal("create human user")
+	return resp
+}
+
+func (s *Tester) CreateHumanUserWithTOTP(ctx context.Context, secret string) *user.AddHumanUserResponse {
+	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
+		Organization: &object.Organization{
+			Org: &object.Organization_OrgId{
+				OrgId: s.Organisation.ID,
+			},
+		},
+		Profile: &user.SetHumanProfile{
+			GivenName:         "Mickey",
+			FamilyName:        "Mouse",
+			PreferredLanguage: gu.Ptr("nl"),
+			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
+		},
+		Email: &user.SetHumanEmail{
+			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
+			Verification: &user.SetHumanEmail_ReturnCode{
+				ReturnCode: &user.ReturnEmailVerificationCode{},
+			},
+		},
+		Phone: &user.SetHumanPhone{
+			Phone: "+41791234567",
+			Verification: &user.SetHumanPhone_ReturnCode{
+				ReturnCode: &user.ReturnPhoneVerificationCode{},
+			},
+		},
+		TotpSecret: gu.Ptr(secret),
 	})
 	logging.OnError(err).Fatal("create human user")
 	return resp
@@ -277,16 +353,20 @@ func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
 	logging.OnError(err).Fatal("create user u2f")
 }
 
-func (s *Tester) SetUserPassword(ctx context.Context, userID, password string) {
-	_, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
-		UserId:      userID,
-		NewPassword: &user.Password{Password: password},
+func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) *object.Details {
+	resp, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
+		UserId: userID,
+		NewPassword: &user.Password{
+			Password:       password,
+			ChangeRequired: changeRequired,
+		},
 	})
 	logging.OnError(err).Fatal("set user password")
+	return resp.GetDetails()
 }
 
-func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
+func (s *Tester) AddGenericOAuthProvider(t *testing.T, ctx context.Context) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	id, _, err := s.Commands.AddInstanceGenericOAuthProvider(ctx, command.GenericOAuthProvider{
 		Name:                  "idp",
 		ClientID:              "clientID",
@@ -307,8 +387,31 @@ func (s *Tester) AddGenericOAuthProvider(t *testing.T) string {
 	return id
 }
 
-func (s *Tester) AddSAMLProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
+func (s *Tester) AddOrgGenericOAuthProvider(t *testing.T, ctx context.Context, orgID string) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
+	id, _, err := s.Commands.AddOrgGenericOAuthProvider(ctx, orgID,
+		command.GenericOAuthProvider{
+			Name:                  "idp",
+			ClientID:              "clientID",
+			ClientSecret:          "clientSecret",
+			AuthorizationEndpoint: "https://example.com/oauth/v2/authorize",
+			TokenEndpoint:         "https://example.com/oauth/v2/token",
+			UserEndpoint:          "https://api.example.com/user",
+			Scopes:                []string{"openid", "profile", "email"},
+			IDAttribute:           "id",
+			IDPOptions: idp.Options{
+				IsLinkingAllowed:  true,
+				IsCreationAllowed: true,
+				IsAutoCreation:    true,
+				IsAutoUpdate:      true,
+			},
+		})
+	require.NoError(t, err)
+	return id
+}
+
+func (s *Tester) AddSAMLProvider(t *testing.T, ctx context.Context) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	id, _, err := s.Server.Commands.AddInstanceSAMLProvider(ctx, command.SAMLProvider{
 		Name:     "saml-idp",
 		Metadata: []byte("<EntityDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" validUntil=\"2023-09-16T09:00:32.986Z\" cacheDuration=\"PT48H\" entityID=\"http://localhost:8000/metadata\">\n  <IDPSSODescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n    <KeyDescriptor use=\"signing\">\n      <KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n        <X509Data xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n          <X509Certificate xmlns=\"http://www.w3.org/2000/09/xmldsig#\">MIIDBzCCAe+gAwIBAgIJAPr/Mrlc8EGhMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTAeFw0xNTEyMjgxOTE5NDVaFw0yNTEyMjUxOTE5NDVaMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANDoWzLos4LWxTn8Gyu2lEbl4WcelUbgLN5zYm4ron8Ahs+rvcsu2zkdD/s6jdGJI8WqJKhYK2u61ygnXgAZqC6ggtFPnBpizcDzjgND2g+aucSoUODHt67f0fQuAmupN/zp5MZysJ6IHLJnYLNpfJYk96lRz9ODnO1Mpqtr9PWxm+pz7nzq5F0vRepkgpcRxv6ufQBjlrFytccyEVdXrvFtkjXcnhVVNSR4kHuOOMS6D7pebSJ1mrCmshbD5SX1jXPBKFPAjozYX6PxqLxUx1Y4faFEf4MBBVcInyB4oURNB2s59hEEi2jq9izNE7EbEK6BY5sEhoCPl9m32zE6ljkCAwEAAaNQME4wHQYDVR0OBBYEFB9ZklC1Ork2zl56zg08ei7ss/+iMB8GA1UdIwQYMBaAFB9ZklC1Ork2zl56zg08ei7ss/+iMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAAVoTSQ5pAirw8OR9FZ1bRSuTDhY9uxzl/OL7lUmsv2cMNeCB3BRZqm3mFt+cwN8GsH6f3uvNONIhgFpTGN5LEcXQz89zJEzB+qaHqmbFpHQl/sx2B8ezNgT/882H2IH00dXESEfy/+1gHg2pxjGnhRBN6el/gSaDiySIMKbilDrffuvxiCfbpPN0NRRiPJhd2ay9KuL/RxQRl1gl9cHaWiouWWba1bSBb2ZPhv2rPMUsFo98ntkGCObDX6Y1SpkqmoTbrsbGFsTG2DLxnvr4GdN1BSr0Uu/KV3adj47WkXVPeMYQti/bQmxQB8tRFhrw80qakTLUzreO96WzlBBMtY=</X509Certificate>\n        </X509Data>\n      </KeyInfo>\n    </KeyDescriptor>\n    <KeyDescriptor use=\"encryption\">\n      <KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n        <X509Data xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n          <X509Certificate xmlns=\"http://www.w3.org/2000/09/xmldsig#\">MIIDBzCCAe+gAwIBAgIJAPr/Mrlc8EGhMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTAeFw0xNTEyMjgxOTE5NDVaFw0yNTEyMjUxOTE5NDVaMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANDoWzLos4LWxTn8Gyu2lEbl4WcelUbgLN5zYm4ron8Ahs+rvcsu2zkdD/s6jdGJI8WqJKhYK2u61ygnXgAZqC6ggtFPnBpizcDzjgND2g+aucSoUODHt67f0fQuAmupN/zp5MZysJ6IHLJnYLNpfJYk96lRz9ODnO1Mpqtr9PWxm+pz7nzq5F0vRepkgpcRxv6ufQBjlrFytccyEVdXrvFtkjXcnhVVNSR4kHuOOMS6D7pebSJ1mrCmshbD5SX1jXPBKFPAjozYX6PxqLxUx1Y4faFEf4MBBVcInyB4oURNB2s59hEEi2jq9izNE7EbEK6BY5sEhoCPl9m32zE6ljkCAwEAAaNQME4wHQYDVR0OBBYEFB9ZklC1Ork2zl56zg08ei7ss/+iMB8GA1UdIwQYMBaAFB9ZklC1Ork2zl56zg08ei7ss/+iMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAAVoTSQ5pAirw8OR9FZ1bRSuTDhY9uxzl/OL7lUmsv2cMNeCB3BRZqm3mFt+cwN8GsH6f3uvNONIhgFpTGN5LEcXQz89zJEzB+qaHqmbFpHQl/sx2B8ezNgT/882H2IH00dXESEfy/+1gHg2pxjGnhRBN6el/gSaDiySIMKbilDrffuvxiCfbpPN0NRRiPJhd2ay9KuL/RxQRl1gl9cHaWiouWWba1bSBb2ZPhv2rPMUsFo98ntkGCObDX6Y1SpkqmoTbrsbGFsTG2DLxnvr4GdN1BSr0Uu/KV3adj47WkXVPeMYQti/bQmxQB8tRFhrw80qakTLUzreO96WzlBBMtY=</X509Certificate>\n        </X509Data>\n      </KeyInfo>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes128-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes192-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes256-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p\"></EncryptionMethod>\n    </KeyDescriptor>\n    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>\n    <SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" Location=\"http://localhost:8000/sso\"></SingleSignOnService>\n    <SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"http://localhost:8000/sso\"></SingleSignOnService>\n  </IDPSSODescriptor>\n</EntityDescriptor>"),
@@ -323,12 +426,13 @@ func (s *Tester) AddSAMLProvider(t *testing.T) string {
 	return id
 }
 
-func (s *Tester) AddSAMLRedirectProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
+func (s *Tester) AddSAMLRedirectProvider(t *testing.T, ctx context.Context, transientMappingAttributeName string) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	id, _, err := s.Server.Commands.AddInstanceSAMLProvider(ctx, command.SAMLProvider{
-		Name:     "saml-idp-redirect",
-		Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-		Metadata: []byte("<EntityDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" validUntil=\"2023-09-16T09:00:32.986Z\" cacheDuration=\"PT48H\" entityID=\"http://localhost:8000/metadata\">\n  <IDPSSODescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n    <KeyDescriptor use=\"signing\">\n      <KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n        <X509Data xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n          <X509Certificate xmlns=\"http://www.w3.org/2000/09/xmldsig#\">MIIDBzCCAe+gAwIBAgIJAPr/Mrlc8EGhMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTAeFw0xNTEyMjgxOTE5NDVaFw0yNTEyMjUxOTE5NDVaMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANDoWzLos4LWxTn8Gyu2lEbl4WcelUbgLN5zYm4ron8Ahs+rvcsu2zkdD/s6jdGJI8WqJKhYK2u61ygnXgAZqC6ggtFPnBpizcDzjgND2g+aucSoUODHt67f0fQuAmupN/zp5MZysJ6IHLJnYLNpfJYk96lRz9ODnO1Mpqtr9PWxm+pz7nzq5F0vRepkgpcRxv6ufQBjlrFytccyEVdXrvFtkjXcnhVVNSR4kHuOOMS6D7pebSJ1mrCmshbD5SX1jXPBKFPAjozYX6PxqLxUx1Y4faFEf4MBBVcInyB4oURNB2s59hEEi2jq9izNE7EbEK6BY5sEhoCPl9m32zE6ljkCAwEAAaNQME4wHQYDVR0OBBYEFB9ZklC1Ork2zl56zg08ei7ss/+iMB8GA1UdIwQYMBaAFB9ZklC1Ork2zl56zg08ei7ss/+iMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAAVoTSQ5pAirw8OR9FZ1bRSuTDhY9uxzl/OL7lUmsv2cMNeCB3BRZqm3mFt+cwN8GsH6f3uvNONIhgFpTGN5LEcXQz89zJEzB+qaHqmbFpHQl/sx2B8ezNgT/882H2IH00dXESEfy/+1gHg2pxjGnhRBN6el/gSaDiySIMKbilDrffuvxiCfbpPN0NRRiPJhd2ay9KuL/RxQRl1gl9cHaWiouWWba1bSBb2ZPhv2rPMUsFo98ntkGCObDX6Y1SpkqmoTbrsbGFsTG2DLxnvr4GdN1BSr0Uu/KV3adj47WkXVPeMYQti/bQmxQB8tRFhrw80qakTLUzreO96WzlBBMtY=</X509Certificate>\n        </X509Data>\n      </KeyInfo>\n    </KeyDescriptor>\n    <KeyDescriptor use=\"encryption\">\n      <KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n        <X509Data xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n          <X509Certificate xmlns=\"http://www.w3.org/2000/09/xmldsig#\">MIIDBzCCAe+gAwIBAgIJAPr/Mrlc8EGhMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTAeFw0xNTEyMjgxOTE5NDVaFw0yNTEyMjUxOTE5NDVaMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANDoWzLos4LWxTn8Gyu2lEbl4WcelUbgLN5zYm4ron8Ahs+rvcsu2zkdD/s6jdGJI8WqJKhYK2u61ygnXgAZqC6ggtFPnBpizcDzjgND2g+aucSoUODHt67f0fQuAmupN/zp5MZysJ6IHLJnYLNpfJYk96lRz9ODnO1Mpqtr9PWxm+pz7nzq5F0vRepkgpcRxv6ufQBjlrFytccyEVdXrvFtkjXcnhVVNSR4kHuOOMS6D7pebSJ1mrCmshbD5SX1jXPBKFPAjozYX6PxqLxUx1Y4faFEf4MBBVcInyB4oURNB2s59hEEi2jq9izNE7EbEK6BY5sEhoCPl9m32zE6ljkCAwEAAaNQME4wHQYDVR0OBBYEFB9ZklC1Ork2zl56zg08ei7ss/+iMB8GA1UdIwQYMBaAFB9ZklC1Ork2zl56zg08ei7ss/+iMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAAVoTSQ5pAirw8OR9FZ1bRSuTDhY9uxzl/OL7lUmsv2cMNeCB3BRZqm3mFt+cwN8GsH6f3uvNONIhgFpTGN5LEcXQz89zJEzB+qaHqmbFpHQl/sx2B8ezNgT/882H2IH00dXESEfy/+1gHg2pxjGnhRBN6el/gSaDiySIMKbilDrffuvxiCfbpPN0NRRiPJhd2ay9KuL/RxQRl1gl9cHaWiouWWba1bSBb2ZPhv2rPMUsFo98ntkGCObDX6Y1SpkqmoTbrsbGFsTG2DLxnvr4GdN1BSr0Uu/KV3adj47WkXVPeMYQti/bQmxQB8tRFhrw80qakTLUzreO96WzlBBMtY=</X509Certificate>\n        </X509Data>\n      </KeyInfo>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes128-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes192-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes256-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p\"></EncryptionMethod>\n    </KeyDescriptor>\n    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>\n    <SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" Location=\"http://localhost:8000/sso\"></SingleSignOnService>\n  </IDPSSODescriptor>\n</EntityDescriptor>"),
+		Name:                          "saml-idp-redirect",
+		Binding:                       "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+		Metadata:                      []byte("<EntityDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" validUntil=\"2023-09-16T09:00:32.986Z\" cacheDuration=\"PT48H\" entityID=\"http://localhost:8000/metadata\">\n  <IDPSSODescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">\n    <KeyDescriptor use=\"signing\">\n      <KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n        <X509Data xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n          <X509Certificate xmlns=\"http://www.w3.org/2000/09/xmldsig#\">MIIDBzCCAe+gAwIBAgIJAPr/Mrlc8EGhMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTAeFw0xNTEyMjgxOTE5NDVaFw0yNTEyMjUxOTE5NDVaMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANDoWzLos4LWxTn8Gyu2lEbl4WcelUbgLN5zYm4ron8Ahs+rvcsu2zkdD/s6jdGJI8WqJKhYK2u61ygnXgAZqC6ggtFPnBpizcDzjgND2g+aucSoUODHt67f0fQuAmupN/zp5MZysJ6IHLJnYLNpfJYk96lRz9ODnO1Mpqtr9PWxm+pz7nzq5F0vRepkgpcRxv6ufQBjlrFytccyEVdXrvFtkjXcnhVVNSR4kHuOOMS6D7pebSJ1mrCmshbD5SX1jXPBKFPAjozYX6PxqLxUx1Y4faFEf4MBBVcInyB4oURNB2s59hEEi2jq9izNE7EbEK6BY5sEhoCPl9m32zE6ljkCAwEAAaNQME4wHQYDVR0OBBYEFB9ZklC1Ork2zl56zg08ei7ss/+iMB8GA1UdIwQYMBaAFB9ZklC1Ork2zl56zg08ei7ss/+iMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAAVoTSQ5pAirw8OR9FZ1bRSuTDhY9uxzl/OL7lUmsv2cMNeCB3BRZqm3mFt+cwN8GsH6f3uvNONIhgFpTGN5LEcXQz89zJEzB+qaHqmbFpHQl/sx2B8ezNgT/882H2IH00dXESEfy/+1gHg2pxjGnhRBN6el/gSaDiySIMKbilDrffuvxiCfbpPN0NRRiPJhd2ay9KuL/RxQRl1gl9cHaWiouWWba1bSBb2ZPhv2rPMUsFo98ntkGCObDX6Y1SpkqmoTbrsbGFsTG2DLxnvr4GdN1BSr0Uu/KV3adj47WkXVPeMYQti/bQmxQB8tRFhrw80qakTLUzreO96WzlBBMtY=</X509Certificate>\n        </X509Data>\n      </KeyInfo>\n    </KeyDescriptor>\n    <KeyDescriptor use=\"encryption\">\n      <KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n        <X509Data xmlns=\"http://www.w3.org/2000/09/xmldsig#\">\n          <X509Certificate xmlns=\"http://www.w3.org/2000/09/xmldsig#\">MIIDBzCCAe+gAwIBAgIJAPr/Mrlc8EGhMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTAeFw0xNTEyMjgxOTE5NDVaFw0yNTEyMjUxOTE5NDVaMBoxGDAWBgNVBAMMD3d3dy5leGFtcGxlLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANDoWzLos4LWxTn8Gyu2lEbl4WcelUbgLN5zYm4ron8Ahs+rvcsu2zkdD/s6jdGJI8WqJKhYK2u61ygnXgAZqC6ggtFPnBpizcDzjgND2g+aucSoUODHt67f0fQuAmupN/zp5MZysJ6IHLJnYLNpfJYk96lRz9ODnO1Mpqtr9PWxm+pz7nzq5F0vRepkgpcRxv6ufQBjlrFytccyEVdXrvFtkjXcnhVVNSR4kHuOOMS6D7pebSJ1mrCmshbD5SX1jXPBKFPAjozYX6PxqLxUx1Y4faFEf4MBBVcInyB4oURNB2s59hEEi2jq9izNE7EbEK6BY5sEhoCPl9m32zE6ljkCAwEAAaNQME4wHQYDVR0OBBYEFB9ZklC1Ork2zl56zg08ei7ss/+iMB8GA1UdIwQYMBaAFB9ZklC1Ork2zl56zg08ei7ss/+iMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAAVoTSQ5pAirw8OR9FZ1bRSuTDhY9uxzl/OL7lUmsv2cMNeCB3BRZqm3mFt+cwN8GsH6f3uvNONIhgFpTGN5LEcXQz89zJEzB+qaHqmbFpHQl/sx2B8ezNgT/882H2IH00dXESEfy/+1gHg2pxjGnhRBN6el/gSaDiySIMKbilDrffuvxiCfbpPN0NRRiPJhd2ay9KuL/RxQRl1gl9cHaWiouWWba1bSBb2ZPhv2rPMUsFo98ntkGCObDX6Y1SpkqmoTbrsbGFsTG2DLxnvr4GdN1BSr0Uu/KV3adj47WkXVPeMYQti/bQmxQB8tRFhrw80qakTLUzreO96WzlBBMtY=</X509Certificate>\n        </X509Data>\n      </KeyInfo>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes128-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes192-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#aes256-cbc\"></EncryptionMethod>\n      <EncryptionMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p\"></EncryptionMethod>\n    </KeyDescriptor>\n    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>\n    <SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" Location=\"http://localhost:8000/sso\"></SingleSignOnService>\n  </IDPSSODescriptor>\n</EntityDescriptor>"),
+		TransientMappingAttributeName: transientMappingAttributeName,
 		IDPOptions: idp.Options{
 			IsLinkingAllowed:  true,
 			IsCreationAllowed: true,
@@ -340,8 +444,8 @@ func (s *Tester) AddSAMLRedirectProvider(t *testing.T) string {
 	return id
 }
 
-func (s *Tester) AddSAMLPostProvider(t *testing.T) string {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
+func (s *Tester) AddSAMLPostProvider(t *testing.T, ctx context.Context) string {
+	ctx = authz.WithInstance(ctx, s.Instance)
 	id, _, err := s.Server.Commands.AddInstanceSAMLProvider(ctx, command.SAMLProvider{
 		Name:     "saml-idp-post",
 		Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
@@ -357,17 +461,17 @@ func (s *Tester) AddSAMLPostProvider(t *testing.T) string {
 	return id
 }
 
-func (s *Tester) CreateIntent(t *testing.T, idpID string) string {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
-	writeModel, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Organisation.ID)
+func (s *Tester) CreateIntent(t *testing.T, ctx context.Context, idpID string) string {
+	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
+	writeModel, _, err := s.Commands.CreateIntent(ctx, idpID, "https://example.com/success", "https://example.com/failure", s.Instance.InstanceID())
 	require.NoError(t, err)
 	return writeModel.AggregateID
 }
 
-func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
-	intentID := s.CreateIntent(t, idpID)
-	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
+func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
+	intentID := s.CreateIntent(t, ctx, idpID)
+	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
 	require.NoError(t, err)
 	idpUser := openid.NewUser(
 		&oidc.UserInfo{
@@ -390,10 +494,10 @@ func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, idpID, userID, idpUse
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
-func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
-	intentID := s.CreateIntent(t, idpID)
-	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
+func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
+	intentID := s.CreateIntent(t, ctx, idpID)
+	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
 	require.NoError(t, err)
 	username := "username"
 	lang := language.Make("en")
@@ -418,10 +522,10 @@ func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, idpID, userID, idpUser
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
-func (s *Tester) CreateSuccessfulSAMLIntent(t *testing.T, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
-	ctx := authz.WithInstance(context.Background(), s.Instance)
-	intentID := s.CreateIntent(t, idpID)
-	writeModel, err := s.Server.Commands.GetIntentWriteModel(ctx, intentID, s.Organisation.ID)
+func (s *Tester) CreateSuccessfulSAMLIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
+	intentID := s.CreateIntent(t, ctx, idpID)
+	writeModel, err := s.Server.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
 	require.NoError(t, err)
 
 	idpUser := &saml.UserMapper{
@@ -464,8 +568,7 @@ func (s *Tester) CreateVerifiedWebAuthNSessionWithLifetime(t *testing.T, ctx con
 	require.NoError(t, err)
 
 	updateResp, err := s.Client.SessionV2.SetSession(ctx, &session.SetSessionRequest{
-		SessionId:    createResp.GetSessionId(),
-		SessionToken: createResp.GetSessionToken(),
+		SessionId: createResp.GetSessionId(),
 		Checks: &session.Checks{
 			WebAuthN: &session.CheckWebAuthN{
 				CredentialAssertionData: assertion,
@@ -519,57 +622,60 @@ func (s *Tester) CreateProjectMembership(t *testing.T, ctx context.Context, proj
 	require.NoError(t, err)
 }
 
-func (s *Tester) CreateTarget(ctx context.Context, t *testing.T) *execution.CreateTargetResponse {
-	req := &execution.CreateTargetRequest{
-		Name: fmt.Sprint(time.Now().UnixNano() + 1),
-		TargetType: &execution.CreateTargetRequest_RestWebhook{
-			RestWebhook: &execution.SetRESTWebhook{
-				Url: "https://example.com",
-			},
-		},
-		Timeout: durationpb.New(10 * time.Second),
+func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+	nameSet := fmt.Sprint(time.Now().UnixNano() + 1)
+	if name != "" {
+		nameSet = name
 	}
-	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
+	req := &action.CreateTargetRequest{
+		Name:     nameSet,
+		Endpoint: endpoint,
+		Timeout:  durationpb.New(10 * time.Second),
+	}
+	switch ty {
+	case domain.TargetTypeWebhook:
+		req.TargetType = &action.CreateTargetRequest_RestWebhook{
+			RestWebhook: &action.SetRESTWebhook{
+				InterruptOnError: interrupt,
+			},
+		}
+	case domain.TargetTypeCall:
+		req.TargetType = &action.CreateTargetRequest_RestCall{
+			RestCall: &action.SetRESTCall{
+				InterruptOnError: interrupt,
+			},
+		}
+	case domain.TargetTypeAsync:
+		req.TargetType = &action.CreateTargetRequest_RestAsync{
+			RestAsync: &action.SetRESTAsync{},
+		}
+	}
+	target, err := s.Client.ActionV3.CreateTarget(ctx, req)
 	require.NoError(t, err)
 	return target
 }
 
-func (s *Tester) CreateTargetWithNameAndType(ctx context.Context, t *testing.T, name string, async bool, interrupt bool) *execution.CreateTargetResponse {
-	req := &execution.CreateTargetRequest{
-		Name: name,
-		TargetType: &execution.CreateTargetRequest_RestWebhook{
-			RestWebhook: &execution.SetRESTWebhook{
-				Url: "https://example.com",
-			},
-		},
-		Timeout: durationpb.New(10 * time.Second),
-	}
-	if async {
-		req.ExecutionType = &execution.CreateTargetRequest_IsAsync{
-			IsAsync: true,
-		}
-	}
-	if interrupt {
-		req.ExecutionType = &execution.CreateTargetRequest_InterruptOnError{
-			InterruptOnError: true,
-		}
-	}
-	target, err := s.Client.ExecutionV3.CreateTarget(ctx, req)
-	require.NoError(t, err)
-	return target
-}
-
-func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *execution.Condition, targets []string, includes []string) *execution.SetExecutionResponse {
-	target, err := s.Client.ExecutionV3.SetExecution(ctx, &execution.SetExecutionRequest{
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
+	target, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 		Targets:   targets,
-		Includes:  includes,
 	})
 	require.NoError(t, err)
 	return target
 }
 
+func (s *Tester) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
+	_, err := s.Client.ActionV3.DeleteExecution(ctx, &action.DeleteExecutionRequest{
+		Condition: cond,
+	})
+	require.NoError(t, err)
+}
+
 func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {
+	return s.CreateUserSchemaWithType(ctx, t, fmt.Sprint(time.Now().UnixNano()+1))
+}
+
+func (s *Tester) CreateUserSchemaWithType(ctx context.Context, t *testing.T, schemaType string) *schema.CreateUserSchemaResponse {
 	userSchema := new(structpb.Struct)
 	err := userSchema.UnmarshalJSON([]byte(`{
 		"$schema": "urn:zitadel:schema:v1",
@@ -578,7 +684,7 @@ func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.Cre
 	}`))
 	require.NoError(t, err)
 	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &schema.CreateUserSchemaRequest{
-		Type: fmt.Sprint(time.Now().UnixNano() + 1),
+		Type: schemaType,
 		DataType: &schema.CreateUserSchemaRequest_Schema{
 			Schema: userSchema,
 		},

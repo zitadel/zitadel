@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
@@ -18,6 +18,7 @@ import {
   LANGUAGES,
   IDP,
   LOCKOUT,
+  AGE,
   LOGIN,
   LOGINTEXTS,
   MESSAGETEXTS,
@@ -32,6 +33,7 @@ import {
   FAILEDEVENTS,
   EVENTS,
   ORGANIZATIONS,
+  FEATURESETTINGS,
 } from '../../modules/settings-list/settings';
 import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -41,7 +43,7 @@ import { EnvironmentService } from 'src/app/services/environment.service';
   templateUrl: './instance.component.html',
   styleUrls: ['./instance.component.scss'],
 })
-export class InstanceComponent {
+export class InstanceComponent implements OnInit, OnDestroy {
   public instance?: InstanceDetail.AsObject;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -53,6 +55,7 @@ export class InstanceComponent {
   public id: string = '';
   public defaultSettingsList: SidenavSetting[] = [
     ORGANIZATIONS,
+    FEATURESETTINGS,
     // notifications
     // { showWarn: true, ...NOTIFICATIONS },
     NOTIFICATIONS,
@@ -62,6 +65,7 @@ export class InstanceComponent {
     LOGIN,
     IDP,
     COMPLEXITY,
+    AGE,
     LOCKOUT,
 
     DOMAIN,

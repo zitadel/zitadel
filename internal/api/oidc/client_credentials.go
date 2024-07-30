@@ -2,13 +2,14 @@ package oidc
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
-	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -41,15 +42,18 @@ func (s *Server) clientCredentialsAuth(ctx context.Context, clientID, clientSecr
 	if err != nil {
 		return nil, err // defaults to server error
 	}
-	if user.Machine == nil || user.Machine.Secret == nil {
+	if user.Machine == nil || user.Machine.EncodedSecret == "" {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-pieP8", "Errors.User.Machine.Secret.NotExisting")
 	}
-	if err = crypto.CompareHash(user.Machine.Secret, []byte(clientSecret), s.hashAlg); err != nil {
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
+	updated, err := s.hasher.Verify(user.Machine.EncodedSecret, clientSecret)
+	spanPasswordComparison.EndWithError(err)
+	if err != nil {
 		s.command.MachineSecretCheckFailed(ctx, user.ID, user.ResourceOwner)
 		return nil, zerrors.ThrowInvalidArgument(err, "OIDC-VoXo6", "Errors.User.Machine.Secret.Invalid")
 	}
 
-	s.command.MachineSecretCheckSucceeded(ctx, user.ID, user.ResourceOwner)
+	s.command.MachineSecretCheckSucceeded(ctx, user.ID, user.ResourceOwner, updated)
 	return &clientCredentialsClient{
 		id:   clientID,
 		user: user,
@@ -133,9 +137,8 @@ func (c *clientCredentialsClient) RestrictAdditionalAccessTokenScopes() func(sco
 	}
 }
 
-// IsScopeAllowed returns null false as the check is executed during the auth request validation
 func (c *clientCredentialsClient) IsScopeAllowed(scope string) bool {
-	return false
+	return isScopeAllowed(scope) || strings.HasPrefix(scope, ScopeProjectRolePrefix)
 }
 
 // IDTokenUserinfoClaimsAssertion returns null false as no id_token is issued

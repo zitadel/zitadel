@@ -55,7 +55,7 @@ func (c *Commands) ResendUserPhoneCodeReturnCode(ctx context.Context, userID str
 }
 
 func (c *Commands) changeUserPhoneWithCode(ctx context.Context, userID, phone string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *Commands) changeUserPhoneWithCode(ctx context.Context, userID, phone st
 }
 
 func (c *Commands) resendUserPhoneCode(ctx context.Context, userID string, alg crypto.EncryptionAlgorithm, returnCode bool) (*domain.Phone, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (c *Commands) resendUserPhoneCodeWithGenerator(ctx context.Context, userID 
 }
 
 func (c *Commands) VerifyUserPhone(ctx context.Context, userID, code string, alg crypto.EncryptionAlgorithm) (*domain.ObjectDetails, error) {
-	config, err := secretGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode)
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
 	if err != nil {
 		return nil, err
 	}
@@ -132,6 +132,29 @@ func (c *Commands) verifyUserPhoneWithGenerator(ctx context.Context, userID, cod
 	}
 	err = cmd.VerifyCode(ctx, code, gen)
 	if err != nil {
+		return nil, err
+	}
+	if _, err = cmd.Push(ctx); err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&cmd.model.WriteModel), nil
+}
+
+func (c *Commands) RemoveUserPhone(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+	return c.removeUserPhone(ctx, userID)
+}
+
+func (c *Commands) removeUserPhone(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+	cmd, err := c.NewUserPhoneEvents(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if authz.GetCtxData(ctx).UserID != userID {
+		if err = c.checkPermission(ctx, domain.PermissionUserWrite, cmd.aggregate.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
+	}
+	if err = cmd.Remove(ctx); err != nil {
 		return nil, err
 	}
 	if _, err = cmd.Push(ctx); err != nil {
@@ -191,6 +214,14 @@ func (c *UserPhoneEvents) Change(ctx context.Context, phone domain.PhoneNumber) 
 	return nil
 }
 
+func (c *UserPhoneEvents) Remove(ctx context.Context) error {
+	if c.model.State == domain.PhoneStateRemoved || c.model.State == domain.PhoneStateUnspecified {
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-ieJ2e", "Errors.User.Phone.NotFound")
+	}
+	c.events = append(c.events, user.NewHumanPhoneRemovedEvent(ctx, c.aggregate))
+	return nil
+}
+
 // SetVerified sets the phone number to verified.
 func (c *UserPhoneEvents) SetVerified(ctx context.Context) {
 	c.events = append(c.events, user.NewHumanPhoneVerifiedEvent(ctx, c.aggregate))
@@ -216,7 +247,7 @@ func (c *UserPhoneEvents) VerifyCode(ctx context.Context, code string, gen crypt
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-Fia4a", "Errors.User.Code.Empty")
 	}
 
-	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen)
+	err := crypto.VerifyCode(c.model.CodeCreationDate, c.model.CodeExpiry, c.model.Code, code, gen.Alg())
 	if err == nil {
 		c.events = append(c.events, user.NewHumanPhoneVerifiedEvent(ctx, c.aggregate))
 		return nil

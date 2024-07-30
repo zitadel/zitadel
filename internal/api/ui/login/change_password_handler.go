@@ -20,13 +20,13 @@ type changePasswordData struct {
 
 func (l *Login) handleChangePassword(w http.ResponseWriter, r *http.Request) {
 	data := new(changePasswordData)
-	authReq, err := l.getAuthRequestAndParseData(r, data)
+	authReq, err := l.ensureAuthRequestAndParseData(r, data)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	_, err = l.command.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserOrgID, authReq.UserID, data.OldPassword, data.NewPassword, userAgentID)
+	_, err = l.command.ChangePassword(setContext(r.Context(), authReq.UserOrgID), authReq.UserOrgID, authReq.UserID, data.OldPassword, data.NewPassword, userAgentID, false)
 	if err != nil {
 		l.renderChangePassword(w, r, authReq, err)
 		return
@@ -40,9 +40,19 @@ func (l *Login) renderChangePassword(w http.ResponseWriter, r *http.Request, aut
 		errType, errMessage = l.getErrorMessage(r, err)
 	}
 	translator := l.getTranslator(r.Context(), authReq)
+	if authReq == nil || len(authReq.PossibleSteps) < 1 {
+		l.renderError(w, r, authReq, err)
+		return
+	}
+	step, ok := authReq.PossibleSteps[0].(*domain.ChangePasswordStep)
+	if !ok {
+		l.renderError(w, r, authReq, err)
+		return
+	}
 	data := passwordData{
 		baseData:    l.getBaseData(r, authReq, translator, "PasswordChange.Title", "PasswordChange.Description", errType, errMessage),
 		profileData: l.getProfileData(authReq),
+		Expired:     step.Expired,
 	}
 	policy := l.getPasswordComplexityPolicy(r, authReq.UserOrgID)
 	if policy != nil {

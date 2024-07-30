@@ -4,9 +4,8 @@ import (
 	"encoding/base64"
 	"net/http"
 
-	"github.com/zitadel/zitadel/internal/domain"
-
 	http_mw "github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/domain"
 )
 
 const (
@@ -51,7 +50,7 @@ func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, au
 
 func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 	formData := new(mfaU2FFormData)
-	authReq, err := l.getAuthRequestAndParseData(r, formData)
+	authReq, err := l.ensureAuthRequestAndParseData(r, formData)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

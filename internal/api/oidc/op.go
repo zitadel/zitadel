@@ -80,6 +80,7 @@ type OPStorage struct {
 }
 
 func NewServer(
+	ctx context.Context,
 	config Config,
 	defaultLogoutRedirectURI string,
 	externalSecure bool,
@@ -93,13 +94,14 @@ func NewServer(
 	userAgentCookie, instanceHandler func(http.Handler) http.Handler,
 	accessHandler *middleware.AccessInterceptor,
 	fallbackLogger *slog.Logger,
+	hashConfig crypto.HashConfig,
 ) (*Server, error) {
 	opConfig, err := createOPConfig(config, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
 	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
-	keyCache := newPublicKeyCache(context.TODO(), config.PublicKeyCacheMaxAge, query.GetPublicKeyByID)
+	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, query.GetPublicKeyByID)
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 
@@ -119,7 +121,10 @@ func NewServer(
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider")
 	}
-
+	hasher, err := hashConfig.NewHasher()
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "OIDC-Aij4e", "cannot create secret hasher")
+	}
 	server := &Server{
 		LegacyServer:               op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
 		repo:                       repo,
@@ -133,12 +138,15 @@ func NewServer(
 		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime,
 		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime,
 		fallbackLogger:             fallbackLogger,
-		hashAlg:                    crypto.NewBCrypt(10), // as we are only verifying in oidc, the cost is already part of the hash string and the config here is irrelevant.
+		hasher:                     hasher,
 		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
+		encAlg:                     encryptionAlg,
+		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
 		assetAPIPrefix:             assets.AssetAPI(externalSecure),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server,
+		server.authorizeCallbackHandler,
 		op.WithFallbackLogger(fallbackLogger),
 		op.WithHTTPMiddleware(
 			middleware.MetricsHandler(metricTypes),

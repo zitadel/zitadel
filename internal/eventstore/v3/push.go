@@ -8,10 +8,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -26,13 +25,10 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	// tx is not closed because [crdb.ExecuteInTx] takes care of that
 	var (
 		sequences []*latestSequence
-		once      sync.Once
 	)
 
 	err = crdb.ExecuteInTx(ctx, &transaction{tx}, func() error {
-		once.Do(func() {
-			sequences, err = latestSequences(ctx, tx, commands)
-		})
+		sequences, err = latestSequences(ctx, tx, commands)
 		if err != nil {
 			return err
 		}
@@ -42,7 +38,20 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			return err
 		}
 
-		return handleUniqueConstraints(ctx, tx, commands)
+		if err = handleUniqueConstraints(ctx, tx, commands); err != nil {
+			return err
+		}
+
+		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
+		// Thats why we enable it manually
+		if es.client.Type() == "cockroach" {
+			_, err = tx.Exec("SET enable_multiple_modifications_of_table = on")
+			if err != nil {
+				return err
+			}
+		}
+
+		return handleFieldCommands(ctx, tx, commands)
 	})
 
 	if err != nil {

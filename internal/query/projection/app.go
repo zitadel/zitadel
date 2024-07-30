@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -15,7 +16,7 @@ import (
 )
 
 const (
-	AppProjectionTable = "projections.apps6"
+	AppProjectionTable = "projections.apps7"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 	AppSAMLTable       = AppProjectionTable + "_" + appSAMLTableSuffix
@@ -96,7 +97,7 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppAPIConfigColumnAppID, handler.ColumnTypeText),
 			handler.NewColumn(AppAPIConfigColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(AppAPIConfigColumnClientID, handler.ColumnTypeText),
-			handler.NewColumn(AppAPIConfigColumnClientSecret, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(AppAPIConfigColumnClientSecret, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(AppAPIConfigColumnAuthMethod, handler.ColumnTypeEnum),
 		},
 			handler.NewPrimaryKey(AppAPIConfigColumnInstanceID, AppAPIConfigColumnAppID),
@@ -109,7 +110,7 @@ func (*appProjection) Init() *old_handler.Check {
 			handler.NewColumn(AppOIDCConfigColumnInstanceID, handler.ColumnTypeText),
 			handler.NewColumn(AppOIDCConfigColumnVersion, handler.ColumnTypeEnum),
 			handler.NewColumn(AppOIDCConfigColumnClientID, handler.ColumnTypeText),
-			handler.NewColumn(AppOIDCConfigColumnClientSecret, handler.ColumnTypeJSONB, handler.Nullable()),
+			handler.NewColumn(AppOIDCConfigColumnClientSecret, handler.ColumnTypeText, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnRedirectUris, handler.ColumnTypeTextArray, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnResponseTypes, handler.ColumnTypeEnumArray, handler.Nullable()),
 			handler.NewColumn(AppOIDCConfigColumnGrantTypes, handler.ColumnTypeEnumArray, handler.Nullable()),
@@ -187,6 +188,10 @@ func (p *appProjection) Reducers() []handler.AggregateReducer {
 					Reduce: p.reduceAPIConfigSecretChanged,
 				},
 				{
+					Event:  project.APIConfigSecretHashUpdatedType,
+					Reduce: p.reduceAPIConfigSecretHashUpdated,
+				},
+				{
 					Event:  project.OIDCConfigAddedType,
 					Reduce: p.reduceOIDCConfigAdded,
 				},
@@ -197,6 +202,10 @@ func (p *appProjection) Reducers() []handler.AggregateReducer {
 				{
 					Event:  project.OIDCConfigSecretChangedType,
 					Reduce: p.reduceOIDCConfigSecretChanged,
+				},
+				{
+					Event:  project.OIDCConfigSecretHashUpdatedType,
+					Reduce: p.reduceOIDCConfigSecretHashUpdated,
 				},
 				{
 					Event:  project.SAMLConfigAddedType,
@@ -350,7 +359,7 @@ func (p *appProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 				handler.NewCol(AppAPIConfigColumnAppID, e.AppID),
 				handler.NewCol(AppAPIConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(AppAPIConfigColumnClientID, e.ClientID),
-				handler.NewCol(AppAPIConfigColumnClientSecret, e.ClientSecret),
+				handler.NewCol(AppAPIConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
 				handler.NewCol(AppAPIConfigColumnAuthMethod, e.AuthMethodType),
 			},
 			handler.WithTableSuffix(appAPITableSuffix),
@@ -374,9 +383,6 @@ func (p *appProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler
 		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-vnZKi", "reduce.wrong.event.type %s", project.APIConfigChangedType)
 	}
 	cols := make([]handler.Column, 0, 2)
-	if e.ClientSecret != nil {
-		cols = append(cols, handler.NewCol(AppAPIConfigColumnClientSecret, e.ClientSecret))
-	}
 	if e.AuthMethodType != nil {
 		cols = append(cols, handler.NewCol(AppAPIConfigColumnAuthMethod, *e.AuthMethodType))
 	}
@@ -415,7 +421,37 @@ func (p *appProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*h
 		e,
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(AppAPIConfigColumnClientSecret, e.ClientSecret),
+				handler.NewCol(AppAPIConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
+			},
+			[]handler.Condition{
+				handler.NewCond(AppAPIConfigColumnAppID, e.AppID),
+				handler.NewCond(AppAPIConfigColumnInstanceID, e.Aggregate().InstanceID),
+			},
+			handler.WithTableSuffix(appAPITableSuffix),
+		),
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
+				handler.NewCol(AppColumnSequence, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *appProjection) reduceAPIConfigSecretHashUpdated(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*project.APIConfigSecretHashUpdatedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-ttb0I", "reduce.wrong.event.type %s", project.APIConfigSecretHashUpdatedType)
+	}
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AppAPIConfigColumnClientSecret, e.HashedSecret),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppAPIConfigColumnAppID, e.AppID),
@@ -449,10 +485,10 @@ func (p *appProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 				handler.NewCol(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(AppOIDCConfigColumnVersion, e.Version),
 				handler.NewCol(AppOIDCConfigColumnClientID, e.ClientID),
-				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),
+				handler.NewCol(AppOIDCConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
 				handler.NewCol(AppOIDCConfigColumnRedirectUris, database.TextArray[string](e.RedirectUris)),
-				handler.NewCol(AppOIDCConfigColumnResponseTypes, database.Array[domain.OIDCResponseType](e.ResponseTypes)),
-				handler.NewCol(AppOIDCConfigColumnGrantTypes, database.Array[domain.OIDCGrantType](e.GrantTypes)),
+				handler.NewCol(AppOIDCConfigColumnResponseTypes, database.NumberArray[domain.OIDCResponseType](e.ResponseTypes)),
+				handler.NewCol(AppOIDCConfigColumnGrantTypes, database.NumberArray[domain.OIDCGrantType](e.GrantTypes)),
 				handler.NewCol(AppOIDCConfigColumnApplicationType, e.ApplicationType),
 				handler.NewCol(AppOIDCConfigColumnAuthMethodType, e.AuthMethodType),
 				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, database.TextArray[string](e.PostLogoutRedirectUris)),
@@ -494,10 +530,10 @@ func (p *appProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, database.TextArray[string](*e.RedirectUris)))
 	}
 	if e.ResponseTypes != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, database.Array[domain.OIDCResponseType](*e.ResponseTypes)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, database.NumberArray[domain.OIDCResponseType](*e.ResponseTypes)))
 	}
 	if e.GrantTypes != nil {
-		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, database.Array[domain.OIDCGrantType](*e.GrantTypes)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, database.NumberArray[domain.OIDCGrantType](*e.GrantTypes)))
 	}
 	if e.ApplicationType != nil {
 		cols = append(cols, handler.NewCol(AppOIDCConfigColumnApplicationType, *e.ApplicationType))
@@ -569,7 +605,37 @@ func (p *appProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*
 		e,
 		handler.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),
+				handler.NewCol(AppOIDCConfigColumnClientSecret, crypto.SecretOrEncodedHash(e.ClientSecret, e.HashedSecret)),
+			},
+			[]handler.Condition{
+				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
+				handler.NewCond(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
+			},
+			handler.WithTableSuffix(appOIDCTableSuffix),
+		),
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
+				handler.NewCol(AppColumnSequence, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AppColumnID, e.AppID),
+				handler.NewCond(AppColumnInstanceID, e.Aggregate().InstanceID),
+			},
+		),
+	), nil
+}
+
+func (p *appProjection) reduceOIDCConfigSecretHashUpdated(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*project.OIDCConfigSecretHashUpdatedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-toSh1", "reduce.wrong.event.type %s", project.OIDCConfigSecretHashUpdatedType)
+	}
+	return handler.NewMultiStatement(
+		e,
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AppOIDCConfigColumnClientSecret, e.HashedSecret),
 			},
 			[]handler.Condition{
 				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),

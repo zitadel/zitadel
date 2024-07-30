@@ -10,10 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database/mock"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -213,11 +214,11 @@ func TestHandler_updateLastUpdated(t *testing.T) {
 							"projection",
 							"instance",
 							"aggregate id",
-							"aggregate type",
+							eventstore.AggregateType("aggregate type"),
 							uint64(42),
 							mock.AnyType[time.Time]{},
 							float64(42),
-							uint16(0),
+							uint32(0),
 						),
 						mock.WithExecRowsAffected(1),
 					),

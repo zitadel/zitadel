@@ -2,10 +2,14 @@ package command
 
 import (
 	"context"
+	"io"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/zitadel/passwap"
+	"github.com/zitadel/passwap/bcrypt"
 
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -23,9 +27,8 @@ func TestAddOIDCApp(t *testing.T) {
 		idGenerator id.Generator
 	}
 	type args struct {
-		app             *addOIDCApp
-		clientSecretAlg crypto.HashAlgorithm
-		filter          preparation.FilterToQueryReducer
+		app    *addOIDCApp
+		filter preparation.FilterToQueryReducer
 	}
 
 	ctx := context.Background()
@@ -155,8 +158,8 @@ func TestAddOIDCApp(t *testing.T) {
 					project.NewOIDCConfigAddedEvent(ctx, &agg.Aggregate,
 						domain.OIDCVersionV1,
 						"id",
-						"clientID@project",
-						nil,
+						"clientID",
+						"",
 						[]string{"https://test.ch"},
 						[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 						[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -220,8 +223,8 @@ func TestAddOIDCApp(t *testing.T) {
 					project.NewOIDCConfigAddedEvent(ctx, &agg.Aggregate,
 						domain.OIDCVersionV1,
 						"id",
-						"clientID@project",
-						nil,
+						"clientID",
+						"",
 						nil,
 						[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 						[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -240,17 +243,150 @@ func TestAddOIDCApp(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "correct with old ID format",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "clientID@project"),
+			},
+			args: args{
+				app: &addOIDCApp{
+					AddApp: AddApp{
+						Aggregate: *agg,
+						ID:        "id",
+						Name:      "name",
+					},
+					GrantTypes:    []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes: []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					Version:       domain.OIDCVersionV1,
+
+					ApplicationType: domain.OIDCApplicationTypeWeb,
+					AuthMethodType:  domain.OIDCAuthMethodTypeNone,
+					AccessTokenType: domain.OIDCTokenTypeBearer,
+				},
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							project.NewProjectAddedEvent(
+								ctx,
+								&agg.Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						}, nil
+					}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					project.NewApplicationAddedEvent(ctx, &agg.Aggregate,
+						"id",
+						"name",
+					),
+					project.NewOIDCConfigAddedEvent(ctx, &agg.Aggregate,
+						domain.OIDCVersionV1,
+						"id",
+						"clientID@project",
+						"",
+						nil,
+						[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+						[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+						domain.OIDCApplicationTypeWeb,
+						domain.OIDCAuthMethodTypeNone,
+						nil,
+						false,
+						domain.OIDCTokenTypeBearer,
+						false,
+						false,
+						false,
+						0,
+						nil,
+						false,
+					),
+				},
+			},
+		},
+		{
+			name: "with secret",
+			fields: fields{
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "clientID"),
+			},
+			args: args{
+				app: &addOIDCApp{
+					AddApp: AddApp{
+						Aggregate: *agg,
+						ID:        "id",
+						Name:      "name",
+					},
+					GrantTypes:    []domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+					ResponseTypes: []domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+					Version:       domain.OIDCVersionV1,
+
+					ApplicationType: domain.OIDCApplicationTypeWeb,
+					AuthMethodType:  domain.OIDCAuthMethodTypeBasic,
+					AccessTokenType: domain.OIDCTokenTypeBearer,
+				},
+				filter: NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							project.NewProjectAddedEvent(
+								ctx,
+								&agg.Aggregate,
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
+							),
+						}, nil
+					}).
+					Filter(),
+			},
+			want: Want{
+				Commands: []eventstore.Command{
+					project.NewApplicationAddedEvent(ctx, &agg.Aggregate,
+						"id",
+						"name",
+					),
+					project.NewOIDCConfigAddedEvent(ctx, &agg.Aggregate,
+						domain.OIDCVersionV1,
+						"id",
+						"clientID",
+						"secret",
+						nil,
+						[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+						[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+						domain.OIDCApplicationTypeWeb,
+						domain.OIDCAuthMethodTypeBasic,
+						nil,
+						false,
+						domain.OIDCTokenTypeBearer,
+						false,
+						false,
+						false,
+						0,
+						nil,
+						false,
+					),
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := Commands{
-				idGenerator: tt.fields.idGenerator,
+				idGenerator:     tt.fields.idGenerator,
+				newHashedSecret: mockHashedSecret("secret"),
+				defaultSecretGenerators: &SecretGenerators{
+					ClientSecret: emptyConfig,
+				},
 			}
 			AssertValidation(t,
 				context.Background(),
 				c.AddOIDCAppCommand(
 					tt.args.app,
-					tt.args.clientSecretAlg,
 				), tt.args.filter, tt.want)
 		})
 	}
@@ -258,14 +394,13 @@ func TestAddOIDCApp(t *testing.T) {
 
 func TestCommandSide_AddOIDCApplication(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 	}
 	type args struct {
-		ctx             context.Context
-		oidcApp         *domain.OIDCApp
-		resourceOwner   string
-		secretGenerator crypto.Generator
+		ctx           context.Context
+		oidcApp       *domain.OIDCApp
+		resourceOwner string
 	}
 	type res struct {
 		want *domain.OIDCApp
@@ -280,9 +415,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 		{
 			name: "no aggregate id, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -296,8 +429,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 		{
 			name: "project not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -319,8 +451,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 		{
 			name: "invalid app, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -349,8 +480,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 		{
 			name: "create oidc app basic using whitespaces in uris, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -369,13 +499,8 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate,
 							domain.OIDCVersionV1,
 							"app1",
-							"client1@project",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
+							"client1",
+							"secret",
 							[]string{"https://test.ch"},
 							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -418,8 +543,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{" https://sub.test.ch "},
 					SkipNativeAppSuccessPage: true,
 				},
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.OIDCApp{
@@ -429,8 +553,8 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					},
 					AppID:                    "app1",
 					AppName:                  "app",
-					ClientID:                 "client1@project",
-					ClientSecretString:       "a",
+					ClientID:                 "client1",
+					ClientSecretString:       "secret",
 					AuthMethodType:           domain.OIDCAuthMethodTypePost,
 					OIDCVersion:              domain.OIDCVersionV1,
 					RedirectUris:             []string{"https://test.ch"},
@@ -454,8 +578,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 		{
 			name: "create oidc app basic, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewProjectAddedEvent(context.Background(),
@@ -474,13 +597,8 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 							&project.NewAggregate("project1", "org1").Aggregate,
 							domain.OIDCVersionV1,
 							"app1",
-							"client1@project",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
+							"client1",
+							"secret",
 							[]string{"https://test.ch"},
 							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -523,8 +641,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 					SkipNativeAppSuccessPage: true,
 				},
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.OIDCApp{
@@ -534,8 +651,8 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					},
 					AppID:                    "app1",
 					AppName:                  "app",
-					ClientID:                 "client1@project",
-					ClientSecretString:       "a",
+					ClientID:                 "client1",
+					ClientSecretString:       "secret",
 					AuthMethodType:           domain.OIDCAuthMethodTypePost,
 					OIDCVersion:              domain.OIDCVersionV1,
 					RedirectUris:             []string{"https://test.ch"},
@@ -560,10 +677,14 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				eventstore:      tt.fields.eventstore(t),
+				idGenerator:     tt.fields.idGenerator,
+				newHashedSecret: mockHashedSecret("secret"),
+				defaultSecretGenerators: &SecretGenerators{
+					ClientSecret: emptyConfig,
+				},
 			}
-			got, err := r.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner, tt.args.secretGenerator)
+			got, err := r.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -709,12 +830,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								domain.OIDCVersionV1,
 								"app1",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								[]string{"https://test.ch"},
 								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -783,12 +899,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								domain.OIDCVersionV1,
 								"app1",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								[]string{"https://test.ch"},
 								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -857,12 +968,7 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 								domain.OIDCVersionV1,
 								"app1",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								[]string{"https://test.ch"},
 								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -965,14 +1071,13 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 
 func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
-		ctx             context.Context
-		appID           string
-		projectID       string
-		resourceOwner   string
-		secretGenerator crypto.Generator
+		ctx           context.Context
+		appID         string
+		projectID     string
+		resourceOwner string
 	}
 	type res struct {
 		want *domain.OIDCApp
@@ -987,9 +1092,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 		{
 			name: "no projectid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1003,9 +1106,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 		{
 			name: "no appid, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:           context.Background(),
@@ -1020,8 +1121,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 		{
 			name: "app not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -1038,8 +1138,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 		{
 			name: "change secret, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							project.NewApplicationAddedEvent(context.Background(),
@@ -1054,12 +1153,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 								domain.OIDCVersionV1,
 								"app1",
 								"client1@project",
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "enc",
-									KeyID:      "id",
-									Crypted:    []byte("a"),
-								},
+								"secret",
 								[]string{"https://test.ch"},
 								[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 								[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
@@ -1081,22 +1175,16 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 						project.NewOIDCConfigSecretChangedEvent(context.Background(),
 							&project.NewAggregate("project1", "org1").Aggregate,
 							"app1",
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
+							"secret",
 						),
 					),
 				),
 			},
 			args: args{
-				ctx:             context.Background(),
-				projectID:       "project1",
-				appID:           "app1",
-				resourceOwner:   "org1",
-				secretGenerator: GetMockSecretGenerator(t),
+				ctx:           context.Background(),
+				projectID:     "project1",
+				appID:         "app1",
+				resourceOwner: "org1",
 			},
 			res: res{
 				want: &domain.OIDCApp{
@@ -1107,7 +1195,7 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 					AppID:                    "app1",
 					AppName:                  "app",
 					ClientID:                 "client1@project",
-					ClientSecretString:       "a",
+					ClientSecretString:       "secret",
 					AuthMethodType:           domain.OIDCAuthMethodTypePost,
 					OIDCVersion:              domain.OIDCVersionV1,
 					RedirectUris:             []string{"https://test.ch"},
@@ -1129,11 +1217,15 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(*testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore(t),
+				newHashedSecret: mockHashedSecret("secret"),
+				defaultSecretGenerators: &SecretGenerators{
+					ClientSecret: emptyConfig,
+				},
 			}
-			got, err := r.ChangeOIDCApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner, tt.args.secretGenerator)
+			got, err := r.ChangeOIDCApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1164,4 +1256,166 @@ func newOIDCAppChangedEvent(ctx context.Context, appID, projectID, resourceOwner
 		changes,
 	)
 	return event
+}
+
+func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
+	hasher := &crypto.Hasher{
+		Swapper: passwap.NewSwapper(bcrypt.New(bcrypt.MinCost)),
+	}
+	hashedSecret, err := hasher.Hash("secret")
+	require.NoError(t, err)
+	agg := project.NewAggregate("projectID", "orgID")
+
+	tests := []struct {
+		name       string
+		secret     string
+		eventstore func(*testing.T) *eventstore.Eventstore
+		wantErr    error
+	}{
+		{
+			name: "filter error",
+			eventstore: expectEventstore(
+				expectFilterError(io.ErrClosedPipe),
+			),
+			wantErr: io.ErrClosedPipe,
+		},
+		{
+			name: "app not exists",
+			eventstore: expectEventstore(
+				expectFilter(),
+			),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-D8hba", "Errors.Project.App.NotExisting"),
+		},
+		{
+			name: "wrong app type",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(
+						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
+					),
+				),
+			),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "COMMAND-BHgn2", "Errors.Project.App.IsNotOIDC"),
+		},
+		{
+			name: "no secret set",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(
+						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
+					),
+					eventFromEventPusher(
+						project.NewOIDCConfigAddedEvent(context.Background(),
+							&agg.Aggregate,
+							domain.OIDCVersionV1,
+							"appID",
+							"client1@project",
+							"",
+							[]string{"https://test.ch"},
+							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+							domain.OIDCApplicationTypeWeb,
+							domain.OIDCAuthMethodTypePost,
+							[]string{"https://test.ch/logout"},
+							true,
+							domain.OIDCTokenTypeBearer,
+							true,
+							true,
+							true,
+							time.Second*1,
+							[]string{"https://sub.test.ch"},
+							false,
+						),
+					),
+				),
+			),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-D6hba", "Errors.Project.App.OIDCConfigInvalid"),
+		},
+		{
+			name:   "check succeeded",
+			secret: "secret",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(
+						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
+					),
+					eventFromEventPusher(
+						project.NewOIDCConfigAddedEvent(context.Background(),
+							&agg.Aggregate,
+							domain.OIDCVersionV1,
+							"appID",
+							"client1@project",
+							hashedSecret,
+							[]string{"https://test.ch"},
+							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+							domain.OIDCApplicationTypeWeb,
+							domain.OIDCAuthMethodTypePost,
+							[]string{"https://test.ch/logout"},
+							true,
+							domain.OIDCTokenTypeBearer,
+							true,
+							true,
+							true,
+							time.Second*1,
+							[]string{"https://sub.test.ch"},
+							false,
+						),
+					),
+				),
+				expectPush(
+					project.NewOIDCConfigSecretCheckSucceededEvent(context.Background(), &agg.Aggregate, "appID"),
+				),
+			),
+		},
+		{
+			name:   "check failed",
+			secret: "wrong!",
+			eventstore: expectEventstore(
+				expectFilter(
+					eventFromEventPusher(
+						project.NewApplicationAddedEvent(context.Background(), &agg.Aggregate, "appID", "appName"),
+					),
+					eventFromEventPusher(
+						project.NewOIDCConfigAddedEvent(context.Background(),
+							&agg.Aggregate,
+							domain.OIDCVersionV1,
+							"appID",
+							"client1@project",
+							hashedSecret,
+							[]string{"https://test.ch"},
+							[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
+							[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
+							domain.OIDCApplicationTypeWeb,
+							domain.OIDCAuthMethodTypePost,
+							[]string{"https://test.ch/logout"},
+							true,
+							domain.OIDCTokenTypeBearer,
+							true,
+							true,
+							true,
+							time.Second*1,
+							[]string{"https://sub.test.ch"},
+							false,
+						),
+					),
+				),
+				expectPush(
+					project.NewOIDCConfigSecretCheckFailedEvent(context.Background(), &agg.Aggregate, "appID"),
+				),
+			),
+			wantErr: zerrors.ThrowInvalidArgument(err, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:   tt.eventstore(t),
+				secretHasher: hasher,
+			}
+			err := c.VerifyOIDCClientSecret(context.Background(), "projectID", "appID", tt.secret)
+			c.jobs.Wait()
+			require.ErrorIs(t, err, tt.wantErr)
+		})
+	}
 }

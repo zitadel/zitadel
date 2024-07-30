@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/zitadel/logging"
+	"golang.org/x/exp/constraints"
 
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -504,6 +505,16 @@ func NewJSONCol(name string, value interface{}) Column {
 	return NewCol(name, marshalled)
 }
 
+func NewIncrementCol[Int constraints.Integer](column string, value Int) Column {
+	return Column{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return column + " + " + placeholder
+		},
+	}
+}
+
 type Condition func(param string) (string, []any)
 
 type NamespacedCondition func(namespace string) Condition
@@ -551,6 +562,13 @@ func Not(condition Condition) Condition {
 	return func(param string) (string, []any) {
 		cond, value := condition(param)
 		return "NOT (" + cond + ")", value
+	}
+}
+
+// NewOneOfTextCond returns a Condition that checks if the column that stores a text is one of the given values
+func NewOneOfTextCond(column string, values []string) Condition {
+	return func(param string) (string, []any) {
+		return column + " = ANY(" + param + ")", []any{database.TextArray[string](values)}
 	}
 }
 

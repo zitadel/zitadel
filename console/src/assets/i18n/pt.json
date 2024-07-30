@@ -48,13 +48,13 @@
       "TITLE": "Usuários",
       "DESCRIPTION": "Um usuário é um humano ou uma máquina que pode acessar seus aplicativos.",
       "HUMANS": {
-        "TITLE": "Humanos",
-        "DESCRIPTION": "Humanos autenticam interativamente em uma sessão de navegador com um prompt de login.",
+        "TITLE": "Usuários",
+        "DESCRIPTION": "Os usuários são autenticados interativamente em uma sessão do navegador com um prompt de login.",
         "METADATA": "Adicione atributos personalizados ao usuário, como o departamento. Você pode usar essas informações em suas ações."
       },
       "MACHINES": {
-        "TITLE": "Máquinas",
-        "DESCRIPTION": "Máquinas autenticam de forma não interativa usando um token JWT assinado com uma chave privada. Eles também podem usar um token de acesso pessoal.",
+        "TITLE": "Usuários do serviço",
+        "DESCRIPTION": "Os usuários do serviço autenticam-se de forma não interativa usando um token de portador JWT assinado com uma chave privada. Eles também podem usar um token de acesso pessoal.",
         "METADATA": "Adicione atributos personalizados ao usuário, como o sistema de autenticação. Você pode usar essas informações em suas ações."
       },
       "SELF": {
@@ -79,16 +79,45 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Configurações da Instância",
-        "DESCRIPTION": "As configurações da instância são as configurações padrão para todas as organizações. Com as permissões corretas, algumas delas podem ser sobrescritas nas configurações da organização."
+        "TITLE": "Configurações padrão",
+        "DESCRIPTION": "Configurações padrão para todas as organizações. Com as permissões corretas, algumas delas podem ser substituídas nas configurações da organização."
       },
       "ORG": {
         "TITLE": "Configurações da Organização",
         "DESCRIPTION": "Personalize as configurações da sua organização."
       },
+      "FEATURES": {
+        "TITLE": "Configurações de recursos",
+        "DESCRIPTION": "Desbloqueie recursos para sua instância."
+      },
       "IDPS": {
         "TITLE": "Provedores de Identidade",
-        "DESCRIPTION": "Crie e ative provedores de identidade externos. Escolha um provedor conhecido ou configure qualquer outro provedor compatível com OIDC, OAuth ou SAML de sua escolha. Você pode até usar seus tokens JWT existentes como identidades federadas configurando um provedor de identidade JWT."
+        "DESCRIPTION": "Crie e ative provedores de identidade externos. Escolha um provedor conhecido ou configure qualquer outro provedor compatível com OIDC, OAuth ou SAML de sua escolha. Você pode até usar seus tokens JWT existentes como identidades federadas configurando um provedor de identidade JWT.",
+        "NEXT": "E agora?",
+        "SAML": {
+          "TITLE": "Configure seu Provedor de Identidade SAML",
+          "DESCRIPTION": "O ZITADEL está configurado. Agora, seu Provedor de Identidade SAML precisa de alguma configuração. A maioria dos provedores permite que você simplesmente faça o upload do XML de metadados do ZITADEL completo. Outros provedores pedem que você forneça apenas alguns URLs específicos, como por exemplo a ID da entidade (URL de metadados), a URL do Serviço de Consumidor de Afirmação (ACS) ou a URL de Logout Único."
+        },
+        "CALLBACK": {
+          "TITLE": "Configure seu {{ provider }} Provedor de Identidade",
+          "DESCRIPTION": "Antes de poder configurar o ZITADEL, passe este URL para o seu Provedor de Identidade para permitir o redirecionamento do navegador de volta para o ZITADEL após a autenticação."
+        },
+        "JWT": {
+          "TITLE": "Use JWTs como Identidades Federadas",
+          "DESCRIPTION": "O Provedor de Identidade JWT permite que você use seus tokens JWT existentes como identidades federadas. Este recurso é útil se você já tem um emissor para JWTs. Com um IdP JWT, você pode usar esses JWTs para criar e atualizar usuários no ZITADEL em tempo real."
+        },
+        "LDAP": {
+          "TITLE": "Configure o ZITADEL para conectar ao seu Provedor de Identidade LDAP",
+          "DESCRIPTION": "Forneça os detalhes de conexão para o seu servidor LDAP e configure o mapeamento dos seus atributos LDAP para atributos do ZITADEL."
+        },
+        "AUTOFILL": {
+          "TITLE": "Preenchimento automático de dados do usuário",
+          "DESCRIPTION": "Use uma ação para melhorar a experiência dos seus usuários. Você pode pré-preencher o formulário de registro do ZITADEL com valores do provedor de identidade."
+        },
+        "ACTIVATE": {
+          "TITLE": "Ative o IdP",
+          "DESCRIPTION": "Seu IdP ainda não está ativo. Ative-o para permitir que seus usuários façam login."
+        }
       },
       "PW_COMPLEXITY": {
         "TITLE": "Complexidade da Senha",
@@ -100,7 +129,7 @@
       },
       "PRIVACY_POLICY": {
         "TITLE": "Links Externos",
-        "DESCRIPTION": "Guie seus usuários para recursos externos personalizados mostrados na página de login. Os usuários precisam aceitar os Termos de Serviço e a Política de Privacidade antes de poderem se inscrever."
+        "DESCRIPTION": "Oriente seus usuários sobre recursos externos personalizados mostrados na página de login. Os usuários precisam aceitar os Termos de Serviço e a Política de Privacidade antes de se inscreverem. Altere o link para sua documentação ou defina uma string vazia para ocultar o botão de documentação do console. Adicione um link externo personalizado e um texto personalizado para esse link no console ou deixe-os vazios para ocultar esse botão."
       },
       "SMTP_PROVIDER": {
         "TITLE": "Configurações de SMTP",
@@ -202,7 +231,7 @@
           "LABEL": "Duração Máxima em horas",
           "PW_CHECK": {
             "TITLE": "Verificação de Senha",
-            "DESCRIPTION": "Seus usuários devem mudar suas senhas nesses períodos."
+            "DESCRIPTION": "Os usuários serão obrigados a reautentificar-se com sua senha após este período."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Verificação de Login Externo",
@@ -240,9 +269,9 @@
             "TITLE": "Login Externo permitido",
             "DESCRIPTION": "Permite que seus usuários façam login com um provedor de identidade externo em vez de usar o usuário ZITADEL para fazer login."
           },
-          "PASSWORD_RESET_ALLOWED": {
-            "TITLE": "Redefinição de Senha permitida",
-            "DESCRIPTION": "Permite que seus usuários redefinam sua senha."
+          "HIDE_PASSWORD_RESET": {
+            "TITLE": "Redefinição de senha oculta",
+            "DESCRIPTION": "Não permita que seus usuários redefinam a senha."
           },
           "DOMAIN_DISCOVERY_ALLOWED": {
             "TITLE": "Descoberta de Domínio permitida",
@@ -457,6 +486,7 @@
     "MORE": "mais",
     "STEP": "Passo",
     "SETUP": "Configuração",
+    "TEST": "Teste",
     "UNSAVEDCHANGES": "Alterações não salvas",
     "UNSAVED": {
       "DIALOG": {
@@ -467,7 +497,9 @@
     },
     "TABLE": {
       "SHOWUSER": "Mostrar usuário {{value}}"
-    }
+    },
+    "DOWNLOAD": "Baixar",
+    "APPLY": "Aplicar"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Tem controle sobre toda a instância, incluindo todas as organizações",
@@ -565,6 +597,7 @@
     "INVALID_FORMAT": "O formato é inválido.",
     "NOTANEMAIL": "O valor fornecido não é um endereço de e-mail.",
     "MINLENGTH": "Deve ter pelo menos {{requiredLength}} caracteres.",
+    "MAXLENGTH": "Deve ter menos de {{requiredLength}} caracteres.",
     "UPPERCASEMISSING": "Deve incluir uma letra maiúscula.",
     "LOWERCASEMISSING": "Deve incluir uma letra minúscula.",
     "SYMBOLERROR": "Deve incluir um símbolo ou caractere de pontuação.",
@@ -850,7 +883,8 @@
       "SET": "Definir Nova Senha",
       "RESENDNOTIFICATION": "Enviar Link de Redefinição de Senha",
       "REQUIRED": "Algumas informações obrigatórias estão faltando.",
-      "MINLENGTHERROR": "Deve ter pelo menos {{value}} caracteres."
+      "MINLENGTHERROR": "Deve ter pelo menos {{value}} caracteres.",
+      "MAXLENGTHERROR": "Deve ter menos de {{value}} caracteres"
     },
     "ID": "ID",
     "EMAIL": "E-mail",
@@ -1052,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Excluir Ações Selecionadas?",
         "DESCRIPTION": "Tem certeza de que deseja excluir as ações selecionadas do fluxo?"
-      }
+      },
+      "ABOUTNAME": "O nome da ação e o nome da função no javascript devem ser iguais"
     },
     "TOAST": {
       "ACTIONSSET": "Ações definidas",
@@ -1263,6 +1298,7 @@
       "MEMBERCHANGED": "Gerente alterado.",
       "SETPRIMARY": "Domínio principal definido.",
       "DELETED": "Organização excluída com sucesso",
+      "DEFAULTORGNOTFOUND": "A organização padrão não foi encontrada",
       "ORG_WAS_DELETED": "Organização foi excluída."
     },
     "DIALOG": {
@@ -1284,15 +1320,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Configurações da Instância",
-      "DESCRIPTION": "Essas configurações serão aplicadas a todas as suas organizações, a menos que tenham sido substituídas."
-    },
     "LIST": {
       "ORGS": "Organizações",
+      "FEATURESETTINGS": "Configurações de Recursos",
       "LANGUAGES": "Idiomas",
       "LOGIN": "Comportamento de Login e Segurança",
       "LOCKOUT": "Bloqueio",
+      "AGE": "Expiração da senha",
       "COMPLEXITY": "Complexidade de Senha",
       "NOTIFICATIONS": "Configurações de Notificação",
       "SMTP_PROVIDER": "Provedor SMTP",
@@ -1347,10 +1381,13 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
+      "TITLE": "Configurações SMTP",
+      "DESCRIPTION": "Descrição",
       "SENDERADDRESS": "Endereço de e-mail do remetente",
       "SENDERNAME": "Nome do remetente",
       "REPLYTOADDRESS": "Endereço Reply-To",
@@ -1361,6 +1398,7 @@
       "PASSWORDSET": "Senha do SMTP definida com sucesso.",
       "TLS": "Transport Layer Security (TLS)",
       "SAVED": "Salvo com sucesso!",
+      "NOCHANGES": "Sem alterações!",
       "REQUIREDWARN": "Para enviar notificações do seu domínio, você precisa inserir seus dados SMTP."
     },
     "SMS": {
@@ -1401,9 +1439,7 @@
         "7": "Senha única (OTP) - SMS",
         "8": "Senha única (OTP) - e-mail"
       },
-      "ADDGENERATOR": "Definir aparência de segredo",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Expiração (em horas)",
+      "EXPIRY": "Expiração (em minutos)",
       "INCLUDEDIGITS": "Incluir números",
       "INCLUDESYMBOLS": "Incluir símbolos",
       "INCLUDELOWERLETTERS": "Incluir letras minúsculas",
@@ -1419,6 +1455,31 @@
       "IMPERSONATIONTITLE": "Personificação",
       "IMPERSONATIONENABLED": "Permitir representação",
       "IMPERSONATIONDESCRIPTION": "Esta configuração permite usar a representação em princípio. Observe que o imitador também precisa das funções `*_IMPERSONATOR` apropriadas atribuídas."
+    },
+    "FEATURES": {
+      "LOGINDEFAULTORG": "Organização Padrão de Login",
+      "LOGINDEFAULTORG_DESCRIPTION": "A interface de login utilizará as configurações da organização padrão (e não da instância) se nenhum contexto de organização estiver definido",
+      "OIDCLEGACYINTROSPECTION": "Introspecção Legada OIDC",
+      "OIDCLEGACYINTROSPECTION_DESCRIPTION": "Recentemente refatoramos o endpoint de introspecção por motivos de performance. Esse recurso pode ser usado para reverter para a implementação legada caso surjam bugs inesperados.",
+      "OIDCTOKENEXCHANGE": "Troca de Token OIDC",
+      "OIDCTOKENEXCHANGE_DESCRIPTION": "Habilita o tipo de concessão experimental urn:ietf:params:oauth:grant-type:token-exchange para o endpoint de token OIDC. A troca de token pode ser usada para solicitar tokens com escopo menor ou personificar outros usuários. Consulte a política de segurança para permitir a personificação em uma instância.",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS": "Projeções de Introspecção com Gatilho OIDC",
+      "OIDCTRIGGERINTROSPECTIONPROJECTIONS_DESCRIPTION": "Habilita gatilhos de projeção durante uma solicitação de introspecção. Isso pode funcionar como uma solução alternativa se houver problemas de consistência perceptíveis na resposta de introspecção, mas pode impactar o desempenho. Planejamos remover gatilhos para solicitações de introspecção no futuro.",
+      "USERSCHEMA": "Esquema de Usuário",
+      "USERSCHEMAS_DESCRIPTION": "Esquemas de Usuário permitem gerenciar esquemas de dados do usuário. Se o sinalizador estiver ativado, você poderá usar a nova API e seus recursos.",
+      "ACTIONS": "Ações",
+      "ACTIONS_DESCRIPTION": "Actions v2 permitem gerenciar execuções e destinos de dados. Se a flag estiver habilitada, você poderá usar a nova API e seus recursos.",
+      "STATES": {
+        "INHERITED": "Herdade",
+        "ENABLED": "Habilitado",
+        "DISABLED": "Desabilitado"
+      },
+      "INHERITED_DESCRIPTION": "Essa configuração define o valor para o padrão do sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Habilitado\" é herdado",
+        "DISABLED": "\"Desabilitado\" é herdado"
+      },
+      "RESET": "Definir tudo para herdar"
     },
     "DIALOG": {
       "RESET": {
@@ -1488,8 +1549,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Envelhecimento de senha",
-      "DESCRIPTION": "Você pode definir uma política para o envelhecimento de senhas. Essa política emite um aviso após o tempo de envelhecimento específico ter passado."
+      "TITLE": "Expiração da senha",
+      "DESCRIPTION": "Você pode definir uma política para a expiração de senhas. Esta política forçará o usuário a alterar a senha no próximo login após a expiração. Não existem avisos e notificações automáticas."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Política de bloqueio",
@@ -1507,7 +1568,8 @@
       "DESCRIPTIONCREATEADMIN": "Os usuários podem escolher entre os provedores de identidade disponíveis abaixo.",
       "DESCRIPTIONCREATEMGMT": "Os usuários podem escolher entre os provedores de identidade disponíveis abaixo. Observação: você também pode usar provedores definidos pelo sistema e provedores definidos apenas para sua organização.",
       "LIFETIME_INVALID": "O formulário contém valores inválidos.",
-      "SAVED": "Salvo com sucesso!"
+      "SAVED": "Salvo com sucesso!",
+      "PROVIDER_ADDED": "Provedor de identidade ativado."
     },
     "PRIVACY_POLICY": {
       "DESCRIPTION": "Defina os links para a sua Política de Privacidade e Termos de Serviço",
@@ -1515,6 +1577,9 @@
       "POLICYLINK": "Link para a Política de Privacidade",
       "HELPLINK": "Link para Ajuda",
       "SUPPORTEMAIL": "E-mail de suporte",
+      "DOCSLINK": "Link do Documentos (Console)",
+      "CUSTOMLINK": "Link personalizado (Console)",
+      "CUSTOMLINKTEXT": "Texto do link personalizado (Console)",
       "SAVED": "Salvo com sucesso!",
       "RESET_TITLE": "Restaurar valores padrão",
       "RESET_DESCRIPTION": "Você está prestes a restaurar os Links padrão para TOS e Política de Privacidade. Deseja realmente continuar?"
@@ -1548,7 +1613,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Verificação de email concluída",
@@ -1563,6 +1629,7 @@
         "initPasswordText": "Inicialização de senha",
         "initializeDoneText": "Inicialização de usuário concluída",
         "initializeUserText": "Inicializaçãode usuário",
+        "linkingUserPromptText": "Prompt de usuário para vinculação",
         "linkingUserDoneText": "Vinculação de usuário concluída",
         "loginText": "Login",
         "logoutText": "Logout",
@@ -1617,7 +1684,8 @@
         "username": "Nome de usuário",
         "tempUsername": "Nome de usuário temporário",
         "otp": "Senha de uso único",
-        "verifyUrl": "URL para verificar a senha de uso único"
+        "verifyUrl": "URL para verificar a senha de uso único",
+        "expiry": "Data de expiração"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados salvos."
@@ -1634,9 +1702,10 @@
       "HASLOWERCASE": "tem letra minúscula",
       "HASUPPERCASE": "tem letra maiúscula",
       "SHOWLOCKOUTFAILURES": "mostrar falhas de bloqueio",
-      "MAXATTEMPTS": "Máximo de tentativas de senha",
+      "MAXPASSWORDATTEMPTS": "Máximo de tentativas de senha",
+      "MAXOTPATTEMPTS": "Máximo de tentativas de OTP",
       "EXPIREWARNDAYS": "Aviso de expiração após dias",
-      "MAXAGEDAYS": "Idade máxima em dias",
+      "MAXAGEDAYS": "Validade máxima em dias",
       "USERLOGINMUSTBEDOMAIN": "Adicionar domínio da organização como sufixo aos nomes de login",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Se você habilitar essa configuração, todos os nomes de login serão sufixados com o domínio da organização. Se essa configuração estiver desabilitada, você deve garantir que os nomes de usuário sejam exclusivos em todas as organizações.",
       "VALIDATEORGDOMAINS": "Verificação de domínio da organização necessária (desafio DNS ou HTTP)",
@@ -1993,7 +2062,13 @@
       "ISCREATIONALLOWED": "Criação de Conta Permitida",
       "ISCREATIONALLOWED_DESC": "Determina se as contas podem ser criadas.",
       "ISLINKINGALLOWED": "Vinculação de Conta Permitida",
-      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada a uma conta existente."
+      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada a uma conta existente.",
+      "AUTOLINKING_DESC": "Determina se uma identidade será solicitada a ser vinculada a uma conta existente.",
+      "AUTOLINKINGTYPE": {
+        "0": "Desativado",
+        "1": "Verificar nome de usuário existente",
+        "2": "Verificar e-mail existente"
+      }
     },
     "OWNERTYPES": {
       "0": "desconhecido",
@@ -2152,6 +2227,63 @@
       "1": "Permitido"
     }
   },
+  "SMTP": {
+    "LIST": {
+      "TITLE": "Provedor SMTP",
+      "DESCRIPTION": "Estes são os provedores SMTP para sua instância ZITADEL. Ative aquele que deseja usar para enviar notificações aos seus usuários.",
+      "EMPTY": "Nenhum provedor SMTP disponível",
+      "ACTIVATED": "Ativado",
+      "ACTIVATE": "Ativar provedor",
+      "DEACTIVATE": "Desativar provedor",
+      "TEST": "Teste seu provedor",
+      "TYPE": "Tipo",
+      "DIALOG": {
+        "ACTIVATED": "A configuração SMTP foi ativada",
+        "ACTIVATE_WARN_TITLE": "Ativar configuração SMTP",
+        "ACTIVATE_WARN_DESCRIPTION": "Você está prestes a ativar uma configuração SMTP. Primeiro, desativaremos o provedor ativo atual e depois ativaremos esta configuração. Tem certeza?",
+        "DEACTIVATE_WARN_TITLE": "Desativar configuração SMTP",
+        "DEACTIVATE_WARN_DESCRIPTION": "Você está prestes a desativar uma configuração SMTP. Tem certeza?",
+        "DEACTIVATED": "A configuração SMTP foi desativada",
+        "DELETE_TITLE": "Excluir configuração SMTP",
+        "DELETE_DESCRIPTION": "Você está prestes a excluir uma configuração. Confirme esta ação digitando o nome do remetente",
+        "DELETED": "A configuração SMTP foi excluída",
+        "SENDER": "Digite {{ value }} para excluir esta configuração SMTP."
+      }
+    },
+    "CREATE": {
+      "TITLE": "Adicionar provedor SMTP",
+      "DESCRIPTION": "Selecione um ou mais dos seguintes fornecedores.",
+      "STEPS": {
+        "TITLE": "Adicionar {{ value }} provedor SMTP",
+        "CREATE_DESC_TITLE": "Insira suas configurações SMTP de {{ value }} passo a passo",
+        "CURRENT_DESC_TITLE": "Estas são suas configurações de SMTP",
+        "PROVIDER_SETTINGS": "Configurações do provedor SMTP",
+        "SENDER_SETTINGS": "Configurações do remetente",
+        "NEXT_STEPS": "Próximos passos",
+        "ACTIVATE": {
+          "TITLE": "Ative seu provedor SMTP",
+          "DESCRIPTION": "ZITADEL não pode usar este provedor SMTP para enviar notificações até que você o ative. Se você ativar este provedor, qualquer outro provedor que estava ativo será desativado."
+        },
+        "DEACTIVATE": {
+          "TITLE": "Desative seu provedor SMTP",
+          "DESCRIPTION": "Se você desativar este provedor SMTP, a ZITADEL não poderá usá-lo para enviar notificações até que você o ative novamente."
+        },
+        "SAVE_SETTINGS": "Salve suas configurações",
+        "TEST": {
+          "TITLE": "Teste suas configurações",
+          "DESCRIPTION": "Você pode testar as configurações do seu provedor SMTP e verificar o resultado do teste antes de salvá-las",
+          "RESULT": "Seu e-mail foi enviado com sucesso"
+        }
+      }
+    },
+    "DETAIL": {
+      "TITLE": "Configurações do provedor SMTP"
+    },
+    "EMPTY": "Nenhum provedor SMTP disponível",
+    "STEPS": {
+      "SENDGRID": {}
+    }
+  },
   "APP": {
     "LIST": "Aplicações",
     "COMPLIANCE": "Conformidade OIDC",
@@ -2275,7 +2407,8 @@
         "0": "Código de Autorização",
         "1": "Implícito",
         "2": "Token de Atualização",
-        "3": "Código do Dispositivo"
+        "3": "Código do Dispositivo",
+        "4": "Troca de tokens"
       },
       "AUTHMETHOD": {
         "0": "Básico",
@@ -2414,7 +2547,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Adicionar um Gerente",

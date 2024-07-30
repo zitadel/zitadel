@@ -266,7 +266,7 @@ func (wm *UserV2WriteModel) Reduce() error {
 		case *user.HumanPasswordCheckSucceededEvent:
 			wm.PasswordCheckFailedCount = 0
 		case *user.HumanPasswordChangedEvent:
-			wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+			wm.PasswordEncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 			wm.PasswordChangeRequired = e.ChangeRequired
 			wm.EmptyPasswordCode()
 		case *user.HumanPasswordCodeAddedEvent:
@@ -470,7 +470,7 @@ func (wm *UserV2WriteModel) reduceHumanAddedEvent(e *user.HumanAddedEvent) {
 	wm.Email = e.EmailAddress
 	wm.Phone = e.PhoneNumber
 	wm.UserState = domain.UserStateActive
-	wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+	wm.PasswordEncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 	wm.PasswordChangeRequired = e.ChangeRequired
 }
 
@@ -485,7 +485,7 @@ func (wm *UserV2WriteModel) reduceHumanRegisteredEvent(e *user.HumanRegisteredEv
 	wm.Email = e.EmailAddress
 	wm.Phone = e.PhoneNumber
 	wm.UserState = domain.UserStateActive
-	wm.PasswordEncodedHash = user.SecretOrEncodedHash(e.Secret, e.EncodedHash)
+	wm.PasswordEncodedHash = crypto.SecretOrEncodedHash(e.Secret, e.EncodedHash)
 	wm.PasswordChangeRequired = e.ChangeRequired
 }
 

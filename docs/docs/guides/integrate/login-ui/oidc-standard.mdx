@@ -55,7 +55,7 @@ With the ID from the redirect before you will now be able to get the information
 
 ```bash
 curl --request GET \
-  --url https://$ZITADEL_DOMAIN/v2beta/oidc/auth_requests/V2_224908753244265546 \
+  --url https://$ZITADEL_DOMAIN/v2/oidc/auth_requests/V2_224908753244265546 \
   --header 'Authorization: Bearer '"$TOKEN"''\
 ```
 
@@ -100,7 +100,7 @@ Read more about the [Finalize Auth Request Documentation](/docs/apis/resources/o
 Make sure that the authorization header is from the same account that you originally sent in the client id header ```x-zitadel-login-client: <userid>``` on the authorize endpoint.
 ```bash
 curl --request POST \
-  --url $ZITADEL_DOMAIN/v2beta/oidc/auth_requests/V2_224908753244265546 \
+  --url $ZITADEL_DOMAIN/v2/oidc/auth_requests/V2_224908753244265546 \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \

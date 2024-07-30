@@ -7,13 +7,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
 	"github.com/zitadel/zitadel/pkg/grpc/instance"
 	"github.com/zitadel/zitadel/pkg/grpc/object"
 	system_pb "github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 func TestServer_ListInstances(t *testing.T) {
-	domain, instanceID, _ := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	domain, instanceID, _, _ := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 
 	tests := []struct {
 		name    string

@@ -49,6 +49,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             name: "User Authentication Factor"
         },
         {
+            name: "User Authorizations/Grants"
+        },
+        {
             name: "User Email"
         },
         {
@@ -1569,6 +1572,8 @@ message ListMyProjectOrgsRequest {
     zitadel.v1.ListQuery query = 1;
     //criteria the client is looking for
     repeated zitadel.org.v1.OrgQuery queries = 2;
+    // States by which field the results are sorted.
+    zitadel.org.v1.OrgFieldName sorting_column = 3;
 }
 
 message ListMyProjectOrgsResponse {
