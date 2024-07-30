@@ -579,6 +579,13 @@ Errors:
       NotForAPI: Tokens personificados não permitidos para API
     Impersonation:
       PolicyDisabled: A representação está desativada na política de segurança da instância
+  WebKey:
+    ActiveDelete: Não é possível eliminar a chave web ativa
+    Config: Configuração de chave web inválida
+    Duplicate: ID da chave Web não exclusivo
+    FeatureDisabled: Recurso chave da Web desativado
+    NoActive: Nenhuma chave web ativa encontrada
+    NotFound: Chave Web não encontrada
 
 AggregateTypes:
   action: Ação
@@ -602,6 +609,7 @@ AggregateTypes:
   restrictions: Restrições
   system: Sistema
   session: Sessão
+  web_key: Chave da Web
 
 EventTypes:
   execution:
@@ -1300,6 +1308,11 @@ EventTypes:
     deactivated: Esquema de usuário desativado
     reactivated: Esquema do usuário reativado
     deleted: Esquema do usuário excluído
+  web_key:
+    added: Chave Web adicionada
+    activated: Chave Web ativada
+    deactivated: Chave Web desativada
+    removed: Chave Web removida
 
 Application:
   OIDC:

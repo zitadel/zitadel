@@ -656,7 +656,7 @@ func TestCommands_DeleteWebKey(t *testing.T) {
 				),
 			},
 			args:    args{"key1"},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Chai1", "Errors.WebKey.Active"),
+			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-Chai1", "Errors.WebKey.ActiveDelete"),
 		},
 		{
 			name: "delete deactivated key",

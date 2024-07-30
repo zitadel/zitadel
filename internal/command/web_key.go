@@ -166,7 +166,7 @@ func (c *Commands) DeleteWebKey(ctx context.Context, keyID string) (_ *domain.Ob
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ooCa7", "Errors.WebKey.NotFound")
 	}
 	if model.State == domain.WebKeyStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Chai1", "Errors.WebKey.Active")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Chai1", "Errors.WebKey.ActiveDelete")
 	}
 	events, err := c.eventstore.Push(ctx, webkey.NewRemovedEvent(ctx,
 		webkey.AggregateFromWriteModel(ctx, &model.WriteModel),

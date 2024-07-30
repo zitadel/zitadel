@@ -131,7 +131,7 @@ func (c WebKeyRSAConfig) IsValid() error {
 		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-eaz3T", "Errors.WebKey.Config")
 	}
 	if !c.Hasher.IsARSAHasher() || c.Hasher == RSAHasherUnspecified {
-		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-eaz3T", "Errors.WebKey.Config")
+		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-ODie7", "Errors.WebKey.Config")
 	}
 	return nil
 }
@@ -161,7 +161,7 @@ func (WebKeyECDSAConfig) Type() WebKeyConfigType {
 
 func (c WebKeyECDSAConfig) IsValid() error {
 	if !c.Curve.IsAEllipticCurve() || c.Curve == EllipticCurveUnspecified {
-		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-eaz3T", "Errors.WebKey.Config")
+		return zerrors.ThrowInvalidArgument(nil, "CRYPTO-Ii2ai", "Errors.WebKey.Config")
 	}
 	return nil
 }

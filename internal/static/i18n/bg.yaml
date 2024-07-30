@@ -601,6 +601,13 @@ Errors:
       NotForAPI: Имитирани токени не са разрешени за API
     Impersonation:
       PolicyDisabled: Имитирането е деактивирано в политиката за сигурност на екземпляра
+  WebKey:
+    ActiveDelete: Не може да се изтрие активен уеб ключ
+    Config: Невалидна конфигурация на уеб ключ
+    Duplicate: ID на уеб ключ не е уникален
+    FeatureDisabled: Ключовата уеб функция е деактивирана
+    NoActive: Не е намерен активен уеб ключ
+    NotFound: Уеб ключът не е намерен
 
 AggregateTypes:
   action: Действие
@@ -624,6 +631,7 @@ AggregateTypes:
   restrictions: Ограничения
   system: Система
   session: Сесия
+  web_key: Уеб ключ
 
 EventTypes:
   execution:
@@ -1340,6 +1348,12 @@ EventTypes:
     deactivated: Потребителската схема е деактивирана
     reactivated: Потребителската схема е активирана отново
     deleted: Потребителската схема е изтрита
+  web_key:
+    added: Добавен уеб ключ
+    activated: Уеб ключът е активиран
+    deactivated: Уеб ключът е деактивиран
+    removed: Уеб ключът е премахнат
+
 Application:
   OIDC:
     UnsupportedVersion: Вашата OIDC версия не се поддържа
