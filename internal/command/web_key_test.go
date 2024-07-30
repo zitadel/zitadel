@@ -594,8 +594,7 @@ func TestCommands_DeleteWebKey(t *testing.T) {
 	require.NoError(t, err)
 
 	type fields struct {
-		eventstore      func(*testing.T) *eventstore.Eventstore
-		webKeyGenerator func(keyID string, alg crypto.EncryptionAlgorithm, genConfig crypto.WebKeyConfig) (encryptedPrivate *crypto.CryptoValue, public *jose.JSONWebKey, err error)
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		keyID string
@@ -724,8 +723,7 @@ func TestCommands_DeleteWebKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore(t),
-				webKeyGenerator: tt.fields.webKeyGenerator,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := c.DeleteWebKey(ctx, tt.args.keyID)
 			require.ErrorIs(t, err, tt.wantErr)
