@@ -108,6 +108,7 @@ message SMSProvider {
 message TwilioConfig {
   string sid = 1;
   string sender_number = 2;
+  string verify_service_sid = 3;
 }
 
 enum SMSProviderConfigState {

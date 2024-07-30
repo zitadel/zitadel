@@ -18,9 +18,10 @@ type IAMSMSConfigWriteModel struct {
 }
 
 type TwilioConfig struct {
-	SID          string
-	Token        *crypto.CryptoValue
-	SenderNumber string
+	SID              string
+	Token            *crypto.CryptoValue
+	SenderNumber     string
+	VerifyServiceSID string
 }
 
 func NewIAMSMSConfigWriteModel(instanceID, id string) *IAMSMSConfigWriteModel {
@@ -42,9 +43,10 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 				continue
 			}
 			wm.Twilio = &TwilioConfig{
-				SID:          e.SID,
-				Token:        e.Token,
-				SenderNumber: e.SenderNumber,
+				SID:              e.SID,
+				Token:            e.Token,
+				SenderNumber:     e.SenderNumber,
+				VerifyServiceSID: e.VerifyServiceSID,
 			}
 			wm.State = domain.SMSConfigStateInactive
 		case *instance.SMSConfigTwilioChangedEvent:
@@ -56,6 +58,9 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 			}
 			if e.SenderNumber != nil {
 				wm.Twilio.SenderNumber = *e.SenderNumber
+			}
+			if e.VerifyServiceSID != nil {
+				wm.Twilio.VerifyServiceSID = *e.VerifyServiceSID
 			}
 		case *instance.SMSConfigTwilioTokenChangedEvent:
 			if wm.ID != e.ID {
@@ -98,7 +103,7 @@ func (wm *IAMSMSConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, sid, senderNumber string) (*instance.SMSConfigTwilioChangedEvent, bool, error) {
+func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, sid, senderNumber string, verifyServiceSID string) (*instance.SMSConfigTwilioChangedEvent, bool, error) {
 	changes := make([]instance.SMSConfigTwilioChanges, 0)
 	var err error
 
@@ -107,6 +112,9 @@ func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate
 	}
 	if wm.Twilio.SenderNumber != senderNumber {
 		changes = append(changes, instance.ChangeSMSConfigTwilioSenderNumber(senderNumber))
+	}
+	if wm.Twilio.VerifyServiceSID != verifyServiceSID {
+		changes = append(changes, instance.ChangeSMSConfigTwilioVerifyServiceSID(verifyServiceSID))
 	}
 
 	if len(changes) == 0 {

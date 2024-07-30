@@ -21,3 +21,18 @@ func (msg *SMS) GetContent() (string, error) {
 func (msg *SMS) GetTriggeringEvent() eventstore.Event {
 	return msg.TriggeringEvent
 }
+
+var _ channels.Message = (*TwilioVerify)(nil)
+
+type TwilioVerify struct {
+	VerifyServiceSID     string
+	RecipientPhoneNumber string
+	TriggeringEvent      eventstore.Event
+}
+
+func (msg *TwilioVerify) GetContent() (string, error) {
+	return "", nil
+}
+func (msg *TwilioVerify) GetTriggeringEvent() eventstore.Event {
+	return msg.TriggeringEvent
+}

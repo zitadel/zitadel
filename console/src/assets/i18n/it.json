@@ -1418,6 +1418,7 @@
         "SID": "Sid",
         "TOKEN": "Token",
         "SENDERNUMBER": "Sender Number",
+        "VERIFYSERVICESID": "Verification Service Sid",
         "ADDED": "Twilio aggiunto con successo.",
         "UPDATED": "Twilio aggiornato correttamente.",
         "REMOVED": "Twilio rimosso con successo.",

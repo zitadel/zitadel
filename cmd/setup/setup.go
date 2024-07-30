@@ -3,7 +3,6 @@ package setup
 import (
 	"context"
 	"embed"
-	_ "embed"
 	"net/http"
 
 	"github.com/spf13/cobra"
@@ -160,6 +159,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s29FillFieldsForProjectGrant = &FillFieldsForProjectGrant{eventstore: eventstoreClient}
 	steps.s30FillFieldsForOrgDomainVerified = &FillFieldsForOrgDomainVerified{eventstore: eventstoreClient}
 	steps.s31AddAggregateIndexToFields = &AddAggregateIndexToFields{dbClient: esPusherDBClient}
+	steps.s32SMSConfigs2TwilioAddVerifyServiceSid = &SMSConfigs2TwilioAddVerifyServiceSid{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -216,6 +216,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s21AddBlockFieldToLimits,
 		steps.s25User11AddLowerFieldsToVerifiedEmail,
 		steps.s27IDPTemplate6SAMLNameIDFormat,
+		steps.s32SMSConfigs2TwilioAddVerifyServiceSid,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
