@@ -12,7 +12,7 @@ import (
 
 func (c *Commands) AddTrustedDomain(ctx context.Context, trustedDomain string) (*domain.ObjectDetails, error) {
 	trustedDomain = strings.TrimSpace(trustedDomain)
-	if trustedDomain == "" {
+	if trustedDomain == "" || len(trustedDomain) > 253 {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-Stk21", "Errors.Invalid.Argument")
 	}
 	if !allowDomainRunes.MatchString(trustedDomain) {

@@ -45,7 +45,20 @@ func TestCommands_AddTrustedDomain(t *testing.T) {
 			},
 		},
 		{
-			name: "invalid domain, error",
+			name: "invalid domain (length), error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
+				trustedDomain: "my-very-endleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeess-looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo0ooooooooooooooooooooooong.domain.com",
+			},
+			want: want{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMA-Stk21", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "invalid domain (chars), error",
 			fields: fields{
 				eventstore: expectEventstore(),
 			},
@@ -182,125 +195,3 @@ func TestCommands_RemoveTrustedDomain(t *testing.T) {
 		})
 	}
 }
-
-//
-//func TestCommands_RemoveTrustedDomain(t *testing.T) {
-//	type fields struct {
-//		httpClient                      *http.Client
-//		jobs                            sync.WaitGroup
-//		checkPermission                 domain.PermissionCheck
-//		newEncryptedCode                encrypedCodeFunc
-//		newEncryptedCodeWithDefault     encryptedCodeWithDefaultFunc
-//		newHashedSecret                 hashedSecretFunc
-//		eventstore                      *eventstore.Eventstore
-//		static                          static.Storage
-//		idGenerator                     id.Generator
-//		zitadelRoles                    []authz.RoleMapping
-//		externalDomain                  string
-//		externalSecure                  bool
-//		externalPort                    uint16
-//		idpConfigEncryption             crypto.EncryptionAlgorithm
-//		smtpEncryption                  crypto.EncryptionAlgorithm
-//		smsEncryption                   crypto.EncryptionAlgorithm
-//		userEncryption                  crypto.EncryptionAlgorithm
-//		userPasswordHasher              *crypto.Hasher
-//		secretHasher                    *crypto.Hasher
-//		machineKeySize                  int
-//		applicationKeySize              int
-//		domainVerificationAlg           crypto.EncryptionAlgorithm
-//		domainVerificationGenerator     crypto.Generator
-//		domainVerificationValidator     func(domain, token, verifier string, checkType api_http.CheckType) error
-//		sessionTokenCreator             func(sessionID string) (id string, token string, err error)
-//		sessionTokenVerifier            func(ctx context.Context, sessionToken, sessionID, tokenID string) (err error)
-//		defaultAccessTokenLifetime      time.Duration
-//		defaultRefreshTokenLifetime     time.Duration
-//		defaultRefreshTokenIdleLifetime time.Duration
-//		multifactors                    domain.MultifactorConfigs
-//		webauthnConfig                  *webauthn_helper.Config
-//		keySize                         int
-//		keyAlgorithm                    crypto.EncryptionAlgorithm
-//		certificateAlgorithm            crypto.EncryptionAlgorithm
-//		certKeySize                     int
-//		privateKeyLifetime              time.Duration
-//		publicKeyLifetime               time.Duration
-//		certificateLifetime             time.Duration
-//		defaultSecretGenerators         *SecretGenerators
-//		samlCertificateAndKeyGenerator  func(id string) ([]byte, []byte, error)
-//		GrpcMethodExisting              func(method string) bool
-//		GrpcServiceExisting             func(method string) bool
-//		ActionFunctionExisting          func(function string) bool
-//		EventExisting                   func(event string) bool
-//		EventGroupExisting              func(group string) bool
-//		GenerateDomain                  func(instanceName, domain string) (string, error)
-//	}
-//	type args struct {
-//		ctx           context.Context
-//		trustedDomain string
-//	}
-//	tests := []struct {
-//		name    string
-//		fields  fields
-//		args    args
-//		want    *domain.ObjectDetails
-//		wantErr assert.ErrorAssertionFunc
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			c := &Commands{
-//				httpClient:                      tt.fields.httpClient,
-//				jobs:                            tt.fields.jobs,
-//				checkPermission:                 tt.fields.checkPermission,
-//				newEncryptedCode:                tt.fields.newEncryptedCode,
-//				newEncryptedCodeWithDefault:     tt.fields.newEncryptedCodeWithDefault,
-//				newHashedSecret:                 tt.fields.newHashedSecret,
-//				eventstore:                      tt.fields.eventstore,
-//				static:                          tt.fields.static,
-//				idGenerator:                     tt.fields.idGenerator,
-//				zitadelRoles:                    tt.fields.zitadelRoles,
-//				externalDomain:                  tt.fields.externalDomain,
-//				externalSecure:                  tt.fields.externalSecure,
-//				externalPort:                    tt.fields.externalPort,
-//				idpConfigEncryption:             tt.fields.idpConfigEncryption,
-//				smtpEncryption:                  tt.fields.smtpEncryption,
-//				smsEncryption:                   tt.fields.smsEncryption,
-//				userEncryption:                  tt.fields.userEncryption,
-//				userPasswordHasher:              tt.fields.userPasswordHasher,
-//				secretHasher:                    tt.fields.secretHasher,
-//				machineKeySize:                  tt.fields.machineKeySize,
-//				applicationKeySize:              tt.fields.applicationKeySize,
-//				domainVerificationAlg:           tt.fields.domainVerificationAlg,
-//				domainVerificationGenerator:     tt.fields.domainVerificationGenerator,
-//				domainVerificationValidator:     tt.fields.domainVerificationValidator,
-//				sessionTokenCreator:             tt.fields.sessionTokenCreator,
-//				sessionTokenVerifier:            tt.fields.sessionTokenVerifier,
-//				defaultAccessTokenLifetime:      tt.fields.defaultAccessTokenLifetime,
-//				defaultRefreshTokenLifetime:     tt.fields.defaultRefreshTokenLifetime,
-//				defaultRefreshTokenIdleLifetime: tt.fields.defaultRefreshTokenIdleLifetime,
-//				multifactors:                    tt.fields.multifactors,
-//				webauthnConfig:                  tt.fields.webauthnConfig,
-//				keySize:                         tt.fields.keySize,
-//				keyAlgorithm:                    tt.fields.keyAlgorithm,
-//				certificateAlgorithm:            tt.fields.certificateAlgorithm,
-//				certKeySize:                     tt.fields.certKeySize,
-//				privateKeyLifetime:              tt.fields.privateKeyLifetime,
-//				publicKeyLifetime:               tt.fields.publicKeyLifetime,
-//				certificateLifetime:             tt.fields.certificateLifetime,
-//				defaultSecretGenerators:         tt.fields.defaultSecretGenerators,
-//				samlCertificateAndKeyGenerator:  tt.fields.samlCertificateAndKeyGenerator,
-//				GrpcMethodExisting:              tt.fields.GrpcMethodExisting,
-//				GrpcServiceExisting:             tt.fields.GrpcServiceExisting,
-//				ActionFunctionExisting:          tt.fields.ActionFunctionExisting,
-//				EventExisting:                   tt.fields.EventExisting,
-//				EventGroupExisting:              tt.fields.EventGroupExisting,
-//				GenerateDomain:                  tt.fields.GenerateDomain,
-//			}
-//			got, err := c.RemoveTrustedDomain(tt.args.ctx, tt.args.trustedDomain)
-//			if !tt.wantErr(t, err, fmt.Sprintf("RemoveTrustedDomain(%v, %v)", tt.args.ctx, tt.args.trustedDomain)) {
-//				return
-//			}
-//			assert.Equalf(t, tt.want, got, "RemoveTrustedDomain(%v, %v)", tt.args.ctx, tt.args.trustedDomain)
-//		})
-//	}
-//}
