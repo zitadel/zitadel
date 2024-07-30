@@ -17,18 +17,12 @@ message Details {
       example: "\"69629012906488334\"";
     }
   ];
-  //revision shows how many events have been applied to the object.
-  uint64 revision = 2 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"2\"";
-    }
-  ];
   //the timestamp of the first event applied to the object.
   google.protobuf.Timestamp created = 3;
   //the timestamp of the last event applied to the object.
   google.protobuf.Timestamp changed = 4;
   //the parent object representing the returned objects context.
-  zitadel.object.v3alpha.Owner owner = 5 [
+  optional zitadel.object.v3alpha.Owner owner = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\"";
     }

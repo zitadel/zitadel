@@ -60,8 +60,8 @@ func TestServer_GetTargetByID(t *testing.T) {
 					response.Target.Target.Name = name
 					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -92,8 +92,8 @@ func TestServer_GetTargetByID(t *testing.T) {
 					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Target.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -124,8 +124,8 @@ func TestServer_GetTargetByID(t *testing.T) {
 					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Target.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -158,8 +158,8 @@ func TestServer_GetTargetByID(t *testing.T) {
 					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Target.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -192,8 +192,8 @@ func TestServer_GetTargetByID(t *testing.T) {
 					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Target.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -300,11 +300,11 @@ func TestServer_ListTargets(t *testing.T) {
 							TargetIds: []string{resp.GetDetails().GetId()},
 						},
 					}
-					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
+					response.Details.Timestamp = resp.GetDetails().GetChanged()
 					//response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
 
-					response.Result[0].Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					response.Result[0].Details.Id = resp.GetDetails().GetId()
 					response.Result[0].Target.Name = name
 					return nil

@@ -10,7 +10,6 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
@@ -19,13 +18,13 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 		return nil, err
 	}
 	add := createTargetToCommand(req)
-	instance := targetOwnerInstance(ctx)
-	details, err := s.command.AddTarget(ctx, add, instance.Id)
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	details, err := s.command.AddTarget(ctx, add, instanceID)
 	if err != nil {
 		return nil, err
 	}
 	return &action.CreateTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, instance, add.AggregateID),
+		Details: resource_object.DomainToDetailsPb(details, nil, add.AggregateID),
 	}, nil
 }
 
@@ -33,13 +32,13 @@ func (s *Server) PatchTarget(ctx context.Context, req *action.PatchTargetRequest
 	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
-	instance := targetOwnerInstance(ctx)
-	details, err := s.command.ChangeTarget(ctx, patchTargetToCommand(req), instance.Id)
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	details, err := s.command.ChangeTarget(ctx, patchTargetToCommand(req), instanceID)
 	if err != nil {
 		return nil, err
 	}
 	return &action.PatchTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, instance, req.GetId()),
+		Details: resource_object.DomainToDetailsPb(details, nil, req.GetId()),
 	}, nil
 }
 
@@ -47,13 +46,13 @@ func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetReque
 	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
-	instance := targetOwnerInstance(ctx)
-	details, err := s.command.DeleteTarget(ctx, req.GetId(), instance.Id)
+	instanceID := authz.GetInstance(ctx).InstanceID()
+	details, err := s.command.DeleteTarget(ctx, req.GetId(), instanceID)
 	if err != nil {
 		return nil, err
 	}
 	return &action.DeleteTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, instance, req.GetId()),
+		Details: resource_object.DomainToDetailsPb(details, nil, req.GetId()),
 	}, nil
 }
 
@@ -111,11 +110,4 @@ func patchTargetToCommand(req *action.PatchTargetRequest) *command.ChangeTarget 
 		target.Timeout = gu.Ptr(reqTarget.GetTimeout().AsDuration())
 	}
 	return target
-}
-
-func targetOwnerInstance(ctx context.Context) *object.Owner {
-	return &object.Owner{
-		Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-		Id:   authz.GetInstance(ctx).InstanceID(),
-	}
 }

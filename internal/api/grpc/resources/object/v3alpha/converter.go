@@ -14,9 +14,8 @@ import (
 
 func DomainToDetailsPb(objectDetail *domain.ObjectDetails, owner *object.Owner, id string) *resource_object.Details {
 	details := &resource_object.Details{
-		Id:       id,
-		Revision: objectDetail.Sequence,
-		Owner:    owner,
+		Id:    id,
+		Owner: owner,
 	}
 	if !objectDetail.EventDate.IsZero() {
 		details.Changed = timestamppb.New(objectDetail.EventDate)

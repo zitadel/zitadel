@@ -9,7 +9,6 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
@@ -34,24 +33,21 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 	set := &command.SetExecution{
 		Targets: targets,
 	}
-	owner := &object.Owner{
-		Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-		Id:   authz.GetInstance(ctx).InstanceID(),
-	}
 	var err error
 	var details *domain.ObjectDetails
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	switch t := req.GetCondition().GetConditionType().(type) {
 	case *action.Condition_Request:
 		cond := executionConditionFromRequest(t.Request)
-		details, err = s.command.SetExecutionRequest(ctx, cond, set, owner.Id)
+		details, err = s.command.SetExecutionRequest(ctx, cond, set, instanceID)
 	case *action.Condition_Response:
 		cond := executionConditionFromResponse(t.Response)
-		details, err = s.command.SetExecutionResponse(ctx, cond, set, owner.Id)
+		details, err = s.command.SetExecutionResponse(ctx, cond, set, instanceID)
 	case *action.Condition_Event:
 		cond := executionConditionFromEvent(t.Event)
-		details, err = s.command.SetExecutionEvent(ctx, cond, set, owner.Id)
+		details, err = s.command.SetExecutionEvent(ctx, cond, set, instanceID)
 	case *action.Condition_Function:
-		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function.GetName()), set, owner.Id)
+		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function.GetName()), set, instanceID)
 	default:
 		err = zerrors.ThrowInvalidArgument(nil, "ACTION-5r5Ju", "Errors.Execution.ConditionInvalid")
 	}
@@ -59,7 +55,7 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 		return nil, err
 	}
 	return &action.SetExecutionResponse{
-		Details: settings_object.DomainToDetailsPb(details, owner),
+		Details: settings_object.DomainToDetailsPb(details, nil),
 	}, nil
 }
 
