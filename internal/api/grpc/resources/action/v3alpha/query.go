@@ -42,7 +42,7 @@ func (s *Server) SearchTargets(ctx context.Context, req *action.SearchTargetsReq
 	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
-	queries, err := searchTargetsRequestToModel(req)
+	queries, err := s.searchTargetsRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (s *Server) SearchTargets(ctx context.Context, req *action.SearchTargetsReq
 	}
 	return &action.SearchTargetsResponse{
 		Result:  targetsToPb(resp.Targets),
-		Details: resource_object.ToListDetails(queries.SearchRequest, resp.SearchResponse),
+		Details: resource_object.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
 	}, nil
 }
 
@@ -60,8 +60,7 @@ func (s *Server) SearchExecutions(ctx context.Context, req *action.SearchExecuti
 	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
-
-	queries, err := listExecutionsRequestToModel(req)
+	queries, err := s.searchExecutionsRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +70,7 @@ func (s *Server) SearchExecutions(ctx context.Context, req *action.SearchExecuti
 	}
 	return &action.SearchExecutionsResponse{
 		Result:  executionsToPb(resp.Executions),
-		Details: resource_object.ToListDetails(queries.SearchRequest, resp.SearchResponse),
+		Details: resource_object.ToSearchDetailsPb(queries.SearchRequest, resp.SearchResponse),
 	}, nil
 }
 
@@ -105,8 +104,11 @@ func targetToPb(t *query.Target) *action.GetTarget {
 	return target
 }
 
-func searchTargetsRequestToModel(req *action.SearchTargetsRequest) (*query.TargetSearchQueries, error) {
-	offset, limit, asc := resource_object.ListQueryToQuery(req.Query)
+func (s *Server) searchTargetsRequestToModel(req *action.SearchTargetsRequest) (*query.TargetSearchQueries, error) {
+	offset, limit, asc, err := resource_object.SearchQueryPbToQuery(s.systemDefaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := targetQueriesToQuery(req.Filters)
 	if err != nil {
 		return nil, err
@@ -145,15 +147,19 @@ func targetQueryToQuery(filter *action.TargetSearchFilter) (query.SearchQuery, e
 }
 
 func targetNameQueryToQuery(q *action.TargetNameFilter) (query.SearchQuery, error) {
-	return query.NewTargetNameSearchQuery(resource_object.TextMethodToQuery(q.Method), q.GetTargetName())
+	return query.NewTargetNameSearchQuery(resource_object.TextMethodPbToQuery(q.Method), q.GetTargetName())
 }
 
 func targetInTargetIdsQueryToQuery(q *action.InTargetIDsFilter) (query.SearchQuery, error) {
 	return query.NewTargetInIDsSearchQuery(q.GetTargetIds())
 }
 
-func targetFieldNameToSortingColumn(field action.TargetFieldName) query.Column {
-	switch field {
+// targetFieldNameToSortingColumn defaults to the creation date because this ensures deterministic pagination
+func targetFieldNameToSortingColumn(field *action.TargetFieldName) query.Column {
+	if field == nil {
+		return query.TargetColumnCreationDate
+	}
+	switch *field {
 	case action.TargetFieldName_TARGET_FIELD_NAME_UNSPECIFIED:
 		return query.TargetColumnID
 	case action.TargetFieldName_TARGET_FIELD_NAME_ID:
@@ -173,12 +179,15 @@ func targetFieldNameToSortingColumn(field action.TargetFieldName) query.Column {
 	case action.TargetFieldName_TARGET_FIELD_NAME_INTERRUPT_ON_ERROR:
 		return query.TargetColumnInterruptOnError
 	default:
-		return query.TargetColumnID
+		return query.TargetColumnCreationDate
 	}
 }
 
-func listExecutionsRequestToModel(req *action.SearchExecutionsRequest) (*query.ExecutionSearchQueries, error) {
-	offset, limit, asc := resource_object.ListQueryToQuery(req.Query)
+func (s *Server) searchExecutionsRequestToModel(req *action.SearchExecutionsRequest) (*query.ExecutionSearchQueries, error) {
+	offset, limit, asc, err := resource_object.SearchQueryPbToQuery(s.systemDefaults, req.Query)
+	if err != nil {
+		return nil, err
+	}
 	queries, err := executionQueriesToQuery(req.Filters)
 	if err != nil {
 		return nil, err

@@ -102,7 +102,7 @@ func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQuerie
 	eq := sq.Eq{
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareTargetsQuery(ctx, q.client)
+	query, scan := prepareTargetsQuery()
 	return genericRowsQueryWithState[*Targets](ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
@@ -111,7 +111,7 @@ func (q *Queries) GetTargetByID(ctx context.Context, id string) (target *Target,
 		TargetColumnID.identifier():         id,
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareTargetQuery(ctx, q.client)
+	query, scan := prepareTargetQuery()
 	return genericRowQuery[*Target](ctx, q.client, query.Where(eq), scan)
 }
 
@@ -123,9 +123,10 @@ func NewTargetInIDsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(TargetColumnID, values)
 }
 
-func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
+func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
+			TargetColumnCreationDate.identifier(),
 			TargetColumnChangeDate.identifier(),
 			TargetColumnResourceOwner.identifier(),
 			TargetColumnSequence.identifier(),
@@ -144,6 +145,7 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				target := new(Target)
 				err := rows.Scan(
 					&target.ID,
+					&target.CreationDate,
 					&target.EventDate,
 					&target.ResourceOwner,
 					&target.Sequence,
@@ -173,9 +175,10 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		}
 }
 
-func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
+func prepareTargetQuery() (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
+			TargetColumnCreationDate.identifier(),
 			TargetColumnChangeDate.identifier(),
 			TargetColumnResourceOwner.identifier(),
 			TargetColumnSequence.identifier(),
@@ -190,6 +193,7 @@ func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			target := new(Target)
 			err := row.Scan(
 				&target.ID,
+				&target.CreationDate,
 				&target.EventDate,
 				&target.ResourceOwner,
 				&target.Sequence,

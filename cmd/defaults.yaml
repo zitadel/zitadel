@@ -532,6 +532,10 @@ SystemDefaults:
     PublicKeyLifetime: 30h # ZITADEL_SYSTEMDEFAULTS_KEYCONFIG_PUBLICKEYLIFETIME
     # 8766h are 1 year
     CertificateLifetime: 8766h # ZITADEL_SYSTEMDEFAULTS_KEYCONFIG_CERTIFICATELIFETIME
+  # DefaultQueryLimit limits the number of items that can be queried in a single v3 API search request without explicitly passing a limit.
+  DefaultQueryLimit: 100 # ZITADEL_SYSTEMDEFAULTS_DEFAULTQUERYLIMIT
+  # MaxQueryLimit limits the number of items that can be queried in a single v3 API search request with explicitly passing a limit.
+  MaxQueryLimit: 1000 # ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT
 
 Actions:
   HTTP:

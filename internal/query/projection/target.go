@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	TargetTable               = "projections.targets1"
+	TargetTable               = "projections.targets2"
 	TargetIDCol               = "id"
 	TargetCreationDateCol     = "creation_date"
 	TargetChangeDateCol       = "change_date"
@@ -97,7 +97,7 @@ func (p *targetProjection) reduceTargetAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(TargetInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCol(TargetResourceOwnerCol, e.Aggregate().ResourceOwner),
 			handler.NewCol(TargetIDCol, e.Aggregate().ID),
-			handler.NewCol(TargetCreationDateCol, e.CreationDate()),
+			handler.NewCol(TargetCreationDateCol, handler.OnlySetValueOnInsert(TargetTable, e.CreationDate())),
 			handler.NewCol(TargetChangeDateCol, e.CreationDate()),
 			handler.NewCol(TargetSequenceCol, e.Sequence()),
 			handler.NewCol(TargetNameCol, e.Name),

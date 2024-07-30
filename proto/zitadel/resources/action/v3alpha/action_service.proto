@@ -396,7 +396,11 @@ service ZITADELActions {
 
 message CreateTargetRequest {
   optional zitadel.object.v3alpha.Instance instance = 1;
-  Target target = 2;
+  Target target = 2 [
+    (validate.rules).message = {
+      required: true
+    }
+  ];
 }
 
 message CreateTargetResponse {
@@ -407,14 +411,17 @@ message PatchTargetRequest {
   optional zitadel.object.v3alpha.Instance instance = 1;
   string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
       max_length: 200,
       example: "\"69629026806489455\"";
     }
   ];
-  PatchTarget target = 3;
+  PatchTarget target = 3 [
+    (validate.rules).message = {
+      required: true
+    }
+  ];
 }
 
 message PatchTargetResponse {
@@ -425,7 +432,6 @@ message DeleteTargetRequest {
   optional zitadel.object.v3alpha.Instance instance = 1;
   string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
       max_length: 200,
@@ -443,7 +449,6 @@ message GetTargetRequest {
   optional zitadel.object.v3alpha.Instance instance = 1;
   string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
       max_length: 200,
@@ -459,11 +464,11 @@ message GetTargetResponse {
 message SearchTargetsRequest {
   optional zitadel.object.v3alpha.Instance instance = 1;
   // list limitations and ordering.
-  zitadel.resources.object.v3alpha.ListQuery query = 2;
+  optional zitadel.resources.object.v3alpha.SearchQuery query = 2;
   // the field the result is sorted.
-  TargetFieldName sorting_column = 3 [
+  optional TargetFieldName sorting_column = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"FIELD_NAME_SCHEMA_TYPE\""
+      example: "\"TARGET_FIELD_NAME_CREATION_DATE\""
     }
   ];
   // Define the criteria to query for.
@@ -499,7 +504,7 @@ message SetExecutionResponse {
 message SearchExecutionsRequest {
   optional zitadel.object.v3alpha.Instance instance = 1;
   // list limitations and ordering.
-  zitadel.resources.object.v3alpha.ListQuery query = 2;
+  optional zitadel.resources.object.v3alpha.SearchQuery query = 2;
   // Define the criteria to query for.
   repeated ExecutionSearchFilter filters = 3;
 }
