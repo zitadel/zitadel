@@ -436,7 +436,7 @@ export async function verifyU2FRegistration(
   return userService.verifyU2FRegistration(request, {});
 }
 
-export async function getActiveIdentityProviders(orgId: string) {
+export async function getActiveIdentityProviders(orgId?: string) {
   return settingsService.getActiveIdentityProviders(
     { ctx: makeReqCtx(orgId) },
     {},

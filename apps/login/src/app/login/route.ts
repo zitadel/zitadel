@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
         idpId = matched?.[1] ?? "";
 
         const identityProviders = await getActiveIdentityProviders(
-          organization,
+          organization ? organization : undefined,
         ).then((resp) => {
           return resp.identityProviders;
         });
