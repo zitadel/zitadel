@@ -8,7 +8,6 @@ import {
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
-import { makeReqCtx } from "@zitadel/client2/v2beta";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
 
