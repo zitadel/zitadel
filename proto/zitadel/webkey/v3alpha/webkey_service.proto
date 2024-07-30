@@ -11,7 +11,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/webkey/v3alpha/config.proto";
 import "zitadel/webkey/v3alpha/details.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha;webkey";
 
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {

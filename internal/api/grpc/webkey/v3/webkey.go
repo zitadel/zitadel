@@ -7,10 +7,10 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	"github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha"
+	webkey "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha"
 )
 
-func (s *Server) GenerateWebKey(ctx context.Context, req *v3alpha.GenerateWebKeyRequest) (_ *v3alpha.GenerateWebKeyResponse, err error) {
+func (s *Server) GenerateWebKey(ctx context.Context, req *webkey.GenerateWebKeyRequest) (_ *webkey.GenerateWebKeyResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -22,13 +22,13 @@ func (s *Server) GenerateWebKey(ctx context.Context, req *v3alpha.GenerateWebKey
 		return nil, err
 	}
 
-	return &v3alpha.GenerateWebKeyResponse{
+	return &webkey.GenerateWebKeyResponse{
 		KeyId:   webKey.KeyID,
 		Details: object.DomainToDetailsPb(webKey.ObjectDetails),
 	}, nil
 }
 
-func (s *Server) ActivateWebKey(ctx context.Context, req *v3alpha.ActivateWebKeyRequest) (_ *v3alpha.ActivateWebKeyResponse, err error) {
+func (s *Server) ActivateWebKey(ctx context.Context, req *webkey.ActivateWebKeyRequest) (_ *webkey.ActivateWebKeyResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -40,12 +40,12 @@ func (s *Server) ActivateWebKey(ctx context.Context, req *v3alpha.ActivateWebKey
 		return nil, err
 	}
 
-	return &v3alpha.ActivateWebKeyResponse{
+	return &webkey.ActivateWebKeyResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) DeleteWebKey(ctx context.Context, req *v3alpha.DeleteWebKeyRequest) (_ *v3alpha.DeleteWebKeyResponse, err error) {
+func (s *Server) DeleteWebKey(ctx context.Context, req *webkey.DeleteWebKeyRequest) (_ *webkey.DeleteWebKeyResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -57,12 +57,12 @@ func (s *Server) DeleteWebKey(ctx context.Context, req *v3alpha.DeleteWebKeyRequ
 		return nil, err
 	}
 
-	return &v3alpha.DeleteWebKeyResponse{
+	return &webkey.DeleteWebKeyResponse{
 		Details: object.DomainToDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) ListWebKeys(ctx context.Context, req *v3alpha.ListWebKeysRequest) (_ *v3alpha.ListWebKeysResponse, err error) {
+func (s *Server) ListWebKeys(ctx context.Context, req *webkey.ListWebKeysRequest) (_ *webkey.ListWebKeysResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -74,7 +74,7 @@ func (s *Server) ListWebKeys(ctx context.Context, req *v3alpha.ListWebKeysReques
 		return nil, err
 	}
 
-	return &v3alpha.ListWebKeysResponse{
+	return &webkey.ListWebKeysResponse{
 		WebKeys: webKeyDetailsListToPb(list),
 	}, nil
 }
