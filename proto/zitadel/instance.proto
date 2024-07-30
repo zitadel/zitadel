@@ -164,7 +164,7 @@ enum DomainFieldName {
     DOMAIN_FIELD_NAME_CREATION_DATE = 4;
 }
 
-message AllowedDomain {
+message TrustedDomain {
     zitadel.v1.ObjectDetails details = 1;
     string domain = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -173,7 +173,7 @@ message AllowedDomain {
     ];
 }
 
-message AllowedDomainSearchQuery {
+message TrustedDomainSearchQuery {
     oneof query {
         option (validate.required) = true;
 

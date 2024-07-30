@@ -10,15 +10,15 @@ import (
 )
 
 var (
-	prepareInstanceAllowedDomainsStmt = `SELECT projections.instance_allowed_domains.creation_date,` +
-		` projections.instance_allowed_domains.change_date,` +
-		` projections.instance_allowed_domains.sequence,` +
-		` projections.instance_allowed_domains.domain,` +
-		` projections.instance_allowed_domains.instance_id,` +
+	prepareInstanceTrustedDomainsStmt = `SELECT projections.instance_trusted_domains.creation_date,` +
+		` projections.instance_trusted_domains.change_date,` +
+		` projections.instance_trusted_domains.sequence,` +
+		` projections.instance_trusted_domains.domain,` +
+		` projections.instance_trusted_domains.instance_id,` +
 		` COUNT(*) OVER ()` +
-		` FROM projections.instance_allowed_domains` +
+		` FROM projections.instance_trusted_domains` +
 		` AS OF SYSTEM TIME '-1 ms'`
-	prepareInstanceAllowedDomainsCols = []string{
+	prepareInstanceTrustedDomainsCols = []string{
 		"creation_date",
 		"change_date",
 		"sequence",
@@ -28,7 +28,7 @@ var (
 	}
 )
 
-func Test_InstanceAllowedDomainPrepares(t *testing.T) {
+func Test_InstanceTrustedDomainPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
@@ -40,24 +40,24 @@ func Test_InstanceAllowedDomainPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareInstanceAllowedDomainsQuery no result",
-			prepare: prepareInstanceAllowedDomainsQuery,
+			name:    "prepareInstanceTrustedDomainsQuery no result",
+			prepare: prepareInstanceTrustedDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(prepareInstanceAllowedDomainsStmt),
+					regexp.QuoteMeta(prepareInstanceTrustedDomainsStmt),
 					nil,
 					nil,
 				),
 			},
-			object: &InstanceAllowedDomains{Domains: []*InstanceAllowedDomain{}},
+			object: &InstanceTrustedDomains{Domains: []*InstanceTrustedDomain{}},
 		},
 		{
-			name:    "prepareInstanceAllowedDomainsQuery one result",
-			prepare: prepareInstanceAllowedDomainsQuery,
+			name:    "prepareInstanceTrustedDomainsQuery one result",
+			prepare: prepareInstanceTrustedDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(prepareInstanceAllowedDomainsStmt),
-					prepareInstanceAllowedDomainsCols,
+					regexp.QuoteMeta(prepareInstanceTrustedDomainsStmt),
+					prepareInstanceTrustedDomainsCols,
 					[][]driver.Value{
 						{
 							testNow,
@@ -69,11 +69,11 @@ func Test_InstanceAllowedDomainPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &InstanceAllowedDomains{
+			object: &InstanceTrustedDomains{
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Domains: []*InstanceAllowedDomain{
+				Domains: []*InstanceTrustedDomain{
 					{
 						CreationDate: testNow,
 						ChangeDate:   testNow,
@@ -85,12 +85,12 @@ func Test_InstanceAllowedDomainPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareInstanceAllowedDomainsQuery multiple result",
-			prepare: prepareInstanceAllowedDomainsQuery,
+			name:    "prepareInstanceTrustedDomainsQuery multiple result",
+			prepare: prepareInstanceTrustedDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(prepareInstanceAllowedDomainsStmt),
-					prepareInstanceAllowedDomainsCols,
+					regexp.QuoteMeta(prepareInstanceTrustedDomainsStmt),
+					prepareInstanceTrustedDomainsCols,
 					[][]driver.Value{
 						{
 							testNow,
@@ -109,11 +109,11 @@ func Test_InstanceAllowedDomainPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &InstanceAllowedDomains{
+			object: &InstanceTrustedDomains{
 				SearchResponse: SearchResponse{
 					Count: 2,
 				},
-				Domains: []*InstanceAllowedDomain{
+				Domains: []*InstanceTrustedDomain{
 					{
 						CreationDate: testNow,
 						ChangeDate:   testNow,
@@ -132,11 +132,11 @@ func Test_InstanceAllowedDomainPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareInstanceAllowedDomainsQuery sql err",
-			prepare: prepareInstanceAllowedDomainsQuery,
+			name:    "prepareInstanceTrustedDomainsQuery sql err",
+			prepare: prepareInstanceTrustedDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(prepareInstanceAllowedDomainsStmt),
+					regexp.QuoteMeta(prepareInstanceTrustedDomainsStmt),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

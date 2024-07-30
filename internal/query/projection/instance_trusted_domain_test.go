@@ -9,7 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestInstanceAllowedDomainProjection_reduces(t *testing.T) {
+func TestInstanceTrustedDomainProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
 	}
@@ -24,19 +24,19 @@ func TestInstanceAllowedDomainProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						instance.AllowedDomainAddedEventType,
+						instance.TrustedDomainAddedEventType,
 						instance.AggregateType,
 						[]byte(`{"domain": "domain.new"}`),
-					), eventstore.GenericEventMapper[instance.AllowedDomainAddedEvent]),
+					), eventstore.GenericEventMapper[instance.TrustedDomainAddedEvent]),
 			},
-			reduce: (&instanceAllowedDomainProjection{}).reduceDomainAdded,
+			reduce: (&instanceTrustedDomainProjection{}).reduceDomainAdded,
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.instance_allowed_domains (creation_date, change_date, sequence, domain, instance_id) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.instance_trusted_domains (creation_date, change_date, sequence, domain, instance_id) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -54,19 +54,19 @@ func TestInstanceAllowedDomainProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						instance.AllowedDomainRemovedEventType,
+						instance.TrustedDomainRemovedEventType,
 						instance.AggregateType,
 						[]byte(`{"domain": "domain.new"}`),
-					), eventstore.GenericEventMapper[instance.AllowedDomainRemovedEvent]),
+					), eventstore.GenericEventMapper[instance.TrustedDomainRemovedEvent]),
 			},
-			reduce: (&instanceAllowedDomainProjection{}).reduceDomainRemoved,
+			reduce: (&instanceTrustedDomainProjection{}).reduceDomainRemoved,
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_allowed_domains WHERE (domain = $1) AND (instance_id = $2)",
+							expectedStmt: "DELETE FROM projections.instance_trusted_domains WHERE (domain = $1) AND (instance_id = $2)",
 							expectedArgs: []interface{}{
 								"domain.new",
 								"agg-id",
@@ -86,14 +86,14 @@ func TestInstanceAllowedDomainProjection_reduces(t *testing.T) {
 						nil,
 					), instance.InstanceRemovedEventMapper),
 			},
-			reduce: reduceInstanceRemovedHelper(InstanceAllowedDomainInstanceIDCol),
+			reduce: reduceInstanceRemovedHelper(InstanceTrustedDomainInstanceIDCol),
 			want: wantReduce{
 				aggregateType: eventstore.AggregateType("instance"),
 				sequence:      15,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.instance_allowed_domains WHERE (instance_id = $1)",
+							expectedStmt: "DELETE FROM projections.instance_trusted_domains WHERE (instance_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -113,7 +113,7 @@ func TestInstanceAllowedDomainProjection_reduces(t *testing.T) {
 
 			event = tt.args.event(t)
 			got, err = tt.reduce(event)
-			assertReduce(t, got, err, InstanceAllowedDomainTable, tt.want)
+			assertReduce(t, got, err, InstanceTrustedDomainTable, tt.want)
 		})
 	}
 }

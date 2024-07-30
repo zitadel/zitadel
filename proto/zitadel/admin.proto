@@ -323,9 +323,9 @@ service AdminService {
         };
     }
 
-    rpc ListInstanceAllowedDomains(ListInstanceAllowedDomainsRequest) returns (ListInstanceAllowedDomainsResponse) {
+    rpc ListInstanceTrustedDomains(ListInstanceTrustedDomainsRequest) returns (ListInstanceTrustedDomainsResponse) {
         option (google.api.http) = {
-            post: "/allowed_domains/_search";
+            post: "/trusted_domains/_search";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -334,14 +334,14 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
-            summary: "List Instance Allowed Domains";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are allowed to be used as public hosts."
+            summary: "List Instance Trusted Domains";
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
         };
     }
 
-    rpc AddInstanceAllowedDomain(AddInstanceAllowedDomainRequest) returns (AddInstanceAllowedDomainResponse) {
+    rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
         option (google.api.http) = {
-            post: "/allowed_domains";
+            post: "/trusted_domains";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -350,14 +350,14 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
-            summary: "Add an Instance Allowed Domain";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are allowed to be used as public hosts."
+            summary: "Add an Instance Trusted Domain";
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
         };
     }
 
-    rpc RemoveInstanceAllowedDomain(RemoveInstanceAllowedDomainRequest) returns (RemoveInstanceAllowedDomainResponse) {
+    rpc RemoveInstanceTrustedDomain(RemoveInstanceTrustedDomainRequest) returns (RemoveInstanceTrustedDomainResponse) {
         option (google.api.http) = {
-            delete: "/allowed_domains/{domain}";
+            delete: "/trusted_domains/{domain}";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -366,8 +366,8 @@ service AdminService {
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             tags: "Instance";
-            summary: "Remove an Instance Allowed Domain";
-            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are allowed to be used as public hosts."
+            summary: "Remove an Instance Trusted Domain";
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
         };
     }
 
@@ -4110,21 +4110,21 @@ message ListInstanceDomainsResponse {
     repeated zitadel.instance.v1.Domain result = 3;
 }
 
-message ListInstanceAllowedDomainsRequest {
+message ListInstanceTrustedDomainsRequest {
     zitadel.v1.ListQuery query = 1;
     // the field the result is sorted
     zitadel.instance.v1.DomainFieldName sorting_column = 2;
     //criteria the client is looking for
-    repeated zitadel.instance.v1.AllowedDomainSearchQuery queries = 3;
+    repeated zitadel.instance.v1.TrustedDomainSearchQuery queries = 3;
 }
 
-message ListInstanceAllowedDomainsResponse {
+message ListInstanceTrustedDomainsResponse {
     zitadel.v1.ListDetails details = 1;
     zitadel.instance.v1.DomainFieldName sorting_column = 2;
-    repeated zitadel.instance.v1.AllowedDomain result = 3;
+    repeated zitadel.instance.v1.TrustedDomain result = 3;
 }
 
-message AddInstanceAllowedDomainRequest {
+message AddInstanceTrustedDomainRequest {
     string domain = 1 [
         (validate.rules).string = {min_len: 1, max_len: 253},
         (google.api.field_behavior) = REQUIRED,
@@ -4136,11 +4136,11 @@ message AddInstanceAllowedDomainRequest {
     ];
 }
 
-message AddInstanceAllowedDomainResponse {
+message AddInstanceTrustedDomainResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message RemoveInstanceAllowedDomainRequest {
+message RemoveInstanceTrustedDomainRequest {
     string domain = 1 [
         (validate.rules).string = {min_len: 1, max_len: 253},
         (google.api.field_behavior) = REQUIRED,
@@ -4152,7 +4152,7 @@ message RemoveInstanceAllowedDomainRequest {
     ];
 }
 
-message RemoveInstanceAllowedDomainResponse {
+message RemoveInstanceTrustedDomainResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

@@ -9,14 +9,14 @@ import (
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
 
-type InstanceAllowedDomainsWriteModel struct {
+type InstanceTrustedDomainsWriteModel struct {
 	eventstore.WriteModel
 
 	Domains []string
 }
 
-func NewInstanceAllowedDomainsWriteModel(ctx context.Context) *InstanceAllowedDomainsWriteModel {
-	return &InstanceAllowedDomainsWriteModel{
+func NewInstanceTrustedDomainsWriteModel(ctx context.Context) *InstanceTrustedDomainsWriteModel {
+	return &InstanceTrustedDomainsWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   authz.GetInstance(ctx).InstanceID(),
 			ResourceOwner: authz.GetInstance(ctx).InstanceID(),
@@ -24,12 +24,12 @@ func NewInstanceAllowedDomainsWriteModel(ctx context.Context) *InstanceAllowedDo
 	}
 }
 
-func (wm *InstanceAllowedDomainsWriteModel) Reduce() error {
+func (wm *InstanceTrustedDomainsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *instance.AllowedDomainAddedEvent:
+		case *instance.TrustedDomainAddedEvent:
 			wm.Domains = append(wm.Domains, e.Domain)
-		case *instance.AllowedDomainRemovedEvent:
+		case *instance.TrustedDomainRemovedEvent:
 			wm.Domains = slices.DeleteFunc(wm.Domains, func(domain string) bool {
 				return domain == e.Domain
 			})
@@ -38,15 +38,15 @@ func (wm *InstanceAllowedDomainsWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *InstanceAllowedDomainsWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *InstanceTrustedDomainsWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(instance.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
-			instance.AllowedDomainAddedEventType,
-			instance.AllowedDomainRemovedEventType,
+			instance.TrustedDomainAddedEventType,
+			instance.TrustedDomainRemovedEventType,
 		).
 		Builder()
 }

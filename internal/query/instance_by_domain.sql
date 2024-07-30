@@ -30,8 +30,8 @@ select
 	f.features
 from domain d
 join projections.instances i on i.id = d.instance_id
-join projections.instance_allowed_domains ad on i.id = ad.instance_id
+join projections.instance_trusted_domains td on i.id = td.instance_id
 left join projections.security_policies2 s on i.id = s.instance_id
 left join projections.limits l on i.id = l.instance_id
 left join features f on i.id = f.instance_id
-where case when $2 = '' then true else ad.domain = $2 end;
+where case when $2 = '' then true else td.domain = $2 end;

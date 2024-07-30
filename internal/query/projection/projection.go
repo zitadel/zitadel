@@ -45,7 +45,7 @@ var (
 	LoginNameProjection                 *handler.Handler
 	OrgMemberProjection                 *handler.Handler
 	InstanceDomainProjection            *handler.Handler
-	InstanceAllowedDomainProjection     *handler.Handler
+	InstanceTrustedDomainProjection     *handler.Handler
 	InstanceMemberProjection            *handler.Handler
 	ProjectMemberProjection             *handler.Handler
 	ProjectGrantMemberProjection        *handler.Handler
@@ -133,7 +133,7 @@ func Create(ctx context.Context, sqlClient *database.DB, es handler.EventStore, 
 	LoginNameProjection = newLoginNameProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_names"]))
 	OrgMemberProjection = newOrgMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_members"]))
 	InstanceDomainProjection = newInstanceDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_domains"]))
-	InstanceAllowedDomainProjection = newInstanceAllowedDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_allowed_domains"]))
+	InstanceTrustedDomainProjection = newInstanceTrustedDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instance_trusted_domains"]))
 	InstanceMemberProjection = newInstanceMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam_members"]))
 	ProjectMemberProjection = newProjectMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_members"]))
 	ProjectGrantMemberProjection = newProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
@@ -262,7 +262,7 @@ func newProjectionsList() {
 		LoginNameProjection,
 		OrgMemberProjection,
 		InstanceDomainProjection,
-		InstanceAllowedDomainProjection,
+		InstanceTrustedDomainProjection,
 		InstanceMemberProjection,
 		ProjectMemberProjection,
 		ProjectGrantMemberProjection,

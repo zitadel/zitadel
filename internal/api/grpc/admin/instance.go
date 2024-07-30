@@ -38,17 +38,17 @@ func (s *Server) ListInstanceDomains(ctx context.Context, req *admin_pb.ListInst
 	}, nil
 }
 
-func (s *Server) ListInstanceAllowedDomains(ctx context.Context, req *admin_pb.ListInstanceAllowedDomainsRequest) (*admin_pb.ListInstanceAllowedDomainsResponse, error) {
-	queries, err := ListInstanceAllowedDomainsRequestToModel(req)
+func (s *Server) ListInstanceTrustedDomains(ctx context.Context, req *admin_pb.ListInstanceTrustedDomainsRequest) (*admin_pb.ListInstanceTrustedDomainsResponse, error) {
+	queries, err := ListInstanceTrustedDomainsRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.query.SearchInstanceAllowedDomains(ctx, queries)
+	domains, err := s.query.SearchInstanceTrustedDomains(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.ListInstanceAllowedDomainsResponse{
-		Result: instance_grpc.AllowedDomainsToPb(domains.Domains),
+	return &admin_pb.ListInstanceTrustedDomainsResponse{
+		Result: instance_grpc.TrustedDomainsToPb(domains.Domains),
 		Details: object.ToListDetails(
 			domains.Count,
 			domains.Sequence,
@@ -57,22 +57,22 @@ func (s *Server) ListInstanceAllowedDomains(ctx context.Context, req *admin_pb.L
 	}, nil
 }
 
-func (s *Server) AddInstanceAllowedDomain(ctx context.Context, req *admin_pb.AddInstanceAllowedDomainRequest) (*admin_pb.AddInstanceAllowedDomainResponse, error) {
-	details, err := s.command.AddAllowedDomain(ctx, req.Domain)
+func (s *Server) AddInstanceTrustedDomain(ctx context.Context, req *admin_pb.AddInstanceTrustedDomainRequest) (*admin_pb.AddInstanceTrustedDomainResponse, error) {
+	details, err := s.command.AddTrustedDomain(ctx, req.Domain)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.AddInstanceAllowedDomainResponse{
+	return &admin_pb.AddInstanceTrustedDomainResponse{
 		Details: object.DomainToAddDetailsPb(details),
 	}, nil
 }
 
-func (s *Server) RemoveInstanceAllowedDomain(ctx context.Context, req *admin_pb.RemoveInstanceAllowedDomainRequest) (*admin_pb.RemoveInstanceAllowedDomainResponse, error) {
-	details, err := s.command.RemoveAllowedDomain(ctx, req.Domain)
+func (s *Server) RemoveInstanceTrustedDomain(ctx context.Context, req *admin_pb.RemoveInstanceTrustedDomainRequest) (*admin_pb.RemoveInstanceTrustedDomainResponse, error) {
+	details, err := s.command.RemoveTrustedDomain(ctx, req.Domain)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.RemoveInstanceAllowedDomainResponse{
+	return &admin_pb.RemoveInstanceTrustedDomainResponse{
 		Details: object.DomainToChangeDetailsPb(details),
 	}, nil
 }
