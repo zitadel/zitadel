@@ -7,15 +7,18 @@ import {
 } from "@zitadel/client/v2beta";
 import { createManagementServiceClient } from "@zitadel/client/v1";
 import { createServerTransport } from "@zitadel/node";
+import { GetActiveIdentityProvidersRequest } from "@zitadel/proto/zitadel/settings/v2beta/settings_service_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2beta/challenge_pb";
 import {
   RetrieveIdentityProviderIntentRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
+
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2beta/oidc_service_pb";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2beta/object_pb";
 import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2beta/idp_pb";
+import { ProviderSlug } from "./demos";
 import { PlainMessage } from "@zitadel/client";
 
 const SESSION_LIFETIME_S = 3000;
@@ -290,6 +293,13 @@ export async function getOrgByDomain(domain: string) {
   return managementService.getOrgByDomainGlobal({ domain }, {});
 }
 
+export const PROVIDER_NAME_MAPPING: {
+  [provider: string]: string;
+} = {
+  [ProviderSlug.GOOGLE]: "Google",
+  [ProviderSlug.GITHUB]: "GitHub",
+};
+
 export async function startIdentityProviderFlow({
   idpId,
   urls,
@@ -424,6 +434,13 @@ export async function verifyU2FRegistration(
   request: PlainMessage<VerifyU2FRegistrationRequest>,
 ) {
   return userService.verifyU2FRegistration(request, {});
+}
+
+export async function getActiveIdentityProviders(orgId: string) {
+  return settingsService.getActiveIdentityProviders(
+    { ctx: makeReqCtx(orgId) },
+    {},
+  );
 }
 
 /**

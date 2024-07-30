@@ -1,13 +1,6 @@
 import { ProviderSlug } from "@/lib/demos";
-import { getBrandingSettings } from "@/lib/zitadel";
+import { getBrandingSettings, PROVIDER_NAME_MAPPING } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
-
-const PROVIDER_NAME_MAPPING: {
-  [provider: string]: string;
-} = {
-  [ProviderSlug.GOOGLE]: "Google",
-  [ProviderSlug.GITHUB]: "GitHub",
-};
 
 export default async function Page({
   searchParams,
