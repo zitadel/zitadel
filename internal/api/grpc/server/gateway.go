@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -55,26 +56,29 @@ var (
 		},
 	)
 
-	serveMuxOptions = []runtime.ServeMuxOption{
-		runtime.WithMarshalerOption(jsonMarshaler.ContentType(nil), jsonMarshaler),
-		runtime.WithMarshalerOption(mimeWildcard, jsonMarshaler),
-		runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonMarshaler),
-		runtime.WithIncomingHeaderMatcher(headerMatcher),
-		runtime.WithOutgoingHeaderMatcher(runtime.DefaultHeaderMatcher),
-		runtime.WithForwardResponseOption(responseForwarder),
-		runtime.WithRoutingErrorHandler(httpErrorHandler),
+	serveMuxOptions = func(hostHeaders []string) []runtime.ServeMuxOption {
+		return []runtime.ServeMuxOption{
+			runtime.WithMarshalerOption(jsonMarshaler.ContentType(nil), jsonMarshaler),
+			runtime.WithMarshalerOption(mimeWildcard, jsonMarshaler),
+			runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonMarshaler),
+			runtime.WithIncomingHeaderMatcher(headerMatcher(hostHeaders)),
+			runtime.WithOutgoingHeaderMatcher(runtime.DefaultHeaderMatcher),
+			runtime.WithForwardResponseOption(responseForwarder),
+			runtime.WithRoutingErrorHandler(httpErrorHandler),
+		}
 	}
 
-	headerMatcher = runtime.HeaderMatcherFunc(
-		func(header string) (string, bool) {
+	headerMatcher = func(hostHeaders []string) runtime.HeaderMatcherFunc {
+		customHeaders = slices.Compact(append(customHeaders, hostHeaders...))
+		return func(header string) (string, bool) {
 			for _, customHeader := range customHeaders {
 				if strings.HasPrefix(strings.ToLower(header), customHeader) {
 					return header, true
 				}
 			}
 			return runtime.DefaultHeaderMatcher(header)
-		},
-	)
+		}
+	}
 
 	responseForwarder = func(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
 		t, ok := resp.(CustomHTTPResponse)
@@ -106,10 +110,11 @@ func CreateGatewayWithPrefix(
 	ctx context.Context,
 	g WithGatewayPrefix,
 	port uint16,
+	hostHeaders []string,
 	accessInterceptor *http_mw.AccessInterceptor,
 	tlsConfig *tls.Config,
 ) (http.Handler, string, error) {
-	runtimeMux := runtime.NewServeMux(serveMuxOptions...)
+	runtimeMux := runtime.NewServeMux(serveMuxOptions(hostHeaders)...)
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(grpcCredentials(tlsConfig)),
 		grpc.WithChainUnaryInterceptor(
@@ -131,6 +136,7 @@ func CreateGatewayWithPrefix(
 func CreateGateway(
 	ctx context.Context,
 	port uint16,
+	hostHeaders []string,
 	accessInterceptor *http_mw.AccessInterceptor,
 	tlsConfig *tls.Config,
 ) (*Gateway, error) {
@@ -146,7 +152,7 @@ func CreateGateway(
 	if err != nil {
 		return nil, err
 	}
-	runtimeMux := runtime.NewServeMux(append(serveMuxOptions, runtime.WithHealthzEndpoint(healthpb.NewHealthClient(connection)))...)
+	runtimeMux := runtime.NewServeMux(append(serveMuxOptions(hostHeaders), runtime.WithHealthzEndpoint(healthpb.NewHealthClient(connection)))...)
 	return &Gateway{
 		mux:               runtimeMux,
 		connection:        connection,

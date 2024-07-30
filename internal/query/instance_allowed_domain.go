@@ -60,20 +60,6 @@ func (q *Queries) SearchInstanceAllowedDomains(ctx context.Context, queries *Ins
 	return q.queryInstanceAllowedDomains(ctx, stmt, scan, args...)
 }
 
-//
-//func (q *Queries) SearchInstanceDomainsGlobal(ctx context.Context, queries *InstanceDomainSearchQueries) (domains *InstanceDomains, err error) {
-//	ctx, span := tracing.NewSpan(ctx)
-//	defer func() { span.EndWithError(err) }()
-//
-//	query, scan := prepareInstanceDomainsQuery(ctx, q.client)
-//	stmt, args, err := queries.toQuery(query).ToSql()
-//	if err != nil {
-//		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-IHhLR", "Errors.Query.SQLStatement")
-//	}
-//
-//	return q.queryInstanceDomains(ctx, stmt, scan, args...)
-//}
-
 func (q *Queries) queryInstanceAllowedDomains(ctx context.Context, stmt string, scan func(*sql.Rows) (*InstanceAllowedDomains, error), args ...interface{}) (domains *InstanceAllowedDomains, err error) {
 	err = q.client.QueryContext(ctx, func(rows *sql.Rows) error {
 		domains, err = scan(rows)

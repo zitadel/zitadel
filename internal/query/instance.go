@@ -207,6 +207,11 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 	instanceDomain := strings.Split(instanceHost, ":")[0] // remove possible port
 	publicDomain := strings.Split(publicHost, ":")[0]     // remove possible port
 	instance, scan := scanAuthzInstance()
+	// in case public domain is the same as the instance domain, we do not need to check it
+	// and can empty it for the check
+	if instanceDomain == publicDomain {
+		publicDomain = ""
+	}
 	err = q.client.QueryRowContext(ctx, scan, instanceByDomainQuery, instanceDomain, publicDomain)
 	return instance, err
 }

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"slices"
 
 	"github.com/gorilla/mux"
 	"github.com/muhlemmer/httpforwarded"
@@ -9,14 +10,15 @@ import (
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 )
 
-func WithOrigin(fallBackToHttps bool, http1Header, http2Header, publicDomainHeader string) mux.MiddlewareFunc {
+func WithOrigin(fallBackToHttps bool, http1Header, http2Header string, instanceHostHeaders, publicDomainHeaders []string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			origin := composeDomainContext(
 				r,
 				fallBackToHttps,
-				[]string{http1Header, http2Header, http_util.Forwarded, http_util.ForwardedFor, http_util.ForwardedHost, http_util.ForwardedProto},
-				[]string{publicDomainHeader},
+				// to make sure we don't break existing configurations we append the existing checked headers as well
+				slices.Compact(append(instanceHostHeaders, http1Header, http2Header, http_util.Forwarded, http_util.ForwardedFor, http_util.ForwardedHost, http_util.ForwardedProto)),
+				publicDomainHeaders,
 			)
 			next.ServeHTTP(w, r.WithContext(http_util.WithDomainContext(r.Context(), origin)))
 		})

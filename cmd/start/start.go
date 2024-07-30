@@ -59,6 +59,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/robots_txt"
 	"github.com/zitadel/zitadel/internal/api/saml"
 	"github.com/zitadel/zitadel/internal/api/ui/console"
+	"github.com/zitadel/zitadel/internal/api/ui/console/path"
 	"github.com/zitadel/zitadel/internal/api/ui/login"
 	auth_es "github.com/zitadel/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/zitadel/zitadel/internal/authz"
@@ -346,7 +347,7 @@ func startAPIs(
 	}
 	oidcPrefixes := []string{"/.well-known/openid-configuration", "/oidc/v1", "/oauth/v2"}
 	// always set the origin in the context if available in the http headers, no matter for what protocol
-	router.Use(middleware.WithOrigin(config.ExternalSecure, config.HTTP1HostHeader, config.HTTP2HostHeader, config.PublicHostHeader))
+	router.Use(middleware.WithOrigin(config.ExternalSecure, config.HTTP1HostHeader, config.HTTP2HostHeader, config.InstanceHostHeaders, config.PublicHostHeaders))
 	systemTokenVerifier, err := internal_authz.StartSystemTokenVerifierFromConfig(http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), config.SystemAPIUsers)
 	if err != nil {
 		return nil, err
@@ -374,7 +375,7 @@ func startAPIs(
 		http_util.WithMaxAge(int(math.Floor(config.Quotas.Access.ExhaustedCookieMaxAge.Seconds()))),
 	)
 	limitingAccessInterceptor := middleware.NewAccessInterceptor(accessSvc, exhaustedCookieHandler, &config.Quotas.Access.AccessConfig)
-	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.ExternalDomain, limitingAccessInterceptor)
+	apis, err := api.New(ctx, config.Port, router, queries, verifier, config.InternalAuthZ, tlsConfig, config.ExternalDomain, append(config.InstanceHostHeaders, config.PublicHostHeaders...), limitingAccessInterceptor)
 	if err != nil {
 		return nil, fmt.Errorf("error creating api %w", err)
 	}
@@ -414,7 +415,7 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, session_v2beta.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(commands, queries, config.ExternalSecure)); err != nil {
+	if err := apis.RegisterService(ctx, settings_v2beta.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, org_v2beta.CreateServer(commands, queries, permissionCheck)); err != nil {
@@ -482,8 +483,8 @@ func startAPIs(
 	if err != nil {
 		return nil, fmt.Errorf("unable to start console: %w", err)
 	}
-	apis.RegisterHandlerOnPrefix(console.HandlerPrefix, c)
-	consolePath := console.HandlerPrefix + "/"
+	apis.RegisterHandlerOnPrefix(path.HandlerPrefix, c)
+	consolePath := path.HandlerPrefix + "/"
 	l, err := login.CreateLogin(
 		config.Login,
 		commands,
