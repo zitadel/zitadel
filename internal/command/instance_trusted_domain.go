@@ -15,6 +15,9 @@ func (c *Commands) AddTrustedDomain(ctx context.Context, trustedDomain string) (
 	if trustedDomain == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-Stk21", "Errors.Invalid.Argument")
 	}
+	if !allowDomainRunes.MatchString(trustedDomain) {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-S3v3w", "Errors.Instance.Domain.InvalidCharacter")
+	}
 	model := NewInstanceTrustedDomainsWriteModel(ctx)
 	err := c.eventstore.FilterToQueryReducer(ctx, model)
 	if err != nil {

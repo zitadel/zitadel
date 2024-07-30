@@ -16,10 +16,12 @@ type InstanceTrustedDomainsWriteModel struct {
 }
 
 func NewInstanceTrustedDomainsWriteModel(ctx context.Context) *InstanceTrustedDomainsWriteModel {
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	return &InstanceTrustedDomainsWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   authz.GetInstance(ctx).InstanceID(),
-			ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
+			InstanceID:    instanceID,
 		},
 	}
 }

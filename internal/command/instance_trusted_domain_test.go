@@ -45,6 +45,19 @@ func TestCommands_AddTrustedDomain(t *testing.T) {
 			},
 		},
 		{
+			name: "invalid domain, error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:           authz.WithInstanceID(context.Background(), "instanceID"),
+				trustedDomain: "&.com",
+			},
+			want: want{
+				err: zerrors.ThrowInvalidArgument(nil, "COMMA-S3v3w", "Errors.Domain.InvalidCharacter"),
+			},
+		},
+		{
 			name: "domain already exists, error",
 			fields: fields{
 				eventstore: expectEventstore(
