@@ -261,27 +261,33 @@ export class GrpcAuthService {
           this.setActiveOrg(orgs[0]);
           return Promise.resolve(orgs[0]);
         } else {
+          // throw error if the org was specifically requested but not found
           return Promise.reject(new Error('requested organization not found'));
         }
       }
     } else {
       let orgs = this.cachedOrgs.getValue();
-
       const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.local);
 
       if (org) {
-        const orgQuery = new OrgQuery();
-        const orgIdQuery = new OrgIDQuery();
-        orgIdQuery.setId(org.id);
-        orgQuery.setIdQuery(orgIdQuery);
+        orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
+        this.cachedOrgs.next(orgs);
 
-        const specificOrg = (await this.listMyProjectOrgs(ORG_LIMIT, 0, [orgQuery])).resultList;
-        if (specificOrg.length === 1) {
-          this.setActiveOrg(specificOrg[0]);
-          return Promise.resolve(specificOrg[0]);
+        const find = this.cachedOrgs.getValue().find((tmp) => tmp.id === id);
+        if (find) {
+          this.setActiveOrg(find);
+          return Promise.resolve(find);
         } else {
-          orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
-          this.cachedOrgs.next(orgs);
+          const orgQuery = new OrgQuery();
+          const orgIdQuery = new OrgIDQuery();
+          orgIdQuery.setId(org.id);
+          orgQuery.setIdQuery(orgIdQuery);
+
+          const specificOrg = (await this.listMyProjectOrgs(ORG_LIMIT, 0, [orgQuery])).resultList;
+          if (specificOrg.length === 1) {
+            this.setActiveOrg(specificOrg[0]);
+            return Promise.resolve(specificOrg[0]);
+          }
         }
       } else {
         orgs = (await this.listMyProjectOrgs(ORG_LIMIT, 0)).resultList;
