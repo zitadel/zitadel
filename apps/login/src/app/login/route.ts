@@ -139,11 +139,15 @@ export async function GET(request: NextRequest) {
         const matched = IDP_SCOPE_REGEX.exec(idpScope);
         idpId = matched?.[1] ?? "";
 
+        console.log("idpId", idpId, organization ? organization : undefined);
+
         const identityProviders = await getActiveIdentityProviders(
           organization ? organization : undefined,
         ).then((resp) => {
           return resp.identityProviders;
         });
+
+        console.log("idps", JSON.stringify(identityProviders));
 
         const idp = identityProviders.find((idp) => idp.id === idpId);
 
@@ -173,6 +177,10 @@ export async function GET(request: NextRequest) {
             params.set("organization", organization);
           }
 
+          console.log(
+            `${host}/idp/${provider}/success?` + new URLSearchParams(params),
+          );
+
           return startIdentityProviderFlow({
             idpId,
             urls: {
@@ -184,6 +192,7 @@ export async function GET(request: NextRequest) {
                 new URLSearchParams(params),
             },
           }).then((resp: any) => {
+            console.log(resp);
             if (resp.authUrl) {
               return NextResponse.redirect(resp.authUrl);
             }
