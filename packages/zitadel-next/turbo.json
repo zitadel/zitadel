@@ -1,12 +1,20 @@
 {
-  "extends": ["//"],
-  "pipeline": {
+  "extends": [
+    "//"
+  ],
+  "tasks": {
     "dev": {
-      "dependsOn": ["@zitadel/react#build"]
+      "dependsOn": [
+        "@zitadel/react#build"
+      ]
     },
     "build": {
-      "outputs": ["dist/**"],
-      "dependsOn": ["@zitadel/react#build"]
+      "outputs": [
+        "dist/**"
+      ],
+      "dependsOn": [
+        "@zitadel/react#build"
+      ]
     }
   }
 }

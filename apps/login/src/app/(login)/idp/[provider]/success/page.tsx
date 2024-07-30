@@ -8,7 +8,7 @@ import {
   IDPInformation,
   IDPLink,
 } from "@zitadel/proto/zitadel/user/v2beta/idp_pb";
-import { PartialMessage } from "@zitadel/client2";
+import { PartialMessage } from "@zitadel/client";
 
 const PROVIDER_MAPPING: {
   [provider: string]: (

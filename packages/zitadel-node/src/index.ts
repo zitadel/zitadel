@@ -1,4 +1,4 @@
-import { NewAuthorizationBearerInterceptor } from "@zitadel/client2";
+import { NewAuthorizationBearerInterceptor } from "@zitadel/client";
 import {
   createGrpcTransport,
   GrpcTransportOptions,

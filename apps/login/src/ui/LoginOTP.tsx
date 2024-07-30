@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { TextInput } from "./Input";
 import BackButton from "./BackButton";
 import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
-import { PlainMessage } from "@zitadel/client2";
+import { PlainMessage } from "@zitadel/client";
 import { Challenges } from "@zitadel/proto/zitadel/session/v2beta/challenge_pb";
 
 // either loginName or sessionId must be provided

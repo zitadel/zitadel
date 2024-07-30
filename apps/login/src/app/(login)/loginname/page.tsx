@@ -7,7 +7,7 @@ import {
 import DynamicTheme from "@/ui/DynamicTheme";
 import { SignInWithIDP } from "@/ui/SignInWithIDP";
 import UsernameForm from "@/ui/UsernameForm";
-import { makeReqCtx } from "@zitadel/client2/v2beta";
+import { makeReqCtx } from "@zitadel/client/v2beta";
 
 function getIdentityProviders(orgId?: string) {
   return settingsService

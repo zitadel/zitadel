@@ -28,7 +28,7 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf src/proto"
   },
   "peerDependencies": {
-    "@zitadel/client2": "workspace:*"
+    "@zitadel/client": "workspace:*"
   },
   "dependencies": {
     "@connectrpc/connect-node": "^1.4.0",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
-    "@zitadel/client2": "workspace:*",
+    "@zitadel/client": "workspace:*",
     "@zitadel/tsconfig": "workspace:*",
     "eslint-config-zitadel": "workspace:*"
   }

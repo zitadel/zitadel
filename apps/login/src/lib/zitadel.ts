@@ -4,8 +4,8 @@ import {
   createSettingsServiceClient,
   createUserServiceClient,
   makeReqCtx,
-} from "@zitadel/client2/v2beta";
-import { createManagementServiceClient } from "@zitadel/client2/v1";
+} from "@zitadel/client/v2beta";
+import { createManagementServiceClient } from "@zitadel/client/v1";
 import { createServerTransport } from "@zitadel/node";
 import { GetActiveIdentityProvidersRequest } from "@zitadel/proto/zitadel/settings/v2beta/settings_service_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
@@ -18,8 +18,8 @@ import {
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2beta/oidc_service_pb";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2beta/object_pb";
 import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2beta/idp_pb";
-import { PlainMessage } from "@zitadel/client2";
 import { ProviderSlug } from "./demos";
+import { PlainMessage } from "@zitadel/client";
 
 const SESSION_LIFETIME_S = 3000;
 
