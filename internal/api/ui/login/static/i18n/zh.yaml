@@ -89,7 +89,7 @@ InitUserDone:
 InitMFAPrompt:
   Title: 两步验证设置
   Description: 两步验证为您的账户提供了额外的安全保障。这确保只有你能访问你的账户。
-  Provider0: 软件应用（如 Google/Migrosoft Authenticator、Authy）
+  Provider0: 软件应用（如 Google/Microsoft Authenticator、Authy）
   Provider1: 硬件设备（如 Face ID、Windows Hello、指纹）
   Provider3: 一次性密码短信
   Provider4: 一次性密码电子邮件

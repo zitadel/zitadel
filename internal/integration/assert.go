@@ -9,8 +9,6 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
-
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
 )
 
 // Details is the interface that covers both v1 and v2 proto generated object details.
@@ -26,8 +24,14 @@ type DetailsMsg[D Details] interface {
 	GetDetails() D
 }
 
-type ListDetailsMsg interface {
-	GetDetails() *object.ListDetails
+type ListDetails interface {
+	comparable
+	GetTotalResult() uint64
+	GetTimestamp() *timestamppb.Timestamp
+}
+
+type ListDetailsMsg[L ListDetails] interface {
+	GetDetails() L
 }
 
 // AssertDetails asserts values in a message's object Details,
@@ -59,13 +63,13 @@ func AssertDetails[D Details, M DetailsMsg[D]](t testing.TB, expected, actual M)
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
 }
 
-func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
+func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t testing.TB, expected, actual D) {
 	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
-	if wantDetails == nil {
+	var nilDetails L
+	if wantDetails == nilDetails {
 		assert.Nil(t, gotDetails)
 		return
 	}
-
 	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
 
 	if wantDetails.GetTimestamp() != nil {
