@@ -107,7 +107,11 @@ export default async function Page({
       .then((resp) => {
         const { idpInformation, userId } = resp;
 
-        console.log("idpInformation", userId, JSON.stringify(idpInformation));
+        console.log(
+          "idpInformation",
+          `userId:'${userId}'`,
+          JSON.stringify(idpInformation),
+        );
         if (idpInformation) {
           // handle login
           if (userId) {
