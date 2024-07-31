@@ -39,10 +39,6 @@ var (
 		name:  projection.TargetInstanceIDCol,
 		table: targetTable,
 	}
-	TargetColumnSequence = Column{
-		name:  projection.TargetSequenceCol,
-		table: targetTable,
-	}
 	TargetColumnName = Column{
 		name:  projection.TargetNameCol,
 		table: targetTable,
@@ -101,7 +97,7 @@ func (q *Queries) SearchTargets(ctx context.Context, queries *TargetSearchQuerie
 	eq := sq.Eq{
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareTargetsQuery()
+	query, scan := prepareTargetsQuery(ctx, q.client)
 	return genericRowsQueryWithState[*Targets](ctx, q.client, targetTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
@@ -110,7 +106,7 @@ func (q *Queries) GetTargetByID(ctx context.Context, id string) (target *Target,
 		TargetColumnID.identifier():         id,
 		TargetColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareTargetQuery()
+	query, scan := prepareTargetQuery(ctx, q.client)
 	return genericRowQuery[*Target](ctx, q.client, query.Where(eq), scan)
 }
 
@@ -122,13 +118,12 @@ func NewTargetInIDsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(TargetColumnID, values)
 }
 
-func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
+func prepareTargetsQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
 			TargetColumnCreationDate.identifier(),
 			TargetColumnChangeDate.identifier(),
 			TargetColumnResourceOwner.identifier(),
-			TargetColumnSequence.identifier(),
 			TargetColumnName.identifier(),
 			TargetColumnTargetType.identifier(),
 			TargetColumnTimeout.identifier(),
@@ -147,7 +142,6 @@ func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, er
 					&target.CreationDate,
 					&target.EventDate,
 					&target.ResourceOwner,
-					&target.Sequence,
 					&target.Name,
 					&target.TargetType,
 					&target.Timeout,
@@ -174,13 +168,12 @@ func prepareTargetsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, er
 		}
 }
 
-func prepareTargetQuery() (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
+func prepareTargetQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
 			TargetColumnCreationDate.identifier(),
 			TargetColumnChangeDate.identifier(),
 			TargetColumnResourceOwner.identifier(),
-			TargetColumnSequence.identifier(),
 			TargetColumnName.identifier(),
 			TargetColumnTargetType.identifier(),
 			TargetColumnTimeout.identifier(),
@@ -195,7 +188,6 @@ func prepareTargetQuery() (sq.SelectBuilder, func(row *sql.Row) (*Target, error)
 				&target.CreationDate,
 				&target.EventDate,
 				&target.ResourceOwner,
-				&target.Sequence,
 				&target.Name,
 				&target.TargetType,
 				&target.Timeout,

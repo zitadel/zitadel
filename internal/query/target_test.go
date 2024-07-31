@@ -15,9 +15,9 @@ import (
 
 var (
 	prepareTargetsStmt = `SELECT projections.targets1.id,` +
+		` projections.targets1.creation_date,` +
 		` projections.targets1.change_date,` +
 		` projections.targets1.resource_owner,` +
-		` projections.targets1.sequence,` +
 		` projections.targets1.name,` +
 		` projections.targets1.target_type,` +
 		` projections.targets1.timeout,` +
@@ -27,9 +27,9 @@ var (
 		` FROM projections.targets1`
 	prepareTargetsCols = []string{
 		"id",
+		"creation_date",
 		"change_date",
 		"resource_owner",
-		"sequence",
 		"name",
 		"target_type",
 		"timeout",
@@ -39,9 +39,9 @@ var (
 	}
 
 	prepareTargetStmt = `SELECT projections.targets1.id,` +
+		` projections.targets1.creation_date,` +
 		` projections.targets1.change_date,` +
 		` projections.targets1.resource_owner,` +
-		` projections.targets1.sequence,` +
 		` projections.targets1.name,` +
 		` projections.targets1.target_type,` +
 		` projections.targets1.timeout,` +
@@ -50,9 +50,9 @@ var (
 		` FROM projections.targets1`
 	prepareTargetCols = []string{
 		"id",
+		"creation_date",
 		"change_date",
 		"resource_owner",
-		"sequence",
 		"name",
 		"target_type",
 		"timeout",
@@ -95,8 +95,8 @@ func Test_TargetPrepares(t *testing.T) {
 						{
 							"id",
 							testNow,
+							testNow,
 							"ro",
-							uint64(20211109),
 							"target-name",
 							domain.TargetTypeWebhook,
 							1 * time.Second,
@@ -115,8 +115,8 @@ func Test_TargetPrepares(t *testing.T) {
 						ObjectDetails: domain.ObjectDetails{
 							ID:            "id",
 							EventDate:     testNow,
+							CreationDate:  testNow,
 							ResourceOwner: "ro",
-							Sequence:      20211109,
 						},
 						Name:             "target-name",
 						TargetType:       domain.TargetTypeWebhook,
@@ -138,8 +138,8 @@ func Test_TargetPrepares(t *testing.T) {
 						{
 							"id-1",
 							testNow,
+							testNow,
 							"ro",
-							uint64(20211109),
 							"target-name1",
 							domain.TargetTypeWebhook,
 							1 * time.Second,
@@ -149,8 +149,8 @@ func Test_TargetPrepares(t *testing.T) {
 						{
 							"id-2",
 							testNow,
+							testNow,
 							"ro",
-							uint64(20211110),
 							"target-name2",
 							domain.TargetTypeWebhook,
 							1 * time.Second,
@@ -160,8 +160,8 @@ func Test_TargetPrepares(t *testing.T) {
 						{
 							"id-3",
 							testNow,
+							testNow,
 							"ro",
-							uint64(20211110),
 							"target-name3",
 							domain.TargetTypeAsync,
 							1 * time.Second,
@@ -180,8 +180,8 @@ func Test_TargetPrepares(t *testing.T) {
 						ObjectDetails: domain.ObjectDetails{
 							ID:            "id-1",
 							EventDate:     testNow,
+							CreationDate:  testNow,
 							ResourceOwner: "ro",
-							Sequence:      20211109,
 						},
 						Name:             "target-name1",
 						TargetType:       domain.TargetTypeWebhook,
@@ -193,8 +193,8 @@ func Test_TargetPrepares(t *testing.T) {
 						ObjectDetails: domain.ObjectDetails{
 							ID:            "id-2",
 							EventDate:     testNow,
+							CreationDate:  testNow,
 							ResourceOwner: "ro",
-							Sequence:      20211110,
 						},
 						Name:             "target-name2",
 						TargetType:       domain.TargetTypeWebhook,
@@ -206,8 +206,8 @@ func Test_TargetPrepares(t *testing.T) {
 						ObjectDetails: domain.ObjectDetails{
 							ID:            "id-3",
 							EventDate:     testNow,
+							CreationDate:  testNow,
 							ResourceOwner: "ro",
-							Sequence:      20211110,
 						},
 						Name:             "target-name3",
 						TargetType:       domain.TargetTypeAsync,
@@ -263,8 +263,8 @@ func Test_TargetPrepares(t *testing.T) {
 					[]driver.Value{
 						"id",
 						testNow,
+						testNow,
 						"ro",
-						uint64(20211109),
 						"target-name",
 						domain.TargetTypeWebhook,
 						1 * time.Second,
@@ -277,8 +277,8 @@ func Test_TargetPrepares(t *testing.T) {
 				ObjectDetails: domain.ObjectDetails{
 					ID:            "id",
 					EventDate:     testNow,
+					CreationDate:  testNow,
 					ResourceOwner: "ro",
-					Sequence:      20211109,
 				},
 				Name:             "target-name",
 				TargetType:       domain.TargetTypeWebhook,

@@ -40,11 +40,6 @@ var (
 		name:  projection.ExecutionInstanceIDCol,
 		table: executionTable,
 	}
-	ExecutionColumnSequence = Column{
-		name:  projection.ExecutionSequenceCol,
-		table: executionTable,
-	}
-
 	executionTargetsTable = table{
 		name:          projection.ExecutionTable + "_" + projection.ExecutionTargetSuffix,
 		instanceIDCol: projection.ExecutionTargetInstanceIDCol,
@@ -105,7 +100,7 @@ func (q *Queries) SearchExecutions(ctx context.Context, queries *ExecutionSearch
 	eq := sq.Eq{
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareExecutionsQuery()
+	query, scan := prepareExecutionsQuery(ctx, q.client)
 	return genericRowsQueryWithState[*Executions](ctx, q.client, executionTable, combineToWhereStmt(query, queries.toQuery, eq), scan)
 }
 
@@ -114,7 +109,7 @@ func (q *Queries) GetExecutionByID(ctx context.Context, id string) (execution *E
 		ExecutionColumnID.identifier():         id,
 		ExecutionColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 	}
-	query, scan := prepareExecutionQuery()
+	query, scan := prepareExecutionQuery(ctx, q.client)
 	return genericRowQuery[*Execution](ctx, q.client, query.Where(eq), scan)
 }
 
@@ -213,13 +208,12 @@ func (q *Queries) TargetsByExecutionIDs(ctx context.Context, ids1, ids2 []string
 	return execution, err
 }
 
-func prepareExecutionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Execution, error)) {
+func prepareExecutionQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Execution, error)) {
 	return sq.Select(
 			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
 			ExecutionColumnCreateDate.identifier(),
 			ExecutionColumnChangeDate.identifier(),
-			ExecutionColumnSequence.identifier(),
 			executionTargetsListCol.identifier(),
 		).From(executionTable.identifier()).
 			Join("(" + executionTargetsQuery + ") AS " + executionTargetsTableAlias.alias + " ON " +
@@ -230,13 +224,12 @@ func prepareExecutionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Execution, 
 		scanExecution
 }
 
-func prepareExecutionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
+func prepareExecutionsQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Executions, error)) {
 	return sq.Select(
 			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
 			ExecutionColumnCreateDate.identifier(),
 			ExecutionColumnChangeDate.identifier(),
-			ExecutionColumnSequence.identifier(),
 			executionTargetsListCol.identifier(),
 			countColumn.identifier(),
 		).From(executionTable.identifier()).
@@ -263,7 +256,6 @@ func scanExecution(row *sql.Row) (*Execution, error) {
 		&execution.ID,
 		&execution.CreationDate,
 		&execution.EventDate,
-		&execution.Sequence,
 		&targets,
 	)
 	if err != nil {
@@ -323,7 +315,6 @@ func scanExecutions(rows *sql.Rows) (*Executions, error) {
 			&execution.ID,
 			&execution.CreationDate,
 			&execution.EventDate,
-			&execution.Sequence,
 			&targets,
 			&count,
 		)
