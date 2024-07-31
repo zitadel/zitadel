@@ -118,14 +118,6 @@ func (m *mockInstance) DefaultOrganisationID() string {
 	return "orgID"
 }
 
-func (m *mockInstance) RequestedDomain() string {
-	return "zitadel.cloud"
-}
-
-func (m *mockInstance) RequestedHost() string {
-	return "zitadel.cloud:443"
-}
-
 func (m *mockInstance) SecurityPolicyAllowedOrigins() []string {
 	return nil
 }

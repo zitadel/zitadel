@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -65,7 +66,7 @@ func TestAddOrg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AssertValidation(t, context.Background(), AddOrgCommand(authz.WithRequestedDomain(context.Background(), "localhost"), tt.args.a, tt.args.name), nil, tt.want)
+			AssertValidation(t, context.Background(), AddOrgCommand(http_util.WithRequestedHost(context.Background(), "localhost"), tt.args.a, tt.args.name), nil, tt.want)
 		})
 	}
 }
@@ -229,7 +230,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx:           http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -297,7 +298,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx:           http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -360,7 +361,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx:           http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				name:          "Org",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -431,7 +432,7 @@ func TestCommandSide_AddOrg(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx:           http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				name:          " Org ",
 				userID:        "user1",
 				resourceOwner: "org1",
@@ -551,7 +552,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
+				ctx:   http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  " org ",
 			},
@@ -581,7 +582,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
+				ctx:   http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  "neworg",
 			},
@@ -635,7 +636,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
+				ctx:   http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  "neworg",
 			},
@@ -695,7 +696,7 @@ func TestCommandSide_ChangeOrg(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:   authz.WithRequestedDomain(context.Background(), "zitadel.ch"),
+				ctx:   http_util.WithRequestedHost(context.Background(), "zitadel.ch"),
 				orgID: "org1",
 				name:  "neworg",
 			},
@@ -1286,7 +1287,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "",
 				},
@@ -1304,7 +1305,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "Org",
 					Admins: []*OrgSetupAdmin{
@@ -1325,7 +1326,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID", "userID"),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "Org",
 					Admins: []*OrgSetupAdmin{
@@ -1418,7 +1419,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 						),
 						eventFromEventPusher(
 							user.NewHumanInitialCodeAddedEvent(
-								context.Background(),
+								http_util.WithRequestedHost(context.Background(), "iam-domain"),
 								&user.NewAggregate("userID", "orgID").Aggregate,
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
@@ -1441,7 +1442,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				newCode:     mockEncryptedCode("userinit", time.Hour),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "Org",
 					Admins: []*OrgSetupAdmin{
@@ -1521,7 +1522,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "orgID"),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "Org",
 					Admins: []*OrgSetupAdmin{
@@ -1621,7 +1622,7 @@ func TestCommandSide_SetUpOrg(t *testing.T) {
 				keyAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: authz.WithRequestedDomain(context.Background(), "iam-domain"),
+				ctx: http_util.WithRequestedHost(context.Background(), "iam-domain"),
 				setupOrg: &OrgSetup{
 					Name: "Org",
 					Admins: []*OrgSetupAdmin{
