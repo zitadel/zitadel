@@ -14,6 +14,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -534,7 +535,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(authz.NewMockContext("instanceID", "org1", "user1"), "zitadel.com"),
+				ctx:           http_util.WithRequestedHost(authz.NewMockContext("instanceID", "org1", "user1"), "zitadel.com"),
 				resourceOwner: "org1",
 				userID:        "user1",
 			},
@@ -583,7 +584,7 @@ func TestCommands_createHumanTOTP(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
-				ctx:           authz.WithRequestedDomain(authz.NewMockContext("instanceID", "org1", "user1"), "zitadel.com"),
+				ctx:           http_util.WithRequestedHost(authz.NewMockContext("instanceID", "org1", "user1"), "zitadel.com"),
 				resourceOwner: "org1",
 				userID:        "user2",
 			},

@@ -12,6 +12,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -25,7 +26,7 @@ import (
 
 func TestCommands_RegisterUserPasskey(t *testing.T) {
 	ctx := authz.NewMockContextWithPermissions("instance1", "org1", "user1", nil)
-	ctx = authz.WithRequestedDomain(ctx, "example.com")
+	ctx = http_util.WithRequestedHost(ctx, "example.com")
 
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
@@ -129,7 +130,7 @@ func TestCommands_RegisterUserPasskey(t *testing.T) {
 }
 
 func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
-	ctx := authz.WithRequestedDomain(context.Background(), "example.com")
+	ctx := http_util.WithRequestedHost(context.Background(), "example.com")
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
 		ExternalSecure: true,
@@ -231,7 +232,7 @@ func TestCommands_RegisterUserPasskeyWithCode(t *testing.T) {
 }
 
 func TestCommands_verifyUserPasskeyCode(t *testing.T) {
-	ctx := authz.WithRequestedDomain(context.Background(), "example.com")
+	ctx := http_util.WithRequestedHost(context.Background(), "example.com")
 	alg := crypto.CreateMockEncryptionAlg(gomock.NewController(t))
 	es := eventstoreExpect(t,
 		expectFilter(eventFromEventPusher(testSecretGeneratorAddedEvent(domain.SecretGeneratorTypePasswordlessInitCode))),
@@ -339,7 +340,7 @@ func TestCommands_verifyUserPasskeyCode(t *testing.T) {
 }
 
 func TestCommands_pushUserPasskey(t *testing.T) {
-	ctx := authz.WithRequestedDomain(authz.NewMockContext("instance1", "org1", "user1"), "example.com")
+	ctx := http_util.WithRequestedHost(authz.NewMockContext("instance1", "org1", "user1"), "example.com")
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
 		ExternalSecure: true,

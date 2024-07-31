@@ -16,7 +16,7 @@ import (
 func TestNotify_SendEmailVerificationCode(t *testing.T) {
 	type args struct {
 		user          *query.NotifyUser
-		origin        string
+		origin        *http_utils.DomainCtx
 		code          string
 		urlTmpl       string
 		authRequestID string
@@ -34,7 +34,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 					ID:            "user1",
 					ResourceOwner: "org1",
 				},
-				origin:        "https://example.com",
+				origin:        &http_utils.DomainCtx{InstanceHost: "example.com", Protocol: "https"},
 				code:          "123",
 				urlTmpl:       "",
 				authRequestID: "authRequestID",
@@ -53,7 +53,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 					ID:            "user1",
 					ResourceOwner: "org1",
 				},
-				origin:        "https://example.com",
+				origin:        &http_utils.DomainCtx{InstanceHost: "example.com", Protocol: "https"},
 				code:          "123",
 				urlTmpl:       "{{",
 				authRequestID: "authRequestID",
@@ -68,7 +68,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 					ID:            "user1",
 					ResourceOwner: "org1",
 				},
-				origin:        "https://example.com",
+				origin:        &http_utils.DomainCtx{InstanceHost: "example.com", Protocol: "https"},
 				code:          "123",
 				urlTmpl:       "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
 				authRequestID: "authRequestID",
@@ -84,7 +84,7 @@ func TestNotify_SendEmailVerificationCode(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, notify := mockNotify()
-			err := notify.SendEmailVerificationCode(http_utils.WithComposedOrigin(context.Background(), tt.args.origin), tt.args.user, tt.args.code, tt.args.urlTmpl, tt.args.authRequestID)
+			err := notify.SendEmailVerificationCode(http_utils.WithDomainContext(context.Background(), tt.args.origin), tt.args.user, tt.args.code, tt.args.urlTmpl, tt.args.authRequestID)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})
