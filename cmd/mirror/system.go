@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"io"
+	"os"
 	"time"
 
 	"github.com/jackc/pgx/v5/stdlib"
@@ -34,16 +35,33 @@ Only keys and assets are mirrored`,
 }
 
 func copySystem(ctx context.Context, config *Migration) {
-	sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
-	logging.OnError(err).Fatal("unable to connect to source database")
-	defer sourceClient.Close()
+	switch {
+	case isSrcFile:
+		destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
+		logging.OnError(err).Fatal("unable to connect to destination database")
+		defer destClient.Close()
 
-	destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
-	logging.OnError(err).Fatal("unable to connect to destination database")
-	defer destClient.Close()
+		copyAssetsFromFile(ctx, destClient)
+		copyEncryptionKeysFromFile(ctx, destClient)
+	case isDestFile:
+		sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
+		logging.OnError(err).Fatal("unable to connect to source database")
+		defer sourceClient.Close()
 
-	copyAssets(ctx, sourceClient, destClient)
-	copyEncryptionKeys(ctx, sourceClient, destClient)
+		copyAssetsToFile(ctx, sourceClient)
+		copyEncryptionKeysToFile(ctx, sourceClient)
+	default:
+		sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
+		logging.OnError(err).Fatal("unable to connect to source database")
+		defer sourceClient.Close()
+
+		destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
+		logging.OnError(err).Fatal("unable to connect to destination database")
+		defer destClient.Close()
+
+		copyAssets(ctx, sourceClient, destClient)
+		copyEncryptionKeys(ctx, sourceClient, destClient)
+	}
 }
 
 func copyAssets(ctx context.Context, source, dest *database.DB) {
@@ -92,7 +110,46 @@ func copyAssets(ctx context.Context, source, dest *database.DB) {
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("assets migrated")
 }
 
-func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
+func copyAssetsFromFile(ctx context.Context, dest *database.DB) {
+	start := time.Now()
+
+	srcFile, err := os.OpenFile(filePath+"/system.assets.csv", os.O_RDONLY, 0)
+	logging.OnError(err).Fatal("unable to open source file")
+	defer srcFile.Close()
+
+	r, w := io.Pipe()
+	errs := make(chan error, 1)
+
+	go func() {
+		_, err := srcFile.WriteTo(w)
+		w.Close()
+		errs <- err
+	}()
+
+	destConn, err := dest.Conn(ctx)
+	logging.OnError(err).Fatal("unable to acquire dest connection")
+	defer destConn.Close()
+
+	var eventCount int64
+	err = destConn.Raw(func(driverConn interface{}) error {
+		conn := driverConn.(*stdlib.Conn).Conn()
+
+		_, err := conn.Exec(ctx, "DELETE FROM system.assets "+instanceClause())
+		if err != nil {
+			return err
+		}
+
+		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY system.assets (instance_id, asset_type, resource_owner, name, content_type, data, updated_at) FROM stdin (DELIMITER ',')")
+		eventCount = tag.RowsAffected()
+
+		return err
+	})
+	logging.OnError(err).Fatal("unable to copy assets to destination")
+	logging.OnError(<-errs).Fatal("unable to copy assets from source")
+	logging.WithFields("took", time.Since(start), "count", eventCount).Info("assets migrated")
+}
+
+func copyAssetsToFile(ctx context.Context, source *database.DB) {
 	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
@@ -106,6 +163,36 @@ func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
 		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 			// ignore hash column because it's computed
+			_, err := conn.PgConn().CopyTo(ctx, w, "COPY system.assets TO stdout (DELIMITER ',')")
+			w.Close()
+			return err
+		})
+		errs <- err
+	}()
+
+	destFile, err := os.OpenFile(filePath+"/system.assets.csv", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	logging.OnError(err).Fatal("unable to open destination file")
+	defer destFile.Close()
+
+	eventBytes, err := io.Copy(destFile, r)
+	logging.OnError(err).Fatal("unable to copy assets to destination")
+	logging.OnError(<-errs).Fatal("unable to copy assets from source")
+	logging.WithFields("took", time.Since(start), "bytes", eventBytes).Info("assets migrated")
+}
+
+func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
+	start := time.Now()
+
+	sourceConn, err := source.Conn(ctx)
+	logging.OnError(err).Fatal("unable to acquire source connection")
+	defer sourceConn.Close()
+
+	r, w := io.Pipe()
+	errs := make(chan error, 1)
+
+	go func() {
+		err = sourceConn.Raw(func(driverConn interface{}) error {
+			conn := driverConn.(*stdlib.Conn).Conn()
 			_, err := conn.PgConn().CopyTo(ctx, w, "COPY system.encryption_keys TO stdout")
 			w.Close()
 			return err
@@ -136,4 +223,73 @@ func copyEncryptionKeys(ctx context.Context, source, dest *database.DB) {
 	logging.OnError(err).Fatal("unable to copy encryption keys to destination")
 	logging.OnError(<-errs).Fatal("unable to copy encryption keys from source")
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("encryption keys migrated")
+}
+
+func copyEncryptionKeysFromFile(ctx context.Context, dest *database.DB) {
+	start := time.Now()
+
+	srcFile, err := os.OpenFile(filePath+"/system.encryption_keys.csv", os.O_RDONLY, 0)
+	logging.OnError(err).Fatal("unable to open source file")
+	defer srcFile.Close()
+
+	r, w := io.Pipe()
+	errs := make(chan error, 1)
+
+	go func() {
+		_, err := srcFile.WriteTo(w)
+		w.Close()
+		errs <- err
+	}()
+
+	destConn, err := dest.Conn(ctx)
+	logging.OnError(err).Fatal("unable to acquire dest connection")
+	defer destConn.Close()
+
+	var eventCount int64
+	err = destConn.Raw(func(driverConn interface{}) error {
+		conn := driverConn.(*stdlib.Conn).Conn()
+
+		_, err := conn.Exec(ctx, "TRUNCATE system.encryption_keys")
+		if err != nil {
+			return err
+		}
+
+		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY system.encryption_keys FROM stdin (DELIMITER ',')")
+		eventCount = tag.RowsAffected()
+
+		return err
+	})
+	logging.OnError(err).Fatal("unable to copy encryption keys to destination")
+	logging.OnError(<-errs).Fatal("unable to copy encryption keys from source")
+	logging.WithFields("took", time.Since(start), "count", eventCount).Info("encryption keys migrated")
+}
+
+func copyEncryptionKeysToFile(ctx context.Context, source *database.DB) {
+	start := time.Now()
+
+	sourceConn, err := source.Conn(ctx)
+	logging.OnError(err).Fatal("unable to acquire source connection")
+	defer sourceConn.Close()
+
+	r, w := io.Pipe()
+	errs := make(chan error, 1)
+
+	go func() {
+		err = sourceConn.Raw(func(driverConn interface{}) error {
+			conn := driverConn.(*stdlib.Conn).Conn()
+			_, err := conn.PgConn().CopyTo(ctx, w, "COPY system.encryption_keys TO stdout (DELIMITER ',')")
+			w.Close()
+			return err
+		})
+		errs <- err
+	}()
+
+	destFile, err := os.OpenFile(filePath+"/system.encryption_keys.csv", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	logging.OnError(err).Fatal("unable to open destination file")
+	defer destFile.Close()
+
+	eventBytes, err := io.Copy(destFile, r)
+	logging.OnError(err).Fatal("unable to copy encryption keys to destination")
+	logging.OnError(<-errs).Fatal("unable to copy encryption keys from source")
+	logging.WithFields("took", time.Since(start), "bytes", eventBytes).Info("encryption keys migrated")
 }
