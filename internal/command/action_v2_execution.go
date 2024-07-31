@@ -200,13 +200,6 @@ func (t SetExecution) GetTargets() []string {
 	return targets
 }
 
-func (e *SetExecution) IsValid() error {
-	if e.Targets == nil {
-		return zerrors.ThrowInvalidArgument(nil, "COMMAND-56bteot2uj", "Errors.Execution.NoTargets")
-	}
-	return nil
-}
-
 func (e *SetExecution) Existing(c *Commands, ctx context.Context, resourceOwner string) error {
 	targets := e.GetTargets()
 	if len(targets) > 0 && !c.existsTargetsByIDs(ctx, targets, resourceOwner) {
@@ -225,10 +218,6 @@ func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resource
 	if resourceOwner == "" || set.AggregateID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-gg3a6ol4om", "Errors.IDMissing")
 	}
-	if err := set.IsValid(); err != nil {
-		return nil, err
-	}
-
 	wm, err := c.getExecutionWriteModelByID(ctx, set.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
