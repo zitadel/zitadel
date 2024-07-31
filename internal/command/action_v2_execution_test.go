@@ -91,26 +91,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			},
 		},
 		{
-			"empty executionType, error",
-			fields{
-				eventstore:       expectEventstore(),
-				grpcMethodExists: existsMock(true),
-			},
-			args{
-				ctx: context.Background(),
-				cond: &ExecutionAPICondition{
-					"notvalid",
-					"",
-					false,
-				},
-				set:           &SetExecution{},
-				resourceOwner: "instance",
-			},
-			res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
-		},
-		{
 			"empty target, error",
 			fields{
 				eventstore:       expectEventstore(),
@@ -123,7 +103,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					"",
 					false,
 				},
-				set:           &SetExecution{},
+				set:           &SetExecution{Targets: []*execution.Target{{}}},
 				resourceOwner: "instance",
 			},
 			res{
@@ -739,26 +719,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			},
 		},
 		{
-			"empty executionType, error",
-			fields{
-				eventstore:       expectEventstore(),
-				grpcMethodExists: existsMock(true),
-			},
-			args{
-				ctx: context.Background(),
-				cond: &ExecutionAPICondition{
-					"notvalid",
-					"",
-					false,
-				},
-				set:           &SetExecution{},
-				resourceOwner: "instance",
-			},
-			res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
-		},
-		{
 			"empty target, error",
 			fields{
 				eventstore:       expectEventstore(),
@@ -771,7 +731,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					"",
 					false,
 				},
-				set:           &SetExecution{},
+				set:           &SetExecution{Targets: []*execution.Target{{}}},
 				resourceOwner: "instance",
 			},
 			res{
@@ -1560,22 +1520,6 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			},
 		},
 		{
-			"empty executionType, error",
-			fields{
-				eventstore:           expectEventstore(),
-				actionFunctionExists: existsMock(true),
-			},
-			args{
-				ctx:           context.Background(),
-				cond:          "function",
-				set:           &SetExecution{},
-				resourceOwner: "instance",
-			},
-			res{
-				err: zerrors.IsErrorInvalidArgument,
-			},
-		},
-		{
 			"empty target, error",
 			fields{
 				eventstore:           expectEventstore(),
@@ -1584,7 +1528,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				cond:          "function",
-				set:           &SetExecution{},
+				set:           &SetExecution{Targets: []*execution.Target{{}}},
 				resourceOwner: "instance",
 			},
 			res{

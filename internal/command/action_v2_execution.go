@@ -60,6 +60,11 @@ func (c *Commands) SetExecutionRequest(ctx context.Context, cond *ExecutionAPICo
 	if err := cond.IsValid(); err != nil {
 		return nil, err
 	}
+	for _, target := range set.Targets {
+		if err = target.Validate(); err != nil {
+			return nil, err
+		}
+	}
 	if err := cond.Existing(c); err != nil {
 		return nil, err
 	}
@@ -72,6 +77,11 @@ func (c *Commands) SetExecutionRequest(ctx context.Context, cond *ExecutionAPICo
 func (c *Commands) SetExecutionResponse(ctx context.Context, cond *ExecutionAPICondition, set *SetExecution, resourceOwner string) (_ *domain.ObjectDetails, err error) {
 	if err := cond.IsValid(); err != nil {
 		return nil, err
+	}
+	for _, target := range set.Targets {
+		if err = target.Validate(); err != nil {
+			return nil, err
+		}
 	}
 	if err := cond.Existing(c); err != nil {
 		return nil, err
@@ -106,8 +116,18 @@ func (c *Commands) SetExecutionFunction(ctx context.Context, cond ExecutionFunct
 	if err := cond.IsValid(); err != nil {
 		return nil, err
 	}
+	for _, target := range set.Targets {
+		if err = target.Validate(); err != nil {
+			return nil, err
+		}
+	}
 	if err := cond.Existing(c); err != nil {
 		return nil, err
+	}
+	for _, target := range set.Targets {
+		if err = target.Validate(); err != nil {
+			return nil, err
+		}
 	}
 	if set.AggregateID == "" {
 		set.AggregateID = cond.ID()
@@ -165,16 +185,16 @@ func (c *Commands) SetExecutionEvent(ctx context.Context, cond *ExecutionEventCo
 	if err := cond.IsValid(); err != nil {
 		return nil, err
 	}
+	for _, target := range set.Targets {
+		if err = target.Validate(); err != nil {
+			return nil, err
+		}
+	}
 	if err := cond.Existing(c); err != nil {
 		return nil, err
 	}
 	if set.AggregateID == "" {
 		set.AggregateID = cond.ID()
-	}
-	for _, target := range set.Targets {
-		if err = target.Validate(); err != nil {
-			return nil, err
-		}
 	}
 	return c.setExecution(ctx, set, resourceOwner)
 }
