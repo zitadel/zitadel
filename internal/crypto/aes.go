@@ -47,6 +47,8 @@ func (a *AESCrypto) Decrypt(value []byte, keyID string) ([]byte, error) {
 	return DecryptAES(value, key)
 }
 
+// DecryptString decrypts the value using the key identified by keyID.
+// When the decrypted value contains non-UTF8 characters an error is returned.
 func (a *AESCrypto) DecryptString(value []byte, keyID string) (string, error) {
 	b, err := a.Decrypt(value, keyID)
 	if err != nil {
