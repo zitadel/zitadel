@@ -1767,7 +1767,7 @@
       "TYPE": {
         "OWNED": "所有プロジェクト",
         "OWNED_SINGULAR": "所有プロジェクト",
-        "GRANTED_SINGULAR": "グラントされたプロジェクト"
+        "GRANTED_SINGULAR": "{{name}}に付与されたプロジェクト"
       },
       "PRIVATELABEL": {
         "TITLE": "ブランディング設定",

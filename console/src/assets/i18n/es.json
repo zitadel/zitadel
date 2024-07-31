@@ -1773,7 +1773,7 @@
       "TYPE": {
         "OWNED": "Proyectos propios",
         "OWNED_SINGULAR": "Proyecto propio",
-        "GRANTED_SINGULAR": "Proyecto concedido"
+        "GRANTED_SINGULAR": "Proyecto asignado {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Ajustes de imagen de marca",

@@ -1770,8 +1770,8 @@
       "ZITADELPROJECT": "Ceci appartient au projet ZITADEL. Attention",
       "TYPE": {
         "OWNED": "Projets possédés",
-        "OWNED_SINGULAR": "Projet propre",
-        "GRANTED_SINGULAR": "Projet concédé"
+        "OWNED_SINGULAR": "Projet possédé",
+        "GRANTED_SINGULAR": "Projet attribué à {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Image de marque",

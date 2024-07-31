@@ -1770,7 +1770,7 @@
       "TYPE": {
         "OWNED": "拥有的项目",
         "OWNED_SINGULAR": "拥有项目",
-        "GRANTED_SINGULAR": "被授予的项目"
+        "GRANTED_SINGULAR": "授予{{name}}的项目"
       },
       "PRIVATELABEL": {
         "TITLE": "品牌标识设置",
