@@ -426,8 +426,6 @@ type authzInstance struct {
 	iamProjectID        string
 	consoleID           string
 	consoleAppID        string
-	host                string
-	domain              string
 	defaultLang         language.Tag
 	defaultOrgID        string
 	csp                 csp
