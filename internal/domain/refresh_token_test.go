@@ -28,7 +28,7 @@ func (s *mockKeyStorage) ReadKey(id string) (*crypto.Key, error) {
 	}, nil
 }
 
-func (*mockKeyStorage) CreateKeys(_ context.Context, keys ...*crypto.Key) error {
+func (*mockKeyStorage) CreateKeys(context.Context, ...*crypto.Key) error {
 	return errors.New("mockKeyStorage.CreateKeys not implemented")
 }
 
@@ -72,12 +72,12 @@ func TestFromRefreshToken(t *testing.T) {
 		{
 			name:    "short cipher text",
 			args:    args{"DEADBEEF", algorithm},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "CRYPT-23kH1", "cipher text block too short"),
+			wantErr: zerrors.ThrowInvalidArgument(err, "DOMAIN-rie9A", "Errors.User.RefreshToken.Invalid"),
 		},
 		{
 			name:    "incorrect amount of segments",
 			args:    args{base64.RawURLEncoding.EncodeToString(invalidRefreshToken), algorithm},
-			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-BGDhn", "Errors.User.RefreshToken.Invalid"),
+			wantErr: zerrors.ThrowInvalidArgument(nil, "DOMAIN-Se8oh", "Errors.User.RefreshToken.Invalid"),
 		},
 		{
 			name:        "success",
@@ -96,4 +96,34 @@ func TestFromRefreshToken(t *testing.T) {
 			assert.Equal(t, tt.wantToken, gotToken)
 		})
 	}
+}
+
+// Fuzz test invalid inputs. None of the inputs should result in a success.
+func FuzzFromRefreshToken(f *testing.F) {
+	keyConfig := &crypto.KeyConfig{
+		EncryptionKeyID:  "keyID",
+		DecryptionKeyIDs: []string{"keyID"},
+	}
+	keys := crypto.Keys{"keyID": "ThisKeyNeedsToHave32Characters!!"}
+	algorithm, err := crypto.NewAESCrypto(keyConfig, &mockKeyStorage{keys: keys})
+	require.NoError(f, err)
+
+	invalidRefreshToken, err := algorithm.Encrypt([]byte("userID:tokenID"))
+	require.NoError(f, err)
+
+	tests := []string{
+		"~~~",      // invalid base64
+		"DEADBEEF", // short cipher text
+		base64.RawURLEncoding.EncodeToString(invalidRefreshToken), // incorrect amount of segments
+	}
+	for _, tc := range tests {
+		f.Add(tc)
+	}
+
+	f.Fuzz(func(t *testing.T, refreshToken string) {
+		gotUserID, gotTokenID, gotToken, err := FromRefreshToken(refreshToken, algorithm)
+		target := zerrors.InvalidArgumentError{ZitadelError: new(zerrors.ZitadelError)}
+		t.Log(gotUserID, gotTokenID, gotToken)
+		require.ErrorAs(t, err, &target)
+	})
 }
