@@ -77,9 +77,9 @@ func AssertResourceDetails(t testing.TB, expected *resources_object.Details, act
 		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
 	}
 	if expected.GetCreated() != nil {
-		wantChangeDate := time.Now()
-		gotChangeDate := actual.GetCreated().AsTime()
-		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
+		wantCreatedDate := time.Now()
+		gotCreatedDate := actual.GetCreated().AsTime()
+		assert.WithinRange(t, gotCreatedDate, wantCreatedDate.Add(-time.Minute), wantCreatedDate.Add(time.Minute))
 	}
 	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
 	assert.NotEmpty(t, actual.GetId())

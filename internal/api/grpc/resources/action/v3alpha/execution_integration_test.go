@@ -101,7 +101,6 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -145,7 +144,6 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -170,7 +168,6 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -278,7 +275,6 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -303,7 +299,6 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -407,7 +402,6 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -451,7 +445,6 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -476,7 +469,6 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -584,7 +576,6 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -630,7 +621,6 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -655,7 +645,6 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},
@@ -751,7 +740,6 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			},
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
-					Created: timestamppb.Now(),
 					Changed: timestamppb.Now(),
 					Owner:   nil,
 				},

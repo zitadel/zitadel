@@ -101,7 +101,6 @@ func TestServer_CreateTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -119,7 +118,6 @@ func TestServer_CreateTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -137,7 +135,6 @@ func TestServer_CreateTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -155,7 +152,6 @@ func TestServer_CreateTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 
@@ -174,7 +170,6 @@ func TestServer_CreateTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 	}
@@ -254,7 +249,6 @@ func TestServer_PatchTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -278,7 +272,6 @@ func TestServer_PatchTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -298,7 +291,6 @@ func TestServer_PatchTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -318,7 +310,6 @@ func TestServer_PatchTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -340,7 +331,6 @@ func TestServer_PatchTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 	}
@@ -395,7 +385,6 @@ func TestServer_DeleteTarget(t *testing.T) {
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),
-				Created: timestamppb.Now(),
 			},
 		},
 	}

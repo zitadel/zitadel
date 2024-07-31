@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -20,7 +21,7 @@ import (
 	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
-func TestServer_GetTargetByID(t *testing.T) {
+func TestServer_GetTarget(t *testing.T) {
 	ensureFeatureEnabled(t)
 	type args struct {
 		ctx context.Context
@@ -69,7 +70,8 @@ func TestServer_GetTargetByID(t *testing.T) {
 			want: &action.GetTargetResponse{
 				Target: &action.GetTarget{
 					Details: &resource_object.Details{
-						Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+						Created: timestamppb.Now(),
+						Changed: timestamppb.Now(),
 					},
 					Target: &action.Target{
 						Endpoint: "https://example.com",
@@ -101,7 +103,8 @@ func TestServer_GetTargetByID(t *testing.T) {
 			want: &action.GetTargetResponse{
 				Target: &action.GetTarget{
 					Details: &resource_object.Details{
-						Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+						Created: timestamppb.Now(),
+						Changed: timestamppb.Now(),
 					},
 					Target: &action.Target{
 						Endpoint: "https://example.com",
@@ -133,7 +136,8 @@ func TestServer_GetTargetByID(t *testing.T) {
 			want: &action.GetTargetResponse{
 				Target: &action.GetTarget{
 					Details: &resource_object.Details{
-						Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+						Created: timestamppb.Now(),
+						Changed: timestamppb.Now(),
 					},
 					Target: &action.Target{
 						Endpoint: "https://example.com",
@@ -167,7 +171,8 @@ func TestServer_GetTargetByID(t *testing.T) {
 			want: &action.GetTargetResponse{
 				Target: &action.GetTarget{
 					Details: &resource_object.Details{
-						Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+						Created: timestamppb.Now(),
+						Changed: timestamppb.Now(),
 					},
 					Target: &action.Target{
 						Endpoint: "https://example.com",
@@ -201,7 +206,8 @@ func TestServer_GetTargetByID(t *testing.T) {
 			want: &action.GetTargetResponse{
 				Target: &action.GetTarget{
 					Details: &resource_object.Details{
-						Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+						Created: timestamppb.Now(),
+						Changed: timestamppb.Now(),
 					},
 					Target: &action.Target{
 						Endpoint: "https://example.com",
@@ -234,10 +240,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 					assert.Error(ttt, getErr, "Error: "+getErr.Error())
 				} else {
 					assert.NoError(ttt, getErr)
-
-					integration.AssertResourceDetails(t, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
-
-					assert.Equal(t, tt.want.Target, got.Target)
+					wantTarget := tt.want.GetTarget()
+					gotTarget := got.GetTarget()
+					integration.AssertResourceDetails(t, wantTarget.GetDetails(), gotTarget.GetDetails())
+					assert.Equal(t, wantTarget.GetTarget(), gotTarget.GetTarget())
 				}
 
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
@@ -283,7 +289,8 @@ func TestServer_ListTargets(t *testing.T) {
 			},
 			want: &action.SearchTargetsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 0,
+					TotalResult:  0,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetTarget{},
 			},
@@ -301,7 +308,6 @@ func TestServer_ListTargets(t *testing.T) {
 						},
 					}
 					response.Details.Timestamp = resp.GetDetails().GetChanged()
-					//response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
 
 					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
 					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
@@ -315,12 +321,14 @@ func TestServer_ListTargets(t *testing.T) {
 			},
 			want: &action.SearchTargetsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetTarget{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 						Target: &action.Target{
 							Endpoint: "https://example.com",
@@ -360,12 +368,14 @@ func TestServer_ListTargets(t *testing.T) {
 			},
 			want: &action.SearchTargetsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetTarget{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 						Target: &action.Target{
 							Endpoint: "https://example.com",
@@ -418,12 +428,14 @@ func TestServer_ListTargets(t *testing.T) {
 			},
 			want: &action.SearchTargetsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 3,
+					TotalResult:  3,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetTarget{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 						Target: &action.Target{
 							Endpoint: "https://example.com",
@@ -437,7 +449,8 @@ func TestServer_ListTargets(t *testing.T) {
 					},
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 						Target: &action.Target{
 							Endpoint: "https://example.com",
@@ -451,7 +464,8 @@ func TestServer_ListTargets(t *testing.T) {
 					},
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 						Target: &action.Target{
 							Endpoint: "https://example.com",
@@ -490,7 +504,8 @@ func TestServer_ListTargets(t *testing.T) {
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
-					assert.Contains(ttt, got.Result, tt.want.Result[i])
+					integration.AssertResourceDetails(t, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
+					assert.Equal(ttt, tt.want.Result[i].GetTarget(), got.Result[i].GetTarget())
 				}
 				integration.AssertResourceListDetails(t, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
@@ -558,12 +573,14 @@ func TestServer_SearchExecutions(t *testing.T) {
 			},
 			want: &action.SearchExecutionsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 						Condition: &action.Condition{
 							ConditionType: &action.Condition_Request{
@@ -621,12 +638,14 @@ func TestServer_SearchExecutions(t *testing.T) {
 			},
 			want: &action.SearchExecutionsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 						Condition: &action.Condition{},
 						Execution: &action.Execution{
@@ -684,12 +703,14 @@ func TestServer_SearchExecutions(t *testing.T) {
 			},
 			want: &action.SearchExecutionsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 					},
 				},
@@ -773,7 +794,8 @@ func TestServer_SearchExecutions(t *testing.T) {
 			},
 			want: &action.SearchExecutionsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 3,
+					TotalResult:  3,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
 					{
@@ -835,7 +857,8 @@ func TestServer_SearchExecutions(t *testing.T) {
 			},
 			want: &action.SearchExecutionsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 10,
+					TotalResult:  10,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
 					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
