@@ -14,12 +14,12 @@ import (
 )
 
 var (
-	instanceIDs       []string
-	isSystem          bool
-	shouldReplace     bool
-	isSrcFile         bool
-	isDestFile        bool
-	filePath          string
+	instanceIDs   []string
+	isSystem      bool
+	shouldReplace bool
+	isSrcFile     bool
+	isDestFile    bool
+	filePath      string
 )
 
 func New() *cobra.Command {
@@ -48,7 +48,7 @@ Order of execution:
 			if isDestFile = viper.IsSet("Destination.file.path"); isDestFile {
 				filePath = viper.GetString("Destination.file.path")
 			}
-			
+
 			if isSrcFile || isDestFile {
 				if isSrcFile && isDestFile {
 					logging.Fatal("both source and destination cannot be files")
