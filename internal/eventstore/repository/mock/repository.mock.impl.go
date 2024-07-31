@@ -166,7 +166,7 @@ func (e *mockEvent) DataAsBytes() []byte {
 	}
 	payload, err := json.Marshal(e.Payload())
 	if err != nil {
-		panic("unable to unmarshal")
+		panic(err)
 	}
 	return payload
 }

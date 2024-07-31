@@ -19,7 +19,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	key_repo "github.com/zitadel/zitadel/internal/repository/keypair"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -131,7 +130,7 @@ func Test_KeyPrepares(t *testing.T) {
 							sequence:      20211109,
 							resourceOwner: "ro",
 							algorithm:     "RS256",
-							use:           domain.KeyUsageSigning,
+							use:           crypto.KeyUsageSigning,
 						},
 						expiry: testNow,
 						publicKey: &rsa.PublicKey{
@@ -212,7 +211,7 @@ func Test_KeyPrepares(t *testing.T) {
 							sequence:      20211109,
 							resourceOwner: "ro",
 							algorithm:     "RS256",
-							use:           domain.KeyUsageSigning,
+							use:           crypto.KeyUsageSigning,
 						},
 						expiry: testNow,
 						privateKey: &crypto.CryptoValue{
@@ -306,7 +305,7 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 							InstanceID:    "instanceID",
 							Version:       key_repo.AggregateVersion,
 						},
-						domain.KeyUsageSigning, "alg",
+						crypto.KeyUsageSigning, "alg",
 						&crypto.CryptoValue{
 							CryptoType: crypto.TypeEncryption,
 							Algorithm:  "alg",
@@ -345,7 +344,7 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 							InstanceID:    "instanceID",
 							Version:       key_repo.AggregateVersion,
 						},
-						domain.KeyUsageSigning, "alg",
+						crypto.KeyUsageSigning, "alg",
 						&crypto.CryptoValue{
 							CryptoType: crypto.TypeEncryption,
 							Algorithm:  "alg",
@@ -385,7 +384,7 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 							InstanceID:    "instanceID",
 							Version:       key_repo.AggregateVersion,
 						},
-						domain.KeyUsageSigning, "alg",
+						crypto.KeyUsageSigning, "alg",
 						&crypto.CryptoValue{
 							CryptoType: crypto.TypeEncryption,
 							Algorithm:  "alg",
@@ -416,7 +415,7 @@ func TestQueries_GetPublicKeyByID(t *testing.T) {
 					id:            "keyID",
 					resourceOwner: "instanceID",
 					algorithm:     "alg",
-					use:           domain.KeyUsageSigning,
+					use:           crypto.KeyUsageSigning,
 				},
 				expiry: future,
 				publicKey: func() *rsa.PublicKey {

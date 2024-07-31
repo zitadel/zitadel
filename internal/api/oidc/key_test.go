@@ -12,14 +12,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/query"
 )
 
 type publicKey struct {
 	id     string
 	alg    string
-	use    domain.KeyUsage
+	use    crypto.KeyUsage
 	seq    uint64
 	expiry time.Time
 	key    any
@@ -33,7 +33,7 @@ func (k *publicKey) Algorithm() string {
 	return k.alg
 }
 
-func (k *publicKey) Use() domain.KeyUsage {
+func (k *publicKey) Use() crypto.KeyUsage {
 	return k.use
 }
 
@@ -55,21 +55,21 @@ var (
 		"key1": {
 			id:     "key1",
 			alg:    "alg",
-			use:    domain.KeyUsageSigning,
+			use:    crypto.KeyUsageSigning,
 			seq:    1,
 			expiry: clock.Now().Add(time.Minute),
 		},
 		"key2": {
 			id:     "key2",
 			alg:    "alg",
-			use:    domain.KeyUsageSigning,
+			use:    crypto.KeyUsageSigning,
 			seq:    3,
 			expiry: clock.Now().Add(10 * time.Hour),
 		},
 		"exp1": {
 			id:     "key2",
 			alg:    "alg",
-			use:    domain.KeyUsageSigning,
+			use:    crypto.KeyUsageSigning,
 			seq:    4,
 			expiry: clock.Now().Add(-time.Hour),
 		},

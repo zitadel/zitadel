@@ -74,6 +74,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
+			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
@@ -139,6 +140,7 @@ func MustNewSteps(v *viper.Viper) *Steps {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
+			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read steps")

@@ -42,6 +42,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		TokenExchange:                   req.OidcTokenExchange,
 		Actions:                         req.Actions,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
+		WebKey:                          req.WebKey,
 	}
 }
 
@@ -55,6 +56,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		OidcTokenExchange:                   featureSourceToFlagPb(&f.TokenExchange),
 		Actions:                             featureSourceToFlagPb(&f.Actions),
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
+		WebKey:                              featureSourceToFlagPb(&f.WebKey),
 	}
 }
 

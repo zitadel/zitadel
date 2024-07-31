@@ -14,7 +14,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
@@ -208,7 +207,7 @@ func (k keySetMap) getKey(keyID string) (*jose.JSONWebKey, error) {
 	return &jose.JSONWebKey{
 		Key:   pubKey,
 		KeyID: keyID,
-		Use:   domain.KeyUsageSigning.String(),
+		Use:   crypto.KeyUsageSigning.String(),
 	}, nil
 }
 

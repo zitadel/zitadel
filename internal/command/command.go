@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
@@ -76,6 +77,7 @@ type Commands struct {
 	defaultSecretGenerators *SecretGenerators
 
 	samlCertificateAndKeyGenerator func(id string) ([]byte, []byte, error)
+	webKeyGenerator                func(keyID string, alg crypto.EncryptionAlgorithm, genConfig crypto.WebKeyConfig) (encryptedPrivate *crypto.CryptoValue, public *jose.JSONWebKey, err error)
 
 	GrpcMethodExisting     func(method string) bool
 	GrpcServiceExisting    func(method string) bool
@@ -157,6 +159,7 @@ func StartCommands(
 		defaultRefreshTokenIdleLifetime: defaultRefreshTokenIdleLifetime,
 		defaultSecretGenerators:         defaultSecretGenerators,
 		samlCertificateAndKeyGenerator:  samlCertificateAndKeyGenerator(defaults.KeyConfig.CertificateSize, defaults.KeyConfig.CertificateLifetime),
+		webKeyGenerator:                 crypto.GenerateEncryptedWebKey,
 		// always true for now until we can check with an eventlist
 		EventExisting: func(event string) bool { return true },
 		// always true for now until we can check with an eventlist

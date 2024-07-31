@@ -52,6 +52,7 @@ import (
 	user_schema_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/user/schema/v3alpha"
 	user_v2 "github.com/zitadel/zitadel/internal/api/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/internal/api/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/internal/api/grpc/webkey/v3"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
 	"github.com/zitadel/zitadel/internal/api/idp"
@@ -439,6 +440,9 @@ func startAPIs(
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, user_schema_v3_alpha.CreateServer(commands, queries)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, webkey.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader, config.ExternalDomain, login.IgnoreInstanceEndpoints...)

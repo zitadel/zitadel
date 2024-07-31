@@ -11,7 +11,6 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/keypair"
@@ -22,7 +21,7 @@ import (
 type Key interface {
 	ID() string
 	Algorithm() string
-	Use() domain.KeyUsage
+	Use() crypto.KeyUsage
 	Sequence() uint64
 }
 
@@ -55,7 +54,7 @@ type key struct {
 	sequence      uint64
 	resourceOwner string
 	algorithm     string
-	use           domain.KeyUsage
+	use           crypto.KeyUsage
 }
 
 func (k *key) ID() string {
@@ -66,7 +65,7 @@ func (k *key) Algorithm() string {
 	return k.algorithm
 }
 
-func (k *key) Use() domain.KeyUsage {
+func (k *key) Use() crypto.KeyUsage {
 	return k.use
 }
 
@@ -222,7 +221,7 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (key
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
-				KeyColUse.identifier():        domain.KeyUsageSigning,
+				KeyColUse.identifier():        crypto.KeyUsageSigning,
 				KeyColInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 			},
 			sq.Gt{KeyPrivateColExpiry.identifier(): t},
@@ -358,7 +357,7 @@ type PublicKeyReadModel struct {
 	Algorithm string
 	Key       *crypto.CryptoValue
 	Expiry    time.Time
-	Usage     domain.KeyUsage
+	Usage     crypto.KeyUsage
 }
 
 func NewPublicKeyReadModel(keyID, resourceOwner string) *PublicKeyReadModel {
