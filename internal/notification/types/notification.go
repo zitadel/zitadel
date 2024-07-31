@@ -2,7 +2,9 @@ package types
 
 import (
 	"context"
+	"html"
 
+	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
@@ -42,6 +44,7 @@ func SendEmail(
 		allowUnverifiedNotificationChannel bool,
 	) error {
 		args = mapNotifyUserToArgs(user, args)
+		sanitizeArgsForHTML(args)
 		data := GetTemplateData(ctx, translator, args, url, messageType, user.PreferredLanguage.String(), colors)
 		template, err := templates.GetParsedTemplate(mailhtml, data)
 		if err != nil {
@@ -56,6 +59,23 @@ func SendEmail(
 			allowUnverifiedNotificationChannel,
 			triggeringEvent,
 		)
+	}
+}
+
+func sanitizeArgsForHTML(args map[string]any) {
+	for key, arg := range args {
+		switch a := arg.(type) {
+		case string:
+			args[key] = html.EscapeString(a)
+		case []string:
+			for i, s := range a {
+				a[i] = html.EscapeString(s)
+			}
+		case database.TextArray[string]:
+			for i, s := range a {
+				a[i] = html.EscapeString(s)
+			}
+		}
 	}
 }
 
