@@ -1782,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Притежавани проекти",
         "OWNED_SINGULAR": "Собствен проект",
-        "GRANTED_SINGULAR": "Приет проект"
+        "GRANTED_SINGULAR": "Отпуснат проект на {{name}}"
       },
       "PRIVATELABEL": {
         "0": {
