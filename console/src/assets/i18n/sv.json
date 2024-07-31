@@ -1781,7 +1781,7 @@
       "TYPE": {
         "OWNED": "Ägda Projekt",
         "OWNED_SINGULAR": "Ägt Projekt",
-        "GRANTED_SINGULAR": "Beviljat Projekt"
+        "GRANTED_SINGULAR": "Projekt tilldelat {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Varumärkesinställning",

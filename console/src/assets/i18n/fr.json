@@ -1781,7 +1781,7 @@
       "TYPE": {
         "OWNED": "Projets possédés",
         "OWNED_SINGULAR": "Projet possédé",
-        "GRANTED_SINGULAR": "Projet octroyé"
+        "GRANTED_SINGULAR": "Projet attribué à {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Image de marque",

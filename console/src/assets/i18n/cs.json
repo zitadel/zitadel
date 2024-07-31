@@ -1782,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Vlastní projekty",
         "OWNED_SINGULAR": "Vlastní projekt",
-        "GRANTED_SINGULAR": "Přidělený projekt"
+        "GRANTED_SINGULAR": "Projekt přidělený {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Nastavení brandingu",
