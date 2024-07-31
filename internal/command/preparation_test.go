@@ -4,12 +4,13 @@ package command
 import (
 	"context"
 	"errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/zitadel/zitadel/internal/domain"
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/zitadel/zitadel/internal/command/preparation"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 

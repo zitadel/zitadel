@@ -303,8 +303,8 @@ func TestServer_ListTargets(t *testing.T) {
 					response.Details.Timestamp = resp.GetDetails().GetChanged()
 					//response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
 
-					response.Target.Details.Changed = resp.GetDetails().GetChanged()
-					response.Target.Details.Created = resp.GetDetails().GetCreated()
+					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
+					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
 					response.Result[0].Details.Id = resp.GetDetails().GetId()
 					response.Result[0].Target.Name = name
 					return nil
@@ -346,11 +346,10 @@ func TestServer_ListTargets(t *testing.T) {
 							TargetName: name,
 						},
 					}
-					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
-					response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
+					response.Details.Timestamp = resp.GetDetails().GetChanged()
 
-					response.Result[0].Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
+					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
+					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
 					response.Result[0].Details.Id = resp.GetDetails().GetId()
 					response.Result[0].Target.Name = name
 					return nil
@@ -397,19 +396,18 @@ func TestServer_ListTargets(t *testing.T) {
 							TargetIds: []string{resp1.GetDetails().GetId(), resp2.GetDetails().GetId(), resp3.GetDetails().GetId()},
 						},
 					}
-					response.Details.Timestamp = resp3.GetDetails().GetChangeDate()
-					response.Details.ProcessedSequence = resp3.GetDetails().GetSequence()
+					response.Details.Timestamp = resp3.GetDetails().GetChanged()
 
-					response.Result[0].Details.ChangeDate = resp1.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp1.GetDetails().GetSequence()
+					response.Result[0].Details.Changed = resp1.GetDetails().GetChanged()
+					response.Result[0].Details.Created = resp1.GetDetails().GetCreated()
 					response.Result[0].Details.Id = resp1.GetDetails().GetId()
 					response.Result[0].Target.Name = name1
-					response.Result[1].Details.ChangeDate = resp2.GetDetails().GetChangeDate()
-					response.Result[1].Details.Sequence = resp2.GetDetails().GetSequence()
+					response.Result[1].Details.Changed = resp2.GetDetails().GetChanged()
+					response.Result[1].Details.Created = resp2.GetDetails().GetCreated()
 					response.Result[1].Details.Id = resp2.GetDetails().GetId()
 					response.Result[1].Target.Name = name2
-					response.Result[2].Details.ChangeDate = resp3.GetDetails().GetChangeDate()
-					response.Result[2].Details.Sequence = resp3.GetDetails().GetSequence()
+					response.Result[2].Details.Changed = resp3.GetDetails().GetChanged()
+					response.Result[2].Details.Created = resp3.GetDetails().GetCreated()
 					response.Result[2].Details.Id = resp3.GetDetails().GetId()
 					response.Result[2].Target.Name = name3
 					return nil
@@ -531,12 +529,12 @@ func TestServer_SearchExecutions(t *testing.T) {
 					cond := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
 					resp := Tester.SetExecution(ctx, t, cond, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
 
-					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
+					response.Details.Timestamp = resp.GetDetails().GetChanged()
 					// response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
 
 					// Set expected response with used values for SetExecution
-					response.Result[0].Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
+					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
+					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
 					response.Result[0].Condition = cond
 					return nil
 				},
@@ -609,11 +607,10 @@ func TestServer_SearchExecutions(t *testing.T) {
 					targets := executionTargetsSingleTarget(target.GetDetails().GetId())
 					resp := Tester.SetExecution(ctx, t, cond, targets)
 
-					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
-					response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
+					response.Details.Timestamp = resp.GetDetails().GetChanged()
 
-					response.Result[0].Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
+					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
+					response.Result[0].Details.Created = resp.GetDetails().GetChanged()
 					response.Result[0].Condition = cond
 					response.Result[0].Execution.Targets = targets
 					return nil
@@ -667,11 +664,10 @@ func TestServer_SearchExecutions(t *testing.T) {
 					includeTargets := executionTargetsSingleInclude(cond)
 					resp2 := Tester.SetExecution(ctx, t, includeCond, includeTargets)
 
-					response.Details.Timestamp = resp2.GetDetails().GetChangeDate()
-					response.Details.ProcessedSequence = resp2.GetDetails().GetSequence()
+					response.Details.Timestamp = resp2.GetDetails().GetChanged()
 
-					response.Result[0].Details.ChangeDate = resp2.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp2.GetDetails().GetSequence()
+					response.Result[0].Details.Created = resp2.GetDetails().GetCreated()
+					response.Result[0].Details.Changed = resp2.GetDetails().GetChanged()
 					response.Result[0].Condition = includeCond
 					response.Result[0].Execution = &action.Execution{
 						Targets: includeTargets,
@@ -708,8 +704,8 @@ func TestServer_SearchExecutions(t *testing.T) {
 					cond1 := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
 					targets1 := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					resp1 := Tester.SetExecution(ctx, t, cond1, targets1)
-					response.Result[0].Details.ChangeDate = resp1.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp1.GetDetails().GetSequence()
+					response.Result[0].Details.Changed = resp1.GetDetails().GetChanged()
+					response.Result[0].Details.Created = resp1.GetDetails().GetCreated()
 					response.Result[0].Condition = cond1
 					response.Result[0].Execution = &action.Execution{
 						Targets: targets1,
@@ -718,8 +714,8 @@ func TestServer_SearchExecutions(t *testing.T) {
 					cond2 := request.Filters[0].GetInConditionsFilter().GetConditions()[1]
 					targets2 := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					resp2 := Tester.SetExecution(ctx, t, cond2, targets2)
-					response.Result[1].Details.ChangeDate = resp2.GetDetails().GetChangeDate()
-					response.Result[1].Details.Sequence = resp2.GetDetails().GetSequence()
+					response.Result[1].Details.Changed = resp2.GetDetails().GetChanged()
+					response.Result[1].Details.Created = resp2.GetDetails().GetCreated()
 					response.Result[1].Condition = cond2
 					response.Result[1].Execution = &action.Execution{
 						Targets: targets2,
@@ -728,14 +724,13 @@ func TestServer_SearchExecutions(t *testing.T) {
 					cond3 := request.Filters[0].GetInConditionsFilter().GetConditions()[2]
 					targets3 := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					resp3 := Tester.SetExecution(ctx, t, cond3, targets3)
-					response.Result[2].Details.ChangeDate = resp3.GetDetails().GetChangeDate()
-					response.Result[2].Details.Sequence = resp3.GetDetails().GetSequence()
+					response.Result[2].Details.Changed = resp3.GetDetails().GetChanged()
+					response.Result[2].Details.Created = resp3.GetDetails().GetCreated()
 					response.Result[2].Condition = cond3
 					response.Result[2].Execution = &action.Execution{
 						Targets: targets3,
 					}
-					response.Details.Timestamp = resp3.GetDetails().GetChangeDate()
-					response.Details.ProcessedSequence = resp3.GetDetails().GetSequence()
+					response.Details.Timestamp = resp3.GetDetails().GetChanged()
 					return nil
 				},
 				req: &action.SearchExecutionsRequest{
@@ -805,15 +800,14 @@ func TestServer_SearchExecutions(t *testing.T) {
 					targets := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					for i, cond := range request.Filters[0].GetInConditionsFilter().GetConditions() {
 						resp := Tester.SetExecution(ctx, t, cond, targets)
-						response.Result[i].Details.ChangeDate = resp.GetDetails().GetChangeDate()
-						response.Result[i].Details.Sequence = resp.GetDetails().GetSequence()
+						response.Result[i].Details.Changed = resp.GetDetails().GetChanged()
+						response.Result[i].Details.Created = resp.GetDetails().GetCreated()
 						response.Result[i].Condition = cond
 						response.Result[i].Execution = &action.Execution{
 							Targets: targets,
 						}
 						// filled with info of last sequence
-						response.Details.Timestamp = resp.GetDetails().GetChangeDate()
-						response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
+						response.Details.Timestamp = resp.GetDetails().GetChanged()
 					}
 
 					return nil

@@ -15,7 +15,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
@@ -101,11 +100,8 @@ func TestServer_CreateTarget(t *testing.T) {
 				Timeout: durationpb.New(10 * time.Second),
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -122,11 +118,8 @@ func TestServer_CreateTarget(t *testing.T) {
 				Timeout: durationpb.New(10 * time.Second),
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -143,11 +136,8 @@ func TestServer_CreateTarget(t *testing.T) {
 				Timeout: durationpb.New(10 * time.Second),
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -164,11 +154,8 @@ func TestServer_CreateTarget(t *testing.T) {
 				Timeout: durationpb.New(10 * time.Second),
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 
@@ -186,11 +173,8 @@ func TestServer_CreateTarget(t *testing.T) {
 				Timeout: durationpb.New(10 * time.Second),
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 	}
@@ -269,11 +253,8 @@ func TestServer_PatchTarget(t *testing.T) {
 				},
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -296,11 +277,8 @@ func TestServer_PatchTarget(t *testing.T) {
 				},
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -319,11 +297,8 @@ func TestServer_PatchTarget(t *testing.T) {
 				},
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -342,11 +317,8 @@ func TestServer_PatchTarget(t *testing.T) {
 				},
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 		{
@@ -367,11 +339,8 @@ func TestServer_PatchTarget(t *testing.T) {
 				},
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 	}
@@ -425,11 +394,8 @@ func TestServer_DeleteTarget(t *testing.T) {
 				Id: target.GetDetails().GetId(),
 			},
 			want: &resource_object.Details{
-				ChangeDate: timestamppb.Now(),
-				Owner: &object.Owner{
-					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
-				},
+				Changed: timestamppb.Now(),
+				Created: timestamppb.Now(),
 			},
 		},
 	}

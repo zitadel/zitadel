@@ -198,7 +198,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 				return
 			}
-			assertObjectDetails(t, tt.res.want,			got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }

@@ -2,6 +2,7 @@ package object
 
 import (
 	"fmt"
+
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/config/systemdefaults"

@@ -3,7 +3,6 @@ package integration
 import (
 	"context"
 	"fmt"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	"testing"
 	"time"
 
@@ -37,6 +36,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
+	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
