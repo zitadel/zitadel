@@ -67,7 +67,7 @@ func TestCommands_AddTrustedDomain(t *testing.T) {
 				trustedDomain: "&.com",
 			},
 			want: want{
-				err: zerrors.ThrowInvalidArgument(nil, "COMMA-S3v3w", "Errors.Domain.InvalidCharacter"),
+				err: zerrors.ThrowInvalidArgument(nil, "COMMA-S3v3w", "Errors.Instance.Domain.InvalidCharacter"),
 			},
 		},
 		{

@@ -8,9 +8,23 @@ import (
 
 const (
 	trustedDomainPrefix           = "trusted_domains."
+	UniqueTrustedDomain           = "trusted_domain"
 	TrustedDomainAddedEventType   = instanceEventTypePrefix + trustedDomainPrefix + "added"
 	TrustedDomainRemovedEventType = instanceEventTypePrefix + trustedDomainPrefix + "removed"
 )
+
+func NewAddTrustedDomainUniqueConstraint(trustedDomain string) *eventstore.UniqueConstraint {
+	return eventstore.NewAddEventUniqueConstraint(
+		UniqueTrustedDomain,
+		trustedDomain,
+		"Errors.Instance.Domain.AlreadyExists")
+}
+
+func NewRemoveTrustedDomainUniqueConstraint(trustedDomain string) *eventstore.UniqueConstraint {
+	return eventstore.NewRemoveUniqueConstraint(
+		UniqueTrustedDomain,
+		trustedDomain)
+}
 
 type TrustedDomainAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
@@ -43,7 +57,7 @@ func (e *TrustedDomainAddedEvent) Payload() interface{} {
 }
 
 func (e *TrustedDomainAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+	return []*eventstore.UniqueConstraint{NewAddTrustedDomainUniqueConstraint(e.Domain)}
 }
 
 type TrustedDomainRemovedEvent struct {
@@ -77,5 +91,5 @@ func (e *TrustedDomainRemovedEvent) Payload() interface{} {
 }
 
 func (e *TrustedDomainRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
+	return []*eventstore.UniqueConstraint{NewRemoveTrustedDomainUniqueConstraint(e.Domain)}
 }
