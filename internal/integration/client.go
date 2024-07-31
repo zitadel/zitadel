@@ -30,16 +30,15 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
-	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
-	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
+	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 	settings_v2beta "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
@@ -62,7 +61,7 @@ type Client struct {
 	OIDCv2beta     oidc_pb_v2beta.OIDCServiceClient
 	OIDCv2         oidc_pb.OIDCServiceClient
 	OrgV2beta      org_v2beta.OrganizationServiceClient
-	OrgV2          organisation.OrganizationServiceClient
+	OrgV2          org.OrganizationServiceClient
 	System         system.SystemServiceClient
 	ActionV3       action.ZITADELActionsClient
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
@@ -85,7 +84,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		OIDCv2beta:     oidc_pb_v2beta.NewOIDCServiceClient(cc),
 		OIDCv2:         oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2beta:      org_v2beta.NewOrganizationServiceClient(cc),
-		OrgV2:          organisation.NewOrganizationServiceClient(cc),
+		OrgV2:          org.NewOrganizationServiceClient(cc),
 		System:         system.NewSystemServiceClient(cc),
 		ActionV3:       action.NewZITADELActionsClient(cc),
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),

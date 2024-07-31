@@ -4,7 +4,6 @@ package action_test
 
 import (
 	"context"
-	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,6 +12,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
 func executionTargetsSingleTarget(id string) []*action.ExecutionTargetType {
@@ -102,7 +102,6 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -145,7 +144,6 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -169,7 +167,6 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -276,7 +273,6 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -300,7 +296,6 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -403,7 +398,6 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -446,7 +440,6 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -470,7 +463,6 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -577,7 +569,6 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -622,7 +613,6 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -646,7 +636,6 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},
@@ -741,7 +730,6 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
-					Owner:   nil,
 				},
 			},
 		},

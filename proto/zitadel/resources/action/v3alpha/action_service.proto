@@ -17,6 +17,7 @@ import "zitadel/resources/action/v3alpha/filter.proto";
 import "zitadel/resources/object/v3alpha/object.proto";
 import "zitadel/object/v3alpha/object.proto";
 
+
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
@@ -321,7 +322,7 @@ service ZITADELActions {
       };
     };
   }
-  
+
   // List all available functions
   //
   // List all available functions which can be used as condition for executions.
@@ -501,7 +502,6 @@ message SearchExecutionsResponse {
   zitadel.resources.object.v3alpha.ListDetails details = 1;
   repeated GetExecution result = 2;
 }
-
 
 message ListExecutionFunctionsRequest{}
 message ListExecutionFunctionsResponse{
