@@ -24,7 +24,7 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 		return nil, err
 	}
 	return &action.CreateTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, nil, add.AggregateID),
+		Details: resource_object.DomainToDetailsPb(details, nil),
 	}, nil
 }
 
@@ -38,7 +38,7 @@ func (s *Server) PatchTarget(ctx context.Context, req *action.PatchTargetRequest
 		return nil, err
 	}
 	return &action.PatchTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, nil, req.GetId()),
+		Details: resource_object.DomainToDetailsPb(details, nil),
 	}, nil
 }
 
@@ -52,7 +52,7 @@ func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetReque
 		return nil, err
 	}
 	return &action.DeleteTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, nil, req.GetId()),
+		Details: resource_object.DomainToDetailsPb(details, nil),
 	}, nil
 }
 

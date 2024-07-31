@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	settings_object "github.com/zitadel/zitadel/internal/api/grpc/settings/object/v3alpha"
+	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/execution"
@@ -55,7 +55,7 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 		return nil, err
 	}
 	return &action.SetExecutionResponse{
-		Details: settings_object.DomainToDetailsPb(details, nil),
+		Details: resource_object.DomainToDetailsPb(details, nil),
 	}, nil
 }
 

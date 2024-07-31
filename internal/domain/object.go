@@ -11,4 +11,6 @@ type ObjectDetails struct {
 	// CreationDate is the date of the first event that created the object
 	CreationDate  time.Time
 	ResourceOwner string
+	// ID is the Aggregate ID of the resource
+	ID string
 }

@@ -75,7 +75,6 @@ func (t *Targets) SetState(s *State) {
 }
 
 type Target struct {
-	ID string
 	domain.ObjectDetails
 
 	Name             string

@@ -482,23 +482,12 @@ message SearchTargetsResponse {
 
 message SetExecutionRequest {
   optional zitadel.object.v3alpha.Instance instance = 1 [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { default: "\"domain from HOST or :authority header\""}];
-  oneof id {
-    option (validate.required) = true;
-    Condition condition = 2;
-    string condition_string = 3 [
-      (validate.rules).string = {min_len: 1, max_len: 200},
-      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-        min_length: 1,
-        max_length: 200,
-        example: "\"69629026806489455\"";
-      }
-    ];
-  }
-  Execution execution = 4;
+  Condition condition = 2;
+  Execution execution = 3;
 }
 
 message SetExecutionResponse {
-  zitadel.settings.object.v3alpha.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message SearchExecutionsRequest {
