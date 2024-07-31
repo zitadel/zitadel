@@ -222,8 +222,8 @@ func (c *Commands) setExecution(ctx context.Context, set *SetExecution, resource
 	if err != nil {
 		return nil, err
 	}
+	// Check if targets and includes for execution are existing
 	if wm.ExecutionTargetsEqual(set.Targets) {
-		// Check if targets and includes for execution are existing
 		return writeModelToObjectDetails(&wm.WriteModel), err
 	}
 	if err := set.Existing(c, ctx, resourceOwner); err != nil {
