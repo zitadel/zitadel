@@ -171,6 +171,11 @@ func (c *Commands) SetExecutionEvent(ctx context.Context, cond *ExecutionEventCo
 	if set.AggregateID == "" {
 		set.AggregateID = cond.ID()
 	}
+	for _, target := range set.Targets {
+		if err = target.Validate(); err != nil {
+			return nil, err
+		}
+	}
 	return c.setExecution(ctx, set, resourceOwner)
 }
 

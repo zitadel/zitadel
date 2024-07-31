@@ -1179,7 +1179,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					"",
 					false,
 				},
-				set:           &SetExecution{},
+				set:           &SetExecution{Targets: []*execution.Target{{Target: "target"}}},
 				resourceOwner: "instance",
 			},
 			res{
@@ -1199,7 +1199,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					"",
 					false,
 				},
-				set:           &SetExecution{},
+				set:           &SetExecution{Targets: []*execution.Target{{}}},
 				resourceOwner: "instance",
 			},
 			res{
