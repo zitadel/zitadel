@@ -223,6 +223,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "request/method",
 				},
 			},
 		},
@@ -271,6 +272,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "request/service",
 				},
 			},
 		},
@@ -318,6 +320,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "request",
 				},
 			},
 		},
@@ -401,6 +404,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "request/method",
 				},
 			},
 		},
@@ -484,6 +488,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "request/service",
 				},
 			},
 		},
@@ -565,6 +570,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "request",
 				},
 			},
 		},
@@ -605,6 +611,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "request",
 				},
 			},
 		},
@@ -642,6 +649,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "request",
 				},
 			},
 		},
@@ -661,7 +669,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -916,6 +924,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "response/method",
 				},
 			},
 		},
@@ -955,6 +964,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "response/service",
 				},
 			},
 		},
@@ -993,6 +1003,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "response",
 				},
 			},
 		},
@@ -1033,6 +1044,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "response",
 				},
 			},
 		},
@@ -1070,6 +1082,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "response",
 				},
 			},
 		},
@@ -1089,7 +1102,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -1328,6 +1341,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "event/event",
 				},
 			},
 		},
@@ -1367,6 +1381,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "event/group.*",
 				},
 			},
 		},
@@ -1405,6 +1420,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "event",
 				},
 			},
 		},
@@ -1445,6 +1461,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "event",
 				},
 			},
 		},
@@ -1482,6 +1499,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "event",
 				},
 			},
 		},
@@ -1501,7 +1519,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -1699,6 +1717,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "function/function",
 				},
 			},
 		},
@@ -1736,6 +1755,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "function/function",
 				},
 			},
 		},
@@ -1770,6 +1790,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "function/function",
 				},
 			},
 		},
@@ -1788,7 +1809,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}

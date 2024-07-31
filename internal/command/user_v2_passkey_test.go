@@ -536,7 +536,7 @@ func TestCommands_AddUserPasskeyCode(t *testing.T) {
 			}
 			got, err := c.AddUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			assertObjectDetails(t, tt.want, got)
 		})
 	}
 }
@@ -644,7 +644,7 @@ func TestCommands_AddUserPasskeyCodeURLTemplate(t *testing.T) {
 			}
 			got, err := c.AddUserPasskeyCodeURLTemplate(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, tt.args.urlTmpl)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			assertObjectDetails(t, tt.want, got)
 		})
 	}
 }
@@ -735,8 +735,13 @@ func TestCommands_AddUserPasskeyCodeReturn(t *testing.T) {
 				idGenerator:      tt.fields.idGenerator,
 			}
 			got, err := c.AddUserPasskeyCodeReturn(context.Background(), tt.args.userID, tt.args.resourceOwner, alg)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			if tt.wantErr != nil {
+				require.ErrorIs(t, err, tt.wantErr)
+				return
+			}
+			assert.Equal(t, tt.want.CodeID, got.CodeID)
+			assert.Equal(t, tt.want.Code, got.Code)
+			assertObjectDetails(t, tt.want.ObjectDetails, got.ObjectDetails)
 		})
 	}
 }
@@ -895,8 +900,13 @@ func TestCommands_addUserPasskeyCode(t *testing.T) {
 				idGenerator:      tt.fields.idGenerator,
 			}
 			got, err := c.addUserPasskeyCode(context.Background(), tt.args.userID, tt.args.resourceOwner, alg, "", false)
-			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			if tt.wantErr != nil {
+				require.ErrorIs(t, err, tt.wantErr)
+				return
+			}
+			assert.Equal(t, tt.want.CodeID, got.CodeID)
+			assert.Equal(t, tt.want.Code, got.Code)
+			assertObjectDetails(t, tt.want.ObjectDetails, got.ObjectDetails)
 		})
 	}
 }

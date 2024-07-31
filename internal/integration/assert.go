@@ -70,14 +70,11 @@ func AssertDetails[D Details, M DetailsMsg[D]](t testing.TB, expected, actual M)
 }
 
 func AssertResourceDetails(t testing.TB, expected *resources_object.Details, actual *resources_object.Details) {
-	assert.NotZero(t, actual.GetSequence())
-
-	if expected.GetChangeDate() != nil {
+	if expected.GetChanged() != nil {
 		wantChangeDate := time.Now()
-		gotChangeDate := actual.GetChangeDate().AsTime()
+		gotChangeDate := actual.GetChanged().AsTime()
 		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
 	}
-
 	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
 	assert.NotEmpty(t, actual.GetId())
 }
@@ -118,7 +115,6 @@ func AssertResourceListDetails[D ResourceListDetailsMsg](t testing.TB, expected,
 	}
 
 	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
-	assert.Equal(t, wantDetails.GetEndOfList(), gotDetails.GetEndOfList())
 	assert.Equal(t, wantDetails.GetAppliedLimit(), gotDetails.GetAppliedLimit())
 
 	if wantDetails.GetTimestamp() != nil {

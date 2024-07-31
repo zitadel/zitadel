@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	TargetTable               = "projections.targets2"
+	TargetTable               = "projections.targets1"
 	TargetIDCol               = "id"
 	TargetCreationDateCol     = "creation_date"
 	TargetChangeDateCol       = "change_date"

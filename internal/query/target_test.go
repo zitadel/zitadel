@@ -112,8 +112,8 @@ func Test_TargetPrepares(t *testing.T) {
 				},
 				Targets: []*Target{
 					{
-						ID: "id",
 						ObjectDetails: domain.ObjectDetails{
+							ID:            "id",
 							EventDate:     testNow,
 							ResourceOwner: "ro",
 							Sequence:      20211109,
@@ -177,8 +177,8 @@ func Test_TargetPrepares(t *testing.T) {
 				},
 				Targets: []*Target{
 					{
-						ID: "id-1",
 						ObjectDetails: domain.ObjectDetails{
+							ID:            "id-1",
 							EventDate:     testNow,
 							ResourceOwner: "ro",
 							Sequence:      20211109,
@@ -190,8 +190,8 @@ func Test_TargetPrepares(t *testing.T) {
 						InterruptOnError: true,
 					},
 					{
-						ID: "id-2",
 						ObjectDetails: domain.ObjectDetails{
+							ID:            "id-2",
 							EventDate:     testNow,
 							ResourceOwner: "ro",
 							Sequence:      20211110,
@@ -203,8 +203,8 @@ func Test_TargetPrepares(t *testing.T) {
 						InterruptOnError: false,
 					},
 					{
-						ID: "id-3",
 						ObjectDetails: domain.ObjectDetails{
+							ID:            "id-3",
 							EventDate:     testNow,
 							ResourceOwner: "ro",
 							Sequence:      20211110,
@@ -274,8 +274,8 @@ func Test_TargetPrepares(t *testing.T) {
 				),
 			},
 			object: &Target{
-				ID: "id",
 				ObjectDetails: domain.ObjectDetails{
+					ID:            "id",
 					EventDate:     testNow,
 					ResourceOwner: "ro",
 					Sequence:      20211109,

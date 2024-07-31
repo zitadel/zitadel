@@ -4,6 +4,8 @@ package command
 import (
 	"context"
 	"errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/zitadel/zitadel/internal/domain"
 	"reflect"
 	"testing"
 
@@ -87,5 +89,19 @@ func (mf *MultiFilter) Filter() preparation.FilterToQueryReducer {
 	return func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 		mf.count++
 		return mf.filters[mf.count-1](ctx, queryFactory)
+	}
+}
+
+func assertObjectDetails(t *testing.T, want, got *domain.ObjectDetails) {
+	if want == nil {
+		assert.Nil(t, got)
+		return
+	}
+	assert.Equal(t, got.CreationDate, want.CreationDate)
+	assert.Equal(t, got.EventDate, want.EventDate)
+	assert.Equal(t, got.ResourceOwner, want.ResourceOwner)
+	assert.Equal(t, got.Sequence, want.Sequence)
+	if want.ID != "" {
+		assert.Equal(t, got.ID, want.ID)
 	}
 }
