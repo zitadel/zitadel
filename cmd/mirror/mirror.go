@@ -3,6 +3,7 @@ package mirror
 import (
 	"bytes"
 	_ "embed"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -13,9 +14,12 @@ import (
 )
 
 var (
-	instanceIDs   []string
-	isSystem      bool
-	shouldReplace bool
+	instanceIDs       []string
+	isSystem          bool
+	shouldReplace     bool
+	isSrcFile         bool
+	isDestFile        bool
+	filePath          string
 )
 
 func New() *cobra.Command {
@@ -37,6 +41,31 @@ Order of execution:
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			err := viper.MergeConfig(bytes.NewBuffer(defaultConfig))
 			logging.OnError(err).Fatal("unable to read default config")
+
+			if isSrcFile = viper.IsSet("Source.file.path"); isSrcFile {
+				filePath = viper.GetString("Source.file.path")
+			}
+			if isDestFile = viper.IsSet("Destination.file.path"); isDestFile {
+				filePath = viper.GetString("Destination.file.path")
+			}
+			
+			if isSrcFile || isDestFile {
+				if isSrcFile && isDestFile {
+					logging.Fatal("both source and destination cannot be files")
+				}
+
+				if !(shouldIgnorePrevious && shouldReplace) {
+					logging.Fatal("both --ignore-previous and --replace flags must be set for mirroring files")
+				}
+
+				if stat, err := os.Stat(filePath); err != nil || !stat.IsDir() {
+					if os.IsNotExist(err) {
+						logging.Fatal("file path does not exist")
+					} else {
+						logging.Fatal("file path leads to a file not a directory")
+					}
+				}
+			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			config := mustNewMigrationConfig(viper.GetViper())
