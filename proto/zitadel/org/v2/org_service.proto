@@ -1,0 +1,174 @@
+syntax = "proto3";
+
+
+package zitadel.org.v2;
+
+import "zitadel/object/v2/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/user/v2/auth.proto";
+import "zitadel/user/v2/email.proto";
+import "zitadel/user/v2/phone.proto";
+import "zitadel/user/v2/idp.proto";
+import "zitadel/user/v2/password.proto";
+import "zitadel/user/v2/user.proto";
+import "zitadel/user/v2/user_service.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2;org";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "User Service";
+    version: "2.0";
+    description: "This API is intended to manage organizations in a ZITADEL instance.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+service OrganizationService {
+
+  // Create a new organization and grant the user(s) permission to manage it
+  rpc AddOrganization(AddOrganizationRequest) returns (AddOrganizationResponse) {
+    option (google.api.http) = {
+      post: "/v2/organizations"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.create"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create an Organization";
+      description: "Create a new organization with an administrative user. If no specific roles are sent for the users, they will be granted the role ORG_OWNER."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+}
+
+message AddOrganizationRequest{
+  message Admin {
+    oneof user_type{
+      string user_id = 1;
+      zitadel.user.v2.AddHumanUserRequest human = 2;
+    }
+    // specify Org Member Roles for the provided user (default is ORG_OWNER if roles are empty)
+    repeated string roles = 3;
+  }
+
+  string name = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"ZITADEL\"";
+    }
+  ];
+  repeated Admin admins = 2;
+}
+
+message AddOrganizationResponse{
+  message CreatedAdmin {
+    string user_id = 1;
+    optional string email_code = 2;
+    optional string phone_code = 3;
+  }
+  zitadel.object.v2.Details details = 1;
+  string organization_id = 2;
+  repeated CreatedAdmin created_admins = 3;
+}

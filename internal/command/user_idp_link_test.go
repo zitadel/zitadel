@@ -519,7 +519,8 @@ func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 
 func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx  context.Context
@@ -541,6 +542,7 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -562,6 +564,7 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -598,6 +601,7 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -620,6 +624,7 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 					t,
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -633,6 +638,38 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 			},
 			res: res{
 				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			name: "remove external idp, permission error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"config1",
+								"name",
+								"externaluser1",
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
+			},
+			args: args{
+				ctx: context.Background(),
+				link: &domain.UserIDPLink{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "user1",
+					},
+					IDPConfigID:    "config1",
+					ExternalUserID: "externaluser1",
+				},
+			},
+			res: res{
+				err: zerrors.IsPermissionDenied,
 			},
 		},
 		{
@@ -658,6 +695,7 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -679,7 +717,8 @@ func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := r.RemoveUserIDPLink(tt.args.ctx, tt.args.link)
 			if tt.res.err == nil {

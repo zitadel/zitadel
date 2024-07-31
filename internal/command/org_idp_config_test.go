@@ -398,7 +398,8 @@ func newIDPConfigChangedEvent(ctx context.Context, orgID, configID, oldName, new
 
 func TestCommands_RemoveIDPConfig(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore      *eventstore.Eventstore
+		checkPermission domain.PermissionCheck
 	}
 	type args struct {
 		ctx                   context.Context
@@ -423,6 +424,7 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				context.Background(),
@@ -460,6 +462,7 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
 				context.Background(),
@@ -532,6 +535,84 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 						),
 					),
 				),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				context.Background(),
+				"idp1",
+				"org1",
+				true,
+				[]*domain.UserIDPLink{
+					{
+						ObjectRoot: models.ObjectRoot{
+							AggregateID: "user1",
+						},
+						IDPConfigID:    "idp1",
+						ExternalUserID: "id1",
+						DisplayName:    "name",
+					},
+				},
+			},
+			res{
+				&domain.ObjectDetails{
+					ResourceOwner: "org1",
+				},
+				nil,
+			},
+		},
+		{
+			"cascade, permission error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewIDPConfigAddedEvent(context.Background(),
+								&org.NewAggregate("org1").Aggregate,
+								"idp1",
+								"name1",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeGoogle,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayName",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.com",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewUserIDPLinkAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"idp1",
+								"name",
+								"id1",
+							),
+						),
+					),
+					expectPush(
+						org.NewIDPConfigRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"idp1",
+							"name1",
+						),
+						org.NewIdentityProviderCascadeRemovedEvent(context.Background(),
+							&org.NewAggregate("org1").Aggregate,
+							"idp1",
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckNotAllowed(),
 			},
 			args{
 				context.Background(),
@@ -560,7 +641,8 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore:      tt.fields.eventstore,
+				checkPermission: tt.fields.checkPermission,
 			}
 			got, err := c.RemoveIDPConfig(tt.args.ctx, tt.args.idpID, tt.args.orgID, tt.args.cascadeRemoveProvider, tt.args.cascadeExternalIDPs...)
 			if tt.res.err == nil {

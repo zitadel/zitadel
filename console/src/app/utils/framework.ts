@@ -29,7 +29,7 @@ export const OIDC_CONFIGURATIONS: OidcAppConfigurations = {
     .setResponseTypesList([OIDCResponseType.OIDC_RESPONSE_TYPE_CODE])
     .setGrantTypesList([OIDCGrantType.OIDC_GRANT_TYPE_AUTHORIZATION_CODE])
     .setRedirectUrisList(['http://localhost:5173/auth/signinwin/zitadel'])
-    .setPostLogoutRedirectUrisList(['http://localhost:5173']),
+    .setPostLogoutRedirectUrisList(['http://localhost:5173/']),
   // web applications
   ['next']: new AddOIDCAppRequest()
     .setAppType(OIDCAppType.OIDC_APP_TYPE_WEB)

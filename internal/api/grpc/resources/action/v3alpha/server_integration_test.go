@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 

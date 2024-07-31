@@ -7,9 +7,10 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) RegisterPasskey(ctx context.Context, req *user.RegisterPasskeyRequest) (resp *user.RegisterPasskeyResponse, err error) {
@@ -115,4 +116,69 @@ func passkeyCodeDetailsToPb(details *domain.PasskeyCodeDetails, err error) (*use
 			Code: details.Code,
 		},
 	}, nil
+}
+
+func (s *Server) RemovePasskey(ctx context.Context, req *user.RemovePasskeyRequest) (*user.RemovePasskeyResponse, error) {
+	objectDetails, err := s.command.HumanRemovePasswordless(ctx, req.GetUserId(), req.GetPasskeyId(), "")
+	if err != nil {
+		return nil, err
+	}
+	return &user.RemovePasskeyResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) ListPasskeys(ctx context.Context, req *user.ListPasskeysRequest) (*user.ListPasskeysResponse, error) {
+	query := new(query.UserAuthMethodSearchQueries)
+	err := query.AppendUserIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendAuthMethodQuery(domain.UserAuthMethodTypePasswordless)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendStateQuery(domain.MFAStateReady)
+	if err != nil {
+		return nil, err
+	}
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query, false)
+	authMethods.RemoveNoPermission(ctx, s.checkPermission)
+	if err != nil {
+		return nil, err
+	}
+	return &user.ListPasskeysResponse{
+		Details: object.ToListDetails(authMethods.SearchResponse),
+		Result:  authMethodsToPasskeyPb(authMethods),
+	}, nil
+}
+
+func authMethodsToPasskeyPb(methods *query.AuthMethods) []*user.Passkey {
+	t := make([]*user.Passkey, len(methods.AuthMethods))
+	for i, token := range methods.AuthMethods {
+		t[i] = authMethodToPasskeyPb(token)
+	}
+	return t
+}
+
+func authMethodToPasskeyPb(token *query.AuthMethod) *user.Passkey {
+	return &user.Passkey{
+		Id:    token.TokenID,
+		State: mfaStateToPb(token.State),
+		Name:  token.Name,
+	}
+}
+
+func mfaStateToPb(state domain.MFAState) user.AuthFactorState {
+	switch state {
+	case domain.MFAStateNotReady:
+		return user.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY
+	case domain.MFAStateReady:
+		return user.AuthFactorState_AUTH_FACTOR_STATE_READY
+	case domain.MFAStateUnspecified, domain.MFAStateRemoved:
+		// Handle all remaining cases so the linter succeeds
+		return user.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
+	default:
+		return user.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
+	}
 }

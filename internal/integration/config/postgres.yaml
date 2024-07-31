@@ -3,8 +3,7 @@ Database:
     Host: localhost
     Port: 5432
     Database: zitadel
-    EventPushConnRatio: 0.2
-    MaxOpenConns: 40
+    MaxOpenConns: 15
     MaxIdleConns: 10
     User:
       Username: zitadel
