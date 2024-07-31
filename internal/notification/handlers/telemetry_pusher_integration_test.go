@@ -19,7 +19,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object"
-	oidc_v2 "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	oidc_v2 "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 	"github.com/zitadel/zitadel/pkg/grpc/project"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )

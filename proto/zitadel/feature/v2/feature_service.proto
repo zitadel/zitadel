@@ -1,0 +1,395 @@
+syntax = "proto3";
+
+package zitadel.feature.v2;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+import "zitadel/feature/v2/system.proto";
+import "zitadel/feature/v2/instance.proto";
+import "zitadel/feature/v2/organization.proto";
+import "zitadel/feature/v2/user.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/feature/v2;feature";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Feature Service";
+    version: "2.0";
+    description: "This API is intended to manage features for ZITADEL. Feature settings that are available on multiple \"levels\", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource has no feature flag settings and inheritance from the parent is disabled.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+// FeatureService is intended to manage features for ZITADEL.
+//
+// Feature settings that are available on multiple "levels", such as instance and organization.
+// The higher level (instance) acts as a default for the lower level (organization).
+// When a feature is set on multiple levels, the lower level takes precedence.
+//
+// Features can be experimental where ZITADEL will assume a sane default, such as disabled.
+// When over time confidence in such a feature grows, ZITADEL can default to enabling the feature.
+// As a final step we might choose to always enable a feature and remove the setting from this API,
+// reserving the proto field number. Such removal is not considered a breaking change.
+// Setting a removed field will effectively result in a no-op.
+service FeatureService {
+  rpc SetSystemFeatures (SetSystemFeaturesRequest) returns (SetSystemFeaturesResponse) {
+    option (google.api.http) = {
+      put: "/v2/features/system"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.feature.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Set system level features";
+      description: "Configure and set features that apply to the complete system. Only fields present in the request are set or unset."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc ResetSystemFeatures (ResetSystemFeaturesRequest) returns (ResetSystemFeaturesResponse) {
+    option (google.api.http) = {
+      delete: "/v2/features/system"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.feature.delete"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Reset system level features";
+      description: "Deletes ALL configured features for the system, reverting the behaviors to system defaults."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc GetSystemFeatures (GetSystemFeaturesRequest) returns (GetSystemFeaturesResponse) {
+    option (google.api.http) = {
+      get: "/v2/features/system"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "system.feature.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get system level features";
+      description: "Returns all configured features for the system. Unset fields mean the feature is the current system default."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc SetInstanceFeatures (SetInstanceFeaturesRequest) returns (SetInstanceFeaturesResponse) {
+    option (google.api.http) = {
+      put: "/v2/features/instance"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.feature.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Set instance level features";
+      description: "Configure and set features that apply to a complete instance. Only fields present in the request are set or unset."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc ResetInstanceFeatures (ResetInstanceFeaturesRequest) returns (ResetInstanceFeaturesResponse) {
+    option (google.api.http) = {
+      delete: "/v2/features/instance"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.feature.delete"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Reset instance level features";
+      description: "Deletes ALL configured features for an instance, reverting the behaviors to system defaults."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc GetInstanceFeatures (GetInstanceFeaturesRequest) returns (GetInstanceFeaturesResponse) {
+    option (google.api.http) = {
+      get: "/v2/features/instance"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.feature.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get instance level features";
+      description: "Returns all configured features for an instance. Unset fields mean the feature is the current system default."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc SetOrganizationFeatures (SetOrganizationFeaturesRequest) returns (SetOrganizationFeaturesResponse) {
+    option (google.api.http) = {
+      put: "/v2/features/organization/{organization_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.feature.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Set organization level features";
+      description: "Configure and set features that apply to a complete instance. Only fields present in the request are set or unset."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc ResetOrganizationFeatures (ResetOrganizationFeaturesRequest) returns (ResetOrganizationFeaturesResponse) {
+    option (google.api.http) = {
+      delete: "/v2/features/organization/{organization_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.feature.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Reset organization level features";
+      description: "Deletes ALL configured features for an organization, reverting the behaviors to instance defaults."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc GetOrganizationFeatures(GetOrganizationFeaturesRequest) returns (GetOrganizationFeaturesResponse) {
+    option (google.api.http) = {
+      get: "/v2/features/organization/{organization_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.feature.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get organization level features";
+      description: "Returns all configured features for an organization. Unset fields mean the feature is the current instance default."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc SetUserFeatures(SetUserFeatureRequest) returns (SetUserFeaturesResponse) {
+    option (google.api.http) = {
+      put: "/v2/features/user/{user_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.feature.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Set user level features";
+      description: "Configure and set features that apply to an user. Only fields present in the request are set or unset."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc ResetUserFeatures(ResetUserFeaturesRequest) returns (ResetUserFeaturesResponse) {
+    option (google.api.http) = {
+      delete: "/v2/features/user/{user_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.feature.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Reset user level features";
+      description: "Deletes ALL configured features for a user, reverting the behaviors to organization defaults."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  rpc GetUserFeatures(GetUserFeaturesRequest) returns (GetUserFeaturesResponse) {
+    option (google.api.http) = {
+      get: "/v2/features/user/{user_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "user.feature.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get organization level features";
+      description: "Returns all configured features for an organization. Unset fields mean the feature is the current instance default."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+}

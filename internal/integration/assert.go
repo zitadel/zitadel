@@ -10,7 +10,8 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	resources_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
+	settings_object "github.com/zitadel/zitadel/pkg/grpc/settings/object/v3alpha"
 )
 
 // Details is the interface that covers both v1 and v2 proto generated object details.
@@ -26,8 +27,14 @@ type DetailsMsg[D Details] interface {
 	GetDetails() D
 }
 
-type ListDetailsMsg interface {
-	GetDetails() *object.ListDetails
+type ListDetails interface {
+	comparable
+	GetTotalResult() uint64
+	GetTimestamp() *timestamppb.Timestamp
+}
+
+type ListDetailsMsg[L ListDetails] interface {
+	GetDetails() L
 }
 
 // AssertDetails asserts values in a message's object Details,
@@ -59,13 +66,38 @@ func AssertDetails[D Details, M DetailsMsg[D]](t testing.TB, expected, actual M)
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
 }
 
-func AssertListDetails[D ListDetailsMsg](t testing.TB, expected, actual D) {
+func AssertResourceDetails(t testing.TB, expected *resources_object.Details, actual *resources_object.Details) {
+	assert.NotZero(t, actual.GetSequence())
+
+	if expected.GetChangeDate() != nil {
+		wantChangeDate := time.Now()
+		gotChangeDate := actual.GetChangeDate().AsTime()
+		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
+	}
+
+	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
+	assert.NotEmpty(t, actual.GetId())
+}
+
+func AssertSettingsDetails(t testing.TB, expected *settings_object.Details, actual *settings_object.Details) {
+	assert.NotZero(t, actual.GetSequence())
+
+	if expected.GetChangeDate() != nil {
+		wantChangeDate := time.Now()
+		gotChangeDate := actual.GetChangeDate().AsTime()
+		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
+	}
+
+	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
+}
+
+func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t testing.TB, expected, actual D) {
 	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
-	if wantDetails == nil {
+	var nilDetails L
+	if wantDetails == nilDetails {
 		assert.Nil(t, gotDetails)
 		return
 	}
-
 	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
 
 	if wantDetails.GetTimestamp() != nil {

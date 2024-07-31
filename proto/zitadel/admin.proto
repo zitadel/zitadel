@@ -323,6 +323,54 @@ service AdminService {
         };
     }
 
+    rpc ListInstanceTrustedDomains(ListInstanceTrustedDomainsRequest) returns (ListInstanceTrustedDomainsResponse) {
+        option (google.api.http) = {
+            post: "/trusted_domains/_search";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Instance";
+            summary: "List Instance Trusted Domains";
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+        };
+    }
+
+    rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
+        option (google.api.http) = {
+            post: "/trusted_domains";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Instance";
+            summary: "Add an Instance Trusted Domain";
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+        };
+    }
+
+    rpc RemoveInstanceTrustedDomain(RemoveInstanceTrustedDomainRequest) returns (RemoveInstanceTrustedDomainResponse) {
+        option (google.api.http) = {
+            delete: "/trusted_domains/{domain}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            tags: "Instance";
+            summary: "Remove an Instance Trusted Domain";
+            description: "Returns a list of domains that are configured for this ZITADEL instance. These domains are trusted to be used as public hosts."
+        };
+    }
+
     rpc ListSecretGenerators(ListSecretGeneratorsRequest) returns (ListSecretGeneratorsResponse) {
         option (google.api.http) = {
             post: "/secretgenerators/_search"
@@ -4060,6 +4108,52 @@ message ListInstanceDomainsResponse {
     zitadel.v1.ListDetails details = 1;
     zitadel.instance.v1.DomainFieldName sorting_column = 2;
     repeated zitadel.instance.v1.Domain result = 3;
+}
+
+message ListInstanceTrustedDomainsRequest {
+    zitadel.v1.ListQuery query = 1;
+    // the field the result is sorted
+    zitadel.instance.v1.DomainFieldName sorting_column = 2;
+    //criteria the client is looking for
+    repeated zitadel.instance.v1.TrustedDomainSearchQuery queries = 3;
+}
+
+message ListInstanceTrustedDomainsResponse {
+    zitadel.v1.ListDetails details = 1;
+    zitadel.instance.v1.DomainFieldName sorting_column = 2;
+    repeated zitadel.instance.v1.TrustedDomain result = 3;
+}
+
+message AddInstanceTrustedDomainRequest {
+    string domain = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 253},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"login.example.com\"";
+            min_length: 1;
+            max_length: 253;
+        }
+    ];
+}
+
+message AddInstanceTrustedDomainResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message RemoveInstanceTrustedDomainRequest {
+    string domain = 1 [
+        (validate.rules).string = {min_len: 1, max_len: 253},
+        (google.api.field_behavior) = REQUIRED,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"login.example.com\"";
+            min_length: 1;
+            max_length: 253;
+        }
+    ];
+}
+
+message RemoveInstanceTrustedDomainResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListSecretGeneratorsRequest {

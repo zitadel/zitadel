@@ -11,8 +11,8 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	object_pb "github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
 func TestServer_GetSecuritySettings(t *testing.T) {

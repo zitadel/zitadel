@@ -231,7 +231,7 @@
           "LABEL": "Duração Máxima em horas",
           "PW_CHECK": {
             "TITLE": "Verificação de Senha",
-            "DESCRIPTION": "Seus usuários devem mudar suas senhas nesses períodos."
+            "DESCRIPTION": "Os usuários serão obrigados a reautentificar-se com sua senha após este período."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Verificação de Login Externo",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Excluir Ações Selecionadas?",
         "DESCRIPTION": "Tem certeza de que deseja excluir as ações selecionadas do fluxo?"
-      }
+      },
+      "ABOUTNAME": "O nome da ação e o nome da função no javascript devem ser iguais"
     },
     "TOAST": {
       "ACTIONSSET": "Ações definidas",
@@ -1438,9 +1439,7 @@
         "7": "Senha única (OTP) - SMS",
         "8": "Senha única (OTP) - e-mail"
       },
-      "ADDGENERATOR": "Definir aparência de segredo",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Expiração (em horas)",
+      "EXPIRY": "Expiração (em minutos)",
       "INCLUDEDIGITS": "Incluir números",
       "INCLUDESYMBOLS": "Incluir símbolos",
       "INCLUDELOWERLETTERS": "Incluir letras minúsculas",
@@ -1476,6 +1475,10 @@
         "DISABLED": "Desabilitado"
       },
       "INHERITED_DESCRIPTION": "Essa configuração define o valor para o padrão do sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Habilitado\" é herdado",
+        "DISABLED": "\"Desabilitado\" é herdado"
+      },
       "RESET": "Definir tudo para herdar"
     },
     "DIALOG": {
@@ -1681,7 +1684,8 @@
         "username": "Nome de usuário",
         "tempUsername": "Nome de usuário temporário",
         "otp": "Senha de uso único",
-        "verifyUrl": "URL para verificar a senha de uso único"
+        "verifyUrl": "URL para verificar a senha de uso único",
+        "expiry": "Data de expiração"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados salvos."
@@ -1777,7 +1781,7 @@
       "TYPE": {
         "OWNED": "Projetos Próprios",
         "OWNED_SINGULAR": "Projeto Próprio",
-        "GRANTED_SINGULAR": "Projeto Concedido"
+        "GRANTED_SINGULAR": "Projeto atribuído a {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Configuração de Marca",

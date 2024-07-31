@@ -231,7 +231,7 @@
           "LABEL": "Durée de vie maximale en heures",
           "PW_CHECK": {
             "TITLE": "Vérification de Mot de Passe",
-            "DESCRIPTION": "Vos utilisateurs doivent changer leurs mots de passe pendant ces périodes."
+            "DESCRIPTION": "Les utilisateurs devront se réauthentifier avec leur mot de passe après cette période."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Vérification de Connexion Externe",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Supprimer les actions sélectionnées ?",
         "DESCRIPTION": "Voulez-vous vraiment supprimer les actions sélectionnées du flux ?"
-      }
+      },
+      "ABOUTNAME": "Le nom de l'action et le nom de la fonction dans le javascript doivent être identiques"
     },
     "TOAST": {
       "ACTIONSSET": "Actions définies",
@@ -1437,9 +1438,7 @@
         "7": "Mot de passe à usage unique (OTP) - SMS",
         "8": "Mot de passe à usage unique (OTP) -e-mail"
       },
-      "ADDGENERATOR": "Configurer générateur de mot de passe",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Expiration (en heures)",
+      "EXPIRY": "Expiration (en minutes)",
       "INCLUDEDIGITS": "Inclure les chiffres",
       "INCLUDESYMBOLS": "Inclure les symboles",
       "INCLUDELOWERLETTERS": "Inclure les lettres minuscules",
@@ -1475,6 +1474,10 @@
         "DISABLED": "Désactivé"
       },
       "INHERITED_DESCRIPTION": "Ce paramètre définit la valeur par défaut du système.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Activé\" est hérité",
+        "DISABLED": "\"Désactivé\" est hérité"
+      },
       "RESET": "Réinitialiser tout sur hérité"
     },
     "DIALOG": {
@@ -1680,7 +1683,8 @@
         "username": "Nom d'utilisateur",
         "tempUsername": "Nom d'utilisateur temporaire",
         "otp": "Mot de passe à usage unique",
-        "verifyUrl": "URL pour vérifier le mot de passe à usage unique"
+        "verifyUrl": "URL pour vérifier le mot de passe à usage unique",
+        "expiry": "Expiration"
       },
       "TOAST": {
         "UPDATED": "Textes personnalisés enregistrés."
@@ -1778,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Projets possédés",
         "OWNED_SINGULAR": "Projet possédé",
-        "GRANTED_SINGULAR": "Projet octroyé"
+        "GRANTED_SINGULAR": "Projet attribué à {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Image de marque",

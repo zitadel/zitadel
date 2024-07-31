@@ -231,7 +231,7 @@
           "LABEL": "Maximální doba životnosti v hodinách",
           "PW_CHECK": {
             "TITLE": "Kontrola hesla",
-            "DESCRIPTION": "Tví uživatelé musí v těchto obdobích změnit svá hesla."
+            "DESCRIPTION": "Po uplynutí této doby budou uživatelé vyzváni k opětovné autentizaci pomocí hesla."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Kontrola externího přihlášení",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Smazat vybrané akce?",
         "DESCRIPTION": "Jste si jisti, že chcete smazat vybrané akce z toku?"
-      }
+      },
+      "ABOUTNAME": "Název akce a název funkce v javascriptu musí být stejný"
     },
     "TOAST": {
       "ACTIONSSET": "Akce nastaveny",
@@ -1437,9 +1438,7 @@
         "7": "Jednorázové heslo (OTP) - SMS",
         "8": "Jednorázové heslo (OTP) - E-mail"
       },
-      "ADDGENERATOR": "Definovat generátor tajemství",
-      "GENERATORTYPE": "Typ",
-      "EXPIRY": "Expirace (v hodinách)",
+      "EXPIRY": "Expirace (v minutách)",
       "INCLUDEDIGITS": "Zahrnout čísla",
       "INCLUDESYMBOLS": "Zahrnout symboly",
       "INCLUDELOWERLETTERS": "Zahrnout malá písmena",
@@ -1475,6 +1474,10 @@
         "DISABLED": "Zakázáno"
       },
       "INHERITED_DESCRIPTION": "Toto nastavení nastaví hodnotu na výchozí hodnotu systému.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Povoleno“ je zděděno",
+        "DISABLED": "„Zakázáno“ je zděděno"
+      },
       "RESET": "Nastavit vše na děděné"
     },
     "DIALOG": {
@@ -1680,7 +1683,8 @@
         "username": "Uživatelské jméno",
         "tempUsername": "Dočasné uživatelské jméno",
         "otp": "Jednorázové heslo",
-        "verifyUrl": "Ověřovací URL jednorázového hesla"
+        "verifyUrl": "Ověřovací URL jednorázového hesla",
+        "expiry": "Expirace"
       },
       "TOAST": {
         "UPDATED": "Vlastní texty uloženy."
@@ -1779,7 +1783,7 @@
       "TYPE": {
         "OWNED": "Vlastní projekty",
         "OWNED_SINGULAR": "Vlastní projekt",
-        "GRANTED_SINGULAR": "Přidělený projekt"
+        "GRANTED_SINGULAR": "Projekt přidělený {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Nastavení brandingu",

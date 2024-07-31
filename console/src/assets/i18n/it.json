@@ -231,7 +231,7 @@
           "LABEL": "Durata Massima in ore",
           "PW_CHECK": {
             "TITLE": "Controllo Password",
-            "DESCRIPTION": "I tuoi utenti devono cambiare le loro password in questi periodi."
+            "DESCRIPTION": "Gli utenti dovranno ri-autentificarsi con la password dopo questo periodo."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Controllo Login Esterno",
@@ -1085,7 +1085,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Elimina le azioni selezionate?",
         "DESCRIPTION": "Sei sicuro di voler eliminare le azioni selezionate dal processo?"
-      }
+      },
+      "ABOUTNAME": "Il nome dell'azione e il nome della funzione nel javascript devono essere gli stessi"
     },
     "TOAST": {
       "ACTIONSSET": "Azioni salvate!",
@@ -1437,9 +1438,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Imposta il generatore di password",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Scadenza (in ore)",
+      "EXPIRY": "Scadenza (in minuti)",
       "INCLUDEDIGITS": "Contiene numeri",
       "INCLUDESYMBOLS": "Contiene simboli",
       "INCLUDELOWERLETTERS": "Contiene lettere minuscole",
@@ -1475,6 +1474,10 @@
         "DISABLED": "Disabilitato"
       },
       "INHERITED_DESCRIPTION": "Questa impostazione imposta il valore predefinito del sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Abilitato\" viene ereditato",
+        "DISABLED": "\"Disabilitato\" viene ereditato"
+      },
       "RESET": "Imposta tutto su predefinito"
     },
     "DIALOG": {
@@ -1680,7 +1683,8 @@
         "username": "Nome utente",
         "tempUsername": "Nome utente temporaneo",
         "otp": "Password monouso",
-        "verifyUrl": "URL per verificare la password monouso"
+        "verifyUrl": "URL per verificare la password monouso",
+        "expiry": "Scadenza"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."
@@ -1778,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Progetti proprietari",
         "OWNED_SINGULAR": "Progetto proprietario",
-        "GRANTED_SINGULAR": "Progetto delegato"
+        "GRANTED_SINGULAR": "Progetto concesso di {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Impostazione branding",

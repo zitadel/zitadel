@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) (_ *user.GetUserByIDResponse, err error) {
@@ -60,7 +60,12 @@ func UsersToPb(users []*query.User, assetPrefix string) []*user.User {
 
 func userToPb(userQ *query.User, assetPrefix string) *user.User {
 	return &user.User{
-		UserId:             userQ.ID,
+		UserId: userQ.ID,
+		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
+			Sequence:      userQ.Sequence,
+			EventDate:     userQ.ChangeDate,
+			ResourceOwner: userQ.ResourceOwner,
+		}),
 		State:              userStateToPb(userQ.State),
 		Username:           userQ.Username,
 		LoginNames:         userQ.LoginNames,

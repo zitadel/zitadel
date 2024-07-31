@@ -22,7 +22,7 @@ var (
 	filePath      string
 )
 
-func New() *cobra.Command {
+func New(configFiles *[]string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "mirror",
 		Short: "mirrors all data of ZITADEL from one database to another",
@@ -41,6 +41,12 @@ Order of execution:
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			err := viper.MergeConfig(bytes.NewBuffer(defaultConfig))
 			logging.OnError(err).Fatal("unable to read default config")
+			
+			for _, file := range *configFiles {
+				viper.SetConfigFile(file)
+				err := viper.MergeInConfig()
+				logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
+			}
 
 			if isSrcFile = viper.IsSet("Source.file.path"); isSrcFile {
 				filePath = viper.GetString("Source.file.path")
