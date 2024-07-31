@@ -1776,7 +1776,7 @@
       "TYPE": {
         "OWNED": "Progetti proprietari",
         "OWNED_SINGULAR": "Progetto proprietario",
-        "GRANTED_SINGULAR": "Progetto delegato"
+        "GRANTED_SINGULAR": "Progetto concesso di {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Impostazione branding",

@@ -1777,7 +1777,7 @@
       "TYPE": {
         "OWNED": "Owned Projects",
         "OWNED_SINGULAR": "Owned Project",
-        "GRANTED_SINGULAR": "Granted Project"
+        "GRANTED_SINGULAR": "Granted Project of {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Branding Setting",

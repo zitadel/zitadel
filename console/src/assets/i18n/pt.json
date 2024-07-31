@@ -1776,7 +1776,7 @@
       "TYPE": {
         "OWNED": "Projetos Próprios",
         "OWNED_SINGULAR": "Projeto Próprio",
-        "GRANTED_SINGULAR": "Projeto Concedido"
+        "GRANTED_SINGULAR": "Projeto atribuído a {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Configuração de Marca",
