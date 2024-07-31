@@ -16,7 +16,6 @@ import "zitadel/resources/action/v3alpha/execution.proto";
 import "zitadel/resources/action/v3alpha/filter.proto";
 import "zitadel/resources/object/v3alpha/object.proto";
 import "zitadel/object/v3alpha/object.proto";
-import "zitadel/settings/object/v3alpha/object.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
