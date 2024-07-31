@@ -10,12 +10,12 @@ import (
 
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
 func Test_createTargetToCommand(t *testing.T) {
 	type args struct {
-		req *action.CreateTargetRequest
+		req *action.Target
 	}
 	tests := []struct {
 		name string
@@ -34,10 +34,10 @@ func Test_createTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (webhook)",
-			args: args{&action.CreateTargetRequest{
+			args: args{&action.Target{
 				Name:     "target 1",
 				Endpoint: "https://example.com/hooks/1",
-				TargetType: &action.CreateTargetRequest_RestWebhook{
+				TargetType: &action.Target_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{},
 				},
 				Timeout: durationpb.New(10 * time.Second),
@@ -52,10 +52,10 @@ func Test_createTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (async)",
-			args: args{&action.CreateTargetRequest{
+			args: args{&action.Target{
 				Name:     "target 1",
 				Endpoint: "https://example.com/hooks/1",
-				TargetType: &action.CreateTargetRequest_RestAsync{
+				TargetType: &action.Target_RestAsync{
 					RestAsync: &action.SetRESTAsync{},
 				},
 				Timeout: durationpb.New(10 * time.Second),
@@ -70,10 +70,10 @@ func Test_createTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (interrupting response)",
-			args: args{&action.CreateTargetRequest{
+			args: args{&action.Target{
 				Name:     "target 1",
 				Endpoint: "https://example.com/hooks/1",
-				TargetType: &action.CreateTargetRequest_RestCall{
+				TargetType: &action.Target_RestCall{
 					RestCall: &action.SetRESTCall{
 						InterruptOnError: true,
 					},
@@ -91,7 +91,7 @@ func Test_createTargetToCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := createTargetToCommand(tt.args.req)
+			got := createTargetToCommand(&action.CreateTargetRequest{Target: tt.args.req})
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -99,7 +99,7 @@ func Test_createTargetToCommand(t *testing.T) {
 
 func Test_updateTargetToCommand(t *testing.T) {
 	type args struct {
-		req *action.UpdateTargetRequest
+		req *action.PatchTarget
 	}
 	tests := []struct {
 		name string
@@ -113,7 +113,7 @@ func Test_updateTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields nil",
-			args: args{&action.UpdateTargetRequest{
+			args: args{&action.PatchTarget{
 				Name:       nil,
 				TargetType: nil,
 				Timeout:    nil,
@@ -128,7 +128,7 @@ func Test_updateTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields empty",
-			args: args{&action.UpdateTargetRequest{
+			args: args{&action.PatchTarget{
 				Name:       gu.Ptr(""),
 				TargetType: nil,
 				Timeout:    durationpb.New(0),
@@ -143,10 +143,10 @@ func Test_updateTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (webhook)",
-			args: args{&action.UpdateTargetRequest{
+			args: args{&action.PatchTarget{
 				Name:     gu.Ptr("target 1"),
 				Endpoint: gu.Ptr("https://example.com/hooks/1"),
-				TargetType: &action.UpdateTargetRequest_RestWebhook{
+				TargetType: &action.PatchTarget_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{
 						InterruptOnError: false,
 					},
@@ -163,10 +163,10 @@ func Test_updateTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (webhook interrupt)",
-			args: args{&action.UpdateTargetRequest{
+			args: args{&action.PatchTarget{
 				Name:     gu.Ptr("target 1"),
 				Endpoint: gu.Ptr("https://example.com/hooks/1"),
-				TargetType: &action.UpdateTargetRequest_RestWebhook{
+				TargetType: &action.PatchTarget_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{
 						InterruptOnError: true,
 					},
@@ -183,10 +183,10 @@ func Test_updateTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (async)",
-			args: args{&action.UpdateTargetRequest{
+			args: args{&action.PatchTarget{
 				Name:     gu.Ptr("target 1"),
 				Endpoint: gu.Ptr("https://example.com/hooks/1"),
-				TargetType: &action.UpdateTargetRequest_RestAsync{
+				TargetType: &action.PatchTarget_RestAsync{
 					RestAsync: &action.SetRESTAsync{},
 				},
 				Timeout: durationpb.New(10 * time.Second),
@@ -201,10 +201,10 @@ func Test_updateTargetToCommand(t *testing.T) {
 		},
 		{
 			name: "all fields (interrupting response)",
-			args: args{&action.UpdateTargetRequest{
+			args: args{&action.PatchTarget{
 				Name:     gu.Ptr("target 1"),
 				Endpoint: gu.Ptr("https://example.com/hooks/1"),
-				TargetType: &action.UpdateTargetRequest_RestCall{
+				TargetType: &action.PatchTarget_RestCall{
 					RestCall: &action.SetRESTCall{
 						InterruptOnError: true,
 					},
@@ -222,7 +222,7 @@ func Test_updateTargetToCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := updateTargetToCommand(tt.args.req)
+			got := patchTargetToCommand(&action.PatchTargetRequest{Target: tt.args.req})
 			assert.Equal(t, tt.want, got)
 		})
 	}
