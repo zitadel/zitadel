@@ -16,6 +16,15 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+var (
+	ErrPasswordInvalid = func(err error) error {
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-3M0fs", "Errors.User.Password.Invalid")
+	}
+	ErrPasswordUnchanged = func(err error) error {
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-Aesh5", "Errors.User.Password.NotChanged")
+	}
+)
+
 func (c *Commands) SetPassword(ctx context.Context, orgID, userID, password string, oneTime bool) (objectDetails *domain.ObjectDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -383,10 +392,10 @@ func convertPasswapErr(err error) error {
 		return nil
 	}
 	if errors.Is(err, passwap.ErrPasswordMismatch) {
-		return zerrors.ThrowInvalidArgument(err, "COMMAND-3M0fs", "Errors.User.Password.Invalid")
+		return ErrPasswordInvalid(err)
 	}
 	if errors.Is(err, passwap.ErrPasswordNoChange) {
-		return zerrors.ThrowPreconditionFailed(err, "COMMAND-Aesh5", "Errors.User.Password.NotChanged")
+		return ErrPasswordUnchanged(err)
 	}
 	return zerrors.ThrowInternal(err, "COMMAND-CahN2", "Errors.Internal")
 }

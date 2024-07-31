@@ -10,9 +10,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/view"
 	cache "github.com/zitadel/zitadel/internal/auth_request/repository"
 	"github.com/zitadel/zitadel/internal/auth_request/repository/mock"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -103,7 +105,7 @@ func (m *mockViewUserSession) GetLatestUserSessionSequence(ctx context.Context, 
 
 type mockViewNoUser struct{}
 
-func (m *mockViewNoUser) UserByID(string, string) (*user_view_model.UserView, error) {
+func (m *mockViewNoUser) UserByID(context.Context, string, string) (*user_view_model.UserView, error) {
 	return nil, zerrors.ThrowNotFound(nil, "id", "user not found")
 }
 
@@ -189,7 +191,7 @@ func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, bool, string) (*
 	return m.policy, nil
 }
 
-func (m *mockViewUser) UserByID(string, string) (*user_view_model.UserView, error) {
+func (m *mockViewUser) UserByID(context.Context, string, string) (*user_view_model.UserView, error) {
 	return &user_view_model.UserView{
 		State:    int32(user_model.UserStateActive),
 		UserName: "UserName",
@@ -287,6 +289,14 @@ type mockIDPUserLinks struct {
 
 func (m *mockIDPUserLinks) IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery, withOwnerRemoved bool) (*query.IDPUserLinks, error) {
 	return &query.IDPUserLinks{Links: m.idps}, nil
+}
+
+type mockPasswordChecker struct {
+	err error
+}
+
+func (m *mockPasswordChecker) HumanCheckPassword(ctx context.Context, resourceOwner, userID, password string, authReq *domain.AuthRequest, policy *domain.LockoutPolicy) error {
+	return m.err
 }
 
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
@@ -2344,6 +2354,158 @@ func Test_userByID(t *testing.T) {
 				return
 			}
 			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestAuthRequestRepo_VerifyPassword_IgnoreUnknownUsernames(t *testing.T) {
+	authRequest := func(userID string) *domain.AuthRequest {
+		a := &domain.AuthRequest{
+			ID:      "authRequestID",
+			AgentID: "userAgentID",
+			UserID:  userID,
+			LoginPolicy: &domain.LoginPolicy{
+				ObjectRoot:            es_models.ObjectRoot{},
+				Default:               true,
+				AllowUsernamePassword: true,
+				AllowRegister:         true,
+				AllowExternalIDP:      true,
+				IDPProviders: []*domain.IDPProvider{
+					{
+						ObjectRoot:  es_models.ObjectRoot{},
+						Type:        domain.IdentityProviderTypeSystem,
+						IDPConfigID: "idpConfig1",
+						Name:        "IdP",
+						IDPType:     domain.IDPTypeOIDC,
+						IDPState:    domain.IDPConfigStateActive,
+					},
+				},
+				IgnoreUnknownUsernames: true,
+			},
+			AllowedExternalIDPs: []*domain.IDPProvider{
+				{
+					ObjectRoot:  es_models.ObjectRoot{},
+					Type:        domain.IdentityProviderTypeSystem,
+					IDPConfigID: "idpConfig1",
+					Name:        "IdP",
+					IDPType:     domain.IDPTypeOIDC,
+					IDPState:    domain.IDPConfigStateActive,
+				},
+			},
+			LabelPolicy: &domain.LabelPolicy{
+				ObjectRoot: es_models.ObjectRoot{},
+				State:      domain.LabelPolicyStateActive,
+				Default:    true,
+			},
+			PrivacyPolicy: &domain.PrivacyPolicy{
+				ObjectRoot: es_models.ObjectRoot{},
+				State:      domain.PolicyStateActive,
+				Default:    true,
+			},
+			LockoutPolicy: &domain.LockoutPolicy{
+				Default: true,
+			},
+			DefaultTranslations: []*domain.CustomText{{}},
+			OrgTranslations:     []*domain.CustomText{{}},
+			SAMLRequestID:       "",
+		}
+		a.SetPolicyOrgID("instance1")
+		return a
+	}
+	type fields struct {
+		AuthRequests              func(*testing.T, string) cache.AuthRequestCache
+		UserViewProvider          userViewProvider
+		UserEventProvider         userEventProvider
+		OrgViewProvider           orgViewProvider
+		PasswordChecker           passwordChecker
+		LockoutPolicyViewProvider lockoutPolicyViewProvider
+	}
+	type args struct {
+		ctx           context.Context
+		authReqID     string
+		userID        string
+		resourceOwner string
+		password      string
+		userAgentID   string
+		info          *domain.BrowserInfo
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+	}{
+		{
+			name: "no user",
+			fields: fields{
+				AuthRequests: func(tt *testing.T, userID string) cache.AuthRequestCache {
+					m := mock.NewMockAuthRequestCache(gomock.NewController(tt))
+					a := authRequest(userID)
+					m.EXPECT().GetAuthRequestByID(gomock.Any(), "authRequestID").Return(a, nil)
+					m.EXPECT().CacheAuthRequest(gomock.Any(), a)
+					return m
+				},
+				UserViewProvider:  &mockViewNoUser{},
+				UserEventProvider: &mockEventUser{},
+			},
+			args: args{
+				ctx:           authz.NewMockContext("instance1", "", ""),
+				authReqID:     "authRequestID",
+				userID:        unknownUserID,
+				resourceOwner: "org1",
+				password:      "password",
+				userAgentID:   "userAgentID",
+				info: &domain.BrowserInfo{
+					UserAgent: "useragent",
+				},
+			},
+		},
+		{
+			name: "invalid password",
+			fields: fields{
+				AuthRequests: func(tt *testing.T, userID string) cache.AuthRequestCache {
+					m := mock.NewMockAuthRequestCache(gomock.NewController(tt))
+					a := authRequest(userID)
+					m.EXPECT().GetAuthRequestByID(gomock.Any(), "authRequestID").Return(a, nil)
+					m.EXPECT().CacheAuthRequest(gomock.Any(), a)
+					return m
+				},
+				UserViewProvider:  &mockViewUser{},
+				UserEventProvider: &mockEventUser{},
+				OrgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
+				PasswordChecker: &mockPasswordChecker{
+					err: command.ErrPasswordInvalid(nil),
+				},
+				LockoutPolicyViewProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+			},
+			args: args{
+				ctx:           authz.NewMockContext("instance1", "", ""),
+				authReqID:     "authRequestID",
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+				userAgentID:   "userAgentID",
+				info: &domain.BrowserInfo{
+					UserAgent: "useragent",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo := &AuthRequestRepo{
+				AuthRequests:              tt.fields.AuthRequests(t, tt.args.userID),
+				UserViewProvider:          tt.fields.UserViewProvider,
+				UserEventProvider:         tt.fields.UserEventProvider,
+				OrgViewProvider:           tt.fields.OrgViewProvider,
+				PasswordChecker:           tt.fields.PasswordChecker,
+				LockoutPolicyViewProvider: tt.fields.LockoutPolicyViewProvider,
+			}
+			err := repo.VerifyPassword(tt.args.ctx, tt.args.authReqID, tt.args.userID, tt.args.resourceOwner, tt.args.password, tt.args.userAgentID, tt.args.info)
+			assert.ErrorIs(t, err, zerrors.ThrowInvalidArgument(nil, "EVENT-SDe2f", "Errors.User.UsernameOrPassword.Invalid"))
 		})
 	}
 }
