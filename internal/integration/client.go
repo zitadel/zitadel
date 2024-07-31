@@ -657,18 +657,14 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, endpoint 
 
 func (s *Tester) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
 	_, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
-		Id: &action.SetExecutionRequest_Condition{
-			Condition: cond,
-		},
+		Condition: cond,
 	})
 	require.NoError(t, err)
 }
 
 func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
 	target, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
-		Id: &action.SetExecutionRequest_Condition{
-			Condition: cond,
-		},
+		Condition: cond,
 		Execution: &action.Execution{
 			Targets: targets,
 		},
