@@ -41,7 +41,7 @@ Order of execution:
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			err := viper.MergeConfig(bytes.NewBuffer(defaultConfig))
 			logging.OnError(err).Fatal("unable to read default config")
-			
+
 			for _, file := range *configFiles {
 				viper.SetConfigFile(file)
 				err := viper.MergeInConfig()
