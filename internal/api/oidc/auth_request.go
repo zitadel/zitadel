@@ -277,7 +277,7 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 		if zerrors.IsPreconditionFailed(err) {
 			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
 		}
-		return oidc.ErrServerError().WithParent(err)
+		return oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}
 
 	return o.revokeTokenV1(ctx, token, userID, clientID)
@@ -293,14 +293,14 @@ func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID s
 		if err == nil || zerrors.IsNotFound(err) {
 			return nil
 		}
-		return oidc.ErrServerError().WithParent(err)
+		return oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}
 	accessToken, err := o.repo.TokenByIDs(ctx, userID, token)
 	if err != nil {
 		if zerrors.IsNotFound(err) {
 			return nil
 		}
-		return oidc.ErrServerError().WithParent(err)
+		return oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 	}
 	if accessToken.ApplicationID != clientID {
 		return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
@@ -309,7 +309,7 @@ func (o *OPStorage) revokeTokenV1(ctx context.Context, token, userID, clientID s
 	if err == nil || zerrors.IsNotFound(err) {
 		return nil
 	}
-	return oidc.ErrServerError().WithParent(err)
+	return oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError)
 }
 
 func (o *OPStorage) GetRefreshTokenInfo(ctx context.Context, clientID string, token string) (userID string, tokenID string, err error) {

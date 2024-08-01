@@ -89,6 +89,10 @@ func (*instanceFeatureProjection) Reducers() []handler.AggregateReducer {
 				Reduce: reduceInstanceSetFeature[[]feature.ImprovedPerformanceType],
 			},
 			{
+				Event:  feature_v2.InstanceDebugOIDCParentErrorEventType,
+				Reduce: reduceInstanceSetFeature[bool],
+			},
+			{
 				Event:  instance.InstanceRemovedEventType,
 				Reduce: reduceInstanceRemovedHelper(InstanceDomainInstanceIDCol),
 			},

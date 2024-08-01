@@ -22,7 +22,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/fatih/color v1.17.0
 	github.com/gabriel-vasile/mimetype v1.4.4
-	github.com/go-jose/go-jose/v4 v4.0.2
+	github.com/go-jose/go-jose/v4 v4.0.4
 	github.com/go-ldap/ldap/v3 v3.4.8
 	github.com/go-webauthn/webauthn v0.10.2
 	github.com/gorilla/csrf v1.7.2
@@ -58,7 +58,7 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.6.0
-	github.com/zitadel/oidc/v3 v3.25.1
+	github.com/zitadel/oidc/v3 v3.26.1-0.20240801104134-f30c5492b305
 	github.com/zitadel/passwap v0.6.0
 	github.com/zitadel/saml v0.1.3
 	github.com/zitadel/schema v1.3.0
@@ -73,7 +73,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.28.0
 	go.opentelemetry.io/otel/trace v1.28.0
 	go.uber.org/mock v0.4.0
-	golang.org/x/crypto v0.24.0
+	golang.org/x/crypto v0.25.0
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	golang.org/x/net v0.26.0
 	golang.org/x/oauth2 v0.21.0
@@ -92,7 +92,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.48.0 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
 	github.com/crewjam/httperr v0.2.0 // indirect
-	github.com/go-chi/chi/v5 v5.0.12 // indirect
+	github.com/go-chi/chi/v5 v5.1.0 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -198,7 +198,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.28.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
-	golang.org/x/sys v0.21.0
+	golang.org/x/sys v0.22.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
