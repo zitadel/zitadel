@@ -49,7 +49,7 @@ message SearchQuery {
   ];
   bool desc = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "default is ascending, because together with the creation date sorting column, this returns the most deterministic results.";
+      description: "default is ascending, because together with the creation date sorting column, this returns the most deterministic pagination results.";
     }
   ];
 }

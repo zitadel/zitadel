@@ -395,7 +395,11 @@ service ZITADELActions {
 }
 
 message CreateTargetRequest {
-  optional zitadel.object.v3alpha.Instance instance = 1;
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   Target target = 2 [
     (validate.rules).message = {
       required: true
@@ -408,7 +412,11 @@ message CreateTargetResponse {
 }
 
 message PatchTargetRequest {
-  optional zitadel.object.v3alpha.Instance instance = 1;
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -429,7 +437,11 @@ message PatchTargetResponse {
 }
 
 message DeleteTargetRequest {
-  optional zitadel.object.v3alpha.Instance instance = 1;
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -445,8 +457,11 @@ message DeleteTargetResponse {
 }
 
 message GetTargetRequest {
-  // unique identifier of the target.
-  optional zitadel.object.v3alpha.Instance instance = 1;
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -462,7 +477,11 @@ message GetTargetResponse {
 }
 
 message SearchTargetsRequest {
-  optional zitadel.object.v3alpha.Instance instance = 1;
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   // list limitations and ordering.
   optional zitadel.resources.object.v3alpha.SearchQuery query = 2;
   // the field the result is sorted.
@@ -481,7 +500,11 @@ message SearchTargetsResponse {
 }
 
 message SetExecutionRequest {
-  optional zitadel.object.v3alpha.Instance instance = 1 [ (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = { default: "\"domain from HOST or :authority header\""}];
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   Condition condition = 2;
   Execution execution = 3;
 }
@@ -491,7 +514,11 @@ message SetExecutionResponse {
 }
 
 message SearchExecutionsRequest {
-  optional zitadel.object.v3alpha.Instance instance = 1;
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   // list limitations and ordering.
   optional zitadel.resources.object.v3alpha.SearchQuery query = 2;
   // Define the criteria to query for.

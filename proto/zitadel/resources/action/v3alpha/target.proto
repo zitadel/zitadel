@@ -16,8 +16,11 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alph
 
 message Target {
   string name = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 1000},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"ip_allow_list\"";
+      min_length: 1
+      max_length: 1000
     }
   ];
   // Defines the target type and how the response of the target is treated.
@@ -29,26 +32,34 @@ message Target {
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
   google.protobuf.Duration timeout = 5 [
+    (validate.rules).duration = {gte: {}, lte: {seconds: 20}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "if the target doesn't respond before this timeout expires, the the connection is closed and the action fails";
       example: "\"10s\"";
     }
   ];
   string endpoint = 6 [
+    (validate.rules).string = {min_len: 1, max_len: 1000},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"https://example.com/hooks/ip_check\"";
+      example: "\"https://example.com/hooks/ip_check\""
+      min_length: 1
+      max_length: 1000
     }
   ];
 }
 
 message GetTarget {
   zitadel.resources.object.v3alpha.Details details = 1;
-  Target target = 2;
+  Target config = 2;
 }
 
 message PatchTarget {
   optional string name = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 1000},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"ip_allow_list\"";
+      example: "\"ip_allow_list\""
+      min_length: 1
+      max_length: 1000
     }
   ];
   // Defines the target type and how the response of the target is treated.
@@ -59,13 +70,18 @@ message PatchTarget {
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
   optional google.protobuf.Duration timeout = 5 [
+    (validate.rules).duration = {gte: {}, lte: {seconds: 20}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "if the target doesn't respond before this timeout expires, the the connection is closed and the action fails";
       example: "\"10s\"";
     }
   ];
   optional string endpoint = 6 [
+    (validate.rules).string = {min_len: 1, max_len: 1000},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"https://example.com/hooks/ip_check\"";
+      example: "\"https://example.com/hooks/ip_check\""
+      min_length: 1
+      max_length: 1000
     }
   ];
 }
