@@ -21,6 +21,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	console_path "github.com/zitadel/zitadel/internal/api/ui/console/path"
 )
 
 type Config struct {
@@ -40,7 +41,6 @@ var (
 
 const (
 	envRequestPath = "/assets/environment.json"
-	HandlerPrefix  = "/ui/console"
 )
 
 var (
@@ -56,7 +56,7 @@ var (
 )
 
 func LoginHintLink(origin, username string) string {
-	return origin + HandlerPrefix + "?login_hint=" + username
+	return origin + console_path.HandlerPrefix + "?login_hint=" + username
 }
 
 func (i *spaHandler) Open(name string) (http.File, error) {

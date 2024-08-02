@@ -491,7 +491,7 @@ func (u *userNotifier) reduceOTPEmail(
 	if err != nil {
 		return nil, err
 	}
-	url, err := urlTmpl(plainCode, http_util.ComposedOrigin(ctx), notifyUser)
+	url, err := urlTmpl(plainCode, http_util.DomainContext(ctx).Origin(), notifyUser)
 	if err != nil {
 		return nil, err
 	}

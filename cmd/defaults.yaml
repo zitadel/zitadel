@@ -83,9 +83,17 @@ TLS:
   Cert: # ZITADEL_TLS_CERT
 
 # Header name of HTTP2 (incl. gRPC) calls from which the instance will be matched
+# Deprecated: Use the InstanceHostHeaders instead
 HTTP2HostHeader: ":authority" # ZITADEL_HTTP2HOSTHEADER
 # Header name of HTTP1 calls from which the instance will be matched
+# Deprecated: Use the InstanceHostHeaders instead
 HTTP1HostHeader: "host" # ZITADEL_HTTP1HOSTHEADER
+# Ordered header name list, which will be used to match the instance
+InstanceHostHeaders: # ZITADEL_INSTANCEHOSTHEADERS
+  - "x-zitadel-instance-host"
+# Ordered header name list, which will be used as the public host
+PublicHostHeaders: # ZITADEL_PUBLICHOSTHEADERS
+  - "x-zitadel-public-host"
 
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
@@ -1041,12 +1049,9 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.delete"
-        - "execution.target.read"
-        - "execution.target.write"
-        - "execution.target.delete"
-        - "execution.read"
-        - "execution.write"
-        - "execution.delete"
+        - "action.target.write"
+        - "action.target.delete"
+        - "action.execution.write"
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"

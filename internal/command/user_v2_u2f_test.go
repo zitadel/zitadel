@@ -9,6 +9,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
@@ -21,7 +22,7 @@ import (
 
 func TestCommands_RegisterUserU2F(t *testing.T) {
 	ctx := authz.NewMockContextWithPermissions("instance1", "org1", "user1", nil)
-	ctx = authz.WithRequestedDomain(ctx, "example.com")
+	ctx = http_util.WithRequestedHost(ctx, "example.com")
 
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
@@ -143,7 +144,7 @@ func TestCommands_RegisterUserU2F(t *testing.T) {
 }
 
 func TestCommands_pushUserU2F(t *testing.T) {
-	ctx := authz.WithRequestedDomain(authz.NewMockContext("instance1", "org1", "user1"), "example.com")
+	ctx := http_util.WithRequestedHost(authz.NewMockContext("instance1", "org1", "user1"), "example.com")
 	webauthnConfig := &webauthn_helper.Config{
 		DisplayName:    "test",
 		ExternalSecure: true,

@@ -563,6 +563,7 @@ Errors:
     NotFound: Execution not found
     IncludeNotFound: Include not found
     NoTargets: No targets defined
+    ResponseIsNotValidJSON: Response is not valid JSON
   UserSchema:
     NotEnabled: Feature "User Schema" is not enabled
     Type:

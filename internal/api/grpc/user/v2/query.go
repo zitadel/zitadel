@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) (_ *user.GetUserByIDResponse, err error) {

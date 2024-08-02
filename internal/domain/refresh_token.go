@@ -25,13 +25,13 @@ func FromRefreshToken(refreshToken string, algorithm crypto.EncryptionAlgorithm)
 	if err != nil {
 		return "", "", "", zerrors.ThrowInvalidArgument(err, "DOMAIN-BGDhn", "Errors.User.RefreshToken.Invalid")
 	}
-	decrypted, err := algorithm.Decrypt(decoded, algorithm.EncryptionKeyID())
+	decrypted, err := algorithm.DecryptString(decoded, algorithm.EncryptionKeyID())
 	if err != nil {
-		return "", "", "", err
+		return "", "", "", zerrors.ThrowInvalidArgument(err, "DOMAIN-rie9A", "Errors.User.RefreshToken.Invalid")
 	}
-	split := strings.Split(string(decrypted), ":")
+	split := strings.Split(decrypted, ":")
 	if len(split) != 3 {
-		return "", "", "", zerrors.ThrowInvalidArgument(nil, "DOMAIN-BGDhn", "Errors.User.RefreshToken.Invalid")
+		return "", "", "", zerrors.ThrowInvalidArgument(nil, "DOMAIN-Se8oh", "Errors.User.RefreshToken.Invalid")
 	}
 	return split[0], split[1], split[2], nil
 }

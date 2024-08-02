@@ -297,8 +297,7 @@ func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessT
 
 func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
 	keySet := &openIDKeySet{repo.Query}
-	issuer := http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), repo.ExternalSecure)
-	return op.NewAccessTokenVerifier(issuer, keySet)
+	return op.NewAccessTokenVerifier(http_util.DomainContext(ctx).Origin(), keySet)
 }
 
 func (repo *TokenVerifierRepo) decryptAccessToken(token string) (string, error) {

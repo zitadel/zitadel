@@ -20,7 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
 
 func TestServer_Introspect(t *testing.T) {
