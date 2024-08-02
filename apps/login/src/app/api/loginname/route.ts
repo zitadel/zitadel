@@ -131,6 +131,11 @@ export async function POST(request: NextRequest) {
           { message: "Could not find user" },
           { status: 404 },
         );
+      } else {
+        return NextResponse.json(
+          { message: "Could not find user" },
+          { status: 404 },
+        );
       }
     });
   } else {
