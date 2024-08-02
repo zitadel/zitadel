@@ -66,7 +66,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// expected response from the GetTarget
 				expectedResponse := &action.GetTargetResponse{
 					Target: &action.GetTarget{
-						Target: &action.Target{
+						Config: &action.Target{
 							Name:     targetCreatedName,
 							Endpoint: targetCreatedURL,
 							TargetType: &action.Target_RestCall{
@@ -82,7 +82,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// has to be set separately because of the pointers
 				response.Target = &action.GetTarget{
 					Details: targetCreated.GetDetails(),
-					Target: &action.Target{
+					Config: &action.Target{
 						Name: targetCreatedName,
 						TargetType: &action.Target_RestCall{
 							RestCall: &action.SetRESTCall{

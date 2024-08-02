@@ -58,7 +58,7 @@ func TestServer_GetTarget(t *testing.T) {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
 					request.Id = resp.GetDetails().GetId()
-					response.Target.Target.Name = name
+					response.Target.Config.Name = name
 					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
 					response.Target.Details.Changed = resp.GetDetails().GetChanged()
@@ -73,7 +73,7 @@ func TestServer_GetTarget(t *testing.T) {
 						Created: timestamppb.Now(),
 						Changed: timestamppb.Now(),
 					},
-					Target: &action.Target{
+					Config: &action.Target{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestWebhook{
 							RestWebhook: &action.SetRESTWebhook{},
@@ -92,7 +92,7 @@ func TestServer_GetTarget(t *testing.T) {
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeAsync, false)
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Details.Id = resp.GetDetails().GetId()
-					response.Target.Target.Name = name
+					response.Target.Config.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
 					response.Target.Details.Changed = resp.GetDetails().GetChanged()
 					response.Target.Details.Created = resp.GetDetails().GetCreated()
@@ -106,7 +106,7 @@ func TestServer_GetTarget(t *testing.T) {
 						Created: timestamppb.Now(),
 						Changed: timestamppb.Now(),
 					},
-					Target: &action.Target{
+					Config: &action.Target{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestAsync{
 							RestAsync: &action.SetRESTAsync{},
@@ -125,7 +125,7 @@ func TestServer_GetTarget(t *testing.T) {
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, true)
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Details.Id = resp.GetDetails().GetId()
-					response.Target.Target.Name = name
+					response.Target.Config.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
 					response.Target.Details.Changed = resp.GetDetails().GetChanged()
 					response.Target.Details.Created = resp.GetDetails().GetCreated()
@@ -139,7 +139,7 @@ func TestServer_GetTarget(t *testing.T) {
 						Created: timestamppb.Now(),
 						Changed: timestamppb.Now(),
 					},
-					Target: &action.Target{
+					Config: &action.Target{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestWebhook{
 							RestWebhook: &action.SetRESTWebhook{
@@ -160,7 +160,7 @@ func TestServer_GetTarget(t *testing.T) {
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, false)
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Details.Id = resp.GetDetails().GetId()
-					response.Target.Target.Name = name
+					response.Target.Config.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
 					response.Target.Details.Changed = resp.GetDetails().GetChanged()
 					response.Target.Details.Created = resp.GetDetails().GetCreated()
@@ -174,7 +174,7 @@ func TestServer_GetTarget(t *testing.T) {
 						Created: timestamppb.Now(),
 						Changed: timestamppb.Now(),
 					},
-					Target: &action.Target{
+					Config: &action.Target{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestCall{
 							RestCall: &action.SetRESTCall{
@@ -195,7 +195,7 @@ func TestServer_GetTarget(t *testing.T) {
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, true)
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Details.Id = resp.GetDetails().GetId()
-					response.Target.Target.Name = name
+					response.Target.Config.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
 					response.Target.Details.Changed = resp.GetDetails().GetChanged()
 					response.Target.Details.Created = resp.GetDetails().GetCreated()
@@ -209,7 +209,7 @@ func TestServer_GetTarget(t *testing.T) {
 						Created: timestamppb.Now(),
 						Changed: timestamppb.Now(),
 					},
-					Target: &action.Target{
+					Config: &action.Target{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestCall{
 							RestCall: &action.SetRESTCall{
@@ -243,7 +243,7 @@ func TestServer_GetTarget(t *testing.T) {
 					wantTarget := tt.want.GetTarget()
 					gotTarget := got.GetTarget()
 					integration.AssertResourceDetails(t, wantTarget.GetDetails(), gotTarget.GetDetails())
-					assert.Equal(t, wantTarget.GetTarget(), gotTarget.GetTarget())
+					assert.Equal(t, wantTarget.GetConfig(), gotTarget.GetConfig())
 				}
 
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
@@ -312,7 +312,7 @@ func TestServer_ListTargets(t *testing.T) {
 					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
 					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
 					response.Result[0].Details.Id = resp.GetDetails().GetId()
-					response.Result[0].Target.Name = name
+					response.Result[0].Config.Name = name
 					return nil
 				},
 				req: &action.SearchTargetsRequest{
@@ -330,7 +330,7 @@ func TestServer_ListTargets(t *testing.T) {
 							Created: timestamppb.Now(),
 							Changed: timestamppb.Now(),
 						},
-						Target: &action.Target{
+						Config: &action.Target{
 							Endpoint: "https://example.com",
 							TargetType: &action.Target_RestWebhook{
 								RestWebhook: &action.SetRESTWebhook{
@@ -359,7 +359,7 @@ func TestServer_ListTargets(t *testing.T) {
 					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
 					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
 					response.Result[0].Details.Id = resp.GetDetails().GetId()
-					response.Result[0].Target.Name = name
+					response.Result[0].Config.Name = name
 					return nil
 				},
 				req: &action.SearchTargetsRequest{
@@ -377,7 +377,7 @@ func TestServer_ListTargets(t *testing.T) {
 							Created: timestamppb.Now(),
 							Changed: timestamppb.Now(),
 						},
-						Target: &action.Target{
+						Config: &action.Target{
 							Endpoint: "https://example.com",
 							TargetType: &action.Target_RestWebhook{
 								RestWebhook: &action.SetRESTWebhook{
@@ -411,15 +411,15 @@ func TestServer_ListTargets(t *testing.T) {
 					response.Result[0].Details.Changed = resp1.GetDetails().GetChanged()
 					response.Result[0].Details.Created = resp1.GetDetails().GetCreated()
 					response.Result[0].Details.Id = resp1.GetDetails().GetId()
-					response.Result[0].Target.Name = name1
+					response.Result[0].Config.Name = name1
 					response.Result[1].Details.Changed = resp2.GetDetails().GetChanged()
 					response.Result[1].Details.Created = resp2.GetDetails().GetCreated()
 					response.Result[1].Details.Id = resp2.GetDetails().GetId()
-					response.Result[1].Target.Name = name2
+					response.Result[1].Config.Name = name2
 					response.Result[2].Details.Changed = resp3.GetDetails().GetChanged()
 					response.Result[2].Details.Created = resp3.GetDetails().GetCreated()
 					response.Result[2].Details.Id = resp3.GetDetails().GetId()
-					response.Result[2].Target.Name = name3
+					response.Result[2].Config.Name = name3
 					return nil
 				},
 				req: &action.SearchTargetsRequest{
@@ -437,7 +437,7 @@ func TestServer_ListTargets(t *testing.T) {
 							Created: timestamppb.Now(),
 							Changed: timestamppb.Now(),
 						},
-						Target: &action.Target{
+						Config: &action.Target{
 							Endpoint: "https://example.com",
 							TargetType: &action.Target_RestWebhook{
 								RestWebhook: &action.SetRESTWebhook{
@@ -452,7 +452,7 @@ func TestServer_ListTargets(t *testing.T) {
 							Created: timestamppb.Now(),
 							Changed: timestamppb.Now(),
 						},
-						Target: &action.Target{
+						Config: &action.Target{
 							Endpoint: "https://example.com",
 							TargetType: &action.Target_RestCall{
 								RestCall: &action.SetRESTCall{
@@ -467,7 +467,7 @@ func TestServer_ListTargets(t *testing.T) {
 							Created: timestamppb.Now(),
 							Changed: timestamppb.Now(),
 						},
-						Target: &action.Target{
+						Config: &action.Target{
 							Endpoint: "https://example.com",
 							TargetType: &action.Target_RestAsync{
 								RestAsync: &action.SetRESTAsync{},
@@ -505,7 +505,7 @@ func TestServer_ListTargets(t *testing.T) {
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
 					integration.AssertResourceDetails(t, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
-					assert.Equal(ttt, tt.want.Result[i].GetTarget(), got.Result[i].GetTarget())
+					assert.Equal(ttt, tt.want.Result[i].GetConfig(), got.Result[i].GetConfig())
 				}
 				integration.AssertResourceListDetails(t, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")

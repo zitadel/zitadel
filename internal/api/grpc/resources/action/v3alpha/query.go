@@ -84,7 +84,7 @@ func targetsToPb(targets []*query.Target) []*action.GetTarget {
 func targetToPb(t *query.Target) *action.GetTarget {
 	target := &action.GetTarget{
 		Details: resource_object.DomainToDetailsPb(&t.ObjectDetails, nil),
-		Target: &action.Target{
+		Config: &action.Target{
 			Name:     t.Name,
 			Timeout:  durationpb.New(t.Timeout),
 			Endpoint: t.Endpoint,
@@ -92,13 +92,13 @@ func targetToPb(t *query.Target) *action.GetTarget {
 	}
 	switch t.TargetType {
 	case domain.TargetTypeWebhook:
-		target.Target.TargetType = &action.Target_RestWebhook{RestWebhook: &action.SetRESTWebhook{InterruptOnError: t.InterruptOnError}}
+		target.Config.TargetType = &action.Target_RestWebhook{RestWebhook: &action.SetRESTWebhook{InterruptOnError: t.InterruptOnError}}
 	case domain.TargetTypeCall:
-		target.Target.TargetType = &action.Target_RestCall{RestCall: &action.SetRESTCall{InterruptOnError: t.InterruptOnError}}
+		target.Config.TargetType = &action.Target_RestCall{RestCall: &action.SetRESTCall{InterruptOnError: t.InterruptOnError}}
 	case domain.TargetTypeAsync:
-		target.Target.TargetType = &action.Target_RestAsync{RestAsync: &action.SetRESTAsync{}}
+		target.Config.TargetType = &action.Target_RestAsync{RestAsync: &action.SetRESTAsync{}}
 	default:
-		target.Target.TargetType = nil
+		target.Config.TargetType = nil
 	}
 	return target
 }
