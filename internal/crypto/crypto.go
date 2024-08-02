@@ -19,6 +19,9 @@ type EncryptionAlgorithm interface {
 	DecryptionKeyIDs() []string
 	Encrypt(value []byte) ([]byte, error)
 	Decrypt(hashed []byte, keyID string) ([]byte, error)
+
+	// DecryptString decrypts the value using the key identified by keyID.
+	// When the decrypted value contains non-UTF8 characters an error is returned.
 	DecryptString(hashed []byte, keyID string) (string, error)
 }
 
@@ -72,6 +75,8 @@ func Decrypt(value *CryptoValue, alg EncryptionAlgorithm) ([]byte, error) {
 	return alg.Decrypt(value.Crypted, value.KeyID)
 }
 
+// DecryptString decrypts the value using the key identified by keyID.
+// When the decrypted value contains non-UTF8 characters an error is returned.
 func DecryptString(value *CryptoValue, alg EncryptionAlgorithm) (string, error) {
 	if err := checkEncryptionAlgorithm(value, alg); err != nil {
 		return "", err

@@ -293,7 +293,7 @@ func (c *Commands) decryptRefreshToken(refreshToken string) (sessionID, refreshT
 	}
 	decrypted, err := c.keyAlgorithm.DecryptString(decoded, c.keyAlgorithm.EncryptionKeyID())
 	if err != nil {
-		return "", "", err
+		return "", "", zerrors.ThrowInvalidArgument(err, "OIDCS-Jei0i", "Errors.User.RefreshToken.Invalid")
 	}
 	return parseRefreshToken(decrypted)
 }
