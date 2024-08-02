@@ -45,9 +45,8 @@ export async function POST(request: NextRequest) {
             console.error(error);
             return NextResponse.json(error, { status: 500 });
           });
-      } else if (organization) {
+      } else {
         const loginSettings = await getLoginSettings(organization);
-
         // TODO: check if allowDomainDiscovery has to be allowed too, to redirect to the register page
         // user not found, check if register is enabled on organization
 
@@ -103,6 +102,11 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ nextStep: resp.authUrl });
               }
             });
+          } else {
+            return NextResponse.json(
+              { message: "Could not find user" },
+              { status: 404 },
+            );
           }
         } else if (
           loginSettings?.allowRegister &&
@@ -127,11 +131,6 @@ export async function POST(request: NextRequest) {
           });
         }
 
-        return NextResponse.json(
-          { message: "Could not find user" },
-          { status: 404 },
-        );
-      } else {
         return NextResponse.json(
           { message: "Could not find user" },
           { status: 404 },
