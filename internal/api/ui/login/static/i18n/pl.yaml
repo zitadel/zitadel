@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Zmiana hasła
   Description: Zmień swoje hasło. Wprowadź swoje stare i nowe hasło.
+  ExpiredDescription: Twoje hasło wygasło i musi zostać zmienione. Wprowadź swoje stare i nowe hasło.
   OldPasswordLabel: Stare hasło
   NewPasswordLabel: Nowe hasło
   NewPasswordConfirmLabel: Potwierdzenie hasła
@@ -251,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Płeć
   Female: Kobieta
   Male: Mężczyzna
@@ -290,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Warunki i zasady
   TosConfirm: Akceptuję
   TosLinkText: Warunki korzystania
@@ -363,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: Autoryzacja urządzenia

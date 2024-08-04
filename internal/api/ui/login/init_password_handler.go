@@ -91,16 +91,13 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *initPasswordFormData) {
 	userOrg := data.OrgID
 	userID := data.UserID
+	var authReqID string
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 		userID = authReq.UserID
+		authReqID = authReq.ID
 	}
-	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.userCodeAlg)
-	if err != nil {
-		l.renderInitPassword(w, r, authReq, userID, "", err)
-		return
-	}
-	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), userID, userOrg, domain.NotificationTypeEmail, passwordCodeGenerator, authReq.ID)
+	_, err := l.command.RequestSetPassword(setContext(r.Context(), userOrg), userID, userOrg, domain.NotificationTypeEmail, authReqID)
 	l.renderInitPassword(w, r, authReq, userID, "", err)
 }
 

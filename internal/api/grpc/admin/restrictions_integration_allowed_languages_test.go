@@ -33,7 +33,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		unsupportedLanguage       = language.Afrikaans
 	)
 
-	domain, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, ctx, SystemCTX)
+	domain, _, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, ctx, SystemCTX)
 	t.Run("assumed defaults are correct", func(tt *testing.T) {
 		tt.Run("languages are not restricted by default", func(ttt *testing.T) {
 			restrictions, err := Tester.Client.Admin.GetRestrictions(iamOwnerCtx, &admin.GetRestrictionsRequest{})
@@ -90,7 +90,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		awaitDiscoveryEndpoint(tt, domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
 	})
 	t.Run("the login ui is rendered in the default language", func(tt *testing.T) {
-		awaitLoginUILanguage(tt, domain, disallowedLanguage, defaultAndAllowedLanguage, "Allgemeine Geschäftsbedingungen und Datenschutz")
+		awaitLoginUILanguage(tt, domain, disallowedLanguage, defaultAndAllowedLanguage, "Passwort")
 	})
 	t.Run("preferred languages are not restricted by the supported languages", func(tt *testing.T) {
 		tt.Run("change user profile", func(ttt *testing.T) {
@@ -151,7 +151,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 			awaitDiscoveryEndpoint(ttt, domain, []string{disallowedLanguage.String()}, nil)
 		})
 		tt.Run("the login ui is rendered in the previously disallowed language", func(ttt *testing.T) {
-			awaitLoginUILanguage(ttt, domain, disallowedLanguage, disallowedLanguage, "Términos y condiciones")
+			awaitLoginUILanguage(ttt, domain, disallowedLanguage, disallowedLanguage, "Contraseña")
 		})
 	})
 }

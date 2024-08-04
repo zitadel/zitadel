@@ -5,7 +5,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query"
-	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 )
 
 func systemFeaturesToCommand(req *feature_pb.SetSystemFeaturesRequest) *command.SystemFeatures {
@@ -109,6 +109,14 @@ func improvedPerformanceTypeToPb(typ feature.ImprovedPerformanceType) feature_pb
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_UNSPECIFIED
 	case feature.ImprovedPerformanceTypeOrgByID:
 		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID
+	case feature.ImprovedPerformanceTypeProjectGrant:
+		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT
+	case feature.ImprovedPerformanceTypeProject:
+		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT
+	case feature.ImprovedPerformanceTypeUserGrant:
+		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_USER_GRANT
+	case feature.ImprovedPerformanceTypeOrgDomainVerified:
+		return feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED
 	default:
 		return feature_pb.ImprovedPerformance(typ)
 	}
@@ -133,6 +141,14 @@ func improvedPerformanceToDomain(typ feature_pb.ImprovedPerformance) feature.Imp
 		return feature.ImprovedPerformanceTypeUnknown
 	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID:
 		return feature.ImprovedPerformanceTypeOrgByID
+	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT_GRANT:
+		return feature.ImprovedPerformanceTypeProjectGrant
+	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_PROJECT:
+		return feature.ImprovedPerformanceTypeProject
+	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_USER_GRANT:
+		return feature.ImprovedPerformanceTypeUserGrant
+	case feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_DOMAIN_VERIFIED:
+		return feature.ImprovedPerformanceTypeOrgDomainVerified
 	default:
 		return feature.ImprovedPerformanceTypeUnknown
 	}

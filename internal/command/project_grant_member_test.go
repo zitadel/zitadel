@@ -105,58 +105,6 @@ func TestCommandSide_AddProjectGrantMember(t *testing.T) {
 			},
 		},
 		{
-			name: "member already exists, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							user.NewHumanAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
-								"username1",
-								"firstname1",
-								"lastname1",
-								"nickname1",
-								"displayname1",
-								language.German,
-								domain.GenderMale,
-								"email1",
-								true,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
-							project.NewProjectGrantMemberAddedEvent(context.Background(),
-								&project.NewAggregate("project1", "org1").Aggregate,
-								"user1",
-								"projectgrant1",
-							),
-						),
-					),
-				),
-				zitadelRoles: []authz.RoleMapping{
-					{
-						Role: "PROJECT_GRANT_OWNER",
-					},
-				},
-			},
-			args: args{
-				ctx: context.Background(),
-				member: &domain.ProjectGrantMember{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID: "project1",
-					},
-					GrantID: "projectgrant1",
-					UserID:  "user1",
-					Roles:   []string{"PROJECT_GRANT_OWNER"},
-				},
-			},
-			res: res{
-				err: zerrors.IsErrorAlreadyExists,
-			},
-		},
-		{
 			name: "member add uniqueconstraint err, already exists",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -177,7 +125,6 @@ func TestCommandSide_AddProjectGrantMember(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectPushFailed(zerrors.ThrowAlreadyExists(nil, "ERROR", "internal"),
 						project.NewProjectGrantMemberAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "").Aggregate,
@@ -229,7 +176,6 @@ func TestCommandSide_AddProjectGrantMember(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectPush(
 						project.NewProjectGrantMemberAddedEvent(context.Background(),
 							&project.NewAggregate("project1", "").Aggregate,

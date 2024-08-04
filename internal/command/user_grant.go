@@ -4,14 +4,21 @@ import (
 	"context"
 	"reflect"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/feature"
+	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/repository/project"
 	"github.com/zitadel/zitadel/internal/repository/usergrant"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (_ *domain.UserGrant, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	event, addedUserGrant, err := c.addUserGrant(ctx, usergrant, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -284,9 +291,146 @@ func (c *Commands) userGrantWriteModelByID(ctx context.Context, userGrantID, res
 	return writeModel, nil
 }
 
-func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) error {
+func (c *Commands) checkUserGrantPreCondition(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (err error) {
+	if !authz.GetFeatures(ctx).ShouldUseImprovedPerformance(feature.ImprovedPerformanceTypeUserGrant) {
+		return c.checkUserGrantPreConditionOld(ctx, usergrant, resourceOwner)
+	}
+
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if err := c.checkUserExists(ctx, usergrant.UserID, ""); err != nil {
+		return err
+	}
+	existingRoleKeys, err := c.searchUserGrantPreConditionState(ctx, usergrant, resourceOwner)
+	if err != nil {
+		return err
+	}
+	if usergrant.HasInvalidRoles(existingRoleKeys) {
+		return zerrors.ThrowPreconditionFailed(err, "COMMAND-mm9F4", "Errors.Project.Role.NotFound")
+	}
+	return nil
+}
+
+// this code needs to be rewritten anyways as soon as we improved the fields handling
+//
+//nolint:gocognit
+func (c *Commands) searchUserGrantPreConditionState(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (existingRoleKeys []string, err error) {
+	criteria := []map[eventstore.FieldType]any{
+		// project state query
+		{
+			eventstore.FieldTypeAggregateType: project.AggregateType,
+			eventstore.FieldTypeAggregateID:   userGrant.ProjectID,
+			eventstore.FieldTypeFieldName:     project.ProjectStateSearchField,
+			eventstore.FieldTypeObjectType:    project.ProjectSearchType,
+		},
+		// granted org query
+		{
+			eventstore.FieldTypeAggregateType: org.AggregateType,
+			eventstore.FieldTypeAggregateID:   resourceOwner,
+			eventstore.FieldTypeFieldName:     org.OrgStateSearchField,
+			eventstore.FieldTypeObjectType:    org.OrgSearchType,
+		},
+	}
+	if userGrant.ProjectGrantID != "" {
+		criteria = append(criteria, map[eventstore.FieldType]any{
+			eventstore.FieldTypeAggregateType: project.AggregateType,
+			eventstore.FieldTypeAggregateID:   userGrant.ProjectID,
+			eventstore.FieldTypeObjectType:    project.ProjectGrantSearchType,
+			eventstore.FieldTypeObjectID:      userGrant.ProjectGrantID,
+		})
+	} else {
+		criteria = append(criteria, map[eventstore.FieldType]any{
+			eventstore.FieldTypeAggregateType: project.AggregateType,
+			eventstore.FieldTypeAggregateID:   userGrant.ProjectID,
+			eventstore.FieldTypeObjectType:    project.ProjectRoleSearchType,
+			eventstore.FieldTypeFieldName:     project.ProjectRoleKeySearchField,
+		})
+	}
+	results, err := c.eventstore.Search(ctx, criteria...)
+	if err != nil {
+		return nil, err
+	}
+
+	var (
+		existsProject    bool
+		existsGrantedOrg bool
+		existsGrant      bool
+	)
+
+	for _, result := range results {
+		switch result.Object.Type {
+		case project.ProjectRoleSearchType:
+			var role string
+			err := result.Value.Unmarshal(&role)
+			if err != nil {
+				return nil, err
+			}
+			existingRoleKeys = append(existingRoleKeys, role)
+		case org.OrgSearchType:
+			var state domain.OrgState
+			err := result.Value.Unmarshal(&state)
+			if err != nil {
+				return nil, err
+			}
+			existsGrantedOrg = state.Valid() && state != domain.OrgStateRemoved
+		case project.ProjectSearchType:
+			var state domain.ProjectState
+			err := result.Value.Unmarshal(&state)
+			if err != nil {
+				return nil, err
+			}
+			existsProject = state.Valid() && state != domain.ProjectStateRemoved
+		case project.ProjectGrantSearchType:
+			switch result.FieldName {
+			case project.ProjectGrantGrantedOrgIDSearchField:
+				var orgID string
+				err := result.Value.Unmarshal(&orgID)
+				if err != nil || orgID != resourceOwner {
+					return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
+				}
+			case project.ProjectGrantStateSearchField:
+				var state domain.ProjectGrantState
+				err := result.Value.Unmarshal(&state)
+				if err != nil {
+					return nil, err
+				}
+				existsGrant = state.Valid() && state != domain.ProjectGrantStateRemoved
+			case project.ProjectGrantRoleKeySearchField:
+				var role string
+				err := result.Value.Unmarshal(&role)
+				if err != nil {
+					return nil, err
+				}
+				existingRoleKeys = append(existingRoleKeys, role)
+			case project.ProjectGrantGrantIDSearchField:
+				var grantID string
+				err := result.Value.Unmarshal(&grantID)
+				if err != nil || grantID != userGrant.ProjectGrantID {
+					return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-huvKF", "Errors.Project.Grant.NotFound")
+				}
+			}
+		}
+	}
+
+	if !existsProject {
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-m9gsd", "Errors.Project.NotFound")
+	}
+	if !existsGrantedOrg {
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-3m9gg", "Errors.Org.NotFound")
+	}
+	if userGrant.ProjectGrantID != "" && !existsGrant {
+		return nil, zerrors.ThrowPreconditionFailed(err, "COMMAND-huvKF", "Errors.Project.Grant.NotFound")
+	}
+	return existingRoleKeys, nil
+}
+
+func (c *Commands) checkUserGrantPreConditionOld(ctx context.Context, usergrant *domain.UserGrant, resourceOwner string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	preConditions := NewUserGrantPreConditionReadModel(usergrant.UserID, usergrant.ProjectID, usergrant.ProjectGrantID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, preConditions)
+	err = c.eventstore.FilterToQueryReducer(ctx, preConditions)
 	if err != nil {
 		return err
 	}

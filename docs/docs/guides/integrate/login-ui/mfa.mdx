@@ -41,7 +41,7 @@ Request Example:
 
 ```bash
 curl --request POST \
-    --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/totp \
+    --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/totp \
     --header 'Accept: application/json' \
     --header 'Authorization: Bearer '"$TOKEN"''
     --header 'Content-Type: application/json' \
@@ -73,7 +73,7 @@ Request Example:
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/totp/verify \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/totp/verify \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''
   --header 'Content-Type: application/json' \
@@ -99,7 +99,7 @@ Example Request
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
+  --url https://$ZITADEL_DOMAIN/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
@@ -136,7 +136,7 @@ More detailed information about the API: [Update session Documentation](/apis/re
 Example Request
 ```bash
 curl --request PATCH \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions/$SESSION-ID \
+  --url https://$ZITADEL_DOMAIN/v2/sessions/$SESSION-ID \
   --header 'Accept: application/json' \
   --header 'Content-Type: application/json' \
   --data '{
@@ -175,7 +175,7 @@ Example Request:
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER-ID/phone \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER-ID/phone \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
@@ -195,7 +195,7 @@ More detailed information about the API: [Verify phone](/apis/resources/user_ser
 Example Request:
 ```bash
 curl --request POST \
-    --url https://$ZITADEL_DOMAIN/v2beta/users/$USER-ID/phone/verify \
+    --url https://$ZITADEL_DOMAIN/v2/users/$USER-ID/phone/verify \
     --header 'Accept: application/json' \
     --header 'Authorization: Bearer '"$TOKEN"'' \
     --header 'Content-Type: application/json' \
@@ -213,7 +213,7 @@ More detailed information about the API: [Add OTP SMS for a user](/apis/resource
 Example Request:
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER-ID/otp_sms \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER-ID/otp_sms \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json'
@@ -237,7 +237,7 @@ Example Request
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
+  --url https://$ZITADEL_DOMAIN/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
@@ -264,7 +264,7 @@ Example Request
 
 ```bash
 curl --request PATCH \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions/225307381909694507 \
+  --url https://$ZITADEL_DOMAIN/v2/sessions/225307381909694507 \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
@@ -301,7 +301,7 @@ More detailed information about the API: [Add OTP Email for a user](/apis/resour
 Example Request:
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER-ID/otp_email \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER-ID/otp_email \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json'
@@ -325,7 +325,7 @@ Example Request
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
+  --url https://$ZITADEL_DOMAIN/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
@@ -352,7 +352,7 @@ Example Request
 
 ```bash
 curl --request PATCH \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions/225307381909694507 \
+  --url https://$ZITADEL_DOMAIN/v2/sessions/225307381909694507 \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \
@@ -386,7 +386,7 @@ Request Example:
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/u2f \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/u2f \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''
   --header 'Content-Type: application/json' \
@@ -457,7 +457,7 @@ Example Request:
 ```bash
 
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/users/$USER_ID/u2f/$PASSKEY_ID \
+  --url https://$ZITADEL_DOMAIN/v2/users/$USER_ID/u2f/$PASSKEY_ID \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"''\
   --header 'Content-Type: application/json' \
@@ -497,7 +497,7 @@ Example Request
 
 ```bash
 curl --request POST \
-  --url https://$ZITADEL_DOMAIN/v2beta/sessions \
+  --url https://$ZITADEL_DOMAIN/v2/sessions \
   --header 'Accept: application/json' \
   --header 'Authorization: Bearer '"$TOKEN"'' \
   --header 'Content-Type: application/json' \

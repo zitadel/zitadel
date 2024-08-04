@@ -21,6 +21,9 @@ func (c *Commands) SetCustomInstanceLoginText(ctx context.Context, loginText *do
 	if err != nil {
 		return nil, err
 	}
+	if len(events) == 0 {
+		return writeModelToObjectDetails(&existingMailText.WriteModel), nil
+	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err

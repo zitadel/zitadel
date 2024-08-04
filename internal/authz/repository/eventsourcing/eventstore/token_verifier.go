@@ -172,7 +172,7 @@ func (repo *TokenVerifierRepo) verifySessionToken(ctx context.Context, sessionID
 }
 
 // checkAuthentication ensures the session or token was authenticated (at least a single [domain.UserAuthMethodType]).
-// It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any
+// It will also check if there was a multi factor authentication, if either MFA is forced by the login policy or if the user has set up any second factor
 func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMethods []domain.UserAuthMethodType, userID string) error {
 	if len(authMethods) == 0 {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "authentication required")
@@ -190,8 +190,8 @@ func (repo *TokenVerifierRepo) checkAuthentication(ctx context.Context, authMeth
 	if domain.RequiresMFA(
 		requirements.ForceMFA,
 		requirements.ForceMFALocalOnly,
-		!hasIDPAuthentication(authMethods)) ||
-		domain.HasMFA(requirements.AuthMethods) {
+		!hasIDPAuthentication(authMethods),
+	) {
 		return zerrors.ThrowPermissionDenied(nil, "AUTHZ-Kl3p0", "mfa required")
 	}
 	return nil
@@ -297,8 +297,7 @@ func (repo *TokenVerifierRepo) getTokenIDAndSubject(ctx context.Context, accessT
 
 func (repo *TokenVerifierRepo) jwtTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
 	keySet := &openIDKeySet{repo.Query}
-	issuer := http_util.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), repo.ExternalSecure)
-	return op.NewAccessTokenVerifier(issuer, keySet)
+	return op.NewAccessTokenVerifier(http_util.DomainContext(ctx).Origin(), keySet)
 }
 
 func (repo *TokenVerifierRepo) decryptAccessToken(token string) (string, error) {

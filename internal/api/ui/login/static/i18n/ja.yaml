@@ -183,6 +183,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: パスワードの変更
   Description: 旧パスワードと新パスワードを入力し、パスワードを変更してください。
+  ExpiredDescription: パスワードの有効期限が切れたため、変更する必要があります。古いパスワードと新しいパスワードを入力してください。
   OldPasswordLabel: 旧パスワード
   NewPasswordLabel: 新パスワード
   NewPasswordConfirmLabel: 新パスワードの確認
@@ -243,6 +244,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: 性別
   Female: 女性
   Male: 男性
@@ -282,6 +284,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: 利用規約
   TosConfirm: 私は利用規約を承諾します。
   TosLinkText: TOS
@@ -355,6 +358,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 
 DeviceAuth:
   Title: デバイス認証

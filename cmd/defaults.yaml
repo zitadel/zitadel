@@ -83,9 +83,17 @@ TLS:
   Cert: # ZITADEL_TLS_CERT
 
 # Header name of HTTP2 (incl. gRPC) calls from which the instance will be matched
+# Deprecated: Use the InstanceHostHeaders instead
 HTTP2HostHeader: ":authority" # ZITADEL_HTTP2HOSTHEADER
 # Header name of HTTP1 calls from which the instance will be matched
+# Deprecated: Use the InstanceHostHeaders instead
 HTTP1HostHeader: "host" # ZITADEL_HTTP1HOSTHEADER
+# Ordered header name list, which will be used to match the instance
+InstanceHostHeaders: # ZITADEL_INSTANCEHOSTHEADERS
+  - "x-zitadel-instance-host"
+# Ordered header name list, which will be used as the public host
+PublicHostHeaders: # ZITADEL_PUBLICHOSTHEADERS
+  - "x-zitadel-public-host"
 
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
@@ -95,19 +103,19 @@ Database:
   # MaxOpenConns and MaxIdleConns are used to push events and spool projections.
   # Remaining connection are used for queries (search).
   # Values may not be negative and the sum of the ratios must always be less than 1.
-  # For example this defaults define 40 MaxOpenConns overall.
-  # - 40*0.2=8 connections are allocated to the event pusher;
-  # - 40*0.2=8 connections are allocated to the projection spooler;
-  # - 40-(8+8)=24 connections are remaining for queries;
+  # For example this defaults define 15 MaxOpenConns overall.
+  # - 15*0.2=3 connections are allocated to the event pusher;
+  # - 15*0.135=2 connections are allocated to the projection spooler;
+  # - 15-(3+2)=10 connections are remaining for queries;
   EventPushConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_EVENTPUSHCONNRATIO
-  ProjectionSpoolerConnRatio: 0.2 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
+  ProjectionSpoolerConnRatio: 0.135 # ZITADEL_DATABASE_COCKROACH_PROJECTIONSPOOLERCONNRATIO
   # CockroachDB is the default database of ZITADEL
   cockroach:
     Host: localhost # ZITADEL_DATABASE_COCKROACH_HOST
     Port: 26257 # ZITADEL_DATABASE_COCKROACH_PORT
     Database: zitadel # ZITADEL_DATABASE_COCKROACH_DATABASE
-    MaxOpenConns: 40 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
-    MaxIdleConns: 20 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
+    MaxOpenConns: 15 # ZITADEL_DATABASE_COCKROACH_MAXOPENCONNS
+    MaxIdleConns: 12 # ZITADEL_DATABASE_COCKROACH_MAXIDLECONNS
     MaxConnLifetime: 30m # ZITADEL_DATABASE_COCKROACH_MAXCONNLIFETIME
     MaxConnIdleTime: 5m # ZITADEL_DATABASE_COCKROACH_MAXCONNIDLETIME
     Options: "" # ZITADEL_DATABASE_COCKROACH_OPTIONS
@@ -120,6 +128,10 @@ Database:
         Cert: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_CERT
         Key: "" # ZITADEL_DATABASE_COCKROACH_USER_SSL_KEY
     Admin:
+      # By default, ExistingDatabase is not specified in the connection string
+      # If the connection resolves to a database that is not existing in your system, configure an existing one here
+      # It is used in zitadel init to connect to cockroach and create a dedicated database for ZITADEL.
+      ExistingDatabase: # ZITADEL_DATABASE_COCKROACH_ADMIN_EXISTINGDATABASE
       Username: root # ZITADEL_DATABASE_COCKROACH_ADMIN_USERNAME
       Password: "" # ZITADEL_DATABASE_COCKROACH_ADMIN_PASSWORD
       SSL:
@@ -147,6 +159,10 @@ Database:
         Cert: # ZITADEL_DATABASE_POSTGRES_USER_SSL_CERT
         Key: # ZITADEL_DATABASE_POSTGRES_USER_SSL_KEY
     Admin:
+      # The default ExistingDatabase is postgres
+      # If your db system doesn't have a database named postgres, configure an existing database here
+      # It is used in zitadel init to connect to postgres and create a dedicated database for ZITADEL.
+      ExistingDatabase: # ZITADEL_DATABASE_POSTGRES_ADMIN_EXISTINGDATABASE
       Username: # ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME
       Password: # ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD
       SSL:
@@ -223,6 +239,13 @@ Projections:
     custom_texts:
       TransactionDuration: 2s
       BulkLimit: 400
+    project_grant_fields:
+      TransactionDuration: 0s
+      BulkLimit: 2000
+    org_domain_verified_fields:
+      TransactionDuration: 0s
+      BulkLimit: 2000
+    
     # The Notifications projection is used for sending emails and SMS to users
     Notifications:
       # As notification projections don't result in database statements, retries don't have an effect
@@ -438,12 +461,10 @@ SystemDefaults:
     # Passwords previously hashed with a different algorithm
     # or cost are automatically re-hashed using this config,
     # upon password validation or update.
-    # Configure the Hasher config by environment variable using JSON notation:
-    # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER='{"Algorithm":"pbkdf2","Rounds":290000,"Hash":"sha256"}'
     Hasher:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
       # Depending on the algorithm, different configuration options take effect.
-      Algorithm: bcrypt
+      Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_ALGORITHM
       # Cost takes effect for the algorithms bcrypt and scrypt
       Cost: 14 # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_HASHER_COST
       # Time takes effect for the algorithms argon2i and argon2id
@@ -472,17 +493,18 @@ SystemDefaults:
     #
     # Supported verifiers: (uncomment to enable)
     Verifiers: # ZITADEL_SYSTEMDEFAULTS_PASSWORDHASHER_VERIFIERS
-    #   - "argon2" # verifier for both argon2i and argon2id.
+    #   - "argon2"   # verifier for both argon2i and argon2id.
     #   - "bcrypt"
-    #   - "md5"
+    #   - "md5"      # md5Crypt with salt and password shuffling.
+    #   - "md5plain" # md5 digest of a password without salt
     #   - "scrypt"
-    #   - "pbkdf2" # verifier for all pbkdf2 hash modes.
+    #   - "pbkdf2"   # verifier for all pbkdf2 hash modes.
   SecretHasher:
     # Set hasher configuration for machine users, API and OIDC client secrets.
     Hasher:
       # Supported algorithms: "argon2i", "argon2id", "bcrypt", "scrypt", "pbkdf2"
       # Depending on the algorithm, different configuration options take effect.
-      Algorithm: bcrypt
+      Algorithm: bcrypt # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_ALGORITHM
       # Cost takes effect for the algorithms bcrypt and scrypt
       Cost: 4 # ZITADEL_SYSTEMDEFAULTS_SECRETHASHER_HASHER_COST
       # Time takes effect for the algorithms argon2i and argon2id
@@ -569,8 +591,7 @@ DefaultInstance:
   Org:
     Name: ZITADEL # ZITADEL_DEFAULTINSTANCE_ORG_NAME
     # In the DefaultInstance.Org.Human section, the initial organization's admin user with the role IAM_OWNER is defined.
-    # ZITADEL either creates a human user or a machine user.
-    # If DefaultInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
+    # If DefaultInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role.
     Human:
       # In case that UserLoginMustBeDomain is false (default) and if you don't overwrite the username with an email,
       # it will be suffixed by the org domain (org-name + domain from config).
@@ -590,8 +611,7 @@ DefaultInstance:
         Verified: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PHONE_VERIFIED
       Password: # ZITADEL_DEFAULTINSTANCE_ORG_HUMAN_PASSWORD
     # In the DefaultInstance.Org.Machine section, the initial organization's admin user with the role IAM_OWNER is defined.
-    # ZITADEL either creates a human user or a machine user.
-    # If DefaultInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
+    # If DefaultInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role.
     Machine:
       Machine:
         Username: # ZITADEL_DEFAULTINSTANCE_ORG_MACHINE_MACHINE_USERNAME
@@ -700,8 +720,8 @@ DefaultInstance:
     SecondFactorCheckLifetime: 18h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_SECONDFACTORCHECKLIFETIME
     MultiFactorCheckLifetime: 12h # ZITADEL_DEFAULTINSTANCE_LOGINPOLICY_MULTIFACTORCHECKLIFETIME
   PrivacyPolicy:
-    TOSLink: https://zitadel.com/docs/legal/terms-of-service # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_TOSLINK
-    PrivacyLink: https://zitadel.com/docs/legal/privacy-policy # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_PRIVACYLINK
+    TOSLink: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_TOSLINK
+    PrivacyLink: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_PRIVACYLINK
     HelpLink: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_HELPLINK
     SupportEmail: "" # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_SUPPORTEMAIL
     DocsLink: https://zitadel.com/docs # ZITADEL_DEFAULTINSTANCE_PRIVACYPOLICY_DOCSLINK
@@ -1029,12 +1049,9 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.delete"
-        - "execution.target.read"
-        - "execution.target.write"
-        - "execution.target.delete"
-        - "execution.read"
-        - "execution.write"
-        - "execution.delete"
+        - "action.target.write"
+        - "action.target.delete"
+        - "action.execution.write"
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"

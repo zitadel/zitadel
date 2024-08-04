@@ -3,7 +3,7 @@ package http
 import (
 	errorsAs "errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 
@@ -43,7 +43,7 @@ func ValidateDomainHTTP(domain, token, verifier string) error {
 		return zerrors.ThrowInternal(err, "HTTP-G2zsw", "Errors.Internal")
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return zerrors.ThrowInternal(err, "HTTP-HB432", "Errors.Internal")
 	}

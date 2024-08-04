@@ -18,7 +18,7 @@ Before we can start building our application, we have to do a few configuration 
 
 ### Project roles
 
-The Example expects [user roles](guides/integrate/retrieve-user-roles) to be returned after login.
+The Example expects [user roles](/docs/guides/integrate/retrieve-user-roles) to be returned after login.
 Symfony uses `ROLE_USER` format.
 The application will take care of upper-casing and prefixing for us.
 Inside ZITADEL, you can use regular lower-case role names without prefixes, if you prefer.
@@ -102,7 +102,7 @@ composer require drenso/symfony-oidc-bundle
 
 First, we need to create a User class for the database, so we can persist user info between requests. In this case you don't need password authentication.
 Email addresses are not unique for ZITADEL users. There can be multiple user accounts with the same email address.
-See [User Constraints](https://zitadel.com/docs/concepts/structure/users#constraints) for more details.
+See [User Constraints](/docs/concepts/structure/users#constraints) for more details.
 We will use the User Info `sub` claim as unique "display" name for the user. `sub` equals the unique User ID from ZITADEL.
 This creates a User Repository and Entity that implements the `UserInterface`:
 

@@ -189,6 +189,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Изменение пароля
   Description: Измените ваш пароль. Введите старый и новый пароли.
+  ExpiredDescription: Срок действия вашего пароля истек, и его необходимо изменить. Введите старый и новый пароль.
   OldPasswordLabel: Старый пароль
   NewPasswordLabel: Новый пароль
   NewPasswordConfirmLabel: Подтверждение пароля
@@ -250,6 +251,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Пол
   Female: Женский
   Male: Мужской
@@ -289,6 +291,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Условия использования
   TosConfirm: Я согласен с
   TosLinkText: Пользовательским соглашением
@@ -362,6 +365,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   
 DeviceAuth:
   Title: Авторизация устройства

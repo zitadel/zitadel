@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
-	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 )
 
 func (s *Server) SetSystemFeatures(ctx context.Context, req *feature.SetSystemFeaturesRequest) (_ *feature.SetSystemFeaturesResponse, err error) {

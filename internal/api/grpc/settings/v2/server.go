@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 )
 
 var _ settings.SettingsServiceServer = (*Server)(nil)
@@ -27,12 +27,11 @@ type Config struct{}
 func CreateServer(
 	command *command.Commands,
 	query *query.Queries,
-	externalSecure bool,
 ) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
-		assetsAPIDomain: assets.AssetAPI(externalSecure),
+		assetsAPIDomain: assets.AssetAPI(),
 	}
 }
 

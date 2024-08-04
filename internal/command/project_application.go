@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/project"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -129,9 +130,12 @@ func (c *Commands) RemoveApplication(ctx context.Context, projectID, appID, reso
 	return writeModelToObjectDetails(&existingApp.WriteModel), nil
 }
 
-func (c *Commands) getApplicationWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*ApplicationWriteModel, error) {
+func (c *Commands) getApplicationWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (_ *ApplicationWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	appWriteModel := NewApplicationWriteModelWithAppIDC(projectID, appID, resourceOwner)
-	err := c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, appWriteModel)
 	if err != nil {
 		return nil, err
 	}

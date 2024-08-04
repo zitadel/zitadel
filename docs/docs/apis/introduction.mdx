@@ -281,7 +281,7 @@ ZITADEL hosts everything under a single domain: `{instance}.zitadel.cloud` or yo
 
 The domain is used as the OIDC issuer and as the base url for the gRPC and REST APIs, the Login and Console UI, which you'll find under `{your_domain}/ui/console/`.
 
-Are you self-hosting and having troubles with *Instance not found* errors? [Check out this page](https://zitadel.com/docs/self-hosting/manage/custom-domain).
+Are you self-hosting and having troubles with *Instance not found* errors? [Check out this page](/docs/self-hosting/manage/custom-domain).
 
 ## API path prefixes
 
@@ -313,4 +313,10 @@ For easy copying to your reverse proxy configuration, here is the list of URL pa
 /zitadel.settings.v2beta.SettingsService/
 /zitadel.oidc.v2beta.OIDCService/
 /zitadel.org.v2beta.OrganizationService/
+/v2/
+/zitadel.user.v2.UserService/
+/zitadel.session.v2.SessionService/
+/zitadel.settings.v2.SettingsService/
+/zitadel.oidc.v2.OIDCService/
+/zitadel.org.v2.OrganizationService/
 ```

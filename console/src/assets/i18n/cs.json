@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Nastavení instance",
-        "DESCRIPTION": "Nastavení instance jsou výchozí nastavení pro všechny organizace. S odpovídajícími oprávněními jsou některá z nich přepisovatelná v nastavení organizace."
+        "TITLE": "Výchozí nastavení",
+        "DESCRIPTION": "Výchozí nastavení pro všechny organizace. Se správnými oprávněními lze některá z nich přepsat v nastavení organizace."
       },
       "ORG": {
         "TITLE": "Nastavení organizace",
@@ -231,7 +231,7 @@
           "LABEL": "Maximální doba životnosti v hodinách",
           "PW_CHECK": {
             "TITLE": "Kontrola hesla",
-            "DESCRIPTION": "Tví uživatelé musí v těchto obdobích změnit svá hesla."
+            "DESCRIPTION": "Po uplynutí této doby budou uživatelé vyzváni k opětovné autentizaci pomocí hesla."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Kontrola externího přihlášení",
@@ -486,6 +486,7 @@
     "MORE": "více",
     "STEP": "Krok",
     "SETUP": "Nastavit",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Neuložené změny",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Zobrazit uživatele {{value}}"
     },
-    "DOWNLOAD": "Stáhnout"
+    "DOWNLOAD": "Stáhnout",
+    "APPLY": "Platit"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Má kontrolu nad celou instancí, včetně všech organizací",
@@ -1084,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Smazat vybrané akce?",
         "DESCRIPTION": "Jste si jisti, že chcete smazat vybrané akce z toku?"
-      }
+      },
+      "ABOUTNAME": "Název akce a název funkce v javascriptu musí být stejný"
     },
     "TOAST": {
       "ACTIONSSET": "Akce nastaveny",
@@ -1316,16 +1319,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Nastavení instance",
-      "DESCRIPTION": "Tato nastavení se budou aplikovat na všechny vaše organizace, pokud nebyla přepsána."
-    },
     "LIST": {
       "ORGS": "Organizace",
       "FEATURESETTINGS": "Nastavení funkcí",
       "LANGUAGES": "Jazyky",
       "LOGIN": "Chování při přihlášení a bezpečnost",
       "LOCKOUT": "Blokování",
+      "AGE": "Expirace hesla",
       "COMPLEXITY": "Složitost hesla",
       "NOTIFICATIONS": "Oznámení",
       "SMTP_PROVIDER": "Poskytovatel SMTP",
@@ -1380,7 +1380,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1437,9 +1438,7 @@
         "7": "Jednorázové heslo (OTP) - SMS",
         "8": "Jednorázové heslo (OTP) - E-mail"
       },
-      "ADDGENERATOR": "Definovat generátor tajemství",
-      "GENERATORTYPE": "Typ",
-      "EXPIRY": "Expirace (v hodinách)",
+      "EXPIRY": "Expirace (v minutách)",
       "INCLUDEDIGITS": "Zahrnout čísla",
       "INCLUDESYMBOLS": "Zahrnout symboly",
       "INCLUDELOWERLETTERS": "Zahrnout malá písmena",
@@ -1475,6 +1474,10 @@
         "DISABLED": "Zakázáno"
       },
       "INHERITED_DESCRIPTION": "Toto nastavení nastaví hodnotu na výchozí hodnotu systému.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Povoleno“ je zděděno",
+        "DISABLED": "„Zakázáno“ je zděděno"
+      },
       "RESET": "Nastavit vše na děděné"
     },
     "DIALOG": {
@@ -1545,8 +1548,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Stáří hesla",
-      "DESCRIPTION": "Můžete nastavit politiku pro stáří hesel. Tato politika vydá varování po uplynutí konkrétního času stáří."
+      "TITLE": "Expirace hesla",
+      "DESCRIPTION": "Můžete nastavit pravidlo pro vypršení platnosti hesel. Toto pravidlo donutí uživatele změnit heslo při dalším přihlášení po uplynutí platnosti. Neexistují žádná automatická varování a upozornění."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Politika uzamčení",
@@ -1609,7 +1612,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Ověření e-mailu dokončeno",
@@ -1679,7 +1683,8 @@
         "username": "Uživatelské jméno",
         "tempUsername": "Dočasné uživatelské jméno",
         "otp": "Jednorázové heslo",
-        "verifyUrl": "Ověřovací URL jednorázového hesla"
+        "verifyUrl": "Ověřovací URL jednorázového hesla",
+        "expiry": "Expirace"
       },
       "TOAST": {
         "UPDATED": "Vlastní texty uloženy."
@@ -1698,8 +1703,8 @@
       "SHOWLOCKOUTFAILURES": "zobrazit neúspěšné pokusy o uzamčení",
       "MAXPASSWORDATTEMPTS": "Maximální počet pokusů o heslo",
       "MAXOTPATTEMPTS": "Maximální počet pokusů o OTP",
-      "EXPIREWARNDAYS": "Upozornění na expiraci po dni",
-      "MAXAGEDAYS": "Maximální stáří v dnech",
+      "EXPIREWARNDAYS": "Upozornění na uplynutí po dnech",
+      "MAXAGEDAYS": "Maximální platnost v dnech",
       "USERLOGINMUSTBEDOMAIN": "Přidat doménu organizace jako příponu k přihlašovacím jménům",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Pokud povolíte toto nastavení, všechna přihlašovací jména budou doplněna o doménu organizace. Pokud je toto nastavení zakázáno, musíte zajistit, aby byla uživatelská jména jedinečná napříč všemi organizacemi.",
       "VALIDATEORGDOMAINS": "Požadováno ověření domény organizace (DNS nebo HTTP výzva)",
@@ -1778,7 +1783,7 @@
       "TYPE": {
         "OWNED": "Vlastní projekty",
         "OWNED_SINGULAR": "Vlastní projekt",
-        "GRANTED_SINGULAR": "Přidělený projekt"
+        "GRANTED_SINGULAR": "Projekt přidělený {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Nastavení brandingu",
@@ -2244,6 +2249,7 @@
       "ACTIVATED": "Aktivováno",
       "ACTIVATE": "Aktivujte poskytovatele",
       "DEACTIVATE": "Deaktivovat poskytovatele",
+      "TEST": "Otestujte svého poskytovatele",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "Konfigurace SMTP byla aktivována",
@@ -2267,7 +2273,6 @@
         "CURRENT_DESC_TITLE": "Toto jsou vaše nastavení SMTP",
         "PROVIDER_SETTINGS": "Nastavení poskytovatele SMTP",
         "SENDER_SETTINGS": "Nastavení odesílatele",
-        "TEST_SETTINGS": "Otestujte nastavení SMTP",
         "NEXT_STEPS": "Další kroky",
         "ACTIVATE": {
           "TITLE": "Aktivujte svého poskytovatele SMTP",
@@ -2276,6 +2281,12 @@
         "DEACTIVATE": {
           "TITLE": "Deaktivujte svého poskytovatele SMTP",
           "DESCRIPTION": "Pokud deaktivujete tohoto poskytovatele SMTP, ZITADEL jej nebude moci používat k odesílání upozornění, dokud jej znovu neaktivujete."
+        },
+        "SAVE_SETTINGS": "Uložte nastavení",
+        "TEST": {
+          "TITLE": "Otestujte svá nastavení",
+          "DESCRIPTION": "Nastavení poskytovatele SMTP můžete otestovat a před uložením zkontrolovat výsledek testu",
+          "RESULT": "Váš email byl úspěšně odeslán"
         }
       }
     },
@@ -2550,7 +2561,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Přidat manažera",

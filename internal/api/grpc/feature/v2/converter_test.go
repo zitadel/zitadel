@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query"
-	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 )
 
 func Test_systemFeaturesToCommand(t *testing.T) {

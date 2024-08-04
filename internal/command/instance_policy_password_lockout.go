@@ -32,7 +32,7 @@ func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, maxPasswordAttem
 }
 
 func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
-	existingPolicy, err := c.defaultLockoutPolicyWriteModelByID(ctx)
+	existingPolicy, err := defaultLockoutPolicyWriteModelByID(ctx, c.eventstore.FilterToQueryReducer)
 	if err != nil {
 		return nil, err
 	}
@@ -63,12 +63,12 @@ func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domai
 	return writeModelToLockoutPolicy(&existingPolicy.LockoutPolicyWriteModel), nil
 }
 
-func (c *Commands) defaultLockoutPolicyWriteModelByID(ctx context.Context) (policy *InstanceLockoutPolicyWriteModel, err error) {
+func defaultLockoutPolicyWriteModelByID(ctx context.Context, reducer func(ctx context.Context, r eventstore.QueryReducer) error) (policy *InstanceLockoutPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	writeModel := NewInstanceLockoutPolicyWriteModel(ctx)
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	err = reducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
 	}

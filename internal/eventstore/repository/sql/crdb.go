@@ -18,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/database/dialect"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/repository"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
@@ -248,8 +249,11 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 }
 
 // FilterToReducer finds all events matching the given search query and passes them to the reduce function.
-func (crdb *CRDB) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) error {
-	err := query(ctx, crdb, searchQuery, reduce, false)
+func (crdb *CRDB) FilterToReducer(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder, reduce eventstore.Reducer) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	err = query(ctx, crdb, searchQuery, reduce, false)
 	if err == nil {
 		return nil
 	}
@@ -282,17 +286,23 @@ func (db *CRDB) db() *database.DB {
 	return db.DB
 }
 
-func (db *CRDB) orderByEventSequence(desc, useV1 bool) string {
+func (db *CRDB) orderByEventSequence(desc, shouldOrderBySequence, useV1 bool) string {
 	if useV1 {
 		if desc {
 			return ` ORDER BY event_sequence DESC`
 		}
 		return ` ORDER BY event_sequence`
 	}
+	if shouldOrderBySequence {
+		if desc {
+			return ` ORDER BY "sequence" DESC`
+		}
+		return ` ORDER BY "sequence"`
+	}
+
 	if desc {
 		return ` ORDER BY "position" DESC, in_tx_order DESC`
 	}
-
 	return ` ORDER BY "position", in_tx_order`
 }
 

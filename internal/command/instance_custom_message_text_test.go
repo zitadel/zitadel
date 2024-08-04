@@ -54,7 +54,6 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectPush(),
 				),
 			},
 			args: args{

@@ -4,6 +4,7 @@ package oidc_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
@@ -18,10 +19,13 @@ import (
 )
 
 func TestServer_ClientCredentialsExchange(t *testing.T) {
-	userID, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
+	machine, name, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 
 	type claims struct {
+		name                       string
+		username                   string
+		updated                    time.Time
 		resourceOwnerID            any
 		resourceOwnerName          any
 		resourceOwnerPrimaryDomain any
@@ -79,6 +83,17 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			scope:        []string{oidc.ScopeOpenID},
 		},
 		{
+			name:         "openid, profile, email",
+			clientID:     clientID,
+			clientSecret: clientSecret,
+			scope:        []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail},
+			wantClaims: claims{
+				name:     name,
+				username: name,
+				updated:  machine.GetDetails().GetChangeDate().AsTime(),
+			},
+		},
+		{
 			name:         "org id and domain scope",
 			clientID:     clientID,
 			clientSecret: clientSecret,
@@ -132,12 +147,20 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			}
 			require.NoError(t, err)
 			require.NotNil(t, tokens)
-			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, oidc.BearerToken, userID, provider)
+			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, oidc.BearerToken, machine.GetUserId(), provider)
 			require.NoError(t, err)
 			assert.Equal(t, tt.wantClaims.resourceOwnerID, userinfo.Claims[oidc_api.ClaimResourceOwnerID])
 			assert.Equal(t, tt.wantClaims.resourceOwnerName, userinfo.Claims[oidc_api.ClaimResourceOwnerName])
 			assert.Equal(t, tt.wantClaims.resourceOwnerPrimaryDomain, userinfo.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
 			assert.Equal(t, tt.wantClaims.orgDomain, userinfo.Claims[domain.OrgDomainPrimaryClaim])
+			assert.Equal(t, tt.wantClaims.name, userinfo.Name)
+			assert.Equal(t, tt.wantClaims.username, userinfo.PreferredUsername)
+			assertOIDCTime(t, userinfo.UpdatedAt, tt.wantClaims.updated)
+			assert.Empty(t, userinfo.UserInfoProfile.FamilyName)
+			assert.Empty(t, userinfo.UserInfoProfile.GivenName)
+			assert.Empty(t, userinfo.UserInfoEmail)
+			assert.Empty(t, userinfo.UserInfoPhone)
+			assert.Empty(t, userinfo.Address)
 		})
 	}
 }

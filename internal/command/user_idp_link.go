@@ -12,6 +12,9 @@ import (
 )
 
 func (c *Commands) AddUserIDPLink(ctx context.Context, userID, resourceOwner string, link *AddLink) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if userID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")
 	}
@@ -122,6 +125,11 @@ func (c *Commands) removeUserIDPLink(ctx context.Context, link *domain.UserIDPLi
 	}
 	if existingLink.State == domain.UserIDPLinkStateUnspecified || existingLink.State == domain.UserIDPLinkStateRemoved {
 		return nil, nil, zerrors.ThrowNotFound(nil, "COMMAND-1M9xR", "Errors.User.ExternalIDP.NotFound")
+	}
+	if existingLink.AggregateID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingLink.ResourceOwner, existingLink.AggregateID); err != nil {
+			return nil, nil, err
+		}
 	}
 	userAgg := UserAggregateFromWriteModel(&existingLink.WriteModel)
 	if cascade {

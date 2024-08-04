@@ -18,6 +18,7 @@ import { I18nInterceptor } from './interceptors/i18n.interceptor';
 import { OrgInterceptor } from './interceptors/org.interceptor';
 import { StorageService } from './storage.service';
 import { FeatureServiceClient } from '../proto/generated/zitadel/feature/v2beta/Feature_serviceServiceClientPb';
+import { GrpcAuthService } from './grpc-auth.service';
 
 @Injectable({
   providedIn: 'root',

@@ -87,7 +87,7 @@ type PushAggregate struct {
 	// owner of the aggregate
 	owner string
 	// Commands is an ordered list of changes on the aggregate
-	commands []Command
+	commands []*Command
 	// CurrentSequence checks the current state of the aggregate.
 	// The following types match the current sequence of the aggregate as described:
 	// * nil or [SequenceIgnore]: Not relevant to add the commands
@@ -122,7 +122,7 @@ func (pa *PushAggregate) Owner() string {
 	return pa.owner
 }
 
-func (pa *PushAggregate) Commands() []Command {
+func (pa *PushAggregate) Commands() []*Command {
 	return pa.commands
 }
 
@@ -165,7 +165,7 @@ func CurrentSequenceAtLeast(sequence uint32) PushAggregateOpt {
 	}
 }
 
-func AppendCommands(commands ...Command) PushAggregateOpt {
+func AppendCommands(commands ...*Command) PushAggregateOpt {
 	return func(pa *PushAggregate) {
 		pa.commands = append(pa.commands, commands...)
 	}

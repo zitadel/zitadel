@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: Verander Wachtwoord
   Description: Verander uw wachtwoord. Voer uw oude en nieuwe wachtwoord in.
+  ExpiredDescription: Je wachtwoord is verlopen en moet worden gewijzigd. Voer uw oude en nieuwe wachtwoord in.
   OldPasswordLabel: Oud Wachtwoord
   NewPasswordLabel: Nieuw Wachtwoord
   NewPasswordConfirmLabel: Bevestig Wachtwoord
@@ -251,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: Geslacht
   Female: Vrouw
   Male: Man
@@ -290,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Nederlands: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: Algemene voorwaarden
   TosConfirm: Ik accepteer de
   TosLinkText: AV
@@ -363,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: Apparaat Autorisatie
   UserCode:

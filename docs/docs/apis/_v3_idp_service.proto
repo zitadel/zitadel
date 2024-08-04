@@ -1,0 +1,325 @@
+syntax = "proto3";
+
+package zitadel.resources.idp.v3alpha;
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
+import "zitadel/resources/object/v3alpha/object.proto";
+import "zitadel/resources/idp/v3alpha/search.proto";
+import "zitadel/resources/idp/v3alpha/idp.proto";
+import "zitadel/resources/idp/v3alpha/gitlab.proto";
+import "zitadel/object/v3alpha/object.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/idp/v3alpha;idp";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Identity Provider Service";
+    version: "3.0-alpha";
+    description: "This API is intended to manage identity providers (IDPs). IDPs can be created for specific organizations or for an instance. IDPs created on an instance can be activated (reused) or deactivated in organizations. It is behind the feature flag \"multitenancy_resources_api\". It will continue breaking as long as it is in alpha state.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$ZITADEL_DOMAIN";
+  base_path: "/resources/v3alpha";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+service ZITADELIdentityProviders {
+
+  // Create a GitLab IDP
+  rpc CreateGitLabIDP (CreateGitLabIDPRequest) returns (CreateGitLabIDPResponse) {
+    option (google.api.http) = {
+      post: "/idps/gitlab"
+      body: "idp"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "idp.write"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "201";
+        value: {
+          description: "GitLabIDP successfully created";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/v2CreateGitLabIDPResponse";
+            }
+          }
+        };
+      };
+    };
+  }
+
+  // Patch a GitLab IDP
+  rpc PatchGitLabIDP (PatchGitLabIDPRequest) returns (PatchGitLabIDPResponse) {
+    option (google.api.http) = {
+      patch: "/idps/gitlab/{id}"
+      body: "idp"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "idp.write"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "GitLabIDP successfully updated";
+        };
+      };
+    };
+  }
+
+  // Find a GitLab IDP by ID
+  rpc GetGitLabIDP (GetGitLabIDPRequest) returns (GetGitLabIDPResponse) {
+    option (google.api.http) = {
+      get: "/idps/gitlab/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "idp.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "GitLabIDP successfully retrieved";
+        }
+      };
+    };
+  }
+
+  // Delete an IDP of any type
+  rpc DeleteIDP (DeleteIDPRequest) returns (DeleteIDPResponse) {
+    option (google.api.http) = {
+      delete: "/idps/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "idp.delete"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "Identity provider successfully deleted";
+        };
+      };
+    };
+  }
+
+  // Search IDPs
+  //
+  // Search all matching IDPs. By default, all instance-level and organization-level providers of all types are returned.
+  // Only type-agnostic properties are returned in the response.
+  // To get the full details of a specific IDP, use the specific types Get method.
+  // If you search by passing an organization context, the state and the state policy might be different than if you search within the default instance-level context.
+  // Make sure to include a limit and sorting for pagination.
+  rpc SearchIDPs (SearchIDPsRequest) returns (SearchIDPsResponse) {
+    option (google.api.http) = {
+      post: "/idps/_search",
+      body: "filters"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "idp.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all IDPs matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+}
+
+message CreateGitLabIDPRequest {
+  optional zitadel.object.v3alpha.RequestContext ctx = 1;
+  GitLabIDP idp = 2;
+}
+
+message CreateGitLabIDPResponse {
+  zitadel.resources.object.v3alpha.Details details = 2;
+}
+
+message PatchGitLabIDPRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  PatchGitLabIDP idp = 2;
+}
+
+message PatchGitLabIDPResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
+}
+
+message DeleteIDPRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message DeleteIDPResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
+}
+
+message SearchIDPsRequest {
+  optional zitadel.object.v3alpha.RequestContext ctx = 1;
+  // list limitations and ordering.
+  zitadel.resources.object.v3alpha.ListQuery query = 2;
+  // the field the result is sorted.
+  zitadel.resources.idp.v3alpha.IDPFieldName sorting_column = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "\"FIELD_NAME_SCHEMA_TYPE\""
+    }
+  ];
+  repeated zitadel.resources.idp.v3alpha.IDPSearchFilter filters = 4;
+}
+
+message SearchIDPsResponse {
+  zitadel.resources.object.v3alpha.ListDetails details = 1;
+  zitadel.resources.idp.v3alpha.IDPFieldName sorting_column = 2;
+  repeated zitadel.resources.idp.v3alpha.GetIDP result = 3;
+}
+
+message GetGitLabIDPRequest {
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message GetGitLabIDPResponse {
+  zitadel.resources.idp.v3alpha.GetGitLabIDP idp = 1;
+}
