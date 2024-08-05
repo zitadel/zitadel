@@ -563,6 +563,7 @@ Errors:
     NotFound: 未找到执行
     IncludeNotFound: 包括未找到的内容
     NoTargets: 没有定义目标
+    ResponseIsNotValidJSON: 响应不是有效的 JSON
   UserSchema:
     NotEnabled: 未启用“用户架构”功能
     Type:

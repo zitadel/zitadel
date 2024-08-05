@@ -25,21 +25,20 @@ import (
 	openid "github.com/zitadel/zitadel/internal/idp/providers/oidc"
 	"github.com/zitadel/zitadel/internal/idp/providers/saml"
 	"github.com/zitadel/zitadel/internal/repository/idp"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
-	organisation "github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
+	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	session "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
+	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 	settings_v2beta "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
@@ -62,9 +61,9 @@ type Client struct {
 	OIDCv2beta     oidc_pb_v2beta.OIDCServiceClient
 	OIDCv2         oidc_pb.OIDCServiceClient
 	OrgV2beta      org_v2beta.OrganizationServiceClient
-	OrgV2          organisation.OrganizationServiceClient
+	OrgV2          org.OrganizationServiceClient
 	System         system.SystemServiceClient
-	ActionV3       action.ActionServiceClient
+	ActionV3       action.ZITADELActionsClient
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
 	UserSchemaV3   schema.UserSchemaServiceClient
@@ -85,9 +84,9 @@ func newClient(cc *grpc.ClientConn) Client {
 		OIDCv2beta:     oidc_pb_v2beta.NewOIDCServiceClient(cc),
 		OIDCv2:         oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2beta:      org_v2beta.NewOrganizationServiceClient(cc),
-		OrgV2:          organisation.NewOrganizationServiceClient(cc),
+		OrgV2:          org.NewOrganizationServiceClient(cc),
 		System:         system.NewSystemServiceClient(cc),
-		ActionV3:       action.NewActionServiceClient(cc),
+		ActionV3:       action.NewZITADELActionsClient(cc),
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:   schema.NewUserSchemaServiceClient(cc),
@@ -627,48 +626,50 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, endpoint 
 	if name != "" {
 		nameSet = name
 	}
-	req := &action.CreateTargetRequest{
+	reqTarget := &action.Target{
 		Name:     nameSet,
 		Endpoint: endpoint,
 		Timeout:  durationpb.New(10 * time.Second),
 	}
 	switch ty {
 	case domain.TargetTypeWebhook:
-		req.TargetType = &action.CreateTargetRequest_RestWebhook{
+		reqTarget.TargetType = &action.Target_RestWebhook{
 			RestWebhook: &action.SetRESTWebhook{
 				InterruptOnError: interrupt,
 			},
 		}
 	case domain.TargetTypeCall:
-		req.TargetType = &action.CreateTargetRequest_RestCall{
+		reqTarget.TargetType = &action.Target_RestCall{
 			RestCall: &action.SetRESTCall{
 				InterruptOnError: interrupt,
 			},
 		}
 	case domain.TargetTypeAsync:
-		req.TargetType = &action.CreateTargetRequest_RestAsync{
+		reqTarget.TargetType = &action.Target_RestAsync{
 			RestAsync: &action.SetRESTAsync{},
 		}
 	}
-	target, err := s.Client.ActionV3.CreateTarget(ctx, req)
-	require.NoError(t, err)
-	return target
-}
-
-func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
-	target, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
-		Condition: cond,
-		Targets:   targets,
-	})
+	target, err := s.Client.ActionV3.CreateTarget(ctx, &action.CreateTargetRequest{Target: reqTarget})
 	require.NoError(t, err)
 	return target
 }
 
 func (s *Tester) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
-	_, err := s.Client.ActionV3.DeleteExecution(ctx, &action.DeleteExecutionRequest{
+	_, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 	})
 	require.NoError(t, err)
+}
+
+func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
+	target, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
+		Condition: cond,
+		Execution: &action.Execution{
+			Targets: targets,
+		},
+	})
+	require.NoError(t, err)
+	return target
 }
 
 func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {

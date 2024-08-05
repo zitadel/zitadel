@@ -580,6 +580,7 @@ Errors:
     NotFound: Изпълнението не е намерено
     IncludeNotFound: Включването не е намерено
     NoTargets: Няма определени цели
+    ResponseIsNotValidJSON: Отговорът не е валиден JSON
   UserSchema:
     NotEnabled: Функцията „Потребителска схема“ не е активирана
     Type:
