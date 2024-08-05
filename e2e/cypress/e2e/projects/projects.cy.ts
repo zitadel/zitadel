@@ -2,9 +2,6 @@ import { Context } from 'support/commands';
 import { ensureProjectDoesntExist, ensureProjectExists } from '../../support/api/projects';
 import { ensureOrgExists } from 'support/api/orgs';
 
-import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 10000 });
-
 describe('projects', () => {
   beforeEach(() => {
     cy.context().as('ctx');

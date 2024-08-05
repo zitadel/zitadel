@@ -11,9 +11,6 @@ import { ensureHumanUserExists, ensureUserDoesntExist } from 'support/api/users'
 import { Context } from 'support/commands';
 import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from '../../support/api/projects';
 
-import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 10000 });
-
 describe('permissions', () => {
   beforeEach(() => {
     cy.context()
