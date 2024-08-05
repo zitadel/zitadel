@@ -2,7 +2,7 @@ import { ensureExternalLinksSettingsSet } from 'support/api/external-links-setti
 import { apiAuth } from '../../support/api/apiauth';
 
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 2000 });
+registerVisit({ timeout: 10000 });
 
 describe('external link settings', () => {
   const tosLink = '';

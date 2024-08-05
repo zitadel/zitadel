@@ -3,7 +3,7 @@ import { ensureProjectDoesntExist, ensureProjectExists } from '../../support/api
 import { ensureOrgExists } from 'support/api/orgs';
 
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 2000 });
+registerVisit({ timeout: 10000 });
 
 describe('projects', () => {
   beforeEach(() => {

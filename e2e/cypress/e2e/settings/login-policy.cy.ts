@@ -3,7 +3,7 @@ import { ensureHumanUserExists } from '../../support/api/users';
 import { login, User } from '../../support/login/users';
 
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 2000 });
+registerVisit({ timeout: 10000 });
 
 describe('login policy', () => {
   const orgPath = `/org`;

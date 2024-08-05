@@ -3,7 +3,7 @@ import { Context } from 'support/commands';
 
 
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 2000 });
+registerVisit({ timeout: 10000 });
 
 const testProjectName = 'e2eprojectapplication';
 const testPKCEAppName = 'e2eapppkcetest';

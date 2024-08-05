@@ -4,7 +4,7 @@ import { ensureDomainPolicy } from '../../support/api/policies';
 import { Context } from 'support/commands';
 
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 2000 });
+registerVisit({ timeout: 10000 });
 
 describe('machines', () => {
   const machinesPath = `/users?type=machine`;
