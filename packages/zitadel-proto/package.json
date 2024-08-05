@@ -12,7 +12,7 @@
   "sideEffects": false,
   "scripts": {
     "generate": "buf generate https://github.com/zitadel/zitadel.git --path ./proto/zitadel",
-    "clean": "rm -rf gen && rm -rf .turbo && rm -rf node_modules"
+    "clean": "rm -rf zitadel && rm -rf .turbo && rm -rf node_modules"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0"
