@@ -14,7 +14,6 @@ import (
 	"github.com/zitadel/zitadel/internal/query"
 	exec_repo "github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func ExecutionHandler(queries *query.Queries) grpc.UnaryServerInterceptor {
@@ -144,9 +143,6 @@ func (c *ContextInfoRequest) GetHTTPRequestBody() []byte {
 }
 
 func (c *ContextInfoRequest) SetHTTPResponseBody(resp []byte) error {
-	if !json.Valid(resp) {
-		return zerrors.ThrowPreconditionFailed(nil, "ACTION-4m9s2", "Errors.Execution.ResponseIsNotValidJSON")
-	}
 	return json.Unmarshal(resp, c.Request)
 }
 
