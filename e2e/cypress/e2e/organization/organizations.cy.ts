@@ -25,8 +25,8 @@ describe('organizations', () => {
 
     it('should delete an org', () => {
       cy.visit(orgsPath);
-      cy.contains('tr', newOrg).click();
       cy.wait(3000);
+      cy.contains('tr', newOrg).click();
       cy.contains(newOrg).should('be.visible');
       cy.get('[data-e2e="actions"]').click();
       cy.get('[data-e2e="delete"]', { timeout: 1000 }).should('be.visible').click();
