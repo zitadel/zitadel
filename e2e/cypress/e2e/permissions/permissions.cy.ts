@@ -12,7 +12,7 @@ import { Context } from 'support/commands';
 import { ensureProjectExists, ensureProjectResourceDoesntExist, Roles } from '../../support/api/projects';
 
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 1000 });
+registerVisit({ timeout: 2000 });
 
 describe('permissions', () => {
   beforeEach(() => {

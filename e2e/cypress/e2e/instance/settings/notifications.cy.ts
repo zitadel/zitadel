@@ -3,7 +3,7 @@ const smtpPath = `/instance?id=smtpprovider`;
 const smsPath = `/instance?id=smsprovider`;
 
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 1000 });
+registerVisit({ timeout: 2000 });
 
 beforeEach(() => {
   cy.context().as('ctx');
@@ -208,7 +208,7 @@ describe('instance notifications', () => {
 
     it(`should activate SMS provider`, () => {
       cy.visit(smsPath);
-      cy.wait(1000);
+      // cy.wait(1000);
       cy.get('h4').contains('Twilio');
       cy.get('.state').contains('Inactive');
       cy.get('[data-e2e="activate-sms-provider-button"]').click();
@@ -218,7 +218,7 @@ describe('instance notifications', () => {
 
     it(`should edit SMS provider`, () => {
       cy.visit(smsPath);
-      cy.wait(1000);
+      // cy.wait(1000);
       cy.get('h4').contains('Twilio');
       cy.get('.state').contains('Active');
       cy.get('[data-e2e="new-twilio-button"]').click();
@@ -232,7 +232,7 @@ describe('instance notifications', () => {
 
     it(`should contain edited values`, () => {
       cy.visit(smsPath);
-      cy.wait(1000);
+      // cy.wait(1000);
       cy.get('h4').contains('Twilio');
       cy.get('.state').contains('Active');
       cy.get('[data-e2e="new-twilio-button"]').click();
@@ -242,7 +242,7 @@ describe('instance notifications', () => {
 
     it(`should edit SMS provider token`, () => {
       cy.visit(smsPath);
-      cy.wait(1000);
+      // cy.wait(1000);
       cy.get('h4').contains('Twilio');
       cy.get('.state').contains('Active');
       cy.get('[data-e2e="new-twilio-button"]').click();
@@ -254,7 +254,7 @@ describe('instance notifications', () => {
 
     it(`should remove SMS provider`, () => {
       cy.visit(smsPath);
-      cy.wait(1000);
+      // cy.wait(1000);
       cy.get('h4').contains('Twilio');
       cy.get('.state').contains('Active');
       cy.get('[data-e2e="remove-sms-provider-button"]').click();

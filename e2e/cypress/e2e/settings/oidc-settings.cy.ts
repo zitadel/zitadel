@@ -2,7 +2,7 @@ import { apiAuth } from '../../support/api/apiauth';
 import { ensureOIDCSettingsSet } from '../../support/api/oidc-settings';
 
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 1000 });
+registerVisit({ timeout: 2000 });
 
 describe('oidc settings', () => {
   const oidcSettingsPath = `/instance?id=oidc`;

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Context } from 'support/commands';
 
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 1000 });
+registerVisit({ timeout: 2000 });
 
 const orgPath = `/org`;
 const orgsPath = `/orgs`;
@@ -29,7 +29,7 @@ describe('organizations', () => {
 
     it('should delete an org', () => {
       cy.visit(orgsPath);
-      cy.wait(3000);
+      // cy.wait(3000);
       cy.contains('tr', newOrg).click();
       cy.contains(newOrg).should('be.visible');
       cy.get('[data-e2e="actions"]').click();

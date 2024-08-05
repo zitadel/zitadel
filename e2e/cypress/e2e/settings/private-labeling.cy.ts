@@ -4,7 +4,7 @@ import { Policy, resetPolicy } from '../../support/api/policies';
 import { login, User } from '../../support/login/users';
 
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 1000 });
+registerVisit({ timeout: 2000 });
 
 describe('private labeling', () => {
   const orgPath = `/org`;

@@ -1,5 +1,5 @@
 import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 1000 });
+registerVisit({ timeout: 2000 });
 
 describe('events', () => {
   beforeEach(() => {
