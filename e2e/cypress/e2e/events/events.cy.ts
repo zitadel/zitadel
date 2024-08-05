@@ -1,6 +1,3 @@
-import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 10000 });
-
 describe('events', () => {
   beforeEach(() => {
     cy.context().as('ctx');
