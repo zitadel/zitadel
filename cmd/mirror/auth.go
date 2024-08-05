@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"io"
+	"os"
 	"time"
 
 	"github.com/jackc/pgx/v5/stdlib"
@@ -34,15 +35,32 @@ Only auth requests are mirrored`,
 }
 
 func copyAuth(ctx context.Context, config *Migration) {
-	sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
-	logging.OnError(err).Fatal("unable to connect to source database")
-	defer sourceClient.Close()
+	switch {
+	case isSrcFile:
+		destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
+		logging.OnError(err).Fatal("unable to connect to destination database")
+		defer destClient.Close()
 
-	destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
-	logging.OnError(err).Fatal("unable to connect to destination database")
-	defer destClient.Close()
+		copyAuthRequestsFromFile(ctx, destClient)
 
-	copyAuthRequests(ctx, sourceClient, destClient)
+	case isDestFile:
+		sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
+		logging.OnError(err).Fatal("unable to connect to source database")
+		defer sourceClient.Close()
+
+		copyAuthRequestsToFile(ctx, sourceClient)
+
+	default:
+		sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
+		logging.OnError(err).Fatal("unable to connect to source database")
+		defer sourceClient.Close()
+
+		destClient, err := database.Connect(config.Destination, false, dialect.DBPurposeEventPusher)
+		logging.OnError(err).Fatal("unable to connect to destination database")
+		defer destClient.Close()
+
+		copyAuthRequests(ctx, sourceClient, destClient)
+	}
 }
 
 func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
@@ -88,4 +106,75 @@ func copyAuthRequests(ctx context.Context, source, dest *database.DB) {
 	logging.OnError(err).Fatal("unable to copy auth requests to destination")
 	logging.OnError(<-errs).Fatal("unable to copy auth requests from source")
 	logging.WithFields("took", time.Since(start), "count", affected).Info("auth requests migrated")
+}
+
+func copyAuthRequestsFromFile(ctx context.Context, dest *database.DB) {
+	start := time.Now()
+
+	srcFile, err := os.OpenFile(filePath+"/auth.auth_requests.csv", os.O_RDONLY, 0)
+	logging.OnError(err).Fatal("unable to open file")
+	defer srcFile.Close()
+
+	r, w := io.Pipe()
+	errs := make(chan error, 1)
+
+	go func() {
+		_, err := srcFile.WriteTo(w)
+		w.Close()
+		errs <- err
+	}()
+
+	destConn, err := dest.Conn(ctx)
+	logging.OnError(err).Fatal("unable to acquire connection")
+	defer destConn.Close()
+
+	var affected int64
+	err = destConn.Raw(func(driverConn interface{}) error {
+		conn := driverConn.(*stdlib.Conn).Conn()
+
+		if shouldReplace {
+			_, err := conn.Exec(ctx, "DELETE FROM auth.auth_requests "+instanceClause())
+			if err != nil {
+				return err
+			}
+		}
+
+		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY auth.auth_requests FROM STDIN")
+		affected = tag.RowsAffected()
+
+		return err
+	})
+	logging.OnError(err).Fatal("unable to copy auth requests to destination")
+	logging.OnError(<-errs).Fatal("unable to copy auth requests from source")
+	logging.WithFields("took", time.Since(start), "count", affected).Info("auth requests migrated")
+}
+
+func copyAuthRequestsToFile(ctx context.Context, src *database.DB) {
+	start := time.Now()
+
+	sourceConn, err := src.Conn(ctx)
+	logging.OnError(err).Fatal("unable to acquire connection")
+	defer sourceConn.Close()
+
+	r, w := io.Pipe()
+	errs := make(chan error, 1)
+
+	go func() {
+		err = sourceConn.Raw(func(driverConn interface{}) error {
+			conn := driverConn.(*stdlib.Conn).Conn()
+			_, err := conn.PgConn().CopyTo(ctx, w, "COPY (SELECT id, regexp_replace(request::TEXT, '\\\\u0000', '', 'g')::JSON request, code, request_type, creation_date, change_date, instance_id FROM auth.auth_requests "+instanceClause()+") TO STDOUT")
+			w.Close()
+			return err
+		})
+		errs <- err
+	}()
+
+	destFile, err := os.OpenFile(filePath+"/auth.auth_requests.csv", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	logging.OnError(err).Fatal("unable to open file")
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, r)
+	logging.OnError(err).Fatal("unable to copy auth requests to file")
+	logging.OnError(<-errs).Fatal("unable to copy auth requests from source")
+	logging.WithFields("took", time.Since(start)).Info("auth requests copied to file")
 }
