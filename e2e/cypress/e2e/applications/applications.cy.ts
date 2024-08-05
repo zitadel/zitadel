@@ -1,6 +1,10 @@
 import { Apps, ensureProjectExists, ensureProjectResourceDoesntExist } from '../../support/api/projects';
 import { Context } from 'support/commands';
 
+
+import { registerVisit } from 'cypress-network-idle/src/register';
+registerVisit({ timeout: 1000 });
+
 const testProjectName = 'e2eprojectapplication';
 const testPKCEAppName = 'e2eapppkcetest';
 const testDEVICECODEAppName = 'e2eappdevicecodetest';

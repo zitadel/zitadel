@@ -2,6 +2,9 @@ const notificationPath = `/instance?id=notifications`;
 const smtpPath = `/instance?id=smtpprovider`;
 const smsPath = `/instance?id=smsprovider`;
 
+import { registerVisit } from 'cypress-network-idle/src/register';
+registerVisit({ timeout: 1000 });
+
 beforeEach(() => {
   cy.context().as('ctx');
 });

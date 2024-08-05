@@ -2,6 +2,9 @@ import { apiAuth } from '../../support/api/apiauth';
 import { ensureHumanUserExists } from '../../support/api/users';
 import { login, User } from '../../support/login/users';
 
+import { registerVisit } from 'cypress-network-idle/src/register';
+registerVisit({ timeout: 1000 });
+
 describe('login policy', () => {
   const orgPath = `/org`;
 

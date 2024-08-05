@@ -2,6 +2,9 @@ import { ensureOrgExists, ensureOrgIsDefault, isDefaultOrg } from 'support/api/o
 import { v4 as uuidv4 } from 'uuid';
 import { Context } from 'support/commands';
 
+import { registerVisit } from 'cypress-network-idle/src/register';
+registerVisit({ timeout: 1000 });
+
 const orgPath = `/org`;
 const orgsPath = `/orgs`;
 const orgsPathCreate = `/orgs/create`;
@@ -9,6 +12,7 @@ const orgsPathCreate = `/orgs/create`;
 const orgNameOnCreation = 'e2eorgrename';
 const testOrgNameChange = uuidv4();
 const newOrg = uuidv4();
+
 
 beforeEach(() => {
   cy.context().as('ctx');

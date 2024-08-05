@@ -2,6 +2,9 @@ import { getInstance } from 'support/api/instances';
 import { ensureQuotaIsRemoved, removeQuota, Unit } from 'support/api/quota';
 import { Context } from 'support/commands';
 
+import { registerVisit } from 'cypress-network-idle/src/register';
+registerVisit({ timeout: 1000 });
+
 describe('api internationalization', () => {
   beforeEach(() => {
     cy.context()

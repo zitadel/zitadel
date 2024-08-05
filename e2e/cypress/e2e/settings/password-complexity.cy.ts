@@ -1,5 +1,8 @@
 import { login, User } from '../../support/login/users';
 
+import { registerVisit } from 'cypress-network-idle/src/register';
+registerVisit({ timeout: 1000 });
+
 describe('password complexity', () => {
   const orgPath = `/org`;
   const testProjectName = 'e2eproject';

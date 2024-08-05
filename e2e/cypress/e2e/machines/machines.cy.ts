@@ -3,6 +3,9 @@ import { loginname } from '../../support/login/users';
 import { ensureDomainPolicy } from '../../support/api/policies';
 import { Context } from 'support/commands';
 
+import { registerVisit } from 'cypress-network-idle/src/register';
+registerVisit({ timeout: 1000 });
+
 describe('machines', () => {
   const machinesPath = `/users?type=machine`;
 
