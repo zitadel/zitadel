@@ -1,10 +1,10 @@
-import { FeatureService } from "@zitadel/proto/zitadel/feature/v2beta/feature_service_connect";
-import { RequestContext } from "@zitadel/proto/zitadel/object/v2/object_pb";
-import { OIDCService } from "@zitadel/proto/zitadel/oidc/v2beta/oidc_service_connect";
-import { OrganizationService } from "@zitadel/proto/zitadel/org/v2beta/org_service_connect";
-import { SessionService } from "@zitadel/proto/zitadel/session/v2beta/session_service_connect";
-import { SettingsService } from "@zitadel/proto/zitadel/settings/v2beta/settings_service_connect";
-import { UserService } from "@zitadel/proto/zitadel/user/v2beta/user_service_connect";
+import { FeatureService } from "@zitadel/proto/gen/zitadel/feature/v2/feature_service_connect";
+import { RequestContext } from "@zitadel/proto/gen/zitadel/object/v2/object_pb";
+import { OIDCService } from "@zitadel/proto/gen/zitadel/oidc/v2/oidc_service_connect";
+import { OrganizationService } from "@zitadel/proto/gen/zitadel/org/v2/org_service_connect";
+import { SessionService } from "@zitadel/proto/gen/zitadel/session/v2/session_service_connect";
+import { SettingsService } from "@zitadel/proto/gen/zitadel/settings/v2/settings_service_connect";
+import { UserService } from "@zitadel/proto/gen/zitadel/user/v2/user_service_connect";
 import { createClientFor } from "./helpers";
 
 export const createUserServiceClient = createClientFor(UserService);

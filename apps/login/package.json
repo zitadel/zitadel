@@ -54,7 +54,7 @@
     "tinycolor2": "1.4.2"
   },
   "devDependencies": {
-    "@bufbuild/buf": "^1.14.0",
+    "@bufbuild/buf": "^1.35.1",
     "@testing-library/jest-dom": "^6.4.5",
     "@testing-library/react": "^15.0.7",
     "@types/ms": "0.7.31",
