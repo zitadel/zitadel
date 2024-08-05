@@ -41,7 +41,7 @@
             class="state"
             [ngClass]="{
               active: mfa.state === AuthFactorState.AUTH_FACTOR_STATE_READY,
-              inactive: mfa.state === AuthFactorState.AUTH_FACTOR_STATE_NOT_READY
+              inactive: mfa.state === AuthFactorState.AUTH_FACTOR_STATE_NOT_READY,
             }"
           >
             {{ 'USER.MFA.STATE.' + mfa.state | translate }}

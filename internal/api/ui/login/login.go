@@ -129,7 +129,7 @@ func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecu
 				sameSiteMode = csrf.SameSiteNoneMode
 				// ... and since SameSite none requires the secure flag, we'll set it for TLS and for localhost
 				// (regardless of the TLS / externalSecure settings)
-				secureOnly = externalSecure || instance.RequestedDomain() == "localhost"
+				secureOnly = externalSecure || http_utils.DomainContext(r.Context()).RequestedDomain() == "localhost"
 			}
 			csrf.Protect(csrfCookieKey,
 				csrf.Secure(secureOnly),
@@ -163,7 +163,7 @@ func (l *Login) Handler() http.Handler {
 }
 
 func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
-	orgDomain, err := domain.NewIAMDomainName(orgName, authz.GetInstance(ctx).RequestedDomain())
+	orgDomain, err := domain.NewIAMDomainName(orgName, http_utils.DomainContext(ctx).RequestedDomain())
 	if err != nil {
 		return nil, err
 	}
@@ -199,5 +199,5 @@ func setUserContext(ctx context.Context, userID, resourceOwner string) context.C
 }
 
 func (l *Login) baseURL(ctx context.Context) string {
-	return http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure) + HandlerPrefix
+	return http_utils.DomainContext(ctx).Origin() + HandlerPrefix
 }

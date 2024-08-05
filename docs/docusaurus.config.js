@@ -333,7 +333,7 @@ module.exports = {
             },
           },
           action_v3: {
-            specPath: ".artifacts/openapi/zitadel/action/v3alpha/action_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/resources/action/v3alpha/action_service.swagger.json",
             outputDir: "docs/apis/resources/action_service_v3",
             sidebarOptions: {
                 groupPathsBy: "tag",

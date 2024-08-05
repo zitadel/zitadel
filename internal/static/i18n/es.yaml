@@ -563,6 +563,7 @@ Errors:
     NotFound: Ejecución no encontrada
     IncludeNotFound: Incluir no encontrado
     NoTargets: No hay objetivos definidos
+    ResponseIsNotValidJSON: La respuesta no es un JSON válido
   UserSchema:
     NotEnabled: La función "Esquema de usuario" no está habilitada
     Type:

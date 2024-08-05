@@ -4,38 +4,22 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	settings_object "github.com/zitadel/zitadel/internal/api/grpc/settings/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/execution"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
+	"github.com/zitadel/zitadel/internal/zerrors"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
-
-func (s *Server) ListExecutionFunctions(_ context.Context, _ *action.ListExecutionFunctionsRequest) (*action.ListExecutionFunctionsResponse, error) {
-	return &action.ListExecutionFunctionsResponse{
-		Functions: s.ListActionFunctions(),
-	}, nil
-}
-
-func (s *Server) ListExecutionMethods(_ context.Context, _ *action.ListExecutionMethodsRequest) (*action.ListExecutionMethodsResponse, error) {
-	return &action.ListExecutionMethodsResponse{
-		Methods: s.ListGRPCMethods(),
-	}, nil
-}
-
-func (s *Server) ListExecutionServices(_ context.Context, _ *action.ListExecutionServicesRequest) (*action.ListExecutionServicesResponse, error) {
-	return &action.ListExecutionServicesResponse{
-		Services: s.ListGRPCServices(),
-	}, nil
-}
 
 func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionRequest) (*action.SetExecutionResponse, error) {
 	if err := checkExecutionEnabled(ctx); err != nil {
 		return nil, err
 	}
-
-	targets := make([]*execution.Target, len(req.Targets))
-	for i, target := range req.Targets {
+	reqTargets := req.GetExecution().GetTargets()
+	targets := make([]*execution.Target, len(reqTargets))
+	for i, target := range reqTargets {
 		switch t := target.GetType().(type) {
 		case *action.ExecutionTargetType_Include:
 			include, err := conditionToInclude(t.Include)
@@ -50,36 +34,32 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 	set := &command.SetExecution{
 		Targets: targets,
 	}
-
+	owner := &object.Owner{
+		Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+		Id:   authz.GetInstance(ctx).InstanceID(),
+	}
 	var err error
 	var details *domain.ObjectDetails
 	switch t := req.GetCondition().GetConditionType().(type) {
 	case *action.Condition_Request:
 		cond := executionConditionFromRequest(t.Request)
-		details, err = s.command.SetExecutionRequest(ctx, cond, set, authz.GetInstance(ctx).InstanceID())
-		if err != nil {
-			return nil, err
-		}
+		details, err = s.command.SetExecutionRequest(ctx, cond, set, owner.Id)
 	case *action.Condition_Response:
 		cond := executionConditionFromResponse(t.Response)
-		details, err = s.command.SetExecutionResponse(ctx, cond, set, authz.GetInstance(ctx).InstanceID())
-		if err != nil {
-			return nil, err
-		}
+		details, err = s.command.SetExecutionResponse(ctx, cond, set, owner.Id)
 	case *action.Condition_Event:
 		cond := executionConditionFromEvent(t.Event)
-		details, err = s.command.SetExecutionEvent(ctx, cond, set, authz.GetInstance(ctx).InstanceID())
-		if err != nil {
-			return nil, err
-		}
+		details, err = s.command.SetExecutionEvent(ctx, cond, set, owner.Id)
 	case *action.Condition_Function:
-		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function.GetName()), set, authz.GetInstance(ctx).InstanceID())
-		if err != nil {
-			return nil, err
-		}
+		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function.GetName()), set, owner.Id)
+	default:
+		err = zerrors.ThrowInvalidArgument(nil, "ACTION-5r5Ju", "Errors.Execution.ConditionInvalid")
+	}
+	if err != nil {
+		return nil, err
 	}
 	return &action.SetExecutionResponse{
-		Details: object.DomainToDetailsPb(details),
+		Details: settings_object.DomainToDetailsPb(details, owner),
 	}, nil
 }
 
@@ -109,44 +89,26 @@ func conditionToInclude(cond *action.Condition) (string, error) {
 			return "", err
 		}
 		return cond.ID(), nil
+	default:
+		return "", zerrors.ThrowInvalidArgument(nil, "ACTION-9BBob", "Errors.Execution.ConditionInvalid")
 	}
-	return "", nil
 }
 
-func (s *Server) DeleteExecution(ctx context.Context, req *action.DeleteExecutionRequest) (*action.DeleteExecutionResponse, error) {
-	if err := checkExecutionEnabled(ctx); err != nil {
-		return nil, err
-	}
+func (s *Server) ListExecutionFunctions(_ context.Context, _ *action.ListExecutionFunctionsRequest) (*action.ListExecutionFunctionsResponse, error) {
+	return &action.ListExecutionFunctionsResponse{
+		Functions: s.ListActionFunctions(),
+	}, nil
+}
 
-	var err error
-	var details *domain.ObjectDetails
-	switch t := req.GetCondition().GetConditionType().(type) {
-	case *action.Condition_Request:
-		cond := executionConditionFromRequest(t.Request)
-		details, err = s.command.DeleteExecutionRequest(ctx, cond, authz.GetInstance(ctx).InstanceID())
-		if err != nil {
-			return nil, err
-		}
-	case *action.Condition_Response:
-		cond := executionConditionFromResponse(t.Response)
-		details, err = s.command.DeleteExecutionResponse(ctx, cond, authz.GetInstance(ctx).InstanceID())
-		if err != nil {
-			return nil, err
-		}
-	case *action.Condition_Event:
-		cond := executionConditionFromEvent(t.Event)
-		details, err = s.command.DeleteExecutionEvent(ctx, cond, authz.GetInstance(ctx).InstanceID())
-		if err != nil {
-			return nil, err
-		}
-	case *action.Condition_Function:
-		details, err = s.command.DeleteExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function.GetName()), authz.GetInstance(ctx).InstanceID())
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &action.DeleteExecutionResponse{
-		Details: object.DomainToDetailsPb(details),
+func (s *Server) ListExecutionMethods(_ context.Context, _ *action.ListExecutionMethodsRequest) (*action.ListExecutionMethodsResponse, error) {
+	return &action.ListExecutionMethodsResponse{
+		Methods: s.ListGRPCMethods(),
+	}, nil
+}
+
+func (s *Server) ListExecutionServices(_ context.Context, _ *action.ListExecutionServicesRequest) (*action.ListExecutionServicesResponse, error) {
+	return &action.ListExecutionServicesResponse{
+		Services: s.ListGRPCServices(),
 	}, nil
 }
 

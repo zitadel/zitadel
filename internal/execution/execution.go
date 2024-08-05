@@ -46,7 +46,7 @@ func CallTargets(
 		}
 		if len(resp) > 0 {
 			// error in unmarshalling
-			if err := info.SetHTTPResponseBody(resp); err != nil {
+			if err := info.SetHTTPResponseBody(resp); err != nil && target.IsInterruptOnError() {
 				return nil, err
 			}
 		}
@@ -73,10 +73,10 @@ func CallTarget(
 		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
 	// get request, return response and error
 	case domain.TargetTypeCall:
-		return call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
+		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
 	case domain.TargetTypeAsync:
 		go func(target Target, info ContextInfoRequest) {
-			if _, err := call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody()); err != nil {
+			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody()); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
 		}(target, info)
@@ -88,12 +88,12 @@ func CallTarget(
 
 // webhook call a webhook, ignore the response but return the errror
 func webhook(ctx context.Context, url string, timeout time.Duration, body []byte) error {
-	_, err := call(ctx, url, timeout, body)
+	_, err := Call(ctx, url, timeout, body)
 	return err
 }
 
-// call function to do a post HTTP request to a desired url with timeout
-func call(ctx context.Context, url string, timeout time.Duration, body []byte) (_ []byte, err error) {
+// Call function to do a post HTTP request to a desired url with timeout
+func Call(ctx context.Context, url string, timeout time.Duration, body []byte) (_ []byte, err error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {

@@ -552,6 +552,7 @@ Errors:
     NotFound: Исполнение не найдено
     IncludeNotFound: Включить не найдено
     NoTargets: Цели не определены
+    ResponseIsNotValidJSON: Ответ не является допустимым JSON
   UserSchema:
     NotEnabled: Функция «Пользовательская схема» не включена
     Type:

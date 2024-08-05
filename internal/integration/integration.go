@@ -205,7 +205,7 @@ func (s *Tester) createLoginClient(ctx context.Context) {
 func (s *Tester) createMachineUser(ctx context.Context, username string, userType UserType) (context.Context, *query.User) {
 	var err error
 
-	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host())
+	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host(), "")
 	logging.OnError(err).Fatal("query instance")
 	ctx = authz.WithInstance(ctx, s.Instance)
 

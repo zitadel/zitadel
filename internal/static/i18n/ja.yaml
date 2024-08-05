@@ -552,6 +552,7 @@ Errors:
     NotFound: 実行が見つかりませんでした
     IncludeNotFound: 見つからないものを含める
     NoTargets: ターゲットが定義されていません
+    ResponseIsNotValidJSON: 応答は有効な JSON ではありません
   UserSchema:
     NotEnabled: 機能「ユーザースキーマ」が有効になっていません
     Type:

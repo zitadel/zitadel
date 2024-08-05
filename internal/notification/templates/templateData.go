@@ -2,7 +2,6 @@ package templates
 
 import (
 	"fmt"
-	"html"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/i18n"
@@ -40,7 +39,7 @@ func (data *TemplateData) Translate(translator *i18n.Translator, msgType string,
 	data.PreHeader = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessagePreHeader), args, langs...)
 	data.Subject = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageSubject), args, langs...)
 	data.Greeting = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageGreeting), args, langs...)
-	data.Text = html.UnescapeString(translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageText), args, langs...))
+	data.Text = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageText), args, langs...)
 	data.ButtonText = translator.Localize(fmt.Sprintf("%s.%s", msgType, domain.MessageButtonText), args, langs...)
 	// Footer text is neither included in i18n files nor defaults.yaml
 	footerText := fmt.Sprintf("%s.%s", msgType, domain.MessageFooterText)
