@@ -9,10 +9,11 @@ The typescript repository contains all TypeScript and JavaScript packages and ap
 ## Included Apps And Packages
 
 - **[login](./typescript-repo#new-login-ui)**: The future login UI used by ZITADEL Cloud, powered by Next.js
-- `@zitadel/server`: core components for establishing node client connection, grpc stub
-- `@zitadel/client`: core components for establishing web client connection, grpc stub
-- `@zitadel/react`: shared React utilities and components built with Tailwind CSS
-- `@zitadel/next`: shared Next.js utilities
+- `@zitadel/proto`: Typescript implementation of Protocol Buffers, suitable for web browsers and Node.js.
+- `@zitadel/client`: Core components for establishing a client connection
+- `@zitadel/node`: Core components for establishing a server connection
+- `@zitadel/react`: Shared React Utilities and components built with Tailwind CSS
+- `@zitadel/next`: Shared Next.js Utilities
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `eslint-config-zitadel`: ESLint preset
 
@@ -69,7 +70,7 @@ The application can then request a token calling the /token endpoint of the logi
 - Scopes
   - [x] `openid email profile address``
   - [x] `offline access`
-  - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
+  - [x] `urn:zitadel:iam:org:idp:id:{idp_id}`
   - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
   - [x] `urn:zitadel:iam:org:id:{orgid}`
   - [x] `urn:zitadel:iam:org:domain:primary:{domain}`
