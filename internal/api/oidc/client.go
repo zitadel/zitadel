@@ -975,13 +975,13 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 		return s.clientCredentialsAuth(ctx, r.Data.ClientID, r.Data.ClientSecret)
 	}
 
-	clientID, assertion, err := clientIDFromCredentials(r.Data)
+	clientID, assertion, err := clientIDFromCredentials(ctx, r.Data)
 	if err != nil {
 		return nil, err
 	}
 	client, err := s.query.GetOIDCClientByID(ctx, clientID, assertion)
 	if zerrors.IsNotFound(err) {
-		return nil, oidc.ErrInvalidClient().WithParent(err).WithDescription("client not found")
+		return nil, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("client not found")
 	}
 	if err != nil {
 		return nil, err // defaults to server error
@@ -1019,7 +1019,7 @@ func (s *Server) verifyClientAssertion(ctx context.Context, client *query.OIDCCl
 	}
 	verifier := op.NewJWTProfileVerifierKeySet(keySetMap(client.PublicKeys), op.IssuerFromContext(ctx), time.Hour, client.ClockSkew)
 	if _, err := op.VerifyJWTAssertion(ctx, assertion, verifier); err != nil {
-		return oidc.ErrInvalidClient().WithParent(err).WithDescription("invalid assertion")
+		return oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("invalid assertion")
 	}
 	return nil
 }
@@ -1036,7 +1036,7 @@ func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClien
 	spanPasswordComparison.EndWithError(err)
 	if err != nil {
 		s.command.OIDCSecretCheckFailed(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner)
-		return oidc.ErrInvalidClient().WithParent(err).WithDescription("invalid secret")
+		return oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("invalid secret")
 	}
 	s.command.OIDCSecretCheckSucceeded(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner, updated)
 	return nil

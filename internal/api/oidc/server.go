@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -119,7 +120,7 @@ func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.
 	}()
 	restrictions, err := s.query.GetInstanceRestrictions(ctx)
 	if err != nil {
-		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithDescription("internal server error"), http.StatusInternalServerError)
+		return nil, op.NewStatusError(oidc.ErrServerError().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("internal server error"), http.StatusInternalServerError)
 	}
 	allowedLanguages := restrictions.AllowedLanguages
 	if len(allowedLanguages) == 0 {
