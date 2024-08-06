@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
-	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -31,7 +30,7 @@ func (mig *FillFieldsForProjectGrant) Execute(ctx context.Context, _ eventstore.
 	}
 	for _, instance := range instances {
 		ctx := authz.WithInstanceID(ctx, instance)
-		if err := projection.ProjectGrantFields.Trigger(ctx, handler.WithAwaitRunning()); err != nil {
+		if err := projection.ProjectGrantFields.Trigger(ctx); err != nil {
 			return err
 		}
 	}
