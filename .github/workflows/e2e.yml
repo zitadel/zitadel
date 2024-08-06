@@ -48,6 +48,8 @@ jobs:
           CYPRESS_WEBHOOK_HANDLER_HOST: host.docker.internal
           CYPRESS_DATABASE_CONNECTION_URL: 'postgresql://root@localhost:26257/zitadel'
           CYPRESS_BACKEND_URL: http://localhost:8080
+          CYPRESS_COMMAND_DELAY: 1000
+          COMMAND_DELAY: 1000
         with:
           working-directory: e2e
           browser: ${{ matrix.browser }}
