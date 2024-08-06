@@ -62,7 +62,6 @@ export class AccountsCardComponent implements OnInit {
     const configWithPrompt: Partial<AuthConfig> = {
       customQueryParams: {
         prompt: 'login',
-        scope: 'openid profile email',
       } as any,
     };
     this.authService.authenticate(configWithPrompt);
