@@ -64,18 +64,29 @@ export async function POST(request: NextRequest) {
           if (identityProviders.length === 1) {
             const host = request.nextUrl.origin;
 
-            const provider =
-              identityProviders[0].type === IdentityProviderType.GITHUB
-                ? "github"
-                : identityProviders[0].type === IdentityProviderType.GOOGLE
-                  ? "google"
-                  : identityProviders[0].type === IdentityProviderType.AZURE_AD
-                    ? "azure"
-                    : identityProviders[0].type === IdentityProviderType.SAML
-                      ? "saml"
-                      : identityProviders[0].type === IdentityProviderType.OIDC
-                        ? "oidc"
-                        : "oidc";
+            const identityProviderType = identityProviders[0].type;
+            let provider: string;
+
+            switch (identityProviderType) {
+              case IdentityProviderType.GITHUB:
+                provider = "github";
+                break;
+              case IdentityProviderType.GOOGLE:
+                provider = "google";
+                break;
+              case IdentityProviderType.AZURE_AD:
+                provider = "azure";
+                break;
+              case IdentityProviderType.SAML:
+                provider = "saml";
+                break;
+              case IdentityProviderType.OIDC:
+                provider = "oidc";
+                break;
+              default:
+                provider = "oidc";
+                break;
+            }
 
             const params = new URLSearchParams();
 
