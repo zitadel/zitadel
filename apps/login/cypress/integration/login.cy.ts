@@ -2,7 +2,7 @@ import { stub } from "../support/mock";
 
 describe("login", () => {
   beforeEach(() => {
-    stub("zitadel.session.v2beta.SessionService", "CreateSession", {
+    stub("zitadel.session.v2.SessionService", "CreateSession", {
       data: {
         details: {
           sequence: 859,
@@ -16,7 +16,7 @@ describe("login", () => {
       },
     });
 
-    stub("zitadel.session.v2beta.SessionService", "GetSession", {
+    stub("zitadel.session.v2.SessionService", "GetSession", {
       data: {
         session: {
           id: "221394658884845598",
@@ -37,7 +37,7 @@ describe("login", () => {
       },
     });
 
-    stub("zitadel.settings.v2beta.SettingsService", "GetLoginSettings", {
+    stub("zitadel.settings.v2.SettingsService", "GetLoginSettings", {
       data: {
         settings: {
           passkeysType: 1,
@@ -47,7 +47,7 @@ describe("login", () => {
   });
   describe("password login", () => {
     beforeEach(() => {
-      stub("zitadel.user.v2beta.UserService", "ListUsers", {
+      stub("zitadel.user.v2.UserService", "ListUsers", {
         data: {
           details: {
             totalResult: 1,
@@ -79,7 +79,7 @@ describe("login", () => {
           ],
         },
       });
-      stub("zitadel.user.v2beta.UserService", "ListAuthenticationMethodTypes", {
+      stub("zitadel.user.v2.UserService", "ListAuthenticationMethodTypes", {
         data: {
           authMethodTypes: [1], // 1 for password authentication
         },
@@ -91,7 +91,7 @@ describe("login", () => {
     });
     describe("with passkey prompt", () => {
       beforeEach(() => {
-        stub("zitadel.session.v2beta.SessionService", "SetSession", {
+        stub("zitadel.session.v2.SessionService", "SetSession", {
           data: {
             details: {
               sequence: 859,
@@ -118,7 +118,7 @@ describe("login", () => {
   });
   describe("passkey login", () => {
     beforeEach(() => {
-      stub("zitadel.user.v2beta.UserService", "ListUsers", {
+      stub("zitadel.user.v2.UserService", "ListUsers", {
         data: {
           details: {
             totalResult: 1,
@@ -150,7 +150,7 @@ describe("login", () => {
           ],
         },
       });
-      stub("zitadel.user.v2beta.UserService", "ListAuthenticationMethodTypes", {
+      stub("zitadel.user.v2.UserService", "ListAuthenticationMethodTypes", {
         data: {
           authMethodTypes: [2], // 2 for passwordless authentication
         },

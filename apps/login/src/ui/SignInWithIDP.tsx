@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { ProviderSlug } from "@/lib/demos";
 import Alert from "./Alert";
 import BackButton from "./BackButton";
-import { IdentityProvider } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+import { IdentityProvider } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;

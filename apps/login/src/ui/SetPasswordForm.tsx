@@ -14,7 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
-import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2beta/password_settings_pb";
+import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 
 type Inputs =
   | {

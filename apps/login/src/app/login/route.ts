@@ -8,12 +8,12 @@ import {
 } from "@/lib/zitadel";
 import { SessionCookie, getAllSessions } from "@/utils/cookies";
 import { NextRequest, NextResponse } from "next/server";
-import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
   AuthRequest,
   Prompt,
-} from "@zitadel/proto/zitadel/oidc/v2beta/authorization_pb";
-import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+} from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(

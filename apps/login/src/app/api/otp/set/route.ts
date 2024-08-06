@@ -6,7 +6,7 @@ import {
 } from "@/utils/cookies";
 import { setSessionAndUpdateCookie } from "@/utils/session";
 import { NextRequest, NextResponse, userAgent } from "next/server";
-import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PlainMessage } from "@zitadel/client";
 
 export async function POST(request: NextRequest) {

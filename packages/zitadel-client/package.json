@@ -23,11 +23,6 @@
       "require": "./dist/v2.cjs",
       "types": "./dist/v2.d.ts"
     },
-    "./v2beta": {
-      "import": "./dist/v2.js",
-      "require": "./dist/v2.cjs",
-      "types": "./dist/v2.d.ts"
-    },
     "./v3alpha": {
       "import": "./dist/v3alpha.js",
       "require": "./dist/v3alpha.cjs",
