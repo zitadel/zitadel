@@ -4,7 +4,7 @@ import React from "react";
 import { Logo } from "@/ui/Logo";
 import ThemeWrapper from "./ThemeWrapper";
 import { LayoutProviders } from "./LayoutProviders";
-import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2beta/branding_settings_pb";
+import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 
 export default function DynamicTheme({
   branding,

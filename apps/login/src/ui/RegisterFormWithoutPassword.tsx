@@ -12,7 +12,7 @@ import AuthenticationMethodRadio, {
 } from "./AuthenticationMethodRadio";
 import Alert from "./Alert";
 import BackButton from "./BackButton";
-import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2beta/legal_settings_pb";
+import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import { first } from "node_modules/cypress/types/lodash";
 
 type Inputs =

@@ -3,11 +3,8 @@ import { getBrandingSettings, userService } from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import IdpSignin from "@/ui/IdpSignin";
-import { AddHumanUserRequest } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
-import {
-  IDPInformation,
-  IDPLink,
-} from "@zitadel/proto/zitadel/user/v2beta/idp_pb";
+import { AddHumanUserRequest } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { IDPInformation, IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { PartialMessage } from "@zitadel/client";
 
 const PROVIDER_MAPPING: {

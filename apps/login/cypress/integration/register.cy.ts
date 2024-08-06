@@ -2,7 +2,7 @@ import { stub } from "../support/mock";
 
 describe("register", () => {
   beforeEach(() => {
-    stub("zitadel.user.v2beta.UserService", "AddHumanUser", {
+    stub("zitadel.user.v2.UserService", "AddHumanUser", {
       data: {
         userId: "123",
       },

@@ -8,9 +8,9 @@ import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
 import BackButton from "./BackButton";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 type Inputs = {
   password: string;

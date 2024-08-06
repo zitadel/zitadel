@@ -8,7 +8,7 @@ import { Spinner } from "./Spinner";
 import Alert from "./Alert";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
 import BackButton from "./BackButton";
-import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
+import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 type Inputs = {};
 

@@ -10,7 +10,7 @@ import Alert from "./Alert";
 import {
   LoginSettings,
   PasskeysType,
-} from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
 type Inputs = {
   loginName: string;

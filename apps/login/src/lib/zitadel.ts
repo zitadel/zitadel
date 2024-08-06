@@ -4,20 +4,20 @@ import {
   createSettingsServiceClient,
   createUserServiceClient,
   makeReqCtx,
-} from "@zitadel/client/v2beta";
+} from "@zitadel/client/v2";
 import { createManagementServiceClient } from "@zitadel/client/v1";
 import { createServerTransport } from "@zitadel/node";
-import { GetActiveIdentityProvidersRequest } from "@zitadel/proto/zitadel/settings/v2beta/settings_service_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
-import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2beta/challenge_pb";
+import { GetActiveIdentityProvidersRequest } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import {
   RetrieveIdentityProviderIntentRequest,
   VerifyU2FRegistrationRequest,
-} from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
-import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2beta/oidc_service_pb";
-import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2beta/object_pb";
-import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2beta/idp_pb";
+import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
+import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { ProviderSlug } from "./demos";
 import { PlainMessage } from "@zitadel/client";
 

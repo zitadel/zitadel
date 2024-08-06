@@ -8,7 +8,7 @@ import {
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
-import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
