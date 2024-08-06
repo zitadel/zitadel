@@ -62,7 +62,7 @@ export class AccountsCardComponent implements OnInit {
     const configWithPrompt: Partial<AuthConfig> = {
       customQueryParams: {
         prompt: 'login',
-        scope: 'openid profile email urn:zitadel:iam:org:id:267341574889856757', // urn:zitadel:iam:org:idp:id:258370286980727297 urn:zitadel:iam:org:id:267341574889856757
+        scope: 'openid profile email',
       } as any,
     };
     this.authService.authenticate(configWithPrompt);
