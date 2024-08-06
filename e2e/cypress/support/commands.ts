@@ -20,9 +20,9 @@ if (COMMAND_DELAY > 0) {
             const origVal = originalFn(...args);
 
             return new Promise((resolve) => {
-              setTimeout(() => {}, COMMAND_DELAY/2);
+              setTimeout(() => {}, COMMAND_DELAY);
               resolve(origVal);
-              setTimeout(() => {}, COMMAND_DELAY/2);
+              setTimeout(() => {}, COMMAND_DELAY);
             });
         });
     }
