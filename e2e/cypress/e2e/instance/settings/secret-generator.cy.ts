@@ -1,8 +1,5 @@
 const secretGeneratorSettingsPath = `/instance?id=secrets`;
 
-import { registerVisit } from 'cypress-network-idle/src/register';
-registerVisit({ timeout: 10000 });
-
 beforeEach(() => {
   cy.context().as('ctx');
 });
