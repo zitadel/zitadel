@@ -1,3 +1,4 @@
+import 'cypress-wait-until';
 import { apiAuth, systemAuth } from './api/apiauth';
 import { API, SystemAPI } from './api/types';
 import { ensureQuotaIsRemoved, Unit } from './api/quota';
@@ -14,7 +15,7 @@ interface ShouldNotExistOptions {
 // Goal is to reduce the speed of operations executed to better mimic user interaction
 const COMMAND_DELAY = Cypress.env('COMMAND_DELAY') || 0;
 if (COMMAND_DELAY > 0) {
-    for (const command of ['visit', 'click', 'trigger', 'type', 'clear', 'reload', 'contains']) {
+    for (const command of ['visit', 'click', 'trigger', 'type', 'clear', 'reload']) {
         Cypress.Commands.overwrite(command as unknown as keyof Cypress.Chainable<any>, (originalFn, ...args) => {
             const origVal = originalFn(...args);
 
