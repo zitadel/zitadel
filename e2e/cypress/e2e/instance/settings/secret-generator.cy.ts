@@ -175,12 +175,12 @@ describe('instance secret generators', () => {
 
     it(`App Secret should update settings`, () => {
       cy.visit(secretGeneratorSettingsPath);
-      // cy.wait(1000);
+      cy.wait(1000);
       cy.get('input[id="length6"]').clear().type('32');
       cy.get('input[id="expiry6"]').clear().type('120');
       cy.get('mat-slide-toggle#includeUpperLetters6 button').click();
       cy.get('button[id="saveSecretGenerator6"]').click();
-      // cy.wait(1000);
+      cy.wait(1000);
       cy.get('input[id="length6"]').should('have.value', '32');
       cy.get('input[id="expiry6"]').should('have.value', '120');
       cy.get('mat-slide-toggle#includeLowerLetters6 button').should('have.attr', 'aria-checked', 'true');
