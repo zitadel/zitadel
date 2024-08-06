@@ -5,6 +5,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 )
@@ -30,7 +31,7 @@ func (mig *FillFieldsForOrgDomainVerified) Execute(ctx context.Context, _ events
 	}
 	for _, instance := range instances {
 		ctx := authz.WithInstanceID(ctx, instance)
-		if err := projection.OrgDomainVerifiedFields.Trigger(ctx); err != nil {
+		if err := projection.OrgDomainVerifiedFields.Trigger(ctx, handler.WithAwaitRunning()); err != nil {
 			return err
 		}
 	}

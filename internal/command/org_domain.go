@@ -13,6 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -420,7 +421,7 @@ func (c *Commands) searchOrgDomainVerifiedByDomain(ctx context.Context, domain s
 		return nil, err
 	}
 	if len(results) == 0 {
-		_ = projection.OrgDomainVerifiedFields.Trigger(ctx)
+		_ = projection.OrgDomainVerifiedFields.Trigger(ctx, handler.WithAwaitRunning())
 		results, err = c.eventstore.Search(ctx, condition)
 		if err != nil {
 			return nil, err

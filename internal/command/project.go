@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
+	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query/projection"
 	"github.com/zitadel/zitadel/internal/repository/project"
@@ -174,7 +175,7 @@ func (c *Commands) projectAggregateByID(ctx context.Context, projectID, resource
 		return nil, domain.ProjectStateUnspecified, zerrors.ThrowNotFound(err, "COMMA-NDQoF", "Errors.Project.NotFound")
 	}
 	if len(result) == 0 {
-		_ = projection.ProjectGrantFields.Trigger(ctx)
+		_ = projection.ProjectGrantFields.Trigger(ctx, handler.WithAwaitRunning())
 		result, err = c.projectState(ctx, projectID, resourceOwner)
 		if err != nil || len(result) == 0 {
 			return nil, domain.ProjectStateUnspecified, zerrors.ThrowNotFound(err, "COMMA-U1nza", "Errors.Project.NotFound")
