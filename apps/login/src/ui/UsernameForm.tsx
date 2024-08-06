@@ -10,7 +10,7 @@ import Alert from "./Alert";
 import {
   LoginSettings,
   PasskeysType,
-} from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+} from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
 type Inputs = {
   loginName: string;
@@ -82,9 +82,10 @@ export default function UsernameForm({
     values: Inputs,
     organization?: string,
   ) {
-    console.log(loginSettings);
     return submitLoginName(values, organization).then((response) => {
-      if (response.authMethodTypes.length == 1) {
+      if (response.nextStep) {
+        return router.push(response.nextStep);
+      } else if (response.authMethodTypes.length == 1) {
         const method = response.authMethodTypes[0];
         switch (method) {
           case 1: // user has only password as auth method
@@ -92,8 +93,11 @@ export default function UsernameForm({
               loginName: response.factors.user.loginName,
             };
 
-            if (organization) {
-              paramsPassword.organization = organization;
+            // TODO: does this have to be checked in loginSettings.allowDomainDiscovery
+
+            if (organization || response.factors.user.organizationId) {
+              paramsPassword.organization =
+                organization ?? response.factors.user.organizationId;
             }
 
             if (
@@ -117,8 +121,10 @@ export default function UsernameForm({
             if (authRequestId) {
               paramsPasskey.authRequestId = authRequestId;
             }
-            if (organization) {
-              paramsPasskey.organization = organization;
+
+            if (organization || response.factors.user.organizationId) {
+              paramsPasskey.organization =
+                organization ?? response.factors.user.organizationId;
             }
 
             return router.push(
@@ -134,8 +140,10 @@ export default function UsernameForm({
             if (authRequestId) {
               paramsPasskeyDefault.authRequestId = authRequestId;
             }
-            if (organization) {
-              paramsPasskeyDefault.organization = organization;
+
+            if (organization || response.factors.user.organizationId) {
+              paramsPasskeyDefault.organization =
+                organization ?? response.factors.user.organizationId;
             }
 
             return router.push(
@@ -161,8 +169,9 @@ export default function UsernameForm({
             passkeyParams.authRequestId = authRequestId;
           }
 
-          if (organization) {
-            passkeyParams.organization = organization;
+          if (organization || response.factors.user.organizationId) {
+            passkeyParams.organization =
+              organization ?? response.factors.user.organizationId;
           }
 
           return router.push(
@@ -180,8 +189,9 @@ export default function UsernameForm({
             paramsPasswordDefault.authRequestId = authRequestId;
           }
 
-          if (organization) {
-            paramsPasswordDefault.organization = organization;
+          if (organization || response.factors.user.organizationId) {
+            paramsPasswordDefault.organization =
+              organization ?? response.factors.user.organizationId;
           }
 
           return router.push(

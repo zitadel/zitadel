@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { ProviderSlug } from "@/lib/demos";
 import Alert from "./Alert";
 import BackButton from "./BackButton";
-import { IdentityProvider } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
+import { IdentityProvider } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -19,18 +19,13 @@ export interface SignInWithIDPProps {
   identityProviders: IdentityProvider[];
   authRequestId?: string;
   organization?: string;
-  startIDPFlowPath?: (idpId: string) => string;
 }
-
-const START_IDP_FLOW_PATH = (idpId: string) =>
-  `/v2beta/users/idps/${idpId}/start`;
 
 export function SignInWithIDP({
   host,
   identityProviders,
   authRequestId,
   organization,
-  startIDPFlowPath = START_IDP_FLOW_PATH,
 }: SignInWithIDPProps) {
   // TODO: remove casting when bufbuild/protobuf-es@v2 is released
   identityProviders = identityProviders.map((idp) =>

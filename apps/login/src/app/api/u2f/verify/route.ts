@@ -1,7 +1,7 @@
 import { getSession, verifyU2FRegistration } from "@/lib/zitadel";
 import { getSessionCookieById } from "@/utils/cookies";
 import { NextRequest, NextResponse, userAgent } from "next/server";
-import { VerifyU2FRegistrationRequest } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
+import { VerifyU2FRegistrationRequest } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { PlainMessage } from "@zitadel/client";
 
 export async function POST(request: NextRequest) {

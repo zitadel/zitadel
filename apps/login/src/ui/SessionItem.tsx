@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Avatar } from "./Avatar";
 import moment from "moment";
 import { XCircleIcon } from "@heroicons/react/24/outline";
-import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
 export default function SessionItem({
   session,

@@ -14,9 +14,9 @@ import {
 import {
   Challenges,
   RequestChallenges,
-} from "@zitadel/proto/zitadel/session/v2beta/challenge_pb";
-import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
+} from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PlainMessage } from "@zitadel/client";
 
 export async function createSessionAndUpdateCookie(
@@ -91,7 +91,6 @@ export async function createSessionForUserIdAndUpdateCookie(
   );
 
   if (createdSession) {
-    console.log("cs", createdSession);
     return getSession(
       createdSession.sessionId,
       createdSession.sessionToken,

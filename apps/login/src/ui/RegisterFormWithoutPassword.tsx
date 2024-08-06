@@ -12,7 +12,8 @@ import AuthenticationMethodRadio, {
 } from "./AuthenticationMethodRadio";
 import Alert from "./Alert";
 import BackButton from "./BackButton";
-import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2beta/legal_settings_pb";
+import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import { first } from "node_modules/cypress/types/lodash";
 
 type Inputs =
   | {
@@ -24,17 +25,28 @@ type Inputs =
 
 type Props = {
   legal: LegalAndSupportSettings;
+  firstname?: string;
+  lastname?: string;
+  email?: string;
   organization?: string;
   authRequestId?: string;
 };
 
 export default function RegisterFormWithoutPassword({
   legal,
+  email,
+  firstname,
+  lastname,
   organization,
   authRequestId,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
+    defaultValues: {
+      email: email ?? "",
+      firstName: firstname ?? "",
+      lastname: lastname ?? "",
+    },
   });
 
   const [loading, setLoading] = useState<boolean>(false);

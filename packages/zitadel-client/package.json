@@ -18,10 +18,10 @@
       "require": "./dist/v1.cjs",
       "types": "./dist/v1.d.ts"
     },
-    "./v2beta": {
-      "import": "./dist/v2beta.js",
-      "require": "./dist/v2beta.cjs",
-      "types": "./dist/v2beta.d.ts"
+    "./v2": {
+      "import": "./dist/v2.js",
+      "require": "./dist/v2.cjs",
+      "types": "./dist/v2.d.ts"
     },
     "./v3alpha": {
       "import": "./dist/v3alpha.js",

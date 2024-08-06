@@ -1,5 +1,5 @@
 import tinycolor from "tinycolor2";
-import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2beta/branding_settings_pb";
+import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
 import { PartialMessage } from "@zitadel/client";
 
 export interface Color {
