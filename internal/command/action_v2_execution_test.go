@@ -91,6 +91,26 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			},
 		},
 		{
+			"empty executionType, error",
+			fields{
+				eventstore:       expectEventstore(),
+				grpcMethodExists: existsMock(true),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"notvalid",
+					"",
+					false,
+				},
+				set:           &SetExecution{},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			"empty target, error",
 			fields{
 				eventstore:       expectEventstore(),
@@ -103,7 +123,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					"",
 					false,
 				},
-				set:           &SetExecution{Targets: []*execution.Target{{}}},
+				set:           &SetExecution{},
 				resourceOwner: "instance",
 			},
 			res{
@@ -162,7 +182,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, method target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -210,7 +229,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, service target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -258,7 +276,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, all target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -305,8 +322,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push not found, method include",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
-					expectFilter(), // target doesn't exist
+					expectFilter(),
 				),
 				grpcMethodExists: existsMock(true),
 			},
@@ -332,7 +348,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, method include",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
@@ -388,8 +403,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push not found, service include",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
-					expectFilter(), // target doesn't exist
+					expectFilter(),
 				),
 				grpcServiceExists: existsMock(true),
 			},
@@ -415,7 +429,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, service include",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
@@ -471,8 +484,7 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push not found, all include",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
-					expectFilter(), // target doesn't exist
+					expectFilter(),
 				),
 			},
 			args{
@@ -497,7 +509,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 			"push ok, all include",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
@@ -539,83 +550,6 @@ func TestCommands_SetExecutionRequest(t *testing.T) {
 					Targets: []*execution.Target{
 						{Type: domain.ExecutionTargetTypeInclude, Target: "request/include"},
 					},
-				},
-				resourceOwner: "instance",
-			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-				},
-			},
-		},
-		{
-			"push ok, remove all targets",
-			fields{
-				eventstore: expectEventstore(
-					expectFilter( // execution has targets
-						eventFromEventPusher(
-							execution.NewSetEventV2(context.Background(),
-								execution.NewAggregate("request", "instance"),
-								[]*execution.Target{
-									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
-								},
-							),
-						),
-					),
-					expectPush(
-						execution.NewSetEventV2(context.Background(),
-							execution.NewAggregate("request", "instance"),
-							[]*execution.Target{},
-						),
-					),
-				),
-			},
-			args{
-				ctx: context.Background(),
-				cond: &ExecutionAPICondition{
-					"",
-					"",
-					true,
-				},
-				set: &SetExecution{
-					Targets: []*execution.Target{},
-				},
-				resourceOwner: "instance",
-			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-				},
-			},
-		},
-		{
-			"push ok, unchanged execution",
-			fields{
-				eventstore: expectEventstore(
-					expectFilter( // execution has targets
-						eventFromEventPusher(
-							execution.NewSetEventV2(context.Background(),
-								execution.NewAggregate("request", "instance"),
-								[]*execution.Target{
-									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
-								},
-							),
-						),
-					),
-				),
-			},
-			args{
-				ctx: context.Background(),
-				cond: &ExecutionAPICondition{
-					"",
-					"",
-					true,
-				},
-				set: &SetExecution{
-					Targets: []*execution.Target{{
-						Type:   domain.ExecutionTargetTypeTarget,
-						Target: "target",
-					}},
 				},
 				resourceOwner: "instance",
 			},
@@ -719,6 +653,26 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			},
 		},
 		{
+			"empty executionType, error",
+			fields{
+				eventstore:       expectEventstore(),
+				grpcMethodExists: existsMock(true),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"notvalid",
+					"",
+					false,
+				},
+				set:           &SetExecution{},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			"empty target, error",
 			fields{
 				eventstore:       expectEventstore(),
@@ -731,7 +685,7 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					"",
 					false,
 				},
-				set:           &SetExecution{Targets: []*execution.Target{{}}},
+				set:           &SetExecution{},
 				resourceOwner: "instance",
 			},
 			res{
@@ -742,7 +696,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			"push failed, error",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						target.NewAddedEvent(context.Background(),
 							target.NewAggregate("target", "instance"),
@@ -835,7 +788,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			"push ok, method target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						eventFromEventPusher(
 							target.NewAddedEvent(context.Background(),
@@ -883,7 +835,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			"push ok, service target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						targetAddEvent("target", "instance"),
 					),
@@ -922,7 +873,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 			"push ok, all target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						targetAddEvent("target", "instance"),
 					),
@@ -947,83 +897,6 @@ func TestCommands_SetExecutionResponse(t *testing.T) {
 					Targets: []*execution.Target{
 						{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
 					},
-				},
-				resourceOwner: "instance",
-			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-				},
-			},
-		},
-		{
-			"push ok, remove all targets",
-			fields{
-				eventstore: expectEventstore(
-					expectFilter( // execution has targets
-						eventFromEventPusher(
-							execution.NewSetEventV2(context.Background(),
-								execution.NewAggregate("response", "instance"),
-								[]*execution.Target{
-									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
-								},
-							),
-						),
-					),
-					expectPush(
-						execution.NewSetEventV2(context.Background(),
-							execution.NewAggregate("response", "instance"),
-							[]*execution.Target{},
-						),
-					),
-				),
-			},
-			args{
-				ctx: context.Background(),
-				cond: &ExecutionAPICondition{
-					"",
-					"",
-					true,
-				},
-				set: &SetExecution{
-					Targets: []*execution.Target{},
-				},
-				resourceOwner: "instance",
-			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-				},
-			},
-		},
-		{
-			"push ok, unchanged execution",
-			fields{
-				eventstore: expectEventstore(
-					expectFilter( // execution has targets
-						eventFromEventPusher(
-							execution.NewSetEventV2(context.Background(),
-								execution.NewAggregate("response", "instance"),
-								[]*execution.Target{
-									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
-								},
-							),
-						),
-					),
-				),
-			},
-			args{
-				ctx: context.Background(),
-				cond: &ExecutionAPICondition{
-					"",
-					"",
-					true,
-				},
-				set: &SetExecution{
-					Targets: []*execution.Target{{
-						Type:   domain.ExecutionTargetTypeTarget,
-						Target: "target",
-					}},
 				},
 				resourceOwner: "instance",
 			},
@@ -1139,7 +1012,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					"",
 					false,
 				},
-				set:           &SetExecution{Targets: []*execution.Target{{Target: "target"}}},
+				set:           &SetExecution{},
 				resourceOwner: "instance",
 			},
 			res{
@@ -1159,7 +1032,7 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					"",
 					false,
 				},
-				set:           &SetExecution{Targets: []*execution.Target{{}}},
+				set:           &SetExecution{},
 				resourceOwner: "instance",
 			},
 			res{
@@ -1170,7 +1043,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			"push failed, error",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						targetAddEvent("target", "instance"),
 					),
@@ -1256,7 +1128,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			"push ok, event target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						targetAddEvent("target", "instance"),
 					),
@@ -1295,7 +1166,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			"push ok, group target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						targetAddEvent("target", "instance"),
 					),
@@ -1334,7 +1204,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 			"push ok, all target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						targetAddEvent("target", "instance"),
 					),
@@ -1359,83 +1228,6 @@ func TestCommands_SetExecutionEvent(t *testing.T) {
 					Targets: []*execution.Target{
 						{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
 					},
-				},
-				resourceOwner: "instance",
-			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-				},
-			},
-		},
-		{
-			"push ok, remove all targets",
-			fields{
-				eventstore: expectEventstore(
-					expectFilter( // execution has targets
-						eventFromEventPusher(
-							execution.NewSetEventV2(context.Background(),
-								execution.NewAggregate("event", "instance"),
-								[]*execution.Target{
-									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
-								},
-							),
-						),
-					),
-					expectPush(
-						execution.NewSetEventV2(context.Background(),
-							execution.NewAggregate("event", "instance"),
-							[]*execution.Target{},
-						),
-					),
-				),
-			},
-			args{
-				ctx: context.Background(),
-				cond: &ExecutionEventCondition{
-					"",
-					"",
-					true,
-				},
-				set: &SetExecution{
-					Targets: []*execution.Target{},
-				},
-				resourceOwner: "instance",
-			},
-			res{
-				details: &domain.ObjectDetails{
-					ResourceOwner: "instance",
-				},
-			},
-		},
-		{
-			"push ok, unchanged execution",
-			fields{
-				eventstore: expectEventstore(
-					expectFilter( // execution has targets
-						eventFromEventPusher(
-							execution.NewSetEventV2(context.Background(),
-								execution.NewAggregate("event", "instance"),
-								[]*execution.Target{
-									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
-								},
-							),
-						),
-					),
-				),
-			},
-			args{
-				ctx: context.Background(),
-				cond: &ExecutionEventCondition{
-					"",
-					"",
-					true,
-				},
-				set: &SetExecution{
-					Targets: []*execution.Target{{
-						Type:   domain.ExecutionTargetTypeTarget,
-						Target: "target",
-					}},
 				},
 				resourceOwner: "instance",
 			},
@@ -1520,6 +1312,22 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			},
 		},
 		{
+			"empty executionType, error",
+			fields{
+				eventstore:           expectEventstore(),
+				actionFunctionExists: existsMock(true),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          "function",
+				set:           &SetExecution{},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
 			"empty target, error",
 			fields{
 				eventstore:           expectEventstore(),
@@ -1528,7 +1336,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			args{
 				ctx:           context.Background(),
 				cond:          "function",
-				set:           &SetExecution{Targets: []*execution.Target{{}}},
+				set:           &SetExecution{},
 				resourceOwner: "instance",
 			},
 			res{
@@ -1539,7 +1347,6 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			"push failed, error",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						targetAddEvent("target", "instance"),
 					),
@@ -1572,8 +1379,7 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			"push error, function target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
-					expectFilter(), // target doesn't exist
+					expectFilter(),
 				),
 				actionFunctionExists: existsMock(true),
 			},
@@ -1615,7 +1421,6 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			"push ok, function target",
 			fields{
 				eventstore: expectEventstore(
-					expectFilter(), // execution doesn't exist yet
 					expectFilter(
 						targetAddEvent("target", "instance"),
 					),
@@ -1646,15 +1451,155 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 				},
 			},
 		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore:             tt.fields.eventstore(t),
+				ActionFunctionExisting: tt.fields.actionFunctionExists,
+			}
+			details, err := c.SetExecutionFunction(tt.args.ctx, tt.args.cond, tt.args.set, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.details, details)
+			}
+		})
+	}
+}
+
+func TestCommands_DeleteExecutionRequest(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		cond          *ExecutionAPICondition
+		resourceOwner string
+	}
+	type res struct {
+		details *domain.ObjectDetails
+		err     func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
 		{
-			"push ok, remove all targets",
+			"no resourceowner, error",
 			fields{
-				actionFunctionExists: existsMock(true),
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          &ExecutionAPICondition{},
+				resourceOwner: "",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no cond, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          &ExecutionAPICondition{},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no valid cond, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"notvalid",
+					"notvalid",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"push failed, error",
+			fields{
 				eventstore: expectEventstore(
-					expectFilter( // execution has targets
+					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
-								execution.NewAggregate("function/function", "instance"),
+								execution.NewAggregate("request/valid", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPushFailed(
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("request/valid", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"valid",
+					"",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"not found, error",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"method",
+					"",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, method target",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request/method", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
 								},
@@ -1662,18 +1607,18 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 						),
 					),
 					expectPush(
-						execution.NewSetEventV2(context.Background(),
-							execution.NewAggregate("function/function", "instance"),
-							[]*execution.Target{},
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("request/method", "instance"),
 						),
 					),
 				),
 			},
 			args{
-				ctx:  context.Background(),
-				cond: "function",
-				set: &SetExecution{
-					Targets: []*execution.Target{},
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"method",
+					"",
+					false,
 				},
 				resourceOwner: "instance",
 			},
@@ -1684,30 +1629,68 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 			},
 		},
 		{
-			"push ok, unchanged execution",
+			"push ok, service target",
 			fields{
-				actionFunctionExists: existsMock(true),
 				eventstore: expectEventstore(
-					expectFilter( // execution has targets
+					expectFilter(
 						eventFromEventPusher(
 							execution.NewSetEventV2(context.Background(),
-								execution.NewAggregate("function/function", "instance"),
+								execution.NewAggregate("request/service", "instance"),
 								[]*execution.Target{
 									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
 								},
 							),
 						),
 					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("request/service", "instance"),
+						),
+					),
 				),
 			},
 			args{
-				ctx:  context.Background(),
-				cond: "function",
-				set: &SetExecution{
-					Targets: []*execution.Target{{
-						Type:   domain.ExecutionTargetTypeTarget,
-						Target: "target",
-					}},
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"service",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instance",
+				},
+			},
+		},
+		{
+			"push ok, all target",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("request", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("request", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"",
+					true,
 				},
 				resourceOwner: "instance",
 			},
@@ -1721,10 +1704,693 @@ func TestCommands_SetExecutionFunction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:             tt.fields.eventstore(t),
-				ActionFunctionExisting: tt.fields.actionFunctionExists,
+				eventstore: tt.fields.eventstore(t),
 			}
-			details, err := c.SetExecutionFunction(tt.args.ctx, tt.args.cond, tt.args.set, tt.args.resourceOwner)
+			details, err := c.DeleteExecutionRequest(tt.args.ctx, tt.args.cond, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.details, details)
+			}
+		})
+	}
+}
+
+func TestCommands_DeleteExecutionResponse(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		cond          *ExecutionAPICondition
+		resourceOwner string
+	}
+	type res struct {
+		details *domain.ObjectDetails
+		err     func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"no resourceowner, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          &ExecutionAPICondition{},
+				resourceOwner: "",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no cond, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          &ExecutionAPICondition{},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no valid cond, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"notvalid",
+					"notvalid",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"push failed, error",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("response/valid", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPushFailed(
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("response/valid", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"valid",
+					"",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"not found, error",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"method",
+					"",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, method target",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("response/method", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("response/method", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"method",
+					"",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instance",
+				},
+			},
+		},
+		{
+			"push ok, service target",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("response/service", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("response/service", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"service",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instance",
+				},
+			},
+		},
+		{
+			"push ok, all target",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("response", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("response", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionAPICondition{
+					"",
+					"",
+					true,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instance",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			details, err := c.DeleteExecutionResponse(tt.args.ctx, tt.args.cond, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.details, details)
+			}
+		})
+	}
+}
+
+func TestCommands_DeleteExecutionEvent(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		cond          *ExecutionEventCondition
+		resourceOwner string
+	}
+	type res struct {
+		details *domain.ObjectDetails
+		err     func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"no resourceowner, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          &ExecutionEventCondition{},
+				resourceOwner: "",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no cond, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          &ExecutionEventCondition{},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"push failed, error",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("event/valid", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPushFailed(
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("event/valid", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionEventCondition{
+					"valid",
+					"",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"push error, not existing",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionEventCondition{
+					"valid",
+					"",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push error, event",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionEventCondition{
+					"valid",
+					"",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, event",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("event/valid", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("event/valid", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionEventCondition{
+					"valid",
+					"",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instance",
+				},
+			},
+		},
+		{
+			"push error, group",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionEventCondition{
+					"",
+					"valid",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, group",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("event/group", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("event/group.*", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionEventCondition{
+					"",
+					"group",
+					false,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instance",
+				},
+			},
+		},
+		{
+			"push error, all",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionEventCondition{
+					"",
+					"",
+					true,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, all",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("event", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("event", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				cond: &ExecutionEventCondition{
+					"",
+					"",
+					true,
+				},
+				resourceOwner: "instance",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instance",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			details, err := c.DeleteExecutionEvent(tt.args.ctx, tt.args.cond, tt.args.resourceOwner)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.details, details)
+			}
+		})
+	}
+}
+
+func TestCommands_DeleteExecutionFunction(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx           context.Context
+		cond          ExecutionFunctionCondition
+		resourceOwner string
+	}
+	type res struct {
+		details *domain.ObjectDetails
+		err     func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"no resourceowner, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          "",
+				resourceOwner: "",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"no cond, error",
+			fields{
+				eventstore: expectEventstore(),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          "",
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"push failed, error",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("function/function", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPushFailed(
+						zerrors.ThrowPreconditionFailed(nil, "id", "name already exists"),
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("function/function", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          "function",
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			"push error, not existing",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          "function",
+				resourceOwner: "instance",
+			},
+			res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			"push ok, function",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							execution.NewSetEventV2(context.Background(),
+								execution.NewAggregate("function/function", "instance"),
+								[]*execution.Target{
+									{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
+								},
+							),
+						),
+					),
+					expectPush(
+						execution.NewRemovedEvent(context.Background(),
+							execution.NewAggregate("function/function", "instance"),
+						),
+					),
+				),
+			},
+			args{
+				ctx:           context.Background(),
+				cond:          "function",
+				resourceOwner: "instance",
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "instance",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			details, err := c.DeleteExecutionFunction(tt.args.ctx, tt.args.cond, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
