@@ -100,13 +100,10 @@ export async function GET(request: NextRequest) {
   }
 
   if (authRequestId) {
-    console.log(`Login with authRequest: ${authRequestId}`);
     const { authRequest } = await getAuthRequest({ authRequestId });
 
     let organization = "";
     let idpId = "";
-
-    console.log(`AuthRequest: ${JSON.stringify(authRequest)}`);
 
     if (authRequest?.scope) {
       const orgScope = authRequest.scope.find((s: string) =>
