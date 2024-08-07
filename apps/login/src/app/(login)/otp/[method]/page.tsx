@@ -1,13 +1,9 @@
-import {
-  getBrandingSettings,
-  getLoginSettings,
-  getSession,
-} from "@/lib/zitadel";
+import { getBrandingSettings } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import LoginOTP from "@/ui/LoginOTP";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -21,20 +17,9 @@ export default async function Page({
 
   const { method } = params;
 
-  const { session, token } = await loadSession(loginName, organization);
+  const session = await loadMostRecentSession(loginName, organization);
 
   const branding = await getBrandingSettings(organization);
-
-  async function loadSession(loginName?: string, organization?: string) {
-    const recent = await getMostRecentCookieWithLoginname(
-      loginName,
-      organization,
-    );
-
-    return getSession(recent.id, recent.token).then((response) => {
-      return { session: response?.session, token: recent.token };
-    });
-  }
 
   return (
     <DynamicTheme branding={branding}>

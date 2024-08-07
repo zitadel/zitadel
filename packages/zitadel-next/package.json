@@ -6,6 +6,7 @@
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "license": "MIT",
+  "type": "module",
   "files": [
     "dist/**"
   ],
@@ -25,6 +26,8 @@
   "peerDependencies": {
     "@zitadel/node": "workspace:*",
     "@zitadel/react": "workspace:*",
+    "@zitadel/client": "workspace:*",
+    "@zitadel/proto": "workspace:*",
     "next": "^14.2.3",
     "react": "18.2.0"
   },

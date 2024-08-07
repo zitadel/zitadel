@@ -15,6 +15,7 @@ import UserAvatar from "@/ui/UserAvatar";
 import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
 import Link from "next/link";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -28,7 +29,7 @@ export default async function Page({
   const { method } = params;
 
   const branding = await getBrandingSettings(organization);
-  const { session, token } = await loadSession(loginName, organization);
+  const session = await loadMostRecentSession(loginName, organization);
 
   let totpResponse: RegisterTOTPResponse | undefined,
     totpError: Error | undefined;
@@ -54,17 +55,6 @@ export default async function Page({
     }
   } else {
     throw new Error("No session found");
-  }
-
-  async function loadSession(loginName?: string, organization?: string) {
-    const recent = await getMostRecentCookieWithLoginname(
-      loginName,
-      organization,
-    );
-
-    return getSession(recent.id, recent.token).then((response) => {
-      return { session: response?.session, token: recent.token };
-    });
   }
 
   const paramsToContinue = new URLSearchParams({});

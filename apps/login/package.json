@@ -40,6 +40,7 @@
     "@zitadel/node": "workspace:*",
     "@zitadel/proto": "workspace:*",
     "@zitadel/react": "workspace:*",
+    "@zitadel/next": "workspace:*",
     "clsx": "1.2.1",
     "copy-to-clipboard": "^3.3.3",
     "moment": "^2.29.4",
