@@ -95,7 +95,7 @@
               class="state"
               [ngClass]="{
                 active: project.state === ProjectState.PROJECT_STATE_ACTIVE,
-                inactive: project.state === ProjectState.PROJECT_STATE_INACTIVE
+                inactive: project.state === ProjectState.PROJECT_STATE_INACTIVE,
               }"
               *ngIf="project.state"
               >{{ 'PROJECT.STATE.' + project.state | translate }}</span

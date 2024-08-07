@@ -1782,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Eigene Projekte",
         "OWNED_SINGULAR": "Eigenes Projekt",
-        "GRANTED_SINGULAR": "Berechtigtes Projekt"
+        "GRANTED_SINGULAR": "Berechtigtes Projekt von {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Branding Verhalten",

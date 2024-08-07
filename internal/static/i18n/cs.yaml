@@ -561,6 +561,7 @@ Errors:
     NotFound: Provedení nenalezeno
     IncludeNotFound: Zahrnout nenalezeno
     NoTargets: Nejsou definovány žádné cíle
+    ResponseIsNotValidJSON: Odpověď není platný JSON
   UserSchema:
     NotEnabled: Funkce "Uživatelské schéma" není povolena
     Type:
