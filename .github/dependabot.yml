@@ -16,3 +16,6 @@ updates:
         dependency-type: production
       dev:
         dependency-type: development
+    ignore:
+      - dependency-name: "eslint"
+        versions: [ "9.x" ]
