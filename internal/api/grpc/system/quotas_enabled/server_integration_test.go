@@ -1,4 +1,4 @@
-//go:build integration
+//go:build integration_old
 
 package quotas_enabled_test
 

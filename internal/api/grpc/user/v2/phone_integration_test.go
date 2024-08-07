@@ -1,4 +1,4 @@
-//go:build integration
+//go:build integration_old
 
 package user_test
 
@@ -263,7 +263,7 @@ func TestServer_RemovePhone(t *testing.T) {
 		req     *user.RemovePhoneRequest
 		want    *user.RemovePhoneResponse
 		wantErr bool
-		dep func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error)
+		dep     func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error)
 	}{
 		{
 			name: "remove phone",
@@ -303,7 +303,7 @@ func TestServer_RemovePhone(t *testing.T) {
 			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
 				return Client.RemovePhone(ctx, &user.RemovePhoneRequest{
 					UserId: doubleRemoveUser.GetUserId(),
-				});
+				})
 			},
 		},
 		{

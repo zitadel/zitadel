@@ -1,4 +1,4 @@
-//go:build integration
+//go:build integration_old
 
 package admin_test
 
