@@ -109,18 +109,19 @@ core_integration_setup:
 	go build -cover -race -o zitadel.test main.go
 	mkdir -p tmp/coverage
 	GORACE="halt_on_error=1" GOCOVERDIR="tmp/coverage" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-	GORACE="halt_on_error=1" GOCOVERDIR="tmp/coverage" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/zitadel.yaml --steps internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+	GORACE="halt_on_error=1" GOCOVERDIR="tmp/coverage" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/steps.yaml
 
-.PHONY: core_integration_start
-core_integration_start: core_integration_setup
+.PHONY: core_integration_start_server
+core_integration_start_server: core_integration_setup
 	GORACE="log_path=tmp/race.log" GOCOVERDIR="tmp/coverage" ./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml & printf $$! > tmp/zitadel.pid
+	go run ./internal/integration/cmd/setup
 
 .PHONY: core_integration_test_packages
-core_integration_test: core_integration_start
+core_integration_test_packages: core_integration_start_server
 	sleep 10
 
-.PHONY: core_integration_stop
-core_integration_stop:
+.PHONY: core_integration_stop_server
+core_integration_stop_server:
 	pid=$$(cat tmp/zitadel.pid); \
 	$(RM) tmp/zitadel.pid; \
 	kill $$pid; \
@@ -133,7 +134,7 @@ core_integration_stop:
 	$(RM) -r tmp/coverage
 
 .PHONY: core_integration_test
-core_integration_test: core_integration_start core_integration_test_packages core_integration_stop
+core_integration_test: core_integration_start_server core_integration_test_packages core_integration_stop_server
 
 .PHONY: console_lint
 console_lint:

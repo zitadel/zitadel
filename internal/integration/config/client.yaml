@@ -1,0 +1,5 @@
+Hostname: localhost
+Port: 8080
+Secure: false
+LoginURLV2: "/login?authRequest="
+WebAuthNName: ZITADEL

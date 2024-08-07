@@ -4,49 +4,39 @@ package integration
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path"
+	"path/filepath"
 	"reflect"
-	"strings"
-	"sync"
 	"time"
 
-	"github.com/spf13/viper"
-	"github.com/zitadel/logging"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/zitadel/oidc/v3/pkg/client"
-	"github.com/zitadel/oidc/v3/pkg/oidc"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/encoding/protojson"
+	"sigs.k8s.io/yaml"
 
-	"github.com/zitadel/zitadel/cmd"
-	"github.com/zitadel/zitadel/cmd/start"
-	"github.com/zitadel/zitadel/internal/api/authz"
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	z_oidc "github.com/zitadel/zitadel/internal/api/oidc"
-	"github.com/zitadel/zitadel/internal/command"
-	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
 	"github.com/zitadel/zitadel/internal/net"
-	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/webauthn"
-	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
+	"github.com/zitadel/zitadel/pkg/grpc/auth"
+	"github.com/zitadel/zitadel/pkg/grpc/instance"
+	"github.com/zitadel/zitadel/pkg/grpc/management"
+	"github.com/zitadel/zitadel/pkg/grpc/org"
+	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
 var (
-	//go:embed config/zitadel.yaml
-	zitadelYAML []byte
-	//go:embed config/cockroach.yaml
-	cockroachYAML []byte
-	//go:embed config/postgres.yaml
-	postgresYAML []byte
+	//go:embed config/client.yaml
+	clientYAML []byte
 	//go:embed config/system-user-key.pem
 	systemUserKey []byte
 )
@@ -55,20 +45,25 @@ var (
 // It can be used in tests to assert whether a value should be empty or not.
 const NotEmpty = "not empty"
 
+const (
+	stateFile    = "integration_test_state.json"
+	adminPATFile = "admin-pat.txt"
+)
+
 // UserType provides constants that give
-// a short explinanation with the purpose
-// a serverice user.
+// a short explanation with the purpose
+// a service user.
 // This allows to pre-create users with
 // different permissions and reuse them.
 type UserType int
 
-//go:generate stringer -type=UserType
+//go:generate enumer -type UserType -transform snake -trimprefix UserType
 const (
-	Unspecified UserType = iota
-	OrgOwner
-	Login
-	IAMOwner
-	SystemUser // SystemUser is a user with access to the system service.
+	UserTypeUnspecified UserType = iota
+	UserTypeSystem               // UserTypeSystem is a user with access to the system service.
+	UserTypeIAMOwner
+	UserTypeOrgOwner
+	UserTypeLogin
 )
 
 const (
@@ -83,8 +78,9 @@ const (
 
 // User information with a Personal Access Token.
 type User struct {
-	*query.User
-	Token string
+	ID       string
+	Username string
+	Token    string
 }
 
 type InstanceUserMap map[string]map[UserType]*User
@@ -103,142 +99,195 @@ func (m InstanceUserMap) Get(instanceID string, typ UserType) *User {
 	return nil
 }
 
+type Config struct {
+	Hostname     string
+	Port         uint16
+	Secure       bool
+	LoginURLV2   string
+	WebAuthNName string
+}
+
 // Tester is a Zitadel server and client with all resources available for testing.
 type Tester struct {
-	*start.Server
-
-	Instance     authz.Instance
-	Organisation *query.Org
+	Config       Config
+	Instance     *instance.InstanceDetail
+	Organization *org.Org
 	Users        InstanceUserMap
 
-	MilestoneChan           chan []byte
-	milestoneServer         *httptest.Server
-	QuotaNotificationChan   chan []byte
-	quotaNotificationServer *httptest.Server
-
-	Client   Client
+	Client   *Client
 	WebAuthN *webauthn.Client
-	wg       sync.WaitGroup // used for shutdown
 }
 
-const commandLine = `start --masterkeyFromEnv`
+func (c *Config) Host() string {
+	return fmt.Sprintf("%s:%d", c.Hostname, c.Port)
+}
+
+// LoadTester constructs a new Tester from a reusable state file,
+// and constructs the gRPC clients.
+// The integration test server must be running.
+func LoadTester(ctx context.Context, tmpDir string) (*Tester, error) {
+	tester, err := loadStateFile(tmpDir)
+	if err != nil {
+		return nil, err
+	}
+	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.Hostname, http_util.BuildOrigin(tester.Host(), tester.Config.Secure))
+	tester.Client, err = newClient(ctx, tester.Host())
+	if err != nil {
+		return nil, err
+	}
+	return nil, err
+}
+
+// loadStateFile loads a state file with instance, org and machine user details.
+func loadStateFile(tmpDir string) (*Tester, error) {
+	data, err := os.ReadFile(path.Join(tmpDir, stateFile))
+	if err != nil {
+		return nil, fmt.Errorf("integration load tester: %w", err)
+	}
+	dst := new(Tester)
+	if err = json.Unmarshal(data, dst); err != nil {
+		return nil, fmt.Errorf("integration load tester: %w", err)
+	}
+	return dst, nil
+}
+
+type jsonTester struct {
+	Config       Config
+	Instance     json.RawMessage
+	Organization json.RawMessage
+	Users        InstanceUserMap
+}
+
+func (s *Tester) MarshalJSON() ([]byte, error) {
+	instance, err := protojson.Marshal(s.Instance)
+	if err != nil {
+		return nil, err
+	}
+	org, err := protojson.Marshal(s.Organization)
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(jsonTester{
+		Config:       s.Config,
+		Instance:     instance,
+		Organization: org,
+		Users:        s.Users,
+	})
+}
+
+func (s *Tester) UnmarshalJSON(data []byte) error {
+	dst := new(jsonTester)
+	if err := json.Unmarshal(data, dst); err != nil {
+		return err
+	}
+
+	instance := new(instance.InstanceDetail)
+	if err := protojson.Unmarshal(dst.Instance, instance); err != nil {
+		return err
+	}
+	org := new(org.Org)
+	if err := protojson.Unmarshal(dst.Organization, org); err != nil {
+		return err
+	}
+	*s = Tester{
+		Config:       dst.Config,
+		Instance:     instance,
+		Organization: org,
+		Users:        dst.Users,
+	}
+	return nil
+}
 
 func (s *Tester) Host() string {
-	return fmt.Sprintf("%s:%d", s.Config.ExternalDomain, s.Config.Port)
+	return s.Config.Host()
 }
 
-func (s *Tester) createClientConn(ctx context.Context, target string) {
-	cc, err := grpc.DialContext(ctx, target,
-		grpc.WithBlock(),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+func (s *Tester) createSystemUser() error {
+	const ISSUER = "tester"
+	audience := http_util.BuildOrigin(s.Host(), false)
+	signer, err := client.NewSignerFromPrivateKeyByte(systemUserKey, "")
 	if err != nil {
-		s.Shutdown <- os.Interrupt
-		s.wg.Wait()
+		return err
 	}
-	logging.OnError(err).Fatal("integration tester client dial")
-	logging.New().WithField("target", target).Info("finished dialing grpc client conn")
-
-	s.Client = newClient(cc)
-	err = s.pollHealth(ctx)
-	logging.OnError(err).Fatal("integration tester health")
+	jwt, err := client.SignedJWTProfileAssertion(ISSUER, []string{audience}, time.Hour, signer)
+	if err != nil {
+		return err
+	}
+	s.Users.Set(FirstInstanceUsersKey, UserTypeSystem, &User{Token: jwt})
+	return nil
 }
 
-// pollHealth waits until a healthy status is reported.
-// TODO: remove when we make the setup blocking on all
-// projections completed.
-func (s *Tester) pollHealth(ctx context.Context) (err error) {
-	for {
-		err = func(ctx context.Context) error {
-			ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-			defer cancel()
-
-			_, err := s.Client.Admin.Healthz(ctx, &admin.HealthzRequest{})
-			return err
-		}(ctx)
-		if err == nil {
-			return nil
-		}
-		logging.WithError(err).Info("poll healthz")
-
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-time.After(time.Second):
-			continue
-		}
+func loadInstanceOwnerPAT(tmpPath string) (string, error) {
+	data, err := os.ReadFile(filepath.Join(tmpPath, adminPATFile))
+	if err != nil {
+		return "", err
 	}
+	return string(bytes.TrimSpace(data)), nil
 }
 
-const (
-	LoginUser                = "loginClient"
-	MachineUserOrgOwner      = "integrationOrgOwner"
-	MachineUserInstanceOwner = "integrationInstanceOwner"
-)
-
-func (s *Tester) createMachineUserOrgOwner(ctx context.Context) {
-	var err error
-
-	ctx, user := s.createMachineUser(ctx, MachineUserOrgOwner, OrgOwner)
-	_, err = s.Commands.AddOrgMember(ctx, user.ResourceOwner, user.ID, "ORG_OWNER")
-	target := new(zerrors.AlreadyExistsError)
-	if !errors.As(err, &target) {
-		logging.OnError(err).Fatal("add org member")
+func (s *Tester) createMachineUserInstanceOwner(ctx context.Context, token string) error {
+	user, err := s.Client.Auth.GetMyUser(WithAuthorizationToken(ctx, token), &auth.GetMyUserRequest{})
+	if err != nil {
+		return err
 	}
-}
-
-func (s *Tester) createMachineUserInstanceOwner(ctx context.Context) {
-	var err error
-
-	ctx, user := s.createMachineUser(ctx, MachineUserInstanceOwner, IAMOwner)
-	_, err = s.Commands.AddInstanceMember(ctx, user.ID, "IAM_OWNER")
-	target := new(zerrors.AlreadyExistsError)
-	if !errors.As(err, &target) {
-		logging.OnError(err).Fatal("add instance member")
-	}
-}
-
-func (s *Tester) createLoginClient(ctx context.Context) {
-	s.createMachineUser(ctx, LoginUser, Login)
-}
-
-func (s *Tester) createMachineUser(ctx context.Context, username string, userType UserType) (context.Context, *query.User) {
-	var err error
-
-	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host(), "")
-	logging.OnError(err).Fatal("query instance")
-	ctx = authz.WithInstance(ctx, s.Instance)
-
-	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
-	logging.OnError(err).Fatal("query organisation")
-
-	usernameQuery, err := query.NewUserUsernameSearchQuery(username, query.TextEquals)
-	logging.OnError(err).Fatal("user query")
-	user, err := s.Queries.GetUser(ctx, true, usernameQuery)
-	if errors.Is(err, sql.ErrNoRows) {
-		_, err = s.Commands.AddMachine(ctx, &command.Machine{
-			ObjectRoot: models.ObjectRoot{
-				ResourceOwner: s.Organisation.ID,
-			},
-			Username:        username,
-			Name:            username,
-			Description:     "who cares?",
-			AccessTokenType: domain.OIDCTokenTypeJWT,
-		})
-		logging.WithFields("username", username).OnError(err).Fatal("add machine user")
-		user, err = s.Queries.GetUser(ctx, true, usernameQuery)
-	}
-	logging.WithFields("username", username).OnError(err).Fatal("get user")
-
-	scopes := []string{oidc.ScopeOpenID, oidc.ScopeProfile, z_oidc.ScopeUserMetaData, z_oidc.ScopeResourceOwner}
-	pat := command.NewPersonalAccessToken(user.ResourceOwner, user.ID, time.Now().Add(time.Hour), scopes, domain.UserTypeMachine)
-	_, err = s.Commands.AddPersonalAccessToken(ctx, pat)
-	logging.WithFields("username", SystemUser).OnError(err).Fatal("add pat")
-	s.Users.Set(FirstInstanceUsersKey, userType, &User{
-		User:  user,
-		Token: pat.Token,
+	s.Users.Set(FirstInstanceUsersKey, UserTypeIAMOwner, &User{
+		ID:       user.GetUser().GetId(),
+		Username: user.GetUser().GetUserName(),
+		Token:    token,
 	})
-	return ctx, user
+	return nil
+}
+
+func (s *Tester) createMachineUserOrgOwner(ctx context.Context) error {
+	userID, err := s.createMachineUser(ctx, UserTypeOrgOwner)
+	if err != nil {
+		return err
+	}
+	_, err = s.Client.Mgmt.AddOrgMember(ctx, &management.AddOrgMemberRequest{
+		UserId: userID,
+		Roles:  []string{"ORG_OWNER"},
+	})
+	return err
+}
+
+func (s *Tester) createLoginClient(ctx context.Context) error {
+	_, err := s.createMachineUser(ctx, UserTypeLogin)
+	return err
+}
+
+func (s *Tester) setOrganization(ctx context.Context) error {
+	resp, err := s.Client.Mgmt.GetMyOrg(ctx, &management.GetMyOrgRequest{})
+	if err != nil {
+		return err
+	}
+	s.Organization = resp.GetOrg()
+	return nil
+}
+
+func (s *Tester) createMachineUser(ctx context.Context, userType UserType) (userID string, err error) {
+	username := gofakeit.Username()
+	userResp, err := s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+		UserName:        username,
+		Name:            username,
+		Description:     userType.String(),
+		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+	})
+	if err != nil {
+		return "", err
+	}
+	userID = userResp.GetUserId()
+	patResp, err := s.Client.Mgmt.AddPersonalAccessToken(ctx, &management.AddPersonalAccessTokenRequest{
+		UserId: userID,
+	})
+	if err != nil {
+		return "", err
+	}
+	s.Users.Set(FirstInstanceUsersKey, userType, &User{
+		ID:       userID,
+		Username: username,
+		Token:    patResp.GetToken(),
+	})
+	return userID, nil
 }
 
 func (s *Tester) WithAuthorization(ctx context.Context, u UserType) context.Context {
@@ -246,20 +295,14 @@ func (s *Tester) WithAuthorization(ctx context.Context, u UserType) context.Cont
 }
 
 func (s *Tester) WithInstanceAuthorization(ctx context.Context, u UserType, instanceID string) context.Context {
-	if u == SystemUser {
-		s.ensureSystemUser()
-	}
-	return s.WithAuthorizationToken(ctx, s.Users.Get(instanceID, u).Token)
+	return WithAuthorizationToken(ctx, s.Users.Get(instanceID, u).Token)
 }
 
 func (s *Tester) GetUserID(u UserType) string {
-	if u == SystemUser {
-		s.ensureSystemUser()
-	}
 	return s.Users.Get(FirstInstanceUsersKey, u).ID
 }
 
-func (s *Tester) WithAuthorizationToken(ctx context.Context, token string) context.Context {
+func WithAuthorizationToken(ctx context.Context, token string) context.Context {
 	md, ok := metadata.FromOutgoingContext(ctx)
 	if !ok {
 		md = make(metadata.MD)
@@ -276,101 +319,64 @@ func (s *Tester) BearerToken(ctx context.Context) string {
 	return md.Get("Authorization")[0]
 }
 
-func (s *Tester) ensureSystemUser() {
-	const ISSUER = "tester"
-	if s.Users.Get(FirstInstanceUsersKey, SystemUser) != nil {
-		return
-	}
-	audience := http_util.BuildOrigin(s.Host(), s.Server.Config.ExternalSecure)
-	signer, err := client.NewSignerFromPrivateKeyByte(systemUserKey, "")
-	logging.OnError(err).Fatal("system key signer")
-	jwt, err := client.SignedJWTProfileAssertion(ISSUER, []string{audience}, time.Hour, signer)
-	logging.OnError(err).Fatal("system key jwt")
-	s.Users.Set(FirstInstanceUsersKey, SystemUser, &User{Token: jwt})
-}
-
 func (s *Tester) WithSystemAuthorizationHTTP(u UserType) map[string]string {
 	return map[string]string{"Authorization": fmt.Sprintf("Bearer %s", s.Users.Get(FirstInstanceUsersKey, u).Token)}
 }
 
-// Done send an interrupt signal to cleanly shutdown the server.
-func (s *Tester) Done() {
-	err := s.Client.CC.Close()
-	logging.OnError(err).Error("integration tester client close")
-
-	s.Shutdown <- os.Interrupt
-	s.wg.Wait()
-	s.milestoneServer.Close()
-	s.quotaNotificationServer.Close()
-}
-
-// NewTester start a new Zitadel server by passing the default commandline.
-// The server will listen on the configured port.
-// The database configuration that will be used can be set by the
-// INTEGRATION_DB_FLAVOR environment variable and can have the values "cockroach"
-// or "postgres". Defaults to "cockroach".
+// InitTesterState parses config, creates machine users and
+// gets default instance and org information.
+// Needed details are stored in a state file and can be loaded
+// with [loadStateFile] for reuse between multiple test packages.
 //
-// The default Instance and Organisation are read from the DB and system
-// users are created as needed.
+// If an existing state file has the same first instance ID as reported
+// by the server, the file will not be modified.
 //
-// After the server is started, a [grpc.ClientConn] will be created and
-// the server is polled for it's health status.
-//
-// Note: the database must already be setup and initialized before
-// using NewTester. See the CONTRIBUTING.md document for details.
-
-func NewTester(ctx context.Context, zitadelConfigYAML ...string) *Tester {
-	args := strings.Split(commandLine, " ")
-
-	sc := make(chan *start.Server)
-	//nolint:contextcheck
-	cmd := cmd.New(os.Stdout, os.Stdin, args, sc)
-	cmd.SetArgs(args)
-	for _, yaml := range append([]string{string(zitadelYAML)}, zitadelConfigYAML...) {
-		err := viper.MergeConfig(bytes.NewBuffer([]byte(yaml)))
-		logging.OnError(err).Fatal()
+// The integration test server must be running.
+func InitTesterState(ctx context.Context, tmpPath string) error {
+	var config Config
+	if err := yaml.Unmarshal(clientYAML, &config); err != nil {
+		return err
 	}
-	var err error
-	flavor := os.Getenv("INTEGRATION_DB_FLAVOR")
-	switch flavor {
-	case "cockroach", "":
-		err = viper.MergeConfig(bytes.NewBuffer(cockroachYAML))
-	case "postgres":
-		err = viper.MergeConfig(bytes.NewBuffer(postgresYAML))
-	default:
-		logging.New().WithField("flavor", flavor).Fatal("unknown db flavor set in INTEGRATION_DB_FLAVOR")
+	client, err := newClient(ctx, config.Host())
+	if err != nil {
+		return err
 	}
-	logging.OnError(err).Fatal()
+	token, err := loadInstanceOwnerPAT(tmpPath)
+	if err != nil {
+		return err
+	}
 
-	tester := Tester{
+	ctx = WithAuthorizationToken(ctx, token)
+	instance, err := client.Admin.GetMyInstance(ctx, &admin.GetMyInstanceRequest{})
+	if err != nil {
+		return err
+	}
+	tester, err := loadStateFile(tmpPath)
+	if err == nil && tester.Instance.GetId() == instance.GetInstance().GetId() {
+		return nil
+	}
+	tester = &Tester{
 		Users: make(InstanceUserMap),
 	}
-	tester.MilestoneChan = make(chan []byte, 100)
-	tester.milestoneServer, err = runMilestoneServer(ctx, tester.MilestoneChan)
-	logging.OnError(err).Fatal()
-	tester.QuotaNotificationChan = make(chan []byte, 100)
-	tester.quotaNotificationServer, err = runQuotaServer(ctx, tester.QuotaNotificationChan)
-	logging.OnError(err).Fatal()
+	tester.Instance = instance.GetInstance()
+	tester.Client = client
+	tester.Config = config
 
-	tester.wg.Add(1)
-	go func(wg *sync.WaitGroup) {
-		logging.OnError(cmd.Execute()).Fatal()
-		wg.Done()
-	}(&tester.wg)
-
-	select {
-	case tester.Server = <-sc:
-	case <-ctx.Done():
-		logging.OnError(ctx.Err()).Fatal("waiting for integration tester server")
+	err = errors.Join(
+		tester.setOrganization(ctx),
+		tester.createSystemUser(),
+		tester.createMachineUserInstanceOwner(ctx, token),
+		tester.createMachineUserOrgOwner(ctx),
+		tester.createLoginClient(ctx),
+	)
+	if err != nil {
+		return err
 	}
-	host := tester.Host()
-	tester.createClientConn(ctx, host)
-	tester.createLoginClient(ctx)
-	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, http_util.BuildOrigin(host, tester.Config.ExternalSecure))
-	tester.createMachineUserOrgOwner(ctx)
-	tester.createMachineUserInstanceOwner(ctx)
-	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.ExternalDomain, "https://"+tester.Host())
-	return &tester
+	data, err := json.MarshalIndent(tester, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(tmpPath, stateFile), data, os.ModePerm)
 }
 
 func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel context.CancelFunc) {

@@ -151,7 +151,7 @@ func (s *Tester) CreateAPIClientBasic(ctx context.Context, projectID string) (*m
 const CodeVerifier = "codeVerifier"
 
 func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	return s.CreateOIDCAuthRequestWithDomain(ctx, s.Config.ExternalDomain, clientID, loginClient, redirectURI, scope...)
+	return s.CreateOIDCAuthRequestWithDomain(ctx, s.Config.Hostname, clientID, loginClient, redirectURI, scope...)
 }
 func (s *Tester) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
 	provider, err := s.CreateRelyingPartyForDomain(ctx, domain, clientID, redirectURI, scope...)
@@ -171,7 +171,7 @@ func (s *Tester) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, cl
 		return "", err
 	}
 
-	prefixWithHost := provider.Issuer() + s.Config.OIDC.DefaultLoginURLV2
+	prefixWithHost := provider.Issuer() + s.Config.LoginURLV2
 	if !strings.HasPrefix(loc.String(), prefixWithHost) {
 		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
 	}
@@ -203,7 +203,7 @@ func (s *Tester) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, lo
 		return "", err
 	}
 
-	prefixWithHost := provider.Issuer() + s.Config.OIDC.DefaultLoginURLV2
+	prefixWithHost := provider.Issuer() + s.Config.LoginURLV2
 	if !strings.HasPrefix(loc.String(), prefixWithHost) {
 		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
 	}
@@ -211,27 +211,28 @@ func (s *Tester) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, lo
 }
 
 func (s *Tester) OIDCIssuer() string {
-	return http_util.BuildHTTP(s.Config.ExternalDomain, s.Config.Port, s.Config.ExternalSecure)
+	return http_util.BuildHTTP(s.Config.Hostname, s.Config.Port, s.Config.Secure)
 }
 
 func (s *Tester) CreateRelyingParty(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
-	return s.CreateRelyingPartyForDomain(ctx, s.Config.ExternalDomain, clientID, redirectURI, scope...)
+	return s.CreateRelyingPartyForDomain(ctx, s.Config.Hostname, clientID, redirectURI, scope...)
 }
 
 func (s *Tester) CreateRelyingPartyForDomain(ctx context.Context, domain, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
 	if len(scope) == 0 {
 		scope = []string{oidc.ScopeOpenID}
 	}
-	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport}}
-	return rp.NewRelyingPartyOIDC(ctx, http_util.BuildHTTP(domain, s.Config.Port, s.Config.ExternalSecure), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
+	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport, s.Users.Get(FirstInstanceUsersKey, UserTypeLogin).Username}}
+	return rp.NewRelyingPartyOIDC(ctx, http_util.BuildHTTP(domain, s.Config.Port, s.Config.Secure), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
 }
 
 type loginRoundTripper struct {
 	http.RoundTripper
+	loginUsername string
 }
 
 func (c *loginRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.Header.Set(oidc_internal.LoginClientHeader, LoginUser)
+	req.Header.Set(oidc_internal.LoginClientHeader, c.loginUsername)
 	return c.RoundTripper.RoundTrip(req)
 }
 
