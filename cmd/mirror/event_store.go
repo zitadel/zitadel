@@ -52,12 +52,14 @@ func copyEventstore(ctx context.Context, config *Migration) {
 		defer destClient.Close()
 
 		copyEventsFromFile(ctx, destClient)
+		copyUniqueConstraintsFromFile(ctx, destClient)
 	case isDestFile:
 		sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeQuery)
 		logging.OnError(err).Fatal("unable to connect to source database")
 		defer sourceClient.Close()
 
 		copyEventsToFile(ctx, sourceClient)
+		copyUniqueConstraintsToFile(ctx, sourceClient)
 	default:
 		sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeQuery)
 		logging.OnError(err).Fatal("unable to connect to source database")
@@ -281,20 +283,6 @@ func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, sou
 
 	err = writeMigrationSucceeded(ctx, es, id, source, position)
 	logging.OnError(err).Fatal("unable to write failed event")
-}
-
-func copyUniqueConstraintsDB(ctx context.Context, source, dest *db.DB) {
-	start := time.Now()
-	switch {
-	case isSrcFile:
-		copyUniqueConstraintsFromFile(ctx, dest)
-	case isDestFile:
-		copyUniqueConstraintsToFile(ctx, source)
-	default:
-		copyUniqueConstraintsDB(ctx, source, dest)
-	}
-	logging.WithFields("took", time.Since(start)).Info("unique constraints migrated")
-
 }
 
 func copyUniqueConstraintsDB(ctx context.Context, source, dest *db.DB) {
