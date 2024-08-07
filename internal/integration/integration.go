@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"reflect"
@@ -40,6 +41,17 @@ var (
 	//go:embed config/system-user-key.pem
 	systemUserKey []byte
 )
+
+var tmpDir string
+
+func init() {
+	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+	out, err := cmd.Output()
+	if err != nil {
+		panic(err)
+	}
+	tmpDir = filepath.Join(string(bytes.TrimSpace(out)), "tmp")
+}
 
 // NotEmpty can be used as placeholder, when the returned values is unknown.
 // It can be used in tests to assert whether a value should be empty or not.
@@ -111,7 +123,7 @@ type Config struct {
 type Tester struct {
 	Config       Config
 	Instance     *instance.InstanceDetail
-	Organization *org.Org
+	Organisation *org.Org
 	Users        InstanceUserMap
 
 	Client   *Client
@@ -122,11 +134,11 @@ func (c *Config) Host() string {
 	return fmt.Sprintf("%s:%d", c.Hostname, c.Port)
 }
 
-// LoadTester constructs a new Tester from a reusable state file,
+// NewTester constructs a new Tester from a reusable state file,
 // and constructs the gRPC clients.
 // The integration test server must be running.
-func LoadTester(ctx context.Context, tmpDir string) (*Tester, error) {
-	tester, err := loadStateFile(tmpDir)
+func NewTester(ctx context.Context) (*Tester, error) {
+	tester, err := loadStateFile()
 	if err != nil {
 		return nil, err
 	}
@@ -135,11 +147,11 @@ func LoadTester(ctx context.Context, tmpDir string) (*Tester, error) {
 	if err != nil {
 		return nil, err
 	}
-	return nil, err
+	return tester, nil
 }
 
 // loadStateFile loads a state file with instance, org and machine user details.
-func loadStateFile(tmpDir string) (*Tester, error) {
+func loadStateFile() (*Tester, error) {
 	data, err := os.ReadFile(path.Join(tmpDir, stateFile))
 	if err != nil {
 		return nil, fmt.Errorf("integration load tester: %w", err)
@@ -163,7 +175,7 @@ func (s *Tester) MarshalJSON() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	org, err := protojson.Marshal(s.Organization)
+	org, err := protojson.Marshal(s.Organisation)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +204,7 @@ func (s *Tester) UnmarshalJSON(data []byte) error {
 	*s = Tester{
 		Config:       dst.Config,
 		Instance:     instance,
-		Organization: org,
+		Organisation: org,
 		Users:        dst.Users,
 	}
 	return nil
@@ -217,8 +229,8 @@ func (s *Tester) createSystemUser() error {
 	return nil
 }
 
-func loadInstanceOwnerPAT(tmpPath string) (string, error) {
-	data, err := os.ReadFile(filepath.Join(tmpPath, adminPATFile))
+func loadInstanceOwnerPAT() (string, error) {
+	data, err := os.ReadFile(filepath.Join(tmpDir, adminPATFile))
 	if err != nil {
 		return "", err
 	}
@@ -260,7 +272,7 @@ func (s *Tester) setOrganization(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	s.Organization = resp.GetOrg()
+	s.Organisation = resp.GetOrg()
 	return nil
 }
 
@@ -332,7 +344,7 @@ func (s *Tester) WithSystemAuthorizationHTTP(u UserType) map[string]string {
 // by the server, the file will not be modified.
 //
 // The integration test server must be running.
-func InitTesterState(ctx context.Context, tmpPath string) error {
+func InitTesterState(ctx context.Context) error {
 	var config Config
 	if err := yaml.Unmarshal(clientYAML, &config); err != nil {
 		return err
@@ -341,7 +353,7 @@ func InitTesterState(ctx context.Context, tmpPath string) error {
 	if err != nil {
 		return err
 	}
-	token, err := loadInstanceOwnerPAT(tmpPath)
+	token, err := loadInstanceOwnerPAT()
 	if err != nil {
 		return err
 	}
@@ -351,7 +363,7 @@ func InitTesterState(ctx context.Context, tmpPath string) error {
 	if err != nil {
 		return err
 	}
-	tester, err := loadStateFile(tmpPath)
+	tester, err := loadStateFile()
 	if err == nil && tester.Instance.GetId() == instance.GetInstance().GetId() {
 		return nil
 	}
@@ -376,14 +388,7 @@ func InitTesterState(ctx context.Context, tmpPath string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(filepath.Join(tmpPath, stateFile), data, os.ModePerm)
-}
-
-func Contexts(timeout time.Duration) (ctx, errCtx context.Context, cancel context.CancelFunc) {
-	errCtx, cancel = context.WithCancel(context.Background())
-	cancel()
-	ctx, cancel = context.WithTimeout(context.Background(), timeout)
-	return ctx, errCtx, cancel
+	return os.WriteFile(filepath.Join(tmpDir, stateFile), data, os.ModePerm)
 }
 
 func runMilestoneServer(ctx context.Context, bodies chan []byte) (*httptest.Server, error) {

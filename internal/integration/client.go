@@ -184,7 +184,7 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
 		Organization: &object.Organization{
 			Org: &object.Organization_OrgId{
-				OrgId: s.Organization.GetId(),
+				OrgId: s.Organisation.GetId(),
 			},
 		},
 		Profile: &user.SetHumanProfile{
@@ -214,7 +214,7 @@ func (s *Tester) CreateHumanUserNoPhone(ctx context.Context) *user.AddHumanUserR
 	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
 		Organization: &object.Organization{
 			Org: &object.Organization_OrgId{
-				OrgId: s.Organization.GetId(),
+				OrgId: s.Organisation.GetId(),
 			},
 		},
 		Profile: &user.SetHumanProfile{
@@ -238,7 +238,7 @@ func (s *Tester) CreateHumanUserWithTOTP(ctx context.Context, secret string) *us
 	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
 		Organization: &object.Organization{
 			Org: &object.Organization_OrgId{
-				OrgId: s.Organization.GetId(),
+				OrgId: s.Organisation.GetId(),
 			},
 		},
 		Profile: &user.SetHumanProfile{

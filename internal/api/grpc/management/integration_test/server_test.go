@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package management_test
 
@@ -20,14 +20,17 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, _, cancel := integration.Contexts(3 * time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
 
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
+		var err error
+		Tester, err = integration.NewTester(ctx)
+		if err != nil {
+			panic(err)
+		}
 
 		CTX = ctx
-		OrgCTX = Tester.WithAuthorization(ctx, integration.OrgOwner)
+		OrgCTX = Tester.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		Client = Tester.Client.Mgmt
 		return m.Run()
 	}())

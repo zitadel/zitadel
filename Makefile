@@ -111,17 +111,20 @@ core_integration_setup:
 	GORACE="halt_on_error=1" GOCOVERDIR="tmp/coverage" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	GORACE="halt_on_error=1" GOCOVERDIR="tmp/coverage" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/steps.yaml
 
-.PHONY: core_integration_start_server
-core_integration_start_server: core_integration_setup
-	GORACE="log_path=tmp/race.log" GOCOVERDIR="tmp/coverage" ./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml & printf $$! > tmp/zitadel.pid
+.PHONY: core_integration_server_start
+core_integration_server_start: core_integration_setup
+	GORACE="log_path=tmp/race.log" GOCOVERDIR="tmp/coverage" \
+	./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml \
+	  > tmp/zitadel.log 2>&1 \
+	  & printf $$! > tmp/zitadel.pid
 	go run ./internal/integration/cmd/setup
 
 .PHONY: core_integration_test_packages
-core_integration_test_packages: core_integration_start_server
-	sleep 10
+core_integration_test_packages:
+	go test -count 1 -tags integration $$(go list -tags integration ./... | grep "integration_test")
 
-.PHONY: core_integration_stop_server
-core_integration_stop_server:
+.PHONY: core_integration_server_stop
+core_integration_server_stop:
 	pid=$$(cat tmp/zitadel.pid); \
 	$(RM) tmp/zitadel.pid; \
 	kill $$pid; \
@@ -132,9 +135,10 @@ core_integration_stop_server:
 	
 	go tool covdata textfmt -i tmp/coverage -o profile.cov
 	$(RM) -r tmp/coverage
+	cat tmp/zitadel.log
 
 .PHONY: core_integration_test
-core_integration_test: core_integration_start_server core_integration_test_packages core_integration_stop_server
+core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop
 
 .PHONY: console_lint
 console_lint:
