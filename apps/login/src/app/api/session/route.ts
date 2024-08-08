@@ -165,9 +165,9 @@ export async function PUT(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
-  if (id) {
-    const session = await getSessionCookieById(id);
+  const sessionId = searchParams.get("id");
+  if (sessionId) {
+    const session = await getSessionCookieById({ sessionId });
 
     return deleteSession(session.id, session.token)
       .then(() => {

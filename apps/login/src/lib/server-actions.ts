@@ -8,7 +8,7 @@ export async function verifyTOTP(
   loginName?: string,
   organization?: string,
 ) {
-  return getMostRecentCookieWithLoginname(loginName, organization)
+  return getMostRecentCookieWithLoginname({ loginName, organization })
     .then((recent) => {
       return getSession(recent.id, recent.token).then((response) => {
         return { session: response?.session, token: recent.token };

@@ -111,10 +111,10 @@ export async function getMostRecentSessionCookie<T>(): Promise<any> {
 }
 
 export async function getSessionCookieById<T>({
-  id,
+  sessionId,
   organization,
 }: {
-  id: string;
+  sessionId: string;
   organization?: string;
 }): Promise<SessionCookie<T>> {
   const cookiesList = cookies();
@@ -123,7 +123,9 @@ export async function getSessionCookieById<T>({
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
 
-    const found = sessions.find((s) => (organization ? s.organization === organization && s.id === id : s.id === id));
+    const found = sessions.find((s) =>
+      organization ? s.organization === organization && s.id === sessionId : s.id === sessionId,
+    );
     if (found) {
       return found;
     } else {

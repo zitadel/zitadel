@@ -5,7 +5,7 @@ import { getMostRecentCookieWithLoginname } from "@zitadel/next";
 import { redirect } from "next/navigation";
 
 async function loadSession(loginName: string, authRequestId?: string) {
-  const recent = await getMostRecentCookieWithLoginname(`${loginName}`);
+  const recent = await getMostRecentCookieWithLoginname({ loginName });
 
   if (authRequestId) {
     return createCallback({

@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   if (body) {
     const { sessionId } = body;
 
-    const sessionCookie = await getSessionCookieById(sessionId);
+    const sessionCookie = await getSessionCookieById({ sessionId });
 
     const session = await getSession(sessionCookie.id, sessionCookie.token);
 

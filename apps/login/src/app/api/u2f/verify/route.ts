@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         device.vendor || device.model ? ", " : ""
       }${os.name}${os.name ? ", " : ""}${browser.name}`;
     }
-    const sessionCookie = await getSessionCookieById(sessionId);
+    const sessionCookie = await getSessionCookieById({ sessionId });
 
     const session = await getSession(sessionCookie.id, sessionCookie.token);
 

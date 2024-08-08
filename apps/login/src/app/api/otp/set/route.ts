@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       body;
 
     const recentPromise = sessionId
-      ? getSessionCookieById(sessionId).catch((error) => {
+      ? getSessionCookieById({ sessionId }).catch((error) => {
           return Promise.reject(error);
         })
       : loginName
