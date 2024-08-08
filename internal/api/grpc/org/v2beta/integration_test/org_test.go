@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package org_test
 
@@ -28,14 +28,17 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
 
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
+		var err error
+		Tester, err = integration.NewTester(ctx)
+		if err != nil {
+			panic(err)
+		}
 		Client = Tester.Client.OrgV2beta
 
-		CTX, _ = Tester.WithAuthorization(ctx, integration.IAMOwner), errCtx
+		CTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		User = Tester.CreateHumanUser(CTX)
 		return m.Run()
 	}())
@@ -53,7 +56,7 @@ func TestServer_AddOrganization(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &org.AddOrganizationRequest{
 				Name:   "name",
 				Admins: nil,
