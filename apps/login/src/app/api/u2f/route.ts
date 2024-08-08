@@ -4,7 +4,7 @@ import {
   registerPasskey,
   registerU2F,
 } from "@/lib/zitadel";
-import { getSessionCookieById } from "@/utils/cookies";
+import { getSessionCookieById } from "@zitadel/next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {

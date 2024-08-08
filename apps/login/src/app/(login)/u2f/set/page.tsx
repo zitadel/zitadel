@@ -4,7 +4,7 @@ import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterPasskey from "@/ui/RegisterPasskey";
 import RegisterU2F from "@/ui/RegisterU2F";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { getMostRecentCookieWithLoginname } from "@zitadel/next";
 import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({

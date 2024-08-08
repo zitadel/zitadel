@@ -7,7 +7,7 @@ import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import PasswordForm from "@/ui/PasswordForm";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { getMostRecentCookieWithLoginname } from "@zitadel/next";
 import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({

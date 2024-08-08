@@ -1,7 +1,7 @@
 import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { getMostRecentCookieWithLoginname } from "@zitadel/next";
 import { redirect } from "next/navigation";
 
 async function loadSession(loginName: string, authRequestId?: string) {

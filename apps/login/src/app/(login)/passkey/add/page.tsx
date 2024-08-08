@@ -3,7 +3,7 @@ import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterPasskey from "@/ui/RegisterPasskey";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { getMostRecentCookieWithLoginname } from "@zitadel/next";
 import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({

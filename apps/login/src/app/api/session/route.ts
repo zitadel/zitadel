@@ -5,12 +5,11 @@ import {
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
 import {
-  SessionCookie,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
-} from "@/utils/cookies";
+} from "@zitadel/next";
 import {
   createSessionAndUpdateCookie,
   createSessionForIdpAndUpdateCookie,
@@ -76,7 +75,7 @@ export async function PUT(request: NextRequest) {
       challenges,
     } = body;
 
-    const recentPromise: Promise<SessionCookie> = sessionId
+    const recentPromise = sessionId
       ? getSessionCookieById(sessionId).catch((error) => {
           return Promise.reject(error);
         })

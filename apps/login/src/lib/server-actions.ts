@@ -1,6 +1,6 @@
 "use server";
 
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { getMostRecentCookieWithLoginname } from "@zitadel/next";
 import { getSession, verifyTOTPRegistration } from "./zitadel";
 
 export async function verifyTOTP(

@@ -13,7 +13,7 @@ import UserAvatar from "@/ui/UserAvatar";
 import {
   getMostRecentCookieWithLoginname,
   getSessionCookieById,
-} from "@/utils/cookies";
+} from "@zitadel/next";
 
 export default async function Page({
   searchParams,

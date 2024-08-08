@@ -1,9 +1,8 @@
 import {
-  SessionCookie,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
-} from "@/utils/cookies";
+} from "@zitadel/next";
 import { setSessionAndUpdateCookie } from "@/utils/session";
 import { NextRequest, NextResponse, userAgent } from "next/server";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
@@ -16,7 +15,7 @@ export async function POST(request: NextRequest) {
     const { loginName, sessionId, organization, authRequestId, code, method } =
       body;
 
-    const recentPromise: Promise<SessionCookie> = sessionId
+    const recentPromise = sessionId
       ? getSessionCookieById(sessionId).catch((error) => {
           return Promise.reject(error);
         })

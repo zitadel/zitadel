@@ -6,7 +6,7 @@ import UserAvatar from "@/ui/UserAvatar";
 import {
   getMostRecentCookieWithLoginname,
   getSessionCookieById,
-} from "@/utils/cookies";
+} from "@zitadel/next";
 
 const title = "Authenticate with a passkey";
 const description =

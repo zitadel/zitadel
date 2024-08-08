@@ -2,17 +2,14 @@ import {
   addOTPEmail,
   addOTPSMS,
   getBrandingSettings,
-  getSession,
   registerTOTP,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import BackButton from "@/ui/BackButton";
 import { Button, ButtonVariants } from "@/ui/Button";
 import DynamicTheme from "@/ui/DynamicTheme";
-import { Spinner } from "@/ui/Spinner";
 import TOTPRegister from "@/ui/TOTPRegister";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
 import Link from "next/link";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { loadMostRecentSession } from "@zitadel/next";
