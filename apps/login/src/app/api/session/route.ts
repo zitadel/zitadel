@@ -80,7 +80,7 @@ export async function PUT(request: NextRequest) {
           return Promise.reject(error);
         })
       : loginName
-        ? getSessionCookieByLoginName(loginName, organization).catch(
+        ? getSessionCookieByLoginName({ loginName, organization }).catch(
             (error) => {
               return Promise.reject(error);
             },

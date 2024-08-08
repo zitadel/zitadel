@@ -29,10 +29,10 @@ export default async function Page({
     loginName?: string,
     organization?: string,
   ) {
-    const recent = await getMostRecentCookieWithLoginname(
+    const recent = await getMostRecentCookieWithLoginname({
       loginName,
       organization,
-    );
+    });
     return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes(

@@ -110,7 +110,13 @@ export async function getMostRecentSessionCookie<T>(): Promise<any> {
   }
 }
 
-export async function getSessionCookieById<T>(id: string, organization?: string): Promise<SessionCookie<T>> {
+export async function getSessionCookieById<T>({
+  id,
+  organization,
+}: {
+  id: string;
+  organization?: string;
+}): Promise<SessionCookie<T>> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -128,7 +134,13 @@ export async function getSessionCookieById<T>(id: string, organization?: string)
   }
 }
 
-export async function getSessionCookieByLoginName<T>(loginName: string, organization?: string): Promise<SessionCookie<T>> {
+export async function getSessionCookieByLoginName<T>({
+  loginName,
+  organization,
+}: {
+  loginName?: string;
+  organization?: string;
+}): Promise<SessionCookie<T>> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -197,10 +209,17 @@ export async function getAllSessions<T>(cleanup: boolean = false): Promise<Sessi
 
 /**
  * Returns most recent session filtered by optinal loginName
- * @param loginName
+ * @param loginName optional loginName to filter cookies, if non provided, returns most recent session
+ * @param organization optional organization to filter cookies
  * @returns most recent session
  */
-export async function getMostRecentCookieWithLoginname<T>(loginName?: string, organization?: string): Promise<any> {
+export async function getMostRecentCookieWithLoginname<T>({
+  loginName,
+  organization,
+}: {
+  loginName?: string;
+  organization?: string;
+}): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -233,5 +252,3 @@ export async function getMostRecentCookieWithLoginname<T>(loginName?: string, or
     return Promise.reject("Could not read session cookie");
   }
 }
-
-export async function clearSessions() {}

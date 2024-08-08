@@ -7,7 +7,7 @@ export async function loadMostRecentSession(
   loginName?: string,
   organization?: string,
 ): Promise<Session | undefined> {
-  const recent = await getMostRecentCookieWithLoginname(loginName, organization);
+  const recent = await getMostRecentCookieWithLoginname({ loginName, organization });
   return sessionService
     .getSession({ sessionId: recent.id, sessionToken: recent.token }, {})
     .then((resp: GetSessionResponse) => resp.session);
