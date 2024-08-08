@@ -32,7 +32,7 @@ message Target {
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
   google.protobuf.Duration timeout = 5 [
-    (validate.rules).duration = {gte: {}, lte: {seconds: 20}},
+    (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "if the target doesn't respond before this timeout expires, the the connection is closed and the action fails";
       example: "\"10s\"";
@@ -70,7 +70,7 @@ message PatchTarget {
   }
   // Timeout defines the duration until ZITADEL cancels the execution.
   optional google.protobuf.Duration timeout = 5 [
-    (validate.rules).duration = {gte: {}, lte: {seconds: 20}},
+    (validate.rules).duration = {gte: {}, lte: {seconds: 270}},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "if the target doesn't respond before this timeout expires, the the connection is closed and the action fails";
       example: "\"10s\"";
