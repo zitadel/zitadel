@@ -545,8 +545,6 @@ func TestServer_SearchExecutions(t *testing.T) {
 					resp := Tester.SetExecution(ctx, t, cond, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
 
 					response.Details.Timestamp = resp.GetDetails().GetChanged()
-					// response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
-
 					// Set expected response with used values for SetExecution
 					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
 					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
