@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package admin_test
 
@@ -40,7 +40,7 @@ func TestServer_GetSecurityPolicy(t *testing.T) {
 	}{
 		{
 			name:    "permission error",
-			ctx:     Tester.WithAuthorization(CTX, integration.OrgOwner),
+			ctx:     Tester.WithAuthorization(CTX, integration.UserTypeOrgOwner),
 			wantErr: true,
 		},
 		{
@@ -85,7 +85,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 		{
 			name: "permission error",
 			args: args{
-				ctx: Tester.WithAuthorization(CTX, integration.OrgOwner),
+				ctx: Tester.WithAuthorization(CTX, integration.UserTypeOrgOwner),
 				req: &admin_pb.SetSecurityPolicyRequest{
 					EnableIframeEmbedding: true,
 					AllowedOrigins:        []string{"foo.com", "bar.com"},
@@ -105,7 +105,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -120,7 +120,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -135,7 +135,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -152,7 +152,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},

@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package admin_test
 
@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/text"
@@ -33,68 +34,68 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		unsupportedLanguage       = language.Afrikaans
 	)
 
-	domain, _, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, ctx, SystemCTX)
+	instance := Tester.UseIsolatedInstance(t, ctx, SystemCTX)
 	t.Run("assumed defaults are correct", func(tt *testing.T) {
 		tt.Run("languages are not restricted by default", func(ttt *testing.T) {
-			restrictions, err := Tester.Client.Admin.GetRestrictions(iamOwnerCtx, &admin.GetRestrictionsRequest{})
+			restrictions, err := instance.Client.Admin.GetRestrictions(instance.IAMOwnerCTX, &admin.GetRestrictionsRequest{})
 			require.NoError(ttt, err)
 			require.Len(ttt, restrictions.AllowedLanguages, 0)
 		})
 		tt.Run("default language is English by default", func(ttt *testing.T) {
-			defaultLang, err := Tester.Client.Admin.GetDefaultLanguage(iamOwnerCtx, &admin.GetDefaultLanguageRequest{})
+			defaultLang, err := instance.Client.Admin.GetDefaultLanguage(instance.IAMOwnerCTX, &admin.GetDefaultLanguageRequest{})
 			require.NoError(ttt, err)
 			require.Equal(ttt, language.Make(defaultLang.Language), language.English)
 		})
 		tt.Run("the discovery endpoint returns all supported languages", func(ttt *testing.T) {
-			awaitDiscoveryEndpoint(ttt, domain, supportedLanguagesStr, nil)
+			awaitDiscoveryEndpoint(ttt, instance.Domain, supportedLanguagesStr, nil)
 		})
 	})
 	t.Run("restricting the default language fails", func(tt *testing.T) {
-		_, err := Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{AllowedLanguages: &admin.SelectLanguages{List: []string{defaultAndAllowedLanguage.String()}}})
+		_, err := instance.Client.Admin.SetRestrictions(instance.IAMOwnerCTX, &admin.SetRestrictionsRequest{AllowedLanguages: &admin.SelectLanguages{List: []string{defaultAndAllowedLanguage.String()}}})
 		expectStatus, ok := status.FromError(err)
 		require.True(tt, ok)
 		require.Equal(tt, codes.FailedPrecondition, expectStatus.Code())
 	})
 	t.Run("not defining any restrictions throws an error", func(tt *testing.T) {
-		_, err := Tester.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{})
+		_, err := instance.Client.Admin.SetRestrictions(instance.IAMOwnerCTX, &admin.SetRestrictionsRequest{})
 		expectStatus, ok := status.FromError(err)
 		require.True(tt, ok)
 		require.Equal(tt, codes.InvalidArgument, expectStatus.Code())
 	})
 	t.Run("setting the default language works", func(tt *testing.T) {
-		setAndAwaitDefaultLanguage(iamOwnerCtx, tt, defaultAndAllowedLanguage)
+		setAndAwaitDefaultLanguage(instance.IAMOwnerCTX, instance.Client, tt, defaultAndAllowedLanguage)
 	})
 	t.Run("restricting allowed languages works", func(tt *testing.T) {
-		setAndAwaitAllowedLanguages(iamOwnerCtx, tt, []string{defaultAndAllowedLanguage.String()})
+		setAndAwaitAllowedLanguages(instance.IAMOwnerCTX, instance.Client, tt, []string{defaultAndAllowedLanguage.String()})
 	})
 	t.Run("GetAllowedLanguage returns only the allowed languages", func(tt *testing.T) {
 		expectContains, expectNotContains := []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()}
-		adminResp, err := Tester.Client.Admin.GetAllowedLanguages(iamOwnerCtx, &admin.GetAllowedLanguagesRequest{})
+		adminResp, err := instance.Client.Admin.GetAllowedLanguages(instance.IAMOwnerCTX, &admin.GetAllowedLanguagesRequest{})
 		require.NoError(t, err)
 		langs := adminResp.GetLanguages()
 		assert.Condition(t, contains(langs, expectContains))
 		assert.Condition(t, not(contains(langs, expectNotContains)))
 	})
 	t.Run("setting the default language to a disallowed language fails", func(tt *testing.T) {
-		_, err := Tester.Client.Admin.SetDefaultLanguage(iamOwnerCtx, &admin.SetDefaultLanguageRequest{Language: disallowedLanguage.String()})
+		_, err := instance.Client.Admin.SetDefaultLanguage(instance.IAMOwnerCTX, &admin.SetDefaultLanguageRequest{Language: disallowedLanguage.String()})
 		expectStatus, ok := status.FromError(err)
 		require.True(tt, ok)
 		require.Equal(tt, codes.FailedPrecondition, expectStatus.Code())
 	})
 	t.Run("the list of supported languages includes the disallowed languages", func(tt *testing.T) {
-		supported, err := Tester.Client.Admin.GetSupportedLanguages(iamOwnerCtx, &admin.GetSupportedLanguagesRequest{})
+		supported, err := instance.Client.Admin.GetSupportedLanguages(instance.IAMOwnerCTX, &admin.GetSupportedLanguagesRequest{})
 		require.NoError(tt, err)
 		require.Condition(tt, contains(supported.GetLanguages(), supportedLanguagesStr))
 	})
 	t.Run("the disallowed language is not listed in the discovery endpoint", func(tt *testing.T) {
-		awaitDiscoveryEndpoint(tt, domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
+		awaitDiscoveryEndpoint(tt, instance.Domain, []string{defaultAndAllowedLanguage.String()}, []string{disallowedLanguage.String()})
 	})
 	t.Run("the login ui is rendered in the default language", func(tt *testing.T) {
-		awaitLoginUILanguage(tt, domain, disallowedLanguage, defaultAndAllowedLanguage, "Passwort")
+		awaitLoginUILanguage(tt, instance.Domain, disallowedLanguage, defaultAndAllowedLanguage, "Passwort")
 	})
 	t.Run("preferred languages are not restricted by the supported languages", func(tt *testing.T) {
 		tt.Run("change user profile", func(ttt *testing.T) {
-			resp, err := Tester.Client.Mgmt.ListUsers(iamOwnerCtx, &management.ListUsersRequest{Queries: []*user.SearchQuery{{Query: &user.SearchQuery_UserNameQuery{UserNameQuery: &user.UserNameQuery{
+			resp, err := instance.Client.Mgmt.ListUsers(instance.IAMOwnerCTX, &management.ListUsersRequest{Queries: []*user.SearchQuery{{Query: &user.SearchQuery_UserNameQuery{UserNameQuery: &user.UserNameQuery{
 				UserName: "zitadel-admin@zitadel.localhost"}},
 			}}})
 			require.NoError(ttt, err)
@@ -102,7 +103,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 			humanAdmin := resp.GetResult()[0]
 			profile := humanAdmin.GetHuman().GetProfile()
 			require.NotEqual(ttt, unsupportedLanguage.String(), profile.GetPreferredLanguage())
-			_, updateErr := Tester.Client.Mgmt.UpdateHumanProfile(iamOwnerCtx, &management.UpdateHumanProfileRequest{
+			_, updateErr := instance.Client.Mgmt.UpdateHumanProfile(instance.IAMOwnerCTX, &management.UpdateHumanProfileRequest{
 				PreferredLanguage: unsupportedLanguage.String(),
 				UserId:            humanAdmin.GetId(),
 				FirstName:         profile.GetFirstName(),
@@ -115,26 +116,26 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		})
 	})
 	t.Run("custom texts are only restricted by the supported languages", func(tt *testing.T) {
-		_, err := Tester.Client.Admin.SetCustomLoginText(iamOwnerCtx, &admin.SetCustomLoginTextsRequest{
+		_, err := instance.Client.Admin.SetCustomLoginText(instance.IAMOwnerCTX, &admin.SetCustomLoginTextsRequest{
 			Language: disallowedLanguage.String(),
 			EmailVerificationText: &text.EmailVerificationScreenText{
 				Description: "hodor",
 			},
 		})
 		assert.NoError(tt, err)
-		_, err = Tester.Client.Mgmt.SetCustomLoginText(iamOwnerCtx, &management.SetCustomLoginTextsRequest{
+		_, err = instance.Client.Mgmt.SetCustomLoginText(instance.IAMOwnerCTX, &management.SetCustomLoginTextsRequest{
 			Language: disallowedLanguage.String(),
 			EmailVerificationText: &text.EmailVerificationScreenText{
 				Description: "hodor",
 			},
 		})
 		assert.NoError(tt, err)
-		_, err = Tester.Client.Mgmt.SetCustomInitMessageText(iamOwnerCtx, &management.SetCustomInitMessageTextRequest{
+		_, err = instance.Client.Mgmt.SetCustomInitMessageText(instance.IAMOwnerCTX, &management.SetCustomInitMessageTextRequest{
 			Language: disallowedLanguage.String(),
 			Text:     "hodor",
 		})
 		assert.NoError(tt, err)
-		_, err = Tester.Client.Admin.SetDefaultInitMessageText(iamOwnerCtx, &admin.SetDefaultInitMessageTextRequest{
+		_, err = instance.Client.Admin.SetDefaultInitMessageText(instance.IAMOwnerCTX, &admin.SetDefaultInitMessageTextRequest{
 			Language: disallowedLanguage.String(),
 			Text:     "hodor",
 		})
@@ -142,27 +143,27 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 	})
 	t.Run("allowing all languages works", func(tt *testing.T) {
 		tt.Run("restricting allowed languages works", func(ttt *testing.T) {
-			setAndAwaitAllowedLanguages(iamOwnerCtx, ttt, make([]string, 0))
+			setAndAwaitAllowedLanguages(instance.IAMOwnerCTX, instance.Client, ttt, make([]string, 0))
 		})
 	})
 
 	t.Run("allowing the language makes it usable again", func(tt *testing.T) {
 		tt.Run("the previously disallowed language is listed in the discovery endpoint again", func(ttt *testing.T) {
-			awaitDiscoveryEndpoint(ttt, domain, []string{disallowedLanguage.String()}, nil)
+			awaitDiscoveryEndpoint(ttt, instance.Domain, []string{disallowedLanguage.String()}, nil)
 		})
 		tt.Run("the login ui is rendered in the previously disallowed language", func(ttt *testing.T) {
-			awaitLoginUILanguage(ttt, domain, disallowedLanguage, disallowedLanguage, "Contraseña")
+			awaitLoginUILanguage(ttt, instance.Domain, disallowedLanguage, disallowedLanguage, "Contraseña")
 		})
 	})
 }
 
-func setAndAwaitAllowedLanguages(ctx context.Context, t *testing.T, selectLanguages []string) {
-	_, err := Tester.Client.Admin.SetRestrictions(ctx, &admin.SetRestrictionsRequest{AllowedLanguages: &admin.SelectLanguages{List: selectLanguages}})
+func setAndAwaitAllowedLanguages(ctx context.Context, cc *integration.Client, t *testing.T, selectLanguages []string) {
+	_, err := cc.Admin.SetRestrictions(ctx, &admin.SetRestrictionsRequest{AllowedLanguages: &admin.SelectLanguages{List: selectLanguages}})
 	require.NoError(t, err)
 	awaitCtx, awaitCancel := context.WithTimeout(ctx, 10*time.Second)
 	defer awaitCancel()
 	await(t, awaitCtx, func(tt *assert.CollectT) {
-		restrictions, getErr := Tester.Client.Admin.GetRestrictions(awaitCtx, &admin.GetRestrictionsRequest{})
+		restrictions, getErr := cc.Admin.GetRestrictions(awaitCtx, &admin.GetRestrictionsRequest{})
 		expectLanguages := selectLanguages
 		if len(selectLanguages) == 0 {
 			expectLanguages = nil
@@ -172,13 +173,13 @@ func setAndAwaitAllowedLanguages(ctx context.Context, t *testing.T, selectLangua
 	})
 }
 
-func setAndAwaitDefaultLanguage(ctx context.Context, t *testing.T, lang language.Tag) {
-	_, err := Tester.Client.Admin.SetDefaultLanguage(ctx, &admin.SetDefaultLanguageRequest{Language: lang.String()})
+func setAndAwaitDefaultLanguage(ctx context.Context, cc *integration.Client, t *testing.T, lang language.Tag) {
+	_, err := cc.Admin.SetDefaultLanguage(ctx, &admin.SetDefaultLanguageRequest{Language: lang.String()})
 	require.NoError(t, err)
 	awaitCtx, awaitCancel := context.WithTimeout(ctx, 10*time.Second)
 	defer awaitCancel()
 	await(t, awaitCtx, func(tt *assert.CollectT) {
-		defaultLang, getErr := Tester.Client.Admin.GetDefaultLanguage(awaitCtx, &admin.GetDefaultLanguageRequest{})
+		defaultLang, getErr := cc.Admin.GetDefaultLanguage(awaitCtx, &admin.GetDefaultLanguageRequest{})
 		assert.NoError(tt, getErr)
 		assert.Equal(tt, lang.String(), defaultLang.GetLanguage())
 	})

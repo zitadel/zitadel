@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package admin_test
 
@@ -23,15 +23,18 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, _, cancel := integration.Contexts(3 * time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
 
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
+		var err error
+		Tester, err = integration.NewTester(ctx)
+		if err != nil {
+			panic(err)
+		}
 
 		CTX = ctx
-		AdminCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
-		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
+		AdminCTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		SystemCTX = Tester.WithAuthorization(ctx, integration.UserTypeSystem)
 		Client = Tester.Client.Admin
 		return m.Run()
 	}())
