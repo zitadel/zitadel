@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package schema_test
 
@@ -30,13 +30,16 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, _, cancel := integration.Contexts(5 * time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
 
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
+		var err error
+		Tester, err = integration.NewTester(ctx)
+		if err != nil {
+			panic(err)
+		}
 
-		CTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
+		CTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		Client = Tester.Client.UserSchemaV3
 
 		return m.Run()
@@ -86,7 +89,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 	}{
 		{
 			name: "missing permission, error",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &schema.CreateUserSchemaRequest{
 				Type: fmt.Sprint(time.Now().UnixNano() + 1),
 			},
@@ -167,7 +170,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			want: &schema.CreateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -236,7 +239,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			want: &schema.CreateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -310,7 +313,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			want: &schema.CreateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -352,7 +355,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				return nil
 			},
 			args: args{
-				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+				ctx: Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.UpdateUserSchemaRequest{
 					Type: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
 				},
@@ -413,7 +416,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -433,7 +436,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -510,7 +513,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -549,7 +552,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -628,7 +631,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 			want: &schema.DeactivateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -720,7 +723,7 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 			want: &schema.ReactivateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -780,7 +783,7 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 			want: &schema.DeleteUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -839,7 +842,7 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+				ctx: Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.GetUserSchemaByIDRequest{},
 				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
@@ -941,7 +944,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+				ctx: Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.ListUserSchemasRequest{},
 			},
 			wantErr: true,
