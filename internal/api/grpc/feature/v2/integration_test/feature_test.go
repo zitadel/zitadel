@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package feature_test
 
@@ -28,14 +28,18 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, _, cancel := integration.Contexts(5 * time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
-		Tester = integration.NewTester(ctx)
-		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
-		IamCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
-		OrgCTX = Tester.WithAuthorization(ctx, integration.OrgOwner)
 
-		defer Tester.Done()
+		var err error
+		Tester, err = integration.NewTester(ctx)
+		if err != nil {
+			panic(err)
+		}
+		SystemCTX = Tester.WithAuthorization(ctx, integration.UserTypeSystem)
+		IamCTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		OrgCTX = Tester.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+
 		Client = Tester.Client.FeatureV2
 
 		return m.Run()
@@ -264,7 +268,7 @@ func TestServer_SetInstanceFeatures(t *testing.T) {
 			want: &feature.SetInstanceFeaturesResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -310,7 +314,7 @@ func TestServer_ResetInstanceFeatures(t *testing.T) {
 			want: &feature.ResetInstanceFeaturesResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
