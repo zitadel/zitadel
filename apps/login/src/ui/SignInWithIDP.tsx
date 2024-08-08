@@ -143,10 +143,6 @@ export function SignInWithIDP({
           <Alert>{error}</Alert>
         </div>
       )}
-      <div className="mt-8 flex w-full flex-row items-center pt-4">
-        <BackButton />
-        <span className="flex-grow"></span>
-      </div>
     </div>
   );
 }
