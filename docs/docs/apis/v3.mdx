@@ -130,6 +130,8 @@ All resource services by default support the following CRUD operations [as descr
 - Standard CRUD methods for Targets
 - Standard CRUD methods for Executions except the PutExecution method replaces the CreateExecution and PatchExecution methods
 
+TODO: Should we think again about the naming of the resources? For example Triggers instead of executions?
+
 Additional to the standard CRUD methods:
 
 - ListAvailableExecutionServices
@@ -228,23 +230,31 @@ Standard CRUD methods
 
 Standard CRUD methods
 
+Search also returns granted projects with owner and an indicator that it is granted.
+
 ### ZITADELApps
 
 Standard CRUD methods
 
-### ZITADELMemberships
+### ZITADELManagers
 
-The given context defines the organization, instance or system where the membership is created.
+Previously known as memberships
+
+- Standard CRUD for managers
+
+The given context defines the project, organization, instance where the manager is allowed.
 The context and the user ID together are unique.
+
+TODO: Can we remove project grant manager roles? A manager only needs a user id, an org id and a project manager role.
 
 Additional to the standard CRUD methods:
 
 - ListAvailableRoles (context-aware)
 
-### ZITADELGrants
+### ZITADELAuthorizations
 
-- Standard CRUD methods for project grants
-- Standard CRUD methods for user grants
+- Standard CRUD methods for project grants (project grants are org and project linking resources with roles. grants are not projects.)
+- Standard CRUD methods for authorizations (previously known as user grants)
 - Standard CRUD methods for roles
 
 ### ZITADELSMTPProviders
