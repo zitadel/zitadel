@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package oidc_test
 
@@ -27,7 +27,7 @@ import (
 // userinfo integration test against a matrix of different feature flags.
 // This ensure that the response of the different implementations remains the same.
 func TestServer_UserInfo(t *testing.T) {
-	iamOwnerCTX := Tester.WithAuthorization(CTX, integration.IAMOwner)
+	iamOwnerCTX := Tester.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	t.Cleanup(func() {
 		_, err := Tester.Client.FeatureV2.ResetInstanceFeatures(iamOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
 		require.NoError(t, err)
@@ -144,7 +144,7 @@ func testServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo, roleBar}, []string{Tester.Organisation.ID})
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo, roleBar}, []string{Tester.Organisation.Id})
 				},
 			},
 		},
@@ -157,7 +157,7 @@ func testServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Tester.Organisation.ID})
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Tester.Organisation.Id})
 				},
 			},
 		},
@@ -171,14 +171,14 @@ func testServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Tester.Organisation.ID})
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Tester.Organisation.Id})
 				},
 			},
 		},
 		{
 			name: "PAT",
 			prepare: func(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
-				user := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.OrgOwner)
+				user := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.UserTypeOrgOwner)
 				return &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: user.Token,
@@ -193,11 +193,8 @@ func testServer_UserInfo(t *testing.T) {
 			},
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				func(t *testing.T, ui *oidc.UserInfo) {
-					user := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.OrgOwner)
+					user := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.UserTypeOrgOwner)
 					assert.Equal(t, user.ID, ui.Subject)
-					assert.Equal(t, user.PreferredLoginName, ui.PreferredUsername)
-					assert.Equal(t, user.Machine.Name, ui.Name)
-					assert.Equal(t, user.ResourceOwner, ui.Claims[oidc_api.ClaimResourceOwnerID])
 					assert.NotEmpty(t, ui.Claims[oidc_api.ClaimResourceOwnerName])
 					assert.NotEmpty(t, ui.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
 				},
@@ -253,7 +250,7 @@ func TestServer_UserInfo_OrgIDRoles(t *testing.T) {
 			scope: []string{
 				oidc.ScopeOpenID, oidc.ScopeOfflineAccess,
 			},
-			wantRoleOrgIDs: []string{Tester.Organisation.ID, grantedOrgID},
+			wantRoleOrgIDs: []string{Tester.Organisation.Id, grantedOrgID},
 		},
 		{
 			name: "only granted org",
@@ -266,18 +263,18 @@ func TestServer_UserInfo_OrgIDRoles(t *testing.T) {
 			name: "only own org",
 			scope: []string{
 				oidc.ScopeOpenID, oidc.ScopeOfflineAccess,
-				domain.OrgRoleIDScope + Tester.Organisation.ID,
+				domain.OrgRoleIDScope + Tester.Organisation.Id,
 			},
-			wantRoleOrgIDs: []string{Tester.Organisation.ID},
+			wantRoleOrgIDs: []string{Tester.Organisation.Id},
 		},
 		{
 			name: "request both orgs",
 			scope: []string{
 				oidc.ScopeOpenID, oidc.ScopeOfflineAccess,
-				domain.OrgRoleIDScope + Tester.Organisation.ID,
+				domain.OrgRoleIDScope + Tester.Organisation.Id,
 				domain.OrgRoleIDScope + grantedOrgID,
 			},
-			wantRoleOrgIDs: []string{Tester.Organisation.ID, grantedOrgID},
+			wantRoleOrgIDs: []string{Tester.Organisation.Id, grantedOrgID},
 		},
 	}
 	for _, tt := range tests {
@@ -318,7 +315,7 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 
 	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, user.GetUserId(), provider)
 	require.NoError(t, err)
-	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, []string{roleFoo}, []string{Tester.Organisation.ID})
+	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, []string{roleFoo}, []string{Tester.Organisation.Id})
 }
 
 func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...string) {

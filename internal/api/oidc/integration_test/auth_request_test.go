@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package oidc_test
 
@@ -479,7 +479,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 
 	postLogoutRedirect, err := rp.EndSession(CTX, provider, "", logoutRedirectURI, "state")
 	require.NoError(t, err)
-	assert.Equal(t, http_utils.BuildOrigin(Tester.Host(), Tester.Config.ExternalSecure)+Tester.Config.OIDC.DefaultLogoutURLV2+logoutRedirectURI+"?state=state", postLogoutRedirect.String())
+	assert.Equal(t, http_utils.BuildOrigin(Tester.Config.Host(), Tester.Config.Secure)+Tester.Config.LogoutURLV2+logoutRedirectURI+"?state=state", postLogoutRedirect.String())
 
 	// userinfo must not fail until login UI terminated session
 	_, err = rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)

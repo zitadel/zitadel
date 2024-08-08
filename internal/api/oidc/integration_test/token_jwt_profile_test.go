@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package oidc_test
 
@@ -56,14 +56,14 @@ func TestServer_JWTProfile(t *testing.T) {
 			keyData: keyData,
 			scope: []string{
 				oidc.ScopeOpenID,
-				domain.OrgIDScope + Tester.Organisation.ID,
-				domain.OrgDomainPrimaryScope + Tester.Organisation.Domain,
+				domain.OrgIDScope + Tester.Organisation.Id,
+				domain.OrgDomainPrimaryScope + Tester.Organisation.PrimaryDomain,
 			},
 			wantClaims: claims{
-				resourceOwnerID:            Tester.Organisation.ID,
+				resourceOwnerID:            Tester.Organisation.Id,
 				resourceOwnerName:          Tester.Organisation.Name,
-				resourceOwnerPrimaryDomain: Tester.Organisation.Domain,
-				orgDomain:                  Tester.Organisation.Domain,
+				resourceOwnerPrimaryDomain: Tester.Organisation.PrimaryDomain,
+				orgDomain:                  Tester.Organisation.PrimaryDomain,
 			},
 		},
 		{
@@ -71,23 +71,23 @@ func TestServer_JWTProfile(t *testing.T) {
 			keyData: keyData,
 			scope: []string{
 				oidc.ScopeOpenID,
-				domain.OrgDomainPrimaryScope + Tester.Organisation.Domain,
+				domain.OrgDomainPrimaryScope + Tester.Organisation.PrimaryDomain,
 				domain.OrgDomainPrimaryScope + "foo"},
 			wantClaims: claims{
-				orgDomain: Tester.Organisation.Domain,
+				orgDomain: Tester.Organisation.PrimaryDomain,
 			},
 		},
 		{
 			name:    "invalid org id filtered",
 			keyData: keyData,
 			scope: []string{oidc.ScopeOpenID,
-				domain.OrgIDScope + Tester.Organisation.ID,
+				domain.OrgIDScope + Tester.Organisation.Id,
 				domain.OrgIDScope + "foo",
 			},
 			wantClaims: claims{
-				resourceOwnerID:            Tester.Organisation.ID,
+				resourceOwnerID:            Tester.Organisation.Id,
 				resourceOwnerName:          Tester.Organisation.Name,
-				resourceOwnerPrimaryDomain: Tester.Organisation.Domain,
+				resourceOwnerPrimaryDomain: Tester.Organisation.PrimaryDomain,
 			},
 		},
 	}

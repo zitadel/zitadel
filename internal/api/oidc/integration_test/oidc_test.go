@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package oidc_test
 
@@ -41,18 +41,21 @@ const (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, _, cancel := integration.Contexts(10 * time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
 		defer cancel()
 
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
+		var err error
+		Tester, err = integration.NewTester(ctx)
+		if err != nil {
+			panic(err)
+		}
 
-		CTX = Tester.WithAuthorization(ctx, integration.OrgOwner)
+		CTX = Tester.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		User = Tester.CreateHumanUser(CTX)
 		Tester.SetUserPassword(CTX, User.GetUserId(), integration.UserPassword, false)
 		Tester.RegisterUserPasskey(CTX, User.GetUserId())
-		CTXLOGIN = Tester.WithAuthorization(ctx, integration.Login)
-		CTXIAM = Tester.WithAuthorization(ctx, integration.IAMOwner)
+		CTXLOGIN = Tester.WithAuthorization(ctx, integration.UserTypeLogin)
+		CTXIAM = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		return m.Run()
 	}())
 }
@@ -421,13 +424,13 @@ func createImplicitClient(t testing.TB) string {
 }
 
 func createAuthRequest(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequest(CTX, clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, scope...)
+	redURL, err := Tester.CreateOIDCAuthRequest(CTX, clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.UserTypeLogin].ID, redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }
 
 func createAuthRequestImplicit(t testing.TB, clientID, redirectURI string, scope ...string) string {
-	redURL, err := Tester.CreateOIDCAuthRequestImplicit(CTX, clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, scope...)
+	redURL, err := Tester.CreateOIDCAuthRequestImplicit(CTX, clientID, Tester.Users[integration.FirstInstanceUsersKey][integration.UserTypeLogin].ID, redirectURI, scope...)
 	require.NoError(t, err)
 	return redURL
 }

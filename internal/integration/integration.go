@@ -116,6 +116,7 @@ type Config struct {
 	Port         uint16
 	Secure       bool
 	LoginURLV2   string
+	LogoutURLV2  string
 	WebAuthNName string
 }
 

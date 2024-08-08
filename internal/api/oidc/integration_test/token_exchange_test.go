@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package oidc_test
 
@@ -26,7 +26,7 @@ import (
 )
 
 func setTokenExchangeFeature(t *testing.T, value bool) {
-	iamCTX := Tester.WithAuthorization(CTX, integration.IAMOwner)
+	iamCTX := Tester.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	_, err := Tester.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
 		OidcTokenExchange: proto.Bool(value),
@@ -36,14 +36,14 @@ func setTokenExchangeFeature(t *testing.T, value bool) {
 }
 
 func resetFeatures(t *testing.T) {
-	iamCTX := Tester.WithAuthorization(CTX, integration.IAMOwner)
+	iamCTX := Tester.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	_, err := Tester.Client.FeatureV2.ResetInstanceFeatures(iamCTX, &feature.ResetInstanceFeaturesRequest{})
 	require.NoError(t, err)
 	time.Sleep(time.Second)
 }
 
 func setImpersonationPolicy(t *testing.T, value bool) {
-	iamCTX := Tester.WithAuthorization(CTX, integration.IAMOwner)
+	iamCTX := Tester.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	policy, err := Tester.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
 	require.NoError(t, err)
@@ -57,7 +57,7 @@ func setImpersonationPolicy(t *testing.T, value bool) {
 }
 
 func createMachineUserPATWithMembership(t *testing.T, roles ...string) (userID, pat string) {
-	iamCTX := Tester.WithAuthorization(CTX, integration.IAMOwner)
+	iamCTX := Tester.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	userID, pat, err := Tester.CreateMachineUserPATWithMembership(iamCTX, roles...)
 	require.NoError(t, err)
 	return userID, pat
@@ -576,14 +576,14 @@ func TestImpersonation_API_Call(t *testing.T) {
 	})
 
 	iamUserID, iamImpersonatorPAT := createMachineUserPATWithMembership(t, "IAM_ADMIN_IMPERSONATOR")
-	iamOwner := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner)
+	iamOwner := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.UserTypeIAMOwner)
 
 	// impersonating the IAM owner!
 	resp, err := tokenexchange.ExchangeToken(CTX, exchanger, iamOwner.Token, oidc.AccessTokenType, iamImpersonatorPAT, oidc.AccessTokenType, nil, nil, nil, oidc.AccessTokenType)
 	require.NoError(t, err)
 	accessTokenVerifier(CTX, resourceServer, iamOwner.ID, iamUserID)
 
-	impersonatedCTX := Tester.WithAuthorizationToken(CTX, resp.AccessToken)
+	impersonatedCTX := integration.WithAuthorizationToken(CTX, resp.AccessToken)
 	_, err = Tester.Client.Admin.GetAllowedLanguages(impersonatedCTX, &admin.GetAllowedLanguagesRequest{})
 	status := status.Convert(err)
 	assert.Equal(t, codes.PermissionDenied, status.Code())

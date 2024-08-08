@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package oidc_test
 
@@ -295,7 +295,7 @@ func TestServer_VerifyClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, tt.client.authReqClientID, Tester.Users[integration.FirstInstanceUsersKey][integration.Login].ID, redirectURI, oidc.ScopeOpenID)
+			authRequestID, err := Tester.CreateOIDCAuthRequest(CTX, tt.client.authReqClientID, Tester.Users[integration.FirstInstanceUsersKey][integration.UserTypeLogin].ID, redirectURI, oidc.ScopeOpenID)
 			require.NoError(t, err)
 			linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: authRequestID,
