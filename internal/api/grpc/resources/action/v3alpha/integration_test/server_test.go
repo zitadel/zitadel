@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package action_test
 
@@ -25,14 +25,17 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
 
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
+		var err error
+		Tester, err = integration.NewTester(ctx)
+		if err != nil {
+			panic(err)
+		}
 		Client = Tester.Client.ActionV3
 
-		CTX, _ = Tester.WithAuthorization(ctx, integration.IAMOwner), errCtx
+		CTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		return m.Run()
 	}())
 }

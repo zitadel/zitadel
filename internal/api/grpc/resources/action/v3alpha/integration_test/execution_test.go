@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package action_test
 
@@ -37,7 +37,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -105,7 +105,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -151,7 +151,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -178,7 +178,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -289,7 +289,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -317,7 +317,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -355,7 +355,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -423,7 +423,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -469,7 +469,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -496,7 +496,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -534,7 +534,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Event{
@@ -606,7 +606,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -654,7 +654,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -681,7 +681,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},
@@ -719,7 +719,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -779,7 +779,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
+						Id:   Tester.Instance.Id,
 					},
 				},
 			},

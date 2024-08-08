@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package action_test
 
@@ -31,7 +31,7 @@ func TestServer_CreateTarget(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.Target{
 				Name: fmt.Sprint(time.Now().UnixNano() + 1),
 			},
@@ -104,7 +104,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
@@ -125,7 +125,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
@@ -146,7 +146,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
@@ -167,7 +167,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
@@ -189,7 +189,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
@@ -228,7 +228,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				return nil
 			},
 			args: args{
-				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+				ctx: Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.PatchTargetRequest{
 					Target: &action.PatchTarget{
 						Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
@@ -272,7 +272,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
@@ -299,7 +299,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
@@ -322,7 +322,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
@@ -345,7 +345,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
@@ -370,7 +370,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
@@ -404,7 +404,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.DeleteTargetRequest{
 				Id: target.GetDetails().GetId(),
 			},
@@ -428,7 +428,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.InstanceID(),
+					Id:   Tester.Instance.Id,
 				},
 			},
 		},
