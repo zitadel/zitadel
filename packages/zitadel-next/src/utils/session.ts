@@ -4,10 +4,12 @@ import { getMostRecentCookieWithLoginname } from "./cookies";
 
 export async function loadMostRecentSession(
   sessionService: any, // TODO: SessionServiceClient,
-  loginName?: string,
-  organization?: string,
+  sessionParams: { loginName?: string; organization?: string },
 ): Promise<Session | undefined> {
-  const recent = await getMostRecentCookieWithLoginname({ loginName, organization });
+  const recent = await getMostRecentCookieWithLoginname({
+    loginName: sessionParams.loginName,
+    organization: sessionParams.organization,
+  });
   return sessionService
     .getSession({ sessionId: recent.id, sessionToken: recent.token }, {})
     .then((resp: GetSessionResponse) => resp.session);

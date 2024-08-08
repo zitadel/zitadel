@@ -1,4 +1,4 @@
-import { getBrandingSettings } from "@/lib/zitadel";
+import { getBrandingSettings, sessionService } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import LoginOTP from "@/ui/LoginOTP";
@@ -17,7 +17,10 @@ export default async function Page({
 
   const { method } = params;
 
-  const session = await loadMostRecentSession(loginName, organization);
+  const session = await loadMostRecentSession(sessionService, {
+    loginName,
+    organization,
+  });
 
   const branding = await getBrandingSettings(organization);
 

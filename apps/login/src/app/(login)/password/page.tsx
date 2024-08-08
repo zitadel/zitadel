@@ -2,6 +2,7 @@ import {
   getBrandingSettings,
   getLoginSettings,
   getSession,
+  sessionService,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
@@ -17,7 +18,10 @@ export default async function Page({
   const { loginName, organization, promptPasswordless, authRequestId, alt } =
     searchParams;
 
-  const sessionFactors = await loadMostRecentSession(loginName, organization);
+  const sessionFactors = await loadMostRecentSession(sessionService, {
+    loginName,
+    organization,
+  });
 
   const branding = await getBrandingSettings(organization);
   const loginSettings = await getLoginSettings(organization);

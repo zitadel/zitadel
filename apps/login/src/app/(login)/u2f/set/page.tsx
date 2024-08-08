@@ -1,4 +1,4 @@
-import { getBrandingSettings, getSession } from "@/lib/zitadel";
+import { getBrandingSettings, getSession, sessionService } from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterPasskey from "@/ui/RegisterPasskey";
@@ -14,7 +14,10 @@ export default async function Page({
 }) {
   const { loginName, organization, authRequestId } = searchParams;
 
-  const sessionFactors = await loadMostRecentSession(loginName, organization);
+  const sessionFactors = await loadMostRecentSession(sessionService, {
+    loginName,
+    organization,
+  });
 
   const title = "Use your passkey to confirm it's really you";
   const description =

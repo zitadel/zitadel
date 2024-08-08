@@ -1,4 +1,4 @@
-import { getBrandingSettings, getSession } from "@/lib/zitadel";
+import { getBrandingSettings, getSession, sessionService } from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterPasskey from "@/ui/RegisterPasskey";
@@ -13,7 +13,10 @@ export default async function Page({
   const { loginName, promptPasswordless, organization, authRequestId } =
     searchParams;
 
-  const sessionFactors = await loadMostRecentSession(loginName, organization);
+  const sessionFactors = await loadMostRecentSession(sessionService, {
+    loginName,
+    organization,
+  });
 
   const title = !!promptPasswordless
     ? "Authenticate with a passkey"

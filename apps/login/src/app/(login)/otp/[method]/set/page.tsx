@@ -3,6 +3,7 @@ import {
   addOTPSMS,
   getBrandingSettings,
   registerTOTP,
+  sessionService,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import BackButton from "@/ui/BackButton";
@@ -26,7 +27,10 @@ export default async function Page({
   const { method } = params;
 
   const branding = await getBrandingSettings(organization);
-  const session = await loadMostRecentSession(loginName, organization);
+  const session = await loadMostRecentSession(sessionService, {
+    loginName,
+    organization,
+  });
 
   let totpResponse: RegisterTOTPResponse | undefined,
     totpError: Error | undefined;
