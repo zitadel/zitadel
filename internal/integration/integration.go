@@ -142,6 +142,10 @@ func NewTester(ctx context.Context) (*Tester, error) {
 	if err != nil {
 		return nil, err
 	}
+	// refresh short-lived system user token
+	if err = tester.createSystemUser(); err != nil {
+		return nil, err
+	}
 	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.Hostname, http_util.BuildOrigin(tester.Host(), tester.Config.Secure))
 	tester.Client, err = newClient(ctx, tester.Host())
 	if err != nil {
@@ -225,7 +229,11 @@ func (s *Tester) createSystemUser() error {
 	if err != nil {
 		return err
 	}
-	s.Users.Set(FirstInstanceUsersKey, UserTypeSystem, &User{Token: jwt})
+	s.Users.Set(FirstInstanceUsersKey, UserTypeSystem, &User{
+		ID:       "SYSTEM",
+		Username: "SYSTEM",
+		Token:    jwt,
+	})
 	return nil
 }
 
