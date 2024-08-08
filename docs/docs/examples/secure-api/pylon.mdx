@@ -8,7 +8,7 @@ import ServiceuserJWT from "../imports/_serviceuser_jwt.mdx";
 import ServiceuserRole from "../imports/_serviceuser_role.mdx";
 import SetupPylon from "../imports/_setup_pylon.mdx";
 
-This integration guide demonstrates the recommended way to incorporate ZITADEL into your Pylon service.
+This integration guide demonstrates the recommended way to incorporate ZITADEL into your [Pylon](https://pylon.cronit.io) service.
 It explains how to check the token validity in the API and how to check for permissions.
 
 By the end of this guide, your application will have three different endpoint which are public, private(valid token) and private-scoped(valid token with specific role).
@@ -301,4 +301,4 @@ curl -H "Authorization: Bearer $TOKEN" -X GET http://localhost:3000/api/me/messa
 
 Congratulations! You have successfully integrated your Pylon with ZITADEL!
 
-If you get stuck, consider checking out their [documentation](https://pylon.cronit.io/). If you face issues, contact Pylon or raise an issue on [GitHub](https://github.com/getcronit/pylon/issues).
+If you get stuck, consider checking out their [documentation](https://pylon.cronit.io). If you face issues, contact Pylon or raise an issue on [GitHub](https://github.com/getcronit/pylon/issues).
