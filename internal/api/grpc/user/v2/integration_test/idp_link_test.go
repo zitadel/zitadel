@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package user_test
 
@@ -18,7 +18,7 @@ import (
 )
 
 func TestServer_AddIDPLink(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, CTX)
+	idpID := Tester.AddGenericOAuthProvider(t, IamCTX)
 	type args struct {
 		ctx context.Context
 		req *user.AddIDPLinkRequest
@@ -50,7 +50,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
+					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.UserTypeOrgOwner].ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    "idpID",
 						UserId:   "userID",
@@ -66,7 +66,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.OrgOwner].ID,
+					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.UserTypeOrgOwner].ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    idpID,
 						UserId:   "userID",
@@ -77,7 +77,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			want: &user.AddIDPLinkResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 			wantErr: false,
@@ -102,15 +102,18 @@ func TestServer_ListIDPLinks(t *testing.T) {
 
 	instanceIdpID := Tester.AddGenericOAuthProvider(t, IamCTX)
 	userInstanceResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	Tester.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
-
+	_, err := Tester.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
+	require.NoError(t, err)
 	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
 	userOrgResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	Tester.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
+	_, err = Tester.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
+	require.NoError(t, err)
 
 	userMultipleResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	Tester.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", instanceIdpID, "externalUsername_multi")
-	Tester.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", orgIdpID, "externalUsername_multi")
+	_, err = Tester.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", instanceIdpID, "externalUsername_multi")
+	require.NoError(t, err)
+	_, err = Tester.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", orgIdpID, "externalUsername_multi")
+	require.NoError(t, err)
 
 	type args struct {
 		ctx context.Context
@@ -258,11 +261,12 @@ func TestServer_RemoveIDPLink(t *testing.T) {
 
 	instanceIdpID := Tester.AddGenericOAuthProvider(t, IamCTX)
 	userInstanceResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	Tester.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
-
+	_, err := Tester.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
+	require.NoError(t, err)
 	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
 	userOrgResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	Tester.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
+	_, err = Tester.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
+	require.NoError(t, err)
 
 	userNoLinkResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
 

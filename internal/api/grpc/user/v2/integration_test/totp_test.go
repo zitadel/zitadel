@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package user_test
 
@@ -22,12 +22,12 @@ func TestServer_RegisterTOTP(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
 	Tester.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
-	ctx := Tester.WithAuthorizationToken(CTX, sessionToken)
+	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
 	Tester.RegisterUserPasskey(CTX, otherUser)
 	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
-	ctxOtherUser := Tester.WithAuthorizationToken(CTX, sessionTokenOtherUser)
+	ctxOtherUser := integration.WithAuthorizationToken(CTX, sessionTokenOtherUser)
 
 	type args struct {
 		ctx context.Context
@@ -68,7 +68,7 @@ func TestServer_RegisterTOTP(t *testing.T) {
 			want: &user.RegisterTOTPResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -83,7 +83,7 @@ func TestServer_RegisterTOTP(t *testing.T) {
 			want: &user.RegisterTOTPResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -108,7 +108,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
 	Tester.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
-	ctx := Tester.WithAuthorizationToken(CTX, sessionToken)
+	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	reg, err := Client.RegisterTOTP(ctx, &user.RegisterTOTPRequest{
 		UserId: userID,
@@ -120,7 +120,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
 	Tester.RegisterUserPasskey(CTX, otherUser)
 	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
-	ctxOtherUser := Tester.WithAuthorizationToken(CTX, sessionTokenOtherUser)
+	ctxOtherUser := integration.WithAuthorizationToken(CTX, sessionTokenOtherUser)
 
 	regOtherUser, err := Client.RegisterTOTP(CTX, &user.RegisterTOTPRequest{
 		UserId: otherUser,
@@ -172,7 +172,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 			want: &user.VerifyTOTPRegistrationResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ResourceOwner,
+					ResourceOwner: Tester.Organisation.Details.ResourceOwner,
 				},
 			},
 		},
@@ -188,7 +188,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 			want: &user.VerifyTOTPRegistrationResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ResourceOwner,
+					ResourceOwner: Tester.Organisation.Details.ResourceOwner,
 				},
 			},
 		},
@@ -215,7 +215,7 @@ func TestServer_RemoveTOTP(t *testing.T) {
 	userVerified := Tester.CreateHumanUser(CTX)
 	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
 	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
-	userVerifiedCtx := Tester.WithAuthorizationToken(context.Background(), sessionTokenVerified)
+	userVerifiedCtx := integration.WithAuthorizationToken(context.Background(), sessionTokenVerified)
 	_, err := Tester.Client.UserV2.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
 		UserId:           userVerified.GetUserId(),
 		VerificationCode: userVerified.GetPhoneCode(),
@@ -248,7 +248,7 @@ func TestServer_RemoveTOTP(t *testing.T) {
 		{
 			name: "not added",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(context.Background(), sessionToken),
+				ctx: integration.WithAuthorizationToken(context.Background(), sessionToken),
 				req: &user.RemoveTOTPRequest{
 					UserId: userID,
 				},
@@ -265,7 +265,7 @@ func TestServer_RemoveTOTP(t *testing.T) {
 			},
 			want: &user.RemoveTOTPResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ResourceOwner,
+					ResourceOwner: Tester.Organisation.Details.ResourceOwner,
 				},
 			},
 		},

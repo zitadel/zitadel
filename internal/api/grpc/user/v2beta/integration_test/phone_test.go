@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package user_test
 
@@ -37,7 +37,7 @@ func TestServer_SetPhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -54,7 +54,7 @@ func TestServer_SetPhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -71,7 +71,7 @@ func TestServer_SetPhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 				VerificationCode: gu.Ptr("xxx"),
 			},
@@ -89,7 +89,7 @@ func TestServer_SetPhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -123,7 +123,7 @@ func TestServer_SetPhone(t *testing.T) {
 
 func TestServer_ResendPhoneCode(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Tester.CreateHumanUserVerified(CTX, Tester.Organisation.ID, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
+	verifiedUserID := Tester.CreateHumanUserVerified(CTX, Tester.Organisation.Id, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -157,7 +157,7 @@ func TestServer_ResendPhoneCode(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -173,7 +173,7 @@ func TestServer_ResendPhoneCode(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 				VerificationCode: gu.Ptr("xxx"),
 			},
@@ -229,7 +229,7 @@ func TestServer_VerifyPhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -274,7 +274,7 @@ func TestServer_RemovePhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {
@@ -316,7 +316,7 @@ func TestServer_RemovePhone(t *testing.T) {
 		},
 		{
 			name: "other user, no permission",
-			ctx:  Tester.WithAuthorizationToken(CTX, sessionTokenOtherUser),
+			ctx:  integration.WithAuthorizationToken(CTX, sessionTokenOtherUser),
 			req: &user.RemovePhoneRequest{
 				UserId: userResp.GetUserId(),
 			},

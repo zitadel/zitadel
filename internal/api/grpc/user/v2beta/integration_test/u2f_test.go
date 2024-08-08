@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package user_test
 
@@ -55,14 +55,14 @@ func TestServer_RegisterU2F(t *testing.T) {
 			want: &user.RegisterU2FResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
 		{
 			name: "other user, no permission",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(CTX, sessionTokenOtherUser),
+				ctx: integration.WithAuthorizationToken(CTX, sessionTokenOtherUser),
 				req: &user.RegisterU2FRequest{
 					UserId: userID,
 				},
@@ -72,7 +72,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 		{
 			name: "user setting its own passkey",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(CTX, sessionToken),
+				ctx: integration.WithAuthorizationToken(CTX, sessionToken),
 				req: &user.RegisterU2FRequest{
 					UserId: userID,
 				},
@@ -80,7 +80,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 			want: &user.RegisterU2FResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -109,7 +109,7 @@ func TestServer_VerifyU2FRegistration(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
 	Tester.RegisterUserPasskey(CTX, userID)
 	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
-	ctx := Tester.WithAuthorizationToken(CTX, sessionToken)
+	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	pkr, err := Client.RegisterU2F(ctx, &user.RegisterU2FRequest{
 		UserId: userID,
@@ -155,7 +155,7 @@ func TestServer_VerifyU2FRegistration(t *testing.T) {
 			want: &user.VerifyU2FRegistrationResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},

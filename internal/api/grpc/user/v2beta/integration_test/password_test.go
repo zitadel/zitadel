@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package user_test
 
@@ -34,7 +34,7 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -53,7 +53,7 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -81,7 +81,7 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 				VerificationCode: gu.Ptr("xxx"),
 			},
@@ -144,7 +144,7 @@ func TestServer_SetPassword(t *testing.T) {
 			want: &user.SetPasswordResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -175,7 +175,7 @@ func TestServer_SetPassword(t *testing.T) {
 			want: &user.SetPasswordResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -209,7 +209,7 @@ func TestServer_SetPassword(t *testing.T) {
 			want: &user.SetPasswordResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},

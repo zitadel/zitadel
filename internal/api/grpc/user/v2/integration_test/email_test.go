@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package user_test
 
@@ -45,7 +45,7 @@ func TestServer_SetEmail(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -64,7 +64,7 @@ func TestServer_SetEmail(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -94,7 +94,7 @@ func TestServer_SetEmail(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 				VerificationCode: gu.Ptr("xxx"),
 			},
@@ -112,7 +112,7 @@ func TestServer_SetEmail(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -146,7 +146,7 @@ func TestServer_SetEmail(t *testing.T) {
 
 func TestServer_ResendEmailCode(t *testing.T) {
 	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Tester.CreateHumanUserVerified(CTX, Tester.Organisation.ID, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
+	verifiedUserID := Tester.CreateHumanUserVerified(CTX, Tester.Organisation.Id, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -177,7 +177,7 @@ func TestServer_ResendEmailCode(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -195,7 +195,7 @@ func TestServer_ResendEmailCode(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -223,7 +223,7 @@ func TestServer_ResendEmailCode(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 				VerificationCode: gu.Ptr("xxx"),
 			},
@@ -279,7 +279,7 @@ func TestServer_VerifyEmail(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},

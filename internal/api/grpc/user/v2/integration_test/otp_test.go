@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package user_test
 
@@ -61,7 +61,7 @@ func TestServer_AddOTPSMS(t *testing.T) {
 		{
 			name: "user mismatch",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(context.Background(), sessionTokenOtherUser),
+				ctx: integration.WithAuthorizationToken(context.Background(), sessionTokenOtherUser),
 				req: &user.AddOTPSMSRequest{
 					UserId: userID,
 				},
@@ -71,7 +71,7 @@ func TestServer_AddOTPSMS(t *testing.T) {
 		{
 			name: "phone not verified",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(context.Background(), sessionToken),
+				ctx: integration.WithAuthorizationToken(context.Background(), sessionToken),
 				req: &user.AddOTPSMSRequest{
 					UserId: userID,
 				},
@@ -81,14 +81,14 @@ func TestServer_AddOTPSMS(t *testing.T) {
 		{
 			name: "add success",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(context.Background(), sessionTokenVerified),
+				ctx: integration.WithAuthorizationToken(context.Background(), sessionTokenVerified),
 				req: &user.AddOTPSMSRequest{
 					UserId: userVerified.GetUserId(),
 				},
 			},
 			want: &user.AddOTPSMSResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -102,7 +102,7 @@ func TestServer_AddOTPSMS(t *testing.T) {
 			},
 			want: &user.AddOTPSMSResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -129,7 +129,7 @@ func TestServer_RemoveOTPSMS(t *testing.T) {
 	userVerified := Tester.CreateHumanUser(CTX)
 	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
 	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
-	userVerifiedCtx := Tester.WithAuthorizationToken(context.Background(), sessionTokenVerified)
+	userVerifiedCtx := integration.WithAuthorizationToken(context.Background(), sessionTokenVerified)
 	_, err := Tester.Client.UserV2.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
 		UserId:           userVerified.GetUserId(),
 		VerificationCode: userVerified.GetPhoneCode(),
@@ -151,7 +151,7 @@ func TestServer_RemoveOTPSMS(t *testing.T) {
 		{
 			name: "not added",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(context.Background(), sessionToken),
+				ctx: integration.WithAuthorizationToken(context.Background(), sessionToken),
 				req: &user.RemoveOTPSMSRequest{
 					UserId: userID,
 				},
@@ -168,7 +168,7 @@ func TestServer_RemoveOTPSMS(t *testing.T) {
 			},
 			want: &user.RemoveOTPSMSResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.ResourceOwner,
+					ResourceOwner: Tester.Organisation.Details.ResourceOwner,
 				},
 			},
 		},
@@ -233,7 +233,7 @@ func TestServer_AddOTPEmail(t *testing.T) {
 		{
 			name: "user mismatch",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(context.Background(), sessionTokenOtherUser),
+				ctx: integration.WithAuthorizationToken(context.Background(), sessionTokenOtherUser),
 				req: &user.AddOTPEmailRequest{
 					UserId: userID,
 				},
@@ -243,7 +243,7 @@ func TestServer_AddOTPEmail(t *testing.T) {
 		{
 			name: "email not verified",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(context.Background(), sessionToken),
+				ctx: integration.WithAuthorizationToken(context.Background(), sessionToken),
 				req: &user.AddOTPEmailRequest{
 					UserId: userID,
 				},
@@ -253,7 +253,7 @@ func TestServer_AddOTPEmail(t *testing.T) {
 		{
 			name: "add success",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(context.Background(), sessionTokenVerified),
+				ctx: integration.WithAuthorizationToken(context.Background(), sessionTokenVerified),
 				req: &user.AddOTPEmailRequest{
 					UserId: userVerified.GetUserId(),
 				},
@@ -261,7 +261,7 @@ func TestServer_AddOTPEmail(t *testing.T) {
 			want: &user.AddOTPEmailResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -276,7 +276,7 @@ func TestServer_AddOTPEmail(t *testing.T) {
 			want: &user.AddOTPEmailResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -303,7 +303,7 @@ func TestServer_RemoveOTPEmail(t *testing.T) {
 	userVerified := Tester.CreateHumanUser(CTX)
 	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
 	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
-	userVerifiedCtx := Tester.WithAuthorizationToken(context.Background(), sessionTokenVerified)
+	userVerifiedCtx := integration.WithAuthorizationToken(context.Background(), sessionTokenVerified)
 	_, err := Tester.Client.UserV2.VerifyEmail(userVerifiedCtx, &user.VerifyEmailRequest{
 		UserId:           userVerified.GetUserId(),
 		VerificationCode: userVerified.GetEmailCode(),
@@ -325,7 +325,7 @@ func TestServer_RemoveOTPEmail(t *testing.T) {
 		{
 			name: "not added",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(context.Background(), sessionToken),
+				ctx: integration.WithAuthorizationToken(context.Background(), sessionToken),
 				req: &user.RemoveOTPEmailRequest{
 					UserId: userID,
 				},
@@ -343,7 +343,7 @@ func TestServer_RemoveOTPEmail(t *testing.T) {
 			want: &user.RemoveOTPEmailResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ResourceOwner,
+					ResourceOwner: Tester.Organisation.Details.ResourceOwner,
 				},
 			},
 		},

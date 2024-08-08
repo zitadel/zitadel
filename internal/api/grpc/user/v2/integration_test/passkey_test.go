@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package user_test
 
@@ -62,7 +62,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			want: &user.RegisterPasskeyResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -106,7 +106,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 		{
 			name: "user setting its own passkey",
 			args: args{
-				ctx: Tester.WithAuthorizationToken(CTX, sessionToken),
+				ctx: integration.WithAuthorizationToken(CTX, sessionToken),
 				req: &user.RegisterPasskeyRequest{
 					UserId: userID,
 				},
@@ -114,7 +114,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			want: &user.RegisterPasskeyResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -181,7 +181,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 			want: &user.VerifyPasskeyRegistrationResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -248,7 +248,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -268,7 +268,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -284,7 +284,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 			wantCode: true,
@@ -396,7 +396,7 @@ func TestServer_RemovePasskey(t *testing.T) {
 			want: &user.RemovePasskeyResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
@@ -423,7 +423,7 @@ func TestServer_RemovePasskey(t *testing.T) {
 			want: &user.RemovePasskeyResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.ID,
+					ResourceOwner: Tester.Organisation.Id,
 				},
 			},
 		},
