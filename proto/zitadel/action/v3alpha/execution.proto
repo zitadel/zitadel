@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.resources.action.v3alpha;
+package zitadel.action.v3alpha;
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -8,22 +8,21 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "zitadel/object/v2/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
-import "zitadel/resources/object/v3alpha/object.proto";
-import "google/protobuf/timestamp.proto";
-import "zitadel/object/v3alpha/object.proto";
-
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha;action";
 
 message Execution {
-  // Ordered list of targets/includes called during the execution.
-  repeated ExecutionTargetType targets = 1;
+  Condition Condition = 1;
+  // Details provide some base information (such as the last change date) of the target.
+  zitadel.object.v2.Details details = 2;
+  // List of ordered list of targets/includes called during the execution.
+  repeated ExecutionTargetType targets = 3;
 }
 
 message ExecutionTargetType {
   oneof type {
-    option (validate.required) = true;
     // Unique identifier of existing target to call.
     string target = 1;
     // Unique identifier of existing execution to include targets of.
@@ -48,9 +47,8 @@ message Condition {
 }
 
 message RequestExecution {
-  // Condition for the request execution. Only one is possible.
+  // Condition for the request execution, only one possible.
   oneof condition{
-    option (validate.required) = true;
     // GRPC-method as condition.
     string method = 1 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
@@ -69,15 +67,14 @@ message RequestExecution {
         example: "\"zitadel.session.v2.SessionService\"";
       }
     ];
-    // All calls to any available services and methods as condition.
-    bool all = 3 [(validate.rules).bool = {const: true}];
+    // All calls to any available service and endpoint as condition.
+    bool all = 3;
   }
 }
 
 message ResponseExecution {
-  // Condition for the response execution. Only one is possible.
+  // Condition for the response execution, only one possible.
   oneof condition{
-    option (validate.required) = true;
     // GRPC-method as condition.
     string method = 1 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
@@ -96,8 +93,8 @@ message ResponseExecution {
         example: "\"zitadel.session.v2.SessionService\"";
       }
     ];
-    // All calls to any available services and methods as condition.
-    bool all = 3 [(validate.rules).bool = {const: true}];
+    // All calls to any available service and endpoint as condition.
+    bool all = 3;
   }
 }
 
@@ -106,10 +103,9 @@ message FunctionExecution {
   string name = 1 [(validate.rules).string = {min_len: 1, max_len: 1000}];
 }
 
-message EventExecution {
-  // Condition for the event execution. Only one is possible.
+message EventExecution{
+  // Condition for the event execution, only one possible.
   oneof condition{
-    option (validate.required) = true;
     // Event name as condition.
     string event = 1 [
       (validate.rules).string = {min_len: 1, max_len: 1000},
@@ -129,6 +125,7 @@ message EventExecution {
       }
     ];
     // all events as condition.
-    bool all = 3 [(validate.rules).bool = {const: true}];
+    bool all = 3;
   }
 }
+
