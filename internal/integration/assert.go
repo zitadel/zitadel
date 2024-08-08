@@ -11,7 +11,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	resources_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
-	settings_object "github.com/zitadel/zitadel/pkg/grpc/settings/object/v3alpha"
 )
 
 // Details is the interface that covers both v1 and v2 proto generated object details.
@@ -83,18 +82,9 @@ func AssertResourceDetails(t testing.TB, expected *resources_object.Details, act
 	}
 	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
 	assert.NotEmpty(t, actual.GetId())
-}
-
-func AssertSettingsDetails(t testing.TB, expected *settings_object.Details, actual *settings_object.Details) {
-	assert.NotZero(t, actual.GetSequence())
-
-	if expected.GetChangeDate() != nil {
-		wantChangeDate := time.Now()
-		gotChangeDate := actual.GetChangeDate().AsTime()
-		assert.WithinRange(t, gotChangeDate, wantChangeDate.Add(-time.Minute), wantChangeDate.Add(time.Minute))
+	if expected.GetId() != "" {
+		assert.Equal(t, expected.GetId(), actual.GetId())
 	}
-
-	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
 }
 
 func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t testing.TB, expected, actual D) {
