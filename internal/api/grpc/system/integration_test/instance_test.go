@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package system_test
 
@@ -14,7 +14,7 @@ import (
 )
 
 func TestServer_ListInstances(t *testing.T) {
-	domain, instanceID, _, _ := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	isoInstance := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 
 	tests := []struct {
 		name    string
@@ -51,13 +51,13 @@ func TestServer_ListInstances(t *testing.T) {
 				Queries: []*instance.Query{{
 					Query: &instance.Query_IdQuery{
 						IdQuery: &instance.IdsQuery{
-							Ids: []string{instanceID},
+							Ids: []string{isoInstance.InstanceID},
 						},
 					},
 				}},
 			},
 			want: []*instance.Instance{{
-				Id: instanceID,
+				Id: isoInstance.InstanceID,
 			}},
 		},
 		{
@@ -82,19 +82,19 @@ func TestServer_ListInstances(t *testing.T) {
 				Queries: []*instance.Query{{
 					Query: &instance.Query_DomainQuery{
 						DomainQuery: &instance.DomainsQuery{
-							Domains: []string{domain},
+							Domains: []string{isoInstance.Domain},
 						},
 					},
 				}},
 			},
 			want: []*instance.Instance{{
-				Id: instanceID,
+				Id: isoInstance.InstanceID,
 			}},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := Tester.Client.System.ListInstances(SystemCTX, tt.req)
+			resp, err := isoInstance.Client.System.ListInstances(SystemCTX, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

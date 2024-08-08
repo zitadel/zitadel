@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package system_test
 
@@ -19,14 +19,17 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, _, cancel := integration.Contexts(5 * time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
+
+		var err error
+		Tester, err = integration.NewTester(ctx)
+		if err != nil {
+			panic(err)
+		}
+
 		CTX = ctx
-
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
-
-		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
+		SystemCTX = Tester.WithAuthorization(ctx, integration.UserTypeSystem)
 		return m.Run()
 	}())
 }

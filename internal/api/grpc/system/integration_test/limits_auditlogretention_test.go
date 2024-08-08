@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package system_test
 
@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
@@ -21,44 +22,44 @@ import (
 )
 
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
-	_, instanceID, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
-	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t)
+	isoInstance := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	userID, projectID, appID, projectGrantID := seedObjects(isoInstance.IAMOwnerCTX, t, isoInstance.Client)
 	beforeTime := time.Now()
 	farPast := timestamppb.New(beforeTime.Add(-10 * time.Hour).UTC())
 	zeroCounts := &eventCounts{}
-	seededCount := requireEventually(t, iamOwnerCtx, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
+	seededCount := requireEventually(t, isoInstance.IAMOwnerCTX, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "seeded events are > 0", assert.Greater, zeroCounts)
 	}, "wait for seeded event assertions to pass")
-	produceEvents(iamOwnerCtx, t, userID, appID, projectID, projectGrantID)
-	addedCount := requireEventually(t, iamOwnerCtx, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
+	produceEvents(isoInstance.IAMOwnerCTX, t, isoInstance.Client, userID, appID, projectID, projectGrantID)
+	addedCount := requireEventually(t, isoInstance.IAMOwnerCTX, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for added event assertions to pass")
 	_, err := Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
-		InstanceId:        instanceID,
+		InstanceId:        isoInstance.InstanceID,
 		AuditLogRetention: durationpb.New(time.Now().Sub(beforeTime)),
 	})
 	require.NoError(t, err)
 	var limitedCounts *eventCounts
-	requireEventually(t, iamOwnerCtx, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
+	requireEventually(t, isoInstance.IAMOwnerCTX, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "limited events < added events", assert.Less, addedCount)
 		counts.assertAll(t, c, "limited events > 0", assert.Greater, zeroCounts)
 		limitedCounts = counts
 	}, "wait for limited event assertions to pass")
-	listedEvents, err := Tester.Client.Admin.ListEvents(iamOwnerCtx, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_From{
+	listedEvents, err := isoInstance.Client.Admin.ListEvents(isoInstance.IAMOwnerCTX, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_From{
 		From: farPast,
 	}})
 	require.NoError(t, err)
 	assert.LessOrEqual(t, len(listedEvents.GetEvents()), limitedCounts.all, "ListEvents with from query older than retention doesn't return more events")
-	listedEvents, err = Tester.Client.Admin.ListEvents(iamOwnerCtx, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_Range{Range: &admin.ListEventsRequestCreationDateRange{
+	listedEvents, err = isoInstance.Client.Admin.ListEvents(isoInstance.IAMOwnerCTX, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_Range{Range: &admin.ListEventsRequestCreationDateRange{
 		Since: farPast,
 	}}})
 	require.NoError(t, err)
 	assert.LessOrEqual(t, len(listedEvents.GetEvents()), limitedCounts.all, "ListEvents with since query older than retention doesn't return more events")
-	_, err = Tester.Client.System.ResetLimits(SystemCTX, &system.ResetLimitsRequest{
-		InstanceId: instanceID,
+	_, err = isoInstance.Client.System.ResetLimits(SystemCTX, &system.ResetLimitsRequest{
+		InstanceId: isoInstance.InstanceID,
 	})
 	require.NoError(t, err)
-	requireEventually(t, iamOwnerCtx, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
+	requireEventually(t, isoInstance.IAMOwnerCTX, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "with reset limit, added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for reset event assertions to pass")
 }
@@ -66,6 +67,7 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 func requireEventually(
 	t *testing.T,
 	ctx context.Context,
+	cc *integration.Client,
 	userID, projectID, appID, projectGrantID string,
 	assertCounts func(assert.TestingT, *eventCounts),
 	msg string,
@@ -75,7 +77,7 @@ func requireEventually(
 	countCtx, cancel := context.WithTimeout(ctx, countTimeout)
 	defer cancel()
 	require.EventuallyWithT(t, func(c *assert.CollectT) {
-		counts = countEvents(countCtx, t, userID, projectID, appID, projectGrantID)
+		counts = countEvents(countCtx, t, cc, userID, projectID, appID, projectGrantID)
 		assertCounts(c, counts)
 	}, assertTimeout, time.Second, msg)
 	return counts
@@ -91,68 +93,68 @@ func randomString(resourceType string, n int) string {
 	return "test" + resourceType + "-" + string(b)
 }
 
-func seedObjects(ctx context.Context, t *testing.T) (string, string, string, string) {
+func seedObjects(ctx context.Context, t *testing.T, cc *integration.Client) (string, string, string, string) {
 	t.Helper()
-	project, err := Tester.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
+	project, err := cc.Mgmt.AddProject(ctx, &management.AddProjectRequest{
 		Name: randomString("project", 5),
 	})
 	require.NoError(t, err)
-	app, err := Tester.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
+	app, err := cc.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		Name:      randomString("app", 5),
 		ProjectId: project.GetId(),
 	})
-	org, err := Tester.Client.Mgmt.AddOrg(ctx, &management.AddOrgRequest{
+	org, err := cc.Mgmt.AddOrg(ctx, &management.AddOrgRequest{
 		Name: randomString("org", 5),
 	})
 	require.NoError(t, err)
 	role := randomString("role", 5)
 	require.NoError(t, err)
-	_, err = Tester.Client.Mgmt.AddProjectRole(ctx, &management.AddProjectRoleRequest{
+	_, err = cc.Mgmt.AddProjectRole(ctx, &management.AddProjectRoleRequest{
 		ProjectId:   project.GetId(),
 		RoleKey:     role,
 		DisplayName: role,
 	})
 	require.NoError(t, err)
-	projectGrant, err := Tester.Client.Mgmt.AddProjectGrant(ctx, &management.AddProjectGrantRequest{
+	projectGrant, err := cc.Mgmt.AddProjectGrant(ctx, &management.AddProjectGrantRequest{
 		ProjectId:    project.GetId(),
 		GrantedOrgId: org.GetId(),
 		RoleKeys:     []string{role},
 	})
 	require.NoError(t, err)
-	user, err := Tester.Client.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
+	user, err := cc.Auth.GetMyUser(ctx, &auth.GetMyUserRequest{})
 	require.NoError(t, err)
 	userID := user.GetUser().GetId()
-	requireUserEvent(ctx, t, userID)
+	requireUserEvent(ctx, t, cc, userID)
 	return userID, project.GetId(), app.GetAppId(), projectGrant.GetGrantId()
 }
 
-func produceEvents(ctx context.Context, t *testing.T, machineID, appID, projectID, grantID string) {
+func produceEvents(ctx context.Context, t *testing.T, cc *integration.Client, machineID, appID, projectID, grantID string) {
 	t.Helper()
-	_, err := Tester.Client.Mgmt.UpdateOrg(ctx, &management.UpdateOrgRequest{
+	_, err := cc.Mgmt.UpdateOrg(ctx, &management.UpdateOrgRequest{
 		Name: randomString("org", 5),
 	})
 	require.NoError(t, err)
-	_, err = Tester.Client.Mgmt.UpdateProject(ctx, &management.UpdateProjectRequest{
+	_, err = cc.Mgmt.UpdateProject(ctx, &management.UpdateProjectRequest{
 		Id:   projectID,
 		Name: randomString("project", 5),
 	})
 	require.NoError(t, err)
-	_, err = Tester.Client.Mgmt.UpdateApp(ctx, &management.UpdateAppRequest{
+	_, err = cc.Mgmt.UpdateApp(ctx, &management.UpdateAppRequest{
 		AppId:     appID,
 		ProjectId: projectID,
 		Name:      randomString("app", 5),
 	})
 	require.NoError(t, err)
-	requireUserEvent(ctx, t, machineID)
-	_, err = Tester.Client.Mgmt.UpdateProjectGrant(ctx, &management.UpdateProjectGrantRequest{
+	requireUserEvent(ctx, t, cc, machineID)
+	_, err = cc.Mgmt.UpdateProjectGrant(ctx, &management.UpdateProjectGrantRequest{
 		ProjectId: projectID,
 		GrantId:   grantID,
 	})
 	require.NoError(t, err)
 }
 
-func requireUserEvent(ctx context.Context, t *testing.T, machineID string) {
-	_, err := Tester.Client.Mgmt.UpdateMachine(ctx, &management.UpdateMachineRequest{
+func requireUserEvent(ctx context.Context, t *testing.T, cc *integration.Client, machineID string) {
+	_, err := cc.Mgmt.UpdateMachine(ctx, &management.UpdateMachineRequest{
 		UserId: machineID,
 		Name:   randomString("machine", 5),
 	})
@@ -175,50 +177,50 @@ func (e *eventCounts) assertAll(t *testing.T, c assert.TestingT, name string, co
 	})
 }
 
-func countEvents(ctx context.Context, t *testing.T, userID, projectID, appID, grantID string) *eventCounts {
+func countEvents(ctx context.Context, t *testing.T, cc *integration.Client, userID, projectID, appID, grantID string) *eventCounts {
 	t.Helper()
 	counts := new(eventCounts)
 	var wg sync.WaitGroup
 	wg.Add(7)
 	go func() {
 		defer wg.Done()
-		result, err := Tester.Client.Admin.ListEvents(ctx, &admin.ListEventsRequest{})
+		result, err := cc.Admin.ListEvents(ctx, &admin.ListEventsRequest{})
 		require.NoError(t, err)
 		counts.all = len(result.GetEvents())
 	}()
 	go func() {
 		defer wg.Done()
-		result, err := Tester.Client.Auth.ListMyUserChanges(ctx, &auth.ListMyUserChangesRequest{})
+		result, err := cc.Auth.ListMyUserChanges(ctx, &auth.ListMyUserChangesRequest{})
 		require.NoError(t, err)
 		counts.myUser = len(result.GetResult())
 	}()
 	go func() {
 		defer wg.Done()
-		result, err := Tester.Client.Mgmt.ListUserChanges(ctx, &management.ListUserChangesRequest{UserId: userID})
+		result, err := cc.Mgmt.ListUserChanges(ctx, &management.ListUserChangesRequest{UserId: userID})
 		require.NoError(t, err)
 		counts.aUser = len(result.GetResult())
 	}()
 	go func() {
 		defer wg.Done()
-		result, err := Tester.Client.Mgmt.ListAppChanges(ctx, &management.ListAppChangesRequest{ProjectId: projectID, AppId: appID})
+		result, err := cc.Mgmt.ListAppChanges(ctx, &management.ListAppChangesRequest{ProjectId: projectID, AppId: appID})
 		require.NoError(t, err)
 		counts.app = len(result.GetResult())
 	}()
 	go func() {
 		defer wg.Done()
-		result, err := Tester.Client.Mgmt.ListOrgChanges(ctx, &management.ListOrgChangesRequest{})
+		result, err := cc.Mgmt.ListOrgChanges(ctx, &management.ListOrgChangesRequest{})
 		require.NoError(t, err)
 		counts.org = len(result.GetResult())
 	}()
 	go func() {
 		defer wg.Done()
-		result, err := Tester.Client.Mgmt.ListProjectChanges(ctx, &management.ListProjectChangesRequest{ProjectId: projectID})
+		result, err := cc.Mgmt.ListProjectChanges(ctx, &management.ListProjectChangesRequest{ProjectId: projectID})
 		require.NoError(t, err)
 		counts.project = len(result.GetResult())
 	}()
 	go func() {
 		defer wg.Done()
-		result, err := Tester.Client.Mgmt.ListProjectGrantChanges(ctx, &management.ListProjectGrantChangesRequest{ProjectId: projectID, GrantId: grantID})
+		result, err := cc.Mgmt.ListProjectGrantChanges(ctx, &management.ListProjectGrantChangesRequest{ProjectId: projectID, GrantId: grantID})
 		require.NoError(t, err)
 		counts.grant = len(result.GetResult())
 	}()
