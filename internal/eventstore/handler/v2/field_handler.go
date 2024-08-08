@@ -113,6 +113,8 @@ func (h *FieldHandler) processEvents(ctx context.Context, config *triggerConfig)
 		}
 	}()
 
+	// always await currently running transactions
+	config.awaitRunning = true
 	currentState, err := h.currentState(ctx, tx, config)
 	if err != nil {
 		if errors.Is(err, errJustUpdated) {
