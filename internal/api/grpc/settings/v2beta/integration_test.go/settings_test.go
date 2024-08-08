@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package settings_test
 
@@ -33,7 +33,7 @@ func TestServer_GetSecuritySettings(t *testing.T) {
 	}{
 		{
 			name:    "permission error",
-			ctx:     Tester.WithAuthorization(CTX, integration.OrgOwner),
+			ctx:     Tester.WithAuthorization(CTX, integration.UserTypeOrgOwner),
 			wantErr: true,
 		},
 		{
@@ -80,7 +80,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 		{
 			name: "permission error",
 			args: args{
-				ctx: Tester.WithAuthorization(CTX, integration.OrgOwner),
+				ctx: Tester.WithAuthorization(CTX, integration.UserTypeOrgOwner),
 				req: &settings.SetSecuritySettingsRequest{
 					EmbeddedIframe: &settings.EmbeddedIframeSettings{
 						Enabled:        true,
@@ -104,7 +104,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 			want: &settings.SetSecuritySettingsResponse{
 				Details: &object_pb.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -121,7 +121,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 			want: &settings.SetSecuritySettingsResponse{
 				Details: &object_pb.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -136,7 +136,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 			want: &settings.SetSecuritySettingsResponse{
 				Details: &object_pb.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
@@ -155,7 +155,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 			want: &settings.SetSecuritySettingsResponse{
 				Details: &object_pb.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.InstanceID(),
+					ResourceOwner: Tester.Instance.Id,
 				},
 			},
 		},
