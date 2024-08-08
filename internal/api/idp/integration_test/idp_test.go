@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package idp_test
 
@@ -32,20 +32,22 @@ import (
 
 var (
 	CTX    context.Context
-	ErrCTX context.Context
 	Tester *integration.Tester
 	Client user.UserServiceClient
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(time.Hour)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
 		defer cancel()
 
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
+		var err error
+		Tester, err = integration.NewTester(ctx)
+		if err != nil {
+			panic(err)
+		}
 
-		CTX, ErrCTX = Tester.WithAuthorization(ctx, integration.OrgOwner), errCtx
+		CTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		Client = Tester.Client.UserV2
 		return m.Run()
 	}())
@@ -91,7 +93,7 @@ func TestServer_SAMLCertificate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			certificateURL := http_util.BuildOrigin(Tester.Host(), Tester.Server.Config.ExternalSecure) + "/idps/" + tt.args.idpID + "/saml/certificate"
+			certificateURL := http_util.BuildOrigin(Tester.Host(), Tester.Config.Secure) + "/idps/" + tt.args.idpID + "/saml/certificate"
 			resp, err := http.Get(certificateURL)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.want, resp.StatusCode)
@@ -148,7 +150,7 @@ func TestServer_SAMLMetadata(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			metadataURL := http_util.BuildOrigin(Tester.Host(), Tester.Server.Config.ExternalSecure) + "/idps/" + tt.args.idpID + "/saml/metadata"
+			metadataURL := http_util.BuildOrigin(Tester.Host(), Tester.Config.Secure) + "/idps/" + tt.args.idpID + "/saml/metadata"
 			resp, err := http.Get(metadataURL)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.want, resp.StatusCode)
@@ -172,7 +174,7 @@ func TestServer_SAMLACS(t *testing.T) {
 	linkedExternalUserID := "test2"
 	Tester.CreateUserIDPlink(CTX, userHuman.UserId, linkedExternalUserID, samlRedirectIdpID, linkedExternalUserID)
 	idp, err := getIDP(
-		http_util.BuildOrigin(Tester.Host(), Tester.Server.Config.ExternalSecure),
+		http_util.BuildOrigin(Tester.Host(), Tester.Config.Secure),
 		[]string{samlRedirectIdpID},
 		externalUserID,
 		linkedExternalUserID,
@@ -328,7 +330,7 @@ func TestServer_SAMLACS(t *testing.T) {
 			if tt.args.intentID != "" {
 				relayState = tt.args.intentID
 			}
-			callbackURL := http_util.BuildOrigin(Tester.Host(), Tester.Server.Config.ExternalSecure) + "/idps/" + tt.args.idpID + "/saml/acs"
+			callbackURL := http_util.BuildOrigin(Tester.Host(), Tester.Config.Secure) + "/idps/" + tt.args.idpID + "/saml/acs"
 			response := createResponse(t, idp, samlRequest, tt.args.nameID, tt.args.nameIDFormat, tt.args.username)
 			//test purposes, use defined response
 			if tt.args.response != "" {
