@@ -1,39 +1,43 @@
 package object
 
 import (
+	"fmt"
+
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/internal/zerrors"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
-func DomainToDetailsPb(objectDetail *domain.ObjectDetails, owner *object.Owner, id string) *resource_object.Details {
+func DomainToDetailsPb(objectDetail *domain.ObjectDetails, owner *object.Owner) *resource_object.Details {
 	details := &resource_object.Details{
-		Id:       id,
-		Sequence: objectDetail.Sequence,
-		Owner:    owner,
+		Id:    objectDetail.ID,
+		Owner: owner,
 	}
 	if !objectDetail.EventDate.IsZero() {
-		details.ChangeDate = timestamppb.New(objectDetail.EventDate)
+		details.Changed = timestamppb.New(objectDetail.EventDate)
+	}
+	if !objectDetail.CreationDate.IsZero() {
+		details.Created = timestamppb.New(objectDetail.CreationDate)
 	}
 	return details
 }
 
-func ToListDetails(request query.SearchRequest, response query.SearchResponse) *resource_object.ListDetails {
+func ToSearchDetailsPb(request query.SearchRequest, response query.SearchResponse) *resource_object.ListDetails {
 	details := &resource_object.ListDetails{
-		AppliedLimit:      uint32(request.Limit),
-		EndOfList:         false, // TODO: Implement
-		TotalResult:       response.Count,
-		ProcessedSequence: response.Sequence,
-		Timestamp:         timestamppb.New(response.EventCreatedAt),
+		AppliedLimit: request.Limit,
+		TotalResult:  response.Count,
+		Timestamp:    timestamppb.New(response.EventCreatedAt),
 	}
 
 	return details
 }
 
-func TextMethodToQuery(method resource_object.TextFilterMethod) query.TextComparison {
+func TextMethodPbToQuery(method resource_object.TextFilterMethod) query.TextComparison {
 	switch method {
 	case resource_object.TextFilterMethod_TEXT_FILTER_METHOD_EQUALS:
 		return query.TextEquals
@@ -56,9 +60,21 @@ func TextMethodToQuery(method resource_object.TextFilterMethod) query.TextCompar
 	}
 }
 
-func ListQueryToQuery(query *resource_object.ListQuery) (offset, limit uint64, asc bool) {
+func SearchQueryPbToQuery(defaults systemdefaults.SystemDefaults, query *resource_object.SearchQuery) (offset, limit uint64, asc bool, err error) {
+	limit = defaults.DefaultQueryLimit
+	asc = true
 	if query == nil {
-		return 0, 0, false
+		return 0, limit, asc, nil
 	}
-	return query.Offset, uint64(query.Limit), query.Asc
+	offset = query.Offset
+	if query.Desc {
+		asc = false
+	}
+	if defaults.MaxQueryLimit > 0 && uint64(query.Limit) > defaults.MaxQueryLimit {
+		return 0, 0, false, zerrors.ThrowInvalidArgumentf(fmt.Errorf("given: %d, allowed: %d", query.Limit, defaults.MaxQueryLimit), "QUERY-4M0fs", "Errors.Query.LimitExceeded")
+	}
+	if query.Limit > 0 {
+		limit = uint64(query.Limit)
+	}
+	return offset, limit, asc, nil
 }

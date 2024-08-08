@@ -2,7 +2,6 @@ package server
 
 import (
 	"crypto/tls"
-
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -38,7 +37,6 @@ func CreateServer(
 	verifier authz.APITokenVerifier,
 	authConfig authz.Config,
 	queries *query.Queries,
-	hostHeaderName string,
 	externalDomain string,
 	tlsConfig *tls.Config,
 	accessSvc *logstore.Service[*record.AccessLog],
@@ -51,7 +49,7 @@ func CreateServer(
 				middleware.DefaultTracingServer(),
 				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
 				middleware.NoCacheInterceptor(),
-				middleware.InstanceInterceptor(queries, hostHeaderName, externalDomain, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
+				middleware.InstanceInterceptor(queries, externalDomain, system_pb.SystemService_ServiceDesc.ServiceName, healthpb.Health_ServiceDesc.ServiceName),
 				middleware.AccessStorageInterceptor(accessSvc),
 				middleware.ErrorHandler(),
 				middleware.LimitsInterceptor(system_pb.SystemService_ServiceDesc.ServiceName),

@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
@@ -20,7 +21,7 @@ import (
 	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
-func TestServer_GetTargetByID(t *testing.T) {
+func TestServer_GetTarget(t *testing.T) {
 	ensureFeatureEnabled(t)
 	type args struct {
 		ctx context.Context
@@ -57,11 +58,11 @@ func TestServer_GetTargetByID(t *testing.T) {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
 					request.Id = resp.GetDetails().GetId()
-					response.Target.Target.Name = name
+					response.Target.Config.Name = name
 					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -69,9 +70,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 			want: &action.GetTargetResponse{
 				Target: &action.GetTarget{
 					Details: &resource_object.Details{
-						Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+						Created: timestamppb.Now(),
+						Changed: timestamppb.Now(),
 					},
-					Target: &action.Target{
+					Config: &action.Target{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestWebhook{
 							RestWebhook: &action.SetRESTWebhook{},
@@ -90,10 +92,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeAsync, false)
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Details.Id = resp.GetDetails().GetId()
-					response.Target.Target.Name = name
+					response.Target.Config.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -101,9 +103,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 			want: &action.GetTargetResponse{
 				Target: &action.GetTarget{
 					Details: &resource_object.Details{
-						Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+						Created: timestamppb.Now(),
+						Changed: timestamppb.Now(),
 					},
-					Target: &action.Target{
+					Config: &action.Target{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestAsync{
 							RestAsync: &action.SetRESTAsync{},
@@ -122,10 +125,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, true)
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Details.Id = resp.GetDetails().GetId()
-					response.Target.Target.Name = name
+					response.Target.Config.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -133,9 +136,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 			want: &action.GetTargetResponse{
 				Target: &action.GetTarget{
 					Details: &resource_object.Details{
-						Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+						Created: timestamppb.Now(),
+						Changed: timestamppb.Now(),
 					},
-					Target: &action.Target{
+					Config: &action.Target{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestWebhook{
 							RestWebhook: &action.SetRESTWebhook{
@@ -156,10 +160,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, false)
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Details.Id = resp.GetDetails().GetId()
-					response.Target.Target.Name = name
+					response.Target.Config.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -167,9 +171,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 			want: &action.GetTargetResponse{
 				Target: &action.GetTarget{
 					Details: &resource_object.Details{
-						Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+						Created: timestamppb.Now(),
+						Changed: timestamppb.Now(),
 					},
-					Target: &action.Target{
+					Config: &action.Target{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestCall{
 							RestCall: &action.SetRESTCall{
@@ -190,10 +195,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, true)
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Details.Id = resp.GetDetails().GetId()
-					response.Target.Target.Name = name
+					response.Target.Config.Name = name
 					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Target.Details.Sequence = resp.GetDetails().GetSequence()
+					response.Target.Details.Changed = resp.GetDetails().GetChanged()
+					response.Target.Details.Created = resp.GetDetails().GetCreated()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -201,9 +206,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 			want: &action.GetTargetResponse{
 				Target: &action.GetTarget{
 					Details: &resource_object.Details{
-						Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+						Created: timestamppb.Now(),
+						Changed: timestamppb.Now(),
 					},
-					Target: &action.Target{
+					Config: &action.Target{
 						Endpoint: "https://example.com",
 						TargetType: &action.Target_RestCall{
 							RestCall: &action.SetRESTCall{
@@ -234,10 +240,10 @@ func TestServer_GetTargetByID(t *testing.T) {
 					assert.Error(ttt, getErr, "Error: "+getErr.Error())
 				} else {
 					assert.NoError(ttt, getErr)
-
-					integration.AssertResourceDetails(t, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
-
-					assert.Equal(t, tt.want.Target, got.Target)
+					wantTarget := tt.want.GetTarget()
+					gotTarget := got.GetTarget()
+					integration.AssertResourceDetails(t, wantTarget.GetDetails(), gotTarget.GetDetails())
+					assert.Equal(t, wantTarget.GetConfig(), gotTarget.GetConfig())
 				}
 
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
@@ -283,7 +289,8 @@ func TestServer_ListTargets(t *testing.T) {
 			},
 			want: &action.SearchTargetsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 0,
+					TotalResult:  0,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetTarget{},
 			},
@@ -300,13 +307,12 @@ func TestServer_ListTargets(t *testing.T) {
 							TargetIds: []string{resp.GetDetails().GetId()},
 						},
 					}
-					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
-					//response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
+					response.Details.Timestamp = resp.GetDetails().GetChanged()
 
-					response.Result[0].Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
+					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
+					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
 					response.Result[0].Details.Id = resp.GetDetails().GetId()
-					response.Result[0].Target.Name = name
+					response.Result[0].Config.Name = name
 					return nil
 				},
 				req: &action.SearchTargetsRequest{
@@ -315,14 +321,16 @@ func TestServer_ListTargets(t *testing.T) {
 			},
 			want: &action.SearchTargetsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetTarget{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
-						Target: &action.Target{
+						Config: &action.Target{
 							Endpoint: "https://example.com",
 							TargetType: &action.Target_RestWebhook{
 								RestWebhook: &action.SetRESTWebhook{
@@ -346,13 +354,12 @@ func TestServer_ListTargets(t *testing.T) {
 							TargetName: name,
 						},
 					}
-					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
-					response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
+					response.Details.Timestamp = resp.GetDetails().GetChanged()
 
-					response.Result[0].Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
+					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
+					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
 					response.Result[0].Details.Id = resp.GetDetails().GetId()
-					response.Result[0].Target.Name = name
+					response.Result[0].Config.Name = name
 					return nil
 				},
 				req: &action.SearchTargetsRequest{
@@ -361,14 +368,16 @@ func TestServer_ListTargets(t *testing.T) {
 			},
 			want: &action.SearchTargetsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetTarget{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
-						Target: &action.Target{
+						Config: &action.Target{
 							Endpoint: "https://example.com",
 							TargetType: &action.Target_RestWebhook{
 								RestWebhook: &action.SetRESTWebhook{
@@ -397,21 +406,20 @@ func TestServer_ListTargets(t *testing.T) {
 							TargetIds: []string{resp1.GetDetails().GetId(), resp2.GetDetails().GetId(), resp3.GetDetails().GetId()},
 						},
 					}
-					response.Details.Timestamp = resp3.GetDetails().GetChangeDate()
-					response.Details.ProcessedSequence = resp3.GetDetails().GetSequence()
+					response.Details.Timestamp = resp3.GetDetails().GetChanged()
 
-					response.Result[0].Details.ChangeDate = resp1.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp1.GetDetails().GetSequence()
+					response.Result[0].Details.Changed = resp1.GetDetails().GetChanged()
+					response.Result[0].Details.Created = resp1.GetDetails().GetCreated()
 					response.Result[0].Details.Id = resp1.GetDetails().GetId()
-					response.Result[0].Target.Name = name1
-					response.Result[1].Details.ChangeDate = resp2.GetDetails().GetChangeDate()
-					response.Result[1].Details.Sequence = resp2.GetDetails().GetSequence()
+					response.Result[0].Config.Name = name1
+					response.Result[1].Details.Changed = resp2.GetDetails().GetChanged()
+					response.Result[1].Details.Created = resp2.GetDetails().GetCreated()
 					response.Result[1].Details.Id = resp2.GetDetails().GetId()
-					response.Result[1].Target.Name = name2
-					response.Result[2].Details.ChangeDate = resp3.GetDetails().GetChangeDate()
-					response.Result[2].Details.Sequence = resp3.GetDetails().GetSequence()
+					response.Result[1].Config.Name = name2
+					response.Result[2].Details.Changed = resp3.GetDetails().GetChanged()
+					response.Result[2].Details.Created = resp3.GetDetails().GetCreated()
 					response.Result[2].Details.Id = resp3.GetDetails().GetId()
-					response.Result[2].Target.Name = name3
+					response.Result[2].Config.Name = name3
 					return nil
 				},
 				req: &action.SearchTargetsRequest{
@@ -420,14 +428,16 @@ func TestServer_ListTargets(t *testing.T) {
 			},
 			want: &action.SearchTargetsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 3,
+					TotalResult:  3,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetTarget{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
-						Target: &action.Target{
+						Config: &action.Target{
 							Endpoint: "https://example.com",
 							TargetType: &action.Target_RestWebhook{
 								RestWebhook: &action.SetRESTWebhook{
@@ -439,9 +449,10 @@ func TestServer_ListTargets(t *testing.T) {
 					},
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
-						Target: &action.Target{
+						Config: &action.Target{
 							Endpoint: "https://example.com",
 							TargetType: &action.Target_RestCall{
 								RestCall: &action.SetRESTCall{
@@ -453,9 +464,10 @@ func TestServer_ListTargets(t *testing.T) {
 					},
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
-						Target: &action.Target{
+						Config: &action.Target{
 							Endpoint: "https://example.com",
 							TargetType: &action.Target_RestAsync{
 								RestAsync: &action.SetRESTAsync{},
@@ -492,7 +504,8 @@ func TestServer_ListTargets(t *testing.T) {
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
-					assert.Contains(ttt, got.Result, tt.want.Result[i])
+					integration.AssertResourceDetails(t, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
+					assert.Equal(ttt, tt.want.Result[i].GetConfig(), got.Result[i].GetConfig())
 				}
 				integration.AssertResourceListDetails(t, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
@@ -531,12 +544,10 @@ func TestServer_SearchExecutions(t *testing.T) {
 					cond := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
 					resp := Tester.SetExecution(ctx, t, cond, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
 
-					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
-					// response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
-
+					response.Details.Timestamp = resp.GetDetails().GetChanged()
 					// Set expected response with used values for SetExecution
-					response.Result[0].Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
+					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
+					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
 					response.Result[0].Condition = cond
 					return nil
 				},
@@ -548,7 +559,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 									ConditionType: &action.Condition_Request{
 										Request: &action.RequestExecution{
 											Condition: &action.RequestExecution_Method{
-												Method: "/zitadel.session.v2beta.SessionService/GetSession",
+												Method: "/zitadel.session.v2.SessionService/GetSession",
 											},
 										},
 									},
@@ -560,18 +571,20 @@ func TestServer_SearchExecutions(t *testing.T) {
 			},
 			want: &action.SearchExecutionsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 						Condition: &action.Condition{
 							ConditionType: &action.Condition_Request{
 								Request: &action.RequestExecution{
 									Condition: &action.RequestExecution_Method{
-										Method: "/zitadel.session.v2beta.SessionService/GetSession",
+										Method: "/zitadel.session.v2.SessionService/GetSession",
 									},
 								},
 							},
@@ -609,11 +622,10 @@ func TestServer_SearchExecutions(t *testing.T) {
 					targets := executionTargetsSingleTarget(target.GetDetails().GetId())
 					resp := Tester.SetExecution(ctx, t, cond, targets)
 
-					response.Details.Timestamp = resp.GetDetails().GetChangeDate()
-					response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
+					response.Details.Timestamp = resp.GetDetails().GetChanged()
 
-					response.Result[0].Details.ChangeDate = resp.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp.GetDetails().GetSequence()
+					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
+					response.Result[0].Details.Created = resp.GetDetails().GetChanged()
 					response.Result[0].Condition = cond
 					response.Result[0].Execution.Targets = targets
 					return nil
@@ -624,12 +636,14 @@ func TestServer_SearchExecutions(t *testing.T) {
 			},
 			want: &action.SearchExecutionsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 						Condition: &action.Condition{},
 						Execution: &action.Execution{
@@ -667,11 +681,10 @@ func TestServer_SearchExecutions(t *testing.T) {
 					includeTargets := executionTargetsSingleInclude(cond)
 					resp2 := Tester.SetExecution(ctx, t, includeCond, includeTargets)
 
-					response.Details.Timestamp = resp2.GetDetails().GetChangeDate()
-					response.Details.ProcessedSequence = resp2.GetDetails().GetSequence()
+					response.Details.Timestamp = resp2.GetDetails().GetChanged()
 
-					response.Result[0].Details.ChangeDate = resp2.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp2.GetDetails().GetSequence()
+					response.Result[0].Details.Created = resp2.GetDetails().GetCreated()
+					response.Result[0].Details.Changed = resp2.GetDetails().GetChanged()
 					response.Result[0].Condition = includeCond
 					response.Result[0].Execution = &action.Execution{
 						Targets: includeTargets,
@@ -688,12 +701,14 @@ func TestServer_SearchExecutions(t *testing.T) {
 			},
 			want: &action.SearchExecutionsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Created: timestamppb.Now(),
+							Changed: timestamppb.Now(),
 						},
 					},
 				},
@@ -708,8 +723,8 @@ func TestServer_SearchExecutions(t *testing.T) {
 					cond1 := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
 					targets1 := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					resp1 := Tester.SetExecution(ctx, t, cond1, targets1)
-					response.Result[0].Details.ChangeDate = resp1.GetDetails().GetChangeDate()
-					response.Result[0].Details.Sequence = resp1.GetDetails().GetSequence()
+					response.Result[0].Details.Changed = resp1.GetDetails().GetChanged()
+					response.Result[0].Details.Created = resp1.GetDetails().GetCreated()
 					response.Result[0].Condition = cond1
 					response.Result[0].Execution = &action.Execution{
 						Targets: targets1,
@@ -718,8 +733,8 @@ func TestServer_SearchExecutions(t *testing.T) {
 					cond2 := request.Filters[0].GetInConditionsFilter().GetConditions()[1]
 					targets2 := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					resp2 := Tester.SetExecution(ctx, t, cond2, targets2)
-					response.Result[1].Details.ChangeDate = resp2.GetDetails().GetChangeDate()
-					response.Result[1].Details.Sequence = resp2.GetDetails().GetSequence()
+					response.Result[1].Details.Changed = resp2.GetDetails().GetChanged()
+					response.Result[1].Details.Created = resp2.GetDetails().GetCreated()
 					response.Result[1].Condition = cond2
 					response.Result[1].Execution = &action.Execution{
 						Targets: targets2,
@@ -728,14 +743,13 @@ func TestServer_SearchExecutions(t *testing.T) {
 					cond3 := request.Filters[0].GetInConditionsFilter().GetConditions()[2]
 					targets3 := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					resp3 := Tester.SetExecution(ctx, t, cond3, targets3)
-					response.Result[2].Details.ChangeDate = resp3.GetDetails().GetChangeDate()
-					response.Result[2].Details.Sequence = resp3.GetDetails().GetSequence()
+					response.Result[2].Details.Changed = resp3.GetDetails().GetChanged()
+					response.Result[2].Details.Created = resp3.GetDetails().GetCreated()
 					response.Result[2].Condition = cond3
 					response.Result[2].Execution = &action.Execution{
 						Targets: targets3,
 					}
-					response.Details.Timestamp = resp3.GetDetails().GetChangeDate()
-					response.Details.ProcessedSequence = resp3.GetDetails().GetSequence()
+					response.Details.Timestamp = resp3.GetDetails().GetChanged()
 					return nil
 				},
 				req: &action.SearchExecutionsRequest{
@@ -747,7 +761,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 										ConditionType: &action.Condition_Request{
 											Request: &action.RequestExecution{
 												Condition: &action.RequestExecution_Method{
-													Method: "/zitadel.session.v2beta.SessionService/GetSession",
+													Method: "/zitadel.session.v2.SessionService/GetSession",
 												},
 											},
 										},
@@ -756,7 +770,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 										ConditionType: &action.Condition_Request{
 											Request: &action.RequestExecution{
 												Condition: &action.RequestExecution_Method{
-													Method: "/zitadel.session.v2beta.SessionService/CreateSession",
+													Method: "/zitadel.session.v2.SessionService/CreateSession",
 												},
 											},
 										},
@@ -765,7 +779,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 										ConditionType: &action.Condition_Request{
 											Request: &action.RequestExecution{
 												Condition: &action.RequestExecution_Method{
-													Method: "/zitadel.session.v2beta.SessionService/SetSession",
+													Method: "/zitadel.session.v2.SessionService/SetSession",
 												},
 											},
 										},
@@ -778,7 +792,8 @@ func TestServer_SearchExecutions(t *testing.T) {
 			},
 			want: &action.SearchExecutionsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 3,
+					TotalResult:  3,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
 					{
@@ -805,15 +820,14 @@ func TestServer_SearchExecutions(t *testing.T) {
 					targets := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					for i, cond := range request.Filters[0].GetInConditionsFilter().GetConditions() {
 						resp := Tester.SetExecution(ctx, t, cond, targets)
-						response.Result[i].Details.ChangeDate = resp.GetDetails().GetChangeDate()
-						response.Result[i].Details.Sequence = resp.GetDetails().GetSequence()
+						response.Result[i].Details.Changed = resp.GetDetails().GetChanged()
+						response.Result[i].Details.Created = resp.GetDetails().GetCreated()
 						response.Result[i].Condition = cond
 						response.Result[i].Execution = &action.Execution{
 							Targets: targets,
 						}
 						// filled with info of last sequence
-						response.Details.Timestamp = resp.GetDetails().GetChangeDate()
-						response.Details.ProcessedSequence = resp.GetDetails().GetSequence()
+						response.Details.Timestamp = resp.GetDetails().GetChanged()
 					}
 
 					return nil
@@ -823,11 +837,11 @@ func TestServer_SearchExecutions(t *testing.T) {
 						Filter: &action.ExecutionSearchFilter_InConditionsFilter{
 							InConditionsFilter: &action.InConditionsFilter{
 								Conditions: []*action.Condition{
-									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Method{Method: "/zitadel.session.v2beta.SessionService/GetSession"}}}},
-									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Service{Service: "zitadel.session.v2beta.SessionService"}}}},
+									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Method{Method: "/zitadel.session.v2.SessionService/GetSession"}}}},
+									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Service{Service: "zitadel.session.v2.SessionService"}}}},
 									{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_All{All: true}}}},
-									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Method{Method: "/zitadel.session.v2beta.SessionService/GetSession"}}}},
-									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Service{Service: "zitadel.session.v2beta.SessionService"}}}},
+									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Method{Method: "/zitadel.session.v2.SessionService/GetSession"}}}},
+									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Service{Service: "zitadel.session.v2.SessionService"}}}},
 									{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_All{All: true}}}},
 									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Event{Event: "user.added"}}}},
 									{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: "user"}}}},
@@ -841,7 +855,8 @@ func TestServer_SearchExecutions(t *testing.T) {
 			},
 			want: &action.SearchExecutionsResponse{
 				Details: &resource_object.ListDetails{
-					TotalResult: 10,
+					TotalResult:  10,
+					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
 					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},

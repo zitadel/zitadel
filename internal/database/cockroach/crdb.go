@@ -1,12 +1,14 @@
 package cockroach
 
 import (
+	"context"
 	"database/sql"
 	"strconv"
 	"strings"
 	"time"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/mitchellh/mapstructure"
 	"github.com/zitadel/logging"
 
@@ -70,22 +72,33 @@ func (_ *Config) Decode(configs []interface{}) (dialect.Connector, error) {
 }
 
 func (c *Config) Connect(useAdmin bool, pusherRatio, spoolerRatio float64, purpose dialect.DBPurpose) (*sql.DB, error) {
-	client, err := sql.Open("pgx", c.String(useAdmin, purpose.AppName()))
+	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, pusherRatio, spoolerRatio, purpose)
 	if err != nil {
 		return nil, err
 	}
 
-	connConfig, err := dialect.NewConnectionConfig(c.MaxOpenConns, c.MaxIdleConns, spoolerRatio, pusherRatio, purpose)
+	config, err := pgxpool.ParseConfig(c.String(useAdmin, purpose.AppName()))
 	if err != nil {
 		return nil, err
 	}
 
-	client.SetMaxOpenConns(int(connConfig.MaxOpenConns))
-	client.SetMaxIdleConns(int(connConfig.MaxIdleConns))
-	client.SetConnMaxLifetime(c.MaxConnLifetime)
-	client.SetConnMaxIdleTime(c.MaxConnIdleTime)
+	if connConfig.MaxOpenConns != 0 {
+		config.MaxConns = int32(connConfig.MaxOpenConns)
+	}
 
-	return client, nil
+	config.MaxConnLifetime = c.MaxConnLifetime
+	config.MaxConnIdleTime = c.MaxConnIdleTime
+
+	pool, err := pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := pool.Ping(context.Background()); err != nil {
+		return nil, err
+	}
+
+	return stdlib.OpenDBFromPool(pool), nil
 }
 
 func (c *Config) DatabaseName() string {

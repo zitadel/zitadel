@@ -18,7 +18,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alph
 
 message Execution {
   // Ordered list of targets/includes called during the execution.
-  repeated ExecutionTargetType targets = 2;
+  repeated ExecutionTargetType targets = 1;
 }
 
 message GetExecution {
@@ -63,7 +63,7 @@ message RequestExecution {
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
         max_length: 1000,
-        example: "\"/zitadel.session.v2beta.SessionService/ListSessions\"";
+        example: "\"/zitadel.session.v2.SessionService/ListSessions\"";
       }
     ];
     // GRPC-service as condition.
@@ -72,7 +72,7 @@ message RequestExecution {
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
         max_length: 1000,
-        example: "\"zitadel.session.v2beta.SessionService\"";
+        example: "\"zitadel.session.v2.SessionService\"";
       }
     ];
     // All calls to any available services and methods as condition.
@@ -90,7 +90,7 @@ message ResponseExecution {
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
         max_length: 1000,
-        example: "\"/zitadel.session.v2beta.SessionService/ListSessions\"";
+        example: "\"/zitadel.session.v2.SessionService/ListSessions\"";
       }
     ];
     // GRPC-service as condition.
@@ -99,7 +99,7 @@ message ResponseExecution {
       (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
         min_length: 1,
         max_length: 1000,
-        example: "\"zitadel.session.v2beta.SessionService\"";
+        example: "\"zitadel.session.v2.SessionService\"";
       }
     ];
     // All calls to any available services and methods as condition.

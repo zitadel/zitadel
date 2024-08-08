@@ -1439,9 +1439,7 @@
         "7": "Senha única (OTP) - SMS",
         "8": "Senha única (OTP) - e-mail"
       },
-      "ADDGENERATOR": "Definir aparência de segredo",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Expiração (em horas)",
+      "EXPIRY": "Expiração (em minutos)",
       "INCLUDEDIGITS": "Incluir números",
       "INCLUDESYMBOLS": "Incluir símbolos",
       "INCLUDELOWERLETTERS": "Incluir letras minúsculas",
@@ -1783,7 +1781,7 @@
       "TYPE": {
         "OWNED": "Projetos Próprios",
         "OWNED_SINGULAR": "Projeto Próprio",
-        "GRANTED_SINGULAR": "Projeto Concedido"
+        "GRANTED_SINGULAR": "Projeto atribuído a {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Configuração de Marca",

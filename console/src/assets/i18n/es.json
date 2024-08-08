@@ -1439,9 +1439,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Configurar generador del secreto",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Caducidad (en horas)",
+      "EXPIRY": "Caducidad (en minutos)",
       "INCLUDEDIGITS": "Incluir números",
       "INCLUDESYMBOLS": "Incluir símbolos",
       "INCLUDELOWERLETTERS": "Incluir letras minúsculas",
@@ -1785,7 +1783,7 @@
       "TYPE": {
         "OWNED": "Proyectos propios",
         "OWNED_SINGULAR": "Proyecto propio",
-        "GRANTED_SINGULAR": "Proyecto concedido"
+        "GRANTED_SINGULAR": "Proyecto asignado {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Ajustes de imagen de marca",

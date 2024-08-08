@@ -488,6 +488,7 @@ Errors:
     SQLStatement: SQL-запрос не может быть создан
     InvalidRequest: Запрос недействителен
     TooManyNestingLevels: слишком много уровней вложенности запросов (максимум 20)
+    LimitExceeded: Превышен лимит
   Quota:
     AlreadyExists: Квота для данного объекта уже существует
     NotFound: Квота для данного объекта не найдена
