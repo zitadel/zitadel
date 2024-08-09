@@ -44,6 +44,38 @@ const PROVIDER_MAPPING: {
     };
     return req;
   },
+  [ProviderSlug.AZURE]: (idp: IDPInformation) => {
+    const rawInfo = idp.rawInformation?.toJson() as {
+      User: {
+        email: string;
+        name?: string;
+        given_name?: string;
+        family_name?: string;
+      };
+    };
+
+    const idpLink: PartialMessage<IDPLink> = {
+      idpId: idp.idpId,
+      userId: idp.userId,
+      userName: idp.userName,
+    };
+
+    const req: PartialMessage<AddHumanUserRequest> = {
+      username: idp.userName,
+      email: {
+        email: rawInfo.User?.email,
+        verification: { case: "isVerified", value: true },
+      },
+      // organisation: Organisation | undefined;
+      profile: {
+        displayName: rawInfo.User?.name ?? "",
+        givenName: rawInfo.User?.given_name ?? "",
+        familyName: rawInfo.User?.family_name ?? "",
+      },
+      idpLinks: [idpLink],
+    };
+    return req;
+  },
   [ProviderSlug.GITHUB]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation?.toJson() as {
       email: string;

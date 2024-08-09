@@ -102,7 +102,13 @@ export function SignInWithIDP({
               return (
                 <SignInWithAzureAD
                   key={`idp-${i}`}
-                  onClick={() => alert("TODO: unimplemented")}
+                  onClick={() =>
+                    startFlow(idp.id, ProviderSlug.AZURE).then(
+                      ({ authUrl }) => {
+                        router.push(authUrl);
+                      },
+                    )
+                  }
                 ></SignInWithAzureAD>
               );
             case 10: // IdentityProviderType.IDENTITY_PROVIDER_TYPE_GOOGLE:
