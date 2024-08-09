@@ -10,7 +10,7 @@
   >
     <cnsl-form-field class="oidc-form-field" label="Sender Address" required="true">
       <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.OIDC.LABEL_HOURS' | translate }}</cnsl-label>
-      <input cnslInput type="number" name="accessTokenLifetime" formControlName="accessTokenLifetime" min="0"/>
+      <input cnslInput type="number" name="accessTokenLifetime" formControlName="accessTokenLifetime" min="1" step="1" />
     </cnsl-form-field>
   </cnsl-card>
 
@@ -20,7 +20,7 @@
   >
     <cnsl-form-field class="oidc-form-field" label="Sender Name" required="true">
       <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.OIDC.LABEL_HOURS' | translate }}</cnsl-label>
-      <input cnslInput type="number" name="idTokenLifetime" formControlName="idTokenLifetime" min="0" />
+      <input cnslInput type="number" name="idTokenLifetime" formControlName="idTokenLifetime" min="1" step="1" />
     </cnsl-form-field>
   </cnsl-card>
 
@@ -30,7 +30,7 @@
   >
     <cnsl-form-field class="oidc-form-field" label="Sender Address" required="true">
       <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.OIDC.LABEL_DAYS' | translate }}</cnsl-label>
-      <input cnslInput type="number" name="refreshTokenExpiration" formControlName="refreshTokenExpiration" />
+      <input cnslInput type="number" name="refreshTokenExpiration" formControlName="refreshTokenExpiration" min="1" step="1" />
     </cnsl-form-field>
   </cnsl-card>
 
@@ -40,7 +40,7 @@
   >
     <cnsl-form-field class="oidc-form-field" label="Sender Name" required="true">
       <cnsl-label>{{ 'DESCRIPTIONS.SETTINGS.OIDC.LABEL_DAYS' | translate }}</cnsl-label>
-      <input cnslInput type="number" name="refreshTokenIdleExpiration" formControlName="refreshTokenIdleExpiration" />
+      <input cnslInput type="number" name="refreshTokenIdleExpiration" formControlName="refreshTokenIdleExpiration" min="1" step="1" />
     </cnsl-form-field>
   </cnsl-card>
 </form>
