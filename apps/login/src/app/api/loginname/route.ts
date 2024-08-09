@@ -4,7 +4,6 @@ import {
   getLoginSettings,
   listAuthenticationMethodTypes,
   listUsers,
-  PROVIDER_NAME_MAPPING,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";

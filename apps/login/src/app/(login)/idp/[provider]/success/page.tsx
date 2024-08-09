@@ -46,12 +46,10 @@ const PROVIDER_MAPPING: {
   },
   [ProviderSlug.AZURE]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation?.toJson() as {
-      User: {
-        mail: string;
-        displayName?: string;
-        givenName?: string;
-        surname?: string;
-      };
+      mail: string;
+      displayName?: string;
+      givenName?: string;
+      surname?: string;
     };
 
     const idpLink: PartialMessage<IDPLink> = {
@@ -63,14 +61,14 @@ const PROVIDER_MAPPING: {
     const req: PartialMessage<AddHumanUserRequest> = {
       username: idp.userName,
       email: {
-        email: rawInfo.User?.mail,
+        email: rawInfo?.mail,
         verification: { case: "isVerified", value: true },
       },
       // organisation: Organisation | undefined;
       profile: {
-        displayName: rawInfo.User?.displayName ?? "",
-        givenName: rawInfo.User?.givenName ?? "",
-        familyName: rawInfo.User?.surname ?? "",
+        displayName: rawInfo?.displayName ?? "",
+        givenName: rawInfo?.givenName ?? "",
+        familyName: rawInfo?.surname ?? "",
       },
       idpLinks: [idpLink],
     };
