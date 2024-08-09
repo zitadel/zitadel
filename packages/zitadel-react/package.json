@@ -40,7 +40,7 @@
     "autoprefixer": "10.4.13",
     "eslint-config-zitadel": "workspace:*",
     "jsdom": "^24.0.0",
-    "postcss": "8.4.21",
+    "postcss": "8.4.31",
     "sass": "^1.77.1",
     "tailwindcss": "3.2.4",
     "zitadel-tailwind-config": "workspace:*"

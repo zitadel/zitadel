@@ -1,10 +1,11 @@
-import { getBrandingSettings, getSession } from "@/lib/zitadel";
+import { getBrandingSettings, getSession, sessionService } from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterPasskey from "@/ui/RegisterPasskey";
 import RegisterU2F from "@/ui/RegisterU2F";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { getMostRecentCookieWithLoginname } from "@zitadel/next";
+import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -13,19 +14,11 @@ export default async function Page({
 }) {
   const { loginName, organization, authRequestId } = searchParams;
 
-  const sessionFactors = await loadSession(loginName);
+  const sessionFactors = await loadMostRecentSession(sessionService, {
+    loginName,
+    organization,
+  });
 
-  async function loadSession(loginName?: string) {
-    const recent = await getMostRecentCookieWithLoginname(
-      loginName,
-      organization,
-    );
-    return getSession(recent.id, recent.token).then((response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    });
-  }
   const title = "Use your passkey to confirm it's really you";
   const description =
     "Your device will ask for your fingerprint, face, or screen lock";

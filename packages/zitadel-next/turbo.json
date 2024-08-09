@@ -1,20 +1,9 @@
 {
-  "extends": [
-    "//"
-  ],
+  "extends": ["//"],
   "tasks": {
-    "dev": {
-      "dependsOn": [
-        "@zitadel/react#build"
-      ]
-    },
     "build": {
-      "outputs": [
-        "dist/**"
-      ],
-      "dependsOn": [
-        "@zitadel/react#build"
-      ]
+      "outputs": ["dist/**"],
+      "dependsOn": ["@zitadel/client#build", "@zitadel/react#build"]
     }
   }
 }

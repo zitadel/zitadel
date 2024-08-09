@@ -1,5 +1,5 @@
 import { getSession, verifyU2FRegistration } from "@/lib/zitadel";
-import { getSessionCookieById } from "@/utils/cookies";
+import { getSessionCookieById } from "@zitadel/next";
 import { NextRequest, NextResponse, userAgent } from "next/server";
 import { VerifyU2FRegistrationRequest } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { PlainMessage } from "@zitadel/client";
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         device.vendor || device.model ? ", " : ""
       }${os.name}${os.name ? ", " : ""}${browser.name}`;
     }
-    const sessionCookie = await getSessionCookieById(sessionId);
+    const sessionCookie = await getSessionCookieById({ sessionId });
 
     const session = await getSession(sessionCookie.id, sessionCookie.token);
 

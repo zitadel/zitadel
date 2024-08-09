@@ -3,7 +3,7 @@
   "tasks": {
     "generate": {
       "outputs": ["zitadel/**"],
-      "cache": false
+      "cache": true
     }
   }
 }

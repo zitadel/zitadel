@@ -51,16 +51,16 @@ export default async function Page({
           organization={organization}
           submit={submit}
           allowRegister={!!loginSettings?.allowRegister}
-        />
-
-        {legal && identityProviders && process.env.ZITADEL_API_URL && (
-          <SignInWithIDP
-            host={host}
-            identityProviders={identityProviders}
-            authRequestId={authRequestId}
-            organization={organization}
-          ></SignInWithIDP>
-        )}
+        >
+          {legal && identityProviders && process.env.ZITADEL_API_URL && (
+            <SignInWithIDP
+              host={host}
+              identityProviders={identityProviders}
+              authRequestId={authRequestId}
+              organization={organization}
+            ></SignInWithIDP>
+          )}
+        </UsernameForm>
       </div>
     </DynamicTheme>
   );
