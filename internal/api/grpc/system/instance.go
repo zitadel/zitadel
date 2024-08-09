@@ -151,12 +151,12 @@ func (s *Server) ListDomains(ctx context.Context, req *system_pb.ListDomainsRequ
 }
 
 func (s *Server) AddDomain(ctx context.Context, req *system_pb.AddDomainRequest) (*system_pb.AddDomainResponse, error) {
-	instance, err := s.query.InstanceByID(ctx)
+	instance, err := s.query.InstanceByID(ctx, authz.GetInstance(ctx).InstanceID())
 	if err != nil {
 		return nil, err
 	}
+	// TODO: Is this not done by the instance interceptor already?
 	ctx = authz.WithInstance(ctx, instance)
-
 	details, err := s.command.AddInstanceDomain(ctx, req.Domain)
 	if err != nil {
 		return nil, err

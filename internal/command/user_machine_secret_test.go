@@ -139,7 +139,7 @@ func TestCommandSide_GenerateMachineSecret(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 				assert.Equal(t, tt.args.set.ClientSecret, tt.res.secret.ClientSecret)
 			}
 		})
@@ -297,7 +297,7 @@ func TestCommandSide_RemoveMachineSecret(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

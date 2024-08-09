@@ -2,7 +2,6 @@ package server
 
 import (
 	"crypto/tls"
-
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"

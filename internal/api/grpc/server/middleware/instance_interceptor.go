@@ -17,6 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	object_v3 "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 )
 
 const (
@@ -34,33 +35,67 @@ func InstanceInterceptor(verifier authz.InstanceVerifier, externalDomain string,
 func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, externalDomain string, translator *i18n.Translator, idFromRequestsServices ...string) (_ interface{}, err error) {
 	interceptorCtx, span := tracing.NewServerInterceptorSpan(ctx)
 	defer func() { span.EndWithError(err) }()
+
 	for _, service := range idFromRequestsServices {
 		if !strings.HasPrefix(service, "/") {
 			service = "/" + service
 		}
 		if strings.HasPrefix(info.FullMethod, service) {
-			withInstanceIDProperty, ok := req.(interface{ GetInstanceId() string })
+			withInstanceIDProperty, ok := req.(interface {
+				GetInstanceId() string
+			})
 			if !ok {
 				return handler(ctx, req)
 			}
-			ctx = authz.WithInstanceID(ctx, withInstanceIDProperty.GetInstanceId())
-			instance, err := verifier.InstanceByID(ctx)
-			if err != nil {
-				notFoundErr := new(zerrors.NotFoundError)
-				if errors.As(err, &notFoundErr) {
-					notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
-				}
-				return nil, status.Error(codes.NotFound, err.Error())
-			}
-			return handler(authz.WithInstance(ctx, instance), req)
+			return addInstanceByID(interceptorCtx, req, handler, verifier, translator, withInstanceIDProperty.GetInstanceId())
 		}
 	}
+	explicitInstanceRequest, ok := req.(interface {
+		GetInstance() *object_v3.Instance
+	})
+	if ok {
+		instance := explicitInstanceRequest.GetInstance()
+		if id := instance.GetId(); id != "" {
+			return addInstanceByID(interceptorCtx, req, handler, verifier, translator, id)
+		}
+		if domain := instance.GetDomain(); domain != "" {
+			return addInstanceByDomain(interceptorCtx, req, handler, verifier, translator, domain)
+		}
+	}
+	return addInstanceByRequestedHost(interceptorCtx, req, handler, verifier, translator, externalDomain)
+}
+
+func addInstanceByID(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, id string) (interface{}, error) {
+	instance, err := verifier.InstanceByID(ctx, id)
+	if err != nil {
+		notFoundErr := new(zerrors.ZitadelError)
+		if errors.As(err, &notFoundErr) {
+			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
+		}
+		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using id %s: %w", id, notFoundErr).Error())
+	}
+	return handler(authz.WithInstance(ctx, instance), req)
+}
+
+func addInstanceByDomain(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, domain string) (interface{}, error) {
+	instance, err := verifier.InstanceByHost(ctx, domain, "")
+	if err != nil {
+		notFoundErr := new(zerrors.NotFoundError)
+		if errors.As(err, &notFoundErr) {
+			notFoundErr.Message = translator.LocalizeFromCtx(ctx, notFoundErr.GetMessage(), nil)
+		}
+		return nil, status.Error(codes.NotFound, fmt.Errorf("unable to set instance using domain %s: %w", domain, notFoundErr).Error())
+	}
+	return handler(authz.WithInstance(ctx, instance), req)
+}
+
+func addInstanceByRequestedHost(ctx context.Context, req interface{}, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, translator *i18n.Translator, externalDomain string) (interface{}, error) {
 	requestContext := zitadel_http.DomainContext(ctx)
 	if requestContext.InstanceHost == "" {
-		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).WithError(err).Error("unable to set instance")
+		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).Error("unable to set instance")
 		return nil, status.Error(codes.NotFound, "no instanceHost specified")
 	}
-	instance, err := verifier.InstanceByHost(interceptorCtx, requestContext.InstanceHost, requestContext.PublicHost)
+	instance, err := verifier.InstanceByHost(ctx, requestContext.InstanceHost, requestContext.PublicHost)
 	if err != nil {
 		origin := zitadel_http.DomainContext(ctx)
 		logging.WithFields("origin", requestContext.Origin(), "externalDomain", externalDomain).WithError(err).Error("unable to set instance")
@@ -72,6 +107,5 @@ func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInf
 		}
 		return nil, status.Error(codes.NotFound, fmt.Sprintf("unable to set instance using origin %s (ExternalDomain is %s)", origin, externalDomain))
 	}
-	span.End()
 	return handler(authz.WithInstance(ctx, instance), req)
 }

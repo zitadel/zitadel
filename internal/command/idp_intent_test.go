@@ -333,7 +333,7 @@ func TestCommands_CreateIntent(t *testing.T) {
 			} else {
 				assert.Equal(t, tt.res.intentID, "")
 			}
-			assert.Equal(t, tt.res.details, details)
+			assertObjectDetails(t, tt.res.details, details)
 		})
 	}
 }

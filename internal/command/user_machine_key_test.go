@@ -267,7 +267,7 @@ func TestCommands_AddMachineKey(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 				receivedKey := len(tt.args.key.PrivateKey) > 0
 				assert.Equal(t, tt.res.key, receivedKey)
 			}

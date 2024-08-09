@@ -119,7 +119,7 @@ func TestCommands_AddTrustedDomain(t *testing.T) {
 			}
 			got, err := c.AddTrustedDomain(tt.args.ctx, tt.args.trustedDomain)
 			assert.ErrorIs(t, err, tt.want.err)
-			assert.Equal(t, tt.want.details, got)
+			assertObjectDetails(t, tt.want.details, got)
 		})
 	}
 }
@@ -191,7 +191,7 @@ func TestCommands_RemoveTrustedDomain(t *testing.T) {
 			}
 			got, err := c.RemoveTrustedDomain(tt.args.ctx, tt.args.trustedDomain)
 			assert.ErrorIs(t, err, tt.want.err)
-			assert.Equal(t, tt.want.details, got)
+			assertObjectDetails(t, tt.want.details, got)
 		})
 	}
 }

@@ -494,6 +494,7 @@ Errors:
     SQLStatement: Não foi possível criar a instrução SQL
     InvalidRequest: O pedido é inválido
     TooManyNestingLevels: muitos níveis de aninhamento de consulta (máx. 20)
+    LimitExceeded: Limite excedido
   Quota:
     AlreadyExists: Cota já existe para esta unidade
     NotFound: Cota não encontrada para esta unidade

@@ -39,10 +39,6 @@ var (
 		name:  projection.TargetInstanceIDCol,
 		table: targetTable,
 	}
-	TargetColumnSequence = Column{
-		name:  projection.TargetSequenceCol,
-		table: targetTable,
-	}
 	TargetColumnName = Column{
 		name:  projection.TargetNameCol,
 		table: targetTable,
@@ -75,7 +71,6 @@ func (t *Targets) SetState(s *State) {
 }
 
 type Target struct {
-	ID string
 	domain.ObjectDetails
 
 	Name             string
@@ -123,12 +118,12 @@ func NewTargetInIDsSearchQuery(values []string) (SearchQuery, error) {
 	return NewInTextQuery(TargetColumnID, values)
 }
 
-func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
+func prepareTargetsQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(rows *sql.Rows) (*Targets, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
+			TargetColumnCreationDate.identifier(),
 			TargetColumnChangeDate.identifier(),
 			TargetColumnResourceOwner.identifier(),
-			TargetColumnSequence.identifier(),
 			TargetColumnName.identifier(),
 			TargetColumnTargetType.identifier(),
 			TargetColumnTimeout.identifier(),
@@ -144,9 +139,9 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 				target := new(Target)
 				err := rows.Scan(
 					&target.ID,
+					&target.CreationDate,
 					&target.EventDate,
 					&target.ResourceOwner,
-					&target.Sequence,
 					&target.Name,
 					&target.TargetType,
 					&target.Timeout,
@@ -173,12 +168,12 @@ func prepareTargetsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuil
 		}
 }
 
-func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
+func prepareTargetQuery(context.Context, prepareDatabase) (sq.SelectBuilder, func(row *sql.Row) (*Target, error)) {
 	return sq.Select(
 			TargetColumnID.identifier(),
+			TargetColumnCreationDate.identifier(),
 			TargetColumnChangeDate.identifier(),
 			TargetColumnResourceOwner.identifier(),
-			TargetColumnSequence.identifier(),
 			TargetColumnName.identifier(),
 			TargetColumnTargetType.identifier(),
 			TargetColumnTimeout.identifier(),
@@ -190,9 +185,9 @@ func prepareTargetQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuild
 			target := new(Target)
 			err := row.Scan(
 				&target.ID,
+				&target.CreationDate,
 				&target.EventDate,
 				&target.ResourceOwner,
-				&target.Sequence,
 				&target.Name,
 				&target.TargetType,
 				&target.Timeout,

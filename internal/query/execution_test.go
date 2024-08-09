@@ -16,8 +16,8 @@ import (
 var (
 	prepareExecutionsStmt = `SELECT projections.executions1.instance_id,` +
 		` projections.executions1.id,` +
+		` projections.executions1.creation_date,` +
 		` projections.executions1.change_date,` +
-		` projections.executions1.sequence,` +
 		` execution_targets.targets,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.executions1` +
@@ -32,16 +32,16 @@ var (
 	prepareExecutionsCols = []string{
 		"instance_id",
 		"id",
+		"creation_date",
 		"change_date",
-		"sequence",
 		"targets",
 		"count",
 	}
 
 	prepareExecutionStmt = `SELECT projections.executions1.instance_id,` +
 		` projections.executions1.id,` +
+		` projections.executions1.creation_date,` +
 		` projections.executions1.change_date,` +
-		` projections.executions1.sequence,` +
 		` execution_targets.targets` +
 		` FROM projections.executions1` +
 		` JOIN (` +
@@ -55,8 +55,8 @@ var (
 	prepareExecutionCols = []string{
 		"instance_id",
 		"id",
+		"creation_date",
 		"change_date",
-		"sequence",
 		"targets",
 	}
 )
@@ -96,7 +96,7 @@ func Test_ExecutionPrepares(t *testing.T) {
 							"ro",
 							"id",
 							testNow,
-							uint64(20211109),
+							testNow,
 							[]byte(`[{"position" : 1, "target" : "target"}, {"position" : 2, "include" : "include"}]`),
 						},
 					},
@@ -108,11 +108,11 @@ func Test_ExecutionPrepares(t *testing.T) {
 				},
 				Executions: []*Execution{
 					{
-						ID: "id",
 						ObjectDetails: domain.ObjectDetails{
 							EventDate:     testNow,
+							CreationDate:  testNow,
 							ResourceOwner: "ro",
-							Sequence:      20211109,
+							ID:            "id",
 						},
 						Targets: []*exec.Target{
 							{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -134,14 +134,14 @@ func Test_ExecutionPrepares(t *testing.T) {
 							"ro",
 							"id-1",
 							testNow,
-							uint64(20211109),
+							testNow,
 							[]byte(`[{"position" : 1, "target" : "target"}, {"position" : 2, "include" : "include"}]`),
 						},
 						{
 							"ro",
 							"id-2",
 							testNow,
-							uint64(20211110),
+							testNow,
 							[]byte(`[{"position" : 2, "target" : "target"}, {"position" : 1, "include" : "include"}]`),
 						},
 					},
@@ -153,11 +153,11 @@ func Test_ExecutionPrepares(t *testing.T) {
 				},
 				Executions: []*Execution{
 					{
-						ID: "id-1",
 						ObjectDetails: domain.ObjectDetails{
+							ID:            "id-1",
 							EventDate:     testNow,
+							CreationDate:  testNow,
 							ResourceOwner: "ro",
-							Sequence:      20211109,
 						},
 						Targets: []*exec.Target{
 							{Type: domain.ExecutionTargetTypeTarget, Target: "target"},
@@ -165,11 +165,11 @@ func Test_ExecutionPrepares(t *testing.T) {
 						},
 					},
 					{
-						ID: "id-2",
 						ObjectDetails: domain.ObjectDetails{
+							ID:            "id-2",
 							EventDate:     testNow,
+							CreationDate:  testNow,
 							ResourceOwner: "ro",
-							Sequence:      20211110,
 						},
 						Targets: []*exec.Target{
 							{Type: domain.ExecutionTargetTypeInclude, Target: "include"},
@@ -225,17 +225,17 @@ func Test_ExecutionPrepares(t *testing.T) {
 						"ro",
 						"id",
 						testNow,
-						uint64(20211109),
+						testNow,
 						[]byte(`[{"position" : 1, "target" : "target"}, {"position" : 2, "include" : "include"}]`),
 					},
 				),
 			},
 			object: &Execution{
-				ID: "id",
 				ObjectDetails: domain.ObjectDetails{
+					ID:            "id",
 					EventDate:     testNow,
+					CreationDate:  testNow,
 					ResourceOwner: "ro",
-					Sequence:      20211109,
 				},
 				Targets: []*exec.Target{
 					{Type: domain.ExecutionTargetTypeTarget, Target: "target"},

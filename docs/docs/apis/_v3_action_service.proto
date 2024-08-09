@@ -466,7 +466,7 @@ message DeleteTargetResponse {
 
 message SearchTargetsRequest {
   // list limitations and ordering.
-  zitadel.resources.object.v3alpha.ListQuery query = 2;
+  zitadel.resources.object.v3alpha.SearchQuery query = 2;
   // the field the result is sorted.
   zitadel.resources.action.v3alpha.TargetFieldName sorting_column = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -526,7 +526,7 @@ message DeleteExecutionResponse {
 
 message SearchExecutionsRequest {
   // list limitations and ordering.
-  zitadel.resources.object.v3alpha.ListQuery query = 1;
+  zitadel.resources.object.v3alpha.SearchQuery query = 1;
   // Define the criteria to query for.
   repeated zitadel.resources.action.v3alpha.ExecutionSearchFilter filters = 2;
 }

@@ -495,6 +495,7 @@ Errors:
     SQLStatement: La sentencia SQL no pudo crearse
     InvalidRequest: La solicitud no es válida
     TooManyNestingLevels: Demasiados niveles de anidamiento de consultas (máximo 20)
+    LimitExceeded: Se ha superado el límite de resultados
   Quota:
     AlreadyExists: La cuota ya existe para esta unidad
     NotFound: Cuota no encontrada para esta unidad

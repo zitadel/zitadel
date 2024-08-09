@@ -20,3 +20,10 @@ message Owner {
   string id = 2;
 }
 
+message Instance {
+  oneof property {
+    option (validate.required) = true;
+    string id = 1;
+    string domain = 2;
+  }
+}

@@ -281,7 +281,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			}
 			gotID, gotDetails, err := c.CreateUserSchema(tt.args.ctx, tt.args.userSchema)
 			assert.Equal(t, tt.res.id, gotID)
-			assert.Equal(t, tt.res.details, gotDetails)
+			assertObjectDetails(t, tt.res.details, gotDetails)
 			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}
@@ -620,7 +620,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			}
 			got, err := c.UpdateUserSchema(tt.args.ctx, tt.args.userSchema)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.details, got)
+			assertObjectDetails(t, tt.res.details, got)
 		})
 	}
 }
@@ -713,7 +713,7 @@ func TestCommands_DeactivateUserSchema(t *testing.T) {
 			}
 			got, err := c.DeactivateUserSchema(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.details, got)
+			assertObjectDetails(t, tt.res.details, got)
 		})
 	}
 }
@@ -812,7 +812,7 @@ func TestCommands_ReactivateUserSchema(t *testing.T) {
 			}
 			got, err := c.ReactivateUserSchema(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.details, got)
+			assertObjectDetails(t, tt.res.details, got)
 		})
 	}
 }
@@ -906,7 +906,7 @@ func TestCommands_DeleteUserSchema(t *testing.T) {
 			}
 			got, err := c.DeleteUserSchema(tt.args.ctx, tt.args.id, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.details, got)
+			assertObjectDetails(t, tt.res.details, got)
 		})
 	}
 }

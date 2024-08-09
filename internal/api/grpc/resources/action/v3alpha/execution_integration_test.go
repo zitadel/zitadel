@@ -11,9 +11,8 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
-	settings_object "github.com/zitadel/zitadel/pkg/grpc/settings/object/v3alpha"
+	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
 func executionTargetsSingleTarget(id string) []*action.ExecutionTargetType {
@@ -101,12 +100,8 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -147,12 +142,8 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -174,12 +165,8 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -196,7 +183,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 
 			require.NoError(t, err)
 
-			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
+			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
 			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
@@ -280,17 +267,12 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					},
 				},
 				Execution: &action.Execution{
-
 					Targets: executionTargetsSingleInclude(executionCond),
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -308,17 +290,12 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					},
 				},
 				Execution: &action.Execution{
-
 					Targets: executionTargetsSingleInclude(executionCond),
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -334,7 +311,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
+			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
 			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
@@ -419,12 +396,8 @@ func TestServer_SetExecution_Response(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -465,12 +438,8 @@ func TestServer_SetExecution_Response(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -492,12 +461,8 @@ func TestServer_SetExecution_Response(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -513,7 +478,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
+			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
 			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
@@ -602,12 +567,8 @@ func TestServer_SetExecution_Event(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -650,12 +611,8 @@ func TestServer_SetExecution_Event(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -677,12 +634,8 @@ func TestServer_SetExecution_Event(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -698,7 +651,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
+			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
 			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
@@ -775,12 +728,8 @@ func TestServer_SetExecution_Function(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
-					Owner: &object.Owner{
-						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.InstanceID(),
-					},
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 				},
 			},
 		},
@@ -796,7 +745,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			}
 			require.NoError(t, err)
 
-			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
+			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
 			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())

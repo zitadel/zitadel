@@ -14,6 +14,8 @@ type SystemDefaults struct {
 	DomainVerification DomainVerification
 	Notifications      Notifications
 	KeyConfig          KeyConfig
+	DefaultQueryLimit  uint64
+	MaxQueryLimit      uint64
 }
 
 type SecretGenerators struct {

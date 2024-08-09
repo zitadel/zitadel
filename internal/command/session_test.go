@@ -1464,7 +1464,7 @@ func TestCommands_TerminateSession(t *testing.T) {
 			}
 			got, err := c.TerminateSession(tt.args.ctx, tt.args.sessionID, tt.args.sessionToken)
 			require.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }

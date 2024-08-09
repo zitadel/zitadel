@@ -363,7 +363,7 @@ func TestCommands_ResetInstanceFeatures(t *testing.T) {
 			}
 			got, err := c.ResetInstanceFeatures(ctx)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			assertObjectDetails(t, tt.want, got)
 		})
 	}
 }

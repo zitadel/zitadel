@@ -223,7 +223,7 @@ func TestLimits_SetLimits(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -626,8 +626,11 @@ func TestLimits_SetLimitsBulk(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, gotDetails)
-				assert.Equal(t, tt.res.wantTarget, gotTargetDetails)
+				assertObjectDetails(t, tt.res.want, gotDetails)
+				assert.Len(t, gotTargetDetails, len(tt.res.wantTarget))
+				for i, want := range tt.res.wantTarget {
+					assertObjectDetails(t, want, gotTargetDetails[i])
+				}
 			}
 		})
 	}
@@ -748,7 +751,7 @@ func TestLimits_ResetLimits(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}

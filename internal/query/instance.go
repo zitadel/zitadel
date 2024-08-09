@@ -216,14 +216,12 @@ func (q *Queries) InstanceByHost(ctx context.Context, instanceHost, publicHost s
 	return instance, err
 }
 
-func (q *Queries) InstanceByID(ctx context.Context) (_ authz.Instance, err error) {
+func (q *Queries) InstanceByID(ctx context.Context, id string) (_ authz.Instance, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-
-	instanceID := authz.GetInstance(ctx).InstanceID()
 	instance, scan := scanAuthzInstance()
-	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, instanceID)
-	logging.OnError(err).WithField("instance_id", instanceID).Warn("instance by ID")
+	err = q.client.QueryRowContext(ctx, scan, instanceByIDQuery, id)
+	logging.OnError(err).WithField("instance_id", id).Warn("instance by ID")
 	return instance, err
 }
 

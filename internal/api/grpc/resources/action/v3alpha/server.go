@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
@@ -17,6 +18,7 @@ var _ action.ZITADELActionsServer = (*Server)(nil)
 
 type Server struct {
 	action.UnimplementedZITADELActionsServer
+	systemDefaults      systemdefaults.SystemDefaults
 	command             *command.Commands
 	query               *query.Queries
 	ListActionFunctions func() []string
@@ -27,6 +29,7 @@ type Server struct {
 type Config struct{}
 
 func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,
 	query *query.Queries,
 	listActionFunctions func() []string,
@@ -34,6 +37,7 @@ func CreateServer(
 	listGRPCServices func() []string,
 ) *Server {
 	return &Server{
+		systemDefaults:      systemDefaults,
 		command:             command,
 		query:               query,
 		ListActionFunctions: listActionFunctions,
@@ -62,7 +66,7 @@ func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
 	return action.RegisterZITADELActionsHandler
 }
 
-func checkExecutionEnabled(ctx context.Context) error {
+func checkActionsEnabled(ctx context.Context) error {
 	if authz.GetInstance(ctx).Features().Actions {
 		return nil
 	}
