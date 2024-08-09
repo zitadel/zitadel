@@ -86,7 +86,7 @@ func writeQuery(stmt *database.Statement, query *eventstore.Query) {
 
 	stmt.WriteString(" FROM (")
 	writeFilters(stmt, query.Filters())
-	stmt.WriteRune(')')
+	stmt.WriteString(") sub")
 	writePagination(stmt, query.Pagination())
 }
 
@@ -194,6 +194,7 @@ func writeAggregateFilters(stmt *database.Statement, filters []*eventstore.Aggre
 
 func writeAggregateFilter(stmt *database.Statement, filter *eventstore.AggregateFilter) {
 	conditions := definedConditions([]*condition{
+		{column: "owner", condition: filter.Owners()},
 		{column: "aggregate_type", condition: filter.Type()},
 		{column: "aggregate_id", condition: filter.IDs()},
 	})

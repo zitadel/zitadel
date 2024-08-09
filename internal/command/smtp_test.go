@@ -1196,6 +1196,329 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 	}
 }
 
+func TestCommandSide_TestSMTPConfig(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+		alg        crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx        context.Context
+		instanceID string
+		id         string
+		email      string
+		config     smtp.Config
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "id empty, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "email empty, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID: "INSTANCE",
+				id:         "id",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "if password is empty, smtp id must not",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "",
+				email:      "email",
+				config: smtp.Config{
+					From:     "test@example,com",
+					FromName: "Test",
+					SMTP: smtp.SMTP{
+						User:     "user",
+						Password: "",
+						Host:     "example.com:2525",
+					},
+				},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "password empty and smtp config not found, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "id",
+				email:      "email",
+				config: smtp.Config{
+					From:     "test@example,com",
+					FromName: "Test",
+					SMTP: smtp.SMTP{
+						User:     "user",
+						Password: "",
+						Host:     "example.com:2525",
+					},
+				},
+			},
+			res: res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			name: "valid new smtp config, wrong auth, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				email:      "email",
+				config: smtp.Config{
+					From:     "test@example.com",
+					FromName: "Test",
+					SMTP: smtp.SMTP{
+						User:     "user",
+						Password: "password",
+						Host:     "mail.smtp2go.com:2525",
+					},
+				},
+			},
+			res: res{
+				err: zerrors.IsInternal,
+			},
+		},
+		{
+			name: "valid smtp config using stored password, wrong auth, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMTPConfigAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
+								"test",
+								true,
+								"from",
+								"name",
+								"",
+								"mail.smtp2go.com:2525",
+								"user",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("password"),
+								},
+							),
+						),
+					),
+				),
+				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				email:      "email",
+				id:         "ID",
+				config: smtp.Config{
+					From:     "test@example.com",
+					FromName: "Test",
+					SMTP: smtp.SMTP{
+						User:     "user",
+						Password: "",
+						Host:     "mail.smtp2go.com:2525",
+					},
+				},
+			},
+			res: res{
+				err: zerrors.IsInternal,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:     tt.fields.eventstore,
+				smtpEncryption: tt.fields.alg,
+			}
+			err := r.TestSMTPConfig(tt.args.ctx, tt.args.instanceID, tt.args.id, tt.args.email, &tt.args.config)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
+func TestCommandSide_TestSMTPConfigById(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+		alg        crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx        context.Context
+		instanceID string
+		id         string
+		email      string
+	}
+	type res struct {
+		err func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "id empty, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "email empty, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+				),
+			},
+			args: args{
+				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
+				instanceID: "INSTANCE",
+				id:         "id",
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "smtp config not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "id",
+				email:      "email",
+			},
+			res: res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			name: "valid smtp config, wrong auth, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMTPConfigAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
+								"test",
+								true,
+								"from",
+								"name",
+								"",
+								"mail.smtp2go.com:2525",
+								"user",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("password"),
+								},
+							),
+						),
+					),
+				),
+				alg: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
+				id:         "ID",
+				instanceID: "INSTANCE",
+				email:      "test@example.com",
+			},
+			res: res{
+				err: zerrors.IsInternal,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:     tt.fields.eventstore,
+				smtpEncryption: tt.fields.alg,
+			}
+			err := r.TestSMTPConfigById(tt.args.ctx, tt.args.instanceID, tt.args.id, tt.args.email)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+		})
+	}
+}
+
 func newSMTPConfigChangedEvent(ctx context.Context, id, description string, tls bool, fromAddress, fromName, replyTo, host, user string) *instance.SMTPConfigChangedEvent {
 	changes := []instance.SMTPConfigChanges{
 		instance.ChangeSMTPConfigDescription(description),

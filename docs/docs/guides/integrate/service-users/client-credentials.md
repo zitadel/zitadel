@@ -26,7 +26,7 @@ If you lose it, you will have to generate a new one.
 
 ![Create new service user](/img/console_serviceusers_secret.gif)
 
-## 2. Authenticating a service user and request a token
+### 2. Authenticating a service user and request a token
 
 In this step, we will authenticate a service user and receive an access_token to use against the ZITADEL API.
 
@@ -36,16 +36,21 @@ You will need to craft a POST request to ZITADEL's token endpoint:
 curl --request POST \
   --url https://$CUSTOM-DOMAIN/oauth/v2/token \
   --header 'Content-Type: application/x-www-form-urlencoded' \
-  --header 'Authorization: Basic ${BASIC_AUTH}' \
   --data grant_type=client_credentials \
-  --data scope='openid profile'
+  --data scope='openid profile' \
+  --user "$CLIENT_ID:$CLIENT_SECRET"
 ```
 
+* `CUSTOM_DOMAIN` should be set to your [custom domain](/docs/concepts/features/custom-domain)
 * `grant_type` should be set to `client_credentials`
 * `scope` should contain any [Scopes](/apis/openidoauth/scopes) you want to include, but must include `openid`. For this example, please include `profile`
+* `CLIENT_ID` and `CLIENT_SECRET` should be set with the values shown in Console when generating a new secret to enable [basic authentication](/docs/apis/openidoauth/authn-methods)
 
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
 Read our guide [how to access ZITADEL APIs](../zitadel-apis/access-zitadel-apis) to learn more.
+
+**Important Note:** If the service user token needs to be validated using token introspection, ensure you include the `urn:zitadel:iam:org:project:id:{projectid}:aud` scope in your token request. 
+Without this, token introspection will fail.
 
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.
 
@@ -98,7 +103,7 @@ By following these steps and adhering to security best practices, you can effect
 ## Notes
 
 * Read about the [different methods to authenticate service users](./authenticate-service-users)
-* [Service User API reference](/docs/category/apis/resources/mgmt/user-machine)
+* [Service User API reference](/docs/apis/resources/mgmt/user-machine)
 * [OIDC client secret basic](/docs/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with basic auth](../token-introspection/basic-auth)

@@ -4,15 +4,20 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.LockoutPolicy) (*domain.LockoutPolicy, error) {
+func (c *Commands) AddLockoutPolicy(ctx context.Context, resourceOwner string, policy *domain.LockoutPolicy) (_ *domain.LockoutPolicy, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-8fJif", "Errors.ResourceOwnerMissing")
 	}
-	addedPolicy, err := c.orgLockoutPolicyWriteModelByID(ctx, resourceOwner)
+	addedPolicy, err := orgLockoutPolicyWriteModelByID(ctx, resourceOwner, c.eventstore.FilterToQueryReducer)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +47,7 @@ func (c *Commands) ChangeLockoutPolicy(ctx context.Context, resourceOwner string
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-3J9fs", "Errors.ResourceOwnerMissing")
 	}
-	existingPolicy, err := c.orgLockoutPolicyWriteModelByID(ctx, resourceOwner)
+	existingPolicy, err := orgLockoutPolicyWriteModelByID(ctx, resourceOwner, c.eventstore.FilterToQueryReducer)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +76,7 @@ func (c *Commands) RemoveLockoutPolicy(ctx context.Context, orgID string) (*doma
 	if orgID == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "Org-4J9fs", "Errors.ResourceOwnerMissing")
 	}
-	existingPolicy, err := c.orgLockoutPolicyWriteModelByID(ctx, orgID)
+	existingPolicy, err := orgLockoutPolicyWriteModelByID(ctx, orgID, c.eventstore.FilterToQueryReducer)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +98,7 @@ func (c *Commands) RemoveLockoutPolicy(ctx context.Context, orgID string) (*doma
 }
 
 func (c *Commands) removeLockoutPolicyIfExists(ctx context.Context, orgID string) (*org.LockoutPolicyRemovedEvent, error) {
-	existingPolicy, err := c.orgLockoutPolicyWriteModelByID(ctx, orgID)
+	existingPolicy, err := orgLockoutPolicyWriteModelByID(ctx, orgID, c.eventstore.FilterToQueryReducer)
 	if err != nil {
 		return nil, err
 	}
@@ -104,24 +109,27 @@ func (c *Commands) removeLockoutPolicyIfExists(ctx context.Context, orgID string
 	return org.NewLockoutPolicyRemovedEvent(ctx, orgAgg), nil
 }
 
-func (c *Commands) orgLockoutPolicyWriteModelByID(ctx context.Context, orgID string) (*OrgLockoutPolicyWriteModel, error) {
+func orgLockoutPolicyWriteModelByID(ctx context.Context, orgID string, queryReducer func(ctx context.Context, r eventstore.QueryReducer) error) (_ *OrgLockoutPolicyWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	policy := NewOrgLockoutPolicyWriteModel(orgID)
-	err := c.eventstore.FilterToQueryReducer(ctx, policy)
+	err = queryReducer(ctx, policy)
 	if err != nil {
 		return nil, err
 	}
 	return policy, nil
 }
 
-func (c *Commands) getLockoutPolicy(ctx context.Context, orgID string) (*domain.LockoutPolicy, error) {
-	orgWm, err := c.orgLockoutPolicyWriteModelByID(ctx, orgID)
+func getLockoutPolicy(ctx context.Context, orgID string, queryReducer func(ctx context.Context, r eventstore.QueryReducer) error) (*domain.LockoutPolicy, error) {
+	orgWm, err := orgLockoutPolicyWriteModelByID(ctx, orgID, queryReducer)
 	if err != nil {
 		return nil, err
 	}
 	if orgWm.State == domain.PolicyStateActive {
 		return writeModelToLockoutPolicy(&orgWm.LockoutPolicyWriteModel), nil
 	}
-	instanceWm, err := c.defaultLockoutPolicyWriteModelByID(ctx)
+	instanceWm, err := defaultLockoutPolicyWriteModelByID(ctx, queryReducer)
 	if err != nil {
 		return nil, err
 	}

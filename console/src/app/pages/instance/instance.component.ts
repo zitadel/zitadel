@@ -18,6 +18,7 @@ import {
   LANGUAGES,
   IDP,
   LOCKOUT,
+  AGE,
   LOGIN,
   LOGINTEXTS,
   MESSAGETEXTS,
@@ -64,6 +65,7 @@ export class InstanceComponent implements OnInit, OnDestroy {
     LOGIN,
     IDP,
     COMPLEXITY,
+    AGE,
     LOCKOUT,
 
     DOMAIN,

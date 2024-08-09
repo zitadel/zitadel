@@ -7,7 +7,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/ui/console"
+	"github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
@@ -26,13 +26,11 @@ import (
 )
 
 const (
-	zitadelProjectName    = "ZITADEL"
-	mgmtAppName           = "Management-API"
-	adminAppName          = "Admin-API"
-	authAppName           = "Auth-API"
-	consoleAppName        = "Console"
-	consoleRedirectPath   = console.HandlerPrefix + "/auth/callback"
-	consolePostLogoutPath = console.HandlerPrefix + "/signedout"
+	zitadelProjectName = "ZITADEL"
+	mgmtAppName        = "Management-API"
+	adminAppName       = "Admin-API"
+	authAppName        = "Auth-API"
+	consoleAppName     = "Console"
 )
 
 type InstanceSetup struct {
@@ -233,7 +231,7 @@ func (c *Commands) SetUpInstance(ctx context.Context, setup *InstanceSetup) (str
 func contextWithInstanceSetupInfo(ctx context.Context, instanceID, projectID, consoleAppID, externalDomain string) context.Context {
 	return authz.WithConsole(
 		authz.SetCtxData(
-			authz.WithRequestedDomain(
+			http.WithRequestedHost(
 				authz.WithInstanceID(
 					ctx,
 					instanceID),

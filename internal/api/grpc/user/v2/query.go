@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/muhlemmer/gu"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) (_ *user.GetUserByIDResponse, err error) {
@@ -59,7 +60,12 @@ func UsersToPb(users []*query.User, assetPrefix string) []*user.User {
 
 func userToPb(userQ *query.User, assetPrefix string) *user.User {
 	return &user.User{
-		UserId:             userQ.ID,
+		UserId: userQ.ID,
+		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
+			Sequence:      userQ.Sequence,
+			EventDate:     userQ.ChangeDate,
+			ResourceOwner: userQ.ResourceOwner,
+		}),
 		State:              userStateToPb(userQ.State),
 		Username:           userQ.Username,
 		LoginNames:         userQ.LoginNames,
@@ -83,6 +89,10 @@ func userTypeToPb(userQ *query.User, assetPrefix string) user.UserType {
 }
 
 func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
+	var passwordChanged *timestamppb.Timestamp
+	if !userQ.PasswordChanged.IsZero() {
+		passwordChanged = timestamppb.New(userQ.PasswordChanged)
+	}
 	return &user.HumanUser{
 		Profile: &user.HumanProfile{
 			GivenName:         userQ.FirstName,
@@ -102,6 +112,7 @@ func humanToPb(userQ *query.Human, assetPrefix, owner string) *user.HumanUser {
 			IsVerified: userQ.IsPhoneVerified,
 		},
 		PasswordChangeRequired: userQ.PasswordChangeRequired,
+		PasswordChanged:        passwordChanged,
 	}
 }
 

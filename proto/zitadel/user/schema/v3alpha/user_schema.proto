@@ -6,7 +6,7 @@ import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";
 import "validate/validate.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
-import "zitadel/object/v2beta/object.proto";
+import "zitadel/object/v2/object.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha";
 
@@ -19,7 +19,7 @@ message UserSchema {
     }
   ];
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2beta.Details details = 2;
+  zitadel.object.v2.Details details = 2;
   // Type is a human readable text describing the schema.
   string type = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -119,7 +119,7 @@ message IDQuery {
     }
   ];
   // Defines which text comparison method used for the id query.
-  zitadel.object.v2beta.TextQueryMethod method = 2 [
+  zitadel.object.v2.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }
@@ -135,7 +135,7 @@ message TypeQuery {
     }
   ];
   // Defines which text comparison method used for the type query.
-  zitadel.object.v2beta.TextQueryMethod method = 2 [
+  zitadel.object.v2.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }

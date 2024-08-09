@@ -12,9 +12,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+
 	"github.com/zitadel/zitadel/internal/integration"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
 func TestServer_RegisterTOTP(t *testing.T) {
@@ -195,6 +196,83 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Client.VerifyTOTPRegistration(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.NotNil(t, got)
+			integration.AssertDetails(t, tt.want, got)
+		})
+	}
+}
+
+func TestServer_RemoveTOTP(t *testing.T) {
+	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	Tester.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+
+	userVerified := Tester.CreateHumanUser(CTX)
+	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
+	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
+	userVerifiedCtx := Tester.WithAuthorizationToken(context.Background(), sessionTokenVerified)
+	_, err := Tester.Client.UserV2.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
+		UserId:           userVerified.GetUserId(),
+		VerificationCode: userVerified.GetPhoneCode(),
+	})
+	require.NoError(t, err)
+
+	regOtherUser, err := Client.RegisterTOTP(CTX, &user.RegisterTOTPRequest{
+		UserId: userVerified.GetUserId(),
+	})
+	require.NoError(t, err)
+	codeOtherUser, err := totp.GenerateCode(regOtherUser.Secret, time.Now())
+	require.NoError(t, err)
+	_, err = Client.VerifyTOTPRegistration(userVerifiedCtx, &user.VerifyTOTPRegistrationRequest{
+		UserId: userVerified.GetUserId(),
+		Code:   codeOtherUser,
+	},
+	)
+	require.NoError(t, err)
+
+	type args struct {
+		ctx context.Context
+		req *user.RemoveTOTPRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *user.RemoveTOTPResponse
+		wantErr bool
+	}{
+		{
+			name: "not added",
+			args: args{
+				ctx: Tester.WithAuthorizationToken(context.Background(), sessionToken),
+				req: &user.RemoveTOTPRequest{
+					UserId: userID,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "success",
+			args: args{
+				ctx: userVerifiedCtx,
+				req: &user.RemoveTOTPRequest{
+					UserId: userVerified.GetUserId(),
+				},
+			},
+			want: &user.RemoveTOTPResponse{
+				Details: &object.Details{
+					ResourceOwner: Tester.Organisation.ResourceOwner,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Client.RemoveTOTP(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

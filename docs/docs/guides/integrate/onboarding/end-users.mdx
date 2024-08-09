@@ -102,7 +102,7 @@ Please follow the configuration guides for the needed providers: [Let Users Logi
 
 import OrgLoginDescription from "./_org_login_description.mdx";
 
-<OrgLoginDescription name="OrgLodinDescription" />
+<OrgLoginDescription name="OrgLoginDescription" />
 
 ### Build your own registration form
 
@@ -115,10 +115,13 @@ We do have a guide series on how to build your own login ui, which also includes
 - Passkeys
 - External Login Providers
 
-You can find all the guides here: [Build your own login UI](https://zitadel.com/docs/guides/integrate/login-ui)
+You can find all the guides here: [Build your own login UI](/docs/guides/integrate/login-ui)
 
-The create user request also allows you to add metadata (key, value) to the user.
+#### Custom fields
+
+The [create user request](/docs/apis/resources/user_service/user-service-add-human-user) also allows you to add [metadata](/docs/guides/manage/customize/user-metadata) (key, value) to the user.
 This gives you the possibility to collect additional data from your users during the registration process and store it directly to the user in ZITADEL.
+Those metadata can also directly be included in the [token](/docs/guides/manage/customize/user-metadata#use-tokens-to-get-user-metadata) of the user.
 We recommend storing business relevant data in the database of your application, and only authentication and authorization relevant data in ZITADEL to follow the separation of concern pattern.
 
 #### Registration with Organization External Identity Provider

@@ -8,15 +8,15 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
-
+import { MatDialogModule } from '@angular/material/dialog';
 import { CardModule } from '../../card/card.module';
 import { FormFieldModule } from '../../form-field/form-field.module';
 import { InputModule } from '../../input/input.module';
-import { DialogAddSecretGeneratorComponent } from './dialog-add-secret-generator/dialog-add-secret-generator.component';
 import { SecretGeneratorComponent } from './secret-generator.component';
+import { SecretGeneratorCardComponent } from './secret-generator-card/secret-generator-card.component';
 
 @NgModule({
-  declarations: [SecretGeneratorComponent, DialogAddSecretGeneratorComponent],
+  declarations: [SecretGeneratorComponent, SecretGeneratorCardComponent],
   imports: [
     CommonModule,
     MatIconModule,
@@ -31,7 +31,8 @@ import { SecretGeneratorComponent } from './secret-generator.component';
     MatProgressSpinnerModule,
     MatSelectModule,
     TranslateModule,
+    MatDialogModule,
   ],
-  exports: [SecretGeneratorComponent, DialogAddSecretGeneratorComponent],
+  exports: [SecretGeneratorComponent],
 })
 export class SecretGeneratorModule {}

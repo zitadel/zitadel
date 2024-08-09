@@ -9,12 +9,16 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/repository/org"
+	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 // SetOrgLoginText only validates if the language is supported, not if it is allowed.
 // This enables setting texts before allowing a language
-func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, loginText *domain.CustomLoginText) (*domain.ObjectDetails, error) {
+func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, loginText *domain.CustomLoginText) (_ *domain.ObjectDetails, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
 	if resourceOwner == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "ORG-m29rF", "Errors.ResourceOwnerMissing")
 	}
@@ -22,6 +26,9 @@ func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, lo
 	events, existingLoginText, err := c.setOrgLoginText(ctx, &iamAgg.Aggregate, loginText)
 	if err != nil {
 		return nil, err
+	}
+	if len(events) == 0 {
+		return writeModelToObjectDetails(&existingLoginText.WriteModel), nil
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {

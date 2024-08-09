@@ -89,7 +89,7 @@ InitUserDone:
 InitMFAPrompt:
   Title: 两步验证设置
   Description: 两步验证为您的账户提供了额外的安全保障。这确保只有你能访问你的账户。
-  Provider0: 软件应用（如 Google/Migrosoft Authenticator、Authy）
+  Provider0: 软件应用（如 Google/Microsoft Authenticator、Authy）
   Provider1: 硬件设备（如 Face ID、Windows Hello、指纹）
   Provider3: 一次性密码短信
   Provider4: 一次性密码电子邮件
@@ -190,6 +190,7 @@ PasswordlessRegistrationDone:
 PasswordChange:
   Title: 更改密码
   Description: 更改您的密码。输入您的旧密码和新密码。
+  ExpiredDescription: 您的密码已过期，需要更改。请输入您的新旧密码。
   OldPasswordLabel: 旧密码
   NewPasswordLabel: 新密码
   NewPasswordConfirmLabel: 确认密码
@@ -251,6 +252,7 @@ RegistrationUser:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   GenderLabel: 性别
   Female: 女性
   Male: 男性
@@ -290,6 +292,7 @@ ExternalRegistrationUserOverview:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
   TosAndPrivacyLabel: 条款和条款
   TosConfirm: 我接受
   TosLinkText: 服务条款
@@ -363,6 +366,7 @@ ExternalNotFound:
   Czech: Čeština
   Russian: Русский
   Dutch: Nederlands
+  Swedish: Svenska
 DeviceAuth:
   Title: 设备授权
   UserCode:

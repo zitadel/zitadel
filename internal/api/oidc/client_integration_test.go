@@ -20,7 +20,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/authn"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
 
 func TestServer_Introspect(t *testing.T) {
@@ -122,7 +122,7 @@ func TestServer_Introspect(t *testing.T) {
 			tokens, err := exchangeTokens(t, app.GetClientId(), code, redirectURI)
 			require.NoError(t, err)
 			assertTokens(t, tokens, true)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
 
 			// test actual introspection
 			introspection, err := rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, tokens.AccessToken)
@@ -138,6 +138,15 @@ func TestServer_Introspect(t *testing.T) {
 				tokens.Expiry, tokens.Expiry.Add(-12*time.Hour))
 		})
 	}
+}
+
+func TestServer_Introspect_invalid_auth_invalid_token(t *testing.T) {
+	// ensure that when an invalid authentication and token is sent, the authentication error is returned
+	// https://github.com/zitadel/zitadel/pull/8133
+	resourceServer, err := Tester.CreateResourceServerClientCredentials(CTX, "xxxxx", "xxxxx")
+	require.NoError(t, err)
+	_, err = rs.Introspect[*oidc.IntrospectionResponse](context.Background(), resourceServer, "xxxxx")
+	require.Error(t, err)
 }
 
 func assertIntrospection(
@@ -317,7 +326,7 @@ func TestServer_VerifyClient(t *testing.T) {
 			}
 			require.NoError(t, err)
 			assertTokens(t, tokens, false)
-			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime)
+			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
 		})
 	}
 }

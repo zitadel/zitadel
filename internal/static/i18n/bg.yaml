@@ -53,13 +53,26 @@ Errors:
     NotFound: SMS конфигурацията не е намерена
     AlreadyActive: SMS конфигурацията вече е активна
     AlreadyDeactivated: SMS конфигурацията вече е деактивирана
+  SMTP:
+    NotEmailMessage: съобщението не е имейл съобщение
+    RequiredAttributes: темата, получателите и съдържанието трябва да бъдат зададени, но някои или всички са празни
+    CouldNotSplit: не можа да раздели хост и порт за свързване към smtp
+    CouldNotDial: не може да се свърже със SMTP сървъра, проверете порта, проблеми със защитната стена...
+    CouldNotDialTLS: не може да се свърже със SMTP сървъра чрез TLS, проверете порта, проблеми със защитната стена...
+    CouldNotCreateClient: не може да създаде smtp клиент
+    CouldNotStartTLS: не можа да стартира TLS
+    CouldNotAuth: не може да добави smtp auth, проверете дали потребителят и паролата ви са правилни, ако са правилни, може би вашият доставчик изисква метод за удостоверяване, който не се поддържа от ZITADEL
+    CouldNotSetSender: не можа да зададе подател
+    CouldNotSetRecipient: не можа да зададе получател
   SMTPConfig:
+    TestPassword: Паролата за тест не е намерена
     NotFound: SMTP конфигурацията не е намерена
     AlreadyExists: SMTP конфигурация вече съществува
     AlreadyDeactivated: SMTP конфигурацията вече е деактивирана
     SenderAdressNotCustomDomain: >-
       Адресът на изпращача трябва да бъде конфигуриран като персонализиран
       домейн в екземпляра.
+    TestEmailNotFound: Имейл адресът за теста не е намерен
   Notification:
     NoDomain: Няма намерен домейн за съобщение
   User:
@@ -567,6 +580,7 @@ Errors:
     NotFound: Изпълнението не е намерено
     IncludeNotFound: Включването не е намерено
     NoTargets: Няма определени цели
+    ResponseIsNotValidJSON: Отговорът не е валиден JSON
   UserSchema:
     NotEnabled: Функцията „Потребителска схема“ не е активирана
     Type:

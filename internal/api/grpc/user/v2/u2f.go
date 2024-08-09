@@ -6,7 +6,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 func (s *Server) RegisterU2F(ctx context.Context, req *user.RegisterU2FRequest) (*user.RegisterU2FResponse, error) {
@@ -37,6 +37,16 @@ func (s *Server) VerifyU2FRegistration(ctx context.Context, req *user.VerifyU2FR
 		return nil, err
 	}
 	return &user.VerifyU2FRegistrationResponse{
+		Details: object.DomainToDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) RemoveU2F(ctx context.Context, req *user.RemoveU2FRequest) (*user.RemoveU2FResponse, error) {
+	objectDetails, err := s.command.HumanRemoveU2F(ctx, req.GetUserId(), req.GetU2FId(), "")
+	if err != nil {
+		return nil, err
+	}
+	return &user.RemoveU2FResponse{
 		Details: object.DomainToDetailsPb(objectDetails),
 	}, nil
 }

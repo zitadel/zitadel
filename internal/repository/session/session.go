@@ -358,7 +358,7 @@ func NewOTPSMSChallengedEvent(
 		Code:              code,
 		Expiry:            expiry,
 		CodeReturned:      codeReturned,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 
@@ -468,7 +468,7 @@ func NewOTPEmailChallengedEvent(
 		Expiry:            expiry,
 		ReturnCode:        returnCode,
 		URLTmpl:           urlTmpl,
-		TriggeredAtOrigin: http.ComposedOrigin(ctx),
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
 	}
 }
 

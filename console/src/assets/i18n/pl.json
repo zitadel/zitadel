@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Ustawienia instancji",
-        "DESCRIPTION": "Ustawienia instancji są domyślnymi ustawieniami dla wszystkich organizacji. Z odpowiednimi uprawnieniami niektóre z nich mogą być nadpisywane w ustawieniach organizacji."
+        "TITLE": "Ustawienia domyślne",
+        "DESCRIPTION": "Ustawienia domyślne dla wszystkich organizacji. Przy odpowiednich uprawnieniach niektóre z nich można zastąpić w ustawieniach organizacji."
       },
       "ORG": {
         "TITLE": "Ustawienia organizacji",
@@ -231,7 +231,7 @@
           "LABEL": "Maksymalny czas życia w godzinach",
           "PW_CHECK": {
             "TITLE": "Sprawdzenie Hasła",
-            "DESCRIPTION": "Twoi użytkownicy muszą zmienić swoje hasła w tych okresach."
+            "DESCRIPTION": "Po tym okresie użytkownicy będą zobowiązani do ponownej autoryzacji za pomocą hasła."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Sprawdzenie Logowania Zewnętrznego",
@@ -486,6 +486,7 @@
     "MORE": "więcej",
     "STEP": "Krok",
     "UNSAVEDCHANGES": "Niezapisane zmiany",
+    "TEST": "Test",
     "UNSAVED": {
       "DIALOG": {
         "DESCRIPTION": "Czy na pewno chcesz odrzucić to nowe działanie? Twoje działanie zostanie utracone",
@@ -496,7 +497,8 @@
     "TABLE": {
       "SHOWUSER": "Pokaż użytkownika {{value}}"
     },
-    "DOWNLOAD": "Pobierz"
+    "DOWNLOAD": "Pobierz",
+    "APPLY": "Stosować"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Ma kontrolę nad całą instancją, włącznie z wszystkimi organizacjami",
@@ -1083,7 +1085,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Usunąć wybrane działanie?",
         "DESCRIPTION": "Czy na pewno chcesz usunąć wybrane działania z przepływu?"
-      }
+      },
+      "ABOUTNAME": "Nazwa akcji i nazwa funkcji w JavaScript muszą być takie same"
     },
     "TOAST": {
       "ACTIONSSET": "Ustawiono działanie",
@@ -1315,16 +1318,13 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Ustawienia instancji",
-      "DESCRIPTION": "Te ustawienia będą dotyczyć wszystkich twoich organizacji, chyba że zostaną zastąpione."
-    },
     "LIST": {
       "ORGS": "Organizacje",
       "FEATURESETTINGS": "Ustawienia funkcji",
       "LANGUAGES": "Języki",
       "LOGIN": "Zachowanie logowania i bezpieczeństwo",
       "LOCKOUT": "Blokada",
+      "AGE": "Wygaśnięcie hasła",
       "COMPLEXITY": "Złożoność hasła",
       "NOTIFICATIONS": "Ustawienia powiadomień",
       "SMTP_PROVIDER": "Dostawca SMTP",
@@ -1379,7 +1379,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       }
     },
     "SMTP": {
@@ -1436,9 +1437,7 @@
         "7": "Hasło jednorazowe (OTP) - SMS",
         "8": "Hasło jednorazowe (OTP) — e-mail"
       },
-      "ADDGENERATOR": "Zdefiniuj wygląd sekretu",
-      "GENERATORTYPE": "Typ",
-      "EXPIRY": "Wygaśnięcie (w godzinach)",
+      "EXPIRY": "Wygaśnięcie (w minutach)",
       "INCLUDEDIGITS": "Dołącz cyfry",
       "INCLUDESYMBOLS": "Dołącz symbole",
       "INCLUDELOWERLETTERS": "Dołącz małe litery",
@@ -1474,6 +1473,10 @@
         "DISABLED": "Wyłączony"
       },
       "INHERITED_DESCRIPTION": "To ustawienie przypisuje wartość do wartości domyślnej systemu.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Włączony” jest dziedziczone",
+        "DISABLED": "„Wyłączony” jest dziedziczone"
+      },
       "RESET": "Ustaw wszystko na dziedziczone"
     },
     "DIALOG": {
@@ -1544,8 +1547,8 @@
       }
     },
     "PWD_AGE": {
-      "TITLE": "Starzenie się hasła",
-      "DESCRIPTION": "Możesz ustawić politykę dotyczącą starzenia się haseł. Ta polityka emituje ostrzeżenie po upływie określonego czasu starzenia."
+      "TITLE": "Wygaśnięcie hasła",
+      "DESCRIPTION": "Możesz ustawić zasady wygasania haseł. Ta zasada zmusi użytkownika do zmiany hasła przy następnym logowaniu po jego wygaśnięciu. Nie ma automatycznych ostrzeżeń i powiadomień."
     },
     "PWD_LOCKOUT": {
       "TITLE": "Polityka blokowania",
@@ -1608,7 +1611,8 @@
         "mk": "Македонски",
         "cs": "Čeština",
         "ru": "Русский",
-        "nl": "Nederlands"
+        "nl": "Nederlands",
+        "sv": "Svenska"
       },
       "KEYS": {
         "emailVerificationDoneText": "Weryfikacja adresu e-mail zakończona",
@@ -1678,7 +1682,8 @@
         "username": "Nazwa użytkownika",
         "tempUsername": "Tymczasowa nazwa użytkownika",
         "otp": "Hasło jednorazowe",
-        "verifyUrl": "URL do weryfikacji hasła jednorazowego"
+        "verifyUrl": "URL do weryfikacji hasła jednorazowego",
+        "expiry": "Wygaśnięcie"
       },
       "TOAST": {
         "UPDATED": "Teksty niestandardowe zapisane."
@@ -1697,8 +1702,8 @@
       "SHOWLOCKOUTFAILURES": "pokaż blokady nieudanych prób",
       "MAXPASSWORDATTEMPTS": "Maksymalna liczba prób wprowadzenia hasła",
       "MAXOTPATTEMPTS": "Maksymalna liczba prób OTP",
-      "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniu",
-      "MAXAGEDAYS": "Maksymalny wiek w dniach",
+      "EXPIREWARNDAYS": "Ostrzeżenie o wygaśnięciu po dniach",
+      "MAXAGEDAYS": "Maksymalna ważność w dniach",
       "USERLOGINMUSTBEDOMAIN": "Dodaj domenę organizacji jako przyrostek do nazw logowania",
       "USERLOGINMUSTBEDOMAIN_DESCRIPTION": "Jeśli włączysz to ustawienie, wszystkie nazwy logowania będą miały przyrostek z domeną organizacji. Jeśli to ustawienie jest wyłączone, musisz zapewnić unikalność nazw użytkowników we wszystkich organizacjach.",
       "VALIDATEORGDOMAINS": "Weryfikacja domeny organizacji jest wymagana (wyzwanie DNS lub HTTP)",
@@ -1776,7 +1781,7 @@
       "TYPE": {
         "OWNED": "Własne Projekty",
         "OWNED_SINGULAR": "Własny Projekt",
-        "GRANTED_SINGULAR": "Udzielony Projekt"
+        "GRANTED_SINGULAR": "Projekt przydzielony {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Ustawienia marka",
@@ -2235,6 +2240,7 @@
       "ACTIVATED": "Aktywowany",
       "ACTIVATE": "Aktywuj dostawcę",
       "DEACTIVATE": "Dezaktywuj dostawcę",
+      "TEST": "Przetestuj swojego dostawcę",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "Konfiguracja SMTP została aktywowana",
@@ -2258,7 +2264,6 @@
         "CURRENT_DESC_TITLE": "To są Twoje ustawienia SMTP",
         "PROVIDER_SETTINGS": "Ustawienia dostawcy SMTP",
         "SENDER_SETTINGS": "Ustawienia nadawcy",
-        "TEST_SETTINGS": "Przetestuj ustawienia SMTP",
         "NEXT_STEPS": "Następne kroki",
         "ACTIVATE": {
           "TITLE": "Aktywuj swojego dostawcę SMTP",
@@ -2267,6 +2272,12 @@
         "DEACTIVATE": {
           "TITLE": "Dezaktywuj swojego dostawcę SMTP",
           "DESCRIPTION": "Jeśli dezaktywujesz tego dostawcę SMTP, ZITADEL nie będzie mógł go używać do wysyłania powiadomień, dopóki nie aktywujesz go ponownie."
+        },
+        "SAVE_SETTINGS": "Zapisz swoje ustawienia",
+        "TEST": {
+          "TITLE": "Przetestuj swoje ustawienia",
+          "DESCRIPTION": "Możesz przetestować ustawienia dostawcy SMTP i sprawdzić wynik testu przed ich zapisaniem",
+          "RESULT": "Twój email został wysłany"
         }
       }
     },
@@ -2541,7 +2552,8 @@
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
-    "nl": "Nederlands"
+    "nl": "Nederlands",
+    "sv": "Svenska"
   },
   "MEMBER": {
     "ADD": "Dodaj managera",

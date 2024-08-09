@@ -1,5 +1,7 @@
 # By using the FirstInstance section, you can overwrite the DefaultInstance configuration for the first instance created by zitadel setup.
 FirstInstance:
+  # If set to true zitadel is setup without initial data
+  Skip: false
   # The machine key from the section FirstInstance.Org.Machine.MachineKey is written to the MachineKeyPath.
   MachineKeyPath: # ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH
   # The personal access token from the section FirstInstance.Org.Machine.Pat is written to the PatPath.
@@ -9,8 +11,7 @@ FirstInstance:
   Org:
     Name: ZITADEL # ZITADEL_FIRSTINSTANCE_ORG_NAME
     # In the FirstInstance.Org.Human section, the initial organization's admin user with the role IAM_OWNER is defined.
-    # ZITADEL either creates a human user or a machine user.
-    # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
+    # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role.
     Human:
       # In case UserLoginMustBeDomain is false (default) and you don't overwrite the username with an email,
       # it will be suffixed by the org domain (org-name + domain from config).
@@ -32,8 +33,7 @@ FirstInstance:
       Password: Password1! # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD
       PasswordChangeRequired: true # ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED
     # In the FirstInstance.Org.Machine section, the initial organization's admin user with the role IAM_OWNER is defined.
-    # ZITADEL either creates a human user or a machine user.
-    # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role, not a human user.
+    # If FirstInstance.Org.Machine.Machine is defined, a service user is created with the IAM_OWNER role.
     Machine:
       Machine:
         Username: # ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME
@@ -52,3 +52,6 @@ CorrectCreationDate:
 
 AddEventCreatedAt:
   BulkAmount: 100 # ZITADEL_ADDEVENTCREATEDAT_BULKAMOUNT
+
+FillFields:
+  BatchSize: 1000 # ZITADEL_EVENTSTORE_FILLFIELDS_BULKLIMIT

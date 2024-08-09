@@ -78,3 +78,36 @@ func TestImport_UnparsablePreferredLanguage(t *testing.T) {
 	})
 	require.NoError(t, err)
 }
+
+func TestAdd_MachineUser(t *testing.T) {
+	random := integration.RandString(5)
+	res, err := Client.AddMachineUser(OrgCTX, &management.AddMachineUserRequest{
+		UserName:        random,
+		Name:            "testMachineName1",
+		Description:     "testMachineDescription1",
+		AccessTokenType: 0,
+	})
+	require.NoError(t, err)
+
+	_, err = Client.GetUserByID(OrgCTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
+	require.NoError(t, err)
+}
+
+func TestAdd_MachineUserCustomID(t *testing.T) {
+	id := integration.RandString(5)
+	random := integration.RandString(5)
+
+	res, err := Client.AddMachineUser(OrgCTX, &management.AddMachineUserRequest{
+		UserId:          &id,
+		UserName:        random,
+		Name:            "testMachineName1",
+		Description:     "testMachineDescription1",
+		AccessTokenType: 0,
+	})
+	require.NoError(t, err)
+
+	_, err = Client.GetUserByID(OrgCTX, &management.GetUserByIDRequest{Id: id})
+	require.NoError(t, err)
+
+	require.Equal(t, id, res.GetUserId())
+}
