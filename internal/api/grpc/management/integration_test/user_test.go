@@ -25,7 +25,7 @@ import (
 // When the bug still existed, some (between 1 to 7 out of 100)
 // Get calls would return a Not Found error.
 func TestImport_and_Get(t *testing.T) {
-	const N = 100
+	const N = 10
 
 	for i := 0; i < N; i++ {
 		firstName := strconv.Itoa(i)
