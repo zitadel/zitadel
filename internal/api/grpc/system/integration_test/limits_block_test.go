@@ -26,6 +26,8 @@ import (
 )
 
 func TestServer_Limits_Block(t *testing.T) {
+	t.Parallel()
+
 	isoInstance, err := Instance.UseIsolatedInstance(CTX)
 	require.NoError(t, err)
 	iamOwnerCtx := isoInstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)

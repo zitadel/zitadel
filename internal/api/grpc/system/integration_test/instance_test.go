@@ -14,6 +14,8 @@ import (
 )
 
 func TestServer_ListInstances(t *testing.T) {
+	t.Parallel()
+
 	isoInstance, err := Instance.UseIsolatedInstance(CTX)
 	require.NoError(t, err)
 

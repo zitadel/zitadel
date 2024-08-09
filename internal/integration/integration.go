@@ -195,6 +195,8 @@ func FirstInstance(ctx context.Context) (*Instance, error) {
 // The returned Instance contains a gRPC client connected to the domain of the new instance.
 // The included users are the (global) system user, IAM_OWNER, ORG_OWNER of the default org and
 // a Login client user.
+//
+// Individual Test function that use an Isolated Instance should use [t.Parallel].
 func (i *Instance) UseIsolatedInstance(ctx context.Context) (*Instance, error) {
 	systemCtx := i.WithAuthorization(ctx, UserTypeSystem)
 	primaryDomain := RandString(5) + ".integration.localhost"
