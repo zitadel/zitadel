@@ -22,7 +22,7 @@ var (
 	SystemCTX context.Context
 	IamCTX    context.Context
 	OrgCTX    context.Context
-	Tester    *integration.Tester
+	Instance  *integration.Instance
 	Client    feature.FeatureServiceClient
 )
 
@@ -32,201 +32,28 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Tester, err = integration.NewTester(ctx)
+		first, err := integration.FirstInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
-		SystemCTX = Tester.WithAuthorization(ctx, integration.UserTypeSystem)
-		IamCTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		OrgCTX = Tester.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		Instance, err = first.UseIsolatedInstance(ctx)
+		if err != nil {
+			panic(err)
+		}
+		Client = Instance.Client.FeatureV2beta
 
-		Client = Tester.Client.FeatureV2beta
+		SystemCTX = Instance.WithAuthorization(ctx, integration.UserTypeSystem)
+		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		OrgCTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 
 		return m.Run()
 	}())
 }
 
-func TestServer_SetSystemFeatures(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		req *feature.SetSystemFeaturesRequest
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *feature.SetSystemFeaturesResponse
-		wantErr bool
-	}{
-		{
-			name: "permission error",
-			args: args{
-				ctx: IamCTX,
-				req: &feature.SetSystemFeaturesRequest{
-					OidcTriggerIntrospectionProjections: gu.Ptr(true),
-				},
-			},
-			wantErr: true,
-		},
-		{
-			name: "no changes error",
-			args: args{
-				ctx: SystemCTX,
-				req: &feature.SetSystemFeaturesRequest{},
-			},
-			wantErr: true,
-		},
-		{
-			name: "success",
-			args: args{
-				ctx: SystemCTX,
-				req: &feature.SetSystemFeaturesRequest{
-					OidcTriggerIntrospectionProjections: gu.Ptr(true),
-				},
-			},
-			want: &feature.SetSystemFeaturesResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: "SYSTEM",
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Cleanup(func() {
-				// make sure we have a clean state after each test
-				_, err := Client.ResetSystemFeatures(SystemCTX, &feature.ResetSystemFeaturesRequest{})
-				require.NoError(t, err)
-			})
-			got, err := Client.SetSystemFeatures(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			integration.AssertDetails(t, tt.want, got)
-		})
-	}
-}
-
-func TestServer_ResetSystemFeatures(t *testing.T) {
-	_, err := Client.SetSystemFeatures(SystemCTX, &feature.SetSystemFeaturesRequest{
-		LoginDefaultOrg: gu.Ptr(true),
-	})
-	require.NoError(t, err)
-
-	tests := []struct {
-		name    string
-		ctx     context.Context
-		want    *feature.ResetSystemFeaturesResponse
-		wantErr bool
-	}{
-		{
-			name:    "permission error",
-			ctx:     IamCTX,
-			wantErr: true,
-		},
-		{
-			name: "success",
-			ctx:  SystemCTX,
-			want: &feature.ResetSystemFeaturesResponse{
-				Details: &object.Details{
-					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: "SYSTEM",
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.ResetSystemFeatures(tt.ctx, &feature.ResetSystemFeaturesRequest{})
-			if tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			integration.AssertDetails(t, tt.want, got)
-		})
-	}
-}
-
-func TestServer_GetSystemFeatures(t *testing.T) {
-	type args struct {
-		ctx context.Context
-		req *feature.GetSystemFeaturesRequest
-	}
-	tests := []struct {
-		name    string
-		prepare func(t *testing.T)
-		args    args
-		want    *feature.GetSystemFeaturesResponse
-		wantErr bool
-	}{
-		{
-			name: "permission error",
-			args: args{
-				ctx: IamCTX,
-				req: &feature.GetSystemFeaturesRequest{},
-			},
-			wantErr: true,
-		},
-		{
-			name: "nothing set",
-			args: args{
-				ctx: SystemCTX,
-				req: &feature.GetSystemFeaturesRequest{},
-			},
-			want: &feature.GetSystemFeaturesResponse{},
-		},
-		{
-			name: "some features",
-			prepare: func(t *testing.T) {
-				_, err := Client.SetSystemFeatures(SystemCTX, &feature.SetSystemFeaturesRequest{
-					LoginDefaultOrg:                     gu.Ptr(true),
-					OidcTriggerIntrospectionProjections: gu.Ptr(false),
-				})
-				require.NoError(t, err)
-			},
-			args: args{
-				ctx: SystemCTX,
-				req: &feature.GetSystemFeaturesRequest{},
-			},
-			want: &feature.GetSystemFeaturesResponse{
-				LoginDefaultOrg: &feature.FeatureFlag{
-					Enabled: true,
-					Source:  feature.Source_SOURCE_SYSTEM,
-				},
-				OidcTriggerIntrospectionProjections: &feature.FeatureFlag{
-					Enabled: false,
-					Source:  feature.Source_SOURCE_SYSTEM,
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Cleanup(func() {
-				// make sure we have a clean state after each test
-				_, err := Client.ResetSystemFeatures(SystemCTX, &feature.ResetSystemFeaturesRequest{})
-				require.NoError(t, err)
-			})
-			if tt.prepare != nil {
-				tt.prepare(t)
-			}
-			got, err := Client.GetSystemFeatures(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			assertFeatureFlag(t, tt.want.LoginDefaultOrg, got.LoginDefaultOrg)
-			assertFeatureFlag(t, tt.want.OidcTriggerIntrospectionProjections, got.OidcTriggerIntrospectionProjections)
-			assertFeatureFlag(t, tt.want.OidcLegacyIntrospection, got.OidcLegacyIntrospection)
-			assertFeatureFlag(t, tt.want.UserSchema, got.UserSchema)
-			assertFeatureFlag(t, tt.want.Actions, got.Actions)
-		})
-	}
-}
+/*
+System feature tests are removed in this package,
+so it does not interfere with the feature/v2 API tests
+*/
 
 func TestServer_SetInstanceFeatures(t *testing.T) {
 	type args struct {
@@ -268,7 +95,7 @@ func TestServer_SetInstanceFeatures(t *testing.T) {
 			want: &feature.SetInstanceFeaturesResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -314,7 +141,7 @@ func TestServer_ResetInstanceFeatures(t *testing.T) {
 			want: &feature.ResetInstanceFeaturesResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -333,15 +160,6 @@ func TestServer_ResetInstanceFeatures(t *testing.T) {
 }
 
 func TestServer_GetInstanceFeatures(t *testing.T) {
-	_, err := Client.SetSystemFeatures(SystemCTX, &feature.SetSystemFeaturesRequest{
-		OidcLegacyIntrospection: gu.Ptr(true),
-	})
-	require.NoError(t, err)
-	t.Cleanup(func() {
-		_, err := Client.ResetSystemFeatures(SystemCTX, &feature.ResetSystemFeaturesRequest{})
-		require.NoError(t, err)
-	})
-
 	type args struct {
 		ctx context.Context
 		req *feature.GetInstanceFeaturesRequest
@@ -387,8 +205,8 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
 				OidcLegacyIntrospection: &feature.FeatureFlag{
-					Enabled: true,
-					Source:  feature.Source_SOURCE_SYSTEM,
+					Enabled: false,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
 				UserSchema: &feature.FeatureFlag{
 					Enabled: false,
@@ -458,8 +276,8 @@ func TestServer_GetInstanceFeatures(t *testing.T) {
 					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
 				OidcLegacyIntrospection: &feature.FeatureFlag{
-					Enabled: true,
-					Source:  feature.Source_SOURCE_SYSTEM,
+					Enabled: false,
+					Source:  feature.Source_SOURCE_UNSPECIFIED,
 				},
 				UserSchema: &feature.FeatureFlag{
 					Enabled: false,

@@ -22,7 +22,7 @@ var (
 	SystemCTX context.Context
 	IamCTX    context.Context
 	OrgCTX    context.Context
-	Tester    *integration.Tester
+	Instance  *integration.Instance
 	Client    feature.FeatureServiceClient
 )
 
@@ -32,15 +32,19 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Tester, err = integration.NewTester(ctx)
+		first, err := integration.FirstInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
-		SystemCTX = Tester.WithAuthorization(ctx, integration.UserTypeSystem)
-		IamCTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		OrgCTX = Tester.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		Instance, err = first.UseIsolatedInstance(ctx)
+		if err != nil {
+			panic(err)
+		}
+		Client = Instance.Client.FeatureV2
 
-		Client = Tester.Client.FeatureV2
+		SystemCTX = Instance.WithAuthorization(ctx, integration.UserTypeSystem)
+		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		OrgCTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 
 		return m.Run()
 	}())
@@ -268,7 +272,7 @@ func TestServer_SetInstanceFeatures(t *testing.T) {
 			want: &feature.SetInstanceFeaturesResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -314,7 +318,7 @@ func TestServer_ResetInstanceFeatures(t *testing.T) {
 			want: &feature.ResetInstanceFeaturesResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
