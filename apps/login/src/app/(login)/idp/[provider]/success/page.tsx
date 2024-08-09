@@ -116,6 +116,7 @@ function createUser(
   info: IDPInformation,
 ): Promise<string> {
   const userData = PROVIDER_MAPPING[provider](info);
+  console.log(JSON.stringify(info));
   return userService.addHumanUser(userData, {}).then((resp) => resp.userId);
 }
 
