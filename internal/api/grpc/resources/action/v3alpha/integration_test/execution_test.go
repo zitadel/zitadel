@@ -26,7 +26,7 @@ func executionTargetsSingleInclude(include *action.Condition) []*action.Executio
 
 func TestServer_SetExecution_Request(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := Instance.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -37,7 +37,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -105,7 +105,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -151,7 +151,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -178,7 +178,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -199,14 +199,14 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
-			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			Instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := Instance.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 	executionCond := &action.Condition{
 		ConditionType: &action.Condition_Request{
 			Request: &action.RequestExecution{
@@ -216,7 +216,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			},
 		},
 	}
-	Tester.SetExecution(CTX, t,
+	Instance.SetExecution(CTX, t,
 		executionCond,
 		executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
 	)
@@ -230,7 +230,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			},
 		},
 	}
-	Tester.SetExecution(CTX, t,
+	Instance.SetExecution(CTX, t,
 		circularExecutionService,
 		executionTargetsSingleInclude(executionCond),
 	)
@@ -243,7 +243,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			},
 		},
 	}
-	Tester.SetExecution(CTX, t,
+	Instance.SetExecution(CTX, t,
 		circularExecutionMethod,
 		executionTargetsSingleInclude(circularExecutionService),
 	)
@@ -289,7 +289,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -317,7 +317,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -337,14 +337,14 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
-			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			Instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Response(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := Instance.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -355,7 +355,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -423,7 +423,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -469,7 +469,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -496,7 +496,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -516,14 +516,14 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
-			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			Instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Event(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := Instance.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -534,7 +534,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Event{
@@ -606,7 +606,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -654,7 +654,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -681,7 +681,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -701,14 +701,14 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
-			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			Instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Function(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := Instance.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -719,7 +719,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -779,7 +779,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 					ChangeDate: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Tester.Instance.Id,
+						Id:   Instance.Instance.Id,
 					},
 				},
 			},
@@ -799,7 +799,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
-			Tester.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			Instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }

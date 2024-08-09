@@ -9,5 +9,5 @@ import (
 )
 
 func main() {
-	logging.OnError(integration.InitTesterState(context.TODO())).Fatal("integration setup failed")
+	logging.OnError(integration.InitFirstInstance(context.TODO())).Fatal("integration setup failed")
 }

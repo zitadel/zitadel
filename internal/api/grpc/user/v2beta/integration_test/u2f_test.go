@@ -17,14 +17,14 @@ import (
 )
 
 func TestServer_RegisterU2F(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
 
 	// We also need a user session
-	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
-	Tester.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	Instance.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
 
 	type args struct {
 		ctx context.Context
@@ -55,7 +55,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 			want: &user.RegisterU2FResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -80,7 +80,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 			want: &user.RegisterU2FResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -98,7 +98,7 @@ func TestServer_RegisterU2F(t *testing.T) {
 			if tt.want != nil {
 				assert.NotEmpty(t, got.GetU2FId())
 				assert.NotEmpty(t, got.GetPublicKeyCredentialCreationOptions())
-				_, err = Tester.WebAuthN.CreateAttestationResponse(got.GetPublicKeyCredentialCreationOptions())
+				_, err = Instance.WebAuthN.CreateAttestationResponse(got.GetPublicKeyCredentialCreationOptions())
 				require.NoError(t, err)
 			}
 		})
@@ -106,9 +106,9 @@ func TestServer_RegisterU2F(t *testing.T) {
 }
 
 func TestServer_VerifyU2FRegistration(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	pkr, err := Client.RegisterU2F(ctx, &user.RegisterU2FRequest{
@@ -117,7 +117,7 @@ func TestServer_VerifyU2FRegistration(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, pkr.GetPublicKeyCredentialCreationOptions())
 
-	attestationResponse, err := Tester.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
+	attestationResponse, err := Instance.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	require.NoError(t, err)
 
 	type args struct {
@@ -155,7 +155,7 @@ func TestServer_VerifyU2FRegistration(t *testing.T) {
 			want: &user.VerifyU2FRegistrationResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},

@@ -23,11 +23,11 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
-func (s *Tester) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool, grantTypes ...app.OIDCGrantType) (*management.AddOIDCAppResponse, error) {
+func (i *Instance) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, appType app.OIDCAppType, authMethod app.OIDCAuthMethodType, devMode bool, grantTypes ...app.OIDCGrantType) (*management.AddOIDCAppResponse, error) {
 	if len(grantTypes) == 0 {
 		grantTypes = []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN}
 	}
-	return s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
+	return i.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                projectID,
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
 		RedirectUris:             []string{redirectURI},
@@ -48,20 +48,20 @@ func (s *Tester) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedire
 	})
 }
 
-func (s *Tester) CreateOIDCNativeClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, devMode bool) (*management.AddOIDCAppResponse, error) {
-	return s.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, devMode)
+func (i *Instance) CreateOIDCNativeClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, devMode bool) (*management.AddOIDCAppResponse, error) {
+	return i.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_NATIVE, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_NONE, devMode)
 }
 
-func (s *Tester) CreateOIDCWebClientBasic(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
-	return s.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_WEB, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC, false)
+func (i *Instance) CreateOIDCWebClientBasic(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
+	return i.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_WEB, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_BASIC, false)
 }
 
-func (s *Tester) CreateOIDCWebClientJWT(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, grantTypes ...app.OIDCGrantType) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
-	client, err = s.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_WEB, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT, false, grantTypes...)
+func (i *Instance) CreateOIDCWebClientJWT(ctx context.Context, redirectURI, logoutRedirectURI, projectID string, grantTypes ...app.OIDCGrantType) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
+	client, err = i.CreateOIDCClient(ctx, redirectURI, logoutRedirectURI, projectID, app.OIDCAppType_OIDC_APP_TYPE_WEB, app.OIDCAuthMethodType_OIDC_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT, false, grantTypes...)
 	if err != nil {
 		return nil, nil, err
 	}
-	key, err := s.Client.Mgmt.AddAppKey(ctx, &management.AddAppKeyRequest{
+	key, err := i.Client.Mgmt.AddAppKey(ctx, &management.AddAppKeyRequest{
 		ProjectId:      projectID,
 		AppId:          client.GetAppId(),
 		Type:           authn.KeyType_KEY_TYPE_JSON,
@@ -73,12 +73,12 @@ func (s *Tester) CreateOIDCWebClientJWT(ctx context.Context, redirectURI, logout
 	return client, key.GetKeyDetails(), nil
 }
 
-func (s *Tester) CreateOIDCInactivateClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
-	client, err := s.CreateOIDCNativeClient(ctx, redirectURI, logoutRedirectURI, projectID, false)
+func (i *Instance) CreateOIDCInactivateClient(ctx context.Context, redirectURI, logoutRedirectURI, projectID string) (*management.AddOIDCAppResponse, error) {
+	client, err := i.CreateOIDCNativeClient(ctx, redirectURI, logoutRedirectURI, projectID, false)
 	if err != nil {
 		return nil, err
 	}
-	_, err = s.Client.Mgmt.DeactivateApp(ctx, &management.DeactivateAppRequest{
+	_, err = i.Client.Mgmt.DeactivateApp(ctx, &management.DeactivateAppRequest{
 		ProjectId: projectID,
 		AppId:     client.GetAppId(),
 	})
@@ -88,14 +88,14 @@ func (s *Tester) CreateOIDCInactivateClient(ctx context.Context, redirectURI, lo
 	return client, err
 }
 
-func (s *Tester) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI string) (*management.AddOIDCAppResponse, error) {
-	project, err := s.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
+func (i *Instance) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI string) (*management.AddOIDCAppResponse, error) {
+	project, err := i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
 		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
 	})
 	if err != nil {
 		return nil, err
 	}
-	return s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
+	return i.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                project.GetId(),
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
 		RedirectUris:             []string{redirectURI},
@@ -116,32 +116,32 @@ func (s *Tester) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI s
 	})
 }
 
-func (s *Tester) CreateOIDCTokenExchangeClient(ctx context.Context) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
-	project, err := s.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
+func (i *Instance) CreateOIDCTokenExchangeClient(ctx context.Context) (client *management.AddOIDCAppResponse, keyData []byte, err error) {
+	project, err := i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
 		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
 	})
 	if err != nil {
 		return nil, nil, err
 	}
-	return s.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN)
+	return i.CreateOIDCWebClientJWT(ctx, "", "", project.GetId(), app.OIDCGrantType_OIDC_GRANT_TYPE_TOKEN_EXCHANGE, app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN)
 }
 
-func (s *Tester) CreateProject(ctx context.Context) (*management.AddProjectResponse, error) {
-	return s.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
+func (i *Instance) CreateProject(ctx context.Context) (*management.AddProjectResponse, error) {
+	return i.Client.Mgmt.AddProject(ctx, &management.AddProjectRequest{
 		Name: fmt.Sprintf("project-%d", time.Now().UnixNano()),
 	})
 }
 
-func (s *Tester) CreateAPIClientJWT(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
-	return s.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
+func (i *Instance) CreateAPIClientJWT(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
+	return i.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
 		ProjectId:      projectID,
 		Name:           fmt.Sprintf("api-%d", time.Now().UnixNano()),
 		AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_PRIVATE_KEY_JWT,
 	})
 }
 
-func (s *Tester) CreateAPIClientBasic(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
-	return s.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
+func (i *Instance) CreateAPIClientBasic(ctx context.Context, projectID string) (*management.AddAPIAppResponse, error) {
+	return i.Client.Mgmt.AddAPIApp(ctx, &management.AddAPIAppRequest{
 		ProjectId:      projectID,
 		Name:           fmt.Sprintf("api-%d", time.Now().UnixNano()),
 		AuthMethodType: app.APIAuthMethodType_API_AUTH_METHOD_TYPE_BASIC,
@@ -150,11 +150,11 @@ func (s *Tester) CreateAPIClientBasic(ctx context.Context, projectID string) (*m
 
 const CodeVerifier = "codeVerifier"
 
-func (s *Tester) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	return s.CreateOIDCAuthRequestWithDomain(ctx, s.Config.Hostname, clientID, loginClient, redirectURI, scope...)
+func (i *Instance) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	return i.CreateOIDCAuthRequestWithDomain(ctx, i.Config.Hostname, clientID, loginClient, redirectURI, scope...)
 }
-func (s *Tester) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	provider, err := s.CreateRelyingPartyForDomain(ctx, domain, clientID, redirectURI, scope...)
+func (i *Instance) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	provider, err := i.CreateRelyingPartyForDomain(ctx, domain, clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
 	}
@@ -171,15 +171,15 @@ func (s *Tester) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, cl
 		return "", err
 	}
 
-	prefixWithHost := provider.Issuer() + s.Config.LoginURLV2
+	prefixWithHost := provider.Issuer() + i.Config.LoginURLV2
 	if !strings.HasPrefix(loc.String(), prefixWithHost) {
 		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
 	}
 	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
 }
 
-func (s *Tester) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	provider, err := s.CreateRelyingParty(ctx, clientID, redirectURI, scope...)
+func (i *Instance) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
+	provider, err := i.CreateRelyingParty(ctx, clientID, redirectURI, scope...)
 	if err != nil {
 		return "", err
 	}
@@ -203,27 +203,27 @@ func (s *Tester) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, lo
 		return "", err
 	}
 
-	prefixWithHost := provider.Issuer() + s.Config.LoginURLV2
+	prefixWithHost := provider.Issuer() + i.Config.LoginURLV2
 	if !strings.HasPrefix(loc.String(), prefixWithHost) {
 		return "", fmt.Errorf("login location has not prefix %s, but is %s", prefixWithHost, loc.String())
 	}
 	return strings.TrimPrefix(loc.String(), prefixWithHost), nil
 }
 
-func (s *Tester) OIDCIssuer() string {
-	return http_util.BuildHTTP(s.Config.Hostname, s.Config.Port, s.Config.Secure)
+func (i *Instance) OIDCIssuer() string {
+	return http_util.BuildHTTP(i.Config.Hostname, i.Config.Port, i.Config.Secure)
 }
 
-func (s *Tester) CreateRelyingParty(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
-	return s.CreateRelyingPartyForDomain(ctx, s.Config.Hostname, clientID, redirectURI, scope...)
+func (i *Instance) CreateRelyingParty(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
+	return i.CreateRelyingPartyForDomain(ctx, i.Config.Hostname, clientID, redirectURI, scope...)
 }
 
-func (s *Tester) CreateRelyingPartyForDomain(ctx context.Context, domain, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
+func (i *Instance) CreateRelyingPartyForDomain(ctx context.Context, domain, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
 	if len(scope) == 0 {
 		scope = []string{oidc.ScopeOpenID}
 	}
-	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport, s.Users.Get(FirstInstanceUsersKey, UserTypeLogin).Username}}
-	return rp.NewRelyingPartyOIDC(ctx, http_util.BuildHTTP(domain, s.Config.Port, s.Config.Secure), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
+	loginClient := &http.Client{Transport: &loginRoundTripper{http.DefaultTransport, i.Users.Get(UserTypeLogin).Username}}
+	return rp.NewRelyingPartyOIDC(ctx, http_util.BuildHTTP(domain, i.Config.Port, i.Config.Secure), clientID, "", redirectURI, scope, rp.WithHTTPClient(loginClient))
 }
 
 type loginRoundTripper struct {
@@ -236,16 +236,16 @@ func (c *loginRoundTripper) RoundTrip(req *http.Request) (*http.Response, error)
 	return c.RoundTripper.RoundTrip(req)
 }
 
-func (s *Tester) CreateResourceServerJWTProfile(ctx context.Context, keyFileData []byte) (rs.ResourceServer, error) {
+func (i *Instance) CreateResourceServerJWTProfile(ctx context.Context, keyFileData []byte) (rs.ResourceServer, error) {
 	keyFile, err := client.ConfigFromKeyFileData(keyFileData)
 	if err != nil {
 		return nil, err
 	}
-	return rs.NewResourceServerJWTProfile(ctx, s.OIDCIssuer(), keyFile.ClientID, keyFile.KeyID, []byte(keyFile.Key))
+	return rs.NewResourceServerJWTProfile(ctx, i.OIDCIssuer(), keyFile.ClientID, keyFile.KeyID, []byte(keyFile.Key))
 }
 
-func (s *Tester) CreateResourceServerClientCredentials(ctx context.Context, clientID, clientSecret string) (rs.ResourceServer, error) {
-	return rs.NewResourceServerClientCredentials(ctx, s.OIDCIssuer(), clientID, clientSecret)
+func (i *Instance) CreateResourceServerClientCredentials(ctx context.Context, clientID, clientSecret string) (rs.ResourceServer, error) {
+	return rs.NewResourceServerClientCredentials(ctx, i.OIDCIssuer(), clientID, clientSecret)
 }
 
 func GetRequest(url string, headers map[string]string) (*http.Request, error) {
@@ -289,9 +289,9 @@ func CheckRedirect(req *http.Request) (*url.URL, error) {
 	return resp.Location()
 }
 
-func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
+func (i *Instance) CreateOIDCCredentialsClient(ctx context.Context) (machine *management.AddMachineUserResponse, name, clientID, clientSecret string, err error) {
 	name = gofakeit.Username()
-	machine, err = s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,
 		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
@@ -299,7 +299,7 @@ func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (machine *mana
 	if err != nil {
 		return nil, "", "", "", err
 	}
-	secret, err := s.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
+	secret, err := i.Client.Mgmt.GenerateMachineSecret(ctx, &management.GenerateMachineSecretRequest{
 		UserId: machine.GetUserId(),
 	})
 	if err != nil {
@@ -308,9 +308,9 @@ func (s *Tester) CreateOIDCCredentialsClient(ctx context.Context) (machine *mana
 	return machine, name, secret.GetClientId(), secret.GetClientSecret(), nil
 }
 
-func (s *Tester) CreateOIDCJWTProfileClient(ctx context.Context) (machine *management.AddMachineUserResponse, name string, keyData []byte, err error) {
+func (i *Instance) CreateOIDCJWTProfileClient(ctx context.Context) (machine *management.AddMachineUserResponse, name string, keyData []byte, err error) {
 	name = gofakeit.Username()
-	machine, err = s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+	machine, err = i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		Name:            name,
 		UserName:        name,
 		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
@@ -318,7 +318,7 @@ func (s *Tester) CreateOIDCJWTProfileClient(ctx context.Context) (machine *manag
 	if err != nil {
 		return nil, "", nil, err
 	}
-	keyResp, err := s.Client.Mgmt.AddMachineKey(ctx, &management.AddMachineKeyRequest{
+	keyResp, err := i.Client.Mgmt.AddMachineKey(ctx, &management.AddMachineKeyRequest{
 		UserId:         machine.GetUserId(),
 		Type:           authn.KeyType_KEY_TYPE_JSON,
 		ExpirationDate: timestamppb.New(time.Now().Add(time.Hour)),

@@ -31,7 +31,7 @@ func TestServer_CreateTarget(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.Target{
 				Name: fmt.Sprint(time.Now().UnixNano() + 1),
 			},
@@ -104,7 +104,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},
@@ -125,7 +125,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},
@@ -146,7 +146,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},
@@ -167,7 +167,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},
@@ -189,7 +189,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},
@@ -223,12 +223,12 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
 			args: args{
-				ctx: Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.PatchTargetRequest{
 					Target: &action.PatchTarget{
 						Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
@@ -256,7 +256,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change name, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -272,14 +272,14 @@ func TestServer_PatchTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "change type, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -299,14 +299,14 @@ func TestServer_PatchTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "change url, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -322,14 +322,14 @@ func TestServer_PatchTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "change timeout, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -345,14 +345,14 @@ func TestServer_PatchTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "change type async, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeAsync, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeAsync, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -370,7 +370,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},
@@ -394,7 +394,7 @@ func TestServer_PatchTarget(t *testing.T) {
 
 func TestServer_DeleteTarget(t *testing.T) {
 	ensureFeatureEnabled(t)
-	target := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
+	target := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 	tests := []struct {
 		name    string
 		ctx     context.Context
@@ -404,7 +404,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.DeleteTargetRequest{
 				Id: target.GetDetails().GetId(),
 			},
@@ -428,7 +428,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 				ChangeDate: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   Tester.Instance.Id,
+					Id:   Instance.Instance.Id,
 				},
 			},
 		},

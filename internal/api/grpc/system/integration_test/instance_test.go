@@ -14,7 +14,8 @@ import (
 )
 
 func TestServer_ListInstances(t *testing.T) {
-	isoInstance := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	isoInstance, err := Instance.UseIsolatedInstance(CTX)
+	require.NoError(t, err)
 
 	tests := []struct {
 		name    string
@@ -51,13 +52,13 @@ func TestServer_ListInstances(t *testing.T) {
 				Queries: []*instance.Query{{
 					Query: &instance.Query_IdQuery{
 						IdQuery: &instance.IdsQuery{
-							Ids: []string{isoInstance.InstanceID},
+							Ids: []string{isoInstance.Instance.Id},
 						},
 					},
 				}},
 			},
 			want: []*instance.Instance{{
-				Id: isoInstance.InstanceID,
+				Id: isoInstance.Instance.Id,
 			}},
 		},
 		{
@@ -88,7 +89,7 @@ func TestServer_ListInstances(t *testing.T) {
 				}},
 			},
 			want: []*instance.Instance{{
-				Id: isoInstance.InstanceID,
+				Id: isoInstance.Instance.Id,
 			}},
 		},
 	}

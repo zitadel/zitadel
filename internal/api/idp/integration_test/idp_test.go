@@ -31,9 +31,9 @@ import (
 )
 
 var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client user.UserServiceClient
+	CTX      context.Context
+	Instance *integration.Instance
+	Client   user.UserServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -42,20 +42,20 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Tester, err = integration.NewTester(ctx)
+		Instance, err = integration.FirstInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
 
-		CTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		Client = Tester.Client.UserV2
+		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		Client = Instance.Client.UserV2
 		return m.Run()
 	}())
 }
 
 func TestServer_SAMLCertificate(t *testing.T) {
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX, "")
-	oauthIdpID := Tester.AddGenericOAuthProvider(t, CTX)
+	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(t, CTX, "")
+	oauthIdpID := Instance.AddGenericOAuthProvider(t, CTX)
 
 	type args struct {
 		ctx   context.Context
@@ -93,7 +93,7 @@ func TestServer_SAMLCertificate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			certificateURL := http_util.BuildOrigin(Tester.Host(), Tester.Config.Secure) + "/idps/" + tt.args.idpID + "/saml/certificate"
+			certificateURL := http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/idps/" + tt.args.idpID + "/saml/certificate"
 			resp, err := http.Get(certificateURL)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.want, resp.StatusCode)
@@ -111,8 +111,8 @@ func TestServer_SAMLCertificate(t *testing.T) {
 }
 
 func TestServer_SAMLMetadata(t *testing.T) {
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX, "")
-	oauthIdpID := Tester.AddGenericOAuthProvider(t, CTX)
+	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(t, CTX, "")
+	oauthIdpID := Instance.AddGenericOAuthProvider(t, CTX)
 
 	type args struct {
 		ctx   context.Context
@@ -150,7 +150,7 @@ func TestServer_SAMLMetadata(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			metadataURL := http_util.BuildOrigin(Tester.Host(), Tester.Config.Secure) + "/idps/" + tt.args.idpID + "/saml/metadata"
+			metadataURL := http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/idps/" + tt.args.idpID + "/saml/metadata"
 			resp, err := http.Get(metadataURL)
 			assert.NoError(t, err)
 			assert.Equal(t, tt.want, resp.StatusCode)
@@ -168,13 +168,13 @@ func TestServer_SAMLMetadata(t *testing.T) {
 }
 
 func TestServer_SAMLACS(t *testing.T) {
-	userHuman := Tester.CreateHumanUser(CTX)
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, CTX, "urn:oid:0.9.2342.19200300.100.1.1") // the username is set in urn:oid:0.9.2342.19200300.100.1.1
+	userHuman := Instance.CreateHumanUser(CTX)
+	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(t, CTX, "urn:oid:0.9.2342.19200300.100.1.1") // the username is set in urn:oid:0.9.2342.19200300.100.1.1
 	externalUserID := "test1"
 	linkedExternalUserID := "test2"
-	Tester.CreateUserIDPlink(CTX, userHuman.UserId, linkedExternalUserID, samlRedirectIdpID, linkedExternalUserID)
+	Instance.CreateUserIDPlink(CTX, userHuman.UserId, linkedExternalUserID, samlRedirectIdpID, linkedExternalUserID)
 	idp, err := getIDP(
-		http_util.BuildOrigin(Tester.Host(), Tester.Config.Secure),
+		http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure),
 		[]string{samlRedirectIdpID},
 		externalUserID,
 		linkedExternalUserID,
@@ -330,7 +330,7 @@ func TestServer_SAMLACS(t *testing.T) {
 			if tt.args.intentID != "" {
 				relayState = tt.args.intentID
 			}
-			callbackURL := http_util.BuildOrigin(Tester.Host(), Tester.Config.Secure) + "/idps/" + tt.args.idpID + "/saml/acs"
+			callbackURL := http_util.BuildOrigin(Instance.Host(), Instance.Config.Secure) + "/idps/" + tt.args.idpID + "/saml/acs"
 			response := createResponse(t, idp, samlRequest, tt.args.nameID, tt.args.nameIDFormat, tt.args.username)
 			//test purposes, use defined response
 			if tt.args.response != "" {

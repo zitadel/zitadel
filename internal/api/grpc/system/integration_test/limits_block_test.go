@@ -20,19 +20,22 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 )
 
 func TestServer_Limits_Block(t *testing.T) {
-	isoInstance := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	isoInstance, err := Instance.UseIsolatedInstance(CTX)
+	require.NoError(t, err)
+	iamOwnerCtx := isoInstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	tests := []*test{
 		publicAPIBlockingTest(isoInstance.Domain),
 		{
 			name: "mutating API",
 			testGrpc: func(tt assert.TestingT, expectBlocked bool) {
 				randomGrpcIdpName := randomString("idp-grpc", 5)
-				_, err := isoInstance.Client.Admin.AddGitHubProvider(isoInstance.IAMOwnerCTX, &admin.AddGitHubProviderRequest{
+				_, err := isoInstance.Client.Admin.AddGitHubProvider(iamOwnerCtx, &admin.AddGitHubProviderRequest{
 					Name:         randomGrpcIdpName,
 					ClientId:     "client-id",
 					ClientSecret: "client-secret",
@@ -40,7 +43,7 @@ func TestServer_Limits_Block(t *testing.T) {
 				assertGrpcError(tt, err, expectBlocked)
 				/*
 					//nolint:contextcheck
-					idpExists := idpExistsCondition(tt, isoInstance.InstanceID, randomGrpcIdpName)
+					idpExists := idpExistsCondition(tt, isoInstance.Instance.Id, randomGrpcIdpName)
 					if expectBlocked {
 						// We ensure that the idp really is not created
 						assert.Neverf(tt, idpExists, 5*time.Second, 1*time.Second, "idp should never be created")
@@ -64,7 +67,7 @@ func TestServer_Limits_Block(t *testing.T) {
 				if err != nil {
 					return nil, err, nil
 				}
-				req.Header.Set("Authorization", Tester.BearerToken(isoInstance.IAMOwnerCTX))
+				req.Header.Set("Authorization", Instance.BearerToken(iamOwnerCtx))
 				return req, nil, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
 					assertLimitResponse(ttt, response, expectBlocked)
 					assertSetLimitingCookie(ttt, response, expectBlocked)
@@ -142,14 +145,14 @@ func TestServer_Limits_Block(t *testing.T) {
 				}
 			},
 		}}
-	_, err := Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
-		InstanceId: isoInstance.InstanceID,
+	_, err = Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+		InstanceId: isoInstance.Instance.Id,
 		Block:      gu.Ptr(true),
 	})
 	require.NoError(t, err)
 	// The following call ensures that an undefined bool is not deserialized to false
-	_, err = Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
-		InstanceId:        isoInstance.InstanceID,
+	_, err = Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+		InstanceId:        isoInstance.Instance.Id,
 		AuditLogRetention: durationpb.New(time.Hour),
 	})
 	require.NoError(t, err)
@@ -160,8 +163,8 @@ func TestServer_Limits_Block(t *testing.T) {
 			testBlockingAPI(t, tt, true, isFirst)
 		})
 	}
-	_, err = Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
-		InstanceId: isoInstance.InstanceID,
+	_, err = Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+		InstanceId: isoInstance.Instance.Id,
 		Block:      gu.Ptr(false),
 	})
 	require.NoError(t, err)

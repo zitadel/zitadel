@@ -23,9 +23,9 @@ import (
 )
 
 var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client schema.UserSchemaServiceClient
+	CTX      context.Context
+	Instance *integration.Instance
+	Client   schema.UserSchemaServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -34,27 +34,27 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Tester, err = integration.NewTester(ctx)
+		Instance, err = integration.FirstInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
 
-		CTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		Client = Tester.Client.UserSchemaV3
+		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		Client = Instance.Client.UserSchemaV3
 
 		return m.Run()
 	}())
 }
 
 func ensureFeatureEnabled(t *testing.T) {
-	f, err := Tester.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
+	f, err := Instance.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
 		Inheritance: true,
 	})
 	require.NoError(t, err)
 	if f.UserSchema.GetEnabled() {
 		return
 	}
-	_, err = Tester.Client.FeatureV2.SetInstanceFeatures(CTX, &feature.SetInstanceFeaturesRequest{
+	_, err = Instance.Client.FeatureV2.SetInstanceFeatures(CTX, &feature.SetInstanceFeaturesRequest{
 		UserSchema: gu.Ptr(true),
 	})
 	require.NoError(t, err)
@@ -64,7 +64,7 @@ func ensureFeatureEnabled(t *testing.T) {
 	}
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
-			f, err := Tester.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
+			f, err := Instance.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
 				Inheritance: true,
 			})
 			require.NoError(ttt, err)
@@ -89,7 +89,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 	}{
 		{
 			name: "missing permission, error",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &schema.CreateUserSchemaRequest{
 				Type: fmt.Sprint(time.Now().UnixNano() + 1),
 			},
@@ -170,7 +170,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			want: &schema.CreateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -239,7 +239,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			want: &schema.CreateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -313,7 +313,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			want: &schema.CreateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -350,12 +350,12 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "missing permission, error",
 			prepare: func(request *schema.UpdateUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 				request.Id = schemaID
 				return nil
 			},
 			args: args{
-				ctx: Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.UpdateUserSchemaRequest{
 					Type: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
 				},
@@ -388,7 +388,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "empty type, error",
 			prepare: func(request *schema.UpdateUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 				request.Id = schemaID
 				return nil
 			},
@@ -403,7 +403,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "update type, ok",
 			prepare: func(request *schema.UpdateUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 				request.Id = schemaID
 				return nil
 			},
@@ -416,14 +416,14 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "empty schema, ok",
 			prepare: func(request *schema.UpdateUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 				request.Id = schemaID
 				return nil
 			},
@@ -436,14 +436,14 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "invalid schema, error",
 			prepare: func(request *schema.UpdateUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 				request.Id = schemaID
 				return nil
 			},
@@ -479,7 +479,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "update schema, ok",
 			prepare: func(request *schema.UpdateUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 				request.Id = schemaID
 				return nil
 			},
@@ -513,14 +513,14 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "invalid authenticator, error",
 			prepare: func(request *schema.UpdateUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 				request.Id = schemaID
 				return nil
 			},
@@ -537,7 +537,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "update authenticator, ok",
 			prepare: func(request *schema.UpdateUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 				request.Id = schemaID
 				return nil
 			},
@@ -552,14 +552,14 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "inactive, error",
 			prepare: func(request *schema.UpdateUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+				schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 				_, err := Client.DeactivateUserSchema(CTX, &schema.DeactivateUserSchemaRequest{
 					Id: schemaID,
 				})
@@ -623,7 +623,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 				CTX,
 				&schema.DeactivateUserSchemaRequest{},
 				func(request *schema.DeactivateUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+					schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 					request.Id = schemaID
 					return nil
 				},
@@ -631,7 +631,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 			want: &schema.DeactivateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -641,7 +641,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 				CTX,
 				&schema.DeactivateUserSchemaRequest{},
 				func(request *schema.DeactivateUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+					schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 					request.Id = schemaID
 					_, err := Client.DeactivateUserSchema(CTX, &schema.DeactivateUserSchemaRequest{
 						Id: schemaID,
@@ -699,7 +699,7 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 				ctx: CTX,
 				req: &schema.ReactivateUserSchemaRequest{},
 				prepare: func(request *schema.ReactivateUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+					schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 					request.Id = schemaID
 					return nil
 				},
@@ -712,7 +712,7 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 				ctx: CTX,
 				req: &schema.ReactivateUserSchemaRequest{},
 				prepare: func(request *schema.ReactivateUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+					schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 					request.Id = schemaID
 					_, err := Client.DeactivateUserSchema(CTX, &schema.DeactivateUserSchemaRequest{
 						Id: schemaID,
@@ -723,7 +723,7 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 			want: &schema.ReactivateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -775,7 +775,7 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 				ctx: CTX,
 				req: &schema.DeleteUserSchemaRequest{},
 				prepare: func(request *schema.DeleteUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+					schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 					request.Id = schemaID
 					return nil
 				},
@@ -783,7 +783,7 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 			want: &schema.DeleteUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -793,7 +793,7 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 				ctx: CTX,
 				req: &schema.DeleteUserSchemaRequest{},
 				prepare: func(request *schema.DeleteUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchema(CTX, t).GetId()
+					schemaID := Instance.CreateUserSchema(CTX, t).GetId()
 					request.Id = schemaID
 					_, err := Client.DeleteUserSchema(CTX, &schema.DeleteUserSchemaRequest{
 						Id: schemaID,
@@ -842,11 +842,11 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.GetUserSchemaByIDRequest{},
 				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
-					createResp := Tester.CreateUserSchemaWithType(CTX, t, schemaType)
+					createResp := Instance.CreateUserSchemaWithType(CTX, t, schemaType)
 					request.Id = createResp.GetId()
 					return nil
 				},
@@ -870,7 +870,7 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 				req: &schema.GetUserSchemaByIDRequest{},
 				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
-					createResp := Tester.CreateUserSchemaWithType(CTX, t, schemaType)
+					createResp := Instance.CreateUserSchemaWithType(CTX, t, schemaType)
 					request.Id = createResp.GetId()
 
 					resp.Schema.Id = createResp.GetId()
@@ -944,7 +944,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+				ctx: Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.ListUserSchemasRequest{},
 			},
 			wantErr: true,
@@ -979,7 +979,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				req: &schema.ListUserSchemasRequest{},
 				prepare: func(request *schema.ListUserSchemasRequest, resp *schema.ListUserSchemasResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
-					createResp := Tester.CreateUserSchemaWithType(CTX, t, schemaType)
+					createResp := Instance.CreateUserSchemaWithType(CTX, t, schemaType)
 					request.Queries = []*schema.SearchQuery{
 						{
 							Query: &schema.SearchQuery_IdQuery{
@@ -1024,8 +1024,8 @@ func TestServer_ListUserSchemas(t *testing.T) {
 					schemaType := fmt.Sprint(time.Now().UnixNano())
 					schemaType1 := schemaType + "_1"
 					schemaType2 := schemaType + "_2"
-					createResp := Tester.CreateUserSchemaWithType(CTX, t, schemaType1)
-					createResp2 := Tester.CreateUserSchemaWithType(CTX, t, schemaType2)
+					createResp := Instance.CreateUserSchemaWithType(CTX, t, schemaType1)
+					createResp2 := Instance.CreateUserSchemaWithType(CTX, t, schemaType2)
 
 					request.SortingColumn = schema.FieldName_FIELD_NAME_TYPE
 					request.Query = &object.ListQuery{Asc: true}

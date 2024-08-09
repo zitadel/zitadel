@@ -19,14 +19,14 @@ import (
 )
 
 func TestServer_RegisterTOTP(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
-	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
 	ctxOtherUser := integration.WithAuthorizationToken(CTX, sessionTokenOtherUser)
 
 	type args struct {
@@ -68,7 +68,7 @@ func TestServer_RegisterTOTP(t *testing.T) {
 			want: &user.RegisterTOTPResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -83,7 +83,7 @@ func TestServer_RegisterTOTP(t *testing.T) {
 			want: &user.RegisterTOTPResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -105,9 +105,9 @@ func TestServer_RegisterTOTP(t *testing.T) {
 }
 
 func TestServer_VerifyTOTPRegistration(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
 	reg, err := Client.RegisterTOTP(ctx, &user.RegisterTOTPRequest{
@@ -117,9 +117,9 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 	code, err := totp.GenerateCode(reg.Secret, time.Now())
 	require.NoError(t, err)
 
-	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
 	ctxOtherUser := integration.WithAuthorizationToken(CTX, sessionTokenOtherUser)
 
 	regOtherUser, err := Client.RegisterTOTP(CTX, &user.RegisterTOTPRequest{
@@ -172,7 +172,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 			want: &user.VerifyTOTPRegistrationResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Details.ResourceOwner,
+					ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 				},
 			},
 		},
@@ -188,7 +188,7 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 			want: &user.VerifyTOTPRegistrationResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Details.ResourceOwner,
+					ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 				},
 			},
 		},
@@ -208,15 +208,15 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 }
 
 func TestServer_RemoveTOTP(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
-	userVerified := Tester.CreateHumanUser(CTX)
-	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
-	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
+	userVerified := Instance.CreateHumanUser(CTX)
+	Instance.RegisterUserPasskey(CTX, userVerified.GetUserId())
+	_, sessionTokenVerified, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
 	userVerifiedCtx := integration.WithAuthorizationToken(context.Background(), sessionTokenVerified)
-	_, err := Tester.Client.UserV2.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
+	_, err := Instance.Client.UserV2.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
 		UserId:           userVerified.GetUserId(),
 		VerificationCode: userVerified.GetPhoneCode(),
 	})
@@ -265,7 +265,7 @@ func TestServer_RemoveTOTP(t *testing.T) {
 			},
 			want: &user.RemoveTOTPResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.Details.ResourceOwner,
+					ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 				},
 			},
 		},

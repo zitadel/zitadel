@@ -33,7 +33,7 @@ func TestServer_ListIAMMemberRoles(t *testing.T) {
 }
 
 func TestServer_ListIAMMembers(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(AdminCTX, Tester.Organisation.Id, gofakeit.Email())
+	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, gofakeit.Email())
 	_, err := Client.AddIAMMember(AdminCTX, &admin_pb.AddIAMMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  iamRoles,
@@ -52,7 +52,7 @@ func TestServer_ListIAMMembers(t *testing.T) {
 		{
 			name: "permission error",
 			args: args{
-				ctx: Tester.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: Instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
 				req: &admin_pb.ListIAMMembersRequest{
 					Query: &object.ListQuery{},
 					Queries: []*member.SearchQuery{{
@@ -110,7 +110,7 @@ func TestServer_ListIAMMembers(t *testing.T) {
 }
 
 func TestServer_AddIAMMember(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(AdminCTX, Tester.Organisation.Id, gofakeit.Email())
+	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, gofakeit.Email())
 	type args struct {
 		ctx context.Context
 		req *admin_pb.AddIAMMemberRequest
@@ -124,7 +124,7 @@ func TestServer_AddIAMMember(t *testing.T) {
 		{
 			name: "permission error",
 			args: args{
-				ctx: Tester.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: Instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
 				req: &admin_pb.AddIAMMemberRequest{
 					UserId: user.GetUserId(),
 					Roles:  iamRoles,
@@ -143,7 +143,7 @@ func TestServer_AddIAMMember(t *testing.T) {
 			},
 			want: &admin_pb.AddIAMMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -184,7 +184,7 @@ func TestServer_AddIAMMember(t *testing.T) {
 }
 
 func TestServer_UpdateIAMMember(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(AdminCTX, Tester.Organisation.Id, gofakeit.Email())
+	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, gofakeit.Email())
 	_, err := Client.AddIAMMember(AdminCTX, &admin_pb.AddIAMMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  []string{"IAM_OWNER"},
@@ -204,7 +204,7 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 		{
 			name: "permission error",
 			args: args{
-				ctx: Tester.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: Instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
 				req: &admin_pb.UpdateIAMMemberRequest{
 					UserId: user.GetUserId(),
 					Roles:  iamRoles,
@@ -223,7 +223,7 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 			},
 			want: &admin_pb.UpdateIAMMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 					ChangeDate:    timestamppb.Now(),
 				},
 			},
@@ -265,7 +265,7 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 }
 
 func TestServer_RemoveIAMMember(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(AdminCTX, Tester.Organisation.Id, gofakeit.Email())
+	user := Instance.CreateHumanUserVerified(AdminCTX, Instance.DefaultOrg.Id, gofakeit.Email())
 	_, err := Client.AddIAMMember(AdminCTX, &admin_pb.AddIAMMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  []string{"IAM_OWNER"},
@@ -285,7 +285,7 @@ func TestServer_RemoveIAMMember(t *testing.T) {
 		{
 			name: "permission error",
 			args: args{
-				ctx: Tester.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: Instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
 				req: &admin_pb.RemoveIAMMemberRequest{
 					UserId: user.GetUserId(),
 				},
@@ -302,7 +302,7 @@ func TestServer_RemoveIAMMember(t *testing.T) {
 			},
 			want: &admin_pb.RemoveIAMMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 					ChangeDate:    timestamppb.Now(),
 				},
 			},

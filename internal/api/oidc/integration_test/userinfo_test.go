@@ -27,9 +27,9 @@ import (
 // userinfo integration test against a matrix of different feature flags.
 // This ensure that the response of the different implementations remains the same.
 func TestServer_UserInfo(t *testing.T) {
-	iamOwnerCTX := Tester.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamOwnerCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	t.Cleanup(func() {
-		_, err := Tester.Client.FeatureV2.ResetInstanceFeatures(iamOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
+		_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(iamOwnerCTX, &feature.ResetInstanceFeaturesRequest{})
 		require.NoError(t, err)
 	})
 	tests := []struct {
@@ -55,7 +55,7 @@ func TestServer_UserInfo(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := Tester.Client.FeatureV2.SetInstanceFeatures(iamOwnerCTX, &feature.SetInstanceFeaturesRequest{
+			_, err := Instance.Client.FeatureV2.SetInstanceFeatures(iamOwnerCTX, &feature.SetInstanceFeaturesRequest{
 				OidcLegacyIntrospection:             &tt.legacy,
 				OidcTriggerIntrospectionProjections: &tt.trigger,
 			})
@@ -120,21 +120,21 @@ func testServer_UserInfo(t *testing.T) {
 		{
 			name: "project role assertion",
 			prepare: func(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
-				_, err := Tester.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
+				_, err := Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
 					Id:                   projectID,
 					Name:                 fmt.Sprintf("project-%d", time.Now().UnixNano()),
 					ProjectRoleAssertion: true,
 				})
 				require.NoError(t, err)
 				t.Cleanup(func() {
-					_, err := Tester.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
+					_, err := Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
 						Id:                   projectID,
 						Name:                 fmt.Sprintf("project-%d", time.Now().UnixNano()),
 						ProjectRoleAssertion: false,
 					})
 					require.NoError(t, err)
 				})
-				resp, err := Tester.Client.Mgmt.GetProjectByID(CTX, &management.GetProjectByIDRequest{Id: projectID})
+				resp, err := Instance.Client.Mgmt.GetProjectByID(CTX, &management.GetProjectByIDRequest{Id: projectID})
 				require.NoError(t, err)
 				require.True(t, resp.GetProject().GetProjectRoleAssertion(), "project role assertion")
 
@@ -144,7 +144,7 @@ func testServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo, roleBar}, []string{Tester.Organisation.Id})
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo, roleBar}, []string{Instance.DefaultOrg.Id})
 				},
 			},
 		},
@@ -157,7 +157,7 @@ func testServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Tester.Organisation.Id})
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Instance.DefaultOrg.Id})
 				},
 			},
 		},
@@ -171,14 +171,14 @@ func testServer_UserInfo(t *testing.T) {
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				assertUserinfo,
 				func(t *testing.T, ui *oidc.UserInfo) {
-					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Tester.Organisation.Id})
+					assertProjectRoleClaims(t, projectID, ui.Claims, true, []string{roleFoo}, []string{Instance.DefaultOrg.Id})
 				},
 			},
 		},
 		{
 			name: "PAT",
 			prepare: func(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
-				user := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.UserTypeOrgOwner)
+				user := Instance.Users.Get(integration.UserTypeOrgOwner)
 				return &oidc.Tokens[*oidc.IDTokenClaims]{
 					Token: &oauth2.Token{
 						AccessToken: user.Token,
@@ -193,7 +193,7 @@ func testServer_UserInfo(t *testing.T) {
 			},
 			assertions: []func(*testing.T, *oidc.UserInfo){
 				func(t *testing.T, ui *oidc.UserInfo) {
-					user := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.UserTypeOrgOwner)
+					user := Instance.Users.Get(integration.UserTypeOrgOwner)
 					assert.Equal(t, user.ID, ui.Subject)
 					assert.NotEmpty(t, ui.Claims[oidc_api.ClaimResourceOwnerName])
 					assert.NotEmpty(t, ui.Claims[oidc_api.ClaimResourceOwnerPrimaryDomain])
@@ -204,7 +204,7 @@ func testServer_UserInfo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tokens := tt.prepare(t, clientID, tt.scope)
-			provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
+			provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 			require.NoError(t, err)
 			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
 			if tt.wantErr {
@@ -230,13 +230,13 @@ func TestServer_UserInfo_OrgIDRoles(t *testing.T) {
 	addProjectRolesGrants(t, User.GetUserId(), projectID, roleFoo, roleBar)
 	grantedOrgID := addProjectOrgGrant(t, User.GetUserId(), projectID, roleFoo, roleBar)
 
-	_, err := Tester.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
+	_, err := Instance.Client.Mgmt.UpdateProject(CTX, &management.UpdateProjectRequest{
 		Id:                   projectID,
 		Name:                 fmt.Sprintf("project-%d", time.Now().UnixNano()),
 		ProjectRoleAssertion: true,
 	})
 	require.NoError(t, err)
-	resp, err := Tester.Client.Mgmt.GetProjectByID(CTX, &management.GetProjectByIDRequest{Id: projectID})
+	resp, err := Instance.Client.Mgmt.GetProjectByID(CTX, &management.GetProjectByIDRequest{Id: projectID})
 	require.NoError(t, err)
 	require.True(t, resp.GetProject().GetProjectRoleAssertion(), "project role assertion")
 
@@ -250,7 +250,7 @@ func TestServer_UserInfo_OrgIDRoles(t *testing.T) {
 			scope: []string{
 				oidc.ScopeOpenID, oidc.ScopeOfflineAccess,
 			},
-			wantRoleOrgIDs: []string{Tester.Organisation.Id, grantedOrgID},
+			wantRoleOrgIDs: []string{Instance.DefaultOrg.Id, grantedOrgID},
 		},
 		{
 			name: "only granted org",
@@ -263,24 +263,24 @@ func TestServer_UserInfo_OrgIDRoles(t *testing.T) {
 			name: "only own org",
 			scope: []string{
 				oidc.ScopeOpenID, oidc.ScopeOfflineAccess,
-				domain.OrgRoleIDScope + Tester.Organisation.Id,
+				domain.OrgRoleIDScope + Instance.DefaultOrg.Id,
 			},
-			wantRoleOrgIDs: []string{Tester.Organisation.Id},
+			wantRoleOrgIDs: []string{Instance.DefaultOrg.Id},
 		},
 		{
 			name: "request both orgs",
 			scope: []string{
 				oidc.ScopeOpenID, oidc.ScopeOfflineAccess,
-				domain.OrgRoleIDScope + Tester.Organisation.Id,
+				domain.OrgRoleIDScope + Instance.DefaultOrg.Id,
 				domain.OrgRoleIDScope + grantedOrgID,
 			},
-			wantRoleOrgIDs: []string{Tester.Organisation.Id, grantedOrgID},
+			wantRoleOrgIDs: []string{Instance.DefaultOrg.Id, grantedOrgID},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tokens := getTokens(t, clientID, tt.scope)
-			provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
+			provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 			require.NoError(t, err)
 			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, tokens.IDTokenClaims.Subject, provider)
 			require.NoError(t, err)
@@ -296,10 +296,10 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 		roleBar = "bar"
 	)
 
-	project, err := Tester.CreateProject(CTX)
+	project, err := Instance.CreateProject(CTX)
 	projectID := project.GetId()
 	require.NoError(t, err)
-	user, _, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
+	user, _, clientID, clientSecret, err := Instance.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 	addProjectRolesGrants(t, user.GetUserId(), projectID, roleFoo, roleBar)
 
@@ -308,14 +308,14 @@ func TestServer_UserInfo_Issue6662(t *testing.T) {
 		domain.ProjectIDScope + projectID + domain.AudSuffix,
 	}
 
-	provider, err := rp.NewRelyingPartyOIDC(CTX, Tester.OIDCIssuer(), clientID, clientSecret, redirectURI, scope)
+	provider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), clientID, clientSecret, redirectURI, scope)
 	require.NoError(t, err)
 	tokens, err := rp.ClientCredentials(CTX, provider, nil)
 	require.NoError(t, err)
 
 	userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, tokens.TokenType, user.GetUserId(), provider)
 	require.NoError(t, err)
-	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, []string{roleFoo}, []string{Tester.Organisation.Id})
+	assertProjectRoleClaims(t, projectID, userinfo.Claims, false, []string{roleFoo}, []string{Instance.DefaultOrg.Id})
 }
 
 func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...string) {
@@ -327,12 +327,12 @@ func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...stri
 			DisplayName: role,
 		}
 	}
-	_, err := Tester.Client.Mgmt.BulkAddProjectRoles(CTX, &management.BulkAddProjectRolesRequest{
+	_, err := Instance.Client.Mgmt.BulkAddProjectRoles(CTX, &management.BulkAddProjectRolesRequest{
 		ProjectId: projectID,
 		Roles:     bulkRoles,
 	})
 	require.NoError(t, err)
-	_, err = Tester.Client.Mgmt.AddUserGrant(CTX, &management.AddUserGrantRequest{
+	_, err = Instance.Client.Mgmt.AddUserGrant(CTX, &management.AddUserGrantRequest{
 		UserId:    userID,
 		ProjectId: projectID,
 		RoleKeys:  roles,
@@ -343,8 +343,8 @@ func addProjectRolesGrants(t *testing.T, userID, projectID string, roles ...stri
 // addProjectOrgGrant adds a new organization which will be granted on the projectID with the specified roles.
 // The userID will be granted in the new organization to the project with the same roles.
 func addProjectOrgGrant(t *testing.T, userID, projectID string, roles ...string) (grantedOrgID string) {
-	grantedOrg := Tester.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_GRANTED_%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
-	projectGrant, err := Tester.Client.Mgmt.AddProjectGrant(CTX, &management.AddProjectGrantRequest{
+	grantedOrg := Instance.CreateOrganization(CTXIAM, fmt.Sprintf("ZITADEL_GRANTED_%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	projectGrant, err := Instance.Client.Mgmt.AddProjectGrant(CTX, &management.AddProjectGrantRequest{
 		ProjectId:    projectID,
 		GrantedOrgId: grantedOrg.GetOrganizationId(),
 		RoleKeys:     roles,
@@ -352,7 +352,7 @@ func addProjectOrgGrant(t *testing.T, userID, projectID string, roles ...string)
 	require.NoError(t, err)
 
 	ctxOrg := metadata.AppendToOutgoingContext(CTXIAM, "x-zitadel-orgid", grantedOrg.GetOrganizationId())
-	_, err = Tester.Client.Mgmt.AddUserGrant(ctxOrg, &management.AddUserGrantRequest{
+	_, err = Instance.Client.Mgmt.AddUserGrant(ctxOrg, &management.AddUserGrantRequest{
 		UserId:         userID,
 		ProjectId:      projectID,
 		ProjectGrantId: projectGrant.GetGrantId(),
@@ -364,8 +364,8 @@ func addProjectOrgGrant(t *testing.T, userID, projectID string, roles ...string)
 
 func getTokens(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
 	authRequestID := createAuthRequest(t, clientID, redirectURI, scope...)
-	sessionID, sessionToken, startTime, changeTime := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
-	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
+	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
 			Session: &oidc_pb.Session{

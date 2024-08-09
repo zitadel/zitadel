@@ -16,25 +16,25 @@ import (
 )
 
 func TestServer_AddOTPSMS(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
-	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
 
-	userVerified := Tester.CreateHumanUser(CTX)
-	_, err := Tester.Client.UserV2.VerifyPhone(CTX, &user.VerifyPhoneRequest{
+	userVerified := Instance.CreateHumanUser(CTX)
+	_, err := Instance.Client.UserV2.VerifyPhone(CTX, &user.VerifyPhoneRequest{
 		UserId:           userVerified.GetUserId(),
 		VerificationCode: userVerified.GetPhoneCode(),
 	})
 	require.NoError(t, err)
-	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
-	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
+	Instance.RegisterUserPasskey(CTX, userVerified.GetUserId())
+	_, sessionTokenVerified, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
 
-	userVerified2 := Tester.CreateHumanUser(CTX)
-	_, err = Tester.Client.UserV2.VerifyPhone(CTX, &user.VerifyPhoneRequest{
+	userVerified2 := Instance.CreateHumanUser(CTX)
+	_, err = Instance.Client.UserV2.VerifyPhone(CTX, &user.VerifyPhoneRequest{
 		UserId:           userVerified2.GetUserId(),
 		VerificationCode: userVerified2.GetPhoneCode(),
 	})
@@ -88,7 +88,7 @@ func TestServer_AddOTPSMS(t *testing.T) {
 			},
 			want: &user.AddOTPSMSResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -102,7 +102,7 @@ func TestServer_AddOTPSMS(t *testing.T) {
 			},
 			want: &user.AddOTPSMSResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -122,20 +122,20 @@ func TestServer_AddOTPSMS(t *testing.T) {
 }
 
 func TestServer_RemoveOTPSMS(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
-	userVerified := Tester.CreateHumanUser(CTX)
-	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
-	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
+	userVerified := Instance.CreateHumanUser(CTX)
+	Instance.RegisterUserPasskey(CTX, userVerified.GetUserId())
+	_, sessionTokenVerified, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
 	userVerifiedCtx := integration.WithAuthorizationToken(context.Background(), sessionTokenVerified)
-	_, err := Tester.Client.UserV2.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
+	_, err := Instance.Client.UserV2.VerifyPhone(userVerifiedCtx, &user.VerifyPhoneRequest{
 		UserId:           userVerified.GetUserId(),
 		VerificationCode: userVerified.GetPhoneCode(),
 	})
 	require.NoError(t, err)
-	_, err = Tester.Client.UserV2.AddOTPSMS(userVerifiedCtx, &user.AddOTPSMSRequest{UserId: userVerified.GetUserId()})
+	_, err = Instance.Client.UserV2.AddOTPSMS(userVerifiedCtx, &user.AddOTPSMSRequest{UserId: userVerified.GetUserId()})
 	require.NoError(t, err)
 
 	type args struct {
@@ -168,7 +168,7 @@ func TestServer_RemoveOTPSMS(t *testing.T) {
 			},
 			want: &user.RemoveOTPSMSResponse{
 				Details: &object.Details{
-					ResourceOwner: Tester.Organisation.Details.ResourceOwner,
+					ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 				},
 			},
 		},
@@ -188,25 +188,25 @@ func TestServer_RemoveOTPSMS(t *testing.T) {
 }
 
 func TestServer_AddOTPEmail(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
-	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
 
-	userVerified := Tester.CreateHumanUser(CTX)
-	_, err := Tester.Client.UserV2.VerifyEmail(CTX, &user.VerifyEmailRequest{
+	userVerified := Instance.CreateHumanUser(CTX)
+	_, err := Instance.Client.UserV2.VerifyEmail(CTX, &user.VerifyEmailRequest{
 		UserId:           userVerified.GetUserId(),
 		VerificationCode: userVerified.GetEmailCode(),
 	})
 	require.NoError(t, err)
-	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
-	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
+	Instance.RegisterUserPasskey(CTX, userVerified.GetUserId())
+	_, sessionTokenVerified, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
 
-	userVerified2 := Tester.CreateHumanUser(CTX)
-	_, err = Tester.Client.UserV2.VerifyEmail(CTX, &user.VerifyEmailRequest{
+	userVerified2 := Instance.CreateHumanUser(CTX)
+	_, err = Instance.Client.UserV2.VerifyEmail(CTX, &user.VerifyEmailRequest{
 		UserId:           userVerified2.GetUserId(),
 		VerificationCode: userVerified2.GetEmailCode(),
 	})
@@ -261,7 +261,7 @@ func TestServer_AddOTPEmail(t *testing.T) {
 			want: &user.AddOTPEmailResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -276,7 +276,7 @@ func TestServer_AddOTPEmail(t *testing.T) {
 			want: &user.AddOTPEmailResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -296,20 +296,20 @@ func TestServer_AddOTPEmail(t *testing.T) {
 }
 
 func TestServer_RemoveOTPEmail(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
-	userVerified := Tester.CreateHumanUser(CTX)
-	Tester.RegisterUserPasskey(CTX, userVerified.GetUserId())
-	_, sessionTokenVerified, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
+	userVerified := Instance.CreateHumanUser(CTX)
+	Instance.RegisterUserPasskey(CTX, userVerified.GetUserId())
+	_, sessionTokenVerified, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userVerified.GetUserId())
 	userVerifiedCtx := integration.WithAuthorizationToken(context.Background(), sessionTokenVerified)
-	_, err := Tester.Client.UserV2.VerifyEmail(userVerifiedCtx, &user.VerifyEmailRequest{
+	_, err := Instance.Client.UserV2.VerifyEmail(userVerifiedCtx, &user.VerifyEmailRequest{
 		UserId:           userVerified.GetUserId(),
 		VerificationCode: userVerified.GetEmailCode(),
 	})
 	require.NoError(t, err)
-	_, err = Tester.Client.UserV2.AddOTPEmail(userVerifiedCtx, &user.AddOTPEmailRequest{UserId: userVerified.GetUserId()})
+	_, err = Instance.Client.UserV2.AddOTPEmail(userVerifiedCtx, &user.AddOTPEmailRequest{UserId: userVerified.GetUserId()})
 	require.NoError(t, err)
 
 	type args struct {
@@ -343,7 +343,7 @@ func TestServer_RemoveOTPEmail(t *testing.T) {
 			want: &user.RemoveOTPEmailResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Details.ResourceOwner,
+					ResourceOwner: Instance.DefaultOrg.Details.ResourceOwner,
 				},
 			},
 		},

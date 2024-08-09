@@ -18,7 +18,7 @@ import (
 )
 
 func TestServer_RequestPasswordReset(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -35,7 +35,7 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -54,7 +54,7 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -82,7 +82,7 @@ func TestServer_RequestPasswordReset(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 				VerificationCode: gu.Ptr("xxx"),
 			},
@@ -130,7 +130,7 @@ func TestServer_SetPassword(t *testing.T) {
 		{
 			name: "set successful",
 			prepare: func(request *user.SetPasswordRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
@@ -145,14 +145,14 @@ func TestServer_SetPassword(t *testing.T) {
 			want: &user.SetPasswordResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
 		{
 			name: "change successful",
 			prepare: func(request *user.SetPasswordRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				_, err := Client.SetPassword(CTX, &user.SetPasswordRequest{
 					UserId: userID,
@@ -176,14 +176,14 @@ func TestServer_SetPassword(t *testing.T) {
 			want: &user.SetPasswordResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
 		{
 			name: "set with code successful",
 			prepare: func(request *user.SetPasswordRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
 					UserId: userID,
@@ -210,7 +210,7 @@ func TestServer_SetPassword(t *testing.T) {
 			want: &user.SetPasswordResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},

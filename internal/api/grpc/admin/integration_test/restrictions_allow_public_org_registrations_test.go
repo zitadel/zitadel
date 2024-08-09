@@ -23,7 +23,8 @@ import (
 func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-	instance := Tester.UseIsolatedInstance(t, ctx, SystemCTX)
+	instance, err := Instance.UseIsolatedInstance(ctx)
+	require.NoError(t, err)
 	regOrgUrl, err := url.Parse("http://" + instance.Domain + ":8080/ui/login/register/org")
 	require.NoError(t, err)
 	// The CSRF cookie must be sent with every request.
@@ -32,18 +33,20 @@ func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	require.NoError(t, err)
 	browserSession := &http.Client{Jar: jar}
 	var csrfToken string
+	iamOwnerCtx := instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+
 	t.Run("public org registration is allowed by default", func(*testing.T) {
-		csrfToken = awaitPubOrgRegAllowed(t, instance.IAMOwnerCTX, instance.Client, browserSession, regOrgUrl)
+		csrfToken = awaitPubOrgRegAllowed(t, iamOwnerCtx, instance.Client, browserSession, regOrgUrl)
 	})
 	t.Run("disallowing public org registration disables the endpoints", func(*testing.T) {
-		_, err = instance.Client.Admin.SetRestrictions(instance.IAMOwnerCTX, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(true)})
+		_, err = instance.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(true)})
 		require.NoError(t, err)
-		awaitPubOrgRegDisallowed(t, instance.IAMOwnerCTX, instance.Client, browserSession, regOrgUrl, csrfToken)
+		awaitPubOrgRegDisallowed(t, iamOwnerCtx, instance.Client, browserSession, regOrgUrl, csrfToken)
 	})
 	t.Run("allowing public org registration again re-enables the endpoints", func(*testing.T) {
-		_, err = instance.Client.Admin.SetRestrictions(instance.IAMOwnerCTX, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(false)})
+		_, err = instance.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(false)})
 		require.NoError(t, err)
-		awaitPubOrgRegAllowed(t, instance.IAMOwnerCTX, instance.Client, browserSession, regOrgUrl)
+		awaitPubOrgRegAllowed(t, iamOwnerCtx, instance.Client, browserSession, regOrgUrl)
 	})
 }
 

@@ -22,44 +22,46 @@ import (
 )
 
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
-	isoInstance := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
-	userID, projectID, appID, projectGrantID := seedObjects(isoInstance.IAMOwnerCTX, t, isoInstance.Client)
+	isoInstance, err := Instance.UseIsolatedInstance(CTX)
+	require.NoError(t, err)
+	iamOwnerCtx := isoInstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t, isoInstance.Client)
 	beforeTime := time.Now()
 	farPast := timestamppb.New(beforeTime.Add(-10 * time.Hour).UTC())
 	zeroCounts := &eventCounts{}
-	seededCount := requireEventually(t, isoInstance.IAMOwnerCTX, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
+	seededCount := requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "seeded events are > 0", assert.Greater, zeroCounts)
 	}, "wait for seeded event assertions to pass")
-	produceEvents(isoInstance.IAMOwnerCTX, t, isoInstance.Client, userID, appID, projectID, projectGrantID)
-	addedCount := requireEventually(t, isoInstance.IAMOwnerCTX, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
+	produceEvents(iamOwnerCtx, t, isoInstance.Client, userID, appID, projectID, projectGrantID)
+	addedCount := requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for added event assertions to pass")
-	_, err := Tester.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
-		InstanceId:        isoInstance.InstanceID,
+	_, err = Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+		InstanceId:        isoInstance.Instance.Id,
 		AuditLogRetention: durationpb.New(time.Now().Sub(beforeTime)),
 	})
 	require.NoError(t, err)
 	var limitedCounts *eventCounts
-	requireEventually(t, isoInstance.IAMOwnerCTX, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
+	requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "limited events < added events", assert.Less, addedCount)
 		counts.assertAll(t, c, "limited events > 0", assert.Greater, zeroCounts)
 		limitedCounts = counts
 	}, "wait for limited event assertions to pass")
-	listedEvents, err := isoInstance.Client.Admin.ListEvents(isoInstance.IAMOwnerCTX, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_From{
+	listedEvents, err := isoInstance.Client.Admin.ListEvents(iamOwnerCtx, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_From{
 		From: farPast,
 	}})
 	require.NoError(t, err)
 	assert.LessOrEqual(t, len(listedEvents.GetEvents()), limitedCounts.all, "ListEvents with from query older than retention doesn't return more events")
-	listedEvents, err = isoInstance.Client.Admin.ListEvents(isoInstance.IAMOwnerCTX, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_Range{Range: &admin.ListEventsRequestCreationDateRange{
+	listedEvents, err = isoInstance.Client.Admin.ListEvents(iamOwnerCtx, &admin.ListEventsRequest{CreationDateFilter: &admin.ListEventsRequest_Range{Range: &admin.ListEventsRequestCreationDateRange{
 		Since: farPast,
 	}}})
 	require.NoError(t, err)
 	assert.LessOrEqual(t, len(listedEvents.GetEvents()), limitedCounts.all, "ListEvents with since query older than retention doesn't return more events")
 	_, err = isoInstance.Client.System.ResetLimits(SystemCTX, &system.ResetLimitsRequest{
-		InstanceId: isoInstance.InstanceID,
+		InstanceId: isoInstance.Instance.Id,
 	})
 	require.NoError(t, err)
-	requireEventually(t, isoInstance.IAMOwnerCTX, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
+	requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "with reset limit, added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for reset event assertions to pass")
 }

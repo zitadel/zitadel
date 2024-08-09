@@ -19,7 +19,7 @@ import (
 )
 
 func TestServer_ClientCredentialsExchange(t *testing.T) {
-	machine, name, clientID, clientSecret, err := Tester.CreateOIDCCredentialsClient(CTX)
+	machine, name, clientID, clientSecret, err := Instance.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 
 	type claims struct {
@@ -57,7 +57,7 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			name: "machine user without secret error",
 			clientID: func() string {
 				name := gofakeit.Username()
-				_, err := Tester.Client.Mgmt.AddMachineUser(CTX, &management.AddMachineUserRequest{
+				_, err := Instance.Client.Mgmt.AddMachineUser(CTX, &management.AddMachineUserRequest{
 					Name:            name,
 					UserName:        name,
 					AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
@@ -99,14 +99,14 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			clientSecret: clientSecret,
 			scope: []string{
 				oidc.ScopeOpenID,
-				domain.OrgIDScope + Tester.Organisation.Id,
-				domain.OrgDomainPrimaryScope + Tester.Organisation.PrimaryDomain,
+				domain.OrgIDScope + Instance.DefaultOrg.Id,
+				domain.OrgDomainPrimaryScope + Instance.DefaultOrg.PrimaryDomain,
 			},
 			wantClaims: claims{
-				resourceOwnerID:            Tester.Organisation.Id,
-				resourceOwnerName:          Tester.Organisation.Name,
-				resourceOwnerPrimaryDomain: Tester.Organisation.PrimaryDomain,
-				orgDomain:                  Tester.Organisation.PrimaryDomain,
+				resourceOwnerID:            Instance.DefaultOrg.Id,
+				resourceOwnerName:          Instance.DefaultOrg.Name,
+				resourceOwnerPrimaryDomain: Instance.DefaultOrg.PrimaryDomain,
+				orgDomain:                  Instance.DefaultOrg.PrimaryDomain,
 			},
 		},
 		{
@@ -115,10 +115,10 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			clientSecret: clientSecret,
 			scope: []string{
 				oidc.ScopeOpenID,
-				domain.OrgDomainPrimaryScope + Tester.Organisation.PrimaryDomain,
+				domain.OrgDomainPrimaryScope + Instance.DefaultOrg.PrimaryDomain,
 				domain.OrgDomainPrimaryScope + "foo"},
 			wantClaims: claims{
-				orgDomain: Tester.Organisation.PrimaryDomain,
+				orgDomain: Instance.DefaultOrg.PrimaryDomain,
 			},
 		},
 		{
@@ -126,19 +126,19 @@ func TestServer_ClientCredentialsExchange(t *testing.T) {
 			clientID:     clientID,
 			clientSecret: clientSecret,
 			scope: []string{oidc.ScopeOpenID,
-				domain.OrgIDScope + Tester.Organisation.Id,
+				domain.OrgIDScope + Instance.DefaultOrg.Id,
 				domain.OrgIDScope + "foo",
 			},
 			wantClaims: claims{
-				resourceOwnerID:            Tester.Organisation.Id,
-				resourceOwnerName:          Tester.Organisation.Name,
-				resourceOwnerPrimaryDomain: Tester.Organisation.PrimaryDomain,
+				resourceOwnerID:            Instance.DefaultOrg.Id,
+				resourceOwnerName:          Instance.DefaultOrg.Name,
+				resourceOwnerPrimaryDomain: Instance.DefaultOrg.PrimaryDomain,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			provider, err := rp.NewRelyingPartyOIDC(CTX, Tester.OIDCIssuer(), tt.clientID, tt.clientSecret, redirectURI, tt.scope)
+			provider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), tt.clientID, tt.clientSecret, redirectURI, tt.scope)
 			require.NoError(t, err)
 			tokens, err := rp.ClientCredentials(CTX, provider, nil)
 			if tt.wantErr {

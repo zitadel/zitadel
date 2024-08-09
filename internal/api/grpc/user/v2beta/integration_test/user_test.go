@@ -29,7 +29,7 @@ var (
 	IamCTX    context.Context
 	UserCTX   context.Context
 	SystemCTX context.Context
-	Tester    *integration.Tester
+	Instance  *integration.Instance
 	Client    user.UserServiceClient
 )
 
@@ -39,22 +39,22 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Tester, err = integration.NewTester(ctx)
+		Instance, err = integration.FirstInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
 
-		UserCTX = Tester.WithAuthorization(ctx, integration.UserTypeLogin)
-		IamCTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		SystemCTX = Tester.WithAuthorization(ctx, integration.UserTypeSystem)
-		CTX = Tester.WithAuthorization(ctx, integration.UserTypeOrgOwner)
-		Client = Tester.Client.UserV2beta
+		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
+		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		SystemCTX = Instance.WithAuthorization(ctx, integration.UserTypeSystem)
+		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		Client = Instance.Client.UserV2beta
 		return m.Run()
 	}())
 }
 
 func TestServer_AddHumanUser(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, IamCTX)
+	idpID := Instance.AddGenericOAuthProvider(t, IamCTX)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -72,7 +72,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -102,7 +102,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			want: &user.AddHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -113,7 +113,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -146,7 +146,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			want: &user.AddHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 				EmailCode: gu.Ptr("something"),
 			},
@@ -158,7 +158,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -193,7 +193,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			want: &user.AddHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -204,7 +204,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -239,7 +239,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			want: &user.AddHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 				PhoneCode: gu.Ptr("something"),
 			},
@@ -251,7 +251,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -292,7 +292,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Email: &user.SetHumanEmail{
@@ -323,7 +323,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -357,7 +357,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -404,7 +404,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -445,7 +445,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			want: &user.AddHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -456,7 +456,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -491,7 +491,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			want: &user.AddHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -502,7 +502,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -536,7 +536,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -564,7 +564,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 			want: &user.AddHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -575,7 +575,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 				&user.AddHumanUserRequest{
 					Organization: &object.Organization{
 						Org: &object.Organization_OrgId{
-							OrgId: Tester.Organisation.Id,
+							OrgId: Instance.DefaultOrg.Id,
 						},
 					},
 					Profile: &user.SetHumanProfile{
@@ -636,7 +636,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 
 func TestServer_AddHumanUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := fmt.Sprintf("%d@permission.com", time.Now().UnixNano())
-	newOrg := Tester.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("AddHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -856,7 +856,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change username, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
@@ -869,14 +869,14 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			want: &user.UpdateHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
 		{
 			name: "change profile, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
@@ -896,14 +896,14 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			want: &user.UpdateHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
 		{
 			name: "change email, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
@@ -919,14 +919,14 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			want: &user.UpdateHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
 		{
 			name: "change email, code, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
@@ -942,7 +942,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			want: &user.UpdateHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 				EmailCode: gu.Ptr("something"),
 			},
@@ -950,7 +950,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change phone, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
@@ -966,14 +966,14 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			want: &user.UpdateHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
 		{
 			name: "change phone, code, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				return nil
 			},
@@ -989,7 +989,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			want: &user.UpdateHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 				PhoneCode: gu.Ptr("something"),
 			},
@@ -997,7 +997,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change password, code, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
 					UserId: userID,
@@ -1029,14 +1029,14 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			want: &user.UpdateHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
 		{
 			name: "change hashed password, code, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
 					UserId: userID,
@@ -1067,14 +1067,14 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			want: &user.UpdateHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
 		{
 			name: "change hashed password, code, not supported",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
 					UserId: userID,
@@ -1109,7 +1109,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 		{
 			name: "change password, old password, ok",
 			prepare: func(request *user.UpdateHumanUserRequest) error {
-				userID := Tester.CreateHumanUser(CTX).GetUserId()
+				userID := Instance.CreateHumanUser(CTX).GetUserId()
 				request.UserId = userID
 
 				resp, err := Client.PasswordReset(CTX, &user.PasswordResetRequest{
@@ -1156,7 +1156,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 			want: &user.UpdateHumanUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1185,7 +1185,7 @@ func TestServer_UpdateHumanUser(t *testing.T) {
 
 func TestServer_UpdateHumanUser_Permission(t *testing.T) {
 	newOrgOwnerEmail := fmt.Sprintf("%d@permission.update.com", time.Now().UnixNano())
-	newOrg := Tester.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("UpdateHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -1295,7 +1295,7 @@ func TestServer_LockUser(t *testing.T) {
 				CTX,
 				&user.LockUserRequest{},
 				func(request *user.LockUserRequest) error {
-					resp := Tester.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1303,7 +1303,7 @@ func TestServer_LockUser(t *testing.T) {
 			want: &user.LockUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1313,7 +1313,7 @@ func TestServer_LockUser(t *testing.T) {
 				CTX,
 				&user.LockUserRequest{},
 				func(request *user.LockUserRequest) error {
-					resp := Tester.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1321,7 +1321,7 @@ func TestServer_LockUser(t *testing.T) {
 			want: &user.LockUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1331,7 +1331,7 @@ func TestServer_LockUser(t *testing.T) {
 				CTX,
 				&user.LockUserRequest{},
 				func(request *user.LockUserRequest) error {
-					resp := Tester.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					_, err := Client.LockUser(CTX, &user.LockUserRequest{
 						UserId: resp.GetUserId(),
@@ -1347,7 +1347,7 @@ func TestServer_LockUser(t *testing.T) {
 				CTX,
 				&user.LockUserRequest{},
 				func(request *user.LockUserRequest) error {
-					resp := Tester.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					_, err := Client.LockUser(CTX, &user.LockUserRequest{
 						UserId: resp.GetUserId(),
@@ -1403,7 +1403,7 @@ func TestServer_UnLockUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.UnlockUserRequest{},
 				prepare: func(request *user.UnlockUserRequest) error {
-					resp := Tester.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1416,7 +1416,7 @@ func TestServer_UnLockUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.UnlockUserRequest{},
 				prepare: func(request *user.UnlockUserRequest) error {
-					resp := Tester.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1429,7 +1429,7 @@ func TestServer_UnLockUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.UnlockUserRequest{},
 				prepare: func(request *user.UnlockUserRequest) error {
-					resp := Tester.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					_, err := Client.LockUser(CTX, &user.LockUserRequest{
 						UserId: resp.GetUserId(),
@@ -1440,7 +1440,7 @@ func TestServer_UnLockUser(t *testing.T) {
 			want: &user.UnlockUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1450,7 +1450,7 @@ func TestServer_UnLockUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.UnlockUserRequest{},
 				prepare: func(request *user.UnlockUserRequest) error {
-					resp := Tester.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					_, err := Client.LockUser(CTX, &user.LockUserRequest{
 						UserId: resp.GetUserId(),
@@ -1461,7 +1461,7 @@ func TestServer_UnLockUser(t *testing.T) {
 			want: &user.UnlockUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1511,7 +1511,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 				CTX,
 				&user.DeactivateUserRequest{},
 				func(request *user.DeactivateUserRequest) error {
-					resp := Tester.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1519,7 +1519,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 			want: &user.DeactivateUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1529,7 +1529,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 				CTX,
 				&user.DeactivateUserRequest{},
 				func(request *user.DeactivateUserRequest) error {
-					resp := Tester.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1537,7 +1537,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 			want: &user.DeactivateUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1547,7 +1547,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 				CTX,
 				&user.DeactivateUserRequest{},
 				func(request *user.DeactivateUserRequest) error {
-					resp := Tester.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
 						UserId: resp.GetUserId(),
@@ -1563,7 +1563,7 @@ func TestServer_DeactivateUser(t *testing.T) {
 				CTX,
 				&user.DeactivateUserRequest{},
 				func(request *user.DeactivateUserRequest) error {
-					resp := Tester.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
 						UserId: resp.GetUserId(),
@@ -1619,7 +1619,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.ReactivateUserRequest{},
 				prepare: func(request *user.ReactivateUserRequest) error {
-					resp := Tester.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1632,7 +1632,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.ReactivateUserRequest{},
 				prepare: func(request *user.ReactivateUserRequest) error {
-					resp := Tester.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					return nil
 				},
@@ -1645,7 +1645,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.ReactivateUserRequest{},
 				prepare: func(request *user.ReactivateUserRequest) error {
-					resp := Tester.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
 						UserId: resp.GetUserId(),
@@ -1656,7 +1656,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 			want: &user.ReactivateUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1666,7 +1666,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.ReactivateUserRequest{},
 				prepare: func(request *user.ReactivateUserRequest) error {
-					resp := Tester.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					_, err := Client.DeactivateUser(CTX, &user.DeactivateUserRequest{
 						UserId: resp.GetUserId(),
@@ -1677,7 +1677,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 			want: &user.ReactivateUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1699,7 +1699,7 @@ func TestServer_ReactivateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	projectResp, err := Tester.CreateProject(CTX)
+	projectResp, err := Instance.CreateProject(CTX)
 	require.NoError(t, err)
 	type args struct {
 		ctx     context.Context
@@ -1729,7 +1729,7 @@ func TestServer_DeleteUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
 				prepare: func(request *user.DeleteUserRequest) error {
-					resp := Tester.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
 					return err
 				},
@@ -1737,7 +1737,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			want: &user.DeleteUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1747,7 +1747,7 @@ func TestServer_DeleteUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
 				prepare: func(request *user.DeleteUserRequest) error {
-					resp := Tester.CreateMachineUser(CTX)
+					resp := Instance.CreateMachineUser(CTX)
 					request.UserId = resp.GetUserId()
 					return err
 				},
@@ -1755,7 +1755,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			want: &user.DeleteUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1765,18 +1765,18 @@ func TestServer_DeleteUser(t *testing.T) {
 				ctx: CTX,
 				req: &user.DeleteUserRequest{},
 				prepare: func(request *user.DeleteUserRequest) error {
-					resp := Tester.CreateHumanUser(CTX)
+					resp := Instance.CreateHumanUser(CTX)
 					request.UserId = resp.GetUserId()
-					Tester.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
-					Tester.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
-					Tester.CreateOrgMembership(t, CTX, request.UserId)
+					Instance.CreateProjectUserGrant(t, CTX, projectResp.GetId(), request.UserId)
+					Instance.CreateProjectMembership(t, CTX, projectResp.GetId(), request.UserId)
+					Instance.CreateOrgMembership(t, CTX, request.UserId)
 					return err
 				},
 			},
 			want: &user.DeleteUserResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -1798,7 +1798,7 @@ func TestServer_DeleteUser(t *testing.T) {
 }
 
 func TestServer_AddIDPLink(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, IamCTX)
+	idpID := Instance.AddGenericOAuthProvider(t, IamCTX)
 	type args struct {
 		ctx context.Context
 		req *user.AddIDPLinkRequest
@@ -1830,7 +1830,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users.Get(integration.FirstInstanceUsersKey, integration.UserTypeOrgOwner).ID,
+					UserId: Instance.Users.Get(integration.UserTypeOrgOwner).ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    "idpID",
 						UserId:   "userID",
@@ -1846,7 +1846,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users.Get(integration.FirstInstanceUsersKey, integration.UserTypeOrgOwner).ID,
+					UserId: Instance.Users.Get(integration.UserTypeOrgOwner).ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    idpID,
 						UserId:   "userID",
@@ -1857,7 +1857,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			want: &user.AddIDPLinkResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 			wantErr: false,
@@ -1878,13 +1878,13 @@ func TestServer_AddIDPLink(t *testing.T) {
 }
 
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, IamCTX)
-	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, CTX, Tester.Organisation.Id)
-	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
-	notDefaultOrgIdpID := Tester.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
-	samlIdpID := Tester.AddSAMLProvider(t, IamCTX)
-	samlRedirectIdpID := Tester.AddSAMLRedirectProvider(t, IamCTX, "")
-	samlPostIdpID := Tester.AddSAMLPostProvider(t, IamCTX)
+	idpID := Instance.AddGenericOAuthProvider(t, IamCTX)
+	orgIdpID := Instance.AddOrgGenericOAuthProvider(t, CTX, Instance.DefaultOrg.Id)
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	notDefaultOrgIdpID := Instance.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
+	samlIdpID := Instance.AddSAMLProvider(t, IamCTX)
+	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(t, IamCTX, "")
+	samlPostIdpID := Instance.AddSAMLPostProvider(t, IamCTX)
 	type args struct {
 		ctx context.Context
 		req *user.StartIdentityProviderIntentRequest
@@ -1929,13 +1929,13 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 				url: "https://example.com/oauth/v2/authorize",
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Tester.Config.Hostname + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Config.Hostname + ":8080/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -1960,13 +1960,13 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 				url: "https://example.com/oauth/v2/authorize",
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Tester.Config.Hostname + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Config.Hostname + ":8080/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -1991,13 +1991,13 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 				url: "https://example.com/oauth/v2/authorize",
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Tester.Config.Hostname + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Config.Hostname + ":8080/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2022,13 +2022,13 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 				url: "https://example.com/oauth/v2/authorize",
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Tester.Config.Hostname + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Config.Hostname + ":8080/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2053,9 +2053,9 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
-				url:                "http://" + Tester.Config.Hostname + ":8000/sso",
+				url:                "http://" + Instance.Config.Hostname + ":8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2077,9 +2077,9 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
-				url:                "http://" + Tester.Config.Hostname + ":8000/sso",
+				url:                "http://" + Instance.Config.Hostname + ":8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2101,7 +2101,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 				postForm: true,
 			},
@@ -2402,26 +2402,26 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 */
 
 func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
-	userIDWithoutAuth := Tester.CreateHumanUser(CTX).GetUserId()
+	userIDWithoutAuth := Instance.CreateHumanUser(CTX).GetUserId()
 
-	userIDWithPasskey := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, userIDWithPasskey)
+	userIDWithPasskey := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userIDWithPasskey)
 
-	userMultipleAuth := Tester.CreateHumanUser(CTX).GetUserId()
-	Tester.RegisterUserPasskey(CTX, userMultipleAuth)
-	provider, err := Tester.Client.Mgmt.AddGenericOIDCProvider(CTX, &mgmt.AddGenericOIDCProviderRequest{
+	userMultipleAuth := Instance.CreateHumanUser(CTX).GetUserId()
+	Instance.RegisterUserPasskey(CTX, userMultipleAuth)
+	provider, err := Instance.Client.Mgmt.AddGenericOIDCProvider(CTX, &mgmt.AddGenericOIDCProviderRequest{
 		Name:         "ListAuthenticationMethodTypes",
 		Issuer:       "https://example.com",
 		ClientId:     "client_id",
 		ClientSecret: "client_secret",
 	})
 	require.NoError(t, err)
-	_, err = Tester.Client.Mgmt.AddCustomLoginPolicy(CTX, &mgmt.AddCustomLoginPolicyRequest{})
+	_, err = Instance.Client.Mgmt.AddCustomLoginPolicy(CTX, &mgmt.AddCustomLoginPolicyRequest{})
 	require.Condition(t, func() bool {
 		code := status.Convert(err).Code()
 		return code == codes.AlreadyExists || code == codes.OK
 	})
-	_, err = Tester.Client.Mgmt.AddIDPToLoginPolicy(CTX, &mgmt.AddIDPToLoginPolicyRequest{
+	_, err = Instance.Client.Mgmt.AddIDPToLoginPolicy(CTX, &mgmt.AddIDPToLoginPolicyRequest{
 		IdpId:     provider.GetId(),
 		OwnerType: idp.IDPOwnerType_IDP_OWNER_TYPE_ORG,
 	})
@@ -2433,7 +2433,7 @@ func TestServer_ListAuthenticationMethodTypes(t *testing.T) {
 	}})
 	require.NoError(t, err)
 	// This should not remove the user IDP links
-	_, err = Tester.Client.Mgmt.RemoveIDPFromLoginPolicy(CTX, &mgmt.RemoveIDPFromLoginPolicyRequest{
+	_, err = Instance.Client.Mgmt.RemoveIDPFromLoginPolicy(CTX, &mgmt.RemoveIDPFromLoginPolicyRequest{
 		IdpId: provider.GetId(),
 	})
 	require.NoError(t, err)

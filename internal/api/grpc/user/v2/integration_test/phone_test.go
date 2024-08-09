@@ -20,7 +20,7 @@ import (
 )
 
 func TestServer_SetPhone(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -38,7 +38,7 @@ func TestServer_SetPhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -55,7 +55,7 @@ func TestServer_SetPhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -72,7 +72,7 @@ func TestServer_SetPhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 				VerificationCode: gu.Ptr("xxx"),
 			},
@@ -90,7 +90,7 @@ func TestServer_SetPhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -123,8 +123,8 @@ func TestServer_SetPhone(t *testing.T) {
 }
 
 func TestServer_ResendPhoneCode(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
-	verifiedUserID := Tester.CreateHumanUserVerified(CTX, Tester.Organisation.Id, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
+	verifiedUserID := Instance.CreateHumanUserVerified(CTX, Instance.DefaultOrg.Id, fmt.Sprintf("%d@mouse.com", time.Now().UnixNano())).GetUserId()
 
 	tests := []struct {
 		name    string
@@ -158,7 +158,7 @@ func TestServer_ResendPhoneCode(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -174,7 +174,7 @@ func TestServer_ResendPhoneCode(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 				VerificationCode: gu.Ptr("xxx"),
 			},
@@ -197,7 +197,7 @@ func TestServer_ResendPhoneCode(t *testing.T) {
 }
 
 func TestServer_VerifyPhone(t *testing.T) {
-	userResp := Tester.CreateHumanUser(CTX)
+	userResp := Instance.CreateHumanUser(CTX)
 	tests := []struct {
 		name    string
 		req     *user.VerifyPhoneRequest
@@ -230,7 +230,7 @@ func TestServer_VerifyPhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -249,13 +249,13 @@ func TestServer_VerifyPhone(t *testing.T) {
 }
 
 func TestServer_RemovePhone(t *testing.T) {
-	userResp := Tester.CreateHumanUser(CTX)
-	failResp := Tester.CreateHumanUserNoPhone(CTX)
-	otherUser := Tester.CreateHumanUser(CTX).GetUserId()
-	doubleRemoveUser := Tester.CreateHumanUser(CTX)
+	userResp := Instance.CreateHumanUser(CTX)
+	failResp := Instance.CreateHumanUserNoPhone(CTX)
+	otherUser := Instance.CreateHumanUser(CTX).GetUserId()
+	doubleRemoveUser := Instance.CreateHumanUser(CTX)
 
-	Tester.RegisterUserPasskey(CTX, otherUser)
-	_, sessionTokenOtherUser, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
+	Instance.RegisterUserPasskey(CTX, otherUser)
+	_, sessionTokenOtherUser, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, otherUser)
 
 	tests := []struct {
 		name    string
@@ -275,7 +275,7 @@ func TestServer_RemovePhone(t *testing.T) {
 				Details: &object.Details{
 					Sequence:      1,
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 			dep: func(ctx context.Context, userID string) (*user.RemovePhoneResponse, error) {

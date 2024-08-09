@@ -20,7 +20,7 @@ import (
 )
 
 func TestServer_RegisterPasskey(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	reg, err := Client.CreatePasskeyRegistrationLink(CTX, &user.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
@@ -28,8 +28,8 @@ func TestServer_RegisterPasskey(t *testing.T) {
 	require.NoError(t, err)
 
 	// We also need a user session
-	Tester.RegisterUserPasskey(CTX, userID)
-	_, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, userID)
+	Instance.RegisterUserPasskey(CTX, userID)
+	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
 
 	type args struct {
 		ctx context.Context
@@ -62,7 +62,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			want: &user.RegisterPasskeyResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -114,7 +114,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			want: &user.RegisterPasskeyResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -132,7 +132,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 			if tt.want != nil {
 				assert.NotEmpty(t, got.GetPasskeyId())
 				assert.NotEmpty(t, got.GetPublicKeyCredentialCreationOptions())
-				_, err = Tester.WebAuthN.CreateAttestationResponse(got.GetPublicKeyCredentialCreationOptions())
+				_, err = Instance.WebAuthN.CreateAttestationResponse(got.GetPublicKeyCredentialCreationOptions())
 				require.NoError(t, err)
 			}
 		})
@@ -142,7 +142,7 @@ func TestServer_RegisterPasskey(t *testing.T) {
 func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 	userID, pkr := userWithPasskeyRegistered(t)
 
-	attestationResponse, err := Tester.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
+	attestationResponse, err := Instance.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	require.NoError(t, err)
 
 	type args struct {
@@ -181,7 +181,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 			want: &user.VerifyPasskeyRegistrationResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -216,7 +216,7 @@ func TestServer_VerifyPasskeyRegistration(t *testing.T) {
 }
 
 func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
 
 	type args struct {
 		ctx context.Context
@@ -248,7 +248,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -268,7 +268,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -284,7 +284,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 			want: &user.CreatePasskeyRegistrationLinkResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 			wantCode: true,
@@ -309,7 +309,7 @@ func TestServer_CreatePasskeyRegistrationLink(t *testing.T) {
 }
 
 func userWithPasskeyRegistered(t *testing.T) (string, *user.RegisterPasskeyResponse) {
-	userID := Tester.CreateHumanUser(CTX).GetUserId()
+	userID := Instance.CreateHumanUser(CTX).GetUserId()
 	return userID, passkeyRegister(t, userID)
 }
 
@@ -335,7 +335,7 @@ func passkeyRegister(t *testing.T, userID string) *user.RegisterPasskeyResponse 
 }
 
 func passkeyVerify(t *testing.T, userID string, pkr *user.RegisterPasskeyResponse) string {
-	attestationResponse, err := Tester.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
+	attestationResponse, err := Instance.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	require.NoError(t, err)
 
 	_, err = Client.VerifyPasskeyRegistration(CTX, &user.VerifyPasskeyRegistrationRequest{
@@ -349,7 +349,7 @@ func passkeyVerify(t *testing.T, userID string, pkr *user.RegisterPasskeyRespons
 }
 
 func TestServer_RemovePasskey(t *testing.T) {
-	userIDWithout := Tester.CreateHumanUser(CTX).GetUserId()
+	userIDWithout := Instance.CreateHumanUser(CTX).GetUserId()
 	userIDRegistered, pkrRegistered := userWithPasskeyRegistered(t)
 	userIDVerified, passkeyIDVerified := userWithPasskeyVerified(t)
 	userIDVerifiedPermission, passkeyIDVerifiedPermission := userWithPasskeyVerified(t)
@@ -396,7 +396,7 @@ func TestServer_RemovePasskey(t *testing.T) {
 			want: &user.RemovePasskeyResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -423,7 +423,7 @@ func TestServer_RemovePasskey(t *testing.T) {
 			want: &user.RemovePasskeyResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -454,7 +454,7 @@ func TestServer_RemovePasskey(t *testing.T) {
 }
 
 func TestServer_ListPasskeys(t *testing.T) {
-	userIDWithout := Tester.CreateHumanUser(CTX).GetUserId()
+	userIDWithout := Instance.CreateHumanUser(CTX).GetUserId()
 	userIDRegistered, _ := userWithPasskeyRegistered(t)
 	userIDVerified, passkeyIDVerified := userWithPasskeyVerified(t)
 

@@ -20,7 +20,7 @@ import (
 )
 
 func TestServer_GetUserByID(t *testing.T) {
-	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetUserByIDOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
 	type args struct {
 		ctx context.Context
 		req *user.GetUserByIDRequest
@@ -64,7 +64,7 @@ func TestServer_GetUserByID(t *testing.T) {
 				IamCTX,
 				&user.GetUserByIDRequest{},
 				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*userAttr, error) {
-					resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+					resp := Instance.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 					request.UserId = resp.GetUserId()
 					return &userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}, nil
 				},
@@ -108,9 +108,9 @@ func TestServer_GetUserByID(t *testing.T) {
 				IamCTX,
 				&user.GetUserByIDRequest{},
 				func(ctx context.Context, username string, request *user.GetUserByIDRequest) (*userAttr, error) {
-					resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+					resp := Instance.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 					request.UserId = resp.GetUserId()
-					details := Tester.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
+					details := Instance.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
 					return &userAttr{resp.GetUserId(), username, details.GetChangeDate(), resp.GetDetails()}, nil
 				},
 			},
@@ -190,7 +190,7 @@ func TestServer_GetUserByID(t *testing.T) {
 func TestServer_GetUserByID_Permission(t *testing.T) {
 	timeNow := time.Now().UTC()
 	newOrgOwnerEmail := fmt.Sprintf("%d@permission.get.com", timeNow.UnixNano())
-	newOrg := Tester.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
+	newOrg := Instance.CreateOrganization(IamCTX, fmt.Sprintf("GetHuman%d", time.Now().UnixNano()), newOrgOwnerEmail)
 	newUserID := newOrg.CreatedAdmins[0].GetUserId()
 	type args struct {
 		ctx context.Context
@@ -330,8 +330,8 @@ type userAttr struct {
 }
 
 func TestServer_ListUsers(t *testing.T) {
-	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
-	userResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listusers.com", time.Now().UnixNano()))
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListUsersOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	userResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listusers.com", time.Now().UnixNano()))
 	type args struct {
 		ctx   context.Context
 		count int
@@ -378,7 +378,7 @@ func TestServer_ListUsers(t *testing.T) {
 					infos := make([]userAttr, len(usernames))
 					userIDs := make([]string, len(usernames))
 					for i, username := range usernames {
-						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+						resp := Instance.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						userIDs[i] = resp.GetUserId()
 						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 					}
@@ -432,9 +432,9 @@ func TestServer_ListUsers(t *testing.T) {
 					infos := make([]userAttr, len(usernames))
 					userIDs := make([]string, len(usernames))
 					for i, username := range usernames {
-						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+						resp := Instance.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						userIDs[i] = resp.GetUserId()
-						details := Tester.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
+						details := Instance.SetUserPassword(ctx, resp.GetUserId(), integration.UserPassword, true)
 						infos[i] = userAttr{resp.GetUserId(), username, details.GetChangeDate(), resp.GetDetails()}
 					}
 					request.Queries = append(request.Queries, InUserIDsQuery(userIDs))
@@ -489,7 +489,7 @@ func TestServer_ListUsers(t *testing.T) {
 					infos := make([]userAttr, len(usernames))
 					userIDs := make([]string, len(usernames))
 					for i, username := range usernames {
-						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+						resp := Instance.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						userIDs[i] = resp.GetUserId()
 						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 					}
@@ -585,7 +585,7 @@ func TestServer_ListUsers(t *testing.T) {
 					infos := make([]userAttr, len(usernames))
 					userIDs := make([]string, len(usernames))
 					for i, username := range usernames {
-						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+						resp := Instance.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						userIDs[i] = resp.GetUserId()
 						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 						request.Queries = append(request.Queries, UsernameQuery(username))
@@ -638,7 +638,7 @@ func TestServer_ListUsers(t *testing.T) {
 				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
 					infos := make([]userAttr, len(usernames))
 					for i, username := range usernames {
-						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+						resp := Instance.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 					}
 					request.Queries = append(request.Queries, InUserEmailsQuery(usernames))
@@ -690,7 +690,7 @@ func TestServer_ListUsers(t *testing.T) {
 				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
 					infos := make([]userAttr, len(usernames))
 					for i, username := range usernames {
-						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+						resp := Instance.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 					}
 					request.Queries = append(request.Queries, InUserEmailsQuery(usernames))
@@ -801,11 +801,11 @@ func TestServer_ListUsers(t *testing.T) {
 				3,
 				&user.ListUsersRequest{},
 				func(ctx context.Context, usernames []string, request *user.ListUsersRequest) ([]userAttr, error) {
-					orgResp := Tester.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+					orgResp := Instance.CreateOrganization(ctx, fmt.Sprintf("ListUsersResourceowner%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
 
 					infos := make([]userAttr, len(usernames))
 					for i, username := range usernames {
-						resp := Tester.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
+						resp := Instance.CreateHumanUserVerified(ctx, orgResp.OrganizationId, username)
 						infos[i] = userAttr{resp.GetUserId(), username, nil, resp.GetDetails()}
 					}
 					request.Queries = append(request.Queries, OrganizationIdQuery(orgResp.OrganizationId))

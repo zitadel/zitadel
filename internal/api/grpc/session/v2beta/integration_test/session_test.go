@@ -31,7 +31,7 @@ import (
 var (
 	CTX             context.Context
 	IAMOwnerCTX     context.Context
-	Tester          *integration.Tester
+	Instance        *integration.Instance
 	Client          session.SessionServiceClient
 	User            *user.AddHumanUserResponse
 	DeactivatedUser *user.AddHumanUserResponse
@@ -44,14 +44,14 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Tester, err = integration.NewTester(ctx)
+		Instance, err = integration.FirstInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
-		Client = Tester.Client.SessionV2beta
+		Client = Instance.Client.SessionV2beta
 
-		CTX = Tester.WithAuthorization(ctx, integration.UserTypeOrgOwner)
-		IAMOwnerCTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		IAMOwnerCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		User = createFullUser(CTX)
 		DeactivatedUser = createDeactivatedUser(CTX)
 		LockedUser = createLockedUser(CTX)
@@ -60,30 +60,30 @@ func TestMain(m *testing.M) {
 }
 
 func createFullUser(ctx context.Context) *user.AddHumanUserResponse {
-	userResp := Tester.CreateHumanUser(ctx)
-	Tester.Client.UserV2.VerifyEmail(ctx, &user.VerifyEmailRequest{
+	userResp := Instance.CreateHumanUser(ctx)
+	Instance.Client.UserV2.VerifyEmail(ctx, &user.VerifyEmailRequest{
 		UserId:           userResp.GetUserId(),
 		VerificationCode: userResp.GetEmailCode(),
 	})
-	Tester.Client.UserV2.VerifyPhone(ctx, &user.VerifyPhoneRequest{
+	Instance.Client.UserV2.VerifyPhone(ctx, &user.VerifyPhoneRequest{
 		UserId:           userResp.GetUserId(),
 		VerificationCode: userResp.GetPhoneCode(),
 	})
-	Tester.SetUserPassword(ctx, userResp.GetUserId(), integration.UserPassword, false)
-	Tester.RegisterUserPasskey(ctx, userResp.GetUserId())
+	Instance.SetUserPassword(ctx, userResp.GetUserId(), integration.UserPassword, false)
+	Instance.RegisterUserPasskey(ctx, userResp.GetUserId())
 	return userResp
 }
 
 func createDeactivatedUser(ctx context.Context) *user.AddHumanUserResponse {
-	userResp := Tester.CreateHumanUser(ctx)
-	_, err := Tester.Client.UserV2.DeactivateUser(ctx, &user.DeactivateUserRequest{UserId: userResp.GetUserId()})
+	userResp := Instance.CreateHumanUser(ctx)
+	_, err := Instance.Client.UserV2.DeactivateUser(ctx, &user.DeactivateUserRequest{UserId: userResp.GetUserId()})
 	logging.OnError(err).Fatal("deactivate human user")
 	return userResp
 }
 
 func createLockedUser(ctx context.Context) *user.AddHumanUserResponse {
-	userResp := Tester.CreateHumanUser(ctx)
-	_, err := Tester.Client.UserV2.LockUser(ctx, &user.LockUserRequest{UserId: userResp.GetUserId()})
+	userResp := Instance.CreateHumanUser(ctx)
+	_, err := Instance.Client.UserV2.LockUser(ctx, &user.LockUserRequest{UserId: userResp.GetUserId()})
 	logging.OnError(err).Fatal("lock human user")
 	return userResp
 }
@@ -192,7 +192,7 @@ func TestServer_CreateSession(t *testing.T) {
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 		},
@@ -212,7 +212,7 @@ func TestServer_CreateSession(t *testing.T) {
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 			wantUserAgent: &session.UserAgent{
@@ -241,7 +241,7 @@ func TestServer_CreateSession(t *testing.T) {
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 			wantExpirationWindow: 5 * time.Minute,
@@ -261,7 +261,7 @@ func TestServer_CreateSession(t *testing.T) {
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Instance.Id,
+					ResourceOwner: Instance.Instance.Id,
 				},
 			},
 			wantFactors: []wantFactor{wantUserFactor},
@@ -308,7 +308,7 @@ func TestServer_CreateSession(t *testing.T) {
 			req: &session.CreateSessionRequest{
 				Challenges: &session.RequestChallenges{
 					WebAuthN: &session.RequestChallenges_WebAuthN{
-						Domain:                      Tester.Config.Hostname,
+						Domain:                      Instance.Config.Hostname,
 						UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 					},
 				},
@@ -351,17 +351,17 @@ func TestServer_CreateSession(t *testing.T) {
 
 func TestServer_CreateSession_lock_user(t *testing.T) {
 	// create a separate org so we don't interfere with any other test
-	org := Tester.CreateOrganization(IAMOwnerCTX,
+	org := Instance.CreateOrganization(IAMOwnerCTX,
 		fmt.Sprintf("TestServer_CreateSession_lock_user_%d", time.Now().UnixNano()),
 		fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
 	)
 	userID := org.CreatedAdmins[0].GetUserId()
-	Tester.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
+	Instance.SetUserPassword(IAMOwnerCTX, userID, integration.UserPassword, false)
 
 	// enable password lockout
 	maxAttempts := 2
 	ctxOrg := metadata.AppendToOutgoingContext(IAMOwnerCTX, "x-zitadel-orgid", org.GetOrganizationId())
-	_, err := Tester.Client.Mgmt.AddCustomLockoutPolicy(ctxOrg, &mgmt.AddCustomLockoutPolicyRequest{
+	_, err := Instance.Client.Mgmt.AddCustomLockoutPolicy(ctxOrg, &mgmt.AddCustomLockoutPolicyRequest{
 		MaxPasswordAttempts: uint32(maxAttempts),
 	})
 	require.NoError(t, err)
@@ -403,7 +403,7 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 		},
 		Challenges: &session.RequestChallenges{
 			WebAuthN: &session.RequestChallenges_WebAuthN{
-				Domain:                      Tester.Config.Hostname,
+				Domain:                      Instance.Config.Hostname,
 				UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 			},
 		},
@@ -411,7 +411,7 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
 
-	assertionData, err := Tester.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
+	assertionData, err := Instance.WebAuthN.CreateAssertionResponse(createResp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
 	require.NoError(t, err)
 
 	// update the session with webauthn assertion data
@@ -535,7 +535,7 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 */
 
 func registerTOTP(ctx context.Context, t *testing.T, userID string) (secret string) {
-	resp, err := Tester.Client.UserV2.RegisterTOTP(ctx, &user.RegisterTOTPRequest{
+	resp, err := Instance.Client.UserV2.RegisterTOTP(ctx, &user.RegisterTOTPRequest{
 		UserId: userID,
 	})
 	require.NoError(t, err)
@@ -543,7 +543,7 @@ func registerTOTP(ctx context.Context, t *testing.T, userID string) (secret stri
 	code, err := totp.GenerateCode(secret, time.Now())
 	require.NoError(t, err)
 
-	_, err = Tester.Client.UserV2.VerifyTOTPRegistration(ctx, &user.VerifyTOTPRegistrationRequest{
+	_, err = Instance.Client.UserV2.VerifyTOTPRegistration(ctx, &user.VerifyTOTPRegistrationRequest{
 		UserId: userID,
 		Code:   code,
 	})
@@ -552,14 +552,14 @@ func registerTOTP(ctx context.Context, t *testing.T, userID string) (secret stri
 }
 
 func registerOTPSMS(ctx context.Context, t *testing.T, userID string) {
-	_, err := Tester.Client.UserV2.AddOTPSMS(ctx, &user.AddOTPSMSRequest{
+	_, err := Instance.Client.UserV2.AddOTPSMS(ctx, &user.AddOTPSMSRequest{
 		UserId: userID,
 	})
 	require.NoError(t, err)
 }
 
 func registerOTPEmail(ctx context.Context, t *testing.T, userID string) {
-	_, err := Tester.Client.UserV2.AddOTPEmail(ctx, &user.AddOTPEmailRequest{
+	_, err := Instance.Client.UserV2.AddOTPEmail(ctx, &user.AddOTPEmailRequest{
 		UserId: userID,
 	})
 	require.NoError(t, err)
@@ -595,7 +595,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 			SessionId: createResp.GetSessionId(),
 			Challenges: &session.RequestChallenges{
 				WebAuthN: &session.RequestChallenges_WebAuthN{
-					Domain:                      Tester.Config.Hostname,
+					Domain:                      Instance.Config.Hostname,
 					UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 				},
 			},
@@ -604,7 +604,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, userExisting.GetUserId())
 		sessionToken = resp.GetSessionToken()
 
-		assertionData, err := Tester.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
+		assertionData, err := Instance.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
 		require.NoError(t, err)
 
 		resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
@@ -621,7 +621,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 	})
 
 	userAuthCtx := integration.WithAuthorizationToken(CTX, sessionToken)
-	Tester.RegisterUserU2F(userAuthCtx, userExisting.GetUserId())
+	Instance.RegisterUserU2F(userAuthCtx, userExisting.GetUserId())
 	totpSecret := registerTOTP(userAuthCtx, t, userExisting.GetUserId())
 	registerOTPSMS(userAuthCtx, t, userExisting.GetUserId())
 	registerOTPEmail(userAuthCtx, t, userExisting.GetUserId())
@@ -642,7 +642,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 		verifyCurrentSession(t, createResp.GetSessionId(), sessionToken, resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, userExisting.GetUserId(), wantUserFactor, wantTOTPFactor)
 	})
 
-	userImport := Tester.CreateHumanUserWithTOTP(CTX, totpSecret)
+	userImport := Instance.CreateHumanUserWithTOTP(CTX, totpSecret)
 	createRespImport, err := Client.CreateSession(CTX, &session.CreateSessionRequest{})
 	require.NoError(t, err)
 	sessionTokenImport := createRespImport.GetSessionToken()
@@ -708,7 +708,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 			SessionId: createResp.GetSessionId(),
 			Challenges: &session.RequestChallenges{
 				WebAuthN: &session.RequestChallenges_WebAuthN{
-					Domain:                      Tester.Config.Hostname,
+					Domain:                      Instance.Config.Hostname,
 					UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 				},
 			},
@@ -717,7 +717,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 		verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
 		sessionToken = resp.GetSessionToken()
 
-		assertionData, err := Tester.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
+		assertionData, err := Instance.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), true)
 		require.NoError(t, err)
 
 		resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
@@ -734,7 +734,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 	})
 
 	userAuthCtx := integration.WithAuthorizationToken(CTX, sessionToken)
-	Tester.RegisterUserU2F(userAuthCtx, User.GetUserId())
+	Instance.RegisterUserU2F(userAuthCtx, User.GetUserId())
 	totpSecret := registerTOTP(userAuthCtx, t, User.GetUserId())
 	registerOTPSMS(userAuthCtx, t, User.GetUserId())
 	registerOTPEmail(userAuthCtx, t, User.GetUserId())
@@ -750,7 +750,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 					SessionId: createResp.GetSessionId(),
 					Challenges: &session.RequestChallenges{
 						WebAuthN: &session.RequestChallenges_WebAuthN{
-							Domain:                      Tester.Config.Hostname,
+							Domain:                      Instance.Config.Hostname,
 							UserVerificationRequirement: userVerificationRequirement,
 						},
 					},
@@ -759,7 +759,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 				verifyCurrentSession(t, createResp.GetSessionId(), resp.GetSessionToken(), resp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
 				sessionToken = resp.GetSessionToken()
 
-				assertionData, err := Tester.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), false)
+				assertionData, err := Instance.WebAuthN.CreateAssertionResponse(resp.GetChallenges().GetWebAuthN().GetPublicKeyCredentialRequestOptions(), false)
 				require.NoError(t, err)
 
 				resp, err = Client.SetSession(CTX, &session.SetSessionRequest{
@@ -891,13 +891,13 @@ func TestServer_DeleteSession_token(t *testing.T) {
 
 func TestServer_DeleteSession_own_session(t *testing.T) {
 	// create two users for the test and a session each to get tokens for authorization
-	user1 := Tester.CreateHumanUser(CTX)
-	Tester.SetUserPassword(CTX, user1.GetUserId(), integration.UserPassword, false)
-	_, token1, _, _ := Tester.CreatePasswordSession(t, CTX, user1.GetUserId(), integration.UserPassword)
+	user1 := Instance.CreateHumanUser(CTX)
+	Instance.SetUserPassword(CTX, user1.GetUserId(), integration.UserPassword, false)
+	_, token1, _, _ := Instance.CreatePasswordSession(t, CTX, user1.GetUserId(), integration.UserPassword)
 
-	user2 := Tester.CreateHumanUser(CTX)
-	Tester.SetUserPassword(CTX, user2.GetUserId(), integration.UserPassword, false)
-	_, token2, _, _ := Tester.CreatePasswordSession(t, CTX, user2.GetUserId(), integration.UserPassword)
+	user2 := Instance.CreateHumanUser(CTX)
+	Instance.SetUserPassword(CTX, user2.GetUserId(), integration.UserPassword, false)
+	_, token2, _, _ := Instance.CreatePasswordSession(t, CTX, user2.GetUserId(), integration.UserPassword)
 
 	// create a new session for the first user
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
@@ -937,7 +937,7 @@ func TestServer_DeleteSession_with_permission(t *testing.T) {
 	require.NoError(t, err)
 
 	// delete the new session by ORG_OWNER
-	_, err = Client.DeleteSession(Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
+	_, err = Client.DeleteSession(Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner), &session.DeleteSessionRequest{
 		SessionId: createResp.GetSessionId(),
 	})
 	require.NoError(t, err)
@@ -955,7 +955,7 @@ func Test_ZITADEL_API_missing_authentication(t *testing.T) {
 }
 
 func Test_ZITADEL_API_success(t *testing.T) {
-	id, token, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, User.GetUserId())
+	id, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, User.GetUserId())
 
 	ctx := integration.WithAuthorizationToken(context.Background(), token)
 	sessionResp, err := Client.GetSession(ctx, &session.GetSessionRequest{SessionId: id})
@@ -967,7 +967,7 @@ func Test_ZITADEL_API_success(t *testing.T) {
 }
 
 func Test_ZITADEL_API_session_not_found(t *testing.T) {
-	id, token, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTX, User.GetUserId())
+	id, token, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, User.GetUserId())
 
 	// test session token works
 	ctx := integration.WithAuthorizationToken(context.Background(), token)
@@ -986,7 +986,7 @@ func Test_ZITADEL_API_session_not_found(t *testing.T) {
 }
 
 func Test_ZITADEL_API_session_expired(t *testing.T) {
-	id, token, _, _ := Tester.CreateVerifiedWebAuthNSessionWithLifetime(t, CTX, User.GetUserId(), 20*time.Second)
+	id, token, _, _ := Instance.CreateVerifiedWebAuthNSessionWithLifetime(t, CTX, User.GetUserId(), 20*time.Second)
 
 	// test session token works
 	ctx := integration.WithAuthorizationToken(context.Background(), token)

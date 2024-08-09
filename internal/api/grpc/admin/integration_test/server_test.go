@@ -17,7 +17,7 @@ import (
 
 var (
 	CTX, AdminCTX, SystemCTX context.Context
-	Tester                   *integration.Tester
+	Instance                 *integration.Instance
 	Client                   admin_pb.AdminServiceClient
 )
 
@@ -27,15 +27,15 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Tester, err = integration.NewTester(ctx)
+		Instance, err = integration.FirstInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
 
 		CTX = ctx
-		AdminCTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		SystemCTX = Tester.WithAuthorization(ctx, integration.UserTypeSystem)
-		Client = Tester.Client.Admin
+		AdminCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		SystemCTX = Instance.WithAuthorization(ctx, integration.UserTypeSystem)
+		Client = Instance.Client.Admin
 		return m.Run()
 	}())
 }

@@ -14,7 +14,7 @@ import (
 var (
 	CTX       context.Context
 	SystemCTX context.Context
-	Tester    *integration.Tester
+	Instance  *integration.Instance
 )
 
 func TestMain(m *testing.M) {
@@ -23,13 +23,13 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Tester, err = integration.NewTester(ctx)
+		Instance, err = integration.FirstInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
 
 		CTX = ctx
-		SystemCTX = Tester.WithAuthorization(ctx, integration.UserTypeSystem)
+		SystemCTX = Instance.WithAuthorization(ctx, integration.UserTypeSystem)
 		return m.Run()
 	}())
 }

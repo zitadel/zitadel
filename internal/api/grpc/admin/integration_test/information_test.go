@@ -15,6 +15,6 @@ import (
 func TestServer_Healthz(t *testing.T) {
 	ctx, cancel := context.WithTimeout(AdminCTX, time.Minute)
 	defer cancel()
-	_, err := Tester.Client.Admin.Healthz(ctx, &admin.HealthzRequest{})
+	_, err := Instance.Client.Admin.Healthz(ctx, &admin.HealthzRequest{})
 	require.NoError(t, err)
 }

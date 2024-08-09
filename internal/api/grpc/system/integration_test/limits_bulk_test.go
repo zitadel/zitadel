@@ -18,7 +18,7 @@ func TestServer_Limits_Bulk(t *testing.T) {
 	instances := make([]*instance, len)
 	for i := 0; i < len; i++ {
 		domain := integration.RandString(5) + ".integration.localhost"
-		resp, err := Tester.Client.System.CreateInstance(SystemCTX, &system.CreateInstanceRequest{
+		resp, err := Instance.Client.System.CreateInstance(SystemCTX, &system.CreateInstanceRequest{
 			InstanceName: "testinstance",
 			CustomDomain: domain,
 			Owner: &system.CreateInstanceRequest_Machine_{
@@ -31,7 +31,7 @@ func TestServer_Limits_Bulk(t *testing.T) {
 		require.NoError(t, err)
 		instances[i] = &instance{domain, resp.GetInstanceId()}
 	}
-	resp, err := Tester.Client.System.BulkSetLimits(SystemCTX, &system.BulkSetLimitsRequest{
+	resp, err := Instance.Client.System.BulkSetLimits(SystemCTX, &system.BulkSetLimitsRequest{
 		Limits: []*system.SetLimitsRequest{{
 			InstanceId: instances[0].id,
 			Block:      gu.Ptr(true),

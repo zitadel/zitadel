@@ -17,7 +17,7 @@ import (
 )
 
 func TestServer_JWTProfile(t *testing.T) {
-	user, name, keyData, err := Tester.CreateOIDCJWTProfileClient(CTX)
+	user, name, keyData, err := Instance.CreateOIDCJWTProfileClient(CTX)
 	require.NoError(t, err)
 
 	type claims struct {
@@ -56,14 +56,14 @@ func TestServer_JWTProfile(t *testing.T) {
 			keyData: keyData,
 			scope: []string{
 				oidc.ScopeOpenID,
-				domain.OrgIDScope + Tester.Organisation.Id,
-				domain.OrgDomainPrimaryScope + Tester.Organisation.PrimaryDomain,
+				domain.OrgIDScope + Instance.DefaultOrg.Id,
+				domain.OrgDomainPrimaryScope + Instance.DefaultOrg.PrimaryDomain,
 			},
 			wantClaims: claims{
-				resourceOwnerID:            Tester.Organisation.Id,
-				resourceOwnerName:          Tester.Organisation.Name,
-				resourceOwnerPrimaryDomain: Tester.Organisation.PrimaryDomain,
-				orgDomain:                  Tester.Organisation.PrimaryDomain,
+				resourceOwnerID:            Instance.DefaultOrg.Id,
+				resourceOwnerName:          Instance.DefaultOrg.Name,
+				resourceOwnerPrimaryDomain: Instance.DefaultOrg.PrimaryDomain,
+				orgDomain:                  Instance.DefaultOrg.PrimaryDomain,
 			},
 		},
 		{
@@ -71,29 +71,29 @@ func TestServer_JWTProfile(t *testing.T) {
 			keyData: keyData,
 			scope: []string{
 				oidc.ScopeOpenID,
-				domain.OrgDomainPrimaryScope + Tester.Organisation.PrimaryDomain,
+				domain.OrgDomainPrimaryScope + Instance.DefaultOrg.PrimaryDomain,
 				domain.OrgDomainPrimaryScope + "foo"},
 			wantClaims: claims{
-				orgDomain: Tester.Organisation.PrimaryDomain,
+				orgDomain: Instance.DefaultOrg.PrimaryDomain,
 			},
 		},
 		{
 			name:    "invalid org id filtered",
 			keyData: keyData,
 			scope: []string{oidc.ScopeOpenID,
-				domain.OrgIDScope + Tester.Organisation.Id,
+				domain.OrgIDScope + Instance.DefaultOrg.Id,
 				domain.OrgIDScope + "foo",
 			},
 			wantClaims: claims{
-				resourceOwnerID:            Tester.Organisation.Id,
-				resourceOwnerName:          Tester.Organisation.Name,
-				resourceOwnerPrimaryDomain: Tester.Organisation.PrimaryDomain,
+				resourceOwnerID:            Instance.DefaultOrg.Id,
+				resourceOwnerName:          Instance.DefaultOrg.Name,
+				resourceOwnerPrimaryDomain: Instance.DefaultOrg.PrimaryDomain,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tokenSource, err := profile.NewJWTProfileTokenSourceFromKeyFileData(CTX, Tester.OIDCIssuer(), tt.keyData, tt.scope)
+			tokenSource, err := profile.NewJWTProfileTokenSourceFromKeyFileData(CTX, Instance.OIDCIssuer(), tt.keyData, tt.scope)
 			require.NoError(t, err)
 
 			tokens, err := tokenSource.TokenCtx(CTX)
@@ -104,7 +104,7 @@ func TestServer_JWTProfile(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, tokens)
 
-			provider, err := rp.NewRelyingPartyOIDC(CTX, Tester.OIDCIssuer(), "", "", redirectURI, tt.scope)
+			provider, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), "", "", redirectURI, tt.scope)
 			require.NoError(t, err)
 			userinfo, err := rp.Userinfo[*oidc.UserInfo](CTX, tokens.AccessToken, oidc.BearerToken, user.GetUserId(), provider)
 			require.NoError(t, err)

@@ -19,7 +19,7 @@ import (
 
 func TestServer_RefreshToken_Status(t *testing.T) {
 	clientID, _ := createClient(t)
-	provider, err := Tester.CreateRelyingParty(CTX, clientID, redirectURI)
+	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 
 	tests := []struct {

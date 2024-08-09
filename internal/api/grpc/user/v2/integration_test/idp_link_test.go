@@ -18,7 +18,7 @@ import (
 )
 
 func TestServer_AddIDPLink(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, IamCTX)
+	idpID := Instance.AddGenericOAuthProvider(t, IamCTX)
 	type args struct {
 		ctx context.Context
 		req *user.AddIDPLinkRequest
@@ -50,7 +50,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.UserTypeOrgOwner].ID,
+					UserId: Instance.Users.Get(integration.UserTypeOrgOwner).ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    "idpID",
 						UserId:   "userID",
@@ -66,7 +66,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			args: args{
 				CTX,
 				&user.AddIDPLinkRequest{
-					UserId: Tester.Users[integration.FirstInstanceUsersKey][integration.UserTypeOrgOwner].ID,
+					UserId: Instance.Users.Get(integration.UserTypeOrgOwner).ID,
 					IdpLink: &user.IDPLink{
 						IdpId:    idpID,
 						UserId:   "userID",
@@ -77,7 +77,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 			want: &user.AddIDPLinkResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 			wantErr: false,
@@ -98,21 +98,21 @@ func TestServer_AddIDPLink(t *testing.T) {
 }
 
 func TestServer_ListIDPLinks(t *testing.T) {
-	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
 
-	instanceIdpID := Tester.AddGenericOAuthProvider(t, IamCTX)
-	userInstanceResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	_, err := Tester.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
+	instanceIdpID := Instance.AddGenericOAuthProvider(t, IamCTX)
+	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	_, err := Instance.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
 	require.NoError(t, err)
-	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
-	userOrgResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	_, err = Tester.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
+	orgIdpID := Instance.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
+	userOrgResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	_, err = Instance.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
 	require.NoError(t, err)
 
-	userMultipleResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	_, err = Tester.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", instanceIdpID, "externalUsername_multi")
+	userMultipleResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	_, err = Instance.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", instanceIdpID, "externalUsername_multi")
 	require.NoError(t, err)
-	_, err = Tester.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", orgIdpID, "externalUsername_multi")
+	_, err = Instance.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", orgIdpID, "externalUsername_multi")
 	require.NoError(t, err)
 
 	type args struct {
@@ -257,18 +257,18 @@ func TestServer_ListIDPLinks(t *testing.T) {
 }
 
 func TestServer_RemoveIDPLink(t *testing.T) {
-	orgResp := Tester.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
+	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
 
-	instanceIdpID := Tester.AddGenericOAuthProvider(t, IamCTX)
-	userInstanceResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	_, err := Tester.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
+	instanceIdpID := Instance.AddGenericOAuthProvider(t, IamCTX)
+	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	_, err := Instance.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
 	require.NoError(t, err)
-	orgIdpID := Tester.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
-	userOrgResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	_, err = Tester.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
+	orgIdpID := Instance.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
+	userOrgResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	_, err = Instance.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
 	require.NoError(t, err)
 
-	userNoLinkResp := Tester.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
+	userNoLinkResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
 
 	type args struct {
 		ctx context.Context

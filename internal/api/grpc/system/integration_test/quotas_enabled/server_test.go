@@ -15,7 +15,7 @@ var (
 	CTX         context.Context
 	SystemCTX   context.Context
 	IAMOwnerCTX context.Context
-	Tester      *integration.Tester
+	Instance    *integration.Tester
 )
 
 func TestMain(m *testing.M) {
@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 		defer cancel()
 		CTX = ctx
 
-		Tester = integration.NewTester(ctx, `
+		Instance = integration.NewTester(ctx, `
 Quotas:
   Access:
     Enabled: true

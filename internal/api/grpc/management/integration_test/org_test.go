@@ -38,7 +38,7 @@ func TestServer_ListOrgMemberRoles(t *testing.T) {
 }
 
 func TestServer_ListOrgMembers(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(OrgCTX, Tester.Organisation.Id, gofakeit.Email())
+	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, gofakeit.Email())
 	_, err := Client.AddOrgMember(OrgCTX, &mgmt_pb.AddOrgMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  iamRoles[1:],
@@ -115,7 +115,7 @@ func TestServer_ListOrgMembers(t *testing.T) {
 }
 
 func TestServer_AddOrgMember(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(OrgCTX, Tester.Organisation.Id, gofakeit.Email())
+	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, gofakeit.Email())
 	type args struct {
 		ctx context.Context
 		req *mgmt_pb.AddOrgMemberRequest
@@ -148,7 +148,7 @@ func TestServer_AddOrgMember(t *testing.T) {
 			},
 			want: &mgmt_pb.AddOrgMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 				},
 			},
 		},
@@ -189,7 +189,7 @@ func TestServer_AddOrgMember(t *testing.T) {
 }
 
 func TestServer_UpdateOrgMember(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(OrgCTX, Tester.Organisation.Id, gofakeit.Email())
+	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, gofakeit.Email())
 	_, err := Client.AddOrgMember(OrgCTX, &mgmt_pb.AddOrgMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  []string{"ORG_OWNER"},
@@ -228,7 +228,7 @@ func TestServer_UpdateOrgMember(t *testing.T) {
 			},
 			want: &mgmt_pb.UpdateOrgMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 					ChangeDate:    timestamppb.Now(),
 				},
 			},
@@ -270,7 +270,7 @@ func TestServer_UpdateOrgMember(t *testing.T) {
 }
 
 func TestServer_RemoveIAMMember(t *testing.T) {
-	user := Tester.CreateHumanUserVerified(OrgCTX, Tester.Organisation.Id, gofakeit.Email())
+	user := Instance.CreateHumanUserVerified(OrgCTX, Instance.DefaultOrg.Id, gofakeit.Email())
 	_, err := Client.AddOrgMember(OrgCTX, &mgmt_pb.AddOrgMemberRequest{
 		UserId: user.GetUserId(),
 		Roles:  []string{"ORG_OWNER"},
@@ -307,7 +307,7 @@ func TestServer_RemoveIAMMember(t *testing.T) {
 			},
 			want: &mgmt_pb.RemoveOrgMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Tester.Organisation.Id,
+					ResourceOwner: Instance.DefaultOrg.Id,
 					ChangeDate:    timestamppb.Now(),
 				},
 			},

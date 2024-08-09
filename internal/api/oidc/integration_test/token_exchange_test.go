@@ -26,9 +26,9 @@ import (
 )
 
 func setTokenExchangeFeature(t *testing.T, value bool) {
-	iamCTX := Tester.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	_, err := Tester.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
+	_, err := Instance.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
 		OidcTokenExchange: proto.Bool(value),
 	})
 	require.NoError(t, err)
@@ -36,19 +36,19 @@ func setTokenExchangeFeature(t *testing.T, value bool) {
 }
 
 func resetFeatures(t *testing.T) {
-	iamCTX := Tester.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	_, err := Tester.Client.FeatureV2.ResetInstanceFeatures(iamCTX, &feature.ResetInstanceFeaturesRequest{})
+	iamCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	_, err := Instance.Client.FeatureV2.ResetInstanceFeatures(iamCTX, &feature.ResetInstanceFeaturesRequest{})
 	require.NoError(t, err)
 	time.Sleep(time.Second)
 }
 
 func setImpersonationPolicy(t *testing.T, value bool) {
-	iamCTX := Tester.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	iamCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	policy, err := Tester.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
+	policy, err := Instance.Client.Admin.GetSecurityPolicy(iamCTX, &admin.GetSecurityPolicyRequest{})
 	require.NoError(t, err)
 	if policy.GetPolicy().GetEnableImpersonation() != value {
-		_, err = Tester.Client.Admin.SetSecurityPolicy(iamCTX, &admin.SetSecurityPolicyRequest{
+		_, err = Instance.Client.Admin.SetSecurityPolicy(iamCTX, &admin.SetSecurityPolicyRequest{
 			EnableImpersonation: value,
 		})
 		require.NoError(t, err)
@@ -57,8 +57,8 @@ func setImpersonationPolicy(t *testing.T, value bool) {
 }
 
 func createMachineUserPATWithMembership(t *testing.T, roles ...string) (userID, pat string) {
-	iamCTX := Tester.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	userID, pat, err := Tester.CreateMachineUserPATWithMembership(iamCTX, roles...)
+	iamCTX := Instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	userID, pat, err := Instance.CreateMachineUserPATWithMembership(iamCTX, roles...)
 	require.NoError(t, err)
 	return userID, pat
 }
@@ -117,11 +117,11 @@ func TestServer_TokenExchange(t *testing.T) {
 		setImpersonationPolicy(t, false)
 	})
 
-	client, keyData, err := Tester.CreateOIDCTokenExchangeClient(CTX)
+	client, keyData, err := Instance.CreateOIDCTokenExchangeClient(CTX)
 	require.NoError(t, err)
 	signer, err := rp.SignerFromKeyFile(keyData)()
 	require.NoError(t, err)
-	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(CTX, Tester.OIDCIssuer(), client.GetClientId(), signer)
+	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(CTX, Instance.OIDCIssuer(), client.GetClientId(), signer)
 	require.NoError(t, err)
 
 	time.Sleep(time.Second)
@@ -137,9 +137,9 @@ func TestServer_TokenExchange(t *testing.T) {
 
 	patScopes := oidc.SpaceDelimitedArray{"openid", "profile", "urn:zitadel:iam:user:metadata", "urn:zitadel:iam:user:resourceowner"}
 
-	relyingParty, err := rp.NewRelyingPartyOIDC(CTX, Tester.OIDCIssuer(), client.GetClientId(), "", "", []string{"openid"}, rp.WithJWTProfile(rp.SignerFromKeyFile(keyData)))
+	relyingParty, err := rp.NewRelyingPartyOIDC(CTX, Instance.OIDCIssuer(), client.GetClientId(), "", "", []string{"openid"}, rp.WithJWTProfile(rp.SignerFromKeyFile(keyData)))
 	require.NoError(t, err)
-	resourceServer, err := Tester.CreateResourceServerJWTProfile(CTX, keyData)
+	resourceServer, err := Instance.CreateResourceServerJWTProfile(CTX, keyData)
 	require.NoError(t, err)
 
 	type settings struct {
@@ -481,7 +481,7 @@ func TestServer_TokenExchange(t *testing.T) {
 					token, err := crypto.Sign(&oidc.JWTTokenRequest{
 						Issuer:    client.GetClientId(),
 						Subject:   User.GetUserId(),
-						Audience:  oidc.Audience{Tester.OIDCIssuer()},
+						Audience:  oidc.Audience{Instance.OIDCIssuer()},
 						ExpiresAt: oidc.FromTime(time.Now().Add(time.Hour)),
 						IssuedAt:  oidc.FromTime(time.Now().Add(-time.Second)),
 					}, signer)
@@ -559,13 +559,13 @@ func TestServer_TokenExchange(t *testing.T) {
 // This test tries to call the zitadel API with an impersonated token,
 // which should fail.
 func TestImpersonation_API_Call(t *testing.T) {
-	client, keyData, err := Tester.CreateOIDCTokenExchangeClient(CTX)
+	client, keyData, err := Instance.CreateOIDCTokenExchangeClient(CTX)
 	require.NoError(t, err)
 	signer, err := rp.SignerFromKeyFile(keyData)()
 	require.NoError(t, err)
-	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(CTX, Tester.OIDCIssuer(), client.GetClientId(), signer)
+	exchanger, err := tokenexchange.NewTokenExchangerJWTProfile(CTX, Instance.OIDCIssuer(), client.GetClientId(), signer)
 	require.NoError(t, err)
-	resourceServer, err := Tester.CreateResourceServerJWTProfile(CTX, keyData)
+	resourceServer, err := Instance.CreateResourceServerJWTProfile(CTX, keyData)
 	require.NoError(t, err)
 
 	setTokenExchangeFeature(t, true)
@@ -576,7 +576,7 @@ func TestImpersonation_API_Call(t *testing.T) {
 	})
 
 	iamUserID, iamImpersonatorPAT := createMachineUserPATWithMembership(t, "IAM_ADMIN_IMPERSONATOR")
-	iamOwner := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.UserTypeIAMOwner)
+	iamOwner := Instance.Users.Get(integration.UserTypeIAMOwner)
 
 	// impersonating the IAM owner!
 	resp, err := tokenexchange.ExchangeToken(CTX, exchanger, iamOwner.Token, oidc.AccessTokenType, iamImpersonatorPAT, oidc.AccessTokenType, nil, nil, nil, oidc.AccessTokenType)
@@ -584,7 +584,7 @@ func TestImpersonation_API_Call(t *testing.T) {
 	accessTokenVerifier(CTX, resourceServer, iamOwner.ID, iamUserID)
 
 	impersonatedCTX := integration.WithAuthorizationToken(CTX, resp.AccessToken)
-	_, err = Tester.Client.Admin.GetAllowedLanguages(impersonatedCTX, &admin.GetAllowedLanguagesRequest{})
+	_, err = Instance.Client.Admin.GetAllowedLanguages(impersonatedCTX, &admin.GetAllowedLanguagesRequest{})
 	status := status.Convert(err)
 	assert.Equal(t, codes.PermissionDenied, status.Code())
 	assert.Equal(t, "Errors.TokenExchange.Token.NotForAPI (APP-Shi0J)", status.Message())

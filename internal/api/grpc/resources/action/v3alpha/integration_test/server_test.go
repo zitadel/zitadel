@@ -18,9 +18,9 @@ import (
 )
 
 var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client action.ZITADELActionsClient
+	CTX      context.Context
+	Instance *integration.Instance
+	Client   action.ZITADELActionsClient
 )
 
 func TestMain(m *testing.M) {
@@ -29,26 +29,26 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Tester, err = integration.NewTester(ctx)
+		Instance, err = integration.FirstInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
-		Client = Tester.Client.ActionV3
+		Client = Instance.Client.ActionV3
 
-		CTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		return m.Run()
 	}())
 }
 
 func ensureFeatureEnabled(t *testing.T) {
-	f, err := Tester.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
+	f, err := Instance.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
 		Inheritance: true,
 	})
 	require.NoError(t, err)
 	if f.Actions.GetEnabled() {
 		return
 	}
-	_, err = Tester.Client.FeatureV2.SetInstanceFeatures(CTX, &feature.SetInstanceFeaturesRequest{
+	_, err = Instance.Client.FeatureV2.SetInstanceFeatures(CTX, &feature.SetInstanceFeaturesRequest{
 		Actions: gu.Ptr(true),
 	})
 	require.NoError(t, err)
@@ -58,7 +58,7 @@ func ensureFeatureEnabled(t *testing.T) {
 	}
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
-			f, err := Tester.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
+			f, err := Instance.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
 				Inheritance: true,
 			})
 			require.NoError(ttt, err)

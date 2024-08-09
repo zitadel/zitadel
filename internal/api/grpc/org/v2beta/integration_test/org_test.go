@@ -20,10 +20,10 @@ import (
 )
 
 var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client org.OrganizationServiceClient
-	User   *user.AddHumanUserResponse
+	CTX      context.Context
+	Instance *integration.Instance
+	Client   org.OrganizationServiceClient
+	User     *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
@@ -32,20 +32,20 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Tester, err = integration.NewTester(ctx)
+		Instance, err = integration.FirstInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
-		Client = Tester.Client.OrgV2beta
+		Client = Instance.Client.OrgV2beta
 
-		CTX = Tester.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		User = Tester.CreateHumanUser(CTX)
+		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		User = Instance.CreateHumanUser(CTX)
 		return m.Run()
 	}())
 }
 
 func TestServer_AddOrganization(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, CTX)
+	idpID := Instance.AddGenericOAuthProvider(t, CTX)
 
 	tests := []struct {
 		name    string
@@ -56,7 +56,7 @@ func TestServer_AddOrganization(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Tester.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &org.AddOrganizationRequest{
 				Name:   "name",
 				Admins: nil,

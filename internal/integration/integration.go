@@ -31,7 +31,9 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/instance"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
+	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/org"
+	"github.com/zitadel/zitadel/pkg/grpc/system"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
@@ -79,8 +81,7 @@ const (
 )
 
 const (
-	FirstInstanceUsersKey = "first"
-	UserPassword          = "VeryS3cret!"
+	UserPassword = "VeryS3cret!"
 )
 
 const (
@@ -95,20 +96,14 @@ type User struct {
 	Token    string
 }
 
-type InstanceUserMap map[string]map[UserType]*User
+type UserMap map[UserType]*User
 
-func (m InstanceUserMap) Set(instanceID string, typ UserType, user *User) {
-	if m[instanceID] == nil {
-		m[instanceID] = make(map[UserType]*User)
-	}
-	m[instanceID][typ] = user
+func (m UserMap) Set(typ UserType, user *User) {
+	m[typ] = user
 }
 
-func (m InstanceUserMap) Get(instanceID string, typ UserType) *User {
-	if users, ok := m[instanceID]; ok {
-		return users[typ]
-	}
-	return nil
+func (m UserMap) Get(typ UserType) *User {
+	return m[typ]
 }
 
 type Config struct {
@@ -120,48 +115,151 @@ type Config struct {
 	WebAuthNName string
 }
 
-// Tester is a Zitadel server and client with all resources available for testing.
-type Tester struct {
-	Config       Config
-	Instance     *instance.InstanceDetail
-	Organisation *org.Org
-	Users        InstanceUserMap
+// Host returns the primary host of zitadel, on which the first instance is served.
+// http://localhost:8080 by default
+func (c *Config) Host() string {
+	return fmt.Sprintf("%s:%d", c.Hostname, c.Port)
+}
+
+// Instance is a Zitadel server and client with all resources available for testing.
+type Instance struct {
+	Config     Config
+	Domain     string
+	Instance   *instance.InstanceDetail
+	DefaultOrg *org.Org
+	Users      UserMap
 
 	Client   *Client
 	WebAuthN *webauthn.Client
 }
 
-func (c *Config) Host() string {
-	return fmt.Sprintf("%s:%d", c.Hostname, c.Port)
+// InitFirstInstance parses config, creates machine users and
+// gets default instance and org information.
+// Needed details are stored in a state file and can be loaded
+// with [loadStateFile] for reuse between multiple test packages.
+//
+// If an existing state file has the same first instance ID as reported
+// by the server, the file will not be modified.
+//
+// The integration test server must be running.
+func InitFirstInstance(ctx context.Context) error {
+	var config Config
+	if err := yaml.Unmarshal(clientYAML, &config); err != nil {
+		return err
+	}
+	i := &Instance{
+		Config: config,
+		Domain: config.Hostname,
+	}
+	token, err := loadInstanceOwnerPAT()
+	if err != nil {
+		return err
+	}
+	if err := i.setupInstance(ctx, token); err != nil {
+		return err
+	}
+	data, err := json.MarshalIndent(i, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(tmpDir, stateFile), data, os.ModePerm)
 }
 
-// NewTester constructs a new Tester from a reusable state file,
-// and constructs the gRPC clients.
+// FirstInstance constructs the first Instance from a reusable state file.
+// The returned Instance contains a gRPC client connected to the domain of the new instance.
+// The included users are the (global) system user, IAM_OWNER, ORG_OWNER of the default org and
+// a Login client user.
 // The integration test server must be running.
-func NewTester(ctx context.Context) (*Tester, error) {
-	tester, err := loadStateFile()
+func FirstInstance(ctx context.Context) (*Instance, error) {
+	instance, err := loadStateFile()
 	if err != nil {
 		return nil, err
 	}
+	if err := yaml.Unmarshal(clientYAML, &instance.Config); err != nil {
+		return nil, err
+	}
+
 	// refresh short-lived system user token
-	if err = tester.createSystemUser(); err != nil {
+	if err = instance.createSystemUser(); err != nil {
 		return nil, err
 	}
-	tester.WebAuthN = webauthn.NewClient(tester.Config.WebAuthNName, tester.Config.Hostname, http_util.BuildOrigin(tester.Host(), tester.Config.Secure))
-	tester.Client, err = newClient(ctx, tester.Host())
+	instance.createWebAuthNClient()
+	instance.Client, err = newClient(ctx, instance.Host())
 	if err != nil {
 		return nil, err
 	}
-	return tester, nil
+	return instance, nil
+}
+
+// UseIsolatedInstance creates a new ZITADEL instance with machine users, using the system API.
+// The returned Instance contains a gRPC client connected to the domain of the new instance.
+// The included users are the (global) system user, IAM_OWNER, ORG_OWNER of the default org and
+// a Login client user.
+func (i *Instance) UseIsolatedInstance(ctx context.Context) (*Instance, error) {
+	systemCtx := i.WithAuthorization(ctx, UserTypeSystem)
+	primaryDomain := RandString(5) + ".integration.localhost"
+	instance, err := i.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
+		InstanceName: "testinstance",
+		CustomDomain: primaryDomain,
+		Owner: &system.CreateInstanceRequest_Machine_{
+			Machine: &system.CreateInstanceRequest_Machine{
+				UserName:            "owner",
+				Name:                "owner",
+				PersonalAccessToken: &system.CreateInstanceRequest_PersonalAccessToken{},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	newI := &Instance{
+		Config: i.Config,
+		Domain: primaryDomain,
+	}
+	if err := newI.setupInstance(ctx, instance.GetPat()); err != nil {
+		return nil, err
+	}
+	newI.createWebAuthNClient()
+	_, err = newI.Client.Mgmt.ImportHumanUser(newI.WithAuthorization(ctx, UserTypeIAMOwner), &mgmt.ImportHumanUserRequest{
+		UserName: "zitadel-admin@zitadel.localhost",
+		Email: &mgmt.ImportHumanUserRequest_Email{
+			Email:           "zitadel-admin@zitadel.localhost",
+			IsEmailVerified: true,
+		},
+		Password: "Password1!",
+		Profile: &mgmt.ImportHumanUserRequest_Profile{
+			FirstName: "hodor",
+			LastName:  "hodor",
+			NickName:  "hodor",
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return newI, nil
+}
+
+func (i *Instance) setupInstance(ctx context.Context, token string) error {
+	i.Users = make(UserMap)
+	ctx = WithAuthorizationToken(ctx, token)
+	return errors.Join(
+		i.setClient(ctx),
+		i.setInstance(ctx),
+		i.setOrganization(ctx),
+		i.createSystemUser(),
+		i.createMachineUserInstanceOwner(ctx, token),
+		i.createMachineUserOrgOwner(ctx),
+		i.createLoginClient(ctx),
+	)
 }
 
 // loadStateFile loads a state file with instance, org and machine user details.
-func loadStateFile() (*Tester, error) {
+func loadStateFile() (*Instance, error) {
 	data, err := os.ReadFile(path.Join(tmpDir, stateFile))
 	if err != nil {
 		return nil, fmt.Errorf("integration load tester: %w", err)
 	}
-	dst := new(Tester)
+	dst := new(Instance)
 	if err = json.Unmarshal(data, dst); err != nil {
 		return nil, fmt.Errorf("integration load tester: %w", err)
 	}
@@ -169,30 +267,30 @@ func loadStateFile() (*Tester, error) {
 }
 
 type jsonTester struct {
-	Config       Config
+	Domain       string
 	Instance     json.RawMessage
 	Organization json.RawMessage
-	Users        InstanceUserMap
+	Users        UserMap
 }
 
-func (s *Tester) MarshalJSON() ([]byte, error) {
-	instance, err := protojson.Marshal(s.Instance)
+func (i *Instance) MarshalJSON() ([]byte, error) {
+	instance, err := protojson.Marshal(i.Instance)
 	if err != nil {
 		return nil, err
 	}
-	org, err := protojson.Marshal(s.Organisation)
+	org, err := protojson.Marshal(i.DefaultOrg)
 	if err != nil {
 		return nil, err
 	}
 	return json.Marshal(jsonTester{
-		Config:       s.Config,
+		Domain:       i.Domain,
 		Instance:     instance,
 		Organization: org,
-		Users:        s.Users,
+		Users:        i.Users,
 	})
 }
 
-func (s *Tester) UnmarshalJSON(data []byte) error {
+func (i *Instance) UnmarshalJSON(data []byte) error {
 	dst := new(jsonTester)
 	if err := json.Unmarshal(data, dst); err != nil {
 		return err
@@ -206,22 +304,23 @@ func (s *Tester) UnmarshalJSON(data []byte) error {
 	if err := protojson.Unmarshal(dst.Organization, org); err != nil {
 		return err
 	}
-	*s = Tester{
-		Config:       dst.Config,
-		Instance:     instance,
-		Organisation: org,
-		Users:        dst.Users,
+	*i = Instance{
+		Domain:     dst.Domain,
+		Instance:   instance,
+		DefaultOrg: org,
+		Users:      dst.Users,
 	}
 	return nil
 }
 
-func (s *Tester) Host() string {
-	return s.Config.Host()
+// Host returns the primary Domain of the instance with the port.
+func (i *Instance) Host() string {
+	return fmt.Sprintf("%s:%d", i.Domain, i.Config.Port)
 }
 
-func (s *Tester) createSystemUser() error {
+func (i *Instance) createSystemUser() error {
 	const ISSUER = "tester"
-	audience := http_util.BuildOrigin(s.Host(), false)
+	audience := http_util.BuildOrigin(i.Config.Host(), false)
 	signer, err := client.NewSignerFromPrivateKeyByte(systemUserKey, "")
 	if err != nil {
 		return err
@@ -230,7 +329,7 @@ func (s *Tester) createSystemUser() error {
 	if err != nil {
 		return err
 	}
-	s.Users.Set(FirstInstanceUsersKey, UserTypeSystem, &User{
+	i.Users.Set(UserTypeSystem, &User{
 		ID:       "SYSTEM",
 		Username: "SYSTEM",
 		Token:    jwt,
@@ -246,12 +345,12 @@ func loadInstanceOwnerPAT() (string, error) {
 	return string(bytes.TrimSpace(data)), nil
 }
 
-func (s *Tester) createMachineUserInstanceOwner(ctx context.Context, token string) error {
-	user, err := s.Client.Auth.GetMyUser(WithAuthorizationToken(ctx, token), &auth.GetMyUserRequest{})
+func (i *Instance) createMachineUserInstanceOwner(ctx context.Context, token string) error {
+	user, err := i.Client.Auth.GetMyUser(WithAuthorizationToken(ctx, token), &auth.GetMyUserRequest{})
 	if err != nil {
 		return err
 	}
-	s.Users.Set(FirstInstanceUsersKey, UserTypeIAMOwner, &User{
+	i.Users.Set(UserTypeIAMOwner, &User{
 		ID:       user.GetUser().GetId(),
 		Username: user.GetUser().GetUserName(),
 		Token:    token,
@@ -259,35 +358,53 @@ func (s *Tester) createMachineUserInstanceOwner(ctx context.Context, token strin
 	return nil
 }
 
-func (s *Tester) createMachineUserOrgOwner(ctx context.Context) error {
-	userID, err := s.createMachineUser(ctx, UserTypeOrgOwner)
+func (i *Instance) createMachineUserOrgOwner(ctx context.Context) error {
+	userID, err := i.createMachineUser(ctx, UserTypeOrgOwner)
 	if err != nil {
 		return err
 	}
-	_, err = s.Client.Mgmt.AddOrgMember(ctx, &management.AddOrgMemberRequest{
+	_, err = i.Client.Mgmt.AddOrgMember(ctx, &management.AddOrgMemberRequest{
 		UserId: userID,
 		Roles:  []string{"ORG_OWNER"},
 	})
 	return err
 }
 
-func (s *Tester) createLoginClient(ctx context.Context) error {
-	_, err := s.createMachineUser(ctx, UserTypeLogin)
+func (i *Instance) createLoginClient(ctx context.Context) error {
+	_, err := i.createMachineUser(ctx, UserTypeLogin)
 	return err
 }
 
-func (s *Tester) setOrganization(ctx context.Context) error {
-	resp, err := s.Client.Mgmt.GetMyOrg(ctx, &management.GetMyOrgRequest{})
+func (i *Instance) setClient(ctx context.Context) error {
+	client, err := newClient(ctx, i.Host())
 	if err != nil {
 		return err
 	}
-	s.Organisation = resp.GetOrg()
+	i.Client = client
 	return nil
 }
 
-func (s *Tester) createMachineUser(ctx context.Context, userType UserType) (userID string, err error) {
+func (i *Instance) setInstance(ctx context.Context) error {
+	instance, err := i.Client.Admin.GetMyInstance(ctx, &admin.GetMyInstanceRequest{})
+	if err != nil {
+		return err
+	}
+	i.Instance = instance.GetInstance()
+	return nil
+}
+
+func (i *Instance) setOrganization(ctx context.Context) error {
+	resp, err := i.Client.Mgmt.GetMyOrg(ctx, &management.GetMyOrgRequest{})
+	if err != nil {
+		return err
+	}
+	i.DefaultOrg = resp.GetOrg()
+	return nil
+}
+
+func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (userID string, err error) {
 	username := gofakeit.Username()
-	userResp, err := s.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+	userResp, err := i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		UserName:        username,
 		Name:            username,
 		Description:     userType.String(),
@@ -297,13 +414,13 @@ func (s *Tester) createMachineUser(ctx context.Context, userType UserType) (user
 		return "", err
 	}
 	userID = userResp.GetUserId()
-	patResp, err := s.Client.Mgmt.AddPersonalAccessToken(ctx, &management.AddPersonalAccessTokenRequest{
+	patResp, err := i.Client.Mgmt.AddPersonalAccessToken(ctx, &management.AddPersonalAccessTokenRequest{
 		UserId: userID,
 	})
 	if err != nil {
 		return "", err
 	}
-	s.Users.Set(FirstInstanceUsersKey, userType, &User{
+	i.Users.Set(userType, &User{
 		ID:       userID,
 		Username: username,
 		Token:    patResp.GetToken(),
@@ -311,16 +428,20 @@ func (s *Tester) createMachineUser(ctx context.Context, userType UserType) (user
 	return userID, nil
 }
 
-func (s *Tester) WithAuthorization(ctx context.Context, u UserType) context.Context {
-	return s.WithInstanceAuthorization(ctx, u, FirstInstanceUsersKey)
+func (i *Instance) createWebAuthNClient() {
+	i.WebAuthN = webauthn.NewClient(i.Config.WebAuthNName, i.Domain, http_util.BuildOrigin(i.Host(), i.Config.Secure))
 }
 
-func (s *Tester) WithInstanceAuthorization(ctx context.Context, u UserType, instanceID string) context.Context {
-	return WithAuthorizationToken(ctx, s.Users.Get(instanceID, u).Token)
+func (i *Instance) WithAuthorization(ctx context.Context, u UserType) context.Context {
+	return i.WithInstanceAuthorization(ctx, u)
 }
 
-func (s *Tester) GetUserID(u UserType) string {
-	return s.Users.Get(FirstInstanceUsersKey, u).ID
+func (i *Instance) WithInstanceAuthorization(ctx context.Context, u UserType) context.Context {
+	return WithAuthorizationToken(ctx, i.Users.Get(u).Token)
+}
+
+func (i *Instance) GetUserID(u UserType) string {
+	return i.Users.Get(u).ID
 }
 
 func WithAuthorizationToken(ctx context.Context, token string) context.Context {
@@ -332,7 +453,7 @@ func WithAuthorizationToken(ctx context.Context, token string) context.Context {
 	return metadata.NewOutgoingContext(ctx, md)
 }
 
-func (s *Tester) BearerToken(ctx context.Context) string {
+func (i *Instance) BearerToken(ctx context.Context) string {
 	md, ok := metadata.FromOutgoingContext(ctx)
 	if !ok {
 		return ""
@@ -340,64 +461,8 @@ func (s *Tester) BearerToken(ctx context.Context) string {
 	return md.Get("Authorization")[0]
 }
 
-func (s *Tester) WithSystemAuthorizationHTTP(u UserType) map[string]string {
-	return map[string]string{"Authorization": fmt.Sprintf("Bearer %s", s.Users.Get(FirstInstanceUsersKey, u).Token)}
-}
-
-// InitTesterState parses config, creates machine users and
-// gets default instance and org information.
-// Needed details are stored in a state file and can be loaded
-// with [loadStateFile] for reuse between multiple test packages.
-//
-// If an existing state file has the same first instance ID as reported
-// by the server, the file will not be modified.
-//
-// The integration test server must be running.
-func InitTesterState(ctx context.Context) error {
-	var config Config
-	if err := yaml.Unmarshal(clientYAML, &config); err != nil {
-		return err
-	}
-	client, err := newClient(ctx, config.Host())
-	if err != nil {
-		return err
-	}
-	token, err := loadInstanceOwnerPAT()
-	if err != nil {
-		return err
-	}
-
-	ctx = WithAuthorizationToken(ctx, token)
-	instance, err := client.Admin.GetMyInstance(ctx, &admin.GetMyInstanceRequest{})
-	if err != nil {
-		return err
-	}
-	tester, err := loadStateFile()
-	if err == nil && tester.Instance.GetId() == instance.GetInstance().GetId() {
-		return nil
-	}
-	tester = &Tester{
-		Users: make(InstanceUserMap),
-	}
-	tester.Instance = instance.GetInstance()
-	tester.Client = client
-	tester.Config = config
-
-	err = errors.Join(
-		tester.setOrganization(ctx),
-		tester.createSystemUser(),
-		tester.createMachineUserInstanceOwner(ctx, token),
-		tester.createMachineUserOrgOwner(ctx),
-		tester.createLoginClient(ctx),
-	)
-	if err != nil {
-		return err
-	}
-	data, err := json.MarshalIndent(tester, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(filepath.Join(tmpDir, stateFile), data, os.ModePerm)
+func (i *Instance) WithSystemAuthorizationHTTP(u UserType) map[string]string {
+	return map[string]string{"Authorization": fmt.Sprintf("Bearer %s", i.Users.Get(u).Token)}
 }
 
 func runMilestoneServer(ctx context.Context, bodies chan []byte) (*httptest.Server, error) {
