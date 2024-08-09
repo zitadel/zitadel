@@ -47,10 +47,10 @@ const PROVIDER_MAPPING: {
   [ProviderSlug.AZURE]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation?.toJson() as {
       User: {
-        email: string;
-        name?: string;
-        given_name?: string;
-        family_name?: string;
+        mail: string;
+        displayName?: string;
+        givenName?: string;
+        surname?: string;
       };
     };
 
@@ -63,14 +63,14 @@ const PROVIDER_MAPPING: {
     const req: PartialMessage<AddHumanUserRequest> = {
       username: idp.userName,
       email: {
-        email: rawInfo.User?.email,
+        email: rawInfo.User?.mail,
         verification: { case: "isVerified", value: true },
       },
       // organisation: Organisation | undefined;
       profile: {
-        displayName: rawInfo.User?.name ?? "",
-        givenName: rawInfo.User?.given_name ?? "",
-        familyName: rawInfo.User?.family_name ?? "",
+        displayName: rawInfo.User?.displayName ?? "",
+        givenName: rawInfo.User?.givenName ?? "",
+        familyName: rawInfo.User?.surname ?? "",
       },
       idpLinks: [idpLink],
     };
@@ -116,7 +116,6 @@ function createUser(
   info: IDPInformation,
 ): Promise<string> {
   const userData = PROVIDER_MAPPING[provider](info);
-  console.log(JSON.stringify(info));
   return userService.addHumanUser(userData, {}).then((resp) => resp.userId);
 }
 
