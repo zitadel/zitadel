@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-
 package zitadel.org.v2;
 
 import "zitadel/object/v2/object.proto";
@@ -18,6 +17,8 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
+import "zitadel/org/v2/org.proto";
+import "zitadel/org/v2/query.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2;org";
 
@@ -111,7 +112,9 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service OrganizationService {
 
-  // Create a new organization and grant the user(s) permission to manage it
+  // Create an Organization
+  //
+  // Create a new organization with an administrative user. If no specific roles are sent for the users, they will be granted the role ORG_OWNER.
   rpc AddOrganization(AddOrganizationRequest) returns (AddOrganizationResponse) {
     option (google.api.http) = {
       post: "/v2/organizations"
@@ -128,13 +131,50 @@ service OrganizationService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Create an Organization";
-      description: "Create a new organization with an administrative user. If no specific roles are sent for the users, they will be granted the role ORG_OWNER."
       responses: {
         key: "200"
         value: {
           description: "OK";
         }
+      };
+    };
+  }
+
+  // Search Organizations
+  //
+  // Search for Organizations. By default, we will return all organization of the instance. Make sure to include a limit and sorting for pagination..
+  rpc ListOrganizations(ListOrganizationsRequest) returns (ListOrganizationsResponse) {
+    option (google.api.http) = {
+      post: "/v2/organizations/_search";
+      body: "*";
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "org.read"
+      }
+      http_response: {
+        success_code: 200
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "A list of all organizations matching the query";
+        }
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
       };
     };
   }
@@ -171,4 +211,19 @@ message AddOrganizationResponse{
   zitadel.object.v2.Details details = 1;
   string organization_id = 2;
   repeated CreatedAdmin created_admins = 3;
+}
+
+message ListOrganizationsRequest {
+  //list limitations and ordering
+  zitadel.object.v2.ListQuery query = 1;
+  // the field the result is sorted
+  zitadel.org.v2.OrganizationFieldName sorting_column = 2;
+  //criteria the client is looking for
+  repeated zitadel.org.v2.SearchQuery queries = 3;
+}
+
+message ListOrganizationsResponse {
+  zitadel.object.v2.ListDetails details = 1;
+  zitadel.org.v2.OrganizationFieldName sorting_column = 2;
+  repeated zitadel.org.v2.Organization result = 3;
 }
