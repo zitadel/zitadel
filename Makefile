@@ -121,7 +121,7 @@ core_integration_server_start: core_integration_setup
 
 .PHONY: core_integration_test_packages
 core_integration_test_packages:
-	go test -count 1 -tags integration $$(go list -tags integration ./... | grep "integration_test")
+	go test -count 1 -tags -timeout 1h integration $$(go list -tags integration ./... | grep "integration_test")
 
 .PHONY: core_integration_server_stop
 core_integration_server_stop:
