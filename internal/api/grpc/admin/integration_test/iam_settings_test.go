@@ -17,21 +17,18 @@ import (
 )
 
 func TestServer_GetSecurityPolicy(t *testing.T) {
-	_, err := Client.SetSecurityPolicy(AdminCTX, &admin_pb.SetSecurityPolicyRequest{
+	t.Parallel()
+
+	instance, err := Instance.UseIsolatedInstance(CTX)
+	require.NoError(t, err)
+	adminCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	_, err = instance.Client.Admin.SetSecurityPolicy(adminCtx, &admin_pb.SetSecurityPolicyRequest{
 		EnableIframeEmbedding: true,
 		AllowedOrigins:        []string{"foo.com", "bar.com"},
 		EnableImpersonation:   true,
 	})
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		_, err := Client.SetSecurityPolicy(AdminCTX, &admin_pb.SetSecurityPolicyRequest{
-			EnableIframeEmbedding: false,
-			AllowedOrigins:        []string{},
-			EnableImpersonation:   false,
-		})
-		require.NoError(t, err)
-	})
-
 	tests := []struct {
 		name    string
 		ctx     context.Context
@@ -40,12 +37,12 @@ func TestServer_GetSecurityPolicy(t *testing.T) {
 	}{
 		{
 			name:    "permission error",
-			ctx:     Instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+			ctx:     instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
 			wantErr: true,
 		},
 		{
 			name: "success",
-			ctx:  AdminCTX,
+			ctx:  adminCtx,
 			want: &admin_pb.GetSecurityPolicyResponse{
 				Policy: &settings.SecurityPolicy{
 					EnableIframeEmbedding: true,
@@ -57,7 +54,7 @@ func TestServer_GetSecurityPolicy(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := Client.GetSecurityPolicy(tt.ctx, &admin_pb.GetSecurityPolicyRequest{})
+			resp, err := instance.Client.Admin.GetSecurityPolicy(tt.ctx, &admin_pb.GetSecurityPolicyRequest{})
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
@@ -72,6 +69,12 @@ func TestServer_GetSecurityPolicy(t *testing.T) {
 }
 
 func TestServer_SetSecurityPolicy(t *testing.T) {
+	t.Parallel()
+
+	instance, err := Instance.UseIsolatedInstance(CTX)
+	require.NoError(t, err)
+	adminCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
 	type args struct {
 		ctx context.Context
 		req *admin_pb.SetSecurityPolicyRequest
@@ -85,7 +88,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 		{
 			name: "permission error",
 			args: args{
-				ctx: Instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
+				ctx: instance.WithAuthorization(CTX, integration.UserTypeOrgOwner),
 				req: &admin_pb.SetSecurityPolicyRequest{
 					EnableIframeEmbedding: true,
 					AllowedOrigins:        []string{"foo.com", "bar.com"},
@@ -97,7 +100,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 		{
 			name: "success allowed origins",
 			args: args{
-				ctx: AdminCTX,
+				ctx: adminCtx,
 				req: &admin_pb.SetSecurityPolicyRequest{
 					AllowedOrigins: []string{"foo.com", "bar.com"},
 				},
@@ -105,14 +108,14 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "success iframe embedding",
 			args: args{
-				ctx: AdminCTX,
+				ctx: adminCtx,
 				req: &admin_pb.SetSecurityPolicyRequest{
 					EnableIframeEmbedding: true,
 				},
@@ -120,14 +123,14 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "success impersonation",
 			args: args{
-				ctx: AdminCTX,
+				ctx: adminCtx,
 				req: &admin_pb.SetSecurityPolicyRequest{
 					EnableImpersonation: true,
 				},
@@ -135,14 +138,14 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: instance.Instance.Id,
 				},
 			},
 		},
 		{
 			name: "success all",
 			args: args{
-				ctx: AdminCTX,
+				ctx: adminCtx,
 				req: &admin_pb.SetSecurityPolicyRequest{
 					EnableIframeEmbedding: true,
 					AllowedOrigins:        []string{"foo.com", "bar.com"},
@@ -152,14 +155,14 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: instance.Instance.Id,
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.SetSecurityPolicy(tt.args.ctx, tt.args.req)
+			got, err := instance.Client.Admin.SetSecurityPolicy(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
