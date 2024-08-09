@@ -44,7 +44,7 @@ Migrate only copies events2 and unique constraints`,
 }
 
 func copyEventstore(ctx context.Context, config *Migration) {
-	sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeQuery)
+	sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeEventPusher)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
 

@@ -12,13 +12,12 @@ import (
 var (
 	_ eventstore.Pusher  = (*Storage)(nil)
 	_ eventstore.Querier = (*Storage)(nil)
-
-	pushPositionStmt string
 )
 
 type Storage struct {
-	client *database.DB
-	config *Config
+	client           *database.DB
+	config           *Config
+	pushPositionStmt string
 }
 
 type Config struct {
@@ -28,19 +27,21 @@ type Config struct {
 func New(client *database.DB, config *Config) *Storage {
 	initPushStmt(client.Type())
 	return &Storage{
-		client: client,
-		config: config,
+		client:           client,
+		config:           config,
+		pushPositionStmt: initPushStmt(client.Type()),
 	}
 }
 
-func initPushStmt(typ string) {
+func initPushStmt(typ string) string {
 	switch typ {
 	case "cockroach":
-		pushPositionStmt = ", hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp()"
+		return ", hlc_to_timestamp(cluster_logical_timestamp()), cluster_logical_timestamp()"
 	case "postgres":
-		pushPositionStmt = ", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())"
+		return ", statement_timestamp(), EXTRACT(EPOCH FROM clock_timestamp())"
 	default:
 		logging.WithFields("database_type", typ).Panic("position statement for type not implemented")
+		return ""
 	}
 }
 
