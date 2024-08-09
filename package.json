@@ -30,10 +30,10 @@
     "eslint-config-zitadel": "workspace:*",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^4.0.0",
-    "tsup": "^8.0.2",
-    "turbo": "2.0.9",
+    "tsup": "^8.2.4",
+    "turbo": "2.0.12",
     "typescript": "^5.4.5",
-    "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^1.6.0"
+    "vite-tsconfig-paths": "^5.0.1",
+    "vitest": "^2.0.5"
   }
 }
