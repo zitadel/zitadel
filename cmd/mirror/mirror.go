@@ -49,10 +49,10 @@ Order of execution:
 			}
 
 			if isSrcFile = viper.IsSet("Source.file.path"); isSrcFile {
-				filePath = viper.GetString("Source.file.path")
+				filePath = viper.GetString("Source.file.path") + "/"
 			}
 			if isDestFile = viper.IsSet("Destination.file.path"); isDestFile {
-				filePath = viper.GetString("Destination.file.path")
+				filePath = viper.GetString("Destination.file.path") + "/"
 			}
 
 			if isSrcFile || isDestFile {
@@ -118,7 +118,7 @@ func mirrorFlags(cmd *cobra.Command) {
 
 func instanceClause() string {
 	if isSystem {
-		return "WHERE instance_id <> ''"
+		return ""
 	}
 	for i := range instanceIDs {
 		instanceIDs[i] = "'" + instanceIDs[i] + "'"

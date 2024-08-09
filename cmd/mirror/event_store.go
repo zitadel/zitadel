@@ -51,15 +51,15 @@ func copyEventstore(ctx context.Context, config *Migration) {
 		logging.OnError(err).Fatal("unable to connect to destination database")
 		defer destClient.Close()
 
-		copyEventsFromFile(ctx, destClient)
-		copyUniqueConstraintsFromFile(ctx, destClient)
+		copyEventsFromFile(ctx, destClient, "eventstore.events2.csv")
+		copyUniqueConstraintsFromFile(ctx, destClient, "eventstore.unique_constraints.csv")
 	case isDestFile:
 		sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeQuery)
 		logging.OnError(err).Fatal("unable to connect to source database")
 		defer sourceClient.Close()
 
-		copyEventsToFile(ctx, sourceClient)
-		copyUniqueConstraintsToFile(ctx, sourceClient)
+		copyEventsToFile(ctx, sourceClient, "eventstore.events2.csv")
+		copyUniqueConstraintsToFile(ctx, sourceClient, "eventstore.unique_constraints.csv")
 	default:
 		sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeQuery)
 		logging.OnError(err).Fatal("unable to connect to source database")
@@ -97,7 +97,7 @@ func copyEventsDB(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	logging.OnError(err).Fatal("unable to acquire source connection")
 
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire dest connection")
+	logging.OnError(err).Fatal("unable to acquire destination connection")
 
 	sourceES := eventstore.NewEventstoreFromOne(postgres.New(source, &postgres.Config{
 		MaxRetries: 3,
@@ -125,9 +125,14 @@ func copyEventsDB(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 			var i uint32
 			for position := range pos {
 				var stmt database.Statement
-				stmt.WriteString("COPY (SELECT instance_id, aggregate_type, aggregate_id, event_type, sequence, revision, created_at, regexp_replace(payload::TEXT, '\\\\u0000', '', 'g')::JSON payload, creator, owner, ")
+				stmt.WriteString(`COPY (SELECT instance_id, aggregate_type, 
+								aggregate_id, event_type, sequence, revision, 
+								created_at, regexp_replace(payload::TEXT, '\\\\u0000', '', 'g')::JSON 
+								payload, creator, owner, `)
 				stmt.WriteArg(position)
-				stmt.WriteString(" position, row_number() OVER (PARTITION BY instance_id ORDER BY position, in_tx_order) AS in_tx_order FROM eventstore.events2 ")
+				stmt.WriteString(` position, row_number() OVER 
+								(PARTITION BY instance_id ORDER BY position, in_tx_order) 
+								AS in_tx_order FROM eventstore.events2 `)
 				stmt.WriteString(instanceClause())
 				stmt.WriteString(" AND ")
 				database.NewNumberAtMost(maxPosition).Write(&stmt, "position")
@@ -198,10 +203,10 @@ func copyEventsDB(ctx context.Context, source, dest *db.DB, bulkSize uint32) {
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events migrated")
 }
 
-func copyEventsFromFile(ctx context.Context, dest *db.DB) {
+func copyEventsFromFile(ctx context.Context, dest *db.DB, fileName string) {
 	start := time.Now()
 
-	srcFile, err := os.OpenFile(filePath+"/eventstore.events2.csv", os.O_RDONLY, 0)
+	srcFile, err := os.OpenFile(filePath+fileName, os.O_RDONLY, 0)
 	logging.OnError(err).Fatal("unable to open source file")
 	defer srcFile.Close()
 
@@ -215,29 +220,40 @@ func copyEventsFromFile(ctx context.Context, dest *db.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire dest connection")
+	logging.OnError(err).Fatal("unable to acquire destination connection")
 	defer destConn.Close()
 
 	var eventCount int64
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
-		_, err := conn.Exec(ctx, "DELETE FROM eventstore.events2 "+instanceClause())
+		var stmt database.Statement
+		stmt.WriteString("DELETE FROM eventstore.events2 ")
+		stmt.WriteString(instanceClause())
+
+		_, err := conn.Exec(ctx, stmt.String())
 		if err != nil {
 			return err
 		}
 
-		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.events2 (instance_id, aggregate_type, aggregate_id, event_type, sequence, revision, created_at, payload, creator, owner, position, in_tx_order) FROM stdin (DELIMITER ',')")
+		stmt.Reset()
+		stmt.WriteString(`COPY eventstore.events2 
+						(instance_id, aggregate_type, aggregate_id, 
+						event_type, sequence, revision, created_at, 
+						payload, creator, owner, position, in_tx_order) 
+						FROM STDIN (DELIMITER ',')`)
+
+		tag, err := conn.PgConn().CopyFrom(ctx, reader, stmt.String())
 		eventCount = tag.RowsAffected()
 
 		return err
 	})
 	logging.OnError(err).Fatal("unable to copy events to destination")
 	logging.OnError(<-errs).Fatal("unable to copy events from source")
-	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events migrated")
+	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events migrated from " + fileName)
 }
 
-func copyEventsToFile(ctx context.Context, source *db.DB) {
+func copyEventsToFile(ctx context.Context, source *db.DB, fileName string) {
 	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
@@ -247,24 +263,36 @@ func copyEventsToFile(ctx context.Context, source *db.DB) {
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
 
+	var eventCount int64
 	go func() {
 		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
-			_, err := conn.PgConn().CopyTo(ctx, writer, "COPY (SELECT instance_id, aggregate_type, aggregate_id, event_type, sequence, revision, created_at, payload, creator, owner, position, in_tx_order FROM eventstore.events2 "+instanceClause()+") TO stdout (DELIMITER ',')")
+
+			var stmt database.Statement
+			stmt.WriteString(`COPY (SELECT instance_id, aggregate_type, 
+							aggregate_id, event_type, sequence, revision, 
+							created_at, payload, creator, owner, position, in_tx_order 
+							FROM eventstore.events2 `)
+			stmt.WriteString(instanceClause())
+			stmt.WriteString(") TO STDOUT (DELIMITER ',')")
+
+			tag, err := conn.PgConn().CopyTo(ctx, writer, stmt.String())
+			eventCount = tag.RowsAffected()
 			writer.Close()
+
 			return err
 		})
 		errs <- err
 	}()
 
-	destFile, err := os.OpenFile(filePath+"/eventstore.events2.csv", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	destFile, err := os.OpenFile(filePath+fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	logging.OnError(err).Fatal("unable to open destination file")
 	defer destFile.Close()
 
-	eventBytes, err := io.Copy(destFile, reader)
+	_, err = io.Copy(destFile, reader)
 	logging.OnError(err).Fatal("unable to copy events to destination")
 	logging.OnError(<-errs).Fatal("unable to copy events from source")
-	logging.WithFields("took", time.Since(start), "bytes", eventBytes).Info("events migrated")
+	logging.WithFields("took", time.Since(start), "count", eventCount).Info("events copied to " + fileName)
 }
 
 func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, source string, position float64, errs <-chan error) {
@@ -286,19 +314,23 @@ func writeCopyEventsDone(ctx context.Context, es *eventstore.EventStore, id, sou
 }
 
 func copyUniqueConstraintsDB(ctx context.Context, source, dest *db.DB) {
-	reader, writer := io.Pipe()
-	errs := make(chan error, 1)
+	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
 	logging.OnError(err).Fatal("unable to acquire source connection")
+	defer sourceConn.Close()
+
+	reader, writer := io.Pipe()
+	errs := make(chan error, 1)
+	var stmt database.Statement
 
 	go func() {
 		err := sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
-			var stmt database.Statement
+
 			stmt.WriteString("COPY (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints ")
 			stmt.WriteString(instanceClause())
-			stmt.WriteString(") TO stdout")
+			stmt.WriteString(") TO STDOUT")
 
 			_, err := conn.PgConn().CopyTo(ctx, writer, stmt.String())
 			writer.Close()
@@ -308,14 +340,15 @@ func copyUniqueConstraintsDB(ctx context.Context, source, dest *db.DB) {
 	}()
 
 	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire dest connection")
+	logging.OnError(err).Fatal("unable to acquire destination connection")
+	defer destConn.Close()
 
 	var eventCount int64
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
 		if shouldReplace {
-			var stmt database.Statement
+			stmt.Reset()
 			stmt.WriteString("DELETE FROM eventstore.unique_constraints ")
 			stmt.WriteString(instanceClause())
 
@@ -325,48 +358,10 @@ func copyUniqueConstraintsDB(ctx context.Context, source, dest *db.DB) {
 			}
 		}
 
-		tag, err := conn.PgConn().CopyFrom(ctx, reader, "COPY eventstore.unique_constraints FROM stdin")
-		eventCount = tag.RowsAffected()
+		stmt.Reset()
+		stmt.WriteString("COPY eventstore.unique_constraints FROM STDIN")
 
-		return err
-	})
-	logging.OnError(err).Fatal("unable to copy unique constraints to destination")
-	logging.OnError(<-errs).Fatal("unable to copy unique constraints from source")
-	logging.WithFields("count", eventCount).Info("unique constraints migrated")
-}
-
-func copyUniqueConstraintsFromFile(ctx context.Context, dest *db.DB) {
-	start := time.Now()
-
-	srcFile, err := os.OpenFile(filePath+"/eventstore.unique_constraints.csv", os.O_RDONLY, 0)
-	logging.OnError(err).Fatal("unable to open source file")
-	defer srcFile.Close()
-
-	r, w := io.Pipe()
-	errs := make(chan error, 1)
-
-	go func() {
-		_, err := srcFile.WriteTo(w)
-		w.Close()
-		errs <- err
-	}()
-
-	destConn, err := dest.Conn(ctx)
-	logging.OnError(err).Fatal("unable to acquire dest connection")
-	defer destConn.Close()
-
-	var eventCount int64
-	err = destConn.Raw(func(driverConn interface{}) error {
-		conn := driverConn.(*stdlib.Conn).Conn()
-
-		if shouldReplace {
-			_, err := conn.Exec(ctx, "DELETE FROM eventstore.unique_constraints "+instanceClause())
-			if err != nil {
-				return err
-			}
-		}
-
-		tag, err := conn.PgConn().CopyFrom(ctx, r, "COPY eventstore.unique_constraints (instance_id, unique_type, unique_field) FROM stdin (DELIMITER ',')")
+		tag, err := conn.PgConn().CopyFrom(ctx, reader, stmt.String())
 		eventCount = tag.RowsAffected()
 
 		return err
@@ -376,32 +371,90 @@ func copyUniqueConstraintsFromFile(ctx context.Context, dest *db.DB) {
 	logging.WithFields("took", time.Since(start), "count", eventCount).Info("unique constraints migrated")
 }
 
-func copyUniqueConstraintsToFile(ctx context.Context, source *db.DB) {
+func copyUniqueConstraintsFromFile(ctx context.Context, dest *db.DB, fileName string) {
+	start := time.Now()
+
+	srcFile, err := os.OpenFile(filePath+fileName, os.O_RDONLY, 0)
+	logging.OnError(err).Fatal("unable to open source file")
+	defer srcFile.Close()
+
+	reader, writer := io.Pipe()
+	errs := make(chan error, 1)
+
+	go func() {
+		_, err := srcFile.WriteTo(writer)
+		writer.Close()
+		errs <- err
+	}()
+
+	destConn, err := dest.Conn(ctx)
+	logging.OnError(err).Fatal("unable to acquire destination connection")
+	defer destConn.Close()
+
+	var eventCount int64
+	err = destConn.Raw(func(driverConn interface{}) error {
+		conn := driverConn.(*stdlib.Conn).Conn()
+
+		var stmt database.Statement
+		stmt.WriteString("DELETE FROM eventstore.unique_constraints ")
+		stmt.WriteString(instanceClause())
+
+		_, err := conn.Exec(ctx, stmt.String())
+		if err != nil {
+			return err
+		}
+
+		stmt.Reset()
+		stmt.WriteString(`COPY eventstore.unique_constraints 
+						(instance_id, unique_type, unique_field) 
+						FROM STDIN (DELIMITER ',')`)
+
+		tag, err := conn.PgConn().CopyFrom(ctx, reader, stmt.String())
+		eventCount = tag.RowsAffected()
+
+		return err
+	})
+	logging.OnError(err).Fatal("unable to copy unique constraints to destination")
+	logging.OnError(<-errs).Fatal("unable to copy unique constraints from source")
+	logging.WithFields("took", time.Since(start), "count", eventCount).Info("unique constraints migrated from " + fileName)
+}
+
+func copyUniqueConstraintsToFile(ctx context.Context, source *db.DB, fileName string) {
 	start := time.Now()
 
 	sourceConn, err := source.Conn(ctx)
 	logging.OnError(err).Fatal("unable to acquire source connection")
 	defer sourceConn.Close()
 
-	r, w := io.Pipe()
+	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
 
+	var eventCount int64
 	go func() {
 		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
-			_, err := conn.PgConn().CopyTo(ctx, w, "COPY eventstore.unique_constraints TO stdout (DELIMITER ',')")
-			w.Close()
+
+			var stmt database.Statement
+			stmt.WriteString(`COPY (SELECT instance_id, unique_type, unique_field 
+							FROM eventstore.unique_constraints `)
+			stmt.WriteString(instanceClause())
+			stmt.WriteString(") TO STDOUT (DELIMITER ',')")
+
+			tag, err := conn.PgConn().CopyTo(ctx, writer, stmt.String())
+			eventCount = tag.RowsAffected()
+			writer.Close()
+
 			return err
 		})
 		errs <- err
 	}()
 
-	destFile, err := os.OpenFile(filePath+"/eventstore.unique_constraints.csv", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	destFile, err := os.OpenFile(filePath+fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	logging.OnError(err).Fatal("unable to open destination file")
 	defer destFile.Close()
 
-	eventBytes, err := io.Copy(destFile, r)
+	_, err = io.Copy(destFile, reader)
 	logging.OnError(err).Fatal("unable to copy unique constraints to destination")
 	logging.OnError(<-errs).Fatal("unable to copy unique constraints from source")
-	logging.WithFields("took", time.Since(start), "bytes", eventBytes).Info("unique constraints migrated")
+	logging.WithFields("took", time.Since(start), "count", eventCount).Info("unique constraints copied to " + fileName)
 }
