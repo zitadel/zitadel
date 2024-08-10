@@ -28,7 +28,7 @@ var (
 		name:  projection.ExecutionIDCol,
 		table: executionTable,
 	}
-	ExecutionColumnCreateDate = Column{
+	ExecutionColumnCreationDate = Column{
 		name:  projection.ExecutionCreationDateCol,
 		table: executionTable,
 	}
@@ -212,7 +212,7 @@ func prepareExecutionQuery(context.Context, prepareDatabase) (sq.SelectBuilder, 
 	return sq.Select(
 			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
-			ExecutionColumnCreateDate.identifier(),
+			ExecutionColumnCreationDate.identifier(),
 			ExecutionColumnChangeDate.identifier(),
 			executionTargetsListCol.identifier(),
 		).From(executionTable.identifier()).
@@ -228,7 +228,7 @@ func prepareExecutionsQuery(context.Context, prepareDatabase) (sq.SelectBuilder,
 	return sq.Select(
 			ExecutionColumnInstanceID.identifier(),
 			ExecutionColumnID.identifier(),
-			ExecutionColumnCreateDate.identifier(),
+			ExecutionColumnCreationDate.identifier(),
 			ExecutionColumnChangeDate.identifier(),
 			executionTargetsListCol.identifier(),
 			countColumn.identifier(),

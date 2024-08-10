@@ -164,9 +164,9 @@ func targetFieldNameToSortingColumn(field *action.TargetFieldName) query.Column 
 		return query.TargetColumnID
 	case action.TargetFieldName_TARGET_FIELD_NAME_ID:
 		return query.TargetColumnID
-	case action.TargetFieldName_TARGET_FIELD_NAME_CREATION_DATE:
+	case action.TargetFieldName_TARGET_FIELD_NAME_CREATED_DATE:
 		return query.TargetColumnCreationDate
-	case action.TargetFieldName_TARGET_FIELD_NAME_CHANGE_DATE:
+	case action.TargetFieldName_TARGET_FIELD_NAME_CHANGED_DATE:
 		return query.TargetColumnChangeDate
 	case action.TargetFieldName_TARGET_FIELD_NAME_NAME:
 		return query.TargetColumnName
@@ -183,6 +183,25 @@ func targetFieldNameToSortingColumn(field *action.TargetFieldName) query.Column 
 	}
 }
 
+// executionFieldNameToSortingColumn defaults to the creation date because this ensures deterministic pagination
+func executionFieldNameToSortingColumn(field *action.ExecutionFieldName) query.Column {
+	if field == nil {
+		return query.ExecutionColumnCreationDate
+	}
+	switch *field {
+	case action.ExecutionFieldName_EXECUTION_FIELD_NAME_UNSPECIFIED:
+		return query.ExecutionColumnID
+	case action.ExecutionFieldName_EXECUTION_FIELD_NAME_ID:
+		return query.ExecutionColumnID
+	case action.ExecutionFieldName_EXECUTION_FIELD_NAME_CREATED_DATE:
+		return query.ExecutionColumnCreationDate
+	case action.ExecutionFieldName_EXECUTION_FIELD_NAME_CHANGED_DATE:
+		return query.ExecutionColumnChangeDate
+	default:
+		return query.ExecutionColumnCreationDate
+	}
+}
+
 func (s *Server) searchExecutionsRequestToModel(req *action.SearchExecutionsRequest) (*query.ExecutionSearchQueries, error) {
 	offset, limit, asc, err := resource_object.SearchQueryPbToQuery(s.systemDefaults, req.Query)
 	if err != nil {
@@ -194,9 +213,10 @@ func (s *Server) searchExecutionsRequestToModel(req *action.SearchExecutionsRequ
 	}
 	return &query.ExecutionSearchQueries{
 		SearchRequest: query.SearchRequest{
-			Offset: offset,
-			Limit:  limit,
-			Asc:    asc,
+			Offset:        offset,
+			Limit:         limit,
+			Asc:           asc,
+			SortingColumn: executionFieldNameToSortingColumn(req.SortingColumn),
 		},
 		Queries: queries,
 	}, nil

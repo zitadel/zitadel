@@ -13,7 +13,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 
 import "zitadel/resources/action/v3alpha/target.proto";
 import "zitadel/resources/action/v3alpha/execution.proto";
-import "zitadel/resources/action/v3alpha/filter.proto";
+import "zitadel/resources/action/v3alpha/query.proto";
 import "zitadel/resources/object/v3alpha/object.proto";
 import "zitadel/object/v3alpha/object.proto";
 
@@ -484,10 +484,10 @@ message SearchTargetsRequest {
   ];
   // list limitations and ordering.
   optional zitadel.resources.object.v3alpha.SearchQuery query = 2;
-  // the field the result is sorted.
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
   optional TargetFieldName sorting_column = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"TARGET_FIELD_NAME_CREATION_DATE\""
+      default: "\"TARGET_FIELD_NAME_CREATION_DATE\""
     }
   ];
   // Define the criteria to query for.
@@ -521,8 +521,14 @@ message SearchExecutionsRequest {
   ];
   // list limitations and ordering.
   optional zitadel.resources.object.v3alpha.SearchQuery query = 2;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional ExecutionFieldName sorting_column = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"EXECUTION_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
   // Define the criteria to query for.
-  repeated ExecutionSearchFilter filters = 3;
+  repeated ExecutionSearchFilter filters = 4;
 }
 
 message SearchExecutionsResponse {
