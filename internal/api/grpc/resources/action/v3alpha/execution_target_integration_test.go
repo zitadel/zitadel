@@ -25,7 +25,7 @@ import (
 )
 
 func TestServer_ExecutionTarget(t *testing.T) {
-	_, instanceID, userID, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
+	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
 	fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
@@ -46,6 +46,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 
 				orgID := Tester.Organisation.ID
 				projectID := ""
+				userID := Tester.Users.Get(instanceID, integration.IAMOwner).ID
 
 				// create target for target changes
 				targetCreatedName := fmt.Sprint("GetTarget", time.Now().UnixNano()+1)
@@ -148,6 +149,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 				orgID := Tester.Organisation.ID
 				projectID := ""
+				userID := Tester.Users.Get(instanceID, integration.IAMOwner).ID
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instanceID, OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
@@ -176,7 +178,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 				orgID := Tester.Organisation.ID
 				projectID := ""
-				userID := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner).ID
+				userID := Tester.Users.Get(instanceID, integration.IAMOwner).ID
 
 				// create target for target changes
 				targetCreatedName := fmt.Sprint("GetTarget", time.Now().UnixNano()+1)
