@@ -3,6 +3,31 @@
 Dear community!
 We're excited to announce bi-weekly office hours.
 
+## #4 Login UI deepdive
+
+Dear community,
+
+We are back from the summer pause with interesting topics.  
+We will showcase the new Login UI, provide insights into the application's architecture, session API, packages, OIDC middleware, customization options and settings, and offer a look ahead at upcoming features.
+
+## What to expect:
+
+* **Architecture of the Login UI**: Explore how server-side and client-side components interact within the new Login UI and NextJS framework.
+* **Session API**: Understand the workings of the Session API
+* **OIDC middleware configuration**: Learn how OIDC functions with the new Login UI and the necessary steps for a complete flow.
+* **Customization Options / Settings**: Discover how to personalize the login and which ZITADEL settings are implemented.
+* **Outlook**: Gain insights into future features
+* **Q&A**
+
+## Details:
+
+* **Target Audience**: Developers using ZITADEL / Contributors
+* **Topic**: New login UI and repo
+* **Duration**: about 1 hour
+* **When**: Wednesday 14th of August 19:00 UTC
+* **Platform**: ZITADEL Discrod Server (Join us here: https://discord.gg/zitadel-927474939156643850?event=1270661421952274442)
+
+
 ## #2 New Resources and Settings APIs
 
 **Shape the future of ZITADEL Let's redesign the API for a better developer experience!**
