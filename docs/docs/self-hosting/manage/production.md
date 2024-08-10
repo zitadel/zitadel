@@ -56,9 +56,31 @@ Logs are a stream of time-ordered events collected from all running processes.
 
 ZITADEL processes write the following events to the standard output:
 
-- Runtime Logs: Define the log level and record format [in the Log configuration section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L1-L4)
-- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L366) 
-- Actions Exectution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this [in the LogStore section](https://github.com/zitadel/zitadel/blob/main/cmd/defaults.yaml#L387) .
+- Runtime Logs: Define the log level and record format [in the `Log` configuration section](#default-zitadel-logging-config)
+- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary [by setting `LogStore.Access.Stdout.Enabled` to true](#default-zitadel-logging-config) 
+- Actions Execution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this [by setting `LogStore.Execution.Stdout.Enabled` to true](#default-zitadel-logging-config) .
+
+### Default ZITADEL Logging Config
+
+```yaml
+Log:
+  Level: info # ZITADEL_LOG_LEVEL
+  Formatter:
+    Format: text # ZITADEL_LOG_FORMATTER_FORMAT
+    
+LogStore:
+  Access:
+    Stdout:
+      # If enabled, all access logs are printed to the binary's standard output
+      Enabled: false # ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED
+  Execution:
+    Stdout:
+      # If enabled, all execution logs are printed to the binary's standard output
+      Enabled: true # ZITADEL_LOGSTORE_EXECUTION_STDOUT_ENABLED
+
+```
+
+### Why ZITADEL does not write logs to files
 
 Log file management should not be in each business apps responsibility.
 Instead, your execution environment should provide tooling for managing logs in a generic way.
