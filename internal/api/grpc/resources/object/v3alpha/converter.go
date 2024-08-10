@@ -52,12 +52,6 @@ func TextMethodPbToQuery(method resource_object.TextFilterMethod) query.TextComp
 		return query.TextStartsWithIgnoreCase
 	case resource_object.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS:
 		return query.TextContains
-	case resource_object.TextFilterMethod_TEXT_FILTER_METHOD_CONTAINS_IGNORE_CASE:
-		return query.TextContainsIgnoreCase
-	case resource_object.TextFilterMethod_TEXT_FILTER_METHOD_ENDS_WITH:
-		return query.TextEndsWith
-	case resource_object.TextFilterMethod_TEXT_FILTER_METHOD_ENDS_WITH_IGNORE_CASE:
-		return query.TextEndsWithIgnoreCase
 	default:
 		return -1
 	}
