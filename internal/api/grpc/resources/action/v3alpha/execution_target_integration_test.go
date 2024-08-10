@@ -60,8 +60,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
 				targetRequest := Tester.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, false)
 				Tester.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
-				// GetTarget with used target
-				request.Id = targetRequest.GetDetails().GetId()
 
 				// expected response from the GetTarget
 				expectedResponse := &action.GetTargetResponse{
@@ -102,8 +100,6 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						},
 					},
 				}
-				// change partial updated content on returned response
-				response.Target.Details.Id = changedResponse.Target.Details.Id
 
 				// response received by target
 				wantResponse := &middleware.ContextInfoResponse{
@@ -129,8 +125,16 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				Tester.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
 				Tester.DeleteExecution(ctx, t, conditionResponseFullMethod(fullMethod))
 			},
-			req:  &action.GetTargetRequest{},
-			want: &action.GetTargetResponse{},
+			req: &action.GetTargetRequest{
+				Id: "something",
+			},
+			want: &action.GetTargetResponse{
+				Target: &action.GetTarget{
+					Details: &resource_object.Details{
+						Id: "changed",
+					},
+				},
+			},
 		},
 		{
 			name: "GetTarget, request, interrupt",
