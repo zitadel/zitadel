@@ -22,7 +22,8 @@ import (
 )
 
 func TestServer_GetTarget(t *testing.T) {
-	ensureFeatureEnabled(t)
+	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
+	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 	type args struct {
 		ctx context.Context
 		dep func(context.Context, *action.GetTargetRequest, *action.GetTargetResponse) error
@@ -45,7 +46,7 @@ func TestServer_GetTarget(t *testing.T) {
 		{
 			name: "not found",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				req: &action.GetTargetRequest{Id: "notexisting"},
 			},
 			wantErr: true,
@@ -53,16 +54,13 @@ func TestServer_GetTarget(t *testing.T) {
 		{
 			name: "get, ok",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
 					request.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
-					response.Target.Details.Id = resp.GetDetails().GetId()
-					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.Changed = resp.GetDetails().GetChanged()
-					response.Target.Details.Created = resp.GetDetails().GetCreated()
+					response.Target.Details = resp.GetDetails()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -86,16 +84,13 @@ func TestServer_GetTarget(t *testing.T) {
 		{
 			name: "get, async, ok",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeAsync, false)
 					request.Id = resp.GetDetails().GetId()
-					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
-					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.Changed = resp.GetDetails().GetChanged()
-					response.Target.Details.Created = resp.GetDetails().GetCreated()
+					response.Target.Details = resp.GetDetails()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -119,16 +114,13 @@ func TestServer_GetTarget(t *testing.T) {
 		{
 			name: "get, webhook interruptOnError, ok",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, true)
 					request.Id = resp.GetDetails().GetId()
-					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
-					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.Changed = resp.GetDetails().GetChanged()
-					response.Target.Details.Created = resp.GetDetails().GetCreated()
+					response.Target.Details = resp.GetDetails()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -154,16 +146,13 @@ func TestServer_GetTarget(t *testing.T) {
 		{
 			name: "get, call, ok",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, false)
 					request.Id = resp.GetDetails().GetId()
-					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
-					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.Changed = resp.GetDetails().GetChanged()
-					response.Target.Details.Created = resp.GetDetails().GetCreated()
+					response.Target.Details = resp.GetDetails()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -189,16 +178,13 @@ func TestServer_GetTarget(t *testing.T) {
 		{
 			name: "get, call interruptOnError, ok",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeCall, true)
 					request.Id = resp.GetDetails().GetId()
-					response.Target.Details.Id = resp.GetDetails().GetId()
 					response.Target.Config.Name = name
-					response.Target.Details.Owner = resp.GetDetails().GetOwner()
-					response.Target.Details.Changed = resp.GetDetails().GetChanged()
-					response.Target.Details.Created = resp.GetDetails().GetCreated()
+					response.Target.Details = resp.GetDetails()
 					return nil
 				},
 				req: &action.GetTargetRequest{},
@@ -228,31 +214,23 @@ func TestServer_GetTarget(t *testing.T) {
 				err := tt.args.dep(tt.args.ctx, tt.args.req, tt.want)
 				require.NoError(t, err)
 			}
-
-			retryDuration := 5 * time.Second
-			if ctxDeadline, ok := CTX.Deadline(); ok {
-				retryDuration = time.Until(ctxDeadline)
+			got, getErr := Tester.Client.ActionV3.GetTarget(tt.args.ctx, tt.args.req)
+			if tt.wantErr {
+				assert.Error(t, getErr, "Error: "+getErr.Error())
+			} else {
+				assert.NoError(t, getErr)
+				wantTarget := tt.want.GetTarget()
+				gotTarget := got.GetTarget()
+				integration.AssertResourceDetails(t, wantTarget.GetDetails(), gotTarget.GetDetails())
+				assert.Equal(t, wantTarget.GetConfig(), gotTarget.GetConfig())
 			}
-
-			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, getErr := Client.GetTarget(tt.args.ctx, tt.args.req)
-				if tt.wantErr {
-					assert.Error(ttt, getErr, "Error: "+getErr.Error())
-				} else {
-					assert.NoError(ttt, getErr)
-					wantTarget := tt.want.GetTarget()
-					gotTarget := got.GetTarget()
-					integration.AssertResourceDetails(t, wantTarget.GetDetails(), gotTarget.GetDetails())
-					assert.Equal(t, wantTarget.GetConfig(), gotTarget.GetConfig())
-				}
-
-			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
 		})
 	}
 }
 
 func TestServer_ListTargets(t *testing.T) {
-	ensureFeatureEnabled(t)
+	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
+	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 	type args struct {
 		ctx context.Context
 		dep func(context.Context, *action.SearchTargetsRequest, *action.SearchTargetsResponse) error
@@ -275,7 +253,7 @@ func TestServer_ListTargets(t *testing.T) {
 		{
 			name: "list, not found",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				req: &action.SearchTargetsRequest{
 					Filters: []*action.TargetSearchFilter{
 						{Filter: &action.TargetSearchFilter_InTargetIdsFilter{
@@ -298,7 +276,7 @@ func TestServer_ListTargets(t *testing.T) {
 		{
 			name: "list single id",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.SearchTargetsRequest, response *action.SearchTargetsResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
@@ -309,9 +287,7 @@ func TestServer_ListTargets(t *testing.T) {
 					}
 					response.Details.Timestamp = resp.GetDetails().GetChanged()
 
-					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
-					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
-					response.Result[0].Details.Id = resp.GetDetails().GetId()
+					response.Result[0].Details = resp.GetDetails()
 					response.Result[0].Config.Name = name
 					return nil
 				},
@@ -345,7 +321,7 @@ func TestServer_ListTargets(t *testing.T) {
 		}, {
 			name: "list single name",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.SearchTargetsRequest, response *action.SearchTargetsResponse) error {
 					name := fmt.Sprint(time.Now().UnixNano() + 1)
 					resp := Tester.CreateTarget(ctx, t, name, "https://example.com", domain.TargetTypeWebhook, false)
@@ -356,9 +332,7 @@ func TestServer_ListTargets(t *testing.T) {
 					}
 					response.Details.Timestamp = resp.GetDetails().GetChanged()
 
-					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
-					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
-					response.Result[0].Details.Id = resp.GetDetails().GetId()
+					response.Result[0].Details = resp.GetDetails()
 					response.Result[0].Config.Name = name
 					return nil
 				},
@@ -376,6 +350,10 @@ func TestServer_ListTargets(t *testing.T) {
 						Details: &resource_object.Details{
 							Created: timestamppb.Now(),
 							Changed: timestamppb.Now(),
+							Owner: &object.Owner{
+								Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+								Id:   instanceID,
+							},
 						},
 						Config: &action.Target{
 							Endpoint: "https://example.com",
@@ -393,7 +371,7 @@ func TestServer_ListTargets(t *testing.T) {
 		{
 			name: "list multiple id",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.SearchTargetsRequest, response *action.SearchTargetsResponse) error {
 					name1 := fmt.Sprint(time.Now().UnixNano() + 1)
 					name2 := fmt.Sprint(time.Now().UnixNano() + 3)
@@ -408,17 +386,11 @@ func TestServer_ListTargets(t *testing.T) {
 					}
 					response.Details.Timestamp = resp3.GetDetails().GetChanged()
 
-					response.Result[0].Details.Changed = resp1.GetDetails().GetChanged()
-					response.Result[0].Details.Created = resp1.GetDetails().GetCreated()
-					response.Result[0].Details.Id = resp1.GetDetails().GetId()
+					response.Result[0].Details = resp1.GetDetails()
 					response.Result[0].Config.Name = name1
-					response.Result[1].Details.Changed = resp2.GetDetails().GetChanged()
-					response.Result[1].Details.Created = resp2.GetDetails().GetCreated()
-					response.Result[1].Details.Id = resp2.GetDetails().GetId()
+					response.Result[1].Details = resp2.GetDetails()
 					response.Result[1].Config.Name = name2
-					response.Result[2].Details.Changed = resp3.GetDetails().GetChanged()
-					response.Result[2].Details.Created = resp3.GetDetails().GetCreated()
-					response.Result[2].Details.Id = resp3.GetDetails().GetId()
+					response.Result[2].Details = resp3.GetDetails()
 					response.Result[2].Config.Name = name3
 					return nil
 				},
@@ -436,6 +408,10 @@ func TestServer_ListTargets(t *testing.T) {
 						Details: &resource_object.Details{
 							Created: timestamppb.Now(),
 							Changed: timestamppb.Now(),
+							Owner: &object.Owner{
+								Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+								Id:   instanceID,
+							},
 						},
 						Config: &action.Target{
 							Endpoint: "https://example.com",
@@ -451,6 +427,10 @@ func TestServer_ListTargets(t *testing.T) {
 						Details: &resource_object.Details{
 							Created: timestamppb.Now(),
 							Changed: timestamppb.Now(),
+							Owner: &object.Owner{
+								Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+								Id:   instanceID,
+							},
 						},
 						Config: &action.Target{
 							Endpoint: "https://example.com",
@@ -466,6 +446,10 @@ func TestServer_ListTargets(t *testing.T) {
 						Details: &resource_object.Details{
 							Created: timestamppb.Now(),
 							Changed: timestamppb.Now(),
+							Owner: &object.Owner{
+								Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+								Id:   instanceID,
+							},
 						},
 						Config: &action.Target{
 							Endpoint: "https://example.com",
@@ -487,12 +471,12 @@ func TestServer_ListTargets(t *testing.T) {
 			}
 
 			retryDuration := 5 * time.Second
-			if ctxDeadline, ok := CTX.Deadline(); ok {
+			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
 				retryDuration = time.Until(ctxDeadline)
 			}
 
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := Client.SearchTargets(tt.args.ctx, tt.args.req)
+				got, listErr := Tester.Client.ActionV3.SearchTargets(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					assert.Error(ttt, listErr, "Error: "+listErr.Error())
 				} else {
@@ -514,8 +498,9 @@ func TestServer_ListTargets(t *testing.T) {
 }
 
 func TestServer_SearchExecutions(t *testing.T) {
-	ensureFeatureEnabled(t)
-	targetResp := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
+	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
+	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
+	targetResp := Tester.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 
 	type args struct {
 		ctx context.Context
@@ -539,15 +524,14 @@ func TestServer_SearchExecutions(t *testing.T) {
 		{
 			name: "list request single condition",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.SearchExecutionsRequest, response *action.SearchExecutionsResponse) error {
 					cond := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
 					resp := Tester.SetExecution(ctx, t, cond, executionTargetsSingleTarget(targetResp.GetDetails().GetId()))
 
 					response.Details.Timestamp = resp.GetDetails().GetChanged()
 					// Set expected response with used values for SetExecution
-					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
-					response.Result[0].Details.Changed = resp.GetDetails().GetChanged()
+					response.Result[0].Details = resp.GetDetails()
 					response.Result[0].Condition = cond
 					return nil
 				},
@@ -599,9 +583,9 @@ func TestServer_SearchExecutions(t *testing.T) {
 		{
 			name: "list request single target",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.SearchExecutionsRequest, response *action.SearchExecutionsResponse) error {
-					target := Tester.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
+					target := Tester.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 					// add target as Filter to the request
 					request.Filters[0] = &action.ExecutionSearchFilter{
 						Filter: &action.ExecutionSearchFilter_TargetFilter{
@@ -624,8 +608,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 
 					response.Details.Timestamp = resp.GetDetails().GetChanged()
 
-					response.Result[0].Details.Created = resp.GetDetails().GetCreated()
-					response.Result[0].Details.Created = resp.GetDetails().GetChanged()
+					response.Result[0].Details = resp.GetDetails()
 					response.Result[0].Condition = cond
 					response.Result[0].Execution.Targets = targets
 					return nil
@@ -655,7 +638,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 		}, {
 			name: "list request single include",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.SearchExecutionsRequest, response *action.SearchExecutionsResponse) error {
 					cond := &action.Condition{
 						ConditionType: &action.Condition_Request{
@@ -683,8 +666,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 
 					response.Details.Timestamp = resp2.GetDetails().GetChanged()
 
-					response.Result[0].Details.Created = resp2.GetDetails().GetCreated()
-					response.Result[0].Details.Changed = resp2.GetDetails().GetChanged()
+					response.Result[0].Details = resp2.GetDetails()
 					response.Result[0].Condition = includeCond
 					response.Result[0].Execution = &action.Execution{
 						Targets: includeTargets,
@@ -717,14 +699,13 @@ func TestServer_SearchExecutions(t *testing.T) {
 		{
 			name: "list multiple conditions",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.SearchExecutionsRequest, response *action.SearchExecutionsResponse) error {
 
 					cond1 := request.Filters[0].GetInConditionsFilter().GetConditions()[0]
 					targets1 := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					resp1 := Tester.SetExecution(ctx, t, cond1, targets1)
-					response.Result[0].Details.Changed = resp1.GetDetails().GetChanged()
-					response.Result[0].Details.Created = resp1.GetDetails().GetCreated()
+					response.Result[0].Details = resp1.GetDetails()
 					response.Result[0].Condition = cond1
 					response.Result[0].Execution = &action.Execution{
 						Targets: targets1,
@@ -733,8 +714,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 					cond2 := request.Filters[0].GetInConditionsFilter().GetConditions()[1]
 					targets2 := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					resp2 := Tester.SetExecution(ctx, t, cond2, targets2)
-					response.Result[1].Details.Changed = resp2.GetDetails().GetChanged()
-					response.Result[1].Details.Created = resp2.GetDetails().GetCreated()
+					response.Result[1].Details = resp2.GetDetails()
 					response.Result[1].Condition = cond2
 					response.Result[1].Execution = &action.Execution{
 						Targets: targets2,
@@ -743,8 +723,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 					cond3 := request.Filters[0].GetInConditionsFilter().GetConditions()[2]
 					targets3 := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					resp3 := Tester.SetExecution(ctx, t, cond3, targets3)
-					response.Result[2].Details.Changed = resp3.GetDetails().GetChanged()
-					response.Result[2].Details.Created = resp3.GetDetails().GetCreated()
+					response.Result[2].Details = resp3.GetDetails()
 					response.Result[2].Condition = cond3
 					response.Result[2].Execution = &action.Execution{
 						Targets: targets3,
@@ -798,15 +777,15 @@ func TestServer_SearchExecutions(t *testing.T) {
 				Result: []*action.GetExecution{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID},
 						},
 					}, {
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID},
 						},
 					}, {
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()},
+							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID},
 						},
 					},
 				},
@@ -815,13 +794,12 @@ func TestServer_SearchExecutions(t *testing.T) {
 		{
 			name: "list multiple conditions all types",
 			args: args{
-				ctx: CTX,
+				ctx: isolatedIAMOwnerCTX,
 				dep: func(ctx context.Context, request *action.SearchExecutionsRequest, response *action.SearchExecutionsResponse) error {
 					targets := executionTargetsSingleTarget(targetResp.GetDetails().GetId())
 					for i, cond := range request.Filters[0].GetInConditionsFilter().GetConditions() {
 						resp := Tester.SetExecution(ctx, t, cond, targets)
-						response.Result[i].Details.Changed = resp.GetDetails().GetChanged()
-						response.Result[i].Details.Created = resp.GetDetails().GetCreated()
+						response.Result[i].Details = resp.GetDetails()
 						response.Result[i].Condition = cond
 						response.Result[i].Execution = &action.Execution{
 							Targets: targets,
@@ -859,16 +837,16 @@ func TestServer_SearchExecutions(t *testing.T) {
 					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: Tester.Instance.InstanceID()}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID}}},
 				},
 			},
 		},
@@ -881,12 +859,12 @@ func TestServer_SearchExecutions(t *testing.T) {
 			}
 
 			retryDuration := 5 * time.Second
-			if ctxDeadline, ok := CTX.Deadline(); ok {
+			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
 				retryDuration = time.Until(ctxDeadline)
 			}
 
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := Client.SearchExecutions(tt.args.ctx, tt.args.req)
+				got, listErr := Tester.Client.ActionV3.SearchExecutions(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					assert.Error(t, listErr, "Error: "+listErr.Error())
 				} else {

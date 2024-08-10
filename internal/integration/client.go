@@ -137,6 +137,7 @@ func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx conte
 		})
 		assert.NoError(collectT, importErr)
 	}, 2*time.Minute, 100*time.Millisecond, "instance not ready")
+	t.updateInstanceAndOrg(newCtx)
 	return primaryDomain, instanceId, adminUser.GetUserId(), newCtx
 }
 

@@ -25,7 +25,8 @@ import (
 )
 
 func TestServer_ExecutionTarget(t *testing.T) {
-	ensureFeatureEnabled(t)
+	_, instanceID, userID, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
+	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
 	fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 
@@ -40,13 +41,11 @@ func TestServer_ExecutionTarget(t *testing.T) {
 	}{
 		{
 			name: "GetTarget, request and response, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
 
-				instanceID := Tester.Instance.InstanceID()
 				orgID := Tester.Organisation.ID
 				projectID := ""
-				userID := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner).ID
 
 				// create target for target changes
 				targetCreatedName := fmt.Sprint("GetTarget", time.Now().UnixNano()+1)
@@ -135,7 +134,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						Id: "changed",
 						Owner: &object.Owner{
 							Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-							Id:   Tester.Instance.InstanceID(),
+							Id:   instanceID,
 						},
 					},
 				},
@@ -143,14 +142,12 @@ func TestServer_ExecutionTarget(t *testing.T) {
 		},
 		{
 			name: "GetTarget, request, interrupt",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
 
 				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
-				instanceID := Tester.Instance.InstanceID()
 				orgID := Tester.Organisation.ID
 				projectID := ""
-				userID := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner).ID
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instanceID, OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
@@ -173,11 +170,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 		},
 		{
 			name: "GetTarget, response, interrupt",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
 
 				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
-				instanceID := Tester.Instance.InstanceID()
 				orgID := Tester.Organisation.ID
 				projectID := ""
 				userID := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner).ID
@@ -250,7 +246,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				defer close()
 			}
 
-			got, err := Client.GetTarget(tt.ctx, tt.req)
+			got, err := Tester.Client.ActionV3.GetTarget(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

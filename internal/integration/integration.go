@@ -204,14 +204,7 @@ func (s *Tester) createLoginClient(ctx context.Context) {
 
 func (s *Tester) createMachineUser(ctx context.Context, username string, userType UserType) (context.Context, *query.User) {
 	var err error
-
-	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host(), "")
-	logging.OnError(err).Fatal("query instance")
-	ctx = authz.WithInstance(ctx, s.Instance)
-
-	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
-	logging.OnError(err).Fatal("query organisation")
-
+	s.updateInstanceAndOrg(ctx)
 	usernameQuery, err := query.NewUserUsernameSearchQuery(username, query.TextEquals)
 	logging.OnError(err).Fatal("user query")
 	user, err := s.Queries.GetUser(ctx, true, usernameQuery)
@@ -426,4 +419,14 @@ func runQuotaServer(ctx context.Context, bodies chan []byte) (*httptest.Server, 
 	mockServer.Listener = listener
 	mockServer.Start()
 	return mockServer, nil
+}
+
+func (s *Tester) updateInstanceAndOrg(ctx context.Context) {
+	var err error
+	s.Instance, err = s.Queries.InstanceByHost(ctx, s.Host(), "")
+	logging.OnError(err).Fatal("query instance")
+	ctx = authz.WithInstance(ctx, s.Instance)
+
+	s.Organisation, err = s.Queries.OrgByID(ctx, true, s.Instance.DefaultOrganisationID())
+	logging.OnError(err).Fatal("query organisation")
 }
