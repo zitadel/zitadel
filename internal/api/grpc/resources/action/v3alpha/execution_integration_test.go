@@ -11,6 +11,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
@@ -102,6 +103,10 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -144,6 +149,10 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -167,6 +176,10 @@ func TestServer_SetExecution_Request(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -273,6 +286,10 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -296,6 +313,10 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -398,6 +419,10 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -440,6 +465,10 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -463,6 +492,10 @@ func TestServer_SetExecution_Response(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -569,6 +602,10 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -613,6 +650,10 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -636,6 +677,10 @@ func TestServer_SetExecution_Event(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
@@ -730,6 +775,10 @@ func TestServer_SetExecution_Function(t *testing.T) {
 			want: &action.SetExecutionResponse{
 				Details: &resource_object.Details{
 					Changed: timestamppb.Now(),
+					Owner: &object.Owner{
+						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+						Id:   Tester.Instance.InstanceID(),
+					},
 				},
 			},
 		},
