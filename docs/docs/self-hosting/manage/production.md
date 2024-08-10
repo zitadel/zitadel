@@ -54,11 +54,11 @@ Tracing:
 ZITADEL follows the principles that guide cloud-native and twelve factor applications.
 Logs are a stream of time-ordered events collected from all running processes.
 
-ZITADEL processes write the following events to the standard output:
+[ZITADEL is configurable](#default-zitadel-logging-config) to write the following events to the standard output:
 
-- Runtime Logs: Define the log level and record format [in the `Log` configuration section](#default-zitadel-logging-config)
-- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary [by setting `LogStore.Access.Stdout.Enabled` to true](#default-zitadel-logging-config) 
-- Actions Execution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this [by setting `LogStore.Execution.Stdout.Enabled` to true](#default-zitadel-logging-config) .
+- Runtime Logs: Define the log level and record format in the `Log` configuration section.
+- Access Logs: Enable logging all HTTP and gRPC responses from the ZITADEL binary by setting `LogStore.Access.Stdout.Enabled` to true.
+- Actions Execution Logs: Actions can emit custom logs at different levels. For example, a log record can be emitted each time a user is created or authenticated. If you don't want to have these logs in STDOUT, you can disable this by setting `LogStore.Execution.Stdout.Enabled` to true.
 
 ### Default ZITADEL Logging Config
 
