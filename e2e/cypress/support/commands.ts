@@ -12,6 +12,22 @@ interface ShouldNotExistOptions {
   };
 }
 
+// Goal is to reduce the speed of operations executed to better mimic user interaction
+const COMMAND_DELAY = Cypress.env('COMMAND_DELAY') || 0;
+if (COMMAND_DELAY > 0) {
+  for (const command of ['visit', 'click', 'trigger', 'clear', 'reload']) {
+    Cypress.Commands.overwrite(command as unknown as keyof Cypress.Chainable<any>, (originalFn, ...args) => {
+        const origVal = originalFn(...args);
+
+        return new Promise((resolve) => {
+          setTimeout(() => {}, COMMAND_DELAY);
+          resolve(origVal);
+          setTimeout(() => {}, COMMAND_DELAY);
+        });
+    });
+  }
+}
+
 declare global {
   namespace Cypress {
     interface Chainable {

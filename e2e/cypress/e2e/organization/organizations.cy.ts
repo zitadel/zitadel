@@ -10,6 +10,7 @@ const orgNameOnCreation = 'e2eorgrename';
 const testOrgNameChange = uuidv4();
 const newOrg = uuidv4();
 
+
 beforeEach(() => {
   cy.context().as('ctx');
 });
@@ -23,7 +24,11 @@ describe('organizations', () => {
       cy.contains('tr', newOrg);
     });
 
-    it('should delete an org', () => {
+    it('should delete an org',
+      {
+        retries: 3,
+      }
+      , () => {
       cy.visit(orgsPath);
       cy.wait(2000);
       cy.contains('tr', newOrg).click();

@@ -10,13 +10,13 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
 )
 
-var _ action.ZITADELActionsServer = (*Server)(nil)
+var _ action.ActionServiceServer = (*Server)(nil)
 
 type Server struct {
-	action.UnimplementedZITADELActionsServer
+	action.UnimplementedActionServiceServer
 	command             *command.Commands
 	query               *query.Queries
 	ListActionFunctions func() []string
@@ -43,23 +43,23 @@ func CreateServer(
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	action.RegisterZITADELActionsServer(grpcServer, s)
+	action.RegisterActionServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
-	return action.ZITADELActions_ServiceDesc.ServiceName
+	return action.ActionService_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return action.ZITADELActions_ServiceDesc.ServiceName
+	return action.ActionService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return action.ZITADELActions_AuthMethods
+	return action.ActionService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return action.RegisterZITADELActionsHandler
+	return action.RegisterActionServiceHandler
 }
 
 func checkExecutionEnabled(ctx context.Context) error {
