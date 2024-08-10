@@ -9,6 +9,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/execution"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
@@ -55,7 +56,7 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 		return nil, err
 	}
 	return &action.SetExecutionResponse{
-		Details: resource_object.DomainToDetailsPb(details, nil),
+		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
 	}, nil
 }
 

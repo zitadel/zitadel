@@ -11,6 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
@@ -83,7 +84,7 @@ func targetsToPb(targets []*query.Target) []*action.GetTarget {
 
 func targetToPb(t *query.Target) *action.GetTarget {
 	target := &action.GetTarget{
-		Details: resource_object.DomainToDetailsPb(&t.ObjectDetails, nil),
+		Details: resource_object.DomainToDetailsPb(&t.ObjectDetails, object.OwnerType_OWNER_TYPE_INSTANCE, t.ResourceOwner),
 		Config: &action.Target{
 			Name:     t.Name,
 			Timeout:  durationpb.New(t.Timeout),
@@ -314,7 +315,7 @@ func executionToPb(e *query.Execution) *action.GetExecution {
 	}
 
 	return &action.GetExecution{
-		Details: resource_object.DomainToDetailsPb(&e.ObjectDetails, nil),
+		Details: resource_object.DomainToDetailsPb(&e.ObjectDetails, object.OwnerType_OWNER_TYPE_INSTANCE, e.ResourceOwner),
 		Execution: &action.Execution{
 			Targets: targets,
 		},

@@ -13,10 +13,13 @@ import (
 	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
-func DomainToDetailsPb(objectDetail *domain.ObjectDetails, owner *object.Owner) *resource_object.Details {
+func DomainToDetailsPb(objectDetail *domain.ObjectDetails, ownerType object.OwnerType, ownerId string) *resource_object.Details {
 	details := &resource_object.Details{
-		Id:    objectDetail.ID,
-		Owner: owner,
+		Id: objectDetail.ID,
+		Owner: &object.Owner{
+			Type: ownerType,
+			Id:   ownerId,
+		},
 	}
 	if !objectDetail.EventDate.IsZero() {
 		details.Changed = timestamppb.New(objectDetail.EventDate)

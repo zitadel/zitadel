@@ -10,6 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore/v1/models"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
@@ -24,7 +25,7 @@ func (s *Server) CreateTarget(ctx context.Context, req *action.CreateTargetReque
 		return nil, err
 	}
 	return &action.CreateTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, nil),
+		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
 	}, nil
 }
 
@@ -38,7 +39,7 @@ func (s *Server) PatchTarget(ctx context.Context, req *action.PatchTargetRequest
 		return nil, err
 	}
 	return &action.PatchTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, nil),
+		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
 	}, nil
 }
 
@@ -52,7 +53,7 @@ func (s *Server) DeleteTarget(ctx context.Context, req *action.DeleteTargetReque
 		return nil, err
 	}
 	return &action.DeleteTargetResponse{
-		Details: resource_object.DomainToDetailsPb(details, nil),
+		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
 	}, nil
 }
 

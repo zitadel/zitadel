@@ -22,7 +22,7 @@ message Details {
   //the timestamp of the last event applied to the object.
   google.protobuf.Timestamp changed = 4;
   //the parent object representing the returned objects context.
-  optional zitadel.object.v3alpha.Owner owner = 5 [
+  zitadel.object.v3alpha.Owner owner = 5 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"69629023906488334\"";
     }
