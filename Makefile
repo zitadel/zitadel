@@ -132,13 +132,15 @@ core_integration_server_stop:
 		cat tmp/race.log.$$pid; \
 		exit 66; \
 	fi
-	
+
+.PHONY: core_integration_reports
+core_integration_reports:
 	go tool covdata textfmt -i tmp/coverage -o profile.cov
 	$(RM) -r tmp/coverage
 	cat tmp/zitadel.log
 
 .PHONY: core_integration_test
-core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop
+core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop core_integration_reports
 
 .PHONY: console_lint
 console_lint:
