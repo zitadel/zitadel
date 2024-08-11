@@ -151,7 +151,7 @@ func (i *Instance) CreateAPIClientBasic(ctx context.Context, projectID string) (
 const CodeVerifier = "codeVerifier"
 
 func (i *Instance) CreateOIDCAuthRequest(ctx context.Context, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
-	return i.CreateOIDCAuthRequestWithDomain(ctx, i.Config.Hostname, clientID, loginClient, redirectURI, scope...)
+	return i.CreateOIDCAuthRequestWithDomain(ctx, i.Domain, clientID, loginClient, redirectURI, scope...)
 }
 func (i *Instance) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
 	provider, err := i.CreateRelyingPartyForDomain(ctx, domain, clientID, redirectURI, scope...)
@@ -211,11 +211,11 @@ func (i *Instance) CreateOIDCAuthRequestImplicit(ctx context.Context, clientID, 
 }
 
 func (i *Instance) OIDCIssuer() string {
-	return http_util.BuildHTTP(i.Config.Hostname, i.Config.Port, i.Config.Secure)
+	return http_util.BuildHTTP(i.Domain, i.Config.Port, i.Config.Secure)
 }
 
 func (i *Instance) CreateRelyingParty(ctx context.Context, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {
-	return i.CreateRelyingPartyForDomain(ctx, i.Config.Hostname, clientID, redirectURI, scope...)
+	return i.CreateRelyingPartyForDomain(ctx, i.Domain, clientID, redirectURI, scope...)
 }
 
 func (i *Instance) CreateRelyingPartyForDomain(ctx context.Context, domain, clientID, redirectURI string, scope ...string) (rp.RelyingParty, error) {

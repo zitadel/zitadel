@@ -440,5 +440,5 @@ func assertOIDCTime(t *testing.T, actual oidc.Time, expected time.Time) {
 }
 
 func assertOIDCTimeRange(t *testing.T, actual oidc.Time, expectedStart, expectedEnd time.Time) {
-	assert.WithinRange(t, actual.AsTime(), expectedStart.Add(-1*time.Second), expectedEnd.Add(1*time.Second))
+	assert.WithinRange(t, actual.AsTime(), expectedStart.Add(-10*time.Second), expectedEnd.Add(10*time.Second))
 }

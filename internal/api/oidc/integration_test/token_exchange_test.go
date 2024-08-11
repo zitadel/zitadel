@@ -112,6 +112,8 @@ func refreshTokenVerifier(ctx context.Context, provider rp.RelyingParty, subject
 }
 
 func TestServer_TokenExchange(t *testing.T) {
+	t.Parallel()
+
 	t.Cleanup(func() {
 		resetFeatures(t)
 		setImpersonationPolicy(t, false)

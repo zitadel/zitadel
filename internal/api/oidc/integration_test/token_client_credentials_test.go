@@ -19,6 +19,8 @@ import (
 )
 
 func TestServer_ClientCredentialsExchange(t *testing.T) {
+	t.Parallel()
+
 	machine, name, clientID, clientSecret, err := Instance.CreateOIDCCredentialsClient(CTX)
 	require.NoError(t, err)
 
