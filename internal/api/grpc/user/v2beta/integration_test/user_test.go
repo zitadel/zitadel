@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Instance, err = integration.FirstInstance(ctx)
+		Instance, err = integration.GetInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
@@ -1935,7 +1935,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Config.Hostname + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -1966,7 +1966,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Config.Hostname + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -1997,7 +1997,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Config.Hostname + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2028,7 +2028,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 				parametersEqual: map[string]string{
 					"client_id":     "clientID",
 					"prompt":        "select_account",
-					"redirect_uri":  "http://" + Instance.Config.Hostname + ":8080/idps/callback",
+					"redirect_uri":  "http://" + Instance.Domain + ":8080/idps/callback",
 					"response_type": "code",
 					"scope":         "openid profile email",
 				},
@@ -2055,7 +2055,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.Instance.Id,
 				},
-				url:                "http://" + Instance.Config.Hostname + ":8000/sso",
+				url:                "http://" + Instance.Domain + ":8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,
@@ -2079,7 +2079,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 					ChangeDate:    timestamppb.Now(),
 					ResourceOwner: Instance.Instance.Id,
 				},
-				url:                "http://" + Instance.Config.Hostname + ":8000/sso",
+				url:                "http://" + Instance.Domain + ":8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
 			},
 			wantErr: false,

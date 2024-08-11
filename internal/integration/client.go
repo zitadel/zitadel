@@ -142,7 +142,7 @@ func (i *Instance) CreateHumanUser(ctx context.Context) *user.AddHumanUserRespon
 			},
 		},
 	})
-	logging.OnError(err).Fatal("create human user")
+	logging.OnError(err).Panic("create human user")
 	return resp
 }
 
@@ -166,7 +166,7 @@ func (i *Instance) CreateHumanUserNoPhone(ctx context.Context) *user.AddHumanUse
 			},
 		},
 	})
-	logging.OnError(err).Fatal("create human user")
+	logging.OnError(err).Panic("create human user")
 	return resp
 }
 
@@ -197,7 +197,7 @@ func (i *Instance) CreateHumanUserWithTOTP(ctx context.Context, secret string) *
 		},
 		TotpSecret: gu.Ptr(secret),
 	})
-	logging.OnError(err).Fatal("create human user")
+	logging.OnError(err).Panic("create human user")
 	return resp
 }
 
@@ -223,7 +223,7 @@ func (i *Instance) CreateOrganization(ctx context.Context, name, adminEmail stri
 			},
 		},
 	})
-	logging.OnError(err).Fatal("create org")
+	logging.OnError(err).Panic("create org")
 	return resp
 }
 
@@ -254,7 +254,7 @@ func (i *Instance) CreateHumanUserVerified(ctx context.Context, org, email strin
 			},
 		},
 	})
-	logging.OnError(err).Fatal("create human user")
+	logging.OnError(err).Panic("create human user")
 	return resp
 }
 
@@ -265,7 +265,7 @@ func (i *Instance) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserRe
 		Description:     "Mickey Mouse",
 		AccessTokenType: user_pb.AccessTokenType_ACCESS_TOKEN_TYPE_BEARER,
 	})
-	logging.OnError(err).Fatal("create human user")
+	logging.OnError(err).Panic("create human user")
 	return resp
 }
 
@@ -288,16 +288,16 @@ func (i *Instance) RegisterUserPasskey(ctx context.Context, userID string) {
 		UserId: userID,
 		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
 	})
-	logging.OnError(err).Fatal("create user passkey")
+	logging.OnError(err).Panic("create user passkey")
 
 	pkr, err := i.Client.UserV2.RegisterPasskey(ctx, &user.RegisterPasskeyRequest{
 		UserId: userID,
 		Code:   reg.GetCode(),
-		Domain: i.Config.Hostname,
+		Domain: i.Domain,
 	})
-	logging.OnError(err).Fatal("create user passkey")
+	logging.OnError(err).Panic("create user passkey")
 	attestationResponse, err := i.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
-	logging.OnError(err).Fatal("create user passkey")
+	logging.OnError(err).Panic("create user passkey")
 
 	_, err = i.Client.UserV2.VerifyPasskeyRegistration(ctx, &user.VerifyPasskeyRegistrationRequest{
 		UserId:              userID,
@@ -305,17 +305,17 @@ func (i *Instance) RegisterUserPasskey(ctx context.Context, userID string) {
 		PublicKeyCredential: attestationResponse,
 		PasskeyName:         "nice name",
 	})
-	logging.OnError(err).Fatal("create user passkey")
+	logging.OnError(err).Panic("create user passkey")
 }
 
 func (i *Instance) RegisterUserU2F(ctx context.Context, userID string) {
 	pkr, err := i.Client.UserV2.RegisterU2F(ctx, &user.RegisterU2FRequest{
 		UserId: userID,
-		Domain: i.Config.Hostname,
+		Domain: i.Domain,
 	})
-	logging.OnError(err).Fatal("create user u2f")
+	logging.OnError(err).Panic("create user u2f")
 	attestationResponse, err := i.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
-	logging.OnError(err).Fatal("create user u2f")
+	logging.OnError(err).Panic("create user u2f")
 
 	_, err = i.Client.UserV2.VerifyU2FRegistration(ctx, &user.VerifyU2FRegistrationRequest{
 		UserId:              userID,
@@ -323,7 +323,7 @@ func (i *Instance) RegisterUserU2F(ctx context.Context, userID string) {
 		PublicKeyCredential: attestationResponse,
 		TokenName:           "nice name",
 	})
-	logging.OnError(err).Fatal("create user u2f")
+	logging.OnError(err).Panic("create user u2f")
 }
 
 func (i *Instance) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) *object.Details {
@@ -334,7 +334,7 @@ func (i *Instance) SetUserPassword(ctx context.Context, userID, password string,
 			ChangeRequired: changeRequired,
 		},
 	})
-	logging.OnError(err).Fatal("set user password")
+	logging.OnError(err).Panic("set user password")
 	return resp.GetDetails()
 }
 
@@ -540,7 +540,7 @@ func (i *Instance) CreateVerifiedWebAuthNSessionWithLifetime(t *testing.T, ctx c
 		},
 		Challenges: &session.RequestChallenges{
 			WebAuthN: &session.RequestChallenges_WebAuthN{
-				Domain:                      i.Config.Hostname,
+				Domain:                      i.Domain,
 				UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 			},
 		},

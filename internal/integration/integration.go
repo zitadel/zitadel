@@ -16,9 +16,11 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/client"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -53,6 +55,11 @@ func init() {
 		panic(err)
 	}
 	tmpDir = filepath.Join(string(bytes.TrimSpace(out)), "tmp")
+}
+
+// TmpDir returns the absolute path to the projects's temp directory.
+func TmpDir() string {
+	return tmpDir
 }
 
 // NotEmpty can be used as placeholder, when the returned values is unknown.
@@ -155,6 +162,9 @@ func InitFirstInstance(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	if err = i.setClient(ctx); err != nil {
+		return err
+	}
 	if err := i.setupInstance(ctx, token); err != nil {
 		return err
 	}
@@ -165,12 +175,17 @@ func InitFirstInstance(ctx context.Context) error {
 	return os.WriteFile(filepath.Join(tmpDir, stateFile), data, os.ModePerm)
 }
 
-// FirstInstance constructs the first Instance from a reusable state file.
-// The returned Instance contains a gRPC client connected to the domain of the new instance.
+var IsolatedInstances, _ = strconv.ParseBool(os.Getenv("ISOLATED_INSTANCES"))
+
+// GetInstance returns an instance that can be used for integration tests.
+// The instance contains a gRPC client connected to the domain of this instance.
 // The included users are the (global) system user, IAM_OWNER, ORG_OWNER of the default org and
 // a Login client user.
-// The integration test server must be running.
-func FirstInstance(ctx context.Context) (*Instance, error) {
+//
+// If the `ISOLATED_INSTANCES` environment variable is set to `true`,
+// a newly created instance is always returned.
+// Else it is the first instance, cached and loaded from a state file.
+func GetInstance(ctx context.Context) (*Instance, error) {
 	instance, err := loadStateFile()
 	if err != nil {
 		return nil, err
@@ -188,7 +203,13 @@ func FirstInstance(ctx context.Context) (*Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	return instance, nil
+	if IsolatedInstances {
+		if instance, err = instance.UseIsolatedInstance(ctx); err != nil {
+			return nil, err
+		}
+	}
+	logging.WithFields("ISOLATED_INSTANCES", IsolatedInstances, "instance_id", instance.Instance.Id, "domain", instance.Domain, "org_id", instance.DefaultOrg.Id).Info("get instance")
+	return instance, err
 }
 
 // UseIsolatedInstance creates a new ZITADEL instance with machine users, using the system API.
@@ -218,34 +239,53 @@ func (i *Instance) UseIsolatedInstance(ctx context.Context) (*Instance, error) {
 		Config: i.Config,
 		Domain: primaryDomain,
 	}
+	if err = newI.setClient(ctx); err != nil {
+		return nil, err
+	}
+	if err = newI.awaitFirstUser(WithAuthorizationToken(ctx, instance.GetPat())); err != nil {
+		return nil, err
+	}
 	if err := newI.setupInstance(ctx, instance.GetPat()); err != nil {
 		return nil, err
 	}
 	newI.createWebAuthNClient()
-	_, err = newI.Client.Mgmt.ImportHumanUser(newI.WithAuthorization(ctx, UserTypeIAMOwner), &mgmt.ImportHumanUserRequest{
-		UserName: "zitadel-admin@zitadel.localhost",
-		Email: &mgmt.ImportHumanUserRequest_Email{
-			Email:           "zitadel-admin@zitadel.localhost",
-			IsEmailVerified: true,
-		},
-		Password: "Password1!",
-		Profile: &mgmt.ImportHumanUserRequest_Profile{
-			FirstName: "hodor",
-			LastName:  "hodor",
-			NickName:  "hodor",
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
 	return newI, nil
+}
+
+func (i *Instance) awaitFirstUser(ctx context.Context) error {
+	var allErrs []error
+	for {
+		_, err := i.Client.Mgmt.ImportHumanUser(ctx, &mgmt.ImportHumanUserRequest{
+			UserName: "zitadel-admin@zitadel.localhost",
+			Email: &mgmt.ImportHumanUserRequest_Email{
+				Email:           "zitadel-admin@zitadel.localhost",
+				IsEmailVerified: true,
+			},
+			Password: "Password1!",
+			Profile: &mgmt.ImportHumanUserRequest_Profile{
+				FirstName: "hodor",
+				LastName:  "hodor",
+				NickName:  "hodor",
+			},
+		})
+		if err == nil {
+			return nil
+		}
+		logging.WithError(err).Debug("await first instance user")
+		allErrs = append(allErrs, err)
+		select {
+		case <-ctx.Done():
+			return errors.Join(append(allErrs, ctx.Err())...)
+		case <-time.After(time.Second):
+			continue
+		}
+	}
 }
 
 func (i *Instance) setupInstance(ctx context.Context, token string) error {
 	i.Users = make(UserMap)
 	ctx = WithAuthorizationToken(ctx, token)
 	return errors.Join(
-		i.setClient(ctx),
 		i.setInstance(ctx),
 		i.setOrganization(ctx),
 		i.createSystemUser(),

@@ -44,7 +44,7 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Instance, err = integration.FirstInstance(ctx)
+		Instance, err = integration.GetInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
@@ -308,7 +308,7 @@ func TestServer_CreateSession(t *testing.T) {
 			req: &session.CreateSessionRequest{
 				Challenges: &session.RequestChallenges{
 					WebAuthN: &session.RequestChallenges_WebAuthN{
-						Domain:                      Instance.Config.Hostname,
+						Domain:                      Instance.Domain,
 						UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 					},
 				},
@@ -403,7 +403,7 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 		},
 		Challenges: &session.RequestChallenges{
 			WebAuthN: &session.RequestChallenges_WebAuthN{
-				Domain:                      Instance.Config.Hostname,
+				Domain:                      Instance.Domain,
 				UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 			},
 		},
@@ -595,7 +595,7 @@ func TestServer_SetSession_flow_totp(t *testing.T) {
 			SessionId: createResp.GetSessionId(),
 			Challenges: &session.RequestChallenges{
 				WebAuthN: &session.RequestChallenges_WebAuthN{
-					Domain:                      Instance.Config.Hostname,
+					Domain:                      Instance.Domain,
 					UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 				},
 			},
@@ -708,7 +708,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 			SessionId: createResp.GetSessionId(),
 			Challenges: &session.RequestChallenges{
 				WebAuthN: &session.RequestChallenges_WebAuthN{
-					Domain:                      Instance.Config.Hostname,
+					Domain:                      Instance.Domain,
 					UserVerificationRequirement: session.UserVerificationRequirement_USER_VERIFICATION_REQUIREMENT_REQUIRED,
 				},
 			},
@@ -750,7 +750,7 @@ func TestServer_SetSession_flow(t *testing.T) {
 					SessionId: createResp.GetSessionId(),
 					Challenges: &session.RequestChallenges{
 						WebAuthN: &session.RequestChallenges_WebAuthN{
-							Domain:                      Instance.Config.Hostname,
+							Domain:                      Instance.Domain,
 							UserVerificationRequirement: userVerificationRequirement,
 						},
 					},

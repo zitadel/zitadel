@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		Instance, err = integration.FirstInstance(ctx)
+		Instance, err = integration.GetInstance(ctx)
 		if err != nil {
 			panic(err)
 		}

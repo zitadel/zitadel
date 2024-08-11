@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
 
-		first, err := integration.FirstInstance(ctx)
+		first, err := integration.GetInstance(ctx)
 		if err != nil {
 			panic(err)
 		}

@@ -32,7 +32,7 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		var err error
-		first, err := integration.FirstInstance(ctx)
+		first, err := integration.GetInstance(ctx)
 		if err != nil {
 			panic(err)
 		}
