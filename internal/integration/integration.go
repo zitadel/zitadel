@@ -152,22 +152,15 @@ type Instance struct {
 func InitFirstInstance(ctx context.Context) error {
 	var config Config
 	if err := yaml.Unmarshal(clientYAML, &config); err != nil {
-		return err
+		panic(err)
 	}
 	i := &Instance{
 		Config: config,
 		Domain: config.Hostname,
 	}
-	token, err := loadInstanceOwnerPAT()
-	if err != nil {
-		return err
-	}
-	if err = i.setClient(ctx); err != nil {
-		return err
-	}
-	if err := i.setupInstance(ctx, token); err != nil {
-		return err
-	}
+	token := loadInstanceOwnerPAT()
+	i.setClient(ctx)
+	i.setupInstance(ctx, token)
 	data, err := json.MarshalIndent(i, "", "  ")
 	if err != nil {
 		return err
@@ -185,31 +178,27 @@ var IsolatedInstances, _ = strconv.ParseBool(os.Getenv("ISOLATED_INSTANCES"))
 // If the `ISOLATED_INSTANCES` environment variable is set to `true`,
 // a newly created instance is always returned.
 // Else it is the first instance, cached and loaded from a state file.
-func GetInstance(ctx context.Context) (*Instance, error) {
+func GetInstance(ctx context.Context) *Instance {
 	instance, err := loadStateFile()
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	if err := yaml.Unmarshal(clientYAML, &instance.Config); err != nil {
-		return nil, err
+		panic(err)
 	}
 
 	// refresh short-lived system user token
-	if err = instance.createSystemUser(); err != nil {
-		return nil, err
-	}
+	instance.createSystemUser()
 	instance.createWebAuthNClient()
 	instance.Client, err = newClient(ctx, instance.Host())
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	if IsolatedInstances {
-		if instance, err = instance.UseIsolatedInstance(ctx); err != nil {
-			return nil, err
-		}
+		instance = instance.UseIsolatedInstance(ctx)
 	}
 	logging.WithFields("ISOLATED_INSTANCES", IsolatedInstances, "instance_id", instance.Instance.Id, "domain", instance.Domain, "org_id", instance.DefaultOrg.Id).Info("get instance")
-	return instance, err
+	return instance
 }
 
 // UseIsolatedInstance creates a new ZITADEL instance with machine users, using the system API.
@@ -218,7 +207,7 @@ func GetInstance(ctx context.Context) (*Instance, error) {
 // a Login client user.
 //
 // Individual Test function that use an Isolated Instance should use [t.Parallel].
-func (i *Instance) UseIsolatedInstance(ctx context.Context) (*Instance, error) {
+func (i *Instance) UseIsolatedInstance(ctx context.Context) *Instance {
 	systemCtx := i.WithAuthorization(ctx, UserTypeSystem)
 	primaryDomain := RandString(5) + ".integration.localhost"
 	instance, err := i.Client.System.CreateInstance(systemCtx, &system.CreateInstanceRequest{
@@ -233,26 +222,20 @@ func (i *Instance) UseIsolatedInstance(ctx context.Context) (*Instance, error) {
 		},
 	})
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	newI := &Instance{
 		Config: i.Config,
 		Domain: primaryDomain,
 	}
-	if err = newI.setClient(ctx); err != nil {
-		return nil, err
-	}
-	if err = newI.awaitFirstUser(WithAuthorizationToken(ctx, instance.GetPat())); err != nil {
-		return nil, err
-	}
-	if err := newI.setupInstance(ctx, instance.GetPat()); err != nil {
-		return nil, err
-	}
+	newI.setClient(ctx)
+	newI.awaitFirstUser(WithAuthorizationToken(ctx, instance.GetPat()))
+	newI.setupInstance(ctx, instance.GetPat())
 	newI.createWebAuthNClient()
-	return newI, nil
+	return newI
 }
 
-func (i *Instance) awaitFirstUser(ctx context.Context) error {
+func (i *Instance) awaitFirstUser(ctx context.Context) {
 	var allErrs []error
 	for {
 		_, err := i.Client.Mgmt.ImportHumanUser(ctx, &mgmt.ImportHumanUserRequest{
@@ -269,30 +252,28 @@ func (i *Instance) awaitFirstUser(ctx context.Context) error {
 			},
 		})
 		if err == nil {
-			return nil
+			return
 		}
 		logging.WithError(err).Debug("await first instance user")
 		allErrs = append(allErrs, err)
 		select {
 		case <-ctx.Done():
-			return errors.Join(append(allErrs, ctx.Err())...)
+			panic(errors.Join(append(allErrs, ctx.Err())...))
 		case <-time.After(time.Second):
 			continue
 		}
 	}
 }
 
-func (i *Instance) setupInstance(ctx context.Context, token string) error {
+func (i *Instance) setupInstance(ctx context.Context, token string) {
 	i.Users = make(UserMap)
 	ctx = WithAuthorizationToken(ctx, token)
-	return errors.Join(
-		i.setInstance(ctx),
-		i.setOrganization(ctx),
-		i.createSystemUser(),
-		i.createMachineUserInstanceOwner(ctx, token),
-		i.createMachineUserOrgOwner(ctx),
-		i.createLoginClient(ctx),
-	)
+	i.setInstance(ctx)
+	i.setOrganization(ctx)
+	i.createSystemUser()
+	i.createMachineUserInstanceOwner(ctx, token)
+	i.createMachineUserOrgOwner(ctx)
+	i.createLoginClient(ctx)
 }
 
 // loadStateFile loads a state file with instance, org and machine user details.
@@ -360,91 +341,83 @@ func (i *Instance) Host() string {
 	return fmt.Sprintf("%s:%d", i.Domain, i.Config.Port)
 }
 
-func (i *Instance) createSystemUser() error {
+func (i *Instance) createSystemUser() {
 	const ISSUER = "tester"
 	audience := http_util.BuildOrigin(i.Config.Host(), false)
 	signer, err := client.NewSignerFromPrivateKeyByte(systemUserKey, "")
 	if err != nil {
-		return err
+		panic(err)
 	}
 	jwt, err := client.SignedJWTProfileAssertion(ISSUER, []string{audience}, time.Hour, signer)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	i.Users.Set(UserTypeSystem, &User{
 		ID:       "SYSTEM",
 		Username: "SYSTEM",
 		Token:    jwt,
 	})
-	return nil
 }
 
-func loadInstanceOwnerPAT() (string, error) {
+func loadInstanceOwnerPAT() string {
 	data, err := os.ReadFile(filepath.Join(tmpDir, adminPATFile))
 	if err != nil {
-		return "", err
+		panic(err)
 	}
-	return string(bytes.TrimSpace(data)), nil
+	return string(bytes.TrimSpace(data))
 }
 
-func (i *Instance) createMachineUserInstanceOwner(ctx context.Context, token string) error {
+func (i *Instance) createMachineUserInstanceOwner(ctx context.Context, token string) {
 	user, err := i.Client.Auth.GetMyUser(WithAuthorizationToken(ctx, token), &auth.GetMyUserRequest{})
 	if err != nil {
-		return err
+		panic(err)
 	}
 	i.Users.Set(UserTypeIAMOwner, &User{
 		ID:       user.GetUser().GetId(),
 		Username: user.GetUser().GetUserName(),
 		Token:    token,
 	})
-	return nil
 }
 
-func (i *Instance) createMachineUserOrgOwner(ctx context.Context) error {
-	userID, err := i.createMachineUser(ctx, UserTypeOrgOwner)
-	if err != nil {
-		return err
-	}
-	_, err = i.Client.Mgmt.AddOrgMember(ctx, &management.AddOrgMemberRequest{
-		UserId: userID,
+func (i *Instance) createMachineUserOrgOwner(ctx context.Context) {
+	_, err := i.Client.Mgmt.AddOrgMember(ctx, &management.AddOrgMemberRequest{
+		UserId: i.createMachineUser(ctx, UserTypeOrgOwner),
 		Roles:  []string{"ORG_OWNER"},
 	})
-	return err
+	if err != nil {
+		panic(err)
+	}
 }
 
-func (i *Instance) createLoginClient(ctx context.Context) error {
-	_, err := i.createMachineUser(ctx, UserTypeLogin)
-	return err
+func (i *Instance) createLoginClient(ctx context.Context) {
+	i.createMachineUser(ctx, UserTypeLogin)
 }
 
-func (i *Instance) setClient(ctx context.Context) error {
+func (i *Instance) setClient(ctx context.Context) {
 	client, err := newClient(ctx, i.Host())
 	if err != nil {
-		return err
+		panic(err)
 	}
 	i.Client = client
-	return nil
 }
 
-func (i *Instance) setInstance(ctx context.Context) error {
+func (i *Instance) setInstance(ctx context.Context) {
 	instance, err := i.Client.Admin.GetMyInstance(ctx, &admin.GetMyInstanceRequest{})
 	if err != nil {
-		return err
+		panic(err)
 	}
 	i.Instance = instance.GetInstance()
-	return nil
 }
 
-func (i *Instance) setOrganization(ctx context.Context) error {
+func (i *Instance) setOrganization(ctx context.Context) {
 	resp, err := i.Client.Mgmt.GetMyOrg(ctx, &management.GetMyOrgRequest{})
 	if err != nil {
-		return err
+		panic(err)
 	}
 	i.DefaultOrg = resp.GetOrg()
-	return nil
 }
 
-func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (userID string, err error) {
+func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (userID string) {
 	username := gofakeit.Username()
 	userResp, err := i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
 		UserName:        username,
@@ -453,21 +426,21 @@ func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (us
 		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
 	})
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 	userID = userResp.GetUserId()
 	patResp, err := i.Client.Mgmt.AddPersonalAccessToken(ctx, &management.AddPersonalAccessTokenRequest{
 		UserId: userID,
 	})
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 	i.Users.Set(userType, &User{
 		ID:       userID,
 		Username: username,
 		Token:    patResp.GetToken(),
 	})
-	return userID, nil
+	return userID
 }
 
 func (i *Instance) createWebAuthNClient() {

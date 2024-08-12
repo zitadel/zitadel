@@ -28,8 +28,7 @@ import (
 func TestServer_Limits_Block(t *testing.T) {
 	t.Parallel()
 
-	isoInstance, err := Instance.UseIsolatedInstance(CTX)
-	require.NoError(t, err)
+	isoInstance := Instance.UseIsolatedInstance(CTX)
 	iamOwnerCtx := isoInstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	tests := []*test{
 		publicAPIBlockingTest(isoInstance.Domain),
@@ -147,7 +146,7 @@ func TestServer_Limits_Block(t *testing.T) {
 				}
 			},
 		}}
-	_, err = Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+	_, err := Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
 		InstanceId: isoInstance.Instance.Id,
 		Block:      gu.Ptr(true),
 	})

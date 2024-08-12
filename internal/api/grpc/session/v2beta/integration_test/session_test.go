@@ -43,11 +43,7 @@ func TestMain(m *testing.M) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 		defer cancel()
 
-		var err error
-		Instance, err = integration.GetInstance(ctx)
-		if err != nil {
-			panic(err)
-		}
+		Instance = integration.GetInstance(ctx)
 		Client = Instance.Client.SessionV2beta
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)

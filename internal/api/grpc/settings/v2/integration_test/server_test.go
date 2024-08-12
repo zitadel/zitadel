@@ -23,14 +23,7 @@ func TestMain(m *testing.M) {
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
 
-		first, err := integration.GetInstance(ctx)
-		if err != nil {
-			panic(err)
-		}
-		Instance, err = first.UseIsolatedInstance(ctx)
-		if err != nil {
-			panic(err)
-		}
+		Instance = integration.GetInstance(ctx).UseIsolatedInstance(ctx)
 
 		CTX = ctx
 		AdminCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)

@@ -24,8 +24,7 @@ import (
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	t.Parallel()
 
-	isoInstance, err := Instance.UseIsolatedInstance(CTX)
-	require.NoError(t, err)
+	isoInstance := Instance.UseIsolatedInstance(CTX)
 	iamOwnerCtx := isoInstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t, isoInstance.Client)
 	beforeTime := time.Now()
@@ -38,7 +37,7 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	addedCount := requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for added event assertions to pass")
-	_, err = Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+	_, err := Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
 		InstanceId:        isoInstance.Instance.Id,
 		AuditLogRetention: durationpb.New(time.Now().Sub(beforeTime)),
 	})

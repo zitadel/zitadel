@@ -19,11 +19,10 @@ import (
 func TestServer_GetSecurityPolicy(t *testing.T) {
 	t.Parallel()
 
-	instance, err := Instance.UseIsolatedInstance(CTX)
-	require.NoError(t, err)
+	instance := Instance.UseIsolatedInstance(CTX)
 	adminCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
-	_, err = instance.Client.Admin.SetSecurityPolicy(adminCtx, &admin_pb.SetSecurityPolicyRequest{
+	_, err := instance.Client.Admin.SetSecurityPolicy(adminCtx, &admin_pb.SetSecurityPolicyRequest{
 		EnableIframeEmbedding: true,
 		AllowedOrigins:        []string{"foo.com", "bar.com"},
 		EnableImpersonation:   true,
@@ -71,8 +70,7 @@ func TestServer_GetSecurityPolicy(t *testing.T) {
 func TestServer_SetSecurityPolicy(t *testing.T) {
 	t.Parallel()
 
-	instance, err := Instance.UseIsolatedInstance(CTX)
-	require.NoError(t, err)
+	instance := Instance.UseIsolatedInstance(CTX)
 	adminCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	type args struct {

@@ -25,8 +25,7 @@ func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
-	instance, err := Instance.UseIsolatedInstance(ctx)
-	require.NoError(t, err)
+	instance := Instance.UseIsolatedInstance(ctx)
 	regOrgUrl, err := url.Parse("http://" + instance.Domain + ":8080/ui/login/register/org")
 	require.NoError(t, err)
 	// The CSRF cookie must be sent with every request.

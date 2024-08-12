@@ -36,8 +36,7 @@ func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 		unsupportedLanguage       = language.Afrikaans
 	)
 
-	instance, err := Instance.UseIsolatedInstance(ctx)
-	require.NoError(t, err)
+	instance := Instance.UseIsolatedInstance(ctx)
 	iamOwnerCtx := instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 
 	t.Run("assumed defaults are correct", func(tt *testing.T) {
