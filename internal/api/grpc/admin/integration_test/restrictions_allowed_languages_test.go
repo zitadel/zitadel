@@ -222,16 +222,16 @@ func awaitLoginUILanguage(t *testing.T, domain string, acceptLanguage language.T
 	await(t, awaitCtx, func(tt *assert.CollectT) {
 		req, err := http.NewRequestWithContext(awaitCtx, http.MethodGet, "http://"+domain+":8080/ui/login/register", nil)
 		req.Header.Set("Accept-Language", acceptLanguage.String())
-		require.NoError(t, err)
+		require.NoError(tt, err)
 		resp, err := http.DefaultClient.Do(req)
-		require.NoError(t, err)
-		require.Equal(t, http.StatusOK, resp.StatusCode)
+		require.NoError(tt, err)
+		assert.Equal(tt, http.StatusOK, resp.StatusCode)
 		body, err := io.ReadAll(resp.Body)
 		defer func() {
-			require.NoError(t, resp.Body.Close())
+			require.NoError(tt, resp.Body.Close())
 		}()
-		require.NoError(t, err)
-		assert.Containsf(t, string(body), containsText, "login ui language is in "+expectLang.String())
+		require.NoError(tt, err)
+		assert.Containsf(tt, string(body), containsText, "login ui language is in "+expectLang.String())
 	})
 }
 

@@ -26,7 +26,7 @@ func executionTargetsSingleInclude(include *action.Condition) []*action.Executio
 
 func TestServer_SetExecution_Request(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Instance.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := Instance.CreateTarget(CTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -206,7 +206,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Instance.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := Instance.CreateTarget(CTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
 	executionCond := &action.Condition{
 		ConditionType: &action.Condition_Request{
 			Request: &action.RequestExecution{
@@ -344,7 +344,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 
 func TestServer_SetExecution_Response(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Instance.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := Instance.CreateTarget(CTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -523,7 +523,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 
 func TestServer_SetExecution_Event(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Instance.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := Instance.CreateTarget(CTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -708,7 +708,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 
 func TestServer_SetExecution_Function(t *testing.T) {
 	ensureFeatureEnabled(t)
-	targetResp := Instance.CreateTarget(CTX, t, "", "https://notexisting", domain.TargetTypeWebhook, false)
+	targetResp := Instance.CreateTarget(CTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string

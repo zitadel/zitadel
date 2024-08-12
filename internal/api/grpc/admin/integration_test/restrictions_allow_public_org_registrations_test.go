@@ -36,18 +36,18 @@ func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	var csrfToken string
 	iamOwnerCtx := instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 
-	t.Run("public org registration is allowed by default", func(*testing.T) {
-		csrfToken = awaitPubOrgRegAllowed(t, iamOwnerCtx, instance.Client, browserSession, regOrgUrl)
+	t.Run("public org registration is allowed by default", func(tt *testing.T) {
+		csrfToken = awaitPubOrgRegAllowed(tt, iamOwnerCtx, instance.Client, browserSession, regOrgUrl)
 	})
-	t.Run("disallowing public org registration disables the endpoints", func(*testing.T) {
+	t.Run("disallowing public org registration disables the endpoints", func(tt *testing.T) {
 		_, err = instance.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(true)})
-		require.NoError(t, err)
-		awaitPubOrgRegDisallowed(t, iamOwnerCtx, instance.Client, browserSession, regOrgUrl, csrfToken)
+		require.NoError(tt, err)
+		awaitPubOrgRegDisallowed(tt, iamOwnerCtx, instance.Client, browserSession, regOrgUrl, csrfToken)
 	})
-	t.Run("allowing public org registration again re-enables the endpoints", func(*testing.T) {
+	t.Run("allowing public org registration again re-enables the endpoints", func(tt *testing.T) {
 		_, err = instance.Client.Admin.SetRestrictions(iamOwnerCtx, &admin.SetRestrictionsRequest{DisallowPublicOrgRegistration: gu.Ptr(false)})
-		require.NoError(t, err)
-		awaitPubOrgRegAllowed(t, iamOwnerCtx, instance.Client, browserSession, regOrgUrl)
+		require.NoError(tt, err)
+		awaitPubOrgRegAllowed(tt, iamOwnerCtx, instance.Client, browserSession, regOrgUrl)
 	})
 }
 
@@ -75,9 +75,9 @@ func awaitGetSSRGetResponse(t *testing.T, ctx context.Context, client *http.Clie
 	var csrfToken []byte
 	await(t, ctx, func(tt *assert.CollectT) {
 		resp, err := client.Get(parsedURL.String())
-		require.NoError(t, err)
+		require.NoError(tt, err)
 		body, err := io.ReadAll(resp.Body)
-		require.NoError(t, err)
+		require.NoError(tt, err)
 		searchField := `<input type="hidden" name="gorilla.csrf.Token" value="`
 		_, after, hasCsrfToken := bytes.Cut(body, []byte(searchField))
 		if hasCsrfToken {
@@ -94,7 +94,7 @@ func awaitPostFormResponse(t *testing.T, ctx context.Context, client *http.Clien
 		resp, err := client.PostForm(parsedURL.String(), url.Values{
 			"gorilla.csrf.Token": {csrfToken},
 		})
-		require.NoError(t, err)
+		require.NoError(tt, err)
 		assert.Equal(tt, resp.StatusCode, expectCode)
 	})
 }

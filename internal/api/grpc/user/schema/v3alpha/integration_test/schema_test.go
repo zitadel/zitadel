@@ -63,12 +63,22 @@ func ensureFeatureEnabled(t *testing.T) {
 			f, err := Instance.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
 				Inheritance: true,
 			})
-			require.NoError(ttt, err)
+			assert.NoError(ttt, err)
 			assert.True(ttt, f.UserSchema.GetEnabled())
 		},
 		retryDuration,
 		100*time.Millisecond,
 		"timed out waiting for ensuring instance feature")
+
+	require.EventuallyWithT(t,
+		func(ttt *assert.CollectT) {
+			_, err := Instance.Client.UserSchemaV3.ListUserSchemas(CTX, &schema.ListUserSchemasRequest{})
+			assert.NoError(ttt, err)
+		},
+		retryDuration,
+		100*time.Millisecond,
+		"timed out waiting for ensuring instance feature call")
+
 }
 
 func TestServer_CreateUserSchema(t *testing.T) {

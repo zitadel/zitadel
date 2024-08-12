@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/integration"
-	feature "github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
@@ -57,7 +57,7 @@ func ensureFeatureEnabled(t *testing.T) {
 			f, err := Instance.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
 				Inheritance: true,
 			})
-			require.NoError(ttt, err)
+			assert.NoError(ttt, err)
 			if f.Actions.GetEnabled() {
 				return
 			}
@@ -65,4 +65,13 @@ func ensureFeatureEnabled(t *testing.T) {
 		retryDuration,
 		100*time.Millisecond,
 		"timed out waiting for ensuring instance feature")
+
+	require.EventuallyWithT(t,
+		func(ttt *assert.CollectT) {
+			_, err := Instance.Client.ActionV3.ListExecutionMethods(CTX, &action.ListExecutionMethodsRequest{})
+			assert.NoError(ttt, err)
+		},
+		retryDuration,
+		100*time.Millisecond,
+		"timed out waiting for ensuring instance feature call")
 }

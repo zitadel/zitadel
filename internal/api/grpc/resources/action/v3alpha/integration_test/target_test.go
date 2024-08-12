@@ -4,10 +4,10 @@ package action_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -33,7 +33,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "missing permission",
 			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.Target{
-				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				Name: gofakeit.Name(),
 			},
 			wantErr: true,
 		},
@@ -49,7 +49,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty type",
 			ctx:  CTX,
 			req: &action.Target{
-				Name:       fmt.Sprint(time.Now().UnixNano() + 1),
+				Name:       gofakeit.Name(),
 				TargetType: nil,
 			},
 			wantErr: true,
@@ -58,7 +58,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty webhook url",
 			ctx:  CTX,
 			req: &action.Target{
-				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				Name: gofakeit.Name(),
 				TargetType: &action.Target_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{},
 				},
@@ -69,7 +69,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty request response url",
 			ctx:  CTX,
 			req: &action.Target{
-				Name: fmt.Sprint(time.Now().UnixNano() + 1),
+				Name: gofakeit.Name(),
 				TargetType: &action.Target_RestCall{
 					RestCall: &action.SetRESTCall{},
 				},
@@ -80,7 +80,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "empty timeout",
 			ctx:  CTX,
 			req: &action.Target{
-				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Name:     gofakeit.Name(),
 				Endpoint: "https://example.com",
 				TargetType: &action.Target_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{},
@@ -93,7 +93,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "async, ok",
 			ctx:  CTX,
 			req: &action.Target{
-				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Name:     gofakeit.Name(),
 				Endpoint: "https://example.com",
 				TargetType: &action.Target_RestAsync{
 					RestAsync: &action.SetRESTAsync{},
@@ -112,7 +112,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "webhook, ok",
 			ctx:  CTX,
 			req: &action.Target{
-				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Name:     gofakeit.Name(),
 				Endpoint: "https://example.com",
 				TargetType: &action.Target_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{
@@ -133,7 +133,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "webhook, interrupt on error, ok",
 			ctx:  CTX,
 			req: &action.Target{
-				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Name:     gofakeit.Name(),
 				Endpoint: "https://example.com",
 				TargetType: &action.Target_RestWebhook{
 					RestWebhook: &action.SetRESTWebhook{
@@ -154,7 +154,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "call, ok",
 			ctx:  CTX,
 			req: &action.Target{
-				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Name:     gofakeit.Name(),
 				Endpoint: "https://example.com",
 				TargetType: &action.Target_RestCall{
 					RestCall: &action.SetRESTCall{
@@ -176,7 +176,7 @@ func TestServer_CreateTarget(t *testing.T) {
 			name: "call, interruptOnError, ok",
 			ctx:  CTX,
 			req: &action.Target{
-				Name:     fmt.Sprint(time.Now().UnixNano() + 1),
+				Name:     gofakeit.Name(),
 				Endpoint: "https://example.com",
 				TargetType: &action.Target_RestCall{
 					RestCall: &action.SetRESTCall{
@@ -223,7 +223,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -231,7 +231,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				ctx: Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &action.PatchTargetRequest{
 					Target: &action.PatchTarget{
-						Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+						Name: gu.Ptr(gofakeit.Name()),
 					},
 				},
 			},
@@ -247,7 +247,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				ctx: CTX,
 				req: &action.PatchTargetRequest{
 					Target: &action.PatchTarget{
-						Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+						Name: gu.Ptr(gofakeit.Name()),
 					},
 				},
 			},
@@ -256,7 +256,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change name, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -264,7 +264,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				ctx: CTX,
 				req: &action.PatchTargetRequest{
 					Target: &action.PatchTarget{
-						Name: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+						Name: gu.Ptr(gofakeit.Name()),
 					},
 				},
 			},
@@ -279,7 +279,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change type, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -306,7 +306,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change url, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -329,7 +329,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change timeout, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -352,7 +352,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change type async, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeAsync, false).GetDetails().GetId()
+				targetID := Instance.CreateTarget(CTX, t, "https://example.com", domain.TargetTypeAsync, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -394,7 +394,7 @@ func TestServer_PatchTarget(t *testing.T) {
 
 func TestServer_DeleteTarget(t *testing.T) {
 	ensureFeatureEnabled(t)
-	target := Instance.CreateTarget(CTX, t, "", "https://example.com", domain.TargetTypeWebhook, false)
+	target := Instance.CreateTarget(CTX, t, "https://example.com", domain.TargetTypeWebhook, false)
 	tests := []struct {
 		name    string
 		ctx     context.Context

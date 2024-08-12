@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/require"
 	"github.com/zitadel/logging"
@@ -606,13 +607,9 @@ func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, pr
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
-	nameSet := fmt.Sprint(time.Now().UnixNano() + 1)
-	if name != "" {
-		nameSet = name
-	}
+func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
 	reqTarget := &action.Target{
-		Name:     nameSet,
+		Name:     gofakeit.Name(),
 		Endpoint: endpoint,
 		Timeout:  durationpb.New(10 * time.Second),
 	}
