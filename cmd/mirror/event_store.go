@@ -28,8 +28,8 @@ var shouldIgnorePrevious bool
 func eventstoreCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "eventstore",
-		Short: "mirrors the eventstore of an instance from one database to another",
-		Long: `mirrors the eventstore of an instance from one database to another
+		Short: "mirrors the eventstore of an instance between databases, or between a database and files",
+		Long: `mirrors the eventstore of an instance between databases, or between a database and files
 ZITADEL needs to be initialized and set up with the --for-mirror flag
 Migrate only copies events2 and unique constraints`,
 		Run: func(cmd *cobra.Command, args []string) {
