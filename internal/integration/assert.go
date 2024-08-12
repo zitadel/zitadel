@@ -47,7 +47,7 @@ type ListDetailsMsg[L ListDetails] interface {
 // If the change date is populated, it is checked with a tolerance of 1 minute around Now.
 //
 // The resource owner is compared with expected.
-func AssertDetails[D Details, M DetailsMsg[D]](t testing.TB, expected, actual M) {
+func AssertDetails[D Details, M DetailsMsg[D]](t assert.TestingT, expected, actual M) {
 	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
 	var nilDetails D
 	if wantDetails == nilDetails {
@@ -66,7 +66,7 @@ func AssertDetails[D Details, M DetailsMsg[D]](t testing.TB, expected, actual M)
 	assert.Equal(t, wantDetails.GetResourceOwner(), gotDetails.GetResourceOwner())
 }
 
-func AssertResourceDetails(t testing.TB, expected *resources_object.Details, actual *resources_object.Details) {
+func AssertResourceDetails(t assert.TestingT, expected *resources_object.Details, actual *resources_object.Details) {
 	assert.NotZero(t, actual.GetSequence())
 
 	if expected.GetChangeDate() != nil {
@@ -79,7 +79,7 @@ func AssertResourceDetails(t testing.TB, expected *resources_object.Details, act
 	assert.NotEmpty(t, actual.GetId())
 }
 
-func AssertSettingsDetails(t testing.TB, expected *settings_object.Details, actual *settings_object.Details) {
+func AssertSettingsDetails(t assert.TestingT, expected *settings_object.Details, actual *settings_object.Details) {
 	assert.NotZero(t, actual.GetSequence())
 
 	if expected.GetChangeDate() != nil {
@@ -91,7 +91,7 @@ func AssertSettingsDetails(t testing.TB, expected *settings_object.Details, actu
 	assert.Equal(t, expected.GetOwner(), actual.GetOwner())
 }
 
-func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t testing.TB, expected, actual D) {
+func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t assert.TestingT, expected, actual D) {
 	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
 	var nilDetails L
 	if wantDetails == nilDetails {

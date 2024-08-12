@@ -918,8 +918,8 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 				}
 				assert.NoError(ttt, err)
 
-				integration.AssertDetails(t, tt.want.GetSchema(), got.GetSchema())
-				grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
+				integration.AssertDetails(ttt, tt.want.GetSchema(), got.GetSchema())
+				grpc.AllFieldsEqual(ttt, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
 		})

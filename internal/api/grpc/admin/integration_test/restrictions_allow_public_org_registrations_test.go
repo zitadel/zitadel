@@ -10,7 +10,6 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"testing"
-	"time"
 
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
@@ -23,9 +22,7 @@ import (
 func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	t.Parallel()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-	instance := Instance.UseIsolatedInstance(ctx)
+	instance := Instance.UseIsolatedInstance(CTX)
 	regOrgUrl, err := url.Parse("http://" + instance.Domain + ":8080/ui/login/register/org")
 	require.NoError(t, err)
 	// The CSRF cookie must be sent with every request.
@@ -34,7 +31,7 @@ func TestServer_Restrictions_DisallowPublicOrgRegistration(t *testing.T) {
 	require.NoError(t, err)
 	browserSession := &http.Client{Jar: jar}
 	var csrfToken string
-	iamOwnerCtx := instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	t.Run("public org registration is allowed by default", func(tt *testing.T) {
 		csrfToken = awaitPubOrgRegAllowed(tt, iamOwnerCtx, instance.Client, browserSession, regOrgUrl)

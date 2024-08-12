@@ -80,7 +80,7 @@ func requireEventually(
 	countCtx, cancel := context.WithTimeout(ctx, countTimeout)
 	defer cancel()
 	require.EventuallyWithT(t, func(c *assert.CollectT) {
-		counts = countEvents(countCtx, t, cc, userID, projectID, appID, projectGrantID)
+		counts = countEvents(countCtx, c, cc, userID, projectID, appID, projectGrantID)
 		assertCounts(c, counts)
 	}, assertTimeout, time.Second, msg)
 	return counts
@@ -180,51 +180,50 @@ func (e *eventCounts) assertAll(t *testing.T, c assert.TestingT, name string, co
 	})
 }
 
-func countEvents(ctx context.Context, t *testing.T, cc *integration.Client, userID, projectID, appID, grantID string) *eventCounts {
-	t.Helper()
+func countEvents(ctx context.Context, t assert.TestingT, cc *integration.Client, userID, projectID, appID, grantID string) *eventCounts {
 	counts := new(eventCounts)
 	var wg sync.WaitGroup
 	wg.Add(7)
 	go func() {
 		defer wg.Done()
 		result, err := cc.Admin.ListEvents(ctx, &admin.ListEventsRequest{})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		counts.all = len(result.GetEvents())
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Auth.ListMyUserChanges(ctx, &auth.ListMyUserChangesRequest{})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		counts.myUser = len(result.GetResult())
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Mgmt.ListUserChanges(ctx, &management.ListUserChangesRequest{UserId: userID})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		counts.aUser = len(result.GetResult())
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Mgmt.ListAppChanges(ctx, &management.ListAppChangesRequest{ProjectId: projectID, AppId: appID})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		counts.app = len(result.GetResult())
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Mgmt.ListOrgChanges(ctx, &management.ListOrgChangesRequest{})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		counts.org = len(result.GetResult())
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Mgmt.ListProjectChanges(ctx, &management.ListProjectChangesRequest{ProjectId: projectID})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		counts.project = len(result.GetResult())
 	}()
 	go func() {
 		defer wg.Done()
 		result, err := cc.Mgmt.ListProjectGrantChanges(ctx, &management.ListProjectGrantChangesRequest{ProjectId: projectID, GrantId: grantID})
-		require.NoError(t, err)
+		assert.NoError(t, err)
 		counts.grant = len(result.GetResult())
 	}()
 	wg.Wait()

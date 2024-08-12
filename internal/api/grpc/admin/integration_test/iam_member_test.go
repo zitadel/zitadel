@@ -98,7 +98,7 @@ func TestServer_ListIAMMembers(t *testing.T) {
 					assert.Error(ct, err)
 					return
 				}
-				require.NoError(t, err)
+				require.NoError(ct, err)
 				wantResult := tt.want.GetResult()
 				gotResult := got.GetResult()
 

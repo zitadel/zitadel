@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 
 	"github.com/zitadel/zitadel/internal/integration"
 )
@@ -181,7 +181,7 @@ func TestServer_GetUserByID(t *testing.T) {
 					}
 				}
 				assert.Equal(ttt, tt.want.User, got.User)
-				integration.AssertDetails(t, tt.want, got)
+				integration.AssertDetails(ttt, tt.want, got)
 			}, retryDuration, time.Second)
 		})
 	}
@@ -931,7 +931,7 @@ func TestServer_ListUsers(t *testing.T) {
 				for i := range tt.want.Result {
 					assert.Contains(ttt, got.Result, tt.want.Result[i])
 				}
-				integration.AssertListDetails(t, tt.want, got)
+				integration.AssertListDetails(ttt, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user result")
 		})
 	}

@@ -29,7 +29,7 @@ func TestImport_and_Get(t *testing.T) {
 
 	for i := 0; i < N; i++ {
 		firstName := strconv.Itoa(i)
-		t.Run(firstName, func(t *testing.T) {
+		t.Run(firstName, func(tt *testing.T) {
 			// create unique names.
 			lastName := strconv.FormatInt(time.Now().Unix(), 10)
 			userName := strings.Join([]string{firstName, lastName}, "_")
@@ -48,15 +48,15 @@ func TestImport_and_Get(t *testing.T) {
 					IsEmailVerified: true,
 				},
 			})
-			require.NoError(t, err)
+			require.NoError(tt, err)
 
 			_, err = Client.GetUserByID(OrgCTX, &management.GetUserByIDRequest{Id: res.GetUserId()})
 
 			s, ok := status.FromError(err)
 			if ok && s != nil && s.Code() == codes.NotFound {
-				t.Errorf("iteration %d: user with id %q not found", i, res.GetUserId())
+				tt.Errorf("iteration %d: user with id %q not found", i, res.GetUserId())
 			}
-			require.NoError(t, err) // catch and fail on any other error
+			require.NoError(tt, err) // catch and fail on any other error
 		})
 	}
 }
