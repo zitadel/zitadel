@@ -431,3 +431,19 @@ func (s *Tester) updateInstanceAndOrg(ctx context.Context, domain string) contex
 	logging.OnError(err).Fatal("query organisation")
 	return ctx
 }
+
+func await(af func() error) error {
+	maxTimer := time.NewTimer(15 * time.Minute)
+	for {
+		err := af()
+		if err == nil {
+			return nil
+		}
+		select {
+		case <-maxTimer.C:
+			return err
+		case <-time.After(time.Second / 10):
+			continue
+		}
+	}
+}
