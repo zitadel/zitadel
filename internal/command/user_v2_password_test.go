@@ -601,7 +601,7 @@ func TestCommands_requestPasswordReset(t *testing.T) {
 			}
 			got, gotPlainCode, err := c.requestPasswordReset(tt.args.ctx, tt.args.userID, tt.args.returnCode, tt.args.urlTmpl, tt.args.notificationType)
 			require.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.details, got)
+			assertObjectDetails(t, tt.res.details, got)
 			assert.Equal(t, tt.res.code, gotPlainCode)
 		})
 	}
