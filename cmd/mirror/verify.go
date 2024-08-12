@@ -36,6 +36,14 @@ var schemas = []string{
 }
 
 func verifyMigration(ctx context.Context, config *Migration) {
+	if isSrcFile || isDestFile {
+		verifyFileMigration(ctx, config)
+	} else {
+		verifyMigrationDB(ctx, config)
+	}
+}
+
+func verifyMigrationDB(ctx context.Context, config *Migration) {
 	sourceClient, err := database.Connect(config.Source, false, dialect.DBPurposeQuery)
 	logging.OnError(err).Fatal("unable to connect to source database")
 	defer sourceClient.Close()
