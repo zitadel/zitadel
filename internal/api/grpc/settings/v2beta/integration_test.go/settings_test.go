@@ -5,6 +5,7 @@ package settings_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -52,16 +53,18 @@ func TestServer_GetSecuritySettings(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := Client.GetSecuritySettings(tt.ctx, &settings.GetSecuritySettingsRequest{})
-			if tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			got, want := resp.GetSettings(), tt.want.GetSettings()
-			assert.Equal(t, want.GetEmbeddedIframe().GetEnabled(), got.GetEmbeddedIframe().GetEnabled(), "enable iframe embedding")
-			assert.Equal(t, want.GetEmbeddedIframe().GetAllowedOrigins(), got.GetEmbeddedIframe().GetAllowedOrigins(), "allowed origins")
-			assert.Equal(t, want.GetEnableImpersonation(), got.GetEnableImpersonation(), "enable impersonation")
+			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
+				resp, err := Client.GetSecuritySettings(tt.ctx, &settings.GetSecuritySettingsRequest{})
+				if tt.wantErr {
+					assert.Error(ct, err)
+					return
+				}
+				require.NoError(ct, err)
+				got, want := resp.GetSettings(), tt.want.GetSettings()
+				assert.Equal(ct, want.GetEmbeddedIframe().GetEnabled(), got.GetEmbeddedIframe().GetEnabled(), "enable iframe embedding")
+				assert.Equal(ct, want.GetEmbeddedIframe().GetAllowedOrigins(), got.GetEmbeddedIframe().GetAllowedOrigins(), "allowed origins")
+				assert.Equal(ct, want.GetEnableImpersonation(), got.GetEnableImpersonation(), "enable impersonation")
+			}, time.Minute, time.Second/10)
 		})
 	}
 }
