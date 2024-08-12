@@ -2,6 +2,7 @@
 
 import { ColorShade, getColorHash } from "@/utils/colors";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 
 interface AvatarProps {
   name: string | null | undefined;
@@ -77,8 +78,11 @@ export function Avatar({
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >
       {imageUrl ? (
-        <img
-          className="border border-divider-light dark:border-divider-dark rounded-full w-12 h-12"
+        <Image
+          height={48}
+          width={48}
+          alt="avatar"
+          className="border border-divider-light dark:border-divider-dark rounded-full"
           src={imageUrl}
         />
       ) : (
