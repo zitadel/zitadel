@@ -60,7 +60,7 @@ func (c *DeviceAuthorizationConfig) toOPConfig() op.DeviceAuthorizationConfig {
 		out.UserCode.CharAmount = c.UserCode.CharAmount
 	}
 	if c.UserCode.DashInterval != 0 {
-		out.UserCode.DashInterval = c.UserCode.CharAmount
+		out.UserCode.DashInterval = c.UserCode.DashInterval
 	}
 	return out
 }
