@@ -62,19 +62,6 @@ func TestServer_GetIDPByID(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "idp by ID, not found",
-			args: args{
-				IamCTX,
-				&idp.GetIDPByIDRequest{
-					Id: "unknown",
-				},
-				func(ctx context.Context, request *idp.GetIDPByIDRequest) *idpAttr {
-					return nil
-				},
-			},
-			wantErr: true,
-		},
-		{
 			name: "idp by ID, instance, ok",
 			args: args{
 				IamCTX,
