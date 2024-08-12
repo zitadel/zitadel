@@ -64,9 +64,7 @@ func ensureFeatureEnabled(t *testing.T) {
 				Inheritance: true,
 			})
 			require.NoError(ttt, err)
-			if f.UserSchema.GetEnabled() {
-				return
-			}
+			assert.True(ttt, f.UserSchema.GetEnabled())
 		},
 		retryDuration,
 		100*time.Millisecond,
