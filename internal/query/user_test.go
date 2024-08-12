@@ -17,7 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func Test_RemoveNoPermission(t *testing.T) {
+func TestUser_RemoveNoPermission(t *testing.T) {
 	type want struct {
 		users []*User
 	}

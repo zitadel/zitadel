@@ -30,15 +30,15 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
-	org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
-	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 	settings_v2beta "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
@@ -243,6 +243,21 @@ func (s *Tester) CreateOrganization(ctx context.Context, name, adminEmail string
 							},
 						},
 					},
+				},
+			},
+		},
+	})
+	logging.OnError(err).Fatal("create org")
+	return resp
+}
+
+func (s *Tester) CreateOrganizationWithUserID(ctx context.Context, name, userID string) *org.AddOrganizationResponse {
+	resp, err := s.Client.OrgV2.AddOrganization(ctx, &org.AddOrganizationRequest{
+		Name: name,
+		Admins: []*org.AddOrganizationRequest_Admin{
+			{
+				UserType: &org.AddOrganizationRequest_Admin_UserId{
+					UserId: userID,
 				},
 			},
 		},

@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/require"
 
 	"github.com/zitadel/zitadel/internal/database"
 	db_mock "github.com/zitadel/zitadel/internal/database/mock"
@@ -439,5 +440,128 @@ func TestQueries_IsOrgUnique(t *testing.T) {
 			}
 		})
 
+	}
+}
+
+func TestOrg_RemoveNoPermission(t *testing.T) {
+	type want struct {
+		orgs []*Org
+	}
+	tests := []struct {
+		name        string
+		want        want
+		orgs        *Orgs
+		permissions []string
+	}{
+		{
+			"permissions for all",
+			want{
+				orgs: []*Org{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			&Orgs{
+				Orgs: []*Org{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"first", "second", "third"},
+		},
+		{
+			"permissions for one, first",
+			want{
+				orgs: []*Org{
+					{ID: "first"},
+				},
+			},
+			&Orgs{
+				Orgs: []*Org{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"first"},
+		},
+		{
+			"permissions for one, second",
+			want{
+				orgs: []*Org{
+					{ID: "second"},
+				},
+			},
+			&Orgs{
+				Orgs: []*Org{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"second"},
+		},
+		{
+			"permissions for one, third",
+			want{
+				orgs: []*Org{
+					{ID: "third"},
+				},
+			},
+			&Orgs{
+				Orgs: []*Org{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"third"},
+		},
+		{
+			"permissions for two, first third",
+			want{
+				orgs: []*Org{
+					{ID: "first"}, {ID: "third"},
+				},
+			},
+			&Orgs{
+				Orgs: []*Org{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"first", "third"},
+		},
+		{
+			"permissions for two, second third",
+			want{
+				orgs: []*Org{
+					{ID: "second"}, {ID: "third"},
+				},
+			},
+			&Orgs{
+				Orgs: []*Org{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{"second", "third"},
+		},
+		{
+			"no permissions",
+			want{
+				orgs: []*Org{},
+			},
+			&Orgs{
+				Orgs: []*Org{
+					{ID: "first"}, {ID: "second"}, {ID: "third"},
+				},
+			},
+			[]string{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			checkPermission := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				for _, perm := range tt.permissions {
+					if resourceID == perm {
+						return nil
+					}
+				}
+				return errors.New("failed")
+			}
+			tt.orgs.RemoveNoPermission(context.Background(), checkPermission)
+			require.Equal(t, tt.want.orgs, tt.orgs.Orgs)
+		})
 	}
 }

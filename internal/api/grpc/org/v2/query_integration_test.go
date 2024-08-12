@@ -233,7 +233,7 @@ func TestServer_ListOrganizations(t *testing.T) {
 			},
 		},
 		{
-			name: "list org, no permission",
+			name: "list org, no login",
 			args: args{
 				context.Background(),
 				&org.ListOrganizationsRequest{
@@ -244,6 +244,70 @@ func TestServer_ListOrganizations(t *testing.T) {
 				nil,
 			},
 			wantErr: true,
+		},
+		{
+			name: "list org, no permission",
+			args: args{
+				UserCTX,
+				&org.ListOrganizationsRequest{},
+				nil,
+			},
+			want: &org.ListOrganizationsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 1,
+				Result:        []*org.Organization{},
+			},
+		},
+		{
+			name: "list org, no permission org owner",
+			args: args{
+				OwnerCTX,
+				&org.ListOrganizationsRequest{
+					Queries: []*org.SearchQuery{
+						OrganizationDomainQuery("nopermission"),
+					},
+				},
+				nil,
+			},
+			want: &org.ListOrganizationsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 0,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 1,
+				Result:        []*org.Organization{},
+			},
+		},
+		{
+			name: "list org, org owner",
+			args: args{
+				OwnerCTX,
+				&org.ListOrganizationsRequest{},
+				nil,
+			},
+			want: &org.ListOrganizationsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 1,
+				Result: []*org.Organization{
+					{
+						State: org.OrganizationState_ORGANIZATION_STATE_ACTIVE,
+						Name:  Tester.Organisation.Name,
+						Details: &object.Details{
+							Sequence:      Tester.Organisation.Sequence,
+							ChangeDate:    timestamppb.New(Tester.Organisation.ChangeDate),
+							ResourceOwner: Tester.Organisation.ResourceOwner,
+						},
+						Id:            Tester.Organisation.ID,
+						PrimaryDomain: Tester.Organisation.Domain,
+					},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {
