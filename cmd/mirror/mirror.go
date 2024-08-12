@@ -25,8 +25,8 @@ var (
 func New(configFiles *[]string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "mirror",
-		Short: "mirrors all data of ZITADEL from one database to another",
-		Long: `mirrors all data of ZITADEL from one database to another
+		Short: "mirrors all data of ZITADEL between databases, or between a database and files",
+		Long: `mirrors all data of ZITADEL between databases, or between a database and files
 ZITADEL needs to be initialized and set up with --for-mirror
 
 The command does mirror all data needed and recomputes the projections.

@@ -20,8 +20,8 @@ import (
 func systemCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "system",
-		Short: "mirrors the system tables of ZITADEL from one database to another",
-		Long: `mirrors the system tables of ZITADEL from one database to another
+		Short: "mirrors the system tables of ZITADEL between databases, or between a database and files",
+		Long: `mirrors the system tables of ZITADEL between databases, or between a database and files
 ZITADEL needs to be initialized
 Only keys and assets are mirrored`,
 		Run: func(cmd *cobra.Command, args []string) {

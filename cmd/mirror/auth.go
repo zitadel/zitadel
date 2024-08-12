@@ -20,8 +20,8 @@ import (
 func authCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "auth",
-		Short: "mirrors the auth requests table from one database to another",
-		Long: `mirrors the auth requests table from one database to another
+		Short: "mirrors the auth requests table between databases, or between a database and files",
+		Long: `mirrors the auth requests table between databases, or between a database and files
 ZITADEL needs to be initialized and set up with the --for-mirror flag
 Only auth requests are mirrored`,
 		Run: func(cmd *cobra.Command, args []string) {
