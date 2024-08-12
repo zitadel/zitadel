@@ -15,6 +15,13 @@ import (
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
+const (
+	conditionIDAllSegmentCount                    = 0
+	conditionIDRequestResponseServiceSegmentCount = 1
+	conditionIDRequestResponseMethodSegmentCount  = 2
+	conditionIDEventGroupSegmentCount             = 1
+)
+
 func (s *Server) GetTarget(ctx context.Context, req *action.GetTargetRequest) (*action.GetTargetResponse, error) {
 	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
@@ -360,11 +367,11 @@ func executionIDToCondition(include string) *action.Condition {
 
 func includeRequestToCondition(id string) *action.Condition {
 	switch strings.Count(id, "/") {
-	case 2:
+	case conditionIDRequestResponseMethodSegmentCount:
 		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Method{Method: id}}}}
-	case 1:
+	case conditionIDRequestResponseServiceSegmentCount:
 		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_Service{Service: strings.TrimPrefix(id, "/")}}}}
-	case 0:
+	case conditionIDAllSegmentCount:
 		return &action.Condition{ConditionType: &action.Condition_Request{Request: &action.RequestExecution{Condition: &action.RequestExecution_All{All: true}}}}
 	default:
 		return nil
@@ -372,11 +379,11 @@ func includeRequestToCondition(id string) *action.Condition {
 }
 func includeResponseToCondition(id string) *action.Condition {
 	switch strings.Count(id, "/") {
-	case 2:
+	case conditionIDRequestResponseMethodSegmentCount:
 		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Method{Method: id}}}}
-	case 1:
+	case conditionIDRequestResponseServiceSegmentCount:
 		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_Service{Service: strings.TrimPrefix(id, "/")}}}}
-	case 0:
+	case conditionIDAllSegmentCount:
 		return &action.Condition{ConditionType: &action.Condition_Response{Response: &action.ResponseExecution{Condition: &action.ResponseExecution_All{All: true}}}}
 	default:
 		return nil
@@ -385,13 +392,13 @@ func includeResponseToCondition(id string) *action.Condition {
 
 func includeEventToCondition(id string) *action.Condition {
 	switch strings.Count(id, "/") {
-	case 1:
+	case conditionIDEventGroupSegmentCount:
 		if strings.HasSuffix(id, command.EventGroupSuffix) {
 			return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Group{Group: strings.TrimSuffix(strings.TrimPrefix(id, "/"), command.EventGroupSuffix)}}}}
 		} else {
 			return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_Event{Event: strings.TrimPrefix(id, "/")}}}}
 		}
-	case 0:
+	case conditionIDAllSegmentCount:
 		return &action.Condition{ConditionType: &action.Condition_Event{Event: &action.EventExecution{Condition: &action.EventExecution_All{All: true}}}}
 	default:
 		return nil
