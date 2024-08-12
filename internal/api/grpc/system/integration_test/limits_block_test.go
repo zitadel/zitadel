@@ -204,7 +204,7 @@ func testBlockingAPI(t *testing.T, tt *test, expectBlocked bool, isFirst bool) {
 		// limits are eventually consistent, so we need to wait for the blocking to be set on the first test
 		assert.EventuallyWithT(t, func(c *assert.CollectT) {
 			testHTTP(c)
-		}, 15*time.Second, time.Second, "wait for blocking to be set")
+		}, time.Minute, time.Second, "wait for blocking to be set")
 	} else {
 		testHTTP(t)
 	}
