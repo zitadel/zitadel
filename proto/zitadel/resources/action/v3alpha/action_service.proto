@@ -132,7 +132,7 @@ service ZITADELActions {
           description: "Target successfully created";
           schema: {
             json_schema: {
-              ref: "#/definitions/CreateTargetResponse";
+              ref: "#/definitions/v3alphaCreateTargetResponse";
             }
           }
         };
@@ -214,7 +214,7 @@ service ZITADELActions {
           description: "Execution successfully updated or left unchanged";
           schema: {
             json_schema: {
-              ref: "#/definitions/SetExecutionResponse";
+              ref: "#/definitions/v3alphaSetExecutionResponse";
             }
           }
         };
