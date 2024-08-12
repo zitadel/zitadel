@@ -156,19 +156,19 @@ func (i *Instance) CreateOIDCAuthRequest(ctx context.Context, clientID, loginCli
 func (i *Instance) CreateOIDCAuthRequestWithDomain(ctx context.Context, domain, clientID, loginClient, redirectURI string, scope ...string) (authRequestID string, err error) {
 	provider, err := i.CreateRelyingPartyForDomain(ctx, domain, clientID, redirectURI, scope...)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("create relying party: %w", err)
 	}
 	codeChallenge := oidc.NewSHACodeChallenge(CodeVerifier)
 	authURL := rp.AuthURL("state", provider, rp.WithCodeChallenge(codeChallenge))
 
 	req, err := GetRequest(authURL, map[string]string{oidc_internal.LoginClientHeader: loginClient})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("get request: %w", err)
 	}
 
 	loc, err := CheckRedirect(req)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("check redirect: %w", err)
 	}
 
 	prefixWithHost := provider.Issuer() + i.Config.LoginURLV2

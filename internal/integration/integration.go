@@ -368,14 +368,17 @@ func loadInstanceOwnerPAT() string {
 }
 
 func (i *Instance) createMachineUserInstanceOwner(ctx context.Context, token string) {
-	user, err := i.Client.Auth.GetMyUser(WithAuthorizationToken(ctx, token), &auth.GetMyUserRequest{})
-	if err != nil {
-		panic(err)
-	}
-	i.Users.Set(UserTypeIAMOwner, &User{
-		ID:       user.GetUser().GetId(),
-		Username: user.GetUser().GetUserName(),
-		Token:    token,
+	mustAwait(func() error {
+		user, err := i.Client.Auth.GetMyUser(WithAuthorizationToken(ctx, token), &auth.GetMyUserRequest{})
+		if err != nil {
+			return err
+		}
+		i.Users.Set(UserTypeIAMOwner, &User{
+			ID:       user.GetUser().GetId(),
+			Username: user.GetUser().GetUserName(),
+			Token:    token,
+		})
+		return nil
 	})
 }
 
@@ -402,43 +405,46 @@ func (i *Instance) setClient(ctx context.Context) {
 }
 
 func (i *Instance) setInstance(ctx context.Context) {
-	instance, err := i.Client.Admin.GetMyInstance(ctx, &admin.GetMyInstanceRequest{})
-	if err != nil {
-		panic(err)
-	}
-	i.Instance = instance.GetInstance()
+	mustAwait(func() error {
+		instance, err := i.Client.Admin.GetMyInstance(ctx, &admin.GetMyInstanceRequest{})
+		i.Instance = instance.GetInstance()
+		return err
+	})
 }
 
 func (i *Instance) setOrganization(ctx context.Context) {
-	resp, err := i.Client.Mgmt.GetMyOrg(ctx, &management.GetMyOrgRequest{})
-	if err != nil {
-		panic(err)
-	}
-	i.DefaultOrg = resp.GetOrg()
+	mustAwait(func() error {
+		resp, err := i.Client.Mgmt.GetMyOrg(ctx, &management.GetMyOrgRequest{})
+		i.DefaultOrg = resp.GetOrg()
+		return err
+	})
 }
 
 func (i *Instance) createMachineUser(ctx context.Context, userType UserType) (userID string) {
-	username := gofakeit.Username()
-	userResp, err := i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
-		UserName:        username,
-		Name:            username,
-		Description:     userType.String(),
-		AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
-	})
-	if err != nil {
-		panic(err)
-	}
-	userID = userResp.GetUserId()
-	patResp, err := i.Client.Mgmt.AddPersonalAccessToken(ctx, &management.AddPersonalAccessTokenRequest{
-		UserId: userID,
-	})
-	if err != nil {
-		panic(err)
-	}
-	i.Users.Set(userType, &User{
-		ID:       userID,
-		Username: username,
-		Token:    patResp.GetToken(),
+	mustAwait(func() error {
+		username := gofakeit.Username()
+		userResp, err := i.Client.Mgmt.AddMachineUser(ctx, &management.AddMachineUserRequest{
+			UserName:        username,
+			Name:            username,
+			Description:     userType.String(),
+			AccessTokenType: user.AccessTokenType_ACCESS_TOKEN_TYPE_JWT,
+		})
+		if err != nil {
+			return err
+		}
+		userID = userResp.GetUserId()
+		patResp, err := i.Client.Mgmt.AddPersonalAccessToken(ctx, &management.AddPersonalAccessTokenRequest{
+			UserId: userID,
+		})
+		if err != nil {
+			return err
+		}
+		i.Users.Set(userType, &User{
+			ID:       userID,
+			Username: username,
+			Token:    patResp.GetToken(),
+		})
+		return nil
 	})
 	return userID
 }
@@ -526,4 +532,20 @@ func runQuotaServer(ctx context.Context, bodies chan []byte) (*httptest.Server, 
 	mockServer.Listener = listener
 	mockServer.Start()
 	return mockServer, nil
+}
+
+func mustAwait(af func() error) {
+	maxTimer := time.NewTimer(5 * time.Minute)
+	for {
+		err := af()
+		if err == nil {
+			return
+		}
+		select {
+		case <-maxTimer.C:
+			panic(err)
+		case <-time.After(time.Second / 10):
+			continue
+		}
+	}
 }

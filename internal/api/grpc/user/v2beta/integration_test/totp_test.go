@@ -109,10 +109,15 @@ func TestServer_VerifyTOTPRegistration(t *testing.T) {
 	_, sessionToken, _, _ := Instance.CreateVerifiedWebAuthNSession(t, CTX, userID)
 	ctx := integration.WithAuthorizationToken(CTX, sessionToken)
 
-	reg, err := Client.RegisterTOTP(ctx, &user.RegisterTOTPRequest{
-		UserId: userID,
-	})
-	require.NoError(t, err)
+	var reg *user.RegisterTOTPResponse
+	assert.EventuallyWithT(t, func(ct *assert.CollectT) {
+		var err error
+		reg, err = Client.RegisterTOTP(ctx, &user.RegisterTOTPRequest{
+			UserId: userID,
+		})
+		assert.NoError(ct, err)
+	}, time.Minute, time.Second/10)
+
 	code, err := totp.GenerateCode(reg.Secret, time.Now())
 	require.NoError(t, err)
 

@@ -5,6 +5,7 @@ package admin_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
@@ -91,20 +92,23 @@ func TestServer_ListIAMMembers(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Client.ListIAMMembers(tt.args.ctx, tt.args.req)
-			if tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			require.NoError(t, err)
-			wantResult := tt.want.GetResult()
-			gotResult := got.GetResult()
+			assert.EventuallyWithT(t, func(ct *assert.CollectT) {
+				got, err := Client.ListIAMMembers(tt.args.ctx, tt.args.req)
+				if tt.wantErr {
+					assert.Error(ct, err)
+					return
+				}
+				require.NoError(t, err)
+				wantResult := tt.want.GetResult()
+				gotResult := got.GetResult()
 
-			require.Len(t, gotResult, len(wantResult))
-			for i, want := range wantResult {
-				assert.Equal(t, want.GetUserId(), gotResult[i].GetUserId())
-				assert.ElementsMatch(t, want.GetRoles(), gotResult[i].GetRoles())
-			}
+				if assert.Len(ct, gotResult, len(wantResult)) {
+					for i, want := range wantResult {
+						assert.Equal(ct, want.GetUserId(), gotResult[i].GetUserId())
+						assert.ElementsMatch(ct, want.GetRoles(), gotResult[i].GetRoles())
+					}
+				}
+			}, time.Minute, time.Second)
 		})
 	}
 }
