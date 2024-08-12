@@ -147,8 +147,8 @@ func copyAuthRequestsFromFile(ctx context.Context, dest *db.DB, fileName string)
 	var eventCount int64
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
-		var stmt database.Statement
 
+		var stmt database.Statement
 		stmt.WriteString("DELETE FROM auth.auth_requests ")
 		stmt.WriteString(instanceClause())
 
@@ -158,7 +158,10 @@ func copyAuthRequestsFromFile(ctx context.Context, dest *db.DB, fileName string)
 		}
 
 		stmt.Reset()
-		stmt.WriteString("COPY auth.auth_requests FROM STDIN (DELIMITER ',')")
+		stmt.WriteString(`COPY auth.auth_requests
+						 (id, request, code, request_type,
+						 creation_date, change_date, instance_id)
+						 FROM STDIN (DELIMITER ',')`)
 
 		tag, err := conn.PgConn().CopyFrom(ctx, reader, stmt.String())
 		eventCount = tag.RowsAffected()
@@ -180,6 +183,7 @@ func copyAuthRequestsToFile(ctx context.Context, src *db.DB, fileName string) {
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
 
+	var eventCount int64
 	go func() {
 		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
@@ -192,8 +196,10 @@ func copyAuthRequestsToFile(ctx context.Context, src *db.DB, fileName string) {
 			stmt.WriteString(instanceClause())
 			stmt.WriteString(") TO STDOUT (DELIMITER ',')")
 
-			_, err := conn.PgConn().CopyTo(ctx, writer, stmt.String())
+			tag, err := conn.PgConn().CopyTo(ctx, writer, stmt.String())
+			eventCount = tag.RowsAffected()
 			writer.Close()
+
 			return err
 		})
 		errs <- err
@@ -206,5 +212,5 @@ func copyAuthRequestsToFile(ctx context.Context, src *db.DB, fileName string) {
 	_, err = io.Copy(destFile, reader)
 	logging.OnError(err).Fatal("unable to copy auth requests to file")
 	logging.OnError(<-errs).Fatal("unable to copy auth requests from source")
-	logging.WithFields("took", time.Since(start)).Info("auth requests copied to " + fileName)
+	logging.WithFields("took", time.Since(start), "count", eventCount).Info("auth requests copied to " + fileName)
 }
