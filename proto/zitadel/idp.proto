@@ -500,12 +500,12 @@ message AzureADConfig {
 message Options {
     bool is_linking_allowed = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enable if users should be able to link an existing ZITADEL user with an external account.";
+            description: "Enable if users should be able to manually link an existing ZITADEL user with an external account. Disable if users should only be allowed to link the proposed account in case of active auto_linking.";
         }
     ];
     bool is_creation_allowed = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "Enable if users should be able to create a new account in ZITADEL when using an external account.";
+            description: "Enable if users should be able to manually create a new account in ZITADEL when using an external account. Disable if users should not be able to edit account information when aut_creation is enabled.";
         }
     ];
     bool is_auto_creation = 3 [

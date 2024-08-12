@@ -533,8 +533,8 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 		}
 	}
 
-	// if auto creation or creation itself is disabled, send the user to the notFoundOption
-	if !provider.IsCreationAllowed || !provider.IsAutoCreation {
+	// if auto creation is disabled, send the user to the notFoundOption
+	if !provider.IsAutoCreation {
 		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
 		return
 	}
