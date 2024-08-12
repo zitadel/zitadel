@@ -72,8 +72,8 @@ export function Avatar({
           : size === "base"
             ? "w-[38px] h-[38px] font-bold"
             : size === "small"
-              ? "w-[32px] h-[32px] font-bold text-[13px]"
-              : ""
+              ? "!w-[32px] !h-[32px] font-bold text-[13px]"
+              : "w-12 h-12"
       }`}
       style={resolvedTheme === "light" ? avatarStyleLight : avatarStyleDark}
     >
@@ -82,7 +82,7 @@ export function Avatar({
           height={48}
           width={48}
           alt="avatar"
-          className="border border-divider-light dark:border-divider-dark rounded-full"
+          className="w-full h-full border border-divider-light dark:border-divider-dark rounded-full"
           src={imageUrl}
         />
       ) : (
