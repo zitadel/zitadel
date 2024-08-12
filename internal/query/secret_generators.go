@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/zitadel/logging"
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/call"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -138,6 +139,7 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 		generator, err = scan(row)
 		return err
 	}, query, args...)
+	logging.OnError(err).WithField("type", generatorType).Error("secret generator by type")
 	return generator, err
 }
 
