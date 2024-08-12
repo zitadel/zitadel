@@ -534,18 +534,24 @@ func runQuotaServer(ctx context.Context, bodies chan []byte) (*httptest.Server, 
 	return mockServer, nil
 }
 
-func mustAwait(af func() error) {
-	maxTimer := time.NewTimer(5 * time.Minute)
+func await(af func() error) error {
+	maxTimer := time.NewTimer(15 * time.Minute)
 	for {
 		err := af()
 		if err == nil {
-			return
+			return nil
 		}
 		select {
 		case <-maxTimer.C:
-			panic(err)
+			return err
 		case <-time.After(time.Second / 10):
 			continue
 		}
+	}
+}
+
+func mustAwait(af func() error) {
+	if err := await(af); err != nil {
+		panic(err)
 	}
 }
