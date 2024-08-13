@@ -494,6 +494,7 @@ Errors:
     SQLStatement: SQL наредбата не може да се креира
     InvalidRequest: Барањето е невалидно
     TooManyNestingLevels: Премногу нивоа на вгнездување на барања (макс 20)
+    LimitExceeded: Превишена граница
   Quota:
     AlreadyExists: Веќе постои квота за оваа единица
     NotFound: Квотата не е пронајдена за оваа единица
