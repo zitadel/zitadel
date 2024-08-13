@@ -3,7 +3,7 @@ import {
   getSession,
   registerPasskey,
 } from "@/lib/zitadel";
-import { getSessionCookieById } from "@/utils/cookies";
+import { getSessionCookieById } from "@zitadel/next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   if (body) {
     const { sessionId } = body;
 
-    const sessionCookie = await getSessionCookieById(sessionId);
+    const sessionCookie = await getSessionCookieById({ sessionId });
 
     const session = await getSession(sessionCookie.id, sessionCookie.token);
 

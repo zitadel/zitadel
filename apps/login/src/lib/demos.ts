@@ -7,6 +7,7 @@ export type Item = {
 export enum ProviderSlug {
   GOOGLE = "google",
   GITHUB = "github",
+  AZURE = "microsoft",
 }
 
 export const demos: { name: string; items: Item[] }[] = [

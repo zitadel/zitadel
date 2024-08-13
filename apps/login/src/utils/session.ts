@@ -6,11 +6,7 @@ import {
   getSession,
   setSession,
 } from "@/lib/zitadel";
-import {
-  SessionCookie,
-  addSessionToCookie,
-  updateSessionCookie,
-} from "./cookies";
+import { addSessionToCookie, updateSessionCookie } from "@zitadel/next";
 import {
   Challenges,
   RequestChallenges,
@@ -18,6 +14,17 @@ import {
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { PlainMessage } from "@zitadel/client";
+
+type CustomCookieData = {
+  id: string;
+  token: string;
+  loginName: string;
+  organization?: string;
+  creationDate: string;
+  expirationDate: string;
+  changeDate: string;
+  authRequestId?: string; // if its linked to an OIDC flow
+};
 
 export async function createSessionAndUpdateCookie(
   loginName: string,
@@ -43,7 +50,7 @@ export async function createSessionAndUpdateCookie(
       createdSession.sessionToken,
     ).then((response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
-        const sessionCookie: SessionCookie = {
+        const sessionCookie: any = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
           creationDate: `${response.session.creationDate?.toDate().getTime() ?? ""}`,
@@ -61,7 +68,7 @@ export async function createSessionAndUpdateCookie(
           sessionCookie.organization = organization;
         }
 
-        return addSessionToCookie(sessionCookie).then(() => {
+        return addSessionToCookie<CustomCookieData>(sessionCookie).then(() => {
           return response.session as Session;
         });
       } else {
@@ -96,7 +103,7 @@ export async function createSessionForUserIdAndUpdateCookie(
       createdSession.sessionToken,
     ).then((response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
-        const sessionCookie: SessionCookie = {
+        const sessionCookie: any = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
           creationDate: `${response.session.creationDate?.toDate().getTime() ?? ""}`,
@@ -146,7 +153,7 @@ export async function createSessionForIdpAndUpdateCookie(
       createdSession.sessionToken,
     ).then((response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
-        const sessionCookie: SessionCookie = {
+        const sessionCookie: any = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
           creationDate: `${response.session.creationDate?.toDate().getTime() ?? ""}`,
@@ -181,7 +188,7 @@ export type SessionWithChallenges = Session & {
 };
 
 export async function setSessionAndUpdateCookie(
-  recentCookie: SessionCookie,
+  recentCookie: CustomCookieData,
   checks: PlainMessage<Checks>,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
@@ -193,7 +200,7 @@ export async function setSessionAndUpdateCookie(
     checks,
   ).then((updatedSession) => {
     if (updatedSession) {
-      const sessionCookie: SessionCookie = {
+      const sessionCookie: CustomCookieData = {
         id: recentCookie.id,
         token: updatedSession.sessionToken,
         creationDate: recentCookie.creationDate,
@@ -211,7 +218,7 @@ export async function setSessionAndUpdateCookie(
         (response) => {
           if (response?.session && response.session.factors?.user?.loginName) {
             const { session } = response;
-            const newCookie: SessionCookie = {
+            const newCookie: CustomCookieData = {
               id: sessionCookie.id,
               token: updatedSession.sessionToken,
               creationDate: sessionCookie.creationDate,

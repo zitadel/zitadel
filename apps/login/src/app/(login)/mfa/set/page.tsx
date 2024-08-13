@@ -13,7 +13,7 @@ import UserAvatar from "@/ui/UserAvatar";
 import {
   getMostRecentCookieWithLoginname,
   getSessionCookieById,
-} from "@/utils/cookies";
+} from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -31,10 +31,10 @@ export default async function Page({
     loginName?: string,
     organization?: string,
   ) {
-    const recent = await getMostRecentCookieWithLoginname(
+    const recent = await getMostRecentCookieWithLoginname({
       loginName,
       organization,
-    );
+    });
     return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         const userId = response.session.factors.user.id;
@@ -58,7 +58,7 @@ export default async function Page({
   }
 
   async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById(sessionId, organization);
+    const recent = await getSessionCookieById({ sessionId, organization });
     return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         const userId = response.session.factors.user.id;

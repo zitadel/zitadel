@@ -26,7 +26,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.22.0",
     "@vitejs/plugin-react": "^4.2.1",
-    "eslint": "^8.57.0",
+    "eslint": "8.57.0",
     "eslint-config-zitadel": "workspace:*",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^4.0.0",

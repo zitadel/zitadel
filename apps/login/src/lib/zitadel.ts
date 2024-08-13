@@ -298,6 +298,7 @@ export const PROVIDER_NAME_MAPPING: {
 } = {
   [ProviderSlug.GOOGLE]: "Google",
   [ProviderSlug.GITHUB]: "GitHub",
+  [ProviderSlug.AZURE]: "Microft",
 };
 
 export async function startIdentityProviderFlow({

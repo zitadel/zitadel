@@ -1,5 +1,5 @@
 import { getBrandingSettings, listSessions } from "@/lib/zitadel";
-import { getAllSessionCookieIds } from "@/utils/cookies";
+import { getAllSessionCookieIds } from "@zitadel/next";
 import { UserPlusIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import SessionsList from "@/ui/SessionsList";

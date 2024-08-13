@@ -1,5 +1,5 @@
 import { getSession, verifyPasskeyRegistration } from "@/lib/zitadel";
-import { getSessionCookieById } from "@/utils/cookies";
+import { getSessionCookieById } from "@zitadel/next";
 import { NextRequest, NextResponse, userAgent } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
         device.vendor || device.model ? ", " : ""
       }${os.name}${os.name ? ", " : ""}${browser.name}`;
     }
-    const sessionCookie = await getSessionCookieById(sessionId);
+    const sessionCookie = await getSessionCookieById({ sessionId });
 
     const session = await getSession(sessionCookie.id, sessionCookie.token);
 

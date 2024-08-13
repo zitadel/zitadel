@@ -6,7 +6,7 @@ import {
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
-import { SessionCookie, getAllSessions } from "@/utils/cookies";
+import { getAllSessions } from "@zitadel/next";
 import { NextRequest, NextResponse } from "next/server";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
   const authRequestId = searchParams.get("authRequest");
   const sessionId = searchParams.get("sessionId");
 
-  const sessionCookies: SessionCookie[] = await getAllSessions();
+  const sessionCookies = await getAllSessions();
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {

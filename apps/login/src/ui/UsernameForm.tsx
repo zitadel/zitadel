@@ -11,6 +11,7 @@ import {
   LoginSettings,
   PasskeysType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import BackButton from "./BackButton";
 
 type Inputs = {
   loginName: string;
@@ -23,6 +24,7 @@ type Props = {
   organization?: string;
   submit: boolean;
   allowRegister: boolean;
+  children?: React.ReactNode;
 };
 
 export default function UsernameForm({
@@ -32,6 +34,7 @@ export default function UsernameForm({
   organization,
   submit,
   allowRegister,
+  children,
 }: Props) {
   const { register, handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
@@ -220,6 +223,16 @@ export default function UsernameForm({
           {...register("loginName", { required: "This field is required" })}
           label="Loginname"
         />
+        {allowRegister && (
+          <button
+            className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
+            onClick={() => router.push("/register")}
+            type="button"
+            disabled={loading}
+          >
+            Register new user
+          </button>
+        )}
       </div>
 
       {error && (
@@ -228,17 +241,10 @@ export default function UsernameForm({
         </div>
       )}
 
-      <div className="mt-8 flex w-full flex-row items-center">
-        {allowRegister && (
-          <Button
-            type="button"
-            className="self-end"
-            variant={ButtonVariants.Secondary}
-            onClick={() => router.push("/register")}
-          >
-            register
-          </Button>
-        )}
+      <div className="pt-6 pb-4">{children}</div>
+
+      <div className="mt-4 flex w-full flex-row items-center">
+        <BackButton />
         <span className="flex-grow"></span>
         <Button
           type="submit"
