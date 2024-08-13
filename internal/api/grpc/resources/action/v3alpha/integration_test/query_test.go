@@ -490,10 +490,10 @@ func TestServer_ListTargets(t *testing.T) {
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
-					integration.AssertResourceDetails(t, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
+					integration.AssertResourceDetails(ttt, tt.want.Result[i].GetDetails(), got.Result[i].GetDetails())
 					assert.Equal(ttt, tt.want.Result[i].GetConfig(), got.Result[i].GetConfig())
 				}
-				integration.AssertResourceListDetails(t, tt.want, got)
+				integration.AssertResourceListDetails(ttt, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
 		})
 	}
@@ -869,15 +869,15 @@ func TestServer_SearchExecutions(t *testing.T) {
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				got, listErr := instance.Client.ActionV3.SearchExecutions(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					assert.Error(t, listErr, "Error: "+listErr.Error())
+					assert.Error(ttt, listErr, "Error: "+listErr.Error())
 				} else {
-					assert.NoError(t, listErr)
+					assert.NoError(ttt, listErr)
 				}
 				if listErr != nil {
 					return
 				}
 				// always first check length, otherwise its failed anyway
-				assert.Len(t, got.Result, len(tt.want.Result))
+				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
 					// as not sorted, all elements have to be checked
 					// workaround as oneof elements can only be checked with assert.EqualExportedValues()
@@ -885,7 +885,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 						assert.EqualExportedValues(t, tt.want.Result[i], got.Result[j])
 					}
 				}
-				integration.AssertResourceListDetails(t, tt.want, got)
+				integration.AssertResourceListDetails(ttt, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected execution result")
 		})
 	}
