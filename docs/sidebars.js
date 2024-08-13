@@ -681,13 +681,13 @@ module.exports = {
             },
             {
               type: "category",
-              label: "IDP Lifecycle",
+              label: "Identity Provider Lifecycle",
               link: {
                 type: "generated-index",
-                title: "IDP Service API",
+                title: "Identity Provider Service API",
                 slug: "/apis/resources/idp_service_v2",
                 description:
-                  'This API is intended to manage IDPs for ZITADEL.\n'
+                  'This API is intended to manage identity providers (IdPs) for ZITADEL.\n'
               },
               items: require("./docs/apis/resources/idp_service_v2/sidebar.ts"),
             },

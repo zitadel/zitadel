@@ -11,7 +11,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/idp/providers/azuread"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/internal/repository/idp"
+	idp_rp "github.com/zitadel/zitadel/internal/repository/idp"
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 )
 
@@ -35,17 +35,12 @@ func (s *Server) GetIDPByID(ctx context.Context, req *idp_pb.GetIDPByIDRequest) 
 }
 
 func idpToPb(idp *query.IDPTemplate) *idp_pb.IDP {
-	changeDate := idp.CreationDate
-	if !idp.ChangeDate.IsZero() {
-		changeDate = idp.ChangeDate
-	}
-
 	return &idp_pb.IDP{
 		Id: idp.ID,
 		Details: object.DomainToDetailsPb(
 			&domain.ObjectDetails{
 				Sequence:      idp.Sequence,
-				EventDate:     changeDate,
+				EventDate:     idp.ChangeDate,
 				ResourceOwner: idp.ResourceOwner,
 			}),
 		State:  idpStateToPb(idp.State),
@@ -56,13 +51,17 @@ func idpToPb(idp *query.IDPTemplate) *idp_pb.IDP {
 }
 
 func idpStateToPb(state domain.IDPState) idp_pb.IDPState {
-	switch state { //nolint:exhaustive
+	switch state {
 	case domain.IDPStateActive:
 		return idp_pb.IDPState_IDP_STATE_ACTIVE
 	case domain.IDPStateInactive:
 		return idp_pb.IDPState_IDP_STATE_INACTIVE
 	case domain.IDPStateUnspecified:
 		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
+	case domain.IDPStateMigrated:
+		return idp_pb.IDPState_IDP_STATE_MIGRATED
+	case domain.IDPStateRemoved:
+		return idp_pb.IDPState_IDP_STATE_REMOVED
 	default:
 		return idp_pb.IDPState_IDP_STATE_UNSPECIFIED
 	}
@@ -305,7 +304,7 @@ func ldapConfigToPb(idpConfig *idp_pb.IDPConfig, template *query.LDAPIDPTemplate
 	}
 }
 
-func ldapAttributesToPb(attributes idp.LDAPAttributes) *idp_pb.LDAPAttributes {
+func ldapAttributesToPb(attributes idp_rp.LDAPAttributes) *idp_pb.LDAPAttributes {
 	return &idp_pb.LDAPAttributes{
 		IdAttribute:                attributes.IDAttribute,
 		FirstNameAttribute:         attributes.FirstNameAttribute,

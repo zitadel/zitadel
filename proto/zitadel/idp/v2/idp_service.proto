@@ -14,9 +14,9 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/idp/v2;idp";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "IDP Service";
+    title: "Identity Provider Service";
     version: "2.0";
-    description: "This API is intended to manage IDPs in a ZITADEL instance.";
+    description: "This API is intended to manage identity providers (IdPs) in a ZITADEL instance.";
     contact:{
       name: "ZITADEL"
       url: "https://zitadel.com"
@@ -100,11 +100,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service IDPService {
+service IdentityProviderService {
 
-  // Get Identity Provider (IDP) by ID
+  // Get identity provider (IdP) by ID
   //
-  // Returns an identity provider (social/enterprise login) by its ID e.g Google, AzureAD, etc.
+  // Returns an identity provider (social/enterprise login) by its ID, which can be of the type Google, AzureAD, etc.
   rpc GetIDPByID (GetIDPByIDRequest) returns (GetIDPByIDResponse) {
     option (google.api.http) = {
       get: "/v2/idp/{id}"
