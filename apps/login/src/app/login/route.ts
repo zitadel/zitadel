@@ -95,21 +95,26 @@ export async function GET(request: NextRequest) {
           sessionToken: cookie?.token,
         };
 
-        // works not with fresh login (session is given on call)
-        const { callbackUrl } = await createCallback({
-          authRequestId,
-          callbackKind: {
-            case: "session",
-            value: session,
-          },
-        });
-        if (callbackUrl) {
-          return NextResponse.redirect(callbackUrl);
-        } else {
-          return NextResponse.json(
-            { error: "An error occurred!" },
-            { status: 500 },
-          );
+        // works not with _rsc request
+        try {
+          const { callbackUrl } = await createCallback({
+            authRequestId,
+            callbackKind: {
+              case: "session",
+              value: session,
+            },
+          });
+          console.log("callbackUrl", callbackUrl);
+          if (callbackUrl) {
+            return NextResponse.redirect(callbackUrl);
+          } else {
+            return NextResponse.json(
+              { error: "An error occurred!" },
+              { status: 500 },
+            );
+          }
+        } catch (error) {
+          return NextResponse.json({ error }, { status: 500 });
         }
       }
     }
