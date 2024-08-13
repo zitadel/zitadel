@@ -107,7 +107,7 @@ service IdentityProviderService {
   // Returns an identity provider (social/enterprise login) by its ID, which can be of the type Google, AzureAD, etc.
   rpc GetIDPByID (GetIDPByIDRequest) returns (GetIDPByIDResponse) {
     option (google.api.http) = {
-      get: "/v2/idp/{id}"
+      get: "/v2/idps/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
