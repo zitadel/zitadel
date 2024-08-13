@@ -45,19 +45,19 @@ func TestMain(m *testing.M) {
 func TestServer_Feature_Disabled(t *testing.T) {
 	client, iamCTX := createInstanceAndClients(t, false)
 
-	t.Run("GenerateWebKey", func(t *testing.T) {
-		_, err := client.GenerateWebKey(iamCTX, &webkey.GenerateWebKeyRequest{})
+	t.Run("CreateWebKey", func(t *testing.T) {
+		_, err := client.CreateWebKey(iamCTX, &webkey.CreateWebKeyRequest{})
 		assertFeatureDisabledError(t, err)
 	})
 	t.Run("ActivateWebKey", func(t *testing.T) {
 		_, err := client.ActivateWebKey(iamCTX, &webkey.ActivateWebKeyRequest{
-			KeyId: "1",
+			Id: "1",
 		})
 		assertFeatureDisabledError(t, err)
 	})
 	t.Run("DeleteWebKey", func(t *testing.T) {
 		_, err := client.DeleteWebKey(iamCTX, &webkey.DeleteWebKeyRequest{
-			KeyId: "1",
+			Id: "1",
 		})
 		assertFeatureDisabledError(t, err)
 	})
@@ -70,7 +70,7 @@ func TestServer_Feature_Disabled(t *testing.T) {
 func TestServer_ListWebKeys(t *testing.T) {
 	client, iamCtx := createInstanceAndClients(t, true)
 	// After the feature is first enabled, we can expect 2 generated keys with the default config.
-	checkWebKeyListState(iamCtx, t, client, 2, "", &webkey.WebKeyDetails_Rsa{
+	checkWebKeyListState(iamCtx, t, client, 2, "", &webkey.WebKey_Rsa{
 		Rsa: &webkey.WebKeyRSAConfig{
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
@@ -78,19 +78,21 @@ func TestServer_ListWebKeys(t *testing.T) {
 	})
 }
 
-func TestServer_GenerateWebKey(t *testing.T) {
+func TestServer_CreateWebKey(t *testing.T) {
 	client, iamCtx := createInstanceAndClients(t, true)
-	_, err := client.GenerateWebKey(iamCtx, &webkey.GenerateWebKeyRequest{
-		Config: &webkey.GenerateWebKeyRequest_Rsa{
-			Rsa: &webkey.WebKeyRSAConfig{
-				Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
-				Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
+	_, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
+		Key: &webkey.WebKey{
+			Config: &webkey.WebKey_Rsa{
+				Rsa: &webkey.WebKeyRSAConfig{
+					Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
+					Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
+				},
 			},
 		},
 	})
 	require.NoError(t, err)
 
-	checkWebKeyListState(iamCtx, t, client, 3, "", &webkey.WebKeyDetails_Rsa{
+	checkWebKeyListState(iamCtx, t, client, 3, "", &webkey.WebKey_Rsa{
 		Rsa: &webkey.WebKeyRSAConfig{
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
@@ -100,22 +102,24 @@ func TestServer_GenerateWebKey(t *testing.T) {
 
 func TestServer_ActivateWebKey(t *testing.T) {
 	client, iamCtx := createInstanceAndClients(t, true)
-	resp, err := client.GenerateWebKey(iamCtx, &webkey.GenerateWebKeyRequest{
-		Config: &webkey.GenerateWebKeyRequest_Rsa{
-			Rsa: &webkey.WebKeyRSAConfig{
-				Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
-				Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
+	resp, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
+		Key: &webkey.WebKey{
+			Config: &webkey.WebKey_Rsa{
+				Rsa: &webkey.WebKeyRSAConfig{
+					Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
+					Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
+				},
 			},
 		},
 	})
 	require.NoError(t, err)
 
 	_, err = client.ActivateWebKey(iamCtx, &webkey.ActivateWebKeyRequest{
-		KeyId: resp.GetKeyId(),
+		Id: resp.GetDetails().GetId(),
 	})
 	require.NoError(t, err)
 
-	checkWebKeyListState(iamCtx, t, client, 3, resp.GetKeyId(), &webkey.WebKeyDetails_Rsa{
+	checkWebKeyListState(iamCtx, t, client, 3, resp.GetDetails().GetId(), &webkey.WebKey_Rsa{
 		Rsa: &webkey.WebKeyRSAConfig{
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
@@ -127,25 +131,27 @@ func TestServer_DeleteWebKey(t *testing.T) {
 	client, iamCtx := createInstanceAndClients(t, true)
 	keyIDs := make([]string, 2)
 	for i := 0; i < 2; i++ {
-		resp, err := client.GenerateWebKey(iamCtx, &webkey.GenerateWebKeyRequest{
-			Config: &webkey.GenerateWebKeyRequest_Rsa{
-				Rsa: &webkey.WebKeyRSAConfig{
-					Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
-					Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
+		resp, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
+			Key: &webkey.WebKey{
+				Config: &webkey.WebKey_Rsa{
+					Rsa: &webkey.WebKeyRSAConfig{
+						Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
+						Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
+					},
 				},
 			},
 		})
 		require.NoError(t, err)
-		keyIDs[i] = resp.GetKeyId()
+		keyIDs[i] = resp.GetDetails().GetId()
 	}
 	_, err := client.ActivateWebKey(iamCtx, &webkey.ActivateWebKeyRequest{
-		KeyId: keyIDs[0],
+		Id: keyIDs[0],
 	})
 	require.NoError(t, err)
 
 	ok := t.Run("cannot delete active key", func(t *testing.T) {
 		_, err := client.DeleteWebKey(iamCtx, &webkey.DeleteWebKeyRequest{
-			KeyId: keyIDs[0],
+			Id: keyIDs[0],
 		})
 		require.Error(t, err)
 		s := status.Convert(err)
@@ -158,7 +164,7 @@ func TestServer_DeleteWebKey(t *testing.T) {
 
 	ok = t.Run("delete inactive key", func(t *testing.T) {
 		_, err := client.DeleteWebKey(iamCtx, &webkey.DeleteWebKeyRequest{
-			KeyId: keyIDs[1],
+			Id: keyIDs[1],
 		})
 		require.NoError(t, err)
 	})
@@ -167,7 +173,7 @@ func TestServer_DeleteWebKey(t *testing.T) {
 	}
 
 	// There are 2 keys from feature setup, +2 created, -1 deleted = 3
-	checkWebKeyListState(iamCtx, t, client, 3, keyIDs[0], &webkey.WebKeyDetails_Rsa{
+	checkWebKeyListState(iamCtx, t, client, 3, keyIDs[0], &webkey.WebKey_Rsa{
 		Rsa: &webkey.WebKeyRSAConfig{
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
@@ -175,7 +181,7 @@ func TestServer_DeleteWebKey(t *testing.T) {
 	})
 }
 
-func createInstanceAndClients(t *testing.T, enableFeature bool) (webkey.WebKeyServiceClient, context.Context) {
+func createInstanceAndClients(t *testing.T, enableFeature bool) (webkey.ZITADELWebKeysClient, context.Context) {
 	domain, _, _, iamCTX := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
 	cc, err := grpc.NewClient(
 		net.JoinHostPort(domain, "8080"),
@@ -192,7 +198,7 @@ func createInstanceAndClients(t *testing.T, enableFeature bool) (webkey.WebKeySe
 		time.Sleep(time.Second)
 	}
 
-	return webkey.NewWebKeyServiceClient(cc), iamCTX
+	return webkey.NewZITADELWebKeysClient(cc), iamCTX
 }
 
 func assertFeatureDisabledError(t *testing.T, err error) {
@@ -203,7 +209,7 @@ func assertFeatureDisabledError(t *testing.T, err error) {
 	assert.Contains(t, s.Message(), "WEBKEY-Ohx6E")
 }
 
-func checkWebKeyListState(ctx context.Context, t *testing.T, client webkey.WebKeyServiceClient, nKeys int, expectActiveKeyID string, config any) {
+func checkWebKeyListState(ctx context.Context, t *testing.T, client webkey.ZITADELWebKeysClient, nKeys int, expectActiveKeyID string, config any) {
 	resp, err := client.ListWebKeys(ctx, &webkey.ListWebKeysRequest{})
 	require.NoError(t, err)
 	list := resp.GetWebKeys()
@@ -212,16 +218,15 @@ func checkWebKeyListState(ctx context.Context, t *testing.T, client webkey.WebKe
 	now := time.Now()
 	var gotActiveKeyID string
 	for _, key := range list {
-		assert.NotEmpty(t, key.GetKeyId())
-		assert.WithinRange(t, key.GetCreatedDate().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
-		assert.WithinRange(t, key.GetChangeDate().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
-		assert.NotEmpty(t, key.GetSequence())
+		assert.NotEmpty(t, key.GetDetails().GetId())
+		assert.WithinRange(t, key.GetDetails().GetCreated().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
+		assert.WithinRange(t, key.GetDetails().GetChanged().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
 		assert.NotEqual(t, webkey.WebKeyState_STATE_UNSPECIFIED, key.GetState())
 		assert.NotEqual(t, webkey.WebKeyState_STATE_REMOVED, key.GetState())
-		assert.Equal(t, config, key.GetConfig())
+		assert.Equal(t, config, key.GetConfig().GetConfig())
 
 		if key.GetState() == webkey.WebKeyState_STATE_ACTIVE {
-			gotActiveKeyID = key.GetKeyId()
+			gotActiveKeyID = key.GetDetails().GetId()
 		}
 	}
 	assert.NotEmpty(t, gotActiveKeyID)
