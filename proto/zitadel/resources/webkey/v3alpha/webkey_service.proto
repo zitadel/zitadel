@@ -104,7 +104,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 };
 
 service ZITADELWebKeys {
-  rpc GenerateWebKey(GenerateWebKeyRequest) returns (GenerateWebKeyResponse) {
+  rpc CreateWebKey(CreateWebKeyRequest) returns (CreateWebKeyResponse) {
     option (google.api.http) = {
       post: "/"
       body: "key"
@@ -210,7 +210,7 @@ service ZITADELWebKeys {
   }
 }
 
-message GenerateWebKeyRequest {
+message CreateWebKeyRequest {
   optional zitadel.object.v3alpha.Instance instance = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       default: "\"domain from HOST or :authority header\""
@@ -219,7 +219,7 @@ message GenerateWebKeyRequest {
   WebKey key = 2;
 }
 
-message GenerateWebKeyResponse {
+message CreateWebKeyResponse {
   zitadel.resources.object.v3alpha.Details details = 1;
 }
 

@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	webkey "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha"
+	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 )
 
 func Test_generateWebKeyRequestToConfig(t *testing.T) {
