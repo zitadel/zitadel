@@ -10,12 +10,14 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 )
 
-func Test_generateWebKeyRequestToConfig(t *testing.T) {
+func Test_createWebKeyRequestToConfig(t *testing.T) {
 	type args struct {
-		req *webkey.GenerateWebKeyRequest
+		req *webkey.CreateWebKeyRequest
 	}
 	tests := []struct {
 		name string
@@ -24,11 +26,13 @@ func Test_generateWebKeyRequestToConfig(t *testing.T) {
 	}{
 		{
 			name: "RSA",
-			args: args{&webkey.GenerateWebKeyRequest{
-				Config: &webkey.GenerateWebKeyRequest_Rsa{
-					Rsa: &webkey.WebKeyRSAConfig{
-						Bits:   webkey.WebKeyRSAConfig_RSA_BITS_3072,
-						Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA384,
+			args: args{&webkey.CreateWebKeyRequest{
+				Key: &webkey.WebKey{
+					Config: &webkey.WebKey_Rsa{
+						Rsa: &webkey.WebKeyRSAConfig{
+							Bits:   webkey.WebKeyRSAConfig_RSA_BITS_3072,
+							Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA384,
+						},
 					},
 				},
 			}},
@@ -39,10 +43,12 @@ func Test_generateWebKeyRequestToConfig(t *testing.T) {
 		},
 		{
 			name: "ECDSA",
-			args: args{&webkey.GenerateWebKeyRequest{
-				Config: &webkey.GenerateWebKeyRequest_Ecdsa{
-					Ecdsa: &webkey.WebKeyECDSAConfig{
-						Curve: webkey.WebKeyECDSAConfig_ECDSA_CURVE_P384,
+			args: args{&webkey.CreateWebKeyRequest{
+				Key: &webkey.WebKey{
+					Config: &webkey.WebKey_Ecdsa{
+						Ecdsa: &webkey.WebKeyECDSAConfig{
+							Curve: webkey.WebKeyECDSAConfig_ECDSA_CURVE_P384,
+						},
 					},
 				},
 			}},
@@ -52,18 +58,18 @@ func Test_generateWebKeyRequestToConfig(t *testing.T) {
 		},
 		{
 			name: "ED25519",
-			args: args{&webkey.GenerateWebKeyRequest{
-				Config: &webkey.GenerateWebKeyRequest_Ed25519{
-					Ed25519: &webkey.WebKeyED25519Config{},
+			args: args{&webkey.CreateWebKeyRequest{
+				Key: &webkey.WebKey{
+					Config: &webkey.WebKey_Ed25519{
+						Ed25519: &webkey.WebKeyED25519Config{},
+					},
 				},
 			}},
 			want: &crypto.WebKeyED25519Config{},
 		},
 		{
 			name: "default",
-			args: args{&webkey.GenerateWebKeyRequest{
-				Config: nil,
-			}},
+			args: args{&webkey.CreateWebKeyRequest{}},
 			want: &crypto.WebKeyRSAConfig{
 				Bits:   crypto.RSABits2048,
 				Hasher: crypto.RSAHasherSHA256,
@@ -72,7 +78,7 @@ func Test_generateWebKeyRequestToConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := generateWebKeyRequestToConfig(tt.args.req)
+			got := createWebKeyRequestToConfig(tt.args.req)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -215,6 +221,7 @@ func Test_webKeyECDSAConfigToCrypto(t *testing.T) {
 }
 
 func Test_webKeyDetailsListToPb(t *testing.T) {
+	instanceID := "ownerid"
 	list := []query.WebKeyDetails{
 		{
 			KeyID:        "key1",
@@ -236,43 +243,52 @@ func Test_webKeyDetailsListToPb(t *testing.T) {
 			Config:       &crypto.WebKeyED25519Config{},
 		},
 	}
-	want := []*webkey.WebKeyDetails{
+	want := []*webkey.GetWebKey{
 		{
-			KeyId:       "key1",
-			CreatedDate: &timestamppb.Timestamp{Seconds: 123, Nanos: 456},
-			ChangeDate:  &timestamppb.Timestamp{Seconds: 789, Nanos: 0},
-			Sequence:    123,
-			State:       webkey.WebKeyState_STATE_ACTIVE,
-			Config: &webkey.WebKeyDetails_Rsa{
-				Rsa: &webkey.WebKeyRSAConfig{
-					Bits:   webkey.WebKeyRSAConfig_RSA_BITS_3072,
-					Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA384,
+			Details: &resource_object.Details{
+				Id:      "key1",
+				Created: &timestamppb.Timestamp{Seconds: 123, Nanos: 456},
+				Changed: &timestamppb.Timestamp{Seconds: 789, Nanos: 0},
+				Owner:   &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID},
+			},
+			State: webkey.WebKeyState_STATE_ACTIVE,
+			Config: &webkey.WebKey{
+				Config: &webkey.WebKey_Rsa{
+					Rsa: &webkey.WebKeyRSAConfig{
+						Bits:   webkey.WebKeyRSAConfig_RSA_BITS_3072,
+						Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA384,
+					},
 				},
 			},
 		},
 		{
-			KeyId:       "key2",
-			CreatedDate: &timestamppb.Timestamp{Seconds: 123, Nanos: 456},
-			ChangeDate:  &timestamppb.Timestamp{Seconds: 789, Nanos: 0},
-			Sequence:    123,
-			State:       webkey.WebKeyState_STATE_ACTIVE,
-			Config: &webkey.WebKeyDetails_Ed25519{
-				Ed25519: &webkey.WebKeyED25519Config{},
+			Details: &resource_object.Details{
+				Id:      "key2",
+				Created: &timestamppb.Timestamp{Seconds: 123, Nanos: 456},
+				Changed: &timestamppb.Timestamp{Seconds: 789, Nanos: 0},
+				Owner:   &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID},
+			},
+			State: webkey.WebKeyState_STATE_ACTIVE,
+			Config: &webkey.WebKey{
+				Config: &webkey.WebKey_Ed25519{
+					Ed25519: &webkey.WebKeyED25519Config{},
+				},
 			},
 		},
 	}
-	got := webKeyDetailsListToPb(list)
+	got := webKeyDetailsListToPb(list, instanceID)
 	assert.Equal(t, want, got)
 }
 
 func Test_webKeyDetailsToPb(t *testing.T) {
+	instanceID := "ownerid"
 	type args struct {
 		details *query.WebKeyDetails
 	}
 	tests := []struct {
 		name string
 		args args
-		want *webkey.WebKeyDetails
+		want *webkey.GetWebKey
 	}{
 		{
 			name: "RSA",
@@ -287,16 +303,20 @@ func Test_webKeyDetailsToPb(t *testing.T) {
 					Hasher: crypto.RSAHasherSHA384,
 				},
 			}},
-			want: &webkey.WebKeyDetails{
-				KeyId:       "keyID",
-				CreatedDate: &timestamppb.Timestamp{Seconds: 123, Nanos: 456},
-				ChangeDate:  &timestamppb.Timestamp{Seconds: 789, Nanos: 0},
-				Sequence:    123,
-				State:       webkey.WebKeyState_STATE_ACTIVE,
-				Config: &webkey.WebKeyDetails_Rsa{
-					Rsa: &webkey.WebKeyRSAConfig{
-						Bits:   webkey.WebKeyRSAConfig_RSA_BITS_3072,
-						Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA384,
+			want: &webkey.GetWebKey{
+				Details: &resource_object.Details{
+					Id:      "keyID",
+					Created: &timestamppb.Timestamp{Seconds: 123, Nanos: 456},
+					Changed: &timestamppb.Timestamp{Seconds: 789, Nanos: 0},
+					Owner:   &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID},
+				},
+				State: webkey.WebKeyState_STATE_ACTIVE,
+				Config: &webkey.WebKey{
+					Config: &webkey.WebKey_Rsa{
+						Rsa: &webkey.WebKeyRSAConfig{
+							Bits:   webkey.WebKeyRSAConfig_RSA_BITS_3072,
+							Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA384,
+						},
 					},
 				},
 			},
@@ -313,15 +333,19 @@ func Test_webKeyDetailsToPb(t *testing.T) {
 					Curve: crypto.EllipticCurveP384,
 				},
 			}},
-			want: &webkey.WebKeyDetails{
-				KeyId:       "keyID",
-				CreatedDate: &timestamppb.Timestamp{Seconds: 123, Nanos: 456},
-				ChangeDate:  &timestamppb.Timestamp{Seconds: 789, Nanos: 0},
-				Sequence:    123,
-				State:       webkey.WebKeyState_STATE_ACTIVE,
-				Config: &webkey.WebKeyDetails_Ecdsa{
-					Ecdsa: &webkey.WebKeyECDSAConfig{
-						Curve: webkey.WebKeyECDSAConfig_ECDSA_CURVE_P384,
+			want: &webkey.GetWebKey{
+				Details: &resource_object.Details{
+					Id:      "keyID",
+					Created: &timestamppb.Timestamp{Seconds: 123, Nanos: 456},
+					Changed: &timestamppb.Timestamp{Seconds: 789, Nanos: 0},
+					Owner:   &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID},
+				},
+				State: webkey.WebKeyState_STATE_ACTIVE,
+				Config: &webkey.WebKey{
+					Config: &webkey.WebKey_Ecdsa{
+						Ecdsa: &webkey.WebKeyECDSAConfig{
+							Curve: webkey.WebKeyECDSAConfig_ECDSA_CURVE_P384,
+						},
 					},
 				},
 			},
@@ -336,21 +360,25 @@ func Test_webKeyDetailsToPb(t *testing.T) {
 				State:        domain.WebKeyStateActive,
 				Config:       &crypto.WebKeyED25519Config{},
 			}},
-			want: &webkey.WebKeyDetails{
-				KeyId:       "keyID",
-				CreatedDate: &timestamppb.Timestamp{Seconds: 123, Nanos: 456},
-				ChangeDate:  &timestamppb.Timestamp{Seconds: 789, Nanos: 0},
-				Sequence:    123,
-				State:       webkey.WebKeyState_STATE_ACTIVE,
-				Config: &webkey.WebKeyDetails_Ed25519{
-					Ed25519: &webkey.WebKeyED25519Config{},
+			want: &webkey.GetWebKey{
+				Details: &resource_object.Details{
+					Id:      "keyID",
+					Created: &timestamppb.Timestamp{Seconds: 123, Nanos: 456},
+					Changed: &timestamppb.Timestamp{Seconds: 789, Nanos: 0},
+					Owner:   &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instanceID},
+				},
+				State: webkey.WebKeyState_STATE_ACTIVE,
+				Config: &webkey.WebKey{
+					Config: &webkey.WebKey_Ed25519{
+						Ed25519: &webkey.WebKeyED25519Config{},
+					},
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := webKeyDetailsToPb(tt.args.details)
+			got := webKeyDetailsToPb(tt.args.details, instanceID)
 			assert.Equal(t, tt.want, got)
 		})
 	}
