@@ -322,12 +322,12 @@ func copyUniqueConstraintsDB(ctx context.Context, source, dest *db.DB) {
 
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
-	var stmt database.Statement
 
 	go func() {
 		err := sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 
+			var stmt database.Statement
 			stmt.WriteString("COPY (SELECT instance_id, unique_type, unique_field FROM eventstore.unique_constraints ")
 			stmt.WriteString(instanceClause())
 			stmt.WriteString(") TO STDOUT")
@@ -347,8 +347,8 @@ func copyUniqueConstraintsDB(ctx context.Context, source, dest *db.DB) {
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
+		var stmt database.Statement
 		if shouldReplace {
-			stmt.Reset()
 			stmt.WriteString("DELETE FROM eventstore.unique_constraints ")
 			stmt.WriteString(instanceClause())
 

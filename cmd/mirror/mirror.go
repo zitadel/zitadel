@@ -118,7 +118,11 @@ func mirrorFlags(cmd *cobra.Command) {
 
 func instanceClause() string {
 	if isSystem {
-		return ""
+		if isSrcFile || isDestFile {
+			return ""
+		} else {
+		return "WHERE instance_id <> ''"
+		}
 	}
 	for i := range instanceIDs {
 		instanceIDs[i] = "'" + instanceIDs[i] + "'"

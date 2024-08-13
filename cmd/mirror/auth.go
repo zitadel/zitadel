@@ -71,12 +71,12 @@ func copyAuthRequestsDB(ctx context.Context, source, dest *db.DB) {
 
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
-	var stmt database.Statement
 
 	go func() {
 		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 
+			var stmt database.Statement
 			stmt.WriteString(`COPY (SELECT id, 
 							regexp_replace(request::TEXT, '\\\\u0000', '', 'g')::JSON 
 							request, code, request_type, creation_date, change_date, instance_id 
@@ -100,8 +100,8 @@ func copyAuthRequestsDB(ctx context.Context, source, dest *db.DB) {
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
+		var stmt database.Statement
 		if shouldReplace {
-			stmt.Reset()
 			stmt.WriteString("DELETE FROM auth.auth_requests ")
 			stmt.WriteString(instanceClause())
 

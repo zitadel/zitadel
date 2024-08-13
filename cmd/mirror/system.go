@@ -74,13 +74,13 @@ func copyAssetsDB(ctx context.Context, source, dest *db.DB) {
 
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
-	var stmt database.Statement
 
 	go func() {
 		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 
 			// ignore hash column because it's computed
+			var stmt database.Statement
 			stmt.WriteString(`COPY (SELECT instance_id, asset_type, 
 							resource_owner, name, content_type, data, updated_at 
 							FROM system.assets `)
@@ -103,7 +103,7 @@ func copyAssetsDB(ctx context.Context, source, dest *db.DB) {
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
-		stmt.Reset()
+		var stmt database.Statement
 		stmt.WriteString("DELETE FROM system.assets ")
 		stmt.WriteString(instanceClause())
 
@@ -230,12 +230,12 @@ func copyEncryptionKeysDB(ctx context.Context, source, dest *db.DB) {
 
 	reader, writer := io.Pipe()
 	errs := make(chan error, 1)
-	var stmt database.Statement
 
 	go func() {
 		err = sourceConn.Raw(func(driverConn interface{}) error {
 			conn := driverConn.(*stdlib.Conn).Conn()
 
+			var stmt database.Statement
 			stmt.WriteString("COPY system.encryption_keys TO STDOUT")
 
 			_, err := conn.PgConn().CopyTo(ctx, writer, stmt.String())
@@ -254,8 +254,8 @@ func copyEncryptionKeysDB(ctx context.Context, source, dest *db.DB) {
 	err = destConn.Raw(func(driverConn interface{}) error {
 		conn := driverConn.(*stdlib.Conn).Conn()
 
+		var stmt database.Statement
 		if shouldReplace {
-			stmt.Reset()
 			stmt.WriteString("TRUNCATE system.encryption_keys")
 
 			_, err := conn.Exec(ctx, stmt.String())
