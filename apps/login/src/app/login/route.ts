@@ -80,13 +80,18 @@ export async function GET(request: NextRequest) {
       );
 
       if (cookie && cookie.id && cookie.token) {
-        console.log(`Found sessioncookie ${cookie.id}`);
+        console.log(
+          `Found sessioncookie ${cookie.id}`,
+          JSON.stringify(selectedSession),
+          JSON.stringify(cookie),
+        );
 
         const session = {
           sessionId: cookie?.id,
           sessionToken: cookie?.token,
         };
 
+        // works not with fresh login (session is given on call)
         const { callbackUrl } = await createCallback({
           authRequestId,
           callbackKind: {
