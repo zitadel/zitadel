@@ -42,6 +42,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		TokenExchange:                   req.OidcTokenExchange,
 		Actions:                         req.Actions,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
+		DebugOIDCParentError:            req.DebugOidcParentError,
 	}
 }
 
