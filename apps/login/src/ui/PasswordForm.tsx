@@ -256,7 +256,10 @@ export default function PasswordForm({
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
-          onClick={handleSubmit(submitPasswordAndContinue)}
+          onClick={(event) => {
+            event.preventDefault();
+            return handleSubmit(submitPasswordAndContinue);
+          }}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

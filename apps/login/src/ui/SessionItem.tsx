@@ -54,6 +54,7 @@ export default function SessionItem({
 
   return (
     <Link
+      prefetch={false}
       href={
         validUser && authRequestId
           ? `/login?` +
