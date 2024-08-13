@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 export const revalidate = false;
-export const fetchCatch = "default-no-store";
+export const fetchCache = "default-no-store";
 
 import {
   createCallback,
