@@ -12,16 +12,11 @@ export default async function Page({
 }) {
   const { loginName, promptPasswordless, organization, authRequestId } =
     searchParams;
-  let sessionFactors;
-  try {
-    sessionFactors = await loadMostRecentSession(sessionService, {
-      loginName,
-      organization,
-    });
-  } catch (error) {
-    console.error(error);
-    return <div>{JSON.stringify(error)}</div>;
-  }
+
+  const session = await loadMostRecentSession(sessionService, {
+    loginName,
+    organization,
+  });
 
   const title = !!promptPasswordless
     ? "Authenticate with a passkey"
@@ -37,10 +32,10 @@ export default async function Page({
       <div className="flex flex-col items-center space-y-4">
         <h1>{title}</h1>
 
-        {sessionFactors && (
+        {session && (
           <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
+            loginName={loginName ?? session.factors?.user?.loginName}
+            displayName={session.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
@@ -61,7 +56,7 @@ export default async function Page({
           </span>
         </Alert>
 
-        {!sessionFactors && (
+        {!session && (
           <div className="py-4">
             <Alert>
               Could not get the context of the user. Make sure to enter the
@@ -70,9 +65,9 @@ export default async function Page({
           </div>
         )}
 
-        {sessionFactors?.id && (
+        {session?.id && (
           <RegisterPasskey
-            sessionId={sessionFactors.id}
+            sessionId={session.id}
             isPrompt={!!promptPasswordless}
             organization={organization}
             authRequestId={authRequestId}
