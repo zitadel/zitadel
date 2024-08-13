@@ -94,7 +94,14 @@ export async function GET(request: NextRequest) {
             value: session,
           },
         });
-        return NextResponse.redirect(callbackUrl);
+        if (callbackUrl) {
+          return NextResponse.redirect(callbackUrl);
+        } else {
+          return NextResponse.json(
+            { error: "An error occurred!" },
+            { status: 500 },
+          );
+        }
       }
     }
   }
@@ -305,6 +312,9 @@ export async function GET(request: NextRequest) {
               if (callbackUrl) {
                 return NextResponse.redirect(callbackUrl);
               } else {
+                console.log(
+                  "could not create callback, redirect user to choose other account",
+                );
                 return gotoAccounts();
               }
             } catch (error) {
