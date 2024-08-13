@@ -12,11 +12,16 @@ export default async function Page({
 }) {
   const { loginName, promptPasswordless, organization, authRequestId } =
     searchParams;
-
-  const sessionFactors = await loadMostRecentSession(sessionService, {
-    loginName,
-    organization,
-  });
+  let sessionFactors;
+  try {
+    sessionFactors = await loadMostRecentSession(sessionService, {
+      loginName,
+      organization,
+    });
+  } catch (error) {
+    console.error(error);
+    return <div>{JSON.stringify(error)}</div>;
+  }
 
   const title = !!promptPasswordless
     ? "Authenticate with a passkey"
