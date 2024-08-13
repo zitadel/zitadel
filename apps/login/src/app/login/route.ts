@@ -1,3 +1,4 @@
+export const experimental_ppr = false;
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 
