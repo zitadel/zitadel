@@ -1569,7 +1569,7 @@ func TestCommandSide_AddUserHuman(t *testing.T) {
 				return
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, tt.args.human.Details)
+				assertObjectDetails(t, tt.res.want, tt.args.human.Details)
 				assert.Equal(t, tt.res.wantID, tt.args.human.ID)
 				assert.Equal(t, tt.res.wantEmailCode, gu.Value(tt.args.human.EmailCode))
 			}
@@ -2945,7 +2945,7 @@ func TestCommandSide_ChangeUserHuman(t *testing.T) {
 				return
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, tt.args.human.Details)
+				assertObjectDetails(t, tt.res.want, tt.args.human.Details)
 				assert.Equal(t, tt.res.wantEmailCode, tt.args.human.EmailCode)
 				assert.Equal(t, tt.res.wantPhoneCode, tt.args.human.PhoneCode)
 			}
