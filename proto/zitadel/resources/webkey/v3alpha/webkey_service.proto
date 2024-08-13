@@ -1,22 +1,23 @@
 syntax = "proto3";
 
-package zitadel.webkey.v3alpha;
+package zitadel.resources.webkey.v3alpha;
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2/object.proto";
+
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/webkey/v3alpha/config.proto";
-import "zitadel/webkey/v3alpha/details.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha;webkey";
+import "zitadel/resources/webkey/v3alpha/key.proto";
+import "zitadel/resources/object/v3alpha/object.proto";
+import "zitadel/object/v3alpha/object.proto";
 
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha;webkey";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "User Service";
+    title: "Webkey Service";
     version: "3.0-preview";
     description: "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens. This project is in preview state. It can AND will continue breaking until a stable version is released.";
     contact:{
@@ -41,8 +42,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$CUSTOM-DOMAIN";
-  base_path: "/";
+  host: "${ZITADEL_DOMAIN}";
+  base_path: "/resources/v3alpha/web_keys";
 
   external_docs: {
     description: "Detailed information about ZITADEL",
@@ -102,11 +103,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service WebKeyService {
+service ZITADELWebKeys {
   rpc GenerateWebKey(GenerateWebKeyRequest) returns (GenerateWebKeyResponse) {
     option (google.api.http) = {
-      post: "/v3alpha/web_keys"
-      body: "*"
+      post: "/"
+      body: "key"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -132,8 +133,7 @@ service WebKeyService {
   
   rpc ActivateWebKey(ActivateWebKeyRequest) returns (ActivateWebKeyResponse) {
     option (google.api.http) = {
-      post: "/v3alpha/web_keys/{key_id}/activate"
-      body: "*"
+      post: "/{id}/_activate"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -159,7 +159,7 @@ service WebKeyService {
   
   rpc DeleteWebKey(DeleteWebKeyRequest) returns (DeleteWebKeyResponse) {
     option (google.api.http) = {
-      delete: "/v3alpha/web_keys/{key_id}"
+      delete: "/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -185,7 +185,7 @@ service WebKeyService {
   
   rpc ListWebKeys(ListWebKeysRequest) returns (ListWebKeysResponse) {
     option (google.api.http) = {
-      get: "/v3alpha/web_keys"
+      get: "/"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -211,23 +211,25 @@ service WebKeyService {
 }
 
 message GenerateWebKeyRequest {
-  // config is optional and defaults to RSA with 2048 bits and the SHA256 hash algorithm.
-  oneof config {
-    WebKeyRSAConfig rsa = 1;
-    WebKeyECDSAConfig ecdsa = 2;
-    WebKeyED25519Config ed25519 = 3;
-  }
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  WebKey key = 2;
 }
 
 message GenerateWebKeyResponse {
-  // unique identifier of the web key
-  string key_id = 1;
-  zitadel.object.v2.Details details = 2;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message ActivateWebKeyRequest {
-  // unique identifier of the web key
-  string key_id = 1 [
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -239,12 +241,16 @@ message ActivateWebKeyRequest {
 }
 
 message ActivateWebKeyResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message DeleteWebKeyRequest {
-  // unique identifier of the web key
-  string key_id = 1[
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -256,13 +262,17 @@ message DeleteWebKeyRequest {
 }
 
 message DeleteWebKeyResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message ListWebKeysRequest {
-  // emtpy request
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
 }
 
 message ListWebKeysResponse {
-  repeated WebKeyDetails web_keys = 1;
+  repeated GetWebKey web_keys = 1;
 }

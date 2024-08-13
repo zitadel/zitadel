@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package zitadel.webkey.v3alpha;
+package zitadel.resources.webkey.v3alpha;
 
 import "validate/validate.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha;webkey";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha;webkey";
 
 message WebKeyRSAConfig {
   enum RSABits {
