@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -180,6 +181,46 @@ func TestServer_ListOrganizations(t *testing.T) {
 			},
 		},
 		{
+			name: "list org by inactive state, ok",
+			args: args{
+				CTX,
+				&org.ListOrganizationsRequest{
+					Queries: []*org.SearchQuery{},
+				},
+				func(ctx context.Context, request *org.ListOrganizationsRequest) ([]orgAttr, error) {
+					name := gofakeit.Name()
+					orgResp := Tester.CreateOrganization(ctx, name, gofakeit.Email())
+					deactivateOrgResp := Tester.DeactivateOrganization(ctx, orgResp.GetOrganizationId())
+					request.Queries = []*org.SearchQuery{
+						OrganizationIdQuery(orgResp.GetOrganizationId()),
+						OrganizationStateQuery(org.OrganizationState_ORGANIZATION_STATE_INACTIVE),
+					}
+					return []orgAttr{{
+						ID:   orgResp.GetOrganizationId(),
+						Name: name,
+						Details: &object.Details{
+							ResourceOwner: deactivateOrgResp.GetDetails().GetResourceOwner(),
+							Sequence:      deactivateOrgResp.GetDetails().GetSequence(),
+							ChangeDate:    deactivateOrgResp.GetDetails().GetChangeDate(),
+						},
+					}}, nil
+				},
+			},
+			want: &org.ListOrganizationsResponse{
+				Details: &object.ListDetails{
+					TotalResult: 1,
+					Timestamp:   timestamppb.Now(),
+				},
+				SortingColumn: 0,
+				Result: []*org.Organization{
+					{
+						State:   org.OrganizationState_ORGANIZATION_STATE_INACTIVE,
+						Details: &object.Details{},
+					},
+				},
+			},
+		},
+		{
 			name: "list org by domain, ok, sorted",
 			args: args{
 				CTX,
@@ -338,8 +379,9 @@ func TestServer_ListOrganizations(t *testing.T) {
 				if listErr != nil {
 					return
 				}
-				// always only give back dependency infos which are required for the response
-				assert.Len(ttt, tt.want.Result, int(tt.want.Details.TotalResult))
+
+				// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
+				tt.want.Details.TotalResult = got.Details.TotalResult
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 
@@ -350,8 +392,6 @@ func TestServer_ListOrganizations(t *testing.T) {
 					tt.want.Result[i].Details.Sequence = got.Result[i].Details.Sequence
 				}
 
-				fmt.Println(tt.want.Result)
-				fmt.Println(got.Result)
 				for i := range tt.want.Result {
 					assert.Contains(ttt, got.Result, tt.want.Result[i])
 				}
@@ -390,6 +430,14 @@ func OrganizationDomainQuery(domain string) *org.SearchQuery {
 	return &org.SearchQuery{Query: &org.SearchQuery_DomainQuery{
 		DomainQuery: &org.OrganizationDomainQuery{
 			Domain: domain,
+		},
+	}}
+}
+
+func OrganizationStateQuery(state org.OrganizationState) *org.SearchQuery {
+	return &org.SearchQuery{Query: &org.SearchQuery_StateQuery{
+		StateQuery: &org.OrganizationStateQuery{
+			State: state,
 		},
 	}}
 }

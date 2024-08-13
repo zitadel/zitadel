@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -83,26 +84,14 @@ type Org struct {
 }
 
 func (u *Orgs) RemoveNoPermission(ctx context.Context, permissionCheck domain_pkg.PermissionCheck) {
-	removableIndexes := make([]int, 0)
-	for i := range u.Orgs {
-		ctxData := authz.GetCtxData(ctx)
-		if ctxData.UserID != u.Orgs[i].ID {
-			if err := permissionCheck(ctx, domain_pkg.PermissionOrgRead, u.Orgs[i].ResourceOwner, u.Orgs[i].ID); err != nil {
-				removableIndexes = append(removableIndexes, i)
+	u.Orgs = slices.DeleteFunc(u.Orgs,
+		func(org *Org) bool {
+			if err := permissionCheck(ctx, domain_pkg.PermissionOrgRead, org.ID, org.ID); err != nil {
+				return true
 			}
-		}
-	}
-	removed := 0
-	for _, removeIndex := range removableIndexes {
-		u.Orgs = removeOrg(u.Orgs, removeIndex-removed)
-		removed++
-	}
-	// reset count as some orgs could be removed
-	u.SearchResponse.Count = uint64(len(u.Orgs))
-}
-
-func removeOrg(slice []*Org, s int) []*Org {
-	return append(slice[:s], slice[s+1:]...)
+			return false
+		},
+	)
 }
 
 type OrgSearchQueries struct {

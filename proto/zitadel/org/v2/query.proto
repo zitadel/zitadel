@@ -24,6 +24,7 @@ message SearchQuery {
 }
 
 message OrganizationNameQuery {
+  // Name of the organization.
   string name = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -33,15 +34,14 @@ message OrganizationNameQuery {
       example: "\"gigi-giraffe\"";
     }
   ];
+  // Defines which text equality method is used.
   zitadel.object.v2.TextQueryMethod method = 2 [
-    (validate.rules).enum.defined_only = true,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines which text equality method is used";
-    }
+    (validate.rules).enum.defined_only = true
   ];
 }
 
 message OrganizationDomainQuery {
+  // Domain used in organization, not necessary primary domain.
   string domain = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
@@ -51,24 +51,21 @@ message OrganizationDomainQuery {
       example: "\"citadel.cloud\"";
     }
   ];
+  // Defines which text equality method is used.
   zitadel.object.v2.TextQueryMethod method = 2 [
-    (validate.rules).enum.defined_only = true,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines which text equality method is used";
-    }
+    (validate.rules).enum.defined_only = true
   ];
 }
 
 message OrganizationStateQuery {
+  // Current state of the organization.
   OrganizationState state = 1 [
-    (validate.rules).enum.defined_only = true,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "current state of the organization";
-    }
+    (validate.rules).enum.defined_only = true
   ];
 }
 
 message OrganizationIDQuery {
+  // Unique identifier of the organization.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,

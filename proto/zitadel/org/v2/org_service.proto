@@ -153,9 +153,6 @@ service OrganizationService {
       auth_option: {
         permission: "authenticated"
       }
-      http_response: {
-        success_code: 200
-      }
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
