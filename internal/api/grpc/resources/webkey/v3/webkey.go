@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
+	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	webkey "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 )
 
-func (s *Server) GenerateWebKey(ctx context.Context, req *webkey.GenerateWebKeyRequest) (_ *webkey.GenerateWebKeyResponse, err error) {
+func (s *Server) GenerateWebKey(ctx context.Context, req *webkey.CreateWebKeyRequest) (_ *webkey.CreateWebKeyResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -22,9 +23,8 @@ func (s *Server) GenerateWebKey(ctx context.Context, req *webkey.GenerateWebKeyR
 		return nil, err
 	}
 
-	return &webkey.GenerateWebKeyResponse{
-		KeyId:   webKey.KeyID,
-		Details: object.DomainToDetailsPb(webKey.ObjectDetails),
+	return &webkey.CreateWebKeyResponse{
+		Details: resource_object.DomainToDetailsPb(webKey.ObjectDetails, object.OwnerType_OWNER_TYPE_INSTANCE, authz.GetInstance(ctx).InstanceID()),
 	}, nil
 }
 
@@ -35,13 +35,13 @@ func (s *Server) ActivateWebKey(ctx context.Context, req *webkey.ActivateWebKeyR
 	if err = checkWebKeyFeature(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.ActivateWebKey(ctx, req.GetKeyId())
+	details, err := s.command.ActivateWebKey(ctx, req.GetId())
 	if err != nil {
 		return nil, err
 	}
 
 	return &webkey.ActivateWebKeyResponse{
-		Details: object.DomainToDetailsPb(details),
+		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, authz.GetInstance(ctx).InstanceID()),
 	}, nil
 }
 
@@ -52,17 +52,17 @@ func (s *Server) DeleteWebKey(ctx context.Context, req *webkey.DeleteWebKeyReque
 	if err = checkWebKeyFeature(ctx); err != nil {
 		return nil, err
 	}
-	details, err := s.command.DeleteWebKey(ctx, req.GetKeyId())
+	details, err := s.command.DeleteWebKey(ctx, req.GetId())
 	if err != nil {
 		return nil, err
 	}
 
 	return &webkey.DeleteWebKeyResponse{
-		Details: object.DomainToDetailsPb(details),
+		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, authz.GetInstance(ctx).InstanceID()),
 	}, nil
 }
 
-func (s *Server) ListWebKeys(ctx context.Context, req *webkey.ListWebKeysRequest) (_ *webkey.ListWebKeysResponse, err error) {
+func (s *Server) ListWebKeys(ctx context.Context, _ *webkey.ListWebKeysRequest) (_ *webkey.ListWebKeysResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -75,7 +75,7 @@ func (s *Server) ListWebKeys(ctx context.Context, req *webkey.ListWebKeysRequest
 	}
 
 	return &webkey.ListWebKeysResponse{
-		WebKeys: webKeyDetailsListToPb(list),
+		WebKeys: webKeyDetailsListToPb(list, authz.GetInstance(ctx).InstanceID()),
 	}, nil
 }
 

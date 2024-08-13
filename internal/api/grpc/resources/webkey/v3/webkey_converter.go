@@ -1,21 +1,21 @@
 package webkey
 
 import (
-	"google.golang.org/protobuf/types/known/timestamppb"
-
+	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	webkey "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 )
 
-func generateWebKeyRequestToConfig(req *webkey.GenerateWebKeyRequest) crypto.WebKeyConfig {
-	switch config := req.GetConfig().(type) {
-	case *webkey.GenerateWebKeyRequest_Rsa:
+func generateWebKeyRequestToConfig(req *webkey.CreateWebKeyRequest) crypto.WebKeyConfig {
+	switch config := req.GetKey().GetConfig().(type) {
+	case *webkey.WebKey_Rsa:
 		return webKeyRSAConfigToCrypto(config.Rsa)
-	case *webkey.GenerateWebKeyRequest_Ecdsa:
+	case *webkey.WebKey_Ecdsa:
 		return webKeyECDSAConfigToCrypto(config.Ecdsa)
-	case *webkey.GenerateWebKeyRequest_Ed25519:
+	case *webkey.WebKey_Ed25519:
 		return new(crypto.WebKeyED25519Config)
 	default:
 		return webKeyRSAConfigToCrypto(nil)
@@ -73,34 +73,35 @@ func webKeyECDSAConfigToCrypto(config *webkey.WebKeyECDSAConfig) *crypto.WebKeyE
 	return out
 }
 
-func webKeyDetailsListToPb(list []query.WebKeyDetails) []*webkey.WebKeyDetails {
-	out := make([]*webkey.WebKeyDetails, len(list))
+func webKeyDetailsListToPb(list []query.WebKeyDetails, instanceID string) []*webkey.GetWebKey {
+	out := make([]*webkey.GetWebKey, len(list))
 	for i := range list {
-		out[i] = webKeyDetailsToPb(&list[i])
+		out[i] = webKeyDetailsToPb(&list[i], instanceID)
 	}
 	return out
 }
 
-func webKeyDetailsToPb(details *query.WebKeyDetails) *webkey.WebKeyDetails {
-	out := &webkey.WebKeyDetails{
-		KeyId:       details.KeyID,
-		CreatedDate: timestamppb.New(details.CreationDate),
-		ChangeDate:  timestamppb.New(details.ChangeDate),
-		Sequence:    details.Sequence,
-		State:       webKeyStateToPb(details.State),
+func webKeyDetailsToPb(details *query.WebKeyDetails, instanceID string) *webkey.GetWebKey {
+	out := &webkey.GetWebKey{
+		Details: resource_object.DomainToDetailsPb(&domain.ObjectDetails{
+			ID:           details.KeyID,
+			CreationDate: details.CreationDate,
+			EventDate:    details.ChangeDate,
+		}, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
+		State: webKeyStateToPb(details.State),
 	}
 
 	switch config := details.Config.(type) {
 	case *crypto.WebKeyRSAConfig:
-		out.Config = &webkey.WebKeyDetails_Rsa{
+		out.Config.Config = &webkey.WebKey_Rsa{
 			Rsa: webKeyRSAConfigToPb(config),
 		}
 	case *crypto.WebKeyECDSAConfig:
-		out.Config = &webkey.WebKeyDetails_Ecdsa{
+		out.Config.Config = &webkey.WebKey_Ecdsa{
 			Ecdsa: webKeyECDSAConfigToPb(config),
 		}
 	case *crypto.WebKeyED25519Config:
-		out.Config = &webkey.WebKeyDetails_Ed25519{
+		out.Config.Config = &webkey.WebKey_Ed25519{
 			Ed25519: new(webkey.WebKeyED25519Config),
 		}
 	}

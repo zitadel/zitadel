@@ -19,7 +19,7 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
-	webkey "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha"
+	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 )
 
 var (

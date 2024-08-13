@@ -36,6 +36,7 @@ import (
 	org "github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 	session "github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	settings "github.com/zitadel/zitadel/pkg/grpc/settings/v2"
@@ -45,7 +46,6 @@ import (
 	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
-	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/webkey/v3alpha"
 )
 
 type Client struct {
