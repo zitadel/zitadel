@@ -16,12 +16,12 @@ import (
 //go:embed user_by_id.sql
 var userByIDQuery string
 
-func UserByID(db *gorm.DB, table, userID, instanceID string) (*model.UserView, error) {
+func UserByID(ctx context.Context, db *gorm.DB, userID, instanceID string) (*model.UserView, error) {
 	user := new(model.UserView)
 
 	query := db.Raw(userByIDQuery, instanceID, userID)
 
-	tx := query.BeginTx(context.Background(), &sql.TxOptions{ReadOnly: true})
+	tx := query.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
 	defer func() {
 		if err := tx.Commit().Error; err != nil {
 			logging.OnError(err).Info("commit failed")
@@ -35,8 +35,8 @@ func UserByID(db *gorm.DB, table, userID, instanceID string) (*model.UserView, e
 		return user, nil
 	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, zerrors.ThrowNotFound(err, "VIEW-hodc6", "object not found")
+		return nil, zerrors.ThrowNotFound(err, "VIEW-hodc6", "Errors.User.NotFound")
 	}
-	logging.WithFields("table ", table).WithError(err).Warn("get from cache error")
-	return nil, zerrors.ThrowInternal(err, "VIEW-qJBg9", "cache error")
+	logging.WithError(err).Warn("unable to get user by id")
+	return nil, zerrors.ThrowInternal(err, "VIEW-qJBg9", "unable to get user by id")
 }

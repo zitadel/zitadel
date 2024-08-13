@@ -100,7 +100,7 @@ func NewServer(
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections, externalSecure)
+	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections)
 	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, query.GetPublicKeyByID)
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
@@ -115,7 +115,7 @@ func NewServer(
 	provider, err := op.NewProvider(
 		opConfig,
 		storage,
-		op.IssuerFromForwardedOrHost("", op.WithIssuerFromCustomHeaders("forwarded", "x-zitadel-forwarded")),
+		IssuerFromContext,
 		options...,
 	)
 	if err != nil {
@@ -142,7 +142,7 @@ func NewServer(
 		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
 		encAlg:                     encryptionAlg,
 		opCrypto:                   op.NewAESCrypto(opConfig.CryptoKey),
-		assetAPIPrefix:             assets.AssetAPI(externalSecure),
+		assetAPIPrefix:             assets.AssetAPI(),
 	}
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
 	server.Handler = op.RegisterLegacyServer(server,
@@ -160,6 +160,12 @@ func NewServer(
 		))
 
 	return server, nil
+}
+
+func IssuerFromContext(_ bool) (op.IssuerFromRequest, error) {
+	return func(r *http.Request) string {
+		return http_utils.DomainContext(r.Context()).Origin()
+	}, nil
 }
 
 func publicAuthPathPrefixes(endpoints *EndpointConfig) []string {
@@ -194,7 +200,7 @@ func createOPConfig(config Config, defaultLogoutRedirectURI string, cryptoKey []
 	return opConfig, nil
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB, externalSecure bool) *OPStorage {
+func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, db *database.DB) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -210,7 +216,7 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration,
 		encAlg:                            encAlg,
 		locker:                            crdb.NewLocker(db.DB, locksTable, signingKey),
-		assetAPIPrefix:                    assets.AssetAPI(externalSecure),
+		assetAPIPrefix:                    assets.AssetAPI(),
 	}
 }
 

@@ -8,15 +8,17 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/config/systemdefaults"
 	"github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/zerrors"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
 )
 
-var _ action.ActionServiceServer = (*Server)(nil)
+var _ action.ZITADELActionsServer = (*Server)(nil)
 
 type Server struct {
-	action.UnimplementedActionServiceServer
+	action.UnimplementedZITADELActionsServer
+	systemDefaults      systemdefaults.SystemDefaults
 	command             *command.Commands
 	query               *query.Queries
 	ListActionFunctions func() []string
@@ -27,6 +29,7 @@ type Server struct {
 type Config struct{}
 
 func CreateServer(
+	systemDefaults systemdefaults.SystemDefaults,
 	command *command.Commands,
 	query *query.Queries,
 	listActionFunctions func() []string,
@@ -34,6 +37,7 @@ func CreateServer(
 	listGRPCServices func() []string,
 ) *Server {
 	return &Server{
+		systemDefaults:      systemDefaults,
 		command:             command,
 		query:               query,
 		ListActionFunctions: listActionFunctions,
@@ -43,26 +47,26 @@ func CreateServer(
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	action.RegisterActionServiceServer(grpcServer, s)
+	action.RegisterZITADELActionsServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
-	return action.ActionService_ServiceDesc.ServiceName
+	return action.ZITADELActions_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return action.ActionService_ServiceDesc.ServiceName
+	return action.ZITADELActions_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return action.ActionService_AuthMethods
+	return action.ZITADELActions_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return action.RegisterActionServiceHandler
+	return action.RegisterZITADELActionsHandler
 }
 
-func checkExecutionEnabled(ctx context.Context) error {
+func checkActionsEnabled(ctx context.Context) error {
 	if authz.GetInstance(ctx).Features().Actions {
 		return nil
 	}

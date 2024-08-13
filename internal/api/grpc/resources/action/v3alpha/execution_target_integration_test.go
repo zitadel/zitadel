@@ -13,92 +13,94 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/integration"
-	action "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
 func TestServer_ExecutionTarget(t *testing.T) {
-	ensureFeatureEnabled(t)
+	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
+	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
-	fullMethod := "/zitadel.action.v3alpha.ActionService/GetTargetByID"
+	fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 
 	tests := []struct {
 		name    string
 		ctx     context.Context
-		dep     func(context.Context, *action.GetTargetByIDRequest, *action.GetTargetByIDResponse) (func(), error)
+		dep     func(context.Context, *action.GetTargetRequest, *action.GetTargetResponse) (func(), error)
 		clean   func(context.Context)
-		req     *action.GetTargetByIDRequest
-		want    *action.GetTargetByIDResponse
+		req     *action.GetTargetRequest
+		want    *action.GetTargetResponse
 		wantErr bool
 	}{
 		{
-			name: "GetTargetByID, request and response, ok",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) (func(), error) {
+			name: "GetTarget, request and response, ok",
+			ctx:  isolatedIAMOwnerCTX,
+			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
 
-				instanceID := Tester.Instance.InstanceID()
 				orgID := Tester.Organisation.ID
 				projectID := ""
-				userID := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner).ID
+				userID := Tester.Users.Get(instanceID, integration.IAMOwner).ID
 
 				// create target for target changes
-				targetCreatedName := fmt.Sprint("GetTargetByID", time.Now().UnixNano()+1)
+				targetCreatedName := fmt.Sprint("GetTarget", time.Now().UnixNano()+1)
 				targetCreatedURL := "https://nonexistent"
 
 				targetCreated := Tester.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, domain.TargetTypeCall, false)
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instanceID, OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
-				changedRequest := &action.GetTargetByIDRequest{TargetId: targetCreated.GetId()}
+				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetDetails().GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
 				targetRequest := Tester.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, false)
-				Tester.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetId()))
-				// GetTargetByID with used target
-				request.TargetId = targetRequest.GetId()
+				Tester.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
 
-				// expected response from the GetTargetByID
-				expectedResponse := &action.GetTargetByIDResponse{
-					Target: &action.Target{
-						TargetId: targetCreated.GetId(),
-						Details:  targetCreated.GetDetails(),
-						Name:     targetCreatedName,
-						Endpoint: targetCreatedURL,
+				// expected response from the GetTarget
+				expectedResponse := &action.GetTargetResponse{
+					Target: &action.GetTarget{
+						Config: &action.Target{
+							Name:     targetCreatedName,
+							Endpoint: targetCreatedURL,
+							TargetType: &action.Target_RestCall{
+								RestCall: &action.SetRESTCall{
+									InterruptOnError: false,
+								},
+							},
+							Timeout: durationpb.New(10 * time.Second),
+						},
+						Details: targetCreated.GetDetails(),
+					},
+				}
+				// has to be set separately because of the pointers
+				response.Target = &action.GetTarget{
+					Details: targetCreated.GetDetails(),
+					Config: &action.Target{
+						Name: targetCreatedName,
 						TargetType: &action.Target_RestCall{
 							RestCall: &action.SetRESTCall{
 								InterruptOnError: false,
 							},
 						},
-						Timeout: durationpb.New(10 * time.Second),
+						Timeout:  durationpb.New(10 * time.Second),
+						Endpoint: targetCreatedURL,
 					},
-				}
-				// has to be set separately because of the pointers
-				response.Target = &action.Target{
-					TargetId: targetCreated.GetId(),
-					Details:  targetCreated.GetDetails(),
-					Name:     targetCreatedName,
-					TargetType: &action.Target_RestCall{
-						RestCall: &action.SetRESTCall{
-							InterruptOnError: false,
-						},
-					},
-					Timeout: durationpb.New(10 * time.Second),
 				}
 
 				// content for partial update
-				changedResponse := &action.GetTargetByIDResponse{
-					Target: &action.Target{
-						TargetId: "changed",
+				changedResponse := &action.GetTargetResponse{
+					Target: &action.GetTarget{
+						Details: &resource_object.Details{
+							Id: targetCreated.GetDetails().GetId(),
+						},
 					},
 				}
-				// change partial updated content on returned response
-				response.Target.TargetId = changedResponse.Target.TargetId
 
 				// response received by target
 				wantResponse := &middleware.ContextInfoResponse{
@@ -113,7 +115,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusOK, changedResponse)
 				targetResponse := Tester.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, false)
-				Tester.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetId()))
+				Tester.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
 				return func() {
 					closeRequest()
@@ -124,28 +126,39 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				Tester.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
 				Tester.DeleteExecution(ctx, t, conditionResponseFullMethod(fullMethod))
 			},
-			req:  &action.GetTargetByIDRequest{},
-			want: &action.GetTargetByIDResponse{},
+			req: &action.GetTargetRequest{
+				Id: "something",
+			},
+			want: &action.GetTargetResponse{
+				Target: &action.GetTarget{
+					Details: &resource_object.Details{
+						Id: "changed",
+						Owner: &object.Owner{
+							Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+							Id:   instanceID,
+						},
+					},
+				},
+			},
 		},
-		/*{
-			name: "GetTargetByID, request, interrupt",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) (func(), error) {
+		{
+			name: "GetTarget, request, interrupt",
+			ctx:  isolatedIAMOwnerCTX,
+			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
 
-				fullMethod := "/zitadel.action.v3alpha.ActionService/GetTargetByID"
-				instanceID := Tester.Instance.InstanceID()
+				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 				orgID := Tester.Organisation.ID
 				projectID := ""
-				userID := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner).ID
+				userID := Tester.Users.Get(instanceID, integration.IAMOwner).ID
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instanceID, OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
-				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetByIDRequest{TargetId: "notchanged"})
+				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetRequest{Id: "notchanged"})
 
 				targetRequest := Tester.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, true)
-				Tester.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetId()))
-				// GetTargetByID with used target
-				request.TargetId = targetRequest.GetId()
+				Tester.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
+				// GetTarget with used target
+				request.Id = targetRequest.GetDetails().GetId()
 
 				return func() {
 					closeRequest()
@@ -154,49 +167,50 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			clean: func(ctx context.Context) {
 				Tester.DeleteExecution(ctx, t, conditionRequestFullMethod(fullMethod))
 			},
-			req:     &action.GetTargetByIDRequest{},
+			req:     &action.GetTargetRequest{},
 			wantErr: true,
 		},
 		{
-			name: "GetTargetByID, response, interrupt",
-			ctx:  CTX,
-			dep: func(ctx context.Context, request *action.GetTargetByIDRequest, response *action.GetTargetByIDResponse) (func(), error) {
+			name: "GetTarget, response, interrupt",
+			ctx:  isolatedIAMOwnerCTX,
+			dep: func(ctx context.Context, request *action.GetTargetRequest, response *action.GetTargetResponse) (func(), error) {
 
-				fullMethod := "/zitadel.action.v3alpha.ActionService/GetTargetByID"
-				instanceID := Tester.Instance.InstanceID()
+				fullMethod := "/zitadel.resources.action.v3alpha.ZITADELActions/GetTarget"
 				orgID := Tester.Organisation.ID
 				projectID := ""
-				userID := Tester.Users.Get(integration.FirstInstanceUsersKey, integration.IAMOwner).ID
+				userID := Tester.Users.Get(instanceID, integration.IAMOwner).ID
 
 				// create target for target changes
-				targetCreatedName := fmt.Sprint("GetTargetByID", time.Now().UnixNano()+1)
+				targetCreatedName := fmt.Sprint("GetTarget", time.Now().UnixNano()+1)
 				targetCreatedURL := "https://nonexistent"
 
 				targetCreated := Tester.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, domain.TargetTypeCall, false)
 
-				// GetTargetByID with used target
-				request.TargetId = targetCreated.GetId()
+				// GetTarget with used target
+				request.Id = targetCreated.GetDetails().GetId()
 
-				// expected response from the GetTargetByID
-				expectedResponse := &action.GetTargetByIDResponse{
-					Target: &action.Target{
-						TargetId: targetCreated.GetId(),
-						Details:  targetCreated.GetDetails(),
-						Name:     targetCreatedName,
-						Endpoint: targetCreatedURL,
-						TargetType: &action.Target_RestCall{
-							RestCall: &action.SetRESTCall{
-								InterruptOnError: false,
+				// expected response from the GetTarget
+				expectedResponse := &action.GetTargetResponse{
+					Target: &action.GetTarget{
+						Details: targetCreated.GetDetails(),
+						Config: &action.Target{
+							Name:     targetCreatedName,
+							Endpoint: targetCreatedURL,
+							TargetType: &action.Target_RestCall{
+								RestCall: &action.SetRESTCall{
+									InterruptOnError: false,
+								},
 							},
+							Timeout: durationpb.New(10 * time.Second),
 						},
-						Timeout: durationpb.New(10 * time.Second),
 					},
 				}
-
 				// content for partial update
-				changedResponse := &action.GetTargetByIDResponse{
-					Target: &action.Target{
-						TargetId: "changed",
+				changedResponse := &action.GetTargetResponse{
+					Target: &action.GetTarget{
+						Details: &resource_object.Details{
+							Id: "changed",
+						},
 					},
 				}
 
@@ -213,7 +227,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusInternalServerError, changedResponse)
 				targetResponse := Tester.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, true)
-				Tester.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetId()))
+				Tester.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
 				return func() {
 					closeResponse()
@@ -222,9 +236,9 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			clean: func(ctx context.Context) {
 				Tester.DeleteExecution(ctx, t, conditionResponseFullMethod(fullMethod))
 			},
-			req:     &action.GetTargetByIDRequest{},
+			req:     &action.GetTargetRequest{},
 			wantErr: true,
-		},*/
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -234,17 +248,15 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				defer close()
 			}
 
-			got, err := Client.GetTargetByID(tt.ctx, tt.req)
+			got, err := Tester.Client.ActionV3.GetTarget(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 
-			integration.AssertDetails(t, tt.want.GetTarget(), got.GetTarget())
-
-			assert.Equal(t, tt.want.Target.TargetId, got.Target.TargetId)
-
+			integration.AssertResourceDetails(t, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
+			require.Equal(t, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
 			if tt.clean != nil {
 				tt.clean(tt.ctx)
 			}

@@ -113,7 +113,6 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 	if err := change.IsValid(); err != nil {
 		return nil, err
 	}
-
 	existing, err := c.getTargetWriteModelByID(ctx, change.AggregateID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -121,7 +120,6 @@ func (c *Commands) ChangeTarget(ctx context.Context, change *ChangeTarget, resou
 	if !existing.State.Exists() {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-xj14f2cccn", "Errors.Target.NotFound")
 	}
-
 	changedEvent := existing.NewChangedEvent(
 		ctx,
 		TargetAggregateFromWriteModel(&existing.WriteModel),

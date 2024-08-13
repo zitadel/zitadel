@@ -56,7 +56,7 @@ Be aware that you won't automatically have the organizations context when you ac
 ## Generated Subdomains
 
 ZITADEL creates random subdomains for [each new virtual instance](/concepts/structure/instance#multiple-virtual-instances).
-You can immediately access the ZITADEL Console an APIs using these subdomains without further actions.
+You can immediately access the ZITADEL Console and APIs using these subdomains without further actions.
 
 ## More Information
 

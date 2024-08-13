@@ -495,6 +495,7 @@ Errors:
     SQLStatement: L'instruction SQL n'a pas pu être créée
     InvalidRequest: La requête n'est pas valide
     TooManyNestingLevels: Trop de niveaux d'imbrication de requêtes (maximum 20)
+    LimitExceeded: Limite dépassée
   Quota:
     AlreadyExists: Contingent existe déjà pour cette unité
     NotFound: Contingent non trouvé pour cette unité
@@ -563,6 +564,7 @@ Errors:
     NotFound: Exécution introuvable
     IncludeNotFound: Inclure introuvable
     NoTargets: Aucune cible définie
+    ResponseIsNotValidJSON: La réponse n'est pas un JSON valide
   UserSchema:
     NotEnabled: La fonctionnalité "Schéma utilisateur" n'est pas activée
     Type:

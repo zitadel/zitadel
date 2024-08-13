@@ -83,9 +83,17 @@ TLS:
   Cert: # ZITADEL_TLS_CERT
 
 # Header name of HTTP2 (incl. gRPC) calls from which the instance will be matched
+# Deprecated: Use the InstanceHostHeaders instead
 HTTP2HostHeader: ":authority" # ZITADEL_HTTP2HOSTHEADER
 # Header name of HTTP1 calls from which the instance will be matched
+# Deprecated: Use the InstanceHostHeaders instead
 HTTP1HostHeader: "host" # ZITADEL_HTTP1HOSTHEADER
+# Ordered header name list, which will be used to match the instance
+InstanceHostHeaders: # ZITADEL_INSTANCEHOSTHEADERS
+  - "x-zitadel-instance-host"
+# Ordered header name list, which will be used as the public host
+PublicHostHeaders: # ZITADEL_PUBLICHOSTHEADERS
+  - "x-zitadel-public-host"
 
 WebAuthNName: ZITADEL # ZITADEL_WEBAUTHNNAME
 
@@ -350,6 +358,13 @@ OIDC:
       Path: /oauth/v2/keys # ZITADEL_OIDC_CUSTOMENDPOINTS_KEYS_PATH
     DeviceAuth:
       Path: /oauth/v2/device_authorization # ZITADEL_OIDC_CUSTOMENDPOINTS_DEVICEAUTH_PATH
+  DeviceAuth:
+    Lifetime: 5m # ZITADEL_OIDC_DEVICEAUTH_LIFETIME
+    PollInterval: 5s # ZITADEL_OIDC_DEVICEAUTH_POLLINTERVAL
+    UserCode:
+      CharSet: "BCDFGHJKLMNPQRSTVWXZ" # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARSET
+      CharAmount: 8 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_CHARARMOUNT
+      DashInterval: 4 # ZITADEL_OIDC_DEVICEAUTH_USERCODE_DASHINTERVAL
   DefaultLoginURLV2: "/login?authRequest=" # ZITADEL_OIDC_DEFAULTLOGINURLV2
   DefaultLogoutURLV2: "/logout?post_logout_redirect=" # ZITADEL_OIDC_DEFAULTLOGOUTURLV2
   PublicKeyCacheMaxAge: 24h # ZITADEL_OIDC_PUBLICKEYCACHEMAXAGE
@@ -532,6 +547,10 @@ SystemDefaults:
     PublicKeyLifetime: 30h # ZITADEL_SYSTEMDEFAULTS_KEYCONFIG_PUBLICKEYLIFETIME
     # 8766h are 1 year
     CertificateLifetime: 8766h # ZITADEL_SYSTEMDEFAULTS_KEYCONFIG_CERTIFICATELIFETIME
+  # DefaultQueryLimit limits the number of items that can be queried in a single v3 API search request without explicitly passing a limit.
+  DefaultQueryLimit: 100 # ZITADEL_SYSTEMDEFAULTS_DEFAULTQUERYLIMIT
+  # MaxQueryLimit limits the number of items that can be queried in a single v3 API search request with explicitly passing a limit.
+  MaxQueryLimit: 1000 # ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT
 
 Actions:
   HTTP:
@@ -1057,12 +1076,11 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.delete"
-        - "execution.target.read"
-        - "execution.target.write"
-        - "execution.target.delete"
-        - "execution.read"
-        - "execution.write"
-        - "execution.delete"
+        - "action.target.read"
+        - "action.target.write"
+        - "action.target.delete"
+        - "action.execution.read"
+        - "action.execution.write"
         - "userschema.read"
         - "userschema.write"
         - "userschema.delete"
@@ -1097,8 +1115,8 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "events.read"
         - "milestones.read"
-        - "execution.target.read"
-        - "execution.read"
+        - "action.target.read"
+        - "action.execution.read"
         - "userschema.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:

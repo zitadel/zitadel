@@ -495,6 +495,7 @@ Errors:
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
     TooManyNestingLevels: Too many query nesting levels (Max 20)
+    LimitExceeded: Limit exceeded
   Quota:
     AlreadyExists: Quota already exists for this unit
     NotFound: Quota not found for this unit
@@ -563,6 +564,7 @@ Errors:
     NotFound: Execution not found
     IncludeNotFound: Include not found
     NoTargets: No targets defined
+    ResponseIsNotValidJSON: Response is not valid JSON
   UserSchema:
     NotEnabled: Feature "User Schema" is not enabled
     Type:
@@ -591,6 +593,7 @@ Errors:
     FeatureDisabled: Web key feature disabled
     NoActive: No active web key found
     NotFound: Web key not found
+
 
 AggregateTypes:
   action: Action

@@ -495,6 +495,7 @@ Errors:
     SQLStatement: SQL Statement kon niet worden gemaakt
     InvalidRequest: Verzoek is ongeldig
     TooManyNestingLevels: Te veel query nesting niveaus (Max 20)
+    LimitExceeded: Limiet overschreden
   Quota:
     AlreadyExists: Quota bestaat al voor deze eenheid
     NotFound: Quota niet gevonden voor deze eenheid
@@ -563,6 +564,7 @@ Errors:
     NotFound: Uitvoering niet gevonden
     IncludeNotFound: Inclusief niet gevonden
     NoTargets: Geen doelstellingen gedefinieerd
+    ResponseIsNotValidJSON: Reactie is geen geldige JSON
   UserSchema:
     NotEnabled: Functie "Gebruikersschema" is niet ingeschakeld
     Type:
