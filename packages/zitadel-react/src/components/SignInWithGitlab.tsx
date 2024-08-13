@@ -1,14 +1,10 @@
 import { ReactNode, forwardRef } from "react";
 import { SignInWithIdentityProviderProps } from "./SignInWith";
+import { IdpButtonClasses } from "./classes";
 
 export const SignInWithGitlab = forwardRef<HTMLButtonElement, SignInWithIdentityProviderProps>(
   ({ children, className = "", name = "", ...props }, ref): ReactNode => (
-    <button
-      type="button"
-      ref={ref}
-      className={`ztdl-w-full ztdl-cursor-pointer ztdl-flex ztdl-flex-row ztdl-items-center bg-background-light-400 text-text-light-500 dark:bg-background-dark-500 dark:text-text-dark-500 border ztdl-border-divider-light dark:ztdl-border-divider-dark rounded-md px-4 text-sm ${className}`}
-      {...props}
-    >
+    <button type="button" ref={ref} className={`${IdpButtonClasses} ${className}`} {...props}>
       <div className="ztdl-h-12 ztdl-w-12 flex items-center justify-center">
         <svg xmlns="http://www.w3.org/2000/svg" width={25} height={24} fill="none">
           <path
