@@ -121,7 +121,7 @@ func instanceClause() string {
 		if isSrcFile || isDestFile {
 			return ""
 		} else {
-		return "WHERE instance_id <> ''"
+			return "WHERE instance_id <> ''"
 		}
 	}
 	for i := range instanceIDs {
