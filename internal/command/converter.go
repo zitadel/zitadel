@@ -19,5 +19,6 @@ func pushedEventsToObjectDetails(events []eventstore.Event) *domain.ObjectDetail
 		Sequence:      events[len(events)-1].Sequence(),
 		EventDate:     events[len(events)-1].CreatedAt(),
 		ResourceOwner: events[len(events)-1].Aggregate().ResourceOwner,
+		ID:            events[len(events)-1].Aggregate().ID,
 	}
 }

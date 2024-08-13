@@ -11,14 +11,14 @@ import (
 	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 )
 
-func (s *Server) GenerateWebKey(ctx context.Context, req *webkey.CreateWebKeyRequest) (_ *webkey.CreateWebKeyResponse, err error) {
+func (s *Server) CreateWebKey(ctx context.Context, req *webkey.CreateWebKeyRequest) (_ *webkey.CreateWebKeyResponse, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	if err = checkWebKeyFeature(ctx); err != nil {
 		return nil, err
 	}
-	webKey, err := s.command.GenerateWebKey(ctx, createWebKeyRequestToConfig(req))
+	webKey, err := s.command.CreateWebKey(ctx, createWebKeyRequestToConfig(req))
 	if err != nil {
 		return nil, err
 	}

@@ -106,7 +106,7 @@ func (p *webKeyProjection) reduceWebKeyAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(WebKeyCreationDateCol, e.CreationDate()),
 			handler.NewCol(WebKeyChangeDateCol, e.CreationDate()),
 			handler.NewCol(WebKeySequenceCol, e.Sequence()),
-			handler.NewCol(WebKeyStateCol, domain.WebKeyStateInactive),
+			handler.NewCol(WebKeyStateCol, domain.WebKeyStateInitial),
 			handler.NewCol(WebKeyPrivateKeyCol, e.PrivateKey),
 			handler.NewCol(WebKeyPublicKeyCol, e.PublicKey),
 			handler.NewCol(WebKeyConfigCol, e.Config),

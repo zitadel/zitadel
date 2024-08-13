@@ -10,7 +10,7 @@ import (
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
-	"github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 )
@@ -399,14 +399,19 @@ func Test_webKeyStateToPb(t *testing.T) {
 			want: webkey.WebKeyState_STATE_UNSPECIFIED,
 		},
 		{
-			name: "inactive",
-			args: args{domain.WebKeyStateInactive},
-			want: webkey.WebKeyState_STATE_INACTIVE,
+			name: "initial",
+			args: args{domain.WebKeyStateInitial},
+			want: webkey.WebKeyState_STATE_INITIAL,
 		},
 		{
 			name: "active",
 			args: args{domain.WebKeyStateActive},
 			want: webkey.WebKeyState_STATE_ACTIVE,
+		},
+		{
+			name: "inactive",
+			args: args{domain.WebKeyStateInactive},
+			want: webkey.WebKeyState_STATE_INACTIVE,
 		},
 		{
 			name: "removed",

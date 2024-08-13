@@ -22,7 +22,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestCommands_GenerateWebKey(t *testing.T) {
+func TestCommands_CreateWebKey(t *testing.T) {
 	ctx := authz.NewMockContextWithPermissions("instance1", "org1", "user1", nil)
 	key, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	require.NoError(t, err)
@@ -213,7 +213,7 @@ func TestCommands_GenerateWebKey(t *testing.T) {
 				idGenerator:     tt.fields.idGenerator,
 				webKeyGenerator: tt.fields.webKeyGenerator,
 			}
-			got, err := c.GenerateWebKey(ctx, tt.args.conf)
+			got, err := c.CreateWebKey(ctx, tt.args.conf)
 			require.ErrorIs(t, err, tt.wantErr)
 			assert.Equal(t, tt.want, got)
 		})

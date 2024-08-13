@@ -4,7 +4,8 @@ type WebKeyState int
 
 const (
 	WebKeyStateUnspecified WebKeyState = iota
-	WebKeyStateInactive
+	WebKeyStateInitial
 	WebKeyStateActive
+	WebKeyStateInactive
 	WebKeyStateRemoved
 )

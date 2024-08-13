@@ -18,9 +18,9 @@ type WebKeyDetails struct {
 	ObjectDetails *domain.ObjectDetails
 }
 
-// GenerateWebKey creates one web key pair for the instance.
+// CreateWebKey creates one web key pair for the instance.
 // If the instance does not have an active key, the new key is activated.
-func (c *Commands) GenerateWebKey(ctx context.Context, conf crypto.WebKeyConfig) (_ *WebKeyDetails, err error) {
+func (c *Commands) CreateWebKey(ctx context.Context, conf crypto.WebKeyConfig) (_ *WebKeyDetails, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

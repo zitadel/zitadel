@@ -33,7 +33,7 @@ func (wm *WebKeyWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *webkey.AddedEvent:
-			wm.State = domain.WebKeyStateInactive
+			wm.State = domain.WebKeyStateInitial
 			wm.PrivateKey = e.PrivateKey
 			wm.PublicKey = e.PublicKey
 		case *webkey.ActivatedEvent:

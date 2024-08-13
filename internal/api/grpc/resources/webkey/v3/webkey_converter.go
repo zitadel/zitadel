@@ -114,10 +114,12 @@ func webKeyStateToPb(state domain.WebKeyState) webkey.WebKeyState {
 	switch state {
 	case domain.WebKeyStateUnspecified:
 		return webkey.WebKeyState_STATE_UNSPECIFIED
-	case domain.WebKeyStateInactive:
-		return webkey.WebKeyState_STATE_INACTIVE
+	case domain.WebKeyStateInitial:
+		return webkey.WebKeyState_STATE_INITIAL
 	case domain.WebKeyStateActive:
 		return webkey.WebKeyState_STATE_ACTIVE
+	case domain.WebKeyStateInactive:
+		return webkey.WebKeyState_STATE_INACTIVE
 	case domain.WebKeyStateRemoved:
 		return webkey.WebKeyState_STATE_REMOVED
 	default:

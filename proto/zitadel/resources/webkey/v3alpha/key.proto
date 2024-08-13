@@ -10,9 +10,10 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alph
 
 enum WebKeyState {
   STATE_UNSPECIFIED = 0;
-  STATE_INACTIVE = 1;
+  STATE_INITIAL = 1;
   STATE_ACTIVE = 2;
-  STATE_REMOVED = 3;
+  STATE_INACTIVE = 3;
+  STATE_REMOVED = 4;
 }
 
 message GetWebKey {

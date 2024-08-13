@@ -51,7 +51,7 @@ func (wm *WebKeyReadModel) Reduce() error {
 }
 
 func (wm *WebKeyReadModel) reduceAdded(e *webkey.AddedEvent) (err error) {
-	wm.State = domain.WebKeyStateInactive
+	wm.State = domain.WebKeyStateInitial
 	wm.PrivateKey = e.PrivateKey
 	wm.PublicKey = e.PublicKey
 	wm.Config, err = crypto.UnmarshalWebKeyConfig(e.Config, e.ConfigType)
