@@ -1,10 +1,8 @@
-import { getBrandingSettings, getSession, sessionService } from "@/lib/zitadel";
-import Alert, { AlertType } from "@/ui/Alert";
+import { getBrandingSettings, sessionService } from "@/lib/zitadel";
+import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
-import RegisterPasskey from "@/ui/RegisterPasskey";
 import RegisterU2F from "@/ui/RegisterU2F";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@zitadel/next";
 import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
