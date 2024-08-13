@@ -116,32 +116,35 @@ func Call(ctx context.Context, url string, timeout time.Duration, body []byte) (
 	}
 	defer resp.Body.Close()
 
-	return handleResponse(resp)
+	return HandleResponse(resp)
 }
 
-func handleResponse(resp *http.Response) ([]byte, error) {
+func HandleResponse(resp *http.Response) ([]byte, error) {
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	// Check for success between 200 and 299, redirect 300 to 399 is handled by the client, return error with statusCode >= 400
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
-		var errorBody errorBody
+		var errorBody ErrorBody
 		if err := json.Unmarshal(data, &errorBody); err != nil {
-			// if json unmarshal fails, body has no errorBody information, so will be taken as successful response
+			// if json unmarshal fails, body has no ErrorBody information, so will be taken as successful response
 			return data, nil
 		}
 		if errorBody.ForwardedStatusCode != 0 || errorBody.ForwardedErrorMessage != "" {
-			return nil, zhttp.HTTPStatusCodeToZitadelError(nil, errorBody.ForwardedStatusCode, "EXEC-reUaUZCzCp", errorBody.ForwardedErrorMessage)
+			if errorBody.ForwardedStatusCode >= 400 && errorBody.ForwardedStatusCode < 500 {
+				return nil, zhttp.HTTPStatusCodeToZitadelError(nil, errorBody.ForwardedStatusCode, "EXEC-reUaUZCzCp", errorBody.ForwardedErrorMessage)
+			}
+			return nil, zerrors.ThrowPreconditionFailed(nil, "EXEC-bmhNhpcqpF", errorBody.ForwardedErrorMessage)
 		}
-		// no errorBody filled in response, so will be taken as successful response
+		// no ErrorBody filled in response, so will be taken as successful response
 		return data, nil
 	}
 
-	return nil, zhttp.HTTPStatusCodeToZitadelError(nil, resp.StatusCode, "EXEC-dra6yamk98", "Errors.Execution.Failed")
+	return nil, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed")
 }
 
-type errorBody struct {
+type ErrorBody struct {
 	ForwardedStatusCode   int    `json:"forwardedStatusCode,omitempty"`
 	ForwardedErrorMessage string `json:"forwardedErrorMessage,omitempty"`
 }

@@ -3,6 +3,7 @@ package execution_test
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -518,7 +519,7 @@ type request struct {
 }
 
 func testErrorBody(code int, message string) []byte {
-	body := &errorBody{ForwardedStatusCode: code, ForwardedErrorMessage: message}
+	body := &execution.ErrorBody{ForwardedStatusCode: code, ForwardedErrorMessage: message}
 	data, _ := json.Marshal(body)
 	return data
 }
@@ -546,12 +547,12 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
 				},
 			},
 		},
 		{
-			"response, statuscode > 400 and no body",
+			"response, statuscode >= 400 and no body",
 			args{
 				resp: &http.Response{
 					StatusCode: http.StatusForbidden,
@@ -560,12 +561,12 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
 				},
 			},
 		},
 		{
-			"response, statuscode > 400 and body",
+			"response, statuscode >= 400 and body",
 			args{
 				resp: &http.Response{
 					StatusCode: http.StatusForbidden,
@@ -574,7 +575,7 @@ func Test_handleResponse(t *testing.T) {
 			},
 			res{
 				wantErr: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
 				}},
 		},
 		{
@@ -604,7 +605,7 @@ func Test_handleResponse(t *testing.T) {
 			},
 		},
 		{
-			"response, statuscode = 200 error body",
+			"response, statuscode = 200, error body >= 400 < 500",
 			args{
 				resp: &http.Response{
 					StatusCode: http.StatusOK,
@@ -617,10 +618,38 @@ func Test_handleResponse(t *testing.T) {
 				},
 			},
 		},
+		{
+			"response, statuscode = 200, error body >= 500",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusInternalServerError, "internal"))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-bmhNhpcqpF", "internal"))
+				},
+			},
+		},
+		{
+			"response, statuscode = 308, no body, should not happen",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusPermanentRedirect, "redirect"))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-bmhNhpcqpF", "redirect"))
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			respBody, err := handleResponse(
+			respBody, err := execution.HandleResponse(
 				tt.args.resp,
 			)
 
