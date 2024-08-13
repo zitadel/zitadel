@@ -495,6 +495,7 @@ Errors:
     SQLStatement: 无法创建 SQL 语句
     InvalidRequest: 请求无效
     TooManyNestingLevels: 查询嵌套级别过多（最多 20 个）
+    LimitExceeded: 限制已超出
   Quota:
     AlreadyExists: 这个单位的配额已经存在
     NotFound: 没有找到该单位的配额
@@ -564,6 +565,7 @@ Errors:
     IncludeNotFound: 包括未找到的内容
     NoTargets: 没有定义目标
     Failed: 执行失败
+    ResponseIsNotValidJSON: 响应不是有效的 JSON
   UserSchema:
     NotEnabled: 未启用“用户架构”功能
     Type:

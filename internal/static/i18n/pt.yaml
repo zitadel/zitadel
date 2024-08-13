@@ -494,6 +494,7 @@ Errors:
     SQLStatement: Não foi possível criar a instrução SQL
     InvalidRequest: O pedido é inválido
     TooManyNestingLevels: muitos níveis de aninhamento de consulta (máx. 20)
+    LimitExceeded: Limite excedido
   Quota:
     AlreadyExists: Cota já existe para esta unidade
     NotFound: Cota não encontrada para esta unidade
@@ -559,6 +560,7 @@ Errors:
     IncludeNotFound: Incluir não encontrado
     NoTargets: Nenhuma meta definida
     Failed: Falha na execução
+    ResponseIsNotValidJSON: A resposta não é um JSON válido
   UserSchema:
     NotEnabled: O recurso "Esquema do usuário" não está habilitado
     Type:

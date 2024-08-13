@@ -495,6 +495,7 @@ Errors:
     SQLStatement: La sentencia SQL no pudo crearse
     InvalidRequest: La solicitud no es válida
     TooManyNestingLevels: Demasiados niveles de anidamiento de consultas (máximo 20)
+    LimitExceeded: Se ha superado el límite de resultados
   Quota:
     AlreadyExists: La cuota ya existe para esta unidad
     NotFound: Cuota no encontrada para esta unidad
@@ -564,6 +565,7 @@ Errors:
     IncludeNotFound: Incluir no encontrado
     NoTargets: No hay objetivos definidos
     Failed: Ejecución fallida
+    ResponseIsNotValidJSON: La respuesta no es un JSON válido
   UserSchema:
     NotEnabled: La función "Esquema de usuario" no está habilitada
     Type:

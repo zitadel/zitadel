@@ -71,7 +71,7 @@
             class="state"
             [ngClass]="{
               active: action.state === ActionState.ACTION_STATE_ACTIVE,
-              inactive: action.state === ActionState.ACTION_STATE_INACTIVE
+              inactive: action.state === ActionState.ACTION_STATE_INACTIVE,
             }"
           >
             {{ 'FLOWS.STATES.' + action.state | translate }}</span

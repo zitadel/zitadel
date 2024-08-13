@@ -231,7 +231,7 @@
           "LABEL": "Maximale Levensduur in uren",
           "PW_CHECK": {
             "TITLE": "Wachtwoord Controle",
-            "DESCRIPTION": "Je gebruikers moeten hun wachtwoorden in deze perioden wijzigen."
+            "DESCRIPTION": "Gebruikers moeten na deze periode opnieuw worden geverifieerd met hun wachtwoord."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Externe Login Controle",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Geselecteerde acties verwijderen?",
         "DESCRIPTION": "Weet u zeker dat u de geselecteerde acties uit de flow wilt verwijderen?"
-      }
+      },
+      "ABOUTNAME": "De naam van de actie en de naam van de functie in het javascript moeten hetzelfde zijn"
     },
     "TOAST": {
       "ACTIONSSET": "Acties ingesteld",
@@ -1437,9 +1438,7 @@
         "7": "Eenmalig Wachtwoord (OTP) - SMS",
         "8": "Eenmalig Wachtwoord (OTP) - Email"
       },
-      "ADDGENERATOR": "Definieer Secret Generator",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Vervaldatum (in uren)",
+      "EXPIRY": "Vervaldatum (in minuten)",
       "INCLUDEDIGITS": "Inclusief Nummers",
       "INCLUDESYMBOLS": "Inclusief Symbolen",
       "INCLUDELOWERLETTERS": "Inclusief Kleinletters",
@@ -1783,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Eigen Projecten",
         "OWNED_SINGULAR": "Eigen Project",
-        "GRANTED_SINGULAR": "Verleend Project"
+        "GRANTED_SINGULAR": "Project toegewezen {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Branding Instelling",

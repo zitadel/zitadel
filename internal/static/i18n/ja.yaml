@@ -484,6 +484,7 @@ Errors:
     SQLStatement: SQLステートメントの作成に失敗しました
     InvalidRequest: 無効なリクエストです
     TooManyNestingLevels: クエリのネスト レベルが多すぎます (最大 20)
+    LimitExceeded: 制限を超えました
   Quota:
     AlreadyExists: このユニットにはすでにクォータが存在しています
     NotFound: このユニットにはクォータが見つかりません
@@ -553,6 +554,7 @@ Errors:
     IncludeNotFound: 見つからないものを含める
     NoTargets: ターゲットが定義されていません
     Failed: 実行に失敗しました
+    ResponseIsNotValidJSON: 応答は有効な JSON ではありません
   UserSchema:
     NotEnabled: 機能「ユーザースキーマ」が有効になっていません
     Type:

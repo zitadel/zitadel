@@ -49,6 +49,7 @@ Management endpoints:
 - /zitadel.*
 - /v2alpha*
 - /v2beta*
+- /v2*
 - /admin*
 - /management*
 - /system*

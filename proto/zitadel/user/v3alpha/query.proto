@@ -8,7 +8,7 @@ import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/user/v3alpha/user.proto";
-import "zitadel/object/v2beta/object.proto";
+import "zitadel/object/v2/object.proto";
 
 message SearchQuery {
   oneof query {
@@ -78,7 +78,7 @@ message UserIDQuery {
     }
   ];
   // Defines which text comparison method used for the id query.
-  zitadel.object.v2beta.TextQueryMethod method = 2 [
+  zitadel.object.v2.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }
@@ -95,7 +95,7 @@ message OrganizationIDQuery {
     }
   ];
   // Defines which text comparison method used for the id query.
-  zitadel.object.v2beta.TextQueryMethod method = 2 [
+  zitadel.object.v2.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }
@@ -112,7 +112,7 @@ message UsernameQuery {
     }
   ];
   // Defines which text comparison method used for the username query.
-  zitadel.object.v2beta.TextQueryMethod method = 2 [
+  zitadel.object.v2.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
   // Defines that the username must only be unique in the organisation.
@@ -131,7 +131,7 @@ message EmailQuery {
     }
   ];
   // Defines which text comparison method used for the email query.
-  zitadel.object.v2beta.TextQueryMethod method = 2 [
+  zitadel.object.v2.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }
@@ -148,7 +148,7 @@ message PhoneQuery {
     }
   ];
   // Defines which text comparison method used for the phone query.
-  zitadel.object.v2beta.TextQueryMethod method = 2 [
+  zitadel.object.v2.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }
@@ -189,7 +189,7 @@ message SchemaTypeQuery {
     }
   ];
   // Defines which text comparison method used for the type query.
-  zitadel.object.v2beta.TextQueryMethod method = 2 [
+  zitadel.object.v2.TextQueryMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }

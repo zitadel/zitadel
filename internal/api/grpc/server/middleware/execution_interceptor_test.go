@@ -131,7 +131,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
@@ -153,7 +153,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:  "instance",
-						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:    "target",
 						TargetType:  domain.TargetTypeCall,
 						Timeout:     time.Minute,
@@ -181,7 +181,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
@@ -211,7 +211,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Second,
@@ -240,7 +240,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Second,
@@ -264,7 +264,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
@@ -293,7 +293,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:  "instance",
-						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:    "target",
 						TargetType:  domain.TargetTypeAsync,
 						Timeout:     time.Second,
@@ -321,7 +321,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:  "instance",
-						ExecutionID: "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID: "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:    "target",
 						TargetType:  domain.TargetTypeAsync,
 						Timeout:     time.Minute,
@@ -349,7 +349,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       domain.TargetTypeWebhook,
 						Timeout:          time.Minute,
@@ -377,7 +377,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       domain.TargetTypeWebhook,
 						Timeout:          time.Second,
@@ -406,7 +406,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       domain.TargetTypeWebhook,
 						Timeout:          time.Minute,
@@ -435,7 +435,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target1",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
@@ -443,7 +443,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					},
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target2",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
@@ -451,7 +451,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					},
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target3",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
@@ -493,7 +493,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target1",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
@@ -501,7 +501,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					},
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target2",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Second,
@@ -509,7 +509,7 @@ func Test_executeTargetsForGRPCFullMethod_request(t *testing.T) {
 					},
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target3",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Second,
@@ -687,7 +687,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "request./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "request./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,
@@ -716,7 +716,7 @@ func Test_executeTargetsForGRPCFullMethod_response(t *testing.T) {
 				executionTargets: []execution.Target{
 					&mockExecutionTarget{
 						InstanceID:       "instance",
-						ExecutionID:      "response./zitadel.session.v2beta.SessionService/SetSession",
+						ExecutionID:      "response./zitadel.session.v2.SessionService/SetSession",
 						TargetID:         "target",
 						TargetType:       domain.TargetTypeCall,
 						Timeout:          time.Minute,

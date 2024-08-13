@@ -495,6 +495,7 @@ Errors:
     SQLStatement: SQL příkaz nemohl být vytvořen
     InvalidRequest: Požadavek je neplatný
     TooManyNestingLevels: Příliš mnoho úrovní vnoření dotazů (max. 20)
+    LimitExceeded: Překročen limit výsledků
   Quota:
     AlreadyExists: Kvóta pro tuto jednotku již existuje
     NotFound: Kvóta pro tuto jednotku nenalezena
@@ -562,6 +563,7 @@ Errors:
     IncludeNotFound: Zahrnout nenalezeno
     NoTargets: Nejsou definovány žádné cíle
     Failed: Provedení se nezdařilo
+    ResponseIsNotValidJSON: Odpověď není platný JSON
   UserSchema:
     NotEnabled: Funkce "Uživatelské schéma" není povolena
     Type:

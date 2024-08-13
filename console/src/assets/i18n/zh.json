@@ -231,7 +231,7 @@
           "LABEL": "最大有效期（小时）",
           "PW_CHECK": {
             "TITLE": "密码检查",
-            "DESCRIPTION": "您的用户必须在这些时期内更改他们的密码。"
+            "DESCRIPTION": "此期间后，用户将需要使用密码重新验证。"
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "外部登录检查",
@@ -1086,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "删除选定的操作？",
         "DESCRIPTION": "您确定要从流中删除选定的操作吗？"
-      }
+      },
+      "ABOUTNAME": "javascript 中的操作名称和函数名称必须相同"
     },
     "TOAST": {
       "ACTIONSSET": "动作设置",
@@ -1437,9 +1438,7 @@
         "7": "一次性密码 (OTP) - SMS",
         "8": "一次性密码 (OTP) - 电子邮件"
       },
-      "ADDGENERATOR": "定义验证码外观",
-      "GENERATORTYPE": "类型",
-      "EXPIRY": "过期时间 (in hours)",
+      "EXPIRY": "过期时间 (以分钟为单位)",
       "INCLUDEDIGITS": "包含数字",
       "INCLUDESYMBOLS": "包含特殊符号",
       "INCLUDELOWERLETTERS": "包含小写字母",
@@ -1782,7 +1781,7 @@
       "TYPE": {
         "OWNED": "拥有的项目",
         "OWNED_SINGULAR": "拥有项目",
-        "GRANTED_SINGULAR": "被授予的项目"
+        "GRANTED_SINGULAR": "授予{{name}}的项目"
       },
       "PRIVATELABEL": {
         "TITLE": "品牌标识设置",

@@ -603,6 +603,11 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 	if existingWebAuthN.State == domain.MFAStateUnspecified || existingWebAuthN.State == domain.MFAStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-DAfb2", "Errors.User.WebAuthN.NotFound")
 	}
+	if userID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingWebAuthN.ResourceOwner, existingWebAuthN.AggregateID); err != nil {
+			return nil, err
+		}
+	}
 
 	userAgg := UserAggregateFromWriteModel(&existingWebAuthN.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, preparedEvent(userAgg))

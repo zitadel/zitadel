@@ -495,6 +495,7 @@ Errors:
     SQLStatement: SQL Statement konnte nicht erstellt werden
     InvalidRequest: Anfrage ist ungültig
     TooManyNestingLevels: Zu viele Abfrageverschachtelungsebenen (maximal 20)
+    LimitExceeded: Limit überschritten
   Quota:
     AlreadyExists: Das Kontingent existiert bereits für diese Einheit
     NotFound: Kontingent für diese Einheit nicht gefunden
@@ -564,6 +565,7 @@ Errors:
     IncludeNotFound: Einschließen nicht gefunden
     NoTargets: Keine Ziele definiert
     Failed: Ausführung fehlgeschlagen
+    ResponseIsNotValidJSON: Antwort ist kein gültiges JSON
   UserSchema:
     NotEnabled: Funktion Benutzerschema ist nicht aktiviert
     Type:
