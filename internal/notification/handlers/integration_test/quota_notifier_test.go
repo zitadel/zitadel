@@ -21,12 +21,12 @@ import (
 )
 
 func TestServer_QuotaNotification_Limit(t *testing.T) {
-	_, instanceID, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	_, instanceID, _, iamOwnerCtx := Instance.UseIsolatedInstance(t, CTX, SystemCTX)
 	amount := 10
 	percent := 50
 	percentAmount := amount * percent / 100
 
-	_, err := Tester.Client.System.AddQuota(SystemCTX, &system.AddQuotaRequest{
+	_, err := Instance.Client.System.AddQuota(SystemCTX, &system.AddQuotaRequest{
 		InstanceId:    instanceID,
 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 		From:          timestamppb.Now(),
@@ -49,30 +49,30 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := 0; i < percentAmount; i++ {
-		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+		_, err := Instance.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
 		if err != nil {
 			require.NoError(t, fmt.Errorf("error in %d call of %d: %f", i, percentAmount, err))
 		}
 	}
-	awaitNotification(t, time.Now(), Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
+	awaitNotification(t, time.Now(), Instance.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
 
 	for i := 0; i < (amount - percentAmount); i++ {
-		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+		_, err := Instance.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
 		require.NoError(t, err)
 	}
-	awaitNotification(t, time.Now(), Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
+	awaitNotification(t, time.Now(), Instance.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
 
-	_, limitErr := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+	_, limitErr := Instance.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
 	require.Error(t, limitErr)
 }
 
 func TestServer_QuotaNotification_NoLimit(t *testing.T) {
-	_, instanceID, _, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	_, instanceID, _, iamOwnerCtx := Instance.UseIsolatedInstance(t, CTX, SystemCTX)
 	amount := 10
 	percent := 50
 	percentAmount := amount * percent / 100
 
-	_, err := Tester.Client.System.AddQuota(SystemCTX, &system.AddQuotaRequest{
+	_, err := Instance.Client.System.AddQuota(SystemCTX, &system.AddQuotaRequest{
 		InstanceId:    instanceID,
 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 		From:          timestamppb.Now(),
@@ -95,30 +95,30 @@ func TestServer_QuotaNotification_NoLimit(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := 0; i < percentAmount; i++ {
-		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+		_, err := Instance.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
 		if err != nil {
 			require.NoError(t, fmt.Errorf("error in %d call of %d: %f", i, percentAmount, err))
 		}
 	}
-	awaitNotification(t, time.Now(), Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
+	awaitNotification(t, time.Now(), Instance.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
 
 	for i := 0; i < (amount - percentAmount); i++ {
-		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+		_, err := Instance.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
 		if err != nil {
 			require.NoError(t, fmt.Errorf("error in %d call of %d: %f", percentAmount+i, amount, err))
 		}
 	}
-	awaitNotification(t, time.Now(), Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
+	awaitNotification(t, time.Now(), Instance.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
 
 	for i := 0; i < amount; i++ {
-		_, err := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+		_, err := Instance.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
 		if err != nil {
 			require.NoError(t, fmt.Errorf("error in %d call of %d over limit: %f", i, amount, err))
 		}
 	}
-	awaitNotification(t, time.Now(), Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 200)
+	awaitNotification(t, time.Now(), Instance.QuotaNotificationChan, quota.RequestsAllAuthenticated, 200)
 
-	_, limitErr := Tester.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
+	_, limitErr := Instance.Client.Admin.GetDefaultOrg(iamOwnerCtx, &admin.GetDefaultOrgRequest{})
 	require.NoError(t, limitErr)
 }
 

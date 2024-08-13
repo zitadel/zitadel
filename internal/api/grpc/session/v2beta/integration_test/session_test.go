@@ -425,7 +425,7 @@ func TestServer_CreateSession_webauthn(t *testing.T) {
 
 /*
 func TestServer_CreateSession_successfulIntent(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, CTX)
+	idpID := Instance.AddGenericOAuthProvider(t, CTX)
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -438,7 +438,7 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
 
-	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), "id")
+	intentID, token, _, _ := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), "id")
 	updateResp, err := Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId: createResp.GetSessionId(),
 		Checks: &session.Checks{
@@ -453,9 +453,9 @@ func TestServer_CreateSession_successfulIntent(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, CTX)
+	idpID := Instance.AddGenericOAuthProvider(t, CTX)
 
-	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), "id")
+	intentID, token, _, _ := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, User.GetUserId(), "id")
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
 			User: &session.CheckUser{
@@ -474,14 +474,14 @@ func TestServer_CreateSession_successfulIntent_instant(t *testing.T) {
 }
 
 func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, CTX)
+	idpID := Instance.AddGenericOAuthProvider(t, CTX)
 
 	// successful intent without known / linked user
 	idpUserID := "id"
-	intentID, token, _, _ := Tester.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", idpUserID)
+	intentID, token, _, _ := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", idpUserID)
 
 	// link the user (with info from intent)
-	Tester.CreateUserIDPlink(CTX, User.GetUserId(), idpUserID, idpID, User.GetUserId())
+	Instance.CreateUserIDPlink(CTX, User.GetUserId(), idpUserID, idpID, User.GetUserId())
 
 	// session with intent check must now succeed
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
@@ -502,7 +502,7 @@ func TestServer_CreateSession_successfulIntentUnknownUserID(t *testing.T) {
 }
 
 func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
-	idpID := Tester.AddGenericOAuthProvider(t, CTX)
+	idpID := Instance.AddGenericOAuthProvider(t, CTX)
 
 	createResp, err := Client.CreateSession(CTX, &session.CreateSessionRequest{
 		Checks: &session.Checks{
@@ -516,7 +516,7 @@ func TestServer_CreateSession_startedIntentFalseToken(t *testing.T) {
 	require.NoError(t, err)
 	verifyCurrentSession(t, createResp.GetSessionId(), createResp.GetSessionToken(), createResp.GetDetails().GetSequence(), time.Minute, nil, nil, 0, User.GetUserId())
 
-	intentID := Tester.CreateIntent(t, CTX, idpID)
+	intentID := Instance.CreateIntent(t, CTX, idpID)
 	_, err = Client.SetSession(CTX, &session.SetSessionRequest{
 		SessionId: createResp.GetSessionId(),
 		Checks: &session.Checks{

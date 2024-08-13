@@ -27,8 +27,8 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 	percent := 50
 	percentAmount := amount * percent / 100
 
-	_, err := Tester.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
-		InstanceId:    Tester.Instance.InstanceID(),
+	_, err := Instance.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
+		InstanceId:    Instance.Instance.InstanceID(),
 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 		From:          timestamppb.Now(),
 		ResetInterval: durationpb.New(time.Minute * 5),
@@ -50,28 +50,28 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := 0; i < percentAmount; i++ {
-		_, err := Tester.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
+		_, err := Instance.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
 		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
 	}
-	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
+	awaitNotification(t, Instance.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
 
 	for i := 0; i < (amount - percentAmount); i++ {
-		_, err := Tester.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
+		_, err := Instance.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
 		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
 	}
-	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
+	awaitNotification(t, Instance.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
 
-	_, limitErr := Tester.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
+	_, limitErr := Instance.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
 	require.Error(t, limitErr)
 }
 
 func TestServer_QuotaNotification_NoLimit(t *testing.T) {
-	_, instanceID, _, IAMOwnerCTX := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	_, instanceID, _, IAMOwnerCTX := Instance.UseIsolatedInstance(t, CTX, SystemCTX)
 	amount := 10
 	percent := 50
 	percentAmount := amount * percent / 100
 
-	_, err := Tester.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
+	_, err := Instance.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
 		InstanceId:    instanceID,
 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 		From:          timestamppb.Now(),
@@ -94,24 +94,24 @@ func TestServer_QuotaNotification_NoLimit(t *testing.T) {
 	require.NoError(t, err)
 
 	for i := 0; i < percentAmount; i++ {
-		_, err := Tester.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
+		_, err := Instance.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
 		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
 	}
-	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
+	awaitNotification(t, Instance.QuotaNotificationChan, quota.RequestsAllAuthenticated, percent)
 
 	for i := 0; i < (amount - percentAmount); i++ {
-		_, err := Tester.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
+		_, err := Instance.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
 		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
 	}
-	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
+	awaitNotification(t, Instance.QuotaNotificationChan, quota.RequestsAllAuthenticated, 100)
 
 	for i := 0; i < amount; i++ {
-		_, err := Tester.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
+		_, err := Instance.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
 		require.NoErrorf(t, err, "error in %d call of %d", i, percentAmount)
 	}
-	awaitNotification(t, Tester.QuotaNotificationChan, quota.RequestsAllAuthenticated, 200)
+	awaitNotification(t, Instance.QuotaNotificationChan, quota.RequestsAllAuthenticated, 200)
 
-	_, limitErr := Tester.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
+	_, limitErr := Instance.Client.Admin.GetDefaultOrg(IAMOwnerCTX, &admin.GetDefaultOrgRequest{})
 	require.NoError(t, limitErr)
 }
 
@@ -148,9 +148,9 @@ func awaitNotification(t *testing.T, bodies chan []byte, unit quota.Unit, percen
 }
 
 func TestServer_AddAndRemoveQuota(t *testing.T) {
-	_, instanceID, _, _ := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	_, instanceID, _, _ := Instance.UseIsolatedInstance(t, CTX, SystemCTX)
 
-	got, err := Tester.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
+	got, err := Instance.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
 		InstanceId:    instanceID,
 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 		From:          timestamppb.Now(),
@@ -168,7 +168,7 @@ func TestServer_AddAndRemoveQuota(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, got.Details.ResourceOwner, instanceID)
 
-	gotAlreadyExisting, errAlreadyExisting := Tester.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
+	gotAlreadyExisting, errAlreadyExisting := Instance.Client.System.SetQuota(SystemCTX, &system.SetQuotaRequest{
 		InstanceId:    instanceID,
 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 		From:          timestamppb.Now(),
@@ -186,14 +186,14 @@ func TestServer_AddAndRemoveQuota(t *testing.T) {
 	require.Nil(t, errAlreadyExisting)
 	require.Equal(t, gotAlreadyExisting.Details.ResourceOwner, instanceID)
 
-	gotRemove, errRemove := Tester.Client.System.RemoveQuota(SystemCTX, &system.RemoveQuotaRequest{
+	gotRemove, errRemove := Instance.Client.System.RemoveQuota(SystemCTX, &system.RemoveQuotaRequest{
 		InstanceId: instanceID,
 		Unit:       quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 	})
 	require.NoError(t, errRemove)
 	require.Equal(t, gotRemove.Details.ResourceOwner, instanceID)
 
-	gotRemoveAlready, errRemoveAlready := Tester.Client.System.RemoveQuota(SystemCTX, &system.RemoveQuotaRequest{
+	gotRemoveAlready, errRemoveAlready := Instance.Client.System.RemoveQuota(SystemCTX, &system.RemoveQuotaRequest{
 		InstanceId: instanceID,
 		Unit:       quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 	})

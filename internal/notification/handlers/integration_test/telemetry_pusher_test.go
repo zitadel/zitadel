@@ -25,16 +25,16 @@ import (
 )
 
 func TestServer_TelemetryPushMilestones(t *testing.T) {
-	primaryDomain, instanceID, adminID, iamOwnerCtx := Tester.UseIsolatedInstance(t, CTX, SystemCTX)
+	primaryDomain, instanceID, adminID, iamOwnerCtx := Instance.UseIsolatedInstance(t, CTX, SystemCTX)
 	t.Log("testing against instance with primary domain", primaryDomain)
-	awaitMilestone(t, Tester.MilestoneChan, primaryDomain, "InstanceCreated")
+	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "InstanceCreated")
 
-	projectAdded, err := Tester.Client.Mgmt.AddProject(iamOwnerCtx, &management.AddProjectRequest{Name: "integration"})
+	projectAdded, err := Instance.Client.Mgmt.AddProject(iamOwnerCtx, &management.AddProjectRequest{Name: "integration"})
 	require.NoError(t, err)
-	awaitMilestone(t, Tester.MilestoneChan, primaryDomain, "ProjectCreated")
+	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "ProjectCreated")
 
 	redirectURI := "http://localhost:8888"
-	application, err := Tester.Client.Mgmt.AddOIDCApp(iamOwnerCtx, &management.AddOIDCAppRequest{
+	application, err := Instance.Client.Mgmt.AddOIDCApp(iamOwnerCtx, &management.AddOIDCAppRequest{
 		ProjectId:       projectAdded.GetId(),
 		Name:            "integration",
 		RedirectUris:    []string{redirectURI},
@@ -46,35 +46,35 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 		AccessTokenType: app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
 	})
 	require.NoError(t, err)
-	awaitMilestone(t, Tester.MilestoneChan, primaryDomain, "ApplicationCreated")
+	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "ApplicationCreated")
 
 	// create the session to be used for the authN of the clients
-	sessionID, sessionToken, _, _ := Tester.CreatePasswordSession(t, iamOwnerCtx, adminID, "Password1!")
+	sessionID, sessionToken, _, _ := Instance.CreatePasswordSession(t, iamOwnerCtx, adminID, "Password1!")
 
 	console := consoleOIDCConfig(iamOwnerCtx, t)
 	loginToClient(iamOwnerCtx, t, primaryDomain, console.GetClientId(), instanceID, console.GetRedirectUris()[0], sessionID, sessionToken)
-	awaitMilestone(t, Tester.MilestoneChan, primaryDomain, "AuthenticationSucceededOnInstance")
+	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "AuthenticationSucceededOnInstance")
 
 	// make sure the client has been projected
 	require.EventuallyWithT(t, func(collectT *assert.CollectT) {
-		_, err := Tester.Client.Mgmt.GetAppByID(iamOwnerCtx, &management.GetAppByIDRequest{
+		_, err := Instance.Client.Mgmt.GetAppByID(iamOwnerCtx, &management.GetAppByIDRequest{
 			ProjectId: projectAdded.GetId(),
 			AppId:     application.GetAppId(),
 		})
 		assert.NoError(collectT, err)
 	}, 1*time.Minute, 100*time.Millisecond, "app not found")
 	loginToClient(iamOwnerCtx, t, primaryDomain, application.GetClientId(), instanceID, redirectURI, sessionID, sessionToken)
-	awaitMilestone(t, Tester.MilestoneChan, primaryDomain, "AuthenticationSucceededOnApplication")
+	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "AuthenticationSucceededOnApplication")
 
-	_, err = Tester.Client.System.RemoveInstance(SystemCTX, &system.RemoveInstanceRequest{InstanceId: instanceID})
+	_, err = Instance.Client.System.RemoveInstance(SystemCTX, &system.RemoveInstanceRequest{InstanceId: instanceID})
 	require.NoError(t, err)
-	awaitMilestone(t, Tester.MilestoneChan, primaryDomain, "InstanceDeleted")
+	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "InstanceDeleted")
 }
 
 func loginToClient(iamOwnerCtx context.Context, t *testing.T, primaryDomain, clientID, instanceID, redirectURI, sessionID, sessionToken string) {
-	authRequestID, err := Tester.CreateOIDCAuthRequestWithDomain(iamOwnerCtx, primaryDomain, clientID, Tester.Users.Get(instanceID, integration.IAMOwner).ID, redirectURI, "openid")
+	authRequestID, err := Instance.CreateOIDCAuthRequestWithDomain(iamOwnerCtx, primaryDomain, clientID, Instance.Users.Get(instanceID, integration.IAMOwner).ID, redirectURI, "openid")
 	require.NoError(t, err)
-	callback, err := Tester.Client.OIDCv2.CreateCallback(iamOwnerCtx, &oidc_v2.CreateCallbackRequest{
+	callback, err := Instance.Client.OIDCv2.CreateCallback(iamOwnerCtx, &oidc_v2.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_v2.CreateCallbackRequest_Session{Session: &oidc_v2.Session{
 			SessionId:    sessionID,
@@ -82,7 +82,7 @@ func loginToClient(iamOwnerCtx context.Context, t *testing.T, primaryDomain, cli
 		}},
 	})
 	require.NoError(t, err)
-	provider, err := Tester.CreateRelyingPartyForDomain(iamOwnerCtx, primaryDomain, clientID, redirectURI)
+	provider, err := Instance.CreateRelyingPartyForDomain(iamOwnerCtx, primaryDomain, clientID, redirectURI)
 	require.NoError(t, err)
 	callbackURL, err := url.Parse(callback.GetCallbackUrl())
 	require.NoError(t, err)
@@ -92,7 +92,7 @@ func loginToClient(iamOwnerCtx context.Context, t *testing.T, primaryDomain, cli
 }
 
 func consoleOIDCConfig(iamOwnerCtx context.Context, t *testing.T) *app.OIDCConfig {
-	projects, err := Tester.Client.Mgmt.ListProjects(iamOwnerCtx, &management.ListProjectsRequest{
+	projects, err := Instance.Client.Mgmt.ListProjects(iamOwnerCtx, &management.ListProjectsRequest{
 		Queries: []*project.ProjectQuery{
 			{
 				Query: &project.ProjectQuery_NameQuery{
@@ -106,7 +106,7 @@ func consoleOIDCConfig(iamOwnerCtx context.Context, t *testing.T) *app.OIDCConfi
 	})
 	require.NoError(t, err)
 	require.Len(t, projects.GetResult(), 1)
-	apps, err := Tester.Client.Mgmt.ListApps(iamOwnerCtx, &management.ListAppsRequest{
+	apps, err := Instance.Client.Mgmt.ListApps(iamOwnerCtx, &management.ListAppsRequest{
 		ProjectId: projects.GetResult()[0].GetId(),
 		Queries: []*app.AppQuery{
 			{

@@ -15,7 +15,7 @@ var (
 	CTX         context.Context
 	SystemCTX   context.Context
 	IAMOwnerCTX context.Context
-	Instance    *integration.Tester
+	Instance    *integration.Instance
 )
 
 func TestMain(m *testing.M) {
@@ -29,9 +29,9 @@ Quotas:
   Access:
     Enabled: true
 `)
-		defer Tester.Done()
-		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
-		IAMOwnerCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
+		defer Instance.Done()
+		SystemCTX = Instance.WithAuthorization(ctx, integration.SystemUser)
+		IAMOwnerCTX = Instance.WithAuthorization(ctx, integration.IAMOwner)
 		return m.Run()
 	}())
 }

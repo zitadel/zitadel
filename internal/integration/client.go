@@ -437,7 +437,7 @@ func (i *Instance) AddSAMLPostProvider(t *testing.T, ctx context.Context) string
 }
 
 /*
-func (s *Tester) CreateIntent(t *testing.T, ctx context.Context, idpID string) string {
+func (s *Instance) CreateIntent(t *testing.T, ctx context.Context, idpID string) string {
 	resp, err := s.Client.UserV2.StartIdentityProviderIntent(ctx, &user.StartIdentityProviderIntentRequest{
 		IdpId: idpID,
 		Content: &user.StartIdentityProviderIntentRequest_Urls{
@@ -452,7 +452,7 @@ func (s *Tester) CreateIntent(t *testing.T, ctx context.Context, idpID string) s
 	return resp
 }
 
-func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+func (s *Instance) CreateSuccessfulOAuthIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
 	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
 	intentID := s.CreateIntent(t, ctx, idpID)
 	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
@@ -478,7 +478,7 @@ func (s *Tester) CreateSuccessfulOAuthIntent(t *testing.T, ctx context.Context, 
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
-func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+func (s *Instance) CreateSuccessfulLDAPIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
 	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
 	intentID := s.CreateIntent(t, ctx, idpID)
 	writeModel, err := s.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())
@@ -506,7 +506,7 @@ func (s *Tester) CreateSuccessfulLDAPIntent(t *testing.T, ctx context.Context, i
 	return intentID, token, writeModel.ChangeDate, writeModel.ProcessedSequence
 }
 
-func (s *Tester) CreateSuccessfulSAMLIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
+func (s *Instance) CreateSuccessfulSAMLIntent(t *testing.T, ctx context.Context, idpID, userID, idpUserID string) (string, string, time.Time, uint64) {
 	ctx = authz.WithInstance(context.WithoutCancel(ctx), s.Instance)
 	intentID := s.CreateIntent(t, ctx, idpID)
 	writeModel, err := s.Server.Commands.GetIntentWriteModel(ctx, intentID, s.Instance.InstanceID())

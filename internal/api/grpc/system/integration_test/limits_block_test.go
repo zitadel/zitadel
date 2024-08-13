@@ -280,7 +280,7 @@ func idpExistsCondition(t assert.TestingT, instanceID, idpName string) func() bo
 		assert.NoError(t, err)
 		instanceQuery, err := query.NewIDPTemplateResourceOwnerSearchQuery(instanceID)
 		assert.NoError(t, err)
-		idps, err := Tester.Queries.IDPTemplates(authz.WithInstanceID(CTX, instanceID), &query.IDPTemplateSearchQueries{
+		idps, err := Instance.Queries.IDPTemplates(authz.WithInstanceID(CTX, instanceID), &query.IDPTemplateSearchQueries{
 			Queries: []query.SearchQuery{
 				instanceQuery,
 				nameQuery,
