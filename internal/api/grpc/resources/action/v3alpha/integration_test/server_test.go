@@ -20,7 +20,6 @@ import (
 var (
 	CTX      context.Context
 	Instance *integration.Instance
-	Client   action.ZITADELActionsClient
 )
 
 func TestMain(m *testing.M) {
@@ -29,38 +28,36 @@ func TestMain(m *testing.M) {
 		defer cancel()
 
 		Instance = integration.GetInstance(ctx)
-		Client = Instance.Client.ActionV3
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
 		return m.Run()
 	}())
 }
 
-func ensureFeatureEnabled(t *testing.T) {
-	f, err := Instance.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
+func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
+	ctx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	f, err := instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{
 		Inheritance: true,
 	})
 	require.NoError(t, err)
 	if f.Actions.GetEnabled() {
 		return
 	}
-	_, err = Instance.Client.FeatureV2.SetInstanceFeatures(CTX, &feature.SetInstanceFeaturesRequest{
+	_, err = instance.Client.FeatureV2.SetInstanceFeatures(ctx, &feature.SetInstanceFeaturesRequest{
 		Actions: gu.Ptr(true),
 	})
 	require.NoError(t, err)
 	retryDuration := time.Minute
-	if ctxDeadline, ok := CTX.Deadline(); ok {
+	if ctxDeadline, ok := ctx.Deadline(); ok {
 		retryDuration = time.Until(ctxDeadline)
 	}
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
-			f, err := Instance.Client.FeatureV2.GetInstanceFeatures(CTX, &feature.GetInstanceFeaturesRequest{
+			f, err := instance.Client.FeatureV2.GetInstanceFeatures(ctx, &feature.GetInstanceFeaturesRequest{
 				Inheritance: true,
 			})
 			assert.NoError(ttt, err)
-			if f.Actions.GetEnabled() {
-				return
-			}
+			assert.True(ttt, f.Actions.GetEnabled())
 		},
 		retryDuration,
 		100*time.Millisecond,
@@ -68,7 +65,7 @@ func ensureFeatureEnabled(t *testing.T) {
 
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
-			_, err := Instance.Client.ActionV3.ListExecutionMethods(CTX, &action.ListExecutionMethodsRequest{})
+			_, err := instance.Client.ActionV3.ListExecutionMethods(ctx, &action.ListExecutionMethodsRequest{})
 			assert.NoError(ttt, err)
 		},
 		retryDuration,

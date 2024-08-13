@@ -13,7 +13,7 @@ import (
 	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
-	settings_object "github.com/zitadel/zitadel/pkg/grpc/settings/object/v3alpha"
+	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 )
 
 func executionTargetsSingleTarget(id string) []*action.ExecutionTargetType {
@@ -25,8 +25,10 @@ func executionTargetsSingleInclude(include *action.Condition) []*action.Executio
 }
 
 func TestServer_SetExecution_Request(t *testing.T) {
-	ensureFeatureEnabled(t)
-	targetResp := Instance.CreateTarget(CTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
+	instance := Instance.UseIsolatedInstance(CTX)
+	ensureFeatureEnabled(t, instance)
+	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -37,7 +39,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -51,7 +53,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 		},
 		{
 			name: "no condition, error",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -66,7 +68,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 		},
 		{
 			name: "method, not existing",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -85,7 +87,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 		},
 		{
 			name: "method, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -101,18 +103,18 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
 		},
 		{
 			name: "service, not existing",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -131,7 +133,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 		},
 		{
 			name: "service, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -147,18 +149,18 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
 		},
 		{
 			name: "all, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -174,11 +176,11 @@ func TestServer_SetExecution_Request(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
@@ -187,8 +189,8 @@ func TestServer_SetExecution_Request(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// We want to have the same response no matter how often we call the function
-			Client.SetExecution(tt.ctx, tt.req)
-			got, err := Client.SetExecution(tt.ctx, tt.req)
+			instance.Client.ActionV3.SetExecution(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV3.SetExecution(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -196,17 +198,19 @@ func TestServer_SetExecution_Request(t *testing.T) {
 
 			require.NoError(t, err)
 
-			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
+			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
-			Instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
-	ensureFeatureEnabled(t)
-	targetResp := Instance.CreateTarget(CTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
+	instance := Instance.UseIsolatedInstance(CTX)
+	ensureFeatureEnabled(t, instance)
+	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
 	executionCond := &action.Condition{
 		ConditionType: &action.Condition_Request{
 			Request: &action.RequestExecution{
@@ -216,7 +220,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			},
 		},
 	}
-	Instance.SetExecution(CTX, t,
+	instance.SetExecution(isolatedIAMOwnerCTX, t,
 		executionCond,
 		executionTargetsSingleTarget(targetResp.GetDetails().GetId()),
 	)
@@ -230,7 +234,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			},
 		},
 	}
-	Instance.SetExecution(CTX, t,
+	instance.SetExecution(isolatedIAMOwnerCTX, t,
 		circularExecutionService,
 		executionTargetsSingleInclude(executionCond),
 	)
@@ -243,7 +247,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 			},
 		},
 	}
-	Instance.SetExecution(CTX, t,
+	instance.SetExecution(isolatedIAMOwnerCTX, t,
 		circularExecutionMethod,
 		executionTargetsSingleInclude(circularExecutionService),
 	)
@@ -257,7 +261,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 	}{
 		{
 			name: "method, circular error",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: circularExecutionService,
 				Execution: &action.Execution{
@@ -268,7 +272,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 		},
 		{
 			name: "method, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -280,23 +284,22 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					},
 				},
 				Execution: &action.Execution{
-
 					Targets: executionTargetsSingleInclude(executionCond),
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
 		},
 		{
 			name: "service, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Request{
@@ -308,16 +311,15 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					},
 				},
 				Execution: &action.Execution{
-
 					Targets: executionTargetsSingleInclude(executionCond),
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
@@ -326,25 +328,27 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// We want to have the same response no matter how often we call the function
-			Client.SetExecution(tt.ctx, tt.req)
-			got, err := Client.SetExecution(tt.ctx, tt.req)
+			instance.Client.ActionV3.SetExecution(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV3.SetExecution(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 
-			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
+			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
-			Instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Response(t *testing.T) {
-	ensureFeatureEnabled(t)
-	targetResp := Instance.CreateTarget(CTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
+	instance := Instance.UseIsolatedInstance(CTX)
+	ensureFeatureEnabled(t, instance)
+	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -355,7 +359,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -369,7 +373,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 		},
 		{
 			name: "no condition, error",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -384,7 +388,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 		},
 		{
 			name: "method, not existing",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -403,7 +407,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 		},
 		{
 			name: "method, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -419,18 +423,18 @@ func TestServer_SetExecution_Response(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
 		},
 		{
 			name: "service, not existing",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -449,7 +453,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 		},
 		{
 			name: "service, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -465,18 +469,18 @@ func TestServer_SetExecution_Response(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
 		},
 		{
 			name: "all, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -492,11 +496,11 @@ func TestServer_SetExecution_Response(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
@@ -505,25 +509,27 @@ func TestServer_SetExecution_Response(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// We want to have the same response no matter how often we call the function
-			Client.SetExecution(tt.ctx, tt.req)
-			got, err := Client.SetExecution(tt.ctx, tt.req)
+			instance.Client.ActionV3.SetExecution(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV3.SetExecution(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 
-			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
+			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
-			Instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Event(t *testing.T) {
-	ensureFeatureEnabled(t)
-	targetResp := Instance.CreateTarget(CTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
+	instance := Instance.UseIsolatedInstance(CTX)
+	ensureFeatureEnabled(t, instance)
+	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -534,7 +540,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Event{
@@ -550,7 +556,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 		},
 		{
 			name: "no condition, error",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Event{
@@ -568,7 +574,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 
 			{
 				name: "event, not existing",
-				ctx:  CTX,
+				ctx:  isolatedIAMOwnerCTX,
 				req: &action.SetExecutionRequest{
 					Condition: &action.Condition{
 						ConditionType: &action.Condition_Event{
@@ -586,7 +592,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 		*/
 		{
 			name: "event, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Event{
@@ -602,11 +608,11 @@ func TestServer_SetExecution_Event(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
@@ -616,7 +622,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 
 			{
 				name: "group, not existing",
-				ctx:  CTX,
+				ctx:  isolatedIAMOwnerCTX,
 				req: &action.SetExecutionRequest{
 					Condition: &action.Condition{
 						ConditionType: &action.Condition_Event{
@@ -634,7 +640,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 		*/
 		{
 			name: "group, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Event{
@@ -650,18 +656,18 @@ func TestServer_SetExecution_Event(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
 		},
 		{
 			name: "all, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Event{
@@ -677,11 +683,11 @@ func TestServer_SetExecution_Event(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
@@ -690,25 +696,27 @@ func TestServer_SetExecution_Event(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// We want to have the same response no matter how often we call the function
-			Client.SetExecution(tt.ctx, tt.req)
-			got, err := Client.SetExecution(tt.ctx, tt.req)
+			instance.Client.ActionV3.SetExecution(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV3.SetExecution(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 
-			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
+			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
-			Instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }
 
 func TestServer_SetExecution_Function(t *testing.T) {
-	ensureFeatureEnabled(t)
-	targetResp := Instance.CreateTarget(CTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
+	instance := Instance.UseIsolatedInstance(CTX)
+	ensureFeatureEnabled(t, instance)
+	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
 
 	tests := []struct {
 		name    string
@@ -719,7 +727,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 	}{
 		{
 			name: "missing permission",
-			ctx:  Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
+			ctx:  instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -733,7 +741,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 		},
 		{
 			name: "no condition, error",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Response{
@@ -748,7 +756,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 		},
 		{
 			name: "function, not existing",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
@@ -763,7 +771,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 		},
 		{
 			name: "function, ok",
-			ctx:  CTX,
+			ctx:  isolatedIAMOwnerCTX,
 			req: &action.SetExecutionRequest{
 				Condition: &action.Condition{
 					ConditionType: &action.Condition_Function{
@@ -775,11 +783,11 @@ func TestServer_SetExecution_Function(t *testing.T) {
 				},
 			},
 			want: &action.SetExecutionResponse{
-				Details: &settings_object.Details{
-					ChangeDate: timestamppb.Now(),
+				Details: &resource_object.Details{
+					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   Instance.Instance.Id,
+						Id:   instance.Instance.Id,
 					},
 				},
 			},
@@ -788,18 +796,18 @@ func TestServer_SetExecution_Function(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// We want to have the same response no matter how often we call the function
-			Client.SetExecution(tt.ctx, tt.req)
-			got, err := Client.SetExecution(tt.ctx, tt.req)
+			instance.Client.ActionV3.SetExecution(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV3.SetExecution(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
 
-			integration.AssertSettingsDetails(t, tt.want.Details, got.Details)
+			integration.AssertResourceDetails(t, tt.want.Details, got.Details)
 
 			// cleanup to not impact other requests
-			Instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
+			instance.DeleteExecution(tt.ctx, t, tt.req.GetCondition())
 		})
 	}
 }

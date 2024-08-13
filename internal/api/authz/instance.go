@@ -29,7 +29,7 @@ type Instance interface {
 
 type InstanceVerifier interface {
 	InstanceByHost(ctx context.Context, host, publicDomain string) (Instance, error)
-	InstanceByID(ctx context.Context) (Instance, error)
+	InstanceByID(ctx context.Context, id string) (Instance, error)
 }
 
 type instance struct {

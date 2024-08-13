@@ -10,10 +10,13 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
+
 import "zitadel/resources/action/v3alpha/target.proto";
 import "zitadel/resources/action/v3alpha/execution.proto";
+import "zitadel/resources/action/v3alpha/query.proto";
 import "zitadel/resources/object/v3alpha/object.proto";
-import "zitadel/settings/object/v3alpha/object.proto";
+import "zitadel/object/v3alpha/object.proto";
+
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
@@ -44,7 +47,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/grpc-web+proto";
   produces: "application/grpc-web+proto";
 
-  host: "$ZITADEL_DOMAIN";
+  host: "${ZITADEL_DOMAIN}";
   base_path: "/resources/v3alpha/actions";
 
   external_docs: {
@@ -57,8 +60,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
       value: {
         type: TYPE_OAUTH2;
         flow: FLOW_ACCESS_CODE;
-        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
-        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        authorization_url: "${ZITADEL_DOMAIN}/oauth/v2/authorize";
+        token_url: "${ZITADEL_DOMAIN}/oauth/v2/token";
         scopes: {
           scope: {
             key: "openid";
@@ -189,6 +192,67 @@ service ZITADELActions {
     };
   }
 
+  // Target by ID
+  //
+  // Returns the target identified by the requested ID.
+  rpc GetTarget (GetTargetRequest) returns (GetTargetResponse) {
+    option (google.api.http) = {
+      get: "/targets/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Target successfully retrieved";
+        }
+      };
+    };
+  }
+
+  // Search targets
+  //
+  // Search all matching targets. By default all targets of the instance are returned.
+  // Make sure to include a limit and sorting for pagination.
+  rpc SearchTargets (SearchTargetsRequest) returns (SearchTargetsResponse) {
+    option (google.api.http) = {
+      post: "/targets/_search",
+      body: "filters"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.target.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all targets matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
   // Sets an execution to call a target or include the targets of another execution.
   //
   // Setting an empty list of targets will remove all targets from the execution, making it a noop.
@@ -217,6 +281,43 @@ service ZITADELActions {
               ref: "#/definitions/SetExecutionResponse";
             }
           }
+        };
+      };
+    };
+  }
+
+  // Search executions
+  //
+  // Search all matching executions. By default all executions of the instance are returned that have at least one execution target.
+  // Make sure to include a limit and sorting for pagination.
+  rpc SearchExecutions (SearchExecutionsRequest) returns (SearchExecutionsResponse) {
+    option (google.api.http) = {
+      post: "/executions/_search"
+      body: "filters"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "action.execution.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200";
+        value: {
+          description: "A list of all non noop executions matching the query";
+        };
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
         };
       };
     };
@@ -294,7 +395,16 @@ service ZITADELActions {
 }
 
 message CreateTargetRequest {
-  Target target = 1;
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  Target target = 2 [
+    (validate.rules).message = {
+      required: true
+    }
+  ];
 }
 
 message CreateTargetResponse {
@@ -302,16 +412,24 @@ message CreateTargetResponse {
 }
 
 message PatchTargetRequest {
-  string id = 1 [
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
       max_length: 200,
       example: "\"69629026806489455\"";
     }
   ];
-  PatchTarget target = 2;
+  PatchTarget target = 3 [
+    (validate.rules).message = {
+      required: true
+    }
+  ];
 }
 
 message PatchTargetResponse {
@@ -319,9 +437,13 @@ message PatchTargetResponse {
 }
 
 message DeleteTargetRequest {
-  string id = 1 [
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  string id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
-    (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
       max_length: 200,
@@ -334,13 +456,84 @@ message DeleteTargetResponse {
   zitadel.resources.object.v3alpha.Details details = 1;
 }
 
+message GetTargetRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  string id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+}
+
+message GetTargetResponse {
+  GetTarget target = 1;
+}
+
+message SearchTargetsRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  // list limitations and ordering.
+  optional zitadel.resources.object.v3alpha.SearchQuery query = 2;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional TargetFieldName sorting_column = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"TARGET_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated TargetSearchFilter filters = 4;
+}
+
+message SearchTargetsResponse {
+  zitadel.resources.object.v3alpha.ListDetails details = 1;
+  repeated GetTarget result = 2;
+}
+
 message SetExecutionRequest {
-  Condition condition = 1;
-  Execution execution = 2;
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  Condition condition = 2;
+  Execution execution = 3;
 }
 
 message SetExecutionResponse {
-  zitadel.settings.object.v3alpha.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
+}
+
+message SearchExecutionsRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  // list limitations and ordering.
+  optional zitadel.resources.object.v3alpha.SearchQuery query = 2;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional ExecutionFieldName sorting_column = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"EXECUTION_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  // Define the criteria to query for.
+  repeated ExecutionSearchFilter filters = 4;
+}
+
+message SearchExecutionsResponse {
+  zitadel.resources.object.v3alpha.ListDetails details = 1;
+  repeated GetExecution result = 2;
 }
 
 message ListExecutionFunctionsRequest{}

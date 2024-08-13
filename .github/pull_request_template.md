@@ -21,7 +21,7 @@ For example:
 
 Replace this example with links to related issues, discussions, discord threads, or other sources with more context.
 Use the Closing #issue syntax for issues that are resolved with this PR.
-- Closes #123
-- Discussion #456
-- Follow-up for PR #789
-- https://discord.com/channels/123/456
+- Closes #xxx
+- Discussion #xxx
+- Follow-up for PR #xxx
+- https://discord.com/channels/xxx/xxx
