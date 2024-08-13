@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
-	settings_object "github.com/zitadel/zitadel/internal/api/grpc/settings/object/v3alpha"
+	resource_object "github.com/zitadel/zitadel/internal/api/grpc/resources/object/v3alpha"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/repository/execution"
@@ -14,7 +14,7 @@ import (
 )
 
 func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionRequest) (*action.SetExecutionResponse, error) {
-	if err := checkExecutionEnabled(ctx); err != nil {
+	if err := checkActionsEnabled(ctx); err != nil {
 		return nil, err
 	}
 	reqTargets := req.GetExecution().GetTargets()
@@ -34,24 +34,21 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 	set := &command.SetExecution{
 		Targets: targets,
 	}
-	owner := &object.Owner{
-		Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-		Id:   authz.GetInstance(ctx).InstanceID(),
-	}
 	var err error
 	var details *domain.ObjectDetails
+	instanceID := authz.GetInstance(ctx).InstanceID()
 	switch t := req.GetCondition().GetConditionType().(type) {
 	case *action.Condition_Request:
 		cond := executionConditionFromRequest(t.Request)
-		details, err = s.command.SetExecutionRequest(ctx, cond, set, owner.Id)
+		details, err = s.command.SetExecutionRequest(ctx, cond, set, instanceID)
 	case *action.Condition_Response:
 		cond := executionConditionFromResponse(t.Response)
-		details, err = s.command.SetExecutionResponse(ctx, cond, set, owner.Id)
+		details, err = s.command.SetExecutionResponse(ctx, cond, set, instanceID)
 	case *action.Condition_Event:
 		cond := executionConditionFromEvent(t.Event)
-		details, err = s.command.SetExecutionEvent(ctx, cond, set, owner.Id)
+		details, err = s.command.SetExecutionEvent(ctx, cond, set, instanceID)
 	case *action.Condition_Function:
-		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function.GetName()), set, owner.Id)
+		details, err = s.command.SetExecutionFunction(ctx, command.ExecutionFunctionCondition(t.Function.GetName()), set, instanceID)
 	default:
 		err = zerrors.ThrowInvalidArgument(nil, "ACTION-5r5Ju", "Errors.Execution.ConditionInvalid")
 	}
@@ -59,7 +56,7 @@ func (s *Server) SetExecution(ctx context.Context, req *action.SetExecutionReque
 		return nil, err
 	}
 	return &action.SetExecutionResponse{
-		Details: settings_object.DomainToDetailsPb(details, owner),
+		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
 	}, nil
 }
 

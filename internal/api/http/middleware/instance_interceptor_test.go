@@ -242,7 +242,7 @@ func (m *mockInstanceVerifier) InstanceByHost(_ context.Context, instanceHost, p
 	return &mockInstance{}, nil
 }
 
-func (m *mockInstanceVerifier) InstanceByID(context.Context) (authz.Instance, error) {
+func (m *mockInstanceVerifier) InstanceByID(context.Context, string) (authz.Instance, error) {
 	return nil, nil
 }
 

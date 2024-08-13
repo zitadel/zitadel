@@ -54,14 +54,14 @@ func copyEventstore(ctx context.Context, config *Migration) {
 		copyEventsFromFile(ctx, destClient, "eventstore.events2.csv")
 		copyUniqueConstraintsFromFile(ctx, destClient, "eventstore.unique_constraints.csv")
 	case isDestFile:
-		sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeQuery)
+		sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeEventPusher)
 		logging.OnError(err).Fatal("unable to connect to source database")
 		defer sourceClient.Close()
 
 		copyEventsToFile(ctx, sourceClient, "eventstore.events2.csv")
 		copyUniqueConstraintsToFile(ctx, sourceClient, "eventstore.unique_constraints.csv")
 	default:
-		sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeQuery)
+		sourceClient, err := db.Connect(config.Source, false, dialect.DBPurposeEventPusher)
 		logging.OnError(err).Fatal("unable to connect to source database")
 		defer sourceClient.Close()
 

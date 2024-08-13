@@ -962,7 +962,7 @@ func TestCommandSide_RemoveHumanTOTP(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
@@ -1179,7 +1179,7 @@ func TestCommandSide_AddHumanOTPSMS(t *testing.T) {
 			}
 			got, err := r.AddHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -1306,7 +1306,7 @@ func TestCommandSide_AddHumanOTPSMSWithCheckSucceeded(t *testing.T) {
 			}
 			got, err := r.AddHumanOTPSMSWithCheckSucceeded(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -1421,7 +1421,7 @@ func TestCommandSide_RemoveHumanOTPSMS(t *testing.T) {
 			}
 			got, err := r.RemoveHumanOTPSMS(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -2334,7 +2334,7 @@ func TestCommandSide_AddHumanOTPEmail(t *testing.T) {
 			}
 			got, err := r.AddHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -2461,7 +2461,7 @@ func TestCommandSide_AddHumanOTPEmailWithCheckSucceeded(t *testing.T) {
 			}
 			got, err := r.AddHumanOTPEmailWithCheckSucceeded(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.authRequest)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
@@ -2576,7 +2576,7 @@ func TestCommandSide_RemoveHumanOTPEmail(t *testing.T) {
 			}
 			got, err := r.RemoveHumanOTPEmail(tt.args.ctx, tt.args.userID, tt.args.resourceOwner)
 			assert.ErrorIs(t, err, tt.res.err)
-			assert.Equal(t, tt.res.want, got)
+			assertObjectDetails(t, tt.res.want, got)
 		})
 	}
 }
