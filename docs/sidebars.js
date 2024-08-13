@@ -732,6 +732,20 @@ module.exports = {
               },
               items: require("./docs/apis/resources/action_service_v3/sidebar.ts"),
             },
+            {
+              type: "category",
+              label: "Web key Lifecycle (Preview)",
+              link: {
+                type: "generated-index",
+                title: "Action Service API (Preview)",
+                slug: "/apis/resources/action_service_v3",
+                description:
+                  "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
+                  "\n" +
+                  "This project is in preview state. It can AND will continue breaking until a stable version is released.",
+              },
+              items: require("./docs/apis/resources/webkey_service_v3/sidebar.ts"),
+            },
           ],
         },
         {

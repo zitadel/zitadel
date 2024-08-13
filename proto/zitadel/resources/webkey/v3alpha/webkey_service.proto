@@ -17,7 +17,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alph
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "Webkey Service";
+    title: "Web key Service";
     version: "3.0-preview";
     description: "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens. This project is in preview state. It can AND will continue breaking until a stable version is released.";
     contact:{
