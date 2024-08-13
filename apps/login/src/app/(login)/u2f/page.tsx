@@ -7,10 +7,8 @@ import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
-  params,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
-  params: Record<string | number | symbol, string | undefined>;
 }) {
   const { loginName, authRequestId, sessionId, organization } = searchParams;
 

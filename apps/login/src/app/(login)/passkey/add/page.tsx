@@ -1,4 +1,4 @@
-import { getBrandingSettings, getSession, sessionService } from "@/lib/zitadel";
+import { getBrandingSettings, sessionService } from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterPasskey from "@/ui/RegisterPasskey";
