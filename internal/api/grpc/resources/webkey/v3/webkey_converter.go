@@ -9,7 +9,7 @@ import (
 	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 )
 
-func generateWebKeyRequestToConfig(req *webkey.CreateWebKeyRequest) crypto.WebKeyConfig {
+func createWebKeyRequestToConfig(req *webkey.CreateWebKeyRequest) crypto.WebKeyConfig {
 	switch config := req.GetKey().GetConfig().(type) {
 	case *webkey.WebKey_Rsa:
 		return webKeyRSAConfigToCrypto(config.Rsa)
@@ -88,7 +88,8 @@ func webKeyDetailsToPb(details *query.WebKeyDetails, instanceID string) *webkey.
 			CreationDate: details.CreationDate,
 			EventDate:    details.ChangeDate,
 		}, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
-		State: webKeyStateToPb(details.State),
+		State:  webKeyStateToPb(details.State),
+		Config: &webkey.WebKey{},
 	}
 
 	switch config := details.Config.(type) {

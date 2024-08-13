@@ -18,7 +18,7 @@ func (s *Server) GenerateWebKey(ctx context.Context, req *webkey.CreateWebKeyReq
 	if err = checkWebKeyFeature(ctx); err != nil {
 		return nil, err
 	}
-	webKey, err := s.command.GenerateWebKey(ctx, generateWebKeyRequestToConfig(req))
+	webKey, err := s.command.GenerateWebKey(ctx, createWebKeyRequestToConfig(req))
 	if err != nil {
 		return nil, err
 	}
