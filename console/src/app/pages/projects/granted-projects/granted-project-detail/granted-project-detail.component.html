@@ -2,9 +2,7 @@
   title="{{ project?.projectName }}"
   [hasActions]="false"
   docLink="https://zitadel.com/docs/guides/manage/console/projects#what-is-a-granted-project"
-  sub="{{ 'PROJECT.PAGES.TYPE.GRANTED_SINGULAR' | translate }} {{ 'ACTIONS.OF' | translate }} <strong>{{
-    project?.projectOwnerName
-  }}</strong>"
+  sub="{{ 'PROJECT.PAGES.TYPE.GRANTED_SINGULAR' | translate: { name: project?.projectOwnerName } }}"
   [isActive]="project?.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE"
   [isInactive]="project?.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE"
   stateTooltip="{{ 'ORG.STATE.' + project?.state | translate }}"

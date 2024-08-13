@@ -16,8 +16,8 @@ const (
 	userTable = "auth.users3"
 )
 
-func (v *View) UserByID(userID, instanceID string) (*model.UserView, error) {
-	return view.UserByID(v.Db, userTable, userID, instanceID)
+func (v *View) UserByID(ctx context.Context, userID, instanceID string) (*model.UserView, error) {
+	return view.UserByID(ctx, v.Db, userID, instanceID)
 }
 
 func (v *View) UserByLoginName(ctx context.Context, loginName, instanceID string) (*model.UserView, error) {
@@ -27,7 +27,7 @@ func (v *View) UserByLoginName(ctx context.Context, loginName, instanceID string
 	}
 
 	//nolint: contextcheck // no lint was added because refactor would change too much code
-	return view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
+	return view.UserByID(ctx, v.Db, queriedUser.ID, instanceID)
 }
 
 func (v *View) UserByLoginNameAndResourceOwner(ctx context.Context, loginName, resourceOwner, instanceID string) (*model.UserView, error) {
@@ -37,7 +37,7 @@ func (v *View) UserByLoginNameAndResourceOwner(ctx context.Context, loginName, r
 	}
 
 	//nolint: contextcheck // no lint was added because refactor would change too much code
-	user, err := view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
+	user, err := view.UserByID(ctx, v.Db, queriedUser.ID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (v *View) userByID(ctx context.Context, instanceID string, queries ...query
 		OnError(err).
 		Errorf("could not get current sequence for userByID")
 
-	user, err := view.UserByID(v.Db, userTable, queriedUser.ID, instanceID)
+	user, err := view.UserByID(ctx, v.Db, queriedUser.ID, instanceID)
 	if err != nil && !zerrors.IsNotFound(err) {
 		return nil, err
 	}

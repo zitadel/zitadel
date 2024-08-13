@@ -340,7 +340,7 @@ func TestCommands_ResetSystemFeatures(t *testing.T) {
 			}
 			got, err := c.ResetSystemFeatures(context.Background())
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.want, got)
+			assertObjectDetails(t, tt.want, got)
 		})
 	}
 }

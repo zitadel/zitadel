@@ -115,7 +115,7 @@ func TestCommands_AddDeviceAuth(t *testing.T) {
 			}
 			gotDetails, err := c.AddDeviceAuth(tt.args.ctx, tt.args.clientID, tt.args.deviceCode, tt.args.userCode, tt.args.expires, tt.args.scopes, tt.args.audience, tt.args.needRefreshToken)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, tt.wantDetails, gotDetails)
+			assertObjectDetails(t, tt.wantDetails, gotDetails)
 		})
 	}
 }
@@ -254,7 +254,7 @@ func TestCommands_ApproveDeviceAuth(t *testing.T) {
 			}
 			gotDetails, err := c.ApproveDeviceAuth(tt.args.ctx, tt.args.id, tt.args.userID, tt.args.userOrgID, tt.args.authMethods, tt.args.authTime, tt.args.preferredLanguage, tt.args.userAgent)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, gotDetails, tt.wantDetails)
+			assertObjectDetails(t, tt.wantDetails, gotDetails)
 		})
 	}
 }
@@ -376,7 +376,7 @@ func TestCommands_CancelDeviceAuth(t *testing.T) {
 			}
 			gotDetails, err := c.CancelDeviceAuth(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, gotDetails, tt.wantDetails)
+			assertObjectDetails(t, tt.wantDetails, gotDetails)
 		})
 	}
 }

@@ -1,37 +1,38 @@
 syntax = "proto3";
 
-package zitadel.action.v3alpha;
+package zitadel.resources.action.v3alpha;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/action/v3alpha;action";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha;action";
 
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2/object.proto";
-import "zitadel/action/v3alpha/execution.proto";
 
-message SearchQuery {
-  oneof query {
+import "zitadel/resources/object/v3alpha/object.proto";
+import "zitadel/resources/action/v3alpha/execution.proto";
+
+message ExecutionSearchFilter {
+  oneof filter {
     option (validate.required) = true;
 
-    InConditionsQuery in_conditions_query = 1;
-    ExecutionTypeQuery execution_type_query = 2;
-    TargetQuery target_query = 3;
-    IncludeQuery include_query = 4;
+    InConditionsFilter in_conditions_filter = 1;
+    ExecutionTypeFilter execution_type_filter = 2;
+    TargetFilter target_filter = 3;
+    IncludeFilter include_filter = 4;
   }
 }
 
-message InConditionsQuery {
+message InConditionsFilter {
   // Defines the conditions to query for.
   repeated Condition conditions = 1;
 }
 
-message ExecutionTypeQuery {
+message ExecutionTypeFilter {
   // Defines the type to query for.
   ExecutionType execution_type = 1;
 }
 
-message TargetQuery {
+message TargetFilter {
   // Defines the id to query for.
   string target_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -41,7 +42,7 @@ message TargetQuery {
   ];
 }
 
-message IncludeQuery {
+message IncludeFilter {
   // Defines the include to query for.
   Condition include = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -51,16 +52,16 @@ message IncludeQuery {
   ];
 }
 
-message TargetSearchQuery {
-  oneof query {
+message TargetSearchFilter {
+  oneof filter {
     option (validate.required) = true;
 
-    TargetNameQuery target_name_query = 1;
-    InTargetIDsQuery in_target_ids_query = 2;
+    TargetNameFilter target_name_filter = 1;
+    InTargetIDsFilter in_target_ids_filter = 2;
   }
 }
 
-message TargetNameQuery {
+message TargetNameFilter {
   // Defines the name of the target to query for.
   string target_name = 1 [
     (validate.rules).string = {max_len: 200},
@@ -70,7 +71,7 @@ message TargetNameQuery {
     }
   ];
   // Defines which text comparison method used for the name query.
-  zitadel.object.v2.TextQueryMethod method = 2 [
+  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       description: "defines which text equality method is used";
@@ -78,7 +79,7 @@ message TargetNameQuery {
   ];
 }
 
-message InTargetIDsQuery {
+message InTargetIDsFilter {
   // Defines the ids to query for.
   repeated string target_ids = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -97,14 +98,20 @@ enum ExecutionType {
 }
 
 enum TargetFieldName {
-  FIELD_NAME_UNSPECIFIED = 0;
-  FIELD_NAME_ID = 1;
-  FIELD_NAME_CREATION_DATE = 2;
-  FIELD_NAME_CHANGE_DATE = 3;
-  FIELD_NAME_NAME = 4;
-  FIELD_NAME_TARGET_TYPE = 5;
-  FIELD_NAME_URL = 6;
-  FIELD_NAME_TIMEOUT = 7;
-  FIELD_NAME_ASYNC = 8;
-  FIELD_NAME_INTERRUPT_ON_ERROR = 9;
+  TARGET_FIELD_NAME_UNSPECIFIED = 0;
+  TARGET_FIELD_NAME_ID = 1;
+  TARGET_FIELD_NAME_CREATED_DATE = 2;
+  TARGET_FIELD_NAME_CHANGED_DATE = 3;
+  TARGET_FIELD_NAME_NAME = 4;
+  TARGET_FIELD_NAME_TARGET_TYPE = 5;
+  TARGET_FIELD_NAME_URL = 6;
+  TARGET_FIELD_NAME_TIMEOUT = 7;
+  TARGET_FIELD_NAME_INTERRUPT_ON_ERROR = 8;
+}
+
+enum ExecutionFieldName {
+  EXECUTION_FIELD_NAME_UNSPECIFIED = 0;
+  EXECUTION_FIELD_NAME_ID = 1;
+  EXECUTION_FIELD_NAME_CREATED_DATE = 2;
+  EXECUTION_FIELD_NAME_CHANGED_DATE = 3;
 }
