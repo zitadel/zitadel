@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
   const authRequestId = searchParams.get("authRequest");
   const sessionId = searchParams.get("sessionId");
 
+  // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
   const _rsc = searchParams.get("_rsc");
   if (_rsc) {
     return NextResponse.json({ error: "No _rsc supported" }, { status: 500 });
@@ -89,12 +90,6 @@ export async function GET(request: NextRequest) {
       );
 
       if (cookie && cookie.id && cookie.token) {
-        console.log(
-          `Found sessioncookie ${cookie.id}`,
-          JSON.stringify(selectedSession),
-          JSON.stringify(cookie),
-        );
-
         const session = {
           sessionId: cookie?.id,
           sessionToken: cookie?.token,
@@ -109,7 +104,6 @@ export async function GET(request: NextRequest) {
               value: session,
             },
           });
-          console.log("callbackUrl", callbackUrl);
           if (callbackUrl) {
             return NextResponse.redirect(callbackUrl);
           } else {

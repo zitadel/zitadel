@@ -23,11 +23,11 @@ const secureHeaders = [
   },
   // img-src vercel.com needed for deploy button,
   // script-src va.vercel-scripts.com for analytics/vercel scripts
-  // {
-  //   key: "Content-Security-Policy",
-  //   value:
-  //     "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com; connect-src 'self'; child-src; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; img-src 'self' https://vercel.com;",
-  // },
+  {
+    key: "Content-Security-Policy",
+    value:
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com; connect-src 'self'; child-src; style-src 'self' 'unsafe-inline'; font-src 'self'; object-src 'none'; img-src 'self' https://vercel.com;",
+  },
 ];
 
 const nextConfig = {
