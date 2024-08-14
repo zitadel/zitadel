@@ -469,6 +469,7 @@ Errors:
       NoExternalUserData: No se recibieron datos del usuario externo
       CreationNotAllowed: La creación de un nuevo usuario no está permitida para este proveedor
       LinkingNotAllowed: La vinculación de un usuario no está permitida para este proveedor
+      NoOptionAllowed: Ni la creación ni la vinculación están permitidas en este proveedor. Póngase en contacto con su administrador.
     GrantRequired: El inicio de sesión no es posible. Se requiere que el usuario tenga al menos una concesión sobre la aplicación. Por favor contacta con tu administrador.
     ProjectRequired: El inicio de sesión no es posible. La organización del usuario debe tener el acceso concedido para el proyecto. Por favor contacta con tu administrador.
   IdentityProvider:

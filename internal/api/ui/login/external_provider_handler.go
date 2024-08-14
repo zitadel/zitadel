@@ -615,6 +615,10 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		l.renderError(w, r, authReq, err)
 		return
 	}
+	if !idpTemplate.IsCreationAllowed && !idpTemplate.IsLinkingAllowed {
+		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-3kl44", "Errors.User.ExternalIDP.NoOptionAllowed"))
+		return
+	}
 
 	translator := l.getTranslator(r.Context(), authReq)
 	data := externalNotFoundOptionData{
