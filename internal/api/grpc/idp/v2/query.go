@@ -16,20 +16,9 @@ import (
 )
 
 func (s *Server) GetIDPByID(ctx context.Context, req *idp_pb.GetIDPByIDRequest) (*idp_pb.GetIDPByIDResponse, error) {
-	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false)
+	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false, s.checkPermission)
 	if err != nil {
 		return nil, err
-	}
-
-	switch idp.OwnerType {
-	case domain.IdentityProviderTypeSystem:
-		if err := s.checkPermission(ctx, domain.PermissionIDPRead, idp.ResourceOwner, idp.ID); err != nil {
-			return nil, err
-		}
-	case domain.IdentityProviderTypeOrg:
-		if err := s.checkPermission(ctx, domain.PermissionOrgIDPRead, idp.ResourceOwner, idp.ID); err != nil {
-			return nil, err
-		}
 	}
 	return &idp_pb.GetIDPByIDResponse{Idp: idpToPb(idp)}, nil
 }
