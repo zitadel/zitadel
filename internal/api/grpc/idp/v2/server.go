@@ -11,10 +11,10 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 )
 
-var _ idp.IDPServiceServer = (*Server)(nil)
+var _ idp.IdentityProviderServiceServer = (*Server)(nil)
 
 type Server struct {
-	idp.UnimplementedIDPServiceServer
+	idp.UnimplementedIdentityProviderServiceServer
 	command *command.Commands
 	query   *query.Queries
 
@@ -36,21 +36,21 @@ func CreateServer(
 }
 
 func (s *Server) RegisterServer(grpcServer *grpc.Server) {
-	idp.RegisterIDPServiceServer(grpcServer, s)
+	idp.RegisterIdentityProviderServiceServer(grpcServer, s)
 }
 
 func (s *Server) AppName() string {
-	return idp.IDPService_ServiceDesc.ServiceName
+	return idp.IdentityProviderService_ServiceDesc.ServiceName
 }
 
 func (s *Server) MethodPrefix() string {
-	return idp.IDPService_ServiceDesc.ServiceName
+	return idp.IdentityProviderService_ServiceDesc.ServiceName
 }
 
 func (s *Server) AuthMethods() authz.MethodMapping {
-	return idp.IDPService_AuthMethods
+	return idp.IdentityProviderService_AuthMethods
 }
 
 func (s *Server) RegisterGateway() server.RegisterGatewayFunc {
-	return idp.RegisterIDPServiceHandler
+	return idp.RegisterIdentityProviderServiceHandler
 }
