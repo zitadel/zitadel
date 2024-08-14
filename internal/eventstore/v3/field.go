@@ -28,7 +28,7 @@ func (es *Eventstore) FillFields(ctx context.Context, events ...eventstore.FillF
 	ctx, span := tracing.NewSpan(ctx)
 	defer span.End()
 
-	tx, err := es.client.BeginTx(ctx, nil)
+	tx, err := es.client.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelReadCommitted})
 	if err != nil {
 		return err
 	}

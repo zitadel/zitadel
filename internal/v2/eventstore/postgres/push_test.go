@@ -1297,7 +1297,10 @@ func Test_push(t *testing.T) {
 				t.Errorf("unexpected error in begin: %v", err)
 				t.FailNow()
 			}
-			err = push(context.Background(), tx, tt.args.reducer, tt.args.commands)
+			s := Storage{
+				pushPositionStmt: initPushStmt("postgres"),
+			}
+			err = s.push(context.Background(), tx, tt.args.reducer, tt.args.commands)
 			tt.want.assertErr(t, err)
 			dbMock.Assert(t)
 			if tt.args.reducer != nil {
