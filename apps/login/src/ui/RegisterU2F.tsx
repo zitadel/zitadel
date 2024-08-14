@@ -90,7 +90,7 @@ export default function RegisterU2F({
     return submitRegister().then((resp: RegisterU2FResponse) => {
       const u2fId = resp.u2fId;
       const options: CredentialCreationOptions =
-        (resp.publicKeyCredentialCreationOptions?.toJson() as CredentialCreationOptions) ??
+        (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
         {};
 
       if (options.publicKey) {

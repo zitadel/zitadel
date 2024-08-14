@@ -18,6 +18,12 @@ export async function POST(request: NextRequest) {
     const session = await getSession(sessionCookie.id, sessionCookie.token);
 
     const userId = session?.session?.factors?.user?.id;
+    console.log("payload", {
+      passkeyId,
+      passkeyName,
+      publicKeyCredential,
+      userId,
+    });
     if (userId) {
       return verifyPasskeyRegistration({
         passkeyId,

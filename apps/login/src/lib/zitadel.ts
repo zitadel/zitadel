@@ -435,7 +435,8 @@ export async function getActiveIdentityProviders(orgId?: string) {
 export async function verifyPasskeyRegistration(
   request: PartialMessage<VerifyPasskeyRegistrationRequest>,
 ) {
-  request.publicKeyCredential = (request.publicKeyCredential as any).toJson();
+  // TODO: find a better way to handle this
+  request = VerifyPasskeyRegistrationRequest.fromJson(request as any);
   return userService.verifyPasskeyRegistration(request, {});
 }
 
