@@ -54,6 +54,7 @@ export default function SessionItem({
 
   return (
     <Link
+      prefetch={false}
       href={
         validUser && authRequestId
           ? `/login?` +
@@ -120,12 +121,11 @@ export default function SessionItem({
 
         <XCircleIcon
           className="hidden group-hover:block h-5 w-5 transition-all opacity-50 hover:opacity-100"
-          onClick={(event) => {
-            event.preventDefault();
+          onClick={() =>
             clearSession(session.id).then(() => {
               reload();
-            });
-          }}
+            })
+          }
         />
       </div>
     </Link>

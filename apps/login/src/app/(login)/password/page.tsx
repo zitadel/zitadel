@@ -1,7 +1,6 @@
 import {
   getBrandingSettings,
   getLoginSettings,
-  getSession,
   sessionService,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";

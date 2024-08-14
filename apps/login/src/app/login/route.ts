@@ -1,3 +1,7 @@
+export const dynamic = "force-dynamic";
+export const revalidate = false;
+export const fetchCache = "default-no-store";
+
 import {
   createCallback,
   getActiveIdentityProviders,
@@ -52,6 +56,12 @@ export async function GET(request: NextRequest) {
   const authRequestId = searchParams.get("authRequest");
   const sessionId = searchParams.get("sessionId");
 
+  // TODO: find a better way to handle _rsc (react server components) requests and block them to avoid conflicts when creating oidc callback
+  const _rsc = searchParams.get("_rsc");
+  if (_rsc) {
+    return NextResponse.json({ error: "No _rsc supported" }, { status: 500 });
+  }
+
   const sessionCookies = await getAllSessions();
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
@@ -80,21 +90,31 @@ export async function GET(request: NextRequest) {
       );
 
       if (cookie && cookie.id && cookie.token) {
-        console.log(`Found sessioncookie ${cookie.id}`);
-
         const session = {
           sessionId: cookie?.id,
           sessionToken: cookie?.token,
         };
 
-        const { callbackUrl } = await createCallback({
-          authRequestId,
-          callbackKind: {
-            case: "session",
-            value: session,
-          },
-        });
-        return NextResponse.redirect(callbackUrl);
+        // works not with _rsc request
+        try {
+          const { callbackUrl } = await createCallback({
+            authRequestId,
+            callbackKind: {
+              case: "session",
+              value: session,
+            },
+          });
+          if (callbackUrl) {
+            return NextResponse.redirect(callbackUrl);
+          } else {
+            return NextResponse.json(
+              { error: "An error occurred!" },
+              { status: 500 },
+            );
+          }
+        } catch (error) {
+          return NextResponse.json({ error }, { status: 500 });
+        }
       }
     }
   }
@@ -305,6 +325,9 @@ export async function GET(request: NextRequest) {
               if (callbackUrl) {
                 return NextResponse.redirect(callbackUrl);
               } else {
+                console.log(
+                  "could not create callback, redirect user to choose other account",
+                );
                 return gotoAccounts();
               }
             } catch (error) {

@@ -4,16 +4,14 @@ import {
   getSession,
   getUserByID,
   listAuthenticationMethodTypes,
+  sessionService,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import BackButton from "@/ui/BackButton";
 import ChooseSecondFactorToSetup from "@/ui/ChooseSecondFactorToSetup";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
-import {
-  getMostRecentCookieWithLoginname,
-  getSessionCookieById,
-} from "@zitadel/next";
+import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -31,13 +29,12 @@ export default async function Page({
     loginName?: string,
     organization?: string,
   ) {
-    const recent = await getMostRecentCookieWithLoginname({
+    return loadMostRecentSession(sessionService, {
       loginName,
       organization,
-    });
-    return getSession(recent.id, recent.token).then((response) => {
-      if (response?.session && response.session.factors?.user?.id) {
-        const userId = response.session.factors.user.id;
+    }).then((session) => {
+      if (session && session.factors?.user?.id) {
+        const userId = session.factors.user.id;
         return listAuthenticationMethodTypes(userId).then((methods) => {
           return getUserByID(userId).then((user) => {
             const humanUser =
@@ -46,7 +43,7 @@ export default async function Page({
                 : undefined;
 
             return {
-              factors: response.session?.factors,
+              factors: session?.factors,
               authMethods: methods.authMethodTypes ?? [],
               phoneVerified: humanUser?.phone?.isVerified ?? false,
               emailVerified: humanUser?.email?.isVerified ?? false,

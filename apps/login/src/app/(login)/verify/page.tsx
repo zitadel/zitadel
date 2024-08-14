@@ -4,16 +4,8 @@ import VerifyEmailForm from "@/ui/VerifyEmailForm";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 export default async function Page({ searchParams }: { searchParams: any }) {
-  const {
-    userId,
-    sessionId,
-    code,
-    submit,
-    organization,
-    authRequestId,
-    loginname,
-    passwordset,
-  } = searchParams;
+  const { userId, sessionId, code, submit, organization, authRequestId } =
+    searchParams;
 
   const branding = await getBrandingSettings(organization);
 

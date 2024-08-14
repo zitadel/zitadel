@@ -225,24 +225,7 @@ export async function addHumanUser({
   });
 }
 
-export async function verifyTOTPRegistration(
-  code: string,
-  userId: string,
-  token?: string,
-) {
-  // let userService;
-  // if (token) {
-  //   const authConfig: ZitadelServerOptions = {
-  //     name: "zitadel login",
-  //     apiUrl: process.env.ZITADEL_API_URL ?? "",
-  //     token: token,
-  //   };
-  //
-  //   const sessionUser = initializeServer(authConfig);
-  //   userService = user.getUser(sessionUser);
-  // } else {
-  //   userService = user.getUser(server);
-  // }
+export async function verifyTOTPRegistration(code: string, userId: string) {
   return userService.verifyTOTPRegistration({ code, userId }, {});
 }
 
