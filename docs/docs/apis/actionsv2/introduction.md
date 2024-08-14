@@ -184,4 +184,4 @@ If you want to forward a specific error from the Target through ZITADEL, you can
 
 Only values from 400 to 499 will be forwarded through ZITADEL, other StatusCodes will end in a PreconditionFailed error.
 
-If the Target returns any other status code than >= 400, the execution is looked at as failed, and a PreconditionFailed error is logged.
+If the Target returns any other status code than >= 200 and < 299, the execution is looked at as failed, and a PreconditionFailed error is logged.
