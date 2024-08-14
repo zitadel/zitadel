@@ -673,7 +673,7 @@ module.exports = {
               link: {
                 type: "generated-index",
                 title: "Feature Service API",
-                slug: "/apis/resources/feature_service/v2",
+                slug: "/apis/resources/feature_service_v2",
                 description:
                   'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n'
               },
@@ -690,6 +690,16 @@ module.exports = {
                   'This API is intended to manage organizations for ZITADEL. \n'
               },
               items: require("./docs/apis/resources/org_service_v2/sidebar.ts"),
+            },
+              label: "Identity Provider Lifecycle",
+              link: {
+                type: "generated-index",
+                title: "Identity Provider Service API",
+                slug: "/apis/resources/idp_service_v2",
+                description:
+                  'This API is intended to manage identity providers (IdPs) for ZITADEL.\n'
+              },
+              items: require("./docs/apis/resources/idp_service_v2/sidebar.ts"),
             },
           ],
         },
