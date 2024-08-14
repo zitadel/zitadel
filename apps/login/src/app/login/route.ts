@@ -56,6 +56,11 @@ export async function GET(request: NextRequest) {
   const authRequestId = searchParams.get("authRequest");
   const sessionId = searchParams.get("sessionId");
 
+  const _rsc = searchParams.get("_rsc");
+  if (_rsc) {
+    return NextResponse.json({ error: "No _rsc supported" }, { status: 500 });
+  }
+
   const sessionCookies = await getAllSessions();
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
