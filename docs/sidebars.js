@@ -692,6 +692,7 @@ module.exports = {
               items: require("./docs/apis/resources/org_service_v2/sidebar.ts"),
             },
             {
+              type: "category",
               label: "Identity Provider Lifecycle",
               link: {
                 type: "generated-index",
