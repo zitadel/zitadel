@@ -121,11 +121,12 @@ export default function SessionItem({
 
         <XCircleIcon
           className="hidden group-hover:block h-5 w-5 transition-all opacity-50 hover:opacity-100"
-          onClick={() =>
+          onClick={(event) => {
+            event.preventDefault();
             clearSession(session.id).then(() => {
               reload();
-            })
-          }
+            });
+          }}
         />
       </div>
     </Link>
