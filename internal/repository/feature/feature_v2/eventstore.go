@@ -23,4 +23,5 @@ func init() {
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceTokenExchangeEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceActionsEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 	eventstore.RegisterFilterEventMapper(AggregateType, InstanceImprovedPerformanceEventType, eventstore.GenericEventMapper[SetEvent[[]feature.ImprovedPerformanceType]])
+	eventstore.RegisterFilterEventMapper(AggregateType, InstanceWebKeyEventType, eventstore.GenericEventMapper[SetEvent[bool]])
 }
