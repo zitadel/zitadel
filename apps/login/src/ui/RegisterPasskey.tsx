@@ -95,8 +95,6 @@ export default function RegisterPasskey({
         (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
         {};
 
-      console.log(options);
-
       if (options?.publicKey) {
         options.publicKey.challenge = coerceToArrayBuffer(
           options.publicKey.challenge,
@@ -145,6 +143,7 @@ export default function RegisterPasskey({
                   ),
                 },
               };
+
               return submitVerify(passkeyId, "", data, sessionId).then(() => {
                 const params = new URLSearchParams();
 

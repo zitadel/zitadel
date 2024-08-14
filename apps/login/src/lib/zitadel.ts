@@ -7,11 +7,11 @@ import {
 } from "@zitadel/client/v2";
 import { createManagementServiceClient } from "@zitadel/client/v1";
 import { createServerTransport } from "@zitadel/node";
-import { GetActiveIdentityProvidersRequest } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import {
   RetrieveIdentityProviderIntentRequest,
+  VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
@@ -19,7 +19,7 @@ import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_servi
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { ProviderSlug } from "./demos";
-import { PlainMessage } from "@zitadel/client";
+import { PartialMessage, PlainMessage } from "@zitadel/client";
 
 const SESSION_LIFETIME_S = 3000;
 
@@ -433,24 +433,10 @@ export async function getActiveIdentityProviders(orgId?: string) {
  * @returns the newly set email
  */
 export async function verifyPasskeyRegistration(
-  passkeyId: string,
-  passkeyName: string,
-  publicKeyCredential:
-    | {
-        [key: string]: any;
-      }
-    | undefined,
-  userId: string,
+  request: PartialMessage<VerifyPasskeyRegistrationRequest>,
 ) {
-  return userService.verifyPasskeyRegistration(
-    {
-      passkeyId,
-      passkeyName,
-      publicKeyCredential,
-      userId,
-    },
-    {},
-  );
+  request.publicKeyCredential = (request.publicKeyCredential as any).toJson();
+  return userService.verifyPasskeyRegistration(request, {});
 }
 
 /**
