@@ -16,9 +16,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	object "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
+	resource_object "github.com/zitadel/zitadel/pkg/grpc/resources/object/v3alpha"
 	webkey "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 )
 
@@ -218,8 +221,14 @@ func checkWebKeyListState(ctx context.Context, t *testing.T, client webkey.ZITAD
 	now := time.Now()
 	var gotActiveKeyID string
 	for _, key := range list {
-		assert.NotEmpty(t, key.GetDetails().GetId())
-		assert.WithinRange(t, key.GetDetails().GetCreated().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
+		integration.AssertResourceDetails(t, &resource_object.Details{
+			Created: timestamppb.Now(),
+			Changed: timestamppb.Now(),
+			Owner: &object.Owner{
+				Type: object.OwnerType_OWNER_TYPE_INSTANCE,
+				Id:   Tester.Instance.InstanceID(),
+			},
+		}, key.GetDetails())
 		assert.WithinRange(t, key.GetDetails().GetChanged().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))
 		assert.NotEqual(t, webkey.WebKeyState_STATE_UNSPECIFIED, key.GetState())
 		assert.NotEqual(t, webkey.WebKeyState_STATE_REMOVED, key.GetState())
