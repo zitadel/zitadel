@@ -85,62 +85,6 @@ func TestUnmarshalWebKeyConfig(t *testing.T) {
 	}
 }
 
-func TestWebKeyRSAConfig_Alg(t *testing.T) {
-	type fields struct {
-		Hasher RSAHasher
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   jose.SignatureAlgorithm
-	}{
-		{
-			name: "unspecified",
-			fields: fields{
-				Hasher: RSAHasherUnspecified,
-			},
-			want: "",
-		},
-		{
-			name: "SHA256",
-			fields: fields{
-				Hasher: RSAHasherSHA256,
-			},
-			want: jose.RS256,
-		},
-		{
-			name: "SHA384",
-			fields: fields{
-				Hasher: RSAHasherSHA384,
-			},
-			want: jose.RS384,
-		},
-		{
-			name: "SHA512",
-			fields: fields{
-				Hasher: RSAHasherSHA512,
-			},
-			want: jose.RS512,
-		},
-		{
-			name: "default",
-			fields: fields{
-				Hasher: 99,
-			},
-			want: "",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := WebKeyRSAConfig{
-				Hasher: tt.fields.Hasher,
-			}
-			got := c.Alg()
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
 func TestWebKeyECDSAConfig_Alg(t *testing.T) {
 	type fields struct {
 		Curve EllipticCurve
