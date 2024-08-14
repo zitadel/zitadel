@@ -207,6 +207,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID},
 			Source:         feature_pb.Source_SOURCE_SYSTEM,
 		},
+		DebugOidcParentError: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
+		},
 	}
 	got := instanceFeaturesToPb(arg)
 	assert.Equal(t, want, got)
