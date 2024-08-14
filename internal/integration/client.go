@@ -69,7 +69,7 @@ type Client struct {
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
 	UserSchemaV3   schema.UserSchemaServiceClient
-	IDPv2          idp_pb.IDPServiceClient
+	IDPv2          idp_pb.IdentityProviderServiceClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -93,7 +93,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:   schema.NewUserSchemaServiceClient(cc),
-		IDPv2:          idp_pb.NewIDPServiceClient(cc),
+		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
 	}
 }
 
