@@ -9,10 +9,11 @@ The typescript repository contains all TypeScript and JavaScript packages and ap
 ## Included Apps And Packages
 
 - **[login](./typescript-repo#new-login-ui)**: The future login UI used by ZITADEL Cloud, powered by Next.js
-- `@zitadel/server`: core components for establishing node client connection, grpc stub
-- `@zitadel/client`: core components for establishing web client connection, grpc stub
-- `@zitadel/react`: shared React utilities and components built with Tailwind CSS
-- `@zitadel/next`: shared Next.js utilities
+- `@zitadel/proto`: Typescript implementation of Protocol Buffers, suitable for web browsers and Node.js.
+- `@zitadel/client`: Core components for establishing a client connection
+- `@zitadel/node`: Core components for establishing a server connection
+- `@zitadel/react`: Shared React Utilities and components built with Tailwind CSS
+- `@zitadel/next`: Shared Next.js Utilities
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `eslint-config-zitadel`: ESLint preset
 
@@ -43,14 +44,14 @@ _Note that the illustration is just a representation of the architecture and may
 The flow starts by the `/authorize` endpoint which is intercepted by the login and forwarded to ZITADEL.
 ZITADEL interprets the request and specifically redirects back to the login app.
 It does so by redirecting to `/login`.
-The login is then able to load an [AuthRequest](/docs/apis/resources/oidc_service/oidc-service-get-auth-request#get-oidc-auth-request-details).
+The login is then able to load an [AuthRequest](/docs/apis/resources/oidc_service_v2/oidc-service-get-auth-request#get-oidc-auth-request-details).
 
 The Auth Request defines how users proceed to authenticate. If no special prompts or scopes are set, the login brings up the `/loginname` page.
 The /loginname page allows to enter loginname or email of a user. User discovery is implemented at /api/loginname and if the user is found, they will be redirected to the available authentication method page.
 Right after the user is found, a session is created and set as cookie.
 This cookie is then hydrated with more information once the users continues.
 The OIDC Auth request is always passed in the url to have a context to the ongoing authentication flow.
-If enough user information is retrieved and the user is authenticated according to the policies, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service/oidc-service-create-callback) for the auth request and the user is redirected back to the application.
+If enough user information is retrieved and the user is authenticated according to the policies, the flow is finalized by [requesting a the callback url](/docs/apis/resources/oidc_service_v2/oidc-service-create-callback) for the auth request and the user is redirected back to the application.
 The application can then request a token calling the /token endpoint of the login which is proxied to the ZITADEL API.
 
 ### Implemented features
@@ -69,7 +70,7 @@ The application can then request a token calling the /token endpoint of the logi
 - Scopes
   - [x] `openid email profile address``
   - [x] `offline access`
-  - [ ] `urn:zitadel:iam:org:idp:id:{idp_id}`
+  - [x] `urn:zitadel:iam:org:idp:id:{idp_id}`
   - [x] `urn:zitadel:iam:org:project:id:zitadel:aud`
   - [x] `urn:zitadel:iam:org:id:{orgid}`
   - [x] `urn:zitadel:iam:org:domain:primary:{domain}`

@@ -292,7 +292,7 @@ message DeleteIDPResponse {
 message SearchIDPsRequest {
   optional zitadel.object.v3alpha.RequestContext ctx = 1;
   // list limitations and ordering.
-  zitadel.resources.object.v3alpha.ListQuery query = 2;
+  zitadel.resources.object.v3alpha.SearchQuery query = 2;
   // the field the result is sorted.
   zitadel.resources.idp.v3alpha.IDPFieldName sorting_column = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

@@ -14,6 +14,7 @@ const (
 	KeyTokenExchange
 	KeyActions
 	KeyImprovedPerformance
+	KeyWebKey
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -37,6 +38,7 @@ type Features struct {
 	TokenExchange                   bool                      `json:"token_exchange,omitempty"`
 	Actions                         bool                      `json:"actions,omitempty"`
 	ImprovedPerformance             []ImprovedPerformanceType `json:"improved_performance,omitempty"`
+	WebKey                          bool                      `json:"web_key,omitempty"`
 }
 
 type ImprovedPerformanceType int32

@@ -629,7 +629,7 @@ func TestCommands_LinkSessionToAuthRequest(t *testing.T) {
 			}
 			details, got, err := c.LinkSessionToAuthRequest(tt.args.ctx, tt.args.id, tt.args.sessionID, tt.args.sessionToken, tt.args.checkLoginClient)
 			require.ErrorIs(t, err, tt.res.wantErr)
-			assert.Equal(t, tt.res.details, details)
+			assertObjectDetails(t, tt.res.details, details)
 			if err == nil {
 				assert.WithinRange(t, got.AuthTime, testNow, testNow)
 				got.AuthTime = time.Time{}
@@ -739,7 +739,7 @@ func TestCommands_FailAuthRequest(t *testing.T) {
 			}
 			details, got, err := c.FailAuthRequest(tt.args.ctx, tt.args.id, tt.args.reason)
 			require.ErrorIs(t, err, tt.res.wantErr)
-			assert.Equal(t, tt.res.details, details)
+			assertObjectDetails(t, tt.res.details, details)
 			assert.Equal(t, tt.res.authReq, got)
 		})
 	}

@@ -37,6 +37,7 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
@@ -64,10 +65,11 @@ type Client struct {
 	OrgV2beta      org_v2beta.OrganizationServiceClient
 	OrgV2          org.OrganizationServiceClient
 	System         system.SystemServiceClient
-	ActionV3       action.ZITADELActionsClient
+	ActionV3Alpha  action.ZITADELActionsClient
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
 	UserSchemaV3   schema.UserSchemaServiceClient
+	WebKeyV3Alpha  webkey_v3alpha.ZITADELWebKeysClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -87,10 +89,11 @@ func newClient(cc *grpc.ClientConn) Client {
 		OrgV2beta:      org_v2beta.NewOrganizationServiceClient(cc),
 		OrgV2:          org.NewOrganizationServiceClient(cc),
 		System:         system.NewSystemServiceClient(cc),
-		ActionV3:       action.NewZITADELActionsClient(cc),
+		ActionV3Alpha:  action.NewZITADELActionsClient(cc),
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
 		UserSchemaV3:   schema.NewUserSchemaServiceClient(cc),
+		WebKeyV3Alpha:  webkey_v3alpha.NewZITADELWebKeysClient(cc),
 	}
 }
 
@@ -138,7 +141,7 @@ func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx conte
 		})
 		assert.NoError(collectT, importErr)
 	}, 2*time.Minute, 100*time.Millisecond, "instance not ready")
-	return primaryDomain, instanceId, adminUser.GetUserId(), newCtx
+	return primaryDomain, instanceId, adminUser.GetUserId(), t.updateInstanceAndOrg(newCtx, fmt.Sprintf("%s:%d", primaryDomain, t.Config.ExternalPort))
 }
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
@@ -683,20 +686,20 @@ func (s *Tester) CreateTarget(ctx context.Context, t *testing.T, name, endpoint 
 			RestAsync: &action.SetRESTAsync{},
 		}
 	}
-	target, err := s.Client.ActionV3.CreateTarget(ctx, &action.CreateTargetRequest{Target: reqTarget})
+	target, err := s.Client.ActionV3Alpha.CreateTarget(ctx, &action.CreateTargetRequest{Target: reqTarget})
 	require.NoError(t, err)
 	return target
 }
 
 func (s *Tester) DeleteExecution(ctx context.Context, t *testing.T, cond *action.Condition) {
-	_, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
+	_, err := s.Client.ActionV3Alpha.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 	})
 	require.NoError(t, err)
 }
 
 func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Condition, targets []*action.ExecutionTargetType) *action.SetExecutionResponse {
-	target, err := s.Client.ActionV3.SetExecution(ctx, &action.SetExecutionRequest{
+	target, err := s.Client.ActionV3Alpha.SetExecution(ctx, &action.SetExecutionRequest{
 		Condition: cond,
 		Execution: &action.Execution{
 			Targets: targets,

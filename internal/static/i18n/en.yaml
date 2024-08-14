@@ -495,6 +495,7 @@ Errors:
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
     TooManyNestingLevels: Too many query nesting levels (Max 20)
+    LimitExceeded: Limit exceeded
   Quota:
     AlreadyExists: Quota already exists for this unit
     NotFound: Quota not found for this unit
@@ -585,6 +586,14 @@ Errors:
       NotForAPI: Impersonated tokens not allowed for API
     Impersonation:
       PolicyDisabled: Impersonation is disabled in the instance security policy
+  WebKey:
+    ActiveDelete: Cannot delete active web key
+    Config: Invalid web key config
+    Duplicate: Web key ID not unique
+    FeatureDisabled: Web key feature disabled
+    NoActive: No active web key found
+    NotFound: Web key not found
+
 
 AggregateTypes:
   action: Action
@@ -608,6 +617,7 @@ AggregateTypes:
   restrictions: Restrictions
   system: System
   session: Session
+  web_key: Web Key
 
 EventTypes:
   execution:
@@ -1309,6 +1319,11 @@ EventTypes:
     deactivated: User Schema deactivated
     reactivated: User Schema reactivated
     deleted: User Schema deleted
+  web_key:
+    added: Web Key added
+    activated: Web Key activated
+    deactivated: Web Key deactivated
+    removed: Web Key removed
 
 Application:
   OIDC:

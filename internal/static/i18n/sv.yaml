@@ -495,6 +495,7 @@ Errors:
     SQLStatement: SQL-satsen kunde inte skapas
     InvalidRequest: Begäran är ogiltig
     TooManyNestingLevels: För många nivåer av frågenästning (Max 20)
+    LimitExceeded: Gränsen överskreds
   Quota:
     AlreadyExists: Kvota finns redan för denna enhet
     NotFound: Kvota hittades inte för denna enhet
@@ -585,6 +586,13 @@ Errors:
       NotForAPI: Imitationstoken tillåts inte för API
     Impersonation:
       PolicyDisabled: Imitation är inaktiverad i instansens säkerhetspolicy
+  WebKey:
+    ActiveDelete: Det går inte att ta bort aktiv webbnyckel
+    Config: Ogiltig webbnyckelkonfiguration
+    Duplicate: Webnyckel-ID är inte unikt
+    FeatureDisabled: Webnyckelfunktion inaktiverad
+    NoActive: Ingen aktiv webbnyckel hittades
+    NotFound: Webnyckel hittades inte
 
 AggregateTypes:
   action: Åtgärd
@@ -608,6 +616,7 @@ AggregateTypes:
   restrictions: Restriktioner
   system: System
   session: Session
+  web_key: Webbnyckel
 
 EventTypes:
   execution:
@@ -1309,6 +1318,11 @@ EventTypes:
     deactivated: Användarschema avaktiverat
     reactivated: Användarschema återaktiverat
     deleted: Användarschema borttaget
+  web_key:
+    added: Webbnyckel har lagts till
+    activated: Webbnyckel aktiverad
+    deactivated: Webnyckel avaktiverad
+    removed: Webbnyckeln har tagits bort
 
 Application:
   OIDC:
