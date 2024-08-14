@@ -92,8 +92,10 @@ export default function RegisterPasskey({
     return submitRegister().then((resp: RegisterPasskeyResponse) => {
       const passkeyId = resp.passkeyId;
       const options: CredentialCreationOptions =
-        (resp.publicKeyCredentialCreationOptions?.toJson() as CredentialCreationOptions) ??
+        (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
         {};
+
+      console.log(options);
 
       if (options?.publicKey) {
         options.publicKey.challenge = coerceToArrayBuffer(
