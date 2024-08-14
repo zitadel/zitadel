@@ -679,6 +679,18 @@ module.exports = {
               },
               items: require("./docs/apis/resources/feature_service_v2/sidebar.ts"),
             },
+            {
+              type: "category",
+              label: "Organization Lifecycle",
+              link: {
+                type: "generated-index",
+                title: "Organization Service API",
+                slug: "/apis/resources/org_service/v2",
+                description:
+                  'This API is intended to manage organizations for ZITADEL. \n'
+              },
+              items: require("./docs/apis/resources/org_service_v2/sidebar.ts"),
+            },
           ],
         },
         {

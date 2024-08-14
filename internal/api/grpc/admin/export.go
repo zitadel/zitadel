@@ -36,7 +36,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		}
 		orgSearchQuery.Queries = []query.SearchQuery{orgIDsSearchQuery}
 	}
-	queriedOrgs, err := s.query.SearchOrgs(ctx, orgSearchQuery)
+	queriedOrgs, err := s.query.SearchOrgs(ctx, orgSearchQuery, nil)
 	if err != nil {
 		return nil, err
 	}

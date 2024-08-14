@@ -24,7 +24,7 @@ option go_package = "github.com/zitadel/zitadel/pkg/grpc/org/v2;org";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "User Service";
+    title: "Organization Service";
     version: "2.0";
     description: "This API is intended to manage organizations in a ZITADEL instance.";
     contact:{

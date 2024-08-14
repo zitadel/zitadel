@@ -15,11 +15,10 @@ func (s *Server) ListOrganizations(ctx context.Context, req *org.ListOrganizatio
 	if err != nil {
 		return nil, err
 	}
-	orgs, err := s.query.SearchOrgs(ctx, queries)
+	orgs, err := s.query.SearchOrgs(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	orgs.RemoveNoPermission(ctx, s.checkPermission)
 	return &org.ListOrganizationsResponse{
 		Result:  organizationsToPb(orgs.Orgs),
 		Details: object.ToListDetails(orgs.SearchResponse),
