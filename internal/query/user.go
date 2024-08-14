@@ -124,9 +124,9 @@ type NotifyUser struct {
 	PasswordSet        bool
 }
 
-func (u *Users) RemoveNoPermission(ctx context.Context, permissionCheck domain.PermissionCheck) {
+func usersCheckPermission(ctx context.Context, users *Users, permissionCheck domain.PermissionCheck) {
 	ctxData := authz.GetCtxData(ctx)
-	u.Users = slices.DeleteFunc(u.Users,
+	users.Users = slices.DeleteFunc(users.Users,
 		func(user *User) bool {
 			if ctxData.UserID != user.ID {
 				if err := permissionCheck(ctx, domain.PermissionUserRead, user.ResourceOwner, user.ID); err != nil {
@@ -595,7 +595,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, p
 		return nil, err
 	}
 	if permissionCheck != nil {
-		users.RemoveNoPermission(ctx, permissionCheck)
+		usersCheckPermission(ctx, users, permissionCheck)
 	}
 	return users, nil
 }

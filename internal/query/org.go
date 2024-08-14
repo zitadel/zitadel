@@ -83,8 +83,8 @@ type Org struct {
 	Domain string
 }
 
-func (u *Orgs) RemoveNoPermission(ctx context.Context, permissionCheck domain_pkg.PermissionCheck) {
-	u.Orgs = slices.DeleteFunc(u.Orgs,
+func orgsCheckPermission(ctx context.Context, orgs *Orgs, permissionCheck domain_pkg.PermissionCheck) {
+	orgs.Orgs = slices.DeleteFunc(orgs.Orgs,
 		func(org *Org) bool {
 			if err := permissionCheck(ctx, domain_pkg.PermissionOrgRead, org.ID, org.ID); err != nil {
 				return true
@@ -272,7 +272,7 @@ func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries, per
 		return nil, err
 	}
 	if permissionCheck != nil {
-		orgs.RemoveNoPermission(ctx, permissionCheck)
+		orgsCheckPermission(ctx, orgs, permissionCheck)
 	}
 	return orgs, nil
 }
