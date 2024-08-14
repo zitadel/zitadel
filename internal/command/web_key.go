@@ -118,7 +118,9 @@ func (c *Commands) ActivateWebKey(ctx context.Context, keyID string) (_ *domain.
 		return nil, err
 	}
 	if activeID == keyID {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-ahv0Ah", "Errors.NoChangesFound")
+		return writeModelToObjectDetails(
+			&keys[activeID].WriteModel,
+		), nil
 	}
 	nextActive, ok := keys[keyID]
 	if !ok {
