@@ -547,6 +547,10 @@ SystemDefaults:
     PublicKeyLifetime: 30h # ZITADEL_SYSTEMDEFAULTS_KEYCONFIG_PUBLICKEYLIFETIME
     # 8766h are 1 year
     CertificateLifetime: 8766h # ZITADEL_SYSTEMDEFAULTS_KEYCONFIG_CERTIFICATELIFETIME
+  # DefaultQueryLimit limits the number of items that can be queried in a single v3 API search request without explicitly passing a limit.
+  DefaultQueryLimit: 100 # ZITADEL_SYSTEMDEFAULTS_DEFAULTQUERYLIMIT
+  # MaxQueryLimit limits the number of items that can be queried in a single v3 API search request with explicitly passing a limit.
+  MaxQueryLimit: 1000 # ZITADEL_SYSTEMDEFAULTS_MAXQUERYLIMIT
 
 Actions:
   HTTP:
@@ -1056,8 +1060,10 @@ InternalAuthZ:
         - "events.read"
         - "milestones.read"
         - "session.delete"
+        - "action.target.read"
         - "action.target.write"
         - "action.target.delete"
+        - "action.execution.read"
         - "action.execution.write"
         - "userschema.read"
         - "userschema.write"
@@ -1092,8 +1098,8 @@ InternalAuthZ:
         - "project.grant.member.read"
         - "events.read"
         - "milestones.read"
-        - "execution.target.read"
-        - "execution.read"
+        - "action.target.read"
+        - "action.execution.read"
         - "userschema.read"
     - Role: "IAM_ORG_MANAGER"
       Permissions:

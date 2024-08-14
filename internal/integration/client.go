@@ -141,7 +141,7 @@ func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx conte
 		})
 		assert.NoError(collectT, importErr)
 	}, 2*time.Minute, 100*time.Millisecond, "instance not ready")
-	return primaryDomain, instanceId, adminUser.GetUserId(), newCtx
+	return primaryDomain, instanceId, adminUser.GetUserId(), t.updateInstanceAndOrg(newCtx, fmt.Sprintf("%s:%d", primaryDomain, t.Config.ExternalPort))
 }
 
 func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {

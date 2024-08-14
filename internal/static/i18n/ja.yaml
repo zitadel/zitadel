@@ -484,6 +484,7 @@ Errors:
     SQLStatement: SQLステートメントの作成に失敗しました
     InvalidRequest: 無効なリクエストです
     TooManyNestingLevels: クエリのネスト レベルが多すぎます (最大 20)
+    LimitExceeded: 制限を超えました
   Quota:
     AlreadyExists: このユニットにはすでにクォータが存在しています
     NotFound: このユニットにはクォータが見つかりません
