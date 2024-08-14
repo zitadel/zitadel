@@ -761,14 +761,14 @@ DefaultInstance:
   # WebKeys configures the OIDC token signing keys that are generated when a new instance is created.
   # WebKeys are still in alpha, so the config is disabled here. This will prevent generation of keys for now.
   # WebKeys:
-  #  Type: "rsa" # ZITADEL_DEFAULTINSTANCE_TYPE
+  #  Type: "rsa" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_TYPE
   #  Config:
-  #    Bits: "2048" # ZITADEL_DEFAULTINSTANCE_CONFIG_BITS
-  #    Hasher: "sha256" # ZITADEL_DEFAULTINSTANCE_CONFIG_HASHER
+  #    Bits: "2048" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_BITS
+  #    Hasher: "sha256" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_HASHER
   # WebKeys:
   #  Type: "ecdsa"
   #  Config:
-  #    Curve: "P256" # ZITADEL_DEFAULTINSTANCE_CONFIG_CURVE
+  #    Curve: "P256" # ZITADEL_DEFAULTINSTANCE_WEBKEYS_CONFIG_CURVE
      
   # Sets the default values for lifetime and expiration for OIDC in each newly created instance
   # This default can be overwritten for each instance during runtime
