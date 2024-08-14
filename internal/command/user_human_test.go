@@ -1272,7 +1272,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 
 func TestCommandSide_ImportHuman(t *testing.T) {
 	type fields struct {
-		eventstore         *eventstore.Eventstore
+		eventstore         func(*testing.T) *eventstore.Eventstore
 		idGenerator        id.Generator
 		userPasswordHasher *crypto.Hasher
 	}
@@ -1299,9 +1299,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "orgid missing, invalid argument error",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
-						),
+						eventstore: expectEventstore(),
 					},
 					args{
 						ctx:   context.Background(),
@@ -1327,8 +1325,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "org policy not found, precondition error",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(),
 							expectFilter(),
 						),
@@ -1357,8 +1354,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "password policy not found, precondition error",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1397,8 +1393,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "user invalid, invalid argument error",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1442,8 +1437,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "add human (with password and initial code), ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1529,8 +1523,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "add human email verified password change not required, ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1610,8 +1603,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "add human email verified passwordless only, ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1710,8 +1702,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "add human email verified passwordless and password change not required, ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1814,8 +1805,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "add human (with phone), ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -1916,8 +1906,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "add human (with verified phone), ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -2012,8 +2001,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "add human (with undefined preferred language), ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -2098,8 +2086,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "add human (with unsupported preferred language), ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -2185,8 +2172,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			name: "add human (with idp), ok",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -2328,11 +2314,153 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 			},
 		},
 		{
-			name: "add human (with idp, creation not allowed), precondition error",
+			name: "add human (with idp, no creation allowed), precondition error",
 			given: func(t *testing.T) (fields, args) {
 				return fields{
-						eventstore: eventstoreExpect(
-							t,
+						eventstore: expectEventstore(
+							expectFilter(
+								eventFromEventPusher(
+									org.NewDomainPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										true,
+										true,
+										true,
+									),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										1,
+										false,
+										false,
+										false,
+										false,
+									),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewIDPConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										"name",
+										domain.IDPConfigTypeOIDC,
+										domain.IDPConfigStylingTypeUnspecified,
+										false,
+									),
+								),
+								eventFromEventPusher(
+									org.NewIDPOIDCConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"clientID",
+										"idpID",
+										"issuer",
+										"authEndpoint",
+										"tokenEndpoint",
+										nil,
+										domain.OIDCMappingFieldUnspecified,
+										domain.OIDCMappingFieldUnspecified,
+									),
+								),
+								eventFromEventPusher(
+									func() eventstore.Command {
+										e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+											&org.NewAggregate("org1").Aggregate,
+											"config1",
+											[]idp.OIDCIDPChanges{
+												idp.ChangeOIDCOptions(idp.OptionChanges{
+													IsCreationAllowed: gu.Ptr(false),
+													IsAutoCreation:    gu.Ptr(false),
+												}),
+											},
+										)
+										return e
+									}(),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewIDPConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										"name",
+										domain.IDPConfigTypeOIDC,
+										domain.IDPConfigStylingTypeUnspecified,
+										false,
+									),
+								),
+								eventFromEventPusher(
+									org.NewIDPOIDCConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"clientID",
+										"idpID",
+										"issuer",
+										"authEndpoint",
+										"tokenEndpoint",
+										nil,
+										domain.OIDCMappingFieldUnspecified,
+										domain.OIDCMappingFieldUnspecified,
+									),
+								),
+								eventFromEventPusher(
+									func() eventstore.Command {
+										e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+											&org.NewAggregate("org1").Aggregate,
+											"config1",
+											[]idp.OIDCIDPChanges{
+												idp.ChangeOIDCOptions(idp.OptionChanges{IsCreationAllowed: gu.Ptr(false)}),
+											},
+										)
+										return e
+									}(),
+								),
+								eventFromEventPusher(
+									org.NewIdentityProviderAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										domain.IdentityProviderTypeOrg,
+									),
+								),
+							),
+						),
+						idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+						userPasswordHasher: mockPasswordHasher("x"),
+					},
+					args{
+						ctx:   context.Background(),
+						orgID: "org1",
+						human: &domain.Human{
+							Username: "username",
+							Profile: &domain.Profile{
+								FirstName: "firstname",
+								LastName:  "lastname",
+							},
+							Email: &domain.Email{
+								EmailAddress:    "email@test.ch",
+								IsEmailVerified: true,
+							},
+						},
+						links: []*domain.UserIDPLink{
+							{
+								IDPConfigID:    "idpID",
+								ExternalUserID: "externalID",
+								DisplayName:    "name",
+							},
+						},
+						secretGenerator: GetMockSecretGenerator(t),
+					}
+			},
+			res: res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "add human (with idp, manual creation not allowed), ok",
+			given: func(t *testing.T) (fields, args) {
+				return fields{
+						eventstore: expectEventstore(
 							expectFilter(
 								eventFromEventPusher(
 									org.NewDomainPolicyAddedEvent(context.Background(),
@@ -2422,7 +2550,10 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 											&org.NewAggregate("org1").Aggregate,
 											"config1",
 											[]idp.OIDCIDPChanges{
-												idp.ChangeOIDCOptions(idp.OptionChanges{IsCreationAllowed: gu.Ptr(false)}),
+												idp.ChangeOIDCOptions(idp.OptionChanges{
+													IsCreationAllowed: gu.Ptr(false),
+													IsAutoCreation:    gu.Ptr(true),
+												}),
 											},
 										)
 										return e
@@ -2436,6 +2567,17 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 									),
 								),
 							),
+							expectPush(
+								newAddHumanEvent("", false, true, "", AllowedLanguage),
+								user.NewUserIDPLinkAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"idpID",
+									"name",
+									"externalID",
+								),
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+							),
 						),
 						idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 						userPasswordHasher: mockPasswordHasher("x"),
@@ -2446,8 +2588,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						human: &domain.Human{
 							Username: "username",
 							Profile: &domain.Profile{
-								FirstName: "firstname",
-								LastName:  "lastname",
+								FirstName:         "firstname",
+								LastName:          "lastname",
+								PreferredLanguage: AllowedLanguage,
 							},
 							Email: &domain.Email{
 								EmailAddress:    "email@test.ch",
@@ -2465,7 +2608,196 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					}
 			},
 			res: res{
-				err: zerrors.IsPreconditionFailed,
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: AllowedLanguage,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					State: domain.UserStateActive,
+				},
+			},
+		},
+		{
+			name: "add human (with idp, auto creation not allowed), ok",
+			given: func(t *testing.T) (fields, args) {
+				return fields{
+						eventstore: expectEventstore(
+							expectFilter(
+								eventFromEventPusher(
+									org.NewDomainPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										true,
+										true,
+										true,
+									),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+										&user.NewAggregate("user1", "org1").Aggregate,
+										1,
+										false,
+										false,
+										false,
+										false,
+									),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewIDPConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										"name",
+										domain.IDPConfigTypeOIDC,
+										domain.IDPConfigStylingTypeUnspecified,
+										false,
+									),
+								),
+								eventFromEventPusher(
+									org.NewIDPOIDCConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"clientID",
+										"idpID",
+										"issuer",
+										"authEndpoint",
+										"tokenEndpoint",
+										nil,
+										domain.OIDCMappingFieldUnspecified,
+										domain.OIDCMappingFieldUnspecified,
+									),
+								),
+								eventFromEventPusher(
+									func() eventstore.Command {
+										e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+											&org.NewAggregate("org1").Aggregate,
+											"config1",
+											[]idp.OIDCIDPChanges{
+												idp.ChangeOIDCOptions(idp.OptionChanges{IsCreationAllowed: gu.Ptr(false)}),
+											},
+										)
+										return e
+									}(),
+								),
+							),
+							expectFilter(
+								eventFromEventPusher(
+									org.NewIDPConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										"name",
+										domain.IDPConfigTypeOIDC,
+										domain.IDPConfigStylingTypeUnspecified,
+										false,
+									),
+								),
+								eventFromEventPusher(
+									org.NewIDPOIDCConfigAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"clientID",
+										"idpID",
+										"issuer",
+										"authEndpoint",
+										"tokenEndpoint",
+										nil,
+										domain.OIDCMappingFieldUnspecified,
+										domain.OIDCMappingFieldUnspecified,
+									),
+								),
+								eventFromEventPusher(
+									func() eventstore.Command {
+										e, _ := org.NewOIDCIDPChangedEvent(context.Background(),
+											&org.NewAggregate("org1").Aggregate,
+											"config1",
+											[]idp.OIDCIDPChanges{
+												idp.ChangeOIDCOptions(idp.OptionChanges{
+													IsCreationAllowed: gu.Ptr(true),
+													IsAutoCreation:    gu.Ptr(false),
+												}),
+											},
+										)
+										return e
+									}(),
+								),
+								eventFromEventPusher(
+									org.NewIdentityProviderAddedEvent(context.Background(),
+										&org.NewAggregate("org1").Aggregate,
+										"idpID",
+										domain.IdentityProviderTypeOrg,
+									),
+								),
+							),
+							expectPush(
+								newAddHumanEvent("", false, true, "", AllowedLanguage),
+								user.NewUserIDPLinkAddedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									"idpID",
+									"name",
+									"externalID",
+								),
+								user.NewHumanEmailVerifiedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate),
+							),
+						),
+						idGenerator:        id_mock.NewIDGeneratorExpectIDs(t, "user1"),
+						userPasswordHasher: mockPasswordHasher("x"),
+					},
+					args{
+						ctx:   context.Background(),
+						orgID: "org1",
+						human: &domain.Human{
+							Username: "username",
+							Profile: &domain.Profile{
+								FirstName:         "firstname",
+								LastName:          "lastname",
+								PreferredLanguage: AllowedLanguage,
+							},
+							Email: &domain.Email{
+								EmailAddress:    "email@test.ch",
+								IsEmailVerified: true,
+							},
+						},
+						links: []*domain.UserIDPLink{
+							{
+								IDPConfigID:    "idpID",
+								ExternalUserID: "externalID",
+								DisplayName:    "name",
+							},
+						},
+						secretGenerator: GetMockSecretGenerator(t),
+					}
+			},
+			res: res{
+				wantHuman: &domain.Human{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "user1",
+						ResourceOwner: "org1",
+					},
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName:         "firstname",
+						LastName:          "lastname",
+						DisplayName:       "firstname lastname",
+						PreferredLanguage: AllowedLanguage,
+					},
+					Email: &domain.Email{
+						EmailAddress:    "email@test.ch",
+						IsEmailVerified: true,
+					},
+					State: domain.UserStateActive,
+				},
 			},
 		},
 	}
@@ -2473,7 +2805,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f, a := tt.given(t)
 			r := &Commands{
-				eventstore:         f.eventstore,
+				eventstore:         f.eventstore(t),
 				idGenerator:        f.idGenerator,
 				userPasswordHasher: f.userPasswordHasher,
 			}
@@ -2494,7 +2826,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 
 func TestCommandSide_HumanMFASkip(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -2516,9 +2848,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 		{
 			name: "userid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:    context.Background(),
@@ -2532,8 +2862,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -2549,8 +2878,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 		{
 			name: "skip mfa init, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -2589,7 +2917,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			err := r.HumanSkipMFAInit(tt.args.ctx, tt.args.userID, tt.args.orgID)
 			if tt.res.err == nil {
@@ -2604,7 +2932,7 @@ func TestCommandSide_HumanMFASkip(t *testing.T) {
 
 func TestCommandSide_HumanSignOut(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type (
 		args struct {
@@ -2626,9 +2954,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 		{
 			name: "agentid missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:     context.Background(),
@@ -2642,9 +2968,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 		{
 			name: "userids missing, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:     context.Background(),
@@ -2658,8 +2982,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 		{
 			name: "user not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -2673,8 +2996,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 		{
 			name: "human sign out, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -2713,8 +3035,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 		{
 			name: "human sign out multiple users, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -2774,7 +3095,7 @@ func TestCommandSide_HumanSignOut(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			err := r.HumansSignOut(tt.args.ctx, tt.args.agentID, tt.args.userIDs)
 			if tt.res.err == nil {
