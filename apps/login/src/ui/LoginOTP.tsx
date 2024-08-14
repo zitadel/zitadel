@@ -236,12 +236,9 @@ export default function LoginOTP({
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
-          onClick={(event) => {
-            event.preventDefault();
-            return handleSubmit((e) => {
-              setCodeAndContinue(e, organization);
-            });
-          }}
+          onClick={handleSubmit((e) => {
+            setCodeAndContinue(e, organization);
+          })}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue
