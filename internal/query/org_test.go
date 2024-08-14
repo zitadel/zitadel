@@ -560,7 +560,7 @@ func TestOrg_RemoveNoPermission(t *testing.T) {
 				}
 				return errors.New("failed")
 			}
-			tt.orgs.RemoveNoPermission(context.Background(), checkPermission)
+			orgsCheckPermission(context.Background(), tt.orgs, checkPermission)
 			require.Equal(t, tt.want.orgs, tt.orgs.Orgs)
 		})
 	}

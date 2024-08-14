@@ -134,7 +134,7 @@ func TestUser_RemoveNoPermission(t *testing.T) {
 				}
 				return errors.New("failed")
 			}
-			tt.users.RemoveNoPermission(context.Background(), checkPermission)
+			usersCheckPermission(context.Background(), tt.users, checkPermission)
 			require.Equal(t, tt.want.users, tt.users.Users)
 		})
 	}
