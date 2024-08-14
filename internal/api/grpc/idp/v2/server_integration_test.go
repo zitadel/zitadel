@@ -19,7 +19,7 @@ var (
 	SystemCTX context.Context
 	ErrCTX    context.Context
 	Tester    *integration.Tester
-	Client    idp_pb.IDPServiceClient
+	Client    idp_pb.IdentityProviderServiceClient
 )
 
 func TestMain(m *testing.M) {
