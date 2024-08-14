@@ -31,6 +31,9 @@ func (wm *WebKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 
 func (wm *WebKeyWriteModel) Reduce() error {
 	for _, event := range wm.Events {
+		if event.Aggregate().ID != wm.AggregateID {
+			continue
+		}
 		switch e := event.(type) {
 		case *webkey.AddedEvent:
 			wm.State = domain.WebKeyStateInitial

@@ -36,13 +36,14 @@ func (c *Commands) CreateWebKey(ctx context.Context, conf crypto.WebKeyConfig) (
 	if activeID == "" {
 		commands = append(commands, webkey.NewActivatedEvent(ctx, aggregate))
 	}
-	events, err := c.eventstore.Push(ctx, commands...)
+	model := NewWebKeyWriteModel(aggregate.ID, authz.GetInstance(ctx).InstanceID())
+	err = c.pushAppendAndReduce(ctx, model, commands...)
 	if err != nil {
 		return nil, err
 	}
 	return &WebKeyDetails{
 		KeyID:         aggregate.ID,
-		ObjectDetails: pushedEventsToObjectDetails(events),
+		ObjectDetails: writeModelToObjectDetails(&model.WriteModel),
 	}, nil
 }
 
@@ -133,12 +134,11 @@ func (c *Commands) ActivateWebKey(ctx context.Context, keyID string) (_ *domain.
 			webkey.AggregateFromWriteModel(ctx, &keys[activeID].WriteModel),
 		))
 	}
-
-	events, err := c.eventstore.Push(ctx, commands...)
+	err = c.pushAppendAndReduce(ctx, nextActive, commands...)
 	if err != nil {
 		return nil, err
 	}
-	return pushedEventsToObjectDetails(events), nil
+	return writeModelToObjectDetails(&nextActive.WriteModel), nil
 }
 
 // getAllWebKeys searches for all web keys on the instance and returns a map of key IDs.
@@ -168,13 +168,13 @@ func (c *Commands) DeleteWebKey(ctx context.Context, keyID string) (_ *domain.Ob
 	if model.State == domain.WebKeyStateActive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-Chai1", "Errors.WebKey.ActiveDelete")
 	}
-	events, err := c.eventstore.Push(ctx, webkey.NewRemovedEvent(ctx,
+	err = c.pushAppendAndReduce(ctx, model, webkey.NewRemovedEvent(ctx,
 		webkey.AggregateFromWriteModel(ctx, &model.WriteModel),
 	))
 	if err != nil {
 		return nil, err
 	}
-	return pushedEventsToObjectDetails(events), nil
+	return writeModelToObjectDetails(&model.WriteModel), nil
 }
 
 func (c *Commands) prepareGenerateInitialWebKeys(instanceID string, conf crypto.WebKeyConfig) preparation.Validation {

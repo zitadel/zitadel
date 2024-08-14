@@ -146,6 +146,7 @@ func TestCommands_CreateWebKey(t *testing.T) {
 				KeyID: "key2",
 				ObjectDetails: &domain.ObjectDetails{
 					ResourceOwner: "instance1",
+					ID:            "key2",
 				},
 			},
 		},
@@ -202,6 +203,7 @@ func TestCommands_CreateWebKey(t *testing.T) {
 				KeyID: "key1",
 				ObjectDetails: &domain.ObjectDetails{
 					ResourceOwner: "instance1",
+					ID:            "key1",
 				},
 			},
 		},
@@ -415,7 +417,7 @@ func TestCommands_ActivateWebKey(t *testing.T) {
 			wantErr: io.ErrClosedPipe,
 		},
 		{
-			name: "no changes error",
+			name: "no changes",
 			fields: fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -443,8 +445,11 @@ func TestCommands_ActivateWebKey(t *testing.T) {
 					),
 				),
 			},
-			args:    args{"key1"},
-			wantErr: zerrors.ThrowPreconditionFailed(nil, "COMMAND-ahv0Ah", "Errors.NoChangesFound"),
+			args: args{"key1"},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+				ID:            "key1",
+			},
 		},
 		{
 			name: "not found error",
@@ -536,6 +541,7 @@ func TestCommands_ActivateWebKey(t *testing.T) {
 			args: args{"key2"},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
+				ID:            "key2",
 			},
 		},
 		{
@@ -572,6 +578,7 @@ func TestCommands_ActivateWebKey(t *testing.T) {
 			args: args{"key1"},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
+				ID:            "key1",
 			},
 		},
 	}
@@ -717,6 +724,7 @@ func TestCommands_DeleteWebKey(t *testing.T) {
 			args: args{"key1"},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",
+				ID:            "key1",
 			},
 		},
 	}
