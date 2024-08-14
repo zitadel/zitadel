@@ -270,7 +270,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 				assert.Equal(t, tt.res.token, tt.args.pat.Token)
 			}
 		})
@@ -368,7 +368,7 @@ func TestCommands_RemovePersonalAccessToken(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.want, got)
+				assertObjectDetails(t, tt.res.want, got)
 			}
 		})
 	}
