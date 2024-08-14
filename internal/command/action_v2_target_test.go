@@ -202,6 +202,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				id: "id1",
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "id1",
 				},
 			},
 		},
@@ -235,6 +236,7 @@ func TestCommands_AddTarget(t *testing.T) {
 				id: "id1",
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "id1",
 				},
 			},
 		},
@@ -254,7 +256,7 @@ func TestCommands_AddTarget(t *testing.T) {
 			}
 			if tt.res.err == nil {
 				assert.Equal(t, tt.res.id, tt.args.add.AggregateID)
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -416,6 +418,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "id1",
 				},
 			},
 		},
@@ -485,6 +488,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "id1",
 				},
 			},
 		},
@@ -528,6 +532,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "id1",
 				},
 			},
 		},
@@ -545,7 +550,7 @@ func TestCommands_ChangeTarget(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
@@ -625,6 +630,7 @@ func TestCommands_DeleteTarget(t *testing.T) {
 			res{
 				details: &domain.ObjectDetails{
 					ResourceOwner: "instance",
+					ID:            "id1",
 				},
 			},
 		},
@@ -642,7 +648,7 @@ func TestCommands_DeleteTarget(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.details, details)
+				assertObjectDetails(t, tt.res.details, details)
 			}
 		})
 	}
