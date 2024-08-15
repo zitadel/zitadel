@@ -584,6 +584,13 @@ Errors:
       NotForAPI: Zosobněné tokeny nejsou pro API povoleny
     Impersonation:
       PolicyDisabled: Zosobnění je zakázáno v zásadách zabezpečení instance
+  WebKey:
+    ActiveDelete: Aktivní webový klíč nelze smazat
+    Config: Neplatná konfigurace webového klíče
+    Duplicate: ID webového klíče není jedinečné
+    FeatureDisabled: Funkce webového klíče je zakázána
+    NoActive: Nebyl nalezen žádný aktivní webový klíč
+    NotFound: Webový klíč nebyl nalezen
 
 AggregateTypes:
   action: Akce
@@ -607,6 +614,7 @@ AggregateTypes:
   restrictions: Omezení
   system: Systém
   session: Sezení
+  web_key: Webový klíč
 
 EventTypes:
   execution:
@@ -1308,6 +1316,11 @@ EventTypes:
     deactivated: Uživatelské schéma deaktivováno
     reactivated: Uživatelské schéma bylo znovu aktivováno
     deleted: Uživatelské schéma bylo smazáno
+  web_key:
+    added: Přidán webový klíč
+    activated: Web Key aktivován
+    deactivated: Web Key deaktivován
+    removed: Odstraňte webový klíč
 
 Application:
   OIDC:

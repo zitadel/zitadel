@@ -214,7 +214,7 @@ func TestServer_GetTarget(t *testing.T) {
 				err := tt.args.dep(tt.args.ctx, tt.args.req, tt.want)
 				require.NoError(t, err)
 			}
-			got, getErr := Tester.Client.ActionV3.GetTarget(tt.args.ctx, tt.args.req)
+			got, getErr := Tester.Client.ActionV3Alpha.GetTarget(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				assert.Error(t, getErr, "Error: "+getErr.Error())
 			} else {
@@ -476,7 +476,7 @@ func TestServer_ListTargets(t *testing.T) {
 			}
 
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := Tester.Client.ActionV3.SearchTargets(tt.args.ctx, tt.args.req)
+				got, listErr := Tester.Client.ActionV3Alpha.SearchTargets(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					assert.Error(ttt, listErr, "Error: "+listErr.Error())
 				} else {
@@ -864,7 +864,7 @@ func TestServer_SearchExecutions(t *testing.T) {
 			}
 
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, listErr := Tester.Client.ActionV3.SearchExecutions(tt.args.ctx, tt.args.req)
+				got, listErr := Tester.Client.ActionV3Alpha.SearchExecutions(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
 					assert.Error(t, listErr, "Error: "+listErr.Error())
 				} else {

@@ -586,6 +586,13 @@ Errors:
       NotForAPI: Imitierte Token sind für die API nicht zulässig
     Impersonation:
       PolicyDisabled: Der Identitätswechsel ist in der Sicherheitsrichtlinie der Instanz deaktiviert
+  WebKey:
+    ActiveDelete: Aktiver Webschlüssel kann nicht gelöscht werden
+    Config: Ungültige Webschlüsselkonfiguration
+    Duplicate: Webschlüssel-ID nicht eindeutig
+    FeatureDisabled: Webschlüsselfunktion deaktiviert
+    NoActive: Kein aktiver Webschlüssel gefunden
+    NotFound: Webschlüssel nicht gefunden
 
 AggregateTypes:
   action: Action
@@ -609,6 +616,7 @@ AggregateTypes:
   restrictions: Restriktionen
   system: System
   session: Session
+  web_key: Webschlüssel
 
 EventTypes:
   execution:
@@ -1310,6 +1318,11 @@ EventTypes:
     deactivated: Benutzerschema deaktiviert
     reactivated: Benutzerschema reaktiviert
     deleted: Benutzerschema gelöscht
+  web_key:
+    added: Web Key hinzugefügt
+    activated: Web Key aktiviert
+    deactivated: Web Key deaktiviert
+    removed: Web Key entfernen
 
 Application:
   OIDC:

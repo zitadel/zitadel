@@ -16,6 +16,7 @@ type InstanceFeatures struct {
 	TokenExchange                   FeatureSource[bool]
 	Actions                         FeatureSource[bool]
 	ImprovedPerformance             FeatureSource[[]feature.ImprovedPerformanceType]
+	WebKey                          FeatureSource[bool]
 	DebugOIDCParentError            FeatureSource[bool]
 }
 
