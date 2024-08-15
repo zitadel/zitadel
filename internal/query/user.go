@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"slices"
 	"strings"
 	"time"
 
@@ -123,27 +124,18 @@ type NotifyUser struct {
 	PasswordSet        bool
 }
 
-func (u *Users) RemoveNoPermission(ctx context.Context, permissionCheck domain.PermissionCheck) {
-	removableIndexes := make([]int, 0)
-	for i := range u.Users {
-		ctxData := authz.GetCtxData(ctx)
-		if ctxData.UserID != u.Users[i].ID {
-			if err := permissionCheck(ctx, domain.PermissionUserRead, u.Users[i].ResourceOwner, u.Users[i].ID); err != nil {
-				removableIndexes = append(removableIndexes, i)
+func usersCheckPermission(ctx context.Context, users *Users, permissionCheck domain.PermissionCheck) {
+	ctxData := authz.GetCtxData(ctx)
+	users.Users = slices.DeleteFunc(users.Users,
+		func(user *User) bool {
+			if ctxData.UserID != user.ID {
+				if err := permissionCheck(ctx, domain.PermissionUserRead, user.ResourceOwner, user.ID); err != nil {
+					return true
+				}
 			}
-		}
-	}
-	removed := 0
-	for _, removeIndex := range removableIndexes {
-		u.Users = removeUser(u.Users, removeIndex-removed)
-		removed++
-	}
-	// reset count as some users could be removed
-	u.SearchResponse.Count = uint64(len(u.Users))
-}
-
-func removeUser(slice []*User, s int) []*User {
-	return append(slice[:s], slice[s+1:]...)
+			return false
+		},
+	)
 }
 
 type UserSearchQueries struct {
@@ -597,7 +589,18 @@ func (q *Queries) GetNotifyUser(ctx context.Context, shouldTriggered bool, queri
 	return user, err
 }
 
-func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (users *Users, err error) {
+func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries, permissionCheck domain.PermissionCheck) (*Users, error) {
+	users, err := q.searchUsers(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil {
+		usersCheckPermission(ctx, users, permissionCheck)
+	}
+	return users, nil
+}
+
+func (q *Queries) searchUsers(ctx context.Context, queries *UserSearchQueries) (users *Users, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 

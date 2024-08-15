@@ -157,7 +157,7 @@ func (s *Server) GetProviderByID(ctx context.Context, req *admin_pb.GetProviderB
 	if err != nil {
 		return nil, err
 	}
-	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false, instanceIDQuery)
+	idp, err := s.query.IDPTemplateByID(ctx, true, req.Id, false, nil, instanceIDQuery)
 	if err != nil {
 		return nil, err
 	}

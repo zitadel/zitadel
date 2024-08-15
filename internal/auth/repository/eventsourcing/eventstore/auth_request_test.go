@@ -110,15 +110,12 @@ func (m *mockViewNoUser) UserByID(context.Context, string, string) (*user_view_m
 }
 
 type mockEventUser struct {
-	Event      eventstore.Event
+	Events     []eventstore.Event
 	CodeExists bool
 }
 
 func (m *mockEventUser) UserEventsByID(ctx context.Context, id string, changeDate time.Time, types []eventstore.EventType) ([]eventstore.Event, error) {
-	if m.Event != nil {
-		return []eventstore.Event{m.Event}, nil
-	}
-	return nil, nil
+	return m.Events, nil
 }
 
 func (m *mockEventUser) PasswordCodeExists(ctx context.Context, userID string) (bool, error) {
@@ -725,9 +722,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userViewProvider: &mockViewUser{},
 				userEventProvider: &mockEventUser{
-					Event: &es_models.Event{
-						AggregateType: user_repo.AggregateType,
-						Typ:           user_repo.UserDeactivatedType,
+					Events: []eventstore.Event{
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.UserDeactivatedType,
+						},
 					},
 				},
 				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
@@ -747,9 +746,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 			fields{
 				userViewProvider: &mockViewUser{},
 				userEventProvider: &mockEventUser{
-					Event: &es_models.Event{
-						AggregateType: user_repo.AggregateType,
-						Typ:           user_repo.UserLockedType,
+					Events: []eventstore.Event{
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.UserLockedType,
+						},
 					},
 				},
 				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
@@ -2290,10 +2291,12 @@ func Test_userSessionByIDs(t *testing.T) {
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventUser{
-					Event: &es_models.Event{
-						AggregateType: user_repo.AggregateType,
-						Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
-						CreationDate:  testNow,
+					Events: []eventstore.Event{
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
+							CreationDate:  testNow,
+						},
 					},
 				},
 			},
@@ -2313,14 +2316,16 @@ func Test_userSessionByIDs(t *testing.T) {
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id"},
 				eventProvider: &mockEventUser{
-					Event: &es_models.Event{
-						AggregateType: user_repo.AggregateType,
-						Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
-						CreationDate:  testNow,
-						Data: func() []byte {
-							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
-							return data
-						}(),
+					Events: []eventstore.Event{
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
+							CreationDate:  testNow,
+							Data: func() []byte {
+								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "otherID"})
+								return data
+							}(),
+						},
 					},
 				},
 			},
@@ -2340,14 +2345,16 @@ func Test_userSessionByIDs(t *testing.T) {
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id", HumanView: &user_model.HumanView{FirstName: "FirstName"}},
 				eventProvider: &mockEventUser{
-					Event: &es_models.Event{
-						AggregateType: user_repo.AggregateType,
-						Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
-						CreationDate:  testNow,
-						Data: func() []byte {
-							data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
-							return data
-						}(),
+					Events: []eventstore.Event{
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.UserV1MFAOTPCheckSucceededType,
+							CreationDate:  testNow,
+							Data: func() []byte {
+								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								return data
+							}(),
+						},
 					},
 				},
 			},
@@ -2359,7 +2366,7 @@ func Test_userSessionByIDs(t *testing.T) {
 			nil,
 		},
 		{
-			"new user events (user deleted), precondition failed error",
+			"new user events (user deleted), session terminated",
 			args{
 				userProvider: &mockViewUserSession{
 					PasswordVerification: testNow,
@@ -2367,14 +2374,57 @@ func Test_userSessionByIDs(t *testing.T) {
 				agentID: "agentID",
 				user:    &user_model.UserView{ID: "id"},
 				eventProvider: &mockEventUser{
-					Event: &es_models.Event{
-						AggregateType: user_repo.AggregateType,
-						Typ:           user_repo.UserRemovedType,
+					Events: []eventstore.Event{
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.UserRemovedType,
+							CreationDate:  testNow,
+						},
 					},
 				},
 			},
+			&user_model.UserSessionView{
+				ChangeDate: testNow,
+				State:      domain.UserSessionStateTerminated,
+			},
 			nil,
-			zerrors.IsPreconditionFailed,
+		},
+		{
+			"new user events (user deleted, readded and password checked)",
+			args{
+				userProvider: &mockViewUserSession{
+					PasswordVerification: testNow,
+				},
+				agentID: "agentID",
+				user:    &user_model.UserView{ID: "id"},
+				eventProvider: &mockEventUser{
+					Events: []eventstore.Event{
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.UserRemovedType,
+						},
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.HumanAddedType,
+						},
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.HumanPasswordCheckSucceededType,
+							CreationDate:  testNow,
+							Data: func() []byte {
+								data, _ := json.Marshal(&user_es_model.AuthRequest{UserAgentID: "agentID"})
+								return data
+							}(),
+						},
+					},
+				},
+			},
+			&user_model.UserSessionView{
+				ChangeDate:           testNow,
+				PasswordVerification: testNow,
+				State:                domain.UserSessionStateActive,
+			},
+			nil,
 		},
 	}
 	for _, tt := range tests {
@@ -2456,14 +2506,16 @@ func Test_userByID(t *testing.T) {
 					PasswordChangeRequired: true,
 				},
 				eventProvider: &mockEventUser{
-					Event: &es_models.Event{
-						AggregateType: user_repo.AggregateType,
-						Typ:           user_repo.UserV1PasswordChangedType,
-						CreationDate:  testNow,
-						Data: func() []byte {
-							data, _ := json.Marshal(user_es_model.Password{ChangeRequired: false, Secret: &crypto.CryptoValue{}})
-							return data
-						}(),
+					Events: []eventstore.Event{
+						&es_models.Event{
+							AggregateType: user_repo.AggregateType,
+							Typ:           user_repo.UserV1PasswordChangedType,
+							CreationDate:  testNow,
+							Data: func() []byte {
+								data, _ := json.Marshal(user_es_model.Password{ChangeRequired: false, Secret: &crypto.CryptoValue{}})
+								return data
+							}(),
+						},
 					},
 				},
 			},
@@ -2552,6 +2604,7 @@ func TestAuthRequestRepo_VerifyPassword_IgnoreUnknownUsernames(t *testing.T) {
 		a.SetPolicyOrgID("instance1")
 		return a
 	}
+
 	type fields struct {
 		AuthRequests      func(*testing.T, string) cache.AuthRequestCache
 		UserViewProvider  userViewProvider
