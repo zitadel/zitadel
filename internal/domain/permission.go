@@ -33,6 +33,7 @@ const (
 	PermissionUserCredentialWrite = "user.credential.write"
 	PermissionSessionWrite        = "session.write"
 	PermissionSessionDelete       = "session.delete"
+	PermissionOrgRead             = "org.read"
 	PermissionIDPRead             = "iam.idp.read"
 	PermissionOrgIDPRead          = "org.idp.read"
 )

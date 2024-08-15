@@ -15,6 +15,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/text/language"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -250,6 +251,39 @@ func (s *Tester) CreateOrganization(ctx context.Context, name, adminEmail string
 							},
 						},
 					},
+				},
+			},
+		},
+	})
+	logging.OnError(err).Fatal("create org")
+	return resp
+}
+
+func (s *Tester) DeactivateOrganization(ctx context.Context, orgID string) *mgmt.DeactivateOrgResponse {
+	resp, err := s.Client.Mgmt.DeactivateOrg(
+		SetOrgID(ctx, orgID),
+		&mgmt.DeactivateOrgRequest{},
+	)
+	logging.OnError(err).Fatal("deactivate org")
+	return resp
+}
+
+func SetOrgID(ctx context.Context, orgID string) context.Context {
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		return metadata.AppendToOutgoingContext(ctx, "x-zitadel-orgid", orgID)
+	}
+	md.Set("x-zitadel-orgid", orgID)
+	return metadata.NewOutgoingContext(ctx, md)
+}
+
+func (s *Tester) CreateOrganizationWithUserID(ctx context.Context, name, userID string) *org.AddOrganizationResponse {
+	resp, err := s.Client.OrgV2.AddOrganization(ctx, &org.AddOrganizationRequest{
+		Name: name,
+		Admins: []*org.AddOrganizationRequest_Admin{
+			{
+				UserType: &org.AddOrganizationRequest_Admin_UserId{
+					UserId: userID,
 				},
 			},
 		},

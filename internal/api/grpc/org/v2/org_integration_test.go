@@ -19,22 +19,26 @@ import (
 )
 
 var (
-	CTX    context.Context
-	Tester *integration.Tester
-	Client org.OrganizationServiceClient
-	User   *user.AddHumanUserResponse
+	CTX      context.Context
+	OwnerCTX context.Context
+	UserCTX  context.Context
+	Tester   *integration.Tester
+	Client   org.OrganizationServiceClient
+	User     *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, errCtx, cancel := integration.Contexts(5 * time.Minute)
+		ctx, _, cancel := integration.Contexts(5 * time.Minute)
 		defer cancel()
 
 		Tester = integration.NewTester(ctx)
 		defer Tester.Done()
 		Client = Tester.Client.OrgV2
 
-		CTX, _ = Tester.WithAuthorization(ctx, integration.IAMOwner), errCtx
+		CTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
+		OwnerCTX = Tester.WithAuthorization(ctx, integration.OrgOwner)
+		UserCTX = Tester.WithAuthorization(ctx, integration.Login)
 		User = Tester.CreateHumanUser(CTX)
 		return m.Run()
 	}())
