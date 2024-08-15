@@ -70,7 +70,7 @@
           class="state"
           [ngClass]="{
             active: org.state === OrgState.ORG_STATE_ACTIVE,
-            inactive: org.state === OrgState.ORG_STATE_INACTIVE
+            inactive: org.state === OrgState.ORG_STATE_INACTIVE,
           }"
           *ngIf="org.state"
           >{{ 'ORG.STATE.' + org.state | translate }}</span

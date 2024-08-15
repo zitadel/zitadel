@@ -39,11 +39,10 @@ func (s *Server) ListUsers(ctx context.Context, req *user.ListUsersRequest) (*us
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.SearchUsers(ctx, queries)
+	res, err := s.query.SearchUsers(ctx, queries, s.checkPermission)
 	if err != nil {
 		return nil, err
 	}
-	res.RemoveNoPermission(ctx, s.checkPermission)
 	return &user.ListUsersResponse{
 		Result:  UsersToPb(res.Users, s.assetAPIPrefix(ctx)),
 		Details: object.ToListDetails(res.SearchResponse),

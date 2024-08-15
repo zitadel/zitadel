@@ -15,7 +15,7 @@
         class="state"
         [ngClass]="{
           active: twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_ACTIVE,
-          inactive: twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE
+          inactive: twilio.state === SMSProviderConfigState.SMS_PROVIDER_CONFIG_INACTIVE,
         }"
         >{{ 'SETTING.SMS.SMSPROVIDERSTATE.' + twilio.state | translate }}</span
       >

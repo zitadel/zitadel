@@ -673,11 +673,35 @@ module.exports = {
               link: {
                 type: "generated-index",
                 title: "Feature Service API",
-                slug: "/apis/resources/feature_service/v2",
+                slug: "/apis/resources/feature_service_v2",
                 description:
                   'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n'
               },
               items: require("./docs/apis/resources/feature_service_v2/sidebar.ts"),
+            },
+            {
+              type: "category",
+              label: "Organization Lifecycle",
+              link: {
+                type: "generated-index",
+                title: "Organization Service API",
+                slug: "/apis/resources/org_service/v2",
+                description:
+                  'This API is intended to manage organizations for ZITADEL. \n'
+              },
+              items: require("./docs/apis/resources/org_service_v2/sidebar.ts"),
+            },
+            {
+              type: "category",
+              label: "Identity Provider Lifecycle",
+              link: {
+                type: "generated-index",
+                title: "Identity Provider Service API",
+                slug: "/apis/resources/idp_service_v2",
+                description:
+                  'This API is intended to manage identity providers (IdPs) for ZITADEL.\n'
+              },
+              items: require("./docs/apis/resources/idp_service_v2/sidebar.ts"),
             },
           ],
         },
@@ -731,6 +755,20 @@ module.exports = {
                   "This project is in Preview state. It can AND will continue breaking until the services provide the same functionality as the current actions.",
               },
               items: require("./docs/apis/resources/action_service_v3/sidebar.ts"),
+            },
+            {
+              type: "category",
+              label: "Web key Lifecycle (Preview)",
+              link: {
+                type: "generated-index",
+                title: "Action Service API (Preview)",
+                slug: "/apis/resources/action_service_v3",
+                description:
+                  "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
+                  "\n" +
+                  "This project is in preview state. It can AND will continue breaking until a stable version is released.",
+              },
+              items: require("./docs/apis/resources/webkey_service_v3/sidebar.ts"),
             },
           ],
         },

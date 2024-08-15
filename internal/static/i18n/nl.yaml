@@ -496,6 +496,7 @@ Errors:
     SQLStatement: SQL Statement kon niet worden gemaakt
     InvalidRequest: Verzoek is ongeldig
     TooManyNestingLevels: Te veel query nesting niveaus (Max 20)
+    LimitExceeded: Limiet overschreden
   Quota:
     AlreadyExists: Quota bestaat al voor deze eenheid
     NotFound: Quota niet gevonden voor deze eenheid
@@ -564,6 +565,7 @@ Errors:
     NotFound: Uitvoering niet gevonden
     IncludeNotFound: Inclusief niet gevonden
     NoTargets: Geen doelstellingen gedefinieerd
+    ResponseIsNotValidJSON: Reactie is geen geldige JSON
   UserSchema:
     NotEnabled: Functie "Gebruikersschema" is niet ingeschakeld
     Type:
@@ -585,6 +587,13 @@ Errors:
       NotForAPI: Nagebootste tokens zijn niet toegestaan voor API
     Impersonation:
       PolicyDisabled: Nabootsing van identiteit is uitgeschakeld in het beveiligingsbeleid van de instantie.
+  WebKey:
+    ActiveDelete: Kan actieve websleutel niet verwijderen
+    Config: Ongeldige websleutelconfiguratie
+    Duplicate: Websleutel-ID niet uniek
+    FeatureDisabled: Websleutelfunctie uitgeschakeld
+    NoActive: Geen actieve websleutel gevonden
+    NotFound: Websleutel niet gevonden
 
 AggregateTypes:
   action: Actie
@@ -608,6 +617,7 @@ AggregateTypes:
   restrictions: Beperkingen
   system: Systeem
   session: Sessie
+  web_key: Websleutel
 
 EventTypes:
   execution:
@@ -1304,6 +1314,11 @@ EventTypes:
     deactivated: Gebruikersschema gedeactiveerd
     reactivated: Gebruikersschema opnieuw geactiveerd
     deleted: Gebruikersschema verwijderd
+  web_key:
+    added: Web Key toegevoegd
+    activated: Web Key geactiveerd
+    deactivated: Web Key gedeactiveerd
+    removed: Web Key verwijderd
 
 Application:
   OIDC:
