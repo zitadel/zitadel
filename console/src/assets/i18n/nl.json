@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instellingsinstellingen",
-        "DESCRIPTION": "De instellingsinstellingen zijn de standaardinstellingen voor alle organisaties. Met de juiste toestemmingen kunnen sommige hiervan worden overschreven in organisatie-instellingen."
+        "TITLE": "Standaard instellingen",
+        "DESCRIPTION": "Standaardinstellingen voor alle organisaties. Met de juiste machtigingen kunnen sommige ervan worden overschreven in de organisatie-instellingen."
       },
       "ORG": {
         "TITLE": "Organisatie-instellingen",
@@ -231,7 +231,7 @@
           "LABEL": "Maximale Levensduur in uren",
           "PW_CHECK": {
             "TITLE": "Wachtwoord Controle",
-            "DESCRIPTION": "Je gebruikers moeten hun wachtwoorden in deze perioden wijzigen."
+            "DESCRIPTION": "Gebruikers moeten na deze periode opnieuw worden geverifieerd met hun wachtwoord."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Externe Login Controle",
@@ -486,6 +486,7 @@
     "MORE": "meer",
     "STEP": "Stap",
     "SETUP": "Instellen",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Niet-opgeslagen wijzigingen",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Toon gebruiker {{value}}"
     },
-    "DOWNLOAD": "Download"
+    "DOWNLOAD": "Download",
+    "APPLY": "Toepassen"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Heeft controle over de hele instantie, inclusief alle organisaties",
@@ -1084,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Geselecteerde acties verwijderen?",
         "DESCRIPTION": "Weet u zeker dat u de geselecteerde acties uit de flow wilt verwijderen?"
-      }
+      },
+      "ABOUTNAME": "De naam van de actie en de naam van de functie in het javascript moeten hetzelfde zijn"
     },
     "TOAST": {
       "ACTIONSSET": "Acties ingesteld",
@@ -1316,10 +1319,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Instantie Instellingen",
-      "DESCRIPTION": "Deze instellingen zijn van toepassing op al uw organisaties, tenzij ze zijn overschreven."
-    },
     "LIST": {
       "ORGS": "Organisaties",
       "FEATURESETTINGS": "Functie-instellingen",
@@ -1439,9 +1438,7 @@
         "7": "Eenmalig Wachtwoord (OTP) - SMS",
         "8": "Eenmalig Wachtwoord (OTP) - Email"
       },
-      "ADDGENERATOR": "Definieer Secret Generator",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Vervaldatum (in uren)",
+      "EXPIRY": "Vervaldatum (in minuten)",
       "INCLUDEDIGITS": "Inclusief Nummers",
       "INCLUDESYMBOLS": "Inclusief Symbolen",
       "INCLUDELOWERLETTERS": "Inclusief Kleinletters",
@@ -1477,6 +1474,10 @@
         "DISABLED": "Uitgeschakeld"
       },
       "INHERITED_DESCRIPTION": "Deze instelling stelt de waarde in op de standaardwaarde van het systeem.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Ingeschakeld\" wordt overgenomen",
+        "DISABLED": "\"Uitgeschakeld\" wordt overgenomen"
+      },
       "RESET": "Alles instellen op overgenomen"
     },
     "DIALOG": {
@@ -1682,7 +1683,8 @@
         "username": "Gebruikersnaam",
         "tempUsername": "Tijdelijke gebruikersnaam",
         "otp": "Eenmalig wachtwoord",
-        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL"
+        "verifyUrl": "Verifieer Eenmalig-wachtwoord URL",
+        "expiry": "Vervaldatum"
       },
       "TOAST": {
         "UPDATED": "Aangepaste Teksten opgeslagen."
@@ -1780,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Eigen Projecten",
         "OWNED_SINGULAR": "Eigen Project",
-        "GRANTED_SINGULAR": "Verleend Project"
+        "GRANTED_SINGULAR": "Project toegewezen {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Branding Instelling",
@@ -2064,10 +2066,10 @@
       "ISAUTOCREATION_DESC": "Als geselecteerd, wordt een account aangemaakt als het nog niet bestaat.",
       "ISAUTOUPDATE": "Automatische update",
       "ISAUTOUPDATE_DESC": "Als geselecteerd, worden accounts bijgewerkt bij opnieuw authenticeren.",
-      "ISCREATIONALLOWED": "Account creatie toegestaan",
-      "ISCREATIONALLOWED_DESC": "Bepaalt of accounts kunnen worden aangemaakt.",
-      "ISLINKINGALLOWED": "Account koppeling toegestaan",
-      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit kan worden gekoppeld aan een bestaand account.",
+      "ISCREATIONALLOWED": "Accountaanmaak toegestaan (handmatig)",
+      "ISCREATIONALLOWED_DESC": "Bepaalt of accounts kunnen worden aangemaakt met behulp van een extern account. Schakel uit als gebruikers accountinformatie niet mogen kunnen bewerken wanneer auto-aanmaak is ingeschakeld.",
+      "ISLINKINGALLOWED": "Accountkoppeling toegestaan (handmatig)",
+      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit handmatig kan worden gekoppeld aan een bestaand account. Schakel uit als gebruikers alleen het voorgestelde account mogen kunnen koppelen in geval van actieve auto-koppeling.",
       "AUTOLINKING_DESC": "Bepaalt of een identiteit wordt gevraagd om te worden gekoppeld aan een bestaand account.",
       "AUTOLINKINGTYPE": {
         "0": "Uitgeschakeld",
@@ -2256,6 +2258,7 @@
       "ACTIVATED": "Geactiveerd",
       "ACTIVATE": "Aanbieder activeren",
       "DEACTIVATE": "Aanbieder deactiveren",
+      "TEST": "Test uw aanbieder",
       "TYPE": "Type",
       "DIALOG": {
         "ACTIVATED": "SMTP-configuratie is geactiveerd",
@@ -2279,7 +2282,6 @@
         "CURRENT_DESC_TITLE": "Dit zijn uw SMTP-instellingen",
         "PROVIDER_SETTINGS": "SMTP-providerinstellingen",
         "SENDER_SETTINGS": "Afzenderinstellingen",
-        "TEST_SETTINGS": "SMTP-instellingen testen",
         "NEXT_STEPS": "Volgende stappen",
         "ACTIVATE": {
           "TITLE": "Activeer uw SMTP-provider",
@@ -2288,6 +2290,12 @@
         "DEACTIVATE": {
           "TITLE": "Deactiveer uw SMTP-provider",
           "DESCRIPTION": "Als u deze SMTP-provider deactiveert, kan ZITADEL deze niet gebruiken om meldingen te verzenden totdat u deze opnieuw activeert."
+        },
+        "SAVE_SETTINGS": "Sla uw instellingen op",
+        "TEST": {
+          "TITLE": "Test uw instellingen",
+          "DESCRIPTION": "U kunt de instellingen van uw SMTP-provider testen en het testresultaat controleren voordat u deze opslaat",
+          "RESULT": "Je email is succesvol verzonden"
         }
       }
     },

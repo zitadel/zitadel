@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Instansinställningar",
-        "DESCRIPTION": "Instansinställningarna är standardinställningarna för alla organisationer. Med rätt behörigheter kan vissa av dem åsidosättas i organisationsinställningarna."
+        "TITLE": "Standardinställningar",
+        "DESCRIPTION": "Standardinställningar för alla organisationer. Med rätt behörigheter kan vissa av dem åsidosättas i organisationsinställningar."
       },
       "ORG": {
         "TITLE": "Organisationsinställningar",
@@ -231,7 +231,7 @@
           "LABEL": "Maximal livslängd i timmar",
           "PW_CHECK": {
             "TITLE": "Lösenordskontroll",
-            "DESCRIPTION": "Dina användare måste ändra sina lösenord under dessa perioder."
+            "DESCRIPTION": "Användare kommer att behöva autentisera om med sitt lösenord efter denna period."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Extern inloggningskontroll",
@@ -486,6 +486,7 @@
     "MORE": "mer",
     "STEP": "Steg",
     "SETUP": "Inställning",
+    "TEST": "Testa",
     "UNSAVEDCHANGES": "Osparade ändringar",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Visa användare {{value}}"
     },
-    "DOWNLOAD": "Ladda ner"
+    "DOWNLOAD": "Ladda ner",
+    "APPLY": "Tillämpa"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Har kontroll över hela instansen, inklusive alla organisationer",
@@ -1084,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Radera valda åtgärder?",
         "DESCRIPTION": "Är du säker på att du vill radera de valda åtgärderna från flödet?"
-      }
+      },
+      "ABOUTNAME": "Namnet på åtgärden och namnet på funktionen i javascriptet måste vara detsamma"
     },
     "TOAST": {
       "ACTIONSSET": "Åtgärder sparade",
@@ -1439,9 +1442,7 @@
         "7": "Engångslösenord (OTP) - SMS",
         "8": "Engångslösenord (OTP) - E-post"
       },
-      "ADDGENERATOR": "Definiera hemlighetsgenerator",
-      "GENERATORTYPE": "Typ",
-      "EXPIRY": "Utgång (i timmar)",
+      "EXPIRY": "Utgång (på minuter)",
       "INCLUDEDIGITS": "Inkludera siffror",
       "INCLUDESYMBOLS": "Inkludera symboler",
       "INCLUDELOWERLETTERS": "Inkludera små bokstäver",
@@ -1477,6 +1478,10 @@
         "DISABLED": "Inaktiverad"
       },
       "INHERITED_DESCRIPTION": "Detta ställer in värdet till systemets standardvärde.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Aktiverad\" ärvs",
+        "DISABLED": "\"Inaktiverad\" ärvs"
+      },
       "RESET": "Återställ allt till arv"
     },
     "DIALOG": {
@@ -1682,7 +1687,8 @@
         "username": "Användarnamn",
         "tempUsername": "Tillfälligt användarnamn",
         "otp": "Engångslösenord",
-        "verifyUrl": "Verifiera Engångslösenord URL"
+        "verifyUrl": "Verifiera Engångslösenord URL",
+        "expiry": "Utgångsdatum"
       },
       "TOAST": {
         "UPDATED": "Anpassade Texter sparade."
@@ -1780,7 +1786,7 @@
       "TYPE": {
         "OWNED": "Ägda Projekt",
         "OWNED_SINGULAR": "Ägt Projekt",
-        "GRANTED_SINGULAR": "Beviljat Projekt"
+        "GRANTED_SINGULAR": "Projekt tilldelat {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Varumärkesinställning",
@@ -2064,10 +2070,10 @@
       "ISAUTOCREATION_DESC": "Om valt, skapas ett konto om det inte redan finns.",
       "ISAUTOUPDATE": "Automatisk uppdatering",
       "ISAUTOUPDATE_DESC": "Om valt, uppdateras konton vid återautentisering.",
-      "ISCREATIONALLOWED": "Kontoskapande tillåtet",
-      "ISCREATIONALLOWED_DESC": "Avgör om konton kan skapas.",
-      "ISLINKINGALLOWED": "Kontolänkning tillåten",
-      "ISLINKINGALLOWED_DESC": "Avgör om en identitet kan länkas till ett befintligt konto.",
+      "ISCREATIONALLOWED": "Kontoinrättning tillåten (manuellt)",
+      "ISCREATIONALLOWED_DESC": "Bestämmer om konton kan skapas med hjälp av ett externt konto. Avaktivera om användare inte ska kunna redigera kontoinformation när automatisk skapelse är aktiverad.",
+      "ISLINKINGALLOWED": "Kontolänkning tillåten (manuellt)",
+      "ISLINKINGALLOWED_DESC": "Bestämmer om en identitet kan länkas manuellt till ett befintligt konto. Avaktivera om användare bara ska kunna länka det föreslagna kontot vid aktiv automatisk länkning.",
       "AUTOLINKING_DESC": "Avgör om en identitet kommer att uppmanas att länkas till ett befintligt konto.",
       "AUTOLINKINGTYPE": {
         "0": "Inaktiverad",
@@ -2259,6 +2265,7 @@
       "ACTIVATED": "Aktiverad",
       "ACTIVATE": "Aktivera leverantör",
       "DEACTIVATE": "Inaktivera leverantör",
+      "TEST": "Testa din leverantör",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "SMTP-konfigurationen har aktiverats",
@@ -2270,7 +2277,11 @@
         "DELETE_TITLE": "Radera SMTP-konfiguration",
         "DELETE_DESCRIPTION": "Du håller på att radera en konfiguration. Bekräfta denna åtgärd genom att skriva avsändarnamnet",
         "DELETED": "SMTP-konfigurationen har raderats",
-        "SENDER": "Skriv {{value}}, för att radera denna SMTP-konfiguration."
+        "SENDER": "Skriv {{value}}, för att radera denna SMTP-konfiguration.",
+        "TEST_TITLE": "Testa din SMTP-konfiguration",
+        "TEST_DESCRIPTION": "Ange en e-postadress för att testa din SMTP-konfiguration för den här leverantören",
+        "TEST_EMAIL": "E-postadress",
+        "TEST_RESULT": "Testresultat"
       }
     },
     "CREATE": {
@@ -2282,7 +2293,6 @@
         "CURRENT_DESC_TITLE": "Dessa är dina SMTP-inställningar",
         "PROVIDER_SETTINGS": "SMTP-leverantörsinställningar",
         "SENDER_SETTINGS": "Avsändarinställningar",
-        "TEST_SETTINGS": "Testa SMTP-inställningar",
         "NEXT_STEPS": "Nästa steg",
         "ACTIVATE": {
           "TITLE": "Aktivera din SMTP-leverantör",
@@ -2291,6 +2301,12 @@
         "DEACTIVATE": {
           "TITLE": "Inaktivera din SMTP-leverantör",
           "DESCRIPTION": "Om du inaktiverar denna SMTP-leverantör kan ZITADEL inte använda den för att skicka meddelanden förrän du aktiverar den igen."
+        },
+        "SAVE_SETTINGS": "Spara dina inställningar",
+        "TEST": {
+          "TITLE": "Testa dina inställningar",
+          "DESCRIPTION": "Du kan testa inställningarna för din SMTP-leverantör och kontrollera testresultatet innan du sparar dem",
+          "RESULT": "Ditt e-postmeddelande har skickats"
         }
       }
     },

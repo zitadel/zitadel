@@ -74,6 +74,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
+			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read default config")
@@ -111,6 +112,10 @@ type Steps struct {
 	s25User11AddLowerFieldsToVerifiedEmail *User11AddLowerFieldsToVerifiedEmail
 	s26AuthUsers3                          *AuthUsers3
 	s27IDPTemplate6SAMLNameIDFormat        *IDPTemplate6SAMLNameIDFormat
+	s28AddFieldTable                       *AddFieldTable
+	s29FillFieldsForProjectGrant           *FillFieldsForProjectGrant
+	s30FillFieldsForOrgDomainVerified      *FillFieldsForOrgDomainVerified
+	s31AddAggregateIndexToFields           *AddAggregateIndexToFields
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {
@@ -135,6 +140,7 @@ func MustNewSteps(v *viper.Viper) *Steps {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
+			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read steps")

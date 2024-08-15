@@ -53,11 +53,24 @@ Errors:
     NotFound: Konfiguracja SMS nie znaleziona
     AlreadyActive: Konfiguracja SMS już aktywna
     AlreadyDeactivated: Konfiguracja SMS już dezaktywowana
+  SMTP:
+    NotEmailMessage: wiadomość nie jest wiadomością e-mail
+    RequiredAttributes: Temat, odbiorcy i treść muszą być ustawione, ale niektóre lub wszystkie z nich są puste
+    CouldNotSplit: nie można podzielić hosta i portu w celu połączenia z smtp
+    CouldNotDial: nie można połączyć się z serwerem SMTP, sprawdzić port, problemy z zaporą sieciową...
+    CouldNotDialTLS: nie można połączyć się z serwerem SMTP przy użyciu protokołu TLS, sprawdź port, problemy z zaporą sieciową...
+    CouldNotCreateClient: nie można utworzyć klienta smtp
+    CouldNotStartTLS: nie można rozpocząć tls
+    CouldNotAuth: nie można dodać uwierzytelnienia smtp, sprawdź, czy zarówno użytkownik, jak i hasło są poprawne, jeśli są poprawne, być może Twój dostawca wymaga metody uwierzytelniania nieobsługiwanej przez ZITADEL
+    CouldNotSetSender: nie można ustawić nadawcy
+    CouldNotSetRecipient: nie można ustawić odbiorcy
   SMTPConfig:
+    TestPassword: Nie znaleziono hasła do testu
     NotFound: Konfiguracja SMTP nie znaleziona
     AlreadyExists: Konfiguracja SMTP już istnieje
     AlreadyDeactivated: Konfiguracja SMTP jest już dezaktywowana
     SenderAdressNotCustomDomain: Adres nadawcy musi być skonfigurowany jako domena niestandardowa na instancji.
+    TestEmailNotFound: Nie znaleziono adresu e-mail do testu
   Notification:
     NoDomain: Nie znaleziono domeny dla wiadomości
   User:
@@ -482,6 +495,7 @@ Errors:
     SQLStatement: Instrukcja SQL nie mogła zostać utworzona
     InvalidRequest: Żądanie jest nieprawidłowe
     TooManyNestingLevels: Zbyt wiele poziomów zagnieżdżenia zapytań (maks. 20)
+    LimitExceeded: Limit przekroczony
   Quota:
     AlreadyExists: Limit już istnieje dla tej jednostki
     NotFound: Nie znaleziono limitu dla tej jednostki
@@ -550,6 +564,7 @@ Errors:
     NotFound: Nie znaleziono wykonania
     IncludeNotFound: Nie znaleziono uwzględnienia
     NoTargets: Nie zdefiniowano celów
+    ResponseIsNotValidJSON: Odpowiedź nie jest prawidłowym JSON-em
   UserSchema:
     NotEnabled: Funkcja „Schemat użytkownika” nie jest włączona
     Type:
@@ -571,6 +586,13 @@ Errors:
       NotForAPI: Podrabiane tokeny nie są dozwolone w interfejsie API
     Impersonation:
       PolicyDisabled: Podszywanie się jest wyłączone w polityce bezpieczeństwa instancji
+  WebKey:
+    ActiveDelete: Nie można usunąć aktywnego klucza internetowego
+    Config: Nieprawidłowa konfiguracja klucza internetowego
+    Duplicate: Identyfikator klucza internetowego nie jest unikalny
+    FeatureDisabled: Funkcja klucza internetowego jest wyłączona
+    NoActive: Nie znaleziono aktywnego klucza internetowego
+    NotFound: Nie znaleziono klucza internetowego
 
 AggregateTypes:
   action: Działanie
@@ -594,6 +616,7 @@ AggregateTypes:
   restrictions: Ograniczenia
   system: System
   session: Sesja
+  web_key: Klucz internetowy
 
 EventTypes:
   execution:
@@ -1295,6 +1318,11 @@ EventTypes:
     deactivated: Schemat użytkownika dezaktywowany
     reactivated: Schemat użytkownika został ponownie aktywowany
     deleted: Schemat użytkownika został usunięty
+  web_key:
+    added: Dodano klucz internetowy
+    activated: Klucz internetowy aktywowano
+    deactivated: Klucz internetowy dezaktywowano
+    removed: Klucz internetowy usunięto
 
 Application:
   OIDC:

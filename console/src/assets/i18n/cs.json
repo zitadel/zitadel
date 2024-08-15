@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Nastavení instance",
-        "DESCRIPTION": "Nastavení instance jsou výchozí nastavení pro všechny organizace. S odpovídajícími oprávněními jsou některá z nich přepisovatelná v nastavení organizace."
+        "TITLE": "Výchozí nastavení",
+        "DESCRIPTION": "Výchozí nastavení pro všechny organizace. Se správnými oprávněními lze některá z nich přepsat v nastavení organizace."
       },
       "ORG": {
         "TITLE": "Nastavení organizace",
@@ -231,7 +231,7 @@
           "LABEL": "Maximální doba životnosti v hodinách",
           "PW_CHECK": {
             "TITLE": "Kontrola hesla",
-            "DESCRIPTION": "Tví uživatelé musí v těchto obdobích změnit svá hesla."
+            "DESCRIPTION": "Po uplynutí této doby budou uživatelé vyzváni k opětovné autentizaci pomocí hesla."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Kontrola externího přihlášení",
@@ -486,6 +486,7 @@
     "MORE": "více",
     "STEP": "Krok",
     "SETUP": "Nastavit",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Neuložené změny",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Zobrazit uživatele {{value}}"
     },
-    "DOWNLOAD": "Stáhnout"
+    "DOWNLOAD": "Stáhnout",
+    "APPLY": "Platit"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Má kontrolu nad celou instancí, včetně všech organizací",
@@ -1084,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Smazat vybrané akce?",
         "DESCRIPTION": "Jste si jisti, že chcete smazat vybrané akce z toku?"
-      }
+      },
+      "ABOUTNAME": "Název akce a název funkce v javascriptu musí být stejný"
     },
     "TOAST": {
       "ACTIONSSET": "Akce nastaveny",
@@ -1316,10 +1319,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Nastavení instance",
-      "DESCRIPTION": "Tato nastavení se budou aplikovat na všechny vaše organizace, pokud nebyla přepsána."
-    },
     "LIST": {
       "ORGS": "Organizace",
       "FEATURESETTINGS": "Nastavení funkcí",
@@ -1439,9 +1438,7 @@
         "7": "Jednorázové heslo (OTP) - SMS",
         "8": "Jednorázové heslo (OTP) - E-mail"
       },
-      "ADDGENERATOR": "Definovat generátor tajemství",
-      "GENERATORTYPE": "Typ",
-      "EXPIRY": "Expirace (v hodinách)",
+      "EXPIRY": "Expirace (v minutách)",
       "INCLUDEDIGITS": "Zahrnout čísla",
       "INCLUDESYMBOLS": "Zahrnout symboly",
       "INCLUDELOWERLETTERS": "Zahrnout malá písmena",
@@ -1477,6 +1474,10 @@
         "DISABLED": "Zakázáno"
       },
       "INHERITED_DESCRIPTION": "Toto nastavení nastaví hodnotu na výchozí hodnotu systému.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "„Povoleno“ je zděděno",
+        "DISABLED": "„Zakázáno“ je zděděno"
+      },
       "RESET": "Nastavit vše na děděné"
     },
     "DIALOG": {
@@ -1682,7 +1683,8 @@
         "username": "Uživatelské jméno",
         "tempUsername": "Dočasné uživatelské jméno",
         "otp": "Jednorázové heslo",
-        "verifyUrl": "Ověřovací URL jednorázového hesla"
+        "verifyUrl": "Ověřovací URL jednorázového hesla",
+        "expiry": "Expirace"
       },
       "TOAST": {
         "UPDATED": "Vlastní texty uloženy."
@@ -1781,7 +1783,7 @@
       "TYPE": {
         "OWNED": "Vlastní projekty",
         "OWNED_SINGULAR": "Vlastní projekt",
-        "GRANTED_SINGULAR": "Přidělený projekt"
+        "GRANTED_SINGULAR": "Projekt přidělený {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Nastavení brandingu",
@@ -2061,10 +2063,10 @@
       "ISAUTOCREATION_DESC": "Pokud je vybráno, účet bude vytvořen, pokud ještě neexistuje.",
       "ISAUTOUPDATE": "Automatická aktualizace",
       "ISAUTOUPDATE_DESC": "Pokud je vybráno, účty jsou aktualizovány při opětovné autentizaci.",
-      "ISCREATIONALLOWED": "Je povoleno vytváření účtu",
-      "ISCREATIONALLOWED_DESC": "Určuje, zda lze vytvářet účty.",
-      "ISLINKINGALLOWED": "Je povoleno propojení účtů",
-      "ISLINKINGALLOWED_DESC": "Určuje, zda lze identitu propojit s existujícím účtem.",
+      "ISCREATIONALLOWED": "Vytvoření účtu povoleno (ručně)",
+      "ISCREATIONALLOWED_DESC": "Určuje, zda mohou být účty vytvořeny pomocí externího účtu. Zakázat, pokud uživatelé by neměli být schopni upravovat informace o účtu, když je automatické vytváření povoleno.",
+      "ISLINKINGALLOWED": "Propojení účtu povoleno (ručně)",
+      "ISLINKINGALLOWED_DESC": "Určuje, zda identita může být ručně propojena s existujícím účtem. Zakázat, pokud by uživatelé měli být povoleni pouze propojit navrhovaný účet v případě aktivního automatického propojení.",
       "AUTOLINKING_DESC": "Určuje, zda se bude identita vyzývat k propojení se stávajícím účtem.",
       "AUTOLINKINGTYPE": {
         "0": "Vypnuto",
@@ -2247,6 +2249,7 @@
       "ACTIVATED": "Aktivováno",
       "ACTIVATE": "Aktivujte poskytovatele",
       "DEACTIVATE": "Deaktivovat poskytovatele",
+      "TEST": "Otestujte svého poskytovatele",
       "TYPE": "Typ",
       "DIALOG": {
         "ACTIVATED": "Konfigurace SMTP byla aktivována",
@@ -2270,7 +2273,6 @@
         "CURRENT_DESC_TITLE": "Toto jsou vaše nastavení SMTP",
         "PROVIDER_SETTINGS": "Nastavení poskytovatele SMTP",
         "SENDER_SETTINGS": "Nastavení odesílatele",
-        "TEST_SETTINGS": "Otestujte nastavení SMTP",
         "NEXT_STEPS": "Další kroky",
         "ACTIVATE": {
           "TITLE": "Aktivujte svého poskytovatele SMTP",
@@ -2279,6 +2281,12 @@
         "DEACTIVATE": {
           "TITLE": "Deaktivujte svého poskytovatele SMTP",
           "DESCRIPTION": "Pokud deaktivujete tohoto poskytovatele SMTP, ZITADEL jej nebude moci používat k odesílání upozornění, dokud jej znovu neaktivujete."
+        },
+        "SAVE_SETTINGS": "Uložte nastavení",
+        "TEST": {
+          "TITLE": "Otestujte svá nastavení",
+          "DESCRIPTION": "Nastavení poskytovatele SMTP můžete otestovat a před uložením zkontrolovat výsledek testu",
+          "RESULT": "Váš email byl úspěšně odeslán"
         }
       }
     },

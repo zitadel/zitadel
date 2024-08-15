@@ -20,6 +20,9 @@ const (
 	Pragma          = "pragma"
 	UserAgentHeader = "user-agent"
 	ForwardedFor    = "x-forwarded-for"
+	ForwardedHost   = "x-forwarded-host"
+	ForwardedProto  = "x-forwarded-proto"
+	Forwarded       = "forwarded"
 	XUserAgent      = "x-user-agent"
 	XGrpcWeb        = "x-grpc-web"
 	XRequestedWith  = "x-requested-with"
@@ -45,7 +48,7 @@ type key int
 const (
 	httpHeaders key = iota
 	remoteAddr
-	origin
+	domainCtx
 )
 
 func CopyHeadersToContext(h http.Handler) http.Handler {
@@ -68,18 +71,6 @@ func OriginHeader(ctx context.Context) string {
 		return ""
 	}
 	return headers.Get(Origin)
-}
-
-func ComposedOrigin(ctx context.Context) string {
-	o, ok := ctx.Value(origin).(string)
-	if !ok {
-		return ""
-	}
-	return o
-}
-
-func WithComposedOrigin(ctx context.Context, composed string) context.Context {
-	return context.WithValue(ctx, origin, composed)
 }
 
 func RemoteIPFromCtx(ctx context.Context) string {

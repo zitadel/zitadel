@@ -53,11 +53,24 @@ Errors:
     NotFound: Configuração de SMS não encontrada
     AlreadyActive: Configuração de SMS já está ativa
     AlreadyDeactivated: Configuração de SMS já está desativada
+  SMTP:
+    NotEmailMessage: a mensagem não é EmailMessage
+    RequiredAttributes: assunto, destinatários e conteúdo devem ser definidos, mas alguns ou todos eles estão vazios
+    CouldNotSplit: não foi possível dividir o host e a porta para conectar ao smtp
+    CouldNotDial: não foi possível entrar em contato com o servidor SMTP, verificar a porta, problemas de firewall...
+    CouldNotDialTLS: não foi possível entrar em contato com o servidor SMTP usando TLS, verifique a porta, problemas de firewall...
+    CouldNotCreateClient: não foi possível criar o cliente smtp
+    CouldNotStartTLS: não foi possível iniciar o tls
+    CouldNotAuth: não foi possível adicionar autenticação smtp, verifique se seu usuário e senha estão corretos, se estiverem corretos, talvez seu provedor exija um método de autenticação não suportado pelo ZITADEL
+    CouldNotSetSender: não foi possível definir o remetente
+    CouldNotSetRecipient: não foi possível definir o destinatário
   SMTPConfig:
+    TestPassword: Senha para teste não encontrada
     NotFound: Configuração de SMTP não encontrada
     AlreadyExists: Configuração de SMTP já existe
     AlreadyDeactivated: Configuração SMTP já desativada
     SenderAdressNotCustomDomain: O endereço do remetente deve ser configurado como um domínio personalizado na instância.
+    TestEmailNotFound: Endereço de e-mail para teste não encontrado
   Notification:
     NoDomain: Nenhum domínio encontrado para a mensagem
   User:
@@ -481,6 +494,7 @@ Errors:
     SQLStatement: Não foi possível criar a instrução SQL
     InvalidRequest: O pedido é inválido
     TooManyNestingLevels: muitos níveis de aninhamento de consulta (máx. 20)
+    LimitExceeded: Limite excedido
   Quota:
     AlreadyExists: Cota já existe para esta unidade
     NotFound: Cota não encontrada para esta unidade
@@ -545,6 +559,7 @@ Errors:
     NotFound: Execução não encontrada
     IncludeNotFound: Incluir não encontrado
     NoTargets: Nenhuma meta definida
+    ResponseIsNotValidJSON: A resposta não é um JSON válido
   UserSchema:
     NotEnabled: O recurso "Esquema do usuário" não está habilitado
     Type:
@@ -566,6 +581,13 @@ Errors:
       NotForAPI: Tokens personificados não permitidos para API
     Impersonation:
       PolicyDisabled: A representação está desativada na política de segurança da instância
+  WebKey:
+    ActiveDelete: Não é possível eliminar a chave web ativa
+    Config: Configuração de chave web inválida
+    Duplicate: ID da chave Web não exclusivo
+    FeatureDisabled: Recurso chave da Web desativado
+    NoActive: Nenhuma chave web ativa encontrada
+    NotFound: Chave Web não encontrada
 
 AggregateTypes:
   action: Ação
@@ -589,6 +611,7 @@ AggregateTypes:
   restrictions: Restrições
   system: Sistema
   session: Sessão
+  web_key: Chave da Web
 
 EventTypes:
   execution:
@@ -1287,6 +1310,11 @@ EventTypes:
     deactivated: Esquema de usuário desativado
     reactivated: Esquema do usuário reativado
     deleted: Esquema do usuário excluído
+  web_key:
+    added: Chave Web adicionada
+    activated: Chave Web ativada
+    deactivated: Chave Web desativada
+    removed: Chave Web removida
 
 Application:
   OIDC:

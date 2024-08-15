@@ -53,10 +53,24 @@ Errors:
     NotFound: SMS-configuratie niet gevonden
     AlreadyActive: SMS-configuratie al actief
     AlreadyDeactivated: SMS-configuratie al gedeactiveerd
+  SMTP:
+    NotEmailMessage: bericht is geen E-mailbericht
+    RequiredAttributes: onderwerp, ontvangers en inhoud moeten worden ingesteld, maar sommige of allemaal zijn leeg
+    CouldNotSplit: Kan host en poort niet splitsen voor verbinding met smtp
+    CouldNotDial: Kan geen contact maken met de SMTP-server, controleer de poort, firewallproblemen...
+    CouldNotDialTLS: kon geen contact maken met de SMTP-server via TLS, controleer de poort, firewallproblemen...
+    CouldNotCreateClient: kan geen smtp-client maken
+    CouldNotStartTLS: kon tls niet starten
+    CouldNotAuth: kon geen smtp-authenticatie toevoegen, controleer of zowel uw gebruiker als uw wachtwoord correct zijn. Als ze correct zijn, vereist uw provider misschien een auth-methode die niet door ZITADEL wordt ondersteund
+    CouldNotSetSender: kon de afzender niet instellen
+    CouldNotSetRecipient: Kan de ontvanger niet instellen
   SMTPConfig:
+    TestPassword: Wachtwoord voor test niet gevonden
     NotFound: SMTP-configuratie niet gevonden
     AlreadyExists: SMTP-configuratie bestaat al
+    AlreadyDeactivated: SMTP-configuratie al gedeactiveerd
     SenderAdressNotCustomDomain: Het afzenderadres moet worden geconfigureerd als aangepaste domein op de instantie.
+    TestEmailNotFound: E-mailadres voor test niet gevonden
   Notification:
     NoDomain: Geen domein gevonden voor bericht
   User:
@@ -481,6 +495,7 @@ Errors:
     SQLStatement: SQL Statement kon niet worden gemaakt
     InvalidRequest: Verzoek is ongeldig
     TooManyNestingLevels: Te veel query nesting niveaus (Max 20)
+    LimitExceeded: Limiet overschreden
   Quota:
     AlreadyExists: Quota bestaat al voor deze eenheid
     NotFound: Quota niet gevonden voor deze eenheid
@@ -549,6 +564,7 @@ Errors:
     NotFound: Uitvoering niet gevonden
     IncludeNotFound: Inclusief niet gevonden
     NoTargets: Geen doelstellingen gedefinieerd
+    ResponseIsNotValidJSON: Reactie is geen geldige JSON
   UserSchema:
     NotEnabled: Functie "Gebruikersschema" is niet ingeschakeld
     Type:
@@ -570,6 +586,13 @@ Errors:
       NotForAPI: Nagebootste tokens zijn niet toegestaan voor API
     Impersonation:
       PolicyDisabled: Nabootsing van identiteit is uitgeschakeld in het beveiligingsbeleid van de instantie.
+  WebKey:
+    ActiveDelete: Kan actieve websleutel niet verwijderen
+    Config: Ongeldige websleutelconfiguratie
+    Duplicate: Websleutel-ID niet uniek
+    FeatureDisabled: Websleutelfunctie uitgeschakeld
+    NoActive: Geen actieve websleutel gevonden
+    NotFound: Websleutel niet gevonden
 
 AggregateTypes:
   action: Actie
@@ -593,6 +616,7 @@ AggregateTypes:
   restrictions: Beperkingen
   system: Systeem
   session: Sessie
+  web_key: Websleutel
 
 EventTypes:
   execution:
@@ -1289,6 +1313,11 @@ EventTypes:
     deactivated: Gebruikersschema gedeactiveerd
     reactivated: Gebruikersschema opnieuw geactiveerd
     deleted: Gebruikersschema verwijderd
+  web_key:
+    added: Web Key toegevoegd
+    activated: Web Key geactiveerd
+    deactivated: Web Key gedeactiveerd
+    removed: Web Key verwijderd
 
 Application:
   OIDC:

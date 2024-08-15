@@ -18,7 +18,7 @@ Before we can start building our application, we have to do a few configuration 
 
 ### Project roles
 
-The Example expects [user roles](guides/integrate/retrieve-user-roles) to be returned after login.
+The Example expects [user roles](/docs/guides/integrate/retrieve-user-roles) to be returned after login.
 Symfony uses `ROLE_USER` format.
 The application will take care of upper-casing and prefixing for us.
 Inside ZITADEL, you can use regular lower-case role names without prefixes, if you prefer.

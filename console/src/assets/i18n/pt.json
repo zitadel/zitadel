@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Configurações da Instância",
-        "DESCRIPTION": "As configurações da instância são as configurações padrão para todas as organizações. Com as permissões corretas, algumas delas podem ser sobrescritas nas configurações da organização."
+        "TITLE": "Configurações padrão",
+        "DESCRIPTION": "Configurações padrão para todas as organizações. Com as permissões corretas, algumas delas podem ser substituídas nas configurações da organização."
       },
       "ORG": {
         "TITLE": "Configurações da Organização",
@@ -231,7 +231,7 @@
           "LABEL": "Duração Máxima em horas",
           "PW_CHECK": {
             "TITLE": "Verificação de Senha",
-            "DESCRIPTION": "Seus usuários devem mudar suas senhas nesses períodos."
+            "DESCRIPTION": "Os usuários serão obrigados a reautentificar-se com sua senha após este período."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Verificação de Login Externo",
@@ -486,6 +486,7 @@
     "MORE": "mais",
     "STEP": "Passo",
     "SETUP": "Configuração",
+    "TEST": "Teste",
     "UNSAVEDCHANGES": "Alterações não salvas",
     "UNSAVED": {
       "DIALOG": {
@@ -497,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Mostrar usuário {{value}}"
     },
-    "DOWNLOAD": "Baixar"
+    "DOWNLOAD": "Baixar",
+    "APPLY": "Aplicar"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Tem controle sobre toda a instância, incluindo todas as organizações",
@@ -1084,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Excluir Ações Selecionadas?",
         "DESCRIPTION": "Tem certeza de que deseja excluir as ações selecionadas do fluxo?"
-      }
+      },
+      "ABOUTNAME": "O nome da ação e o nome da função no javascript devem ser iguais"
     },
     "TOAST": {
       "ACTIONSSET": "Ações definidas",
@@ -1317,10 +1320,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Configurações da Instância",
-      "DESCRIPTION": "Essas configurações serão aplicadas a todas as suas organizações, a menos que tenham sido substituídas."
-    },
     "LIST": {
       "ORGS": "Organizações",
       "FEATURESETTINGS": "Configurações de Recursos",
@@ -1440,9 +1439,7 @@
         "7": "Senha única (OTP) - SMS",
         "8": "Senha única (OTP) - e-mail"
       },
-      "ADDGENERATOR": "Definir aparência de segredo",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Expiração (em horas)",
+      "EXPIRY": "Expiração (em minutos)",
       "INCLUDEDIGITS": "Incluir números",
       "INCLUDESYMBOLS": "Incluir símbolos",
       "INCLUDELOWERLETTERS": "Incluir letras minúsculas",
@@ -1478,6 +1475,10 @@
         "DISABLED": "Desabilitado"
       },
       "INHERITED_DESCRIPTION": "Essa configuração define o valor para o padrão do sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Habilitado\" é herdado",
+        "DISABLED": "\"Desabilitado\" é herdado"
+      },
       "RESET": "Definir tudo para herdar"
     },
     "DIALOG": {
@@ -1683,7 +1684,8 @@
         "username": "Nome de usuário",
         "tempUsername": "Nome de usuário temporário",
         "otp": "Senha de uso único",
-        "verifyUrl": "URL para verificar a senha de uso único"
+        "verifyUrl": "URL para verificar a senha de uso único",
+        "expiry": "Data de expiração"
       },
       "TOAST": {
         "UPDATED": "Textos personalizados salvos."
@@ -1779,7 +1781,7 @@
       "TYPE": {
         "OWNED": "Projetos Próprios",
         "OWNED_SINGULAR": "Projeto Próprio",
-        "GRANTED_SINGULAR": "Projeto Concedido"
+        "GRANTED_SINGULAR": "Projeto atribuído a {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Configuração de Marca",
@@ -2057,10 +2059,10 @@
       "ISAUTOCREATION_DESC": "Se selecionado, uma conta será criada se ainda não existir.",
       "ISAUTOUPDATE": "Atualização Automática",
       "ISAUTOUPDATE_DESC": "Se selecionado, as contas são atualizadas ao serem reautenticadas.",
-      "ISCREATIONALLOWED": "Criação de Conta Permitida",
-      "ISCREATIONALLOWED_DESC": "Determina se as contas podem ser criadas.",
-      "ISLINKINGALLOWED": "Vinculação de Conta Permitida",
-      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada a uma conta existente.",
+      "ISCREATIONALLOWED": "Criação de conta permitida (manualmente)",
+      "ISCREATIONALLOWED_DESC": "Determina se contas podem ser criadas usando uma conta externa. Desative se os usuários não devem poder editar informações da conta quando a criação automática está ativada.",
+      "ISLINKINGALLOWED": "Vinculação de conta permitida (manualmente)",
+      "ISLINKINGALLOWED_DESC": "Determina se uma identidade pode ser vinculada manualmente a uma conta existente. Desative se os usuários só devem poder vincular a conta proposta em caso de vinculação automática ativa.",
       "AUTOLINKING_DESC": "Determina se uma identidade será solicitada a ser vinculada a uma conta existente.",
       "AUTOLINKINGTYPE": {
         "0": "Desativado",
@@ -2233,6 +2235,7 @@
       "ACTIVATED": "Ativado",
       "ACTIVATE": "Ativar provedor",
       "DEACTIVATE": "Desativar provedor",
+      "TEST": "Teste seu provedor",
       "TYPE": "Tipo",
       "DIALOG": {
         "ACTIVATED": "A configuração SMTP foi ativada",
@@ -2256,7 +2259,6 @@
         "CURRENT_DESC_TITLE": "Estas são suas configurações de SMTP",
         "PROVIDER_SETTINGS": "Configurações do provedor SMTP",
         "SENDER_SETTINGS": "Configurações do remetente",
-        "TEST_SETTINGS": "Testar configurações de SMTP",
         "NEXT_STEPS": "Próximos passos",
         "ACTIVATE": {
           "TITLE": "Ative seu provedor SMTP",
@@ -2265,6 +2267,12 @@
         "DEACTIVATE": {
           "TITLE": "Desative seu provedor SMTP",
           "DESCRIPTION": "Se você desativar este provedor SMTP, a ZITADEL não poderá usá-lo para enviar notificações até que você o ative novamente."
+        },
+        "SAVE_SETTINGS": "Salve suas configurações",
+        "TEST": {
+          "TITLE": "Teste suas configurações",
+          "DESCRIPTION": "Você pode testar as configurações do seu provedor SMTP e verificar o resultado do teste antes de salvá-las",
+          "RESULT": "Seu e-mail foi enviado com sucesso"
         }
       }
     },

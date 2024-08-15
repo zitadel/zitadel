@@ -53,11 +53,24 @@ Errors:
     NotFound: SMS configuration not found
     AlreadyActive: SMS configuration already active
     AlreadyDeactivated: SMS configuration already deactivated
+  SMTP:
+    NotEmailMessage: message is not EmailMessage
+    RequiredAttributes: subject, recipients and content must be set but some or all of them are empty
+    CouldNotSplit: could not split host and port for connect to smtp
+    CouldNotDial: could not contact with the SMTP server, check the port, firewall issues...
+    CouldNotDialTLS: could not contact with the SMTP server using TLS, check the port, firewall issues...
+    CouldNotCreateClient: could not create smtp client
+    CouldNotStartTLS: could not start tls
+    CouldNotAuth: could not add smtp auth, check if both your user and password are correct, if they're correct maybe your provider requires an auth method not supported by ZITADEL
+    CouldNotSetSender: could not set sender
+    CouldNotSetRecipient: could not set recipient
   SMTPConfig:
+    TestPassword: Password for test not found
     NotFound: SMTP configuration not found
     AlreadyExists: SMTP configuration already exists
     AlreadyDeactivated: SMTP configuration already deactivated
     SenderAdressNotCustomDomain: The sender address must be configured as custom domain on the instance.
+    TestEmailNotFound: Email address for test not found
   Notification:
     NoDomain: No Domain found for message
   User:
@@ -482,6 +495,7 @@ Errors:
     SQLStatement: SQL Statement could not be created
     InvalidRequest: Request is invalid
     TooManyNestingLevels: Too many query nesting levels (Max 20)
+    LimitExceeded: Limit exceeded
   Quota:
     AlreadyExists: Quota already exists for this unit
     NotFound: Quota not found for this unit
@@ -550,6 +564,7 @@ Errors:
     NotFound: Execution not found
     IncludeNotFound: Include not found
     NoTargets: No targets defined
+    ResponseIsNotValidJSON: Response is not valid JSON
   UserSchema:
     NotEnabled: Feature "User Schema" is not enabled
     Type:
@@ -571,6 +586,14 @@ Errors:
       NotForAPI: Impersonated tokens not allowed for API
     Impersonation:
       PolicyDisabled: Impersonation is disabled in the instance security policy
+  WebKey:
+    ActiveDelete: Cannot delete active web key
+    Config: Invalid web key config
+    Duplicate: Web key ID not unique
+    FeatureDisabled: Web key feature disabled
+    NoActive: No active web key found
+    NotFound: Web key not found
+
 
 AggregateTypes:
   action: Action
@@ -594,6 +617,7 @@ AggregateTypes:
   restrictions: Restrictions
   system: System
   session: Session
+  web_key: Web Key
 
 EventTypes:
   execution:
@@ -1295,6 +1319,11 @@ EventTypes:
     deactivated: User Schema deactivated
     reactivated: User Schema reactivated
     deleted: User Schema deleted
+  web_key:
+    added: Web Key added
+    activated: Web Key activated
+    deactivated: Web Key deactivated
+    removed: Web Key removed
 
 Application:
   OIDC:

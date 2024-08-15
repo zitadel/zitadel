@@ -1,0 +1,164 @@
+syntax = "proto3";
+
+package zitadel.user.v2;
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v2;user";
+
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+message LDAPCredentials {
+  string username = 1[
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Username used to login through LDAP"
+      min_length: 1;
+      max_length: 200;
+      example: "\"username\"";
+    }
+  ];
+  string password = 2[
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "Password used to login through LDAP"
+      min_length: 1;
+      max_length: 200;
+      example: "\"Password1!\"";
+    }
+  ];
+}
+
+message RedirectURLs {
+  string success_url = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "URL on which the user will be redirected after a successful login"
+      min_length: 1;
+      max_length: 200;
+      example: "\"https://custom.com/login/idp/success\"";
+    }
+  ];
+  string failure_url = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200, uri_ref: true},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "URL on which the user will be redirected after a failed login"
+      min_length: 1;
+      max_length: 200;
+      example: "\"https://custom.com/login/idp/fail\"";
+    }
+  ];
+}
+
+message IDPIntent {
+  string idp_intent_id = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the IDP intent"
+      min_length: 1;
+      max_length: 200;
+      example: "\"163840776835432705\"";
+    }
+  ];
+  string idp_intent_token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "token of the IDP intent"
+      min_length: 1;
+      max_length: 200;
+      example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+    }
+  ];
+  string user_id = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the ZITADEL user if external user already linked"
+      max_length: 200;
+      example: "\"163840776835432345\"";
+    }
+  ];
+}
+
+message IDPInformation{
+  oneof access{
+    IDPOAuthAccessInformation oauth = 1 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "OAuth/OIDC access (and id_token) returned by the identity provider"
+      }
+    ];
+    IDPLDAPAccessInformation ldap = 6 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "LDAP entity attributes returned by the identity provider"
+      }
+    ];
+    IDPSAMLAccessInformation saml = 7 [
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        description: "SAMLResponse returned by the identity provider"
+      }
+    ];
+  }
+  string idp_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the identity provider"
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string user_id = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the user of the identity provider"
+      example: "\"6516849804890468048461403518\"";
+    }
+  ];
+  string user_name = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "username of the user of the identity provider"
+      example: "\"user@external.com\"";
+    }
+  ];
+  google.protobuf.Struct raw_information = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "complete information returned by the identity provider"
+    }
+  ];
+}
+
+message IDPOAuthAccessInformation{
+  string access_token = 1;
+  optional string id_token = 2;
+}
+
+message IDPLDAPAccessInformation{
+  google.protobuf.Struct attributes = 1;
+}
+
+message IDPSAMLAccessInformation{
+  bytes assertion = 1;
+}
+
+message IDPLink {
+  string idp_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the identity provider"
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string user_id = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the user of the identity provider"
+      min_length: 1;
+      max_length: 200;
+      example: "\"6516849804890468048461403518\"";
+    }
+  ];
+  string user_name = 3 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "username of the user of the identity provider"
+      min_length: 1;
+      max_length: 200;
+      example: "\"user@external.com\"";
+    }
+  ];
+}

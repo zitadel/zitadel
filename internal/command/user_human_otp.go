@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/logging"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -107,7 +108,7 @@ func (c *Commands) createHumanTOTP(ctx context.Context, userID, resourceOwner st
 	}
 	issuer := c.multifactors.OTP.Issuer
 	if issuer == "" {
-		issuer = authz.GetInstance(ctx).RequestedDomain()
+		issuer = http_util.DomainContext(ctx).RequestedDomain()
 	}
 	key, err := domain.NewTOTPKey(issuer, accountName)
 	if err != nil {
@@ -238,6 +239,11 @@ func (c *Commands) HumanRemoveTOTP(ctx context.Context, userID, resourceOwner st
 	}
 	if existingOTP.State == domain.MFAStateUnspecified || existingOTP.State == domain.MFAStateRemoved {
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
+	}
+	if userID != authz.GetCtxData(ctx).UserID {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, existingOTP.ResourceOwner, userID); err != nil {
+			return nil, err
+		}
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))

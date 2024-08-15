@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Paramètres de l'Instance",
-        "DESCRIPTION": "Les paramètres de l'instance sont les paramètres par défaut pour toutes les organisations. Avec les bonnes permissions, certains d'entre eux peuvent être remplacés dans les paramètres de l'organisation."
+        "TITLE": "Paramètres par défaut",
+        "DESCRIPTION": "Paramètres par défaut pour toutes les organisations. Avec les autorisations appropriées, certaines d’entre elles peuvent être remplacées dans les paramètres de l’organisation."
       },
       "ORG": {
         "TITLE": "Paramètres de l'Organisation",
@@ -231,7 +231,7 @@
           "LABEL": "Durée de vie maximale en heures",
           "PW_CHECK": {
             "TITLE": "Vérification de Mot de Passe",
-            "DESCRIPTION": "Vos utilisateurs doivent changer leurs mots de passe pendant ces périodes."
+            "DESCRIPTION": "Les utilisateurs devront se réauthentifier avec leur mot de passe après cette période."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Vérification de Connexion Externe",
@@ -485,6 +485,8 @@
     "NEXT": "Suivant",
     "MORE": "Plus",
     "STEP": "Étape",
+    "SETUP": "Installation",
+    "TEST": "Test",
     "UNSAVEDCHANGES": "Modifications non enregistrées",
     "UNSAVED": {
       "DIALOG": {
@@ -496,7 +498,8 @@
     "TABLE": {
       "SHOWUSER": "Afficher l'utilisateur {{value}}"
     },
-    "DOWNLOAD": "Télécharger"
+    "DOWNLOAD": "Télécharger",
+    "APPLY": "Appliquer"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "A le contrôle de toute l'instance, y compris toutes les organisations",
@@ -1083,7 +1086,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Supprimer les actions sélectionnées ?",
         "DESCRIPTION": "Voulez-vous vraiment supprimer les actions sélectionnées du flux ?"
-      }
+      },
+      "ABOUTNAME": "Le nom de l'action et le nom de la fonction dans le javascript doivent être identiques"
     },
     "TOAST": {
       "ACTIONSSET": "Actions définies",
@@ -1315,10 +1319,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Paramètres de l'instance",
-      "DESCRIPTION": "Ces paramètres s'appliqueront à toutes vos organisations, sauf s'ils ont été remplacés."
-    },
     "LIST": {
       "ORGS": "Organisations",
       "FEATURESETTINGS": "Paramètres de fonctionnalité",
@@ -1438,9 +1438,7 @@
         "7": "Mot de passe à usage unique (OTP) - SMS",
         "8": "Mot de passe à usage unique (OTP) -e-mail"
       },
-      "ADDGENERATOR": "Configurer générateur de mot de passe",
-      "GENERATORTYPE": "Type",
-      "EXPIRY": "Expiration (en heures)",
+      "EXPIRY": "Expiration (en minutes)",
       "INCLUDEDIGITS": "Inclure les chiffres",
       "INCLUDESYMBOLS": "Inclure les symboles",
       "INCLUDELOWERLETTERS": "Inclure les lettres minuscules",
@@ -1476,6 +1474,10 @@
         "DISABLED": "Désactivé"
       },
       "INHERITED_DESCRIPTION": "Ce paramètre définit la valeur par défaut du système.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Activé\" est hérité",
+        "DISABLED": "\"Désactivé\" est hérité"
+      },
       "RESET": "Réinitialiser tout sur hérité"
     },
     "DIALOG": {
@@ -1681,7 +1683,8 @@
         "username": "Nom d'utilisateur",
         "tempUsername": "Nom d'utilisateur temporaire",
         "otp": "Mot de passe à usage unique",
-        "verifyUrl": "URL pour vérifier le mot de passe à usage unique"
+        "verifyUrl": "URL pour vérifier le mot de passe à usage unique",
+        "expiry": "Expiration"
       },
       "TOAST": {
         "UPDATED": "Textes personnalisés enregistrés."
@@ -1779,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Projets possédés",
         "OWNED_SINGULAR": "Projet possédé",
-        "GRANTED_SINGULAR": "Projet octroyé"
+        "GRANTED_SINGULAR": "Projet attribué à {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Image de marque",
@@ -2055,10 +2058,10 @@
       "ISAUTOCREATION_DESC": "Détermine si un compte sera créé s'il n'existe pas déjà.",
       "ISAUTOUPDATE": "Mise à jour automatique",
       "ISAUTOUPDATE_DESC": "Si cette option est sélectionnée, les comptes sont mis à jour lors de la réauthentification.",
-      "ISCREATIONALLOWED": "Création de comptes autorisée",
-      "ISCREATIONALLOWED_DESC": "Détermine si des comptes peuvent être créés.",
-      "ISLINKINGALLOWED": "Liaison de comptes autorisée",
-      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant.",
+      "ISCREATIONALLOWED": "Création de compte autorisée (manuellement)",
+      "ISCREATIONALLOWED_DESC": "Détermine si les comptes peuvent être créés à l'aide d'un compte externe. Désactivez si les utilisateurs ne doivent pas pouvoir modifier les informations du compte lorsque la création automatique est activée.",
+      "ISLINKINGALLOWED": "Liaison de compte autorisée (manuellement)",
+      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée manuellement à un compte existant. Désactivez si les utilisateurs ne doivent pouvoir lier que le compte proposé en cas de liaison automatique active.",
       "AUTOLINKING_DESC": "Détermine si une identité sera invitée à être liée à un compte existant.",
       "AUTOLINKINGTYPE": {
         "0": "Désactivé",
@@ -2238,6 +2241,7 @@
       "ACTIVATED": "Activé",
       "ACTIVATE": "Activer le fournisseur",
       "DEACTIVATE": "Désactiver le fournisseur",
+      "TEST": "Testez votre fournisseur",
       "TYPE": "Type",
       "DIALOG": {
         "ACTIVATED": "La configuration SMTP a été activée",
@@ -2261,7 +2265,6 @@
         "CURRENT_DESC_TITLE": "Ce sont vos paramètres SMTP",
         "PROVIDER_SETTINGS": "Paramètres du fournisseur SMTP",
         "SENDER_SETTINGS": "Paramètres de l'expéditeur",
-        "TEST_SETTINGS": "Tester les paramètres SMTP",
         "NEXT_STEPS": "Prochaines étapes",
         "ACTIVATE": {
           "TITLE": "Activez votre fournisseur SMTP",
@@ -2270,6 +2273,12 @@
         "DEACTIVATE": {
           "TITLE": "Désactivez votre fournisseur SMTP",
           "DESCRIPTION": "Si vous désactivez l'option SMTP, vous ne pourrez pas vous connecter à l'application, le dossier sera alors désactivé."
+        },
+        "SAVE_SETTINGS": "Enregistrez vos paramètres",
+        "TEST": {
+          "TITLE": "Testez vos paramètres",
+          "DESCRIPTION": "Vous pouvez tester les paramètres de votre fournisseur SMTP et vérifier le résultat du test avant de les enregistrer",
+          "RESULT": "Votre email a été envoyé avec succès"
         }
       }
     },

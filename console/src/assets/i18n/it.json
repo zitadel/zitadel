@@ -79,8 +79,8 @@
     },
     "SETTINGS": {
       "INSTANCE": {
-        "TITLE": "Impostazioni dell'Istanza",
-        "DESCRIPTION": "Le impostazioni dell'istanza sono le impostazioni predefinite per tutte le organizzazioni. Con i permessi adeguati, alcune di esse possono essere sovrascritte nelle impostazioni dell'organizzazione."
+        "TITLE": "Impostazioni predefinite",
+        "DESCRIPTION": "Impostazioni predefinite per tutte le organizzazioni. Con le giuste autorizzazioni, alcuni di essi sono sovrascrivibili nelle impostazioni dell'organizzazione."
       },
       "ORG": {
         "TITLE": "Impostazioni dell'Organizzazione",
@@ -231,7 +231,7 @@
           "LABEL": "Durata Massima in ore",
           "PW_CHECK": {
             "TITLE": "Controllo Password",
-            "DESCRIPTION": "I tuoi utenti devono cambiare le loro password in questi periodi."
+            "DESCRIPTION": "Gli utenti dovranno ri-autentificarsi con la password dopo questo periodo."
           },
           "EXT_LOGIN_CHECK": {
             "TITLE": "Controllo Login Esterno",
@@ -485,6 +485,8 @@
     "NEXT": "Avanti",
     "MORE": "azioni",
     "STEP": "Passo",
+    "SETUP": "Setup",
+    "TEST": "Test",
     "UNSAVED": {
       "DIALOG": {
         "DESCRIPTION": "Sei sicuro di voler eliminare questa nuova azione? La tua azione andrà persa",
@@ -495,7 +497,8 @@
     "TABLE": {
       "SHOWUSER": "Mostra utente {{value}}"
     },
-    "DOWNLOAD": "Scarica"
+    "DOWNLOAD": "Scarica",
+    "APPLY": "Applicare"
   },
   "MEMBERROLES": {
     "IAM_OWNER": "Ha il controllo sull'intera istanza, comprese tutte le organizzazioni",
@@ -1082,7 +1085,8 @@
       "REMOVEACTIONSLIST": {
         "TITLE": "Elimina le azioni selezionate?",
         "DESCRIPTION": "Sei sicuro di voler eliminare le azioni selezionate dal processo?"
-      }
+      },
+      "ABOUTNAME": "Il nome dell'azione e il nome della funzione nel javascript devono essere gli stessi"
     },
     "TOAST": {
       "ACTIONSSET": "Azioni salvate!",
@@ -1315,10 +1319,6 @@
     }
   },
   "SETTINGS": {
-    "INSTANCE": {
-      "TITLE": "Impostazioni dell'istanza",
-      "DESCRIPTION": "Queste impostazioni si applicheranno a tutte le tue organizzazioni a meno che l'impostazione non venga sovrascritta."
-    },
     "LIST": {
       "ORGS": "Organizzazioni",
       "FEATURESETTINGS": "Impostazioni delle funzionalità",
@@ -1438,9 +1438,7 @@
         "7": "One Time Password (OTP) - SMS",
         "8": "One Time Password (OTP) - email"
       },
-      "ADDGENERATOR": "Imposta il generatore di password",
-      "GENERATORTYPE": "Tipo",
-      "EXPIRY": "Scadenza (in ore)",
+      "EXPIRY": "Scadenza (in minuti)",
       "INCLUDEDIGITS": "Contiene numeri",
       "INCLUDESYMBOLS": "Contiene simboli",
       "INCLUDELOWERLETTERS": "Contiene lettere minuscole",
@@ -1476,6 +1474,10 @@
         "DISABLED": "Disabilitato"
       },
       "INHERITED_DESCRIPTION": "Questa impostazione imposta il valore predefinito del sistema.",
+      "INHERITEDINDICATOR_DESCRIPTION": {
+        "ENABLED": "\"Abilitato\" viene ereditato",
+        "DISABLED": "\"Disabilitato\" viene ereditato"
+      },
       "RESET": "Imposta tutto su predefinito"
     },
     "DIALOG": {
@@ -1681,7 +1683,8 @@
         "username": "Nome utente",
         "tempUsername": "Nome utente temporaneo",
         "otp": "Password monouso",
-        "verifyUrl": "URL per verificare la password monouso"
+        "verifyUrl": "URL per verificare la password monouso",
+        "expiry": "Scadenza"
       },
       "TOAST": {
         "UPDATED": "Testi personalizzati salvati."
@@ -1779,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Progetti proprietari",
         "OWNED_SINGULAR": "Progetto proprietario",
-        "GRANTED_SINGULAR": "Progetto delegato"
+        "GRANTED_SINGULAR": "Progetto concesso di {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Impostazione branding",
@@ -2055,10 +2058,10 @@
       "ISAUTOCREATION_DESC": "Se selezionato, verrà creato un account se non esiste ancora.",
       "ISAUTOUPDATE": "Aggiornamento automatico",
       "ISAUTOUPDATE_DESC": "Se selezionato, gli account vengono aggiornati alla riautenticazione.",
-      "ISCREATIONALLOWED": "Creazione consentita",
-      "ISCREATIONALLOWED_DESC": "Determina se i conti possono essere creati.",
-      "ISLINKINGALLOWED": "Collegamento consentito",
-      "ISLINKINGALLOWED_DESC": "Determina se un'identità può essere collegata a un account esistente.",
+      "ISCREATIONALLOWED": "Creazione account consentita (manualmente)",
+      "ISCREATIONALLOWED_DESC": "Determina se gli account possono essere creati utilizzando un account esterno. Disabilita se gli utenti non dovrebbero essere in grado di modificare le informazioni dell'account quando la creazione automatica è abilitata.",
+      "ISLINKINGALLOWED": "Collegamento account consentito (manualmente)",
+      "ISLINKINGALLOWED_DESC": "Determina se un'identità può essere collegata manualmente a un account esistente. Disabilita se gli utenti dovrebbero essere autorizzati solo a collegare l'account proposto in caso di collegamento automatico attivo.",
       "AUTOLINKING_DESC": "Determina se un'identità verrà invitata a essere collegata a un account esistente.",
       "AUTOLINKINGTYPE": {
         "0": "Disabilitato",
@@ -2238,6 +2241,7 @@
       "ACTIVATED": "Attivato",
       "ACTIVATE": "Attiva fornitore",
       "DEACTIVATE": "Disattiva fornitore",
+      "TEST": "Metti alla prova il tuo fornitore",
       "TYPE": "Tipo",
       "DIALOG": {
         "ACTIVATED": "La configurazione SMTP è stata attivata",
@@ -2261,7 +2265,6 @@
         "CURRENT_DESC_TITLE": "Queste sono le tue impostazioni SMTP",
         "PROVIDER_SETTINGS": "Impostazioni del provider SMTP",
         "SENDER_SETTINGS": "Impostazioni mittente",
-        "TEST_SETTINGS": "Testare le impostazioni SMTP",
         "NEXT_STEPS": "Prossimi passi",
         "ACTIVATE": {
           "TITLE": "Attiva il tuo provider SMTP",
@@ -2270,6 +2273,12 @@
         "DEACTIVATE": {
           "TITLE": "Disattiva il tuo provider SMTP",
           "DESCRIPTION": "Dopo aver disattivato l'archivio SMTP, la schermata non è disponibile per l'utente, il documento è nuovo e non è attivo."
+        },
+        "SAVE_SETTINGS": "Salva le tue impostazioni",
+        "TEST": {
+          "TITLE": "Metti alla prova le tue impostazioni",
+          "DESCRIPTION": "Puoi testare le impostazioni del tuo provider SMTP e controllare il risultato del test prima di salvarle",
+          "RESULT": "La tua email è stata inviata correttamente"
         }
       }
     },

@@ -89,7 +89,7 @@ InitUserDone:
 InitMFAPrompt:
   Title: 两步验证设置
   Description: 两步验证为您的账户提供了额外的安全保障。这确保只有你能访问你的账户。
-  Provider0: 软件应用（如 Google/Migrosoft Authenticator、Authy）
+  Provider0: 软件应用（如 Google/Microsoft Authenticator、Authy）
   Provider1: 硬件设备（如 Face ID、Windows Hello、指纹）
   Provider3: 一次性密码短信
   Provider4: 一次性密码电子邮件
@@ -486,6 +486,7 @@ Errors:
       NoExternalUserData: 未收到外部用户数据
       CreationNotAllowed: 不允许在该供应商上创建新用户
       LinkingNotAllowed: 在此提供者上不允许链接一个用户
+      NoOptionAllowed: 此提供商不允许创建或链接。请联系您的管理员。
     GrantRequired: 无法登录，用户需要在应用程序上拥有至少一项授权，请联系您的管理员。
     ProjectRequired: 无法登录，用户的组织必须授予项目，请联系您的管理员。
   IdentityProvider:

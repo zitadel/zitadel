@@ -87,15 +87,15 @@ func (p *Storage) Health(context.Context) error {
 }
 
 func (p *Storage) GetCA(ctx context.Context) (*key.CertificateAndKey, error) {
-	return p.GetCertificateAndKey(ctx, domain.KeyUsageSAMLCA)
+	return p.GetCertificateAndKey(ctx, crypto.KeyUsageSAMLCA)
 }
 
 func (p *Storage) GetMetadataSigningKey(ctx context.Context) (*key.CertificateAndKey, error) {
-	return p.GetCertificateAndKey(ctx, domain.KeyUsageSAMLMetadataSigning)
+	return p.GetCertificateAndKey(ctx, crypto.KeyUsageSAMLMetadataSigning)
 }
 
 func (p *Storage) GetResponseSigningKey(ctx context.Context) (*key.CertificateAndKey, error) {
-	return p.GetCertificateAndKey(ctx, domain.KeyUsageSAMLResponseSinging)
+	return p.GetCertificateAndKey(ctx, crypto.KeyUsageSAMLResponseSinging)
 }
 
 func (p *Storage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequestType, acsUrl, protocolBinding, relayState, applicationID string) (_ models.AuthRequestInt, err error) {

@@ -217,8 +217,13 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			object: (*AuthMethodTypes)(nil),
 		},
 		{
-			name:    "prepareActiveUserAuthMethodTypesQuery no result",
-			prepare: prepareActiveUserAuthMethodTypesQuery,
+			name: "prepareUserAuthMethodTypesQuery no result",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true)
+				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+					return scan(rows)
+				}
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(prepareActiveAuthMethodTypesStmt),
@@ -229,8 +234,13 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			object: &AuthMethodTypes{AuthMethodTypes: []domain.UserAuthMethodType{}},
 		},
 		{
-			name:    "prepareActiveUserAuthMethodTypesQuery one second factor",
-			prepare: prepareActiveUserAuthMethodTypesQuery,
+			name: "prepareUserAuthMethodTypesQuery one second factor",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true)
+				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+					return scan(rows)
+				}
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(prepareActiveAuthMethodTypesStmt),
@@ -256,8 +266,13 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareActiveUserAuthMethodTypesQuery multiple second factors",
-			prepare: prepareActiveUserAuthMethodTypesQuery,
+			name: "prepareUserAuthMethodTypesQuery multiple second factors",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true)
+				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+					return scan(rows)
+				}
+			},
 			want: want{
 				sqlExpectations: mockQueries(
 					regexp.QuoteMeta(prepareActiveAuthMethodTypesStmt),
@@ -289,8 +304,13 @@ func Test_UserAuthMethodPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareActiveUserAuthMethodTypesQuery sql err",
-			prepare: prepareActiveUserAuthMethodTypesQuery,
+			name: "prepareUserAuthMethodTypesQuery sql err",
+			prepare: func(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*AuthMethodTypes, error)) {
+				builder, scan := prepareUserAuthMethodTypesQuery(ctx, db, true)
+				return builder, func(rows *sql.Rows) (*AuthMethodTypes, error) {
+					return scan(rows)
+				}
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(prepareActiveAuthMethodTypesStmt),

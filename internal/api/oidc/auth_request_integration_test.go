@@ -18,8 +18,8 @@ import (
 	oidc_api "github.com/zitadel/zitadel/internal/api/oidc"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/integration"
-	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
-	session "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
+	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 )
 
 var (

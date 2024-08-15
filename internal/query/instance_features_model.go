@@ -67,6 +67,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceActionsEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
+			feature_v2.InstanceWebKeyEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -115,6 +116,8 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.Actions.set(level, event.Value)
 	case feature.KeyImprovedPerformance:
 		features.ImprovedPerformance.set(level, event.Value)
+	case feature.KeyWebKey:
+		features.WebKey.set(level, event.Value)
 	}
 	return nil
 }

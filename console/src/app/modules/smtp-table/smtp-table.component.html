@@ -12,7 +12,7 @@
     '/instance/smtpprovider/sendgrid/create',
     '/instance/smtpprovider/mailchimp/create',
     '/instance/smtpprovider/brevo/create',
-    '/instance/smtpprovider/outlook/create'
+    '/instance/smtpprovider/outlook/create',
   ]"
   [timestamp]="configsResult?.details?.viewTimestamp"
   [selection]="selection"
@@ -91,6 +91,18 @@
               (click)="deactivateSMTPConfig(config.id); $event.stopPropagation()"
             >
               <i class="las la-times-circle"></i>
+            </button>
+
+            <button
+              actions
+              [disabled]="(['iam.write'] | hasRole | async) === false"
+              mat-icon-button
+              color="primary"
+              matTooltip="{{ 'SMTP.LIST.TEST' | translate }}"
+              data-e2e="test-provider-button"
+              (click)="testSMTPConfig(config.id); $event.stopPropagation()"
+            >
+              <i class="las la-flask"></i>
             </button>
 
             <button

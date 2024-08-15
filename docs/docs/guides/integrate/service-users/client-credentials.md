@@ -49,6 +49,9 @@ curl --request POST \
 If you want to access ZITADEL APIs, make sure to include the required scopes `urn:zitadel:iam:org:project:id:zitadel:aud`.
 Read our guide [how to access ZITADEL APIs](../zitadel-apis/access-zitadel-apis) to learn more.
 
+**Important Note:** If the service user token needs to be validated using token introspection, ensure you include the `urn:zitadel:iam:org:project:id:{projectid}:aud` scope in your token request. 
+Without this, token introspection will fail.
+
 You should receive a successful response with `access_token`,  `token_type` and time to expiry in seconds as `expires_in`.
 
 ```bash
@@ -100,7 +103,7 @@ By following these steps and adhering to security best practices, you can effect
 ## Notes
 
 * Read about the [different methods to authenticate service users](./authenticate-service-users)
-* [Service User API reference](/docs/category/apis/resources/mgmt/user-machine)
+* [Service User API reference](/docs/apis/resources/mgmt/user-machine)
 * [OIDC client secret basic](/docs/apis/openidoauth/authn-methods#client-secret-basic) authentication method reference
 * [Access ZITADEL APIs](../zitadel-apis/access-zitadel-apis)
 * Validate access tokens with [token introspection with basic auth](../token-introspection/basic-auth)

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/command/preparation"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
@@ -239,7 +240,7 @@ func AddOrgCommand(ctx context.Context, a *org.Aggregate, name string) preparati
 		if name = strings.TrimSpace(name); name == "" {
 			return nil, zerrors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")
 		}
-		defaultDomain, err := domain.NewIAMDomainName(name, authz.GetInstance(ctx).RequestedDomain())
+		defaultDomain, err := domain.NewIAMDomainName(name, http_util.DomainContext(ctx).RequestedDomain())
 		if err != nil {
 			return nil, err
 		}
@@ -443,6 +444,7 @@ func (c *Commands) prepareRemoveOrg(a *org.Aggregate) preparation.Validation {
 			if a.ID == instance.DefaultOrganisationID() {
 				return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-wG9p1", "Errors.Org.DefaultOrgNotDeletable")
 			}
+
 			err := c.checkProjectExists(ctx, instance.ProjectID(), a.ID)
 			// if there is no error, the ZITADEL project was found on the org to be deleted
 			if err == nil {
@@ -707,7 +709,7 @@ func (c *Commands) addOrgWithID(ctx context.Context, organisation *domain.Org, o
 	}
 
 	organisation.AggregateID = orgID
-	organisation.AddIAMDomain(authz.GetInstance(ctx).RequestedDomain())
+	organisation.AddIAMDomain(http_util.DomainContext(ctx).RequestedDomain())
 	addedOrg := NewOrgWriteModel(organisation.AggregateID)
 
 	orgAgg := OrgAggregateFromWriteModel(&addedOrg.WriteModel)

@@ -53,11 +53,24 @@ Errors:
     NotFound: Konfigurace SMS nebyla nalezena
     AlreadyActive: Konfigurace SMS je již aktivní
     AlreadyDeactivated: Konfigurace SMS je již deaktivovaná
+  SMTP:
+    NotEmailMessage: zpráva není EmailMessage
+    RequiredAttributes: předmět, příjemci a obsah musí být nastaveny, ale některé nebo všechny jsou prázdné
+    CouldNotSplit: nemohl rozdělit hostitele a port pro připojení k smtp
+    CouldNotDial: nelze se spojit se serverem SMTP, zkontrolovat port, problémy s firewallem...
+    CouldNotDialTLS: nelze se spojit se serverem SMTP pomocí TLS, zkontrolovat port, problémy s firewallem...
+    CouldNotCreateClient: nelze vytvořit smtp klienta
+    CouldNotStartTLS: nelze spustit tls
+    CouldNotAuth: nemohlo se přidat smtp auth, zkontrolujte, zda je váš uživatel i heslo správné, pokud jsou správné, možná váš poskytovatel vyžaduje metodu auth, kterou ZITADEL nepodporuje
+    CouldNotSetSender: nelze nastavit odesílatele
+    CouldNotSetRecipient: nelze nastavit příjemce
   SMTPConfig:
+    TestPassword: Heslo pro test nenalezeno
     NotFound: Konfigurace SMTP nebyla nalezena
     AlreadyExists: Konfigurace SMTP již existuje
     AlreadyDeactivated: Konfigurace SMTP je již deaktivována
     SenderAdressNotCustomDomain: Adresa odesílatele musí být nakonfigurována jako vlastní doména na instanci.
+    TestEmailNotFound: E-mailová adresa pro test nebyla nalezena
   Notification:
     NoDomain: Pro zprávu nebyla nalezena žádná doména
   User:
@@ -482,6 +495,7 @@ Errors:
     SQLStatement: SQL příkaz nemohl být vytvořen
     InvalidRequest: Požadavek je neplatný
     TooManyNestingLevels: Příliš mnoho úrovní vnoření dotazů (max. 20)
+    LimitExceeded: Překročen limit výsledků
   Quota:
     AlreadyExists: Kvóta pro tuto jednotku již existuje
     NotFound: Kvóta pro tuto jednotku nenalezena
@@ -548,6 +562,7 @@ Errors:
     NotFound: Provedení nenalezeno
     IncludeNotFound: Zahrnout nenalezeno
     NoTargets: Nejsou definovány žádné cíle
+    ResponseIsNotValidJSON: Odpověď není platný JSON
   UserSchema:
     NotEnabled: Funkce "Uživatelské schéma" není povolena
     Type:
@@ -569,6 +584,13 @@ Errors:
       NotForAPI: Zosobněné tokeny nejsou pro API povoleny
     Impersonation:
       PolicyDisabled: Zosobnění je zakázáno v zásadách zabezpečení instance
+  WebKey:
+    ActiveDelete: Aktivní webový klíč nelze smazat
+    Config: Neplatná konfigurace webového klíče
+    Duplicate: ID webového klíče není jedinečné
+    FeatureDisabled: Funkce webového klíče je zakázána
+    NoActive: Nebyl nalezen žádný aktivní webový klíč
+    NotFound: Webový klíč nebyl nalezen
 
 AggregateTypes:
   action: Akce
@@ -592,6 +614,7 @@ AggregateTypes:
   restrictions: Omezení
   system: Systém
   session: Sezení
+  web_key: Webový klíč
 
 EventTypes:
   execution:
@@ -1293,6 +1316,11 @@ EventTypes:
     deactivated: Uživatelské schéma deaktivováno
     reactivated: Uživatelské schéma bylo znovu aktivováno
     deleted: Uživatelské schéma bylo smazáno
+  web_key:
+    added: Přidán webový klíč
+    activated: Web Key aktivován
+    deactivated: Web Key deaktivován
+    removed: Odstraňte webový klíč
 
 Application:
   OIDC:

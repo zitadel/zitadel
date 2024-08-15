@@ -12,8 +12,8 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/feature"
 	"github.com/zitadel/zitadel/internal/query"
-	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2beta"
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2beta"
+	feature_pb "github.com/zitadel/zitadel/pkg/grpc/feature/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
 )
 
 func Test_systemFeaturesToCommand(t *testing.T) {
@@ -123,6 +123,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		OidcTokenExchange:                   gu.Ptr(true),
 		Actions:                             gu.Ptr(true),
 		ImprovedPerformance:                 nil,
+		WebKey:                              gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
@@ -132,6 +133,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		TokenExchange:                   gu.Ptr(true),
 		Actions:                         gu.Ptr(true),
 		ImprovedPerformance:             nil,
+		WebKey:                          gu.Ptr(true),
 	}
 	got := instanceFeaturesToCommand(arg)
 	assert.Equal(t, want, got)
@@ -172,6 +174,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelSystem,
 			Value: []feature.ImprovedPerformanceType{feature.ImprovedPerformanceTypeOrgByID},
 		},
+		WebKey: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -206,6 +212,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		ImprovedPerformance: &feature_pb.ImprovedPerformanceFeatureFlag{
 			ExecutionPaths: []feature_pb.ImprovedPerformance{feature_pb.ImprovedPerformance_IMPROVED_PERFORMANCE_ORG_BY_ID},
 			Source:         feature_pb.Source_SOURCE_SYSTEM,
+		},
+		WebKey: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 	}
 	got := instanceFeaturesToPb(arg)

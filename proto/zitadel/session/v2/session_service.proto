@@ -1,0 +1,496 @@
+syntax = "proto3";
+
+package zitadel.session.v2;
+
+
+import "zitadel/object/v2/object.proto";
+import "zitadel/protoc_gen_zitadel/v2/options.proto";
+import "zitadel/session/v2/challenge.proto";
+import "zitadel/session/v2/session.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/duration.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/session/v2;session";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "Session Service";
+    version: "2.0";
+    description: "This API is intended to manage sessions in a ZITADEL instance. Follow the guides on how to [build your own Login UI](/docs/guides/integrate/login-ui) and learn how to use the Session API.";
+    contact:{
+      name: "ZITADEL"
+      url: "https://zitadel.com"
+      email: "hi@zitadel.com"
+    }
+    license: {
+      name: "Apache 2.0",
+      url: "https://github.com/zitadel/zitadel/blob/main/LICENSE";
+    };
+  };
+  schemes: HTTPS;
+  schemes: HTTP;
+
+  consumes: "application/json";
+  consumes: "application/grpc";
+
+  produces: "application/json";
+  produces: "application/grpc";
+
+  consumes: "application/grpc-web+proto";
+  produces: "application/grpc-web+proto";
+
+  host: "$CUSTOM-DOMAIN";
+  base_path: "/";
+
+  external_docs: {
+    description: "Detailed information about ZITADEL",
+    url: "https://zitadel.com/docs"
+  }
+  security_definitions: {
+    security: {
+      key: "OAuth2";
+      value: {
+        type: TYPE_OAUTH2;
+        flow: FLOW_ACCESS_CODE;
+        authorization_url: "$CUSTOM-DOMAIN/oauth/v2/authorize";
+        token_url: "$CUSTOM-DOMAIN/oauth/v2/token";
+        scopes: {
+          scope: {
+            key: "openid";
+            value: "openid";
+          }
+          scope: {
+            key: "urn:zitadel:iam:org:project:id:zitadel:aud";
+            value: "urn:zitadel:iam:org:project:id:zitadel:aud";
+          }
+        }
+      }
+    }
+  }
+  security: {
+    security_requirement: {
+      key: "OAuth2";
+      value: {
+        scope: "openid";
+        scope: "urn:zitadel:iam:org:project:id:zitadel:aud";
+      }
+    }
+  }
+  responses: {
+    key: "403";
+    value: {
+      description: "Returned when the user does not have permission to access the resource.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+  responses: {
+    key: "404";
+    value: {
+      description: "Returned when the resource does not exist.";
+      schema: {
+        json_schema: {
+          ref: "#/definitions/rpcStatus";
+        }
+      }
+    }
+  }
+};
+
+service SessionService {
+
+  // Search sessions
+  rpc ListSessions (ListSessionsRequest) returns (ListSessionsResponse) {
+    option (google.api.http) = {
+      post: "/v2/sessions/search"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Search sessions";
+      description: "Search for sessions"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+      responses: {
+        key: "400";
+        value: {
+          description: "invalid list query";
+          schema: {
+            json_schema: {
+              ref: "#/definitions/rpcStatus";
+            };
+          };
+        };
+      };
+    };
+  }
+
+  // GetSession a session
+  rpc GetSession (GetSessionRequest) returns (GetSessionResponse) {
+    option (google.api.http) = {
+      get: "/v2/sessions/{session_id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get a session";
+      description: "Get a session and all its information like the time of the user or password verification"
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Create a new session
+  rpc CreateSession (CreateSessionRequest) returns (CreateSessionResponse) {
+    option (google.api.http) = {
+      post: "/v2/sessions"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+      http_response: {
+        success_code: 201
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a new session";
+      description: "Create a new session. A token will be returned, which is required for further updates of the session."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Update a session
+  rpc SetSession (SetSessionRequest) returns (SetSessionResponse) {
+    option (google.api.http) = {
+      patch: "/v2/sessions/{session_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update an existing session";
+      description: "Update an existing session with new information."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+
+  // Terminate a session
+  rpc DeleteSession (DeleteSessionRequest) returns (DeleteSessionResponse) {
+    option (google.api.http) = {
+      delete: "/v2/sessions/{session_id}"
+      body: "*"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Terminate an existing session";
+      description: "Terminate your own session or if granted any other session."
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
+}
+
+message ListSessionsRequest{
+  zitadel.object.v2.ListQuery query = 1;
+  repeated SearchQuery queries = 2;
+  zitadel.session.v2.SessionFieldName sorting_column = 3;
+}
+
+message ListSessionsResponse{
+  zitadel.object.v2.ListDetails details = 1;
+  repeated Session sessions = 2;
+}
+
+message GetSessionRequest{
+  string session_id = 1;
+  optional string session_token = 2;
+}
+message GetSessionResponse{
+  Session session = 1;
+}
+
+message CreateSessionRequest{
+  Checks checks = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Check for user and password. Successful checks will be stated as factors on the session.\"";
+    }
+  ];
+  map<string, bytes> metadata = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"custom key value list to be stored on the session\"";
+    }
+  ];
+  RequestChallenges challenges = 3;
+  UserAgent user_agent = 4;
+  optional google.protobuf.Duration lifetime = 5 [
+    (validate.rules).duration = {gt: {seconds: 0}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"duration (in seconds) after which the session will be automatically invalidated\"";
+      example:"\"18000s\""
+    }
+  ];
+}
+
+message CreateSessionResponse{
+  zitadel.object.v2.Details details = 1;
+  string session_id = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"id of the session\"";
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string session_token = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"The current token of the session, which is required for delete session, get session or the request of other resources.\"";
+    }
+  ];
+  Challenges challenges = 4;
+}
+
+message SetSessionRequest{
+  string session_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "\"id of the session to update\"";
+      example: "\"222430354126975533\"";
+    }
+  ];
+  string session_token = 2 [
+    (validate.rules).string = {min_len: 0, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "\"DEPRECATED: this field is ignored.\"";
+    }
+  ];
+  Checks checks = 3[
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Check for user and password. Successful checks will be stated as factors on the session.\"";
+    }
+  ];
+  map<string, bytes> metadata = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"custom key value list to be stored on the session\"";
+    }
+  ];
+  RequestChallenges challenges = 5;
+  optional google.protobuf.Duration lifetime = 6 [
+    (validate.rules).duration = {gt: {seconds: 0}},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"duration (in seconds) after which the session will be automatically invalidated\"";
+      example:"\"18000s\""
+    }
+  ];
+}
+
+message SetSessionResponse{
+  zitadel.object.v2.Details details = 1;
+  string session_token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"The current token of the session, which is required for delete session, get session or the request of other resources.\"";
+    }
+  ];
+  Challenges challenges = 3;
+}
+
+message DeleteSessionRequest{
+  string session_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      description: "\"id of the session to terminate\"";
+      example: "\"222430354126975533\"";
+    }
+  ];
+  optional string session_token = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"The current token of the session, previously returned on the create / update request. The token is required unless the authenticated user terminates the own session or is granted the `session.delete` permission.\"";
+    }
+  ];
+}
+
+message DeleteSessionResponse{
+  zitadel.object.v2.Details details = 1;
+}
+
+message Checks {
+  optional CheckUser user = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"checks the user and updates the session on success\"";
+    }
+  ];
+  optional CheckPassword password = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
+  optional CheckWebAuthN web_auth_n = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the public key credential issued by the WebAuthN client. Requires that the user is already checked and a WebAuthN challenge to be requested, in any previous request.\"";
+    }
+  ];
+  optional CheckIDPIntent idp_intent = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the IDP intent. Requires that the userlink is already checked and a successful idp intent.\"";
+    }
+  ];
+  optional CheckTOTP totp = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the Time-based One-Time Password and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
+  optional CheckOTP otp_sms = 6 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the One-Time Password sent over SMS and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
+  optional CheckOTP otp_email = 7 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "\"Checks the One-Time Password sent over Email and updates the session on success. Requires that the user is already checked, either in the previous or the same request.\"";
+    }
+  ];
+}
+
+message CheckUser {
+  oneof search {
+    string user_id = 1 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1;
+        max_length: 200;
+        example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+      }
+    ];
+    string login_name = 2 [
+      (validate.rules).string = {min_len: 1, max_len: 200},
+      (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+        min_length: 1;
+        max_length: 200;
+        example: "\"mini@mouse.com\"";
+      }
+    ];
+  }
+}
+
+message CheckPassword {
+  string password = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"V3ryS3cure!\"";
+    }
+  ];
+}
+
+message CheckWebAuthN {
+  google.protobuf.Struct credential_assertion_data = 1 [
+    (validate.rules).message.required = true,
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "JSON representation of public key credential issued by the webAuthN client";
+      min_length: 55;
+      max_length: 1048576; //1 MB
+    }
+  ];
+}
+
+message CheckIDPIntent {
+  string idp_intent_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "ID of the idp intent, previously returned on the success response of the IDP callback"
+      min_length: 1;
+      max_length: 200;
+      example: "\"d654e6ba-70a3-48ef-a95d-37c8d8a7901a\"";
+    }
+  ];
+  string idp_intent_token = 2 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      description: "token of the idp intent, previously returned on the success response of the IDP callback"
+      min_length: 1;
+      max_length: 200;
+      example: "\"SJKL3ioIDpo342ioqw98fjp3sdf32wahb=\"";
+    }
+  ];
+}
+
+message CheckTOTP {
+  string code = 1 [
+    (validate.rules).string = {min_len: 6, max_len: 6},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 6;
+      max_length: 6;
+      example: "\"323764\"";
+    }
+  ];
+}
+
+message CheckOTP {
+  string code = 1 [
+    (validate.rules).string = {min_len: 1},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      example: "\"3237642\"";
+    }
+  ];
+}
