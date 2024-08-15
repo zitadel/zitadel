@@ -38,9 +38,9 @@ var schemas = []string{
 func verifyMigration(ctx context.Context, config *Migration) {
 	if isSrcFile || isDestFile {
 		verifyFileMigration(ctx, config)
-	} else {
-		verifyMigrationDB(ctx, config)
+		return
 	}
+	verifyMigrationDB(ctx, config)
 }
 
 func verifyMigrationDB(ctx context.Context, config *Migration) {

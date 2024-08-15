@@ -67,9 +67,8 @@ Order of execution:
 				if stat, err := os.Stat(filePath); err != nil || !stat.IsDir() {
 					if os.IsNotExist(err) {
 						logging.Fatal("file path does not exist")
-					} else {
-						logging.Fatal("file path leads to a file not a directory")
 					}
+					logging.Fatal("file path leads to a file not a directory")
 				}
 			}
 		},
@@ -120,9 +119,8 @@ func instanceClause() string {
 	if isSystem {
 		if isSrcFile || isDestFile {
 			return ""
-		} else {
-			return "WHERE instance_id <> ''"
 		}
+		return "WHERE instance_id <> ''"
 	}
 	for i := range instanceIDs {
 		instanceIDs[i] = "'" + instanceIDs[i] + "'"
