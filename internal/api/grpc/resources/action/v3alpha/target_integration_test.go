@@ -197,7 +197,7 @@ func TestServer_CreateTarget(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Tester.Client.ActionV3.CreateTarget(tt.ctx, &action.CreateTargetRequest{Target: tt.req})
+			got, err := Tester.Client.ActionV3Alpha.CreateTarget(tt.ctx, &action.CreateTargetRequest{Target: tt.req})
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -382,8 +382,8 @@ func TestServer_PatchTarget(t *testing.T) {
 			err := tt.prepare(tt.args.req)
 			require.NoError(t, err)
 			// We want to have the same response no matter how often we call the function
-			Tester.Client.ActionV3.PatchTarget(tt.args.ctx, tt.args.req)
-			got, err := Tester.Client.ActionV3.PatchTarget(tt.args.ctx, tt.args.req)
+			Tester.Client.ActionV3Alpha.PatchTarget(tt.args.ctx, tt.args.req)
+			got, err := Tester.Client.ActionV3Alpha.PatchTarget(tt.args.ctx, tt.args.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -438,7 +438,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Tester.Client.ActionV3.DeleteTarget(tt.ctx, tt.req)
+			got, err := Tester.Client.ActionV3Alpha.DeleteTarget(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

@@ -340,12 +340,36 @@ module.exports = {
                 categoryLinkSource: "auto",
             },
           },
+          webkey_v3: {
+            specPath: ".artifacts/openapi/zitadel/resources/webkey/v3alpha/webkey_service.swagger.json",
+            outputDir: "docs/apis/resources/webkey_service_v3",
+            sidebarOptions: {
+                groupPathsBy: "tag",
+                categoryLinkSource: "auto",
+            },
+          },
           feature_v2: {
             specPath: ".artifacts/openapi/zitadel/feature/v2/feature_service.swagger.json",
             outputDir: "docs/apis/resources/feature_service_v2",
             sidebarOptions: {
                 groupPathsBy: "tag",
                 categoryLinkSource: "auto",
+            },
+          },
+          org_v2: {
+            specPath: ".artifacts/openapi/zitadel/org/v2/org_service.swagger.json",
+            outputDir: "docs/apis/resources/org_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
+            },
+          },
+          idp_v2: {
+            specPath: ".artifacts/openapi/zitadel/idp/v2/idp_service.swagger.json",
+            outputDir: "docs/apis/resources/idp_service_v2",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "auto",
             },
           },
         },
