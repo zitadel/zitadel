@@ -564,6 +564,7 @@ Errors:
     NotFound: Execution not found
     IncludeNotFound: Include not found
     NoTargets: No targets defined
+    Failed: Execution failed
     ResponseIsNotValidJSON: Response is not valid JSON
   UserSchema:
     NotEnabled: Feature "User Schema" is not enabled
@@ -593,7 +594,6 @@ Errors:
     FeatureDisabled: Web key feature disabled
     NoActive: No active web key found
     NotFound: Web key not found
-
 
 AggregateTypes:
   action: Action
