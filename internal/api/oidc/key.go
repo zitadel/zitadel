@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -422,4 +423,42 @@ func retry(retryable func() error) (err error) {
 		time.Sleep(retryBackoff)
 	}
 	return err
+}
+
+func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	if !authz.GetFeatures(ctx).WebKey {
+		return s.LegacyServer.Keys(ctx, r)
+	}
+
+	keyset, err := s.query.GetWebKeySet(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return legacy keys, so we do not invalidate all tokens
+	// once the feature flag is enabled.
+	legacyKeys, err := s.query.ActivePublicKeys(ctx, time.Now())
+	logging.OnError(err).Error("oidc server: active public keys (legacy)")
+	appendPublicKeysToWebKeySet(keyset, legacyKeys)
+
+	return op.NewResponse(keyset), nil
+}
+
+func appendPublicKeysToWebKeySet(keyset *jose.JSONWebKeySet, pubkeys *query.PublicKeys) {
+	if pubkeys == nil || len(pubkeys.Keys) == 0 {
+		return
+	}
+	keyset.Keys = slices.Grow(keyset.Keys, len(pubkeys.Keys))
+
+	for _, key := range pubkeys.Keys {
+		keyset.Keys = append(keyset.Keys, jose.JSONWebKey{
+			Key:       key.Key(),
+			KeyID:     key.ID(),
+			Algorithm: key.Algorithm(),
+			Use:       key.Use().String(),
+		})
+	}
 }

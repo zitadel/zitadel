@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
 	"testing"
 	"time"
@@ -263,6 +264,129 @@ func Test_keySetMap_VerifySignature(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := tt.k.VerifySignature(context.Background(), tt.jws)
 			require.Error(t, err)
+		})
+	}
+}
+
+func Test_appendPublicKeysToWebKeySet(t *testing.T) {
+	keys := [...][]byte{
+		make([]byte, 32),
+		make([]byte, 32),
+	}
+	for _, key := range keys {
+		_, err := rand.Read(key)
+		require.NoError(t, err)
+	}
+
+	type args struct {
+		keyset  *jose.JSONWebKeySet
+		pubkeys *query.PublicKeys
+	}
+	tests := []struct {
+		name string
+		args args
+		want *jose.JSONWebKeySet
+	}{
+		{
+			name: "nil pubkeys",
+			args: args{
+				keyset: &jose.JSONWebKeySet{
+					Keys: []jose.JSONWebKey{
+						{
+							Key:       keys[0],
+							KeyID:     "key0",
+							Algorithm: "XYZ",
+							Use:       crypto.KeyUsageSigning.String(),
+						},
+					},
+				},
+				pubkeys: nil,
+			},
+			want: &jose.JSONWebKeySet{
+				Keys: []jose.JSONWebKey{
+					{
+						Key:       keys[0],
+						KeyID:     "key0",
+						Algorithm: "XYZ",
+						Use:       crypto.KeyUsageSigning.String(),
+					},
+				},
+			},
+		},
+		{
+			name: "empty pubkeys",
+			args: args{
+				keyset: &jose.JSONWebKeySet{
+					Keys: []jose.JSONWebKey{
+						{
+							Key:       keys[0],
+							KeyID:     "key0",
+							Algorithm: "XYZ",
+							Use:       crypto.KeyUsageSigning.String(),
+						},
+					},
+				},
+				pubkeys: &query.PublicKeys{
+					Keys: []query.PublicKey{},
+				},
+			},
+			want: &jose.JSONWebKeySet{
+				Keys: []jose.JSONWebKey{
+					{
+						Key:       keys[0],
+						KeyID:     "key0",
+						Algorithm: "XYZ",
+						Use:       crypto.KeyUsageSigning.String(),
+					},
+				},
+			},
+		},
+		{
+			name: "append pubkeys",
+			args: args{
+				keyset: &jose.JSONWebKeySet{
+					Keys: []jose.JSONWebKey{
+						{
+							Key:       keys[0],
+							KeyID:     "key0",
+							Algorithm: "XYZ",
+							Use:       crypto.KeyUsageSigning.String(),
+						},
+					},
+				},
+				pubkeys: &query.PublicKeys{
+					Keys: []query.PublicKey{
+						&publicKey{
+							id:  "key1",
+							key: keys[1],
+							alg: "XYZ",
+							use: crypto.KeyUsageSigning,
+						},
+					},
+				},
+			},
+			want: &jose.JSONWebKeySet{
+				Keys: []jose.JSONWebKey{
+					{
+						Key:       keys[0],
+						KeyID:     "key0",
+						Algorithm: "XYZ",
+						Use:       crypto.KeyUsageSigning.String(),
+					},
+					{
+						Key:       keys[1],
+						KeyID:     "key1",
+						Algorithm: "XYZ",
+						Use:       crypto.KeyUsageSigning.String(),
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			appendPublicKeysToWebKeySet(tt.args.keyset, tt.args.pubkeys)
+			assert.Equal(t, tt.want, tt.args.keyset)
 		})
 	}
 }

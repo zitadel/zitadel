@@ -128,13 +128,6 @@ func (s *Server) Discovery(ctx context.Context, r *op.Request[struct{}]) (_ *op.
 	return op.NewResponse(s.createDiscoveryConfig(ctx, allowedLanguages)), nil
 }
 
-func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Response, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	return s.LegacyServer.Keys(ctx, r)
-}
-
 func (s *Server) VerifyAuthRequest(ctx context.Context, r *op.Request[oidc.AuthRequest]) (_ *op.ClientRequest[oidc.AuthRequest], err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
