@@ -564,6 +564,7 @@ Errors:
     NotFound: Извршувањето не е пронајдено
     IncludeNotFound: Вклучете не е пронајден
     NoTargets: Не се дефинирани цели
+    Failed: Извршувањето не успеа
     ResponseIsNotValidJSON: Одговорот не е валиден JSON
   UserSchema:
     NotEnabled: Функцијата „Корисничка шема“ не е овозможена

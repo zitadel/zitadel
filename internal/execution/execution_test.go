@@ -1,7 +1,10 @@
 package execution_test
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,6 +18,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server/middleware"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/execution"
+	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 func Test_Call(t *testing.T) {
@@ -512,4 +516,153 @@ var requestContextInfoBody2 = []byte("{\"request\":{\"request\":\"content2\"}}")
 
 type request struct {
 	Request string `json:"request"`
+}
+
+func testErrorBody(code int, message string) []byte {
+	body := &execution.ErrorBody{ForwardedStatusCode: code, ForwardedErrorMessage: message}
+	data, _ := json.Marshal(body)
+	return data
+}
+
+func Test_handleResponse(t *testing.T) {
+	type args struct {
+		resp *http.Response
+	}
+	type res struct {
+		data    []byte
+		wantErr func(error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		res  res
+	}{
+		{
+			"response, statuscode unknown and body",
+			args{
+				resp: &http.Response{
+					StatusCode: 1000,
+					Body:       io.NopCloser(bytes.NewReader([]byte(""))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+				},
+			},
+		},
+		{
+			"response, statuscode >= 400 and no body",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusForbidden,
+					Body:       io.NopCloser(bytes.NewReader([]byte(""))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+				},
+			},
+		},
+		{
+			"response, statuscode >= 400 and body",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusForbidden,
+					Body:       io.NopCloser(bytes.NewReader([]byte("body"))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed"))
+				}},
+		},
+		{
+			"response, statuscode = 200 and body",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewReader([]byte("body"))),
+				},
+			},
+			res{
+				data:    []byte("body"),
+				wantErr: nil,
+			},
+		},
+		{
+			"response, statuscode = 200 no body",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewReader([]byte(""))),
+				},
+			},
+			res{
+				data:    []byte(""),
+				wantErr: nil,
+			},
+		},
+		{
+			"response, statuscode = 200, error body >= 400 < 500",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusForbidden, "forbidden"))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "EXEC-reUaUZCzCp", "forbidden"))
+				},
+			},
+		},
+		{
+			"response, statuscode = 200, error body >= 500",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusInternalServerError, "internal"))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-bmhNhpcqpF", "internal"))
+				},
+			},
+		},
+		{
+			"response, statuscode = 308, no body, should not happen",
+			args{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(bytes.NewReader(testErrorBody(http.StatusPermanentRedirect, "redirect"))),
+				},
+			},
+			res{
+				wantErr: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "EXEC-bmhNhpcqpF", "redirect"))
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			respBody, err := execution.HandleResponse(
+				tt.args.resp,
+			)
+
+			if tt.res.wantErr == nil {
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+			} else if !tt.res.wantErr(err) {
+				t.Errorf("got wrong err: %v", err)
+				return
+			}
+			assert.Equal(t, tt.res.data, respBody)
+		})
+	}
+
 }

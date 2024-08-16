@@ -761,8 +761,8 @@ module.exports = {
               label: "Web key Lifecycle (Preview)",
               link: {
                 type: "generated-index",
-                title: "Action Service API (Preview)",
-                slug: "/apis/resources/action_service_v3",
+                title: "Web Key Service API (Preview)",
+                slug: "/apis/resources/webkey_service_v3",
                 description:
                   "This API is intended to manage web keys for a ZITADEL instance, used to sign and validate OIDC tokens.\n" +
                   "\n" +
