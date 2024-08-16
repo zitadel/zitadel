@@ -105,8 +105,7 @@ func AssertListDetails[L ListDetails, D ListDetailsMsg[L]](t testing.TB, expecte
 
 func AssertResourceListDetails[D ResourceListDetailsMsg](t testing.TB, expected, actual D) {
 	wantDetails, gotDetails := expected.GetDetails(), actual.GetDetails()
-	var nilDetails L
-	if wantDetails == nilDetails {
+	if wantDetails == nil {
 		assert.Nil(t, gotDetails)
 		return
 	}
