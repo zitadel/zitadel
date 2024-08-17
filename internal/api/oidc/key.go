@@ -15,6 +15,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/op"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
+	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/query"
@@ -450,7 +451,10 @@ func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Respo
 	logging.OnError(err).Error("oidc server: active public keys (legacy)")
 	appendPublicKeysToWebKeySet(keyset, legacyKeys)
 
-	return op.NewResponse(keyset), nil
+	resp := op.NewResponse(keyset)
+	resp.Header.Set(http_util.CacheControl, "max-age=300, must-revalidate")
+
+	return resp, nil
 }
 
 func appendPublicKeysToWebKeySet(keyset *jose.JSONWebKeySet, pubkeys *query.PublicKeys) {

@@ -71,7 +71,7 @@ func TestServer_Keys(t *testing.T) {
 			assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				resp, err := http.Get(discovery.JwksURI)
 				require.NoError(ttt, err)
-				require.Equal(t, resp.StatusCode, http.StatusOK)
+				require.Equal(ttt, resp.StatusCode, http.StatusOK)
 				defer resp.Body.Close()
 
 				got := new(jose.JSONWebKeySet)
@@ -81,11 +81,18 @@ func TestServer_Keys(t *testing.T) {
 				assert.Len(t, got.Keys, tt.wantLen)
 				for _, key := range got.Keys {
 					_, ok := key.Key.(*rsa.PublicKey)
-					require.True(t, ok)
-					require.NotEmpty(t, key.KeyID)
-					require.Equal(t, key.Algorithm, string(jose.RS256))
-					require.Equal(t, key.Use, crypto.KeyUsageSigning.String())
+					require.True(ttt, ok)
+					require.NotEmpty(ttt, key.KeyID)
+					require.Equal(ttt, key.Algorithm, string(jose.RS256))
+					require.Equal(ttt, key.Use, crypto.KeyUsageSigning.String())
 				}
+
+				cacheControl := resp.Header.Get("cache-control")
+				if tt.webKeyFeature {
+					require.Equal(ttt, "max-age=300, must-revalidate", cacheControl)
+					return
+				}
+				require.Equal(ttt, "no-store", cacheControl)
 
 			}, time.Minute, time.Second/10)
 		})

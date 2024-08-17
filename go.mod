@@ -58,7 +58,7 @@ require (
 	github.com/superseriousbusiness/exifremove v0.0.0-20210330092427-6acd27eac203
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/zitadel/logging v0.6.0
-	github.com/zitadel/oidc/v3 v3.26.1
+	github.com/zitadel/oidc/v3 v3.27.1-0.20240817133530-f2545780c823
 	github.com/zitadel/passwap v0.6.0
 	github.com/zitadel/saml v0.1.3
 	github.com/zitadel/schema v1.3.0
@@ -77,8 +77,8 @@ require (
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
 	golang.org/x/net v0.26.0
 	golang.org/x/oauth2 v0.22.0
-	golang.org/x/sync v0.7.0
-	golang.org/x/text v0.16.0
+	golang.org/x/sync v0.8.0
+	golang.org/x/text v0.17.0
 	google.golang.org/api v0.187.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094
 	google.golang.org/grpc v1.65.0
