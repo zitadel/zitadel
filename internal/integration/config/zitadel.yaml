@@ -54,3 +54,12 @@ SystemAPIUsers:
 
 InitProjections:
   Enabled: true
+
+# Extend key lifetimes so we do not see more legacy keys when
+# integration tests are rerun on the same DB with more than 6 hours apart.
+# The test counts the amount of keys returned from the JWKS endpoint and fails
+# with 2 or more legacy public keys,
+SystemDefaults:
+  KeyConfig:
+    PrivateKeyLifetime: 7200h
+    PublicKeyLifetime: 14400h
