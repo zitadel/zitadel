@@ -6,10 +6,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/zitadel/logging"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/auth/repository"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -163,8 +165,24 @@ func (s *Server) EndSession(ctx context.Context, r *op.Request[oidc.EndSessionRe
 	return s.LegacyServer.EndSession(ctx, r)
 }
 
+var supportedWebKeyAlgs = []string{
+	string(jose.EdDSA),
+	string(jose.HS256),
+	string(jose.HS384),
+	string(jose.HS512),
+	string(jose.ES256),
+	string(jose.ES384),
+	string(jose.ES512),
+}
+
 func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales oidc.Locales) *oidc.DiscoveryConfiguration {
 	issuer := op.IssuerFromContext(ctx)
+
+	idTokenSigningAlgValuesSupported := []string{s.signingKeyAlgorithm}
+	if authz.GetFeatures(ctx).WebKey {
+		idTokenSigningAlgValuesSupported = supportedWebKeyAlgs
+	}
+
 	return &oidc.DiscoveryConfiguration{
 		Issuer:                      issuer,
 		AuthorizationEndpoint:       s.Endpoints().Authorization.Absolute(issuer),
@@ -184,7 +202,7 @@ func (s *Server) createDiscoveryConfig(ctx context.Context, supportedUILocales o
 		},
 		GrantTypesSupported:                                op.GrantTypes(s.Provider()),
 		SubjectTypesSupported:                              op.SubjectTypes(s.Provider()),
-		IDTokenSigningAlgValuesSupported:                   []string{s.signingKeyAlgorithm},
+		IDTokenSigningAlgValuesSupported:                   idTokenSigningAlgValuesSupported,
 		RequestObjectSigningAlgValuesSupported:             op.RequestObjectSigAlgorithms(s.Provider()),
 		TokenEndpointAuthMethodsSupported:                  op.AuthMethodsTokenEndpoint(s.Provider()),
 		TokenEndpointAuthSigningAlgValuesSupported:         op.TokenSigAlgorithms(s.Provider()),
