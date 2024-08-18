@@ -25,6 +25,23 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
+var supportedWebKeyAlgs = []string{
+	// string(jose.EdDSA), Currently not supported in our OIDC library.
+	string(jose.RS256),
+	string(jose.RS384),
+	string(jose.RS512),
+	string(jose.ES256),
+	string(jose.ES384),
+	string(jose.ES512),
+}
+
+func supportedSigningAlgs(ctx context.Context) []string {
+	if authz.GetFeatures(ctx).WebKey {
+		return supportedWebKeyAlgs
+	}
+	return []string{string(jose.RS256)}
+}
+
 type cachedPublicKey struct {
 	lastUse atomic.Int64 // unix micro time.
 	expiry  *time.Time   // expiry may be nil if the key does not expire.

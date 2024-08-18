@@ -79,6 +79,27 @@ type OPStorage struct {
 	assetAPIPrefix                    func(ctx context.Context) string
 }
 
+// Provider is used to overload certain [op.Provider] methods
+type Provider struct {
+	*op.Provider
+	accessTokenKeySet oidc.KeySet
+	idTokenHintKeySet oidc.KeySet
+}
+
+// IDTokenHintVerifier configures a Verifier and supported signing algorithms based on the Web Key feature in the context.
+func (o *Provider) IDTokenHintVerifier(ctx context.Context) *op.IDTokenHintVerifier {
+	return op.NewIDTokenHintVerifier(op.IssuerFromContext(ctx), o.idTokenHintKeySet, op.WithSupportedIDTokenHintSigningAlgorithms(
+		supportedSigningAlgs(ctx)...,
+	))
+}
+
+// AccessTokenVerifier configures a Verifier and supported signing algorithms based on the Web Key feature in the context.
+func (o *Provider) AccessTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
+	return op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), o.accessTokenKeySet, op.WithSupportedAccessTokenSigningAlgorithms(
+		supportedSigningAlgs(ctx)...,
+	))
+}
+
 func NewServer(
 	ctx context.Context,
 	config Config,
@@ -105,10 +126,7 @@ func NewServer(
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 
-	options := []op.Option{
-		op.WithAccessTokenKeySet(accessTokenKeySet),
-		op.WithIDTokenHintKeySet(idTokenHintKeySet),
-	}
+	var options []op.Option
 	if !externalSecure {
 		options = append(options, op.WithAllowInsecure())
 	}
@@ -126,7 +144,11 @@ func NewServer(
 		return nil, zerrors.ThrowInternal(err, "OIDC-Aij4e", "cannot create secret hasher")
 	}
 	server := &Server{
-		LegacyServer:               op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
+		LegacyServer: op.NewLegacyServer(&Provider{
+			Provider:          provider,
+			accessTokenKeySet: accessTokenKeySet,
+			idTokenHintKeySet: idTokenHintKeySet,
+		}, endpoints(config.CustomEndpoints)),
 		repo:                       repo,
 		query:                      query,
 		command:                    command,
