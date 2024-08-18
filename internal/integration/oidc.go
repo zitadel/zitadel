@@ -3,6 +3,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -27,7 +28,7 @@ func (s *Tester) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedire
 	if len(grantTypes) == 0 {
 		grantTypes = []app.OIDCGrantType{app.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE, app.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN}
 	}
-	return s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
+	resp, err := s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                projectID,
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
 		RedirectUris:             []string{redirectURI},
@@ -45,6 +46,16 @@ func (s *Tester) CreateOIDCClient(ctx context.Context, redirectURI, logoutRedire
 		ClockSkew:                nil,
 		AdditionalOrigins:        nil,
 		SkipNativeAppSuccessPage: false,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return resp, await(func() error {
+		_, err := s.Client.Mgmt.GetAppByID(ctx, &management.GetAppByIDRequest{
+			ProjectId: projectID,
+			AppId:     resp.GetAppId(),
+		})
+		return err
 	})
 }
 
@@ -95,7 +106,7 @@ func (s *Tester) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI s
 	if err != nil {
 		return nil, err
 	}
-	return s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
+	resp, err := s.Client.Mgmt.AddOIDCApp(ctx, &management.AddOIDCAppRequest{
 		ProjectId:                project.GetId(),
 		Name:                     fmt.Sprintf("app-%d", time.Now().UnixNano()),
 		RedirectUris:             []string{redirectURI},
@@ -113,6 +124,16 @@ func (s *Tester) CreateOIDCImplicitFlowClient(ctx context.Context, redirectURI s
 		ClockSkew:                nil,
 		AdditionalOrigins:        nil,
 		SkipNativeAppSuccessPage: false,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return resp, await(func() error {
+		_, err := s.Client.Mgmt.GetAppByID(ctx, &management.GetAppByIDRequest{
+			ProjectId: project.GetId(),
+			AppId:     resp.GetAppId(),
+		})
+		return err
 	})
 }
 
@@ -284,6 +305,10 @@ func CheckRedirect(req *http.Request) (*url.URL, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode < 300 || resp.StatusCode >= 400 {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("check redirect unexpected status: %q; body: %q", resp.Status, body)
+	}
 
 	return resp.Location()
 }

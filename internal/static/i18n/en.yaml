@@ -564,6 +564,7 @@ Errors:
     NotFound: Execution not found
     IncludeNotFound: Include not found
     NoTargets: No targets defined
+    Failed: Execution failed
     ResponseIsNotValidJSON: Response is not valid JSON
   UserSchema:
     NotEnabled: Feature "User Schema" is not enabled
@@ -586,7 +587,13 @@ Errors:
       NotForAPI: Impersonated tokens not allowed for API
     Impersonation:
       PolicyDisabled: Impersonation is disabled in the instance security policy
-
+  WebKey:
+    ActiveDelete: Cannot delete active web key
+    Config: Invalid web key config
+    Duplicate: Web key ID not unique
+    FeatureDisabled: Web key feature disabled
+    NoActive: No active web key found
+    NotFound: Web key not found
 
 AggregateTypes:
   action: Action
@@ -610,6 +617,7 @@ AggregateTypes:
   restrictions: Restrictions
   system: System
   session: Session
+  web_key: Web Key
 
 EventTypes:
   execution:
@@ -1311,6 +1319,11 @@ EventTypes:
     deactivated: User Schema deactivated
     reactivated: User Schema reactivated
     deleted: User Schema deleted
+  web_key:
+    added: Web Key added
+    activated: Web Key activated
+    deactivated: Web Key deactivated
+    removed: Web Key removed
 
 Application:
   OIDC:

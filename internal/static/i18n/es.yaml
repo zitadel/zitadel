@@ -564,6 +564,7 @@ Errors:
     NotFound: Ejecución no encontrada
     IncludeNotFound: Incluir no encontrado
     NoTargets: No hay objetivos definidos
+    Failed: Ejecución fallida
     ResponseIsNotValidJSON: La respuesta no es un JSON válido
   UserSchema:
     NotEnabled: La función "Esquema de usuario" no está habilitada
@@ -586,6 +587,13 @@ Errors:
       NotForAPI: Tokens suplantados no permitidos para API
     Impersonation:
       PolicyDisabled: La suplantación está deshabilitada en la política de seguridad de la instancia.
+  WebKey:
+    ActiveDelete: No se puede eliminar la clave web activa
+    Config: Configuración de clave web no válida
+    Duplicate: ID de clave web no único
+    FeatureDisabled: Función de clave web deshabilitada
+    NoActive: No se encontró ninguna clave web activa
+    NotFound: Clave web no encontrada
 
 AggregateTypes:
   action: Acción
@@ -609,6 +617,7 @@ AggregateTypes:
   restrictions: Restricciones
   system: Sistema
   session: Sesión
+  web_key: Clave web
 
 EventTypes:
   execution:
@@ -1310,6 +1319,11 @@ EventTypes:
     deactivated: Esquema de usuario desactivado
     reactivated: Esquema de usuario reactivado
     deleted: Esquema de usuario eliminado
+  web_key:
+    added: Clave web añadida
+    activated: Clave web activada
+    deactivated: Clave web desactivada
+    removed: Clave web eliminada
 
 Application:
   OIDC:
