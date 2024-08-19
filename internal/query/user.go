@@ -125,15 +125,9 @@ type NotifyUser struct {
 }
 
 func usersCheckPermission(ctx context.Context, users *Users, permissionCheck domain.PermissionCheck) {
-	ctxData := authz.GetCtxData(ctx)
 	users.Users = slices.DeleteFunc(users.Users,
 		func(user *User) bool {
-			if ctxData.UserID != user.ID {
-				if err := permissionCheck(ctx, domain.PermissionUserRead, user.ResourceOwner, user.ID); err != nil {
-					return true
-				}
-			}
-			return false
+			return !userCheckPermission(ctx, user.ResourceOwner, user.ID, permissionCheck)
 		},
 	)
 }
@@ -346,6 +340,27 @@ var (
 
 //go:embed user_by_id.sql
 var userByIDQuery string
+
+func userCheckPermission(ctx context.Context, resourceOwner string, userID string, permissionCheck domain.PermissionCheck) bool {
+	ctxData := authz.GetCtxData(ctx)
+	if ctxData.UserID != userID {
+		if err := permissionCheck(ctx, domain.PermissionUserRead, resourceOwner, userID); err != nil {
+			return false
+		}
+	}
+	return true
+}
+
+func (q *Queries) GetUserByIDWithPermission(ctx context.Context, shouldTriggerBulk bool, userID string, permissionCheck domain.PermissionCheck) (*User, error) {
+	user, err := q.GetUserByID(ctx, shouldTriggerBulk, userID)
+	if err != nil {
+		return nil, err
+	}
+	if !userCheckPermission(ctx, user.ResourceOwner, user.ID, permissionCheck) {
+		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-RUz27qGst0", "Errors.PermissionDenied")
+	}
+	return user, nil
+}
 
 func (q *Queries) GetUserByID(ctx context.Context, shouldTriggerBulk bool, userID string) (user *User, err error) {
 	ctx, span := tracing.NewSpan(ctx)

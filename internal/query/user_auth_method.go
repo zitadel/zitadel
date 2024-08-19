@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -98,27 +99,12 @@ type AuthMethods struct {
 	AuthMethods []*AuthMethod
 }
 
-func (l *AuthMethods) RemoveNoPermission(ctx context.Context, permissionCheck domain.PermissionCheck) {
-	removableIndexes := make([]int, 0)
-	for i := range l.AuthMethods {
-		ctxData := authz.GetCtxData(ctx)
-		if ctxData.UserID != l.AuthMethods[i].UserID {
-			if err := permissionCheck(ctx, domain.PermissionUserRead, l.AuthMethods[i].ResourceOwner, l.AuthMethods[i].UserID); err != nil {
-				removableIndexes = append(removableIndexes, i)
-			}
-		}
-	}
-	removed := 0
-	for _, removeIndex := range removableIndexes {
-		l.AuthMethods = removeAuthMethod(l.AuthMethods, removeIndex-removed)
-		removed++
-	}
-	// reset count as some users could be removed
-	l.SearchResponse.Count = uint64(len(l.AuthMethods))
-}
-
-func removeAuthMethod(slice []*AuthMethod, s int) []*AuthMethod {
-	return append(slice[:s], slice[s+1:]...)
+func authMethodsCheckPermission(ctx context.Context, methods *AuthMethods, permissionCheck domain.PermissionCheck) {
+	methods.AuthMethods = slices.DeleteFunc(methods.AuthMethods,
+		func(method *AuthMethod) bool {
+			return !userCheckPermission(ctx, method.ResourceOwner, method.UserID, permissionCheck)
+		},
+	)
 }
 
 type AuthMethod struct {
@@ -144,7 +130,32 @@ type UserAuthMethodSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries, withOwnerRemoved bool) (userAuthMethods *AuthMethods, err error) {
+func (q *UserAuthMethodSearchQueries) hasUserID() bool {
+	for _, query := range q.Queries {
+		if query.Col() == UserAuthMethodColumnUserID {
+			return true
+		}
+	}
+	return false
+}
+
+func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries, permissionCheck domain.PermissionCheck) (userAuthMethods *AuthMethods, err error) {
+	methods, err := q.searchUserAuthMethods(ctx, queries, false)
+	if err != nil {
+		return nil, err
+	}
+	if permissionCheck != nil && len(methods.AuthMethods) > 0 {
+		// when userID for query is provided, only one check has to be done
+		if queries.hasUserID() && !userCheckPermission(ctx, methods.AuthMethods[0].ResourceOwner, methods.AuthMethods[0].UserID, permissionCheck) {
+			return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-aHDkbvCdAO", "Errors.PermissionDenied")
+		} else {
+			authMethodsCheckPermission(ctx, methods, permissionCheck)
+		}
+	}
+	return methods, nil
+}
+
+func (q *Queries) searchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries, withOwnerRemoved bool) (userAuthMethods *AuthMethods, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
