@@ -23,7 +23,11 @@ export function ensureProjectDoesntExist(api: API, projectName: string, orgId?: 
 }
 
 class ResourceType {
-  constructor(public resourcePath: string, public compareProperty: string, public identifierProperty: string) {}
+  constructor(
+    public resourcePath: string,
+    public compareProperty: string,
+    public identifierProperty: string,
+  ) {}
 }
 
 export const Apps = new ResourceType('apps', 'name', 'id');

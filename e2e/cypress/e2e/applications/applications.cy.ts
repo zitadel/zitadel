@@ -31,7 +31,10 @@ describe('applications', () => {
       cy.get('[data-e2e="continue-button-nameandtype"]').click();
       cy.get('[for="PKCE"]').should('be.visible').click();
       cy.get('[data-e2e="continue-button-authmethod"]').click();
-      cy.get('[data-e2e="redirect-uris"] input').focus().should('be.enabled').type('http://localhost:3000/api/auth/callback/zitadel');
+      cy.get('[data-e2e="redirect-uris"] input')
+        .focus()
+        .should('be.enabled')
+        .type('http://localhost:3000/api/auth/callback/zitadel');
       cy.get('[data-e2e="postlogout-uris"] input').focus().should('be.enabled').type('http://localhost:3000');
       cy.get('[data-e2e="continue-button-redirecturis"]').click();
       cy.get('[data-e2e="create-button"]').click();
