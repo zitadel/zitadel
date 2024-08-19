@@ -24,7 +24,7 @@ export class SettingsListComponent implements OnChanges {
         this.settingsList && this.settingsList.find((l) => l.id === changes['selectedId'].currentValue)
           ? changes['selectedId'].currentValue
           : '';
-    } else {
+    } else if (this.currentSetting === '') {
       this.currentSetting = this.settingsList ? this.settingsList[0].id : '';
     }
   }
