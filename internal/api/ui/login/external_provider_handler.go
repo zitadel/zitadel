@@ -533,9 +533,10 @@ func (l *Login) externalUserNotExisting(w http.ResponseWriter, r *http.Request, 
 		}
 	}
 
-	// if auto creation or creation itself is disabled, send the user to the notFoundOption
-	if !provider.IsCreationAllowed || !provider.IsAutoCreation {
-		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, err)
+	// if auto creation is disabled, send the user to the notFoundOption
+	// where they can either link or create an account (based on the available options)
+	if !provider.IsAutoCreation {
+		l.renderExternalNotFoundOption(w, r, authReq, orgIAMPolicy, human, idpLink, nil)
 		return
 	}
 
@@ -612,6 +613,10 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 	idpTemplate, err := l.getIDPByID(r, idpLink.IDPConfigID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
+		return
+	}
+	if !idpTemplate.IsCreationAllowed && !idpTemplate.IsLinkingAllowed {
+		l.renderError(w, r, authReq, zerrors.ThrowPreconditionFailed(nil, "LOGIN-3kl44", "Errors.User.ExternalIDP.NoOptionAllowed"))
 		return
 	}
 
@@ -1042,7 +1047,7 @@ func (l *Login) samlProvider(ctx context.Context, identityProvider *query.IDPTem
 		opts = append(opts, saml.WithTransientMappingAttributeName(identityProvider.SAMLIDPTemplate.TransientMappingAttributeName))
 	}
 	opts = append(opts,
-		saml.WithEntityID(http_utils.BuildOrigin(authz.GetInstance(ctx).RequestedHost(), l.externalSecure)+"/idps/"+identityProvider.ID+"/saml/metadata"),
+		saml.WithEntityID(http_utils.DomainContext(ctx).Origin()+"/idps/"+identityProvider.ID+"/saml/metadata"),
 		saml.WithCustomRequestTracker(
 			requesttracker.New(
 				func(ctx context.Context, authRequestID, samlRequestID string) error {

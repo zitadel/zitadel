@@ -485,6 +485,7 @@ Errors:
     SQLStatement: SQLステートメントの作成に失敗しました
     InvalidRequest: 無効なリクエストです
     TooManyNestingLevels: クエリのネスト レベルが多すぎます (最大 20)
+    LimitExceeded: 制限を超えました
   Quota:
     AlreadyExists: このユニットにはすでにクォータが存在しています
     NotFound: このユニットにはクォータが見つかりません
@@ -553,6 +554,8 @@ Errors:
     NotFound: 実行が見つかりませんでした
     IncludeNotFound: 見つからないものを含める
     NoTargets: ターゲットが定義されていません
+    Failed: 実行に失敗しました
+    ResponseIsNotValidJSON: 応答は有効な JSON ではありません
   UserSchema:
     NotEnabled: 機能「ユーザースキーマ」が有効になっていません
     Type:
@@ -574,6 +577,13 @@ Errors:
       NotForAPI: 偽装されたトークンは API では許可されません
     Impersonation:
       PolicyDisabled: インスタンスのセキュリティ ポリシーで偽装が無効になっています
+  WebKey:
+    ActiveDelete: アクティブな Web キーを削除できません
+    Config: 無効な Web キー設定
+    Duplicate: Web キー ID が一意ではありません
+    FeatureDisabled: Web キー機能が無効です
+    NoActive: アクティブな Web キーが見つかりません
+    NotFound: Web キーが見つかりません
 
 AggregateTypes:
   action: アクション
@@ -597,6 +607,7 @@ AggregateTypes:
   restrictions: 制限
   system: システム
   session: セッション
+  web_key: Web キー
 
 EventTypes:
   execution:
@@ -1295,6 +1306,11 @@ EventTypes:
     deactivated: ユーザースキーマが非アクティブ化されました
     reactivated: ユーザースキーマが再アクティブ化されました
     deleted: ユーザースキーマが削除されました
+  web_key:
+    added: Web キーが追加されました
+    activated: Web キーが有効化されました
+    deactivated: Web キーが無効化されました
+    removed: Web キーが削除されました
 
 Application:
   OIDC:

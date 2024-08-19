@@ -489,6 +489,7 @@ Errors:
     SQLStatement: SQL-запрос не может быть создан
     InvalidRequest: Запрос недействителен
     TooManyNestingLevels: слишком много уровней вложенности запросов (максимум 20)
+    LimitExceeded: Превышен лимит
   Quota:
     AlreadyExists: Квота для данного объекта уже существует
     NotFound: Квота для данного объекта не найдена
@@ -553,6 +554,8 @@ Errors:
     NotFound: Исполнение не найдено
     IncludeNotFound: Включить не найдено
     NoTargets: Цели не определены
+    Failed: Выполнение не удалось
+    ResponseIsNotValidJSON: Ответ не является допустимым JSON
   UserSchema:
     NotEnabled: Функция «Пользовательская схема» не включена
     Type:
@@ -574,6 +577,13 @@ Errors:
       NotForAPI: Олицетворенные токены не разрешены для API.
     Impersonation:
       PolicyDisabled: Олицетворение отключено в политике безопасности экземпляра.
+  WebKey:
+    ActiveDelete: Невозможно удалить активный веб-ключ
+    Config: Неверная конфигурация веб-ключа
+    Duplicate: Идентификатор веб-ключа не уникален
+    FeatureDisabled: Функция веб-ключа отключена
+    NoActive: Активный веб-ключ не найден
+    NotFound: Веб-ключ не найден
 
 AggregateTypes:
   action: Действие
@@ -597,6 +607,7 @@ AggregateTypes:
   restrictions: Ограничения
   system: Система
   session: Сеанс
+  web_key: Веб-ключ
 
 EventTypes:
   execution:
@@ -1295,6 +1306,12 @@ EventTypes:
     deactivated: Пользовательская схема деактивирована
     reactivated: Пользовательская схема повторно активирована
     deleted: Пользовательская схема удалена
+  web_key:
+    added: Добавлен веб-ключ
+    activated: Веб-ключ активирован
+    deactivated: Веб-ключ деактивирован
+    removed: Веб-ключ удален
+
 Application:
   OIDC:
     UnsupportedVersion: Ваша версия OIDC не поддерживается

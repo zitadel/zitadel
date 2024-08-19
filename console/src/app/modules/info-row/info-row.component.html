@@ -6,7 +6,7 @@
       class="state"
       [ngClass]="{
         active: user.state === UserState.USER_STATE_ACTIVE,
-        inactive: user.state === UserState.USER_STATE_INACTIVE
+        inactive: user.state === UserState.USER_STATE_INACTIVE,
       }"
     >
       {{ 'USER.DATA.STATE' + user.state | translate }}
@@ -57,7 +57,7 @@
       class="state"
       [ngClass]="{
         active: instance.state === State.INSTANCE_STATE_RUNNING,
-        inactive: instance.state === State.INSTANCE_STATE_STOPPED || instance.state === State.INSTANCE_STATE_STOPPING
+        inactive: instance.state === State.INSTANCE_STATE_STOPPED || instance.state === State.INSTANCE_STATE_STOPPING,
       }"
     >
       {{ 'IAM.STATE.' + instance.state | translate }}
@@ -164,7 +164,7 @@
       class="state"
       [ngClass]="{
         active: project.state === ProjectState.PROJECT_STATE_ACTIVE,
-        inactive: project.state === ProjectState.PROJECT_STATE_INACTIVE
+        inactive: project.state === ProjectState.PROJECT_STATE_INACTIVE,
       }"
     >
       {{ 'PROJECT.STATE.' + project.state | translate }}
@@ -199,7 +199,7 @@
       class="state"
       [ngClass]="{
         active: grantedProject.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE,
-        inactive: grantedProject.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE
+        inactive: grantedProject.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE,
       }"
     >
       {{ 'PROJECT.STATE.' + grantedProject.state | translate }}

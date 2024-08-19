@@ -11,12 +11,11 @@ export function ensureExternalLinksSettingsSet(api: API, tosLink: string, privac
         id: body.policy.id,
         entity: null,
       };
-
       if (
         body.policy &&
-        body.policy.tosLink === tosLink &&
-        body.policy.privacyLink === privacyPolicyLink &&
-        body.policy.docsLink === docsLink
+        (body.policy.tosLink || '') === tosLink &&
+        (body.policy.privacyLink || '') === privacyPolicyLink &&
+        (body.policy.docsLink || '') === docsLink
       ) {
         return { ...result, entity: body.policy };
       }

@@ -1615,8 +1615,6 @@ func userSessionByIDs(ctx context.Context, provider userSessionViewProvider, eve
 			if userAgentID != agentID {
 				continue
 			}
-		case user_repo.UserRemovedType:
-			return nil, zerrors.ThrowPreconditionFailed(nil, "EVENT-dG2fe", "Errors.User.NotActive")
 		}
 		err := sessionCopy.AppendEvent(event)
 		logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Warn("error appending event")

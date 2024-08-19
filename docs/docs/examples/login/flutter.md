@@ -65,8 +65,8 @@ The [RFC 8252 specification](https://tools.ietf.org/html/rfc8252) defines how
 Basically, there are two major points in this specification:
 
 1. It recommends to use [PKCE](https://oauth.net/2/pkce/)
-2. It does not allow third party apps to open the browser for the login process,
-   the app must open the login page within the embedded browser view
+2. It does not allow third party apps to use an embedded web view for the login process,
+   the app must open the login page within the default browser
 
 First install [http](https://pub.dev/packages/http) a library for making HTTP calls,
 then [`flutter_web_auth_2`](https://pub.dev/packages/flutter_web_auth_2) and a secure storage to store the auth / refresh tokens [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage).
