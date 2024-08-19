@@ -61,7 +61,7 @@ export class OwnedProjectDetailComponent implements OnInit {
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
   public settingsList: SidenavSetting[] = [GENERAL, ROLES, PROJECTGRANTS, GRANTS];
-  public currentSetting: string | undefined = '';
+  public currentSetting: string = '';
   constructor(
     public translate: TranslateService,
     private route: ActivatedRoute,

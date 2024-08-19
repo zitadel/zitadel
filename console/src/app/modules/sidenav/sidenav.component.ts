@@ -21,7 +21,7 @@ export interface SidenavSetting {
   styleUrls: ['./sidenav.component.scss'],
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: SidenavComponent, multi: true }],
 })
-export class SidenavComponent implements ControlValueAccessor, OnInit {
+export class SidenavComponent implements ControlValueAccessor {
   @Input() public title: string = '';
   @Input() public description: string = '';
   @Input() public indented: boolean = false;
@@ -35,11 +35,11 @@ export class SidenavComponent implements ControlValueAccessor, OnInit {
     private route: ActivatedRoute,
   ) {}
 
-  ngOnInit(): void {
-    if (!this.value) {
-      this.value = this.settingsList[0].id;
-    }
-  }
+  // ngOnInit(): void {
+  //   if (!this.value) {
+  //     this.value = this.settingsList[0].id;
+  //   }
+  // }
 
   private onChange = (current: string | undefined) => {};
   private onTouch = (current: string | undefined) => {};
