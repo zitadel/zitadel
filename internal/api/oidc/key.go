@@ -26,7 +26,7 @@ import (
 )
 
 var supportedWebKeyAlgs = []string{
-	// string(jose.EdDSA), Currently not supported in our OIDC library.
+	string(jose.EdDSA),
 	string(jose.RS256),
 	string(jose.RS384),
 	string(jose.RS512),
