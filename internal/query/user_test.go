@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
@@ -153,7 +154,7 @@ func TestUser_userCheckPermission(t *testing.T) {
 	}
 	tests := []struct {
 		name        string
-		want        bool
+		wantErr     bool
 		args        args
 		permissions []perm
 	}{
@@ -165,7 +166,6 @@ func TestUser_userCheckPermission(t *testing.T) {
 				ctxData:       "user",
 			},
 			permissions: []perm{},
-			want:        true,
 		},
 		{
 			name: "permission, user",
@@ -175,7 +175,7 @@ func TestUser_userCheckPermission(t *testing.T) {
 				ctxData:       "user2",
 			},
 			permissions: []perm{{"org1", "user1"}},
-			want:        true,
+			wantErr:     false,
 		},
 		{
 			name: "permission, org",
@@ -185,7 +185,6 @@ func TestUser_userCheckPermission(t *testing.T) {
 				ctxData:       "user2",
 			},
 			permissions: []perm{{"org1", "user3"}},
-			want:        true,
 		},
 		{
 			name: "permission, none",
@@ -195,7 +194,7 @@ func TestUser_userCheckPermission(t *testing.T) {
 				ctxData:       "user2",
 			},
 			permissions: []perm{},
-			want:        false,
+			wantErr:     true,
 		},
 	}
 	for _, tt := range tests {
@@ -213,7 +212,11 @@ func TestUser_userCheckPermission(t *testing.T) {
 			}
 
 			granted := userCheckPermission(authz.SetCtxData(context.Background(), authz.CtxData{UserID: tt.args.ctxData}), tt.args.resourceowner, tt.args.user, checkPermission)
-			require.Equal(t, tt.want, granted)
+			if tt.wantErr {
+				assert.Error(t, granted)
+			} else {
+				assert.NoError(t, granted)
+			}
 		})
 	}
 }

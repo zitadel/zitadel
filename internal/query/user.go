@@ -127,7 +127,10 @@ type NotifyUser struct {
 func usersCheckPermission(ctx context.Context, users *Users, permissionCheck domain.PermissionCheck) {
 	users.Users = slices.DeleteFunc(users.Users,
 		func(user *User) bool {
-			return !userCheckPermission(ctx, user.ResourceOwner, user.ID, permissionCheck)
+			if err := userCheckPermission(ctx, user.ResourceOwner, user.ID, permissionCheck); err != nil {
+				return true
+			}
+			return false
 		},
 	)
 }
@@ -341,14 +344,14 @@ var (
 //go:embed user_by_id.sql
 var userByIDQuery string
 
-func userCheckPermission(ctx context.Context, resourceOwner string, userID string, permissionCheck domain.PermissionCheck) bool {
+func userCheckPermission(ctx context.Context, resourceOwner string, userID string, permissionCheck domain.PermissionCheck) error {
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.UserID != userID {
 		if err := permissionCheck(ctx, domain.PermissionUserRead, resourceOwner, userID); err != nil {
-			return false
+			return zerrors.ThrowPermissionDenied(err, "QUERY-RUz27qGst0", "Errors.PermissionDenied")
 		}
 	}
-	return true
+	return nil
 }
 
 func (q *Queries) GetUserByIDWithPermission(ctx context.Context, shouldTriggerBulk bool, userID string, permissionCheck domain.PermissionCheck) (*User, error) {
@@ -356,8 +359,8 @@ func (q *Queries) GetUserByIDWithPermission(ctx context.Context, shouldTriggerBu
 	if err != nil {
 		return nil, err
 	}
-	if !userCheckPermission(ctx, user.ResourceOwner, user.ID, permissionCheck) {
-		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-RUz27qGst0", "Errors.PermissionDenied")
+	if err := userCheckPermission(ctx, user.ResourceOwner, user.ID, permissionCheck); err != nil {
+		return nil, err
 	}
 	return user, nil
 }

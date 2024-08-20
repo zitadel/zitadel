@@ -102,7 +102,10 @@ var (
 func idpLinksCheckPermission(ctx context.Context, links *IDPUserLinks, permissionCheck domain.PermissionCheck) {
 	links.Links = slices.DeleteFunc(links.Links,
 		func(link *IDPUserLink) bool {
-			return !userCheckPermission(ctx, link.ResourceOwner, link.UserID, permissionCheck)
+			if err := userCheckPermission(ctx, link.ResourceOwner, link.UserID, permissionCheck); err != nil {
+				return true
+			}
+			return false
 		},
 	)
 }
@@ -114,8 +117,10 @@ func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	}
 	if permissionCheck != nil && len(links.Links) > 0 {
 		// when userID for query is provided, only one check has to be done
-		if queries.hasUserID() && !userCheckPermission(ctx, links.Links[0].ResourceOwner, links.Links[0].UserID, permissionCheck) {
-			return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-yBjZGoVARU", "Errors.PermissionDenied")
+		if queries.hasUserID() {
+			if err := userCheckPermission(ctx, links.Links[0].ResourceOwner, links.Links[0].UserID, permissionCheck); err != nil {
+				return nil, err
+			}
 		} else {
 			idpLinksCheckPermission(ctx, links, permissionCheck)
 		}

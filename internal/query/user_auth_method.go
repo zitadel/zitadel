@@ -102,7 +102,10 @@ type AuthMethods struct {
 func authMethodsCheckPermission(ctx context.Context, methods *AuthMethods, permissionCheck domain.PermissionCheck) {
 	methods.AuthMethods = slices.DeleteFunc(methods.AuthMethods,
 		func(method *AuthMethod) bool {
-			return !userCheckPermission(ctx, method.ResourceOwner, method.UserID, permissionCheck)
+			if err := userCheckPermission(ctx, method.ResourceOwner, method.UserID, permissionCheck); err != nil {
+				return true
+			}
+			return false
 		},
 	)
 }
@@ -146,8 +149,10 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	}
 	if permissionCheck != nil && len(methods.AuthMethods) > 0 {
 		// when userID for query is provided, only one check has to be done
-		if queries.hasUserID() && !userCheckPermission(ctx, methods.AuthMethods[0].ResourceOwner, methods.AuthMethods[0].UserID, permissionCheck) {
-			return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-aHDkbvCdAO", "Errors.PermissionDenied")
+		if queries.hasUserID() {
+			if err := userCheckPermission(ctx, methods.AuthMethods[0].ResourceOwner, methods.AuthMethods[0].UserID, permissionCheck); err != nil {
+				return nil, err
+			}
 		} else {
 			authMethodsCheckPermission(ctx, methods, permissionCheck)
 		}
