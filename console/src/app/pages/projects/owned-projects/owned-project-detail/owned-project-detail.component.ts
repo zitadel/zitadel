@@ -72,14 +72,20 @@ export class OwnedProjectDetailComponent implements OnInit {
     private router: Router,
     private breadcrumbService: BreadcrumbService,
   ) {
+    this.currentSetting = 'general';
     route.queryParams.pipe(take(1)).subscribe((params: Params) => {
       const { id } = params;
       if (id) {
         this.currentSetting = id;
-      } else {
-        this.currentSetting = 'general';
       }
+      // else {
+      //   this.currentSetting = 'general';
+      // }
     });
+  }
+
+  public changeSetting(event: any) {
+    console.log('ll', event);
   }
 
   ngOnInit(): void {

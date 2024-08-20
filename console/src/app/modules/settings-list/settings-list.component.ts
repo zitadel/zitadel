@@ -19,7 +19,6 @@ export class SettingsListComponent implements OnChanges {
   constructor() {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes['selectedId']?.currentValue);
     if (this.settingsList && this.settingsList.length && changes['selectedId']?.currentValue) {
       this.currentSetting =
         this.settingsList && this.settingsList.find((l) => l.id === changes['selectedId'].currentValue)
@@ -29,7 +28,6 @@ export class SettingsListComponent implements OnChanges {
   }
 
   ngOnInit(): void {
-    console.log(this.currentSetting);
     if (!this.currentSetting) {
       this.currentSetting = this.settingsList ? this.settingsList[0].id : '';
     }
