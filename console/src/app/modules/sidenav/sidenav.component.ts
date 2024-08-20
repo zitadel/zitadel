@@ -35,8 +35,8 @@ export class SidenavComponent implements ControlValueAccessor {
     private route: ActivatedRoute,
   ) {}
 
-  private onChange: any = (current: string | undefined) => {};
-  private onTouch: any = (current: string | undefined) => {};
+  private onChange = (current: string | undefined) => {};
+  private onTouch = (current: string | undefined) => {};
 
   @Input() get value(): string | undefined {
     return this.currentSetting;
@@ -73,9 +73,5 @@ export class SidenavComponent implements ControlValueAccessor {
 
   public registerOnTouched(fn: any) {
     this.onTouch = fn;
-  }
-
-  public onBlur(): void {
-    this.onTouch();
   }
 }
