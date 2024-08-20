@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	WebKeyTable = "projections.web_keys"
+	WebKeyTable = "projections.web_keys1"
 
 	WebKeyInstanceIDCol   = "instance_id"
 	WebKeyKeyIDCol        = "key_id"
@@ -58,9 +58,6 @@ func (*webKeyProjection) Init() *old_handler.Check {
 			handler.WithIndex(handler.NewIndex(
 				"web_key_state",
 				[]string{WebKeyInstanceIDCol, WebKeyStateCol},
-				handler.WithInclude(
-					WebKeyPrivateKeyCol,
-				),
 			)),
 		),
 	)
