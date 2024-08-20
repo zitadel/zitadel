@@ -129,7 +129,7 @@ curl --request POST \
 	"limit": 1000,
 	"event_types": [
 		"user.token.added",
-		"user.refresh.token.added
+		"user.refresh.token.added"
 	]
 }'
 ```

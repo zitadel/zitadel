@@ -217,6 +217,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Enabled: true,
 			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
+		DebugOidcParentError: &feature_pb.FeatureFlag{
+			Enabled: false,
+			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
+		},
 	}
 	got := instanceFeaturesToPb(arg)
 	assert.Equal(t, want, got)
