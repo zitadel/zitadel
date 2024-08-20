@@ -539,13 +539,97 @@ module.exports = {
     "apis/introduction",
     {
       type: "category",
-      label: "Core Resources",
+      label: "Resources",
       collapsed: false,
       link: {
         type: "doc",
         id: "apis/apis/index",
       },
       items: [
+        {
+          type: "category",
+          label: "Features",
+          link: {
+            type: "generated-index",
+            title: "Feature Service API",
+            slug: "/apis/resources/feature_service_v2",
+            description:
+                'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n'
+          },
+          items: require("./docs/apis/resources/feature_service_v2/sidebar.ts"),
+        },
+        {
+          type: "category",
+          label: "Identity Providers",
+          link: {
+            type: "generated-index",
+            title: "Identity Provider Service API",
+            slug: "/apis/resources/idp_service_v2",
+            description:
+                'This API is intended to manage identity providers (IdPs) for ZITADEL.\n'
+          },
+          items: require("./docs/apis/resources/idp_service_v2/sidebar.ts"),
+        },
+        {
+          type: "category",
+          label: "OIDC Helpers",
+          link: {
+            type: "generated-index",
+            title: "OIDC Service API",
+            slug: "/apis/resources/oidc_service_v2",
+            description:
+                "Get OIDC Auth Request details and create callback URLs.\n"
+          },
+          items: require("./docs/apis/resources/oidc_service_v2/sidebar.ts"),
+        },
+        {
+          type: "category",
+          label: "Organizations",
+          link: {
+            type: "generated-index",
+            title: "Organization Service API",
+            slug: "/apis/resources/org_service/v2",
+            description:
+                'This API is intended to manage organizations for ZITADEL. \n'
+          },
+          items: require("./docs/apis/resources/org_service_v2/sidebar.ts"),
+        },
+        {
+          type: "category",
+          label: "Sessions",
+          link: {
+            type: "generated-index",
+            title: "Session Service API",
+            slug: "/apis/resources/session_service_v2",
+            description:
+                "This API is intended to manage sessions in a ZITADEL instance.\n"
+          },
+          items: require("./docs/apis/resources/session_service_v2/sidebar.ts"),
+        },
+        {
+          type: "category",
+          label: "Settings",
+          link: {
+            type: "generated-index",
+            title: "Settings Service API",
+            slug: "/apis/resources/settings_service_v2",
+            description:
+                "This API is intended to manage settings in a ZITADEL instance.\n"
+          },
+          items: require("./docs/apis/resources/settings_service_v2/sidebar.ts"),
+        },
+        {
+          type: "category",
+          label: "Users",
+          link: {
+            type: "generated-index",
+            title: "User Service API",
+            slug: "/apis/resources/user_service_v2",
+            description:
+                "This API is intended to manage users in a ZITADEL instance.\n"
+          },
+          items: require("./docs/apis/resources/user_service_v2/sidebar.ts"),
+        },
         {
           type: "category",
           label: "V1 (Generally Available)",
@@ -607,101 +691,6 @@ module.exports = {
                   "Checkout the guide how to access the ZITADEL System API.",
               },
               items: require("./docs/apis/resources/system/sidebar.ts"),
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "V2 (Generally Available)",
-          collapsed: false,
-          link: {
-            type: "doc",
-            id: "apis/v2",
-          },
-          items: [
-            {
-              type: "category",
-              label: "User Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "User Service API",
-                slug: "/apis/resources/user_service_v2",
-                description:
-                  "This API is intended to manage users in a ZITADEL instance.\n"
-              },
-              items: require("./docs/apis/resources/user_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Session Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "Session Service API",
-                slug: "/apis/resources/session_service_v2",
-                description:
-                  "This API is intended to manage sessions in a ZITADEL instance.\n"
-              },
-              items: require("./docs/apis/resources/session_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "OIDC Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "OIDC Service API",
-                slug: "/apis/resources/oidc_service_v2",
-                description:
-                  "Get OIDC Auth Request details and create callback URLs.\n"
-              },
-              items: require("./docs/apis/resources/oidc_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Settings Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "Settings Service API",
-                slug: "/apis/resources/settings_service_v2",
-                description:
-                  "This API is intended to manage settings in a ZITADEL instance.\n"
-              },
-              items: require("./docs/apis/resources/settings_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Feature Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "Feature Service API",
-                slug: "/apis/resources/feature_service_v2",
-                description:
-                  'This API is intended to manage features for ZITADEL. Feature settings that are available on multiple "levels", such as instance and organization. The higher level instance acts as a default for the lower level. When a feature is set on multiple levels, the lower level takes precedence. Features can be experimental where ZITADEL will assume a sane default, such as disabled. When over time confidence in such a feature grows, ZITADEL can default to enabling the feature. As a final step we might choose to always enable a feature and remove the setting from this API, reserving the proto field number. Such removal is not considered a breaking change. Setting a removed field will effectively result in a no-op.\n'
-              },
-              items: require("./docs/apis/resources/feature_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Organization Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "Organization Service API",
-                slug: "/apis/resources/org_service/v2",
-                description:
-                  'This API is intended to manage organizations for ZITADEL. \n'
-              },
-              items: require("./docs/apis/resources/org_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "Identity Provider Lifecycle",
-              link: {
-                type: "generated-index",
-                title: "Identity Provider Service API",
-                slug: "/apis/resources/idp_service_v2",
-                description:
-                  'This API is intended to manage identity providers (IdPs) for ZITADEL.\n'
-              },
-              items: require("./docs/apis/resources/idp_service_v2/sidebar.ts"),
             },
           ],
         },
