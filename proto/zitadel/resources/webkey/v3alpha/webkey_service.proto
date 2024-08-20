@@ -172,8 +172,8 @@ service ZITADELWebKeys {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Generate a web key pair for the instance";
-      description: "Delete a web key. Only inactive keys can be deleted. Once a key is deleted, any tokens signed by this key will be invalid."
+      summary: "Delete a web key pair for the instance";
+      description: "Delete a web key pair. Only inactive keys can be deleted. Once a key is deleted, any tokens signed by this key will be invalid."
       responses: {
         key: "200"
         value: {
@@ -198,7 +198,7 @@ service ZITADELWebKeys {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      summary: "Generate a web key pair for the instance";
+      summary: "List web key details for the instance";
       description: "List web key details for the instance"
       responses: {
         key: "200"
