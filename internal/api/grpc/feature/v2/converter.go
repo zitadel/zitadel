@@ -43,6 +43,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		Actions:                         req.Actions,
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
 		WebKey:                          req.WebKey,
+		DebugOIDCParentError:            req.DebugOidcParentError,
 	}
 }
 
@@ -57,6 +58,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		Actions:                             featureSourceToFlagPb(&f.Actions),
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		WebKey:                              featureSourceToFlagPb(&f.WebKey),
+		DebugOidcParentError:                featureSourceToFlagPb(&f.DebugOIDCParentError),
 	}
 }
 
