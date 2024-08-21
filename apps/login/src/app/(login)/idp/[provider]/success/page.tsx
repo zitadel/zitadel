@@ -4,6 +4,7 @@ import {
   createUser,
   getBrandingSettings,
   getIDPByID,
+  listUsers,
   retrieveIDPIntent,
 } from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
@@ -152,39 +153,47 @@ export default async function Page({
           if (options?.isLinkingAllowed) {
             const userId = "";
 
-            const idpLink = await addIDPLink(
-              {
-                id: idpInformation.idpId,
-                userId: idpInformation.userId,
-                userName: idpInformation.userName,
+            const foundUser = await listUsers(idpInformation.userName).then(
+              (response) => {
+                return response.result ? response.result[0] : null;
               },
-              userId,
-            ).catch((error) => {
-              return (
-                <DynamicTheme branding={branding}>
-                  <div className="flex flex-col items-center space-y-4">
-                    <h1>Linking failed</h1>
-                    <div className="w-full">
-                      {
-                        <Alert type={AlertType.ALERT}>
-                          {JSON.stringify(error.message)}
-                        </Alert>
-                      }
-                    </div>
-                  </div>
-                </DynamicTheme>
-              );
-            });
+            );
 
-            if (idpLink) {
-              return (
-                <DynamicTheme branding={branding}>
-                  <div className="flex flex-col items-center space-y-4">
-                    <h1>Account successfully linked</h1>
-                    <div>Your account has successfully been linked!</div>
-                  </div>
-                </DynamicTheme>
-              );
+            if (foundUser) {
+              const idpLink = await addIDPLink(
+                {
+                  id: idpInformation.idpId,
+                  userId: idpInformation.userId,
+                  userName: idpInformation.userName,
+                },
+                userId,
+              ).catch((error) => {
+                return (
+                  <DynamicTheme branding={branding}>
+                    <div className="flex flex-col items-center space-y-4">
+                      <h1>Linking failed</h1>
+                      <div className="w-full">
+                        {
+                          <Alert type={AlertType.ALERT}>
+                            {JSON.stringify(error.message)}
+                          </Alert>
+                        }
+                      </div>
+                    </div>
+                  </DynamicTheme>
+                );
+              });
+
+              if (idpLink) {
+                return (
+                  <DynamicTheme branding={branding}>
+                    <div className="flex flex-col items-center space-y-4">
+                      <h1>Account successfully linked</h1>
+                      <div>Your account has successfully been linked!</div>
+                    </div>
+                  </DynamicTheme>
+                );
+              }
             }
           } else if (options?.isCreationAllowed && options.isAutoCreation) {
             const userId = await createUser(provider, idpInformation).catch(

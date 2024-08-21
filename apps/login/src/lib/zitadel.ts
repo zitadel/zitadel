@@ -237,7 +237,7 @@ export async function getUserByID(userId: string) {
   return userService.getUserByID({ userId }, {});
 }
 
-export async function listUsers(userName: string, organizationId: string) {
+export async function listUsers(userName: string, organizationId?: string) {
   return userService.listUsers(
     {
       queries: organizationId
