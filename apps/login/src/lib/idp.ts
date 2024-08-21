@@ -33,7 +33,7 @@ export const PROVIDER_MAPPING: {
     rI: IDPInformation,
   ) => PartialMessage<AddHumanUserRequest>;
 } = {
-  [IdentityProviderType.GOOGLE]: (idp: IDPInformation) => {
+  [idpTypeToSlug(IdentityProviderType.GOOGLE)]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation?.toJson() as {
       User: {
         email: string;
@@ -65,7 +65,7 @@ export const PROVIDER_MAPPING: {
     };
     return req;
   },
-  [IdentityProviderType.AZURE_AD]: (idp: IDPInformation) => {
+  [idpTypeToSlug(IdentityProviderType.AZURE_AD)]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation?.toJson() as {
       mail: string;
       displayName?: string;
@@ -96,7 +96,7 @@ export const PROVIDER_MAPPING: {
 
     return req;
   },
-  [IdentityProviderType.GITHUB]: (idp: IDPInformation) => {
+  [idpTypeToSlug(IdentityProviderType.GITHUB)]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation?.toJson() as {
       email: string;
       name: string;

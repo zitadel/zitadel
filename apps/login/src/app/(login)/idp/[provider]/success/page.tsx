@@ -1,10 +1,10 @@
+import { PROVIDER_MAPPING } from "@/lib/idp";
 import {
   addIDPLink,
   createUser,
   getBrandingSettings,
   getIDPByID,
   listUsers,
-  PROVIDER_MAPPING,
   retrieveIDPIntent,
 } from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
