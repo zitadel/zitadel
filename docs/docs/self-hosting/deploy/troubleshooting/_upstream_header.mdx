@@ -13,12 +13,12 @@ annotations:
         SecRuleRemoveById 949110
     nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
     nginx.ingress.kubernetes.io/configuration-snippet: |
-    grpc_set_header Host $host;
-    more_clear_input_headers "Host" "X-Forwarded-Host";
-    proxy_set_header Host $http_host;
-    proxy_set_header X-Forwarded-Host $http_x_forwarded_host;
-        # highlight-next-line
-+       nginx.ingress.kubernetes.io/server-snippet: "grpc_buffer_size 8k;"
+        grpc_set_header Host $host;
+        more_clear_input_headers "Host" "X-Forwarded-Host";
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Host $http_x_forwarded_host;
+    # highlight-next-line
+    nginx.ingress.kubernetes.io/server-snippet: "grpc_buffer_size 8k;"
 ```
 ### NGINX Config
 ```nginx
