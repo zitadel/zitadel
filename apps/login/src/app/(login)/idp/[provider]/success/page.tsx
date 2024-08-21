@@ -1,4 +1,3 @@
-import { ProviderSlug } from "@/lib/demos";
 import {
   addIDPLink,
   createUser,
@@ -11,18 +10,14 @@ import {
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import IdpSignin from "@/ui/IdpSignin";
-import { AddHumanUserRequest } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { IDPInformation, IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { AutoLinkingOption } from "@zitadel/proto/zitadel/idp/v2/idp_pb";
-
-import { PartialMessage } from "@zitadel/client";
 
 export default async function Page({
   searchParams,
   params,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
-  params: { provider: ProviderSlug };
+  params: { provider: string };
 }) {
   const { id, token, authRequestId, organization } = searchParams;
   const { provider } = params;

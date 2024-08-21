@@ -13,17 +13,16 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import {
   RetrieveIdentityProviderIntentRequest,
   VerifyU2FRegistrationRequest,
-  AddHumanUserRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { IDPInformation, IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2/idp_pb";
-import { ProviderSlug } from "./demos";
 import { PartialMessage, PlainMessage } from "@zitadel/client";
-import VerifyEmailForm from "@/ui/VerifyEmailForm";
 import { SearchQuery as UserSearchQuery } from "@zitadel/proto/zitadel/user/v2/query_pb";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3000;
 
@@ -296,14 +295,6 @@ export async function getOrgByDomain(domain: string) {
   return managementService.getOrgByDomainGlobal({ domain }, {});
 }
 
-export const PROVIDER_NAME_MAPPING: {
-  [provider: string]: string;
-} = {
-  [ProviderSlug.GOOGLE]: "Google",
-  [ProviderSlug.GITHUB]: "GitHub",
-  [ProviderSlug.AZURE]: "Microft",
-};
-
 export async function startIdentityProviderFlow({
   idpId,
   urls,
@@ -400,104 +391,8 @@ export function addIDPLink(
   );
 }
 
-export const PROVIDER_MAPPING: {
-  [provider: string]: (
-    rI: IDPInformation,
-  ) => PartialMessage<AddHumanUserRequest>;
-} = {
-  [ProviderSlug.GOOGLE]: (idp: IDPInformation) => {
-    const rawInfo = idp.rawInformation?.toJson() as {
-      User: {
-        email: string;
-        name?: string;
-        given_name?: string;
-        family_name?: string;
-      };
-    };
-
-    const idpLink: PartialMessage<IDPLink> = {
-      idpId: idp.idpId,
-      userId: idp.userId,
-      userName: idp.userName,
-    };
-
-    const req: PartialMessage<AddHumanUserRequest> = {
-      username: idp.userName,
-      email: {
-        email: rawInfo.User?.email,
-        verification: { case: "isVerified", value: true },
-      },
-      // organisation: Organisation | undefined;
-      profile: {
-        displayName: rawInfo.User?.name ?? "",
-        givenName: rawInfo.User?.given_name ?? "",
-        familyName: rawInfo.User?.family_name ?? "",
-      },
-      idpLinks: [idpLink],
-    };
-    return req;
-  },
-  [ProviderSlug.AZURE]: (idp: IDPInformation) => {
-    const rawInfo = idp.rawInformation?.toJson() as {
-      mail: string;
-      displayName?: string;
-      givenName?: string;
-      surname?: string;
-    };
-
-    const idpLink: PartialMessage<IDPLink> = {
-      idpId: idp.idpId,
-      userId: idp.userId,
-      userName: idp.userName,
-    };
-
-    const req: PartialMessage<AddHumanUserRequest> = {
-      username: idp.userName,
-      email: {
-        email: rawInfo?.mail,
-        verification: { case: "isVerified", value: true },
-      },
-      // organisation: Organisation | undefined;
-      profile: {
-        displayName: rawInfo?.displayName ?? "",
-        givenName: rawInfo?.givenName ?? "",
-        familyName: rawInfo?.surname ?? "",
-      },
-      idpLinks: [idpLink],
-    };
-
-    return req;
-  },
-  [ProviderSlug.GITHUB]: (idp: IDPInformation) => {
-    const rawInfo = idp.rawInformation?.toJson() as {
-      email: string;
-      name: string;
-    };
-    const idpLink: PartialMessage<IDPLink> = {
-      idpId: idp.idpId,
-      userId: idp.userId,
-      userName: idp.userName,
-    };
-    const req: PartialMessage<AddHumanUserRequest> = {
-      username: idp.userName,
-      email: {
-        email: rawInfo?.email,
-        verification: { case: "isVerified", value: true },
-      },
-      // organisation: Organisation | undefined;
-      profile: {
-        displayName: rawInfo?.name ?? "",
-        givenName: rawInfo?.name ?? "",
-        familyName: rawInfo?.name ?? "",
-      },
-      idpLinks: [idpLink],
-    };
-    return req;
-  },
-};
-
 export function createUser(
-  provider: ProviderSlug,
+  provider: string,
   info: IDPInformation,
 ): Promise<string> {
   const userData = PROVIDER_MAPPING[provider](info);

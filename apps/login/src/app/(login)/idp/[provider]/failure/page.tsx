@@ -1,4 +1,3 @@
-import { ProviderSlug } from "@/lib/demos";
 import { getBrandingSettings, PROVIDER_NAME_MAPPING } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 
@@ -7,7 +6,7 @@ export default async function Page({
   params,
 }: {
   searchParams: Record<string | number | symbol, string | undefined>;
-  params: { provider: ProviderSlug };
+  params: { provider: string };
 }) {
   const { id, token, authRequestId, organization } = searchParams;
   const { provider } = params;

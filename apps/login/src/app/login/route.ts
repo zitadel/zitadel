@@ -18,6 +18,7 @@ import {
   Prompt,
 } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { idpTypeToSlug } from "@/lib/idp";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(
@@ -168,28 +169,7 @@ export async function GET(request: NextRequest) {
           const host = request.nextUrl.origin;
 
           const identityProviderType = identityProviders[0].type;
-          let provider: string;
-
-          switch (identityProviderType) {
-            case IdentityProviderType.GITHUB:
-              provider = "github";
-              break;
-            case IdentityProviderType.GOOGLE:
-              provider = "google";
-              break;
-            case IdentityProviderType.AZURE_AD:
-              provider = "azure";
-              break;
-            case IdentityProviderType.SAML:
-              provider = "saml";
-              break;
-            case IdentityProviderType.OIDC:
-              provider = "oidc";
-              break;
-            default:
-              provider = "oidc";
-              break;
-          }
+          let provider = idpTypeToSlug(identityProviderType);
 
           const params = new URLSearchParams();
 
