@@ -151,8 +151,6 @@ export default async function Page({
 
           // search for potential user via username, then link
           if (options?.isLinkingAllowed) {
-            const userId = "";
-
             const foundUser = await listUsers(idpInformation.userName).then(
               (response) => {
                 return response.result ? response.result[0] : null;
@@ -166,7 +164,7 @@ export default async function Page({
                   userId: idpInformation.userId,
                   userName: idpInformation.userName,
                 },
-                userId,
+                foundUser.userId,
               ).catch((error) => {
                 return (
                   <DynamicTheme branding={branding}>
