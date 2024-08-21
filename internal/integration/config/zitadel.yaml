@@ -27,13 +27,14 @@ LogStore:
       Enabled: true
 
 Projections:
-  HandleActiveInstances: 60s
+  HandleActiveInstances: 30m
+  RequeueEvery: 5s
+  TransactionDuration: 5s
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
       HandleActiveInstances: 60s
     Telemetry:
-      RequeueEvery: 5s
       HandleActiveInstances: 60s
 
 DefaultInstance:
