@@ -128,7 +128,7 @@ describe('instance notifications', () => {
             });
           });
         });
-        cy.pause()
+        cy.pause();
         cy.visit(smtpPath);
       });
 
@@ -148,7 +148,7 @@ describe('instance notifications', () => {
     });
   });
 
-  describe.only('sms settings', () => {
+  describe('sms settings', () => {
     beforeEach(() => {
       cy.wrap<string>(`twilio-${uuidv4()}`).as('uniqueSid');
     });

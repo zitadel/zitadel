@@ -1,23 +1,23 @@
 import { Context } from 'support/commands';
-import { ensureProjectDoesntExist, ensureProjectExists } from '../../support/api/projects';
+import { ensureProjectDoesntExist, ensureProjectExists, ensureRoleExists } from '../../support/api/projects';
 import { ensureOrgExists } from 'support/api/orgs';
+import { ensureProjectGrantDoesntExist, ensureProjectGrantExists } from '../../support/api/grants';
 
 describe('projects', () => {
   beforeEach(() => {
     cy.context().as('ctx');
   });
 
-  const defaultOrg = 'e2eorgnewdefault';
+  const foreignOrg = 'e2eorgnewdefault';
   const testProjectNameCreate = 'e2eprojectcreate';
   const testProjectNameDelete = 'e2eprojectdelete';
+  const testProjectRole = 'e2eprojectrole';
 
   describe('add project', () => {
     beforeEach(`ensure it doesn't exist already`, () => {
       cy.get<Context>('@ctx').then((ctx) => {
-        ensureOrgExists(ctx, defaultOrg).then(() => {
-          ensureProjectDoesntExist(ctx.api, testProjectNameCreate);
-          cy.visit(`/projects`);
-        });
+        ensureProjectDoesntExist(ctx.api, testProjectNameCreate);
+        cy.visit(`/projects`);
       });
     });
 
@@ -32,21 +32,20 @@ describe('projects', () => {
   });
 
   describe('create project grant', () => {
-    const testRoleName = 'e2eroleundertestname';
-
     beforeEach('ensure it exists', () => {
       cy.get<Context>('@ctx').then((ctx) => {
         ensureProjectExists(ctx.api, testProjectNameCreate).as('projectId');
-        cy.get<number>('@projectId').then((projectId) => {
-          cy.visit(`/projects/${projectId}`);
-        });
       });
     });
 
     it('should add a role', () => {
+      const testRoleName = 'e2eroleundertestname';
+      cy.get<number>('@projectId').then((projectId) => {
+        cy.visit(`/projects/${projectId}`);
+      });
       cy.get('[data-e2e="sidenav-element-roles"]').click();
       cy.get('[data-e2e="add-new-role"]').click();
-      cy.get('[formcontrolname="key"]').should('be.enabled').type(testRoleName);
+      cy.get('[data-e2e="role-key-input"]').should('be.enabled').type(testRoleName);
       cy.get('[formcontrolname="displayName"]').should('be.enabled').type('e2eroleundertestdisplay');
       cy.get('[formcontrolname="group"]').should('be.enabled').type('e2eroleundertestgroup');
       cy.get('[data-e2e="save-button"]').click();
@@ -54,19 +53,33 @@ describe('projects', () => {
       cy.contains('tr', testRoleName);
     });
 
-    it('should add a project grant', () => {
-      const rowSelector = `tr:contains(${testRoleName})`;
+    describe('with existing role, without project grant', () => {
+      beforeEach(() => {
+        cy.get<Context>('@ctx').then((ctx) => {
+          cy.get<number>('@projectId').then((projectId) => {
+            ensureOrgExists(ctx, foreignOrg).then((foreignOrgID) => {
+              ensureRoleExists(ctx.api, projectId, testProjectRole);
+              ensureProjectGrantDoesntExist(ctx, projectId, foreignOrgID);
+              cy.visit(`/projects/${projectId}`);
+            });
+          });
+        });
+      });
 
-      cy.get('[data-e2e="sidenav-element-projectgrants"]').click();
-      cy.get('[data-e2e="create-project-grant-button"]').click();
-      cy.get('[data-e2e="add-org-input"]').should('be.enabled').type(defaultOrg);
-      cy.get('mat-option').contains(defaultOrg).click();
-      cy.get('button').should('be.enabled');
-      cy.get('[data-e2e="project-grant-continue"]').first().click();
-      cy.get(rowSelector).find('input').click({ force: true });
-      cy.get('[data-e2e="save-project-grant-button"]').click();
-      cy.contains('tr', defaultOrg);
-      cy.contains('tr', testRoleName);
+      it('should add a project grant', () => {
+        const rowSelector = `tr:contains(${testProjectRole})`;
+
+        cy.get('[data-e2e="sidenav-element-projectgrants"]').click();
+        cy.get('[data-e2e="create-project-grant-button"]').click();
+        cy.get('[data-e2e="add-org-input"]').should('be.enabled').type(foreignOrg);
+        cy.get('mat-option').contains(foreignOrg).click();
+        cy.get('button').should('be.enabled');
+        cy.get('[data-e2e="project-grant-continue"]').first().click();
+        cy.get(rowSelector).find('input').click({ force: true });
+        cy.get('[data-e2e="save-project-grant-button"]').click();
+        cy.contains('tr', foreignOrg);
+        cy.contains('tr', testProjectRole);
+      });
     });
   });
 
