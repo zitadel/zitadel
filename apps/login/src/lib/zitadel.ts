@@ -391,12 +391,10 @@ export function addIDPLink(
   );
 }
 
-export function createUser(
-  provider: string,
-  info: IDPInformation,
-): Promise<string> {
+export function createUser(provider: string, info: IDPInformation) {
   const userData = PROVIDER_MAPPING[provider](info);
-  return userService.addHumanUser(userData, {}).then((resp) => resp.userId);
+  console.log("ud", userData);
+  return userService.addHumanUser(userData, {});
 }
 
 /**

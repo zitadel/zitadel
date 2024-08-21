@@ -23,21 +23,23 @@ export function idpTypeToSlug(idpType: IdentityProviderType) {
 
 // this maps the IDPInformation to the AddHumanUserRequest which is used when creating a user or linking a user (email)
 // TODO: extend this object from a other file which can be overwritten by customers like map = { ...PROVIDER_MAPPING, ...customerMap }
+export type OIDC_USER = {
+  User: {
+    email: string;
+    name?: string;
+    given_name?: string;
+    family_name?: string;
+  };
+};
+
 export const PROVIDER_MAPPING: {
   [provider: string]: (
     rI: IDPInformation,
   ) => PartialMessage<AddHumanUserRequest>;
 } = {
   [idpTypeToSlug(IdentityProviderType.GOOGLE)]: (idp: IDPInformation) => {
-    const rawInfo = idp.rawInformation?.toJson() as {
-      User: {
-        email: string;
-        name?: string;
-        given_name?: string;
-        family_name?: string;
-      };
-    };
-
+    const rawInfo = idp.rawInformation?.toJson() as OIDC_USER;
+    console.log(rawInfo);
     const idpLink: PartialMessage<IDPLink> = {
       idpId: idp.idpId,
       userId: idp.userId,
@@ -62,10 +64,16 @@ export const PROVIDER_MAPPING: {
   },
   [idpTypeToSlug(IdentityProviderType.AZURE_AD)]: (idp: IDPInformation) => {
     const rawInfo = idp.rawInformation?.toJson() as {
+      jobTitle: string;
       mail: string;
+      mobilePhone: string;
+      preferredLanguage: string;
+      id: string;
       displayName?: string;
       givenName?: string;
       surname?: string;
+      officeLocation?: string;
+      userPrincipalName: string;
     };
 
     const idpLink: PartialMessage<IDPLink> = {
@@ -74,16 +82,18 @@ export const PROVIDER_MAPPING: {
       userName: idp.userName,
     };
 
+    console.log(rawInfo, rawInfo.userPrincipalName);
+
     const req: PartialMessage<AddHumanUserRequest> = {
       username: idp.userName,
       email: {
-        email: rawInfo?.mail,
+        email: rawInfo.mail || rawInfo.userPrincipalName || "",
         verification: { case: "isVerified", value: true },
       },
       profile: {
-        displayName: rawInfo?.displayName ?? "",
-        givenName: rawInfo?.givenName ?? "",
-        familyName: rawInfo?.surname ?? "",
+        displayName: rawInfo.displayName ?? "",
+        givenName: rawInfo.givenName ?? "",
+        familyName: rawInfo.surname ?? "",
       },
       idpLinks: [idpLink],
     };
@@ -105,13 +115,13 @@ export const PROVIDER_MAPPING: {
     const req: PartialMessage<AddHumanUserRequest> = {
       username: idp.userName,
       email: {
-        email: rawInfo?.email,
+        email: rawInfo.email,
         verification: { case: "isVerified", value: true },
       },
       profile: {
-        displayName: rawInfo?.name ?? "",
-        givenName: rawInfo?.name ?? "",
-        familyName: rawInfo?.name ?? "",
+        displayName: rawInfo.name ?? "",
+        givenName: rawInfo.name ?? "",
+        familyName: rawInfo.name ?? "",
       },
       idpLinks: [idpLink],
     };

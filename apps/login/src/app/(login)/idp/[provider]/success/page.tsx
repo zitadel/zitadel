@@ -115,27 +115,12 @@ export default async function Page({
                 );
               }
             }
-          } else if (options?.isCreationAllowed && options.isAutoCreation) {
-            const userId = await createUser(provider, idpInformation).catch(
-              (error) => {
-                return (
-                  <DynamicTheme branding={branding}>
-                    <div className="flex flex-col items-center space-y-4">
-                      <h1>Register failed</h1>
-                      <div className="w-full">
-                        {
-                          <Alert type={AlertType.ALERT}>
-                            {JSON.stringify(error.message)}
-                          </Alert>
-                        }
-                      </div>
-                    </div>
-                  </DynamicTheme>
-                );
-              },
-            );
+          }
 
-            if (userId) {
+          if (options?.isCreationAllowed && options.isAutoCreation) {
+            const newUser = await createUser(provider, idpInformation);
+
+            if (newUser) {
               return (
                 <DynamicTheme branding={branding}>
                   <div className="flex flex-col items-center space-y-4">
