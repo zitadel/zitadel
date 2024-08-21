@@ -61,7 +61,7 @@ require (
 	github.com/zitadel/logging v0.6.0
 	github.com/zitadel/oidc/v3 v3.27.0
 	github.com/zitadel/passwap v0.6.0
-	github.com/zitadel/saml v0.1.3
+	github.com/zitadel/saml v0.2.0
 	github.com/zitadel/schema v1.3.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.53.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
