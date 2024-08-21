@@ -67,6 +67,8 @@ func (m *InstanceFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceTokenExchangeEventType,
 			feature_v2.InstanceActionsEventType,
 			feature_v2.InstanceImprovedPerformanceEventType,
+			feature_v2.InstanceWebKeyEventType,
+			feature_v2.InstanceDebugOIDCParentErrorEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -100,6 +102,12 @@ func reduceInstanceFeature(features *InstanceFeatures, key feature.Key, value an
 	case feature.KeyImprovedPerformance:
 		v := value.([]feature.ImprovedPerformanceType)
 		features.ImprovedPerformance = v
+	case feature.KeyWebKey:
+		v := value.(bool)
+		features.WebKey = &v
+	case feature.KeyDebugOIDCParentError:
+		v := value.(bool)
+		features.DebugOIDCParentError = &v
 	}
 }
 
@@ -113,5 +121,7 @@ func (wm *InstanceFeaturesWriteModel) setCommands(ctx context.Context, f *Instan
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.UserSchema, f.UserSchema, feature_v2.InstanceUserSchemaEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.Actions, f.Actions, feature_v2.InstanceActionsEventType)
 	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.InstanceImprovedPerformanceEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.WebKey, f.WebKey, feature_v2.InstanceWebKeyEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.DebugOIDCParentError, f.DebugOIDCParentError, feature_v2.InstanceDebugOIDCParentErrorEventType)
 	return cmds
 }

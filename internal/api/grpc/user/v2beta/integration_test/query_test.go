@@ -923,6 +923,10 @@ func TestServer_ListUsers(t *testing.T) {
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				// fill in userid and username as it is generated
+
+				// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
+				tt.want.Details.TotalResult = got.Details.TotalResult
+
 				for i := range infos {
 					tt.want.Result[i].UserId = infos[i].UserID
 					tt.want.Result[i].Username = infos[i].Username

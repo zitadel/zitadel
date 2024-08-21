@@ -249,7 +249,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				defer close()
 			}
 
-			got, err := instance.Client.ActionV3.GetTarget(tt.ctx, tt.req)
+			got, err := instance.Client.ActionV3Alpha.GetTarget(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return

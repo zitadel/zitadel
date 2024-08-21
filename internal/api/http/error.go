@@ -45,3 +45,36 @@ func ZitadelErrorToHTTPStatusCode(err error) (statusCode int, ok bool) {
 		return http.StatusInternalServerError, false
 	}
 }
+
+func HTTPStatusCodeToZitadelError(parent error, statusCode int, id string, message string) error {
+	if statusCode == http.StatusOK {
+		return nil
+	}
+	var errorFunc func(parent error, id, message string) error
+	switch statusCode {
+	case http.StatusConflict:
+		errorFunc = zerrors.ThrowAlreadyExists
+	case http.StatusGatewayTimeout:
+		errorFunc = zerrors.ThrowDeadlineExceeded
+	case http.StatusInternalServerError:
+		errorFunc = zerrors.ThrowInternal
+	case http.StatusBadRequest:
+		errorFunc = zerrors.ThrowInvalidArgument
+	case http.StatusNotFound:
+		errorFunc = zerrors.ThrowNotFound
+	case http.StatusForbidden:
+		errorFunc = zerrors.ThrowPermissionDenied
+	case http.StatusUnauthorized:
+		errorFunc = zerrors.ThrowUnauthenticated
+	case http.StatusServiceUnavailable:
+		errorFunc = zerrors.ThrowUnavailable
+	case http.StatusNotImplemented:
+		errorFunc = zerrors.ThrowUnimplemented
+	case http.StatusTooManyRequests:
+		errorFunc = zerrors.ThrowResourceExhausted
+	default:
+		errorFunc = zerrors.ThrowUnknown
+	}
+
+	return errorFunc(parent, id, message)
+}

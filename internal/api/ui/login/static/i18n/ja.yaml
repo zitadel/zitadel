@@ -450,6 +450,7 @@ Errors:
       NoExternalUserData: 外部ユーザー情報を取得できません
       CreationNotAllowed: このプロバイダーでは、新しいユーザーの作成は許可されていません
       LinkingNotAllowed: このプロバイダーでは、ユーザーのリンクが許可されていません
+      NoOptionAllowed: このプロバイダーでは作成もリンクも許可されていません。 管理者にお問い合わせください。
     GrantRequired: ログインできません。このユーザーは、アプリケーションに少なくとも1つの権限を付与されていることが必要です。管理者にお問い合わせください。
     ProjectRequired: ログインできません。ユーザーの組織がプロジェクトに権限を付与されている必要があります。管理者にお問い合わせください。
   IdentityProvider:

@@ -51,7 +51,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddHumanUser(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, IamCTX)
+	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -432,7 +432,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 					},
 					IdpLinks: []*user.IDPLink{
 						{
-							IdpId:    idpID,
+							IdpId:    idpResp.Id,
 							UserId:   "userID",
 							UserName: "username",
 						},
@@ -1795,13 +1795,13 @@ func TestServer_DeleteUser(t *testing.T) {
 }
 
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, IamCTX)
-	orgIdpID := Instance.AddOrgGenericOAuthProvider(t, CTX, Instance.DefaultOrg.Id)
+	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
+	orgIdpResp := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
-	notDefaultOrgIdpID := Instance.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
-	samlIdpID := Instance.AddSAMLProvider(t, IamCTX)
-	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(t, IamCTX, "")
-	samlPostIdpID := Instance.AddSAMLPostProvider(t, IamCTX)
+	notDefaultOrgIdpResp := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
+	samlIdpID := Instance.AddSAMLProvider(IamCTX)
+	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(IamCTX, "")
+	samlPostIdpID := Instance.AddSAMLPostProvider(IamCTX)
 	type args struct {
 		ctx context.Context
 		req *user.StartIdentityProviderIntentRequest
@@ -1824,7 +1824,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: idpID,
+					IdpId: idpResp.Id,
 				},
 			},
 			wantErr: true,
@@ -1834,7 +1834,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: idpID,
+					IdpId: idpResp.Id,
 					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
@@ -1865,7 +1865,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: orgIdpID,
+					IdpId: orgIdpResp.Id,
 					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
@@ -1896,7 +1896,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: notDefaultOrgIdpID,
+					IdpId: notDefaultOrgIdpResp.Id,
 					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
@@ -1927,7 +1927,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: orgIdpID,
+					IdpId: orgIdpResp.Id,
 					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",

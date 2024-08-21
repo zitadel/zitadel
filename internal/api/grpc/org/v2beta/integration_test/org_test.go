@@ -41,7 +41,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddOrganization(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, CTX)
+	idpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 
 	tests := []struct {
 		name    string
@@ -138,7 +138,7 @@ func TestServer_AddOrganization(t *testing.T) {
 								},
 								IdpLinks: []*user_v2beta.IDPLink{
 									{
-										IdpId:    idpID,
+										IdpId:    idpResp.Id,
 										UserId:   "userID",
 										UserName: "username",
 									},

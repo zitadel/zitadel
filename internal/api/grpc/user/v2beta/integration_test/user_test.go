@@ -50,7 +50,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_AddHumanUser(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, IamCTX)
+	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	type args struct {
 		ctx context.Context
 		req *user.AddHumanUserRequest
@@ -431,7 +431,7 @@ func TestServer_AddHumanUser(t *testing.T) {
 					},
 					IdpLinks: []*user.IDPLink{
 						{
-							IdpId:    idpID,
+							IdpId:    idpResp.Id,
 							UserId:   "userID",
 							UserName: "username",
 						},
@@ -1794,7 +1794,7 @@ func TestServer_DeleteUser(t *testing.T) {
 }
 
 func TestServer_AddIDPLink(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, IamCTX)
+	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	type args struct {
 		ctx context.Context
 		req *user.AddIDPLinkRequest
@@ -1812,7 +1812,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 				&user.AddIDPLinkRequest{
 					UserId: "userID",
 					IdpLink: &user.IDPLink{
-						IdpId:    idpID,
+						IdpId:    idpResp.Id,
 						UserId:   "userID",
 						UserName: "username",
 					},
@@ -1844,7 +1844,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 				&user.AddIDPLinkRequest{
 					UserId: Instance.Users.Get(integration.UserTypeOrgOwner).ID,
 					IdpLink: &user.IDPLink{
-						IdpId:    idpID,
+						IdpId:    idpResp.Id,
 						UserId:   "userID",
 						UserName: "username",
 					},
@@ -1874,13 +1874,13 @@ func TestServer_AddIDPLink(t *testing.T) {
 }
 
 func TestServer_StartIdentityProviderIntent(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, IamCTX)
-	orgIdpID := Instance.AddOrgGenericOAuthProvider(t, CTX, Instance.DefaultOrg.Id)
+	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
+	orgIdpID := Instance.AddOrgGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("NotDefaultOrg%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
-	notDefaultOrgIdpID := Instance.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
-	samlIdpID := Instance.AddSAMLProvider(t, IamCTX)
-	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(t, IamCTX, "")
-	samlPostIdpID := Instance.AddSAMLPostProvider(t, IamCTX)
+	notDefaultOrgIdpID := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
+	samlIdpID := Instance.AddSAMLProvider(IamCTX)
+	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(IamCTX, "")
+	samlPostIdpID := Instance.AddSAMLPostProvider(IamCTX)
 	type args struct {
 		ctx context.Context
 		req *user.StartIdentityProviderIntentRequest
@@ -1903,7 +1903,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: idpID,
+					IdpId: idpResp.Id,
 				},
 			},
 			wantErr: true,
@@ -1913,7 +1913,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: idpID,
+					IdpId: idpResp.Id,
 					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
@@ -1944,7 +1944,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: orgIdpID,
+					IdpId: orgIdpID.Id,
 					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
@@ -1975,7 +1975,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: notDefaultOrgIdpID,
+					IdpId: notDefaultOrgIdpID.Id,
 					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
@@ -2006,7 +2006,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			args: args{
 				CTX,
 				&user.StartIdentityProviderIntentRequest{
-					IdpId: orgIdpID,
+					IdpId: orgIdpID.Id,
 					Content: &user.StartIdentityProviderIntentRequest_Urls{
 						Urls: &user.RedirectURLs{
 							SuccessUrl: "https://example.com/success",
@@ -2140,11 +2140,11 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 	idpID := Instance.AddGenericOAuthProvider(t, CTX)
 	intentID := Instance.CreateIntent(t, CTX, idpID)
-	successfulID, token, changeDate, sequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "", "id")
-	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID, "user", "id")
-	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Instance.CreateSuccessfulLDAPIntent(t, CTX, idpID, "", "id")
-	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence := Instance.CreateSuccessfulLDAPIntent(t, CTX, idpID, "user", "id")
-	samlSuccessfulID, samlToken, samlChangeDate, samlSequence := Instance.CreateSuccessfulSAMLIntent(t, CTX, idpID, "", "id")
+	successfulID, token, changeDate, sequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID.Id, "", "id")
+	successfulWithUserID, withUsertoken, withUserchangeDate, withUsersequence := Instance.CreateSuccessfulOAuthIntent(t, CTX, idpID.Id, "user", "id")
+	ldapSuccessfulID, ldapToken, ldapChangeDate, ldapSequence := Instance.CreateSuccessfulLDAPIntent(t, CTX, idpID.Id, "", "id")
+	ldapSuccessfulWithUserID, ldapWithUserToken, ldapWithUserChangeDate, ldapWithUserSequence := Instance.CreateSuccessfulLDAPIntent(t, CTX, idpID.Id, "user", "id")
+	samlSuccessfulID, samlToken, samlChangeDate, samlSequence := Instance.CreateSuccessfulSAMLIntent(t, CTX, idpID.Id, "", "id")
 	type args struct {
 		ctx context.Context
 		req *user.RetrieveIdentityProviderIntentRequest
@@ -2199,7 +2199,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    idpID.Id,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2237,7 +2237,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							IdToken:     gu.Ptr("idToken"),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    idpID.Id,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2281,7 +2281,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							}(),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    idpID.Id,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2327,7 +2327,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							}(),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    idpID.Id,
 					UserId:   "id",
 					UserName: "username",
 					RawInformation: func() *structpb.Struct {
@@ -2364,7 +2364,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 							Assertion: []byte("<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"id\" IssueInstant=\"0001-01-01T00:00:00Z\" Version=\"\"><Issuer xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" NameQualifier=\"\" SPNameQualifier=\"\" Format=\"\" SPProvidedID=\"\"></Issuer></Assertion>"),
 						},
 					},
-					IdpId:    idpID,
+					IdpId:    idpID.Id,
 					UserId:   "id",
 					UserName: "",
 					RawInformation: func() *structpb.Struct {

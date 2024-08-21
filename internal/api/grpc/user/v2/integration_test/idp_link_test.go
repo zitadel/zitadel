@@ -18,7 +18,7 @@ import (
 )
 
 func TestServer_AddIDPLink(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, IamCTX)
+	idpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	type args struct {
 		ctx context.Context
 		req *user.AddIDPLinkRequest
@@ -36,7 +36,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 				&user.AddIDPLinkRequest{
 					UserId: "userID",
 					IdpLink: &user.IDPLink{
-						IdpId:    idpID,
+						IdpId:    idpResp.Id,
 						UserId:   "userID",
 						UserName: "username",
 					},
@@ -68,7 +68,7 @@ func TestServer_AddIDPLink(t *testing.T) {
 				&user.AddIDPLinkRequest{
 					UserId: Instance.Users.Get(integration.UserTypeOrgOwner).ID,
 					IdpLink: &user.IDPLink{
-						IdpId:    idpID,
+						IdpId:    idpResp.Id,
 						UserId:   "userID",
 						UserName: "username",
 					},
@@ -100,19 +100,19 @@ func TestServer_AddIDPLink(t *testing.T) {
 func TestServer_ListIDPLinks(t *testing.T) {
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
 
-	instanceIdpID := Instance.AddGenericOAuthProvider(t, IamCTX)
+	instanceIdpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	_, err := Instance.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
+	_, err := Instance.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpResp.Id, "externalUsername_instance")
 	require.NoError(t, err)
-	orgIdpID := Instance.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
+	orgIdpResp := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
 	userOrgResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	_, err = Instance.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
+	_, err = Instance.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpResp.Id, "externalUsername_org")
 	require.NoError(t, err)
 
 	userMultipleResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	_, err = Instance.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", instanceIdpID, "externalUsername_multi")
+	_, err = Instance.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", instanceIdpResp.Id, "externalUsername_multi")
 	require.NoError(t, err)
-	_, err = Instance.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", orgIdpID, "externalUsername_multi")
+	_, err = Instance.CreateUserIDPlink(IamCTX, userMultipleResp.GetUserId(), "external_multi", orgIdpResp.Id, "externalUsername_multi")
 	require.NoError(t, err)
 
 	type args struct {
@@ -172,7 +172,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 				},
 				Result: []*user.IDPLink{
 					{
-						IdpId:    orgIdpID,
+						IdpId:    orgIdpResp.Id,
 						UserId:   "external_org",
 						UserName: "externalUsername_org",
 					},
@@ -194,7 +194,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 				},
 				Result: []*user.IDPLink{
 					{
-						IdpId:    instanceIdpID,
+						IdpId:    instanceIdpResp.Id,
 						UserId:   "external_instance",
 						UserName: "externalUsername_instance",
 					},
@@ -216,12 +216,12 @@ func TestServer_ListIDPLinks(t *testing.T) {
 				},
 				Result: []*user.IDPLink{
 					{
-						IdpId:    instanceIdpID,
+						IdpId:    instanceIdpResp.Id,
 						UserId:   "external_multi",
 						UserName: "externalUsername_multi",
 					},
 					{
-						IdpId:    orgIdpID,
+						IdpId:    orgIdpResp.Id,
 						UserId:   "external_multi",
 						UserName: "externalUsername_multi",
 					},
@@ -259,13 +259,13 @@ func TestServer_ListIDPLinks(t *testing.T) {
 func TestServer_RemoveIDPLink(t *testing.T) {
 	orgResp := Instance.CreateOrganization(IamCTX, fmt.Sprintf("ListIDPLinks%d", time.Now().UnixNano()), fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()))
 
-	instanceIdpID := Instance.AddGenericOAuthProvider(t, IamCTX)
+	instanceIdpResp := Instance.AddGenericOAuthProvider(IamCTX, Instance.DefaultOrg.Id)
 	userInstanceResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	_, err := Instance.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpID, "externalUsername_instance")
+	_, err := Instance.CreateUserIDPlink(IamCTX, userInstanceResp.GetUserId(), "external_instance", instanceIdpResp.Id, "externalUsername_instance")
 	require.NoError(t, err)
-	orgIdpID := Instance.AddOrgGenericOAuthProvider(t, IamCTX, orgResp.OrganizationId)
+	orgIdpResp := Instance.AddOrgGenericOAuthProvider(IamCTX, orgResp.OrganizationId)
 	userOrgResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
-	_, err = Instance.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpID, "externalUsername_org")
+	_, err = Instance.CreateUserIDPlink(IamCTX, userOrgResp.GetUserId(), "external_org", orgIdpResp.Id, "externalUsername_org")
 	require.NoError(t, err)
 
 	userNoLinkResp := Instance.CreateHumanUserVerified(IamCTX, orgResp.OrganizationId, fmt.Sprintf("%d@listidplinks.com", time.Now().UnixNano()))
@@ -286,7 +286,7 @@ func TestServer_RemoveIDPLink(t *testing.T) {
 				UserCTX,
 				&user.RemoveIDPLinkRequest{
 					UserId:       userOrgResp.GetUserId(),
-					IdpId:        orgIdpID,
+					IdpId:        orgIdpResp.Id,
 					LinkedUserId: "external_org",
 				},
 			},
@@ -298,7 +298,7 @@ func TestServer_RemoveIDPLink(t *testing.T) {
 				CTX,
 				&user.RemoveIDPLinkRequest{
 					UserId:       userOrgResp.GetUserId(),
-					IdpId:        orgIdpID,
+					IdpId:        orgIdpResp.Id,
 					LinkedUserId: "external_org",
 				},
 			},
@@ -310,7 +310,7 @@ func TestServer_RemoveIDPLink(t *testing.T) {
 				IamCTX,
 				&user.RemoveIDPLinkRequest{
 					UserId:       userOrgResp.GetUserId(),
-					IdpId:        orgIdpID,
+					IdpId:        orgIdpResp.Id,
 					LinkedUserId: "external_org",
 				},
 			},
@@ -327,7 +327,7 @@ func TestServer_RemoveIDPLink(t *testing.T) {
 				IamCTX,
 				&user.RemoveIDPLinkRequest{
 					UserId:       userInstanceResp.GetUserId(),
-					IdpId:        instanceIdpID,
+					IdpId:        instanceIdpResp.Id,
 					LinkedUserId: "external_instance",
 				},
 			},

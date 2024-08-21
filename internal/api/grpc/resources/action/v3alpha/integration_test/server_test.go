@@ -65,7 +65,7 @@ func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
 
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
-			_, err := instance.Client.ActionV3.ListExecutionMethods(ctx, &action.ListExecutionMethodsRequest{})
+			_, err := instance.Client.ActionV3Alpha.ListExecutionMethods(ctx, &action.ListExecutionMethodsRequest{})
 			assert.NoError(ttt, err)
 		},
 		retryDuration,

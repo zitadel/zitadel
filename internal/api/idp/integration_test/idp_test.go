@@ -50,8 +50,8 @@ func TestMain(m *testing.M) {
 }
 
 func TestServer_SAMLCertificate(t *testing.T) {
-	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(t, CTX, "")
-	oauthIdpID := Instance.AddGenericOAuthProvider(t, CTX)
+	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(CTX, "")
+	oauthIdpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 
 	type args struct {
 		ctx   context.Context
@@ -74,7 +74,7 @@ func TestServer_SAMLCertificate(t *testing.T) {
 			name: "saml certificate, invalid idp type",
 			args: args{
 				ctx:   CTX,
-				idpID: oauthIdpID,
+				idpID: oauthIdpResp.Id,
 			},
 			want: http.StatusBadRequest,
 		},
@@ -107,8 +107,8 @@ func TestServer_SAMLCertificate(t *testing.T) {
 }
 
 func TestServer_SAMLMetadata(t *testing.T) {
-	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(t, CTX, "")
-	oauthIdpID := Instance.AddGenericOAuthProvider(t, CTX)
+	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(CTX, "")
+	oauthIdpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 
 	type args struct {
 		ctx   context.Context
@@ -131,7 +131,7 @@ func TestServer_SAMLMetadata(t *testing.T) {
 			name: "saml metadata, invalid idp type",
 			args: args{
 				ctx:   CTX,
-				idpID: oauthIdpID,
+				idpID: oauthIdpResp.Id,
 			},
 			want: http.StatusBadRequest,
 		},
@@ -165,7 +165,7 @@ func TestServer_SAMLMetadata(t *testing.T) {
 
 func TestServer_SAMLACS(t *testing.T) {
 	userHuman := Instance.CreateHumanUser(CTX)
-	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(t, CTX, "urn:oid:0.9.2342.19200300.100.1.1") // the username is set in urn:oid:0.9.2342.19200300.100.1.1
+	samlRedirectIdpID := Instance.AddSAMLRedirectProvider(CTX, "urn:oid:0.9.2342.19200300.100.1.1") // the username is set in urn:oid:0.9.2342.19200300.100.1.1
 	externalUserID := "test1"
 	linkedExternalUserID := "test2"
 	Instance.CreateUserIDPlink(CTX, userHuman.UserId, linkedExternalUserID, samlRedirectIdpID, linkedExternalUserID)

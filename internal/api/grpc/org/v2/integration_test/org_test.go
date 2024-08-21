@@ -19,28 +19,30 @@ import (
 )
 
 var (
-	CTX      context.Context
-	Instance *integration.Instance
-	Client   org.OrganizationServiceClient
-	User     *user.AddHumanUserResponse
+	CTX, OwnerCTX, UserCTX context.Context
+	Instance               *integration.Instance
+	Client                 org.OrganizationServiceClient
+	User                   *user.AddHumanUserResponse
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancel()
 
 		Instance = integration.GetInstance(ctx)
 		Client = Instance.Client.OrgV2
 
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		OwnerCTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
+		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
 		User = Instance.CreateHumanUser(CTX)
 		return m.Run()
 	}())
 }
 
 func TestServer_AddOrganization(t *testing.T) {
-	idpID := Instance.AddGenericOAuthProvider(t, CTX)
+	idpResp := Instance.AddGenericOAuthProvider(CTX, Instance.DefaultOrg.Id)
 
 	tests := []struct {
 		name    string
@@ -137,7 +139,7 @@ func TestServer_AddOrganization(t *testing.T) {
 								},
 								IdpLinks: []*user.IDPLink{
 									{
-										IdpId:    idpID,
+										IdpId:    idpResp.Id,
 										UserId:   "userID",
 										UserName: "username",
 									},

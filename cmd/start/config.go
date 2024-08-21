@@ -31,6 +31,7 @@ import (
 	"github.com/zitadel/zitadel/internal/query/projection"
 	static_config "github.com/zitadel/zitadel/internal/static/config"
 	metrics "github.com/zitadel/zitadel/internal/telemetry/metrics/config"
+	profiler "github.com/zitadel/zitadel/internal/telemetry/profiler/config"
 	tracing "github.com/zitadel/zitadel/internal/telemetry/tracing/config"
 )
 
@@ -49,6 +50,7 @@ type Config struct {
 	Database            database.Config
 	Tracing             tracing.Config
 	Metrics             metrics.Config
+	Profiler            profiler.Config
 	Projections         projection.Config
 	Auth                auth_es.Config
 	Admin               admin_es.Config
@@ -100,6 +102,7 @@ func MustNewConfig(v *viper.Viper) *Config {
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToTimeHookFunc(time.RFC3339),
 			mapstructure.StringToSliceHookFunc(","),
+			mapstructure.TextUnmarshallerHookFunc(),
 		)),
 	)
 	logging.OnError(err).Fatal("unable to read config")
@@ -112,6 +115,9 @@ func MustNewConfig(v *viper.Viper) *Config {
 
 	err = config.Metrics.NewMeter()
 	logging.OnError(err).Fatal("unable to set meter")
+
+	err = config.Profiler.NewProfiler()
+	logging.OnError(err).Fatal("unable to set profiler")
 
 	id.Configure(config.Machine)
 	actions.SetHTTPConfig(&config.Actions.HTTP)
