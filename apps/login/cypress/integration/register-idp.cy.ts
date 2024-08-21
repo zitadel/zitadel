@@ -4,7 +4,7 @@ const IDP_URL = "https://example.com/idp/url";
 
 describe("register idps", () => {
   beforeEach(() => {
-    stub("zitadel.user.v2beta.UserService", "StartIdentityProviderIntent", {
+    stub("zitadel.user.v2.UserService", "StartIdentityProviderIntent", {
       data: {
         authUrl: IDP_URL,
       },

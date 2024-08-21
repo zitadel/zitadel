@@ -8,9 +8,9 @@ import { Spinner } from "./Spinner";
 import { useForm } from "react-hook-form";
 import { TextInput } from "./Input";
 import BackButton from "./BackButton";
-import { Checks } from "@zitadel/proto/zitadel/session/v2beta/session_service_pb";
-import { PlainMessage } from "@zitadel/client2";
-import { Challenges } from "@zitadel/proto/zitadel/session/v2beta/challenge_pb";
+import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { PlainMessage } from "@zitadel/client";
+import { Challenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -236,7 +236,9 @@ export default function LoginOTP({
           className="self-end"
           variant={ButtonVariants.Primary}
           disabled={loading || !formState.isValid}
-          onClick={handleSubmit((e) => setCodeAndContinue(e, organization))}
+          onClick={handleSubmit((e) => {
+            setCodeAndContinue(e, organization);
+          })}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

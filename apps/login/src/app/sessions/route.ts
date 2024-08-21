@@ -1,6 +1,6 @@
 import { listSessions } from "@/lib/zitadel";
-import { SessionCookie, getAllSessions } from "@/utils/cookies";
-import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
+import { getAllSessions } from "@zitadel/next";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { NextRequest, NextResponse } from "next/server";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
@@ -12,7 +12,7 @@ async function loadSessions(ids: string[]): Promise<Session[]> {
 }
 
 export async function GET(request: NextRequest) {
-  const sessionCookies: SessionCookie[] = await getAllSessions();
+  const sessionCookies = await getAllSessions();
   const ids = sessionCookies.map((s) => s.id);
   let sessions: Session[] = [];
   if (ids && ids.length) {

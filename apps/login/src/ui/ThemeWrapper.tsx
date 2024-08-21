@@ -2,8 +2,8 @@
 
 import { setTheme } from "@/utils/colors";
 import { useEffect } from "react";
-import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2beta/branding_settings_pb";
-import { PartialMessage } from "@zitadel/client2";
+import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
+import { PartialMessage } from "@zitadel/client";
 
 type Props = {
   branding: PartialMessage<BrandingSettings> | undefined;

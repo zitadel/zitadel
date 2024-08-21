@@ -1,6 +1,6 @@
 {
   "extends": ["//"],
-  "pipeline": {
+  "tasks": {
     "build": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "dependsOn": ["^build"]
@@ -8,29 +8,33 @@
     "test": {
       "dependsOn": [
         "@zitadel/node#build",
-        "@zitadel/client2#build",
-        "@zitadel/react#build"
+        "@zitadel/client#build",
+        "@zitadel/react#build",
+        "@zitadel/next#build"
       ]
     },
     "test:integration": {
       "dependsOn": [
         "@zitadel/node#build",
-        "@zitadel/client2#build",
-        "@zitadel/react#build"
+        "@zitadel/client#build",
+        "@zitadel/react#build",
+        "@zitadel/next#build"
       ]
     },
     "test:unit": {
       "dependsOn": [
         "@zitadel/node#build",
-        "@zitadel/client2#build",
-        "@zitadel/react#build"
+        "@zitadel/client#build",
+        "@zitadel/react#build",
+        "@zitadel/next#build"
       ]
     },
     "test:watch": {
       "dependsOn": [
         "@zitadel/node#build",
-        "@zitadel/client2#build",
-        "@zitadel/react#build"
+        "@zitadel/client#build",
+        "@zitadel/react#build",
+        "@zitadel/next#build"
       ]
     }
   }

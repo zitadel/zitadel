@@ -1,8 +1,6 @@
 {
-  "extends": [
-    "//"
-  ],
-  "pipeline": {
+  "extends": ["//"],
+  "tasks": {
     "generate": {
       "outputs": ["zitadel/**"],
       "cache": true

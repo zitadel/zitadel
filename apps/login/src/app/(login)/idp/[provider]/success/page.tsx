@@ -8,6 +8,104 @@ import {
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import IdpSignin from "@/ui/IdpSignin";
+import { AddHumanUserRequest } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { IDPInformation, IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import { PartialMessage } from "@zitadel/client";
+
+const PROVIDER_MAPPING: {
+  [provider: string]: (
+    rI: IDPInformation,
+  ) => PartialMessage<AddHumanUserRequest>;
+} = {
+  [ProviderSlug.GOOGLE]: (idp: IDPInformation) => {
+    const rawInfo = idp.rawInformation?.toJson() as {
+      User: {
+        email: string;
+        name?: string;
+        given_name?: string;
+        family_name?: string;
+      };
+    };
+
+    const idpLink: PartialMessage<IDPLink> = {
+      idpId: idp.idpId,
+      userId: idp.userId,
+      userName: idp.userName,
+    };
+
+    const req: PartialMessage<AddHumanUserRequest> = {
+      username: idp.userName,
+      email: {
+        email: rawInfo.User?.email,
+        verification: { case: "isVerified", value: true },
+      },
+      // organisation: Organisation | undefined;
+      profile: {
+        displayName: rawInfo.User?.name ?? "",
+        givenName: rawInfo.User?.given_name ?? "",
+        familyName: rawInfo.User?.family_name ?? "",
+      },
+      idpLinks: [idpLink],
+    };
+    return req;
+  },
+  [ProviderSlug.AZURE]: (idp: IDPInformation) => {
+    const rawInfo = idp.rawInformation?.toJson() as {
+      mail: string;
+      displayName?: string;
+      givenName?: string;
+      surname?: string;
+    };
+
+    const idpLink: PartialMessage<IDPLink> = {
+      idpId: idp.idpId,
+      userId: idp.userId,
+      userName: idp.userName,
+    };
+
+    const req: PartialMessage<AddHumanUserRequest> = {
+      username: idp.userName,
+      email: {
+        email: rawInfo?.mail,
+        verification: { case: "isVerified", value: true },
+      },
+      // organisation: Organisation | undefined;
+      profile: {
+        displayName: rawInfo?.displayName ?? "",
+        givenName: rawInfo?.givenName ?? "",
+        familyName: rawInfo?.surname ?? "",
+      },
+      idpLinks: [idpLink],
+    };
+    return req;
+  },
+  [ProviderSlug.GITHUB]: (idp: IDPInformation) => {
+    const rawInfo = idp.rawInformation?.toJson() as {
+      email: string;
+      name: string;
+    };
+    const idpLink: PartialMessage<IDPLink> = {
+      idpId: idp.idpId,
+      userId: idp.userId,
+      userName: idp.userName,
+    };
+    const req: PartialMessage<AddHumanUserRequest> = {
+      username: idp.userName,
+      email: {
+        email: rawInfo?.email,
+        verification: { case: "isVerified", value: true },
+      },
+      // organisation: Organisation | undefined;
+      profile: {
+        displayName: rawInfo?.name ?? "",
+        givenName: rawInfo?.name ?? "",
+        familyName: rawInfo?.name ?? "",
+      },
+      idpLinks: [idpLink],
+    };
+    return req;
+  },
+};
 
 export default async function Page({
   searchParams,

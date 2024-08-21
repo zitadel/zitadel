@@ -1,8 +1,8 @@
 "use client";
 
 import { EMAIL, SMS, TOTP, U2F } from "./AuthMethods";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2beta/login_settings_pb";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2beta/user_service_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 type Props = {
   loginName?: string;

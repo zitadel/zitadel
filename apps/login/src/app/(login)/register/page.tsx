@@ -51,6 +51,9 @@ export default async function Page({
           <RegisterFormWithoutPassword
             legal={legal}
             organization={organization}
+            firstname={firstname}
+            lastname={lastname}
+            email={email}
             authRequestId={authRequestId}
           ></RegisterFormWithoutPassword>
         )}

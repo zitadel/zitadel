@@ -1,9 +1,9 @@
-import { getBrandingSettings, getSession } from "@/lib/zitadel";
+import { getBrandingSettings, sessionService } from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterPasskey from "@/ui/RegisterPasskey";
 import UserAvatar from "@/ui/UserAvatar";
-import { getMostRecentCookieWithLoginname } from "@/utils/cookies";
+import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -13,19 +13,11 @@ export default async function Page({
   const { loginName, promptPasswordless, organization, authRequestId } =
     searchParams;
 
-  const sessionFactors = await loadSession(loginName);
+  const session = await loadMostRecentSession(sessionService, {
+    loginName,
+    organization,
+  });
 
-  async function loadSession(loginName?: string) {
-    const recent = await getMostRecentCookieWithLoginname(
-      loginName,
-      organization,
-    );
-    return getSession(recent.id, recent.token).then((response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    });
-  }
   const title = !!promptPasswordless
     ? "Authenticate with a passkey"
     : "Use your passkey to confirm it's really you";
@@ -40,10 +32,10 @@ export default async function Page({
       <div className="flex flex-col items-center space-y-4">
         <h1>{title}</h1>
 
-        {sessionFactors && (
+        {session && (
           <UserAvatar
-            loginName={loginName ?? sessionFactors.factors?.user?.loginName}
-            displayName={sessionFactors.factors?.user?.displayName}
+            loginName={loginName ?? session.factors?.user?.loginName}
+            displayName={session.factors?.user?.displayName}
             showDropdown
             searchParams={searchParams}
           ></UserAvatar>
@@ -64,7 +56,7 @@ export default async function Page({
           </span>
         </Alert>
 
-        {!sessionFactors && (
+        {!session && (
           <div className="py-4">
             <Alert>
               Could not get the context of the user. Make sure to enter the
@@ -73,9 +65,9 @@ export default async function Page({
           </div>
         )}
 
-        {sessionFactors?.id && (
+        {session?.id && (
           <RegisterPasskey
-            sessionId={sessionFactors.id}
+            sessionId={session.id}
             isPrompt={!!promptPasswordless}
             organization={organization}
             authRequestId={authRequestId}

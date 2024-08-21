@@ -2,16 +2,14 @@ import {
   getBrandingSettings,
   getSession,
   listAuthenticationMethodTypes,
+  sessionService,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import BackButton from "@/ui/BackButton";
 import ChooseSecondFactor from "@/ui/ChooseSecondFactor";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
-import {
-  getMostRecentCookieWithLoginname,
-  getSessionCookieById,
-} from "@/utils/cookies";
+import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,
@@ -29,26 +27,25 @@ export default async function Page({
     loginName?: string,
     organization?: string,
   ) {
-    const recent = await getMostRecentCookieWithLoginname(
+    return loadMostRecentSession(sessionService, {
       loginName,
       organization,
-    );
-    return getSession(recent.id, recent.token).then((response) => {
-      if (response?.session && response.session.factors?.user?.id) {
-        return listAuthenticationMethodTypes(
-          response.session.factors.user.id,
-        ).then((methods) => {
-          return {
-            factors: response.session?.factors,
-            authMethods: methods.authMethodTypes ?? [],
-          };
-        });
+    }).then((session) => {
+      if (session && session.factors?.user?.id) {
+        return listAuthenticationMethodTypes(session.factors.user.id).then(
+          (methods) => {
+            return {
+              factors: session?.factors,
+              authMethods: methods.authMethodTypes ?? [],
+            };
+          },
+        );
       }
     });
   }
 
   async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById(sessionId, organization);
+    const recent = await getSessionCookieById({ sessionId, organization });
     return getSession(recent.id, recent.token).then((response) => {
       if (response?.session && response.session.factors?.user?.id) {
         return listAuthenticationMethodTypes(

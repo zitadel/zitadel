@@ -1,4 +1,5 @@
 "use client";
+
 import { ZitadelReactProvider } from "@zitadel/react";
 import { useTheme } from "next-themes";
 

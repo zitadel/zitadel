@@ -1,12 +1,9 @@
-import { getBrandingSettings, getSession } from "@/lib/zitadel";
+import { getBrandingSettings, getSession, sessionService } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import LoginPasskey from "@/ui/LoginPasskey";
 import UserAvatar from "@/ui/UserAvatar";
-import {
-  getMostRecentCookieWithLoginname,
-  getSessionCookieById,
-} from "@/utils/cookies";
+import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
 
 const title = "Authenticate with a passkey";
 const description =
@@ -22,25 +19,10 @@ export default async function Page({
 
   const sessionFactors = sessionId
     ? await loadSessionById(sessionId, organization)
-    : await loadSessionByLoginname(loginName, organization);
-
-  async function loadSessionByLoginname(
-    loginName?: string,
-    organization?: string,
-  ) {
-    const recent = await getMostRecentCookieWithLoginname(
-      loginName,
-      organization,
-    );
-    return getSession(recent.id, recent.token).then((response) => {
-      if (response?.session) {
-        return response.session;
-      }
-    });
-  }
+    : await loadMostRecentSession(sessionService, { loginName, organization });
 
   async function loadSessionById(sessionId: string, organization?: string) {
-    const recent = await getSessionCookieById(sessionId, organization);
+    const recent = await getSessionCookieById({ sessionId, organization });
     return getSession(recent.id, recent.token).then((response) => {
       if (response?.session) {
         return response.session;

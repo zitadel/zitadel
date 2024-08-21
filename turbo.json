@@ -1,6 +1,20 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "ui": "tui",
+  "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "DEBUG",
+    "ZITADEL_API_URL",
+    "ZITADEL_SERVICE_USER_ID",
+    "ZITADEL_SERVICE_USER_TOKEN",
+    "ZITADEL_SYSTEM_API_URL",
+    "ZITADEL_SYSTEM_API_USERID",
+    "ZITADEL_SYSTEM_API_KEY",
+    "ZITADEL_ISSUER",
+    "ZITADEL_ADMIN_TOKEN",
+    "VERCEL_URL"
+  ],
+  "tasks": {
     "generate": {
       "cache": true
     },
@@ -20,18 +34,5 @@
     "clean": {
       "cache": false
     }
-  },
-  "globalDependencies": ["**/.env.*local"],
-  "globalEnv": [
-    "DEBUG",
-    "ZITADEL_API_URL",
-    "ZITADEL_SERVICE_USER_ID",
-    "ZITADEL_SERVICE_USER_TOKEN",
-    "ZITADEL_SYSTEM_API_URL",
-    "ZITADEL_SYSTEM_API_USERID",
-    "ZITADEL_SYSTEM_API_KEY",
-    "ZITADEL_ISSUER",
-    "ZITADEL_ADMIN_TOKEN",
-    "VERCEL_URL"
-  ]
+  }
 }

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Avatar } from "./Avatar";
 import moment from "moment";
 import { XCircleIcon } from "@heroicons/react/24/outline";
-import { Session } from "@zitadel/proto/zitadel/session/v2beta/session_pb";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
 export default function SessionItem({
   session,
@@ -54,33 +54,40 @@ export default function SessionItem({
 
   return (
     <Link
+      prefetch={false}
       href={
-        validUser
+        validUser && authRequestId
           ? `/login?` +
-            new URLSearchParams(
-              authRequestId
-                ? {
-                    // loginName: session.factors?.user?.loginName as string,
-                    sessionId: session.id,
-                    authRequest: authRequestId,
-                  }
-                : {
-                    loginName: session.factors?.user?.loginName as string,
-                  },
-            )
-          : `/loginname?` +
-            new URLSearchParams(
-              authRequestId
-                ? {
-                    loginName: session.factors?.user?.loginName as string,
-                    submit: "true",
-                    authRequestId,
-                  }
-                : {
-                    loginName: session.factors?.user?.loginName as string,
-                    submit: "true",
-                  },
-            )
+            new URLSearchParams({
+              // loginName: session.factors?.user?.loginName as string,
+              sessionId: session.id,
+              authRequest: authRequestId,
+            })
+          : !validUser
+            ? `/loginname?` +
+              new URLSearchParams(
+                authRequestId
+                  ? {
+                      loginName: session.factors?.user?.loginName as string,
+                      submit: "true",
+                      authRequestId,
+                    }
+                  : {
+                      loginName: session.factors?.user?.loginName as string,
+                      submit: "true",
+                    },
+              )
+            : "/signedin?" +
+              new URLSearchParams(
+                authRequestId
+                  ? {
+                      loginName: session.factors?.user?.loginName as string,
+                      authRequestId,
+                    }
+                  : {
+                      loginName: session.factors?.user?.loginName as string,
+                    },
+              )
       }
       className="group flex flex-row items-center bg-background-light-400 dark:bg-background-dark-400  border border-divider-light hover:shadow-lg dark:hover:bg-white/10 py-2 px-4 rounded-md transition-all"
     >
@@ -114,12 +121,11 @@ export default function SessionItem({
 
         <XCircleIcon
           className="hidden group-hover:block h-5 w-5 transition-all opacity-50 hover:opacity-100"
-          onClick={(event) => {
-            event.preventDefault();
+          onClick={() =>
             clearSession(session.id).then(() => {
               reload();
-            });
-          }}
+            })
+          }
         />
       </div>
     </Link>

@@ -1,4 +1,4 @@
-const sharedConfig = require("zitadel-tailwind-config/tailwind.config.js");
+const sharedConfig = require("zitadel-tailwind-config/tailwind.config.mjs");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {

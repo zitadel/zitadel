@@ -4,7 +4,7 @@ import {
   symbolValidator,
   upperCaseValidator,
 } from "@/utils/validators";
-import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2beta/password_settings_pb";
+import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
 
 type Props = {
   passwordComplexitySettings: PasswordComplexitySettings;

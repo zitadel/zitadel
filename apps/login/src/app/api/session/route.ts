@@ -5,12 +5,11 @@ import {
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
 import {
-  SessionCookie,
   getMostRecentSessionCookie,
   getSessionCookieById,
   getSessionCookieByLoginName,
   removeSessionFromCookie,
-} from "@/utils/cookies";
+} from "@zitadel/next";
 import {
   createSessionAndUpdateCookie,
   createSessionForIdpAndUpdateCookie,
@@ -76,12 +75,12 @@ export async function PUT(request: NextRequest) {
       challenges,
     } = body;
 
-    const recentPromise: Promise<SessionCookie> = sessionId
+    const recentPromise = sessionId
       ? getSessionCookieById(sessionId).catch((error) => {
           return Promise.reject(error);
         })
       : loginName
-        ? getSessionCookieByLoginName(loginName, organization).catch(
+        ? getSessionCookieByLoginName({ loginName, organization }).catch(
             (error) => {
               return Promise.reject(error);
             },
@@ -166,9 +165,9 @@ export async function PUT(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
-  if (id) {
-    const session = await getSessionCookieById(id);
+  const sessionId = searchParams.get("id");
+  if (sessionId) {
+    const session = await getSessionCookieById({ sessionId });
 
     return deleteSession(session.id, session.token)
       .then(() => {

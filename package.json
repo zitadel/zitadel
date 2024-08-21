@@ -1,6 +1,7 @@
 {
   "packageManager": "pnpm@9.1.2+sha256.19c17528f9ca20bd442e4ca42f00f1b9808a9cb419383cd04ba32ef19322aba7",
   "private": true,
+  "name": "typescript-monorepo",
   "scripts": {
     "generate": "turbo run generate",
     "build": "turbo run build",
@@ -25,13 +26,14 @@
   "devDependencies": {
     "@changesets/cli": "^2.22.0",
     "@vitejs/plugin-react": "^4.2.1",
-    "eslint": "^8.57.0",
+    "eslint": "8.57.0",
     "eslint-config-zitadel": "workspace:*",
     "prettier": "^3.2.5",
-    "tsup": "^8.0.2",
-    "turbo": "^1.13.3",
+    "prettier-plugin-organize-imports": "^4.0.0",
+    "tsup": "^8.2.4",
+    "turbo": "2.0.12",
     "typescript": "^5.4.5",
-    "vite-tsconfig-paths": "^4.3.2",
-    "vitest": "^1.6.0"
+    "vite-tsconfig-paths": "^5.0.1",
+    "vitest": "^2.0.5"
   }
 }

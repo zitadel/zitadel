@@ -1,8 +1,8 @@
-version: v1
+version: v2
 managed:
   enabled: true
 plugins:
-  - plugin: buf.build/connectrpc/es:v1.4.0
+  - remote: buf.build/connectrpc/es:v1.4.0
     out: .
-  - plugin: buf.build/bufbuild/es
+  - remote: buf.build/bufbuild/es:v1.7.2
     out: .
