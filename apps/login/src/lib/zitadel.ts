@@ -22,6 +22,8 @@ import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { ProviderSlug } from "./demos";
 import { PartialMessage, PlainMessage } from "@zitadel/client";
+import VerifyEmailForm from "@/ui/VerifyEmailForm";
+import { SearchQuery as UserSearchQuery } from "@zitadel/proto/zitadel/user/v2/query_pb";
 
 const SESSION_LIFETIME_S = 3000;
 
@@ -237,40 +239,54 @@ export async function getUserByID(userId: string) {
   return userService.getUserByID({ userId }, {});
 }
 
-export async function listUsers(userName: string, organizationId?: string) {
+export async function listUsers({
+  userName,
+  email,
+  organizationId,
+}: {
+  userName?: string;
+  email?: string;
+  organizationId?: string;
+}) {
+  const queries: PartialMessage<UserSearchQuery>[] = [];
+
+  if (userName) {
+    queries.push({
+      query: {
+        case: "userNameQuery",
+        value: {
+          userName,
+          method: TextQueryMethod.EQUALS,
+        },
+      },
+    });
+  }
+
+  if (organizationId) {
+    queries.push({
+      query: {
+        case: "organizationIdQuery",
+        value: {
+          organizationId,
+        },
+      },
+    });
+  }
+
+  if (email) {
+    queries.push({
+      query: {
+        case: "emailQuery",
+        value: {
+          emailAddress: email,
+        },
+      },
+    });
+  }
+
   return userService.listUsers(
     {
-      queries: organizationId
-        ? [
-            {
-              query: {
-                case: "userNameQuery",
-                value: {
-                  userName,
-                  method: TextQueryMethod.EQUALS,
-                },
-              },
-            },
-            {
-              query: {
-                case: "organizationIdQuery",
-                value: {
-                  organizationId,
-                },
-              },
-            },
-          ]
-        : [
-            {
-              query: {
-                case: "userNameQuery",
-                value: {
-                  userName,
-                  method: TextQueryMethod.EQUALS,
-                },
-              },
-            },
-          ],
+      queries: queries,
     },
     {},
   );
@@ -384,7 +400,7 @@ export function addIDPLink(
   );
 }
 
-const PROVIDER_MAPPING: {
+export const PROVIDER_MAPPING: {
   [provider: string]: (
     rI: IDPInformation,
   ) => PartialMessage<AddHumanUserRequest>;
@@ -419,6 +435,37 @@ const PROVIDER_MAPPING: {
       },
       idpLinks: [idpLink],
     };
+    return req;
+  },
+  [ProviderSlug.AZURE]: (idp: IDPInformation) => {
+    const rawInfo = idp.rawInformation?.toJson() as {
+      mail: string;
+      displayName?: string;
+      givenName?: string;
+      surname?: string;
+    };
+
+    const idpLink: PartialMessage<IDPLink> = {
+      idpId: idp.idpId,
+      userId: idp.userId,
+      userName: idp.userName,
+    };
+
+    const req: PartialMessage<AddHumanUserRequest> = {
+      username: idp.userName,
+      email: {
+        email: rawInfo?.mail,
+        verification: { case: "isVerified", value: true },
+      },
+      // organisation: Organisation | undefined;
+      profile: {
+        displayName: rawInfo?.displayName ?? "",
+        givenName: rawInfo?.givenName ?? "",
+        familyName: rawInfo?.surname ?? "",
+      },
+      idpLinks: [idpLink],
+    };
+
     return req;
   },
   [ProviderSlug.GITHUB]: (idp: IDPInformation) => {
