@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
 import { SidenavSetting } from '../sidenav/sidenav.component';
@@ -8,7 +8,7 @@ import { SidenavSetting } from '../sidenav/sidenav.component';
   templateUrl: './settings-list.component.html',
   styleUrls: ['./settings-list.component.scss'],
 })
-export class SettingsListComponent implements OnChanges {
+export class SettingsListComponent implements OnChanges, OnInit {
   @Input() public title: string = '';
   @Input() public description: string = '';
   @Input() public serviceType!: PolicyComponentServiceType;
