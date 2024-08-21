@@ -5,7 +5,10 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
     const { loginName, organization } = body;
-    return listUsers(loginName, organization).then((users) => {
+    return listUsers({
+      userName: loginName,
+      organizationId: organization,
+    }).then((users) => {
       if (
         users.details &&
         Number(users.details.totalResult) == 1 &&
