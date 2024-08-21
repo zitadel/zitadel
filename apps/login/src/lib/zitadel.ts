@@ -12,6 +12,7 @@ import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import {
   RetrieveIdentityProviderIntentRequest,
+  VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
@@ -482,24 +483,11 @@ export async function getActiveIdentityProviders(orgId?: string) {
  * @returns the newly set email
  */
 export async function verifyPasskeyRegistration(
-  passkeyId: string,
-  passkeyName: string,
-  publicKeyCredential:
-    | {
-        [key: string]: any;
-      }
-    | undefined,
-  userId: string,
+  request: PartialMessage<VerifyPasskeyRegistrationRequest>,
 ) {
-  return userService.verifyPasskeyRegistration(
-    {
-      passkeyId,
-      passkeyName,
-      publicKeyCredential,
-      userId,
-    },
-    {},
-  );
+  // TODO: find a better way to handle this
+  request = VerifyPasskeyRegistrationRequest.fromJson(request as any);
+  return userService.verifyPasskeyRegistration(request, {});
 }
 
 /**

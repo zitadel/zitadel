@@ -8,6 +8,7 @@ import Alert from "./Alert";
 import { Spinner } from "./Spinner";
 import BackButton from "./BackButton";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -78,7 +79,7 @@ export default function LoginPasskey({
         loginName,
         sessionId,
         organization,
-        challenges: {
+        challenges: RequestChallenges.fromJson({
           webAuthN: {
             domain: "",
             // USER_VERIFICATION_REQUIREMENT_UNSPECIFIED = 0;
@@ -87,7 +88,7 @@ export default function LoginPasskey({
             // USER_VERIFICATION_REQUIREMENT_DISCOURAGED = 3; - mfa
             userVerificationRequirement: userVerificationRequirement,
           },
-        },
+        }),
         authRequestId,
       }),
     });

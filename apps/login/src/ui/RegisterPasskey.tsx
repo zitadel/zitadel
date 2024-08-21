@@ -92,7 +92,7 @@ export default function RegisterPasskey({
     return submitRegister().then((resp: RegisterPasskeyResponse) => {
       const passkeyId = resp.passkeyId;
       const options: CredentialCreationOptions =
-        (resp.publicKeyCredentialCreationOptions?.toJson() as CredentialCreationOptions) ??
+        (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
         {};
 
       if (options?.publicKey) {
@@ -143,6 +143,7 @@ export default function RegisterPasskey({
                   ),
                 },
               };
+
               return submitVerify(passkeyId, "", data, sessionId).then(() => {
                 const params = new URLSearchParams();
 
@@ -194,19 +195,32 @@ export default function RegisterPasskey({
             type="button"
             variant={ButtonVariants.Secondary}
             onClick={() => {
-              const params = new URLSearchParams();
               if (authRequestId) {
-                params.set("authRequest", authRequestId);
-              }
-              if (sessionId) {
-                params.set("sessionId", sessionId);
-              }
+                const params = new URLSearchParams({
+                  authRequest: authRequestId,
+                });
 
-              if (organization) {
-                params.set("organization", organization);
-              }
+                if (sessionId) {
+                  params.set("sessionId", sessionId);
+                }
 
-              router.push("/login?" + params);
+                if (organization) {
+                  params.set("organization", organization);
+                }
+
+                router.push("/login?" + params);
+              } else {
+                const params = new URLSearchParams();
+
+                if (sessionId) {
+                  params.append("sessionId", sessionId);
+                }
+                if (organization) {
+                  params.append("organization", organization);
+                }
+
+                router.push("/signedin?" + params);
+              }
             }}
           >
             skip
