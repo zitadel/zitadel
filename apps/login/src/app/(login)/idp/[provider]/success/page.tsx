@@ -3,6 +3,7 @@ import {
   addIDPLink,
   createUser,
   getBrandingSettings,
+  getIDPByID,
   retrieveIDPIntent,
 } from "@/lib/zitadel";
 import Alert, { AlertType } from "@/ui/Alert";
@@ -77,6 +78,7 @@ const PROVIDER_MAPPING: {
       },
       idpLinks: [idpLink],
     };
+
     return req;
   },
   [ProviderSlug.GITHUB]: (idp: IDPInformation) => {
@@ -120,76 +122,132 @@ export default async function Page({
   const branding = await getBrandingSettings(organization);
   if (provider && id && token) {
     return retrieveIDPIntent(id, token)
-      .then((resp) => {
+      .then(async (resp) => {
         const { idpInformation, userId } = resp;
 
-        if (idpInformation) {
-          if (userId) {
-            return (
-              <DynamicTheme branding={branding}>
-                <div className="flex flex-col items-center space-y-4">
-                  <h1>Login successful</h1>
-                  <div>You have successfully been loggedIn!</div>
+        if (userId) {
+          // TODO: update user if idp.options.isAutoUpdate is true
 
-                  <IdpSignin
-                    userId={userId}
-                    idpIntent={{ idpIntentId: id, idpIntentToken: token }}
-                    authRequestId={authRequestId}
-                  />
-                </div>
-              </DynamicTheme>
-            );
-          } else {
-            return createUser(provider, idpInformation)
-              .then((userId) => {
+          return (
+            <DynamicTheme branding={branding}>
+              <div className="flex flex-col items-center space-y-4">
+                <h1>Login successful</h1>
+                <div>You have successfully been loggedIn!</div>
+
+                <IdpSignin
+                  userId={userId}
+                  idpIntent={{ idpIntentId: id, idpIntentToken: token }}
+                  authRequestId={authRequestId}
+                />
+              </div>
+            </DynamicTheme>
+          );
+        }
+
+        if (idpInformation) {
+          const idp = await getIDPByID(idpInformation.idpId);
+          const options = idp?.config?.options;
+
+          // search for potential user via username, then link
+          if (options?.isLinkingAllowed) {
+            const userId = "";
+
+            const idpLink = await addIDPLink(
+              {
+                id: idpInformation.idpId,
+                userId: idpInformation.userId,
+                userName: idpInformation.userName,
+              },
+              userId,
+            ).catch((error) => {
+              return (
+                <DynamicTheme branding={branding}>
+                  <div className="flex flex-col items-center space-y-4">
+                    <h1>Linking failed</h1>
+                    <div className="w-full">
+                      {
+                        <Alert type={AlertType.ALERT}>
+                          {JSON.stringify(error.message)}
+                        </Alert>
+                      }
+                    </div>
+                  </div>
+                </DynamicTheme>
+              );
+            });
+
+            if (idpLink) {
+              return (
+                <DynamicTheme branding={branding}>
+                  <div className="flex flex-col items-center space-y-4">
+                    <h1>Account successfully linked</h1>
+                    <div>Your account has successfully been linked!</div>
+                  </div>
+                </DynamicTheme>
+              );
+            }
+          } else if (options?.isCreationAllowed && options.isAutoCreation) {
+            const userId = await createUser(provider, idpInformation).catch(
+              (error) => {
                 return (
                   <DynamicTheme branding={branding}>
                     <div className="flex flex-col items-center space-y-4">
-                      <h1>Register successful</h1>
-                      <div>You have successfully been registered!</div>
+                      <h1>Register failed</h1>
+                      <div className="w-full">
+                        {
+                          <Alert type={AlertType.ALERT}>
+                            {JSON.stringify(error.message)}
+                          </Alert>
+                        }
+                      </div>
                     </div>
                   </DynamicTheme>
                 );
-              })
-              .catch((error) => {
-                if (error.code === 6) {
-                  return addIDPLink(
-                    {
-                      id: idpInformation.idpId,
-                      userId: idpInformation.userId,
-                      userName: idpInformation.userName,
-                    },
-                    userId,
-                  ).then(() => {
-                    return (
-                      <DynamicTheme branding={branding}>
-                        <div className="flex flex-col items-center space-y-4">
-                          <h1>Account successfully linked</h1>
-                          <div>Your account has successfully been linked!</div>
-                        </div>
-                      </DynamicTheme>
-                    );
-                  });
-                } else {
-                  return (
-                    <DynamicTheme branding={branding}>
-                      <div className="flex flex-col items-center space-y-4">
-                        <h1>Register failed</h1>
-                        <div className="w-full">
-                          {
-                            <Alert type={AlertType.ALERT}>
-                              {JSON.stringify(error.message)}
-                            </Alert>
-                          }
-                        </div>
-                      </div>
-                    </DynamicTheme>
-                  );
-                }
-              });
+              },
+            );
+
+            if (userId) {
+              return (
+                <DynamicTheme branding={branding}>
+                  <div className="flex flex-col items-center space-y-4">
+                    <h1>Register successful</h1>
+                    <div>You have successfully been registered!</div>
+                  </div>
+                </DynamicTheme>
+              );
+            }
           }
+
+          // return login failed if no linking or creation is allowed and no user was found
+          return (
+            <DynamicTheme branding={branding}>
+              <div className="flex flex-col items-center space-y-4">
+                <h1>Login failed</h1>
+                <div className="w-full">
+                  {
+                    <Alert type={AlertType.ALERT}>
+                      User could not be logged in
+                    </Alert>
+                  }
+                </div>
+              </div>
+            </DynamicTheme>
+          );
         } else {
-          throw new Error("Could not get user information.");
+          return (
+            <DynamicTheme branding={branding}>
+              <div className="flex flex-col items-center space-y-4">
+                <h1>Login failed</h1>
+                <div className="w-full">
+                  {
+                    <Alert type={AlertType.ALERT}>
+                      Could not get user information
+                    </Alert>
+                  }
+                </div>
+              </div>
+            </DynamicTheme>
+          );
         }
       })
       .catch((error) => {

@@ -3,6 +3,7 @@ import {
   createSessionServiceClient,
   createSettingsServiceClient,
   createUserServiceClient,
+  createIdpServiceClient,
   makeReqCtx,
 } from "@zitadel/client/v2";
 import { createManagementServiceClient } from "@zitadel/client/v1";
@@ -12,13 +13,15 @@ import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_p
 import {
   RetrieveIdentityProviderIntentRequest,
   VerifyU2FRegistrationRequest,
+  AddHumanUserRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { IDPInformation, IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { ProviderSlug } from "./demos";
-import { PlainMessage } from "@zitadel/client";
+import { PartialMessage, PlainMessage } from "@zitadel/client";
 
 const SESSION_LIFETIME_S = 3000;
 
@@ -34,6 +37,7 @@ export const sessionService = createSessionServiceClient(transport);
 export const managementService = createManagementServiceClient(transport);
 export const userService = createUserServiceClient(transport);
 export const oidcService = createOIDCServiceClient(transport);
+export const idpService = createIdpServiceClient(transport);
 
 export const settingsService = createSettingsServiceClient(transport);
 
@@ -353,6 +357,10 @@ export function retrieveIDPIntent(id: string, token: string) {
     { idpIntentId: id, idpIntentToken: token },
     {},
   );
+}
+
+export function getIDPByID(id: string) {
+  return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
 }
 
 export function addIDPLink(
