@@ -564,6 +564,7 @@ Errors:
     NotFound: Exekveringen hittades inte
     IncludeNotFound: Inkluderingen hittades inte
     NoTargets: Inga mål definierade
+    Failed: Utförande misslyckades
     ResponseIsNotValidJSON: Svaret är inte giltigt JSON
   UserSchema:
     NotEnabled: Funktionen "Användarschema" är inte aktiverad

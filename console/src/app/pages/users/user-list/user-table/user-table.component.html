@@ -57,11 +57,14 @@
         </cnsl-action-keys>
       </div>
     </button>
-    <cnsl-filter-user
-      *ngIf="!selection.hasValue()"
-      (filterChanged)="applySearchQuery($any($event))"
-      (filterOpen)="filterOpen = $event"
-    ></cnsl-filter-user>
+  </ng-template>
+  <cnsl-filter-user
+    actions
+    *ngIf="!selection.hasValue()"
+    (filterChanged)="applySearchQuery($any($event))"
+    (filterOpen)="filterOpen = $event"
+  ></cnsl-filter-user>
+  <ng-template cnslHasRole [hasRole]="['user.write']" actions>
     <button
       (click)="gotoRouterLink(['/users', type === Type.TYPE_HUMAN ? 'create' : 'create-machine'])"
       color="primary"
