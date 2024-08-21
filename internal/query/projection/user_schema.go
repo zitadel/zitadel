@@ -130,7 +130,10 @@ func (p *userSchemaProjection) reduceUpdated(event eventstore.Event) (*handler.S
 
 	if len(e.Schema) > 0 {
 		cols = append(cols, handler.NewCol(UserSchemaSchemaCol, e.Schema))
-		cols = append(cols, handler.NewIncrementCol(UserSchemaRevisionCol, 1))
+	}
+
+	if e.SchemaRevision != nil {
+		cols = append(cols, handler.NewCol(UserSchemaRevisionCol, *e.SchemaRevision))
 	}
 
 	if len(e.PossibleAuthenticators) > 0 {

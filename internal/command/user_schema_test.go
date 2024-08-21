@@ -107,6 +107,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			"empty user schema created",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectPush(
 						schema.NewCreatedEvent(
 							context.Background(),
@@ -141,6 +142,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			"user schema created",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectPush(
 						schema.NewCreatedEvent(
 							context.Background(),
@@ -220,6 +222,7 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 			"user schema with permission created",
 			fields{
 				eventstore: expectEventstore(
+					expectFilter(),
 					expectPush(
 						schema.NewCreatedEvent(
 							context.Background(),
@@ -515,7 +518,9 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 						schema.NewUpdatedEvent(
 							context.Background(),
 							&schema.NewAggregate("id1", "instanceID").Aggregate,
-							[]schema.Changes{schema.ChangeSchema(json.RawMessage(`{
+							[]schema.Changes{
+								schema.IncreaseRevision(1),
+								schema.ChangeSchema(json.RawMessage(`{
 								"$schema": "urn:zitadel:schema:v1",
 								"type": "object",
 								"properties": {

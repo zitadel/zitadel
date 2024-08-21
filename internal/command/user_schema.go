@@ -70,14 +70,16 @@ func (c *Commands) CreateUserSchema(ctx context.Context, userSchema *CreateUserS
 	if err != nil {
 		return "", nil, err
 	}
-	writeModel := NewUserSchemaWriteModel(id, userSchema.ResourceOwner)
-	err = c.pushAppendAndReduce(ctx, writeModel,
+	writeModel, err := c.getSchemaWriteModelByID(ctx, userSchema.ResourceOwner, id)
+	if err != nil {
+		return "", nil, err
+	}
+	if err := c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewCreatedEvent(ctx,
 			UserSchemaAggregateFromWriteModel(&writeModel.WriteModel),
 			userSchema.Type, userSchema.Schema, userSchema.PossibleAuthenticators,
 		),
-	)
-	if err != nil {
+	); err != nil {
 		return "", nil, err
 	}
 	return id, writeModelToObjectDetails(&writeModel.WriteModel), nil
@@ -87,8 +89,8 @@ func (c *Commands) UpdateUserSchema(ctx context.Context, userSchema *UpdateUserS
 	if err := userSchema.Valid(); err != nil {
 		return nil, err
 	}
-	writeModel := NewUserSchemaWriteModel(userSchema.ID, userSchema.ResourceOwner)
-	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+	writeModel, err := c.getSchemaWriteModelByID(ctx, userSchema.ResourceOwner, userSchema.ID)
+	if err != nil {
 		return nil, err
 	}
 	if writeModel.State != domain.UserSchemaStateActive {
@@ -114,17 +116,16 @@ func (c *Commands) DeactivateUserSchema(ctx context.Context, id, resourceOwner s
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-Vvf3w", "Errors.IDMissing")
 	}
-	writeModel := NewUserSchemaWriteModel(id, resourceOwner)
-	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+	writeModel, err := c.getSchemaWriteModelByID(ctx, resourceOwner, id)
+	if err != nil {
 		return nil, err
 	}
 	if writeModel.State != domain.UserSchemaStateActive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-E4t4z", "Errors.UserSchema.NotActive")
 	}
-	err := c.pushAppendAndReduce(ctx, writeModel,
+	if err := c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewDeactivatedEvent(ctx, UserSchemaAggregateFromWriteModel(&writeModel.WriteModel)),
-	)
-	if err != nil {
+	); err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
@@ -134,17 +135,16 @@ func (c *Commands) ReactivateUserSchema(ctx context.Context, id, resourceOwner s
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-wq3Gw", "Errors.IDMissing")
 	}
-	writeModel := NewUserSchemaWriteModel(id, resourceOwner)
-	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+	writeModel, err := c.getSchemaWriteModelByID(ctx, resourceOwner, id)
+	if err != nil {
 		return nil, err
 	}
 	if writeModel.State != domain.UserSchemaStateInactive {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-DGzh5", "Errors.UserSchema.NotInactive")
 	}
-	err := c.pushAppendAndReduce(ctx, writeModel,
+	if err := c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewReactivatedEvent(ctx, UserSchemaAggregateFromWriteModel(&writeModel.WriteModel)),
-	)
-	if err != nil {
+	); err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
@@ -154,18 +154,17 @@ func (c *Commands) DeleteUserSchema(ctx context.Context, id, resourceOwner strin
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-E22gg", "Errors.IDMissing")
 	}
-	writeModel := NewUserSchemaWriteModel(id, resourceOwner)
-	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+	writeModel, err := c.getSchemaWriteModelByID(ctx, resourceOwner, id)
+	if err != nil {
 		return nil, err
 	}
 	if !writeModel.Exists() {
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-Grg41", "Errors.UserSchema.NotExists")
 	}
 	// TODO: check for users based on that schema; this is only possible with / after https://github.com/zitadel/zitadel/issues/7308
-	err := c.pushAppendAndReduce(ctx, writeModel,
+	if err := c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewDeletedEvent(ctx, UserSchemaAggregateFromWriteModel(&writeModel.WriteModel), writeModel.SchemaType),
-	)
-	if err != nil {
+	); err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
@@ -177,4 +176,20 @@ func validateUserSchema(userSchema json.RawMessage) error {
 		return zerrors.ThrowInvalidArgument(err, "COMMA-W21tg", "Errors.UserSchema.Schema.Invalid")
 	}
 	return nil
+}
+
+func (c *Commands) getSchemaWriteModelByID(ctx context.Context, resourceOwner, id string) (*UserSchemaWriteModel, error) {
+	writeModel := NewUserSchemaWriteModel(resourceOwner, id, "")
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}
+
+func (c *Commands) getSchemaWriteModelByType(ctx context.Context, resourceOwner, ty string) (*UserSchemaWriteModel, error) {
+	writeModel := NewUserSchemaWriteModel(resourceOwner, "", ty)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	return writeModel, nil
 }

@@ -61,9 +61,9 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(
 					testEvent(
-						schema.CreatedType,
+						schema.UpdatedType,
 						schema.AggregateType,
-						[]byte(`{"schemaType": "type", "schema": {"$schema":"urn:zitadel:schema:v1","properties":{"name":{"type":"string","urn:zitadel:schema:permission":{"self":"rw"}}},"type":"object"}, "possibleAuthenticators": [1,2]}`),
+						[]byte(`{"schemaType": "type", "schemaRevision": 2, "schema": {"$schema":"urn:zitadel:schema:v1","properties":{"name":{"type":"string","urn:zitadel:schema:permission":{"self":"rw"}}},"type":"object"}, "possibleAuthenticators": [1,2]}`),
 					), eventstore.GenericEventMapper[schema.UpdatedEvent]),
 			},
 			reduce: (&userSchemaProjection{}).reduceUpdated,
@@ -73,13 +73,13 @@ func TestUserSchemaProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.user_schemas SET (change_date, sequence, type, schema, revision, possible_authenticators) = ($1, $2, $3, $4, revision + $5, $6) WHERE (id = $7) AND (instance_id = $8)",
+							expectedStmt: "UPDATE projections.user_schemas SET (change_date, sequence, type, schema, revision, possible_authenticators) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (instance_id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								"type",
 								json.RawMessage(`{"$schema":"urn:zitadel:schema:v1","properties":{"name":{"type":"string","urn:zitadel:schema:permission":{"self":"rw"}}},"type":"object"}`),
-								1,
+								uint64(2),
 								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername, domain.AuthenticatorTypePassword},
 								"agg-id",
 								"instance-id",
