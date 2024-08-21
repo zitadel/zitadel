@@ -49,7 +49,6 @@ export const PROVIDER_MAPPING: {
         email: rawInfo.User?.email,
         verification: { case: "isVerified", value: true },
       },
-      // organisation: Organisation | undefined;
       profile: {
         displayName: rawInfo.User?.name ?? "",
         givenName: rawInfo.User?.given_name ?? "",
@@ -80,7 +79,6 @@ export const PROVIDER_MAPPING: {
         email: rawInfo?.mail,
         verification: { case: "isVerified", value: true },
       },
-      // organisation: Organisation | undefined;
       profile: {
         displayName: rawInfo?.displayName ?? "",
         givenName: rawInfo?.givenName ?? "",
@@ -109,7 +107,6 @@ export const PROVIDER_MAPPING: {
         email: rawInfo?.email,
         verification: { case: "isVerified", value: true },
       },
-      // organisation: Organisation | undefined;
       profile: {
         displayName: rawInfo?.name ?? "",
         givenName: rawInfo?.name ?? "",
