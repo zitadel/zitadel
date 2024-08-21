@@ -30,7 +30,7 @@ annotations:
                 grpc_pass grpc://zitadel-disabled-tls:8080;
                 grpc_set_header Host $host:$server_port;
                 # highlight-next-line
-+               grpc_buffer_size 8k;
+                grpc_buffer_size 8k;
             }
         }
     }
