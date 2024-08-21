@@ -22,6 +22,7 @@ export function idpTypeToSlug(idpType: IdentityProviderType) {
 }
 
 // this maps the IDPInformation to the AddHumanUserRequest which is used when creating a user or linking a user (email)
+// TODO: extend this object from a other file which can be overwritten by customers like map = { ...PROVIDER_MAPPING, ...customerMap }
 export const PROVIDER_MAPPING: {
   [provider: string]: (
     rI: IDPInformation,
