@@ -42,6 +42,9 @@ Console:
   InstanceManagementURL: "https://example.com/instances/{{.InstanceID}}"
 
 Projections:
+  HandleActiveInstances: 30m
+  RequeueEvery: 5s
+  TransactionDuration: 5s
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
