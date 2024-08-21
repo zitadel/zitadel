@@ -36,8 +36,7 @@ type Config struct {
 	DefaultIdTokenLifetime            time.Duration
 	DefaultRefreshTokenIdleExpiration time.Duration
 	DefaultRefreshTokenExpiration     time.Duration
-	UserAgentCookieConfig             *middleware.UserAgentCookieConfig
-	Cache                             *middleware.CacheConfig
+	JWKSCacheControlMaxAge            time.Duration
 	CustomEndpoints                   *EndpointConfig
 	DeviceAuth                        *DeviceAuthorizationConfig
 	DefaultLoginURLV2                 string
@@ -159,6 +158,7 @@ func NewServer(
 		defaultLogoutURLV2:         config.DefaultLogoutURLV2,
 		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime,
 		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime,
+		jwksCacheControlMaxAge:     config.JWKSCacheControlMaxAge,
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
 		signingKeyAlgorithm:        config.SigningKeyAlgorithm,

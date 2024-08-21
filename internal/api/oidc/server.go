@@ -34,6 +34,7 @@ type Server struct {
 	defaultLogoutURLV2         string
 	defaultAccessTokenLifetime time.Duration
 	defaultIdTokenLifetime     time.Duration
+	jwksCacheControlMaxAge     time.Duration
 
 	fallbackLogger      *slog.Logger
 	hasher              *crypto.Hasher

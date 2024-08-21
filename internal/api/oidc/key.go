@@ -469,7 +469,11 @@ func (s *Server) Keys(ctx context.Context, r *op.Request[struct{}]) (_ *op.Respo
 	appendPublicKeysToWebKeySet(keyset, legacyKeys)
 
 	resp := op.NewResponse(keyset)
-	resp.Header.Set(http_util.CacheControl, "max-age=300, must-revalidate")
+	if s.jwksCacheControlMaxAge != 0 {
+		resp.Header.Set(http_util.CacheControl,
+			fmt.Sprintf("max-age=%d, must-revalidate", int(s.jwksCacheControlMaxAge/time.Second)),
+		)
+	}
 
 	return resp, nil
 }
