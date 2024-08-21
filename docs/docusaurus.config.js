@@ -284,32 +284,6 @@ module.exports = {
               categoryLinkSource: "tag",
             },
           },
-          // users: {
-          //   specPath: ".artifacts/openapi/zitadel/user/v2/user_service.swagger.json",
-          //   outputDir: "docs/apis/resources/user_service",
-          //   baseUrl: "docs/apis/resources/user_service",
-          //   label: "2.0",
-          //   version: "2.0",
-          //   sidebarOptions: {
-          //     groupPathsBy: "tag",
-          //     categoryLinkSource: "auto",
-          //   },
-          //   "versions":
-          //       {
-          //         "2.0": {
-          //           label: "2.0",
-          //           specPath: ".artifacts/openapi/zitadel/user/v2/user_service.swagger.json",
-          //           outputDir: "docs/apis/resources/user_service",
-          //           baseUrl: "docs/apis/resources/user_service"
-          //         },
-          //         "3.0":{
-          //           label: "3.0",
-          //           specPath: ".artifacts/openapi/zitadel/user/v3alpha/user_service.swagger.json",
-          //           outputDir: "docs/apis/resources/user_service",
-          //           baseUrl: "docs/apis/resources/user_service"
-          //         },
-          //       }
-          // },
           user_v2: {
             specPath: ".artifacts/openapi/zitadel/user/v2/user_service.swagger.json",
             outputDir: "docs/apis/resources/user_service_v2",
