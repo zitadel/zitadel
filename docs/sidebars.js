@@ -621,14 +621,34 @@ module.exports = {
         {
           type: "category",
           label: "Users",
-          link: {
-            type: "generated-index",
-            title: "User Service API",
-            slug: "/apis/resources/user_service_v2",
-            description:
-                "This API is intended to manage users in a ZITADEL instance.\n"
-          },
-          items: require("./docs/apis/resources/user_service_v2/sidebar.ts"),
+          items: [
+            {
+              type: "category",
+              label: "v2.0 (stable)",
+              link: {
+                type: "generated-index",
+                title: "User Service API v2",
+                slug: "/apis/resources/user_service_v2",
+                description:
+                    "This API is intended to manage users in a ZITADEL instance.\n"
+              },
+              items: require("./docs/apis/resources/user_service_v2/sidebar.ts"),
+
+            },
+            {
+              type: "category",
+              label: "v3.0 (alpha)",
+              link: {
+                type: "generated-index",
+                title: "User Service API v3",
+                slug: "/apis/resources/user_service_v3",
+                description:
+                    "This API is intended to manage users in a ZITADEL instance.\n"
+              },
+              items: require("./docs/apis/resources/user_service_v3/sidebar.ts"),
+
+            }
+          ],
         },
         {
           type: "category",
