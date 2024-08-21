@@ -3,6 +3,7 @@ import { IDPInformation, IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { PartialMessage } from "@zitadel/client";
 
+// This maps the IdentityProviderType to a slug which is used in the /success and /failure routes
 export function idpTypeToSlug(idpType: IdentityProviderType) {
   switch (idpType) {
     case IdentityProviderType.GITHUB:
@@ -20,14 +21,7 @@ export function idpTypeToSlug(idpType: IdentityProviderType) {
   }
 }
 
-export const PROVIDER_NAME_MAPPING: {
-  [provider: string]: string;
-} = {
-  [IdentityProviderType.GOOGLE]: "Google",
-  [IdentityProviderType.GITHUB]: "GitHub",
-  [IdentityProviderType.AZURE_AD]: "Microsoft",
-};
-
+// this maps the IDPInformation to the AddHumanUserRequest which is used when creating a user or linking a user (email)
 export const PROVIDER_MAPPING: {
   [provider: string]: (
     rI: IDPInformation,
@@ -63,6 +57,7 @@ export const PROVIDER_MAPPING: {
       },
       idpLinks: [idpLink],
     };
+
     return req;
   },
   [idpTypeToSlug(IdentityProviderType.AZURE_AD)]: (idp: IDPInformation) => {
@@ -101,11 +96,13 @@ export const PROVIDER_MAPPING: {
       email: string;
       name: string;
     };
+
     const idpLink: PartialMessage<IDPLink> = {
       idpId: idp.idpId,
       userId: idp.userId,
       userName: idp.userName,
     };
+
     const req: PartialMessage<AddHumanUserRequest> = {
       username: idp.userName,
       email: {
@@ -120,6 +117,7 @@ export const PROVIDER_MAPPING: {
       },
       idpLinks: [idpLink],
     };
+
     return req;
   },
 };
