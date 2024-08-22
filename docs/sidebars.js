@@ -536,7 +536,18 @@ module.exports = {
     },
   ],
   apis: [
-    "apis/introduction",
+    {
+      type: "category",
+      label: "Overview",
+      link: {
+        type: "doc",
+        id: "apis/introduction"
+      },
+      items: [
+          "apis/v2",
+          "apis/v3"
+      ],
+    },
     {
       type: "category",
       label: "Resources",
