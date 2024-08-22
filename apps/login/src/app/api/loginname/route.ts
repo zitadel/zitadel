@@ -1,4 +1,4 @@
-import { ProviderSlug } from "@/lib/demos";
+import { idpTypeToSlug } from "@/lib/idp";
 import {
   getActiveIdentityProviders,
   getLoginSettings,
@@ -7,14 +7,16 @@ import {
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
-import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
   if (body) {
     const { loginName, authRequestId, organization } = body;
-    return listUsers(loginName, organization).then(async (users) => {
+    return listUsers({
+      userName: loginName,
+      organizationId: organization,
+    }).then(async (users) => {
       if (users.details?.totalResult == BigInt(1) && users.result[0].userId) {
         const userId = users.result[0].userId;
         return createSessionForUserIdAndUpdateCookie(
@@ -64,28 +66,8 @@ export async function POST(request: NextRequest) {
             const host = request.nextUrl.origin;
 
             const identityProviderType = identityProviders[0].type;
-            let provider: string;
 
-            switch (identityProviderType) {
-              case IdentityProviderType.GITHUB:
-                provider = "github";
-                break;
-              case IdentityProviderType.GOOGLE:
-                provider = "google";
-                break;
-              case IdentityProviderType.AZURE_AD:
-                provider = "azure";
-                break;
-              case IdentityProviderType.SAML:
-                provider = "saml";
-                break;
-              case IdentityProviderType.OIDC:
-                provider = "oidc";
-                break;
-              default:
-                provider = "oidc";
-                break;
-            }
+            const provider = idpTypeToSlug(identityProviderType);
 
             const params = new URLSearchParams();
 

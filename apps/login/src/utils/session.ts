@@ -38,7 +38,6 @@ export async function createSessionAndUpdateCookie(
       ? {
           user: { search: { case: "loginName", value: loginName } },
           password: { password },
-          // totp: { code: totpCode },
         }
       : { user: { search: { case: "loginName", value: loginName } } },
     challenges,
@@ -50,7 +49,7 @@ export async function createSessionAndUpdateCookie(
       createdSession.sessionToken,
     ).then((response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
-        const sessionCookie: any = {
+        const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
           creationDate: `${response.session.creationDate?.toDate().getTime() ?? ""}`,
@@ -103,7 +102,7 @@ export async function createSessionForUserIdAndUpdateCookie(
       createdSession.sessionToken,
     ).then((response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
-        const sessionCookie: any = {
+        const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
           creationDate: `${response.session.creationDate?.toDate().getTime() ?? ""}`,
@@ -153,7 +152,7 @@ export async function createSessionForIdpAndUpdateCookie(
       createdSession.sessionToken,
     ).then((response) => {
       if (response?.session && response.session?.factors?.user?.loginName) {
-        const sessionCookie: any = {
+        const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
           creationDate: `${response.session.creationDate?.toDate().getTime() ?? ""}`,

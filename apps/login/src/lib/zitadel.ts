@@ -3,23 +3,27 @@ import {
   createSessionServiceClient,
   createSettingsServiceClient,
   createUserServiceClient,
+  createIdpServiceClient,
   makeReqCtx,
 } from "@zitadel/client/v2";
 import { createManagementServiceClient } from "@zitadel/client/v1";
 import { createServerTransport } from "@zitadel/node";
-import { GetActiveIdentityProvidersRequest } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import {
   RetrieveIdentityProviderIntentRequest,
+  VerifyPasskeyRegistrationRequest,
   VerifyU2FRegistrationRequest,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 
 import { CreateCallbackRequest } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 import type { RedirectURLs } from "@zitadel/proto/zitadel/user/v2/idp_pb";
-import { ProviderSlug } from "./demos";
-import { PlainMessage } from "@zitadel/client";
+import { PartialMessage, PlainMessage } from "@zitadel/client";
+import { SearchQuery as UserSearchQuery } from "@zitadel/proto/zitadel/user/v2/query_pb";
+import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { PROVIDER_MAPPING } from "./idp";
 
 const SESSION_LIFETIME_S = 3000;
 
@@ -35,6 +39,8 @@ export const sessionService = createSessionServiceClient(transport);
 export const managementService = createManagementServiceClient(transport);
 export const userService = createUserServiceClient(transport);
 export const oidcService = createOIDCServiceClient(transport);
+export const idpService = createIdpServiceClient(transport);
+
 export const settingsService = createSettingsServiceClient(transport);
 
 export async function getBrandingSettings(organization?: string) {
@@ -233,40 +239,54 @@ export async function getUserByID(userId: string) {
   return userService.getUserByID({ userId }, {});
 }
 
-export async function listUsers(userName: string, organizationId: string) {
+export async function listUsers({
+  userName,
+  email,
+  organizationId,
+}: {
+  userName?: string;
+  email?: string;
+  organizationId?: string;
+}) {
+  const queries: PartialMessage<UserSearchQuery>[] = [];
+
+  if (userName) {
+    queries.push({
+      query: {
+        case: "userNameQuery",
+        value: {
+          userName,
+          method: TextQueryMethod.EQUALS,
+        },
+      },
+    });
+  }
+
+  if (organizationId) {
+    queries.push({
+      query: {
+        case: "organizationIdQuery",
+        value: {
+          organizationId,
+        },
+      },
+    });
+  }
+
+  if (email) {
+    queries.push({
+      query: {
+        case: "emailQuery",
+        value: {
+          emailAddress: email,
+        },
+      },
+    });
+  }
+
   return userService.listUsers(
     {
-      queries: organizationId
-        ? [
-            {
-              query: {
-                case: "userNameQuery",
-                value: {
-                  userName,
-                  method: TextQueryMethod.EQUALS,
-                },
-              },
-            },
-            {
-              query: {
-                case: "organizationIdQuery",
-                value: {
-                  organizationId,
-                },
-              },
-            },
-          ]
-        : [
-            {
-              query: {
-                case: "userNameQuery",
-                value: {
-                  userName,
-                  method: TextQueryMethod.EQUALS,
-                },
-              },
-            },
-          ],
+      queries: queries,
     },
     {},
   );
@@ -275,14 +295,6 @@ export async function listUsers(userName: string, organizationId: string) {
 export async function getOrgByDomain(domain: string) {
   return managementService.getOrgByDomainGlobal({ domain }, {});
 }
-
-export const PROVIDER_NAME_MAPPING: {
-  [provider: string]: string;
-} = {
-  [ProviderSlug.GOOGLE]: "Google",
-  [ProviderSlug.GITHUB]: "GitHub",
-  [ProviderSlug.AZURE]: "Microft",
-};
 
 export async function startIdentityProviderFlow({
   idpId,
@@ -346,6 +358,44 @@ export async function resendEmailCode(userId: string) {
     },
     {},
   );
+}
+
+export function retrieveIDPIntent(id: string, token: string) {
+  return userService.retrieveIdentityProviderIntent(
+    { idpIntentId: id, idpIntentToken: token },
+    {},
+  );
+}
+
+export function getIDPByID(id: string) {
+  return idpService.getIDPByID({ id }, {}).then((resp) => resp.idp);
+}
+
+export function addIDPLink(
+  idp: {
+    id: string;
+    userId: string;
+    userName: string;
+  },
+  userId: string,
+) {
+  return userService.addIDPLink(
+    {
+      idpLink: {
+        userId: idp.userId,
+        idpId: idp.id,
+        userName: idp.userName,
+      },
+      userId,
+    },
+    {},
+  );
+}
+
+export function createUser(provider: string, info: IDPInformation) {
+  const userData = PROVIDER_MAPPING[provider](info);
+  console.log("ud", userData);
+  return userService.addHumanUser(userData, {});
 }
 
 /**
@@ -433,24 +483,11 @@ export async function getActiveIdentityProviders(orgId?: string) {
  * @returns the newly set email
  */
 export async function verifyPasskeyRegistration(
-  passkeyId: string,
-  passkeyName: string,
-  publicKeyCredential:
-    | {
-        [key: string]: any;
-      }
-    | undefined,
-  userId: string,
+  request: PartialMessage<VerifyPasskeyRegistrationRequest>,
 ) {
-  return userService.verifyPasskeyRegistration(
-    {
-      passkeyId,
-      passkeyName,
-      publicKeyCredential,
-      userId,
-    },
-    {},
-  );
+  // TODO: find a better way to handle this
+  request = VerifyPasskeyRegistrationRequest.fromJson(request as any);
+  return userService.verifyPasskeyRegistration(request, {});
 }
 
 /**

@@ -22,12 +22,15 @@ export async function POST(request: NextRequest) {
     const userId = session?.session?.factors?.user?.id;
 
     if (userId) {
-      const req: PlainMessage<VerifyU2FRegistrationRequest> = {
+      let req: PlainMessage<VerifyU2FRegistrationRequest> = {
         publicKeyCredential,
         u2fId,
         userId,
         tokenName: passkeyName,
       };
+
+      req = VerifyU2FRegistrationRequest.fromJson(request as any);
+
       return verifyU2FRegistration(req)
         .then((resp) => {
           return NextResponse.json(resp);
