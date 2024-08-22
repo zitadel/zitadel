@@ -539,7 +539,7 @@ module.exports = {
     "apis/introduction",
     {
       type: "category",
-      label: "Core Resources",
+      label: "Resources",
       collapsed: false,
       link: {
         type: "doc",
@@ -714,12 +714,24 @@ module.exports = {
         },
         {
           type: "category",
-          label: "Instance",
+          label: "Instances",
           items: [
             {
-              type: "link",
+              type: "category",
               label: "v1 (stable)",
-              href: "/apis/resources/admin/instance"
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "System API - Manage Instances",
+                  href: "/apis/resources/system/system-service"
+                },
+                {
+                  type: "link",
+                  label: "Admin API - My Instance",
+                  href: "/apis/resources/admin/instance"
+                }
+              ],
             }
           ],
         },
