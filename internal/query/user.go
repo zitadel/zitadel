@@ -127,10 +127,7 @@ type NotifyUser struct {
 func usersCheckPermission(ctx context.Context, users *Users, permissionCheck domain.PermissionCheck) {
 	users.Users = slices.DeleteFunc(users.Users,
 		func(user *User) bool {
-			if err := userCheckPermission(ctx, user.ResourceOwner, user.ID, permissionCheck); err != nil {
-				return true
-			}
-			return false
+			return userCheckPermission(ctx, user.ResourceOwner, user.ID, permissionCheck) != nil
 		},
 	)
 }
@@ -348,7 +345,7 @@ func userCheckPermission(ctx context.Context, resourceOwner string, userID strin
 	ctxData := authz.GetCtxData(ctx)
 	if ctxData.UserID != userID {
 		if err := permissionCheck(ctx, domain.PermissionUserRead, resourceOwner, userID); err != nil {
-			return zerrors.ThrowPermissionDenied(err, "QUERY-RUz27qGst0", "Errors.PermissionDenied")
+			return err
 		}
 	}
 	return nil

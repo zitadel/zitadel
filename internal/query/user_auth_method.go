@@ -102,10 +102,7 @@ type AuthMethods struct {
 func authMethodsCheckPermission(ctx context.Context, methods *AuthMethods, permissionCheck domain.PermissionCheck) {
 	methods.AuthMethods = slices.DeleteFunc(methods.AuthMethods,
 		func(method *AuthMethod) bool {
-			if err := userCheckPermission(ctx, method.ResourceOwner, method.UserID, permissionCheck); err != nil {
-				return true
-			}
-			return false
+			return userCheckPermission(ctx, method.ResourceOwner, method.UserID, permissionCheck) != nil
 		},
 	)
 }

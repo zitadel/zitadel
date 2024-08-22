@@ -102,10 +102,7 @@ var (
 func idpLinksCheckPermission(ctx context.Context, links *IDPUserLinks, permissionCheck domain.PermissionCheck) {
 	links.Links = slices.DeleteFunc(links.Links,
 		func(link *IDPUserLink) bool {
-			if err := userCheckPermission(ctx, link.ResourceOwner, link.UserID, permissionCheck); err != nil {
-				return true
-			}
-			return false
+			return userCheckPermission(ctx, link.ResourceOwner, link.UserID, permissionCheck) != nil
 		},
 	)
 }
