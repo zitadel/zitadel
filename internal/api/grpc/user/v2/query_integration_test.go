@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
-	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
 
 	"github.com/zitadel/zitadel/internal/integration"
 )
@@ -914,6 +914,10 @@ func TestServer_ListUsers(t *testing.T) {
 				assert.Len(ttt, tt.want.Result, len(infos))
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
+
+				// totalResult is unrelated to the tests here so gets carried over, can vary from the count of results due to permissions
+				tt.want.Details.TotalResult = got.Details.TotalResult
+
 				// fill in userid and username as it is generated
 				for i := range infos {
 					tt.want.Result[i].UserId = infos[i].UserID

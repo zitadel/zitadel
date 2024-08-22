@@ -28,6 +28,8 @@ var (
 	InstanceTokenExchangeEventType                   = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTokenExchange)
 	InstanceActionsEventType                         = setEventTypeFromFeature(feature.LevelInstance, feature.KeyActions)
 	InstanceImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyImprovedPerformance)
+	InstanceWebKeyEventType                          = setEventTypeFromFeature(feature.LevelInstance, feature.KeyWebKey)
+	InstanceDebugOIDCParentErrorEventType            = setEventTypeFromFeature(feature.LevelInstance, feature.KeyDebugOIDCParentError)
 )
 
 const (

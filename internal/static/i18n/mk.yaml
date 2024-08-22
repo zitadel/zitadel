@@ -494,6 +494,7 @@ Errors:
     SQLStatement: SQL наредбата не може да се креира
     InvalidRequest: Барањето е невалидно
     TooManyNestingLevels: Премногу нивоа на вгнездување на барања (макс 20)
+    LimitExceeded: Превишена граница
   Quota:
     AlreadyExists: Веќе постои квота за оваа единица
     NotFound: Квотата не е пронајдена за оваа единица
@@ -562,6 +563,7 @@ Errors:
     NotFound: Извршувањето не е пронајдено
     IncludeNotFound: Вклучете не е пронајден
     NoTargets: Не се дефинирани цели
+    Failed: Извршувањето не успеа
     ResponseIsNotValidJSON: Одговорот не е валиден JSON
   UserSchema:
     NotEnabled: Функцијата „Корисничка шема“ не е овозможена
@@ -584,6 +586,13 @@ Errors:
       NotForAPI: Имитирани токени не се дозволени за API
     Impersonation:
       PolicyDisabled: Имитирањето е оневозможено во политиката за безбедност на примерот
+  WebKey:
+    ActiveDelete: Не може да се избрише активниот веб-клуч
+    Config: Неважечка конфигурација на веб-клуч
+    Duplicate: ID на веб-клучот не е единствен
+    FeatureDisabled: Функцијата за веб-клуч е оневозможена
+    NoActive: Не е пронајден активен веб-клуч
+    NotFound: Веб-клучот не е пронајден
 
 AggregateTypes:
   action: Акција
@@ -607,6 +616,7 @@ AggregateTypes:
   restrictions: Ограничувања
   system: Систем
   session: Сесија
+  web_key: Веб клуч
 
 EventTypes:
   execution:
@@ -1307,6 +1317,11 @@ EventTypes:
     deactivated: Корисничката шема е деактивирана
     reactivated: Корисничката шема е реактивирана
     deleted: Корисничката шема е избришана
+  web_key:
+    added: Додаден е веб-клуч
+    activated: Веб-клучот е активиран
+    deactivated: Веб-клучот е деактивиран
+    removed: Веб-клучот е отстранет
 
 Application:
   OIDC:

@@ -486,6 +486,7 @@ Errors:
       NoExternalUserData: Nebyla přijata žádná externí uživatelská data
       CreationNotAllowed: Vytvoření nového uživatele není na tomto poskytovateli povoleno
       LinkingNotAllowed: Propojení uživatele není na tomto poskytovateli povoleno
+      NoOptionAllowed:   Ani vytvoření, ani propojení není povoleno pro tohoto poskytovatele. Obraťte se na svého správce.
     GrantRequired: Přihlášení není možné. Uživatel musí mít alespoň jeden oprávnění na aplikaci. Prosím, kontaktujte svého správce.
     ProjectRequired: Přihlášení není možné. Organizace uživatele musí být přidělena k projektu. Prosím, kontaktujte svého správce.
   IdentityProvider:

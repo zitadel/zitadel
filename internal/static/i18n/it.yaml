@@ -495,6 +495,7 @@ Errors:
     SQLStatement: Lo statement SQL non può essere creato
     InvalidRequest: La richiesta non è valida
     TooManyNestingLevels: Troppi livelli di nidificazione delle query (massimo 20)
+    LimitExceeded: Limite superato
   Quota:
     AlreadyExists: La quota esiste già per questa unità
     NotFound: Quota non trovata per questa unità
@@ -563,6 +564,7 @@ Errors:
     NotFound: Esecuzione non trovata
     IncludeNotFound: Includi non trovato
     NoTargets: Nessun obiettivo definito
+    Failed: Esecuzione fallita
     ResponseIsNotValidJSON: La risposta non è un JSON valido
   UserSchema:
     NotEnabled: La funzionalità "Schema utente" non è abilitata
@@ -585,6 +587,13 @@ Errors:
       NotForAPI: Token rappresentati non consentiti per l'API
     Impersonation:
       PolicyDisabled: La rappresentazione è disabilitata nella policy di sicurezza dell'istanza
+  WebKey:
+    ActiveDelete: Impossibile eliminare la chiave Web attiva
+    Config: Configurazione chiave Web non valida
+    Duplicate: ID chiave Web non univoco
+    FeatureDisabled: Funzione chiave Web disabilitata
+    NoActive: Nessuna chiave Web attiva trovata
+    NotFound: Chiave Web non trovata
 
 AggregateTypes:
   action: Azione
@@ -608,6 +617,7 @@ AggregateTypes:
   restrictions: Restrizioni
   system: Sistema
   session: Sessione
+  web_key: Chiave Web
 
 EventTypes:
   execution:
@@ -1171,12 +1181,6 @@ EventTypes:
     deactivated: Azione disattivata
     reactivated: Azione riattivata
     removed: Azione rimossa
-  user_schema:
-    created: Schema utente creato
-    updated: Schema utente aggiornato
-    deactivated: Schema utente disattivato
-    reactivated: Schema utente riattivato
-    deleted: Schema utente eliminato
   instance:
     added: Istanza aggiunta
     changed: L'istanza è cambiata
@@ -1305,6 +1309,17 @@ EventTypes:
         password:
           changed: La password della configurazione SMTP è cambiata
         removed: Configurazione SMTP rimossa
+  user_schema:
+    created: Schema utente creato
+    updated: Schema utente aggiornato
+    deactivated: Schema utente disattivato
+    reactivated: Schema utente riattivato
+    deleted: Schema utente eliminato
+  web_key:
+    added: Web Key aggiunto
+    activated: Web Key attivato
+    deactivated: Web Key disattivato
+    removed: Web Key rimosso
 
 Application:
   OIDC:

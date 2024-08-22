@@ -59,7 +59,7 @@ func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	orgs, err := s.query.SearchOrgs(ctx, queries)
+	orgs, err := s.query.SearchOrgs(ctx, queries, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain str
 	if err != nil {
 		return nil, err
 	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}})
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}}, nil)
 	if err != nil {
 		return nil, err
 	}

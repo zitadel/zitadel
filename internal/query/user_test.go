@@ -17,7 +17,7 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func Test_RemoveNoPermission(t *testing.T) {
+func TestUser_RemoveNoPermission(t *testing.T) {
 	type want struct {
 		users []*User
 	}
@@ -134,7 +134,7 @@ func Test_RemoveNoPermission(t *testing.T) {
 				}
 				return errors.New("failed")
 			}
-			tt.users.RemoveNoPermission(context.Background(), checkPermission)
+			usersCheckPermission(context.Background(), tt.users, checkPermission)
 			require.Equal(t, tt.want.users, tt.users.Users)
 		})
 	}

@@ -38,12 +38,14 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/auth"
 	feature_v2 "github.com/zitadel/zitadel/internal/api/grpc/feature/v2"
 	feature_v2beta "github.com/zitadel/zitadel/internal/api/grpc/feature/v2beta"
+	idp_v2 "github.com/zitadel/zitadel/internal/api/grpc/idp/v2"
 	"github.com/zitadel/zitadel/internal/api/grpc/management"
 	oidc_v2 "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2"
 	oidc_v2beta "github.com/zitadel/zitadel/internal/api/grpc/oidc/v2beta"
 	org_v2 "github.com/zitadel/zitadel/internal/api/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/internal/api/grpc/org/v2beta"
 	action_v3_alpha "github.com/zitadel/zitadel/internal/api/grpc/resources/action/v3alpha"
+	"github.com/zitadel/zitadel/internal/api/grpc/resources/webkey/v3"
 	session_v2 "github.com/zitadel/zitadel/internal/api/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/internal/api/grpc/session/v2beta"
 	settings_v2 "github.com/zitadel/zitadel/internal/api/grpc/settings/v2"
@@ -436,10 +438,16 @@ func startAPIs(
 	if err := apis.RegisterService(ctx, feature_v2.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
-	if err := apis.RegisterService(ctx, action_v3_alpha.CreateServer(commands, queries, domain.AllFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
+	if err := apis.RegisterService(ctx, idp_v2.CreateServer(commands, queries, permissionCheck)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, action_v3_alpha.CreateServer(config.SystemDefaults, commands, queries, domain.AllFunctions, apis.ListGrpcMethods, apis.ListGrpcServices)); err != nil {
 		return nil, err
 	}
 	if err := apis.RegisterService(ctx, user_schema_v3_alpha.CreateServer(commands, queries)); err != nil {
+		return nil, err
+	}
+	if err := apis.RegisterService(ctx, webkey.CreateServer(commands, queries)); err != nil {
 		return nil, err
 	}
 	instanceInterceptor := middleware.InstanceInterceptor(queries, config.ExternalDomain, login.IgnoreInstanceEndpoints...)

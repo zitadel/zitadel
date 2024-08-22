@@ -495,6 +495,7 @@ Errors:
     SQLStatement: SQL Statement konnte nicht erstellt werden
     InvalidRequest: Anfrage ist ungültig
     TooManyNestingLevels: Zu viele Abfrageverschachtelungsebenen (maximal 20)
+    LimitExceeded: Limit überschritten
   Quota:
     AlreadyExists: Das Kontingent existiert bereits für diese Einheit
     NotFound: Kontingent für diese Einheit nicht gefunden
@@ -563,6 +564,7 @@ Errors:
     NotFound: Ausführung nicht gefunden
     IncludeNotFound: Einschließen nicht gefunden
     NoTargets: Keine Ziele definiert
+    Failed: Ausführung fehlgeschlagen
     ResponseIsNotValidJSON: Antwort ist kein gültiges JSON
   UserSchema:
     NotEnabled: Funktion Benutzerschema ist nicht aktiviert
@@ -585,6 +587,13 @@ Errors:
       NotForAPI: Imitierte Token sind für die API nicht zulässig
     Impersonation:
       PolicyDisabled: Der Identitätswechsel ist in der Sicherheitsrichtlinie der Instanz deaktiviert
+  WebKey:
+    ActiveDelete: Aktiver Webschlüssel kann nicht gelöscht werden
+    Config: Ungültige Webschlüsselkonfiguration
+    Duplicate: Webschlüssel-ID nicht eindeutig
+    FeatureDisabled: Webschlüsselfunktion deaktiviert
+    NoActive: Kein aktiver Webschlüssel gefunden
+    NotFound: Webschlüssel nicht gefunden
 
 AggregateTypes:
   action: Action
@@ -608,6 +617,7 @@ AggregateTypes:
   restrictions: Restriktionen
   system: System
   session: Session
+  web_key: Webschlüssel
 
 EventTypes:
   execution:
@@ -1309,6 +1319,11 @@ EventTypes:
     deactivated: Benutzerschema deaktiviert
     reactivated: Benutzerschema reaktiviert
     deleted: Benutzerschema gelöscht
+  web_key:
+    added: Web Key hinzugefügt
+    activated: Web Key aktiviert
+    deactivated: Web Key deaktiviert
+    removed: Web Key entfernen
 
 Application:
   OIDC:
