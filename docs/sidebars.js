@@ -539,7 +539,7 @@ module.exports = {
     "apis/introduction",
     {
       type: "category",
-      label: "Resources",
+      label: "Core Resources",
       collapsed: false,
       link: {
         type: "doc",
@@ -628,6 +628,23 @@ module.exports = {
           items: [
             {
               type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default IDPs",
+                  href: "/apis/resources/admin/identity-providers"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization IDPs",
+                  href: "/apis/resources/mgmt/identity-providers"
+                },
+              ]
+            },
+            {
+              type: "category",
               label: "v2 (stable)",
               link: {
                 type: "generated-index",
@@ -642,8 +659,46 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Managers",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Instance Managers",
+                  href: "/apis/resources/admin/members"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Managers",
+                  href: "/apis/resources/mgmt/members"
+                }
+              ],},
+          ],
+        },
+        {
+          type: "category",
           label: "Organizations",
           items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - All Organizations",
+                  href: "/apis/resources/admin/organizations"
+                },
+                {
+                  type: "link",
+                  label: "Management API - My Organization",
+                  href: "/apis/resources/mgmt/organizations"
+                }
+              ],
+            },
             {
               type: "category",
               label: "v2 (stable)",
@@ -881,6 +936,130 @@ module.exports = {
           items: ["apis/assets/assets"],
         },
       ],
+    },
+    {
+      type: "category",
+      label: "Settings",
+      link: {
+        type: "doc",
+        id: "apis/apis/index",
+      },
+      items: [
+        {
+          type: "category",
+          label: "Branding",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/branding"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Domain Settings",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/domain-settings"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Login Settings",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default Login Settings",
+                  href: "/apis/resources/admin/login-settings"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Login Settings",
+                  href: "/apis/resources/mgmt/login-settings"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Login Texts",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default Login Texts",
+                  href: "/apis/resources/admin/login-texts"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Login Texts",
+                  href: "/apis/resources/mgmt/login-texts"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Message Texts",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default Message Texts",
+                  href: "/apis/resources/admin/message-texts"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Message Texts",
+                  href: "/apis/resources/mgmt/message-texts"
+                }
+              ],
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Notification Settings",
+          items: [
+            {
+              type: "category",
+              label: "v1 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Admin API - Default Notification Settings",
+                  href: "/apis/resources/admin/notification-settings"
+                },
+                {
+                  type: "link",
+                  label: "Management API - Organization Notification Settings",
+                  href: "/apis/resources/mgmt/notification-settings"
+                }
+              ],
+            }
+          ],
+        },
+      ]
     },
     {
       type: "category",
