@@ -1,4 +1,4 @@
-//go:build integration_old
+//go:build integration
 
 package quotas_enabled_test
 
@@ -12,26 +12,17 @@ import (
 )
 
 var (
-	CTX         context.Context
-	SystemCTX   context.Context
-	IAMOwnerCTX context.Context
-	Instance    *integration.Instance
+	CTX      context.Context
+	Instance *integration.Instance
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, _, cancel := integration.Contexts(5 * time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 		defer cancel()
 		CTX = ctx
 
-		Instance = integration.NewTester(ctx, `
-Quotas:
-  Access:
-    Enabled: true
-`)
-		defer Instance.Done()
-		SystemCTX = Instance.WithAuthorization(ctx, integration.SystemUser)
-		IAMOwnerCTX = Instance.WithAuthorization(ctx, integration.IAMOwner)
+		Instance = integration.GetInstance(ctx)
 		return m.Run()
 	}())
 }

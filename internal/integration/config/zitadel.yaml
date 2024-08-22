@@ -6,6 +6,10 @@ ExternalSecure: false
 TLS:
   Enabled: false
 
+Quotas:
+  Access:
+    Enabled: true
+
 Telemetry:
   Enabled: true
   Endpoints:
