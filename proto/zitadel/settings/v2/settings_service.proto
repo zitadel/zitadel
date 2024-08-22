@@ -337,7 +337,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Settings";
       summary: "Get Security Settings";
       description: "Returns the security settings of the ZITADEL instance."
     };
@@ -357,7 +356,6 @@ service SettingsService {
     };
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      tags: "Settings";
       summary: "Set Security Settings";
       description: "Set the security settings of the ZITADEL instance."
     };
