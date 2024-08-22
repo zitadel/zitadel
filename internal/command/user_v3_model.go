@@ -13,13 +13,19 @@ import (
 type UserV3WriteModel struct {
 	eventstore.WriteModel
 
+	PhoneWM bool
+	EmailWM bool
+	DataWM  bool
+
 	SchemaType     string
 	SchemaRevision uint64
 
-	Email           string
-	IsEmailVerified bool
-	Phone           string
-	IsPhoneVerified bool
+	Email                    string
+	IsEmailVerified          bool
+	EmailVerifiedFailedCount int
+	Phone                    string
+	IsPhoneVerified          bool
+	PhoneVerifiedFailedCount int
 
 	Data json.RawMessage
 
@@ -42,8 +48,6 @@ func (wm *UserV3WriteModel) Reduce() error {
 			wm.SchemaType = e.SchemaType
 			wm.SchemaRevision = 1
 			wm.Data = e.Data
-			wm.Email = e.Email
-			wm.Phone = e.Phone
 
 			wm.State = domain.UserStateActive
 		case *schemauser.UpdatedEvent:
@@ -56,14 +60,28 @@ func (wm *UserV3WriteModel) Reduce() error {
 			if len(e.Data) > 0 {
 				wm.Data = e.Data
 			}
-			if e.Email != nil {
-				wm.Email = *e.Email
-			}
-			if e.Phone != nil {
-				wm.Phone = *e.Phone
-			}
 		case *schemauser.DeletedEvent:
 			wm.State = domain.UserStateDeleted
+		case *schemauser.EmailChangedEvent:
+			wm.Email = string(e.EmailAddress)
+		case *schemauser.EmailCodeAddedEvent:
+			wm.IsEmailVerified = false
+			wm.EmailVerifiedFailedCount = 0
+		case *schemauser.EmailVerifiedEvent:
+			wm.IsEmailVerified = true
+			wm.EmailVerifiedFailedCount = 0
+		case *schemauser.EmailVerificationFailedEvent:
+			wm.EmailVerifiedFailedCount += 1
+		case *schemauser.PhoneChangedEvent:
+			wm.Phone = string(e.PhoneNumber)
+		case *schemauser.PhoneCodeAddedEvent:
+			wm.IsPhoneVerified = false
+			wm.PhoneVerifiedFailedCount = 0
+		case *schemauser.PhoneVerifiedEvent:
+			wm.PhoneVerifiedFailedCount = 0
+			wm.IsPhoneVerified = true
+		case *schemauser.PhoneVerificationFailedEvent:
+			wm.PhoneVerifiedFailedCount += 1
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -84,7 +102,27 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 	if wm.SchemaType != "" {
 		query = query.EventData(map[string]interface{}{"schemaType": wm.SchemaType})
 	}
-
+	if wm.DataWM {
+		query = query.EventTypes(
+			schemauser.UpdatedType,
+		)
+	}
+	if wm.EmailWM {
+		query = query.EventTypes(
+			schemauser.EmailChangedType,
+			schemauser.EmailVerifiedType,
+			schemauser.EmailCodeAddedType,
+			schemauser.EmailVerificationFailedType,
+		)
+	}
+	if wm.PhoneWM {
+		query = query.EventTypes(
+			schemauser.PhoneChangedType,
+			schemauser.PhoneVerifiedType,
+			schemauser.PhoneCodeAddedType,
+			schemauser.PhoneVerificationFailedType,
+		)
+	}
 	return query.Builder()
 }
 

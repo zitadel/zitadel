@@ -11,7 +11,7 @@ import "zitadel/object/v2/object.proto";
 import "zitadel/user/v3alpha/authenticator.proto";
 import "zitadel/user/v3alpha/communication.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v3alpha";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v3alpha;user";
 
 message User {
 

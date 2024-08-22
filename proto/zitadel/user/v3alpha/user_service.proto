@@ -9,19 +9,20 @@ import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
 import "zitadel/object/v2/object.proto";
+import "zitadel/object/v3alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/user/v3alpha/authenticator.proto";
 import "zitadel/user/v3alpha/communication.proto";
 import "zitadel/user/v3alpha/query.proto";
 import "zitadel/user/v3alpha/user.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v3alpha";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v3alpha;user";
 
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "User Service";
-    version: "3.0-preview";
+    version: "3.0-alpha";
     description: "This API is intended to manage users with your own data schema in a ZITADEL instance. This project is in preview state. It can AND will continue breaking until the service provides the same functionality as the v1 and v2 user services.";
     contact:{
       name: "ZITADEL"
@@ -106,7 +107,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service UserService {
+service ZITADELUsers {
 
   // List users
   //
@@ -1409,9 +1410,9 @@ message ResendContactPhoneCodeRequest {
 }
 
 message ResendContactPhoneCodeResponse {
-    zitadel.object.v2.Details details = 1;
-    // in case the verification was set to return_code, the code will be returned.
-    optional string verification_code = 2;
+  zitadel.object.v2.Details details = 1;
+  // in case the verification was set to return_code, the code will be returned.
+  optional string verification_code = 2;
 }
 
 message AddUsernameRequest {

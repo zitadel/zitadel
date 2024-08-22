@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/muhlemmer/gu"
-
 	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
@@ -18,13 +16,10 @@ const (
 
 type CreatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
-	ID                    string `json:"id"`
-	SchemaType            string `json:"schemaType"`
-	SchemaRevision        uint64 `json:"schemaRevision"`
-
-	Email string          `json:"email,omitempty"`
-	Phone string          `json:"phone,omitempty"`
-	Data  json.RawMessage `json:"user,omitempty"`
+	ID                    string          `json:"id"`
+	SchemaType            string          `json:"schemaType"`
+	SchemaRevision        uint64          `json:"schemaRevision"`
+	Data                  json.RawMessage `json:"user,omitempty"`
 }
 
 func (e *CreatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
@@ -41,7 +36,7 @@ func (e *CreatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 
 /*
 func (e *CreatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUserIDUniqueConstraint(e.SchemaType)}
+	return []*eventstore.UniqueConstraint{NewAddUserIDUniqueConstraint(e.SchemaID)}
 }
 */
 
@@ -51,8 +46,6 @@ func NewCreatedEvent(
 
 	schemaType string,
 	schemaRevision uint64,
-	email string,
-	phone string,
 	data json.RawMessage,
 ) *CreatedEvent {
 	return &CreatedEvent{
@@ -63,8 +56,6 @@ func NewCreatedEvent(
 		),
 		SchemaType:     schemaType,
 		SchemaRevision: schemaRevision,
-		Email:          email,
-		Phone:          phone,
 		Data:           data,
 	}
 }
@@ -75,8 +66,6 @@ type UpdatedEvent struct {
 	SchemaType     *string         `json:"schemaType,omitempty"`
 	SchemaRevision *uint64         `json:"schemaRevision,omitempty"`
 	Data           json.RawMessage `json:"schema,omitempty"`
-	Email          *string         `json:"email,omitempty"`
-	Phone          *string         `json:"phone,omitempty"`
 	oldSchemaType  string
 	oldRevision    uint64
 }
@@ -139,18 +128,6 @@ func ChangeSchemaRevision(oldSchemaRevision, schemaRevision uint64) func(event *
 func ChangeData(data json.RawMessage) func(event *UpdatedEvent) {
 	return func(e *UpdatedEvent) {
 		e.Data = data
-	}
-}
-
-func ChangeEmail(email string) func(event *UpdatedEvent) {
-	return func(e *UpdatedEvent) {
-		e.Email = gu.Ptr(email)
-	}
-}
-
-func ChangePhone(phone string) func(event *UpdatedEvent) {
-	return func(e *UpdatedEvent) {
-		e.Phone = gu.Ptr(phone)
 	}
 }
 
