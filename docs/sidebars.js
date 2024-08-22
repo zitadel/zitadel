@@ -551,11 +551,16 @@ module.exports = {
           label: "Actions",
           items: [
             {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/actions"
+            },
+            {
               type: "category",
               label: "v3 (alpha)",
               link: {
                 type: "generated-index",
-                title: "Action Service API (alpha)",
+                title: "Hodor (alpha)",
                 slug: "/apis/resources/action_service_v3",
                 description:
                     "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
@@ -564,6 +569,39 @@ module.exports = {
               },
               items: require("./docs/apis/resources/action_service_v3/sidebar.ts"),
             },
+          ],
+        },
+        {
+          type: "category",
+          label: "Applications",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/applications"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Authentication Methods",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/authentication-methods"
+            }
+          ],
+        },
+        {
+          type: "category",
+          label: "Authentication Methods",
+          items: [
+            {
+              type: "link",
+              label: "v1 (stable)",
+              href: "/apis/resources/mgmt/authentication-methods"
+            }
           ],
         },
         {
@@ -604,24 +642,6 @@ module.exports = {
         },
         {
           type: "category",
-          label: "OIDC Sessions",
-          items: [
-            {
-              type: "category",
-              label: "v2 (stable)",
-              link: {
-                type: "generated-index",
-                title: "OIDC Service API",
-                slug: "/apis/resources/oidc_service_v2",
-                description:
-                    "Get OIDC Auth Request details and create callback URLs.\n"
-              },
-              items: require("./docs/apis/resources/oidc_service_v2/sidebar.ts"),
-            },
-          ],
-        },
-        {
-          type: "category",
           label: "Organizations",
           items: [
             {
@@ -654,6 +674,24 @@ module.exports = {
               },
               items: require("./docs/apis/resources/session_service_v2/sidebar.ts"),
             },
+            {
+              type: "category",
+              label: "OIDC Extension",
+              items: [
+                {
+                  type: "category",
+                  label: "v2 (stable)",
+                  link: {
+                    type: "generated-index",
+                    title: "OIDC Service API",
+                    slug: "/apis/resources/oidc_service_v2",
+                    description:
+                        "Get OIDC Auth Request details and create callback URLs.\n"
+                  },
+                  items: require("./docs/apis/resources/oidc_service_v2/sidebar.ts"),
+                },
+              ],
+            },
           ],
         },
         {
@@ -684,18 +722,15 @@ module.exports = {
               collapsed: true,
               items: [
                 {
-                  type: "category",
-                  label: "Authenticated User",
-                  link: {
-                    type: "generated-index",
-                    title: "Auth API",
-                    slug: "/apis/resources/auth",
-                    description:
-                        "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
-                  },
-                  items: require("./docs/apis/resources/auth/sidebar.ts"),
+                  type: "link",
+                  label: "Auth API - Profile Management",
+                  href: "/apis/resources/auth"
                 },
-
+                {
+                  type: "link",
+                  label: "Management API - Users",
+                  href: "/apis/resources/mgmt/users"
+                },
               ]
             },
             {
@@ -768,20 +803,31 @@ module.exports = {
         },
         {
           type: "category",
-          label: "V1 (Generally Available)",
+          label: "Service Based API (v1)",
           collapsed: false,
           link: {
             type: "generated-index",
-            title: "APIs V1 (GA)",
+            title: "APIs V1",
             slug: "/apis/services/",
             description:
               "APIs V1 organize access by context (authenticated user, organisation, instance, system), unlike resource-specific V2 APIs.",
           },
           items: [
-
             {
               type: "category",
-              label: "Organization Objects",
+              label: "Auth API",
+              link: {
+                type: "generated-index",
+                title: "Auth API",
+                slug: "/apis/resources/auth",
+                description:
+                    "The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.",
+              },
+              items: require("./docs/apis/resources/auth/sidebar.ts"),
+            },
+            {
+              type: "category",
+              label: "Management API",
               link: {
                 type: "generated-index",
                 title: "Management API",
@@ -793,7 +839,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Instance Objects",
+              label: "Admin API",
               link: {
                 type: "generated-index",
                 title: "Admin API",
@@ -805,7 +851,7 @@ module.exports = {
             },
             {
               type: "category",
-              label: "Instance Lifecycle",
+              label: "System API",
               link: {
                 type: "generated-index",
                 title: "System API",
