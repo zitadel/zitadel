@@ -62,6 +62,7 @@ jobs:
           file: profile.cov
           name: core-unit-tests
           flags: core-unit-tests
+          token: ${{ secrets.CODECOV_TOKEN }}
       - 
         uses: actions/cache/save@v4
         name: cache results
