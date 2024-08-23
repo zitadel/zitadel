@@ -173,7 +173,7 @@ type Subscription struct {
 // Multiple subscription may be active on a single channel.
 // Each request is always forwarded to each Subscription.
 // Close must be called to cleanup up the Subscription's channel and go routine.
-func Subscribe(ctx context.Context, ch Channel) (*Subscription, error) {
+func Subscribe(ctx context.Context, ch Channel) *Subscription {
 	u := url.URL{
 		Scheme: "ws",
 		Host:   listenAddr,
@@ -184,9 +184,9 @@ func Subscribe(ctx context.Context, ch Channel) (*Subscription, error) {
 		if resp != nil {
 			defer resp.Body.Close()
 			body, _ := io.ReadAll(resp.Body)
-			return nil, fmt.Errorf("subscribe: %w, status: %s, body: %s", err, resp.Status, body)
+			err = fmt.Errorf("subscribe: %w, status: %s, body: %s", err, resp.Status, body)
 		}
-		return nil, err
+		panic(err)
 	}
 
 	sub := &Subscription{
@@ -194,7 +194,7 @@ func Subscribe(ctx context.Context, ch Channel) (*Subscription, error) {
 		reqChannel: make(chan *Request, 10),
 	}
 	go sub.readToChan()
-	return sub, nil
+	return sub
 }
 
 func (s *Subscription) readToChan() {

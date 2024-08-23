@@ -54,8 +54,7 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	sub, err := sink.Subscribe(CTX, sink.ChannelQuota)
-	require.NoError(t, err)
+	sub := sink.Subscribe(CTX, sink.ChannelQuota)
 	defer sub.Close()
 
 	for i := 0; i < percentAmount; i++ {
@@ -105,8 +104,7 @@ func TestServer_QuotaNotification_NoLimit(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	sub, err := sink.Subscribe(CTX, sink.ChannelQuota)
-	require.NoError(t, err)
+	sub := sink.Subscribe(CTX, sink.ChannelQuota)
 	defer sub.Close()
 
 	for i := 0; i < percentAmount; i++ {
@@ -145,7 +143,7 @@ func awaitNotification(t *testing.T, sub *sink.Subscription, unit quota.Unit, pe
 			event := struct {
 				Unit        quota.Unit `json:"unit"`
 				ID          string     `json:"id"`
-				CallURL     string     `json:"sink.CallURL"`
+				CallURL     string     `json:"callURL"`
 				PeriodStart time.Time  `json:"periodStart"`
 				Threshold   uint16     `json:"threshold"`
 				Usage       uint64     `json:"usage"`

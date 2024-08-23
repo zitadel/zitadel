@@ -25,8 +25,7 @@ import (
 )
 
 func TestServer_TelemetryPushMilestones(t *testing.T) {
-	sub, err := sink.Subscribe(CTX, sink.ChannelMilestone)
-	require.NoError(t, err)
+	sub := sink.Subscribe(CTX, sink.ChannelMilestone)
 	defer sub.Close()
 
 	instance := Instance.UseIsolatedInstance(CTX)
