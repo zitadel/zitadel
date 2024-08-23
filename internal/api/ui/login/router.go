@@ -30,6 +30,7 @@ const (
 	EndpointChangePassword                = "/password/change"
 	EndpointPasswordReset                 = "/password/reset"
 	EndpointInitUser                      = "/user/init"
+	EndpointInviteUser                    = "/user/invite"
 	EndpointMFAVerify                     = "/mfa/verify"
 	EndpointMFAPrompt                     = "/mfa/prompt"
 	EndpointMFAInitVerify                 = "/mfa/init/verify"

@@ -106,6 +106,10 @@ func (u *userNotifier) Reducers() []handler.AggregateReducer {
 					Event:  user.HumanOTPEmailCodeAddedType,
 					Reduce: u.reduceOTPEmailCodeAdded,
 				},
+				{
+					Event:  user.HumanInviteCodeAddedType,
+					Reduce: u.reduceInviteCodeAdded,
+				},
 			},
 		},
 		{
@@ -715,6 +719,64 @@ func (u *userNotifier) reducePhoneCodeAdded(event eventstore.Event) (*handler.St
 			return err
 		}
 		return u.commands.HumanPhoneVerificationCodeSent(ctx, e.Aggregate().ResourceOwner, e.Aggregate().ID)
+	}), nil
+}
+
+func (u *userNotifier) reduceInviteCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanInviteCodeAddedEvent)
+	if !ok {
+		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-Eeg3s", "reduce.wrong.event.type %s", user.HumanInviteCodeAddedType)
+	}
+	if e.CodeReturned {
+		return handler.NewNoOpStatement(e), nil
+	}
+
+	return handler.NewStatement(event, func(ex handler.Executer, projectionName string) error {
+		ctx := HandlerContext(event.Aggregate())
+		alreadyHandled, err := u.checkIfCodeAlreadyHandledOrExpired(ctx, event, e.Expiry, nil,
+			user.HumanInviteCodeAddedType, user.HumanInviteCodeSentType)
+		if err != nil {
+			return err
+		}
+		if alreadyHandled {
+			return nil
+		}
+		code, err := crypto.DecryptString(e.Code, u.queries.UserDataCrypto)
+		if err != nil {
+			return err
+		}
+		colors, err := u.queries.ActiveLabelPolicyByOrg(ctx, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return err
+		}
+
+		template, err := u.queries.MailTemplateByOrg(ctx, e.Aggregate().ResourceOwner, false)
+		if err != nil {
+			return err
+		}
+
+		notifyUser, err := u.queries.GetNotifyUserByID(ctx, true, e.Aggregate().ID)
+		if err != nil {
+			return err
+		}
+		translator, err := u.queries.GetTranslatorWithOrgTexts(ctx, notifyUser.ResourceOwner, domain.InviteCodeMessageType)
+		if err != nil {
+			return err
+		}
+
+		ctx, err = u.queries.Origin(ctx, e)
+		if err != nil {
+			return err
+		}
+		notify := types.SendEmail(ctx, u.channels, string(template.Template), translator, notifyUser, colors, e)
+		//if e.NotificationType == domain.NotificationTypeSms {
+		//	notify = types.SendSMSTwilio(ctx, u.channels, translator, notifyUser, colors, e)
+		//}
+		err = notify.SendInviteCode(ctx, notifyUser, code, e.ApplicationName, e.URLTemplate, e.AuthRequestID)
+		if err != nil {
+			return err
+		}
+		return u.commands.InviteCodeSent(ctx, e.Aggregate().ID, e.Aggregate().ResourceOwner)
 	}), nil
 }
 

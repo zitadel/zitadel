@@ -644,14 +644,14 @@ func (s *Server) CreateInviteCode(ctx context.Context, req *user.CreateInviteCod
 }
 
 func createInviteCodeRequestToCommand(req *user.CreateInviteCodeRequest) (*command.CreateUserInvite, error) {
-	switch req.GetVerification().(type) {
+	switch v := req.GetVerification().(type) {
 	case *user.CreateInviteCodeRequest_SendCode:
-		urlTemplate := req.GetSendCode().GetUrlTemplate()
+		urlTemplate := v.SendCode.GetUrlTemplate()
 		// test the template execution so the async notification will not fail because of it and the user won't realize
 		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
 			return nil, err
 		}
-		return &command.CreateUserInvite{UserID: req.GetUserId(), URLTemplate: urlTemplate}, nil
+		return &command.CreateUserInvite{UserID: req.GetUserId(), URLTemplate: urlTemplate, ApplicationName: v.SendCode.GetApplicationName()}, nil
 	case *user.CreateInviteCodeRequest_ReturnCode:
 		return &command.CreateUserInvite{UserID: req.GetUserId(), ReturnCode: true}, nil
 	default:

@@ -16,6 +16,9 @@ type UserV2InviteWriteModel struct {
 	InviteCodeCreationDate time.Time
 	InviteCodeExpiry       time.Duration
 
+	ApplicationName string
+	AuthRequestID   string
+
 	InitCode             *crypto.CryptoValue
 	InitCodeCreationDate time.Time
 	InitCodeExpiry       time.Duration
@@ -43,10 +46,11 @@ type UserV2InviteWriteModel struct {
 	//IDPLinks []*domain.UserIDPLink
 }
 
-func newUserV2InviteWriteModel(userID string) *UserV2InviteWriteModel {
+func newUserV2InviteWriteModel(userID, orgID string) *UserV2InviteWriteModel {
 	return &UserV2InviteWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID: userID,
+			AggregateID:   userID,
+			ResourceOwner: orgID,
 		},
 	}
 }

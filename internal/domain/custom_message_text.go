@@ -17,6 +17,7 @@ const (
 	DomainClaimedMessageType            = "DomainClaimed"
 	PasswordlessRegistrationMessageType = "PasswordlessRegistration"
 	PasswordChangeMessageType           = "PasswordChange"
+	InviteCodeMessageType               = "InviteCode"
 	MessageTitle                        = "Title"
 	MessagePreHeader                    = "PreHeader"
 	MessageSubject                      = "Subject"

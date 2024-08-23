@@ -2111,7 +2111,7 @@ message CreateInviteCodeRequest {
       example: "\"69629026806489455\"";
     }
   ];
-  // if no verification is specified, an email is sent with the default url
+  // if no verification is specified, an email is sent with the default url and application name (ZITADEL)
   oneof verification {
     SendInviteCode send_code = 2;
     ReturnInviteCode return_code = 3;

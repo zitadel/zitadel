@@ -22,6 +22,7 @@ const (
 	HumanInitializedCheckSucceededType = humanEventPrefix + "initialization.check.succeeded"
 	HumanInitializedCheckFailedType    = humanEventPrefix + "initialization.check.failed"
 	HumanInviteCodeAddedType           = humanEventPrefix + "invite.code.added_test"
+	HumanInviteCodeSentType            = humanEventPrefix + "invite.code.sent_test"
 	HumanSignedOutType                 = humanEventPrefix + "signed.out"
 )
 
@@ -381,13 +382,18 @@ func HumanInitializedCheckFailedEventMapper(event eventstore.Event) (eventstore.
 }
 
 type HumanInviteCodeAddedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	Code                 *crypto.CryptoValue `json:"code,omitempty"`
-	Expiry               time.Duration       `json:"expiry,omitempty"`
-	TriggeredAtOrigin    string              `json:"triggerOrigin,omitempty"`
-	AuthRequestID        string              `json:"authRequestID,omitempty"` //TODO: ?
-	URLTemplate          string              `json:"urlTemplate,omitempty"`
-	ReturnCode           bool                `json:"returnCode,omitempty"`
+	*eventstore.BaseEvent `json:"-"`
+	Code                  *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry                time.Duration       `json:"expiry,omitempty"`
+	TriggeredAtOrigin     string              `json:"triggerOrigin,omitempty"`
+	URLTemplate           string              `json:"urlTemplate,omitempty"`
+	CodeReturned          bool                `json:"codeReturned,omitempty"`
+	ApplicationName       string              `json:"applicationName,omitempty"`
+	AuthRequestID         string              `json:"authRequestID,omitempty"`
+}
+
+func (e *HumanInviteCodeAddedEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
 }
 
 func (e *HumanInviteCodeAddedEvent) Payload() interface{} {
@@ -408,11 +414,12 @@ func NewHumanInviteCodeAddedEvent(
 	code *crypto.CryptoValue,
 	expiry time.Duration,
 	urlTemplate string,
-	returnCode bool,
+	codeReturned bool,
+	applicationName string,
 	authRequestID string,
 ) *HumanInviteCodeAddedEvent {
 	return &HumanInviteCodeAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			HumanInviteCodeAddedType,
@@ -420,9 +427,36 @@ func NewHumanInviteCodeAddedEvent(
 		Code:              code,
 		Expiry:            expiry,
 		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
-		AuthRequestID:     authRequestID,
 		URLTemplate:       urlTemplate,
-		ReturnCode:        returnCode,
+		CodeReturned:      codeReturned,
+		ApplicationName:   applicationName,
+		AuthRequestID:     authRequestID,
+	}
+}
+
+type HumanInviteCodeSentEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+}
+
+func (e *HumanInviteCodeSentEvent) SetBaseEvent(b *eventstore.BaseEvent) {
+	e.BaseEvent = b
+}
+
+func (e *HumanInviteCodeSentEvent) Payload() interface{} {
+	return nil
+}
+
+func (e *HumanInviteCodeSentEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewHumanInviteCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggregate) *HumanInviteCodeSentEvent {
+	return &HumanInviteCodeSentEvent{
+		BaseEvent: eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanInviteCodeSentType,
+		),
 	}
 }
 
