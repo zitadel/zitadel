@@ -10,10 +10,175 @@ import (
 	"testing"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/stretchr/testify/require"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
+
+func TestUser_authMethodsCheckPermission(t *testing.T) {
+	type want struct {
+		methods []*AuthMethod
+	}
+	type args struct {
+		user    string
+		methods *AuthMethods
+	}
+	tests := []struct {
+		name        string
+		args        args
+		want        want
+		permissions []string
+	}{
+		{
+			"permissions for all users",
+			args{
+				"none",
+				&AuthMethods{
+					AuthMethods: []*AuthMethod{
+						{UserID: "first"}, {UserID: "second"}, {UserID: "third"},
+					},
+				},
+			},
+			want{
+				methods: []*AuthMethod{
+					{UserID: "first"}, {UserID: "second"}, {UserID: "third"},
+				},
+			},
+			[]string{"first", "second", "third"},
+		},
+		{
+			"permissions for one user, first",
+			args{
+				"none",
+				&AuthMethods{
+					AuthMethods: []*AuthMethod{
+						{UserID: "first"}, {UserID: "second"}, {UserID: "third"},
+					},
+				},
+			},
+			want{
+				methods: []*AuthMethod{
+					{UserID: "first"},
+				},
+			},
+			[]string{"first"},
+		},
+		{
+			"permissions for one user, second",
+			args{
+				"none",
+				&AuthMethods{
+					AuthMethods: []*AuthMethod{
+						{UserID: "first"}, {UserID: "second"}, {UserID: "third"},
+					},
+				},
+			},
+			want{
+				methods: []*AuthMethod{
+					{UserID: "second"},
+				},
+			},
+			[]string{"second"},
+		},
+		{
+			"permissions for one user, third",
+			args{
+				"none",
+				&AuthMethods{
+					AuthMethods: []*AuthMethod{
+						{UserID: "first"}, {UserID: "second"}, {UserID: "third"},
+					},
+				},
+			},
+			want{
+				methods: []*AuthMethod{
+					{UserID: "third"},
+				},
+			},
+			[]string{"third"},
+		},
+		{
+			"permissions for two users, first",
+			args{
+				"none",
+				&AuthMethods{
+					AuthMethods: []*AuthMethod{
+						{UserID: "first"}, {UserID: "second"}, {UserID: "third"},
+					},
+				},
+			},
+			want{
+				methods: []*AuthMethod{
+					{UserID: "first"}, {UserID: "third"},
+				},
+			},
+			[]string{"first", "third"},
+		},
+		{
+			"permissions for two users, second",
+			args{
+				"none",
+				&AuthMethods{
+					AuthMethods: []*AuthMethod{
+						{UserID: "first"}, {UserID: "second"}, {UserID: "third"},
+					},
+				},
+			},
+			want{
+				methods: []*AuthMethod{
+					{UserID: "second"}, {UserID: "third"},
+				},
+			},
+			[]string{"second", "third"},
+		},
+		{
+			"no permissions",
+			args{
+				"none",
+				&AuthMethods{
+					AuthMethods: []*AuthMethod{
+						{UserID: "first"}, {UserID: "second"}, {UserID: "third"},
+					},
+				},
+			},
+			want{
+				methods: []*AuthMethod{},
+			},
+			[]string{},
+		},
+		{
+			"no permissions, self",
+			args{
+				"second",
+				&AuthMethods{
+					AuthMethods: []*AuthMethod{
+						{UserID: "first"}, {UserID: "second"}, {UserID: "third"},
+					},
+				},
+			},
+			want{
+				methods: []*AuthMethod{{UserID: "second"}},
+			},
+			[]string{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			checkPermission := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				for _, perm := range tt.permissions {
+					if resourceID == perm {
+						return nil
+					}
+				}
+				return errors.New("failed")
+			}
+			authMethodsCheckPermission(authz.SetCtxData(context.Background(), authz.CtxData{UserID: tt.args.user}), tt.args.methods, checkPermission)
+			require.Equal(t, tt.want.methods, tt.args.methods.AuthMethods)
+		})
+	}
+}
 
 var (
 	prepareUserAuthMethodsStmt = `SELECT projections.user_auth_methods4.token_id,` +

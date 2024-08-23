@@ -298,7 +298,7 @@ type mockIDPUserLinks struct {
 	idps []*query.IDPUserLink
 }
 
-func (m *mockIDPUserLinks) IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery, withOwnerRemoved bool) (*query.IDPUserLinks, error) {
+func (m *mockIDPUserLinks) IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery, permissionCheck domain.PermissionCheck) (*query.IDPUserLinks, error) {
 	return &query.IDPUserLinks{Links: m.idps}, nil
 }
 
