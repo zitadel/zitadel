@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
 	"github.com/zitadel/zitadel/internal/domain"
 	domain_schema "github.com/zitadel/zitadel/internal/domain/schema"
@@ -14,7 +15,8 @@ import (
 )
 
 type CreateSchemaUser struct {
-	Details *domain.ObjectDetails
+	Details       *domain.ObjectDetails
+	ResourceOwner string
 
 	Register bool
 
@@ -30,12 +32,15 @@ type CreateSchemaUser struct {
 	ReturnCodePhone string
 }
 
-func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands, resourceOwner string) error {
+func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
+	if s.ResourceOwner == "" {
+		return zerrors.ThrowInvalidArgument(nil, "TODO", "Errors.ResourceOwnerMissing")
+	}
 	if s.SchemaID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "TODO", "Errors.UserSchema.User.Type.Missing")
 	}
 
-	schemaWriteModel, err := c.getSchemaWriteModelByType(ctx, resourceOwner, s.SchemaID)
+	schemaWriteModel, err := c.getSchemaWriteModelByID(ctx, "", s.SchemaID)
 	if err != nil {
 		return err
 	}
@@ -44,7 +49,26 @@ func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands, resourceOwner
 	}
 	s.schemaRevision = schemaWriteModel.Revision
 
-	schema, err := domain_schema.NewSchema(0, bytes.NewReader(schemaWriteModel.Schema))
+	if s.ID == "" {
+		s.ID, err = c.idGenerator.Next()
+		if err != nil {
+			return err
+		}
+	}
+
+	role := domain_schema.RoleUnspecified
+	// if register then the role is directly self, and check if it is permitted to register is checked before
+	if s.Register {
+		role = domain_schema.RoleSelf
+	} else {
+		// get role for permission check in schema through extension
+		role, err = c.getSchemaRoleForWrite(ctx, s.ResourceOwner, s.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	schema, err := domain_schema.NewSchema(role, bytes.NewReader(schemaWriteModel.Schema))
 	if err != nil {
 		return err
 	}
@@ -73,32 +97,27 @@ func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands, resourceOwner
 	return nil
 }
 
-func (c *Commands) CreateSchemaUser(ctx context.Context, resourceOwner string, user *CreateSchemaUser, emailCodeGenerator, phoneCodeGenerator crypto.Generator) (err error) {
-	if resourceOwner == "" {
-		return zerrors.ThrowInvalidArgument(nil, "TODO", "Errors.ResourceOwnerMissing")
+func (c *Commands) getSchemaRoleForWrite(ctx context.Context, resourceOwner, userID string) (domain_schema.Role, error) {
+	if userID == authz.GetCtxData(ctx).UserID {
+		return domain_schema.RoleSelf, nil
 	}
-	if err := user.Valid(ctx, c, resourceOwner); err != nil {
+	if err := c.checkPermission(ctx, domain.PermissionUserWrite, resourceOwner, userID); err != nil {
+		return domain_schema.RoleUnspecified, err
+	}
+	return domain_schema.RoleOwner, nil
+}
+
+func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser, emailCodeGenerator, phoneCodeGenerator crypto.Generator) (err error) {
+	if err := user.Valid(ctx, c); err != nil {
 		return err
 	}
 
-	if user.ID == "" {
-		user.ID, err = c.idGenerator.Next()
-		if err != nil {
-			return err
-		}
-	}
-
-	writeModel, err := c.getSchemaUserWriteModelByID(ctx, resourceOwner, user.ID)
+	writeModel, err := c.getSchemaUserWriteModelByID(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
 		return err
 	}
 	if writeModel.Exists() {
 		return zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
-	}
-	if !user.Register {
-		if err := c.checkPermission(ctx, domain.PermissionUserWrite, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
-			return err
-		}
 	}
 
 	userAgg := UserV3AggregateFromWriteModel(&writeModel.WriteModel)

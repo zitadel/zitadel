@@ -3,7 +3,10 @@ package user
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
+	"github.com/zitadel/zitadel/internal/api/grpc/object/v2"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/zerrors"
 	"github.com/zitadel/zitadel/pkg/grpc/user/v3alpha"
@@ -13,32 +16,32 @@ func (s *Server) CreateUser(ctx context.Context, req *user.CreateUserRequest) (_
 	if err := checkUserSchemaEnabled(ctx); err != nil {
 		return nil, err
 	}
-	schemauser, err := createUserRequestToCreateSchemaUser(req)
+	schemauser, err := createUserRequestToCreateSchemaUser(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	orgID := authz.GetCtxData(ctx).OrgID
-	id, details, err := s.command.CreateSchemaUser(ctx, orgID, schemauser)
-	if err != nil {
+
+	if err := s.command.CreateSchemaUser(ctx, schemauser, s.userCodeAlg, s.userCodeAlg); err != nil {
 		return nil, err
 	}
 	return &user.CreateUserResponse{
-		UserId:    id,
-		Details:   object.DomainToDetailsPb(details),
-		EmailCode: human.EmailCode,
-		PhoneCode: human.PhoneCode,
+		UserId:    schemauser.ID,
+		Details:   object.DomainToDetailsPb(schemauser.Details),
+		EmailCode: gu.Ptr(schemauser.ReturnCodeEmail),
+		PhoneCode: gu.Ptr(schemauser.ReturnCodePhone),
 	}, nil
 }
 
-func createUserRequestToCreateSchemaUser(req *user.CreateUserRequest) (*command.CreateSchemaUser, error) {
+func createUserRequestToCreateSchemaUser(ctx context.Context, req *user.CreateUserRequest) (*command.CreateSchemaUser, error) {
 	data, err := req.GetData().MarshalJSON()
 	if err != nil {
 		return nil, err
 	}
 	return &command.CreateSchemaUser{
-		SchemaID: req.SchemaId,
-		ID:       req.GetUserId(),
-		Data:     data,
+		ResourceOwner: authz.GetCtxData(ctx).OrgID,
+		SchemaID:      req.SchemaId,
+		ID:            req.GetUserId(),
+		Data:          data,
 	}, nil
 }
 

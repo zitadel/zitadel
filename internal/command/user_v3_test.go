@@ -15,7 +15,6 @@ import (
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/id"
 	"github.com/zitadel/zitadel/internal/id/mock"
-	"github.com/zitadel/zitadel/internal/repository/user"
 	"github.com/zitadel/zitadel/internal/repository/user/schema"
 	"github.com/zitadel/zitadel/internal/repository/user/schemauser"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -28,9 +27,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 		checkPermission domain.PermissionCheck
 	}
 	type args struct {
-		ctx           context.Context
-		resourceowner string
-		user          *CreateSchemaUser
+		ctx  context.Context
+		user *CreateSchemaUser
 	}
 	type res struct {
 		id              string
@@ -62,15 +60,16 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 		},
 		{
-			"no type, error",
+			"no schemaID, error",
 			fields{
 				eventstore:      expectEventstore(),
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:           authz.NewMockContext("instanceID", "", ""),
-				resourceowner: "instanceID",
-				user:          &CreateSchemaUser{},
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner: "org1",
+				},
 			},
 			res{
 				err: func(err error) bool {
@@ -87,9 +86,9 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:           authz.NewMockContext("instanceID", "", ""),
-				resourceowner: "instanceID",
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
 					SchemaID:       "type",
 					schemaRevision: 1,
 				},
@@ -125,11 +124,12 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 					),
 				),
 				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx:           authz.NewMockContext("instanceID", "", ""),
-				resourceowner: "instanceID",
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
 					SchemaID:       "type",
 					schemaRevision: 1,
 				},
@@ -163,15 +163,14 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
 				idGenerator:     mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx:           authz.NewMockContext("instanceID", "", ""),
-				resourceowner: "instanceID",
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
 					SchemaID:       "type",
 					schemaRevision: 1,
 					Data: json.RawMessage(`{
@@ -212,7 +211,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"type",
 							1,
 							json.RawMessage(`{
@@ -225,9 +224,9 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator:     mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx:           authz.NewMockContext("instanceID", "", ""),
-				resourceowner: "instanceID",
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
 					SchemaID:       "type",
 					schemaRevision: 1,
 					Data: json.RawMessage(`{
@@ -238,7 +237,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			res{
 				id: "id1",
 				details: &domain.ObjectDetails{
-					ResourceOwner: "instanceID",
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -269,7 +268,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"type",
 							1,
 							json.RawMessage(`{
@@ -277,11 +276,11 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 					}`),
 						),
 						schemauser.NewEmailChangedEvent(context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"test@example.com",
 						),
 						schemauser.NewEmailCodeAddedEvent(context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -293,11 +292,11 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 							false,
 						),
 						schemauser.NewPhoneChangedEvent(context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"+41791234567",
 						),
 						schemauser.NewPhoneCodeAddedEvent(context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							&crypto.CryptoValue{
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
@@ -313,9 +312,9 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:           authz.NewMockContext("instanceID", "", ""),
-				resourceowner: "instanceID",
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
 					SchemaID:       "type",
 					schemaRevision: 1,
 					Data: json.RawMessage(`{
@@ -335,7 +334,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			res{
 				id: "id1",
 				details: &domain.ObjectDetails{
-					ResourceOwner: "instanceID",
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -366,7 +365,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 					expectPush(
 						schemauser.NewCreatedEvent(
 							context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"type",
 							1,
 							json.RawMessage(`{
@@ -374,18 +373,18 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 					}`),
 						),
 						schemauser.NewEmailChangedEvent(context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"test@example.com",
 						),
 						schemauser.NewEmailVerifiedEvent(context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 						),
 						schemauser.NewPhoneChangedEvent(context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"+41791234567",
 						),
 						schemauser.NewPhoneVerifiedEvent(context.Background(),
-							&schemauser.NewAggregate("id1", "instanceID").Aggregate,
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
 						),
 					),
 				),
@@ -393,9 +392,9 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				checkPermission: newMockPermissionCheckAllowed(),
 			},
 			args{
-				ctx:           authz.NewMockContext("instanceID", "", ""),
-				resourceowner: "instanceID",
+				ctx: authz.NewMockContext("instanceID", "", ""),
 				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
 					SchemaID:       "type",
 					schemaRevision: 1,
 					Data: json.RawMessage(`{
@@ -408,7 +407,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			res{
 				id: "id1",
 				details: &domain.ObjectDetails{
-					ResourceOwner: "instanceID",
+					ResourceOwner: "org1",
 				},
 			},
 		},
@@ -420,7 +419,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator:     tt.fields.idGenerator,
 				checkPermission: tt.fields.checkPermission,
 			}
-			err := c.CreateSchemaUser(tt.args.ctx, tt.args.resourceowner, tt.args.user, GetMockSecretGenerator(t), GetMockSecretGenerator(t))
+			err := c.CreateSchemaUser(tt.args.ctx, tt.args.user, GetMockSecretGenerator(t), GetMockSecretGenerator(t))
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -580,11 +579,6 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 					}`),
 							),
 						),
-						eventFromEventPusher(
-							user.NewHumanInitializedCheckSucceededEvent(context.Background(),
-								&schemauser.NewAggregate("user1", "org1").Aggregate,
-							),
-						),
 					),
 				),
 				checkPermission: newMockPermissionCheckNotAllowed(),
@@ -596,6 +590,39 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 			res: res{
 				err: func(err error) bool {
 					return errors.Is(err, zerrors.ThrowPermissionDenied(nil, "AUTHZ-HKJD33", "Errors.PermissionDenied"))
+				},
+			},
+		},
+		{
+			name: "remove user, self",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schemauser.NewCreatedEvent(context.Background(),
+								&schemauser.NewAggregate("user1", "org1").Aggregate,
+								"schema",
+								1,
+								json.RawMessage(`{
+						"name": "user"
+					}`),
+							),
+						),
+					),
+					expectPush(
+						schemauser.NewDeletedEvent(context.Background(),
+							&schemauser.NewAggregate("user1", "org1").Aggregate,
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:    authz.NewMockContext("instanceID", "org1", "user1"),
+				userID: "user1",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "org1",
 				},
 			},
 		},

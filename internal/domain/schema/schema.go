@@ -19,7 +19,7 @@ const (
 	MetaSchemaID = "urn:zitadel:schema:v1"
 )
 
-func NewSchema(role role, r io.Reader) (*jsonschema.Schema, error) {
+func NewSchema(role Role, r io.Reader) (*jsonschema.Schema, error) {
 	c := jsonschema.NewCompiler()
 	if err := c.AddResource(PermissionSchemaID, strings.NewReader(permissionJSON)); err != nil {
 		return nil, err
