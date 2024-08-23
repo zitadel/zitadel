@@ -16,6 +16,8 @@ import (
 type CreateSchemaUser struct {
 	Details *domain.ObjectDetails
 
+	Register bool
+
 	SchemaID       string
 	schemaRevision uint64
 
@@ -23,9 +25,9 @@ type CreateSchemaUser struct {
 	Data json.RawMessage
 
 	Email           *Email
-	ReturnCodeEmail *domain.EmailCode
+	ReturnCodeEmail string
 	Phone           *Phone
-	ReturnCodePhone *domain.PhoneCode
+	ReturnCodePhone string
 }
 
 func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands, resourceOwner string) error {
@@ -41,9 +43,6 @@ func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands, resourceOwner
 		return zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
 	}
 	s.schemaRevision = schemaWriteModel.Revision
-	if s.schemaRevision == 0 {
-		return zerrors.ThrowInvalidArgument(nil, "TODO", "Errors.UserSchema.User.Revision.Missing")
-	}
 
 	schema, err := domain_schema.NewSchema(0, bytes.NewReader(schemaWriteModel.Schema))
 	if err != nil {
@@ -93,6 +92,14 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, resourceOwner string, u
 	if err != nil {
 		return err
 	}
+	if writeModel.Exists() {
+		return zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
+	}
+	if !user.Register {
+		if err := c.checkPermission(ctx, domain.PermissionUserWrite, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+			return err
+		}
+	}
 
 	userAgg := UserV3AggregateFromWriteModel(&writeModel.WriteModel)
 	events := []eventstore.Command{
@@ -102,42 +109,15 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, resourceOwner string, u
 		),
 	}
 	if user.Email != nil {
-		events = append(events, schemauser.NewEmailChangedEvent(ctx,
-			userAgg,
-			user.Email.Address,
-		))
-		if user.Email.Verified {
-			events = append(events, schemauser.NewEmailVerifiedEvent(ctx, userAgg))
-		} else {
-			user.ReturnCodeEmail, _, err = domain.NewEmailCode(emailCodeGenerator)
-			if err != nil {
-				return err
-			}
-			events = append(events, schemauser.NewEmailCodeAddedEvent(ctx, userAgg,
-				user.ReturnCodeEmail.Code,
-				user.ReturnCodeEmail.Expiry,
-				user.Email.URLTemplate,
-				user.Email.ReturnCode,
-			))
+		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, events, userAgg, user.Email, emailCodeGenerator)
+		if err != nil {
+			return err
 		}
 	}
 	if user.Phone != nil {
-		events = append(events, schemauser.NewPhoneChangedEvent(ctx,
-			userAgg,
-			user.Phone.Number,
-		))
-		if user.Phone.Verified {
-			events = append(events, schemauser.NewPhoneVerifiedEvent(ctx, userAgg))
-		} else {
-			user.ReturnCodePhone, err = domain.NewPhoneCode(phoneCodeGenerator)
-			if err != nil {
-				return err
-			}
-			events = append(events, schemauser.NewPhoneCodeAddedEvent(ctx, userAgg,
-				user.ReturnCodePhone.Code,
-				user.ReturnCodePhone.Expiry,
-				user.Phone.ReturnCode,
-			))
+		events, user.ReturnCodePhone, err = c.updateSchemaUserPhone(ctx, events, userAgg, user.Phone, phoneCodeGenerator)
+		if err != nil {
+			return err
 		}
 	}
 
@@ -157,7 +137,10 @@ func (c *Commands) DeleteSchemaUser(ctx context.Context, id string) (*domain.Obj
 		return nil, err
 	}
 	if !writeModel.Exists() {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "TODO", "Errors.UserSchema.User.NotExists")
+		return nil, zerrors.ThrowNotFound(nil, "TODO", "TODO")
+	}
+	if err := c.checkPermissionDeleteUser(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
+		return nil, err
 	}
 	if err := c.pushAppendAndReduce(ctx, writeModel,
 		schemauser.NewDeletedEvent(ctx, UserV3AggregateFromWriteModel(&writeModel.WriteModel)),
@@ -165,6 +148,72 @@ func (c *Commands) DeleteSchemaUser(ctx context.Context, id string) (*domain.Obj
 		return nil, err
 	}
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+}
+
+func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, email *Email, codeGenerator crypto.Generator) (_ []eventstore.Command, plainCode string, err error) {
+	events = append(events, schemauser.NewEmailChangedEvent(ctx,
+		agg,
+		email.Address,
+	))
+	if email.Verified {
+		events = append(events, schemauser.NewEmailVerifiedEvent(ctx, agg))
+	} else {
+		returnCode, code, err := generateCode(codeGenerator, email.ReturnCode)
+		if err != nil {
+			return nil, "", err
+		}
+		plainCode = code
+		events = append(events, schemauser.NewEmailCodeAddedEvent(ctx, agg,
+			returnCode,
+			codeGenerator.Expiry(),
+			email.URLTemplate,
+			email.ReturnCode,
+		))
+	}
+	return events, plainCode, nil
+}
+
+func (c *Commands) updateSchemaUserPhone(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, phone *Phone, codeGenerator crypto.Generator) (_ []eventstore.Command, plainCode string, err error) {
+	events = append(events, schemauser.NewPhoneChangedEvent(ctx,
+		agg,
+		phone.Number,
+	))
+	if phone.Verified {
+		events = append(events, schemauser.NewPhoneVerifiedEvent(ctx, agg))
+	} else {
+		returnCode, code, err := generateCode(codeGenerator, phone.ReturnCode)
+		if err != nil {
+			return nil, "", err
+		}
+		plainCode = code
+		events = append(events, schemauser.NewPhoneCodeAddedEvent(ctx, agg,
+			returnCode,
+			codeGenerator.Expiry(),
+			phone.ReturnCode,
+		))
+	}
+	return events, plainCode, nil
+}
+
+func generateCode(gen crypto.Generator, returnCode bool) (*crypto.CryptoValue, string, error) {
+	value, plain, err := crypto.NewCode(gen)
+	if err != nil {
+		return nil, "", err
+	}
+
+	if returnCode {
+		return value, plain, nil
+	}
+	return value, "", nil
+
+}
+
+func (c *Commands) getSchemaUserExists(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
+	writeModel := NewExistsUserV3WriteModel(resourceOwner, id)
+	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
+		return nil, err
+	}
+	return writeModel, nil
 }
 
 func (c *Commands) getSchemaUserWriteModelByID(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {

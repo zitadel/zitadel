@@ -32,12 +32,27 @@ type UserV3WriteModel struct {
 	State domain.UserState
 }
 
+func NewExistsUserV3WriteModel(resourceOwner, userID string) *UserV3WriteModel {
+	return &UserV3WriteModel{
+		WriteModel: eventstore.WriteModel{
+			AggregateID:   userID,
+			ResourceOwner: resourceOwner,
+		},
+		PhoneWM: false,
+		EmailWM: false,
+		DataWM:  false,
+	}
+}
+
 func NewUserV3WriteModel(resourceOwner, userID string) *UserV3WriteModel {
 	return &UserV3WriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
+		PhoneWM: false,
+		EmailWM: false,
+		DataWM:  false,
 	}
 }
 
@@ -132,8 +147,6 @@ func (wm *UserV3WriteModel) NewUpdatedEvent(
 	schemaType *string,
 	schemaRevision *uint64,
 	data json.RawMessage,
-	email *string,
-	phone *string,
 ) *schemauser.UpdatedEvent {
 	changes := make([]schemauser.Changes, 0)
 	if schemaType != nil && wm.SchemaType != *schemaType {
@@ -144,12 +157,6 @@ func (wm *UserV3WriteModel) NewUpdatedEvent(
 	}
 	if !bytes.Equal(wm.Data, data) {
 		changes = append(changes, schemauser.ChangeData(data))
-	}
-	if email != nil && wm.Email != *email {
-		changes = append(changes, schemauser.ChangeEmail(*email))
-	}
-	if phone != nil && wm.Phone != *phone {
-		changes = append(changes, schemauser.ChangePhone(*phone))
 	}
 	if len(changes) == 0 {
 		return nil
