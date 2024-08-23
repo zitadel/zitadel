@@ -13,7 +13,7 @@ Quotas:
 Telemetry:
   Enabled: true
   Endpoints:
-  - http://localhost:8081
+  - http://localhost:8081/milestone
   Headers:
     single-value: "single-value"
     multi-value:
@@ -39,7 +39,8 @@ Projections:
       RequeueEvery: 1s
       HandleActiveInstances: 60s
     Telemetry:
-      HandleActiveInstances: 60s
+      MaxFailureCount: 0
+      RequeueEvery: 10s
 
 DefaultInstance:
   LoginPolicy:

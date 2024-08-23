@@ -130,11 +130,12 @@ func (c *Config) Host() string {
 
 // Instance is a Zitadel server and client with all resources available for testing.
 type Instance struct {
-	Config     Config
-	Domain     string
-	Instance   *instance.InstanceDetail
-	DefaultOrg *org.Org
-	Users      UserMap
+	Config      Config
+	Domain      string
+	Instance    *instance.InstanceDetail
+	DefaultOrg  *org.Org
+	Users       UserMap
+	AdminUserID string // First human user for password login
 
 	Client   *Client
 	WebAuthN *webauthn.Client
@@ -238,7 +239,7 @@ func (i *Instance) UseIsolatedInstance(ctx context.Context) *Instance {
 func (i *Instance) awaitFirstUser(ctx context.Context) {
 	var allErrs []error
 	for {
-		_, err := i.Client.Mgmt.ImportHumanUser(ctx, &mgmt.ImportHumanUserRequest{
+		resp, err := i.Client.Mgmt.ImportHumanUser(ctx, &mgmt.ImportHumanUserRequest{
 			UserName: "zitadel-admin@zitadel.localhost",
 			Email: &mgmt.ImportHumanUserRequest_Email{
 				Email:           "zitadel-admin@zitadel.localhost",
@@ -252,6 +253,7 @@ func (i *Instance) awaitFirstUser(ctx context.Context) {
 			},
 		})
 		if err == nil {
+			i.AdminUserID = resp.GetUserId()
 			return
 		}
 		logging.WithError(err).Debug("await first instance user")

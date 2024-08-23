@@ -1,10 +1,9 @@
-//go:build integration_old
+//go:build integration
 
 package handlers_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/url"
 	"testing"
@@ -16,6 +15,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 
 	"github.com/zitadel/zitadel/internal/integration"
+	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/pkg/grpc/app"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object"
@@ -25,16 +25,21 @@ import (
 )
 
 func TestServer_TelemetryPushMilestones(t *testing.T) {
-	primaryDomain, instanceID, adminID, iamOwnerCtx := Instance.UseIsolatedInstance(t, CTX, SystemCTX)
-	t.Log("testing against instance with primary domain", primaryDomain)
-	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "InstanceCreated")
-
-	projectAdded, err := Instance.Client.Mgmt.AddProject(iamOwnerCtx, &management.AddProjectRequest{Name: "integration"})
+	sub, err := sink.Subscribe(CTX, sink.ChannelMilestone)
 	require.NoError(t, err)
-	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "ProjectCreated")
+	defer sub.Close()
+
+	instance := Instance.UseIsolatedInstance(CTX)
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	t.Log("testing against instance with primary domain", instance.Domain)
+	awaitMilestone(t, sub, instance.Domain, "InstanceCreated")
+
+	projectAdded, err := instance.Client.Mgmt.AddProject(iamOwnerCtx, &management.AddProjectRequest{Name: "integration"})
+	require.NoError(t, err)
+	awaitMilestone(t, sub, instance.Domain, "ProjectCreated")
 
 	redirectURI := "http://localhost:8888"
-	application, err := Instance.Client.Mgmt.AddOIDCApp(iamOwnerCtx, &management.AddOIDCAppRequest{
+	application, err := instance.Client.Mgmt.AddOIDCApp(iamOwnerCtx, &management.AddOIDCAppRequest{
 		ProjectId:       projectAdded.GetId(),
 		Name:            "integration",
 		RedirectUris:    []string{redirectURI},
@@ -46,35 +51,37 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 		AccessTokenType: app.OIDCTokenType_OIDC_TOKEN_TYPE_JWT,
 	})
 	require.NoError(t, err)
-	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "ApplicationCreated")
+	awaitMilestone(t, sub, instance.Domain, "ApplicationCreated")
 
 	// create the session to be used for the authN of the clients
-	sessionID, sessionToken, _, _ := Instance.CreatePasswordSession(t, iamOwnerCtx, adminID, "Password1!")
+	sessionID, sessionToken, _, _ := instance.CreatePasswordSession(t, iamOwnerCtx, instance.AdminUserID, "Password1!")
 
-	console := consoleOIDCConfig(iamOwnerCtx, t)
-	loginToClient(iamOwnerCtx, t, primaryDomain, console.GetClientId(), instanceID, console.GetRedirectUris()[0], sessionID, sessionToken)
-	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "AuthenticationSucceededOnInstance")
+	console := consoleOIDCConfig(t, instance)
+	loginToClient(t, instance, console.GetClientId(), console.GetRedirectUris()[0], sessionID, sessionToken)
+	awaitMilestone(t, sub, instance.Domain, "AuthenticationSucceededOnInstance")
 
 	// make sure the client has been projected
 	require.EventuallyWithT(t, func(collectT *assert.CollectT) {
-		_, err := Instance.Client.Mgmt.GetAppByID(iamOwnerCtx, &management.GetAppByIDRequest{
+		_, err := instance.Client.Mgmt.GetAppByID(iamOwnerCtx, &management.GetAppByIDRequest{
 			ProjectId: projectAdded.GetId(),
 			AppId:     application.GetAppId(),
 		})
 		assert.NoError(collectT, err)
 	}, 1*time.Minute, 100*time.Millisecond, "app not found")
-	loginToClient(iamOwnerCtx, t, primaryDomain, application.GetClientId(), instanceID, redirectURI, sessionID, sessionToken)
-	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "AuthenticationSucceededOnApplication")
+	loginToClient(t, instance, application.GetClientId(), redirectURI, sessionID, sessionToken)
+	awaitMilestone(t, sub, instance.Domain, "AuthenticationSucceededOnApplication")
 
-	_, err = Instance.Client.System.RemoveInstance(SystemCTX, &system.RemoveInstanceRequest{InstanceId: instanceID})
+	_, err = instance.Client.System.RemoveInstance(instance.WithAuthorization(CTX, integration.UserTypeSystem), &system.RemoveInstanceRequest{InstanceId: instance.Instance.Id})
 	require.NoError(t, err)
-	awaitMilestone(t, Instance.MilestoneChan, primaryDomain, "InstanceDeleted")
+	awaitMilestone(t, sub, instance.Domain, "InstanceDeleted")
 }
 
-func loginToClient(iamOwnerCtx context.Context, t *testing.T, primaryDomain, clientID, instanceID, redirectURI, sessionID, sessionToken string) {
-	authRequestID, err := Instance.CreateOIDCAuthRequestWithDomain(iamOwnerCtx, primaryDomain, clientID, Instance.Users.Get(instanceID, integration.IAMOwner).ID, redirectURI, "openid")
+func loginToClient(t *testing.T, instance *integration.Instance, clientID, redirectURI, sessionID, sessionToken string) {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	authRequestID, err := instance.CreateOIDCAuthRequestWithDomain(iamOwnerCtx, instance.Domain, clientID, instance.Users.Get(integration.UserTypeIAMOwner).ID, redirectURI, "openid")
 	require.NoError(t, err)
-	callback, err := Instance.Client.OIDCv2.CreateCallback(iamOwnerCtx, &oidc_v2.CreateCallbackRequest{
+	callback, err := instance.Client.OIDCv2.CreateCallback(iamOwnerCtx, &oidc_v2.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_v2.CreateCallbackRequest_Session{Session: &oidc_v2.Session{
 			SessionId:    sessionID,
@@ -82,7 +89,7 @@ func loginToClient(iamOwnerCtx context.Context, t *testing.T, primaryDomain, cli
 		}},
 	})
 	require.NoError(t, err)
-	provider, err := Instance.CreateRelyingPartyForDomain(iamOwnerCtx, primaryDomain, clientID, redirectURI)
+	provider, err := instance.CreateRelyingPartyForDomain(iamOwnerCtx, instance.Domain, clientID, redirectURI)
 	require.NoError(t, err)
 	callbackURL, err := url.Parse(callback.GetCallbackUrl())
 	require.NoError(t, err)
@@ -91,8 +98,10 @@ func loginToClient(iamOwnerCtx context.Context, t *testing.T, primaryDomain, cli
 	require.NoError(t, err)
 }
 
-func consoleOIDCConfig(iamOwnerCtx context.Context, t *testing.T) *app.OIDCConfig {
-	projects, err := Instance.Client.Mgmt.ListProjects(iamOwnerCtx, &management.ListProjectsRequest{
+func consoleOIDCConfig(t *testing.T, instance *integration.Instance) *app.OIDCConfig {
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	projects, err := instance.Client.Mgmt.ListProjects(iamOwnerCtx, &management.ListProjectsRequest{
 		Queries: []*project.ProjectQuery{
 			{
 				Query: &project.ProjectQuery_NameQuery{
@@ -106,7 +115,7 @@ func consoleOIDCConfig(iamOwnerCtx context.Context, t *testing.T) *app.OIDCConfi
 	})
 	require.NoError(t, err)
 	require.Len(t, projects.GetResult(), 1)
-	apps, err := Instance.Client.Mgmt.ListApps(iamOwnerCtx, &management.ListAppsRequest{
+	apps, err := instance.Client.Mgmt.ListApps(iamOwnerCtx, &management.ListAppsRequest{
 		ProjectId: projects.GetResult()[0].GetId(),
 		Queries: []*app.AppQuery{
 			{
@@ -124,12 +133,12 @@ func consoleOIDCConfig(iamOwnerCtx context.Context, t *testing.T) *app.OIDCConfi
 	return apps.GetResult()[0].GetOidcConfig()
 }
 
-func awaitMilestone(t *testing.T, bodies chan []byte, primaryDomain, expectMilestoneType string) {
+func awaitMilestone(t *testing.T, sub *sink.Subscription, primaryDomain, expectMilestoneType string) {
 	for {
 		select {
-		case body := <-bodies:
+		case req := <-sub.Recv():
 			plain := new(bytes.Buffer)
-			if err := json.Indent(plain, body, "", "  "); err != nil {
+			if err := json.Indent(plain, req.Body, "", "  "); err != nil {
 				t.Fatal(err)
 			}
 			t.Log("received milestone", plain.String())
@@ -137,7 +146,7 @@ func awaitMilestone(t *testing.T, bodies chan []byte, primaryDomain, expectMiles
 				Type          string `json:"type"`
 				PrimaryDomain string `json:"primaryDomain"`
 			}{}
-			if err := json.Unmarshal(body, &milestone); err != nil {
+			if err := json.Unmarshal(req.Body, &milestone); err != nil {
 				t.Error(err)
 			}
 			if milestone.Type == expectMilestoneType && milestone.PrimaryDomain == primaryDomain {

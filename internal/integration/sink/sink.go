@@ -4,6 +4,7 @@ package sink
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -16,6 +17,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 	"github.com/zitadel/logging"
 )
 
@@ -33,6 +35,7 @@ const (
 	ChannelQuota
 )
 
+// CallURL returns the full URL to the handler of a Channel.
 func CallURL(ch Channel) string {
 	u := url.URL{
 		Scheme: "http",
@@ -50,9 +53,10 @@ func subscribePath(c Channel) string {
 	return path.Join("/", c.String(), "subscribe")
 }
 
+// Request is a message forwarded from the handler to Subscriptions.
 type Request struct {
 	Header http.Header
-	Body   []byte
+	Body   json.RawMessage
 }
 
 func ListenAndServe() error {
@@ -64,7 +68,8 @@ func ListenAndServe() error {
 	})
 	for _, ch := range ChannelValues() {
 		fwd := &forwarder{
-			channels: make(map[int64]chan<- *Request),
+			channelID: ch,
+			channels:  make(map[int64]chan<- *Request),
 		}
 		router.HandleFunc(rootPath(ch), fwd.receiveHandler)
 		router.HandleFunc(subscribePath(ch), fwd.subscriptionHandler)
@@ -73,10 +78,11 @@ func ListenAndServe() error {
 }
 
 type forwarder struct {
-	id       atomic.Int64
-	mtx      sync.RWMutex
-	channels map[int64]chan<- *Request
-	upgrader websocket.Upgrader
+	channelID Channel
+	id        atomic.Int64
+	mtx       sync.RWMutex
+	channels  map[int64]chan<- *Request
+	upgrader  websocket.Upgrader
 }
 
 func (c *forwarder) receiveHandler(w http.ResponseWriter, r *http.Request) {
@@ -112,7 +118,7 @@ func (c *forwarder) subscriptionHandler(w http.ResponseWriter, r *http.Request) 
 	c.channels[id] = reqChannel
 	c.mtx.Unlock()
 
-	logging.WithFields("id", id).Info("websocket opened")
+	logging.WithFields("id", id, "channel", c.channelID).Info("websocket opened")
 
 	defer func() {
 		c.mtx.Lock()
@@ -126,11 +132,11 @@ func (c *forwarder) subscriptionHandler(w http.ResponseWriter, r *http.Request) 
 	for {
 		select {
 		case err := <-done:
-			logging.OnError(err).WithField("id", id).Info("websocket closed")
+			logging.WithError(err).WithFields(logrus.Fields{"id": id, "channel": c.channelID}).Info("websocket closed")
 			return
 		case req := <-reqChannel:
 			if err := ws.WriteJSON(req); err != nil {
-				logging.WithError(err).WithField("id", id).Error("websocket write json")
+				logging.WithError(err).WithFields(logrus.Fields{"id": id, "channel": c.channelID}).Error("websocket write json")
 				return
 			}
 		}
@@ -161,6 +167,12 @@ type Subscription struct {
 	reqChannel chan *Request
 }
 
+// Subscribe to a channel.
+// The subscription forwards all requests it received on the channel's
+// handler, after Subscribe has returned.
+// Multiple subscription may be active on a single channel.
+// Each request is always forwarded to each Subscription.
+// Close must be called to cleanup up the Subscription's channel and go routine.
 func Subscribe(ctx context.Context, ch Channel) (*Subscription, error) {
 	u := url.URL{
 		Scheme: "ws",
@@ -169,9 +181,12 @@ func Subscribe(ctx context.Context, ch Channel) (*Subscription, error) {
 	}
 	conn, resp, err := websocket.DefaultDialer.DialContext(ctx, u.String(), nil)
 	if err != nil {
-		defer resp.Body.Close()
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("subscribe: %w, status: %s, body: %s", err, resp.Status, body)
+		if resp != nil {
+			defer resp.Body.Close()
+			body, _ := io.ReadAll(resp.Body)
+			return nil, fmt.Errorf("subscribe: %w, status: %s, body: %s", err, resp.Status, body)
+		}
+		return nil, err
 	}
 
 	sub := &Subscription{
@@ -201,6 +216,7 @@ func (s *Subscription) readToChan() {
 	close(s.reqChannel)
 }
 
+// Recv returns the channel over which Requests are send.
 func (s *Subscription) Recv() <-chan *Request {
 	return s.reqChannel
 }
