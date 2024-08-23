@@ -147,7 +147,7 @@ service ZITADELWebKeys {
 
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Activate a signing key for the instance";
-      description: "Switch the active signing web key. The previously active key will be deactivated. Note that the jwks OIDC endpoind has a cache-control header of 5 minutes. Therefore it is not advised to activate a key that is less than 5 minutes old, as the public key may not have been propegated to chaches and clients yet."
+      description: "Switch the active signing web key. The previously active key will be deactivated. Note that the JWKs OIDC endpoint returns a cacheable response. Therefore it is not advised to activate a key that has been created within the cache duration (default is 5min), as the public key may not have been propagated to caches and clients yet."
       responses: {
         key: "200"
         value: {
