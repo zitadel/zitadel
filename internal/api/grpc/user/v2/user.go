@@ -45,14 +45,6 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 	if username == "" {
 		username = req.GetEmail().GetEmail()
 	}
-	var urlTemplate string
-	if req.GetEmail().GetSendCode() != nil {
-		urlTemplate = req.GetEmail().GetSendCode().GetUrlTemplate()
-		// test the template execution so the async notification will not fail because of it and the user won't realize
-		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
-			return nil, err
-		}
-	}
 	passwordChangeRequired := req.GetPassword().GetChangeRequired() || req.GetHashedPassword().GetChangeRequired()
 	metadata := make([]*command.AddMetadataEntry, len(req.Metadata))
 	for i, metadataEntry := range req.Metadata {
@@ -69,6 +61,10 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 			DisplayName:   link.GetUserName(),
 		}
 	}
+	email, err := addUserRequestEmailToCommand(req.GetEmail())
+	if err != nil {
+		return nil, err
+	}
 	return &command.AddHuman{
 		ID:          req.GetUserId(),
 		Username:    username,
@@ -76,12 +72,7 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		LastName:    req.GetProfile().GetFamilyName(),
 		NickName:    req.GetProfile().GetNickName(),
 		DisplayName: req.GetProfile().GetDisplayName(),
-		Email: command.Email{
-			Address:     domain.EmailAddress(req.GetEmail().GetEmail()),
-			Verified:    req.GetEmail().GetIsVerified(),
-			ReturnCode:  req.GetEmail().GetReturnCode() != nil,
-			URLTemplate: urlTemplate,
-		},
+		Email:       email,
 		Phone: command.Phone{
 			Number:     domain.PhoneNumber(req.GetPhone().GetPhone()),
 			Verified:   req.GetPhone().GetIsVerified(),
@@ -98,6 +89,25 @@ func AddUserRequestToAddHuman(req *user.AddHumanUserRequest) (*command.AddHuman,
 		Links:                  links,
 		TOTPSecret:             req.GetTotpSecret(),
 	}, nil
+}
+
+func addUserRequestEmailToCommand(email *user.SetHumanEmail) (command.Email, error) {
+	address := domain.EmailAddress(email.GetEmail())
+	switch v := email.GetVerification().(type) {
+	case *user.SetHumanEmail_ReturnCode:
+		return command.Email{Address: address, ReturnCode: true}, nil
+	case *user.SetHumanEmail_SendCode:
+		urlTemplate := v.SendCode.GetUrlTemplate()
+		// test the template execution so the async notification will not fail because of it and the user won't realize
+		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, "userID", "code", "orgID"); err != nil {
+			return command.Email{}, err
+		}
+		return command.Email{Address: address, URLTemplate: urlTemplate}, nil
+	case *user.SetHumanEmail_IsVerified:
+		return command.Email{Address: address, Verified: v.IsVerified, NoEmailVerification: true}, nil
+	default:
+		return command.Email{Address: address}, nil
+	}
 }
 
 func genderToDomain(gender user.Gender) domain.Gender {
