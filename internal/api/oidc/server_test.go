@@ -32,6 +32,7 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 			fields{
 				LegacyServer: op.NewLegacyServer(
 					func() *op.Provider {
+						//nolint:staticcheck
 						provider, _ := op.NewForwardedOpenIDProvider("path",
 							&op.Config{
 								CodeMethodS256:          true,
@@ -114,6 +115,7 @@ func TestServer_createDiscoveryConfig(t *testing.T) {
 			fields{
 				LegacyServer: op.NewLegacyServer(
 					func() *op.Provider {
+						//nolint:staticcheck
 						provider, _ := op.NewForwardedOpenIDProvider("path",
 							&op.Config{
 								CodeMethodS256:          true,
