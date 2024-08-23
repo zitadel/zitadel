@@ -472,6 +472,16 @@ func TestServer_ListPasskeys(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "list passkeys, no userID",
+			args: args{
+				IamCTX,
+				&user.ListPasskeysRequest{
+					UserId: "",
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "list passkeys, no permission",
 			args: args{
 				UserCTX,
@@ -479,18 +489,12 @@ func TestServer_ListPasskeys(t *testing.T) {
 					UserId: userIDVerified,
 				},
 			},
-			want: &user.ListPasskeysResponse{
-				Details: &object.ListDetails{
-					TotalResult: 0,
-					Timestamp:   timestamppb.Now(),
-				},
-				Result: []*user.Passkey{},
-			},
+			wantErr: true,
 		},
 		{
 			name: "list passkeys, none",
 			args: args{
-				UserCTX,
+				IamCTX,
 				&user.ListPasskeysRequest{
 					UserId: userIDWithout,
 				},
@@ -506,7 +510,7 @@ func TestServer_ListPasskeys(t *testing.T) {
 		{
 			name: "list passkeys, registered",
 			args: args{
-				UserCTX,
+				IamCTX,
 				&user.ListPasskeysRequest{
 					UserId: userIDRegistered,
 				},

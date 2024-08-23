@@ -23,7 +23,11 @@ export function ensureProjectDoesntExist(api: API, projectName: string, orgId?: 
 }
 
 class ResourceType {
-  constructor(public resourcePath: string, public compareProperty: string, public identifierProperty: string) {}
+  constructor(
+    public resourcePath: string,
+    public compareProperty: string,
+    public identifierProperty: string,
+  ) {}
 }
 
 export const Apps = new ResourceType('apps', 'name', 'id');
@@ -47,19 +51,16 @@ export function ensureProjectResourceDoesntExist(
   );
 }
 
-export function ensureApplicationExists(api: API, projectId: number, appName: string) {
+export function ensureRoleExists(api: API, projectId: number, roleName: string) {
   return ensureItemExists(
     api,
-    `${api.mgmtBaseURL}/projects/${projectId}/${Apps.resourcePath}/_search`,
-    (resource: any) => resource.name === appName,
-    `${api.mgmtBaseURL}/projects/${projectId}/${Apps.resourcePath}/oidc`,
+    `${api.mgmtBaseURL}/projects/${projectId}/${Roles.resourcePath}/_search`,
+    (resource: any) => resource.key === roleName,
+    `${api.mgmtBaseURL}/projects/${projectId}/${Roles.resourcePath}`,
     {
-      name: appName,
-      redirectUris: ['https://e2eredirecturl.org'],
-      responseTypes: ['OIDC_RESPONSE_TYPE_CODE'],
-      grantTypes: ['OIDC_GRANT_TYPE_AUTHORIZATION_CODE'],
-      authMethodType: 'OIDC_AUTH_METHOD_TYPE_NONE',
-      postLogoutRedirectUris: ['https://e2elogoutredirecturl.org'],
+      name: roleName,
+      roleKey: roleName,
+      displayName: roleName,
     },
   );
 }

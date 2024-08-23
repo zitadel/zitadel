@@ -126,6 +126,16 @@ func TestServer_ListIDPLinks(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "list links, missing userID",
+			args: args{
+				IamCTX,
+				&user.ListIDPLinksRequest{
+					UserId: "",
+				},
+			},
+			wantErr: true,
+		},
+		{
 			name: "list links, no permission",
 			args: args{
 				UserCTX,
@@ -133,13 +143,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 					UserId: userOrgResp.GetUserId(),
 				},
 			},
-			want: &user.ListIDPLinksResponse{
-				Details: &object.ListDetails{
-					TotalResult: 0,
-					Timestamp:   timestamppb.Now(),
-				},
-				Result: []*user.IDPLink{},
-			},
+			wantErr: true,
 		},
 		{
 			name: "list links, no permission, org",
@@ -149,13 +153,7 @@ func TestServer_ListIDPLinks(t *testing.T) {
 					UserId: userOrgResp.GetUserId(),
 				},
 			},
-			want: &user.ListIDPLinksResponse{
-				Details: &object.ListDetails{
-					TotalResult: 0,
-					Timestamp:   timestamppb.Now(),
-				},
-				Result: []*user.IDPLink{},
-			},
+			wantErr: true,
 		},
 		{
 			name: "list idp links, org, ok",
