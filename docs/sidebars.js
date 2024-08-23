@@ -1186,7 +1186,7 @@ module.exports = {
         {
           type: "category",
           label: "Service Based API (v1)",
-          collapsed: false,
+          collapsed: true,
           link: {
             type: "generated-index",
             title: "APIs V1",
