@@ -539,6 +539,7 @@ module.exports = {
     {
       type: "category",
       label: "Overview",
+      collapsed: true,
       link: {
         type: "doc",
         id: "apis/introduction"
