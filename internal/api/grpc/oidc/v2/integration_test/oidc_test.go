@@ -184,7 +184,7 @@ func TestServer_CreateCallback(t *testing.T) {
 				CallbackUrl: regexp.QuoteMeta(`oidcintegrationtest://callback?error=access_denied&error_description=nope&error_uri=https%3A%2F%2Fexample.com%2Fdocs&state=state`),
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 			wantErr: false,
@@ -208,7 +208,7 @@ func TestServer_CreateCallback(t *testing.T) {
 				CallbackUrl: `oidcintegrationtest:\/\/callback\?code=(.*)&state=state`,
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 			wantErr: false,
@@ -234,7 +234,7 @@ func TestServer_CreateCallback(t *testing.T) {
 				CallbackUrl: `http:\/\/localhost:9999\/callback#access_token=(.*)&expires_in=(.*)&id_token=(.*)&state=state&token_type=Bearer`,
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 			wantErr: false,

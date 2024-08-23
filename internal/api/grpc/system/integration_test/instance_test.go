@@ -53,13 +53,13 @@ func TestServer_ListInstances(t *testing.T) {
 				Queries: []*instance.Query{{
 					Query: &instance.Query_IdQuery{
 						IdQuery: &instance.IdsQuery{
-							Ids: []string{isoInstance.Instance.Id},
+							Ids: []string{isoInstance.ID()},
 						},
 					},
 				}},
 			},
 			want: []*instance.Instance{{
-				Id: isoInstance.Instance.Id,
+				Id: isoInstance.ID(),
 			}},
 		},
 		{
@@ -90,7 +90,7 @@ func TestServer_ListInstances(t *testing.T) {
 				}},
 			},
 			want: []*instance.Instance{{
-				Id: isoInstance.Instance.Id,
+				Id: isoInstance.ID(),
 			}},
 		},
 	}

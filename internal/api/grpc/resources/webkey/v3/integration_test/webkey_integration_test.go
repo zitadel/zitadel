@@ -226,7 +226,7 @@ func checkWebKeyListState(ctx context.Context, t *testing.T, client webkey.ZITAD
 			Changed: timestamppb.Now(),
 			Owner: &object.Owner{
 				Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-				Id:   Instance.Instance.Id,
+				Id:   Instance.ID(),
 			},
 		}, key.GetDetails())
 		assert.WithinRange(t, key.GetDetails().GetChanged().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))

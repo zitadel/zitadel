@@ -107,7 +107,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -153,7 +153,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -180,7 +180,7 @@ func TestServer_SetExecution_Request(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -292,7 +292,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -319,7 +319,7 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -427,7 +427,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -473,7 +473,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -500,7 +500,7 @@ func TestServer_SetExecution_Response(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -612,7 +612,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -660,7 +660,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -687,7 +687,7 @@ func TestServer_SetExecution_Event(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},
@@ -787,7 +787,7 @@ func TestServer_SetExecution_Function(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instance.Instance.Id,
+						Id:   instance.ID(),
 					},
 				},
 			},

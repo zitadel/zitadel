@@ -188,7 +188,7 @@ func TestServer_CreateSession(t *testing.T) {
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -208,7 +208,7 @@ func TestServer_CreateSession(t *testing.T) {
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 			wantUserAgent: &session.UserAgent{
@@ -237,7 +237,7 @@ func TestServer_CreateSession(t *testing.T) {
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 			wantExpirationWindow: 5 * time.Minute,
@@ -257,7 +257,7 @@ func TestServer_CreateSession(t *testing.T) {
 			want: &session.CreateSessionResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 			wantFactors: []wantFactor{wantUserFactor},

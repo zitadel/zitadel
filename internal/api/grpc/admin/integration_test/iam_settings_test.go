@@ -106,7 +106,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: instance.Instance.Id,
+					ResourceOwner: instance.ID(),
 				},
 			},
 		},
@@ -121,7 +121,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: instance.Instance.Id,
+					ResourceOwner: instance.ID(),
 				},
 			},
 		},
@@ -136,7 +136,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: instance.Instance.Id,
+					ResourceOwner: instance.ID(),
 				},
 			},
 		},
@@ -153,7 +153,7 @@ func TestServer_SetSecurityPolicy(t *testing.T) {
 			want: &admin_pb.SetSecurityPolicyResponse{
 				Details: &object.ObjectDetails{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: instance.Instance.Id,
+					ResourceOwner: instance.ID(),
 				},
 			},
 		},

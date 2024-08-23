@@ -38,7 +38,7 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 		counts.assertAll(t, c, "added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for added event assertions to pass")
 	_, err := Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
-		InstanceId:        isoInstance.Instance.Id,
+		InstanceId:        isoInstance.ID(),
 		AuditLogRetention: durationpb.New(time.Now().Sub(beforeTime)),
 	})
 	require.NoError(t, err)
@@ -59,7 +59,7 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	require.NoError(t, err)
 	assert.LessOrEqual(t, len(listedEvents.GetEvents()), limitedCounts.all, "ListEvents with since query older than retention doesn't return more events")
 	_, err = isoInstance.Client.System.ResetLimits(SystemCTX, &system.ResetLimitsRequest{
-		InstanceId: isoInstance.Instance.Id,
+		InstanceId: isoInstance.ID(),
 	})
 	require.NoError(t, err)
 	requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {

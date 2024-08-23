@@ -87,7 +87,7 @@ func TestServer_SetInstanceFeatures(t *testing.T) {
 			want: &feature.SetInstanceFeaturesResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -133,7 +133,7 @@ func TestServer_ResetInstanceFeatures(t *testing.T) {
 			want: &feature.ResetInstanceFeaturesResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},

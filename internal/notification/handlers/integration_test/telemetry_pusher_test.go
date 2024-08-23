@@ -70,7 +70,7 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 	loginToClient(t, instance, application.GetClientId(), redirectURI, sessionID, sessionToken)
 	awaitMilestone(t, sub, instance.Domain, "AuthenticationSucceededOnApplication")
 
-	_, err = instance.Client.System.RemoveInstance(instance.WithAuthorization(CTX, integration.UserTypeSystem), &system.RemoveInstanceRequest{InstanceId: instance.Instance.Id})
+	_, err = instance.Client.System.RemoveInstance(instance.WithAuthorization(CTX, integration.UserTypeSystem), &system.RemoveInstanceRequest{InstanceId: instance.ID()})
 	require.NoError(t, err)
 	awaitMilestone(t, sub, instance.Domain, "InstanceDeleted")
 }

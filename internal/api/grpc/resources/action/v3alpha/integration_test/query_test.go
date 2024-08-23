@@ -354,7 +354,7 @@ func TestServer_ListTargets(t *testing.T) {
 							Changed: timestamppb.Now(),
 							Owner: &object.Owner{
 								Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-								Id:   instance.Instance.Id,
+								Id:   instance.ID(),
 							},
 						},
 						Config: &action.Target{
@@ -412,7 +412,7 @@ func TestServer_ListTargets(t *testing.T) {
 							Changed: timestamppb.Now(),
 							Owner: &object.Owner{
 								Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-								Id:   instance.Instance.Id,
+								Id:   instance.ID(),
 							},
 						},
 						Config: &action.Target{
@@ -431,7 +431,7 @@ func TestServer_ListTargets(t *testing.T) {
 							Changed: timestamppb.Now(),
 							Owner: &object.Owner{
 								Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-								Id:   instance.Instance.Id,
+								Id:   instance.ID(),
 							},
 						},
 						Config: &action.Target{
@@ -450,7 +450,7 @@ func TestServer_ListTargets(t *testing.T) {
 							Changed: timestamppb.Now(),
 							Owner: &object.Owner{
 								Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-								Id:   instance.Instance.Id,
+								Id:   instance.ID(),
 							},
 						},
 						Config: &action.Target{
@@ -780,15 +780,15 @@ func TestServer_SearchExecutions(t *testing.T) {
 				Result: []*action.GetExecution{
 					{
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id},
+							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()},
 						},
 					}, {
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id},
+							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()},
 						},
 					}, {
 						Details: &resource_object.Details{
-							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id},
+							Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()},
 						},
 					},
 				},
@@ -840,16 +840,16 @@ func TestServer_SearchExecutions(t *testing.T) {
 					AppliedLimit: 100,
 				},
 				Result: []*action.GetExecution{
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id}}},
-					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.Instance.Id}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()}}},
+					{Details: &resource_object.Details{Owner: &object.Owner{Type: object.OwnerType_OWNER_TYPE_INSTANCE, Id: instance.ID()}}},
 				},
 			},
 		},

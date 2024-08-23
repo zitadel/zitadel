@@ -236,6 +236,10 @@ func (i *Instance) UseIsolatedInstance(ctx context.Context) *Instance {
 	return newI
 }
 
+func (i *Instance) ID() string {
+	return i.Instance.GetId()
+}
+
 func (i *Instance) awaitFirstUser(ctx context.Context) {
 	var allErrs []error
 	for {

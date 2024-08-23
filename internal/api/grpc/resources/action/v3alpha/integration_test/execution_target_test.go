@@ -56,7 +56,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				targetCreated := instance.CreateTarget(ctx, t, targetCreatedURL, domain.TargetTypeCall, false)
 
 				// request received by target
-				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.Instance.Id, OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
+				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
 				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetDetails().GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
@@ -106,7 +106,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// response received by target
 				wantResponse := &middleware.ContextInfoResponse{
 					FullMethod: fullMethod,
-					InstanceID: instance.Instance.Id,
+					InstanceID: instance.ID(),
 					OrgID:      orgID,
 					ProjectID:  projectID,
 					UserID:     userID,
@@ -136,7 +136,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 						Id: "changed",
 						Owner: &object.Owner{
 							Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-							Id:   instance.Instance.Id,
+							Id:   instance.ID(),
 						},
 					},
 				},
@@ -153,7 +153,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID
 
 				// request received by target
-				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.Instance.Id, OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
+				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetRequest{Id: "notchanged"})
 
 				targetRequest := instance.CreateTarget(ctx, t, urlRequest, domain.TargetTypeCall, true)
@@ -218,7 +218,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				// response received by target
 				wantResponse := &middleware.ContextInfoResponse{
 					FullMethod: fullMethod,
-					InstanceID: instance.Instance.Id,
+					InstanceID: instance.ID(),
 					OrgID:      orgID,
 					ProjectID:  projectID,
 					UserID:     userID,

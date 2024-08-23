@@ -107,7 +107,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 			want: &settings.SetSecuritySettingsResponse{
 				Details: &object_pb.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -124,7 +124,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 			want: &settings.SetSecuritySettingsResponse{
 				Details: &object_pb.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -139,7 +139,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 			want: &settings.SetSecuritySettingsResponse{
 				Details: &object_pb.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -158,7 +158,7 @@ func TestServer_SetSecuritySettings(t *testing.T) {
 			want: &settings.SetSecuritySettingsResponse{
 				Details: &object_pb.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},

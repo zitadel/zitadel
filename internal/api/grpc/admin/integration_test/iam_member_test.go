@@ -147,7 +147,7 @@ func TestServer_AddIAMMember(t *testing.T) {
 			},
 			want: &admin_pb.AddIAMMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -227,7 +227,7 @@ func TestServer_UpdateIAMMember(t *testing.T) {
 			},
 			want: &admin_pb.UpdateIAMMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 					ChangeDate:    timestamppb.Now(),
 				},
 			},
@@ -306,7 +306,7 @@ func TestServer_RemoveIAMMember(t *testing.T) {
 			},
 			want: &admin_pb.RemoveIAMMemberResponse{
 				Details: &object.ObjectDetails{
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 					ChangeDate:    timestamppb.Now(),
 				},
 			},

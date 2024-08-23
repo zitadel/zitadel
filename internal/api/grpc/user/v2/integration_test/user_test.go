@@ -1846,7 +1846,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 				url: "https://example.com/oauth/v2/authorize",
 				parametersEqual: map[string]string{
@@ -1877,7 +1877,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 				url: "https://example.com/oauth/v2/authorize",
 				parametersEqual: map[string]string{
@@ -1908,7 +1908,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 				url: "https://example.com/oauth/v2/authorize",
 				parametersEqual: map[string]string{
@@ -1939,7 +1939,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 				url: "https://example.com/oauth/v2/authorize",
 				parametersEqual: map[string]string{
@@ -1970,7 +1970,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 				url:                "http://" + Instance.Domain + ":8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
@@ -1994,7 +1994,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 				url:                "http://" + Instance.Domain + ":8000/sso",
 				parametersExisting: []string{"RelayState", "SAMLRequest"},
@@ -2018,7 +2018,7 @@ func TestServer_StartIdentityProviderIntent(t *testing.T) {
 			want: want{
 				details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 				postForm: true,
 			},
@@ -2110,7 +2110,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(changeDate),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 					Sequence:      sequence,
 				},
 				IdpInformation: &user.IDPInformation{
@@ -2147,7 +2147,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(withUserchangeDate),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 					Sequence:      withUsersequence,
 				},
 				UserId: "user",
@@ -2185,7 +2185,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(ldapChangeDate),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 					Sequence:      ldapSequence,
 				},
 				IdpInformation: &user.IDPInformation{
@@ -2230,7 +2230,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(ldapWithUserChangeDate),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 					Sequence:      ldapWithUserSequence,
 				},
 				UserId: "user",
@@ -2276,7 +2276,7 @@ func TestServer_RetrieveIdentityProviderIntent(t *testing.T) {
 			want: &user.RetrieveIdentityProviderIntentResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.New(samlChangeDate),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 					Sequence:      samlSequence,
 				},
 				IdpInformation: &user.IDPInformation{

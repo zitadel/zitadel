@@ -174,7 +174,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			want: &schema.CreateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -243,7 +243,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			want: &schema.CreateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -317,7 +317,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			want: &schema.CreateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -420,7 +420,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -440,7 +440,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -517,7 +517,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -556,7 +556,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			want: &schema.UpdateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -635,7 +635,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 			want: &schema.DeactivateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -727,7 +727,7 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 			want: &schema.ReactivateUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},
@@ -787,7 +787,7 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 			want: &schema.DeleteUserSchemaResponse{
 				Details: &object.Details{
 					ChangeDate:    timestamppb.Now(),
-					ResourceOwner: Instance.Instance.Id,
+					ResourceOwner: Instance.ID(),
 				},
 			},
 		},

@@ -106,7 +106,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},
@@ -127,7 +127,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},
@@ -148,7 +148,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},
@@ -169,7 +169,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},
@@ -191,7 +191,7 @@ func TestServer_CreateTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},
@@ -276,7 +276,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},
@@ -303,7 +303,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},
@@ -326,7 +326,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},
@@ -349,7 +349,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},
@@ -374,7 +374,7 @@ func TestServer_PatchTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},
@@ -434,7 +434,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 				Changed: timestamppb.Now(),
 				Owner: &object.Owner{
 					Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-					Id:   instance.Instance.Id,
+					Id:   instance.ID(),
 				},
 			},
 		},

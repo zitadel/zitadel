@@ -44,7 +44,7 @@ func TestServer_Limits_Block(t *testing.T) {
 				assertGrpcError(tt, err, expectBlocked)
 				/*
 					//nolint:contextcheck
-					idpExists := idpExistsCondition(tt, isoInstance.Instance.Id, randomGrpcIdpName)
+					idpExists := idpExistsCondition(tt, isoInstance.ID(), randomGrpcIdpName)
 					if expectBlocked {
 						// We ensure that the idp really is not created
 						assert.Neverf(tt, idpExists, 5*time.Second, 1*time.Second, "idp should never be created")
@@ -147,13 +147,13 @@ func TestServer_Limits_Block(t *testing.T) {
 			},
 		}}
 	_, err := Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
-		InstanceId: isoInstance.Instance.Id,
+		InstanceId: isoInstance.ID(),
 		Block:      gu.Ptr(true),
 	})
 	require.NoError(t, err)
 	// The following call ensures that an undefined bool is not deserialized to false
 	_, err = Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
-		InstanceId:        isoInstance.Instance.Id,
+		InstanceId:        isoInstance.ID(),
 		AuditLogRetention: durationpb.New(time.Hour),
 	})
 	require.NoError(t, err)
@@ -165,7 +165,7 @@ func TestServer_Limits_Block(t *testing.T) {
 		})
 	}
 	_, err = Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
-		InstanceId: isoInstance.Instance.Id,
+		InstanceId: isoInstance.ID(),
 		Block:      gu.Ptr(false),
 	})
 	require.NoError(t, err)
