@@ -1083,6 +1083,30 @@ service UserService {
       };
     };
   }
+
+  // Create an invite code for a user
+  //
+  // Create an invite code for a user to initialize their first authentication method (password, passkeys, IdP) depending on the organization's available methods.
+  rpc CreateInviteCode (CreateInviteCodeRequest) returns (CreateInviteCodeResponse) {
+    option (google.api.http) = {
+      post: "/v2/users/{user_id}/invite_code"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "authenticated"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "OK";
+        }
+      };
+    };
+  }
 }
 
 message AddHumanUserRequest{
@@ -2075,4 +2099,27 @@ enum AuthenticationMethodType {
   AUTHENTICATION_METHOD_TYPE_U2F = 5;
   AUTHENTICATION_METHOD_TYPE_OTP_SMS = 6;
   AUTHENTICATION_METHOD_TYPE_OTP_EMAIL = 7;
+}
+
+message CreateInviteCodeRequest {
+  string user_id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1;
+      max_length: 200;
+      example: "\"69629026806489455\"";
+    }
+  ];
+  // if no verification is specified, an email is sent with the default url
+  oneof verification {
+    SendInviteCode send_code = 2;
+    ReturnInviteCode return_code = 3;
+  }
+}
+
+message CreateInviteCodeResponse {
+  zitadel.object.v2.Details details = 1;
+  // The invite code is returned if the verification was set to return_code.
+  optional string invite_code = 2;
 }

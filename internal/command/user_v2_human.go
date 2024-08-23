@@ -434,3 +434,51 @@ func (c *Commands) userHumanWriteModel(ctx context.Context, userID string, profi
 	}
 	return writeModel, nil
 }
+
+type CreateUserInvite struct {
+	UserID      string
+	URLTemplate string
+	ReturnCode  bool
+}
+
+func (c *Commands) CreateInviteCode(ctx context.Context, invite *CreateUserInvite) (details *domain.ObjectDetails, returnCode *string, err error) {
+	wm, err := c.userInviteCodeWriteModel(ctx, invite.UserID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !wm.UserState.Exists() {
+		return nil, nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-G8dh3", "Errors.User.NotFound")
+	}
+	code, err := c.newUserInviteCode(ctx, c.eventstore.Filter, c.userEncryption)
+	if err != nil {
+		return nil, nil, err
+	}
+	err = c.pushAppendAndReduce(ctx, wm, user.NewHumanInviteCodeAddedEvent(
+		ctx,
+		UserAggregateFromWriteModel(&wm.WriteModel),
+		code.Crypted,
+		code.Expiry,
+		invite.URLTemplate,
+		invite.ReturnCode,
+		"", // TODO: ?
+	))
+	if err != nil {
+		return nil, nil, err
+	}
+	if invite.ReturnCode {
+		returnCode = &code.Plain
+	}
+	return writeModelToObjectDetails(&wm.WriteModel), returnCode, nil
+}
+
+func (c *Commands) userInviteCodeWriteModel(ctx context.Context, userID string) (writeModel *UserV2InviteWriteModel, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	writeModel = newUserV2InviteWriteModel(userID)
+	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
+	if err != nil {
+		return nil, err
+	}
+	return writeModel, nil
+}

@@ -21,6 +21,7 @@ const (
 	HumanInitialCodeSentType           = humanEventPrefix + "initialization.code.sent"
 	HumanInitializedCheckSucceededType = humanEventPrefix + "initialization.check.succeeded"
 	HumanInitializedCheckFailedType    = humanEventPrefix + "initialization.check.failed"
+	HumanInviteCodeAddedType           = humanEventPrefix + "invite.code.added_test"
 	HumanSignedOutType                 = humanEventPrefix + "signed.out"
 )
 
@@ -377,6 +378,52 @@ func HumanInitializedCheckFailedEventMapper(event eventstore.Event) (eventstore.
 	return &HumanInitializedCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
+}
+
+type HumanInviteCodeAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	Code                 *crypto.CryptoValue `json:"code,omitempty"`
+	Expiry               time.Duration       `json:"expiry,omitempty"`
+	TriggeredAtOrigin    string              `json:"triggerOrigin,omitempty"`
+	AuthRequestID        string              `json:"authRequestID,omitempty"` //TODO: ?
+	URLTemplate          string              `json:"urlTemplate,omitempty"`
+	ReturnCode           bool                `json:"returnCode,omitempty"`
+}
+
+func (e *HumanInviteCodeAddedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *HumanInviteCodeAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func (e *HumanInviteCodeAddedEvent) TriggerOrigin() string {
+	return e.TriggeredAtOrigin
+}
+
+func NewHumanInviteCodeAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	code *crypto.CryptoValue,
+	expiry time.Duration,
+	urlTemplate string,
+	returnCode bool,
+	authRequestID string,
+) *HumanInviteCodeAddedEvent {
+	return &HumanInviteCodeAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			HumanInviteCodeAddedType,
+		),
+		Code:              code,
+		Expiry:            expiry,
+		TriggeredAtOrigin: http.DomainContext(ctx).Origin(),
+		AuthRequestID:     authRequestID,
+		URLTemplate:       urlTemplate,
+		ReturnCode:        returnCode,
+	}
 }
 
 type HumanSignedOutEvent struct {

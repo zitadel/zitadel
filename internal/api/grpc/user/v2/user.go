@@ -617,3 +617,34 @@ func authMethodTypeToPb(methodType domain.UserAuthMethodType) user.Authenticatio
 		return user.AuthenticationMethodType_AUTHENTICATION_METHOD_TYPE_UNSPECIFIED
 	}
 }
+
+func (s *Server) CreateInviteCode(ctx context.Context, req *user.CreateInviteCodeRequest) (*user.CreateInviteCodeResponse, error) {
+	invite, err := createInviteCodeRequestToCommand(req)
+	if err != nil {
+		return nil, err
+	}
+	details, code, err := s.command.CreateInviteCode(ctx, invite)
+	if err != nil {
+		return nil, err
+	}
+	return &user.CreateInviteCodeResponse{
+		Details:    object.DomainToDetailsPb(details),
+		InviteCode: code,
+	}, nil
+}
+
+func createInviteCodeRequestToCommand(req *user.CreateInviteCodeRequest) (*command.CreateUserInvite, error) {
+	switch req.GetVerification().(type) {
+	case *user.CreateInviteCodeRequest_SendCode:
+		urlTemplate := req.GetSendCode().GetUrlTemplate()
+		// test the template execution so the async notification will not fail because of it and the user won't realize
+		if err := domain.RenderConfirmURLTemplate(io.Discard, urlTemplate, req.GetUserId(), "code", "orgID"); err != nil {
+			return nil, err
+		}
+		return &command.CreateUserInvite{UserID: req.GetUserId(), URLTemplate: urlTemplate}, nil
+	case *user.CreateInviteCodeRequest_ReturnCode:
+		return &command.CreateUserInvite{UserID: req.GetUserId(), ReturnCode: true}, nil
+	default:
+		return &command.CreateUserInvite{UserID: req.GetUserId()}, nil
+	}
+}
