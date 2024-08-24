@@ -35,7 +35,6 @@ import (
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/settings/v2"
 	settings_v2beta "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
-	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
 	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
@@ -57,7 +56,6 @@ type Client struct {
 	OIDCv2         oidc_pb.OIDCServiceClient
 	OrgV2beta      org_v2beta.OrganizationServiceClient
 	OrgV2          org.OrganizationServiceClient
-	System         system.SystemServiceClient
 	ActionV3Alpha  action.ZITADELActionsClient
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
@@ -88,7 +86,6 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		OIDCv2:         oidc_pb.NewOIDCServiceClient(cc),
 		OrgV2beta:      org_v2beta.NewOrganizationServiceClient(cc),
 		OrgV2:          org.NewOrganizationServiceClient(cc),
-		System:         system.NewSystemServiceClient(cc),
 		ActionV3Alpha:  action.NewZITADELActionsClient(cc),
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),

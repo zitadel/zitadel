@@ -25,7 +25,8 @@ import (
 )
 
 func TestServer_ExecutionTarget(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
+	t.Parallel()
+	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 

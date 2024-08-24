@@ -4,16 +4,13 @@ package webkey_test
 
 import (
 	"context"
-	"net"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -26,53 +23,48 @@ import (
 )
 
 var (
-	CTX       context.Context
-	SystemCTX context.Context
-	Instance  *integration.Instance
+	CTX context.Context
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Hour/4)
 		defer cancel()
-
-		Instance = integration.GetInstance(ctx)
-
-		SystemCTX = Instance.WithAuthorization(ctx, integration.UserTypeSystem)
-		CTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		CTX = ctx
 		return m.Run()
 	}())
 }
 
 func TestServer_Feature_Disabled(t *testing.T) {
-	client, iamCTX := createInstanceAndClients(t, false)
+	instance, iamCtx := createInstance(t, false)
+	client := instance.Client.WebKeyV3Alpha
 
 	t.Run("CreateWebKey", func(t *testing.T) {
-		_, err := client.CreateWebKey(iamCTX, &webkey.CreateWebKeyRequest{})
+		_, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{})
 		assertFeatureDisabledError(t, err)
 	})
 	t.Run("ActivateWebKey", func(t *testing.T) {
-		_, err := client.ActivateWebKey(iamCTX, &webkey.ActivateWebKeyRequest{
+		_, err := client.ActivateWebKey(iamCtx, &webkey.ActivateWebKeyRequest{
 			Id: "1",
 		})
 		assertFeatureDisabledError(t, err)
 	})
 	t.Run("DeleteWebKey", func(t *testing.T) {
-		_, err := client.DeleteWebKey(iamCTX, &webkey.DeleteWebKeyRequest{
+		_, err := client.DeleteWebKey(iamCtx, &webkey.DeleteWebKeyRequest{
 			Id: "1",
 		})
 		assertFeatureDisabledError(t, err)
 	})
 	t.Run("ListWebKeys", func(t *testing.T) {
-		_, err := client.ListWebKeys(iamCTX, &webkey.ListWebKeysRequest{})
+		_, err := client.ListWebKeys(iamCtx, &webkey.ListWebKeysRequest{})
 		assertFeatureDisabledError(t, err)
 	})
 }
 
 func TestServer_ListWebKeys(t *testing.T) {
-	client, iamCtx := createInstanceAndClients(t, true)
+	instance, iamCtx := createInstance(t, true)
 	// After the feature is first enabled, we can expect 2 generated keys with the default config.
-	checkWebKeyListState(iamCtx, t, client, 2, "", &webkey.WebKey_Rsa{
+	checkWebKeyListState(iamCtx, t, instance, 2, "", &webkey.WebKey_Rsa{
 		Rsa: &webkey.WebKeyRSAConfig{
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
@@ -81,7 +73,9 @@ func TestServer_ListWebKeys(t *testing.T) {
 }
 
 func TestServer_CreateWebKey(t *testing.T) {
-	client, iamCtx := createInstanceAndClients(t, true)
+	instance, iamCtx := createInstance(t, true)
+	client := instance.Client.WebKeyV3Alpha
+
 	_, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
 		Key: &webkey.WebKey{
 			Config: &webkey.WebKey_Rsa{
@@ -94,7 +88,7 @@ func TestServer_CreateWebKey(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	checkWebKeyListState(iamCtx, t, client, 3, "", &webkey.WebKey_Rsa{
+	checkWebKeyListState(iamCtx, t, instance, 3, "", &webkey.WebKey_Rsa{
 		Rsa: &webkey.WebKeyRSAConfig{
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
@@ -103,7 +97,9 @@ func TestServer_CreateWebKey(t *testing.T) {
 }
 
 func TestServer_ActivateWebKey(t *testing.T) {
-	client, iamCtx := createInstanceAndClients(t, true)
+	instance, iamCtx := createInstance(t, true)
+	client := instance.Client.WebKeyV3Alpha
+
 	resp, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
 		Key: &webkey.WebKey{
 			Config: &webkey.WebKey_Rsa{
@@ -121,7 +117,7 @@ func TestServer_ActivateWebKey(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	checkWebKeyListState(iamCtx, t, client, 3, resp.GetDetails().GetId(), &webkey.WebKey_Rsa{
+	checkWebKeyListState(iamCtx, t, instance, 3, resp.GetDetails().GetId(), &webkey.WebKey_Rsa{
 		Rsa: &webkey.WebKeyRSAConfig{
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
@@ -130,7 +126,9 @@ func TestServer_ActivateWebKey(t *testing.T) {
 }
 
 func TestServer_DeleteWebKey(t *testing.T) {
-	client, iamCtx := createInstanceAndClients(t, true)
+	instance, iamCtx := createInstance(t, true)
+	client := instance.Client.WebKeyV3Alpha
+
 	keyIDs := make([]string, 2)
 	for i := 0; i < 2; i++ {
 		resp, err := client.CreateWebKey(iamCtx, &webkey.CreateWebKeyRequest{
@@ -175,7 +173,7 @@ func TestServer_DeleteWebKey(t *testing.T) {
 	}
 
 	// There are 2 keys from feature setup, +2 created, -1 deleted = 3
-	checkWebKeyListState(iamCtx, t, client, 3, keyIDs[0], &webkey.WebKey_Rsa{
+	checkWebKeyListState(iamCtx, t, instance, 3, keyIDs[0], &webkey.WebKey_Rsa{
 		Rsa: &webkey.WebKeyRSAConfig{
 			Bits:   webkey.WebKeyRSAConfig_RSA_BITS_2048,
 			Hasher: webkey.WebKeyRSAConfig_RSA_HASHER_SHA256,
@@ -183,25 +181,20 @@ func TestServer_DeleteWebKey(t *testing.T) {
 	})
 }
 
-func createInstanceAndClients(t *testing.T, enableFeature bool) (webkey.ZITADELWebKeysClient, context.Context) {
-	instance := Instance.UseIsolatedInstance(CTX)
-	cc, err := grpc.NewClient(
-		net.JoinHostPort(instance.Domain, "8080"),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	require.NoError(t, err)
-
+func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, context.Context) {
+	t.Parallel()
+	instance := integration.NewInstance(CTX)
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
 	if enableFeature {
-		features := feature.NewFeatureServiceClient(cc)
-		_, err = features.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
+		_, err := instance.Client.FeatureV2.SetInstanceFeatures(iamCTX, &feature.SetInstanceFeaturesRequest{
 			WebKey: proto.Bool(true),
 		})
 		require.NoError(t, err)
 		time.Sleep(time.Second)
 	}
 
-	return instance.Client.WebKeyV3Alpha, iamCTX
+	return instance, iamCTX
 }
 
 func assertFeatureDisabledError(t *testing.T, err error) {
@@ -212,8 +205,8 @@ func assertFeatureDisabledError(t *testing.T, err error) {
 	assert.Contains(t, s.Message(), "WEBKEY-Ohx6E")
 }
 
-func checkWebKeyListState(ctx context.Context, t *testing.T, client webkey.ZITADELWebKeysClient, nKeys int, expectActiveKeyID string, config any) {
-	resp, err := client.ListWebKeys(ctx, &webkey.ListWebKeysRequest{})
+func checkWebKeyListState(ctx context.Context, t *testing.T, instance *integration.Instance, nKeys int, expectActiveKeyID string, config any) {
+	resp, err := instance.Client.WebKeyV3Alpha.ListWebKeys(ctx, &webkey.ListWebKeysRequest{})
 	require.NoError(t, err)
 	list := resp.GetWebKeys()
 	require.Len(t, list, nKeys)
@@ -226,7 +219,7 @@ func checkWebKeyListState(ctx context.Context, t *testing.T, client webkey.ZITAD
 			Changed: timestamppb.Now(),
 			Owner: &object.Owner{
 				Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-				Id:   Instance.ID(),
+				Id:   instance.ID(),
 			},
 		}, key.GetDetails())
 		assert.WithinRange(t, key.GetDetails().GetChanged().AsTime(), now.Add(-time.Minute), now.Add(time.Minute))

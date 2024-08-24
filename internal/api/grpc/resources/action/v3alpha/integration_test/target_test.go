@@ -21,7 +21,8 @@ import (
 )
 
 func TestServer_CreateTarget(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
+	t.Parallel()
+	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	tests := []struct {
@@ -210,7 +211,7 @@ func TestServer_CreateTarget(t *testing.T) {
 }
 
 func TestServer_PatchTarget(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
+	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	type args struct {
@@ -397,7 +398,7 @@ func TestServer_PatchTarget(t *testing.T) {
 }
 
 func TestServer_DeleteTarget(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
+	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	target := instance.CreateTarget(CTX, t, "https://example.com", domain.TargetTypeWebhook, false)

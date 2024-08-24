@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 		defer cancel()
 
-		Instance = integration.GetInstance(ctx)
+		Instance = integration.NewInstance(ctx)
 		CTX = ctx
 		OrgCTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.Mgmt

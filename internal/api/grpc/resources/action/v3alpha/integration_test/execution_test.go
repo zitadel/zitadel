@@ -25,7 +25,8 @@ func executionTargetsSingleInclude(include *action.Condition) []*action.Executio
 }
 
 func TestServer_SetExecution_Request(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
+	t.Parallel()
+	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
@@ -207,7 +208,8 @@ func TestServer_SetExecution_Request(t *testing.T) {
 }
 
 func TestServer_SetExecution_Request_Include(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
+	t.Parallel()
+	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
@@ -345,7 +347,8 @@ func TestServer_SetExecution_Request_Include(t *testing.T) {
 }
 
 func TestServer_SetExecution_Response(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
+	t.Parallel()
+	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
@@ -526,7 +529,8 @@ func TestServer_SetExecution_Response(t *testing.T) {
 }
 
 func TestServer_SetExecution_Event(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
+	t.Parallel()
+	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://notexisting", domain.TargetTypeWebhook, false)
@@ -713,7 +717,8 @@ func TestServer_SetExecution_Event(t *testing.T) {
 }
 
 func TestServer_SetExecution_Function(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
+	t.Parallel()
+	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	targetResp := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://notexisting", domain.TargetTypeWebhook, false)

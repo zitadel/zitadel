@@ -11,10 +11,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/zitadel/zitadel/internal/integration"
 	object "github.com/zitadel/zitadel/pkg/grpc/object/v2"
 	user "github.com/zitadel/zitadel/pkg/grpc/user/v2"
-
-	"github.com/zitadel/zitadel/internal/integration"
 )
 
 func TestServer_RequestPasswordReset(t *testing.T) {

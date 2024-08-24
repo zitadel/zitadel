@@ -24,15 +24,14 @@ import (
 var callURL = sink.CallURL(sink.ChannelQuota)
 
 func TestServer_QuotaNotification_Limit(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
-	systemCTX := instance.WithAuthorization(CTX, integration.UserTypeSystem)
+	instance := integration.NewInstance(CTX)
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	amount := 10
 	percent := 50
 	percentAmount := amount * percent / 100
 
-	_, err := instance.Client.System.SetQuota(systemCTX, &system.SetQuotaRequest{
+	_, err := integration.SystemClient().SetQuota(CTX, &system.SetQuotaRequest{
 		InstanceId:    instance.Instance.Id,
 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 		From:          timestamppb.Now(),
@@ -74,15 +73,14 @@ func TestServer_QuotaNotification_Limit(t *testing.T) {
 }
 
 func TestServer_QuotaNotification_NoLimit(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
-	systemCTX := instance.WithAuthorization(CTX, integration.UserTypeSystem)
+	instance := integration.NewInstance(CTX)
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
 	amount := 10
 	percent := 50
 	percentAmount := amount * percent / 100
 
-	_, err := instance.Client.System.SetQuota(systemCTX, &system.SetQuotaRequest{
+	_, err := integration.SystemClient().SetQuota(CTX, &system.SetQuotaRequest{
 		InstanceId:    instance.Instance.Id,
 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 		From:          timestamppb.Now(),
@@ -164,10 +162,9 @@ func awaitNotification(t *testing.T, sub *sink.Subscription, unit quota.Unit, pe
 }
 
 func TestServer_AddAndRemoveQuota(t *testing.T) {
-	instance := Instance.UseIsolatedInstance(CTX)
-	systemCTX := instance.WithAuthorization(CTX, integration.UserTypeSystem)
+	instance := integration.NewInstance(CTX)
 
-	got, err := instance.Client.System.SetQuota(systemCTX, &system.SetQuotaRequest{
+	got, err := integration.SystemClient().SetQuota(CTX, &system.SetQuotaRequest{
 		InstanceId:    instance.Instance.Id,
 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 		From:          timestamppb.Now(),
@@ -185,7 +182,7 @@ func TestServer_AddAndRemoveQuota(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, got.Details.ResourceOwner, instance.Instance.Id)
 
-	gotAlreadyExisting, errAlreadyExisting := instance.Client.System.SetQuota(systemCTX, &system.SetQuotaRequest{
+	gotAlreadyExisting, errAlreadyExisting := integration.SystemClient().SetQuota(CTX, &system.SetQuotaRequest{
 		InstanceId:    instance.Instance.Id,
 		Unit:          quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 		From:          timestamppb.Now(),
@@ -203,14 +200,14 @@ func TestServer_AddAndRemoveQuota(t *testing.T) {
 	require.Nil(t, errAlreadyExisting)
 	require.Equal(t, gotAlreadyExisting.Details.ResourceOwner, instance.Instance.Id)
 
-	gotRemove, errRemove := instance.Client.System.RemoveQuota(systemCTX, &system.RemoveQuotaRequest{
+	gotRemove, errRemove := integration.SystemClient().RemoveQuota(CTX, &system.RemoveQuotaRequest{
 		InstanceId: instance.Instance.Id,
 		Unit:       quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 	})
 	require.NoError(t, errRemove)
 	require.Equal(t, gotRemove.Details.ResourceOwner, instance.Instance.Id)
 
-	gotRemoveAlready, errRemoveAlready := instance.Client.System.RemoveQuota(systemCTX, &system.RemoveQuotaRequest{
+	gotRemoveAlready, errRemoveAlready := integration.SystemClient().RemoveQuota(CTX, &system.RemoveQuotaRequest{
 		InstanceId: instance.Instance.Id,
 		Unit:       quota_pb.Unit_UNIT_REQUESTS_ALL_AUTHENTICATED,
 	})

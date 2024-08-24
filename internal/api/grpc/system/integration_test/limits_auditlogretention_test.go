@@ -24,7 +24,7 @@ import (
 func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	t.Parallel()
 
-	isoInstance := Instance.UseIsolatedInstance(CTX)
+	isoInstance := integration.NewInstance(CTX)
 	iamOwnerCtx := isoInstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	userID, projectID, appID, projectGrantID := seedObjects(iamOwnerCtx, t, isoInstance.Client)
 	beforeTime := time.Now()
@@ -37,7 +37,7 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	addedCount := requireEventually(t, iamOwnerCtx, isoInstance.Client, userID, projectID, appID, projectGrantID, func(c assert.TestingT, counts *eventCounts) {
 		counts.assertAll(t, c, "added events are > seeded events", assert.Greater, seededCount)
 	}, "wait for added event assertions to pass")
-	_, err := Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+	_, err := integration.SystemClient().SetLimits(CTX, &system.SetLimitsRequest{
 		InstanceId:        isoInstance.ID(),
 		AuditLogRetention: durationpb.New(time.Now().Sub(beforeTime)),
 	})
@@ -58,7 +58,7 @@ func TestServer_Limits_AuditLogRetention(t *testing.T) {
 	}}})
 	require.NoError(t, err)
 	assert.LessOrEqual(t, len(listedEvents.GetEvents()), limitedCounts.all, "ListEvents with since query older than retention doesn't return more events")
-	_, err = isoInstance.Client.System.ResetLimits(SystemCTX, &system.ResetLimitsRequest{
+	_, err = integration.SystemClient().ResetLimits(CTX, &system.ResetLimitsRequest{
 		InstanceId: isoInstance.ID(),
 	})
 	require.NoError(t, err)

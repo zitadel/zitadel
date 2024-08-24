@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _UserTypeName = "unspecifiedsystemiam_ownerorg_ownerlogin"
+const _UserTypeName = "unspecifiediam_ownerorg_ownerlogin"
 
-var _UserTypeIndex = [...]uint8{0, 11, 17, 26, 35, 40}
+var _UserTypeIndex = [...]uint8{0, 11, 20, 29, 34}
 
-const _UserTypeLowerName = "unspecifiedsystemiam_ownerorg_ownerlogin"
+const _UserTypeLowerName = "unspecifiediam_ownerorg_ownerlogin"
 
 func (i UserType) String() string {
 	if i < 0 || i >= UserType(len(_UserTypeIndex)-1) {
@@ -25,33 +25,29 @@ func (i UserType) String() string {
 func _UserTypeNoOp() {
 	var x [1]struct{}
 	_ = x[UserTypeUnspecified-(0)]
-	_ = x[UserTypeSystem-(1)]
-	_ = x[UserTypeIAMOwner-(2)]
-	_ = x[UserTypeOrgOwner-(3)]
-	_ = x[UserTypeLogin-(4)]
+	_ = x[UserTypeIAMOwner-(1)]
+	_ = x[UserTypeOrgOwner-(2)]
+	_ = x[UserTypeLogin-(3)]
 }
 
-var _UserTypeValues = []UserType{UserTypeUnspecified, UserTypeSystem, UserTypeIAMOwner, UserTypeOrgOwner, UserTypeLogin}
+var _UserTypeValues = []UserType{UserTypeUnspecified, UserTypeIAMOwner, UserTypeOrgOwner, UserTypeLogin}
 
 var _UserTypeNameToValueMap = map[string]UserType{
 	_UserTypeName[0:11]:       UserTypeUnspecified,
 	_UserTypeLowerName[0:11]:  UserTypeUnspecified,
-	_UserTypeName[11:17]:      UserTypeSystem,
-	_UserTypeLowerName[11:17]: UserTypeSystem,
-	_UserTypeName[17:26]:      UserTypeIAMOwner,
-	_UserTypeLowerName[17:26]: UserTypeIAMOwner,
-	_UserTypeName[26:35]:      UserTypeOrgOwner,
-	_UserTypeLowerName[26:35]: UserTypeOrgOwner,
-	_UserTypeName[35:40]:      UserTypeLogin,
-	_UserTypeLowerName[35:40]: UserTypeLogin,
+	_UserTypeName[11:20]:      UserTypeIAMOwner,
+	_UserTypeLowerName[11:20]: UserTypeIAMOwner,
+	_UserTypeName[20:29]:      UserTypeOrgOwner,
+	_UserTypeLowerName[20:29]: UserTypeOrgOwner,
+	_UserTypeName[29:34]:      UserTypeLogin,
+	_UserTypeLowerName[29:34]: UserTypeLogin,
 }
 
 var _UserTypeNames = []string{
 	_UserTypeName[0:11],
-	_UserTypeName[11:17],
-	_UserTypeName[17:26],
-	_UserTypeName[26:35],
-	_UserTypeName[35:40],
+	_UserTypeName[11:20],
+	_UserTypeName[20:29],
+	_UserTypeName[29:34],
 }
 
 // UserTypeString retrieves an enum value from the enum constants string name.

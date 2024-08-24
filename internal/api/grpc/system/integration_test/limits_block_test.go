@@ -28,7 +28,7 @@ import (
 func TestServer_Limits_Block(t *testing.T) {
 	t.Parallel()
 
-	isoInstance := Instance.UseIsolatedInstance(CTX)
+	isoInstance := integration.NewInstance(CTX)
 	iamOwnerCtx := isoInstance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 	tests := []*test{
 		publicAPIBlockingTest(isoInstance.Domain),
@@ -68,7 +68,7 @@ func TestServer_Limits_Block(t *testing.T) {
 				if err != nil {
 					return nil, err, nil
 				}
-				req.Header.Set("Authorization", Instance.BearerToken(iamOwnerCtx))
+				req.Header.Set("Authorization", isoInstance.BearerToken(iamOwnerCtx))
 				return req, nil, func(ttt assert.TestingT, response *http.Response, expectBlocked bool) {
 					assertLimitResponse(ttt, response, expectBlocked)
 					assertSetLimitingCookie(ttt, response, expectBlocked)
@@ -146,13 +146,13 @@ func TestServer_Limits_Block(t *testing.T) {
 				}
 			},
 		}}
-	_, err := Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+	_, err := integration.SystemClient().SetLimits(CTX, &system.SetLimitsRequest{
 		InstanceId: isoInstance.ID(),
 		Block:      gu.Ptr(true),
 	})
 	require.NoError(t, err)
 	// The following call ensures that an undefined bool is not deserialized to false
-	_, err = Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+	_, err = integration.SystemClient().SetLimits(CTX, &system.SetLimitsRequest{
 		InstanceId:        isoInstance.ID(),
 		AuditLogRetention: durationpb.New(time.Hour),
 	})
@@ -164,7 +164,7 @@ func TestServer_Limits_Block(t *testing.T) {
 			testBlockingAPI(t, tt, true, isFirst)
 		})
 	}
-	_, err = Instance.Client.System.SetLimits(SystemCTX, &system.SetLimitsRequest{
+	_, err = integration.SystemClient().SetLimits(CTX, &system.SetLimitsRequest{
 		InstanceId: isoInstance.ID(),
 		Block:      gu.Ptr(false),
 	})

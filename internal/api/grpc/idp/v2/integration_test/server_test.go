@@ -13,12 +13,11 @@ import (
 )
 
 var (
-	CTX       context.Context
-	IamCTX    context.Context
-	UserCTX   context.Context
-	SystemCTX context.Context
-	Instance  *integration.Instance
-	Client    idp_pb.IdentityProviderServiceClient
+	CTX      context.Context
+	IamCTX   context.Context
+	UserCTX  context.Context
+	Instance *integration.Instance
+	Client   idp_pb.IdentityProviderServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -26,11 +25,10 @@ func TestMain(m *testing.M) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Hour/4)
 		defer cancel()
 
-		Instance = integration.GetInstance(ctx)
+		Instance = integration.NewInstance(ctx)
 
 		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
 		IamCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		SystemCTX = Instance.WithAuthorization(ctx, integration.UserTypeSystem)
 		CTX = Instance.WithAuthorization(ctx, integration.UserTypeOrgOwner)
 		Client = Instance.Client.IDPv2
 		return m.Run()

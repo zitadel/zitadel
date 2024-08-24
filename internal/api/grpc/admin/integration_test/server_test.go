@@ -16,9 +16,9 @@ import (
 )
 
 var (
-	CTX, AdminCTX, SystemCTX context.Context
-	Instance                 *integration.Instance
-	Client                   admin_pb.AdminServiceClient
+	CTX, AdminCTX context.Context
+	Instance      *integration.Instance
+	Client        admin_pb.AdminServiceClient
 )
 
 func TestMain(m *testing.M) {
@@ -26,10 +26,9 @@ func TestMain(m *testing.M) {
 		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 		defer cancel()
 
-		Instance = integration.GetInstance(ctx)
+		Instance = integration.NewInstance(ctx)
 		CTX = ctx
 		AdminCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
-		SystemCTX = Instance.WithAuthorization(ctx, integration.UserTypeSystem)
 		Client = Instance.Client.Admin
 		return m.Run()
 	}())
