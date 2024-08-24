@@ -78,6 +78,7 @@ import (
 	new_es "github.com/zitadel/zitadel/internal/eventstore/v3"
 	"github.com/zitadel/zitadel/internal/i18n"
 	"github.com/zitadel/zitadel/internal/id"
+	"github.com/zitadel/zitadel/internal/integration/sink"
 	"github.com/zitadel/zitadel/internal/logstore"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/access"
 	"github.com/zitadel/zitadel/internal/logstore/emitters/execution"
@@ -136,6 +137,10 @@ type Server struct {
 
 func startZitadel(ctx context.Context, config *Config, masterKey string, server chan<- *Server) error {
 	showBasicInformation(config)
+
+	// sink Server is stubbed out in production builds, see function's godoc.
+	closeSink := sink.StartServer()
+	defer closeSink()
 
 	i18n.MustLoadSupportedLanguagesFromDir()
 

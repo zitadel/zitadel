@@ -106,7 +106,7 @@ core_unit_test:
 
 .PHONY: core_integration_setup
 core_integration_setup:
-	go build -cover -race -o zitadel.test main.go
+	go build -cover -race -tags integration -o zitadel.test main.go
 	mkdir -p tmp/coverage
 	GORACE="halt_on_error=1" GOCOVERDIR="tmp/coverage" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
 	GORACE="halt_on_error=1" GOCOVERDIR="tmp/coverage" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/steps.yaml
