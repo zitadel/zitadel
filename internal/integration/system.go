@@ -23,7 +23,7 @@ var (
 	// SystemClient creates a system connection once and reuses it on every use.
 	// Each client call automatically gets the authorization context for the system user.
 	SystemClient = sync.OnceValue[system.SystemServiceClient](systemClient)
-	SystemToken  = systemUserToken()
+	SystemToken  string
 )
 
 func systemClient() system.SystemServiceClient {

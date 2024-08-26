@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"time"
@@ -19,7 +18,6 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/metadata"
-	"sigs.k8s.io/yaml"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/net"
@@ -34,49 +32,11 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/user"
 )
 
-type Config struct {
-	Hostname     string
-	Port         uint16
-	Secure       bool
-	LoginURLV2   string
-	LogoutURLV2  string
-	WebAuthNName string
-}
-
-var (
-	//go:embed config/client.yaml
-	clientYAML []byte
-)
-
-var (
-	tmpDir       string
-	loadedConfig Config
-)
-
-func init() {
-	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
-	out, err := cmd.Output()
-	if err != nil {
-		panic(err)
-	}
-	tmpDir = filepath.Join(string(bytes.TrimSpace(out)), "tmp")
-
-	if err := yaml.Unmarshal(clientYAML, &loadedConfig); err != nil {
-		panic(err)
-	}
-}
-
-// TmpDir returns the absolute path to the projects's temp directory.
-func TmpDir() string {
-	return tmpDir
-}
-
 // NotEmpty can be used as placeholder, when the returned values is unknown.
 // It can be used in tests to assert whether a value should be empty or not.
 const NotEmpty = "not empty"
 
 const (
-	stateFile    = "integration_test_state.json"
 	adminPATFile = "admin-pat.txt"
 )
 
@@ -164,6 +124,8 @@ func GetFirstInstance(ctx context.Context) *Instance {
 // The instance is isolated and is safe for parallel testing.
 func NewInstance(ctx context.Context) *Instance {
 	primaryDomain := RandString(5) + ".integration.localhost"
+
+	ctx = WithSystemAuthorization(ctx)
 	resp, err := SystemClient().CreateInstance(ctx, &system.CreateInstanceRequest{
 		InstanceName: "testinstance",
 		CustomDomain: primaryDomain,

@@ -1,0 +1,48 @@
+package integration
+
+import (
+	"bytes"
+	_ "embed"
+	"os/exec"
+	"path/filepath"
+
+	"sigs.k8s.io/yaml"
+)
+
+type Config struct {
+	Hostname     string
+	Port         uint16
+	Secure       bool
+	LoginURLV2   string
+	LogoutURLV2  string
+	WebAuthNName string
+}
+
+var (
+	//go:embed config/client.yaml
+	clientYAML []byte
+)
+
+var (
+	tmpDir       string
+	loadedConfig Config
+)
+
+// TmpDir returns the absolute path to the projects's temp directory.
+func TmpDir() string {
+	return tmpDir
+}
+
+func init() {
+	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+	out, err := cmd.Output()
+	if err != nil {
+		panic(err)
+	}
+	tmpDir = filepath.Join(string(bytes.TrimSpace(out)), "tmp")
+
+	if err := yaml.Unmarshal(clientYAML, &loadedConfig); err != nil {
+		panic(err)
+	}
+	SystemToken = systemUserToken()
+}
