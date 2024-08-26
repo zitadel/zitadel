@@ -1783,7 +1783,7 @@
       "TYPE": {
         "OWNED": "Proyectos propios",
         "OWNED_SINGULAR": "Proyecto propio",
-        "GRANTED_SINGULAR": "Proyecto concedido"
+        "GRANTED_SINGULAR": "Proyecto asignado {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Ajustes de imagen de marca",
@@ -2059,10 +2059,10 @@
       "ISAUTOCREATION_DESC": "Si se selecciona, una cuenta se creará si aún no existiera.",
       "ISAUTOUPDATE": "Actualización automática",
       "ISAUTOUPDATE_DESC": "Si se selecciona, las cuentas se actualizarán en la reautenticación.",
-      "ISCREATIONALLOWED": "Creación de cuentas permitida",
-      "ISCREATIONALLOWED_DESC": "Determina si se pueden crear cuentas.",
-      "ISLINKINGALLOWED": "Permitida la vinculación de cuentas",
-      "ISLINKINGALLOWED_DESC": "Determina si una identidad puede vincularse a una cuenta existente.",
+      "ISCREATIONALLOWED": "Creación de cuenta permitida (manualmente)",
+      "ISCREATIONALLOWED_DESC": "Determina si las cuentas se pueden crear usando una cuenta externa. Deshabilita si los usuarios no deberían poder editar la información de la cuenta cuando la creación automática está habilitada.",
+      "ISLINKINGALLOWED": "Enlace de cuenta permitido (manualmente)",
+      "ISLINKINGALLOWED_DESC": "Determina si una identidad se puede vincular manualmente a una cuenta existente. Deshabilita si los usuarios solo deberían poder vincular la cuenta propuesta en caso de vinculación automática activa.",
       "AUTOLINKING_DESC": "Determina si se pedirá a una identidad que se vincule a una cuenta existente.",
       "AUTOLINKINGTYPE": {
         "0": "Desactivado",

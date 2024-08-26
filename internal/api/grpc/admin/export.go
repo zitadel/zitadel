@@ -36,7 +36,7 @@ func (s *Server) ExportData(ctx context.Context, req *admin_pb.ExportDataRequest
 		}
 		orgSearchQuery.Queries = []query.SearchQuery{orgIDsSearchQuery}
 	}
-	queriedOrgs, err := s.query.SearchOrgs(ctx, orgSearchQuery)
+	queriedOrgs, err := s.query.SearchOrgs(ctx, orgSearchQuery, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -468,7 +468,7 @@ func (s *Server) getUserLinks(ctx context.Context, orgID string) (_ []*idp_pb.ID
 	if err != nil {
 		return nil, err
 	}
-	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}}, false)
+	idpUserLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userLinksResourceOwner}}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -554,7 +554,7 @@ func (s *Server) getUsers(ctx context.Context, org string, withPasswords bool, w
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
-	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}})
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{orgSearch}}, nil)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}

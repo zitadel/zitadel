@@ -3,12 +3,14 @@ package execution
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/zitadel/logging"
 
+	zhttp "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/telemetry/tracing"
 	"github.com/zitadel/zitadel/internal/zerrors"
@@ -46,7 +48,7 @@ func CallTargets(
 		}
 		if len(resp) > 0 {
 			// error in unmarshalling
-			if err := info.SetHTTPResponseBody(resp); err != nil {
+			if err := info.SetHTTPResponseBody(resp); err != nil && target.IsInterruptOnError() {
 				return nil, err
 			}
 		}
@@ -73,10 +75,10 @@ func CallTarget(
 		return nil, webhook(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
 	// get request, return response and error
 	case domain.TargetTypeCall:
-		return call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
+		return Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody())
 	case domain.TargetTypeAsync:
 		go func(target Target, info ContextInfoRequest) {
-			if _, err := call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody()); err != nil {
+			if _, err := Call(ctx, target.GetEndpoint(), target.GetTimeout(), info.GetHTTPRequestBody()); err != nil {
 				logging.WithFields("target", target.GetTargetID()).OnError(err).Info(err)
 			}
 		}(target, info)
@@ -88,12 +90,12 @@ func CallTarget(
 
 // webhook call a webhook, ignore the response but return the errror
 func webhook(ctx context.Context, url string, timeout time.Duration, body []byte) error {
-	_, err := call(ctx, url, timeout, body)
+	_, err := Call(ctx, url, timeout, body)
 	return err
 }
 
-// call function to do a post HTTP request to a desired url with timeout
-func call(ctx context.Context, url string, timeout time.Duration, body []byte) (_ []byte, err error) {
+// Call function to do a post HTTP request to a desired url with timeout
+func Call(ctx context.Context, url string, timeout time.Duration, body []byte) (_ []byte, err error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() {
@@ -114,9 +116,35 @@ func call(ctx context.Context, url string, timeout time.Duration, body []byte) (
 	}
 	defer resp.Body.Close()
 
+	return HandleResponse(resp)
+}
+
+func HandleResponse(resp *http.Response) ([]byte, error) {
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
 	// Check for success between 200 and 299, redirect 300 to 399 is handled by the client, return error with statusCode >= 400
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
-		return io.ReadAll(resp.Body)
+		var errorBody ErrorBody
+		if err := json.Unmarshal(data, &errorBody); err != nil {
+			// if json unmarshal fails, body has no ErrorBody information, so will be taken as successful response
+			return data, nil
+		}
+		if errorBody.ForwardedStatusCode != 0 || errorBody.ForwardedErrorMessage != "" {
+			if errorBody.ForwardedStatusCode >= 400 && errorBody.ForwardedStatusCode < 500 {
+				return nil, zhttp.HTTPStatusCodeToZitadelError(nil, errorBody.ForwardedStatusCode, "EXEC-reUaUZCzCp", errorBody.ForwardedErrorMessage)
+			}
+			return nil, zerrors.ThrowPreconditionFailed(nil, "EXEC-bmhNhpcqpF", errorBody.ForwardedErrorMessage)
+		}
+		// no ErrorBody filled in response, so will be taken as successful response
+		return data, nil
 	}
-	return nil, zerrors.ThrowUnknown(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed")
+
+	return nil, zerrors.ThrowPreconditionFailed(nil, "EXEC-dra6yamk98", "Errors.Execution.Failed")
+}
+
+type ErrorBody struct {
+	ForwardedStatusCode   int    `json:"forwardedStatusCode,omitempty"`
+	ForwardedErrorMessage string `json:"forwardedErrorMessage,omitempty"`
 }

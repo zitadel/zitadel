@@ -1831,7 +1831,7 @@ func TestCommands_verifyUserEmailWithGenerator(t *testing.T) {
 			}
 			got, err := c.verifyUserEmailWithGenerator(context.Background(), tt.args.userID, tt.args.code, GetMockSecretGenerator(t))
 			require.ErrorIs(t, err, tt.wantErr)
-			assert.Equal(t, got, tt.want)
+			assertObjectDetails(t, tt.want, got)
 		})
 	}
 }

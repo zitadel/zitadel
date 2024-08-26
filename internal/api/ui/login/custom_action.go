@@ -479,7 +479,7 @@ func (l *Login) resourceOwnerOfUserIDPLink(ctx context.Context, idpConfigID stri
 	queries := []query.SearchQuery{
 		idQuery, externalIDQuery,
 	}
-	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, nil)
 	if err != nil {
 		return "", err
 	}

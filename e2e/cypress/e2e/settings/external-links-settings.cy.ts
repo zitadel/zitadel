@@ -17,7 +17,6 @@ describe('external link settings', () => {
   });
 
   describe('instance', () => {
-
     beforeEach(`visit`, () => {
       cy.visit(`/instance?id=privacypolicy`);
     });
@@ -94,5 +93,4 @@ describe('external link settings', () => {
       cy.get('[formcontrolname="docsLink"]').should('value', docsLink);
     });
   });
-})
-
+});

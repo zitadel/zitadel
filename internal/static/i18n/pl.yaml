@@ -495,6 +495,7 @@ Errors:
     SQLStatement: Instrukcja SQL nie mogła zostać utworzona
     InvalidRequest: Żądanie jest nieprawidłowe
     TooManyNestingLevels: Zbyt wiele poziomów zagnieżdżenia zapytań (maks. 20)
+    LimitExceeded: Limit przekroczony
   Quota:
     AlreadyExists: Limit już istnieje dla tej jednostki
     NotFound: Nie znaleziono limitu dla tej jednostki
@@ -563,6 +564,8 @@ Errors:
     NotFound: Nie znaleziono wykonania
     IncludeNotFound: Nie znaleziono uwzględnienia
     NoTargets: Nie zdefiniowano celów
+    Failed: Wykonanie nie powiodło się
+    ResponseIsNotValidJSON: Odpowiedź nie jest prawidłowym JSON-em
   UserSchema:
     NotEnabled: Funkcja „Schemat użytkownika” nie jest włączona
     Type:
@@ -584,6 +587,13 @@ Errors:
       NotForAPI: Podrabiane tokeny nie są dozwolone w interfejsie API
     Impersonation:
       PolicyDisabled: Podszywanie się jest wyłączone w polityce bezpieczeństwa instancji
+  WebKey:
+    ActiveDelete: Nie można usunąć aktywnego klucza internetowego
+    Config: Nieprawidłowa konfiguracja klucza internetowego
+    Duplicate: Identyfikator klucza internetowego nie jest unikalny
+    FeatureDisabled: Funkcja klucza internetowego jest wyłączona
+    NoActive: Nie znaleziono aktywnego klucza internetowego
+    NotFound: Nie znaleziono klucza internetowego
 
 AggregateTypes:
   action: Działanie
@@ -607,6 +617,7 @@ AggregateTypes:
   restrictions: Ograniczenia
   system: System
   session: Sesja
+  web_key: Klucz internetowy
 
 EventTypes:
   execution:
@@ -1308,6 +1319,11 @@ EventTypes:
     deactivated: Schemat użytkownika dezaktywowany
     reactivated: Schemat użytkownika został ponownie aktywowany
     deleted: Schemat użytkownika został usunięty
+  web_key:
+    added: Dodano klucz internetowy
+    activated: Klucz internetowy aktywowano
+    deactivated: Klucz internetowy dezaktywowano
+    removed: Klucz internetowy usunięto
 
 Application:
   OIDC:

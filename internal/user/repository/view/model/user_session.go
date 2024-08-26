@@ -199,7 +199,8 @@ func (v *UserSessionView) AppendEvent(event eventstore.Event) error {
 	case user.UserV1SignedOutType,
 		user.HumanSignedOutType,
 		user.UserLockedType,
-		user.UserDeactivatedType:
+		user.UserDeactivatedType,
+		user.UserRemovedType:
 		v.PasswordlessVerification = sql.NullTime{Time: time.Time{}, Valid: true}
 		v.PasswordVerification = sql.NullTime{Time: time.Time{}, Valid: true}
 		v.SecondFactorVerification = sql.NullTime{Time: time.Time{}, Valid: true}

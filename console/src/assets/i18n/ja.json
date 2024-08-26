@@ -1778,7 +1778,7 @@
       "TYPE": {
         "OWNED": "所有プロジェクト",
         "OWNED_SINGULAR": "所有プロジェクト",
-        "GRANTED_SINGULAR": "グラントされたプロジェクト"
+        "GRANTED_SINGULAR": "{{name}}に付与されたプロジェクト"
       },
       "PRIVATELABEL": {
         "TITLE": "ブランディング設定",
@@ -2054,10 +2054,10 @@
       "ISAUTOCREATION_DESC": "選択した場合、アカウントがまだ存在しない場合はアカウントが作成されます。",
       "ISAUTOUPDATE": "自動更新",
       "ISAUTOUPDATE_DESC": "選択した場合、アカウントは再認証時に更新されます。",
-      "ISCREATIONALLOWED": "アカウント作成を許可",
-      "ISCREATIONALLOWED_DESC": "アカウントを作成できるかどうかを決めます。",
-      "ISLINKINGALLOWED": "アカウントリンクを許可",
-      "ISLINKINGALLOWED_DESC": "IDを既存のアカウントにリンクできるかどうかを決めます。",
+      "ISCREATIONALLOWED": "アカウント作成を許可 (手動)",
+      "ISCREATIONALLOWED_DESC": "外部アカウントを使用してアカウントを作成できるかどうかを決定します。 自動作成が有効になっている場合、ユーザーがアカウント情報を編集できないようにするには、無効にします。",
+      "ISLINKINGALLOWED": "アカウントリンクを許可 (手動)",
+      "ISLINKINGALLOWED_DESC": "アイデンティティを手動で既存のアカウントにリンクできるかどうかを決定します。 自動リンクがアクティブな場合は、ユーザーが提案されたアカウントのみをリンクできるようにするには、無効にします。",
       "AUTOLINKING_DESC": "アイデンティティが既存のアカウントにリンクされるように促されるかどうかを決定します。",
       "AUTOLINKINGTYPE": {
         "0": "無効",

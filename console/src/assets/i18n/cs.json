@@ -1783,7 +1783,7 @@
       "TYPE": {
         "OWNED": "Vlastní projekty",
         "OWNED_SINGULAR": "Vlastní projekt",
-        "GRANTED_SINGULAR": "Přidělený projekt"
+        "GRANTED_SINGULAR": "Projekt přidělený {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Nastavení brandingu",
@@ -2063,10 +2063,10 @@
       "ISAUTOCREATION_DESC": "Pokud je vybráno, účet bude vytvořen, pokud ještě neexistuje.",
       "ISAUTOUPDATE": "Automatická aktualizace",
       "ISAUTOUPDATE_DESC": "Pokud je vybráno, účty jsou aktualizovány při opětovné autentizaci.",
-      "ISCREATIONALLOWED": "Je povoleno vytváření účtu",
-      "ISCREATIONALLOWED_DESC": "Určuje, zda lze vytvářet účty.",
-      "ISLINKINGALLOWED": "Je povoleno propojení účtů",
-      "ISLINKINGALLOWED_DESC": "Určuje, zda lze identitu propojit s existujícím účtem.",
+      "ISCREATIONALLOWED": "Vytvoření účtu povoleno (ručně)",
+      "ISCREATIONALLOWED_DESC": "Určuje, zda mohou být účty vytvořeny pomocí externího účtu. Zakázat, pokud uživatelé by neměli být schopni upravovat informace o účtu, když je automatické vytváření povoleno.",
+      "ISLINKINGALLOWED": "Propojení účtu povoleno (ručně)",
+      "ISLINKINGALLOWED_DESC": "Určuje, zda identita může být ručně propojena s existujícím účtem. Zakázat, pokud by uživatelé měli být povoleni pouze propojit navrhovaný účet v případě aktivního automatického propojení.",
       "AUTOLINKING_DESC": "Určuje, zda se bude identita vyzývat k propojení se stávajícím účtem.",
       "AUTOLINKINGTYPE": {
         "0": "Vypnuto",

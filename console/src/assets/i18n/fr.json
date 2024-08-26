@@ -1782,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Projets possédés",
         "OWNED_SINGULAR": "Projet possédé",
-        "GRANTED_SINGULAR": "Projet octroyé"
+        "GRANTED_SINGULAR": "Projet attribué à {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Image de marque",
@@ -2058,10 +2058,10 @@
       "ISAUTOCREATION_DESC": "Détermine si un compte sera créé s'il n'existe pas déjà.",
       "ISAUTOUPDATE": "Mise à jour automatique",
       "ISAUTOUPDATE_DESC": "Si cette option est sélectionnée, les comptes sont mis à jour lors de la réauthentification.",
-      "ISCREATIONALLOWED": "Création de comptes autorisée",
-      "ISCREATIONALLOWED_DESC": "Détermine si des comptes peuvent être créés.",
-      "ISLINKINGALLOWED": "Liaison de comptes autorisée",
-      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée à un compte existant.",
+      "ISCREATIONALLOWED": "Création de compte autorisée (manuellement)",
+      "ISCREATIONALLOWED_DESC": "Détermine si les comptes peuvent être créés à l'aide d'un compte externe. Désactivez si les utilisateurs ne doivent pas pouvoir modifier les informations du compte lorsque la création automatique est activée.",
+      "ISLINKINGALLOWED": "Liaison de compte autorisée (manuellement)",
+      "ISLINKINGALLOWED_DESC": "Détermine si une identité peut être liée manuellement à un compte existant. Désactivez si les utilisateurs ne doivent pouvoir lier que le compte proposé en cas de liaison automatique active.",
       "AUTOLINKING_DESC": "Détermine si une identité sera invitée à être liée à un compte existant.",
       "AUTOLINKINGTYPE": {
         "0": "Désactivé",

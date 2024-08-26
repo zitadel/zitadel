@@ -1782,7 +1782,7 @@
       "TYPE": {
         "OWNED": "Eigen Projecten",
         "OWNED_SINGULAR": "Eigen Project",
-        "GRANTED_SINGULAR": "Verleend Project"
+        "GRANTED_SINGULAR": "Project toegewezen {{name}}"
       },
       "PRIVATELABEL": {
         "TITLE": "Branding Instelling",
@@ -2066,10 +2066,10 @@
       "ISAUTOCREATION_DESC": "Als geselecteerd, wordt een account aangemaakt als het nog niet bestaat.",
       "ISAUTOUPDATE": "Automatische update",
       "ISAUTOUPDATE_DESC": "Als geselecteerd, worden accounts bijgewerkt bij opnieuw authenticeren.",
-      "ISCREATIONALLOWED": "Account creatie toegestaan",
-      "ISCREATIONALLOWED_DESC": "Bepaalt of accounts kunnen worden aangemaakt.",
-      "ISLINKINGALLOWED": "Account koppeling toegestaan",
-      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit kan worden gekoppeld aan een bestaand account.",
+      "ISCREATIONALLOWED": "Accountaanmaak toegestaan (handmatig)",
+      "ISCREATIONALLOWED_DESC": "Bepaalt of accounts kunnen worden aangemaakt met behulp van een extern account. Schakel uit als gebruikers accountinformatie niet mogen kunnen bewerken wanneer auto-aanmaak is ingeschakeld.",
+      "ISLINKINGALLOWED": "Accountkoppeling toegestaan (handmatig)",
+      "ISLINKINGALLOWED_DESC": "Bepaalt of een identiteit handmatig kan worden gekoppeld aan een bestaand account. Schakel uit als gebruikers alleen het voorgestelde account mogen kunnen koppelen in geval van actieve auto-koppeling.",
       "AUTOLINKING_DESC": "Bepaalt of een identiteit wordt gevraagd om te worden gekoppeld aan een bestaand account.",
       "AUTOLINKINGTYPE": {
         "0": "Uitgeschakeld",

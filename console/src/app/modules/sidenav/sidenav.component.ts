@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -19,9 +19,9 @@ export interface SidenavSetting {
   selector: 'cnsl-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
-  providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: SidenavComponent, multi: true }],
+  providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => SidenavComponent), multi: true }],
 })
-export class SidenavComponent implements ControlValueAccessor, OnInit {
+export class SidenavComponent implements ControlValueAccessor {
   @Input() public title: string = '';
   @Input() public description: string = '';
   @Input() public indented: boolean = false;
@@ -35,12 +35,6 @@ export class SidenavComponent implements ControlValueAccessor, OnInit {
     private route: ActivatedRoute,
   ) {}
 
-  ngOnInit(): void {
-    if (!this.value) {
-      this.value = this.settingsList[0].id;
-    }
-  }
-
   private onChange = (current: string | undefined) => {};
   private onTouch = (current: string | undefined) => {};
 
@@ -51,7 +45,7 @@ export class SidenavComponent implements ControlValueAccessor, OnInit {
   set value(setting: string | undefined) {
     this.currentSetting = setting;
 
-    if (setting || setting === undefined) {
+    if (setting || setting === undefined || setting === '') {
       this.onChange(setting);
       this.onTouch(setting);
     }
