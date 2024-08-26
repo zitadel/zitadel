@@ -7,6 +7,12 @@ VERSION ?= development-$(now)
 COMMIT_SHA ?= $(shell git rev-parse HEAD)
 ZITADEL_IMAGE ?= zitadel:local
 
+GOCOVERDIR = tmp/coverage
+INTEGRATION_DB_FLAVOR ?= postgres
+ZITADEL_MASTERKEY ?= MasterkeyNeedsToHave32Characters
+
+export GOCOVERDIR INTEGRATION_DB_FLAVOR ZITADEL_MASTERKEY
+
 .PHONY: compile
 compile: core_build console_build compile_pipeline
 
@@ -95,10 +101,11 @@ console_build: console_dependencies console_client
 	yarn build
 
 .PHONY: clean
-clean:
+clean: core_integration_clean
 	$(RM) -r .artifacts/grpc
 	$(RM) $(gen_authopt_path)
 	$(RM) $(gen_zitadel_path)
+	$(RM) -r tmp/
 
 .PHONY: core_unit_test
 core_unit_test:
@@ -106,22 +113,22 @@ core_unit_test:
 
 .PHONY: core_integration_setup
 core_integration_setup:
+	docker compose -f internal/integration/config/docker-compose.yaml up --wait $${INTEGRATION_DB_FLAVOR}
 	go build -cover -race -tags integration -o zitadel.test main.go
-	mkdir -p tmp/coverage
-	GORACE="halt_on_error=1" GOCOVERDIR="tmp/coverage" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
-	GORACE="halt_on_error=1" GOCOVERDIR="tmp/coverage" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/steps.yaml
+	mkdir -p $${GOCOVERDIR}
+	GORACE="halt_on_error=1" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
+	GORACE="halt_on_error=1" ./zitadel.test setup --masterkeyFromEnv --init-projections --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml --steps internal/integration/config/steps.yaml
 
 .PHONY: core_integration_server_start
 core_integration_server_start: core_integration_setup
-	GORACE="log_path=tmp/race.log" GOCOVERDIR="tmp/coverage" \
+	GORACE="log_path=tmp/race.log" \
 	./zitadel.test start --masterkeyFromEnv --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml \
 	  > tmp/zitadel.log 2>&1 \
 	  & printf $$! > tmp/zitadel.pid
-	go run ./internal/integration/cmd/setup
 
 .PHONY: core_integration_test_packages
 core_integration_test_packages:
-	ISOLATED_INSTANCES=true go test -count 1 -tags integration -timeout 1h $$(go list -tags integration ./... | grep "integration_test")
+	go test -count 1 -tags integration -timeout 1h $$(go list -tags integration ./... | grep "integration_test")
 
 .PHONY: core_integration_server_stop
 core_integration_server_stop:
@@ -132,6 +139,7 @@ core_integration_server_stop:
 		cat tmp/race.log.$$pid; \
 		exit 66; \
 	fi
+	docker compose -f internal/integration/config/docker-compose.yaml stop
 
 .PHONY: core_integration_reports
 core_integration_reports:
@@ -139,8 +147,12 @@ core_integration_reports:
 	$(RM) -r tmp/coverage
 	cat tmp/zitadel.log
 
+.PHONY: core_integration_clean
+core_integration_clean:
+	docker compose -f internal/integration/config/docker-compose.yaml down
+
 .PHONY: core_integration_test
-core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop core_integration_reports
+core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop core_integration_reports core_integration_clean
 
 .PHONY: console_lint
 console_lint:
