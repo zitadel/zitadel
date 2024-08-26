@@ -242,6 +242,100 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 		},
 		{
+			"user create, no field permission as admin",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+									 	"urn:zitadel:schema:permission": {
+											"owner": "r"
+										},
+										"type": "string"
+									}
+								}
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     mock.ExpectID(t, "id1"),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
+					SchemaID:       "type",
+					schemaRevision: 1,
+					Data: json.RawMessage(`{
+						"name": "user"
+					}`),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+				},
+			},
+		},
+		{
+			"user create, no field permission as user",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+									 	"urn:zitadel:schema:permission": {
+											"self": "r"
+										},
+										"type": "string"
+									}
+								}
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
+				),
+				idGenerator: mock.ExpectID(t, "id1"),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
+				user: &CreateSchemaUser{
+					Register:       true,
+					ResourceOwner:  "org1",
+					SchemaID:       "type",
+					schemaRevision: 1,
+					Data: json.RawMessage(`{
+						"name": "user"
+					}`),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+				},
+			},
+		},
+		{
 			"user created, full",
 			fields{
 				eventstore: expectEventstore(
@@ -610,7 +704,7 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 						),
 					),
 					expectPush(
-						schemauser.NewDeletedEvent(context.Background(),
+						schemauser.NewDeletedEvent(authz.NewMockContext("instanceID", "org1", "user1"),
 							&schemauser.NewAggregate("user1", "org1").Aggregate,
 						),
 					),

@@ -33,7 +33,7 @@ func (s *CreateUserSchema) Valid() error {
 	return nil
 }
 
-type UpdateUserSchema struct {
+type ChangeUserSchema struct {
 	ID                     string
 	ResourceOwner          string
 	Type                   *string
@@ -41,7 +41,7 @@ type UpdateUserSchema struct {
 	PossibleAuthenticators []domain.AuthenticatorType
 }
 
-func (s *UpdateUserSchema) Valid() error {
+func (s *ChangeUserSchema) Valid() error {
 	if s.ID == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMA-H5421", "Errors.IDMissing")
 	}
@@ -59,20 +59,20 @@ func (s *UpdateUserSchema) Valid() error {
 	return nil
 }
 
-func (c *Commands) CreateUserSchema(ctx context.Context, userSchema *CreateUserSchema) (string, *domain.ObjectDetails, error) {
+func (c *Commands) CreateUserSchema(ctx context.Context, userSchema *CreateUserSchema) (*domain.ObjectDetails, error) {
 	if err := userSchema.Valid(); err != nil {
-		return "", nil, err
+		return nil, err
 	}
 	if userSchema.ResourceOwner == "" {
-		return "", nil, zerrors.ThrowInvalidArgument(nil, "COMMA-J3hhj", "Errors.ResourceOwnerMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-J3hhj", "Errors.ResourceOwnerMissing")
 	}
 	id, err := c.idGenerator.Next()
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 	writeModel, err := c.getSchemaWriteModelByID(ctx, userSchema.ResourceOwner, id)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 	if err := c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewCreatedEvent(ctx,
@@ -80,12 +80,12 @@ func (c *Commands) CreateUserSchema(ctx context.Context, userSchema *CreateUserS
 			userSchema.Type, userSchema.Schema, userSchema.PossibleAuthenticators,
 		),
 	); err != nil {
-		return "", nil, err
+		return nil, err
 	}
-	return id, writeModelToObjectDetails(&writeModel.WriteModel), nil
+	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) UpdateUserSchema(ctx context.Context, userSchema *UpdateUserSchema) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeUserSchema(ctx context.Context, userSchema *ChangeUserSchema) (*domain.ObjectDetails, error) {
 	if err := userSchema.Valid(); err != nil {
 		return nil, err
 	}

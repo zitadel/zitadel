@@ -39,6 +39,8 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
+	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
 	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
@@ -46,10 +48,8 @@ import (
 	settings_v2beta "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
-	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
 	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
-	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/user/v3alpha"
 )
 
 type Client struct {
@@ -71,7 +71,7 @@ type Client struct {
 	ActionV3Alpha  action.ZITADELActionsClient
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
-	UserSchemaV3   schema.UserSchemaServiceClient
+	UserSchemaV3   userschema_v3alpha.ZITADELUserSchemasClient
 	WebKeyV3Alpha  webkey_v3alpha.ZITADELWebKeysClient
 	IDPv2          idp_pb.IdentityProviderServiceClient
 	UserV3Alpha    user_v3alpha.ZITADELUsersClient
@@ -97,7 +97,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		ActionV3Alpha:  action.NewZITADELActionsClient(cc),
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
-		UserSchemaV3:   schema.NewUserSchemaServiceClient(cc),
+		UserSchemaV3:   userschema_v3alpha.NewZITADELUserSchemasClient(cc),
 		WebKeyV3Alpha:  webkey_v3alpha.NewZITADELWebKeysClient(cc),
 		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
 		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
@@ -760,11 +760,11 @@ func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Co
 	return target
 }
 
-func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {
+func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *userschema_v3alpha.CreateUserSchemaResponse {
 	return s.CreateUserSchemaWithType(ctx, t, fmt.Sprint(time.Now().UnixNano()+1))
 }
 
-func (s *Tester) CreateUserSchemaWithType(ctx context.Context, t *testing.T, schemaType string) *schema.CreateUserSchemaResponse {
+func (s *Tester) CreateUserSchemaWithType(ctx context.Context, t *testing.T, schemaType string) *userschema_v3alpha.CreateUserSchemaResponse {
 	userSchema := new(structpb.Struct)
 	err := userSchema.UnmarshalJSON([]byte(`{
 		"$schema": "urn:zitadel:schema:v1",
@@ -772,10 +772,12 @@ func (s *Tester) CreateUserSchemaWithType(ctx context.Context, t *testing.T, sch
 		"properties": {}
 	}`))
 	require.NoError(t, err)
-	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &schema.CreateUserSchemaRequest{
-		Type: schemaType,
-		DataType: &schema.CreateUserSchemaRequest_Schema{
-			Schema: userSchema,
+	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
+		UserSchema: &userschema_v3alpha.CreateUserSchema{
+			Type: schemaType,
+			DataType: &userschema_v3alpha.CreateUserSchema_Schema{
+				Schema: userSchema,
+			},
 		},
 	})
 	require.NoError(t, err)

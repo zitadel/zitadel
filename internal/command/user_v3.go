@@ -107,7 +107,7 @@ func (c *Commands) getSchemaRoleForWrite(ctx context.Context, resourceOwner, use
 	return domain_schema.RoleOwner, nil
 }
 
-func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser, emailCodeGenerator, phoneCodeGenerator crypto.Generator) (err error) {
+func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser, alg crypto.EncryptionAlgorithm) (err error) {
 	if err := user.Valid(ctx, c); err != nil {
 		return err
 	}
@@ -128,13 +128,13 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser,
 		),
 	}
 	if user.Email != nil {
-		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, events, userAgg, user.Email, emailCodeGenerator)
+		events, user.ReturnCodeEmail, err = c.updateSchemaUserEmail(ctx, events, userAgg, user.Email, alg)
 		if err != nil {
 			return err
 		}
 	}
 	if user.Phone != nil {
-		events, user.ReturnCodePhone, err = c.updateSchemaUserPhone(ctx, events, userAgg, user.Phone, phoneCodeGenerator)
+		events, user.ReturnCodePhone, err = c.updateSchemaUserPhone(ctx, events, userAgg, user.Phone, alg)
 		if err != nil {
 			return err
 		}
@@ -169,7 +169,13 @@ func (c *Commands) DeleteSchemaUser(ctx context.Context, id string) (*domain.Obj
 	return writeModelToObjectDetails(&writeModel.WriteModel), nil
 }
 
-func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, email *Email, codeGenerator crypto.Generator) (_ []eventstore.Command, plainCode string, err error) {
+func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, email *Email, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
+	if err != nil {
+		return nil, "", err
+	}
+	gen := crypto.NewEncryptionGenerator(*config, alg)
+
 	events = append(events, schemauser.NewEmailChangedEvent(ctx,
 		agg,
 		email.Address,
@@ -177,14 +183,14 @@ func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstor
 	if email.Verified {
 		events = append(events, schemauser.NewEmailVerifiedEvent(ctx, agg))
 	} else {
-		returnCode, code, err := generateCode(codeGenerator, email.ReturnCode)
+		returnCode, code, err := generateCode(gen, email.ReturnCode)
 		if err != nil {
 			return nil, "", err
 		}
 		plainCode = code
 		events = append(events, schemauser.NewEmailCodeAddedEvent(ctx, agg,
 			returnCode,
-			codeGenerator.Expiry(),
+			gen.Expiry(),
 			email.URLTemplate,
 			email.ReturnCode,
 		))
@@ -192,7 +198,13 @@ func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstor
 	return events, plainCode, nil
 }
 
-func (c *Commands) updateSchemaUserPhone(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, phone *Phone, codeGenerator crypto.Generator) (_ []eventstore.Command, plainCode string, err error) {
+func (c *Commands) updateSchemaUserPhone(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, phone *Phone, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
+	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
+	if err != nil {
+		return nil, "", err
+	}
+	gen := crypto.NewEncryptionGenerator(*config, alg)
+
 	events = append(events, schemauser.NewPhoneChangedEvent(ctx,
 		agg,
 		phone.Number,
@@ -200,14 +212,14 @@ func (c *Commands) updateSchemaUserPhone(ctx context.Context, events []eventstor
 	if phone.Verified {
 		events = append(events, schemauser.NewPhoneVerifiedEvent(ctx, agg))
 	} else {
-		returnCode, code, err := generateCode(codeGenerator, phone.ReturnCode)
+		returnCode, code, err := generateCode(gen, phone.ReturnCode)
 		if err != nil {
 			return nil, "", err
 		}
 		plainCode = code
 		events = append(events, schemauser.NewPhoneCodeAddedEvent(ctx, agg,
 			returnCode,
-			codeGenerator.Expiry(),
+			gen.Expiry(),
 			phone.ReturnCode,
 		))
 	}

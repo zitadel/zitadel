@@ -290,13 +290,13 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 	}
 }
 
-func TestCommands_UpdateUserSchema(t *testing.T) {
+func TestCommands_ChangeUserSchema(t *testing.T) {
 	type fields struct {
 		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
-		userSchema *UpdateUserSchema
+		userSchema *ChangeUserSchema
 	}
 	type res struct {
 		details *domain.ObjectDetails
@@ -315,7 +315,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx:        authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{},
+				userSchema: &ChangeUserSchema{},
 			},
 			res{
 				err: zerrors.ThrowInvalidArgument(nil, "COMMA-H5421", "Errors.IDMissing"),
@@ -328,7 +328,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:   "id1",
 					Type: gu.Ptr(""),
 				},
@@ -344,7 +344,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID: "id1",
 				},
 			},
@@ -359,7 +359,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID: "id1",
 					Schema: json.RawMessage(`{
 						"properties": {
@@ -382,7 +382,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Schema: json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
@@ -403,7 +403,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Type:   gu.Ptr("type"),
 					Schema: json.RawMessage(`{}`),
@@ -435,7 +435,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Type:   gu.Ptr("type"),
 					Schema: json.RawMessage(`{}`),
@@ -476,7 +476,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Schema: json.RawMessage(`{}`),
 					Type:   gu.Ptr("newType"),
@@ -544,7 +544,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID: "id1",
 					Schema: json.RawMessage(`{
 						"$schema": "urn:zitadel:schema:v1",
@@ -602,7 +602,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
-				userSchema: &UpdateUserSchema{
+				userSchema: &ChangeUserSchema{
 					ID:     "id1",
 					Schema: json.RawMessage(`{}`),
 					PossibleAuthenticators: []domain.AuthenticatorType{
@@ -623,7 +623,7 @@ func TestCommands_UpdateUserSchema(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := c.UpdateUserSchema(tt.args.ctx, tt.args.userSchema)
+			got, err := c.ChangeUserSchema(tt.args.ctx, tt.args.userSchema)
 			assert.ErrorIs(t, err, tt.res.err)
 			assertObjectDetails(t, tt.res.details, got)
 		})

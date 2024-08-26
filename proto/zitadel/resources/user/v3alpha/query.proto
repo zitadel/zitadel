@@ -2,71 +2,70 @@ syntax = "proto3";
 
 package zitadel.user.v3alpha;
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v3alpha;user";
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
 
 import "google/api/field_behavior.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/user/v3alpha/user.proto";
-import "zitadel/object/v2/object.proto";
+import "zitadel/resources/user/v3alpha/user.proto";
+import "zitadel/resources/object/v3alpha/object.proto";
 
-message SearchQuery {
-  oneof query {
+message SearchFilter {
+  oneof Filter {
     option (validate.required) = true;
 
-
-    // Union the results of each sub query ('OR').
-    OrQuery or_query = 1;
+    // Union the results of each sub filter ('OR').
+    OrFilter or_filter = 1;
     // Limit the result to match all sub queries ('AND').
     // Note that if you specify multiple queries, they will be implicitly used as andQueries.
-    // Use the andQuery in combination with orQuery and notQuery.
-    AndQuery and_query = 2;
+    // Use the andFilter in combination with orFilter and notFilter.
+    AndFilter and_filter = 2;
     // Exclude / Negate the result of the sub query ('NOT').
-    NotQuery not_query = 3;
+    NotFilter not_filter = 3;
 
     // Limit the result to a specific user ID.
-    UserIDQuery user_id_query = 4;
+    UserIDFilter user_id_filter = 4;
     // Limit the result to a specific organization.
-    OrganizationIDQuery organization_id_query = 5;
+    OrganizationIDFilter organization_id_filter = 5;
     // Limit the result to a specific username.
-    UsernameQuery username_query = 6;
+    UsernameFilter username_filter = 6;
     // Limit the result to a specific contact email.
-    EmailQuery email_query = 7;
+    EmailFilter email_filter = 7;
     // Limit the result to a specific contact phone.
-    PhoneQuery phone_query = 8;
+    PhoneFilter phone_filter = 8;
     // Limit the result to a specific state of the user.
-    StateQuery state_query = 9;
+    StateFilter state_filter = 9;
     // Limit the result to a specific schema ID.
-    SchemaIDQuery schema_ID_query = 10;
+    SchemaIDFilter schema_id_filter = 10;
     // Limit the result to a specific schema type.
-    SchemaTypeQuery schema_type_query = 11;
+    SchemaTypeFilter schema_type_filter = 11;
   }
 }
 
-message OrQuery {
-  repeated SearchQuery queries = 1 [
+message OrFilter {
+  repeated SearchFilter queries = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) =  {
-      example: "[{\"userIdQuery\": {\"id\": \"163840776835432705\",\"method\": \"TEXT_QUERY_METHOD_EQUALS\"}},{\"userIdQuery\": {\"id\": \"163840776835943483\",\"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]"
+      example: "[{\"userIdFilter\": {\"id\": \"163840776835432705\",\"method\": \"TEXT_FILTER_METHOD_EQUALS\"}},{\"userIdFilter\": {\"id\": \"163840776835943483\",\"method\": \"TEXT_FILTER_METHOD_EQUALS\"}}]"
     }
   ];
 }
-message AndQuery {
-  repeated SearchQuery queries = 1 [
+message AndFilter {
+  repeated SearchFilter queries = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) =  {
-      example: "[{\"organizationIdQuery\": {\"id\": \"163840776835432705\",\"method\": \"TEXT_QUERY_METHOD_EQUALS\"}},{\"usernameQuery\": {\"username\": \"gigi\",\"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]"
-    }
-  ];
-}
-
-message NotQuery {
-  SearchQuery query = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) =  {
-      example: "{\"schemaIDQuery\": {\"id\": \"163840776835432705\"}}"
+      example: "[{\"organizationIdFilter\": {\"id\": \"163840776835432705\",\"method\": \"TEXT_FILTER_METHOD_EQUALS\"}},{\"usernameFilter\": {\"username\": \"gigi\",\"method\": \"TEXT_FILTER_METHOD_EQUALS\"}}]"
     }
   ];
 }
 
-message UserIDQuery {
+message NotFilter {
+  SearchFilter query = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) =  {
+      example: "{\"schemaIDFilter\": {\"id\": \"163840776835432705\"}}"
+    }
+  ];
+}
+
+message UserIDFilter {
   // Defines the ID of the user to query for.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -78,12 +77,12 @@ message UserIDQuery {
     }
   ];
   // Defines which text comparison method used for the id query.
-  zitadel.object.v2.TextQueryMethod method = 2 [
+  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }
 
-message OrganizationIDQuery {
+message OrganizationIDFilter {
   // Defines the ID of the organization to query for.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -95,12 +94,12 @@ message OrganizationIDQuery {
     }
   ];
   // Defines which text comparison method used for the id query.
-  zitadel.object.v2.TextQueryMethod method = 2 [
+  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }
 
-message UsernameQuery {
+message UsernameFilter {
   // Defines the username to query for.
   string username = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -112,14 +111,14 @@ message UsernameQuery {
     }
   ];
   // Defines which text comparison method used for the username query.
-  zitadel.object.v2.TextQueryMethod method = 2 [
+  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
   // Defines that the username must only be unique in the organisation.
   bool is_organization_specific = 3;
 }
 
-message EmailQuery {
+message EmailFilter {
   // Defines the email of the user to query for.
   string address = 1 [
     (validate.rules).string = {max_len: 200},
@@ -131,12 +130,12 @@ message EmailQuery {
     }
   ];
   // Defines which text comparison method used for the email query.
-  zitadel.object.v2.TextQueryMethod method = 2 [
+  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }
 
-message PhoneQuery {
+message PhoneFilter {
   // Defines the phone of the user to query for.
   string number = 1 [
     (validate.rules).string = {min_len: 1, max_len: 20},
@@ -148,13 +147,13 @@ message PhoneQuery {
     }
   ];
   // Defines which text comparison method used for the phone query.
-  zitadel.object.v2.TextQueryMethod method = 2 [
+  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }
 
 
-message StateQuery {
+message StateFilter {
   // Defines the state to query for.
   State state = 1 [
     (validate.rules).enum.defined_only = true,
@@ -164,7 +163,7 @@ message StateQuery {
   ];
 }
 
-message SchemaIDQuery {
+message SchemaIDFilter {
   // Defines the ID of the schema to query for.
   string id = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -177,7 +176,7 @@ message SchemaIDQuery {
   ];
 }
 
-message SchemaTypeQuery {
+message SchemaTypeFilter {
   // Defines which type to query for.
   string type = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -189,7 +188,7 @@ message SchemaTypeQuery {
     }
   ];
   // Defines which text comparison method used for the type query.
-  zitadel.object.v2.TextQueryMethod method = 2 [
+  zitadel.resources.object.v3alpha.TextFilterMethod method = 2 [
     (validate.rules).enum.defined_only = true
   ];
 }

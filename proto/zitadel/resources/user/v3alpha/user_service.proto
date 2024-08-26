@@ -8,16 +8,15 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2/object.proto";
 import "zitadel/object/v3alpha/object.proto";
+import "zitadel/resources/object/v3alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/user/v3alpha/authenticator.proto";
-import "zitadel/user/v3alpha/communication.proto";
-import "zitadel/user/v3alpha/query.proto";
-import "zitadel/user/v3alpha/user.proto";
+import "zitadel/resources/user/v3alpha/authenticator.proto";
+import "zitadel/resources/user/v3alpha/communication.proto";
+import "zitadel/resources/user/v3alpha/query.proto";
+import "zitadel/resources/user/v3alpha/user.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/v3alpha;user";
-
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -109,11 +108,11 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service ZITADELUsers {
 
-  // List users
+  // Search users
   //
-  // List all matching users. By default, we will return all users of your instance.
+  // Search all matching users. By default, we will return all users of your instance.
   // Make sure to include a limit and sorting for pagination.
-  rpc ListUsers (ListUsersRequest) returns (ListUsersResponse) {
+  rpc SearchUsers (SearchUsersRequest) returns (SearchUsersResponse) {
     option (google.api.http) = {
       post: "/v3alpha/users/search"
       body: "*"
@@ -181,7 +180,7 @@ service ZITADELUsers {
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
       auth_option: {
-        permission: "user.write"
+        permission: "authenticated"
         org_field: "organization"
       }
       http_response: {
@@ -204,12 +203,12 @@ service ZITADELUsers {
     };
   }
 
-  // Update a user
+  // Patch a user
   //
-  // Update an existing user with data based on a user schema.
-  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+  // Patch an existing user with data based on a user schema.
+  rpc PatchUser (PatchUserRequest) returns (PatchUserResponse) {
     option (google.api.http) = {
-      put: "/v3alpha/users/{user_id}"
+      patch: "/v3alpha/users/{user_id}"
       body: "*"
     };
 
@@ -223,7 +222,7 @@ service ZITADELUsers {
       responses: {
         key: "200";
         value: {
-          description: "User successfully updated";
+          description: "User successfully updated or left unchanged";
         };
       };
     };
@@ -1038,9 +1037,9 @@ service ZITADELUsers {
 
 }
 
-message ListUsersRequest {
-  // list limitations and ordering.
-  zitadel.object.v2.ListQuery query = 1;
+message SearchUsersRequest {
+  // Search limitations and ordering.
+  zitadel.resources.object.v3alpha.SearchQuery query = 1;
   // the field the result is sorted.
   zitadel.user.v3alpha.FieldName sorting_column = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1048,16 +1047,16 @@ message ListUsersRequest {
     }
   ];
   // Define the criteria to query for.
-  repeated zitadel.user.v3alpha.SearchQuery queries = 3;
+  repeated zitadel.user.v3alpha.SearchFilter queries = 3;
 }
 
-message ListUsersResponse {
+message SearchUsersResponse {
   // Details provides information about the returned result including total amount found.
-  zitadel.object.v2.ListDetails details = 1;
+  zitadel.resources.object.v3alpha.ListDetails details = 1;
   // States by which field the results are sorted.
-  zitadel.user.v3alpha.FieldName sorting_column = 2;
+  FieldName sorting_column = 2;
   // The result contains the user schemas, which matched the queries.
-  repeated zitadel.user.v3alpha.User result = 3;
+  repeated User result = 3;
 }
 
 message GetUserByIDRequest {
@@ -1074,7 +1073,7 @@ message GetUserByIDRequest {
 }
 
 message GetUserByIDResponse {
-  zitadel.user.v3alpha.User user = 1;
+  User user = 1;
 }
 
 message CreateUserRequest {
@@ -1088,7 +1087,7 @@ message CreateUserRequest {
     }
   ];
   // Set the organization the user belongs to.
-  zitadel.object.v2.Organization organization = 2 [
+  zitadel.object.v3alpha.Organization organization = 2 [
     (validate.rules).message = {required: true},
     (google.api.field_behavior) = REQUIRED
   ];
@@ -1106,32 +1105,26 @@ message CreateUserRequest {
       example: "\"69629026806489455\"";
     }
   ];
-  // Provide data about the user. It will be validated based on the specified schema.
-  google.protobuf.Struct data = 6 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "{\"name\":\"Gigi\",\"description\":\"the giraffe\"}"
-    }
-  ];
+  User user = 6;
 }
 
 message CreateUserResponse {
-  string user_id = 1;
-  zitadel.object.v2.Details details = 2;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // The email code will be set if a contact email was set with a return_code verification option.
-  optional string email_code = 3 [
+  optional string email_code = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"SKJd342k\"";
     }
   ];
   // The phone code will be set if a contact phone was set with a return_code verification option.
-  optional string phone_code = 4 [
+  optional string phone_code = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"IFi39dk2\"";
     }
   ];
 }
 
-message UpdateUserRequest {
+message PatchUserRequest {
   //  unique identifier of the user.
   string user_id = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1139,9 +1132,9 @@ message UpdateUserRequest {
     }
   ];
   // Add or update the contact information (email, phone) for the user if needed.
-  optional SetContact contact = 4;
+  optional SetContact contact = 2;
   // Change the schema the user's data schema by providing it's ID if needed.
-  optional string schema_id = 5 [
+  optional string schema_id = 3 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       min_length: 1,
@@ -1149,24 +1142,19 @@ message UpdateUserRequest {
       example: "\"69629026806489455\"";
     }
   ];
-  // Update the user data if needed. It will be validated based on the specified schema.
-  optional google.protobuf.Struct data = 6 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "{\"name\":\"Gigi\",\"description\":\"the giraffe\"}"
-    }
-  ];
+  optional User user = 4;
 }
 
-message UpdateUserResponse {
-  zitadel.object.v2.Details details = 1;
+message PatchUserResponse {
+  zitadel.resources.object.v3alpha.Details details = 1;
   // The email code will be set if a contact email was set with a return_code verification option.
-  optional string email_code = 3 [
+  optional string email_code = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"SKJd342k\"";
     }
   ];
   // The phone code will be set if a contact phone was set with a return_code verification option.
-  optional string phone_code = 4 [
+  optional string phone_code = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"IFi39dk2\"";
     }
@@ -1187,7 +1175,7 @@ message DeactivateUserRequest {
 }
 
 message DeactivateUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 
@@ -1205,7 +1193,7 @@ message ReactivateUserRequest {
 }
 
 message ReactivateUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message LockUserRequest {
@@ -1222,7 +1210,7 @@ message LockUserRequest {
 }
 
 message LockUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message UnlockUserRequest {
@@ -1239,7 +1227,7 @@ message UnlockUserRequest {
 }
 
 message UnlockUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message DeleteUserRequest {
@@ -1256,7 +1244,7 @@ message DeleteUserRequest {
 }
 
 message DeleteUserResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message SetContactEmailRequest {
@@ -1275,7 +1263,7 @@ message SetContactEmailRequest {
 }
 
 message SetContactEmailResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // The verification code will be set if a contact email was set with a return_code verification option.
   optional string verification_code = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1308,7 +1296,7 @@ message VerifyContactEmailRequest {
 }
 
 message VerifyContactEmailResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message ResendContactEmailCodeRequest {
@@ -1332,7 +1320,7 @@ message ResendContactEmailCodeRequest {
 }
 
 message ResendContactEmailCodeResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // in case the verification was set to return_code, the code will be returned.
   optional string verification_code = 2;
 }
@@ -1353,7 +1341,7 @@ message SetContactPhoneRequest {
 }
 
 message SetContactPhoneResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // The phone verification code will be set if a contact phone was set with a return_code verification option.
   optional string email_code = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1386,7 +1374,7 @@ message VerifyContactPhoneRequest {
 }
 
 message VerifyContactPhoneResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message ResendContactPhoneCodeRequest {
@@ -1410,7 +1398,7 @@ message ResendContactPhoneCodeRequest {
 }
 
 message ResendContactPhoneCodeResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // in case the verification was set to return_code, the code will be returned.
   optional string verification_code = 2;
 }
@@ -1431,7 +1419,7 @@ message AddUsernameRequest {
 }
 
 message AddUsernameResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // unique identifier of the username.
   string username_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1464,7 +1452,7 @@ message RemoveUsernameRequest {
 }
 
 message RemoveUsernameResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message SetPasswordRequest {
@@ -1507,7 +1495,7 @@ message SetPasswordRequest {
 }
 
 message SetPasswordResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message RequestPasswordResetRequest {
@@ -1533,7 +1521,7 @@ message RequestPasswordResetRequest {
 }
 
 message RequestPasswordResetResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // In case the medium was set to return_code, the code will be returned.
   optional string verification_code = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1572,7 +1560,7 @@ message StartWebAuthNRegistrationRequest {
 }
 
 message StartWebAuthNRegistrationResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // unique identifier of the WebAuthN registration.
   string web_auth_n_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1635,7 +1623,7 @@ message VerifyWebAuthNRegistrationRequest {
 }
 
 message VerifyWebAuthNRegistrationResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message CreateWebAuthNRegistrationLinkRequest {
@@ -1659,7 +1647,7 @@ message CreateWebAuthNRegistrationLinkRequest {
 }
 
 message CreateWebAuthNRegistrationLinkResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // In case the medium was set to return_code, the code will be returned.
   optional AuthenticatorRegistrationCode code = 2;
 }
@@ -1688,7 +1676,7 @@ message RemoveWebAuthNAuthenticatorRequest {
 }
 
 message RemoveWebAuthNAuthenticatorResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message StartTOTPRegistrationRequest {
@@ -1705,7 +1693,7 @@ message StartTOTPRegistrationRequest {
 }
 
 message StartTOTPRegistrationResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // unique identifier of the TOTP registration.
   string totp_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1760,7 +1748,7 @@ message VerifyTOTPRegistrationRequest {
 }
 
 message VerifyTOTPRegistrationResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message RemoveTOTPAuthenticatorRequest {
@@ -1787,7 +1775,7 @@ message RemoveTOTPAuthenticatorRequest {
 }
 
 message RemoveTOTPAuthenticatorResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message AddOTPSMSAuthenticatorRequest {
@@ -1806,7 +1794,7 @@ message AddOTPSMSAuthenticatorRequest {
 }
 
 message AddOTPSMSAuthenticatorResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // unique identifier of the OTP SMS registration.
   string otp_sms_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1856,7 +1844,7 @@ message VerifyOTPSMSRegistrationRequest {
 }
 
 message VerifyOTPSMSRegistrationResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message RemoveOTPSMSAuthenticatorRequest {
@@ -1883,7 +1871,7 @@ message RemoveOTPSMSAuthenticatorRequest {
 }
 
 message RemoveOTPSMSAuthenticatorResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message AddOTPEmailAuthenticatorRequest {
@@ -1902,7 +1890,7 @@ message AddOTPEmailAuthenticatorRequest {
 }
 
 message AddOTPEmailAuthenticatorResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // unique identifier of the OTP Email registration.
   string otp_email_id = 2 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -1951,7 +1939,7 @@ message VerifyOTPEmailRegistrationRequest {
 }
 
 message VerifyOTPEmailRegistrationResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message RemoveOTPEmailAuthenticatorRequest {
@@ -1978,7 +1966,7 @@ message RemoveOTPEmailAuthenticatorRequest {
 }
 
 message RemoveOTPEmailAuthenticatorResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message StartIdentityProviderIntentRequest {
@@ -2000,7 +1988,7 @@ message StartIdentityProviderIntentRequest {
 }
 
 message StartIdentityProviderIntentResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // the next step to take in the idp intent flow.
   oneof next_step {
     // The authentication URL to which the client should redirect.
@@ -2041,7 +2029,7 @@ message RetrieveIdentityProviderIntentRequest {
 }
 
 message RetrieveIdentityProviderIntentResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
   // Information returned by the identity provider (IDP) such as the identification of the user
   // and detailed / profile information.
   IDPInformation idp_information = 2;
@@ -2068,7 +2056,7 @@ message AddIDPAuthenticatorRequest {
 }
 
 message AddIDPAuthenticatorResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message RemoveIDPAuthenticatorRequest {
@@ -2095,6 +2083,6 @@ message RemoveIDPAuthenticatorRequest {
 }
 
 message RemoveIDPAuthenticatorResponse {
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
