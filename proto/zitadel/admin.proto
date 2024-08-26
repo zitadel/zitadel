@@ -7789,6 +7789,8 @@ message GetCustomLoginTextsResponse {
 }
 
 message SetCustomLoginTextsRequest {
+    reserved "linking_user_prompt_text";
+    reserved 36;
     string language = 1 [
         (validate.rules).string = {min_len: 1, max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -7829,7 +7831,6 @@ message SetCustomLoginTextsRequest {
     zitadel.text.v1.PasswordlessRegistrationScreenText passwordless_registration_text = 33;
     zitadel.text.v1.PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
     zitadel.text.v1.ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
-    zitadel.text.v1.LinkingUserPromptScreenText linking_user_prompt_text = 36;
 }
 
 message SetCustomLoginTextsResponse {
