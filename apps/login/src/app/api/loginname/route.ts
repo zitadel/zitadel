@@ -2,12 +2,15 @@ import { idpTypeToSlug } from "@/lib/idp";
 import {
   getActiveIdentityProviders,
   getLoginSettings,
+  getOrgsByDomainSuffix,
   listAuthenticationMethodTypes,
   listUsers,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
 import { NextRequest, NextResponse } from "next/server";
+
+const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -104,12 +107,35 @@ export async function POST(request: NextRequest) {
           loginSettings?.allowRegister &&
           loginSettings?.allowUsernamePassword
         ) {
-          const params: any = { organization };
+          let orgToRegisterOn: string | undefined = organization;
+
+          if (
+            !orgToRegisterOn &&
+            loginName &&
+            ORG_SUFFIX_REGEX.test(loginName)
+          ) {
+            const matched = ORG_SUFFIX_REGEX.exec(loginName);
+            const suffix = matched?.[1] ?? "";
+
+            const orgs = await getOrgsByDomainSuffix(suffix);
+            orgToRegisterOn =
+              orgs.result && orgs.result.length === 1
+                ? orgs.result[0].id
+                : undefined;
+          }
+
+          const params: any = {};
+
           if (authRequestId) {
             params.authRequestId = authRequestId;
           }
+
           if (loginName) {
             params.email = loginName;
+          }
+
+          if (orgToRegisterOn) {
+            params.organization = orgToRegisterOn;
           }
 
           const registerUrl = new URL(
