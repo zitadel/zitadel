@@ -295,7 +295,16 @@ export async function listUsers({
 
 export async function getOrgsByDomainSuffix(domain: string) {
   return orgService.listOrganizations(
-    { queries: [{ query: { case: "domainQuery", value: { domain } } }] },
+    {
+      queries: [
+        {
+          query: {
+            case: "domainQuery",
+            value: { domain, method: TextQueryMethod.EQUALS },
+          },
+        },
+      ],
+    },
     {},
   );
 }

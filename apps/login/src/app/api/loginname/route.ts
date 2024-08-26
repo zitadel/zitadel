@@ -117,6 +117,7 @@ export async function POST(request: NextRequest) {
             const matched = ORG_SUFFIX_REGEX.exec(loginName);
             const suffix = matched?.[1] ?? "";
 
+            // this just returns orgs where the suffix is set as primary domain
             const orgs = await getOrgsByDomainSuffix(suffix);
             orgToRegisterOn =
               orgs.result && orgs.result.length === 1
