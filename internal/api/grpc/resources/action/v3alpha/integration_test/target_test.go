@@ -400,8 +400,8 @@ func TestServer_PatchTarget(t *testing.T) {
 func TestServer_DeleteTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
-	isolatedIAMOwnerCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	target := instance.CreateTarget(CTX, t, "https://example.com", domain.TargetTypeWebhook, false)
+	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+	target := instance.CreateTarget(iamOwnerCtx, t, "https://example.com", domain.TargetTypeWebhook, false)
 	tests := []struct {
 		name    string
 		ctx     context.Context
@@ -419,7 +419,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 		},
 		{
 			name: "empty id",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  iamOwnerCtx,
 			req: &action.DeleteTargetRequest{
 				Id: "",
 			},
@@ -427,7 +427,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 		},
 		{
 			name: "delete target",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  iamOwnerCtx,
 			req: &action.DeleteTargetRequest{
 				Id: target.GetDetails().GetId(),
 			},

@@ -30,7 +30,7 @@ func systemClient() system.SystemServiceClient {
 	cc, err := grpc.NewClient(loadedConfig.Host(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithChainUnaryInterceptor(func(ctx context.Context, method string, req, reply any, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-			WithSystemAuthorization(ctx)
+			ctx = WithSystemAuthorization(ctx)
 			return invoker(ctx, method, req, reply, cc, opts...)
 		}),
 	)
