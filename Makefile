@@ -111,9 +111,16 @@ clean: core_integration_clean
 core_unit_test:
 	go test -race -coverprofile=profile.cov ./...
 
+.PHONY: core_integration_db_up
+core_integration_db_up:
+	docker compose -f internal/integration/config/docker-compose.yaml up --pull always --wait $${INTEGRATION_DB_FLAVOR}
+
+.PHONY: core_integration_db_down
+core_integration_db_down:
+	docker compose -f internal/integration/config/docker-compose.yaml down
+
 .PHONY: core_integration_setup
 core_integration_setup:
-	docker compose -f internal/integration/config/docker-compose.yaml up --wait $${INTEGRATION_DB_FLAVOR}
 	go build -cover -race -tags integration -o zitadel.test main.go
 	mkdir -p $${GOCOVERDIR}
 	GORACE="halt_on_error=1" ./zitadel.test init --config internal/integration/config/zitadel.yaml --config internal/integration/config/${INTEGRATION_DB_FLAVOR}.yaml
@@ -147,12 +154,10 @@ core_integration_reports:
 	$(RM) -r tmp/coverage
 	cat tmp/zitadel.log
 
-.PHONY: core_integration_clean
-core_integration_clean:
-	docker compose -f internal/integration/config/docker-compose.yaml down
+
 
 .PHONY: core_integration_test
-core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop core_integration_reports core_integration_clean
+core_integration_test: core_integration_server_start core_integration_test_packages core_integration_server_stop core_integration_reports
 
 .PHONY: console_lint
 console_lint:
