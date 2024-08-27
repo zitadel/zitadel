@@ -2,7 +2,7 @@ import { idpTypeToSlug } from "@/lib/idp";
 import {
   getActiveIdentityProviders,
   getLoginSettings,
-  getOrgsByDomainSuffix,
+  getOrgsByDomain,
   listAuthenticationMethodTypes,
   listUsers,
   startIdentityProviderFlow,
@@ -112,13 +112,14 @@ export async function POST(request: NextRequest) {
           if (
             !orgToRegisterOn &&
             loginName &&
-            ORG_SUFFIX_REGEX.test(loginName)
+            ORG_SUFFIX_REGEX.test(loginName) &&
+            loginSettings.allowDomainDiscovery
           ) {
             const matched = ORG_SUFFIX_REGEX.exec(loginName);
             const suffix = matched?.[1] ?? "";
 
             // this just returns orgs where the suffix is set as primary domain
-            const orgs = await getOrgsByDomainSuffix(suffix);
+            const orgs = await getOrgsByDomain(suffix);
             orgToRegisterOn =
               orgs.result && orgs.result.length === 1
                 ? orgs.result[0].id

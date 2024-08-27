@@ -293,7 +293,7 @@ export async function listUsers({
   );
 }
 
-export async function getOrgsByDomainSuffix(domain: string) {
+export async function getOrgsByDomain(domain: string) {
   return orgService.listOrganizations(
     {
       queries: [
