@@ -19,6 +19,7 @@ import (
 
 var (
 	IAMOwnerCTX, SystemCTX context.Context
+	UserCTX                context.Context
 	Tester                 *integration.Tester
 	Client                 user.ZITADELUsersClient
 )
@@ -33,6 +34,7 @@ func TestMain(m *testing.M) {
 
 		IAMOwnerCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
 		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
+		UserCTX = Tester.WithAuthorization(ctx, integration.Login)
 		Client = Tester.Client.UserV3Alpha
 		return m.Run()
 	}())

@@ -12,6 +12,8 @@ import (
 )
 
 type CreateUserSchema struct {
+	Details *domain.ObjectDetails
+
 	ResourceOwner          string
 	Type                   string
 	Schema                 json.RawMessage
@@ -34,6 +36,8 @@ func (s *CreateUserSchema) Valid() error {
 }
 
 type ChangeUserSchema struct {
+	Details *domain.ObjectDetails
+
 	ID                     string
 	ResourceOwner          string
 	Type                   *string
@@ -59,20 +63,20 @@ func (s *ChangeUserSchema) Valid() error {
 	return nil
 }
 
-func (c *Commands) CreateUserSchema(ctx context.Context, userSchema *CreateUserSchema) (*domain.ObjectDetails, error) {
+func (c *Commands) CreateUserSchema(ctx context.Context, userSchema *CreateUserSchema) error {
 	if err := userSchema.Valid(); err != nil {
-		return nil, err
+		return err
 	}
 	if userSchema.ResourceOwner == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "COMMA-J3hhj", "Errors.ResourceOwnerMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMA-J3hhj", "Errors.ResourceOwnerMissing")
 	}
 	id, err := c.idGenerator.Next()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	writeModel, err := c.getSchemaWriteModelByID(ctx, userSchema.ResourceOwner, id)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if err := c.pushAppendAndReduce(ctx, writeModel,
 		schema.NewCreatedEvent(ctx,
@@ -80,21 +84,22 @@ func (c *Commands) CreateUserSchema(ctx context.Context, userSchema *CreateUserS
 			userSchema.Type, userSchema.Schema, userSchema.PossibleAuthenticators,
 		),
 	); err != nil {
-		return nil, err
+		return err
 	}
-	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	userSchema.Details = writeModelToObjectDetails(&writeModel.WriteModel)
+	return nil
 }
 
-func (c *Commands) ChangeUserSchema(ctx context.Context, userSchema *ChangeUserSchema) (*domain.ObjectDetails, error) {
+func (c *Commands) ChangeUserSchema(ctx context.Context, userSchema *ChangeUserSchema) error {
 	if err := userSchema.Valid(); err != nil {
-		return nil, err
+		return err
 	}
 	writeModel, err := c.getSchemaWriteModelByID(ctx, userSchema.ResourceOwner, userSchema.ID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if writeModel.State != domain.UserSchemaStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMA-HB3e1", "Errors.UserSchema.NotActive")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMA-HB3e1", "Errors.UserSchema.NotActive")
 	}
 	updatedEvent := writeModel.NewUpdatedEvent(
 		ctx,
@@ -104,12 +109,14 @@ func (c *Commands) ChangeUserSchema(ctx context.Context, userSchema *ChangeUserS
 		userSchema.PossibleAuthenticators,
 	)
 	if updatedEvent == nil {
-		return writeModelToObjectDetails(&writeModel.WriteModel), nil
+		userSchema.Details = writeModelToObjectDetails(&writeModel.WriteModel)
+		return nil
 	}
 	if err := c.pushAppendAndReduce(ctx, writeModel, updatedEvent); err != nil {
-		return nil, err
+		return err
 	}
-	return writeModelToObjectDetails(&writeModel.WriteModel), nil
+	userSchema.Details = writeModelToObjectDetails(&writeModel.WriteModel)
+	return nil
 }
 
 func (c *Commands) DeactivateUserSchema(ctx context.Context, id, resourceOwner string) (*domain.ObjectDetails, error) {

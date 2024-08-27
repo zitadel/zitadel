@@ -760,18 +760,34 @@ func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Co
 	return target
 }
 
-func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *userschema_v3alpha.CreateUserSchemaResponse {
-	return s.CreateUserSchemaWithType(ctx, t, fmt.Sprint(time.Now().UnixNano()+1))
+func (s *Tester) CreateUserSchemaEmpty(ctx context.Context) *userschema_v3alpha.CreateUserSchemaResponse {
+	return s.CreateUserSchemaEmptyWithType(ctx, fmt.Sprint(time.Now().UnixNano()+1))
 }
 
-func (s *Tester) CreateUserSchemaWithType(ctx context.Context, t *testing.T, schemaType string) *userschema_v3alpha.CreateUserSchemaResponse {
+func (s *Tester) CreateUserSchema(ctx context.Context, schema []byte) *userschema_v3alpha.CreateUserSchemaResponse {
+	userSchema := new(structpb.Struct)
+	err := userSchema.UnmarshalJSON(schema)
+	logging.OnError(err).Fatal("create userschema unmarshal")
+	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
+		UserSchema: &userschema_v3alpha.CreateUserSchema{
+			Type: fmt.Sprint(time.Now().UnixNano() + 1),
+			DataType: &userschema_v3alpha.CreateUserSchema_Schema{
+				Schema: userSchema,
+			},
+		},
+	})
+	logging.OnError(err).Fatal("create userschema")
+	return target
+}
+
+func (s *Tester) CreateUserSchemaEmptyWithType(ctx context.Context, schemaType string) *userschema_v3alpha.CreateUserSchemaResponse {
 	userSchema := new(structpb.Struct)
 	err := userSchema.UnmarshalJSON([]byte(`{
 		"$schema": "urn:zitadel:schema:v1",
 		"type": "object",
 		"properties": {}
 	}`))
-	require.NoError(t, err)
+	logging.OnError(err).Fatal("create userschema unmarshal")
 	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
 		UserSchema: &userschema_v3alpha.CreateUserSchema{
 			Type: schemaType,
@@ -780,6 +796,6 @@ func (s *Tester) CreateUserSchemaWithType(ctx context.Context, t *testing.T, sch
 			},
 		},
 	})
-	require.NoError(t, err)
+	logging.OnError(err).Fatal("create userschema")
 	return target
 }

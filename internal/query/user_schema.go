@@ -26,7 +26,6 @@ func (e *UserSchemas) SetState(s *State) {
 }
 
 type UserSchema struct {
-	ID string
 	domain.ObjectDetails
 	State                  domain.UserSchemaState
 	Type                   string
@@ -152,6 +151,7 @@ func prepareUserSchemaQuery() (sq.SelectBuilder, func(*sql.Row) (*UserSchema, er
 			var schema database.ByteArray[byte]
 			err := row.Scan(
 				&u.ID,
+				&u.CreationDate,
 				&u.EventDate,
 				&u.Sequence,
 				&u.ResourceOwner,
@@ -201,6 +201,7 @@ func prepareUserSchemasQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserSchemas,
 				u := new(UserSchema)
 				err := rows.Scan(
 					&u.ID,
+					&u.CreationDate,
 					&u.EventDate,
 					&u.Sequence,
 					&u.ResourceOwner,

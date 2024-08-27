@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/crypto"
@@ -25,15 +26,15 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 		eventstore      func(t *testing.T) *eventstore.Eventstore
 		idGenerator     id.Generator
 		checkPermission domain.PermissionCheck
+		newCode         encrypedCodeFunc
 	}
 	type args struct {
 		ctx  context.Context
 		user *CreateSchemaUser
 	}
 	type res struct {
-		id              string
-		returnCodeEmail bool
-		returnCodePhone bool
+		returnCodeEmail string
+		returnCodePhone string
 		details         *domain.ObjectDetails
 		err             func(error) bool
 	}
@@ -235,9 +236,9 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				},
 			},
 			res{
-				id: "id1",
 				details: &domain.ObjectDetails{
 					ResourceOwner: "org1",
+					ID:            "id1",
 				},
 			},
 		},
@@ -318,9 +319,8 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				idGenerator: mock.ExpectID(t, "id1"),
 			},
 			args{
-				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
+				ctx: authz.NewMockContext("instanceID", "org1", "id1"),
 				user: &CreateSchemaUser{
-					Register:       true,
 					ResourceOwner:  "org1",
 					SchemaID:       "type",
 					schemaRevision: 1,
@@ -336,7 +336,96 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 		},
 		{
-			"user created, full",
+			"user create, invalid data type",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								}
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     mock.ExpectID(t, "id1"),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
+				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
+					SchemaID:       "type",
+					schemaRevision: 1,
+					Data: json.RawMessage(`{
+						"name": 1
+					}`),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+				},
+			},
+		},
+		{
+			"user create, invalid data attribute name",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								},
+       							"additionalProperties": false
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
+				),
+				checkPermission: newMockPermissionCheckAllowed(),
+				idGenerator:     mock.ExpectID(t, "id1"),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "org1", "user1"),
+				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
+					SchemaID:       "type",
+					schemaRevision: 1,
+					Data: json.RawMessage(`{
+						"invalid": "user"
+					}`),
+				},
+			},
+			res{
+				err: func(err error) bool {
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+				},
+			},
+		},
+		{
+			"user created, email return",
 			fields{
 				eventstore: expectEventstore(
 					expectFilter(
@@ -379,31 +468,17 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 								CryptoType: crypto.TypeEncryption,
 								Algorithm:  "enc",
 								KeyID:      "id",
-								Crypted:    []byte("a"),
+								Crypted:    []byte("emailverify"),
 							},
 							time.Hour*1,
 							"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
-							false,
-						),
-						schemauser.NewPhoneChangedEvent(context.Background(),
-							&schemauser.NewAggregate("id1", "org1").Aggregate,
-							"+41791234567",
-						),
-						schemauser.NewPhoneCodeAddedEvent(context.Background(),
-							&schemauser.NewAggregate("id1", "org1").Aggregate,
-							&crypto.CryptoValue{
-								CryptoType: crypto.TypeEncryption,
-								Algorithm:  "enc",
-								KeyID:      "id",
-								Crypted:    []byte("a"),
-							},
-							time.Hour*1,
-							false,
+							true,
 						),
 					),
 				),
 				idGenerator:     mock.ExpectID(t, "id1"),
 				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockEncryptedCode("emailverify", time.Hour),
 			},
 			args{
 				ctx: authz.NewMockContext("instanceID", "", ""),
@@ -416,19 +491,248 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 					}`),
 					Email: &Email{
 						Address:     "test@example.com",
-						Verified:    false,
+						ReturnCode:  true,
 						URLTemplate: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
-					},
-					Phone: &Phone{
-						Number:   "+41791234567",
-						Verified: false,
 					},
 				},
 			},
 			res{
-				id: "id1",
 				details: &domain.ObjectDetails{
 					ResourceOwner: "org1",
+					ID:            "id1",
+				},
+				returnCodeEmail: "emailverify",
+			},
+		},
+		{
+			"user created, email to verify",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								}
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						schemauser.NewCreatedEvent(
+							context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"type",
+							1,
+							json.RawMessage(`{
+						"name": "user"
+					}`),
+						),
+						schemauser.NewEmailChangedEvent(context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"test@example.com",
+						),
+						schemauser.NewEmailCodeAddedEvent(context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("emailverify"),
+							},
+							time.Hour*1,
+							"https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+							false,
+						),
+					),
+				),
+				idGenerator:     mock.ExpectID(t, "id1"),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockEncryptedCode("emailverify", time.Hour),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
+					SchemaID:       "type",
+					schemaRevision: 1,
+					Data: json.RawMessage(`{
+						"name": "user"
+					}`),
+					Email: &Email{
+						Address:     "test@example.com",
+						URLTemplate: "https://example.com/email/verify?userID={{.UserID}}&code={{.Code}}&orgID={{.OrgID}}",
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "id1",
+				},
+			},
+		},
+		{
+			"user created, phone return",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								}
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						schemauser.NewCreatedEvent(
+							context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"type",
+							1,
+							json.RawMessage(`{
+						"name": "user"
+					}`),
+						),
+						schemauser.NewPhoneChangedEvent(context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"+41791234567",
+						),
+						schemauser.NewPhoneCodeAddedEvent(context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("phoneverify"),
+							},
+							time.Hour*1,
+							true,
+						),
+					),
+				),
+				idGenerator:     mock.ExpectID(t, "id1"),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockEncryptedCode("phoneverify", time.Hour),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
+					SchemaID:       "type",
+					schemaRevision: 1,
+					Data: json.RawMessage(`{
+						"name": "user"
+					}`),
+					Phone: &Phone{
+						Number:     "+41791234567",
+						ReturnCode: true,
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "id1",
+				},
+				returnCodePhone: "phoneverify",
+			},
+		},
+		{
+			"user created, phone to verify",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								}
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						schemauser.NewCreatedEvent(
+							context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"type",
+							1,
+							json.RawMessage(`{
+						"name": "user"
+					}`),
+						),
+						schemauser.NewPhoneChangedEvent(context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"+41791234567",
+						),
+						schemauser.NewPhoneCodeAddedEvent(context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							&crypto.CryptoValue{
+								CryptoType: crypto.TypeEncryption,
+								Algorithm:  "enc",
+								KeyID:      "id",
+								Crypted:    []byte("phoneverify"),
+							},
+							time.Hour*1,
+							false,
+						),
+					),
+				),
+				idGenerator:     mock.ExpectID(t, "id1"),
+				checkPermission: newMockPermissionCheckAllowed(),
+				newCode:         mockEncryptedCode("phoneverify", time.Hour),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
+					SchemaID:       "type",
+					schemaRevision: 1,
+					Data: json.RawMessage(`{
+						"name": "user"
+					}`),
+					Phone: &Phone{
+						Number: "+41791234567",
+					},
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "id1",
 				},
 			},
 		},
@@ -499,9 +803,9 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				},
 			},
 			res{
-				id: "id1",
 				details: &domain.ObjectDetails{
 					ResourceOwner: "org1",
+					ID:            "id1",
 				},
 			},
 		},
@@ -509,11 +813,12 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Commands{
-				eventstore:      tt.fields.eventstore(t),
-				idGenerator:     tt.fields.idGenerator,
-				checkPermission: tt.fields.checkPermission,
+				eventstore:       tt.fields.eventstore(t),
+				idGenerator:      tt.fields.idGenerator,
+				checkPermission:  tt.fields.checkPermission,
+				newEncryptedCode: tt.fields.newCode,
 			}
-			err := c.CreateSchemaUser(tt.args.ctx, tt.args.user, GetMockSecretGenerator(t), GetMockSecretGenerator(t))
+			err := c.CreateSchemaUser(tt.args.ctx, tt.args.user, crypto.CreateMockEncryptionAlg(gomock.NewController(t)))
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -521,15 +826,14 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 				t.Errorf("got wrong err: %v ", err)
 			}
 			if tt.res.err == nil {
-				assert.Equal(t, tt.res.id, tt.args.user.ID)
 				assertObjectDetails(t, tt.res.details, tt.args.user.Details)
 			}
 
-			if tt.res.returnCodePhone {
-				assert.NotEmpty(t, tt.args.user.ReturnCodePhone)
+			if tt.res.returnCodePhone != "" {
+				assert.Equal(t, tt.res.returnCodePhone, tt.args.user.ReturnCodePhone)
 			}
-			if tt.res.returnCodeEmail {
-				assert.NotEmpty(t, tt.args.user.ReturnCodeEmail)
+			if tt.res.returnCodeEmail != "" {
+				assert.Equal(t, tt.res.returnCodeEmail, tt.args.user.ReturnCodeEmail)
 			}
 		})
 	}

@@ -18,8 +18,6 @@ type CreateSchemaUser struct {
 	Details       *domain.ObjectDetails
 	ResourceOwner string
 
-	Register bool
-
 	SchemaID       string
 	schemaRevision uint64
 
@@ -56,16 +54,10 @@ func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 		}
 	}
 
-	role := domain_schema.RoleUnspecified
-	// if register then the role is directly self, and check if it is permitted to register is checked before
-	if s.Register {
-		role = domain_schema.RoleSelf
-	} else {
-		// get role for permission check in schema through extension
-		role, err = c.getSchemaRoleForWrite(ctx, s.ResourceOwner, s.ID)
-		if err != nil {
-			return err
-		}
+	// get role for permission check in schema through extension
+	role, err := c.getSchemaRoleForWrite(ctx, s.ResourceOwner, s.ID)
+	if err != nil {
+		return err
 	}
 
 	schema, err := domain_schema.NewSchema(role, bytes.NewReader(schemaWriteModel.Schema))
@@ -170,11 +162,6 @@ func (c *Commands) DeleteSchemaUser(ctx context.Context, id string) (*domain.Obj
 }
 
 func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, email *Email, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
-	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyEmailCode) //nolint:staticcheck
-	if err != nil {
-		return nil, "", err
-	}
-	gen := crypto.NewEncryptionGenerator(*config, alg)
 
 	events = append(events, schemauser.NewEmailChangedEvent(ctx,
 		agg,
@@ -183,14 +170,16 @@ func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstor
 	if email.Verified {
 		events = append(events, schemauser.NewEmailVerifiedEvent(ctx, agg))
 	} else {
-		returnCode, code, err := generateCode(gen, email.ReturnCode)
+		cryptoCode, err := c.newEmailCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
 		if err != nil {
 			return nil, "", err
 		}
-		plainCode = code
+		if email.ReturnCode {
+			plainCode = cryptoCode.Plain
+		}
 		events = append(events, schemauser.NewEmailCodeAddedEvent(ctx, agg,
-			returnCode,
-			gen.Expiry(),
+			cryptoCode.Crypted,
+			cryptoCode.Expiry,
 			email.URLTemplate,
 			email.ReturnCode,
 		))
@@ -199,12 +188,6 @@ func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstor
 }
 
 func (c *Commands) updateSchemaUserPhone(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, phone *Phone, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
-	config, err := cryptoGeneratorConfig(ctx, c.eventstore.Filter, domain.SecretGeneratorTypeVerifyPhoneCode) //nolint:staticcheck
-	if err != nil {
-		return nil, "", err
-	}
-	gen := crypto.NewEncryptionGenerator(*config, alg)
-
 	events = append(events, schemauser.NewPhoneChangedEvent(ctx,
 		agg,
 		phone.Number,
@@ -212,14 +195,16 @@ func (c *Commands) updateSchemaUserPhone(ctx context.Context, events []eventstor
 	if phone.Verified {
 		events = append(events, schemauser.NewPhoneVerifiedEvent(ctx, agg))
 	} else {
-		returnCode, code, err := generateCode(gen, phone.ReturnCode)
+		cryptoCode, err := c.newPhoneCode(ctx, c.eventstore.Filter, alg) //nolint:staticcheck
 		if err != nil {
 			return nil, "", err
 		}
-		plainCode = code
+		if phone.ReturnCode {
+			plainCode = cryptoCode.Plain
+		}
 		events = append(events, schemauser.NewPhoneCodeAddedEvent(ctx, agg,
-			returnCode,
-			gen.Expiry(),
+			cryptoCode.Crypted,
+			cryptoCode.Expiry,
 			phone.ReturnCode,
 		))
 	}

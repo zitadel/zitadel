@@ -15,7 +15,7 @@ const (
 	UserSchemaTable = "projections.user_schemas1"
 
 	UserSchemaIDCol                     = "id"
-	UserSchemaCreationDateCol           = "create_date"
+	UserSchemaCreationDateCol           = "creation_date"
 	UserSchemaChangeDateCol             = "change_date"
 	UserSchemaSequenceCol               = "sequence"
 	UserSchemaInstanceIDCol             = "instance_id"

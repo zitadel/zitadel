@@ -20,12 +20,12 @@ func (s *Server) CreateUserSchema(ctx context.Context, req *schema.CreateUserSch
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.CreateUserSchema(ctx, userSchema)
-	if err != nil {
+
+	if err := s.command.CreateUserSchema(ctx, userSchema); err != nil {
 		return nil, err
 	}
 	return &schema.CreateUserSchemaResponse{
-		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
+		Details: resource_object.DomainToDetailsPb(userSchema.Details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
 	}, nil
 }
 
@@ -38,12 +38,11 @@ func (s *Server) PatchUserSchema(ctx context.Context, req *schema.PatchUserSchem
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.ChangeUserSchema(ctx, userSchema)
-	if err != nil {
+	if err := s.command.ChangeUserSchema(ctx, userSchema); err != nil {
 		return nil, err
 	}
 	return &schema.PatchUserSchemaResponse{
-		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
+		Details: resource_object.DomainToDetailsPb(userSchema.Details, object.OwnerType_OWNER_TYPE_INSTANCE, instanceID),
 	}, nil
 }
 

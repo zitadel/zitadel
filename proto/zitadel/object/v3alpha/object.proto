@@ -31,7 +31,7 @@ message Instance {
 message Organization {
   oneof property {
     option (validate.required) = true;
-    string id = 1;
-    string domain = 2;
+    string org_id = 1;
+    string org_domain = 2;
   }
 }

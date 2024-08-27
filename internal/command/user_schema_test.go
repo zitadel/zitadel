@@ -27,7 +27,6 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 		userSchema *CreateUserSchema
 	}
 	type res struct {
-		id      string
 		details *domain.ObjectDetails
 		err     error
 	}
@@ -132,8 +131,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				},
 			},
 			res{
-				id: "id1",
 				details: &domain.ObjectDetails{
+					ID:            "id1",
 					ResourceOwner: "instanceID",
 				},
 			},
@@ -183,8 +182,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				},
 			},
 			res{
-				id: "id1",
 				details: &domain.ObjectDetails{
+					ID:            "id1",
 					ResourceOwner: "instanceID",
 				},
 			},
@@ -269,8 +268,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				},
 			},
 			res{
-				id: "id1",
 				details: &domain.ObjectDetails{
+					ID:            "id1",
 					ResourceOwner: "instanceID",
 				},
 			},
@@ -282,9 +281,8 @@ func TestCommands_CreateUserSchema(t *testing.T) {
 				eventstore:  tt.fields.eventstore(t),
 				idGenerator: tt.fields.idGenerator,
 			}
-			gotID, gotDetails, err := c.CreateUserSchema(tt.args.ctx, tt.args.userSchema)
-			assert.Equal(t, tt.res.id, gotID)
-			assertObjectDetails(t, tt.res.details, gotDetails)
+			err := c.CreateUserSchema(tt.args.ctx, tt.args.userSchema)
+			assertObjectDetails(t, tt.res.details, tt.args.userSchema.Details)
 			assert.ErrorIs(t, err, tt.res.err)
 		})
 	}
@@ -623,9 +621,9 @@ func TestCommands_ChangeUserSchema(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := c.ChangeUserSchema(tt.args.ctx, tt.args.userSchema)
+			err := c.ChangeUserSchema(tt.args.ctx, tt.args.userSchema)
 			assert.ErrorIs(t, err, tt.res.err)
-			assertObjectDetails(t, tt.res.details, got)
+			assertObjectDetails(t, tt.res.details, tt.args.userSchema.Details)
 		})
 	}
 }

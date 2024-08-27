@@ -45,6 +45,19 @@ func createUserRequestToCreateSchemaUser(ctx context.Context, req *user.CreateUs
 	}, nil
 }
 
+func (s *Server) DeleteUser(ctx context.Context, req *user.DeleteUserRequest) (_ *user.DeleteUserResponse, err error) {
+	if err := checkUserSchemaEnabled(ctx); err != nil {
+		return nil, err
+	}
+	details, err := s.command.DeleteSchemaUser(ctx, req.GetUserId())
+	if err != nil {
+		return nil, err
+	}
+	return &user.DeleteUserResponse{
+		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_ORG, details.ResourceOwner),
+	}, nil
+}
+
 func checkUserSchemaEnabled(ctx context.Context) error {
 	if authz.GetInstance(ctx).Features().UserSchema {
 		return nil

@@ -34,12 +34,6 @@ func (e *CreatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-/*
-func (e *CreatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return []*eventstore.UniqueConstraint{NewAddUserIDUniqueConstraint(e.SchemaID)}
-}
-*/
-
 func NewCreatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
@@ -77,17 +71,6 @@ func (e *UpdatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
 func (e *UpdatedEvent) Payload() interface{} {
 	return e
 }
-
-/*
-func (e *UpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	if e.oldSchemaType == "" {
-		return nil
-	}
-	return []*eventstore.UniqueConstraint{
-		NewRemoveUserIDUniqueConstraint(e.Agg.ID),
-		NewAddUserIDUniqueConstraint(*e.Agg.ID),
-	}
-}*/
 
 func (e *UpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil

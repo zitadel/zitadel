@@ -20,7 +20,8 @@ import (
 )
 
 func TestServer_ListUserSchemas(t *testing.T) {
-	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
+	//_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
+	isolatedIAMOwnerCTX := IAMOwnerCTX
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
 	userSchema := new(structpb.Struct)
@@ -67,7 +68,8 @@ func TestServer_ListUserSchemas(t *testing.T) {
 			},
 			want: &schema.SearchUserSchemasResponse{
 				Details: &object.ListDetails{
-					TotalResult: 0,
+					TotalResult:  0,
+					AppliedLimit: 100,
 				},
 				Result: []*schema.UserSchema{},
 			},
@@ -79,7 +81,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				req: &schema.SearchUserSchemasRequest{},
 				prepare: func(request *schema.SearchUserSchemasRequest, resp *schema.SearchUserSchemasResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
-					createResp := Tester.CreateUserSchemaWithType(isolatedIAMOwnerCTX, t, schemaType)
+					createResp := Tester.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType)
 					request.Filters = []*schema.SearchFilter{
 						{
 							Filter: &schema.SearchFilter_IdFilter{
@@ -90,20 +92,18 @@ func TestServer_ListUserSchemas(t *testing.T) {
 							},
 						},
 					}
-
 					resp.Result[0].Type = schemaType
-					resp.Result[0].Details = &object.Details{
-						Id:      createResp.GetDetails().GetId(),
-						Created: createResp.GetDetails().GetCreated(),
-						Changed: createResp.GetDetails().GetChanged(),
-						Owner:   createResp.GetDetails().GetOwner(),
-					}
+					resp.Result[0].Details = createResp.GetDetails()
+					// as schema is freshly created, the changed date is the created date
+					resp.Result[0].Details.Created = resp.Result[0].Details.GetChanged()
+					resp.Details.Timestamp = resp.Result[0].Details.GetChanged()
 					return nil
 				},
 			},
 			want: &schema.SearchUserSchemasResponse{
 				Details: &object.ListDetails{
-					TotalResult: 1,
+					TotalResult:  1,
+					AppliedLimit: 100,
 				},
 				Result: []*schema.UserSchema{
 					{
@@ -124,8 +124,8 @@ func TestServer_ListUserSchemas(t *testing.T) {
 					schemaType := fmt.Sprint(time.Now().UnixNano())
 					schemaType1 := schemaType + "_1"
 					schemaType2 := schemaType + "_2"
-					createResp := Tester.CreateUserSchemaWithType(isolatedIAMOwnerCTX, t, schemaType1)
-					createResp2 := Tester.CreateUserSchemaWithType(isolatedIAMOwnerCTX, t, schemaType2)
+					createResp := Tester.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType1)
+					createResp2 := Tester.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType2)
 
 					request.SortingColumn = gu.Ptr(schema.FieldName_FIELD_NAME_TYPE)
 					request.Query = &object.SearchQuery{Desc: false}
@@ -141,25 +141,16 @@ func TestServer_ListUserSchemas(t *testing.T) {
 					}
 
 					resp.Result[0].Type = schemaType1
-					resp.Result[0].Details = &object.Details{
-						Id:      createResp.GetDetails().GetId(),
-						Created: createResp.GetDetails().GetCreated(),
-						Changed: createResp.GetDetails().GetChanged(),
-						Owner:   createResp.GetDetails().GetOwner(),
-					}
+					resp.Result[0].Details = createResp.GetDetails()
 					resp.Result[1].Type = schemaType2
-					resp.Result[1].Details = &object.Details{
-						Id:      createResp2.GetDetails().GetId(),
-						Created: createResp2.GetDetails().GetCreated(),
-						Changed: createResp2.GetDetails().GetChanged(),
-						Owner:   createResp2.GetDetails().GetOwner(),
-					}
+					resp.Result[1].Details = createResp2.GetDetails()
 					return nil
 				},
 			},
 			want: &schema.SearchUserSchemasResponse{
 				Details: &object.ListDetails{
-					TotalResult: 2,
+					TotalResult:  2,
+					AppliedLimit: 100,
 				},
 				Result: []*schema.UserSchema{
 					{
@@ -198,14 +189,15 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				}
 				assert.NoError(ttt, err)
 
-				fmt.Println(tt.want)
-				fmt.Println(got)
-
 				// always first check length, otherwise its failed anyway
 				assert.Len(ttt, got.Result, len(tt.want.Result))
 				for i := range tt.want.Result {
-					//
-					grpc.AllFieldsEqual(t, tt.want.Result[i].ProtoReflect(), got.Result[i].ProtoReflect(), grpc.CustomMappers)
+					want := tt.want.Result[i]
+					got := got.Result[i]
+
+					integration.AssertResourceDetails(t, want.GetDetails(), got.GetDetails())
+					want.Details = got.Details
+					grpc.AllFieldsEqual(t, want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 				}
 				integration.AssertListDetails(t, tt.want, got)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
@@ -214,7 +206,8 @@ func TestServer_ListUserSchemas(t *testing.T) {
 }
 
 func TestServer_GetUserSchemaByID(t *testing.T) {
-	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
+	//_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
+	isolatedIAMOwnerCTX := IAMOwnerCTX
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
 	userSchema := new(structpb.Struct)
@@ -242,7 +235,7 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 				req: &schema.GetUserSchemaByIDRequest{},
 				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
-					createResp := Tester.CreateUserSchemaWithType(isolatedIAMOwnerCTX, t, schemaType)
+					createResp := Tester.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 					return nil
 				},
@@ -266,7 +259,7 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 				req: &schema.GetUserSchemaByIDRequest{},
 				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
-					createResp := Tester.CreateUserSchemaWithType(isolatedIAMOwnerCTX, t, schemaType)
+					createResp := Tester.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 
 					resp.Schema.Type = schemaType
@@ -304,10 +297,8 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 				}
 				assert.NoError(ttt, err)
 
-				fmt.Println(tt.want)
-				fmt.Println(got)
-
 				integration.AssertResourceDetails(t, tt.want.GetSchema().GetDetails(), got.GetSchema().GetDetails())
+				tt.want.Schema.Details = got.GetSchema().GetDetails()
 				grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
 		})
