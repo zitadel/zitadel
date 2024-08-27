@@ -19,8 +19,7 @@ import (
 )
 
 func TestServer_CreateUser(t *testing.T) {
-	//_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	isolatedIAMOwnerCTX := IAMOwnerCTX
+	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 	schema := []byte(`{
 		"$schema": "urn:zitadel:schema:v1",
@@ -65,8 +64,8 @@ func TestServer_CreateUser(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
-					Property: &object.Organization_Id{
-						Id: orgResp.GetOrganizationId(),
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
 				User: &user.User{Data: unmarshalJSON("{\"name\": \"user\"}")},
@@ -78,8 +77,8 @@ func TestServer_CreateUser(t *testing.T) {
 			ctx:  context.Background(),
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
-					Property: &object.Organization_Id{
-						Id: orgResp.GetOrganizationId(),
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
 				SchemaId: schemaResp.GetDetails().GetId(),
@@ -92,8 +91,8 @@ func TestServer_CreateUser(t *testing.T) {
 			ctx:  UserCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
-					Property: &object.Organization_Id{
-						Id: orgResp.GetOrganizationId(),
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
 				SchemaId: schemaResp.GetDetails().GetId(),
@@ -106,8 +105,8 @@ func TestServer_CreateUser(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
-					Property: &object.Organization_Id{
-						Id: orgResp.GetOrganizationId(),
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
 				SchemaId: permissionSchemaResp.GetDetails().GetId(),
@@ -120,8 +119,8 @@ func TestServer_CreateUser(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
-					Property: &object.Organization_Id{
-						Id: orgResp.GetOrganizationId(),
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
 				SchemaId: schemaResp.GetDetails().GetId(),
@@ -141,8 +140,8 @@ func TestServer_CreateUser(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
-					Property: &object.Organization_Id{
-						Id: orgResp.GetOrganizationId(),
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
 				SchemaId: schemaResp.GetDetails().GetId(),
@@ -163,8 +162,8 @@ func TestServer_CreateUser(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
-					Property: &object.Organization_Id{
-						Id: orgResp.GetOrganizationId(),
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
 				SchemaId: schemaResp.GetDetails().GetId(),
@@ -184,8 +183,8 @@ func TestServer_CreateUser(t *testing.T) {
 			ctx:  isolatedIAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
-					Property: &object.Organization_Id{
-						Id: orgResp.GetOrganizationId(),
+					Property: &object.Organization_OrgId{
+						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
 				SchemaId: schemaResp.GetDetails().GetId(),

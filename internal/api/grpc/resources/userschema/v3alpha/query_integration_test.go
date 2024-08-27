@@ -20,8 +20,7 @@ import (
 )
 
 func TestServer_ListUserSchemas(t *testing.T) {
-	//_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	isolatedIAMOwnerCTX := IAMOwnerCTX
+	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
 	userSchema := new(structpb.Struct)
@@ -206,8 +205,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 }
 
 func TestServer_GetUserSchemaByID(t *testing.T) {
-	//_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	isolatedIAMOwnerCTX := IAMOwnerCTX
+	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
 	userSchema := new(structpb.Struct)

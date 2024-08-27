@@ -21,9 +21,7 @@ import (
 )
 
 func TestServer_CreateUserSchema(t *testing.T) {
-	//_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	instanceID := Tester.Instance.InstanceID()
-	isolatedIAMOwnerCTX := IAMOwnerCTX
+	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
 	tests := []struct {
@@ -306,9 +304,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 }
 
 func TestServer_UpdateUserSchema(t *testing.T) {
-	//_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	instanceID := Tester.Instance.InstanceID()
-	isolatedIAMOwnerCTX := IAMOwnerCTX
+	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
 	type args struct {
@@ -580,9 +576,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 }
 
 func TestServer_DeactivateUserSchema(t *testing.T) {
-	//_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	instanceID := Tester.Instance.InstanceID()
-	isolatedIAMOwnerCTX := IAMOwnerCTX
+	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
 	type args struct {
@@ -662,9 +656,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 }
 
 func TestServer_ReactivateUserSchema(t *testing.T) {
-	//_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	instanceID := Tester.Instance.InstanceID()
-	isolatedIAMOwnerCTX := IAMOwnerCTX
+	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 
 	type args struct {
