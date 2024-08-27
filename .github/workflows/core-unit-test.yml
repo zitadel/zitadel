@@ -15,6 +15,9 @@ on:
       crdb_version:
         required: false
         type: string
+    secrets:
+      CODECOV_TOKEN:
+        required: true
 
 jobs:
   test:
