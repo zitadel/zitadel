@@ -506,13 +506,13 @@ func (l *Login) checkAutoLinking(w http.ResponseWriter, r *http.Request, authReq
 }
 
 func (l *Login) autoLinkUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, user *query.NotifyUser) {
-	err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID)
-	if err != nil {
+	if err := l.authRepo.SelectUser(r.Context(), authReq.ID, user.ID, authReq.AgentID); err != nil {
 		l.renderError(w, r, authReq, err)
+		return
 	}
-	err = l.authRepo.LinkExternalUsers(r.Context(), authReq.ID, authReq.AgentID, domain.BrowserInfoFromRequest(r))
-	if err != nil {
+	if err := l.authRepo.LinkExternalUsers(r.Context(), authReq.ID, authReq.AgentID, domain.BrowserInfoFromRequest(r)); err != nil {
 		l.renderError(w, r, authReq, err)
+		return
 	}
 	l.renderNextStep(w, r, authReq)
 }
