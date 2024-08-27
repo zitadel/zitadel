@@ -536,19 +536,8 @@ module.exports = {
     },
   ],
   apis: [
-    {
-      type: "category",
-      label: "Overview",
-      collapsed: true,
-      link: {
-        type: "doc",
-        id: "apis/introduction"
-      },
-      items: [
-          "apis/v2",
-          "apis/v3"
-      ],
-    },
+
+    "apis/introduction",
     {
       type: "category",
       label: "Resources",
@@ -572,7 +561,7 @@ module.exports = {
               label: "v3 (alpha)",
               link: {
                 type: "generated-index",
-                title: "Hodor (alpha)",
+                title: "Actions Service API (alpha)",
                 slug: "/apis/resources/action_service_v3",
                 description:
                     "This API is intended to manage custom executions and targets (previously known as actions) in a ZITADEL instance.\n" +
