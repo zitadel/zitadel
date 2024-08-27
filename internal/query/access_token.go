@@ -109,14 +109,14 @@ func (q *Queries) ActiveAccessTokenByToken(ctx context.Context, token string) (m
 
 	split := strings.Split(token, "-")
 	if len(split) != 2 {
-		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-LJK2W", "Errors.OIDCSession.Token.Invalid")
+		return nil, zerrors.ThrowUnauthenticated(nil, "QUERY-LJK2W", "Errors.OIDCSession.Token.Invalid")
 	}
 	model, err = q.accessTokenByOIDCSessionAndTokenID(ctx, split[0], split[1])
 	if err != nil {
 		return nil, err
 	}
 	if !model.AccessTokenExpiration.After(time.Now()) {
-		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-SAF3rf", "Errors.OIDCSession.Token.Expired")
+		return nil, zerrors.ThrowUnauthenticated(nil, "QUERY-SAF3rf", "Errors.OIDCSession.Token.Expired")
 	}
 	if err = q.checkSessionNotTerminatedAfter(ctx, model.SessionID, model.UserID, model.Position, model.UserAgent.GetFingerprintID()); err != nil {
 		return nil, err
@@ -130,10 +130,10 @@ func (q *Queries) accessTokenByOIDCSessionAndTokenID(ctx context.Context, oidcSe
 
 	model = newOIDCSessionAccessTokenReadModel(oidcSessionID)
 	if err = q.eventstore.FilterToQueryReducer(ctx, model); err != nil {
-		return nil, zerrors.ThrowPermissionDenied(err, "QUERY-ASfe2", "Errors.OIDCSession.Token.Invalid")
+		return nil, zerrors.ThrowUnauthenticated(err, "QUERY-ASfe2", "Errors.OIDCSession.Token.Invalid")
 	}
 	if model.AccessTokenID != tokenID {
-		return nil, zerrors.ThrowPermissionDenied(nil, "QUERY-M2u9w", "Errors.OIDCSession.Token.Invalid")
+		return nil, zerrors.ThrowUnauthenticated(nil, "QUERY-M2u9w", "Errors.OIDCSession.Token.Invalid")
 	}
 	return model, nil
 }
@@ -152,11 +152,11 @@ func (q *Queries) checkSessionNotTerminatedAfter(ctx context.Context, sessionID,
 	}
 	err = q.eventstore.FilterToQueryReducer(ctx, model)
 	if err != nil {
-		return zerrors.ThrowPermissionDenied(err, "QUERY-SJ642", "Errors.Internal")
+		return zerrors.ThrowUnauthenticated(err, "QUERY-SJ642", "Errors.Internal")
 	}
 
 	if model.terminated {
-		return zerrors.ThrowPermissionDenied(nil, "QUERY-IJL3H", "Errors.OIDCSession.Token.Invalid")
+		return zerrors.ThrowUnauthenticated(nil, "QUERY-IJL3H", "Errors.OIDCSession.Token.Invalid")
 	}
 	return nil
 }

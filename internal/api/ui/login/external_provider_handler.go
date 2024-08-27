@@ -846,7 +846,7 @@ func (l *Login) updateExternalUsername(ctx context.Context, user *query.User, ex
 	if err != nil {
 		return err
 	}
-	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{externalIDQuery, idpIDQuery, userIDQuery}}, false)
+	links, err := l.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{externalIDQuery, idpIDQuery, userIDQuery}}, nil)
 	if err != nil || len(links.Links) == 0 {
 		return err
 	}
@@ -1326,6 +1326,6 @@ func (l *Login) getUserLinks(ctx context.Context, userID, idpID string) (*query.
 				userIDQuery,
 				idpIDQuery,
 			},
-		}, false,
+		}, nil,
 	)
 }
