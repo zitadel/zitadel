@@ -602,6 +602,18 @@ module.exports = {
               type: "link",
               label: "v1 (stable)",
               href: "/apis/resources/mgmt/branding"
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Branding",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-branding-settings"
+                }
+              ],
             }
           ],
         },
@@ -613,6 +625,18 @@ module.exports = {
               type: "link",
               label: "v1 (stable)",
               href: "/apis/resources/mgmt/domain-settings"
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Domain Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-domain-settings"
+                }
+              ],
             }
           ],
         },
@@ -738,6 +762,24 @@ module.exports = {
         },
         {
           type: "category",
+          label: "Lockout Settings",
+          items: [
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Lockout Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-lockout-settings"
+                }
+              ],
+            }
+          ]
+        },
+        {
+          type: "category",
           label: "Login Settings",
           items: [
             {
@@ -754,6 +796,18 @@ module.exports = {
                   type: "link",
                   label: "Management API - Organization Login Settings",
                   href: "/apis/resources/mgmt/login-settings"
+                }
+              ],
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Login Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-login-settings"
                 }
               ],
             }
@@ -915,6 +969,23 @@ module.exports = {
                   href: "/apis/resources/mgmt/password-settings"
                 }
               ],
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Password Complexity Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-password-complexity-settings"
+                },
+                {
+                  type: "link",
+                  label: "Get Password Expiry Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-password-expiry-settings"
+                }
+              ],
             }
           ],
         },
@@ -936,6 +1007,18 @@ module.exports = {
                   type: "link",
                   label: "Management API - Organization Privacy Settings",
                   href: "/apis/resources/mgmt/privacy-settings"
+                }
+              ],
+            },
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Legal & Support Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-legal-and-support-settings"
                 }
               ],
             }
@@ -984,6 +1067,29 @@ module.exports = {
               href: "/apis/resources/admin/secrets"
             }
           ],
+        },
+        {
+          type: "category",
+          label: "Security Settings",
+          items: [
+            {
+              type: "category",
+              label: "v2 (stable)",
+              collapsed: true,
+              items: [
+                {
+                  type: "link",
+                  label: "Get Security Settings",
+                  href: "/apis/resources/settings_service_v2/settings-service-get-security-settings"
+                },
+                {
+                  type: "link",
+                  label: "Set Security Settings",
+                  href: "/apis/resources/settings_service_v2/apis/resources/settings_service_v2/settings-service-set-security-settings"
+                }
+              ],
+            }
+          ]
         },
         {
           type: "category",
@@ -1236,15 +1342,6 @@ module.exports = {
             },
           ],
         },
-        // {
-        //   type: "category",
-        //   label: "V3 (Preview)",
-        //   collapsed: false,
-        //   link: {
-        //     type: "doc",
-        //     id: "apis/v3",
-        //   }
-        // },
         {
           type: "category",
           label: "Assets",
