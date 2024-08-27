@@ -576,6 +576,11 @@ Errors:
     NotActive: Gebruikersschema niet actief
     NotInactive: Gebruikersschema niet inactief
     NotExists: Gebruikersschema bestaat niet
+    ID:
+      Missing: Недостасува ID на корисничка шема
+    Invalid: Корисничката шема е неважечка
+    Data:
+      Invalid: Податоците не се валидни за корисничка шема
   TokenExchange:
     FeatureDisabled: De Token Exchange-functie is uitgeschakeld voor uw instantie. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:

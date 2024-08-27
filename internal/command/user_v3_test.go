@@ -56,7 +56,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "TODO", "Errors.ResourceOwnerMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-urEJKa1tJM", "Errors.ResourceOwnerMissing"))
 				},
 			},
 		},
@@ -74,7 +74,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "TODO", "Errors.UserSchema.User.Type.Missing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-TFo06JgnF2", "Errors.UserSchema.ID.Missing"))
 				},
 			},
 		},
@@ -96,7 +96,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-N9QOuN4F7o", "Errors.UserSchema.NotExists"))
 				},
 			},
 		},
@@ -137,7 +137,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-7o3ZGxtXUz", "Errors.User.Invalid"))
 				},
 			},
 		},
@@ -285,7 +285,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SlKXqLSeL6", "Errors.UserSchema.Data.Invalid"))
 				},
 			},
 		},
@@ -331,7 +331,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SlKXqLSeL6", "Errors.UserSchema.Data.Invalid"))
 				},
 			},
 		},
@@ -375,7 +375,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SlKXqLSeL6", "Errors.UserSchema.Data.Invalid"))
 				},
 			},
 		},
@@ -420,7 +420,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 			res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowPreconditionFailed(nil, "COMMAND-SlKXqLSeL6", "Errors.UserSchema.Data.Invalid"))
 				},
 			},
 		},
@@ -458,7 +458,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 						"name": "user"
 					}`),
 						),
-						schemauser.NewEmailChangedEvent(context.Background(),
+						schemauser.NewEmailUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"test@example.com",
 						),
@@ -538,7 +538,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 						"name": "user"
 					}`),
 						),
-						schemauser.NewEmailChangedEvent(context.Background(),
+						schemauser.NewEmailUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"test@example.com",
 						),
@@ -770,7 +770,7 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 						"name": "user"
 					}`),
 						),
-						schemauser.NewEmailChangedEvent(context.Background(),
+						schemauser.NewEmailUpdatedEvent(context.Background(),
 							&schemauser.NewAggregate("id1", "org1").Aggregate,
 							"test@example.com",
 						),
@@ -872,7 +872,7 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "TODO", "Errors.IDMissing"))
+					return errors.Is(err, zerrors.ThrowInvalidArgument(nil, "COMMAND-Vs4wJCME7T", "Errors.IDMissing"))
 				},
 			},
 		},
@@ -890,7 +890,7 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound"))
 				},
 			},
 		},
@@ -924,7 +924,7 @@ func TestCommandSide_DeleteSchemaUser(t *testing.T) {
 			},
 			res: res{
 				err: func(err error) bool {
-					return errors.Is(err, zerrors.ThrowNotFound(nil, "TODO", "TODO"))
+					return errors.Is(err, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound"))
 				},
 			},
 		},

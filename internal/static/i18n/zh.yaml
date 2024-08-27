@@ -576,6 +576,11 @@ Errors:
     NotActive: 用户架构未激活
     NotInactive: 用户架构未处于非活动状态
     NotExists: 用户架构不存在
+    ID:
+      Missing: 缺少用户架构 ID
+    Invalid: 用户架构无效
+    Data:
+      Invalid: 用户架构的数据无效
   TokenExchange:
     FeatureDisabled: 您的实例已禁用令牌交换功能。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:

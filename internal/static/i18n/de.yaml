@@ -576,6 +576,11 @@ Errors:
     NotActive: Benutzerschema nicht aktiv
     NotInactive: Benutzerschema nicht inaktiv
     NotExists: Benutzerschema existiert nicht
+    ID:
+      Missing: BenutzerschemaID fehlt
+    Invalid: Benutzerschema ist ungültig
+    Data:
+      Invalid: Daten für Benutzerschema ungültig
   TokenExchange:
     FeatureDisabled: Die Token-Austauschfunktion ist für Ihre Instanz deaktiviert. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:

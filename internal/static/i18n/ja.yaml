@@ -565,6 +565,11 @@ Errors:
     NotActive: ユーザースキーマがアクティブではありません
     NotInactive: ユーザースキーマが非アクティブではありません
     NotExists: ユーザースキーマが存在しません
+    ID:
+      Missing: ユーザー スキーマ ID がありません
+    Invalid: ユーザー スキーマが無効です
+    Data:
+      Invalid: ユーザー スキーマのデータが無効です
   TokenExchange:
     FeatureDisabled: インスタンスではトークン交換機能が無効になっています。 https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:

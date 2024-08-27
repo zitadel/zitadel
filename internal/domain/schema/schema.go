@@ -31,11 +31,11 @@ func NewSchema(role Role, r io.Reader) (*jsonschema.Schema, error) {
 		role,
 	})
 	if err := c.AddResource("schema.json", r); err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "COMMA-Frh42", "Errors.UserSchema.Schema.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(err, "COMMA-Frh42", "Errors.UserSchema.Invalid")
 	}
 	schema, err := c.Compile("schema.json")
 	if err != nil {
-		return nil, zerrors.ThrowInvalidArgument(err, "COMMA-W21tg", "Errors.UserSchema.Schema.Invalid")
+		return nil, zerrors.ThrowInvalidArgument(err, "COMMA-W21tg", "Errors.UserSchema.Invalid")
 	}
 	return schema, nil
 }

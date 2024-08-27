@@ -77,7 +77,7 @@ func (wm *UserV3WriteModel) Reduce() error {
 			}
 		case *schemauser.DeletedEvent:
 			wm.State = domain.UserStateDeleted
-		case *schemauser.EmailChangedEvent:
+		case *schemauser.EmailUpdatedEvent:
 			wm.Email = string(e.EmailAddress)
 		case *schemauser.EmailCodeAddedEvent:
 			wm.IsEmailVerified = false
@@ -124,7 +124,7 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 	}
 	if wm.EmailWM {
 		query = query.EventTypes(
-			schemauser.EmailChangedType,
+			schemauser.EmailUpdatedType,
 			schemauser.EmailVerifiedType,
 			schemauser.EmailCodeAddedType,
 			schemauser.EmailVerificationFailedType,
@@ -132,7 +132,7 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 	}
 	if wm.PhoneWM {
 		query = query.EventTypes(
-			schemauser.PhoneChangedType,
+			schemauser.PhoneUpdatedType,
 			schemauser.PhoneVerifiedType,
 			schemauser.PhoneCodeAddedType,
 			schemauser.PhoneVerificationFailedType,

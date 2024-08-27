@@ -13,40 +13,40 @@ import (
 
 const (
 	emailEventPrefix            = eventPrefix + "email."
-	EmailChangedType            = emailEventPrefix + "changed"
+	EmailUpdatedType            = emailEventPrefix + "updated"
 	EmailVerifiedType           = emailEventPrefix + "verified"
 	EmailVerificationFailedType = emailEventPrefix + "verification.failed"
 	EmailCodeAddedType          = emailEventPrefix + "code.added"
 	EmailCodeSentType           = emailEventPrefix + "code.sent"
 )
 
-type EmailChangedEvent struct {
+type EmailUpdatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	EmailAddress domain.EmailAddress `json:"email,omitempty"`
 }
 
-func (e *EmailChangedEvent) Payload() interface{} {
+func (e *EmailUpdatedEvent) Payload() interface{} {
 	return e
 }
 
-func (e *EmailChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+func (e *EmailUpdatedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
 }
 
-func NewEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress domain.EmailAddress) *EmailChangedEvent {
-	return &EmailChangedEvent{
+func NewEmailUpdatedEvent(ctx context.Context, aggregate *eventstore.Aggregate, emailAddress domain.EmailAddress) *EmailUpdatedEvent {
+	return &EmailUpdatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			EmailChangedType,
+			EmailUpdatedType,
 		),
 		EmailAddress: emailAddress,
 	}
 }
 
-func EmailChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	emailChangedEvent := &EmailChangedEvent{
+func EmailUpdatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	emailChangedEvent := &EmailUpdatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := event.Unmarshal(emailChangedEvent)

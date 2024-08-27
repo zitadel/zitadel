@@ -571,6 +571,11 @@ Errors:
     NotActive: Esquema do usuário não ativo
     NotInactive: Esquema do usuário não inativo
     NotExists: O esquema do usuário não existe
+    ID:
+      Missing: ID do esquema do utilizador em falta
+    Invalid: Esquema de utilizador inválido
+    Data:
+      Invalid: Dados inválidos para o esquema do utilizador
   TokenExchange:
     FeatureDisabled: O recurso Token Exchange está desabilitado para sua instância. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:

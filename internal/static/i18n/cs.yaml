@@ -574,6 +574,11 @@ Errors:
     NotActive: Uživatelské schéma není aktivní
     NotInactive: Uživatelské schéma není neaktivní
     NotExists: Uživatelské schéma neexistuje
+    ID:
+      Missing: Chybí ID schématu uživatele
+    Invalid: Uživatelské schéma je neplatné
+    Data:
+      Invalid: Data neplatná pro uživatelské schéma
   TokenExchange:
     FeatureDisabled: Funkce Token Exchange je pro vaši instanci zakázána. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:

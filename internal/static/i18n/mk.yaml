@@ -575,6 +575,11 @@ Errors:
     NotActive: Корисничката шема не е активна
     NotInactive: Корисничката шема не е неактивна
     NotExists: Корисничката шема не постои
+    ID:
+      Missing: Недостасува ID на корисничка шема
+    Invalid: Корисничката шема е неважечка
+    Data:
+      Invalid: Податоците не се валидни за корисничка шема
   TokenExchange:
     FeatureDisabled: Функцијата за размена на токени е оневозможена на вашиот пример. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:

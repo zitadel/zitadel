@@ -13,8 +13,7 @@ import (
 
 const (
 	phoneEventPrefix            = eventPrefix + "phone."
-	PhoneChangedType            = phoneEventPrefix + "changed"
-	PhoneRemovedType            = phoneEventPrefix + "removed"
+	PhoneUpdatedType            = phoneEventPrefix + "updated"
 	PhoneVerifiedType           = phoneEventPrefix + "verified"
 	PhoneVerificationFailedType = phoneEventPrefix + "verification.failed"
 	PhoneCodeAddedType          = phoneEventPrefix + "code.added"
@@ -40,7 +39,7 @@ func NewPhoneChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, 
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			PhoneChangedType,
+			PhoneUpdatedType,
 		),
 		PhoneNumber: phone,
 	}
@@ -56,34 +55,6 @@ func PhoneChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
 	}
 
 	return phoneChangedEvent, nil
-}
-
-type PhoneRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *PhoneRemovedEvent) Payload() interface{} {
-	return nil
-}
-
-func (e *PhoneRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
-}
-
-func NewPhoneRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *PhoneRemovedEvent {
-	return &PhoneRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			PhoneRemovedType,
-		),
-	}
-}
-
-func PhoneRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	return &PhoneRemovedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
 }
 
 type PhoneVerifiedEvent struct {

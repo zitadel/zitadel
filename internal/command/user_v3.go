@@ -32,10 +32,10 @@ type CreateSchemaUser struct {
 
 func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 	if s.ResourceOwner == "" {
-		return zerrors.ThrowInvalidArgument(nil, "TODO", "Errors.ResourceOwnerMissing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-urEJKa1tJM", "Errors.ResourceOwnerMissing")
 	}
 	if s.SchemaID == "" {
-		return zerrors.ThrowInvalidArgument(nil, "TODO", "Errors.UserSchema.User.Type.Missing")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-TFo06JgnF2", "Errors.UserSchema.ID.Missing")
 	}
 
 	schemaWriteModel, err := c.getSchemaWriteModelByID(ctx, "", s.SchemaID)
@@ -43,7 +43,7 @@ func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 		return err
 	}
 	if !schemaWriteModel.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-N9QOuN4F7o", "Errors.UserSchema.NotExists")
 	}
 	s.schemaRevision = schemaWriteModel.Revision
 
@@ -67,11 +67,11 @@ func (s *CreateSchemaUser) Valid(ctx context.Context, c *Commands) (err error) {
 
 	var v interface{}
 	if err := json.Unmarshal(s.Data, &v); err != nil {
-		return zerrors.ThrowInvalidArgument(nil, "TODO", "TODO")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-7o3ZGxtXUz", "Errors.User.Invalid")
 	}
 
 	if err := schema.Validate(v); err != nil {
-		return zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-SlKXqLSeL6", "Errors.UserSchema.Data.Invalid")
 	}
 
 	if s.Email != nil && s.Email.Address != "" {
@@ -109,7 +109,7 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser,
 		return err
 	}
 	if writeModel.Exists() {
-		return zerrors.ThrowPreconditionFailed(nil, "TODO", "TODO")
+		return zerrors.ThrowPreconditionFailed(nil, "COMMAND-Nn8CRVlkeZ", "Errors.User.AlreadyExists")
 	}
 
 	userAgg := UserV3AggregateFromWriteModel(&writeModel.WriteModel)
@@ -141,14 +141,14 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser,
 
 func (c *Commands) DeleteSchemaUser(ctx context.Context, id string) (*domain.ObjectDetails, error) {
 	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "TODO", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Vs4wJCME7T", "Errors.IDMissing")
 	}
 	writeModel, err := c.getSchemaUserWriteModelByID(ctx, "", id)
 	if err != nil {
 		return nil, err
 	}
 	if !writeModel.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "TODO", "TODO")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-syHyCsGmvM", "Errors.User.NotFound")
 	}
 	if err := c.checkPermissionDeleteUser(ctx, writeModel.ResourceOwner, writeModel.AggregateID); err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func (c *Commands) DeleteSchemaUser(ctx context.Context, id string) (*domain.Obj
 
 func (c *Commands) updateSchemaUserEmail(ctx context.Context, events []eventstore.Command, agg *eventstore.Aggregate, email *Email, alg crypto.EncryptionAlgorithm) (_ []eventstore.Command, plainCode string, err error) {
 
-	events = append(events, schemauser.NewEmailChangedEvent(ctx,
+	events = append(events, schemauser.NewEmailUpdatedEvent(ctx,
 		agg,
 		email.Address,
 	))
