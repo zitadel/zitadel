@@ -28,9 +28,8 @@
               <span class="msg">{{ action.localizedMessage }}</span>
               <span
                 class="block"
-                matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MM YYYY, HH:mm' }}"
-                >{{ dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm' }}</span
-              >
+                matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MM YYYY, HH:mm:ss.SSS' }}">{{
+                dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm' }}</span>
             </div>
           </div>
         </div>
