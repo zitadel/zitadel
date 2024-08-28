@@ -1320,6 +1320,26 @@ EventTypes:
     deactivated: Schema utente disattivato
     reactivated: Schema utente riattivato
     deleted: Schema utente eliminato
+    user:
+      created: Utente creato
+      updated: Utente aggiornato
+      deleted: Utente eliminato
+      email:
+        updated: Indirizzo email modificato
+        verified: Indirizzo email verificato
+        verification:
+          failed: Verifica indirizzo email non riuscita
+        code:
+          added: Codice di verifica indirizzo email generato
+          sent: Codice di verifica indirizzo email inviato
+      phone:
+        updated: Numero di telefono modificato
+        verified: Numero di telefono verificato
+        verification:
+          failed: Verifica numero di telefono non riuscita
+        code:
+          added: Codice di verifica numero di telefono generato
+          sent: Codice di verifica numero di telefono inviato
   web_key:
     added: Web Key aggiunto
     activated: Web Key attivato

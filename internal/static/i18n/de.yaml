@@ -1324,6 +1324,26 @@ EventTypes:
     deactivated: Benutzerschema deaktiviert
     reactivated: Benutzerschema reaktiviert
     deleted: Benutzerschema gelöscht
+    user:
+      created: Benutzer erstellt
+      updated: Benutzer aktualisiert
+      deleted: Benutzer gelöscht
+      email:
+        updated: E-Mail-Adresse geändert
+        verified: E-Mail-Adresse verifiziert
+        verification:
+          failed: E-Mail-Adressenverifizierung fehlgeschlagen
+        code:
+          added: E-Mail-Adressenverifizierungscode generiert
+          sent: E-Mail-Adressenverifizierungscode gesendet
+      phone:
+        updated: Telefonnummer geändert
+        verified: Telefonnummer verifiziert
+        verification:
+          failed: Telefonnummernverifizierung fehlgeschlagen
+        code:
+          added: Telefonnummernverifizierungscode generiert
+          sent: Telefonnummernverifizierungscode gesendet
   web_key:
     added: Web Key hinzugefügt
     activated: Web Key aktiviert

@@ -1316,6 +1316,26 @@ EventTypes:
     deactivated: Esquema de usuário desativado
     reactivated: Esquema do usuário reativado
     deleted: Esquema do usuário excluído
+    user:
+      created: Utilizador criado
+      updated: Utilizador atualizado
+      deleted: Utilizador excluído
+      email:
+        updated: Endereço de e-mail alterado
+        verified: Endereço de e-mail verificado
+        verification:
+          failed: Falha na verificação do endereço de e-mail
+        code:
+          added: Código de verificação do endereço de e-mail gerado
+          sent: Código de verificação do endereço de e-mail enviado
+      phone:
+        updated: Número de telefone alterado
+        verified: Número de telefone verificado
+        verification:
+          failed: Falha na verificação do número de telefone
+        code:
+          added: Código de verificação do número de telefone gerado
+          sent: Código de verificação do número de telefone enviado
   web_key:
     added: Chave Web adicionada
     activated: Chave Web ativada

@@ -1323,6 +1323,26 @@ EventTypes:
     deactivated: 用户架构已停用
     reactivated: 用户架构已重新激活
     deleted: 用户架构已删除
+    user:
+      created: 用户已创建
+      updated: 用户已更新
+      deleted: 用户已删除
+      email:
+        updated: 电子邮件地址已更改
+        verified: 电子邮件地址已验证
+        verification:
+          failed: 电子邮件地址验证失败
+        code:
+          added: 电子邮件地址验证码已生成
+          sent: 电子邮件地址验证码已发送
+      phone:
+        updated: 电话号码已更改
+        verified: 电话号码已验证
+        verification:
+          failed: 电话号码验证失败
+        code:
+          added: 电话号码验证码已生成
+          sent: 电话号码验证码已发送
   web_key:
     added: 已添加 Web Key
     activated: 已激活 Web Key

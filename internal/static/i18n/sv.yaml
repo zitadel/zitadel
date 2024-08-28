@@ -1324,6 +1324,26 @@ EventTypes:
     deactivated: Användarschema avaktiverat
     reactivated: Användarschema återaktiverat
     deleted: Användarschema borttaget
+    user:
+      created: Användare skapad
+      updated: Användaren uppdaterad
+      deleted: Användare raderad
+      email:
+        updated: E-postadress ändrad
+        verified: E-postadress verifierad
+        verification:
+          failed: E-postadressverifiering misslyckades
+        code:
+          added: Verifieringskod för e-postadress genererad
+          sent: E-postadressens verifieringskod har skickats
+      phone:
+        updated: Telefonnummer ändrat
+        verified: Telefonnummer verifierat
+        verification:
+          failed: Verifiering av telefonnummer misslyckades
+        code:
+          added: Verifieringskod för telefonnummer genererad
+          sent: Verifieringskoden för telefonnummer har skickats
   web_key:
     added: Webbnyckel har lagts till
     activated: Webbnyckel aktiverad
