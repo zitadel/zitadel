@@ -8,8 +8,8 @@ import { Spinner } from "./Spinner";
 import { useForm } from "react-hook-form";
 import { TextInput } from "./Input";
 import BackButton from "./BackButton";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { Challenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { ChecksJson } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { ChallengesJson } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -63,7 +63,7 @@ export default function LoginOTP({
   }, []);
 
   async function updateSessionForOTPChallenge() {
-    const challenges: Challenges = {};
+    const challenges: ChallengesJson = {};
 
     if (method === "email") {
       challenges.otpEmail = "";
@@ -111,7 +111,7 @@ export default function LoginOTP({
       body.authRequestId = authRequestId;
     }
 
-    const checks: Checks = {};
+    const checks: ChecksJson = {};
     if (method === "sms") {
       checks.otpSms = { code: values.code };
     }
