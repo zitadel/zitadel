@@ -15,7 +15,9 @@ import {
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "@/utils/session";
+import { toJson } from "@zitadel/client";
 import { NextRequest, NextResponse } from "next/server";
+import { SessionSchema } from "@zitadel/proto/zitadel/session/v2/session_pb";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -36,7 +38,7 @@ export async function POST(request: NextRequest) {
         organization,
         authRequestId,
       ).then((session) => {
-        return NextResponse.json(session);
+        return NextResponse.json(toJson(SessionSchema, session));
       });
     } else {
       return createSessionAndUpdateCookie(
@@ -46,7 +48,7 @@ export async function POST(request: NextRequest) {
         organization,
         authRequestId,
       ).then((session) => {
-        return NextResponse.json(session);
+        return NextResponse.json(toJson(SessionSchema, session));
       });
     }
   } else {
