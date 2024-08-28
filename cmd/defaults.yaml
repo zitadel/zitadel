@@ -339,6 +339,9 @@ OIDC:
   AuthMethodPrivateKeyJWT: true # ZITADEL_OIDC_AUTHMETHODPRIVATEKEYJWT
   GrantTypeRefreshToken: true # ZITADEL_OIDC_GRANTTYPEREFRESHTOKEN
   RequestObjectSupported: true # ZITADEL_OIDC_REQUESTOBJECTSUPPORTED
+  
+  # Deprecated: The signing algorithm is determined by the generated keys.
+  # Use the web keys resource to generate keys with different algorithms.
   SigningKeyAlgorithm: RS256 # ZITADEL_OIDC_SIGNINGKEYALGORITHM
   # Sets the default values for lifetime and expiration for OIDC
   # This default can be overwritten in the default instance configuration and for each instance during runtime
@@ -349,10 +352,10 @@ OIDC:
   DefaultRefreshTokenIdleExpiration: 720h # ZITADEL_OIDC_DEFAULTREFRESHTOKENIDLEEXPIRATION
   # 2160h are 90 days, three months
   DefaultRefreshTokenExpiration: 2160h # ZITADEL_OIDC_DEFAULTREFRESHTOKENEXPIRATION
-  Cache:
-    MaxAge: 12h # ZITADEL_OIDC_CACHE_MAXAGE
-    # 168h is 7 days, one week
-    SharedMaxAge: 168h # ZITADEL_OIDC_CACHE_SHAREDMAXAGE
+  
+  # HTTP Cache-Control max-age header value to set on the jwks endpoint.
+  # Only used when the web keys feature is enabled.  0 sets a no-store value.
+  JWKSCacheControlMaxAge: 5m # ZITADEL_OIDC_JWKSCACHECONTROLMAXAGE
   CustomEndpoints:
     Auth:
       Path: /oauth/v2/authorize # ZITADEL_OIDC_CUSTOMENDPOINTS_AUTH_PATH

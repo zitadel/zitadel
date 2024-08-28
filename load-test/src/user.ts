@@ -197,6 +197,38 @@ export function addMachineSecret(userId: string, org: Org, accessToken: string):
   });
 }
 
+export type MachineKey = {
+  keyId: string;
+};
+
+const addMachineKeyTrend = new Trend('user_add_machine_key_duration', true);
+export function addMachineKey(userId: string, org: Org, accessToken: string, publicKey?: string): Promise<MachineKey> {
+  return new Promise((resolve, reject) => {
+    let response = http.asyncRequest('POST', url(`/management/v1/users/${userId}/keys`), 
+    JSON.stringify({
+      type: 'KEY_TYPE_JSON',
+      userId: userId,
+      // base64 encoded public key
+      publicKey: publicKey
+    }), 
+    {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'x-zitadel-orgid': org.organizationId,
+      },
+    });
+    response.then((res) => {
+      check(res, {
+        'generate machine key status ok': (r) => r.status === 200,
+      }) || reject(`unable to generate machine Key (user id: ${userId}) status: ${res.status} body: ${res.body}`);
+
+      addMachineKeyTrend.add(res.timings.duration);
+      resolve(res.json()! as MachineKey);
+    });
+  });
+}
+
 const lockUserTrend = new Trend('lock_user_duration', true);
 export function lockUser(userId: string, org: Org, accessToken: string): Promise<RefinedResponse<any>> {
   return new Promise((resolve, reject) => {

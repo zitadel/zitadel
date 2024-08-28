@@ -100,7 +100,7 @@ type idpProviderViewProvider interface {
 }
 
 type idpUserLinksProvider interface {
-	IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery, withOwnerRemoved bool) (*query.IDPUserLinks, error)
+	IDPUserLinks(ctx context.Context, queries *query.IDPUserLinksSearchQuery, permissionCheck domain.PermissionCheck) (*query.IDPUserLinks, error)
 }
 
 type userEventProvider interface {
@@ -1000,7 +1000,7 @@ func (repo *AuthRequestRepo) checkExternalUserLogin(ctx context.Context, request
 		}
 		queries = append(queries, orgIDQuery)
 	}
-	links, err := repo.Query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	links, err := repo.Query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, nil)
 	if err != nil {
 		return err
 	}
@@ -1200,7 +1200,7 @@ func checkExternalIDPsOfUser(ctx context.Context, idpUserLinksProvider idpUserLi
 	if err != nil {
 		return nil, err
 	}
-	return idpUserLinksProvider.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery}}, false)
+	return idpUserLinksProvider.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: []query.SearchQuery{userIDQuery}}, nil)
 }
 
 func (repo *AuthRequestRepo) usersForUserSelection(ctx context.Context, request *domain.AuthRequest) ([]domain.UserSelection, error) {
