@@ -4,8 +4,13 @@ import {
   getSessionCookieByLoginName,
 } from "@zitadel/next";
 import { setSessionAndUpdateCookie } from "@/utils/session";
-import { NextRequest, NextResponse, userAgent } from "next/server";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { NextRequest, NextResponse } from "next/server";
+import {
+  CheckOTPSchema,
+  ChecksSchema,
+  CheckTOTPSchema,
+} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { createMessage } from "@zitadel/client";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -30,20 +35,20 @@ export async function POST(request: NextRequest) {
 
     return recentPromise
       .then((recent) => {
-        const checks: Checks = {};
+        const checks = createMessage(ChecksSchema, {});
 
         if (method === "time-based") {
-          checks.totp = {
+          checks.totp = createMessage(CheckTOTPSchema, {
             code,
-          };
+          });
         } else if (method === "sms") {
-          checks.otpSms = {
+          checks.otpSms = createMessage(CheckOTPSchema, {
             code,
-          };
+          });
         } else if (method === "email") {
-          checks.otpEmail = {
+          checks.otpEmail = createMessage(CheckOTPSchema, {
             code,
-          };
+          });
         }
 
         return setSessionAndUpdateCookie(
