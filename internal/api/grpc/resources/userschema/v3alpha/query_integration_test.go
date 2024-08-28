@@ -20,8 +20,7 @@ import (
 )
 
 func TestServer_ListUserSchemas(t *testing.T) {
-	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
+	ensureFeatureEnabled(t, IAMOwnerCTX)
 
 	userSchema := new(structpb.Struct)
 	err := userSchema.UnmarshalJSON([]byte(`{
@@ -52,7 +51,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 		{
 			name: "not found, error",
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.SearchUserSchemasRequest{
 					Filters: []*schema.SearchFilter{
 						{
@@ -76,11 +75,11 @@ func TestServer_ListUserSchemas(t *testing.T) {
 		{
 			name: "single (id), ok",
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.SearchUserSchemasRequest{},
 				prepare: func(request *schema.SearchUserSchemasRequest, resp *schema.SearchUserSchemasResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
-					createResp := Tester.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType)
+					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
 					request.Filters = []*schema.SearchFilter{
 						{
 							Filter: &schema.SearchFilter_IdFilter{
@@ -117,14 +116,14 @@ func TestServer_ListUserSchemas(t *testing.T) {
 		{
 			name: "multiple (type), ok",
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.SearchUserSchemasRequest{},
 				prepare: func(request *schema.SearchUserSchemasRequest, resp *schema.SearchUserSchemasResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano())
 					schemaType1 := schemaType + "_1"
 					schemaType2 := schemaType + "_2"
-					createResp := Tester.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType1)
-					createResp2 := Tester.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType2)
+					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType1)
+					createResp2 := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType2)
 
 					request.SortingColumn = gu.Ptr(schema.FieldName_FIELD_NAME_TYPE)
 					request.Query = &object.SearchQuery{Desc: false}
@@ -176,7 +175,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 			}
 
 			retryDuration := 20 * time.Second
-			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
+			if ctxDeadline, ok := IAMOwnerCTX.Deadline(); ok {
 				retryDuration = time.Until(ctxDeadline)
 			}
 
@@ -205,8 +204,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 }
 
 func TestServer_GetUserSchemaByID(t *testing.T) {
-	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
+	ensureFeatureEnabled(t, IAMOwnerCTX)
 
 	userSchema := new(structpb.Struct)
 	err := userSchema.UnmarshalJSON([]byte(`{
@@ -233,7 +231,7 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 				req: &schema.GetUserSchemaByIDRequest{},
 				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
-					createResp := Tester.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType)
+					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 					return nil
 				},
@@ -243,7 +241,7 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 		{
 			name: "not existing, error",
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.GetUserSchemaByIDRequest{
 					Id: "notexisting",
 				},
@@ -253,11 +251,11 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 		{
 			name: "get, ok",
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.GetUserSchemaByIDRequest{},
 				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
 					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
-					createResp := Tester.CreateUserSchemaEmptyWithType(isolatedIAMOwnerCTX, schemaType)
+					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 
 					resp.Schema.Type = schemaType
@@ -283,7 +281,7 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 			}
 
 			retryDuration := 5 * time.Second
-			if ctxDeadline, ok := isolatedIAMOwnerCTX.Deadline(); ok {
+			if ctxDeadline, ok := IAMOwnerCTX.Deadline(); ok {
 				retryDuration = time.Until(ctxDeadline)
 			}
 

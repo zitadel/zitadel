@@ -21,8 +21,7 @@ import (
 )
 
 func TestServer_CreateUserSchema(t *testing.T) {
-	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
+	ensureFeatureEnabled(t, IAMOwnerCTX)
 
 	tests := []struct {
 		name    string
@@ -43,7 +42,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 		},
 		{
 			name: "empty type",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.CreateUserSchema{
 					Type: "",
@@ -53,7 +52,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 		},
 		{
 			name: "empty schema, error",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.CreateUserSchema{
 					Type: gofakeit.Name(),
@@ -63,7 +62,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 		},
 		{
 			name: "invalid schema, error",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.CreateUserSchema{
 					Type: gofakeit.Name(),
@@ -94,7 +93,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 		},
 		{
 			name: "no authenticators, ok",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.CreateUserSchema{
 					Type: gofakeit.Name(),
@@ -126,14 +125,14 @@ func TestServer_CreateUserSchema(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instanceID,
+						Id:   Tester.Instance.InstanceID(),
 					},
 				},
 			},
 		},
 		{
 			name: "invalid authenticator, error",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.CreateUserSchema{
 					Type: gofakeit.Name(),
@@ -167,7 +166,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 		},
 		{
 			name: "with authenticator, ok",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.CreateUserSchema{
 					Type: gofakeit.Name(),
@@ -202,14 +201,14 @@ func TestServer_CreateUserSchema(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instanceID,
+						Id:   Tester.Instance.InstanceID(),
 					},
 				},
 			},
 		},
 		{
 			name: "with invalid permission, error",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.CreateUserSchema{
 					Type: gofakeit.Name(),
@@ -244,7 +243,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 		},
 		{
 			name: "with valid permission, ok",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
 				UserSchema: &schema.CreateUserSchema{
 					Type: gofakeit.Name(),
@@ -283,7 +282,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instanceID,
+						Id:   Tester.Instance.InstanceID(),
 					},
 				},
 			},
@@ -304,8 +303,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 }
 
 func TestServer_UpdateUserSchema(t *testing.T) {
-	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
+	ensureFeatureEnabled(t, IAMOwnerCTX)
 
 	type args struct {
 		ctx context.Context
@@ -321,7 +319,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "missing permission, error",
 			prepare: func(request *schema.PatchUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+				schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 				request.Id = schemaID
 				return nil
 			},
@@ -339,7 +337,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				return nil
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{},
 			},
 			wantErr: true,
@@ -351,7 +349,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				return nil
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{},
 			},
 			wantErr: true,
@@ -359,12 +357,12 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "empty type, error",
 			prepare: func(request *schema.PatchUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+				schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 				request.Id = schemaID
 				return nil
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					Type: gu.Ptr(""),
 				},
@@ -374,12 +372,12 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "update type, ok",
 			prepare: func(request *schema.PatchUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+				schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 				request.Id = schemaID
 				return nil
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					Type: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
 				},
@@ -389,7 +387,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instanceID,
+						Id:   Tester.Instance.InstanceID(),
 					},
 				},
 			},
@@ -397,12 +395,12 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "empty schema, ok",
 			prepare: func(request *schema.PatchUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+				schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 				request.Id = schemaID
 				return nil
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					DataType: &schema.PatchUserSchemaRequest_Schema{},
 				},
@@ -412,7 +410,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instanceID,
+						Id:   Tester.Instance.InstanceID(),
 					},
 				},
 			},
@@ -420,12 +418,12 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "invalid schema, error",
 			prepare: func(request *schema.PatchUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+				schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 				request.Id = schemaID
 				return nil
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					DataType: &schema.PatchUserSchemaRequest_Schema{
 						Schema: func() *structpb.Struct {
@@ -456,12 +454,12 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "update schema, ok",
 			prepare: func(request *schema.PatchUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+				schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 				request.Id = schemaID
 				return nil
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					DataType: &schema.PatchUserSchemaRequest_Schema{
 						Schema: func() *structpb.Struct {
@@ -492,7 +490,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instanceID,
+						Id:   Tester.Instance.InstanceID(),
 					},
 				},
 			},
@@ -500,12 +498,12 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "invalid authenticator, error",
 			prepare: func(request *schema.PatchUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+				schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 				request.Id = schemaID
 				return nil
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					PossibleAuthenticators: []schema.AuthenticatorType{
 						schema.AuthenticatorType_AUTHENTICATOR_TYPE_UNSPECIFIED,
@@ -517,12 +515,12 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "update authenticator, ok",
 			prepare: func(request *schema.PatchUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+				schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 				request.Id = schemaID
 				return nil
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					PossibleAuthenticators: []schema.AuthenticatorType{
 						schema.AuthenticatorType_AUTHENTICATOR_TYPE_USERNAME,
@@ -534,7 +532,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instanceID,
+						Id:   Tester.Instance.InstanceID(),
 					},
 				},
 			},
@@ -542,8 +540,8 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 		{
 			name: "inactive, error",
 			prepare: func(request *schema.PatchUserSchemaRequest) error {
-				schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
-				_, err := Client.DeactivateUserSchema(isolatedIAMOwnerCTX, &schema.DeactivateUserSchemaRequest{
+				schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
+				_, err := Client.DeactivateUserSchema(IAMOwnerCTX, &schema.DeactivateUserSchemaRequest{
 					Id: schemaID,
 				})
 				require.NoError(t, err)
@@ -551,7 +549,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 				return nil
 			},
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
 					Type: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
 				},
@@ -576,8 +574,7 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 }
 
 func TestServer_DeactivateUserSchema(t *testing.T) {
-	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
+	ensureFeatureEnabled(t, IAMOwnerCTX)
 
 	type args struct {
 		ctx     context.Context
@@ -607,7 +604,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 				IAMOwnerCTX,
 				&schema.DeactivateUserSchemaRequest{},
 				func(request *schema.DeactivateUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+					schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 					request.Id = schemaID
 					return nil
 				},
@@ -617,7 +614,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instanceID,
+						Id:   Tester.Instance.InstanceID(),
 					},
 				},
 			},
@@ -625,12 +622,12 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 		{
 			name: "inactive, error",
 			args: args{
-				isolatedIAMOwnerCTX,
+				IAMOwnerCTX,
 				&schema.DeactivateUserSchemaRequest{},
 				func(request *schema.DeactivateUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+					schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 					request.Id = schemaID
-					_, err := Client.DeactivateUserSchema(isolatedIAMOwnerCTX, &schema.DeactivateUserSchemaRequest{
+					_, err := Client.DeactivateUserSchema(IAMOwnerCTX, &schema.DeactivateUserSchemaRequest{
 						Id: schemaID,
 					})
 					return err
@@ -656,8 +653,7 @@ func TestServer_DeactivateUserSchema(t *testing.T) {
 }
 
 func TestServer_ReactivateUserSchema(t *testing.T) {
-	_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
+	ensureFeatureEnabled(t, IAMOwnerCTX)
 
 	type args struct {
 		ctx     context.Context
@@ -673,7 +669,7 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 		{
 			name: "not existing, error",
 			args: args{
-				isolatedIAMOwnerCTX,
+				IAMOwnerCTX,
 				&schema.ReactivateUserSchemaRequest{
 					Id: "notexisting",
 				},
@@ -684,10 +680,10 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 		{
 			name: "active, error",
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.ReactivateUserSchemaRequest{},
 				prepare: func(request *schema.ReactivateUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+					schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 					request.Id = schemaID
 					return nil
 				},
@@ -697,12 +693,12 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 		{
 			name: "inactive, ok",
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.ReactivateUserSchemaRequest{},
 				prepare: func(request *schema.ReactivateUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+					schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 					request.Id = schemaID
-					_, err := Client.DeactivateUserSchema(isolatedIAMOwnerCTX, &schema.DeactivateUserSchemaRequest{
+					_, err := Client.DeactivateUserSchema(IAMOwnerCTX, &schema.DeactivateUserSchemaRequest{
 						Id: schemaID,
 					})
 					return err
@@ -713,7 +709,7 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instanceID,
+						Id:   Tester.Instance.InstanceID(),
 					},
 				},
 			},
@@ -736,10 +732,7 @@ func TestServer_ReactivateUserSchema(t *testing.T) {
 }
 
 func TestServer_DeleteUserSchema(t *testing.T) {
-	//_, instanceID, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	instanceID := Tester.Instance.InstanceID()
-	isolatedIAMOwnerCTX := IAMOwnerCTX
-	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
+	ensureFeatureEnabled(t, IAMOwnerCTX)
 
 	type args struct {
 		ctx     context.Context
@@ -755,7 +748,7 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 		{
 			name: "not existing, error",
 			args: args{
-				isolatedIAMOwnerCTX,
+				IAMOwnerCTX,
 				&schema.DeleteUserSchemaRequest{
 					Id: "notexisting",
 				},
@@ -766,10 +759,10 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 		{
 			name: "delete, ok",
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.DeleteUserSchemaRequest{},
 				prepare: func(request *schema.DeleteUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+					schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 					request.Id = schemaID
 					return nil
 				},
@@ -779,7 +772,7 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 					Changed: timestamppb.Now(),
 					Owner: &object.Owner{
 						Type: object.OwnerType_OWNER_TYPE_INSTANCE,
-						Id:   instanceID,
+						Id:   Tester.Instance.InstanceID(),
 					},
 				},
 			},
@@ -787,12 +780,12 @@ func TestServer_DeleteUserSchema(t *testing.T) {
 		{
 			name: "deleted, error",
 			args: args{
-				ctx: isolatedIAMOwnerCTX,
+				ctx: IAMOwnerCTX,
 				req: &schema.DeleteUserSchemaRequest{},
 				prepare: func(request *schema.DeleteUserSchemaRequest) error {
-					schemaID := Tester.CreateUserSchemaEmpty(isolatedIAMOwnerCTX).GetDetails().GetId()
+					schemaID := Tester.CreateUserSchemaEmpty(IAMOwnerCTX).GetDetails().GetId()
 					request.Id = schemaID
-					_, err := Client.DeleteUserSchema(isolatedIAMOwnerCTX, &schema.DeleteUserSchemaRequest{
+					_, err := Client.DeleteUserSchema(IAMOwnerCTX, &schema.DeleteUserSchemaRequest{
 						Id: schemaID,
 					})
 					return err
