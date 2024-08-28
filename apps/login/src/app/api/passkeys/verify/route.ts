@@ -1,7 +1,7 @@
 import { getSession, verifyPasskeyRegistration } from "@/lib/zitadel";
 import { getSessionCookieById } from "@zitadel/next";
 import { NextRequest, NextResponse, userAgent } from "next/server";
-import { createMessage } from "@zitadel/client";
+import { create } from "@zitadel/client";
 import { VerifyPasskeyRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 export async function POST(request: NextRequest) {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     });
     if (userId) {
       return verifyPasskeyRegistration(
-        createMessage(VerifyPasskeyRegistrationRequestSchema, {
+        create(VerifyPasskeyRegistrationRequestSchema, {
           passkeyId,
           passkeyName,
           publicKeyCredential,

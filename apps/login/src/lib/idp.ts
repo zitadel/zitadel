@@ -4,7 +4,7 @@ import {
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { createMessage } from "@zitadel/client";
+import { create } from "@zitadel/client";
 
 // This maps the IdentityProviderType to a slug which is used in the /success and /failure routes
 export function idpTypeToSlug(idpType: IdentityProviderType) {
@@ -42,7 +42,7 @@ export const PROVIDER_MAPPING: {
     const rawInfo = idp.rawInformation as OIDC_USER;
     console.log(rawInfo);
 
-    return createMessage(AddHumanUserRequestSchema, {
+    return create(AddHumanUserRequestSchema, {
       username: idp.userName,
       email: {
         email: rawInfo.User?.email,
@@ -78,7 +78,7 @@ export const PROVIDER_MAPPING: {
 
     console.log(rawInfo, rawInfo.userPrincipalName);
 
-    return createMessage(AddHumanUserRequestSchema, {
+    return create(AddHumanUserRequestSchema, {
       username: idp.userName,
       email: {
         email: rawInfo.mail || rawInfo.userPrincipalName || "",
@@ -104,7 +104,7 @@ export const PROVIDER_MAPPING: {
       name: string;
     };
 
-    return createMessage(AddHumanUserRequestSchema, {
+    return create(AddHumanUserRequestSchema, {
       username: idp.userName,
       email: {
         email: rawInfo.email,

@@ -24,7 +24,7 @@ import {
 } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { idpTypeToSlug } from "@/lib/idp";
-import { createMessage } from "@zitadel/client";
+import { create } from "@zitadel/client";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(
@@ -105,11 +105,11 @@ export async function GET(request: NextRequest) {
         // works not with _rsc request
         try {
           const { callbackUrl } = await createCallback(
-            createMessage(CreateCallbackRequestSchema, {
+            create(CreateCallbackRequestSchema, {
               authRequestId,
               callbackKind: {
                 case: "session",
-                value: createMessage(SessionSchema, session),
+                value: create(SessionSchema, session),
               },
             }),
           );
@@ -269,11 +269,11 @@ export async function GET(request: NextRequest) {
               sessionToken: cookie?.token,
             };
             const { callbackUrl } = await createCallback(
-              createMessage(CreateCallbackRequestSchema, {
+              create(CreateCallbackRequestSchema, {
                 authRequestId,
                 callbackKind: {
                   case: "session",
-                  value: createMessage(SessionSchema, session),
+                  value: create(SessionSchema, session),
                 },
               }),
             );
@@ -306,11 +306,11 @@ export async function GET(request: NextRequest) {
             };
             try {
               const { callbackUrl } = await createCallback(
-                createMessage(CreateCallbackRequestSchema, {
+                create(CreateCallbackRequestSchema, {
                   authRequestId,
                   callbackKind: {
                     case: "session",
-                    value: createMessage(SessionSchema, session),
+                    value: create(SessionSchema, session),
                   },
                 }),
               );

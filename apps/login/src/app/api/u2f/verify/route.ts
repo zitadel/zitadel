@@ -5,7 +5,7 @@ import {
   VerifyU2FRegistrationRequestSchema,
   VerifyU2FRegistrationResponseSchema,
 } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { createMessage, toJson } from "@zitadel/client";
+import { create, toJson } from "@zitadel/client";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       //   tokenName: passkeyName,
       // };
 
-      const req = createMessage(
+      const req = create(
         VerifyU2FRegistrationRequestSchema,
         // TODO: why did we passed the request instead of body here?
         body,

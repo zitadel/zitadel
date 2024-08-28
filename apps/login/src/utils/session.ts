@@ -17,7 +17,7 @@ import {
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { toDate } from "@zitadel/client";
-import { createMessage } from "@zitadel/client";
+import { create } from "@zitadel/client";
 
 type CustomCookieData = {
   id: string;
@@ -37,7 +37,7 @@ export async function createSessionAndUpdateCookie(
   organization?: string,
   authRequestId?: string,
 ) {
-  const checks = createMessage(
+  const checks = create(
     ChecksSchema,
     password
       ? {
@@ -91,7 +91,7 @@ export async function createSessionForUserIdAndUpdateCookie(
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
 ): Promise<Session> {
-  const checks = createMessage(
+  const checks = create(
     ChecksSchema,
     password
       ? {

@@ -10,7 +10,7 @@ import {
   ChecksSchema,
   CheckTOTPSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { createMessage } from "@zitadel/client";
+import { create } from "@zitadel/client";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -35,18 +35,18 @@ export async function POST(request: NextRequest) {
 
     return recentPromise
       .then((recent) => {
-        const checks = createMessage(ChecksSchema, {});
+        const checks = create(ChecksSchema, {});
 
         if (method === "time-based") {
-          checks.totp = createMessage(CheckTOTPSchema, {
+          checks.totp = create(CheckTOTPSchema, {
             code,
           });
         } else if (method === "sms") {
-          checks.otpSms = createMessage(CheckOTPSchema, {
+          checks.otpSms = create(CheckOTPSchema, {
             code,
           });
         } else if (method === "email") {
-          checks.otpEmail = createMessage(CheckOTPSchema, {
+          checks.otpEmail = create(CheckOTPSchema, {
             code,
           });
         }

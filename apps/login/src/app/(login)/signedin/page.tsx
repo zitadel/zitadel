@@ -1,7 +1,7 @@
 import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
-import { createMessage } from "@zitadel/client";
+import { create } from "@zitadel/client";
 import { getMostRecentCookieWithLoginname } from "@zitadel/next";
 import { redirect } from "next/navigation";
 import {
@@ -14,11 +14,11 @@ async function loadSession(loginName: string, authRequestId?: string) {
 
   if (authRequestId) {
     return createCallback(
-      createMessage(CreateCallbackRequestSchema, {
+      create(CreateCallbackRequestSchema, {
         authRequestId,
         callbackKind: {
           case: "session",
-          value: createMessage(SessionSchema, {
+          value: create(SessionSchema, {
             sessionId: recent.id,
             sessionToken: recent.token,
           }),

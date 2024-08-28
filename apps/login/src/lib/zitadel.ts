@@ -24,7 +24,7 @@ import {
   SearchQuerySchema,
 } from "@zitadel/proto/zitadel/user/v2/query_pb";
 import { PROVIDER_MAPPING } from "./idp";
-import { createMessage } from "@zitadel/client";
+import { create } from "@zitadel/client";
 import { TextQueryMethod } from "@zitadel/proto/zitadel/object/v2/object_pb";
 
 const SESSION_LIFETIME_S = 3000;
@@ -254,7 +254,7 @@ export async function listUsers({
 
   if (userName) {
     queries.push(
-      createMessage(SearchQuerySchema, {
+      create(SearchQuerySchema, {
         query: {
           case: "userNameQuery",
           value: {
@@ -268,7 +268,7 @@ export async function listUsers({
 
   if (organizationId) {
     queries.push(
-      createMessage(SearchQuerySchema, {
+      create(SearchQuerySchema, {
         query: {
           case: "organizationIdQuery",
           value: {
@@ -281,7 +281,7 @@ export async function listUsers({
 
   if (email) {
     queries.push(
-      createMessage(SearchQuerySchema, {
+      create(SearchQuerySchema, {
         query: {
           case: "emailQuery",
           value: {
