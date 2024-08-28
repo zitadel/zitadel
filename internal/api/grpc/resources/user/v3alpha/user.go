@@ -39,8 +39,8 @@ func createUserRequestToCreateSchemaUser(ctx context.Context, req *user.CreateUs
 	}
 	return &command.CreateSchemaUser{
 		ResourceOwner: authz.GetCtxData(ctx).OrgID,
-		SchemaID:      req.SchemaId,
-		ID:            req.GetUserId(),
+		SchemaID:      req.GetUser().GetSchemaId(),
+		ID:            req.GetUser().GetUserId(),
 		Data:          data,
 	}, nil
 }

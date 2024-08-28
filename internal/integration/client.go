@@ -34,6 +34,7 @@ import (
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	object_v3alpha "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
@@ -764,11 +765,11 @@ func (s *Tester) CreateUserSchemaEmpty(ctx context.Context) *userschema_v3alpha.
 	return s.CreateUserSchemaEmptyWithType(ctx, fmt.Sprint(time.Now().UnixNano()+1))
 }
 
-func (s *Tester) CreateUserSchema(ctx context.Context, schema []byte) *userschema_v3alpha.CreateUserSchemaResponse {
+func (s *Tester) CreateUserSchema(ctx context.Context, schemaData []byte) *userschema_v3alpha.CreateUserSchemaResponse {
 	userSchema := new(structpb.Struct)
-	err := userSchema.UnmarshalJSON(schema)
+	err := userSchema.UnmarshalJSON(schemaData)
 	logging.OnError(err).Fatal("create userschema unmarshal")
-	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
+	schema, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
 		UserSchema: &userschema_v3alpha.CreateUserSchema{
 			Type: fmt.Sprint(time.Now().UnixNano() + 1),
 			DataType: &userschema_v3alpha.CreateUserSchema_Schema{
@@ -777,7 +778,7 @@ func (s *Tester) CreateUserSchema(ctx context.Context, schema []byte) *userschem
 		},
 	})
 	logging.OnError(err).Fatal("create userschema")
-	return target
+	return schema
 }
 
 func (s *Tester) CreateUserSchemaEmptyWithType(ctx context.Context, schemaType string) *userschema_v3alpha.CreateUserSchemaResponse {
@@ -788,7 +789,7 @@ func (s *Tester) CreateUserSchemaEmptyWithType(ctx context.Context, schemaType s
 		"properties": {}
 	}`))
 	logging.OnError(err).Fatal("create userschema unmarshal")
-	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
+	schema, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
 		UserSchema: &userschema_v3alpha.CreateUserSchema{
 			Type: schemaType,
 			DataType: &userschema_v3alpha.CreateUserSchema_Schema{
@@ -797,5 +798,20 @@ func (s *Tester) CreateUserSchemaEmptyWithType(ctx context.Context, schemaType s
 		},
 	})
 	logging.OnError(err).Fatal("create userschema")
-	return target
+	return schema
+}
+
+func (s *Tester) CreateSchemaUser(ctx context.Context, orgID string, schemaID string, data []byte) *user_v3alpha.CreateUserResponse {
+	userData := new(structpb.Struct)
+	err := userData.UnmarshalJSON(data)
+	logging.OnError(err).Fatal("create user unmarshal")
+	user, err := s.Client.UserV3Alpha.CreateUser(ctx, &user_v3alpha.CreateUserRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		User: &user_v3alpha.CreateUser{
+			SchemaId: schemaID,
+			Data:     userData,
+		},
+	})
+	logging.OnError(err).Fatal("create user")
+	return user
 }

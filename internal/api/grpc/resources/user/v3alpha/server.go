@@ -7,7 +7,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/grpc/server"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/crypto"
-	"github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 )
 
 var _ user.ZITADELUsersServer = (*Server)(nil)

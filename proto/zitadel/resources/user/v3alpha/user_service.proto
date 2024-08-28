@@ -423,7 +423,7 @@ service ZITADELUsers {
   rpc ResendContactEmailCode (ResendContactEmailCodeRequest) returns (ResendContactEmailCodeResponse) {
     option (google.api.http) = {
       post: "/{user_id}/email/_resend"
-      body: "verification"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -500,7 +500,7 @@ service ZITADELUsers {
   rpc ResendContactPhoneCode (ResendContactPhoneCodeRequest) returns (ResendContactPhoneCodeResponse) {
     option (google.api.http) = {
       post: "/{user_id}/phone/_resend"
-      body: "verification"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -599,7 +599,7 @@ service ZITADELUsers {
   rpc RequestPasswordReset (RequestPasswordResetRequest) returns (RequestPasswordResetResponse) {
     option (google.api.http) = {
       post: "/{user_id}/password/_reset"
-      body: "medium"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -676,7 +676,7 @@ service ZITADELUsers {
   rpc CreateWebAuthNRegistrationLink (CreateWebAuthNRegistrationLinkRequest) returns (CreateWebAuthNRegistrationLinkResponse) {
     option (google.api.http) = {
       post: "/{user_id}/webauthn/registration_link"
-      body: "medium"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -942,7 +942,7 @@ service ZITADELUsers {
   rpc StartIdentityProviderIntent (StartIdentityProviderIntentRequest) returns (StartIdentityProviderIntentResponse) {
     option (google.api.http) = {
       post: "/v3alpha/idp_intents"
-      body: "content"
+      body: "*"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -1044,15 +1044,15 @@ message SearchUsersRequest {
   ];
 
   // Search limitations and ordering.
-  zitadel.resources.object.v3alpha.SearchQuery query = 1;
+  zitadel.resources.object.v3alpha.SearchQuery query = 2;
   // the field the result is sorted.
-  FieldName sorting_column = 2 [
+  FieldName sorting_column = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"FIELD_NAME_SCHEMA_TYPE\""
     }
   ];
   // Define the criteria to query for.
-  repeated SearchFilter filters = 3;
+  repeated SearchFilter filters = 4;
 }
 
 message SearchUsersResponse {
@@ -1069,7 +1069,7 @@ message GetUserRequest {
     }
   ];
   // unique identifier of the user.
-  string user_id = 1 [
+  string user_id = 2 [
     (validate.rules).string = {min_len: 1, max_len: 200},
     (google.api.field_behavior) = REQUIRED,
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
