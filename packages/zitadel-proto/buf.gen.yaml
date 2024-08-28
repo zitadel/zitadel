@@ -5,3 +5,5 @@ plugins:
   - remote: buf.build/bufbuild/es:v2.0.0
     out: .
     include_imports: true
+    opt:
+      - json_types=true
