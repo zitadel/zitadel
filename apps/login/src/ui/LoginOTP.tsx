@@ -9,7 +9,6 @@ import { useForm } from "react-hook-form";
 import { TextInput } from "./Input";
 import BackButton from "./BackButton";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { PlainMessage } from "@zitadel/client";
 import { Challenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 
 // either loginName or sessionId must be provided
@@ -64,7 +63,7 @@ export default function LoginOTP({
   }, []);
 
   async function updateSessionForOTPChallenge() {
-    const challenges: PlainMessage<Challenges> = {};
+    const challenges: Challenges = {};
 
     if (method === "email") {
       challenges.otpEmail = "";
@@ -112,7 +111,7 @@ export default function LoginOTP({
       body.authRequestId = authRequestId;
     }
 
-    const checks: PlainMessage<Checks> = {};
+    const checks: Checks = {};
     if (method === "sms") {
       checks.otpSms = { code: values.code };
     }
