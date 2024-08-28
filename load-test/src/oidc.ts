@@ -1,8 +1,11 @@
 import { JSONObject, check, fail } from 'k6';
 import encoding from 'k6/encoding';
-import http from 'k6/http';
+import http, { RequestBody } from 'k6/http';
 import { Trend } from 'k6/metrics';
 import url from './url';
+import { Config } from './config';
+// @ts-ignore Import module
+import zitadel from 'k6/x/zitadel';
 
 export class Tokens {
   idToken?: string;
@@ -104,3 +107,65 @@ export function clientCredentials(clientId: string, clientSecret: string): Promi
     });
   });
 }
+
+export interface TokenRequest {
+  payload(): RequestBody;
+  headers(): { [name: string]: string; };
+}
+
+const privateKey = open('../.keys/key.pem');
+
+export class JWTProfileRequest implements TokenRequest {
+  keyPayload!: {
+    userId: string;
+    expiration: number;
+    keyId: string;
+  };
+
+  constructor(userId: string, keyId: string) {
+    this.keyPayload = {
+      userId: userId,
+      // 1 minute
+      expiration: 60*1_000_000_000,
+      keyId: keyId,
+    };
+  }
+
+  payload(): RequestBody{
+    const assertion = zitadel.signJWTProfileAssertion(
+      this.keyPayload.userId,
+      this.keyPayload.keyId,
+      {
+        audience: [Config.host],
+        expiration: this.keyPayload.expiration,
+        key: privateKey
+      });
+    return {
+      'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      scope: 'openid',
+      assertion: `${assertion}`
+    };
+  };
+  public headers(): { [name: string]: string; } {
+    return {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+  };
+}
+
+const tokenDurationTrend = new Trend('oidc_token_duration', true);
+export async function token(request: TokenRequest): Promise<Tokens> {
+  return http.asyncRequest('POST', configuration().token_endpoint,
+    request.payload(),
+    {
+      headers: request.headers(),
+    },
+  ).then((res) => {
+    tokenDurationTrend.add(res.timings.duration);
+    check(res, {
+      'token status ok': (r) => r.status === 200,
+      'access token returned': (r) => r.json('access_token')! != undefined && r.json('access_token')! != '',
+    });
+    return new Tokens(res.json() as JSONObject);
+  });
+};

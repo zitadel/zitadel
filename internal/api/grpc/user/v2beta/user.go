@@ -434,7 +434,7 @@ func (s *Server) checkLinkedExternalUser(ctx context.Context, idpID, externalUse
 	queries := []query.SearchQuery{
 		idQuery, externalIDQuery,
 	}
-	links, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, false)
+	links, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{Queries: queries}, nil)
 	if err != nil {
 		return "", err
 	}
