@@ -1,3 +1,8 @@
+import {
+  CreateCallbackRequestSchema,
+  SessionSchema,
+} from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
+
 export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
@@ -19,6 +24,7 @@ import {
 } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { idpTypeToSlug } from "@/lib/idp";
+import { createMessage } from "@zitadel/client";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(
@@ -98,13 +104,15 @@ export async function GET(request: NextRequest) {
 
         // works not with _rsc request
         try {
-          const { callbackUrl } = await createCallback({
-            authRequestId,
-            callbackKind: {
-              case: "session",
-              value: session,
-            },
-          });
+          const { callbackUrl } = await createCallback(
+            createMessage(CreateCallbackRequestSchema, {
+              authRequestId,
+              callbackKind: {
+                case: "session",
+                value: createMessage(SessionSchema, session),
+              },
+            }),
+          );
           if (callbackUrl) {
             return NextResponse.redirect(callbackUrl);
           } else {
@@ -260,13 +268,15 @@ export async function GET(request: NextRequest) {
               sessionId: cookie?.id,
               sessionToken: cookie?.token,
             };
-            const { callbackUrl } = await createCallback({
-              authRequestId,
-              callbackKind: {
-                case: "session",
-                value: session,
-              },
-            });
+            const { callbackUrl } = await createCallback(
+              createMessage(CreateCallbackRequestSchema, {
+                authRequestId,
+                callbackKind: {
+                  case: "session",
+                  value: createMessage(SessionSchema, session),
+                },
+              }),
+            );
             return NextResponse.redirect(callbackUrl);
           } else {
             return NextResponse.json(
@@ -295,13 +305,15 @@ export async function GET(request: NextRequest) {
               sessionToken: cookie?.token,
             };
             try {
-              const { callbackUrl } = await createCallback({
-                authRequestId,
-                callbackKind: {
-                  case: "session",
-                  value: session,
-                },
-              });
+              const { callbackUrl } = await createCallback(
+                createMessage(CreateCallbackRequestSchema, {
+                  authRequestId,
+                  callbackKind: {
+                    case: "session",
+                    value: createMessage(SessionSchema, session),
+                  },
+                }),
+              );
               if (callbackUrl) {
                 return NextResponse.redirect(callbackUrl);
               } else {
