@@ -183,17 +183,13 @@ func (s *Server) introspectionClientAuth(ctx context.Context, cc *op.ClientCrede
 var errNoAppType = errors.New("introspection client without app type")
 
 func (s *Server) introspectionClientSecretAuth(ctx context.Context, client *query.IntrospectionClient, secret string) error {
-	var (
-		successCommand func(ctx context.Context, appID, projectID, resourceOwner, updated string)
-		failedCommand  func(ctx context.Context, appID, projectID, resourceOwner string)
-	)
+	var updateCommand func(ctx context.Context, appID, projectID, resourceOwner, updated string)
+
 	switch client.AppType {
 	case query.AppTypeAPI:
-		successCommand = s.command.APISecretCheckSucceeded
-		failedCommand = s.command.APISecretCheckFailed
+		updateCommand = s.command.APIUpdateSecret
 	case query.AppTypeOIDC:
-		successCommand = s.command.OIDCSecretCheckSucceeded
-		failedCommand = s.command.OIDCSecretCheckFailed
+		updateCommand = s.command.OIDCUpdateSecret
 	default:
 		return zerrors.ThrowInternal(errNoAppType, "OIDC-ooD5Ot", "Errors.Internal")
 	}
@@ -202,10 +198,11 @@ func (s *Server) introspectionClientSecretAuth(ctx context.Context, client *quer
 	updated, err := s.hasher.Verify(client.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
 	if err != nil {
-		failedCommand(ctx, client.AppID, client.ProjectID, client.ResourceOwner)
 		return err
 	}
-	successCommand(ctx, client.AppID, client.ProjectID, client.ResourceOwner, updated)
+	if updated != "" {
+		updateCommand(ctx, client.AppID, client.ProjectID, client.ResourceOwner, updated)
+	}
 	return nil
 }
 

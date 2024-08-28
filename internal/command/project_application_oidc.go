@@ -331,22 +331,18 @@ func (c *Commands) VerifyOIDCClientSecret(ctx context.Context, projectID, appID,
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
 	updated, err := c.secretHasher.Verify(app.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
-	if err == nil {
-		c.oidcSecretCheckSucceeded(ctx, projectAgg, appID, updated)
-		return nil
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid")
 	}
-	c.oidcSecretCheckFailed(ctx, projectAgg, appID)
-	return zerrors.ThrowInvalidArgument(err, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid")
+	if updated != "" {
+		c.oidcUpdateSecret(ctx, projectAgg, appID, updated)
+	}
+	return nil
 }
 
-func (c *Commands) OIDCSecretCheckSucceeded(ctx context.Context, appID, projectID, resourceOwner, updated string) {
+func (c *Commands) OIDCUpdateSecret(ctx context.Context, appID, projectID, resourceOwner, updated string) {
 	agg := project_repo.NewAggregate(projectID, resourceOwner)
-	c.oidcSecretCheckSucceeded(ctx, &agg.Aggregate, appID, updated)
-}
-
-func (c *Commands) OIDCSecretCheckFailed(ctx context.Context, appID, projectID, resourceOwner string) {
-	agg := project_repo.NewAggregate(projectID, resourceOwner)
-	c.oidcSecretCheckFailed(ctx, &agg.Aggregate, appID)
+	c.oidcUpdateSecret(ctx, &agg.Aggregate, appID, updated)
 }
 
 func (c *Commands) getOIDCAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (_ *OIDCApplicationWriteModel, err error) {
@@ -382,17 +378,6 @@ func trimStringSliceWhiteSpaces(slice []string) []string {
 	return slice
 }
 
-func (c *Commands) oidcSecretCheckSucceeded(ctx context.Context, agg *eventstore.Aggregate, appID, updated string) {
-	cmds := append(
-		make([]eventstore.Command, 0, 2),
-		project_repo.NewOIDCConfigSecretCheckSucceededEvent(ctx, agg, appID),
-	)
-	if updated != "" {
-		cmds = append(cmds, project_repo.NewOIDCConfigSecretHashUpdatedEvent(ctx, agg, appID, updated))
-	}
-	c.asyncPush(ctx, cmds...)
-}
-
-func (c *Commands) oidcSecretCheckFailed(ctx context.Context, agg *eventstore.Aggregate, appID string) {
-	c.asyncPush(ctx, project_repo.NewOIDCConfigSecretCheckFailedEvent(ctx, agg, appID))
+func (c *Commands) oidcUpdateSecret(ctx context.Context, agg *eventstore.Aggregate, appID, updated string) {
+	c.asyncPush(ctx, project_repo.NewOIDCConfigSecretHashUpdatedEvent(ctx, agg, appID, updated))
 }

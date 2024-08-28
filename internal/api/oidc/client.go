@@ -1037,10 +1037,11 @@ func (s *Server) verifyClientSecret(ctx context.Context, client *query.OIDCClien
 	updated, err := s.hasher.Verify(client.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
 	if err != nil {
-		s.command.OIDCSecretCheckFailed(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner)
 		return oidc.ErrInvalidClient().WithParent(err).WithDescription("invalid secret")
 	}
-	s.command.OIDCSecretCheckSucceeded(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner, updated)
+	if updated != "" {
+		s.command.OIDCUpdateSecret(ctx, client.AppID, client.ProjectID, client.Settings.ResourceOwner, updated)
+	}
 	return nil
 }
 

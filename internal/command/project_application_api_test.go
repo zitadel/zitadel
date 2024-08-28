@@ -783,9 +783,6 @@ func TestCommands_VerifyAPIClientSecret(t *testing.T) {
 						project.NewAPIConfigAddedEvent(context.Background(), &agg.Aggregate, "appID", "clientID", hashedSecret, domain.APIAuthMethodTypePrivateKeyJWT),
 					),
 				),
-				expectPush(
-					project.NewAPIConfigSecretCheckSucceededEvent(context.Background(), &agg.Aggregate, "appID"),
-				),
 			),
 		},
 		{
@@ -799,9 +796,6 @@ func TestCommands_VerifyAPIClientSecret(t *testing.T) {
 					eventFromEventPusher(
 						project.NewAPIConfigAddedEvent(context.Background(), &agg.Aggregate, "appID", "clientID", hashedSecret, domain.APIAuthMethodTypePrivateKeyJWT),
 					),
-				),
-				expectPush(
-					project.NewAPIConfigSecretCheckFailedEvent(context.Background(), &agg.Aggregate, "appID"),
 				),
 			),
 			wantErr: zerrors.ThrowInvalidArgument(err, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid"),
