@@ -1625,7 +1625,6 @@
         "initPasswordText": "パスワードを初期化する",
         "initializeDoneText": "ユーザーの初期化が完了しました",
         "initializeUserText": "ユーザーを初期化する",
-        "linkingUserPromptText": "ユーザーのリンクプロンプト",
         "linkingUserDoneText": "ユーザーのリンクが完了しました",
         "loginText": "ログイン",
         "logoutText": "ログアウト",
