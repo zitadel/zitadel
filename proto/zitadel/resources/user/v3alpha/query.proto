@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.user.v3alpha;
+package zitadel.resources.user.v3alpha;
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha;user";
 
