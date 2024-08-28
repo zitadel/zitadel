@@ -1,6 +1,5 @@
 import tinycolor from "tinycolor2";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
-import { PartialMessage } from "@zitadel/client";
 
 export interface Color {
   name: string;
@@ -69,10 +68,7 @@ type BrandingColors = {
   };
 };
 
-export function setTheme(
-  document: any,
-  policy?: PartialMessage<BrandingSettings>,
-) {
+export function setTheme(document: any, policy?: BrandingSettings) {
   const lP: BrandingColors = {
     lightTheme: {
       backgroundColor: policy?.lightTheme?.backgroundColor || BACKGROUND,
