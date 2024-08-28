@@ -1,8 +1,11 @@
 import { getSession, verifyU2FRegistration } from "@/lib/zitadel";
 import { getSessionCookieById } from "@zitadel/next";
 import { NextRequest, NextResponse, userAgent } from "next/server";
-import { VerifyU2FRegistrationRequest } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { PlainMessage } from "@zitadel/client";
+import {
+  VerifyU2FRegistrationRequestSchema,
+  VerifyU2FRegistrationResponseSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { createMessage, toJson } from "@zitadel/client";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -22,18 +25,26 @@ export async function POST(request: NextRequest) {
     const userId = session?.session?.factors?.user?.id;
 
     if (userId) {
-      let req: PlainMessage<VerifyU2FRegistrationRequest> = {
-        publicKeyCredential,
-        u2fId,
-        userId,
-        tokenName: passkeyName,
-      };
+      // TODO: this does not make sens to me
+      //  We create the object, and later on we assign another object to it.
+      // let req: VerifyU2FRegistrationRequest = {
+      //   publicKeyCredential,
+      //   u2fId,
+      //   userId,
+      //   tokenName: passkeyName,
+      // };
 
-      req = VerifyU2FRegistrationRequest.fromJson(request as any);
+      const req = createMessage(
+        VerifyU2FRegistrationRequestSchema,
+        // TODO: why did we passed the request instead of body here?
+        body,
+      );
 
       return verifyU2FRegistration(req)
         .then((resp) => {
-          return NextResponse.json(resp);
+          return NextResponse.json(
+            toJson(VerifyU2FRegistrationResponseSchema, resp),
+          );
         })
         .catch((error) => {
           return NextResponse.json(error, { status: 500 });
