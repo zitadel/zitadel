@@ -6,22 +6,22 @@ sidebar_label: Web keys
 Web Keys in ZITADEL are used to sign and verify JSON Web Tokens (JWT).
 ID tokens are created, signed and returned by ZITADEL when a OpenID connect (OIDC) or Oauth2
 authorization flow completes and a user is authenticated.
-Optionally zitadel can return JWTs for access tokens if the OIDC Application if configured for it.
+Optionally zitadel can return JWTs for access tokens if the OIDC Application is configured for it.
 
 ## Introduction
 
 ZITADEL uses asymmetric cryptography to sign and validate JWTs.
-Keys are generated in pairs giving a private and public key.
+Keys are generated in pairs resulting in a private and public key.
 Private keys are used to sign tokens.
 Public keys are used to verify tokens.
 OIDC clients need the public key to verify ID tokens.
 Oauth2 API apps might need the public key if they want to client-side verification of a
-JWT access tokens, instead of introspection.
-ZITADEL uses public key verification when API calls are made, the user info or introspection
+JWT access tokens, instead of [introspection](/docs/apis/openidoauth/endpoints#introspection_endpoint).
+ZITADEL uses public key verification when API calls are made or when the user-info or introspection
 endpoints are called with a JWT access token.
 
 :::info
-Web keys are an [experimental](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable it on the [feature API](https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) before using it.
+Web keys are an [experimental](/docs/support/software-release-cycles-support#beta) feature. Be sure to enable the `web_key` [feature](/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) before using it.
 :::
 
 ### JSON Web Key
@@ -43,7 +43,6 @@ Web keys in ZITADEL support a number of [JSON Web Algorithms (JWA)](https://www.
 
 ### Client Algorithm Support
 
-ZITADEL supports a wide range of algorithms.
 Before customizing the algorithm the instance admin **MUST** make sure the complete App and API ecosystem
 supports the chosen algorithm.
 
@@ -52,9 +51,9 @@ introspection for token validation, only the OIDC applications will need to supp
 If JWT access tokens are used and APIs do public key verification, those APIs need to support the chosen algorithm as well.
 
 RS256 is widely considered the default algorithm and must be supported by all OIDC/Oauth2 providers, relying parties and resource servers.
-This also the default ZITADEL uses when [creating web keys](#creation).
-It might be reasonable to assume RS384 and RS512 are just as supported, because those are just variations of RSA based keys.
-The ES256 till ES512 might have reasonable support as well,
+This is also the default ZITADEL uses when [creating web keys](#creation).
+It might be reasonable to assume RS384 and RS512 are just as supported, because those are just variations on RSA based keys.
+The ES256, ES384 and ES512 might have reasonable support as well,
 ECDSA is part of the same [JSON Web Algorithms (JWA)](https://www.rfc-editor.org/rfc/rfc7518) as RSA.
 
 EdDSA usage is defined in the supplemental [RFC8037](https://www.rfc-editor.org/rfc/rfc8037),
@@ -83,12 +82,15 @@ The same counts for [zitadel/oidc](https://github.com/zitadel/oidc) Go library.
 
 ## Web Key management
 
-ZITADEL provides a resource based [web keys API](https://zitadel.com/docs/apis/resources/webkey_service_v3). The API allows the creation, activation, deletion and listing of web keys.
+ZITADEL provides a resource based [web keys API](/docs/apis/resources/webkey_service_v3).
+The API allows the creation, activation, deletion and listing of web keys.
 All public keys that are stored for an instance are served on the [JWKS endpoint](#json-web-key-set).
-Applications need public keys for token verification and not all applications are capable of on-demand key fetching when receiving a token with an unknown key ID (`kid` header claim).
-Instead, those application may do a refresh or only load keys at startup.
+Applications need public keys for token verification and not all applications are capable of on-demand
+key fetching when receiving a token with an unknown key ID (`kid` header claim).
+Instead, those application may do a time-based refresh or only load keys at startup.
 
-Using the web keys API, keys can be created and activated for signing later. This allows the keys to be distributed to the instance's apps and caches.
+Using the web keys API, keys can be created first and activated for signing later.
+This allows the keys to be distributed to the instance's apps and caches.
 Once a key is deactivated, its public key will remain available for token verification on the web key is deleted.
 Delayed deletion makes sure tokens that were signed before the key got deactivated remain valid.
 
@@ -189,21 +191,24 @@ curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/' \
 }'
 ```
 
-[^2]: The ZITADEL back-end is written in Go. The Go developers have denied ed448 curve implementations to be included. Therefore ZITADEL won't support this either.
+[^2]: The ZITADEL back-end is written in Go. The Go developers have denied ed448 curve implementations to be included.
+  Therefore ZITADEL won't support this either.
 
 ### Activation
 
-When a generated web key is [activated](https://zitadel.com/docs/apis/resources/webkey_service_v3/zitadel-web-keys-activate-web-key), its private key will be used to sign new tokens.
+When a generated web key is [activated](/docs/apis/resources/webkey_service_v3/zitadel-web-keys-activate-web-key),
+its private key will be used to sign new tokens.
 There can be only one active key on an instance.
 Activating a key implies deactivation of the previously active key.
 
 Public keys on the [JWKS](#json-web-key-set) endpoint may be [cached](#caching).
 Therefore it is advised to delay activation after generating a key,
-at least for the duration of the max-age setting.
+at least for the duration of the max-age setting plus any time it might take for client applications to refresh.
 
 ### Deletion
 
-Non-active keys may be [deleted](https://zitadel.com/docs/apis/resources/webkey_service_v3/zitadel-web-keys-delete-web-key). Deletion also means tokens signed with this key become invalid.
+Non-active keys may be [deleted](/docs/apis/resources/webkey_service_v3/zitadel-web-keys-delete-web-key).
+Deletion also means tokens signed with this key become invalid.
 Active keys can't be deleted.
 As each public key is available on the [JWKS](#json-web-key-set) endpoint,
 it is important to cleanup old web keys that are no longer needed.
@@ -211,8 +216,9 @@ Otherwise the endpoint's response size will only grow over time, which might lea
 
 Once a key was activated and deactivated (by activation of the next key) deletion should wait:
 
-- Until access and ID tokens are expired. See [OIDC token lifetimes](https://zitadel.com/docs/guides/manage/console/default-settings#oidc-token-lifetimes-and-expiration).
-- ID tokens may be used as `id_token_hint` in authentication and end session requests. The hint typically doesn't expire, but becomes invalid once the key is deleted. It might be desired to keep keys around long enough to minimalize user impact.
+- Until access and ID tokens are expired. See [OIDC token lifetimes](/docs/guides/manage/console/default-settings#oidc-token-lifetimes-and-expiration).
+- ID tokens may be used as `id_token_hint` in authentication and end-session requests. The hint typically doesn't expire, but becomes invalid once the key is deleted.
+  It might be desired to keep keys around long enough to minimalize user impact.
 
 ### Rotation example
 
@@ -222,9 +228,11 @@ This strategy aims to fulfill the following requirements:
 1. Web keys are rotated monthly.
 2. Applications have enough time to see the next activated web key on the [JWKS](#json-web-key-set) endpoint.
 3. Web keys are kept long enough to cover the access and ID token validity of 24 hours.
-4. Web keys are kept long enough to to allow usage of the `id_token_hint` for at least 3 months. Users that haven't logged in / interacted with the client app for that period will need to re-enter their username.
+4. Web keys are kept long enough to to allow usage of the `id_token_hint` for at least 3 months.
+  Users that haven't logged in / refreshed tokens with the client app for that period,
+  will need to re-enter their username.
 
-When the feature flag was enabled the first time, the instance has two keys with the first one activated. When this feature becomes general available, instance creation will setup the first two keys in the same way. So the initial state is always like this:
+When the feature flag was enabled the first time, the instance got two keys with the first one activated. When this feature becomes general available, instance creation will setup the first two keys in the same way. So the initial state always looks like this:
 
 | id  | created    | changed    | state           |
 | --- | ---------- | ---------- | --------------- |
@@ -233,7 +241,7 @@ When the feature flag was enabled the first time, the instance has two keys with
 
 For the sake of this example we will use simplified IDs and restrict timestamps to dates.
 
-After one month, on 2025-02-01, we wish to activate the next available key and create a new key to be available the next time.
+After one month, on 2025-02-01, we wish to activate the next available key and create a new key to be available for activation next month. This fulfills requirements 1 and 2.
 
 ```bash
 curl -L -X POST 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/2/_activate' \
@@ -247,7 +255,7 @@ curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/' \
 -d '{}'
 ```
 
-This gives us a new state:
+Key ID 2 became active, Key ID 1 became inactive and a new key with ID 3 was created:
 
 | id  | created    | changed    | state            |
 | --- | ---------- | ---------- | ---------------- |
@@ -255,6 +263,7 @@ This gives us a new state:
 | 2   | 2025-01-01 | 2025-02-01 | `STATE_ACTIVE`   |
 | 3   | 2025-02-01 | 2025-02-01 | `STATE_INITIAL`  |
 
+No keys are deleted yet.
 We continue like this monthly.
 At one point (on 2025-05-01) we will have a web key with `STATE_INACTIVE` with a changed date of 3 months ago:
 
@@ -268,7 +277,7 @@ At one point (on 2025-05-01) we will have a web key with `STATE_INACTIVE` with a
 | 6   | 2025-05-01 | 2025-05-01 | `STATE_INITIAL`  |
 
 In addition to the activate and create calls we made on this iteration,
-we can now safely delete the oldest key:
+we can now safely delete the oldest key, as both requirement 3 and 4 are now fulfilled:
 
 ```bash
 curl -L -X DELETE 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/1' \
@@ -286,12 +295,14 @@ The final state:
 | 5   | 2025-04-01 | 2025-05-01 | `STATE_ACTIVE`   |
 | 6   | 2025-05-01 | 2025-05-01 | `STATE_INITIAL`  |
 
+Next month, Key ID 6 will be activated, an new key added and Key ID 2 can be deleted.
+
 ## JSON web key set
 
 The JSON web key set (JWKS) endpoint serves all available public keys for the instance on
 `{your_domain}/oauth/v2/keys`. This includes activated, newly non-activated and deactivated web keys. The response format is defined in [RFC7517, section 5: JWK Set Format](https://www.rfc-editor.org/rfc/rfc7517#section-5).
 
-And may look like:
+And looks like:
 
 ```json
 {
@@ -325,7 +336,7 @@ And may look like:
 }
 ```
 
-When the `web_key` feature is enabled, the response may still contain legacy keys, in order not to invalidate older sessions.
+After the `web_key` feature is enabled, the response may still contain legacy keys, in order not to invalidate older sessions.
 The legacy keys will disappear once they expire.
 
 ### Caching
