@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.userschema.v3alpha;
+package zitadel.resources.userschema.v3alpha;
 
 import "google/api/field_behavior.proto";
 import "google/protobuf/struct.proto";

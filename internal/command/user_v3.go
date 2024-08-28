@@ -211,29 +211,8 @@ func (c *Commands) updateSchemaUserPhone(ctx context.Context, events []eventstor
 	return events, plainCode, nil
 }
 
-func generateCode(gen crypto.Generator, returnCode bool) (*crypto.CryptoValue, string, error) {
-	value, plain, err := crypto.NewCode(gen)
-	if err != nil {
-		return nil, "", err
-	}
-
-	if returnCode {
-		return value, plain, nil
-	}
-	return value, "", nil
-
-}
-
 func (c *Commands) getSchemaUserExists(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
 	writeModel := NewExistsUserV3WriteModel(resourceOwner, id)
-	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
-		return nil, err
-	}
-	return writeModel, nil
-}
-
-func (c *Commands) getSchemaUserWriteModelByID(ctx context.Context, resourceOwner, id string) (*UserV3WriteModel, error) {
-	writeModel := NewUserV3WriteModel(resourceOwner, id)
 	if err := c.eventstore.FilterToQueryReducer(ctx, writeModel); err != nil {
 		return nil, err
 	}
