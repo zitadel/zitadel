@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
 import { useForm } from "react-hook-form";
@@ -24,7 +24,7 @@ type Props = {
   organization?: string;
   submit: boolean;
   allowRegister: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
 export default function UsernameForm({

@@ -27,11 +27,6 @@ export function SignInWithIDP({
   authRequestId,
   organization,
 }: SignInWithIDPProps) {
-  // TODO: remove casting when bufbuild/protobuf-es@v2 is released
-  identityProviders = identityProviders.map((idp) =>
-    IdentityProvider.fromJson(idp as any),
-  );
-
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const router = useRouter();
