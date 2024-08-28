@@ -380,6 +380,63 @@ func TestCommands_CreateSchemaUser(t *testing.T) {
 			},
 		},
 		{
+			"user created, additional property",
+			fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							schema.NewCreatedEvent(
+								context.Background(),
+								&schema.NewAggregate("id1", "instanceID").Aggregate,
+								"type",
+								json.RawMessage(`{
+								"$schema": "urn:zitadel:schema:v1",
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								}
+							}`),
+								[]domain.AuthenticatorType{domain.AuthenticatorTypeUsername},
+							),
+						),
+					),
+					expectFilter(),
+					expectPush(
+						schemauser.NewCreatedEvent(
+							context.Background(),
+							&schemauser.NewAggregate("id1", "org1").Aggregate,
+							"type",
+							1,
+							json.RawMessage(`{
+						"additional": "property"
+					}`),
+						),
+					),
+				),
+				idGenerator:     mock.ExpectID(t, "id1"),
+				checkPermission: newMockPermissionCheckAllowed(),
+			},
+			args{
+				ctx: authz.NewMockContext("instanceID", "", ""),
+				user: &CreateSchemaUser{
+					ResourceOwner:  "org1",
+					SchemaID:       "type",
+					schemaRevision: 1,
+					Data: json.RawMessage(`{
+						"additional": "property"
+					}`),
+				},
+			},
+			res{
+				details: &domain.ObjectDetails{
+					ResourceOwner: "org1",
+					ID:            "id1",
+				},
+			},
+		},
+		{
 			"user create, invalid data attribute name",
 			fields{
 				eventstore: expectEventstore(

@@ -110,7 +110,6 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			schemauser.CreatedType,
-			schemauser.UpdatedType,
 			schemauser.DeletedType,
 		)
 	if wm.DataWM {

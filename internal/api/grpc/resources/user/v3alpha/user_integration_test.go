@@ -19,8 +19,7 @@ import (
 )
 
 func TestServer_CreateUser(t *testing.T) {
-	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
+	ensureFeatureEnabled(t, IAMOwnerCTX)
 	schema := []byte(`{
 		"$schema": "urn:zitadel:schema:v1",
 			"type": "object",
@@ -30,7 +29,7 @@ func TestServer_CreateUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Tester.CreateUserSchema(isolatedIAMOwnerCTX, schema)
+	schemaResp := Tester.CreateUserSchema(IAMOwnerCTX, schema)
 	permissionSchema := []byte(`{
 		"$schema": "urn:zitadel:schema:v1",
 			"type": "object",
@@ -44,8 +43,8 @@ func TestServer_CreateUser(t *testing.T) {
 			}
 		}
 	}`)
-	permissionSchemaResp := Tester.CreateUserSchema(isolatedIAMOwnerCTX, permissionSchema)
-	orgResp := Tester.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	permissionSchemaResp := Tester.CreateUserSchema(IAMOwnerCTX, permissionSchema)
+	orgResp := Tester.CreateOrganization(IAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	type res struct {
 		want            *resource_object.Details
@@ -61,7 +60,7 @@ func TestServer_CreateUser(t *testing.T) {
 	}{
 		{
 			name: "user create, no schemaID",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
@@ -106,7 +105,7 @@ func TestServer_CreateUser(t *testing.T) {
 		},
 		{
 			name: "user create, invalid schema permission, owner",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
@@ -122,7 +121,7 @@ func TestServer_CreateUser(t *testing.T) {
 		},
 		{
 			name: "user create, no user data",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
@@ -145,7 +144,7 @@ func TestServer_CreateUser(t *testing.T) {
 		},
 		{
 			name: "user create, ok",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
@@ -168,7 +167,7 @@ func TestServer_CreateUser(t *testing.T) {
 			},
 		}, {
 			name: "user create, full contact, ok",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &user.CreateUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
@@ -223,8 +222,7 @@ func TestServer_CreateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
+	ensureFeatureEnabled(t, IAMOwnerCTX)
 	schema := []byte(`{
 		"$schema": "urn:zitadel:schema:v1",
 			"type": "object",
@@ -234,8 +232,8 @@ func TestServer_DeleteUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Tester.CreateUserSchema(isolatedIAMOwnerCTX, schema)
-	orgResp := Tester.CreateOrganization(isolatedIAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	schemaResp := Tester.CreateUserSchema(IAMOwnerCTX, schema)
+	orgResp := Tester.CreateOrganization(IAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -247,7 +245,7 @@ func TestServer_DeleteUser(t *testing.T) {
 	}{
 		{
 			name: "user delete, no userID",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &user.DeleteUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
@@ -260,7 +258,7 @@ func TestServer_DeleteUser(t *testing.T) {
 		},
 		{
 			name: "user delete, not existing",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			req: &user.DeleteUserRequest{
 				Organization: &object.Organization{
 					Property: &object.Organization_OrgId{
@@ -275,7 +273,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "user delete, no context",
 			ctx:  context.Background(),
 			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
-				userResp := Tester.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := Tester.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.UserId = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -292,7 +290,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "user delete, no permission",
 			ctx:  UserCTX,
 			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
-				userResp := Tester.CreateSchemaUser(isolatedIAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := Tester.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.UserId = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -307,7 +305,7 @@ func TestServer_DeleteUser(t *testing.T) {
 		},
 		{
 			name: "user delete, ok",
-			ctx:  isolatedIAMOwnerCTX,
+			ctx:  IAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
 				userResp := Tester.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.UserId = userResp.GetDetails().GetId()
@@ -319,7 +317,6 @@ func TestServer_DeleteUser(t *testing.T) {
 						OrgId: orgResp.GetOrganizationId(),
 					},
 				},
-				UserId: "",
 			},
 			want: &resource_object.Details{
 				Changed: timestamppb.Now(),

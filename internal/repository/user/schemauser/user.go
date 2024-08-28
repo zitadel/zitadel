@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	eventPrefix = "user_schema.user."
+	eventPrefix = "user."
 	CreatedType = eventPrefix + "created"
 	UpdatedType = eventPrefix + "updated"
 	DeletedType = eventPrefix + "deleted"

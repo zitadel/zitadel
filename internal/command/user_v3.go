@@ -104,7 +104,7 @@ func (c *Commands) CreateSchemaUser(ctx context.Context, user *CreateSchemaUser,
 		return err
 	}
 
-	writeModel, err := c.getSchemaUserWriteModelByID(ctx, user.ResourceOwner, user.ID)
+	writeModel, err := c.getSchemaUserExists(ctx, user.ResourceOwner, user.ID)
 	if err != nil {
 		return err
 	}
@@ -143,7 +143,7 @@ func (c *Commands) DeleteSchemaUser(ctx context.Context, id string) (*domain.Obj
 	if id == "" {
 		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-Vs4wJCME7T", "Errors.IDMissing")
 	}
-	writeModel, err := c.getSchemaUserWriteModelByID(ctx, "", id)
+	writeModel, err := c.getSchemaUserExists(ctx, "", id)
 	if err != nil {
 		return nil, err
 	}
