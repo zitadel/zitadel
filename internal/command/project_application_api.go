@@ -250,22 +250,18 @@ func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, 
 	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "passwap.Verify")
 	updated, err := c.secretHasher.Verify(app.HashedSecret, secret)
 	spanPasswordComparison.EndWithError(err)
-	if err == nil {
-		c.apiSecretCheckSucceeded(ctx, projectAgg, app.AppID, updated)
-		return err
+	if err != nil {
+		return zerrors.ThrowInvalidArgument(err, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
 	}
-	c.apiSecretCheckFailed(ctx, projectAgg, app.AppID)
-	return zerrors.ThrowInvalidArgument(err, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
+	if updated != "" {
+		c.apiUpdateSecret(ctx, projectAgg, app.AppID, updated)
+	}
+	return nil
 }
 
-func (c *Commands) APISecretCheckSucceeded(ctx context.Context, appID, projectID, resourceOwner, updated string) {
+func (c *Commands) APIUpdateSecret(ctx context.Context, appID, projectID, resourceOwner, updated string) {
 	agg := project_repo.NewAggregate(projectID, resourceOwner)
-	c.apiSecretCheckSucceeded(ctx, &agg.Aggregate, appID, updated)
-}
-
-func (c *Commands) APISecretCheckFailed(ctx context.Context, appID, projectID, resourceOwner string) {
-	agg := project_repo.NewAggregate(projectID, resourceOwner)
-	c.apiSecretCheckFailed(ctx, &agg.Aggregate, appID)
+	c.apiUpdateSecret(ctx, &agg.Aggregate, appID, updated)
 }
 
 func (c *Commands) getAPIAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (_ *APIApplicationWriteModel, err error) {
@@ -280,17 +276,6 @@ func (c *Commands) getAPIAppWriteModel(ctx context.Context, projectID, appID, re
 	return appWriteModel, nil
 }
 
-func (c *Commands) apiSecretCheckSucceeded(ctx context.Context, agg *eventstore.Aggregate, appID, updated string) {
-	cmds := append(
-		make([]eventstore.Command, 0, 2),
-		project_repo.NewAPIConfigSecretCheckSucceededEvent(ctx, agg, appID),
-	)
-	if updated != "" {
-		cmds = append(cmds, project_repo.NewAPIConfigSecretHashUpdatedEvent(ctx, agg, appID, updated))
-	}
-	c.asyncPush(ctx, cmds...)
-}
-
-func (c *Commands) apiSecretCheckFailed(ctx context.Context, agg *eventstore.Aggregate, appID string) {
-	c.asyncPush(ctx, project_repo.NewAPIConfigSecretCheckFailedEvent(ctx, agg, appID))
+func (c *Commands) apiUpdateSecret(ctx context.Context, agg *eventstore.Aggregate, appID, updated string) {
+	c.asyncPush(ctx, project_repo.NewAPIConfigSecretHashUpdatedEvent(ctx, agg, appID, updated))
 }

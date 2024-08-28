@@ -1298,9 +1298,6 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 						),
 					),
 				),
-				expectPush(
-					project.NewOIDCConfigSecretCheckSucceededEvent(context.Background(), &agg.Aggregate, "appID"),
-				),
 			),
 		},
 		{
@@ -1334,9 +1331,6 @@ func TestCommands_VerifyOIDCClientSecret(t *testing.T) {
 							false,
 						),
 					),
-				),
-				expectPush(
-					project.NewOIDCConfigSecretCheckFailedEvent(context.Background(), &agg.Aggregate, "appID"),
 				),
 			),
 			wantErr: zerrors.ThrowInvalidArgument(err, "COMMAND-Bz542", "Errors.Project.App.ClientSecretInvalid"),
