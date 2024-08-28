@@ -1,6 +1,10 @@
-import { AddHumanUserRequest } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { IDPInformation, IDPLink } from "@zitadel/proto/zitadel/user/v2/idp_pb";
+import {
+  AddHumanUserRequest,
+  AddHumanUserRequestSchema,
+} from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { IDPInformation } from "@zitadel/proto/zitadel/user/v2/idp_pb";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { createMessage } from "@zitadel/client";
 
 // This maps the IdentityProviderType to a slug which is used in the /success and /failure routes
 export function idpTypeToSlug(idpType: IdentityProviderType) {
@@ -35,15 +39,10 @@ export const PROVIDER_MAPPING: {
   [provider: string]: (rI: IDPInformation) => AddHumanUserRequest;
 } = {
   [idpTypeToSlug(IdentityProviderType.GOOGLE)]: (idp: IDPInformation) => {
-    const rawInfo = idp.rawInformation?.toJson() as OIDC_USER;
+    const rawInfo = idp.rawInformation as OIDC_USER;
     console.log(rawInfo);
-    const idpLink: IDPLink = {
-      idpId: idp.idpId,
-      userId: idp.userId,
-      userName: idp.userName,
-    };
 
-    const req: AddHumanUserRequest = {
+    return createMessage(AddHumanUserRequestSchema, {
       username: idp.userName,
       email: {
         email: rawInfo.User?.email,
@@ -54,13 +53,17 @@ export const PROVIDER_MAPPING: {
         givenName: rawInfo.User?.given_name ?? "",
         familyName: rawInfo.User?.family_name ?? "",
       },
-      idpLinks: [idpLink],
-    };
-
-    return req;
+      idpLinks: [
+        {
+          idpId: idp.idpId,
+          userId: idp.userId,
+          userName: idp.userName,
+        },
+      ],
+    });
   },
   [idpTypeToSlug(IdentityProviderType.AZURE_AD)]: (idp: IDPInformation) => {
-    const rawInfo = idp.rawInformation?.toJson() as {
+    const rawInfo = idp.rawInformation as {
       jobTitle: string;
       mail: string;
       mobilePhone: string;
@@ -73,15 +76,9 @@ export const PROVIDER_MAPPING: {
       userPrincipalName: string;
     };
 
-    const idpLink: IDPLink = {
-      idpId: idp.idpId,
-      userId: idp.userId,
-      userName: idp.userName,
-    };
-
     console.log(rawInfo, rawInfo.userPrincipalName);
 
-    const req: AddHumanUserRequest = {
+    return createMessage(AddHumanUserRequestSchema, {
       username: idp.userName,
       email: {
         email: rawInfo.mail || rawInfo.userPrincipalName || "",
@@ -92,24 +89,22 @@ export const PROVIDER_MAPPING: {
         givenName: rawInfo.givenName ?? "",
         familyName: rawInfo.surname ?? "",
       },
-      idpLinks: [idpLink],
-    };
-
-    return req;
+      idpLinks: [
+        {
+          idpId: idp.idpId,
+          userId: idp.userId,
+          userName: idp.userName,
+        },
+      ],
+    });
   },
   [idpTypeToSlug(IdentityProviderType.GITHUB)]: (idp: IDPInformation) => {
-    const rawInfo = idp.rawInformation?.toJson() as {
+    const rawInfo = idp.rawInformation as {
       email: string;
       name: string;
     };
 
-    const idpLink: IDPLink = {
-      idpId: idp.idpId,
-      userId: idp.userId,
-      userName: idp.userName,
-    };
-
-    const req: AddHumanUserRequest = {
+    return createMessage(AddHumanUserRequestSchema, {
       username: idp.userName,
       email: {
         email: rawInfo.email,
@@ -120,9 +115,13 @@ export const PROVIDER_MAPPING: {
         givenName: rawInfo.name ?? "",
         familyName: rawInfo.name ?? "",
       },
-      idpLinks: [idpLink],
-    };
-
-    return req;
+      idpLinks: [
+        {
+          idpId: idp.idpId,
+          userId: idp.userId,
+          userName: idp.userName,
+        },
+      ],
+    });
   },
 };
