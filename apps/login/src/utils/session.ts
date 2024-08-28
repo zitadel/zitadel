@@ -12,8 +12,12 @@ import {
   RequestChallenges,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { PlainMessage } from "@zitadel/client";
+import {
+  Checks,
+  ChecksSchema,
+} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { toDate } from "@zitadel/client";
+import { createMessage } from "@zitadel/client";
 
 type CustomCookieData = {
   id: string;
@@ -33,15 +37,17 @@ export async function createSessionAndUpdateCookie(
   organization?: string,
   authRequestId?: string,
 ) {
-  const createdSession = await createSessionFromChecks(
+  const checks = createMessage(
+    ChecksSchema,
     password
       ? {
           user: { search: { case: "loginName", value: loginName } },
           password: { password },
         }
       : { user: { search: { case: "loginName", value: loginName } } },
-    challenges,
   );
+
+  const createdSession = await createSessionFromChecks(checks, challenges);
 
   if (createdSession) {
     return getSession(
@@ -52,9 +58,9 @@ export async function createSessionAndUpdateCookie(
         const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
-          creationDate: `${response.session.creationDate?.toDate().getTime() ?? ""}`,
-          expirationDate: `${response.session.expirationDate?.toDate().getTime() ?? ""}`,
-          changeDate: `${response.session.changeDate?.toDate().getTime() ?? ""}`,
+          creationDate: `${toDate(response.session.creationDate)?.getTime() ?? ""}`,
+          expirationDate: `${toDate(response.session.expirationDate)?.getTime() ?? ""}`,
+          changeDate: `${toDate(response.session.changeDate)?.getTime() ?? ""}`,
           loginName: response.session.factors.user.loginName ?? "",
           organization: response.session.factors.user.organizationId ?? "",
         };
@@ -85,7 +91,8 @@ export async function createSessionForUserIdAndUpdateCookie(
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
 ): Promise<Session> {
-  const createdSession = await createSessionFromChecks(
+  const checks = createMessage(
+    ChecksSchema,
     password
       ? {
           user: { search: { case: "userId", value: userId } },
@@ -93,8 +100,8 @@ export async function createSessionForUserIdAndUpdateCookie(
           // totp: { code: totpCode },
         }
       : { user: { search: { case: "userId", value: userId } } },
-    challenges,
   );
+  const createdSession = await createSessionFromChecks(checks, challenges);
 
   if (createdSession) {
     return getSession(
@@ -105,9 +112,9 @@ export async function createSessionForUserIdAndUpdateCookie(
         const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
-          creationDate: `${response.session.creationDate?.toDate().getTime() ?? ""}`,
-          expirationDate: `${response.session.expirationDate?.toDate().getTime() ?? ""}`,
-          changeDate: `${response.session.changeDate?.toDate().getTime() ?? ""}`,
+          creationDate: `${toDate(response.session.creationDate)?.getTime() ?? ""}`,
+          expirationDate: `${toDate(response.session.expirationDate)?.getTime() ?? ""}`,
+          changeDate: `${toDate(response.session.changeDate)?.getTime() ?? ""}`,
           loginName: response.session.factors.user.loginName ?? "",
         };
 
@@ -155,9 +162,9 @@ export async function createSessionForIdpAndUpdateCookie(
         const sessionCookie: CustomCookieData = {
           id: createdSession.sessionId,
           token: createdSession.sessionToken,
-          creationDate: `${response.session.creationDate?.toDate().getTime() ?? ""}`,
-          expirationDate: `${response.session.expirationDate?.toDate().getTime() ?? ""}`,
-          changeDate: `${response.session.changeDate?.toDate().getTime() ?? ""}`,
+          creationDate: `${toDate(response.session.creationDate)?.getTime() ?? ""}`,
+          expirationDate: `${toDate(response.session.expirationDate)?.getTime() ?? ""}`,
+          changeDate: `${toDate(response.session.changeDate)?.getTime() ?? ""}`,
           loginName: response.session.factors.user.loginName ?? "",
           organization: response.session.factors.user.organizationId ?? "",
         };
@@ -188,7 +195,7 @@ export type SessionWithChallenges = Session & {
 
 export async function setSessionAndUpdateCookie(
   recentCookie: CustomCookieData,
-  checks: PlainMessage<Checks>,
+  checks: Checks,
   challenges: RequestChallenges | undefined,
   authRequestId: string | undefined,
 ) {
@@ -204,7 +211,7 @@ export async function setSessionAndUpdateCookie(
         token: updatedSession.sessionToken,
         creationDate: recentCookie.creationDate,
         expirationDate: recentCookie.expirationDate,
-        changeDate: `${updatedSession.details?.changeDate?.toDate().getTime() ?? ""}`,
+        changeDate: `${toDate(updatedSession.details?.changeDate)?.getTime() ?? ""}`,
         loginName: recentCookie.loginName,
         organization: recentCookie.organization,
       };
@@ -222,7 +229,7 @@ export async function setSessionAndUpdateCookie(
               token: updatedSession.sessionToken,
               creationDate: sessionCookie.creationDate,
               expirationDate: sessionCookie.expirationDate,
-              changeDate: `${session.changeDate?.toDate().getTime() ?? ""}`,
+              changeDate: `${toDate(session.changeDate)?.getTime() ?? ""}`,
               loginName: session.factors?.user?.loginName ?? "",
               organization: session.factors?.user?.organizationId ?? "",
             };
