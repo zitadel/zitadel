@@ -339,7 +339,7 @@ message GetUserSchemaByIDRequest {
 }
 
 message GetUserSchemaByIDResponse {
-  zitadel.userschema.v3alpha.UserSchema schema = 1;
+  zitadel.resources.userschema.v3alpha.UserSchema schema = 1;
 }
 
 message CreateUserSchemaRequest {
