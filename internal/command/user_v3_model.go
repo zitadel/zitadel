@@ -17,7 +17,7 @@ type UserV3WriteModel struct {
 	EmailWM bool
 	DataWM  bool
 
-	SchemaType     string
+	SchemaID       string
 	SchemaRevision uint64
 
 	Email                    string
@@ -50,9 +50,9 @@ func NewUserV3WriteModel(resourceOwner, userID string) *UserV3WriteModel {
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
 		},
-		PhoneWM: false,
-		EmailWM: false,
-		DataWM:  false,
+		PhoneWM: true,
+		EmailWM: true,
+		DataWM:  true,
 	}
 }
 
@@ -60,14 +60,14 @@ func (wm *UserV3WriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *schemauser.CreatedEvent:
-			wm.SchemaType = e.SchemaType
+			wm.SchemaID = e.SchemaID
 			wm.SchemaRevision = 1
 			wm.Data = e.Data
 
 			wm.State = domain.UserStateActive
 		case *schemauser.UpdatedEvent:
-			if e.SchemaType != nil {
-				wm.SchemaType = *e.SchemaType
+			if e.SchemaID != nil {
+				wm.SchemaID = *e.SchemaID
 			}
 			if e.SchemaRevision != nil {
 				wm.SchemaRevision = *e.SchemaRevision
@@ -113,10 +113,6 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 			schemauser.UpdatedType,
 			schemauser.DeletedType,
 		)
-
-	if wm.SchemaType != "" {
-		query = query.EventData(map[string]interface{}{"schemaType": wm.SchemaType})
-	}
 	if wm.DataWM {
 		query = query.EventTypes(
 			schemauser.UpdatedType,
@@ -144,13 +140,13 @@ func (wm *UserV3WriteModel) Query() *eventstore.SearchQueryBuilder {
 func (wm *UserV3WriteModel) NewUpdatedEvent(
 	ctx context.Context,
 	agg *eventstore.Aggregate,
-	schemaType *string,
+	schemaID *string,
 	schemaRevision *uint64,
 	data json.RawMessage,
 ) *schemauser.UpdatedEvent {
 	changes := make([]schemauser.Changes, 0)
-	if schemaType != nil && wm.SchemaType != *schemaType {
-		changes = append(changes, schemauser.ChangeSchemaType(wm.SchemaType, *schemaType))
+	if schemaID != nil && wm.SchemaID != *schemaID {
+		changes = append(changes, schemauser.ChangeSchemaID(wm.SchemaID, *schemaID))
 	}
 	if schemaRevision != nil && wm.SchemaRevision != *schemaRevision {
 		changes = append(changes, schemauser.ChangeSchemaRevision(wm.SchemaRevision, *schemaRevision))

@@ -19,8 +19,7 @@ import (
 )
 
 func TestServer_CreateUser(t *testing.T) {
-	//_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	isolatedIAMOwnerCTX := IAMOwnerCTX
+	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 	schema := []byte(`{
 		"$schema": "urn:zitadel:schema:v1",
@@ -224,8 +223,7 @@ func TestServer_CreateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	//_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
-	isolatedIAMOwnerCTX := IAMOwnerCTX
+	_, _, _, isolatedIAMOwnerCTX := Tester.UseIsolatedInstance(t, IAMOwnerCTX, SystemCTX)
 	ensureFeatureEnabled(t, isolatedIAMOwnerCTX)
 	schema := []byte(`{
 		"$schema": "urn:zitadel:schema:v1",

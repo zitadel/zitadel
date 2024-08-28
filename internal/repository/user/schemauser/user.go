@@ -17,7 +17,7 @@ const (
 type CreatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 	ID                    string          `json:"id"`
-	SchemaType            string          `json:"schemaType"`
+	SchemaID              string          `json:"schemaID"`
 	SchemaRevision        uint64          `json:"schemaRevision"`
 	Data                  json.RawMessage `json:"user,omitempty"`
 }
@@ -38,7 +38,7 @@ func NewCreatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 
-	schemaType string,
+	schemaID string,
 	schemaRevision uint64,
 	data json.RawMessage,
 ) *CreatedEvent {
@@ -48,7 +48,7 @@ func NewCreatedEvent(
 			aggregate,
 			CreatedType,
 		),
-		SchemaType:     schemaType,
+		SchemaID:       schemaID,
 		SchemaRevision: schemaRevision,
 		Data:           data,
 	}
@@ -57,10 +57,10 @@ func NewCreatedEvent(
 type UpdatedEvent struct {
 	*eventstore.BaseEvent `json:"-"`
 
-	SchemaType     *string         `json:"schemaType,omitempty"`
+	SchemaID       *string         `json:"schemaID,omitempty"`
 	SchemaRevision *uint64         `json:"schemaRevision,omitempty"`
 	Data           json.RawMessage `json:"schema,omitempty"`
-	oldSchemaType  string
+	oldSchemaID    string
 	oldRevision    uint64
 }
 
@@ -95,10 +95,10 @@ func NewUpdatedEvent(
 
 type Changes func(event *UpdatedEvent)
 
-func ChangeSchemaType(oldSchemaType, schemaType string) func(event *UpdatedEvent) {
+func ChangeSchemaID(oldSchemaID, schemaID string) func(event *UpdatedEvent) {
 	return func(e *UpdatedEvent) {
-		e.SchemaType = &schemaType
-		e.oldSchemaType = oldSchemaType
+		e.SchemaID = &schemaID
+		e.oldSchemaID = oldSchemaID
 	}
 }
 func ChangeSchemaRevision(oldSchemaRevision, schemaRevision uint64) func(event *UpdatedEvent) {

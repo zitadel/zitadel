@@ -104,7 +104,7 @@ func (p *userSchemaProjection) reduceCreated(event eventstore.Event) (*handler.S
 		event,
 		[]handler.Column{
 			handler.NewCol(UserSchemaIDCol, event.Aggregate().ID),
-			handler.NewCol(UserSchemaCreationDateCol, event.CreatedAt()),
+			handler.NewCol(UserSchemaCreationDateCol, handler.OnlySetValueOnInsert(UserSchemaTable, e.CreationDate())),
 			handler.NewCol(UserSchemaChangeDateCol, event.CreatedAt()),
 			handler.NewCol(UserSchemaSequenceCol, event.Sequence()),
 			handler.NewCol(UserSchemaInstanceIDCol, event.Aggregate().InstanceID),
