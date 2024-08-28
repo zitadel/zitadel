@@ -6,6 +6,7 @@ import { Avatar } from "./Avatar";
 import moment from "moment";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { timestampDate } from "@zitadel/client";
 
 export default function SessionItem({
   session,
@@ -16,8 +17,6 @@ export default function SessionItem({
   reload: () => void;
   authRequestId?: string;
 }) {
-  // TODO: remove casting when bufbuild/protobuf-es@v2 is released
-  session = Session.fromJson(session as any);
   const [loading, setLoading] = useState<boolean>(false);
 
   async function clearSession(id: string) {
@@ -46,7 +45,7 @@ export default function SessionItem({
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
   const stillValid = session.expirationDate
-    ? session.expirationDate.toDate() > new Date()
+    ? timestampDate(session.expirationDate) > new Date()
     : true;
 
   const validDate = validPassword || validPasskey;
@@ -106,7 +105,7 @@ export default function SessionItem({
         </span>
         {validUser && (
           <span className="text-xs opacity-80">
-            {validDate && moment(validDate.toDate()).fromNow()}
+            {validDate && moment(timestampDate(validDate)).fromNow()}
           </span>
         )}
       </div>
