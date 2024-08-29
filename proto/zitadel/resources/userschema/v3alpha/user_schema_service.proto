@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package zitadel.user.schema.v3alpha;
+package zitadel.resources.userschema.v3alpha;
 
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
@@ -8,12 +8,12 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 import "validate/validate.proto";
-import "zitadel/object/v2/object.proto";
+import "zitadel/object/v3alpha/object.proto";
+import "zitadel/resources/object/v3alpha/object.proto";
 import "zitadel/protoc_gen_zitadel/v2/options.proto";
-import "zitadel/user/schema/v3alpha/user_schema.proto";
+import "zitadel/resources/userschema/v3alpha/user_schema.proto";
 
-option go_package = "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha";
-
+option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha;userschema";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
@@ -103,12 +103,12 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   }
 };
 
-service UserSchemaService {
+service ZITADELUserSchemas {
 
-  // List user schemas
+  // Search user schemas
   //
-  // List all matching user schemas. By default, we will return all user schema of your instance. Make sure to include a limit and sorting for pagination.
-  rpc ListUserSchemas (ListUserSchemasRequest) returns (ListUserSchemasResponse) {
+  // Search all matching user schemas. By default, we will return all user schema of your instance. Make sure to include a limit and sorting for pagination.
+  rpc SearchUserSchemas (SearchUserSchemasRequest) returns (SearchUserSchemasResponse) {
     option (google.api.http) = {
       post: "/v3alpha/user_schemas/search"
       body: "*"
@@ -124,13 +124,13 @@ service UserSchemaService {
       responses: {
         key: "200";
         value: {
-          description: "A list of all user schema matching the query";
+          description: "A list of all user schema matching the search";
         };
       };
       responses: {
         key: "400";
         value: {
-          description: "invalid list query";
+          description: "invalid search";
           schema: {
             json_schema: {
               ref: "#/definitions/rpcStatus";
@@ -198,12 +198,12 @@ service UserSchemaService {
     };
   }
 
-  // Update a user schema
+  // Patch a user schema
   //
-  // Update an existing user schema to a new revision. Users based on the current revision will not be affected until they are updated.
-  rpc UpdateUserSchema (UpdateUserSchemaRequest) returns (UpdateUserSchemaResponse) {
+  // Patch an existing user schema to a new revision. Users based on the current revision will not be affected until they are updated.
+  rpc PatchUserSchema (PatchUserSchemaRequest) returns (PatchUserSchemaResponse) {
     option (google.api.http) = {
-      put: "/v3alpha/user_schemas/{id}"
+      patch: "/v3alpha/user_schemas/{id}"
       body: "*"
     };
 
@@ -297,26 +297,31 @@ service UserSchemaService {
 
 }
 
-message ListUserSchemasRequest {
-  // list limitations and ordering.
-  zitadel.object.v2.ListQuery query = 1;
-  // the field the result is sorted.
-  zitadel.user.schema.v3alpha.FieldName sorting_column = 2 [
+message SearchUserSchemasRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"FIELD_NAME_TYPE\"";
+      default: "\"domain from HOST or :authority header\""
     }
   ];
-  // Define the criteria to query for.
-  repeated zitadel.user.schema.v3alpha.SearchQuery queries = 3;
+  // list limitations and ordering.
+  optional zitadel.resources.object.v3alpha.SearchQuery query = 2;
+  // The field the result is sorted by. The default is the creation date. Beware that if you change this, your result pagination might be inconsistent.
+  optional FieldName sorting_column = 3 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"TARGET_FIELD_NAME_CREATION_DATE\""
+    }
+  ];
+  // Define the criteria to filter for.
+  repeated SearchFilter filters = 4;
 }
 
-message ListUserSchemasResponse {
+message SearchUserSchemasResponse {
   // Details provides information about the returned result including total amount found.
-  zitadel.object.v2.ListDetails details = 1;
+  zitadel.resources.object.v3alpha.ListDetails details = 1;
   // States by which field the results are sorted.
-  zitadel.user.schema.v3alpha.FieldName sorting_column = 2;
+  FieldName sorting_column = 2;
   // The result contains the user schemas, which matched the queries.
-  repeated zitadel.user.schema.v3alpha.UserSchema result = 3;
+  repeated UserSchema result = 3;
 }
 
 
@@ -334,11 +339,29 @@ message GetUserSchemaByIDRequest {
 }
 
 message GetUserSchemaByIDResponse {
-  zitadel.user.schema.v3alpha.UserSchema schema = 1;
+  zitadel.resources.userschema.v3alpha.UserSchema schema = 1;
 }
 
-
 message CreateUserSchemaRequest {
+  optional zitadel.object.v3alpha.Instance instance = 1 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+  CreateUserSchema user_schema = 2 [
+    (validate.rules).message = {
+      required: true
+    }
+  ];
+}
+
+message CreateUserSchema{
+  optional zitadel.object.v3alpha.Instance instance = 4 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
+
   // Type is a human readable word describing the schema.
   string type = 1 [
     (validate.rules).string = {min_len: 1, max_len: 200},
@@ -373,14 +396,17 @@ message CreateUserSchemaRequest {
 }
 
 message CreateUserSchemaResponse {
-  // ID is the read-only unique identifier of the schema.
-  string id = 1;
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2.Details details = 2;
+  zitadel.resources.object.v3alpha.Details details = 2;
 }
 
 
-message UpdateUserSchemaRequest {
+message PatchUserSchemaRequest {
+  optional zitadel.object.v3alpha.Instance instance = 5 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   // unique identifier of the schema.
   string id = 1;
   // Type is a human readable word describing the schema.
@@ -414,39 +440,75 @@ message UpdateUserSchemaRequest {
   ];
 }
 
-message UpdateUserSchemaResponse {
+message PatchUserSchemaResponse {
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message DeactivateUserSchemaRequest {
+  optional zitadel.object.v3alpha.Instance instance = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   // unique identifier of the schema.
-  string id = 1;
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
 }
 
 message DeactivateUserSchemaResponse {
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message ReactivateUserSchemaRequest {
+  optional zitadel.object.v3alpha.Instance instance = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   // unique identifier of the schema.
-  string id = 1;
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
 }
 
 message ReactivateUserSchemaResponse {
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 message DeleteUserSchemaRequest {
+  optional zitadel.object.v3alpha.Instance instance = 2 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      default: "\"domain from HOST or :authority header\""
+    }
+  ];
   // unique identifier of the schema.
-  string id = 1;
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
 }
 
 message DeleteUserSchemaResponse {
   // Details provide some base information (such as the last change date) of the schema.
-  zitadel.object.v2.Details details = 1;
+  zitadel.resources.object.v3alpha.Details details = 1;
 }
 
 
