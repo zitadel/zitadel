@@ -11,12 +11,10 @@ import (
 )
 
 const (
-	OIDCConfigAddedType                = applicationEventTypePrefix + "config.oidc.added"
-	OIDCConfigChangedType              = applicationEventTypePrefix + "config.oidc.changed"
-	OIDCConfigSecretChangedType        = applicationEventTypePrefix + "config.oidc.secret.changed"
-	OIDCClientSecretCheckSucceededType = applicationEventTypePrefix + "oidc.secret.check.succeeded"
-	OIDCClientSecretCheckFailedType    = applicationEventTypePrefix + "oidc.secret.check.failed"
-	OIDCConfigSecretHashUpdatedType    = applicationEventTypePrefix + "config.oidc.secret.updated"
+	OIDCConfigAddedType             = applicationEventTypePrefix + "config.oidc.added"
+	OIDCConfigChangedType           = applicationEventTypePrefix + "config.oidc.changed"
+	OIDCConfigSecretChangedType     = applicationEventTypePrefix + "config.oidc.secret.changed"
+	OIDCConfigSecretHashUpdatedType = applicationEventTypePrefix + "config.oidc.secret.updated"
 )
 
 type OIDCConfigAddedEvent struct {
@@ -404,90 +402,6 @@ func OIDCConfigSecretChangedEventMapper(event eventstore.Event) (eventstore.Even
 	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "OIDC-M893d", "unable to unmarshal oidc config")
-	}
-
-	return e, nil
-}
-
-type OIDCConfigSecretCheckSucceededEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	AppID string `json:"appId"`
-}
-
-func (e *OIDCConfigSecretCheckSucceededEvent) Payload() interface{} {
-	return e
-}
-
-func (e *OIDCConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
-}
-
-func NewOIDCConfigSecretCheckSucceededEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	appID string,
-) *OIDCConfigSecretCheckSucceededEvent {
-	return &OIDCConfigSecretCheckSucceededEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			OIDCClientSecretCheckSucceededType,
-		),
-		AppID: appID,
-	}
-}
-
-func OIDCConfigSecretCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &OIDCConfigSecretCheckSucceededEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "OIDC-837gV", "unable to unmarshal oidc config")
-	}
-
-	return e, nil
-}
-
-type OIDCConfigSecretCheckFailedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	AppID string `json:"appId"`
-}
-
-func (e *OIDCConfigSecretCheckFailedEvent) Payload() interface{} {
-	return e
-}
-
-func (e *OIDCConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
-}
-
-func NewOIDCConfigSecretCheckFailedEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	appID string,
-) *OIDCConfigSecretCheckFailedEvent {
-	return &OIDCConfigSecretCheckFailedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			OIDCClientSecretCheckFailedType,
-		),
-		AppID: appID,
-	}
-}
-
-func OIDCConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &OIDCConfigSecretCheckFailedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "OIDC-987g%", "unable to unmarshal oidc config")
 	}
 
 	return e, nil

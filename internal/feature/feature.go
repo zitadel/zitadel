@@ -15,6 +15,7 @@ const (
 	KeyActions
 	KeyImprovedPerformance
 	KeyWebKey
+	KeyDebugOIDCParentError
 )
 
 //go:generate enumer -type Level -transform snake -trimprefix Level
@@ -39,6 +40,7 @@ type Features struct {
 	Actions                         bool                      `json:"actions,omitempty"`
 	ImprovedPerformance             []ImprovedPerformanceType `json:"improved_performance,omitempty"`
 	WebKey                          bool                      `json:"web_key,omitempty"`
+	DebugOIDCParentError            bool                      `json:"debug_oidc_parent_error,omitempty"`
 }
 
 type ImprovedPerformanceType int32

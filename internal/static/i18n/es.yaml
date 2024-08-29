@@ -577,6 +577,11 @@ Errors:
     NotActive: Esquema de usuario no activo
     NotInactive: Esquema de usuario no inactivo
     NotExists: El esquema de usuario no existe
+    ID:
+      Missing: Falta el ID del esquema de usuario
+    Invalid: Esquema de usuario no válido
+    Data:
+      Invalid: Datos no válidos para el esquema de usuario
   TokenExchange:
     FeatureDisabled: La función de intercambio de tokens está deshabilitada para su instancia. https://zitadel.com/docs/apis/resources/feature_service_v2/feature-service-set-instance-features
     Token:
@@ -1320,6 +1325,26 @@ EventTypes:
     deactivated: Esquema de usuario desactivado
     reactivated: Esquema de usuario reactivado
     deleted: Esquema de usuario eliminado
+    user:
+      created: Usuario creado
+      updated: Usuario actualizado
+      deleted: Usuario eliminado
+      email:
+        updated:  Dirección de correo electrónico modificada
+        verified: Dirección de correo electrónico verificada
+        verification:
+          failed: Error en la verificación de la dirección de correo electrónico
+        code:
+          added: Código de verificación de la dirección de correo electrónico generado
+          sent: Código de verificación de la dirección de correo electrónico enviado
+      phone:
+        updated: Número de teléfono modificado
+        verified: Número de teléfono verificado
+        verification:
+          failed: Error en la verificación del número de teléfono
+        code:
+          added: Código de verificación del número de teléfono generado
+          sent: Código de verificación del número de teléfono enviado
   web_key:
     added: Clave web añadida
     activated: Clave web activada

@@ -317,7 +317,7 @@ module.exports = {
             },
           },
           user_schema_v3: {
-            specPath: ".artifacts/openapi/zitadel/user/schema/v3alpha/user_schema_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/resources/userschema/v3alpha/user_schema_service.swagger.json",
             outputDir: "docs/apis/resources/user_schema_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
@@ -325,7 +325,7 @@ module.exports = {
             },
           },
           user_v3: {
-            specPath: ".artifacts/openapi/zitadel/user/v3alpha/user_service.swagger.json",
+            specPath: ".artifacts/openapi/zitadel/resources/user/v3alpha/user_service.swagger.json",
             outputDir: "docs/apis/resources/user_service_v3",
             sidebarOptions: {
               groupPathsBy: "tag",
