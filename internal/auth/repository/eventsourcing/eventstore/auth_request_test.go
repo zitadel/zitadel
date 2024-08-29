@@ -2604,6 +2604,7 @@ func TestAuthRequestRepo_VerifyPassword_IgnoreUnknownUsernames(t *testing.T) {
 		a.SetPolicyOrgID("instance1")
 		return a
 	}
+
 	type fields struct {
 		AuthRequests      func(*testing.T, string) cache.AuthRequestCache
 		UserViewProvider  userViewProvider

@@ -109,6 +109,7 @@ func AssertResourceListDetails[D ResourceListDetailsMsg](t testing.TB, expected,
 		assert.Nil(t, gotDetails)
 		return
 	}
+
 	assert.Equal(t, wantDetails.GetTotalResult(), gotDetails.GetTotalResult())
 	assert.Equal(t, wantDetails.GetAppliedLimit(), gotDetails.GetAppliedLimit())
 
