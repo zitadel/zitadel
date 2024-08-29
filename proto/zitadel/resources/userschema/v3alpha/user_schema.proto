@@ -17,7 +17,7 @@ message GetUserSchema {
   string type = 3 [
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "\"employees\""
-
+    }
   ];
   // Current state of the schema.
   State state = 4 [
