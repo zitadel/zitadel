@@ -4,9 +4,7 @@ package userschema_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
-	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
@@ -326,7 +324,9 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			args: args{
 				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
 				req: &schema.PatchUserSchemaRequest{
-					Type: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+					UserSchema: &schema.PatchUserSchema{
+						Type: gu.Ptr(gofakeit.Name()),
+					},
 				},
 			},
 			wantErr: true,
@@ -364,7 +364,9 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			args: args{
 				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
-					Type: gu.Ptr(""),
+					UserSchema: &schema.PatchUserSchema{
+						Type: gu.Ptr(""),
+					},
 				},
 			},
 			wantErr: true,
@@ -379,7 +381,9 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			args: args{
 				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
-					Type: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+					UserSchema: &schema.PatchUserSchema{
+						Type: gu.Ptr(gofakeit.Name()),
+					},
 				},
 			},
 			want: &schema.PatchUserSchemaResponse{
@@ -402,7 +406,9 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			args: args{
 				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
-					DataType: &schema.PatchUserSchemaRequest_Schema{},
+					UserSchema: &schema.PatchUserSchema{
+						DataType: &schema.PatchUserSchema_Schema{},
+					},
 				},
 			},
 			want: &schema.PatchUserSchemaResponse{
@@ -425,10 +431,11 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			args: args{
 				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
-					DataType: &schema.PatchUserSchemaRequest_Schema{
-						Schema: func() *structpb.Struct {
-							s := new(structpb.Struct)
-							err := s.UnmarshalJSON([]byte(`
+					UserSchema: &schema.PatchUserSchema{
+						DataType: &schema.PatchUserSchema_Schema{
+							Schema: func() *structpb.Struct {
+								s := new(structpb.Struct)
+								err := s.UnmarshalJSON([]byte(`
 							{
 								"$schema": "urn:zitadel:schema:v1",
 								"type": "object",
@@ -443,9 +450,10 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 								}
 							}
 						`))
-							require.NoError(t, err)
-							return s
-						}(),
+								require.NoError(t, err)
+								return s
+							}(),
+						},
 					},
 				},
 			},
@@ -461,10 +469,11 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			args: args{
 				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
-					DataType: &schema.PatchUserSchemaRequest_Schema{
-						Schema: func() *structpb.Struct {
-							s := new(structpb.Struct)
-							err := s.UnmarshalJSON([]byte(`
+					UserSchema: &schema.PatchUserSchema{
+						DataType: &schema.PatchUserSchema_Schema{
+							Schema: func() *structpb.Struct {
+								s := new(structpb.Struct)
+								err := s.UnmarshalJSON([]byte(`
 								{
 									"$schema": "urn:zitadel:schema:v1",
 									"type": "object",
@@ -479,9 +488,10 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 									"required": ["name"]
 								}
 							`))
-							require.NoError(t, err)
-							return s
-						}(),
+								require.NoError(t, err)
+								return s
+							}(),
+						},
 					},
 				},
 			},
@@ -505,8 +515,10 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			args: args{
 				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
-					PossibleAuthenticators: []schema.AuthenticatorType{
-						schema.AuthenticatorType_AUTHENTICATOR_TYPE_UNSPECIFIED,
+					UserSchema: &schema.PatchUserSchema{
+						PossibleAuthenticators: []schema.AuthenticatorType{
+							schema.AuthenticatorType_AUTHENTICATOR_TYPE_UNSPECIFIED,
+						},
 					},
 				},
 			},
@@ -522,8 +534,10 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			args: args{
 				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
-					PossibleAuthenticators: []schema.AuthenticatorType{
-						schema.AuthenticatorType_AUTHENTICATOR_TYPE_USERNAME,
+					UserSchema: &schema.PatchUserSchema{
+						PossibleAuthenticators: []schema.AuthenticatorType{
+							schema.AuthenticatorType_AUTHENTICATOR_TYPE_USERNAME,
+						},
 					},
 				},
 			},
@@ -551,7 +565,9 @@ func TestServer_UpdateUserSchema(t *testing.T) {
 			args: args{
 				ctx: IAMOwnerCTX,
 				req: &schema.PatchUserSchemaRequest{
-					Type: gu.Ptr(fmt.Sprint(time.Now().UnixNano() + 1)),
+					UserSchema: &schema.PatchUserSchema{
+						Type: gu.Ptr(gofakeit.Name()),
+					},
 				},
 			},
 			wantErr: true,
