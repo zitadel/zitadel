@@ -9,15 +9,17 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/text/language"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/database"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func TestUser_RemoveNoPermission(t *testing.T) {
+func TestUser_usersCheckPermission(t *testing.T) {
 	type want struct {
 		users []*User
 	}
@@ -136,6 +138,85 @@ func TestUser_RemoveNoPermission(t *testing.T) {
 			}
 			usersCheckPermission(context.Background(), tt.users, checkPermission)
 			require.Equal(t, tt.want.users, tt.users.Users)
+		})
+	}
+}
+
+func TestUser_userCheckPermission(t *testing.T) {
+	type args struct {
+		ctxData       string
+		resourceowner string
+		user          string
+	}
+	type perm struct {
+		resourceowner string
+		user          string
+	}
+	tests := []struct {
+		name        string
+		wantErr     bool
+		args        args
+		permissions []perm
+	}{
+		{
+			name: "permission, self",
+			args: args{
+				resourceowner: "org",
+				user:          "user",
+				ctxData:       "user",
+			},
+			permissions: []perm{},
+		},
+		{
+			name: "permission, user",
+			args: args{
+				resourceowner: "org1",
+				user:          "user1",
+				ctxData:       "user2",
+			},
+			permissions: []perm{{"org1", "user1"}},
+			wantErr:     false,
+		},
+		{
+			name: "permission, org",
+			args: args{
+				resourceowner: "org1",
+				user:          "user1",
+				ctxData:       "user2",
+			},
+			permissions: []perm{{"org1", "user3"}},
+		},
+		{
+			name: "permission, none",
+			args: args{
+				resourceowner: "org1",
+				user:          "user1",
+				ctxData:       "user2",
+			},
+			permissions: []perm{},
+			wantErr:     true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			checkPermission := func(ctx context.Context, permission, orgID, resourceID string) (err error) {
+				for _, perm := range tt.permissions {
+					if resourceID == perm.user {
+						return nil
+					}
+					if orgID == perm.resourceowner {
+						return nil
+					}
+				}
+				return errors.New("failed")
+			}
+
+			granted := userCheckPermission(authz.SetCtxData(context.Background(), authz.CtxData{UserID: tt.args.ctxData}), tt.args.resourceowner, tt.args.user, checkPermission)
+			if tt.wantErr {
+				assert.Error(t, granted)
+			} else {
+				assert.NoError(t, granted)
+			}
 		})
 	}
 }
