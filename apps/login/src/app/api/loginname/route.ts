@@ -112,18 +112,24 @@ export async function POST(request: NextRequest) {
           if (
             !orgToRegisterOn &&
             loginName &&
-            ORG_SUFFIX_REGEX.test(loginName) &&
-            loginSettings.allowDomainDiscovery
+            ORG_SUFFIX_REGEX.test(loginName)
           ) {
             const matched = ORG_SUFFIX_REGEX.exec(loginName);
             const suffix = matched?.[1] ?? "";
 
             // this just returns orgs where the suffix is set as primary domain
             const orgs = await getOrgsByDomain(suffix);
-            orgToRegisterOn =
+            const orgToCheckForDiscovery =
               orgs.result && orgs.result.length === 1
                 ? orgs.result[0].id
                 : undefined;
+
+            const orgLoginSettings = await getLoginSettings(
+              orgToCheckForDiscovery,
+            );
+            if (orgLoginSettings?.allowDomainDiscovery) {
+              orgToRegisterOn = orgToCheckForDiscovery;
+            }
           }
 
           const params: any = {};
