@@ -2,12 +2,15 @@ import { idpTypeToSlug } from "@/lib/idp";
 import {
   getActiveIdentityProviders,
   getLoginSettings,
+  getOrgsByDomain,
   listAuthenticationMethodTypes,
   listUsers,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
 import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
 import { NextRequest, NextResponse } from "next/server";
+
+const ORG_SUFFIX_REGEX = /(?<=@)(.+)/;
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -104,12 +107,43 @@ export async function POST(request: NextRequest) {
           loginSettings?.allowRegister &&
           loginSettings?.allowUsernamePassword
         ) {
-          const params: any = { organization };
+          let orgToRegisterOn: string | undefined = organization;
+
+          if (
+            !orgToRegisterOn &&
+            loginName &&
+            ORG_SUFFIX_REGEX.test(loginName)
+          ) {
+            const matched = ORG_SUFFIX_REGEX.exec(loginName);
+            const suffix = matched?.[1] ?? "";
+
+            // this just returns orgs where the suffix is set as primary domain
+            const orgs = await getOrgsByDomain(suffix);
+            const orgToCheckForDiscovery =
+              orgs.result && orgs.result.length === 1
+                ? orgs.result[0].id
+                : undefined;
+
+            const orgLoginSettings = await getLoginSettings(
+              orgToCheckForDiscovery,
+            );
+            if (orgLoginSettings?.allowDomainDiscovery) {
+              orgToRegisterOn = orgToCheckForDiscovery;
+            }
+          }
+
+          const params: any = {};
+
           if (authRequestId) {
             params.authRequestId = authRequestId;
           }
+
           if (loginName) {
             params.email = loginName;
+          }
+
+          if (orgToRegisterOn) {
+            params.organization = orgToRegisterOn;
           }
 
           const registerUrl = new URL(

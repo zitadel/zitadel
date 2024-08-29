@@ -5,6 +5,7 @@ import {
   createUserServiceClient,
   createIdpServiceClient,
   makeReqCtx,
+  createOrganizationServiceClient,
 } from "@zitadel/client/v2";
 import { createManagementServiceClient } from "@zitadel/client/v1";
 import { createServerTransport } from "@zitadel/node";
@@ -38,10 +39,10 @@ const transport = createServerTransport(
 );
 
 export const sessionService = createSessionServiceClient(transport);
-export const managementService = createManagementServiceClient(transport);
 export const userService = createUserServiceClient(transport);
 export const oidcService = createOIDCServiceClient(transport);
 export const idpService = createIdpServiceClient(transport);
+export const orgService = createOrganizationServiceClient(transport);
 
 export const settingsService = createSettingsServiceClient(transport);
 
@@ -295,8 +296,20 @@ export async function listUsers({
   return userService.listUsers({ queries: queries });
 }
 
-export async function getOrgByDomain(domain: string) {
-  return managementService.getOrgByDomainGlobal({ domain }, {});
+export async function getOrgsByDomain(domain: string) {
+  return orgService.listOrganizations(
+    {
+      queries: [
+        {
+          query: {
+            case: "domainQuery",
+            value: { domain, method: TextQueryMethod.EQUALS },
+          },
+        },
+      ],
+    },
+    {},
+  );
 }
 
 export async function startIdentityProviderFlow({

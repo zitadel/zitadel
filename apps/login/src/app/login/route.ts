@@ -11,7 +11,7 @@ import {
   createCallback,
   getActiveIdentityProviders,
   getAuthRequest,
-  getOrgByDomain,
+  getOrgsByDomain,
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
@@ -155,8 +155,10 @@ export async function GET(request: NextRequest) {
           const matched = ORG_DOMAIN_SCOPE_REGEX.exec(orgDomainScope);
           const orgDomain = matched?.[1] ?? "";
           if (orgDomain) {
-            const org = await getOrgByDomain(orgDomain);
-            organization = org?.org?.id ?? "";
+            const orgs = await getOrgsByDomain(orgDomain);
+            if (orgs.result && orgs.result.length === 1) {
+              organization = orgs.result[0].id ?? "";
+            }
           }
         }
       }
