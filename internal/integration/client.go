@@ -34,11 +34,14 @@ import (
 	idp_pb "github.com/zitadel/zitadel/pkg/grpc/idp/v2"
 	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/object/v2"
+	object_v3alpha "github.com/zitadel/zitadel/pkg/grpc/object/v3alpha"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 	oidc_pb_v2beta "github.com/zitadel/zitadel/pkg/grpc/oidc/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/org/v2"
 	org_v2beta "github.com/zitadel/zitadel/pkg/grpc/org/v2beta"
 	action "github.com/zitadel/zitadel/pkg/grpc/resources/action/v3alpha"
+	user_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
+	userschema_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
 	webkey_v3alpha "github.com/zitadel/zitadel/pkg/grpc/resources/webkey/v3alpha"
 	"github.com/zitadel/zitadel/pkg/grpc/session/v2"
 	session_v2beta "github.com/zitadel/zitadel/pkg/grpc/session/v2beta"
@@ -46,8 +49,7 @@ import (
 	settings_v2beta "github.com/zitadel/zitadel/pkg/grpc/settings/v2beta"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	user_pb "github.com/zitadel/zitadel/pkg/grpc/user"
-	schema "github.com/zitadel/zitadel/pkg/grpc/user/schema/v3alpha"
-	"github.com/zitadel/zitadel/pkg/grpc/user/v2"
+	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 	user_v2beta "github.com/zitadel/zitadel/pkg/grpc/user/v2beta"
 )
 
@@ -57,7 +59,7 @@ type Client struct {
 	Mgmt           mgmt.ManagementServiceClient
 	Auth           auth.AuthServiceClient
 	UserV2beta     user_v2beta.UserServiceClient
-	UserV2         user.UserServiceClient
+	UserV2         user_v2.UserServiceClient
 	SessionV2beta  session_v2beta.SessionServiceClient
 	SessionV2      session.SessionServiceClient
 	SettingsV2beta settings_v2beta.SettingsServiceClient
@@ -70,9 +72,10 @@ type Client struct {
 	ActionV3Alpha  action.ZITADELActionsClient
 	FeatureV2beta  feature_v2beta.FeatureServiceClient
 	FeatureV2      feature.FeatureServiceClient
-	UserSchemaV3   schema.UserSchemaServiceClient
+	UserSchemaV3   userschema_v3alpha.ZITADELUserSchemasClient
 	WebKeyV3Alpha  webkey_v3alpha.ZITADELWebKeysClient
 	IDPv2          idp_pb.IdentityProviderServiceClient
+	UserV3Alpha    user_v3alpha.ZITADELUsersClient
 }
 
 func newClient(cc *grpc.ClientConn) Client {
@@ -82,7 +85,7 @@ func newClient(cc *grpc.ClientConn) Client {
 		Mgmt:           mgmt.NewManagementServiceClient(cc),
 		Auth:           auth.NewAuthServiceClient(cc),
 		UserV2beta:     user_v2beta.NewUserServiceClient(cc),
-		UserV2:         user.NewUserServiceClient(cc),
+		UserV2:         user_v2.NewUserServiceClient(cc),
 		SessionV2beta:  session_v2beta.NewSessionServiceClient(cc),
 		SessionV2:      session.NewSessionServiceClient(cc),
 		SettingsV2beta: settings_v2beta.NewSettingsServiceClient(cc),
@@ -95,9 +98,10 @@ func newClient(cc *grpc.ClientConn) Client {
 		ActionV3Alpha:  action.NewZITADELActionsClient(cc),
 		FeatureV2beta:  feature_v2beta.NewFeatureServiceClient(cc),
 		FeatureV2:      feature.NewFeatureServiceClient(cc),
-		UserSchemaV3:   schema.NewUserSchemaServiceClient(cc),
+		UserSchemaV3:   userschema_v3alpha.NewZITADELUserSchemasClient(cc),
 		WebKeyV3Alpha:  webkey_v3alpha.NewZITADELWebKeysClient(cc),
 		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
+		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 	}
 }
 
@@ -148,29 +152,29 @@ func (t *Tester) UseIsolatedInstance(tt *testing.T, iamOwnerCtx, systemCtx conte
 	return primaryDomain, instanceId, adminUser.GetUserId(), t.updateInstanceAndOrg(newCtx, fmt.Sprintf("%s:%d", primaryDomain, t.Config.ExternalPort))
 }
 
-func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse {
-	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
+func (s *Tester) CreateHumanUser(ctx context.Context) *user_v2.AddHumanUserResponse {
+	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
 			Org: &object.Organization_OrgId{
 				OrgId: s.Organisation.ID,
 			},
 		},
-		Profile: &user.SetHumanProfile{
+		Profile: &user_v2.SetHumanProfile{
 			GivenName:         "Mickey",
 			FamilyName:        "Mouse",
 			PreferredLanguage: gu.Ptr("nl"),
-			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
+			Gender:            gu.Ptr(user_v2.Gender_GENDER_MALE),
 		},
-		Email: &user.SetHumanEmail{
+		Email: &user_v2.SetHumanEmail{
 			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
-			Verification: &user.SetHumanEmail_ReturnCode{
-				ReturnCode: &user.ReturnEmailVerificationCode{},
+			Verification: &user_v2.SetHumanEmail_ReturnCode{
+				ReturnCode: &user_v2.ReturnEmailVerificationCode{},
 			},
 		},
-		Phone: &user.SetHumanPhone{
+		Phone: &user_v2.SetHumanPhone{
 			Phone: "+41791234567",
-			Verification: &user.SetHumanPhone_ReturnCode{
-				ReturnCode: &user.ReturnPhoneVerificationCode{},
+			Verification: &user_v2.SetHumanPhone_ReturnCode{
+				ReturnCode: &user_v2.ReturnPhoneVerificationCode{},
 			},
 		},
 	})
@@ -178,23 +182,23 @@ func (s *Tester) CreateHumanUser(ctx context.Context) *user.AddHumanUserResponse
 	return resp
 }
 
-func (s *Tester) CreateHumanUserNoPhone(ctx context.Context) *user.AddHumanUserResponse {
-	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
+func (s *Tester) CreateHumanUserNoPhone(ctx context.Context) *user_v2.AddHumanUserResponse {
+	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
 			Org: &object.Organization_OrgId{
 				OrgId: s.Organisation.ID,
 			},
 		},
-		Profile: &user.SetHumanProfile{
+		Profile: &user_v2.SetHumanProfile{
 			GivenName:         "Mickey",
 			FamilyName:        "Mouse",
 			PreferredLanguage: gu.Ptr("nl"),
-			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
+			Gender:            gu.Ptr(user_v2.Gender_GENDER_MALE),
 		},
-		Email: &user.SetHumanEmail{
+		Email: &user_v2.SetHumanEmail{
 			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
-			Verification: &user.SetHumanEmail_ReturnCode{
-				ReturnCode: &user.ReturnEmailVerificationCode{},
+			Verification: &user_v2.SetHumanEmail_ReturnCode{
+				ReturnCode: &user_v2.ReturnEmailVerificationCode{},
 			},
 		},
 	})
@@ -202,29 +206,29 @@ func (s *Tester) CreateHumanUserNoPhone(ctx context.Context) *user.AddHumanUserR
 	return resp
 }
 
-func (s *Tester) CreateHumanUserWithTOTP(ctx context.Context, secret string) *user.AddHumanUserResponse {
-	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
+func (s *Tester) CreateHumanUserWithTOTP(ctx context.Context, secret string) *user_v2.AddHumanUserResponse {
+	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
 			Org: &object.Organization_OrgId{
 				OrgId: s.Organisation.ID,
 			},
 		},
-		Profile: &user.SetHumanProfile{
+		Profile: &user_v2.SetHumanProfile{
 			GivenName:         "Mickey",
 			FamilyName:        "Mouse",
 			PreferredLanguage: gu.Ptr("nl"),
-			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
+			Gender:            gu.Ptr(user_v2.Gender_GENDER_MALE),
 		},
-		Email: &user.SetHumanEmail{
+		Email: &user_v2.SetHumanEmail{
 			Email: fmt.Sprintf("%d@mouse.com", time.Now().UnixNano()),
-			Verification: &user.SetHumanEmail_ReturnCode{
-				ReturnCode: &user.ReturnEmailVerificationCode{},
+			Verification: &user_v2.SetHumanEmail_ReturnCode{
+				ReturnCode: &user_v2.ReturnEmailVerificationCode{},
 			},
 		},
-		Phone: &user.SetHumanPhone{
+		Phone: &user_v2.SetHumanPhone{
 			Phone: "+41791234567",
-			Verification: &user.SetHumanPhone_ReturnCode{
-				ReturnCode: &user.ReturnPhoneVerificationCode{},
+			Verification: &user_v2.SetHumanPhone_ReturnCode{
+				ReturnCode: &user_v2.ReturnPhoneVerificationCode{},
 			},
 		},
 		TotpSecret: gu.Ptr(secret),
@@ -239,15 +243,15 @@ func (s *Tester) CreateOrganization(ctx context.Context, name, adminEmail string
 		Admins: []*org.AddOrganizationRequest_Admin{
 			{
 				UserType: &org.AddOrganizationRequest_Admin_Human{
-					Human: &user.AddHumanUserRequest{
-						Profile: &user.SetHumanProfile{
+					Human: &user_v2.AddHumanUserRequest{
+						Profile: &user_v2.SetHumanProfile{
 							GivenName:  "firstname",
 							FamilyName: "lastname",
 						},
-						Email: &user.SetHumanEmail{
+						Email: &user_v2.SetHumanEmail{
 							Email: adminEmail,
-							Verification: &user.SetHumanEmail_ReturnCode{
-								ReturnCode: &user.ReturnEmailVerificationCode{},
+							Verification: &user_v2.SetHumanEmail_ReturnCode{
+								ReturnCode: &user_v2.ReturnEmailVerificationCode{},
 							},
 						},
 					},
@@ -292,29 +296,29 @@ func (s *Tester) CreateOrganizationWithUserID(ctx context.Context, name, userID 
 	return resp
 }
 
-func (s *Tester) CreateHumanUserVerified(ctx context.Context, org, email string) *user.AddHumanUserResponse {
-	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user.AddHumanUserRequest{
+func (s *Tester) CreateHumanUserVerified(ctx context.Context, org, email string) *user_v2.AddHumanUserResponse {
+	resp, err := s.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
 		Organization: &object.Organization{
 			Org: &object.Organization_OrgId{
 				OrgId: org,
 			},
 		},
-		Profile: &user.SetHumanProfile{
+		Profile: &user_v2.SetHumanProfile{
 			GivenName:         "Mickey",
 			FamilyName:        "Mouse",
 			NickName:          gu.Ptr("Mickey"),
 			PreferredLanguage: gu.Ptr("nl"),
-			Gender:            gu.Ptr(user.Gender_GENDER_MALE),
+			Gender:            gu.Ptr(user_v2.Gender_GENDER_MALE),
 		},
-		Email: &user.SetHumanEmail{
+		Email: &user_v2.SetHumanEmail{
 			Email: email,
-			Verification: &user.SetHumanEmail_IsVerified{
+			Verification: &user_v2.SetHumanEmail_IsVerified{
 				IsVerified: true,
 			},
 		},
-		Phone: &user.SetHumanPhone{
+		Phone: &user_v2.SetHumanPhone{
 			Phone: "+41791234567",
-			Verification: &user.SetHumanPhone_IsVerified{
+			Verification: &user_v2.SetHumanPhone_IsVerified{
 				IsVerified: true,
 			},
 		},
@@ -334,12 +338,12 @@ func (s *Tester) CreateMachineUser(ctx context.Context) *mgmt.AddMachineUserResp
 	return resp
 }
 
-func (s *Tester) CreateUserIDPlink(ctx context.Context, userID, externalID, idpID, username string) *user.AddIDPLinkResponse {
+func (s *Tester) CreateUserIDPlink(ctx context.Context, userID, externalID, idpID, username string) *user_v2.AddIDPLinkResponse {
 	resp, err := s.Client.UserV2.AddIDPLink(
 		ctx,
-		&user.AddIDPLinkRequest{
+		&user_v2.AddIDPLinkRequest{
 			UserId: userID,
-			IdpLink: &user.IDPLink{
+			IdpLink: &user_v2.IDPLink{
 				IdpId:    idpID,
 				UserId:   externalID,
 				UserName: username,
@@ -351,13 +355,13 @@ func (s *Tester) CreateUserIDPlink(ctx context.Context, userID, externalID, idpI
 }
 
 func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
-	reg, err := s.Client.UserV2.CreatePasskeyRegistrationLink(ctx, &user.CreatePasskeyRegistrationLinkRequest{
+	reg, err := s.Client.UserV2.CreatePasskeyRegistrationLink(ctx, &user_v2.CreatePasskeyRegistrationLinkRequest{
 		UserId: userID,
-		Medium: &user.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
+		Medium: &user_v2.CreatePasskeyRegistrationLinkRequest_ReturnCode{},
 	})
 	logging.OnError(err).Fatal("create user passkey")
 
-	pkr, err := s.Client.UserV2.RegisterPasskey(ctx, &user.RegisterPasskeyRequest{
+	pkr, err := s.Client.UserV2.RegisterPasskey(ctx, &user_v2.RegisterPasskeyRequest{
 		UserId: userID,
 		Code:   reg.GetCode(),
 		Domain: s.Config.ExternalDomain,
@@ -366,7 +370,7 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 	attestationResponse, err := s.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	logging.OnError(err).Fatal("create user passkey")
 
-	_, err = s.Client.UserV2.VerifyPasskeyRegistration(ctx, &user.VerifyPasskeyRegistrationRequest{
+	_, err = s.Client.UserV2.VerifyPasskeyRegistration(ctx, &user_v2.VerifyPasskeyRegistrationRequest{
 		UserId:              userID,
 		PasskeyId:           pkr.GetPasskeyId(),
 		PublicKeyCredential: attestationResponse,
@@ -376,7 +380,7 @@ func (s *Tester) RegisterUserPasskey(ctx context.Context, userID string) {
 }
 
 func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
-	pkr, err := s.Client.UserV2.RegisterU2F(ctx, &user.RegisterU2FRequest{
+	pkr, err := s.Client.UserV2.RegisterU2F(ctx, &user_v2.RegisterU2FRequest{
 		UserId: userID,
 		Domain: s.Config.ExternalDomain,
 	})
@@ -384,7 +388,7 @@ func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
 	attestationResponse, err := s.WebAuthN.CreateAttestationResponse(pkr.GetPublicKeyCredentialCreationOptions())
 	logging.OnError(err).Fatal("create user u2f")
 
-	_, err = s.Client.UserV2.VerifyU2FRegistration(ctx, &user.VerifyU2FRegistrationRequest{
+	_, err = s.Client.UserV2.VerifyU2FRegistration(ctx, &user_v2.VerifyU2FRegistrationRequest{
 		UserId:              userID,
 		U2FId:               pkr.GetU2FId(),
 		PublicKeyCredential: attestationResponse,
@@ -394,9 +398,9 @@ func (s *Tester) RegisterUserU2F(ctx context.Context, userID string) {
 }
 
 func (s *Tester) SetUserPassword(ctx context.Context, userID, password string, changeRequired bool) *object.Details {
-	resp, err := s.Client.UserV2.SetPassword(ctx, &user.SetPasswordRequest{
+	resp, err := s.Client.UserV2.SetPassword(ctx, &user_v2.SetPasswordRequest{
 		UserId: userID,
-		NewPassword: &user.Password{
+		NewPassword: &user_v2.Password{
 			Password:       password,
 			ChangeRequired: changeRequired,
 		},
@@ -757,24 +761,57 @@ func (s *Tester) SetExecution(ctx context.Context, t *testing.T, cond *action.Co
 	return target
 }
 
-func (s *Tester) CreateUserSchema(ctx context.Context, t *testing.T) *schema.CreateUserSchemaResponse {
-	return s.CreateUserSchemaWithType(ctx, t, fmt.Sprint(time.Now().UnixNano()+1))
+func (s *Tester) CreateUserSchemaEmpty(ctx context.Context) *userschema_v3alpha.CreateUserSchemaResponse {
+	return s.CreateUserSchemaEmptyWithType(ctx, fmt.Sprint(time.Now().UnixNano()+1))
 }
 
-func (s *Tester) CreateUserSchemaWithType(ctx context.Context, t *testing.T, schemaType string) *schema.CreateUserSchemaResponse {
+func (s *Tester) CreateUserSchema(ctx context.Context, schemaData []byte) *userschema_v3alpha.CreateUserSchemaResponse {
+	userSchema := new(structpb.Struct)
+	err := userSchema.UnmarshalJSON(schemaData)
+	logging.OnError(err).Fatal("create userschema unmarshal")
+	schema, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
+		UserSchema: &userschema_v3alpha.CreateUserSchema{
+			Type: fmt.Sprint(time.Now().UnixNano() + 1),
+			DataType: &userschema_v3alpha.CreateUserSchema_Schema{
+				Schema: userSchema,
+			},
+		},
+	})
+	logging.OnError(err).Fatal("create userschema")
+	return schema
+}
+
+func (s *Tester) CreateUserSchemaEmptyWithType(ctx context.Context, schemaType string) *userschema_v3alpha.CreateUserSchemaResponse {
 	userSchema := new(structpb.Struct)
 	err := userSchema.UnmarshalJSON([]byte(`{
 		"$schema": "urn:zitadel:schema:v1",
 		"type": "object",
 		"properties": {}
 	}`))
-	require.NoError(t, err)
-	target, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &schema.CreateUserSchemaRequest{
-		Type: schemaType,
-		DataType: &schema.CreateUserSchemaRequest_Schema{
-			Schema: userSchema,
+	logging.OnError(err).Fatal("create userschema unmarshal")
+	schema, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
+		UserSchema: &userschema_v3alpha.CreateUserSchema{
+			Type: schemaType,
+			DataType: &userschema_v3alpha.CreateUserSchema_Schema{
+				Schema: userSchema,
+			},
 		},
 	})
-	require.NoError(t, err)
-	return target
+	logging.OnError(err).Fatal("create userschema")
+	return schema
+}
+
+func (s *Tester) CreateSchemaUser(ctx context.Context, orgID string, schemaID string, data []byte) *user_v3alpha.CreateUserResponse {
+	userData := new(structpb.Struct)
+	err := userData.UnmarshalJSON(data)
+	logging.OnError(err).Fatal("create user unmarshal")
+	user, err := s.Client.UserV3Alpha.CreateUser(ctx, &user_v3alpha.CreateUserRequest{
+		Organization: &object_v3alpha.Organization{Property: &object_v3alpha.Organization_OrgId{OrgId: orgID}},
+		User: &user_v3alpha.CreateUser{
+			SchemaId: schemaID,
+			Data:     userData,
+		},
+	})
+	logging.OnError(err).Fatal("create user")
+	return user
 }

@@ -36,6 +36,7 @@ func TestServer_UserInfo(t *testing.T) {
 		name    string
 		legacy  bool
 		trigger bool
+		webKey  bool
 	}{
 		{
 			name:   "legacy enabled",
@@ -51,6 +52,17 @@ func TestServer_UserInfo(t *testing.T) {
 			legacy:  false,
 			trigger: true,
 		},
+
+		// This is the only functional test we need to cover web keys.
+		// - By creating tokens the signer is tested
+		// - When obtaining the tokens, the RP verifies the ID Token using the key set from the jwks endpoint.
+		// - By calling userinfo with the access token as JWT, the Token Verifier with the public key cache is tested.
+		{
+			name:    "web keys",
+			legacy:  false,
+			trigger: false,
+			webKey:  true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -58,6 +70,7 @@ func TestServer_UserInfo(t *testing.T) {
 			_, err := Tester.Client.FeatureV2.SetInstanceFeatures(iamOwnerCTX, &feature.SetInstanceFeaturesRequest{
 				OidcLegacyIntrospection:             &tt.legacy,
 				OidcTriggerIntrospectionProjections: &tt.trigger,
+				WebKey:                              &tt.webKey,
 			})
 			require.NoError(t, err)
 			testServer_UserInfo(t)

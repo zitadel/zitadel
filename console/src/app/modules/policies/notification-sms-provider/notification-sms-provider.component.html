@@ -5,7 +5,7 @@
   <mat-spinner diameter="30" *ngIf="smsProvidersLoading" color="primary"></mat-spinner>
 </div>
 
-<div class="sms-providers">
+<div class="sms-providers" *ngIf="!smsProvidersLoading">
   <cnsl-card class="sms-card" [nomargin]="true">
     <div class="sms-provider">
       <h4 class="title">Twilio</h4>
