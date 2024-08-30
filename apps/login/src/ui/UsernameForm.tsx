@@ -12,7 +12,7 @@ import {
   PasskeysType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import BackButton from "./BackButton";
-import { sendLoginname, SendLoginnameOptions } from "@/lib/server/loginname";
+import { sendLoginname } from "@/lib/server/loginname";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 
 type Inputs = {
@@ -53,14 +53,12 @@ export default function UsernameForm({
   async function submitLoginName(values: Inputs, organization?: string) {
     setLoading(true);
 
-    const options: SendLoginnameOptions = {
+    const res = await sendLoginname({
       loginName: values.loginName,
       organization,
       authRequestId,
-    };
-
-    const res = await sendLoginname(options).catch((error) => {
-      setError(error ?? "An internal error occurred");
+    }).catch((error: Error) => {
+      setError(error.message ?? "An internal error occurred");
       return Promise.reject(error ?? "An internal error occurred");
     });
 

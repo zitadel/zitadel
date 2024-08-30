@@ -21,7 +21,7 @@ import { headers } from "next/headers";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 
-type CreateNewSessionOptinos = {
+type CreateNewSessionCommand = {
   userId: string;
   idpIntent: {
     idpIntentId: string;
@@ -33,7 +33,7 @@ type CreateNewSessionOptinos = {
   authRequestId: string;
 };
 
-export async function createNewSession(options: CreateNewSessionOptinos) {
+export async function createNewSession(options: CreateNewSessionCommand) {
   const {
     userId,
     idpIntent,
@@ -61,7 +61,7 @@ export async function createNewSession(options: CreateNewSessionOptinos) {
   }
 }
 
-export type UpdateSessionOptions = {
+export type UpdateSessionCommand = {
   loginName?: string;
   sessionId?: string;
   organization?: string;
@@ -70,7 +70,7 @@ export type UpdateSessionOptions = {
   challenges?: RequestChallenges;
 };
 
-export async function updateSession(options: UpdateSessionOptions) {
+export async function updateSession(options: UpdateSessionCommand) {
   const {
     loginName,
     sessionId,

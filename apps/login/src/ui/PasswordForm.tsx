@@ -58,8 +58,8 @@ export default function PasswordForm({
         password: { password: values.password },
       } as Checks,
       authRequestId,
-    }).catch((error) => {
-      setError(error ?? "Could not verify password");
+    }).catch((error: Error) => {
+      setError(error.message ?? "Could not verify password");
     });
 
     setLoading(false);

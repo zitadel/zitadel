@@ -2,13 +2,14 @@
 
 import { startIdentityProviderFlow } from "@/lib/zitadel";
 
-export type StartIDPFlowOptions = {
+export type StartIDPFlowCommand = {
   idpId: string;
   successUrl: string;
   failureUrl: string;
 };
-export async function startIDPFlow(options: StartIDPFlowOptions) {
-  const { idpId, successUrl, failureUrl } = options;
+
+export async function startIDPFlow(command: StartIDPFlowCommand) {
+  const { idpId, successUrl, failureUrl } = command;
 
   return startIdentityProviderFlow({
     idpId,

@@ -12,13 +12,15 @@ import {
 import { createSessionForUserIdAndUpdateCookie } from "../../utils/session";
 import { redirect } from "next/navigation";
 
-export type SendLoginnameOptions = {
+export type SendLoginnameCommand = {
   loginName: string;
   authRequestId?: string;
   organization?: string;
 };
 
-export async function sendLoginname(options: SendLoginnameOptions) {
+export const UserNotFound = Error("Could not find user");
+
+export async function sendLoginname(options: SendLoginnameCommand) {
   const { loginName, authRequestId, organization } = options;
   const users = await listUsers({
     userName: loginName,
@@ -34,8 +36,8 @@ export async function sendLoginname(options: SendLoginnameOptions) {
       authRequestId,
     );
 
-    if (!session?.factors?.user?.id) {
-      throw "No user id found in session";
+    if (!session.factors?.user?.id) {
+      throw Error("Could not create session for user");
     }
 
     const methods = await listAuthenticationMethodTypes(
@@ -92,7 +94,7 @@ export async function sendLoginname(options: SendLoginnameOptions) {
         }
       });
     } else {
-      throw "Could not find user";
+      throw UserNotFound;
     }
   } else if (
     loginSettings?.allowRegister &&
@@ -114,5 +116,5 @@ export async function sendLoginname(options: SendLoginnameOptions) {
     return redirect(registerUrl.toString());
   }
 
-  throw "Could not find user";
+  throw UserNotFound;
 }
