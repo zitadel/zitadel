@@ -146,18 +146,17 @@ func NewUpsertStatement(event eventstore.Event, conflictCols []Column, values []
 		conflictTarget[i] = col.Name
 	}
 
-	config := execConfig{
-		args: args,
-	}
+	config := execConfig{}
 
 	if len(values) == 0 {
 		config.err = ErrNoValues
 	}
 
-	updateCols, updateVals := getUpdateCols(values, conflictTarget)
+	updateCols, updateVals, args := getUpdateCols(values, conflictTarget, params, args)
 	if len(updateCols) == 0 || len(updateVals) == 0 {
 		config.err = ErrNoValues
 	}
+	config.args = args
 
 	q := func(config execConfig) string {
 		var updateStmt string
@@ -197,51 +196,57 @@ func OnlySetValueOnInsert(table string, value interface{}) *onlySetValueOnInsert
 type onlySetValueInCase struct {
 	Table     string
 	Value     interface{}
-	Condition string
+	Condition Condition
 }
 
 func (c *onlySetValueInCase) GetValue() interface{} {
 	return c.Value
 }
 
-func ColumnChangedCondition(column string, currentValue, newValue interface{}) func(table string) string {
-	return func(table string) string {
-		return fmt.Sprintf("%[1]s.%[2]s = %[3]v AND EXCLUDED.%[2]s = %[4]v", table, column, currentValue, newValue)
+func ColumnChangedCondition(table, column string, currentValue, newValue interface{}) Condition {
+	return func(param string) (string, []any) {
+		index, _ := strconv.Atoi(param)
+		return fmt.Sprintf("%[1]s.%[2]s = $%[3]d AND EXCLUDED.%[2]s = $%[4]d", table, column, index, index+1), []any{currentValue, newValue}
 	}
 }
 
-func ColumnIsNullCondition(column string) func(table string) string {
-	return func(table string) string {
-		return fmt.Sprintf("%[1]s.%[2]s IS NULL", table, column)
+func ColumnIsNullCondition(table, column string) Condition {
+	return func(param string) (string, []any) {
+		return fmt.Sprintf("%[1]s.%[2]s IS NULL", table, column), nil
 	}
 }
 
-func ConditionOr(conditions ...func(string) string) func(table string) string {
-	return func(table string) string {
+func ConditionOr(conditions ...Condition) Condition {
+	return func(param string) (_ string, args []any) {
 		if len(conditions) == 0 {
-			return ""
+			return "", nil
 		}
 		b := strings.Builder{}
-		b.WriteString(conditions[0](table))
+		s, arg := conditions[0](param)
+		b.WriteString(s)
+		args = append(args, arg...)
 		for i := 1; i < len(conditions); i++ {
 			b.WriteString(" OR ")
-			b.WriteString(conditions[i](table))
+			s, condArgs := conditions[i](param)
+			b.WriteString(s)
+			args = append(args, condArgs...)
 		}
-		return b.String()
+		return b.String(), args
 	}
 }
 
-func OnlySetValueInCase(table string, value interface{}, condition func(string) string) *onlySetValueInCase {
+func OnlySetValueInCase(table string, value interface{}, condition Condition) *onlySetValueInCase {
 	return &onlySetValueInCase{
 		Table:     table,
 		Value:     value,
-		Condition: condition(table),
+		Condition: condition,
 	}
 }
 
-func getUpdateCols(cols []Column, conflictTarget []string) (updateCols, updateVals []string) {
+func getUpdateCols(cols []Column, conflictTarget, params []string, args []interface{}) (updateCols, updateVals []string, updatedArgs []interface{}) {
 	updateCols = make([]string, len(cols))
 	updateVals = make([]string, len(cols))
+	updatedArgs = args
 
 	for i := len(cols) - 1; i >= 0; i-- {
 		col := cols[i]
@@ -250,7 +255,9 @@ func getUpdateCols(cols []Column, conflictTarget []string) (updateCols, updateVa
 		case *onlySetValueOnInsert:
 			updateVals[i] = v.Table + "." + col.Name
 		case *onlySetValueInCase:
-			updateVals[i] = fmt.Sprintf("CASE WHEN %[1]s THEN EXCLUDED.%[2]s ELSE %[3]s.%[2]s END", v.Condition, col.Name, v.Table)
+			s, condArgs := v.Condition(strconv.Itoa(len(params) + 1))
+			updatedArgs = append(updatedArgs, condArgs...)
+			updateVals[i] = fmt.Sprintf("CASE WHEN %[1]s THEN EXCLUDED.%[2]s ELSE %[3]s.%[2]s END", s, col.Name, v.Table)
 		default:
 			updateVals[i] = "EXCLUDED" + "." + col.Name
 		}
@@ -269,7 +276,7 @@ func getUpdateCols(cols []Column, conflictTarget []string) (updateCols, updateVa
 		}
 	}
 
-	return updateCols, updateVals
+	return updateCols, updateVals, updatedArgs
 }
 
 func NewUpdateStatement(event eventstore.Event, values []Column, conditions []Condition, opts ...execOption) *Statement {
