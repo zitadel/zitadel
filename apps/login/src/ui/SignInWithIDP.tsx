@@ -60,6 +60,17 @@ export function SignInWithIDP({
     return response;
   }
 
+  async function navigateToAuthUrl(id: string, type: IdentityProviderType) {
+    const startFlowResponse = await startFlow(id, idpTypeToSlug(type));
+    if (
+      startFlowResponse &&
+      startFlowResponse.nextStep.case === "authUrl" &&
+      startFlowResponse?.nextStep.value
+    ) {
+      router.push(startFlowResponse.nextStep.value);
+    }
+  }
+
   return (
     <div className="flex flex-col w-full space-y-2 text-sm">
       {identityProviders &&
@@ -70,12 +81,7 @@ export function SignInWithIDP({
                 <SignInWithGithub
                   key={`idp-${i}`}
                   onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.GITHUB),
-                    ).then(({ authUrl }) => {
-                      router.push(authUrl);
-                    })
+                    navigateToAuthUrl(idp.id, IdentityProviderType.GITHUB)
                   }
                 ></SignInWithGithub>
               );
@@ -83,7 +89,9 @@ export function SignInWithIDP({
               return (
                 <SignInWithGithub
                   key={`idp-${i}`}
-                  onClick={() => alert("TODO: unimplemented")}
+                  onClick={() =>
+                    navigateToAuthUrl(idp.id, IdentityProviderType.GITHUB_ES)
+                  }
                 ></SignInWithGithub>
               );
             case IdentityProviderType.AZURE_AD:
@@ -91,12 +99,7 @@ export function SignInWithIDP({
                 <SignInWithAzureAD
                   key={`idp-${i}`}
                   onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.AZURE_AD),
-                    ).then(({ authUrl }) => {
-                      router.push(authUrl);
-                    })
+                    navigateToAuthUrl(idp.id, IdentityProviderType.AZURE_AD)
                   }
                 ></SignInWithAzureAD>
               );
@@ -107,12 +110,7 @@ export function SignInWithIDP({
                   e2e="google"
                   name={idp.name}
                   onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.GOOGLE),
-                    ).then(({ authUrl }) => {
-                      router.push(authUrl);
-                    })
+                    navigateToAuthUrl(idp.id, IdentityProviderType.GOOGLE)
                   }
                 ></SignInWithGoogle>
               );
@@ -120,14 +118,21 @@ export function SignInWithIDP({
               return (
                 <SignInWithGitlab
                   key={`idp-${i}`}
-                  onClick={() => alert("TODO: unimplemented")}
+                  onClick={() =>
+                    navigateToAuthUrl(idp.id, IdentityProviderType.GITLAB)
+                  }
                 ></SignInWithGitlab>
               );
             case IdentityProviderType.GITLAB_SELF_HOSTED:
               return (
                 <SignInWithGitlab
                   key={`idp-${i}`}
-                  onClick={() => alert("TODO: unimplemented")}
+                  onClick={() =>
+                    navigateToAuthUrl(
+                      idp.id,
+                      IdentityProviderType.GITLAB_SELF_HOSTED,
+                    )
+                  }
                 ></SignInWithGitlab>
               );
             default:

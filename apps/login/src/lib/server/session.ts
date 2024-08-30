@@ -19,7 +19,11 @@ import {
 } from "@/utils/session";
 import { headers } from "next/headers";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import {
+  RequestChallenges,
+  RequestChallengesSchema,
+} from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { create } from "@zitadel/client";
 
 type CreateNewSessionCommand = {
   userId: string;
@@ -71,7 +75,7 @@ export type UpdateSessionCommand = {
 };
 
 export async function updateSession(options: UpdateSessionCommand) {
-  const {
+  let {
     loginName,
     sessionId,
     organization,
@@ -110,21 +114,25 @@ export async function updateSession(options: UpdateSessionCommand) {
   if (recent && challenges && (!challenges.otpEmail || !challenges.otpSms)) {
     const sessionResponse = await getSession(recent.id, recent.token);
 
-    if (sessionResponse && sessionResponse.session.factors.user.id) {
+    if (sessionResponse && sessionResponse?.session?.factors?.user?.id) {
       const userResponse = await getUserByID(
         sessionResponse.session.factors.user.id,
       );
       const humanUser =
-        userResponse.user.type.case === "human"
+        userResponse.user?.type.case === "human"
           ? userResponse.user.type.value
           : undefined;
 
-      if (!challenges.otpEmail && humanUser.email.email) {
-        challenges.otpEmail = humanUser.email.email;
+      if (!challenges.otpEmail && humanUser?.email?.email) {
+        challenges = create(RequestChallengesSchema, {
+          otpEmail: { deliveryType: { case: "sendCode", value: {} } },
+        });
       }
 
-      if (!challenges.otpSms && humanUser.phone.phone) {
-        challenges.otpSms = humanUser.phone.phone;
+      if (!challenges.otpEmail && humanUser?.email?.email) {
+        challenges = create(RequestChallengesSchema, {
+          otpSms: { returnCode: true },
+        });
       }
     }
   }
@@ -138,7 +146,7 @@ export async function updateSession(options: UpdateSessionCommand) {
 
   // if password, check if user has MFA methods
   let authMethods;
-  if (checks && checks.password && session.factors.user.id) {
+  if (checks && checks.password && session.factors?.user?.id) {
     const response = await listAuthenticationMethodTypes(
       session.factors.user.id,
     );

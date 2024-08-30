@@ -12,7 +12,9 @@ import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings
 import {
   CheckPassword,
   Checks,
+  ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { create } from "@zitadel/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { updateSession } from "@/lib/server/session";
 
@@ -54,9 +56,9 @@ export default function PasswordForm({
     const response = await updateSession({
       loginName,
       organization,
-      checks: {
+      checks: create(ChecksSchema, {
         password: { password: values.password },
-      } as Checks,
+      }),
       authRequestId,
     }).catch((error: Error) => {
       setError(error.message ?? "Could not verify password");
@@ -103,7 +105,11 @@ export default function PasswordForm({
     // if no passwordless -> /passkey/add
 
     // exclude password and passwordless
-    if (!submitted || !submitted.authMethods) {
+    if (
+      !submitted ||
+      !submitted.authMethods ||
+      !submitted.factors?.user?.loginName
+    ) {
       setError("Could not verify password");
       return;
     }
@@ -154,7 +160,7 @@ export default function PasswordForm({
       return router.push(`/mfa?` + params);
     } else if (
       submitted.factors &&
-      !submitted.factors.passwordless && // if session was not verified with a passkey
+      !submitted.factors.webAuthN && // if session was not verified with a passkey
       promptPasswordless && // if explicitly prompted due policy
       !isAlternative // escaped if password was used as an alternative method
     ) {
