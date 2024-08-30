@@ -9,8 +9,12 @@ import { Spinner } from "./Spinner";
 import Alert from "./Alert";
 import BackButton from "./BackButton";
 import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import {
+  CheckPassword,
+  Checks,
+} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { updateSession } from "@/lib/server/session";
 
 type Inputs = {
   password: string;
@@ -47,28 +51,19 @@ export default function PasswordForm({
     setError("");
     setLoading(true);
 
-    const res = await fetch("/api/session", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        loginName,
-        organization,
-        checks: {
-          password: { password: values.password },
-        } as Checks,
-        authRequestId,
-      }),
+    const response = await updateSession({
+      loginName,
+      organization,
+      checks: {
+        password: { password: values.password },
+      } as Checks,
+      authRequestId,
+    }).catch((error) => {
+      setError(error ?? "Could not verify password");
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      setError(response.details?.details ?? "Could not verify password");
-      return Promise.reject(response.details);
-    }
+
     return response;
   }
 
@@ -99,123 +94,129 @@ export default function PasswordForm({
     return response;
   }
 
-  function submitPasswordAndContinue(value: Inputs): Promise<boolean | void> {
-    return submitPassword(value).then((resp) => {
-      // if user has mfa -> /otp/[method] or /u2f
-      // if mfa is forced and user has no mfa -> /mfa/set
-      // if no passwordless -> /passkey/add
+  async function submitPasswordAndContinue(
+    value: Inputs,
+  ): Promise<boolean | void> {
+    const submitted = await submitPassword(value);
+    // if user has mfa -> /otp/[method] or /u2f
+    // if mfa is forced and user has no mfa -> /mfa/set
+    // if no passwordless -> /passkey/add
 
-      // exclude password and passwordless
-      const availableSecondFactors = resp.authMethods?.filter(
-        (m: AuthenticationMethodType) =>
-          m !== AuthenticationMethodType.PASSWORD &&
-          m !== AuthenticationMethodType.PASSKEY,
+    // exclude password and passwordless
+    if (!submitted || !submitted.authMethods) {
+      setError("Could not verify password");
+      return;
+    }
+
+    const availableSecondFactors = submitted?.authMethods?.filter(
+      (m: AuthenticationMethodType) =>
+        m !== AuthenticationMethodType.PASSWORD &&
+        m !== AuthenticationMethodType.PASSKEY,
+    );
+
+    if (availableSecondFactors.length == 1) {
+      const params = new URLSearchParams({
+        loginName: submitted.factors.user.loginName,
+      });
+
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
+
+      if (organization) {
+        params.append("organization", organization);
+      }
+
+      const factor = availableSecondFactors[0];
+      // if passwordless is other method, but user selected password as alternative, perform a login
+      if (factor === AuthenticationMethodType.TOTP) {
+        return router.push(`/otp/time-based?` + params);
+      } else if (factor === AuthenticationMethodType.OTP_SMS) {
+        return router.push(`/otp/sms?` + params);
+      } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
+        return router.push(`/otp/email?` + params);
+      } else if (factor === AuthenticationMethodType.U2F) {
+        return router.push(`/u2f?` + params);
+      }
+    } else if (availableSecondFactors.length >= 1) {
+      const params = new URLSearchParams({
+        loginName: submitted.factors.user.loginName,
+      });
+
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
+
+      if (organization) {
+        params.append("organization", organization);
+      }
+
+      return router.push(`/mfa?` + params);
+    } else if (
+      submitted.factors &&
+      !submitted.factors.passwordless && // if session was not verified with a passkey
+      promptPasswordless && // if explicitly prompted due policy
+      !isAlternative // escaped if password was used as an alternative method
+    ) {
+      const params = new URLSearchParams({
+        loginName: submitted.factors.user.loginName,
+        promptPasswordless: "true",
+      });
+
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
+
+      if (organization) {
+        params.append("organization", organization);
+      }
+
+      return router.push(`/passkey/add?` + params);
+    } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
+      const params = new URLSearchParams({
+        loginName: submitted.factors.user.loginName,
+        checkAfter: "true", // this defines if the check is directly made after the setup
+      });
+
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
+
+      if (organization) {
+        params.append("organization", organization);
+      }
+
+      return router.push(`/mfa/set?` + params);
+    } else if (authRequestId && submitted.sessionId) {
+      const params = new URLSearchParams({
+        sessionId: submitted.sessionId,
+        authRequest: authRequestId,
+      });
+
+      if (organization) {
+        params.append("organization", organization);
+      }
+
+      return router.push(`/login?` + params);
+    } else {
+      // without OIDC flow
+      const params = new URLSearchParams(
+        authRequestId
+          ? {
+              loginName: submitted.factors.user.loginName,
+              authRequestId,
+            }
+          : {
+              loginName: submitted.factors.user.loginName,
+            },
       );
 
-      if (availableSecondFactors.length == 1) {
-        const params = new URLSearchParams({
-          loginName: resp.factors.user.loginName,
-        });
-
-        if (authRequestId) {
-          params.append("authRequestId", authRequestId);
-        }
-
-        if (organization) {
-          params.append("organization", organization);
-        }
-
-        const factor = availableSecondFactors[0];
-        // if passwordless is other method, but user selected password as alternative, perform a login
-        if (factor === AuthenticationMethodType.TOTP) {
-          return router.push(`/otp/time-based?` + params);
-        } else if (factor === AuthenticationMethodType.OTP_SMS) {
-          return router.push(`/otp/sms?` + params);
-        } else if (factor === AuthenticationMethodType.OTP_EMAIL) {
-          return router.push(`/otp/email?` + params);
-        } else if (factor === AuthenticationMethodType.U2F) {
-          return router.push(`/u2f?` + params);
-        }
-      } else if (availableSecondFactors.length >= 1) {
-        const params = new URLSearchParams({
-          loginName: resp.factors.user.loginName,
-        });
-
-        if (authRequestId) {
-          params.append("authRequestId", authRequestId);
-        }
-
-        if (organization) {
-          params.append("organization", organization);
-        }
-
-        return router.push(`/mfa?` + params);
-      } else if (
-        resp.factors &&
-        !resp.factors.passwordless && // if session was not verified with a passkey
-        promptPasswordless && // if explicitly prompted due policy
-        !isAlternative // escaped if password was used as an alternative method
-      ) {
-        const params = new URLSearchParams({
-          loginName: resp.factors.user.loginName,
-          promptPasswordless: "true",
-        });
-
-        if (authRequestId) {
-          params.append("authRequestId", authRequestId);
-        }
-
-        if (organization) {
-          params.append("organization", organization);
-        }
-
-        return router.push(`/passkey/add?` + params);
-      } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
-        const params = new URLSearchParams({
-          loginName: resp.factors.user.loginName,
-          checkAfter: "true", // this defines if the check is directly made after the setup
-        });
-
-        if (authRequestId) {
-          params.append("authRequestId", authRequestId);
-        }
-
-        if (organization) {
-          params.append("organization", organization);
-        }
-
-        return router.push(`/mfa/set?` + params);
-      } else if (authRequestId && resp.sessionId) {
-        const params = new URLSearchParams({
-          sessionId: resp.sessionId,
-          authRequest: authRequestId,
-        });
-
-        if (organization) {
-          params.append("organization", organization);
-        }
-
-        return router.push(`/login?` + params);
-      } else {
-        // without OIDC flow
-        const params = new URLSearchParams(
-          authRequestId
-            ? {
-                loginName: resp.factors.user.loginName,
-                authRequestId,
-              }
-            : {
-                loginName: resp.factors.user.loginName,
-              },
-        );
-
-        if (organization) {
-          params.append("organization", organization);
-        }
-
-        return router.push(`/signedin?` + params);
+      if (organization) {
+        params.append("organization", organization);
       }
-    });
+
+      return router.push(`/signedin?` + params);
+    }
   }
 
   return (

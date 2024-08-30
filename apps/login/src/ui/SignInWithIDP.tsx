@@ -12,6 +12,7 @@ import Alert from "./Alert";
 import { IdentityProvider } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { idpTypeToSlug } from "@/lib/idp";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { startIDPFlow } from "@/lib/server/idp";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -44,27 +45,18 @@ export function SignInWithIDP({
       params.set("organization", organization);
     }
 
-    const res = await fetch("/api/idp/start", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        idpId,
-        successUrl:
-          `${host}/idp/${provider}/success?` + new URLSearchParams(params),
-        failureUrl:
-          `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
-      }),
+    const response = await startIDPFlow({
+      idpId,
+      successUrl:
+        `${host}/idp/${provider}/success?` + new URLSearchParams(params),
+      failureUrl:
+        `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
+    }).catch((err) => {
+      setError(response.details);
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      setError(response.details);
-      return Promise.reject(response.details);
-    }
+
     return response;
   }
 
