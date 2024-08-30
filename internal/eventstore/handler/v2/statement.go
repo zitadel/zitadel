@@ -194,18 +194,66 @@ func OnlySetValueOnInsert(table string, value interface{}) *onlySetValueOnInsert
 	}
 }
 
+type onlySetValueInCase struct {
+	Table     string
+	Value     interface{}
+	Condition string
+}
+
+func (c *onlySetValueInCase) GetValue() interface{} {
+	return c.Value
+}
+
+func ColumnChangedCondition(column string, currentValue, newValue interface{}) func(table string) string {
+	return func(table string) string {
+		return fmt.Sprintf("%[1]s.%[2]s = %[3]v AND EXCLUDED.%[2]s = %[4]v", table, column, currentValue, newValue)
+	}
+}
+
+func ColumnIsNullCondition(column string) func(table string) string {
+	return func(table string) string {
+		return fmt.Sprintf("%[1]s.%[2]s IS NULL", table, column)
+	}
+}
+
+func ConditionOr(conditions ...func(string) string) func(table string) string {
+	return func(table string) string {
+		if len(conditions) == 0 {
+			return ""
+		}
+		b := strings.Builder{}
+		b.WriteString(conditions[0](table))
+		for i := 1; i < len(conditions); i++ {
+			b.WriteString(" OR ")
+			b.WriteString(conditions[i](table))
+		}
+		return b.String()
+	}
+}
+
+func OnlySetValueInCase(table string, value interface{}, condition func(string) string) *onlySetValueInCase {
+	return &onlySetValueInCase{
+		Table:     table,
+		Value:     value,
+		Condition: condition(table),
+	}
+}
+
 func getUpdateCols(cols []Column, conflictTarget []string) (updateCols, updateVals []string) {
 	updateCols = make([]string, len(cols))
 	updateVals = make([]string, len(cols))
 
 	for i := len(cols) - 1; i >= 0; i-- {
 		col := cols[i]
-		table := "EXCLUDED"
-		if onlyOnInsert, ok := col.Value.(*onlySetValueOnInsert); ok {
-			table = onlyOnInsert.Table
-		}
 		updateCols[i] = col.Name
-		updateVals[i] = table + "." + col.Name
+		switch v := col.Value.(type) {
+		case *onlySetValueOnInsert:
+			updateVals[i] = v.Table + "." + col.Name
+		case *onlySetValueInCase:
+			updateVals[i] = fmt.Sprintf("CASE WHEN %[1]s THEN EXCLUDED.%[2]s ELSE %[3]s.%[2]s END", v.Condition, col.Name, v.Table)
+		default:
+			updateVals[i] = "EXCLUDED" + "." + col.Name
+		}
 		for _, conflict := range conflictTarget {
 			if conflict == col.Name {
 				copy(updateCols[i:], updateCols[i+1:])

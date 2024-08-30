@@ -8,6 +8,7 @@ import (
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
+	"github.com/zitadel/zitadel/internal/id"
 	query2 "github.com/zitadel/zitadel/internal/query"
 	"github.com/zitadel/zitadel/internal/repository/instance"
 	"github.com/zitadel/zitadel/internal/repository/org"
@@ -21,9 +22,10 @@ const (
 )
 
 type UserSession struct {
-	queries *query2.Queries
-	view    *auth_view.View
-	es      handler.EventStore
+	queries     *query2.Queries
+	view        *auth_view.View
+	es          handler.EventStore
+	idGenerator id.Generator
 }
 
 var _ handler.Projection = (*UserSession)(nil)
@@ -33,14 +35,16 @@ func newUserSession(
 	config handler.Config,
 	view *auth_view.View,
 	queries *query2.Queries,
+	idGenerator id.Generator,
 ) *handler.Handler {
 	return handler.NewHandler(
 		ctx,
 		&config,
 		&UserSession{
-			queries: queries,
-			view:    view,
-			es:      config.Eventstore,
+			queries:     queries,
+			view:        view,
+			es:          config.Eventstore,
+			idGenerator: idGenerator,
 		},
 	)
 }
@@ -187,8 +191,12 @@ func (s *UserSession) Reducers() []handler.AggregateReducer {
 	}
 }
 
-func sessionColumns(event eventstore.Event, columns ...handler.Column) ([]handler.Column, error) {
+func (u *UserSession) sessionColumns(event eventstore.Event, columns ...handler.Column) ([]handler.Column, error) {
 	userAgent, err := agentIDFromSession(event)
+	if err != nil {
+		return nil, err
+	}
+	sessionID, err := u.idGenerator.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -200,6 +208,12 @@ func sessionColumns(event eventstore.Event, columns ...handler.Column) ([]handle
 		handler.NewCol(view_model.UserSessionKeyChangeDate, event.CreatedAt()),
 		handler.NewCol(view_model.UserSessionKeyResourceOwner, event.Aggregate().ResourceOwner),
 		handler.NewCol(view_model.UserSessionKeySequence, event.Sequence()),
+		handler.NewCol(view_model.UserSessionKeyID, handler.OnlySetValueInCase(userSessionTable, sessionID,
+			handler.ConditionOr(
+				handler.ColumnChangedCondition(view_model.UserSessionKeyState, domain.UserSessionStateTerminated, domain.UserSessionStateActive),
+				handler.ColumnIsNullCondition(view_model.UserSessionKeyID),
+			),
+		)),
 	}, columns...), nil
 }
 
@@ -208,7 +222,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 	switch event.Type() {
 	case user.UserV1PasswordCheckSucceededType,
 		user.HumanPasswordCheckSucceededType:
-		columns, err := sessionColumns(event,
+		columns, err := u.sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeyPasswordVerification, event.CreatedAt()),
 			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
 		)
@@ -218,7 +232,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserV1PasswordCheckFailedType,
 		user.HumanPasswordCheckFailedType:
-		columns, err := sessionColumns(event,
+		columns, err := u.sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
 			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
 		)
@@ -228,7 +242,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserV1MFAOTPCheckSucceededType,
 		user.HumanMFAOTPCheckSucceededType:
-		columns, err := sessionColumns(event,
+		columns, err := u.sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, event.CreatedAt()),
 			handler.NewCol(view_model.UserSessionKeySecondFactorVerificationType, domain.MFATypeTOTP),
 			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
@@ -240,7 +254,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 	case user.UserV1MFAOTPCheckFailedType,
 		user.HumanMFAOTPCheckFailedType,
 		user.HumanU2FTokenCheckFailedType:
-		columns, err := sessionColumns(event,
+		columns, err := u.sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),
 			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
 		)
@@ -250,7 +264,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		return handler.NewUpsertStatement(event, columns[0:3], columns), nil
 	case user.UserV1SignedOutType,
 		user.HumanSignedOutType:
-		columns, err := sessionColumns(event,
+		columns, err := u.sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeyPasswordlessVerification, time.Time{}),
 			handler.NewCol(view_model.UserSessionKeyPasswordVerification, time.Time{}),
 			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, time.Time{}),
@@ -270,7 +284,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		if err != nil {
 			return nil, err
 		}
-		columns, err := sessionColumns(event,
+		columns, err := u.sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeyExternalLoginVerification, event.CreatedAt()),
 			handler.NewCol(view_model.UserSessionKeySelectedIDPConfigID, data.SelectedIDPConfigID),
 			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
@@ -285,7 +299,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		if err != nil {
 			return nil, err
 		}
-		columns, err := sessionColumns(event,
+		columns, err := u.sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeySecondFactorVerification, event.CreatedAt()),
 			handler.NewCol(view_model.UserSessionKeySecondFactorVerificationType, domain.MFATypeU2F),
 			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
@@ -300,7 +314,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		if err != nil {
 			return nil, err
 		}
-		columns, err := sessionColumns(event,
+		columns, err := u.sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeyPasswordlessVerification, event.CreatedAt()),
 			handler.NewCol(view_model.UserSessionKeyMultiFactorVerification, event.CreatedAt()),
 			handler.NewCol(view_model.UserSessionKeyMultiFactorVerificationType, domain.MFATypeU2FUserVerification),
@@ -316,7 +330,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 		if err != nil {
 			return nil, err
 		}
-		columns, err := sessionColumns(event,
+		columns, err := u.sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeyPasswordlessVerification, time.Time{}),
 			handler.NewCol(view_model.UserSessionKeyMultiFactorVerification, time.Time{}),
 			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
@@ -429,7 +443,7 @@ func (u *UserSession) Reduce(event eventstore.Event) (_ *handler.Statement, err 
 			},
 		), nil
 	case user.HumanRegisteredType:
-		columns, err := sessionColumns(event,
+		columns, err := u.sessionColumns(event,
 			handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
 			handler.NewCol(view_model.UserSessionKeyPasswordVerification, event.CreatedAt()),
 		)
