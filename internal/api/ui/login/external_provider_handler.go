@@ -223,13 +223,12 @@ func (l *Login) handleExternalLoginCallbackForm(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	relayState := r.URL.Query().Get("RelayState")
+	relayState := r.PostFormValue("RelayState")
 	if data, ok := l.validateIDPInitiatedLogin(r.Context(), relayState); ok {
 		l.handleIDPInitiatedLoginCallbackForm(w, r, data)
 		return
 	}
 
-	logging.Info("idp failed")
 	r.Form.Add("Method", http.MethodPost)
 	http.Redirect(w, r, HandlerPrefix+EndpointExternalLoginCallback+"?"+r.Form.Encode(), 302)
 }
@@ -263,11 +262,11 @@ func (l *Login) validateIDPInitiatedLogin(ctx context.Context, relayState string
 		return data, false
 	}
 
-	// _, err = l.command.GetProvider(ctx, idpID, l.oidcAuthCallbackURL(ctx, idpID), l.samlAuthCallbackURL(ctx, idpID))
-	// if err != nil {
-	// 	logging.WithFields("relayState", relayState).Error("unable to get idp provider for idp initiated login")
-	// 	return data, false
-	// }
+	_, err = l.command.GetProvider(ctx, idpID, l.oidcAuthCallbackURL(ctx, idpID), l.samlAuthCallbackURL(ctx, idpID))
+	if err != nil {
+		logging.WithFields("relayState", relayState).Error("unable to get idp provider for idp initiated login")
+		return data, false
+	}
 
 	searchQuery, err := query.NewOrgDomainOrgIDSearchQuery(orgID)
 	if err != nil {
@@ -298,7 +297,7 @@ func (l *Login) validateIDPInitiatedLogin(ctx context.Context, relayState string
 		logging.WithFields("relayState", relayState).Error("unable to oidc application by clientID for idp initiated login")
 		return data, false
 	}
-	if app.OIDCConfig == nil || !slices.Contains(app.OIDCConfig.RedirectURIs, redirectUri) {
+	if app.OIDCConfig == nil || !slices.Contains(app.OIDCConfig.RedirectURIs, parsedRedirectURI.String()) {
 		logging.WithFields("relayState", relayState).Debug("redirect URI not contained in OIDC application")
 		return data, false
 	}
