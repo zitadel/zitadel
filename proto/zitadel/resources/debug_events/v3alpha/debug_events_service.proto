@@ -11,6 +11,7 @@ import "zitadel/protoc_gen_zitadel/v2/options.proto";
 import "zitadel/object/v3alpha/object.proto";
 import "zitadel/resources/object/v3alpha/object.proto";
 import "zitadel/resources/debug_events/v3alpha/event.proto";
+import "zitadel/resources/debug_events/v3alpha/state.proto";
 
 option go_package = "github.com/zitadel/zitadel/pkg/grpc/resources/debug_events/v3alpha;debug_events";
 
@@ -129,6 +130,48 @@ service ZITADELDebugEvents {
       };
     };
   }
+
+  rpc GetDebugEventsStateByID(GetDebugEventsStateByIDRequest) returns (GetDebugEventsStateByIDResponse) {
+    option (google.api.http) = {
+      get: "/v3alpha/debug_events/{id}"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.debug.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Debug events state successfully retrieved";
+        }
+      };
+    };
+  }
+
+  rpc ListDebugEventsStates(ListDebugEventsStatesRequest) returns (ListDebugEventsStatesResponse) {
+    option (google.api.http) = {
+      get: "/v3alpha/debug_events"
+    };
+
+    option (zitadel.protoc_gen_zitadel.v2.options) = {
+      auth_option: {
+        permission: "iam.debug.read"
+      }
+    };
+
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      responses: {
+        key: "200"
+        value: {
+          description: "Debug events states successfully retrieved";
+        }
+      };
+    };
+  }
 }
 
 message CreateDebugEventsRequest {
@@ -153,4 +196,28 @@ message CreateDebugEventsResponse {
   zitadel.resources.object.v3alpha.Details details = 1;
 }
 
+message GetDebugEventsStateByIDRequest {
+  // unique identifier of the aggregate.
+  string id = 1 [
+    (validate.rules).string = {min_len: 1, max_len: 200},
+    (google.api.field_behavior) = REQUIRED,
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      min_length: 1,
+      max_length: 200,
+      example: "\"69629026806489455\"";
+    }
+  ];
+  bool trigger_bulk = 2;
+}
 
+message GetDebugEventsStateByIDResponse {
+  State state = 1;
+}
+
+message ListDebugEventsStatesRequest {
+  bool trigger_bulk = 1;
+}
+
+message ListDebugEventsStatesResponse {
+  repeated State states = 1;
+}

@@ -22,3 +22,30 @@ func (s *Server) CreateDebugEvents(ctx context.Context, req *debug_events.Create
 		Details: resource_object.DomainToDetailsPb(details, object.OwnerType_OWNER_TYPE_INSTANCE, authz.GetInstance(ctx).InstanceID()),
 	}, nil
 }
+
+func (s *Server) GetDebugEventsStateByID(ctx context.Context, req *debug_events.GetDebugEventsStateByIDRequest) (_ *debug_events.GetDebugEventsStateByIDResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	state, err := s.query.GetDebugEventsStateByID(ctx, req.GetId(), req.GetTriggerBulk())
+	if err != nil {
+		return nil, err
+	}
+
+	return &debug_events.GetDebugEventsStateByIDResponse{
+		State: eventsStateToPB(state),
+	}, nil
+}
+func (s *Server) ListDebugEventsStates(ctx context.Context, req *debug_events.ListDebugEventsStatesRequest) (_ *debug_events.ListDebugEventsStatesResponse, err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	states, err := s.query.ListDebugEventsStates(ctx, req.GetTriggerBulk())
+	if err != nil {
+		return nil, err
+	}
+
+	return &debug_events.ListDebugEventsStatesResponse{
+		States: eventStatesToPB(states),
+	}, nil
+}
