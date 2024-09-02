@@ -24,7 +24,7 @@ You can do so by using [Console](../console/users) or [setting user metadata](/d
 
 Most of the methods below require you to login with the correct user while setting some scopes.
 Make sure you pick the right user when logging into the test application.
-Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](/docs/oidc-playground) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 :::info Getting a token
 In case you want to test out different settings configure an application with code flow (PKCE).
@@ -54,27 +54,27 @@ curl --request GET \
   --header "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
-Replace `$ACCESS_TOKEN` with your user's access token.  
+Replace `$ACCESS_TOKEN` with your user's access token.
 
 The response will look something like this
 
 ```json
 {
-    "email":"road.runner@zitadel.com",
-    "email_verified":true,
-    "family_name":"Runner",
-    "given_name":"Road",
-    "locale":"en",
-    "name":"Road Runner",
-    "preferred_username":"road.runner@...asd.zitadel.cloud",
-    "sub":"166.....729",
-    "updated_at":1655467738,
-    //highlight-start
-    "urn:zitadel:iam:user:metadata":{
-        "ContractNumber":"MTIzNA",
-        }
-    //highlight-end
-    }
+  "email": "road.runner@zitadel.com",
+  "email_verified": true,
+  "family_name": "Runner",
+  "given_name": "Road",
+  "locale": "en",
+  "name": "Road Runner",
+  "preferred_username": "road.runner@...asd.zitadel.cloud",
+  "sub": "166.....729",
+  "updated_at": 1655467738,
+  //highlight-start
+  "urn:zitadel:iam:user:metadata": {
+    "ContractNumber": "MTIzNA"
+  }
+  //highlight-end
+}
 ```
 
 You can grab the metadata from the reserved claim `"urn:zitadel:iam:user:metadata"` as key-value pairs.
@@ -95,10 +95,10 @@ The result will give you something like:
 
 ```json
 {
-    "access_token":"jZuRixKQTVecEjKqw...kc3G4",
-    "token_type":"Bearer",
-    "expires_in":43199,
-    "id_token":"ey...Ww"
+  "access_token": "jZuRixKQTVecEjKqw...kc3G4",
+  "token_type": "Bearer",
+  "expires_in": 43199,
+  "id_token": "ey...Ww"
 }
 ```
 
@@ -106,12 +106,7 @@ When you decode the value of `id_token`, then the response will include the meta
 
 ```json
 {
-  "amr": [
-    "password",
-    "pwd",
-    "mfa",
-    "otp"
-  ],
+  "amr": ["password", "pwd", "mfa", "otp"],
   "at_hash": "lGIblkTr8faHz2zd0oTddA",
   "aud": [
     "170086824411201793@portal",
@@ -157,7 +152,7 @@ You can use the authentication service to request and search for the user's meta
 The introspection endpoint and the token endpoint in the examples above do not require a special scope to access.
 Yet when accessing the authentication service, you need to pass the [reserved scope](/docs/apis/openidoauth/scopes#reserved-scopes) `urn:zitadel:iam:org:project:id:zitadel:aud` along with the authentication request.
 This scope allows the user to access ZITADEL's APIs, specifically the authentication API that we need for this method.
-Use the [OIDC authentication request playground](/docs/apis/openidoauth/authrequest) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
+Use the [OIDC authentication request playground](/docs/oidc-playground) or the configuration of an [example client](/docs/sdk-examples/introduction) to set the required scopes and receive a valid access token.
 
 :::note Invalid audience
 If you get the error "invalid audience (APP-Zxfako)", then you need to add the reserved scope `urn:zitadel:iam:org:project:id:zitadel:aud` to your authentication request.
@@ -199,23 +194,23 @@ An example response for your search looks like this:
 
 ```json
 {
-    "details":{
-        "totalResult":"1",
-        "processedSequence":"2935",
-        "viewTimestamp":"2023-06-21T16:01:52.829838Z"
-    },
-    "result":[
-        {
-            "details":{
-                "sequence":"409",
-                "creationDate":"2022-08-04T09:09:06.259324Z",
-                "changeDate":"2022-08-04T09:09:06.259324Z",
-                "resourceOwner":"170086363054473473"
-                },
-            "key":"ContractNumber",
-            "value":"MTIzNA"
-        }
-    ]
+  "details": {
+    "totalResult": "1",
+    "processedSequence": "2935",
+    "viewTimestamp": "2023-06-21T16:01:52.829838Z"
+  },
+  "result": [
+    {
+      "details": {
+        "sequence": "409",
+        "creationDate": "2022-08-04T09:09:06.259324Z",
+        "changeDate": "2022-08-04T09:09:06.259324Z",
+        "resourceOwner": "170086363054473473"
+      },
+      "key": "ContractNumber",
+      "value": "MTIzNA"
+    }
+  ]
 }
 ```
 

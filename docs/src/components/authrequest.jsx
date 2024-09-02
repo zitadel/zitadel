@@ -25,7 +25,7 @@ const LinkButton = ({
 
   return (
     <CopyToClipboard
-      text={`https://zitadel.com/docs/apis/openidoauth/authrequest?instance=${encodeURIComponent(
+      text={`https://zitadel.com/docs/oidc-playground?instance=${encodeURIComponent(
         instance
       )}&client_id=${encodeURIComponent(
         clientId

@@ -4,6 +4,7 @@ sidebar_label: Onboard Users
 ---
 
 End Users have three different possibilities on how to login with ZITADEL.
+
 1. Local Account with Username, Password, MFA, Passkey, etc
 2. Social Login like Google, Apple, Github, etc
 3. External Identity Provider hosted/managed by Organization like Entra ID, LDAP, Okta etc
@@ -12,9 +13,9 @@ You can either use the hosted login of ZITADEL to let users register themselves,
 
 ## Manually add/invite users
 
-import CreateUser from '/docs/guides/manage/console/_create-user.mdx';
+import CreateUser from "/docs/guides/manage/console/_create-user.mdx";
 
-<CreateUser/>
+<CreateUser />
 
 ## Automated / Self-registration possibilities
 
@@ -29,14 +30,14 @@ By default, redirecting from your application displays the login page.
 
 OpenID Connect (OIDC) allows you to control the initial screen by sending a [prompt](/docs/apis/openidoauth/endpoints#additional-parameters) parameter in the authorization request.
 With the `prompt=create`, the registration form/options will directly be shown to the user.
-You can test the impact of the different prompts on your login UI in our [OIDC Playground](/docs/apis/openidoauth/authrequest).
+You can test the impact of the different prompts on your login UI in our [OIDC Playground](/docs/oidc-playground).
 
 Per default a user will be registered to the default organization.
 By sending the scope below in your authorization request you can choose the organization to which the user will be added.
+
 ```
 urn:zitadel:iam:org:id:{id}
 ```
-
 
 Unfortunately, SAML doesn't offer the same level of control over the initial screen.
 You won't be able to directly influence which page (login or registration) is shown through the SAML flow.
@@ -47,7 +48,10 @@ If an organization allows local user registration as well as registration with a
 
 As soon as users click the "register" button, they will be presented with a screen showing the different registration options.
 
-<img src="/docs/img/guides/solution-scenarios/register-options.png" alt="Register Options"/>
+<img
+  src="/docs/img/guides/solution-scenarios/register-options.png"
+  alt="Register Options"
+/>
 
 After that, the user can select either local user registration or an external provider.
 By pressing the button of an external provider, the user will directly be redirected to the provider for consent.
@@ -62,14 +66,22 @@ If only one option is possible, the option will directly be selected and shown.
 To allow users to register themselves, you have to enable the "register allowed" in the login behavior settings.
 You will now see the register button on the login screen.
 
-<img src="/docs/img/guides/solution-scenarios/register-end-user.png" alt="Register End User"/>
+<img
+  src="/docs/img/guides/solution-scenarios/register-end-user.png"
+  alt="Register End User"
+/>
 
 If nothing else is specified, a user will be registered to the default organization.
-<img src="/docs/img/guides/solution-scenarios/default-organization.png" alt="Default Organization"/>
+
+<img
+  src="/docs/img/guides/solution-scenarios/default-organization.png"
+  alt="Default Organization"
+/>
 
 You can specify another organization, by sending the organization scope in the authorization requests.
 By sending the scope below the settings of the specified organization will be triggered and only users of the said organization will be able to authenticate.
 The users will be registered to the given organization.
+
 ```
 urn:zitadel:iam:org:id:{id}
 ```
@@ -78,7 +90,10 @@ If the user chooses to register a local account, the register form will be shown
 All the mandatory fields like given name, family name, e-mail and password have to be filled.
 You can only setup authentication with the built-in form.
 
-<img src="/docs/img/guides/solution-scenarios/register-local-user.png" alt="Register local user"/>
+<img
+  src="/docs/img/guides/solution-scenarios/register-local-user.png"
+  alt="Register local user"
+/>
 
 #### Registration with Social Login
 
@@ -91,7 +106,10 @@ Please follow the configuration guides for the needed providers: [Let Users Logi
 
 The configured providers will be shown on the first login screen or when the users click on the registration button, they will be able to choose between local account or the social login.
 
-<img src="/docs/img/guides/solution-scenarios/register-end-user.png" alt="Register End User"/>
+<img
+  src="/docs/img/guides/solution-scenarios/register-end-user.png"
+  alt="Register End User"
+/>
 
 #### Registration with Organization External Identity Provider
 
@@ -110,6 +128,7 @@ ZITADEL allows you to build your own registration form and login UI.
 The registration process highly depends on your needs.
 
 We do have a guide series on how to build your own login ui, which also includes the registration of different authentication methods, such as:
+
 - Password authentication
 - Multi-Factor
 - Passkeys
