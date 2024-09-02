@@ -203,6 +203,7 @@ func (c *onlySetValueInCase) GetValue() interface{} {
 	return c.Value
 }
 
+// ColumnChangedCondition checks the current value and if it changed to a specific new value
 func ColumnChangedCondition(table, column string, currentValue, newValue interface{}) Condition {
 	return func(param string) (string, []any) {
 		index, _ := strconv.Atoi(param)
@@ -210,12 +211,14 @@ func ColumnChangedCondition(table, column string, currentValue, newValue interfa
 	}
 }
 
+// ColumnIsNullCondition checks if the current value is null
 func ColumnIsNullCondition(table, column string) Condition {
 	return func(param string) (string, []any) {
 		return fmt.Sprintf("%[1]s.%[2]s IS NULL", table, column), nil
 	}
 }
 
+// ConditionOr links multiple Conditions by OR
 func ConditionOr(conditions ...Condition) Condition {
 	return func(param string) (_ string, args []any) {
 		if len(conditions) == 0 {
@@ -235,6 +238,7 @@ func ConditionOr(conditions ...Condition) Condition {
 	}
 }
 
+// OnlySetValueInCase will only update to the desired value if the condition applies
 func OnlySetValueInCase(table string, value interface{}, condition Condition) *onlySetValueInCase {
 	return &onlySetValueInCase{
 		Table:     table,
