@@ -170,7 +170,7 @@ service ZITADELUserSchemas {
   // Create the first revision of a new user schema. The schema can then be used on users to store and validate their data.
   rpc CreateUserSchema (CreateUserSchemaRequest) returns (CreateUserSchemaResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/user_schemas/"
+      post: "/resources/v3alpha/user_schemas"
       body: "user_schema"
     };
 
