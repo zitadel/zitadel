@@ -162,7 +162,7 @@ func (l *Login) handleDeviceAuthAction(w http.ResponseWriter, r *http.Request) {
 	action := mux.Vars(r)["action"]
 	switch action {
 	case deviceAuthAllowed:
-		_, err = l.command.ApproveDeviceAuth(r.Context(), authDev.DeviceCode, authReq.UserID, authReq.UserOrgID, authReq.UserAuthMethodTypes(), authReq.AuthTime, authReq.PreferredLanguage, authReq.ToUserAgent())
+		_, err = l.command.ApproveDeviceAuth(r.Context(), authDev.DeviceCode, authReq.UserID, authReq.UserOrgID, authReq.UserAuthMethodTypes(), authReq.AuthTime, authReq.PreferredLanguage, authReq.ToUserAgent(), authReq.SessionID)
 	case deviceAuthDenied:
 		_, err = l.command.CancelDeviceAuth(r.Context(), authDev.DeviceCode, domain.DeviceAuthCanceledDenied)
 	default:
