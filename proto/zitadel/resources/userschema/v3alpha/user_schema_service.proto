@@ -43,7 +43,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/grpc-web+proto";
 
   host: "$CUSTOM-DOMAIN";
-  base_path: "/";
+  base_path: "/resources/v3alpha/user_schemas";
 
   external_docs: {
     description: "Detailed information about ZITADEL",
@@ -110,7 +110,7 @@ service ZITADELUserSchemas {
   // Search all matching user schemas. By default, we will return all user schema of your instance. Make sure to include a limit and sorting for pagination.
   rpc SearchUserSchemas (SearchUserSchemasRequest) returns (SearchUserSchemasResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/user_schemas/_search"
+      post: "/_search"
       body: "filters"
     };
 
@@ -146,7 +146,7 @@ service ZITADELUserSchemas {
   // Returns the user schema identified by the requested ID.
   rpc GetUserSchema (GetUserSchemaRequest) returns (GetUserSchemaResponse) {
     option (google.api.http) = {
-      get: "/resources/v3alpha/user_schemas/{id}"
+      get: "/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -170,7 +170,7 @@ service ZITADELUserSchemas {
   // Create the first revision of a new user schema. The schema can then be used on users to store and validate their data.
   rpc CreateUserSchema (CreateUserSchemaRequest) returns (CreateUserSchemaResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/user_schemas/"
+      post: "/"
       body: "user_schema"
     };
 
@@ -203,7 +203,7 @@ service ZITADELUserSchemas {
   // Patch an existing user schema to a new revision. Users based on the current revision will not be affected until they are updated.
   rpc PatchUserSchema (PatchUserSchemaRequest) returns (PatchUserSchemaResponse) {
     option (google.api.http) = {
-      patch: "/resources/v3alpha/user_schemas/{id}"
+      patch: "/{id}"
       body: "user_schema"
     };
 
@@ -228,7 +228,7 @@ service ZITADELUserSchemas {
   // Deactivate an existing user schema and change it into a read-only state. Users based on this schema cannot be updated anymore, but are still able to authenticate.
   rpc DeactivateUserSchema (DeactivateUserSchemaRequest) returns (DeactivateUserSchemaResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/user_schemas/{id}/_deactivate"
+      post: "/{id}/_deactivate"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -252,7 +252,7 @@ service ZITADELUserSchemas {
   // Reactivate an previously deactivated user schema and change it into an active state again.
   rpc ReactivateUserSchema (ReactivateUserSchemaRequest) returns (ReactivateUserSchemaResponse) {
     option (google.api.http) = {
-      post: "/resources/v3alpha/user_schemas/{id}/_reactivate"
+      post: "/{id}/_reactivate"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -276,7 +276,7 @@ service ZITADELUserSchemas {
   // Delete an existing user schema. This operation is only allowed if there are no associated users to it.
   rpc DeleteUserSchema (DeleteUserSchemaRequest) returns (DeleteUserSchemaResponse) {
     option (google.api.http) = {
-      delete: "/resources/v3alpha/user_schemas/{id}"
+      delete: "/{id}"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
