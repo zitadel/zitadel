@@ -770,9 +770,9 @@ func (s *Tester) CreateUserSchema(ctx context.Context, schemaData []byte) *users
 	err := userSchema.UnmarshalJSON(schemaData)
 	logging.OnError(err).Fatal("create userschema unmarshal")
 	schema, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
-		UserSchema: &userschema_v3alpha.CreateUserSchema{
+		UserSchema: &userschema_v3alpha.UserSchema{
 			Type: fmt.Sprint(time.Now().UnixNano() + 1),
-			DataType: &userschema_v3alpha.CreateUserSchema_Schema{
+			DataType: &userschema_v3alpha.UserSchema_Schema{
 				Schema: userSchema,
 			},
 		},
@@ -790,9 +790,9 @@ func (s *Tester) CreateUserSchemaEmptyWithType(ctx context.Context, schemaType s
 	}`))
 	logging.OnError(err).Fatal("create userschema unmarshal")
 	schema, err := s.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
-		UserSchema: &userschema_v3alpha.CreateUserSchema{
+		UserSchema: &userschema_v3alpha.UserSchema{
 			Type: schemaType,
-			DataType: &userschema_v3alpha.CreateUserSchema_Schema{
+			DataType: &userschema_v3alpha.UserSchema_Schema{
 				Schema: userSchema,
 			},
 		},

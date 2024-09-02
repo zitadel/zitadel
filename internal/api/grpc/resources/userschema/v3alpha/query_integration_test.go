@@ -4,10 +4,10 @@ package userschema_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/muhlemmer/gu"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -69,7 +69,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 					TotalResult:  0,
 					AppliedLimit: 100,
 				},
-				Result: []*schema.UserSchema{},
+				Result: []*schema.GetUserSchema{},
 			},
 		},
 		{
@@ -78,7 +78,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				ctx: IAMOwnerCTX,
 				req: &schema.SearchUserSchemasRequest{},
 				prepare: func(request *schema.SearchUserSchemasRequest, resp *schema.SearchUserSchemasResponse) error {
-					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
+					schemaType := gofakeit.Name()
 					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
 					request.Filters = []*schema.SearchFilter{
 						{
@@ -90,7 +90,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 							},
 						},
 					}
-					resp.Result[0].Type = schemaType
+					resp.Result[0].Config.Type = schemaType
 					resp.Result[0].Details = createResp.GetDetails()
 					// as schema is freshly created, the changed date is the created date
 					resp.Result[0].Details.Created = resp.Result[0].Details.GetChanged()
@@ -103,12 +103,17 @@ func TestServer_ListUserSchemas(t *testing.T) {
 					TotalResult:  1,
 					AppliedLimit: 100,
 				},
-				Result: []*schema.UserSchema{
+				Result: []*schema.GetUserSchema{
 					{
-						State:                  schema.State_STATE_ACTIVE,
-						Revision:               1,
-						Schema:                 userSchema,
-						PossibleAuthenticators: nil,
+						State:    schema.State_STATE_ACTIVE,
+						Revision: 1,
+						Config: &schema.UserSchema{
+							Type: "",
+							DataType: &schema.UserSchema_Schema{
+								Schema: userSchema,
+							},
+							PossibleAuthenticators: nil,
+						},
 					},
 				},
 			},
@@ -119,7 +124,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				ctx: IAMOwnerCTX,
 				req: &schema.SearchUserSchemasRequest{},
 				prepare: func(request *schema.SearchUserSchemasRequest, resp *schema.SearchUserSchemasResponse) error {
-					schemaType := fmt.Sprint(time.Now().UnixNano())
+					schemaType := gofakeit.Name()
 					schemaType1 := schemaType + "_1"
 					schemaType2 := schemaType + "_2"
 					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType1)
@@ -138,9 +143,9 @@ func TestServer_ListUserSchemas(t *testing.T) {
 						},
 					}
 
-					resp.Result[0].Type = schemaType1
+					resp.Result[0].Config.Type = schemaType1
 					resp.Result[0].Details = createResp.GetDetails()
-					resp.Result[1].Type = schemaType2
+					resp.Result[1].Config.Type = schemaType2
 					resp.Result[1].Details = createResp2.GetDetails()
 					return nil
 				},
@@ -150,18 +155,24 @@ func TestServer_ListUserSchemas(t *testing.T) {
 					TotalResult:  2,
 					AppliedLimit: 100,
 				},
-				Result: []*schema.UserSchema{
+				Result: []*schema.GetUserSchema{
 					{
-						State:                  schema.State_STATE_ACTIVE,
-						Revision:               1,
-						Schema:                 userSchema,
-						PossibleAuthenticators: nil,
+						State:    schema.State_STATE_ACTIVE,
+						Revision: 1,
+						Config: &schema.UserSchema{
+							DataType: &schema.UserSchema_Schema{
+								Schema: userSchema,
+							},
+						},
 					},
 					{
-						State:                  schema.State_STATE_ACTIVE,
-						Revision:               1,
-						Schema:                 userSchema,
-						PossibleAuthenticators: nil,
+						State:    schema.State_STATE_ACTIVE,
+						Revision: 1,
+						Config: &schema.UserSchema{
+							DataType: &schema.UserSchema_Schema{
+								Schema: userSchema,
+							},
+						},
 					},
 				},
 			},
@@ -203,7 +214,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 	}
 }
 
-func TestServer_GetUserSchemaByID(t *testing.T) {
+func TestServer_GetUserSchema(t *testing.T) {
 	ensureFeatureEnabled(t, IAMOwnerCTX)
 
 	userSchema := new(structpb.Struct)
@@ -215,22 +226,22 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 	require.NoError(t, err)
 	type args struct {
 		ctx     context.Context
-		req     *schema.GetUserSchemaByIDRequest
-		prepare func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error
+		req     *schema.GetUserSchemaRequest
+		prepare func(request *schema.GetUserSchemaRequest, resp *schema.GetUserSchemaResponse) error
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *schema.GetUserSchemaByIDResponse
+		want    *schema.GetUserSchemaResponse
 		wantErr bool
 	}{
 		{
 			name: "missing permission",
 			args: args{
 				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
-				req: &schema.GetUserSchemaByIDRequest{},
-				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
-					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
+				req: &schema.GetUserSchemaRequest{},
+				prepare: func(request *schema.GetUserSchemaRequest, resp *schema.GetUserSchemaResponse) error {
+					schemaType := gofakeit.Name()
 					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 					return nil
@@ -242,7 +253,7 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 			name: "not existing, error",
 			args: args{
 				ctx: IAMOwnerCTX,
-				req: &schema.GetUserSchemaByIDRequest{
+				req: &schema.GetUserSchemaRequest{
 					Id: "notexisting",
 				},
 			},
@@ -252,23 +263,26 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 			name: "get, ok",
 			args: args{
 				ctx: IAMOwnerCTX,
-				req: &schema.GetUserSchemaByIDRequest{},
-				prepare: func(request *schema.GetUserSchemaByIDRequest, resp *schema.GetUserSchemaByIDResponse) error {
-					schemaType := fmt.Sprint(time.Now().UnixNano() + 1)
+				req: &schema.GetUserSchemaRequest{},
+				prepare: func(request *schema.GetUserSchemaRequest, resp *schema.GetUserSchemaResponse) error {
+					schemaType := gofakeit.Name()
 					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 
-					resp.Schema.Type = schemaType
-					resp.Schema.Details = createResp.GetDetails()
+					resp.UserSchema.Config.Type = schemaType
+					resp.UserSchema.Details = createResp.GetDetails()
 					return nil
 				},
 			},
-			want: &schema.GetUserSchemaByIDResponse{
-				Schema: &schema.UserSchema{
-					State:                  schema.State_STATE_ACTIVE,
-					Revision:               1,
-					Schema:                 userSchema,
-					PossibleAuthenticators: nil,
+			want: &schema.GetUserSchemaResponse{
+				UserSchema: &schema.GetUserSchema{
+					State:    schema.State_STATE_ACTIVE,
+					Revision: 1,
+					Config: &schema.UserSchema{
+						DataType: &schema.UserSchema_Schema{
+							Schema: userSchema,
+						},
+					},
 				},
 			},
 		},
@@ -286,16 +300,17 @@ func TestServer_GetUserSchemaByID(t *testing.T) {
 			}
 
 			require.EventuallyWithT(t, func(ttt *assert.CollectT) {
-				got, err := Client.GetUserSchemaByID(tt.args.ctx, tt.args.req)
+				got, err := Client.GetUserSchema(tt.args.ctx, tt.args.req)
 				if tt.wantErr {
-					require.Error(ttt, err)
-					return
+					assert.Error(t, err, "Error: "+err.Error())
+				} else {
+					assert.NoError(t, err)
+					wantSchema := tt.want.GetUserSchema()
+					gotSchema := got.GetUserSchema()
+					integration.AssertResourceDetails(t, wantSchema.GetDetails(), gotSchema.GetDetails())
+					tt.want.UserSchema.Details = got.GetUserSchema().GetDetails()
+					grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 				}
-				assert.NoError(ttt, err)
-
-				integration.AssertResourceDetails(t, tt.want.GetSchema().GetDetails(), got.GetSchema().GetDetails())
-				tt.want.Schema.Details = got.GetSchema().GetDetails()
-				grpc.AllFieldsEqual(t, tt.want.ProtoReflect(), got.ProtoReflect(), grpc.CustomMappers)
 			}, retryDuration, time.Millisecond*100, "timeout waiting for expected user schema result")
 		})
 	}
