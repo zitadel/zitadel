@@ -108,6 +108,11 @@ func (c *Cache) serializeHeaders(w http.ResponseWriter) {
 	control := make([]string, 0, 6)
 	pragma := false
 
+	// Do not overwrite cache-control header if set by business logic.
+	if w.Header().Get(http_utils.CacheControl) != "" {
+		return
+	}
+
 	if c.Cacheability != CacheabilityNotSet {
 		control = append(control, string(c.Cacheability))
 		control = append(control, fmt.Sprintf("max-age=%v", c.MaxAge.Seconds()))
