@@ -43,7 +43,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   produces: "application/grpc-web+proto";
 
   host: "$CUSTOM-DOMAIN";
-  base_path: "/resources";
+  base_path: "/resources/v3alpha/user_schemas";
 
   external_docs: {
     description: "Detailed information about ZITADEL",
@@ -229,7 +229,6 @@ service ZITADELUserSchemas {
   rpc DeactivateUserSchema (DeactivateUserSchemaRequest) returns (DeactivateUserSchemaResponse) {
     option (google.api.http) = {
       post: "/{id}/_deactivate"
-      body: "id"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -254,7 +253,6 @@ service ZITADELUserSchemas {
   rpc ReactivateUserSchema (ReactivateUserSchemaRequest) returns (ReactivateUserSchemaResponse) {
     option (google.api.http) = {
       post: "/{id}/_reactivate"
-      body: "id"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -279,7 +277,6 @@ service ZITADELUserSchemas {
   rpc DeleteUserSchema (DeleteUserSchemaRequest) returns (DeleteUserSchemaResponse) {
     option (google.api.http) = {
       delete: "/{id}"
-      body: "id"
     };
 
     option (zitadel.protoc_gen_zitadel.v2.options) = {
@@ -297,7 +294,6 @@ service ZITADELUserSchemas {
       };
     };
   }
-
 }
 
 message SearchUserSchemasRequest {
@@ -350,7 +346,7 @@ message CreateUserSchemaRequest {
       default: "\"domain from HOST or :authority header\""
     }
   ];
-  CreateUserSchema user_schema = 2;
+  UserSchema user_schema = 2;
 }
 
 message CreateUserSchemaResponse {

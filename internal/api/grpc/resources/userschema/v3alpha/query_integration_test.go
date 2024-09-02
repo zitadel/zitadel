@@ -90,7 +90,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 							},
 						},
 					}
-					resp.Result[0].Type = schemaType
+					resp.Result[0].Config.Type = schemaType
 					resp.Result[0].Details = createResp.GetDetails()
 					// as schema is freshly created, the changed date is the created date
 					resp.Result[0].Details.Created = resp.Result[0].Details.GetChanged()
@@ -105,10 +105,15 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				},
 				Result: []*schema.GetUserSchema{
 					{
-						State:                  schema.State_STATE_ACTIVE,
-						Revision:               1,
-						Schema:                 userSchema,
-						PossibleAuthenticators: nil,
+						State:    schema.State_STATE_ACTIVE,
+						Revision: 1,
+						Config: &schema.UserSchema{
+							Type: "",
+							DataType: &schema.UserSchema_Schema{
+								Schema: userSchema,
+							},
+							PossibleAuthenticators: nil,
+						},
 					},
 				},
 			},
@@ -138,9 +143,9 @@ func TestServer_ListUserSchemas(t *testing.T) {
 						},
 					}
 
-					resp.Result[0].Type = schemaType1
+					resp.Result[0].Config.Type = schemaType1
 					resp.Result[0].Details = createResp.GetDetails()
-					resp.Result[1].Type = schemaType2
+					resp.Result[1].Config.Type = schemaType2
 					resp.Result[1].Details = createResp2.GetDetails()
 					return nil
 				},
@@ -152,16 +157,22 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				},
 				Result: []*schema.GetUserSchema{
 					{
-						State:                  schema.State_STATE_ACTIVE,
-						Revision:               1,
-						Schema:                 userSchema,
-						PossibleAuthenticators: nil,
+						State:    schema.State_STATE_ACTIVE,
+						Revision: 1,
+						Config: &schema.UserSchema{
+							DataType: &schema.UserSchema_Schema{
+								Schema: userSchema,
+							},
+						},
 					},
 					{
-						State:                  schema.State_STATE_ACTIVE,
-						Revision:               1,
-						Schema:                 userSchema,
-						PossibleAuthenticators: nil,
+						State:    schema.State_STATE_ACTIVE,
+						Revision: 1,
+						Config: &schema.UserSchema{
+							DataType: &schema.UserSchema_Schema{
+								Schema: userSchema,
+							},
+						},
 					},
 				},
 			},
@@ -258,17 +269,20 @@ func TestServer_GetUserSchema(t *testing.T) {
 					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 
-					resp.UserSchema.Type = schemaType
+					resp.UserSchema.Config.Type = schemaType
 					resp.UserSchema.Details = createResp.GetDetails()
 					return nil
 				},
 			},
 			want: &schema.GetUserSchemaResponse{
 				UserSchema: &schema.GetUserSchema{
-					State:                  schema.State_STATE_ACTIVE,
-					Revision:               1,
-					Schema:                 userSchema,
-					PossibleAuthenticators: nil,
+					State:    schema.State_STATE_ACTIVE,
+					Revision: 1,
+					Config: &schema.UserSchema{
+						DataType: &schema.UserSchema_Schema{
+							Schema: userSchema,
+						},
+					},
 				},
 			},
 		},

@@ -32,7 +32,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			name: "missing permission, error",
 			ctx:  Tester.WithAuthorization(context.Background(), integration.OrgOwner),
 			req: &schema.CreateUserSchemaRequest{
-				UserSchema: &schema.CreateUserSchema{
+				UserSchema: &schema.UserSchema{
 					Type: gofakeit.Name(),
 				},
 			},
@@ -42,7 +42,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			name: "empty type",
 			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
-				UserSchema: &schema.CreateUserSchema{
+				UserSchema: &schema.UserSchema{
 					Type: "",
 				},
 			},
@@ -52,7 +52,7 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			name: "empty schema, error",
 			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
-				UserSchema: &schema.CreateUserSchema{
+				UserSchema: &schema.UserSchema{
 					Type: gofakeit.Name(),
 				},
 			},
@@ -62,9 +62,9 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			name: "invalid schema, error",
 			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
-				UserSchema: &schema.CreateUserSchema{
+				UserSchema: &schema.UserSchema{
 					Type: gofakeit.Name(),
-					DataType: &schema.CreateUserSchema_Schema{
+					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
 							err := s.UnmarshalJSON([]byte(`
@@ -93,9 +93,9 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			name: "no authenticators, ok",
 			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
-				UserSchema: &schema.CreateUserSchema{
+				UserSchema: &schema.UserSchema{
 					Type: gofakeit.Name(),
-					DataType: &schema.CreateUserSchema_Schema{
+					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
 							err := s.UnmarshalJSON([]byte(`
@@ -132,9 +132,9 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			name: "invalid authenticator, error",
 			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
-				UserSchema: &schema.CreateUserSchema{
+				UserSchema: &schema.UserSchema{
 					Type: gofakeit.Name(),
-					DataType: &schema.CreateUserSchema_Schema{
+					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
 							err := s.UnmarshalJSON([]byte(`
@@ -166,9 +166,9 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			name: "with authenticator, ok",
 			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
-				UserSchema: &schema.CreateUserSchema{
+				UserSchema: &schema.UserSchema{
 					Type: gofakeit.Name(),
-					DataType: &schema.CreateUserSchema_Schema{
+					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
 							err := s.UnmarshalJSON([]byte(`
@@ -208,9 +208,9 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			name: "with invalid permission, error",
 			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
-				UserSchema: &schema.CreateUserSchema{
+				UserSchema: &schema.UserSchema{
 					Type: gofakeit.Name(),
-					DataType: &schema.CreateUserSchema_Schema{
+					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
 							err := s.UnmarshalJSON([]byte(`
@@ -243,9 +243,9 @@ func TestServer_CreateUserSchema(t *testing.T) {
 			name: "with valid permission, ok",
 			ctx:  IAMOwnerCTX,
 			req: &schema.CreateUserSchemaRequest{
-				UserSchema: &schema.CreateUserSchema{
+				UserSchema: &schema.UserSchema{
 					Type: gofakeit.Name(),
-					DataType: &schema.CreateUserSchema_Schema{
+					DataType: &schema.UserSchema_Schema{
 						Schema: func() *structpb.Struct {
 							s := new(structpb.Struct)
 							err := s.UnmarshalJSON([]byte(`

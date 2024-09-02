@@ -111,12 +111,16 @@ func userSchemaToPb(userSchema *query.UserSchema) (*schema.GetUserSchema, error)
 		return nil, err
 	}
 	return &schema.GetUserSchema{
-		Details:                resource_object.DomainToDetailsPb(&userSchema.ObjectDetails, object.OwnerType_OWNER_TYPE_INSTANCE, userSchema.ResourceOwner),
-		Type:                   userSchema.Type,
-		State:                  userSchemaStateToPb(userSchema.State),
-		Revision:               userSchema.Revision,
-		Schema:                 s,
-		PossibleAuthenticators: authenticatorTypesToPb(userSchema.PossibleAuthenticators),
+		Details: resource_object.DomainToDetailsPb(&userSchema.ObjectDetails, object.OwnerType_OWNER_TYPE_INSTANCE, userSchema.ResourceOwner),
+		Config: &schema.UserSchema{
+			Type: userSchema.Type,
+			DataType: &schema.UserSchema_Schema{
+				Schema: s,
+			},
+			PossibleAuthenticators: authenticatorTypesToPb(userSchema.PossibleAuthenticators),
+		},
+		State:    userSchemaStateToPb(userSchema.State),
+		Revision: userSchema.Revision,
 	}, nil
 }
 
