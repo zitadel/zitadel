@@ -59,7 +59,7 @@
     "@angular-eslint/eslint-plugin": "16.2.0",
     "@angular-eslint/eslint-plugin-template": "16.2.0",
     "@angular-eslint/schematics": "16.2.0",
-    "@angular-eslint/template-parser": "16.2.0",
+    "@angular-eslint/template-parser": "18.3.0",
     "@angular/cli": "^16.2.14",
     "@angular/compiler-cli": "^16.2.5",
     "@angular/language-service": "^16.2.5",
