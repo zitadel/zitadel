@@ -11299,7 +11299,8 @@ message SetCustomLoginTextsRequest {
     zitadel.text.v1.PasswordlessRegistrationScreenText passwordless_registration_text = 33;
     zitadel.text.v1.PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
     zitadel.text.v1.ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
-    zitadel.text.v1.LinkingUserPromptScreenText linking_user_prompt_text = 36;
+    // Deprecated: the linking user prompt screen no longer exists
+    zitadel.text.v1.LinkingUserPromptScreenText linking_user_prompt_text = 36 [deprecated = true];
 }
 
 message SetCustomLoginTextsResponse {

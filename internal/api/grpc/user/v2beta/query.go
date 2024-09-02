@@ -6,7 +6,6 @@ import (
 	"github.com/muhlemmer/gu"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/zitadel/zitadel/internal/api/authz"
 	object "github.com/zitadel/zitadel/internal/api/grpc/object/v2beta"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -15,14 +14,9 @@ import (
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *user.GetUserByIDRequest) (_ *user.GetUserByIDResponse, err error) {
-	resp, err := s.query.GetUserByID(ctx, true, req.GetUserId())
+	resp, err := s.query.GetUserByIDWithPermission(ctx, true, req.GetUserId(), s.checkPermission)
 	if err != nil {
 		return nil, err
-	}
-	if authz.GetCtxData(ctx).UserID != req.GetUserId() {
-		if err := s.checkPermission(ctx, domain.PermissionUserRead, resp.ResourceOwner, req.GetUserId()); err != nil {
-			return nil, err
-		}
 	}
 	return &user.GetUserByIDResponse{
 		Details: object.DomainToDetailsPb(&domain.ObjectDetails{
