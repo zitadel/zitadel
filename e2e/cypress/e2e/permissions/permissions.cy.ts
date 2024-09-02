@@ -45,7 +45,7 @@ describe('permissions', () => {
 
         it('should add a manager', () => {
           cy.get('[data-e2e="add-member-button"]').click();
-          cy.get('[data-e2e="add-member-input"]').type(testManagerUsername);
+          cy.get('[data-e2e="add-member-input"]').should('be.enabled').type(testManagerUsername);
           cy.get('[data-e2e="user-option"]').first().click();
           cy.contains('[data-e2e="role-checkbox"]', roles[0]).click();
           cy.get('[data-e2e="confirm-add-member-button"]').click();
@@ -174,9 +174,9 @@ describe('permissions', () => {
           it('should add a role', () => {
             cy.get('[data-e2e="sidenav-element-roles"]').click();
             cy.get('[data-e2e="add-new-role"]').click();
-            cy.get('[formcontrolname="key"]').type(testRoleName);
-            cy.get('[formcontrolname="displayName"]').type('e2eroleundertestdisplay');
-            cy.get('[formcontrolname="group"]').type('e2eroleundertestgroup');
+            cy.get('[formcontrolname="key"]').should('be.enabled').type(testRoleName);
+            cy.get('[formcontrolname="displayName"]').should('be.enabled').type('e2eroleundertestdisplay');
+            cy.get('[formcontrolname="group"]').should('be.enabled').type('e2eroleundertestgroup');
             cy.get('[data-e2e="save-button"]').click();
             cy.shouldConfirmSuccess();
             cy.contains('tr', testRoleName);

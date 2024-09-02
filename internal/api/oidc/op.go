@@ -36,8 +36,7 @@ type Config struct {
 	DefaultIdTokenLifetime            time.Duration
 	DefaultRefreshTokenIdleExpiration time.Duration
 	DefaultRefreshTokenExpiration     time.Duration
-	UserAgentCookieConfig             *middleware.UserAgentCookieConfig
-	Cache                             *middleware.CacheConfig
+	JWKSCacheControlMaxAge            time.Duration
 	CustomEndpoints                   *EndpointConfig
 	DeviceAuth                        *DeviceAuthorizationConfig
 	DefaultLoginURLV2                 string
@@ -79,6 +78,27 @@ type OPStorage struct {
 	assetAPIPrefix                    func(ctx context.Context) string
 }
 
+// Provider is used to overload certain [op.Provider] methods
+type Provider struct {
+	*op.Provider
+	accessTokenKeySet oidc.KeySet
+	idTokenHintKeySet oidc.KeySet
+}
+
+// IDTokenHintVerifier configures a Verifier and supported signing algorithms based on the Web Key feature in the context.
+func (o *Provider) IDTokenHintVerifier(ctx context.Context) *op.IDTokenHintVerifier {
+	return op.NewIDTokenHintVerifier(op.IssuerFromContext(ctx), o.idTokenHintKeySet, op.WithSupportedIDTokenHintSigningAlgorithms(
+		supportedSigningAlgs(ctx)...,
+	))
+}
+
+// AccessTokenVerifier configures a Verifier and supported signing algorithms based on the Web Key feature in the context.
+func (o *Provider) AccessTokenVerifier(ctx context.Context) *op.AccessTokenVerifier {
+	return op.NewAccessTokenVerifier(op.IssuerFromContext(ctx), o.accessTokenKeySet, op.WithSupportedAccessTokenSigningAlgorithms(
+		supportedSigningAlgs(ctx)...,
+	))
+}
+
 func NewServer(
 	ctx context.Context,
 	config Config,
@@ -101,14 +121,11 @@ func NewServer(
 		return nil, zerrors.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
 	storage := newStorage(config, command, query, repo, encryptionAlg, es, projections)
-	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, query.GetPublicKeyByID)
+	keyCache := newPublicKeyCache(ctx, config.PublicKeyCacheMaxAge, queryKeyFunc(query))
 	accessTokenKeySet := newOidcKeySet(keyCache, withKeyExpiryCheck(true))
 	idTokenHintKeySet := newOidcKeySet(keyCache)
 
-	options := []op.Option{
-		op.WithAccessTokenKeySet(accessTokenKeySet),
-		op.WithIDTokenHintKeySet(idTokenHintKeySet),
-	}
+	var options []op.Option
 	if !externalSecure {
 		options = append(options, op.WithAllowInsecure())
 	}
@@ -126,7 +143,11 @@ func NewServer(
 		return nil, zerrors.ThrowInternal(err, "OIDC-Aij4e", "cannot create secret hasher")
 	}
 	server := &Server{
-		LegacyServer:               op.NewLegacyServer(provider, endpoints(config.CustomEndpoints)),
+		LegacyServer: op.NewLegacyServer(&Provider{
+			Provider:          provider,
+			accessTokenKeySet: accessTokenKeySet,
+			idTokenHintKeySet: idTokenHintKeySet,
+		}, endpoints(config.CustomEndpoints)),
 		repo:                       repo,
 		query:                      query,
 		command:                    command,
@@ -137,6 +158,7 @@ func NewServer(
 		defaultLogoutURLV2:         config.DefaultLogoutURLV2,
 		defaultAccessTokenLifetime: config.DefaultAccessTokenLifetime,
 		defaultIdTokenLifetime:     config.DefaultIdTokenLifetime,
+		jwksCacheControlMaxAge:     config.JWKSCacheControlMaxAge,
 		fallbackLogger:             fallbackLogger,
 		hasher:                     hasher,
 		signingKeyAlgorithm:        config.SigningKeyAlgorithm,
