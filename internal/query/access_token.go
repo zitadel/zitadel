@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"golang.org/x/text/language"
 
-	"github.com/shopspring/decimal"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/repository/oidcsession"

@@ -133,8 +133,8 @@ type Columns int8
 const (
 	//ColumnsEvent represents all fields of an event
 	ColumnsEvent = iota + 1
-	// ColumnsMaxSequence represents the latest sequence of the filtered events
-	ColumnsMaxSequence
+	// ColumnsMaxPosition represents the latest sequence of the filtered events
+	ColumnsMaxPosition
 	// ColumnsInstanceIDs represents the instance ids of the filtered events
 	ColumnsInstanceIDs
 
