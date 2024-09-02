@@ -114,7 +114,43 @@ retry:
 	if err != nil {
 		return mappedEvents, err
 	}
-	es.notify(mappedEvents)
+
+	es.notify(context.WithoutCancel(ctx), mappedEvents)
+	return mappedEvents, nil
+}
+
+func (es *Eventstore) PushWithAwaitTriggers(ctx context.Context, cmds ...Command) ([]Event, error) {
+	if es.PushTimeout > 0 {
+		var cancel func()
+		ctx, cancel = context.WithTimeout(ctx, es.PushTimeout)
+		defer cancel()
+	}
+	var (
+		events []Event
+		err    error
+	)
+
+	// Retry when there is a collision of the sequence as part of the primary key.
+	// "duplicate key value violates unique constraint \"events2_pkey\" (SQLSTATE 23505)"
+	// https://github.com/zitadel/zitadel/issues/7202
+retry:
+	for i := 0; i <= es.maxRetries; i++ {
+		events, err = es.pusher.Push(ctx, cmds...)
+		var pgErr *pgconn.PgError
+		if !errors.As(err, &pgErr) || pgErr.ConstraintName != "events2_pkey" || pgErr.SQLState() != "23505" {
+			break retry
+		}
+		logging.WithError(err).Info("eventstore push retry")
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	mappedEvents, err := es.mapEvents(events)
+	if err != nil {
+		return mappedEvents, err
+	}
+	<-es.notify(ctx, mappedEvents)
 	return mappedEvents, nil
 }
 

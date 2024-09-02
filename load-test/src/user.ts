@@ -51,7 +51,7 @@ export function createHuman(username: string, org: Org, accessToken: string): Pr
       .then((res) => {
         check(res, {
           'create user is status ok': (r) => r.status === 201,
-        }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body}`);
+        }) || reject(`unable to create user(username: ${username}) status: ${res.status} body: ${res.body} duration: ${res.timings.duration}`);
         createHumanTrend.add(res.timings.duration);
 
         const user = http.get(url(`/v2beta/users/${res.json('userId')!}`), {

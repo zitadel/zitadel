@@ -323,7 +323,7 @@ func (c *Commands) addOrgWithIDAndMember(ctx context.Context, name, userID, reso
 		return nil, err
 	}
 	events = append(events, orgMemberEvent)
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.eventstore.PushWithAwaitTriggers(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
