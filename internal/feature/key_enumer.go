@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _KeyName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performanceweb_keydebug_oidc_parent_error"
+const _KeyName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performanceweb_keydebug_oidc_parent_errorterminate_single_v1_session"
 
-var _KeyIndex = [...]uint8{0, 11, 28, 61, 81, 92, 106, 113, 133, 140, 163}
+var _KeyIndex = [...]uint8{0, 11, 28, 61, 81, 92, 106, 113, 133, 140, 163, 190}
 
-const _KeyLowerName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performanceweb_keydebug_oidc_parent_error"
+const _KeyLowerName = "unspecifiedlogin_default_orgtrigger_introspection_projectionslegacy_introspectionuser_schematoken_exchangeactionsimproved_performanceweb_keydebug_oidc_parent_errorterminate_single_v1_session"
 
 func (i Key) String() string {
 	if i < 0 || i >= Key(len(_KeyIndex)-1) {
@@ -34,9 +34,10 @@ func _KeyNoOp() {
 	_ = x[KeyImprovedPerformance-(7)]
 	_ = x[KeyWebKey-(8)]
 	_ = x[KeyDebugOIDCParentError-(9)]
+	_ = x[KeyTerminateSingleV1Session-(10)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActions, KeyImprovedPerformance, KeyWebKey, KeyDebugOIDCParentError}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActions, KeyImprovedPerformance, KeyWebKey, KeyDebugOIDCParentError, KeyTerminateSingleV1Session}
 
 var _KeyNameToValueMap = map[string]Key{
 	_KeyName[0:11]:         KeyUnspecified,
@@ -59,6 +60,8 @@ var _KeyNameToValueMap = map[string]Key{
 	_KeyLowerName[133:140]: KeyWebKey,
 	_KeyName[140:163]:      KeyDebugOIDCParentError,
 	_KeyLowerName[140:163]: KeyDebugOIDCParentError,
+	_KeyName[163:190]:      KeyTerminateSingleV1Session,
+	_KeyLowerName[163:190]: KeyTerminateSingleV1Session,
 }
 
 var _KeyNames = []string{
@@ -72,6 +75,7 @@ var _KeyNames = []string{
 	_KeyName[113:133],
 	_KeyName[133:140],
 	_KeyName[140:163],
+	_KeyName[163:190],
 }
 
 // KeyString retrieves an enum value from the enum constants string name.

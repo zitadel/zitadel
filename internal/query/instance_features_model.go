@@ -69,6 +69,7 @@ func (m *InstanceFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.InstanceImprovedPerformanceEventType,
 			feature_v2.InstanceWebKeyEventType,
 			feature_v2.InstanceDebugOIDCParentErrorEventType,
+			feature_v2.InstanceTerminateSingleV1SessionEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -121,6 +122,8 @@ func reduceInstanceFeatureSet[T any](features *InstanceFeatures, event *feature_
 		features.WebKey.set(level, event.Value)
 	case feature.KeyDebugOIDCParentError:
 		features.DebugOIDCParentError.set(level, event.Value)
+	case feature.KeyTerminateSingleV1Session:
+		features.TerminateSingleV1Session.set(level, event.Value)
 	}
 	return nil
 }

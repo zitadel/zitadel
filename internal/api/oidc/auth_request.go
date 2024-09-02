@@ -272,7 +272,7 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 func (o *OPStorage) terminateV1Session(ctx context.Context, userID, sessionID string) error {
 	ctx = authz.SetCtxData(ctx, authz.CtxData{UserID: userID})
 	// if the flag is active we only terminate the specific session
-	if authz.GetFeatures(ctx).WebKey { // TODO: use correct flag
+	if authz.GetFeatures(ctx).TerminateSingleV1Session {
 		userAgentID, err := o.repo.UserAgentIDBySessionID(ctx, sessionID)
 		if err != nil {
 			return err

@@ -30,6 +30,7 @@ var (
 	InstanceImprovedPerformanceEventType             = setEventTypeFromFeature(feature.LevelInstance, feature.KeyImprovedPerformance)
 	InstanceWebKeyEventType                          = setEventTypeFromFeature(feature.LevelInstance, feature.KeyWebKey)
 	InstanceDebugOIDCParentErrorEventType            = setEventTypeFromFeature(feature.LevelInstance, feature.KeyDebugOIDCParentError)
+	InstanceTerminateSingleV1SessionEventType        = setEventTypeFromFeature(feature.LevelInstance, feature.KeyTerminateSingleV1Session)
 )
 
 const (

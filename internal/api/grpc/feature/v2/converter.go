@@ -44,6 +44,7 @@ func instanceFeaturesToCommand(req *feature_pb.SetInstanceFeaturesRequest) *comm
 		ImprovedPerformance:             improvedPerformanceListToDomain(req.ImprovedPerformance),
 		WebKey:                          req.WebKey,
 		DebugOIDCParentError:            req.DebugOidcParentError,
+		TerminateSingleV1Session:        req.TerminateSingleV1Session,
 	}
 }
 
@@ -59,6 +60,7 @@ func instanceFeaturesToPb(f *query.InstanceFeatures) *feature_pb.GetInstanceFeat
 		ImprovedPerformance:                 featureSourceToImprovedPerformanceFlagPb(&f.ImprovedPerformance),
 		WebKey:                              featureSourceToFlagPb(&f.WebKey),
 		DebugOidcParentError:                featureSourceToFlagPb(&f.DebugOIDCParentError),
+		TerminateSingleV1Session:            featureSourceToFlagPb(&f.TerminateSingleV1Session),
 	}
 }
 
