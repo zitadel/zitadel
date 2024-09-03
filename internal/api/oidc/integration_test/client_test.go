@@ -106,7 +106,7 @@ func TestServer_Introspect(t *testing.T) {
 			wantAudience = append(wantAudience, apiID)
 
 			scope := []string{oidc.ScopeOpenID, oidc.ScopeProfile, oidc.ScopeEmail, oidc.ScopeOfflineAccess, oidc_api.ScopeResourceOwner}
-			authRequestID := createAuthRequest(t, app.GetClientId(), redirectURI, scope...)
+			authRequestID := createAuthRequest(t, Instance, app.GetClientId(), redirectURI, scope...)
 			sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 			linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 				AuthRequestId: authRequestID,
@@ -121,7 +121,7 @@ func TestServer_Introspect(t *testing.T) {
 
 			// code exchange
 			code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-			tokens, err := exchangeTokens(t, app.GetClientId(), code, redirectURI)
+			tokens, err := exchangeTokens(t, Instance, app.GetClientId(), code, redirectURI)
 			require.NoError(t, err)
 			assertTokens(t, tokens, true)
 			assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)

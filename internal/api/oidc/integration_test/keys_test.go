@@ -18,17 +18,23 @@ import (
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/crypto"
+	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
 	oidc_pb "github.com/zitadel/zitadel/pkg/grpc/oidc/v2"
 )
 
 func TestServer_Keys(t *testing.T) {
-	// TODO: isolated instance
+	t.Parallel()
 
-	clientID, _ := createClient(t)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess, zitadelAudienceScope)
-	sessionID, sessionToken, _, _ := Tester.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
-	linkResp, err := Tester.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
+	instance := integration.NewInstance(CTX)
+	ctxLogin := instance.WithAuthorization(CTX, integration.UserTypeLogin)
+
+	clientID, _ := createClient(t, instance)
+	authRequestID := createAuthRequest(t, instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess, zitadelAudienceScope)
+
+	instance.RegisterUserPasskey(instance.WithAuthorization(CTX, integration.UserTypeOrgOwner), instance.AdminUserID)
+	sessionID, sessionToken, _, _ := instance.CreateVerifiedWebAuthNSession(t, ctxLogin, instance.AdminUserID)
+	linkResp, err := instance.Client.OIDCv2.CreateCallback(ctxLogin, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
 		CallbackKind: &oidc_pb.CreateCallbackRequest_Session{
 			Session: &oidc_pb.Session{
@@ -41,10 +47,10 @@ func TestServer_Keys(t *testing.T) {
 
 	// code exchange so we are sure there is 1 legacy key pair.
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	_, err = exchangeTokens(t, clientID, code, redirectURI)
+	_, err = exchangeTokens(t, instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 
-	issuer := http_util.BuildHTTP(Tester.Config.ExternalDomain, Tester.Config.Port, Tester.Config.ExternalSecure)
+	issuer := http_util.BuildHTTP(instance.Domain, instance.Config.Port, instance.Config.Secure)
 	discovery, err := client.Discover(CTX, issuer, http.DefaultClient)
 	require.NoError(t, err)
 
@@ -66,7 +72,7 @@ func TestServer_Keys(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ensureWebKeyFeature(t, tt.webKeyFeature)
+			ensureWebKeyFeature(t, instance, tt.webKeyFeature)
 
 			assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
 				resp, err := http.Get(discovery.JwksURI)
@@ -100,14 +106,16 @@ func TestServer_Keys(t *testing.T) {
 	}
 }
 
-func ensureWebKeyFeature(t *testing.T, set bool) {
-	_, err := Tester.Client.FeatureV2.SetInstanceFeatures(CTXIAM, &feature.SetInstanceFeaturesRequest{
+func ensureWebKeyFeature(t *testing.T, instance *integration.Instance, set bool) {
+	ctxIam := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
+
+	_, err := instance.Client.FeatureV2.SetInstanceFeatures(ctxIam, &feature.SetInstanceFeaturesRequest{
 		WebKey: proto.Bool(set),
 	})
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
-		_, err := Tester.Client.FeatureV2.SetInstanceFeatures(CTXIAM, &feature.SetInstanceFeaturesRequest{
+		_, err := instance.Client.FeatureV2.SetInstanceFeatures(ctxIam, &feature.SetInstanceFeaturesRequest{
 			WebKey: proto.Bool(false),
 		})
 		require.NoError(t, err)

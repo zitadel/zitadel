@@ -20,7 +20,7 @@ import (
 func TestServer_RefreshToken_Status(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
+	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 

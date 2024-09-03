@@ -86,7 +86,7 @@ func testServer_UserInfo(t *testing.T) {
 		roleBar = "bar"
 	)
 
-	clientID, projectID := createClient(t)
+	clientID, projectID := createClient(t, Instance)
 	addProjectRolesGrants(t, User.GetUserId(), projectID, roleFoo, roleBar)
 
 	tests := []struct {
@@ -239,7 +239,7 @@ func TestServer_UserInfo_OrgIDRoles(t *testing.T) {
 		roleFoo = "foo"
 		roleBar = "bar"
 	)
-	clientID, projectID := createClient(t)
+	clientID, projectID := createClient(t, Instance)
 	addProjectRolesGrants(t, User.GetUserId(), projectID, roleFoo, roleBar)
 	grantedOrgID := addProjectOrgGrant(t, User.GetUserId(), projectID, roleFoo, roleBar)
 
@@ -376,7 +376,7 @@ func addProjectOrgGrant(t *testing.T, userID, projectID string, roles ...string)
 }
 
 func getTokens(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc.IDTokenClaims] {
-	authRequestID := createAuthRequest(t, clientID, redirectURI, scope...)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, scope...)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -391,7 +391,7 @@ func getTokens(t *testing.T, clientID string, scope []string) *oidc.Tokens[*oidc
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)

@@ -30,17 +30,17 @@ var (
 func TestOPStorage_CreateAuthRequest(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
+	clientID, _ := createClient(t, Instance)
 
-	id := createAuthRequest(t, clientID, redirectURI)
+	id := createAuthRequest(t, Instance, clientID, redirectURI)
 	require.Contains(t, id, command.IDPrefixV2)
 }
 
 func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
-	authRequestID := createAuthRequest(t, clientID, redirectURI)
+	clientID, _ := createClient(t, Instance)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -55,7 +55,7 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 
 	// test code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -73,7 +73,7 @@ func TestOPStorage_CreateAccessToken_code(t *testing.T) {
 	require.Error(t, err)
 
 	// exchange with a used code must fail
-	_, err = exchangeTokens(t, clientID, code, redirectURI)
+	_, err = exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.Error(t, err)
 }
 
@@ -132,8 +132,8 @@ func TestOPStorage_CreateAccessToken_implicit(t *testing.T) {
 func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	clientID, _ := createClient(t, Instance)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -148,7 +148,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 
 	// test code exchange (expect refresh token to be returned)
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -157,10 +157,10 @@ func TestOPStorage_CreateAccessAndRefreshTokens_code(t *testing.T) {
 func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
+	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -175,7 +175,7 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -195,10 +195,10 @@ func TestOPStorage_CreateAccessAndRefreshTokens_refresh(t *testing.T) {
 func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
+	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -213,7 +213,7 @@ func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -240,10 +240,10 @@ func TestOPStorage_RevokeToken_access_token(t *testing.T) {
 func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
+	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -258,7 +258,7 @@ func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -279,10 +279,10 @@ func TestOPStorage_RevokeToken_access_token_invalid_token_hint_type(t *testing.T
 func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
+	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -297,7 +297,7 @@ func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -324,10 +324,10 @@ func TestOPStorage_RevokeToken_refresh_token(t *testing.T) {
 func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
+	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -342,7 +342,7 @@ func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -363,8 +363,8 @@ func TestOPStorage_RevokeToken_refresh_token_invalid_token_type_hint(t *testing.
 func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	clientID, _ := createClient(t, Instance)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -379,13 +379,13 @@ func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
 
 	// code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
 
 	// simulate second client (not part of the audience) trying to revoke the token
-	otherClientID, _ := createClient(t)
+	otherClientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, otherClientID, redirectURI)
 	require.NoError(t, err)
 	err = rp.RevokeToken(CTX, provider, tokens.AccessToken, "")
@@ -395,10 +395,10 @@ func TestOPStorage_RevokeToken_invalid_client(t *testing.T) {
 func TestOPStorage_TerminateSession(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
+	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
-	authRequestID := createAuthRequest(t, clientID, redirectURI)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -413,7 +413,7 @@ func TestOPStorage_TerminateSession(t *testing.T) {
 
 	// test code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -434,10 +434,10 @@ func TestOPStorage_TerminateSession(t *testing.T) {
 func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
+	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
-	authRequestID := createAuthRequest(t, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI, oidc.ScopeOpenID, oidc.ScopeOfflineAccess)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -452,7 +452,7 @@ func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 
 	// test code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, true)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -480,10 +480,10 @@ func TestOPStorage_TerminateSession_refresh_grant(t *testing.T) {
 func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 	t.Parallel()
 
-	clientID, _ := createClient(t)
+	clientID, _ := createClient(t, Instance)
 	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
-	authRequestID := createAuthRequest(t, clientID, redirectURI)
+	authRequestID := createAuthRequest(t, Instance, clientID, redirectURI)
 	sessionID, sessionToken, startTime, changeTime := Instance.CreateVerifiedWebAuthNSession(t, CTXLOGIN, User.GetUserId())
 	linkResp, err := Instance.Client.OIDCv2.CreateCallback(CTXLOGIN, &oidc_pb.CreateCallbackRequest{
 		AuthRequestId: authRequestID,
@@ -498,7 +498,7 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 
 	// test code exchange
 	code := assertCodeResponse(t, linkResp.GetCallbackUrl())
-	tokens, err := exchangeTokens(t, clientID, code, redirectURI)
+	tokens, err := exchangeTokens(t, Instance, clientID, code, redirectURI)
 	require.NoError(t, err)
 	assertTokens(t, tokens, false)
 	assertIDTokenClaims(t, tokens.IDTokenClaims, User.GetUserId(), armPasskey, startTime, changeTime, sessionID)
@@ -523,8 +523,8 @@ func TestOPStorage_TerminateSession_empty_id_token_hint(t *testing.T) {
 	require.Error(t, err)
 }
 
-func exchangeTokens(t testing.TB, clientID, code, redirectURI string) (*oidc.Tokens[*oidc.IDTokenClaims], error) {
-	provider, err := Instance.CreateRelyingParty(CTX, clientID, redirectURI)
+func exchangeTokens(t testing.TB, instance *integration.Instance, clientID, code, redirectURI string) (*oidc.Tokens[*oidc.IDTokenClaims], error) {
+	provider, err := instance.CreateRelyingParty(CTX, clientID, redirectURI)
 	require.NoError(t, err)
 
 	return rp.CodeExchange[*oidc.IDTokenClaims](context.Background(), code, provider, rp.WithCodeVerifier(integration.CodeVerifier))
