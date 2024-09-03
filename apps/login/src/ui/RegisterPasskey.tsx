@@ -26,7 +26,7 @@ export default function RegisterPasskey({
   organization,
   authRequestId,
 }: Props) {
-  const { register, handleSubmit, formState } = useForm<Inputs>({
+  const { handleSubmit, formState } = useForm<Inputs>({
     mode: "onBlur",
   });
 
@@ -61,7 +61,7 @@ export default function RegisterPasskey({
     const resp = await registerPasskeyLink({
       sessionId,
     }).catch((error: Error) => {
-      setError(error.message);
+      setError(error.message ?? "Could not register passkey");
       setLoading(false);
     });
     setLoading(false);

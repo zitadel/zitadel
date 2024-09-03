@@ -85,7 +85,6 @@ export async function updateSession(options: UpdateSessionCommand) {
     authRequestId,
     challenges,
   } = options;
-
   const sessionPromise = sessionId
     ? getSessionCookieById({ sessionId }).catch((error) => {
         return Promise.reject(error);
