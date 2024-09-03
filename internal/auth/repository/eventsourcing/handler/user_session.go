@@ -20,6 +20,8 @@ import (
 
 const (
 	userSessionTable = "auth.user_sessions"
+
+	IDPrefixV1 = "V1_"
 )
 
 type UserSession struct {
@@ -213,6 +215,7 @@ func (u *UserSession) sessionColumnsActivate(event eventstore.Event, columns ...
 	if err != nil {
 		return nil, err
 	}
+	sessionID = IDPrefixV1 + sessionID
 	columns = slices.Grow(columns, 2)
 	columns = append(columns,
 		handler.NewCol(view_model.UserSessionKeyState, domain.UserSessionStateActive),
