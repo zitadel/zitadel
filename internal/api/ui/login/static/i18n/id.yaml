@@ -209,21 +209,22 @@ RegistrationUser:
   FirstnameLabel: Nama yang diberikan
   LastnameLabel: Nama keluarga
   LanguageLabel: Bahasa
-  German: Jerman
-  English: Bahasa inggris
-  Italian: Italia
-  French: Perancis
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
-  Spanish: Spanyol
+  Spanish: Español
   Bulgarian: Български
-  Portuguese: Portugis
+  Portuguese: Português
   Macedonian: Македонски
-  Czech: Ceština
+  Czech: Čeština
   Russian: Русский
-  Dutch: Belanda
+  Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   GenderLabel: Jenis kelamin
   Female: Perempuan
   Male: Pria
@@ -248,21 +249,22 @@ ExternalRegistrationUserOverview:
   NicknameLabel: Nama panggilan
   PhoneLabel: Nomor telepon
   LanguageLabel: Bahasa
-  German: Jerman
-  English: Bahasa inggris
-  Italian: Italia
-  French: Perancis
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
-  Spanish: Spanyol
+  Spanish: Español
   Bulgarian: Български
-  Portuguese: Portugis
+  Portuguese: Português
   Macedonian: Македонски
-  Czech: Ceština
+  Czech: Čeština
   Russian: Русский
-  Dutch: Belanda
+  Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   TosAndPrivacyLabel: Syarat dan Ketentuan
   TosConfirm: Saya menerima itu
   TosLinkText: KL
@@ -316,21 +318,22 @@ ExternalNotFound:
   TosLinkText: KL
   PrivacyConfirm: Saya menerima itu
   PrivacyLinkText: kebijakan privasi
-  German: Jerman
-  English: Bahasa inggris
-  Italian: Italia
-  French: Perancis
+  German: Deutsch
+  English: English
+  Italian: Italiano
+  French: Français
   Chinese: 简体中文
   Polish: Polski
   Japanese: 日本語
-  Spanish: Spanyol
+  Spanish: Español
   Bulgarian: Български
-  Portuguese: Portugis
+  Portuguese: Português
   Macedonian: Македонски
-  Czech: Ceština
+  Czech: Čeština
   Russian: Русский
-  Dutch: Belanda
+  Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
 DeviceAuth:
   Title: Otorisasi Perangkat
   UserCode:
