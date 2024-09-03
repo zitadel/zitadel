@@ -65,8 +65,36 @@ func (s *Server) UpdateSMSProviderTwilioToken(ctx context.Context, req *admin_pb
 	}, nil
 }
 
+func (s *Server) AddSMSProviderHTTP(ctx context.Context, req *admin_pb.AddSMSProviderHTTPRequest) (*admin_pb.AddSMSProviderHTTPResponse, error) {
+	id, result, err := s.command.AddSMSConfigHTTP(ctx, authz.GetInstance(ctx).InstanceID(), AddSMSConfigTHTTPToConfig(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddSMSProviderHTTPResponse{
+		Details: object.DomainToAddDetailsPb(result),
+		Id:      id,
+	}, nil
+}
+
+func (s *Server) UpdateSMSProviderHTTP(ctx context.Context, req *admin_pb.UpdateSMSProviderHTTPRequest) (*admin_pb.UpdateSMSProviderHTTPResponse, error) {
+	result, err := s.command.ChangeSMSConfigHTTP(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, UpdateSMSConfigHTTPToConfig(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateSMSProviderHTTPResponse{
+		Details: object.DomainToChangeDetailsPb(result),
+	}, nil
+}
+
 func (s *Server) ActivateSMSProvider(ctx context.Context, req *admin_pb.ActivateSMSProviderRequest) (*admin_pb.ActivateSMSProviderResponse, error) {
-	result, err := s.command.ActivateSMSConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
+	// Get the ID of current SMTP active provider if any
+	currentActiveProviderID := ""
+	sms, err := s.query.SMSProviderConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
+	if err == nil {
+		currentActiveProviderID = sms.ID
+	}
+
+	result, err := s.command.ActivateSMSConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, currentActiveProviderID)
 	if err != nil {
 		return nil, err
 	}

@@ -19,7 +19,7 @@ import (
 
 func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(*testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 		alg         crypto.EncryptionAlgorithm
 	}
@@ -41,8 +41,7 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 		{
 			name: "add sms config twilio, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 					expectPush(
 						instance.NewSMSConfigTwilioAddedEvent(
@@ -82,7 +81,7 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:    tt.fields.eventstore,
+				eventstore:    tt.fields.eventstore(t),
 				idGenerator:   tt.fields.idGenerator,
 				smsEncryption: tt.fields.alg,
 			}
@@ -102,7 +101,7 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 
 func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
@@ -123,9 +122,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 		{
 			name: "id empty, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -138,8 +135,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 		{
 			name: "sms not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -156,8 +152,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 		{
 			name: "no changes, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewSMSConfigTwilioAddedEvent(
@@ -194,8 +189,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 		{
 			name: "sms config twilio change, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewSMSConfigTwilioAddedEvent(
@@ -243,7 +237,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.ChangeSMSConfigTwilio(tt.args.ctx, tt.args.instanceID, tt.args.id, tt.args.sms)
 			if tt.res.err == nil {
@@ -259,14 +253,223 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 	}
 }
 
-func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
+func TestCommandSide_AddSMSConfigHTTP(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore  *eventstore.Eventstore
+		idGenerator id.Generator
+		alg         crypto.EncryptionAlgorithm
+	}
+	type args struct {
+		ctx        context.Context
+		instanceID string
+		http       *AddSMSHTTP
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "add sms config http, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectPush(
+						instance.NewSMSConfigHTTPAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"providerid",
+							"endpoint",
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "providerid"),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				http: &AddSMSHTTP{
+					Endpoint: "endpoint",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:    tt.fields.eventstore,
+				idGenerator:   tt.fields.idGenerator,
+				smsEncryption: tt.fields.alg,
+			}
+			_, got, err := r.AddSMSConfigHTTP(tt.args.ctx, tt.args.instanceID, tt.args.http)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assertObjectDetails(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_ChangeSMSConfigHTTP(t *testing.T) {
+	type fields struct {
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
 		instanceID string
 		id         string
+		http       *ChangeSMSHTTP
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "id empty, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:  context.Background(),
+				http: &ChangeSMSHTTP{},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "sms not existing, not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				http:       &ChangeSMSHTTP{},
+				instanceID: "INSTANCE",
+				id:         "id",
+			},
+			res: res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			name: "no changes, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"providerid",
+								"endpoint",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				http: &ChangeSMSHTTP{
+					Endpoint: "endpoint",
+				},
+				instanceID: "INSTANCE",
+				id:         "providerid",
+			},
+			res: res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "sms config http change, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"providerid",
+								"endpoint",
+							),
+						),
+					),
+					expectPush(
+						newSMSConfigHTTPChangedEvent(
+							context.Background(),
+							"providerid",
+							"endpoint2",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				http: &ChangeSMSHTTP{
+					Endpoint: "endpoint2",
+				},
+				instanceID: "INSTANCE",
+				id:         "providerid",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			got, err := r.ChangeSMSConfigHTTP(tt.args.ctx, tt.args.instanceID, tt.args.id, tt.args.http)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assertObjectDetails(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
+	type fields struct {
+		eventstore func(*testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx         context.Context
+		instanceID  string
+		id          string
+		activatedID string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -281,9 +484,7 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 		{
 			name: "id empty, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -295,8 +496,7 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 		{
 			name: "sms not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -312,8 +512,7 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 		{
 			name: "sms config twilio activate, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewSMSConfigTwilioAddedEvent(
@@ -327,7 +526,7 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 						),
 					),
 					expectPush(
-						instance.NewSMSConfigTwilioActivatedEvent(
+						instance.NewSMSConfigActivatedEvent(
 							context.Background(),
 							&instance.NewAggregate("INSTANCE").Aggregate,
 							"providerid",
@@ -346,13 +545,106 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "sms config http activate, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"providerid",
+								"endpoint",
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMSConfigActivatedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"providerid",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "providerid",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "sms config http activate,with already active, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"activeproviderid",
+								"activeendpoint",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"activeproviderid",
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMSConfigDeactivatedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"activeproviderid",
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"providerid",
+								"endpoint",
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMSConfigActivatedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"providerid",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:         context.Background(),
+				instanceID:  "INSTANCE",
+				id:          "providerid",
+				activatedID: "activeproviderid",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
-			got, err := r.ActivateSMSConfig(tt.args.ctx, tt.args.instanceID, tt.args.id)
+			got, err := r.ActivateSMSConfig(tt.args.ctx, tt.args.instanceID, tt.args.id, tt.args.activatedID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -368,7 +660,7 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 
 func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
@@ -388,9 +680,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 		{
 			name: "id empty, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -402,8 +692,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 		{
 			name: "sms not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -419,8 +708,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 		{
 			name: "sms config twilio deactivate, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewSMSConfigTwilioAddedEvent(
@@ -433,7 +721,48 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							instance.NewSMSConfigTwilioActivatedEvent(
+							instance.NewSMSConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"providerid",
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMSConfigDeactivatedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"providerid",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "providerid",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "sms config http deactivate, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"providerid",
+								"endpoint",
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMSConfigActivatedEvent(
 								context.Background(),
 								&instance.NewAggregate("INSTANCE").Aggregate,
 								"providerid",
@@ -464,7 +793,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.DeactivateSMSConfig(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {
@@ -482,7 +811,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 
 func TestCommandSide_RemoveSMSConfig(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(*testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
@@ -502,9 +831,7 @@ func TestCommandSide_RemoveSMSConfig(t *testing.T) {
 		{
 			name: "id empty, invalid error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -516,8 +843,7 @@ func TestCommandSide_RemoveSMSConfig(t *testing.T) {
 		{
 			name: "sms not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -531,10 +857,9 @@ func TestCommandSide_RemoveSMSConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "sms config remove, ok",
+			name: "sms config remove, twilio, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewSMSConfigTwilioAddedEvent(
@@ -567,11 +892,45 @@ func TestCommandSide_RemoveSMSConfig(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "sms config remove, http, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMSConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"providerid",
+								"endpoint",
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMSConfigRemovedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"providerid",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				id:         "providerid",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.RemoveSMSConfig(tt.args.ctx, tt.args.instanceID, tt.args.id)
 			if tt.res.err == nil {
@@ -593,6 +952,18 @@ func newSMSConfigTwilioChangedEvent(ctx context.Context, id, sid, senderName str
 		instance.ChangeSMSConfigTwilioSenderNumber(senderName),
 	}
 	event, _ := instance.NewSMSConfigTwilioChangedEvent(ctx,
+		&instance.NewAggregate("INSTANCE").Aggregate,
+		id,
+		changes,
+	)
+	return event
+}
+
+func newSMSConfigHTTPChangedEvent(ctx context.Context, id, endpoint string) *instance.SMSConfigHTTPChangedEvent {
+	changes := []instance.SMSConfigHTTPChanges{
+		instance.ChangeSMSConfigHTTPEndpoint(endpoint),
+	}
+	event, _ := instance.NewSMSConfigHTTPChangedEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,
 		id,
 		changes,

@@ -32,12 +32,17 @@ type SMSConfig struct {
 	Sequence      uint64
 
 	TwilioConfig *Twilio
+	HTTPConfig   *HTTP
 }
 
 type Twilio struct {
 	SID          string
 	Token        *crypto.CryptoValue
 	SenderNumber string
+}
+
+type HTTP struct {
+	Endpoint string
 }
 
 type SMSConfigsSearchQueries struct {
@@ -115,6 +120,21 @@ var (
 	}
 )
 
+var (
+	smsHTTPConfigsTable = table{
+		name:          projection.SMSHTTPTable,
+		instanceIDCol: projection.SMSHTTPColumnInstanceID,
+	}
+	SMSHTTPConfigColumnSMSID = Column{
+		name:  projection.SMSHTTPConfigColumnSMSID,
+		table: smsHTTPConfigsTable,
+	}
+	SMSHTTPConfigColumnEndpoint = Column{
+		name:  projection.SMSHTTPConfigColumnEndpoint,
+		table: smsHTTPConfigsTable,
+	}
+)
+
 func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config *SMSConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
@@ -137,17 +157,15 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config 
 	return config, err
 }
 
-func (q *Queries) SMSProviderConfig(ctx context.Context, queries ...SearchQuery) (config *SMSConfig, err error) {
+func (q *Queries) SMSProviderConfigActive(ctx context.Context, instanceID string) (config *SMSConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	query, scan := prepareSMSConfigQuery(ctx, q.client)
-	for _, searchQuery := range queries {
-		query = searchQuery.toQuery(query)
-	}
 	stmt, args, err := query.Where(
 		sq.Eq{
-			SMSConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+			SMSConfigColumnInstanceID.identifier(): instanceID,
+			SMSConfigColumnState.identifier():      domain.SMSConfigStateActive,
 		},
 	).ToSql()
 	if err != nil {
@@ -203,13 +221,18 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			SMSTwilioConfigColumnSID.identifier(),
 			SMSTwilioConfigColumnToken.identifier(),
 			SMSTwilioConfigColumnSenderNumber.identifier(),
+
+			SMSHTTPConfigColumnSMSID.identifier(),
+			SMSHTTPConfigColumnEndpoint.identifier(),
 		).From(smsConfigsTable.identifier()).
-			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID)).
+			LeftJoin(join(SMSHTTPConfigColumnSMSID, SMSConfigColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*SMSConfig, error) {
 			config := new(SMSConfig)
 
 			var (
 				twilioConfig = sqlTwilioConfig{}
+				httpConfig   = sqlHTTPConfig{}
 			)
 
 			err := row.Scan(
@@ -225,6 +248,9 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				&twilioConfig.sid,
 				&twilioConfig.token,
 				&twilioConfig.senderNumber,
+
+				&httpConfig.smsID,
+				&httpConfig.endpoint,
 			)
 
 			if err != nil {
@@ -235,6 +261,7 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 			}
 
 			twilioConfig.set(config)
+			httpConfig.set(config)
 
 			return config, nil
 		}
@@ -254,9 +281,14 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			SMSTwilioConfigColumnSID.identifier(),
 			SMSTwilioConfigColumnToken.identifier(),
 			SMSTwilioConfigColumnSenderNumber.identifier(),
+
+			SMSHTTPConfigColumnSMSID.identifier(),
+			SMSHTTPConfigColumnEndpoint.identifier(),
+
 			countColumn.identifier(),
 		).From(smsConfigsTable.identifier()).
-			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID)).
+			LeftJoin(join(SMSHTTPConfigColumnSMSID, SMSConfigColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*SMSConfigs, error) {
 			configs := &SMSConfigs{Configs: []*SMSConfig{}}
 
@@ -264,6 +296,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				config := new(SMSConfig)
 				var (
 					twilioConfig = sqlTwilioConfig{}
+					httpConfig   = sqlHTTPConfig{}
 				)
 
 				err := row.Scan(
@@ -279,6 +312,10 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 					&twilioConfig.sid,
 					&twilioConfig.token,
 					&twilioConfig.senderNumber,
+
+					&httpConfig.smsID,
+					&httpConfig.endpoint,
+
 					&configs.Count,
 				)
 
@@ -287,6 +324,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 				}
 
 				twilioConfig.set(config)
+				httpConfig.set(config)
 
 				configs.Configs = append(configs.Configs, config)
 			}
@@ -310,5 +348,19 @@ func (c sqlTwilioConfig) set(smsConfig *SMSConfig) {
 		SID:          c.sid.String,
 		Token:        c.token,
 		SenderNumber: c.senderNumber.String,
+	}
+}
+
+type sqlHTTPConfig struct {
+	smsID    sql.NullString
+	endpoint sql.NullString
+}
+
+func (c sqlHTTPConfig) set(smsConfig *SMSConfig) {
+	if !c.smsID.Valid {
+		return
+	}
+	smsConfig.HTTPConfig = &HTTP{
+		Endpoint: c.endpoint.String,
 	}
 }

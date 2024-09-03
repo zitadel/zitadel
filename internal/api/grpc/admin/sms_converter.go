@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/query"
@@ -41,7 +42,18 @@ func SMSConfigToPb(config *query.SMSConfig) settings_pb.SMSConfig {
 	if config.TwilioConfig != nil {
 		return TwilioConfigToPb(config.TwilioConfig)
 	}
+	if config.HTTPConfig != nil {
+		return HTTPConfigToPb(config.HTTPConfig)
+	}
 	return nil
+}
+
+func HTTPConfigToPb(http *query.HTTP) *settings_pb.SMSProvider_Http {
+	return &settings_pb.SMSProvider_Http{
+		Http: &settings_pb.HTTPConfig{
+			Endpoint: http.Endpoint,
+		},
+	}
 }
 
 func TwilioConfigToPb(twilio *query.Twilio) *settings_pb.SMSProvider_Twilio {
@@ -76,5 +88,17 @@ func UpdateSMSConfigTwilioToConfig(req *admin_pb.UpdateSMSProviderTwilioRequest)
 	return &twilio.Config{
 		SID:          req.Sid,
 		SenderNumber: req.SenderNumber,
+	}
+}
+
+func AddSMSConfigTHTTPToConfig(req *admin_pb.AddSMSProviderHTTPRequest) *command.AddSMSHTTP {
+	return &command.AddSMSHTTP{
+		Endpoint: req.GetEndpoint(),
+	}
+}
+
+func UpdateSMSConfigHTTPToConfig(req *admin_pb.UpdateSMSProviderHTTPRequest) *command.ChangeSMSHTTP {
+	return &command.ChangeSMSHTTP{
+		Endpoint: req.GetEndpoint(),
 	}
 }
