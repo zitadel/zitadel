@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "./Alert";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
+import { registerUser } from "@/lib/server/register";
 
 type Inputs =
   | {
@@ -56,52 +57,36 @@ export default function SetPasswordForm({
 
   async function submitRegister(values: Inputs) {
     setLoading(true);
-    const res = await fetch("/api/registeruser", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        firstName: firstname,
-        lastName: lastname,
-        organization: organization,
-        authRequestId: authRequestId,
-        password: values.password,
-      }),
+    const response = await registerUser({
+      email: email,
+      firstName: firstname,
+      lastName: lastname,
+      organization: organization,
+      authRequestId: authRequestId,
+      password: values.password,
+    }).catch((error: Error) => {
+      setError(error.message ?? "Could not register user");
     });
+
     setLoading(false);
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.details);
+
+    if (!response) {
+      setError("Could not register user");
+      return;
     }
-    return res.json();
-  }
+    const params: any = { userId: response.userId };
 
-  function submitAndLink(value: Inputs): Promise<boolean | void> {
-    return submitRegister(value)
-      .then((registerResponse) => {
-        setError("");
+    if (authRequestId) {
+      params.authRequestId = authRequestId;
+    }
+    if (organization) {
+      params.organization = organization;
+    }
+    if (response && response.sessionId) {
+      params.sessionId = response.sessionId;
+    }
 
-        setLoading(false);
-        const params: any = { userId: registerResponse.userId };
-
-        if (authRequestId) {
-          params.authRequestId = authRequestId;
-        }
-        if (organization) {
-          params.organization = organization;
-        }
-        if (registerResponse && registerResponse.sessionId) {
-          params.sessionId = registerResponse.sessionId;
-        }
-
-        return router.push(`/verify?` + new URLSearchParams(params));
-      })
-      .catch((errorDetails: Error) => {
-        setLoading(false);
-        setError(errorDetails.message);
-      });
+    return router.push(`/verify?` + new URLSearchParams(params));
   }
 
   const { errors } = formState;
@@ -177,7 +162,7 @@ export default function SetPasswordForm({
             !formState.isValid ||
             watchPassword !== watchConfirmPassword
           }
-          onClick={handleSubmit(submitAndLink)}
+          onClick={handleSubmit(submitRegister)}
         >
           {loading && <Spinner className="h-5 w-5 mr-2" />}
           continue

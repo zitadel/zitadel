@@ -17,6 +17,7 @@ import {
 import { create } from "@zitadel/client";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { updateSession } from "@/lib/server/session";
+import { resetPassword } from "@/lib/server/password";
 
 type Inputs = {
   password: string;
@@ -24,7 +25,7 @@ type Inputs = {
 
 type Props = {
   loginSettings: LoginSettings | undefined;
-  loginName?: string;
+  loginName: string;
   organization?: string;
   authRequestId?: string;
   isAlternative?: boolean; // whether password was requested as alternative auth method
@@ -69,30 +70,20 @@ export default function PasswordForm({
     return response;
   }
 
-  async function resetPassword() {
+  async function resetPasswordAndContinue() {
     setError("");
     setLoading(true);
 
-    const res = await fetch("/api/resetpassword", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        loginName,
-        organization,
-        authRequestId,
-      }),
+    const response = await resetPassword({
+      loginName,
+      organization,
+    }).catch((error: Error) => {
+      setLoading(false);
+      setError(error.message ?? "Could not reset password");
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      console.log(response.details.details);
-      setError(response.details?.details ?? "Could not verify password");
-      return Promise.reject(response.details);
-    }
+
     return response;
   }
 
@@ -237,7 +228,7 @@ export default function PasswordForm({
         />
         <button
           className="transition-all text-sm hover:text-primary-light-500 dark:hover:text-primary-dark-500"
-          onClick={() => resetPassword()}
+          onClick={() => resetPasswordAndContinue()}
           type="button"
           disabled={loading}
         >

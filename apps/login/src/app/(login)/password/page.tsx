@@ -31,7 +31,7 @@ export default async function Page({
         <h1>{sessionFactors?.factors?.user?.displayName ?? "Password"}</h1>
         <p className="ztdl-p mb-6 block">Enter your password.</p>
 
-        {!sessionFactors && (
+        {(!sessionFactors || !loginName) && (
           <div className="py-4">
             <Alert>
               Could not get the context of the user. Make sure to enter the
@@ -49,14 +49,16 @@ export default async function Page({
           ></UserAvatar>
         )}
 
-        <PasswordForm
-          loginName={loginName}
-          authRequestId={authRequestId}
-          organization={organization}
-          loginSettings={loginSettings}
-          promptPasswordless={promptPasswordless === "true"}
-          isAlternative={alt === "true"}
-        />
+        {loginName && (
+          <PasswordForm
+            loginName={loginName}
+            authRequestId={authRequestId}
+            organization={organization}
+            loginSettings={loginSettings}
+            promptPasswordless={promptPasswordless === "true"}
+            isAlternative={alt === "true"}
+          />
+        )}
       </div>
     </DynamicTheme>
   );
