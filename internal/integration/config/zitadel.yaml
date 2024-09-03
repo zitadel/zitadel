@@ -33,11 +33,10 @@ LogStore:
 Projections:
   HandleActiveInstances: 30m
   RequeueEvery: 5s
-  TransactionDuration: 5s
+  TransactionDuration: 1m
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
-      HandleActiveInstances: 60s
     Telemetry:
       MaxFailureCount: 0
       RequeueEvery: 10s
