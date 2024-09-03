@@ -176,6 +176,10 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemActionsEventType, true,
 					),
+					feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemOIDCSingleV1SessionTerminationEventType, true,
+					),
 				),
 			),
 			args: args{context.Background(), &SystemFeatures{
@@ -184,6 +188,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
 				Actions:                         gu.Ptr(true),
+				OIDCSingleV1SessionTermination:  gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",
@@ -232,6 +237,10 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 						context.Background(), aggregate,
 						feature_v2.SystemActionsEventType, false,
 					),
+					feature_v2.NewSetEvent[bool](
+						context.Background(), aggregate,
+						feature_v2.SystemOIDCSingleV1SessionTerminationEventType, false,
+					),
 				),
 			),
 			args: args{context.Background(), &SystemFeatures{
@@ -240,6 +249,7 @@ func TestCommands_SetSystemFeatures(t *testing.T) {
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
 				Actions:                         gu.Ptr(false),
+				OIDCSingleV1SessionTermination:  gu.Ptr(false),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "SYSTEM",

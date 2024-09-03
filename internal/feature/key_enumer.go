@@ -34,10 +34,10 @@ func _KeyNoOp() {
 	_ = x[KeyImprovedPerformance-(7)]
 	_ = x[KeyWebKey-(8)]
 	_ = x[KeyDebugOIDCParentError-(9)]
-	_ = x[KeyTerminateSingleV1Session-(10)]
+	_ = x[KeyOIDCSingleV1SessionTermination-(10)]
 }
 
-var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActions, KeyImprovedPerformance, KeyWebKey, KeyDebugOIDCParentError, KeyTerminateSingleV1Session}
+var _KeyValues = []Key{KeyUnspecified, KeyLoginDefaultOrg, KeyTriggerIntrospectionProjections, KeyLegacyIntrospection, KeyUserSchema, KeyTokenExchange, KeyActions, KeyImprovedPerformance, KeyWebKey, KeyDebugOIDCParentError, KeyOIDCSingleV1SessionTermination}
 
 var _KeyNameToValueMap = map[string]Key{
 	_KeyName[0:11]:         KeyUnspecified,
@@ -60,8 +60,8 @@ var _KeyNameToValueMap = map[string]Key{
 	_KeyLowerName[133:140]: KeyWebKey,
 	_KeyName[140:163]:      KeyDebugOIDCParentError,
 	_KeyLowerName[140:163]: KeyDebugOIDCParentError,
-	_KeyName[163:190]:      KeyTerminateSingleV1Session,
-	_KeyLowerName[163:190]: KeyTerminateSingleV1Session,
+	_KeyName[163:190]:      KeyOIDCSingleV1SessionTermination,
+	_KeyLowerName[163:190]: KeyOIDCSingleV1SessionTermination,
 }
 
 var _KeyNames = []string{

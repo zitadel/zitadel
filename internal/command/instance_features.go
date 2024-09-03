@@ -25,7 +25,7 @@ type InstanceFeatures struct {
 	ImprovedPerformance             []feature.ImprovedPerformanceType
 	WebKey                          *bool
 	DebugOIDCParentError            *bool
-	TerminateSingleV1Session        *bool
+	OIDCSingleV1SessionTermination  *bool
 }
 
 func (m *InstanceFeatures) isEmpty() bool {
@@ -39,7 +39,7 @@ func (m *InstanceFeatures) isEmpty() bool {
 		m.ImprovedPerformance == nil &&
 		m.WebKey == nil &&
 		m.DebugOIDCParentError == nil &&
-		m.TerminateSingleV1Session == nil
+		m.OIDCSingleV1SessionTermination == nil
 }
 
 func (c *Commands) SetInstanceFeatures(ctx context.Context, f *InstanceFeatures) (*domain.ObjectDetails, error) {
