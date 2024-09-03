@@ -29,12 +29,12 @@ type CreateNewSessionCommand = {
   userId: string;
   idpIntent: {
     idpIntentId: string;
-    idpIntentType: string;
+    idpIntentToken: string;
   };
-  loginName: string;
-  password: string;
-  organization: string;
-  authRequestId: string;
+  loginName?: string;
+  password?: string;
+  organization?: string;
+  authRequestId?: string;
 };
 
 export async function createNewSession(options: CreateNewSessionCommand) {
@@ -54,7 +54,7 @@ export async function createNewSession(options: CreateNewSessionCommand) {
       organization,
       authRequestId,
     );
-  } else {
+  } else if (loginName) {
     return createSessionAndUpdateCookie(
       loginName,
       password,
@@ -62,6 +62,8 @@ export async function createNewSession(options: CreateNewSessionCommand) {
       organization,
       authRequestId,
     );
+  } else {
+    throw new Error("No userId or loginName provided");
   }
 }
 
@@ -69,7 +71,7 @@ export type UpdateSessionCommand = {
   loginName?: string;
   sessionId?: string;
   organization?: string;
-  checks: Checks;
+  checks?: Checks;
   authRequestId?: string;
   challenges?: RequestChallenges;
 };
@@ -177,4 +179,22 @@ export async function clearSession(options: ClearSessionOptions) {
   if (deletedSession) {
     return removeSessionFromCookie(session);
   }
+}
+
+type CleanupSessionCommand = {
+  sessionId: string;
+};
+export async function cleanupSession({ sessionId }: CleanupSessionCommand) {
+  const sessionCookie = await getSessionCookieById({ sessionId });
+
+  const deleteResponse = await deleteSession(
+    sessionCookie.id,
+    sessionCookie.token,
+  );
+
+  if (!deleteResponse) {
+    throw new Error("Could not delete session");
+  }
+
+  return removeSessionFromCookie(sessionCookie);
 }

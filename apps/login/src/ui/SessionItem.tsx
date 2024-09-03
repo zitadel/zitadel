@@ -7,6 +7,8 @@ import moment from "moment";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { timestampDate } from "@zitadel/client";
+import { deleteSession } from "@/lib/zitadel";
+import { cleanupSession } from "@/lib/server/session";
 
 export default function SessionItem({
   session,
@@ -21,25 +23,14 @@ export default function SessionItem({
 
   async function clearSession(id: string) {
     setLoading(true);
-    const res = await fetch("/api/session?" + new URLSearchParams({ id }), {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: id,
-      }),
+    const response = await cleanupSession({
+      sessionId: id,
+    }).catch((error) => {
+      setError(error.message);
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      //   setError(response.details);
-      return Promise.reject(response);
-    } else {
-      return response;
-    }
+    return response;
   }
 
   const validPassword = session?.factors?.password?.verifiedAt;
@@ -50,6 +41,8 @@ export default function SessionItem({
 
   const validDate = validPassword || validPasskey;
   const validUser = (validPassword || validPasskey) && stillValid;
+
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <Link

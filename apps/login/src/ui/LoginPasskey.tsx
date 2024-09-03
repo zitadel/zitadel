@@ -8,6 +8,12 @@ import Alert from "./Alert";
 import { Spinner } from "./Spinner";
 import BackButton from "./BackButton";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { updateSession } from "@/lib/server/session";
+import {
+  RequestChallengesSchema,
+  UserVerificationRequirement,
+} from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { create } from "@zitadel/client";
 
 // either loginName or sessionId must be provided
 type Props = {
@@ -42,8 +48,8 @@ export default function LoginPasskey({
       updateSessionForChallenge()
         .then((response) => {
           const pK =
-            response.challenges.webAuthN.publicKeyCredentialRequestOptions
-              .publicKey;
+            response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions
+              ?.publicKey;
           if (pK) {
             submitLoginAndContinue(pK)
               .then(() => {
@@ -66,65 +72,46 @@ export default function LoginPasskey({
   }, []);
 
   async function updateSessionForChallenge(
-    userVerificationRequirement: number = login ? 1 : 3,
+    userVerificationRequirement: number = login
+      ? UserVerificationRequirement.REQUIRED
+      : UserVerificationRequirement.DISCOURAGED,
   ) {
     setLoading(true);
-    const res = await fetch("/api/session", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        loginName,
-        sessionId,
-        organization,
-        challenges: {
-          webAuthN: {
-            domain: "",
-            // USER_VERIFICATION_REQUIREMENT_UNSPECIFIED = 0;
-            // USER_VERIFICATION_REQUIREMENT_REQUIRED = 1; - passkey login
-            // USER_VERIFICATION_REQUIREMENT_PREFERRED = 2;
-            // USER_VERIFICATION_REQUIREMENT_DISCOURAGED = 3; - mfa
-            userVerificationRequirement: userVerificationRequirement,
-          },
+    const session = await updateSession({
+      loginName,
+      sessionId,
+      organization,
+      challenges: create(RequestChallengesSchema, {
+        webAuthN: {
+          domain: "",
+          userVerificationRequirement,
         },
-        authRequestId,
       }),
+      authRequestId,
+    }).catch((error: Error) => {
+      setError(error.message);
     });
-
     setLoading(false);
-    if (!res.ok) {
-      const error = await res.json();
-      throw error.details.details;
-    }
-    return res.json();
+
+    return session;
   }
 
   async function submitLogin(data: any) {
     setLoading(true);
-    const res = await fetch("/api/session", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        loginName,
-        sessionId,
-        organization,
-        checks: {
-          webAuthN: { credentialAssertionData: data },
-        } as Checks,
-        authRequestId,
-      }),
+    const response = await updateSession({
+      loginName,
+      sessionId,
+      organization,
+      checks: {
+        webAuthN: { credentialAssertionData: data },
+      } as Checks,
+      authRequestId,
+    }).catch((error: Error) => {
+      setError(error.message);
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      setError(response.details);
-      return Promise.reject(response.details);
-    }
+
     return response;
   }
 
@@ -183,19 +170,16 @@ export default function LoginPasskey({
                   }),
               );
             } else {
-              return router.push(
-                `/signedin?` +
-                  new URLSearchParams(
-                    authRequestId
-                      ? {
-                          loginName: resp.factors.user.loginName,
-                          authRequestId,
-                        }
-                      : {
-                          loginName: resp.factors.user.loginName,
-                        },
-                  ),
-              );
+              const params = new URLSearchParams({});
+
+              if (authRequestId) {
+                params.set("authRequestId", authRequestId);
+              }
+              if (resp?.factors?.user?.loginName) {
+                params.set("loginName", resp.factors.user.loginName);
+              }
+
+              return router.push(`/signedin?` + params);
             }
           });
         } else {

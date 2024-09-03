@@ -195,9 +195,9 @@ export type SessionWithChallenges = Session & {
 
 export async function setSessionAndUpdateCookie(
   recentCookie: CustomCookieData,
-  checks: Checks,
-  challenges: RequestChallenges | undefined,
-  authRequestId: string | undefined,
+  checks?: Checks,
+  challenges?: RequestChallenges,
+  authRequestId?: string,
 ) {
   return setSession(
     recentCookie.id,

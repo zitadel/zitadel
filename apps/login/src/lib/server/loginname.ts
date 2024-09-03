@@ -18,8 +18,6 @@ export type SendLoginnameCommand = {
   organization?: string;
 };
 
-export const UserNotFound = Error("Could not find user");
-
 export async function sendLoginname(options: SendLoginnameCommand) {
   const { loginName, authRequestId, organization } = options;
   const users = await listUsers({
@@ -94,7 +92,7 @@ export async function sendLoginname(options: SendLoginnameCommand) {
         }
       });
     } else {
-      throw UserNotFound;
+      throw Error("Could not find user");
     }
   } else if (
     loginSettings?.allowRegister &&
@@ -116,5 +114,5 @@ export async function sendLoginname(options: SendLoginnameCommand) {
     return redirect(registerUrl.toString());
   }
 
-  throw UserNotFound;
+  throw Error("Could not find user");
 }

@@ -157,8 +157,6 @@ export default function RegisterPasskey({
     }
   }
 
-  const { errors } = formState;
-
   return (
     <form className="w-full">
       {error && (
