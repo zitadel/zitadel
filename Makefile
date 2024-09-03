@@ -101,7 +101,7 @@ console_build: console_dependencies console_client
 	yarn build
 
 .PHONY: clean
-clean: core_integration_clean
+clean:
 	$(RM) -r .artifacts/grpc
 	$(RM) $(gen_authopt_path)
 	$(RM) $(gen_zitadel_path)
