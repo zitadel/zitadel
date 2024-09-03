@@ -1469,6 +1469,8 @@
       "USERSCHEMAS_DESCRIPTION": "Esquemas de Usuário permitem gerenciar esquemas de dados do usuário. Se o sinalizador estiver ativado, você poderá usar a nova API e seus recursos.",
       "ACTIONS": "Ações",
       "ACTIONS_DESCRIPTION": "Actions v2 permitem gerenciar execuções e destinos de dados. Se a flag estiver habilitada, você poderá usar a nova API e seus recursos.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Término de sessão",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Se a bandeira estiver habilitada, você poderá encerrar uma sessão única da interface do usuário de login fornecendo um id_token com uma reivindicação `sid como id_token_hint no ponto final de end_session. Observe que atualmente todas as sessões do mesmo agente de usuário (navegador) são encerradas na interface do usuário de login. As sessões gerenciadas por meio da API de sessão já permitem o encerramento de sessões individuais.",
       "STATES": {
         "INHERITED": "Herdade",
         "ENABLED": "Habilitado",

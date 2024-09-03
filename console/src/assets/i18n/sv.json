@@ -1472,6 +1472,8 @@
       "USERSCHEMA_DESCRIPTION": "Användarscheman tillåter att hantera datascheman för användare. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "ACTIONS": "Åtgärder",
       "ACTIONS_DESCRIPTION": "Åtgärder v2 tillåter att hantera dataexekveringar och mål. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session avslutning",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
       "STATES": {
         "INHERITED": "Ärv",
         "ENABLED": "Aktiverad",
