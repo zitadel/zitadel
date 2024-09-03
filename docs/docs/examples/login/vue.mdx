@@ -85,20 +85,20 @@ https://github.com/zitadel/zitadel-vue/blob/main/src/main.ts
 The restricted admin view will only be shown if the user is authenticated and has the role "admin" in the apps project in ZITADEL.
 
 ```ts reference
-https://github.com/zitadel/zitadel-vue/blob/main/src/views/Admin.vue
+https://github.com/zitadel/zitadel-vue/blob/main/src/views/AdminView.vue
 ```
 
 The restricted login view is shown to all authenticated users.
 It prints all the information it gets from the token and from the user info endpoint.
 
 ```ts reference
-https://github.com/zitadel/zitadel-vue/blob/main/src/views/Login.vue
+https://github.com/zitadel/zitadel-vue/blob/main/src/views/LoginView.vue
 ```
 
 The public no access view is shown to authenticated users who navigate to a page they don't have access to based on their roles.
 
 ```ts reference
-https://github.com/zitadel/zitadel-vue/blob/main/src/views/NoAccess.vue
+https://github.com/zitadel/zitadel-vue/blob/main/src/views/NoAccessView.vue
 ```
 
 ### Add protected routes to your new pages as well as a Signout link
