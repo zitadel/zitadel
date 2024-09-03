@@ -245,6 +245,7 @@ RegistrationUser:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   GenderLabel: 性別
   Female: 女性
   Male: 男性
@@ -285,6 +286,7 @@ ExternalRegistrationUserOverview:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
   TosAndPrivacyLabel: 利用規約
   TosConfirm: 私は利用規約を承諾します。
   TosLinkText: TOS
@@ -359,6 +361,7 @@ ExternalNotFound:
   Russian: Русский
   Dutch: Nederlands
   Swedish: Svenska
+  Indonesian: Bahasa Indonesia
 
 DeviceAuth:
   Title: デバイス認証
