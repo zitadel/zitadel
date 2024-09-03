@@ -16,6 +16,7 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	http_utils "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/api/http/middleware"
+	"github.com/zitadel/zitadel/internal/auth/repository/eventsourcing/handler"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
@@ -250,8 +251,8 @@ func (o *OPStorage) TerminateSessionFromRequest(ctx context.Context, endSessionR
 		return endSessionRequest.RedirectURI, o.TerminateSession(ctx, endSessionRequest.UserID, endSessionRequest.ClientID)
 	}
 
-	// If the sessionID is not prefixed by V2, we also terminate a v1 session.
-	if !strings.HasPrefix(endSessionRequest.IDTokenHintClaims.SessionID, command.IDPrefixV2) {
+	// If the sessionID is prefixed by V1, we also terminate a v1 session.
+	if strings.HasPrefix(endSessionRequest.IDTokenHintClaims.SessionID, handler.IDPrefixV1) {
 		err = o.terminateV1Session(ctx, endSessionRequest.UserID, endSessionRequest.IDTokenHintClaims.SessionID)
 		if err != nil {
 			return "", err
