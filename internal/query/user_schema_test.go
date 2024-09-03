@@ -15,19 +15,21 @@ import (
 )
 
 var (
-	prepareUserSchemasStmt = `SELECT projections.user_schemas.id,` +
-		` projections.user_schemas.change_date,` +
-		` projections.user_schemas.sequence,` +
-		` projections.user_schemas.instance_id,` +
-		` projections.user_schemas.state,` +
-		` projections.user_schemas.type,` +
-		` projections.user_schemas.revision,` +
-		` projections.user_schemas.schema,` +
-		` projections.user_schemas.possible_authenticators,` +
+	prepareUserSchemasStmt = `SELECT projections.user_schemas1.id,` +
+		` projections.user_schemas1.creation_date,` +
+		` projections.user_schemas1.change_date,` +
+		` projections.user_schemas1.sequence,` +
+		` projections.user_schemas1.instance_id,` +
+		` projections.user_schemas1.state,` +
+		` projections.user_schemas1.type,` +
+		` projections.user_schemas1.revision,` +
+		` projections.user_schemas1.schema,` +
+		` projections.user_schemas1.possible_authenticators,` +
 		` COUNT(*) OVER ()` +
 		` FROM projections.user_schemas`
 	prepareUserSchemasCols = []string{
 		"id",
+		"creation_date",
 		"change_date",
 		"sequence",
 		"instance_id",
@@ -39,18 +41,20 @@ var (
 		"count",
 	}
 
-	prepareUserSchemaStmt = `SELECT projections.user_schemas.id,` +
-		` projections.user_schemas.change_date,` +
-		` projections.user_schemas.sequence,` +
-		` projections.user_schemas.instance_id,` +
-		` projections.user_schemas.state,` +
-		` projections.user_schemas.type,` +
-		` projections.user_schemas.revision,` +
-		` projections.user_schemas.schema,` +
-		` projections.user_schemas.possible_authenticators` +
+	prepareUserSchemaStmt = `SELECT projections.user_schemas1.id,` +
+		` projections.user_schemas1.creation_date,` +
+		` projections.user_schemas1.change_date,` +
+		` projections.user_schemas1.sequence,` +
+		` projections.user_schemas1.instance_id,` +
+		` projections.user_schemas1.state,` +
+		` projections.user_schemas1.type,` +
+		` projections.user_schemas1.revision,` +
+		` projections.user_schemas1.schema,` +
+		` projections.user_schemas1.possible_authenticators` +
 		` FROM projections.user_schemas`
 	prepareUserSchemaCols = []string{
 		"id",
+		"creation_date",
 		"change_date",
 		"sequence",
 		"instance_id",
@@ -96,6 +100,7 @@ func Test_UserSchemaPrepares(t *testing.T) {
 						{
 							"id",
 							testNow,
+							testNow,
 							uint64(20211109),
 							"instance-id",
 							domain.UserSchemaStateActive,
@@ -113,9 +118,10 @@ func Test_UserSchemaPrepares(t *testing.T) {
 				},
 				UserSchemas: []*UserSchema{
 					{
-						ID: "id",
 						ObjectDetails: domain.ObjectDetails{
+							ID:            "id",
 							EventDate:     testNow,
+							CreationDate:  testNow,
 							Sequence:      20211109,
 							ResourceOwner: "instance-id",
 						},
@@ -139,6 +145,7 @@ func Test_UserSchemaPrepares(t *testing.T) {
 						{
 							"id-1",
 							testNow,
+							testNow,
 							uint64(20211109),
 							"instance-id",
 							domain.UserSchemaStateActive,
@@ -149,6 +156,7 @@ func Test_UserSchemaPrepares(t *testing.T) {
 						},
 						{
 							"id-2",
+							testNow,
 							testNow,
 							uint64(20211110),
 							"instance-id",
@@ -167,9 +175,10 @@ func Test_UserSchemaPrepares(t *testing.T) {
 				},
 				UserSchemas: []*UserSchema{
 					{
-						ID: "id-1",
 						ObjectDetails: domain.ObjectDetails{
+							ID:            "id-1",
 							EventDate:     testNow,
+							CreationDate:  testNow,
 							Sequence:      20211109,
 							ResourceOwner: "instance-id",
 						},
@@ -180,9 +189,10 @@ func Test_UserSchemaPrepares(t *testing.T) {
 						PossibleAuthenticators: database.NumberArray[domain.AuthenticatorType]{domain.AuthenticatorTypeUsername, domain.AuthenticatorTypePassword},
 					},
 					{
-						ID: "id-2",
 						ObjectDetails: domain.ObjectDetails{
+							ID:            "id-2",
 							EventDate:     testNow,
+							CreationDate:  testNow,
 							Sequence:      20211110,
 							ResourceOwner: "instance-id",
 						},
@@ -240,6 +250,7 @@ func Test_UserSchemaPrepares(t *testing.T) {
 					[]driver.Value{
 						"id",
 						testNow,
+						testNow,
 						uint64(20211109),
 						"instance-id",
 						domain.UserSchemaStateActive,
@@ -251,9 +262,10 @@ func Test_UserSchemaPrepares(t *testing.T) {
 				),
 			},
 			object: &UserSchema{
-				ID: "id",
 				ObjectDetails: domain.ObjectDetails{
+					ID:            "id",
 					EventDate:     testNow,
+					CreationDate:  testNow,
 					Sequence:      20211109,
 					ResourceOwner: "instance-id",
 				},

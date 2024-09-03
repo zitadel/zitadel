@@ -10,12 +10,10 @@ import (
 )
 
 const (
-	APIConfigAddedType                = applicationEventTypePrefix + "config.api.added"
-	APIConfigChangedType              = applicationEventTypePrefix + "config.api.changed"
-	APIConfigSecretChangedType        = applicationEventTypePrefix + "config.api.secret.changed"
-	APIClientSecretCheckSucceededType = applicationEventTypePrefix + "api.secret.check.succeeded"
-	APIClientSecretCheckFailedType    = applicationEventTypePrefix + "api.secret.check.failed"
-	APIConfigSecretHashUpdatedType    = applicationEventTypePrefix + "config.api.secret.updated"
+	APIConfigAddedType             = applicationEventTypePrefix + "config.api.added"
+	APIConfigChangedType           = applicationEventTypePrefix + "config.api.changed"
+	APIConfigSecretChangedType     = applicationEventTypePrefix + "config.api.secret.changed"
+	APIConfigSecretHashUpdatedType = applicationEventTypePrefix + "config.api.secret.updated"
 )
 
 type APIConfigAddedEvent struct {
@@ -197,90 +195,6 @@ func APIConfigSecretChangedEventMapper(event eventstore.Event) (eventstore.Event
 	err := event.Unmarshal(e)
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "API-M893d", "unable to unmarshal api config")
-	}
-
-	return e, nil
-}
-
-type APIConfigSecretCheckSucceededEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	AppID string `json:"appId"`
-}
-
-func (e *APIConfigSecretCheckSucceededEvent) Payload() interface{} {
-	return e
-}
-
-func (e *APIConfigSecretCheckSucceededEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
-}
-
-func NewAPIConfigSecretCheckSucceededEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	appID string,
-) *APIConfigSecretCheckSucceededEvent {
-	return &APIConfigSecretCheckSucceededEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			APIClientSecretCheckSucceededType,
-		),
-		AppID: appID,
-	}
-}
-
-func APIConfigSecretCheckSucceededEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &APIConfigSecretCheckSucceededEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "API-837gV", "unable to unmarshal api config")
-	}
-
-	return e, nil
-}
-
-type APIConfigSecretCheckFailedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-
-	AppID string `json:"appId"`
-}
-
-func (e *APIConfigSecretCheckFailedEvent) Payload() interface{} {
-	return e
-}
-
-func (e *APIConfigSecretCheckFailedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
-	return nil
-}
-
-func NewAPIConfigSecretCheckFailedEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-	appID string,
-) *APIConfigSecretCheckFailedEvent {
-	return &APIConfigSecretCheckFailedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
-			ctx,
-			aggregate,
-			APIClientSecretCheckFailedType,
-		),
-		AppID: appID,
-	}
-}
-
-func APIConfigSecretCheckFailedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	e := &APIConfigSecretCheckFailedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-
-	err := event.Unmarshal(e)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "API-987g%", "unable to unmarshal api config")
 	}
 
 	return e, nil
