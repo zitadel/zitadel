@@ -412,6 +412,7 @@ func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) 
 			IsCreationAllowed: true,
 			IsAutoCreation:    true,
 			IsAutoUpdate:      true,
+			AutoLinking:       idp.AutoLinkingOption_AUTO_LINKING_OPTION_USERNAME,
 		},
 	})
 	logging.OnError(err).Panic("create generic OAuth idp")
