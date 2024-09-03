@@ -9,6 +9,7 @@ import Alert from "./Alert";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
 import BackButton from "./BackButton";
 import { RegisterPasskeyResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { registerPasskeyLink, verifyPasskey } from "@/lib/server/passkeys";
 
 type Inputs = {};
 
@@ -35,29 +36,6 @@ export default function RegisterPasskey({
 
   const router = useRouter();
 
-  async function submitRegister() {
-    setError("");
-    setLoading(true);
-    const res = await fetch("/api/passkeys", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        sessionId,
-      }),
-    });
-
-    const response = await res.json();
-
-    setLoading(false);
-    if (!res.ok) {
-      setError(response.details);
-      return Promise.reject(response.details);
-    }
-    return response;
-  }
-
   async function submitVerify(
     passkeyId: string,
     passkeyName: string,
@@ -65,118 +43,118 @@ export default function RegisterPasskey({
     sessionId: string,
   ) {
     setLoading(true);
-    const res = await fetch("/api/passkeys/verify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        passkeyId,
-        passkeyName,
-        publicKeyCredential,
-        sessionId,
-      }),
+    const response = await verifyPasskey({
+      passkeyId,
+      passkeyName,
+      publicKeyCredential,
+      sessionId,
+    }).catch((error: Error) => {
+      setError(error.message);
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      setError(response.details);
-      return Promise.reject(response.details);
-    }
     return response;
   }
 
-  function submitRegisterAndContinue(value: Inputs): Promise<boolean | void> {
-    return submitRegister().then((resp: RegisterPasskeyResponse) => {
-      const passkeyId = resp.passkeyId;
-      const options: CredentialCreationOptions =
-        (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
-        {};
-
-      if (options?.publicKey) {
-        options.publicKey.challenge = coerceToArrayBuffer(
-          options.publicKey.challenge,
-          "challenge",
-        );
-        options.publicKey.user.id = coerceToArrayBuffer(
-          options.publicKey.user.id,
-          "userid",
-        );
-        if (options.publicKey.excludeCredentials) {
-          options.publicKey.excludeCredentials.map((cred: any) => {
-            cred.id = coerceToArrayBuffer(
-              cred.id as string,
-              "excludeCredentials.id",
-            );
-            return cred;
-          });
-        }
-
-        navigator.credentials
-          .create(options)
-          .then((resp) => {
-            if (
-              resp &&
-              (resp as any).response.attestationObject &&
-              (resp as any).response.clientDataJSON &&
-              (resp as any).rawId
-            ) {
-              const attestationObject = (resp as any).response
-                .attestationObject;
-              const clientDataJSON = (resp as any).response.clientDataJSON;
-              const rawId = (resp as any).rawId;
-
-              const data = {
-                id: resp.id,
-                rawId: coerceToBase64Url(rawId, "rawId"),
-                type: resp.type,
-                response: {
-                  attestationObject: coerceToBase64Url(
-                    attestationObject,
-                    "attestationObject",
-                  ),
-                  clientDataJSON: coerceToBase64Url(
-                    clientDataJSON,
-                    "clientDataJSON",
-                  ),
-                },
-              };
-
-              return submitVerify(passkeyId, "", data, sessionId).then(() => {
-                const params = new URLSearchParams();
-
-                if (organization) {
-                  params.set("organization", organization);
-                }
-
-                if (authRequestId) {
-                  params.set("authRequestId", authRequestId);
-                  params.set("sessionId", sessionId);
-                  // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
-                  // params.set("loginName", resp.loginName);
-
-                  router.push("/passkey/login?" + params);
-                } else {
-                  router.push("/accounts?" + params);
-                }
-              });
-            } else {
-              setLoading(false);
-              setError("An error on registering passkey");
-              return null;
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            setLoading(false);
-            setError(error);
-
-            return null;
-          });
-      }
+  async function submitRegisterAndContinue(): Promise<boolean | void> {
+    setLoading(true);
+    const resp = await registerPasskeyLink({
+      sessionId,
+    }).catch((error: Error) => {
+      setError(error.message);
+      setLoading(false);
     });
+    setLoading(false);
+
+    if (!resp) {
+      setError("An error on registering passkey");
+      return;
+    }
+
+    const passkeyId = resp.passkeyId;
+    const options: CredentialCreationOptions =
+      (resp.publicKeyCredentialCreationOptions as CredentialCreationOptions) ??
+      {};
+
+    if (!options.publicKey) {
+      setError("An error on registering passkey");
+      return;
+    }
+    options.publicKey.challenge = coerceToArrayBuffer(
+      options.publicKey.challenge,
+      "challenge",
+    );
+    options.publicKey.user.id = coerceToArrayBuffer(
+      options.publicKey.user.id,
+      "userid",
+    );
+    if (options.publicKey.excludeCredentials) {
+      options.publicKey.excludeCredentials.map((cred: any) => {
+        cred.id = coerceToArrayBuffer(
+          cred.id as string,
+          "excludeCredentials.id",
+        );
+        return cred;
+      });
+    }
+
+    const credentials = await navigator.credentials.create(options);
+
+    if (
+      !credentials ||
+      !(credentials as any).response?.attestationObject ||
+      !(credentials as any).response?.clientDataJSON ||
+      !(credentials as any).rawId
+    ) {
+      setError("An error on registering passkey");
+      return;
+    }
+
+    const attestationObject = (credentials as any).response.attestationObject;
+    const clientDataJSON = (credentials as any).response.clientDataJSON;
+    const rawId = (credentials as any).rawId;
+
+    const data = {
+      id: credentials.id,
+      rawId: coerceToBase64Url(rawId, "rawId"),
+      type: credentials.type,
+      response: {
+        attestationObject: coerceToBase64Url(
+          attestationObject,
+          "attestationObject",
+        ),
+        clientDataJSON: coerceToBase64Url(clientDataJSON, "clientDataJSON"),
+      },
+    };
+
+    const verificationResponse = await submitVerify(
+      passkeyId,
+      "",
+      data,
+      sessionId,
+    );
+
+    if (!verificationResponse) {
+      setError("Could not verify Passkey!");
+      return;
+    }
+
+    const params = new URLSearchParams();
+
+    if (organization) {
+      params.set("organization", organization);
+    }
+
+    if (authRequestId) {
+      params.set("authRequestId", authRequestId);
+      params.set("sessionId", sessionId);
+      // params.set("altPassword", ${false}); // without setting altPassword this does not allow password
+      // params.set("loginName", resp.loginName);
+
+      router.push("/passkey/login?" + params);
+    } else {
+      router.push("/accounts?" + params);
+    }
   }
 
   const { errors } = formState;
