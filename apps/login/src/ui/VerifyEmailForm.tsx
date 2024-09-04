@@ -71,13 +71,14 @@ export default function VerifyEmailForm({
       userId,
     }).catch((error: Error) => {
       setLoading(false);
-      setError("The provided code is invalid.");
+      setError(error.message);
     });
 
     setLoading(false);
 
     if (!verifyResponse) {
       setError("Could not verify email");
+      return;
     }
 
     const params = new URLSearchParams({});
