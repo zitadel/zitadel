@@ -218,7 +218,7 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 	})
 }
 
-// LatestPosition filters the latest sequence for the given search query
+// LatestPosition filters the latest position for the given search query
 func (es *Eventstore) LatestPosition(ctx context.Context, queryFactory *SearchQueryBuilder) (decimal.Decimal, error) {
 	queryFactory.InstanceID(authz.GetInstance(ctx).InstanceID())
 
@@ -267,7 +267,7 @@ type Querier interface {
 	Health(ctx context.Context) error
 	// FilterToReducer calls r for every event returned from the storage
 	FilterToReducer(ctx context.Context, searchQuery *SearchQueryBuilder, r Reducer) error
-	// LatestPosition returns the latest sequence found by the search query
+	// LatestPosition returns the latest position found by the search query
 	LatestPosition(ctx context.Context, queryFactory *SearchQueryBuilder) (decimal.Decimal, error)
 	// InstanceIDs returns the instance ids found by the search query
 	InstanceIDs(ctx context.Context, queryFactory *SearchQueryBuilder) ([]string, error)

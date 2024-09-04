@@ -266,7 +266,7 @@ func (crdb *CRDB) FilterToReducer(ctx context.Context, searchQuery *eventstore.S
 	return err
 }
 
-// LatestPosition returns the latest sequence found by the search query
+// LatestPosition returns the latest position found by the search query
 func (db *CRDB) LatestPosition(ctx context.Context, searchQuery *eventstore.SearchQueryBuilder) (decimal.Decimal, error) {
 	var position decimal.Decimal
 	err := query(ctx, db, searchQuery, &position, false)

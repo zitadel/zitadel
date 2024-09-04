@@ -645,7 +645,6 @@ func (h *Handler) eventQuery(currentState *state) *eventstore.SearchQueryBuilder
 		InstanceID(currentState.instanceID)
 
 	if currentState.position.GreaterThan(decimal.Decimal{}) {
-		// decrease position by 10 because builder.PositionAfter filters for position > and we need position >=
 		builder = builder.PositionGreaterEqual(currentState.position)
 		if currentState.offset > 0 {
 			builder = builder.Offset(currentState.offset)
