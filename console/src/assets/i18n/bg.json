@@ -1367,7 +1367,7 @@
       "ALLOWED_SAVED": "Разрешените езици са запазени успешно.",
       "OPTIONS": {
         "de": "Deutsch",
-        "en": "Английски",
+        "en": "English",
         "es": "Español",
         "fr": "Français",
         "it": "Италиано",
@@ -1380,7 +1380,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1601,7 +1602,7 @@
       "LANGUAGE": "Език",
       "LANGUAGES": {
         "de": "Deutsch",
-        "en": "Английски",
+        "en": "English",
         "es": "Español",
         "fr": "Français",
         "it": "Италиано",
@@ -1614,7 +1615,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "Проверката на имейл е извършена",
@@ -2537,7 +2539,7 @@
   },
   "LANGUAGES": {
     "de": "Deutsch",
-    "en": "Английски",
+    "en": "English",
     "es": "Español",
     "fr": "Français",
     "it": "Италиано",
@@ -2550,7 +2552,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Добавяне на мениджър",
