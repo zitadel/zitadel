@@ -342,6 +342,7 @@ service AdminService {
     rpc AddInstanceTrustedDomain(AddInstanceTrustedDomainRequest) returns (AddInstanceTrustedDomainResponse) {
         option (google.api.http) = {
             post: "/trusted_domains";
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
