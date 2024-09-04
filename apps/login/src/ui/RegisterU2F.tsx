@@ -9,6 +9,7 @@ import Alert from "./Alert";
 import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
 import BackButton from "./BackButton";
 import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { addU2F, verifyU2F } from "@/lib/server/u2f";
 
 type Inputs = {};
 
@@ -36,23 +37,15 @@ export default function RegisterU2F({
   async function submitRegister() {
     setError("");
     setLoading(true);
-    const res = await fetch("/api/u2f", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        sessionId,
-      }),
+    const response = await addU2F({
+      sessionId,
+    }).catch((error) => {
+      setLoading(false);
+      setError(error.message);
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      setError(response.details);
-      return Promise.reject(response.details);
-    }
+
     return response;
   }
 
@@ -63,26 +56,18 @@ export default function RegisterU2F({
     sessionId: string,
   ) {
     setLoading(true);
-    const res = await fetch("/api/u2f/verify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        u2fId,
-        passkeyName,
-        publicKeyCredential,
-        sessionId,
-      }),
+    const response = await verifyU2F({
+      u2fId,
+      passkeyName,
+      publicKeyCredential,
+      sessionId,
+    }).catch((error: Error) => {
+      setLoading(false);
+      setError(error.message);
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      setError(response.details);
-      return Promise.reject(response.details);
-    }
+
     return response;
   }
 

@@ -1,10 +1,7 @@
 "use server";
 
 import { addHumanUser } from "@/lib/zitadel";
-import {
-  createSessionAndUpdateCookie,
-  createSessionForUserIdAndUpdateCookie,
-} from "@/utils/session";
+import { createSessionForUserIdAndUpdateCookie } from "@/utils/session";
 
 type RegisterUserCommand = {
   email: string;
