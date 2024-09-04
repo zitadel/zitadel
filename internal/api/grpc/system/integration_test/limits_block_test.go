@@ -187,7 +187,7 @@ type test struct {
 func testBlockingAPI(t *testing.T, tt *test, expectBlocked bool, isFirst bool) {
 	req, err, assertResponse := tt.testHttp(t)
 	require.NoError(t, err)
-	testHTTP := func(assert.TestingT) {
+	testHTTP := func(t require.TestingT) {
 		resp, err := (&http.Client{
 			// Don't follow redirects
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -253,7 +253,7 @@ func assertSetLimitingCookie(t assert.TestingT, response *http.Response, expectS
 			return
 		}
 	}
-	assert.FailNow(t, "cookie not found")
+	assert.Fail(t, "cookie not found")
 }
 
 func assertGrpcError(t assert.TestingT, err error, expectBlocked bool) {

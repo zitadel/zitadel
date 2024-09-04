@@ -5,7 +5,6 @@ package action_test
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -13,6 +12,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v6"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/durationpb"
 
@@ -51,17 +52,17 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID
 
 				// create target for target changes
-				targetCreatedName := fmt.Sprint("GetTarget", time.Now().UnixNano()+1)
+				targetCreatedName := gofakeit.Name()
 				targetCreatedURL := "https://nonexistent"
 
-				targetCreated := instance.CreateTarget(ctx, t, targetCreatedURL, domain.TargetTypeCall, false)
+				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, domain.TargetTypeCall, false)
 
 				// request received by target
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
 				changedRequest := &action.GetTargetRequest{Id: targetCreated.GetDetails().GetId()}
 				// replace original request with different targetID
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusOK, changedRequest)
-				targetRequest := instance.CreateTarget(ctx, t, urlRequest, domain.TargetTypeCall, false)
+				targetRequest := instance.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, false)
 				instance.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
 
 				// expected response from the GetTarget
@@ -116,7 +117,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				}
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusOK, changedResponse)
-				targetResponse := instance.CreateTarget(ctx, t, targetResponseURL, domain.TargetTypeCall, false)
+				targetResponse := instance.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, false)
 				instance.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
 				return func() {
@@ -157,7 +158,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				wantRequest := &middleware.ContextInfoRequest{FullMethod: fullMethod, InstanceID: instance.ID(), OrgID: orgID, ProjectID: projectID, UserID: userID, Request: request}
 				urlRequest, closeRequest := testServerCall(wantRequest, 0, http.StatusInternalServerError, &action.GetTargetRequest{Id: "notchanged"})
 
-				targetRequest := instance.CreateTarget(ctx, t, urlRequest, domain.TargetTypeCall, true)
+				targetRequest := instance.CreateTarget(ctx, t, "", urlRequest, domain.TargetTypeCall, true)
 				instance.SetExecution(ctx, t, conditionRequestFullMethod(fullMethod), executionTargetsSingleTarget(targetRequest.GetDetails().GetId()))
 				// GetTarget with used target
 				request.Id = targetRequest.GetDetails().GetId()
@@ -183,10 +184,10 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				userID := instance.Users.Get(integration.UserTypeIAMOwner).ID
 
 				// create target for target changes
-				targetCreatedName := fmt.Sprint("GetTarget", time.Now().UnixNano()+1)
+				targetCreatedName := gofakeit.Name()
 				targetCreatedURL := "https://nonexistent"
 
-				targetCreated := instance.CreateTarget(ctx, t, targetCreatedURL, domain.TargetTypeCall, false)
+				targetCreated := instance.CreateTarget(ctx, t, targetCreatedName, targetCreatedURL, domain.TargetTypeCall, false)
 
 				// GetTarget with used target
 				request.Id = targetCreated.GetDetails().GetId()
@@ -228,7 +229,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 				}
 				// after request with different targetID, return changed response
 				targetResponseURL, closeResponse := testServerCall(wantResponse, 0, http.StatusInternalServerError, changedResponse)
-				targetResponse := instance.CreateTarget(ctx, t, targetResponseURL, domain.TargetTypeCall, true)
+				targetResponse := instance.CreateTarget(ctx, t, "", targetResponseURL, domain.TargetTypeCall, true)
 				instance.SetExecution(ctx, t, conditionResponseFullMethod(fullMethod), executionTargetsSingleTarget(targetResponse.GetDetails().GetId()))
 
 				return func() {
@@ -258,7 +259,7 @@ func TestServer_ExecutionTarget(t *testing.T) {
 			require.NoError(t, err)
 
 			integration.AssertResourceDetails(t, tt.want.GetTarget().GetDetails(), got.GetTarget().GetDetails())
-			require.Equal(t, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
+			assert.Equal(t, tt.want.GetTarget().GetConfig(), got.GetTarget().GetConfig())
 			if tt.clean != nil {
 				tt.clean(tt.ctx)
 			}

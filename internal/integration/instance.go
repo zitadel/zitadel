@@ -7,12 +7,8 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"path/filepath"
-	"reflect"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -20,7 +16,6 @@ import (
 	"google.golang.org/grpc/metadata"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
-	"github.com/zitadel/zitadel/internal/net"
 	"github.com/zitadel/zitadel/internal/webauthn"
 	"github.com/zitadel/zitadel/pkg/grpc/admin"
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
@@ -326,34 +321,6 @@ func (i *Instance) BearerToken(ctx context.Context) string {
 
 func (i *Instance) WithSystemAuthorizationHTTP(u UserType) map[string]string {
 	return map[string]string{"Authorization": fmt.Sprintf("Bearer %s", i.Users.Get(u).Token)}
-}
-
-func runMilestoneServer(ctx context.Context, bodies chan []byte) (*httptest.Server, error) {
-	mockServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if r.Header.Get("single-value") != "single-value" {
-			http.Error(w, "single-value header not set", http.StatusInternalServerError)
-			return
-		}
-		if reflect.DeepEqual(r.Header.Get("multi-value"), "multi-value-1,multi-value-2") {
-			http.Error(w, "single-value header not set", http.StatusInternalServerError)
-			return
-		}
-		bodies <- body
-		w.WriteHeader(http.StatusOK)
-	}))
-	config := net.ListenConfig()
-	listener, err := config.Listen(ctx, "tcp", ":"+PortMilestoneServer)
-	if err != nil {
-		return nil, err
-	}
-	mockServer.Listener = listener
-	mockServer.Start()
-	return mockServer, nil
 }
 
 func await(af func() error) error {

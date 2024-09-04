@@ -109,7 +109,7 @@ func (c *Client) pollHealth(ctx context.Context) (err error) {
 		if err == nil {
 			return nil
 		}
-		logging.WithError(err).Info("poll healthz")
+		logging.WithError(err).Debug("poll healthz")
 
 		select {
 		case <-ctx.Done():
@@ -394,6 +394,14 @@ func (i *Instance) AddGenericOAuthProvider(ctx context.Context, name string) *ad
 		},
 	})
 	logging.OnError(err).Panic("create generic OAuth idp")
+
+	mustAwait(func() error {
+		_, err := i.Client.Admin.GetProviderByID(ctx, &admin.GetProviderByIDRequest{
+			Id: resp.GetId(),
+		})
+		return err
+	})
+
 	return resp
 }
 
@@ -416,6 +424,14 @@ func (i *Instance) AddOrgGenericOAuthProvider(ctx context.Context, name string) 
 		},
 	})
 	logging.OnError(err).Panic("create generic OAuth idp")
+	/*
+		mustAwait(func() error {
+			_, err := i.Client.Mgmt.GetProviderByID(ctx, &mgmt.GetProviderByIDRequest{
+				Id: resp.GetId(),
+			})
+			return err
+		})
+	*/
 	return resp
 }
 
@@ -726,9 +742,12 @@ func (i *Instance) CreateProjectMembership(t *testing.T, ctx context.Context, pr
 	require.NoError(t, err)
 }
 
-func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+func (i *Instance) CreateTarget(ctx context.Context, t *testing.T, name, endpoint string, ty domain.TargetType, interrupt bool) *action.CreateTargetResponse {
+	if name == "" {
+		name = gofakeit.Name()
+	}
 	reqTarget := &action.Target{
-		Name:     gofakeit.Name(),
+		Name:     name,
 		Endpoint: endpoint,
 		Timeout:  durationpb.New(10 * time.Second),
 	}

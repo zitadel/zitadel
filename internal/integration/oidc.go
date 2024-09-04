@@ -81,6 +81,14 @@ func (i *Instance) CreateOIDCWebClientJWT(ctx context.Context, redirectURI, logo
 	if err != nil {
 		return nil, nil, err
 	}
+	mustAwait(func() error {
+		_, err := i.Client.Mgmt.GetAppByID(ctx, &management.GetAppByIDRequest{
+			ProjectId: projectID,
+			AppId:     client.GetAppId(),
+		})
+		return err
+	})
+
 	return client, key.GetKeyDetails(), nil
 }
 

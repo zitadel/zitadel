@@ -196,7 +196,7 @@ func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, co
 			Inheritance: true,
 		})
 		require.NoError(ttt, err)
-		assert.True(ttt, resp.GetWebKey().GetEnabled())
+		assert.Equal(ttt, enableFeature, resp.GetWebKey().GetEnabled())
 	}, time.Minute, time.Second)
 
 	return instance, iamCTX

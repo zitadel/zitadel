@@ -228,7 +228,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "missing permission",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -261,7 +261,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change name, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -284,7 +284,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change type, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -311,7 +311,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change url, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -334,7 +334,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change timeout, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeWebhook, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -357,7 +357,7 @@ func TestServer_PatchTarget(t *testing.T) {
 		{
 			name: "change type async, ok",
 			prepare: func(request *action.PatchTargetRequest) error {
-				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "https://example.com", domain.TargetTypeAsync, false).GetDetails().GetId()
+				targetID := instance.CreateTarget(isolatedIAMOwnerCTX, t, "", "https://example.com", domain.TargetTypeAsync, false).GetDetails().GetId()
 				request.Id = targetID
 				return nil
 			},
@@ -401,7 +401,7 @@ func TestServer_DeleteTarget(t *testing.T) {
 	instance := integration.NewInstance(CTX)
 	ensureFeatureEnabled(t, instance)
 	iamOwnerCtx := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
-	target := instance.CreateTarget(iamOwnerCtx, t, "https://example.com", domain.TargetTypeWebhook, false)
+	target := instance.CreateTarget(iamOwnerCtx, t, "", "https://example.com", domain.TargetTypeWebhook, false)
 	tests := []struct {
 		name    string
 		ctx     context.Context
