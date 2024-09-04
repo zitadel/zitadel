@@ -63,6 +63,7 @@ export default function PasswordForm({
       authRequestId,
     }).catch((error: Error) => {
       setError(error.message ?? "Could not verify password");
+      setLoading(false);
     });
 
     setLoading(false);

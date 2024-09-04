@@ -50,6 +50,7 @@ export default function RegisterPasskey({
       sessionId,
     }).catch((error: Error) => {
       setError(error.message);
+      setLoading(false);
     });
 
     setLoading(false);
