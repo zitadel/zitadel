@@ -53,10 +53,9 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 		return "", nil, err
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigAddedEvent(
+	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, instance.NewSMTPConfigAddedEvent(
 		ctx,
-		iamAgg,
+		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
 		id,
 		description,
 		config.Tls,
@@ -67,11 +66,6 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config 
 		config.SMTP.User,
 		smtpPassword,
 	))
-	if err != nil {
-		return "", nil, err
-	}
-
-	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
 	if err != nil {
 		return "", nil, err
 	}
@@ -119,11 +113,9 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 		return nil, err
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
-
 	changedEvent, hasChanged, err := smtpConfigWriteModel.NewChangedEvent(
 		ctx,
-		iamAgg,
+		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
 		id,
 		description,
 		config.Tls,
@@ -141,11 +133,7 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lh3op", "Errors.NoChangesFound")
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +141,6 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id s
 }
 
 func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, id string, password string) (*domain.ObjectDetails, error) {
-	instanceAgg := instance.NewAggregate(authz.GetInstance(ctx).InstanceID())
 	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
@@ -170,19 +157,79 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, id 
 		}
 	}
 
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigPasswordChangedEvent(
+	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, instance.NewSMTPConfigPasswordChangedEvent(
 		ctx,
-		&instanceAgg.Aggregate,
+		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
 		id,
 		smtpPassword))
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+
+	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
+}
+
+func (c *Commands) AddSMTPConfigHTTP(ctx context.Context, instanceID string, config *smtp.ConfigHTTP) (string, *domain.ObjectDetails, error) {
+	id, err := c.idGenerator.Next()
+	if err != nil {
+		return "", nil, err
+	}
+
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+	if err != nil {
+		return "", nil, err
+	}
+
+	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, instance.NewSMTPConfigHTTPAddedEvent(
+		ctx,
+		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
+		id,
+		config.Description,
+		config.Endpoint,
+	))
+	if err != nil {
+		return "", nil, err
+	}
+	return id, writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
+}
+
+func (c *Commands) ChangeSMTPConfigHTTP(ctx context.Context, instanceID string, id string, config *smtp.ConfigHTTP) (*domain.ObjectDetails, error) {
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-x8vo9", "Errors.IDMissing")
+	}
+
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
 	if err != nil {
 		return nil, err
 	}
 
+	if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.HTTPConfig == nil {
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-7j8gv", "Errors.SMTPConfig.NotFound")
+	}
+
+	err = checkSenderAddress(smtpConfigWriteModel)
+	if err != nil {
+		return nil, err
+	}
+
+	changedEvent, hasChanged, err := smtpConfigWriteModel.NewHTTPChangedEvent(
+		ctx,
+		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
+		id,
+		config.Description,
+		config.Endpoint,
+	)
+	if err != nil {
+		return nil, err
+	}
+	if !hasChanged {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lh3op", "Errors.NoChangesFound")
+	}
+
+	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, changedEvent)
+	if err != nil {
+		return nil, err
+	}
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
@@ -303,11 +350,11 @@ func (c *Commands) TestSMTPConfig(ctx context.Context, instanceID, id, email str
 		if err != nil {
 			return err
 		}
-		if !smtpConfigWriteModel.State.Exists() {
+		if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.SMTPConfig == nil {
 			return zerrors.ThrowNotFound(nil, "SMTP-p9cc", "Errors.SMTPConfig.NotFound")
 		}
 
-		password, err = crypto.DecryptString(smtpConfigWriteModel.Password, c.smtpEncryption)
+		password, err = crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.Password, c.smtpEncryption)
 		if err != nil {
 			return err
 		}
@@ -338,23 +385,23 @@ func (c *Commands) TestSMTPConfigById(ctx context.Context, instanceID, id, email
 		return err
 	}
 
-	if !smtpConfigWriteModel.State.Exists() {
+	if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.SMTPConfig == nil {
 		return zerrors.ThrowNotFound(nil, "SMTP-99klw", "Errors.SMTPConfig.NotFound")
 	}
 
-	password, err := crypto.DecryptString(smtpConfigWriteModel.Password, c.smtpEncryption)
+	password, err := crypto.DecryptString(smtpConfigWriteModel.SMTPConfig.Password, c.smtpEncryption)
 	if err != nil {
 		return err
 	}
 
 	smtpConfig := &smtp.Config{
 		Description: smtpConfigWriteModel.Description,
-		Tls:         smtpConfigWriteModel.TLS,
-		From:        smtpConfigWriteModel.SenderAddress,
-		FromName:    smtpConfigWriteModel.SenderName,
+		Tls:         smtpConfigWriteModel.SMTPConfig.TLS,
+		From:        smtpConfigWriteModel.SMTPConfig.SenderAddress,
+		FromName:    smtpConfigWriteModel.SMTPConfig.SenderName,
 		SMTP: smtp.SMTP{
-			Host:     smtpConfigWriteModel.Host,
-			User:     smtpConfigWriteModel.User,
+			Host:     smtpConfigWriteModel.SMTPConfig.Host,
+			User:     smtpConfigWriteModel.SMTPConfig.User,
 			Password: password,
 		},
 	}

@@ -10,9 +10,12 @@ import (
 
 const (
 	smtpConfigPrefix                   = "smtp.config."
+	httpConfigPrefix                   = "http."
 	SMTPConfigAddedEventType           = instanceEventTypePrefix + smtpConfigPrefix + "added"
 	SMTPConfigChangedEventType         = instanceEventTypePrefix + smtpConfigPrefix + "changed"
 	SMTPConfigPasswordChangedEventType = instanceEventTypePrefix + smtpConfigPrefix + "password.changed"
+	SMTPConfigHTTPAddedEventType       = instanceEventTypePrefix + smtpConfigPrefix + httpConfigPrefix + "added"
+	SMTPConfigHTTPChangedEventType     = instanceEventTypePrefix + smtpConfigPrefix + httpConfigPrefix + "changed"
 	SMTPConfigRemovedEventType         = instanceEventTypePrefix + smtpConfigPrefix + "removed"
 	SMTPConfigActivatedEventType       = instanceEventTypePrefix + smtpConfigPrefix + "activated"
 	SMTPConfigDeactivatedEventType     = instanceEventTypePrefix + smtpConfigPrefix + "deactivated"
@@ -235,6 +238,123 @@ func SMTPConfigPasswordChangedEventMapper(event eventstore.Event) (eventstore.Ev
 	}
 
 	return smtpConfigPasswordChanged, nil
+}
+
+type SMTPConfigHTTPAddedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	ID          string `json:"id,omitempty"`
+	Description string `json:"description,omitempty"`
+	Endpoint    string `json:"endpoint,omitempty"`
+}
+
+func NewSMTPConfigHTTPAddedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id, description string,
+	endpoint string,
+) *SMTPConfigHTTPAddedEvent {
+	return &SMTPConfigHTTPAddedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SMTPConfigHTTPAddedEventType,
+		),
+		ID:          id,
+		Description: description,
+		Endpoint:    endpoint,
+	}
+}
+
+func (e *SMTPConfigHTTPAddedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *SMTPConfigHTTPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func SMTPConfigHTTPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	smtpConfigAdded := &SMTPConfigHTTPAddedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := event.Unmarshal(smtpConfigAdded)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "IAM-39fks", "unable to unmarshal smtp config added")
+	}
+
+	return smtpConfigAdded, nil
+}
+
+type SMTPConfigHTTPChangedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+	ID                   string  `json:"id,omitempty"`
+	Description          *string `json:"description,omitempty"`
+	Endpoint             *string `json:"endpoint,omitempty"`
+}
+
+func (e *SMTPConfigHTTPChangedEvent) Payload() interface{} {
+	return e
+}
+
+func (e *SMTPConfigHTTPChangedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
+	return nil
+}
+
+func NewSMTPConfigHTTPChangeEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	changes []SMTPConfigHTTPChanges,
+) (*SMTPConfigHTTPChangedEvent, error) {
+	if len(changes) == 0 {
+		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-o0pWf", "Errors.NoChangesFound")
+	}
+	changeEvent := &SMTPConfigHTTPChangedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SMTPConfigHTTPChangedEventType,
+		),
+		ID: id,
+	}
+	for _, change := range changes {
+		change(changeEvent)
+	}
+	return changeEvent, nil
+}
+
+type SMTPConfigHTTPChanges func(event *SMTPConfigHTTPChangedEvent)
+
+func ChangeSMTPConfigHTTPID(id string) func(event *SMTPConfigHTTPChangedEvent) {
+	return func(e *SMTPConfigHTTPChangedEvent) {
+		e.ID = id
+	}
+}
+
+func ChangeSMTPConfigHTTPDescription(description string) func(event *SMTPConfigHTTPChangedEvent) {
+	return func(e *SMTPConfigHTTPChangedEvent) {
+		e.Description = &description
+	}
+}
+
+func ChangeSMTPConfigHTTPEndpoint(endpoint string) func(event *SMTPConfigHTTPChangedEvent) {
+	return func(e *SMTPConfigHTTPChangedEvent) {
+		e.Endpoint = &endpoint
+	}
+}
+
+func SMTPConfigHTTPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
+	e := &SMTPConfigHTTPChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+
+	err := event.Unmarshal(e)
+	if err != nil {
+		return nil, zerrors.ThrowInternal(err, "IAM-m09oo", "unable to unmarshal smtp changed")
+	}
+
+	return e, nil
 }
 
 type SMTPConfigActivatedEvent struct {

@@ -20,7 +20,7 @@ import (
 
 func TestCommandSide_AddSMTPConfig(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
+		eventstore  func(t *testing.T) *eventstore.Eventstore
 		idGenerator id.Generator
 		alg         crypto.EncryptionAlgorithm
 	}
@@ -42,8 +42,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 		{
 			name: "smtp config, custom domain not existing",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
@@ -76,8 +75,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 		{
 			name: "add smtp config, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainAddedEvent(context.Background(),
@@ -140,8 +138,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 		{
 			name: "add smtp config with reply to address, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainAddedEvent(context.Background(),
@@ -205,7 +202,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 		{
 			name: "smtp config, port is missing",
 			fields: fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "configid"),
 				alg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
@@ -230,7 +227,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 		{
 			name: "smtp config, host is empty",
 			fields: fields{
-				eventstore:  eventstoreExpect(t),
+				eventstore:  expectEventstore(),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "configid"),
 				alg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
@@ -255,8 +252,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 		{
 			name: "add smtp config, ipv6 works",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainAddedEvent(context.Background(),
@@ -320,7 +316,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore,
+				eventstore:     tt.fields.eventstore(t),
 				idGenerator:    tt.fields.idGenerator,
 				smtpEncryption: tt.fields.alg,
 			}
@@ -340,7 +336,7 @@ func TestCommandSide_AddSMTPConfig(t *testing.T) {
 
 func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 	}
 	type args struct {
 		ctx        context.Context
@@ -361,9 +357,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		{
 			name: "id empty, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:  authz.WithInstanceID(context.Background(), "INSTANCE"),
@@ -376,9 +370,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		{
 			name: "empty config, invalid argument error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx:  authz.WithInstanceID(context.Background(), "INSTANCE"),
@@ -392,8 +384,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		{
 			name: "smtp not existing, not found error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -419,8 +410,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		{
 			name: "smtp domain not matched",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainAddedEvent(context.Background(),
@@ -475,8 +465,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		{
 			name: "no changes, precondition error",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainAddedEvent(context.Background(),
@@ -531,8 +520,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		{
 			name: "smtp config change, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainAddedEvent(context.Background(),
@@ -603,7 +591,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		{
 			name: "smtp config, port is missing",
 			fields: fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
@@ -628,7 +616,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		{
 			name: "smtp config, host is empty",
 			fields: fields{
-				eventstore: eventstoreExpect(t),
+				eventstore: expectEventstore(),
 			},
 			args: args{
 				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
@@ -653,8 +641,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 		{
 			name: "smtp config change, ipv6 works",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainAddedEvent(context.Background(),
@@ -726,7 +713,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore: tt.fields.eventstore,
+				eventstore: tt.fields.eventstore(t),
 			}
 			got, err := r.ChangeSMTPConfig(tt.args.ctx, tt.args.instanceID, tt.args.id, tt.args.smtp)
 			if tt.res.err == nil {
@@ -744,7 +731,7 @@ func TestCommandSide_ChangeSMTPConfig(t *testing.T) {
 
 func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 	type fields struct {
-		eventstore *eventstore.Eventstore
+		eventstore func(t *testing.T) *eventstore.Eventstore
 		alg        crypto.EncryptionAlgorithm
 	}
 	type args struct {
@@ -766,8 +753,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 		{
 			name: "smtp config, error not found",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(),
 				),
 			},
@@ -783,8 +769,7 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 		{
 			name: "change smtp config password, ok",
 			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
+				eventstore: expectEventstore(
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewSMTPConfigAddedEvent(
@@ -841,10 +826,225 @@ func TestCommandSide_ChangeSMTPConfigPassword(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:     tt.fields.eventstore,
+				eventstore:     tt.fields.eventstore(t),
 				smtpEncryption: tt.fields.alg,
 			}
 			got, err := r.ChangeSMTPConfigPassword(tt.args.ctx, tt.args.instanceID, tt.args.id, tt.args.password)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assertObjectDetails(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_AddSMTPConfigHTTP(t *testing.T) {
+	type fields struct {
+		eventstore  func(t *testing.T) *eventstore.Eventstore
+		idGenerator id.Generator
+	}
+	type args struct {
+		ctx        context.Context
+		instanceID string
+		http       *smtp.ConfigHTTP
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "add smtp config, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+					expectPush(
+						instance.NewSMTPConfigHTTPAddedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"configid",
+							"test",
+							"endpoint",
+						),
+					),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "configid"),
+			},
+			args: args{
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				http: &smtp.ConfigHTTP{
+					Description: "test",
+					Endpoint:    "endpoint",
+				},
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore:  tt.fields.eventstore(t),
+				idGenerator: tt.fields.idGenerator,
+			}
+			_, got, err := r.AddSMTPConfigHTTP(tt.args.ctx, tt.args.instanceID, tt.args.http)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assertObjectDetails(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommandSide_ChangeSMTPConfigHTTP(t *testing.T) {
+	type fields struct {
+		eventstore func(t *testing.T) *eventstore.Eventstore
+	}
+	type args struct {
+		ctx        context.Context
+		instanceID string
+		id         string
+		http       *smtp.ConfigHTTP
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			name: "id empty, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(),
+			},
+			args: args{
+				ctx:  authz.WithInstanceID(context.Background(), "INSTANCE"),
+				http: &smtp.ConfigHTTP{},
+			},
+			res: res{
+				err: zerrors.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "smtp not existing, not found error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				http: &smtp.ConfigHTTP{
+					Description: "test",
+					Endpoint:    "endpoint",
+				},
+				instanceID: "INSTANCE",
+				id:         "ID",
+			},
+			res: res{
+				err: zerrors.IsNotFound,
+			},
+		},
+		{
+			name: "no changes, precondition error",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMTPConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
+								"test",
+								"endpoint",
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: authz.WithInstanceID(context.Background(), "INSTANCE"),
+				http: &smtp.ConfigHTTP{
+					Description: "test",
+					Endpoint:    "endpoint",
+				},
+				instanceID: "INSTANCE",
+				id:         "ID",
+			},
+			res: res{
+				err: zerrors.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "smtp config change, ok",
+			fields: fields{
+				eventstore: expectEventstore(
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMTPConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
+								"",
+								"endpoint",
+							),
+						),
+					),
+					expectPush(
+						newSMTPConfigHTTPChangedEvent(
+							context.Background(),
+							"ID",
+							"test",
+							"endpoint2",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				http: &smtp.ConfigHTTP{
+					Description: "test",
+					Endpoint:    "endpoint2",
+				},
+				id:         "ID",
+				instanceID: "INSTANCE",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &Commands{
+				eventstore: tt.fields.eventstore(t),
+			}
+			got, err := r.ChangeSMTPConfigHTTP(tt.args.ctx, tt.args.instanceID, tt.args.id, tt.args.http)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -946,6 +1146,111 @@ func TestCommandSide_ActivateSMTPConfig(t *testing.T) {
 				id:          "ID",
 				instanceID:  "INSTANCE",
 				activatedId: "",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "activate smtp config http, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMTPConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
+								"test",
+								"endpoint",
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMTPConfigActivatedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"ID",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:         authz.WithInstanceID(context.Background(), "INSTANCE"),
+				id:          "ID",
+				instanceID:  "INSTANCE",
+				activatedId: "",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "activate smtp config http, already active, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMTPConfigAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"activeID",
+								"test",
+								true,
+								"from",
+								"name",
+								"",
+								"host:587",
+								"user",
+								&crypto.CryptoValue{},
+							),
+						),
+						eventFromEventPusher(
+							instance.NewSMTPConfigActivatedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"activeID",
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMTPConfigDeactivatedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"activeID",
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMTPConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
+								"test",
+								"endpoint",
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMTPConfigActivatedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"ID",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:         authz.WithInstanceID(context.Background(), "INSTANCE"),
+				id:          "ID",
+				instanceID:  "INSTANCE",
+				activatedId: "activeID",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1152,6 +1457,42 @@ func TestCommandSide_RemoveSMTPConfig(t *testing.T) {
 								"host:587",
 								"user",
 								&crypto.CryptoValue{},
+							),
+						),
+					),
+					expectPush(
+						instance.NewSMTPConfigRemovedEvent(
+							context.Background(),
+							&instance.NewAggregate("INSTANCE").Aggregate,
+							"ID",
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:        authz.WithInstanceID(context.Background(), "INSTANCE"),
+				id:         "ID",
+				instanceID: "INSTANCE",
+			},
+			res: res{
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
+				},
+			},
+		},
+		{
+			name: "remove smtp config http, ok",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							instance.NewSMTPConfigHTTPAddedEvent(
+								context.Background(),
+								&instance.NewAggregate("INSTANCE").Aggregate,
+								"ID",
+								"test",
+								"endpoint",
 							),
 						),
 					),
@@ -1530,6 +1871,19 @@ func newSMTPConfigChangedEvent(ctx context.Context, id, description string, tls 
 		instance.ChangeSMTPConfigSMTPUser(user),
 	}
 	event, _ := instance.NewSMTPConfigChangeEvent(ctx,
+		&instance.NewAggregate("INSTANCE").Aggregate,
+		id,
+		changes,
+	)
+	return event
+}
+
+func newSMTPConfigHTTPChangedEvent(ctx context.Context, id, description, endpoint string) *instance.SMTPConfigHTTPChangedEvent {
+	changes := []instance.SMTPConfigHTTPChanges{
+		instance.ChangeSMTPConfigHTTPDescription(description),
+		instance.ChangeSMTPConfigHTTPEndpoint(endpoint),
+	}
+	event, _ := instance.NewSMTPConfigHTTPChangeEvent(ctx,
 		&instance.NewAggregate("INSTANCE").Aggregate,
 		id,
 		changes,

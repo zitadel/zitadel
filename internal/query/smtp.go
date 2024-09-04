@@ -52,34 +52,6 @@ var (
 		name:  projection.SMTPConfigColumnSequence,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnTLS = Column{
-		name:  projection.SMTPConfigColumnTLS,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnSenderAddress = Column{
-		name:  projection.SMTPConfigColumnSenderAddress,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnSenderName = Column{
-		name:  projection.SMTPConfigColumnSenderName,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnReplyToAddress = Column{
-		name:  projection.SMTPConfigColumnReplyToAddress,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnSMTPHost = Column{
-		name:  projection.SMTPConfigColumnSMTPHost,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnSMTPUser = Column{
-		name:  projection.SMTPConfigColumnSMTPUser,
-		table: smtpConfigsTable,
-	}
-	SMTPConfigColumnSMTPPassword = Column{
-		name:  projection.SMTPConfigColumnSMTPPassword,
-		table: smtpConfigsTable,
-	}
 	SMTPConfigColumnID = Column{
 		name:  projection.SMTPConfigColumnID,
 		table: smtpConfigsTable,
@@ -88,17 +60,69 @@ var (
 		name:  projection.SMTPConfigColumnState,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnDescription = Column{
+
+	smtpConfigsSMTPTable = table{
+		name:          projection.SMTPConfigTable,
+		instanceIDCol: projection.SMTPConfigColumnInstanceID,
+	}
+	SMTPConfigSMTPColumnInstanceID = Column{
+		name:  projection.SMTPConfigColumnInstanceID,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnID = Column{
+		name:  projection.SMTPConfigColumnID,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnDescription = Column{
 		name:  projection.SMTPConfigColumnDescription,
-		table: smtpConfigsTable,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnTLS = Column{
+		name:  projection.SMTPConfigColumnTLS,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnSenderAddress = Column{
+		name:  projection.SMTPConfigColumnSenderAddress,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnSenderName = Column{
+		name:  projection.SMTPConfigColumnSenderName,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnReplyToAddress = Column{
+		name:  projection.SMTPConfigColumnReplyToAddress,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnSMTPHost = Column{
+		name:  projection.SMTPConfigColumnSMTPHost,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnSMTPUser = Column{
+		name:  projection.SMTPConfigColumnSMTPUser,
+		table: smtpConfigsSMTPTable,
+	}
+	SMTPConfigSMTPColumnSMTPPassword = Column{
+		name:  projection.SMTPConfigColumnSMTPPassword,
+		table: smtpConfigsSMTPTable,
 	}
 )
 
 type SMTPConfig struct {
-	CreationDate   time.Time
-	ChangeDate     time.Time
-	ResourceOwner  string
-	Sequence       uint64
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	ResourceOwner string
+	AggregateID   string
+	ID            string
+	Sequence      uint64
+
+	SMTPConfig *SMTP
+	HTTPConfig *HTTP
+
+	State domain.SMTPConfigState
+}
+
+type SMTP struct {
+	Description    string
 	TLS            bool
 	SenderAddress  string
 	SenderName     string
@@ -106,9 +130,10 @@ type SMTPConfig struct {
 	Host           string
 	User           string
 	Password       *crypto.CryptoValue
-	ID             string
-	State          domain.SMTPConfigState
-	Description    string
+}
+
+type HTTP struct {
+	Endpoint string
 }
 
 func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (config *SMTPConfig, err error) {
@@ -175,6 +200,10 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SMTPConfig, error) {
 			config := new(SMTPConfig)
+			var (
+				smtpConfig = sqlTwilioConfig{}
+				httpConfig = sqlHTTPConfig{}
+			)
 			err := row.Scan(
 				&config.CreationDate,
 				&config.ChangeDate,
@@ -218,8 +247,10 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 			SMTPConfigColumnID.identifier(),
 			SMTPConfigColumnState.identifier(),
 			SMTPConfigColumnDescription.identifier(),
-			countColumn.identifier()).
-			From(smtpConfigsTable.identifier() + db.Timetravel(call.Took(ctx))).
+			countColumn.identifier(),
+		).From(smtpConfigsTable.identifier()).
+			LeftJoin(join(SMTPConfigColumnID, SMSConfigColumnID)).
+			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*SMTPConfigs, error) {
 			configs := &SMTPConfigs{Configs: []*SMTPConfig{}}
@@ -230,6 +261,8 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&config.ChangeDate,
 					&config.ResourceOwner,
 					&config.Sequence,
+					&config.ID,
+					&config.State,
 					&config.TLS,
 					&config.SenderAddress,
 					&config.SenderName,
@@ -237,8 +270,6 @@ func prepareSMTPConfigsQuery(ctx context.Context, db prepareDatabase) (sq.Select
 					&config.Host,
 					&config.User,
 					&config.Password,
-					&config.ID,
-					&config.State,
 					&config.Description,
 					&configs.Count,
 				)
@@ -276,4 +307,46 @@ func (q *Queries) SearchSMTPConfigs(ctx context.Context, queries *SMTPConfigsSea
 	}
 	configs.State, err = q.latestState(ctx, smsConfigsTable)
 	return configs, err
+}
+
+type sqlSmtpConfig struct {
+	id             sql.NullString
+	description    sql.NullString
+	tls            sql.NullBool
+	senderAddress  sql.NullString
+	senderName     sql.NullString
+	replyToAddress sql.NullString
+	host           sql.NullString
+	user           sql.NullString
+	password       *crypto.CryptoValue
+}
+
+func (c sqlSmtpConfig) set(smtpConfig *SMTPConfig) {
+	if !c.id.Valid {
+		return
+	}
+	smtpConfig.SMTPConfig = &SMTP{
+		Description:    c.description.String,
+		TLS:            c.tls.Bool,
+		SenderAddress:  c.senderAddress.String,
+		SenderName:     c.senderName.String,
+		ReplyToAddress: c.replyToAddress.String,
+		Host:           c.host.String,
+		User:           c.user.String,
+		Password:       c.password,
+	}
+}
+
+type sqlHTTPConfig struct {
+	id       sql.NullString
+	endpoint sql.NullString
+}
+
+func (c sqlHTTPConfig) set(smtpConfig *SMTPConfig) {
+	if !c.id.Valid {
+		return
+	}
+	smtpConfig.HTTPConfig = &HTTP{
+		Endpoint: c.endpoint.String,
+	}
 }
