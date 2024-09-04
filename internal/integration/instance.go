@@ -366,7 +366,7 @@ func await(af func() error) error {
 		select {
 		case <-maxTimer.C:
 			return err
-		case <-time.After(time.Second / 10):
+		case <-time.After(time.Second):
 			continue
 		}
 	}

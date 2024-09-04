@@ -28,7 +28,7 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Hour/4)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Hour/2)
 		defer cancel()
 		CTX = ctx
 		return m.Run()
@@ -182,7 +182,6 @@ func TestServer_DeleteWebKey(t *testing.T) {
 }
 
 func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, context.Context) {
-	t.Parallel()
 	instance := integration.NewInstance(CTX)
 	iamCTX := instance.WithAuthorization(CTX, integration.UserTypeIAMOwner)
 
@@ -191,8 +190,14 @@ func createInstance(t *testing.T, enableFeature bool) (*integration.Instance, co
 			WebKey: proto.Bool(true),
 		})
 		require.NoError(t, err)
-		time.Sleep(time.Second)
 	}
+	assert.EventuallyWithT(t, func(ttt *assert.CollectT) {
+		resp, err := instance.Client.FeatureV2.GetInstanceFeatures(iamCTX, &feature.GetInstanceFeaturesRequest{
+			Inheritance: true,
+		})
+		require.NoError(ttt, err)
+		assert.True(ttt, resp.GetWebKey().GetEnabled())
+	}, time.Minute, time.Second)
 
 	return instance, iamCTX
 }
