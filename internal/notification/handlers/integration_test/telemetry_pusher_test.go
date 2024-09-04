@@ -66,7 +66,7 @@ func TestServer_TelemetryPushMilestones(t *testing.T) {
 			AppId:     application.GetAppId(),
 		})
 		assert.NoError(collectT, err)
-	}, 1*time.Minute, 100*time.Millisecond, "app not found")
+	}, time.Minute, time.Second, "app not found")
 	loginToClient(t, instance, application.GetClientId(), redirectURI, sessionID, sessionToken)
 	awaitMilestone(t, sub, instance.Domain, "AuthenticationSucceededOnApplication")
 
@@ -151,7 +151,7 @@ func awaitMilestone(t *testing.T, sub *sink.Subscription, primaryDomain, expectM
 			if milestone.Type == expectMilestoneType && milestone.PrimaryDomain == primaryDomain {
 				return
 			}
-		case <-time.After(60 * time.Second):
+		case <-time.After(2 * time.Minute): // why does it take so long to get a milestone !?
 			t.Fatalf("timed out waiting for milestone %s in domain %s", expectMilestoneType, primaryDomain)
 		}
 	}

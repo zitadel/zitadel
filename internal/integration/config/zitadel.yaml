@@ -37,9 +37,9 @@ Projections:
   Customizations:
     NotificationsQuotas:
       RequeueEvery: 1s
-    Telemetry:
-      MaxFailureCount: 0
-      RequeueEvery: 10s
+    telemetry:
+      HandleActiveInstances: 60s
+      RequeueEvery: 1s
 
 DefaultInstance:
   LoginPolicy:
