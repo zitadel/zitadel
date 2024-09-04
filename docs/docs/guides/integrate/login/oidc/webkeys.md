@@ -4,9 +4,9 @@ sidebar_label: Web keys
 ---
 
 Web Keys in ZITADEL are used to sign and verify JSON Web Tokens (JWT).
-ID tokens are created, signed and returned by ZITADEL when a OpenID connect (OIDC) or Oauth2
+ID tokens are created, signed and returned by ZITADEL when a OpenID connect (OIDC) or OAuth2
 authorization flow completes and a user is authenticated.
-Optionally zitadel can return JWTs for access tokens if the OIDC Application is configured for it.
+Optionally, ZITADEL can return JWTs for access tokens if the OIDC Application is configured for it.
 
 ## Introduction
 
@@ -15,9 +15,9 @@ Keys are generated in pairs resulting in a private and public key.
 Private keys are used to sign tokens.
 Public keys are used to verify tokens.
 OIDC clients need the public key to verify ID tokens.
-Oauth2 API apps might need the public key if they want to client-side verification of a
+OAuth2 API apps might need the public key if they want to client-side verification of a
 JWT access tokens, instead of [introspection](/docs/apis/openidoauth/endpoints#introspection_endpoint).
-ZITADEL uses public key verification when API calls are made or when the user-info or introspection
+ZITADEL uses public key verification when API calls are made or when the userInfo or introspection
 endpoints are called with a JWT access token.
 
 :::info
@@ -43,7 +43,7 @@ Web keys in ZITADEL support a number of [JSON Web Algorithms (JWA)](https://www.
 
 ### Client Algorithm Support
 
-Before customizing the algorithm the instance admin **MUST** make sure the complete App and API ecosystem
+Before customizing the algorithm the instance admin **MUST** make sure the complete app and API ecosystem
 supports the chosen algorithm.
 
 When all OIDC applications of an instance use opaque access tokens, and they call APIs which only use
@@ -57,7 +57,7 @@ The ES256, ES384 and ES512 might have reasonable support as well,
 ECDSA is part of the same [JSON Web Algorithms (JWA)](https://www.rfc-editor.org/rfc/rfc7518) as RSA.
 
 EdDSA usage is defined in the supplemental [RFC8037](https://www.rfc-editor.org/rfc/rfc8037),
-and therefore may be less supported then the others.
+and therefore may be less supported than the others.
 Also, the `at_hash` claim in the ID token is a hashed string of the access token.
 The hasher is usually defined by the keys `alg` header. For example:
 
@@ -91,7 +91,7 @@ Instead, those application may do a time-based refresh or only load keys at star
 
 Using the web keys API, keys can be created first and activated for signing later.
 This allows the keys to be distributed to the instance's apps and caches.
-Once a key is deactivated, its public key will remain available for token verification on the web key is deleted.
+Once a key is deactivated, its public key will remain available for token verification until the web key is deleted.
 Delayed deletion makes sure tokens that were signed before the key got deactivated remain valid.
 
 When the `web_key` [feature](/docs/apis/resources/feature_service_v2/feature-service-set-instance-features) is enabled the first time,
@@ -110,7 +110,7 @@ When the request does not contain any specific configuration,
 [RSA](#rsa) is used as default with the default options as described below:
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/' \
+curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -134,7 +134,7 @@ The RSA generator config takes two enum values.
 For example, to create a RSA web key with the size of 3072 bits and the SHA512 algorithm (RS512):
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/' \
+curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -158,7 +158,7 @@ The ECDSA generator config takes a single `curve` enum value which determines bo
 For example, to create a ECDSA web key with a P-256 curve and the SHA256 algorithm:
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/' \
+curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -182,7 +182,7 @@ Clients which support both curves must inspect `crv` header value to assert the 
 For example, to create a ed25519 web key:
 
 ```bash
-curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/' \
+curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
@@ -248,7 +248,7 @@ curl -L -X POST 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/2/_activate' 
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>'
 
-curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys/' \
+curl -L 'https://$CUSTOM-DOMAIN/resources/v3alpha/web_keys' \
 -H 'Content-Type: application/json' \
 -H 'Accept: application/json' \
 -H 'Authorization: Bearer <TOKEN>' \
