@@ -1,18 +1,17 @@
 "use server";
 
-import {
-  getMostRecentSessionCookie,
-  getSessionCookieById,
-  getSessionCookieByLoginName,
-} from "@zitadel/next";
 import { setSessionAndUpdateCookie } from "@/utils/session";
-import { NextRequest, NextResponse } from "next/server";
 import {
   CheckOTPSchema,
   ChecksSchema,
   CheckTOTPSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { create } from "@zitadel/client";
+import {
+  getMostRecentSessionCookie,
+  getSessionCookieById,
+  getSessionCookieByLoginName,
+} from "../cookies";
 
 export type SetOTPCommand = {
   loginName?: string;

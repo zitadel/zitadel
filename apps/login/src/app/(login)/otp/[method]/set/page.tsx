@@ -13,7 +13,7 @@ import TOTPRegister from "@/ui/TOTPRegister";
 import UserAvatar from "@/ui/UserAvatar";
 import Link from "next/link";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { loadMostRecentSession } from "@zitadel/next";
+import { loadMostRecentSession } from "@/lib/session";
 
 export default async function Page({
   searchParams,

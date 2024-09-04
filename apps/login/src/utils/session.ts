@@ -6,7 +6,6 @@ import {
   getSession,
   setSession,
 } from "@/lib/zitadel";
-import { addSessionToCookie, updateSessionCookie } from "@zitadel/next";
 import {
   Challenges,
   RequestChallenges,
@@ -18,6 +17,7 @@ import {
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { timestampDate, toDate } from "@zitadel/client";
 import { create } from "@zitadel/client";
+import { addSessionToCookie, updateSessionCookie } from "@/lib/cookies";
 
 type CustomCookieData = {
   id: string;

@@ -84,10 +84,9 @@ The application is now available at `http://localhost:3000`
 You can execute the following commands `pnpm test` for a single test run or `pnpm test:watch` in the following directories:
 
 - apps/login
+- packages/zitadel-proto
 - packages/zitadel-client
-- packages/zitadel-server
-- packages/zitadel-react
-- packages/zitadel-next
+- packages/zitadel-node
 - The projects root directory: all tests in the project are executed
 
 In apps/login, these commands also spin up the application and a ZITADEL gRPC API mock server to run integration tests using [Cypress](https://www.cypress.io/) against them.

@@ -7,12 +7,6 @@ import {
   listAuthenticationMethodTypes,
 } from "@/lib/zitadel";
 import {
-  getMostRecentSessionCookie,
-  getSessionCookieById,
-  getSessionCookieByLoginName,
-  removeSessionFromCookie,
-} from "@zitadel/next";
-import {
   createSessionAndUpdateCookie,
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
@@ -24,6 +18,12 @@ import {
   RequestChallengesSchema,
 } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { create } from "@zitadel/client";
+import {
+  getMostRecentSessionCookie,
+  getSessionCookieById,
+  getSessionCookieByLoginName,
+  removeSessionFromCookie,
+} from "../cookies";
 
 type CreateNewSessionCommand = {
   userId: string;

@@ -1,9 +1,9 @@
+import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, sessionService } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import RegisterU2F from "@/ui/RegisterU2F";
 import UserAvatar from "@/ui/UserAvatar";
-import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,

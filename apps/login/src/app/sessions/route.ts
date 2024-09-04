@@ -1,5 +1,5 @@
+import { getAllSessions } from "@/lib/cookies";
 import { listSessions } from "@/lib/zitadel";
-import { getAllSessions } from "@zitadel/next";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import { NextRequest, NextResponse } from "next/server";
 

@@ -1,3 +1,4 @@
+import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
   getLoginSettings,
@@ -7,7 +8,6 @@ import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import PasswordForm from "@/ui/PasswordForm";
 import UserAvatar from "@/ui/UserAvatar";
-import { loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,

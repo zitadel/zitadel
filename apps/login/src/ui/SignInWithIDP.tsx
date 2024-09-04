@@ -1,18 +1,16 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import {
-  SignInWithGitlab,
-  SignInWithAzureAD,
-  SignInWithGoogle,
-  SignInWithGithub,
-} from "@zitadel/react";
 import { useRouter } from "next/navigation";
 import Alert from "./Alert";
 import { IdentityProvider } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { idpTypeToSlug } from "@/lib/idp";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { startIDPFlow } from "@/lib/server/idp";
+import { SignInWithGithub } from "./idps/SignInWithGithub";
+import { SignInWithAzureAD } from "./idps/SignInWithAzureAD";
+import { SignInWithGoogle } from "./idps/SignInWithGoogle";
+import { SignInWithGitlab } from "./idps/SignInWithGitlab";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;

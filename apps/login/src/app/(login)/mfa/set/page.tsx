@@ -1,3 +1,5 @@
+import { getSessionCookieById } from "@/lib/cookies";
+import { loadMostRecentSession } from "@/lib/session";
 import {
   getBrandingSettings,
   getLoginSettings,
@@ -11,7 +13,6 @@ import BackButton from "@/ui/BackButton";
 import ChooseSecondFactorToSetup from "@/ui/ChooseSecondFactorToSetup";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
-import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
 
 export default async function Page({
   searchParams,

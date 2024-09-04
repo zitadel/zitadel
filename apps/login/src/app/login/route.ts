@@ -15,7 +15,6 @@ import {
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
-import { getAllSessions } from "@zitadel/next";
 import { NextRequest, NextResponse } from "next/server";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
 import {
@@ -25,6 +24,7 @@ import {
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { idpTypeToSlug } from "@/lib/idp";
 import { create } from "@zitadel/client";
+import { getAllSessions } from "@/lib/cookies";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(

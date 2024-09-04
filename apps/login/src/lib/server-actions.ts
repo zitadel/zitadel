@@ -1,6 +1,6 @@
 "use server";
 
-import { loadMostRecentSession } from "@zitadel/next";
+import { loadMostRecentSession } from "./session";
 import { sessionService, verifyTOTPRegistration } from "./zitadel";
 
 export async function verifyTOTP(

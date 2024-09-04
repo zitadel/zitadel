@@ -1,12 +1,26 @@
-import { ReactNode, forwardRef } from "react";
-import { SignInWithIdentityProviderProps } from "./SignInWith";
-import { IdpButtonClasses } from "./classes";
+"use client";
 
-export const SignInWithGitlab = forwardRef<HTMLButtonElement, SignInWithIdentityProviderProps>(
+import { ReactNode, forwardRef } from "react";
+import { IdpButtonClasses, SignInWithIdentityProviderProps } from "./classes";
+
+export const SignInWithGitlab = forwardRef<
+  HTMLButtonElement,
+  SignInWithIdentityProviderProps
+>(
   ({ children, className = "", name = "", ...props }, ref): ReactNode => (
-    <button type="button" ref={ref} className={`${IdpButtonClasses} ${className}`} {...props}>
-      <div className="ztdl-h-12 ztdl-w-12 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width={25} height={24} fill="none">
+    <button
+      type="button"
+      ref={ref}
+      className={`${IdpButtonClasses} ${className}`}
+      {...props}
+    >
+      <div className="h-12 w-12 flex items-center justify-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={25}
+          height={24}
+          fill="none"
+        >
           <path
             fill="#e24329"
             d="m24.507 9.5-.034-.09L21.082.562a.896.896 0 0 0-1.694.091l-2.29 7.01H7.825L5.535.653a.898.898 0 0 0-1.694-.09L.451 9.411.416 9.5a6.297 6.297 0 0 0 2.09 7.278l.012.01.03.022 5.16 3.867 2.56 1.935 1.554 1.176a1.051 1.051 0 0 0 1.268 0l1.555-1.176 2.56-1.935 5.197-3.89.014-.01A6.297 6.297 0 0 0 24.507 9.5z"
@@ -25,7 +39,11 @@ export const SignInWithGitlab = forwardRef<HTMLButtonElement, SignInWithIdentity
           />
         </svg>
       </div>
-      {children ? children : <span className="ztdl-ml-4">{name ? name : "Sign in with GitLab"}</span>}
+      {children ? (
+        children
+      ) : (
+        <span className="ml-4">{name ? name : "Sign in with GitLab"}</span>
+      )}
     </button>
   ),
 );

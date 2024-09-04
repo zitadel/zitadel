@@ -6,12 +6,12 @@ import {
   registerPasskey,
   verifyPasskeyRegistration,
 } from "@/lib/zitadel";
-import { getSessionCookieById } from "@zitadel/next";
 import { userAgent } from "next/server";
 import { create } from "@zitadel/client";
 import { VerifyPasskeyRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
 import { RegisterPasskeyResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { getSessionCookieById } from "../cookies";
 
 type VerifyPasskeyCommand = {
   passkeyId: string;

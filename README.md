@@ -31,8 +31,6 @@ We think the easiest path of getting up and running, is the following:
 - `@zitadel/node`: core components for establishing node client connection, grpc stub
 - `@zitadel/client`: shared client utilities
 - `@zitadel/proto`: shared protobuf types
-- `@zitadel/react`: shared React utilities and components built with tailwindcss
-- `@zitadel/next`: shared Next.js utilities
 - `@zitadel/tsconfig`: shared `tsconfig.json`s used throughout the monorepo
 - `eslint-config-zitadel`: ESLint preset
 

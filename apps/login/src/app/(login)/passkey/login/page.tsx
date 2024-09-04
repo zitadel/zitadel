@@ -1,9 +1,10 @@
+import { getSessionCookieById } from "@/lib/cookies";
+import { loadMostRecentSession } from "@/lib/session";
 import { getBrandingSettings, getSession, sessionService } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import LoginPasskey from "@/ui/LoginPasskey";
 import UserAvatar from "@/ui/UserAvatar";
-import { getSessionCookieById, loadMostRecentSession } from "@zitadel/next";
 
 const title = "Authenticate with a passkey";
 const description =
