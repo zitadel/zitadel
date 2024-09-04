@@ -99,6 +99,7 @@ message SMSProvider {
   zitadel.v1.ObjectDetails details = 1;
   string id = 2;
   SMSProviderConfigState state = 3;
+  string description = 6;
 
   oneof config {
     TwilioConfig twilio = 4;

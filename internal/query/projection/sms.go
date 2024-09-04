@@ -8,7 +8,6 @@ import (
 	old_handler "github.com/zitadel/zitadel/internal/eventstore/handler"
 	"github.com/zitadel/zitadel/internal/eventstore/handler/v2"
 	"github.com/zitadel/zitadel/internal/repository/instance"
-	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
 const (
@@ -24,18 +23,19 @@ const (
 	SMSColumnState         = "state"
 	SMSColumnResourceOwner = "resource_owner"
 	SMSColumnInstanceID    = "instance_id"
+	SMSColumnDescription   = "description"
 
-	smsTwilioTableSuffix              = "twilio"
-	SMSTwilioConfigColumnSMSID        = "sms_id"
-	SMSTwilioColumnInstanceID         = "instance_id"
-	SMSTwilioConfigColumnSID          = "sid"
-	SMSTwilioConfigColumnSenderNumber = "sender_number"
-	SMSTwilioConfigColumnToken        = "token"
+	smsTwilioTableSuffix        = "twilio"
+	SMSTwilioColumnSMSID        = "sms_id"
+	SMSTwilioColumnInstanceID   = "instance_id"
+	SMSTwilioColumnSID          = "sid"
+	SMSTwilioColumnSenderNumber = "sender_number"
+	SMSTwilioColumnToken        = "token"
 
-	smsHTTPTableSuffix          = "http"
-	SMSHTTPConfigColumnSMSID    = "sms_id"
-	SMSHTTPColumnInstanceID     = "instance_id"
-	SMSHTTPConfigColumnEndpoint = "endpoint"
+	smsHTTPTableSuffix      = "http"
+	SMSHTTPColumnSMSID      = "sms_id"
+	SMSHTTPColumnInstanceID = "instance_id"
+	SMSHTTPColumnEndpoint   = "endpoint"
 )
 
 type smsConfigProjection struct{}
@@ -59,26 +59,27 @@ func (*smsConfigProjection) Init() *old_handler.Check {
 			handler.NewColumn(SMSColumnState, handler.ColumnTypeEnum),
 			handler.NewColumn(SMSColumnResourceOwner, handler.ColumnTypeText),
 			handler.NewColumn(SMSColumnInstanceID, handler.ColumnTypeText),
+			handler.NewColumn(SMSColumnDescription, handler.ColumnTypeText),
 		},
 			handler.NewPrimaryKey(SMSColumnInstanceID, SMSColumnID),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
-			handler.NewColumn(SMSTwilioConfigColumnSMSID, handler.ColumnTypeText),
+			handler.NewColumn(SMSTwilioColumnSMSID, handler.ColumnTypeText),
 			handler.NewColumn(SMSTwilioColumnInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(SMSTwilioConfigColumnSID, handler.ColumnTypeText),
-			handler.NewColumn(SMSTwilioConfigColumnSenderNumber, handler.ColumnTypeText),
-			handler.NewColumn(SMSTwilioConfigColumnToken, handler.ColumnTypeJSONB),
+			handler.NewColumn(SMSTwilioColumnSID, handler.ColumnTypeText),
+			handler.NewColumn(SMSTwilioColumnSenderNumber, handler.ColumnTypeText),
+			handler.NewColumn(SMSTwilioColumnToken, handler.ColumnTypeJSONB),
 		},
-			handler.NewPrimaryKey(SMSTwilioColumnInstanceID, SMSTwilioConfigColumnSMSID),
+			handler.NewPrimaryKey(SMSTwilioColumnInstanceID, SMSTwilioColumnSMSID),
 			smsTwilioTableSuffix,
 			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
 		handler.NewSuffixedTable([]*handler.InitColumn{
-			handler.NewColumn(SMSHTTPConfigColumnSMSID, handler.ColumnTypeText),
+			handler.NewColumn(SMSHTTPColumnSMSID, handler.ColumnTypeText),
 			handler.NewColumn(SMSHTTPColumnInstanceID, handler.ColumnTypeText),
-			handler.NewColumn(SMSHTTPConfigColumnEndpoint, handler.ColumnTypeText),
+			handler.NewColumn(SMSHTTPColumnEndpoint, handler.ColumnTypeText),
 		},
-			handler.NewPrimaryKey(SMSHTTPColumnInstanceID, SMSHTTPConfigColumnSMSID),
+			handler.NewPrimaryKey(SMSHTTPColumnInstanceID, SMSHTTPColumnSMSID),
 			smsHTTPTableSuffix,
 			handler.WithForeignKey(handler.NewForeignKeyOfPublicKeys()),
 		),
@@ -144,9 +145,9 @@ func (p *smsConfigProjection) Reducers() []handler.AggregateReducer {
 }
 
 func (p *smsConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigTwilioAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-s8efs", "reduce.wrong.event.type %s", instance.SMSConfigTwilioAddedEventType)
+	e, err := assertEvent[*instance.SMSConfigTwilioAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewMultiStatement(
@@ -161,15 +162,16 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 				handler.NewCol(SMSColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMSColumnState, domain.SMSConfigStateInactive),
 				handler.NewCol(SMSColumnSequence, e.Sequence()),
+				handler.NewCol(SMSColumnDescription, e.Description),
 			},
 		),
 		handler.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(SMSTwilioConfigColumnSMSID, e.ID),
+				handler.NewCol(SMSTwilioColumnSMSID, e.ID),
 				handler.NewCol(SMSTwilioColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCol(SMSTwilioConfigColumnSID, e.SID),
-				handler.NewCol(SMSTwilioConfigColumnToken, e.Token),
-				handler.NewCol(SMSTwilioConfigColumnSenderNumber, e.SenderNumber),
+				handler.NewCol(SMSTwilioColumnSID, e.SID),
+				handler.NewCol(SMSTwilioColumnToken, e.Token),
+				handler.NewCol(SMSTwilioColumnSenderNumber, e.SenderNumber),
 			},
 			handler.WithTableSuffix(smsTwilioTableSuffix),
 		),
@@ -177,57 +179,64 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 }
 
 func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigTwilioChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigTwilioChangedEventType)
-	}
-	columns := make([]handler.Column, 0)
-	if e.SID != nil {
-		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnSID, *e.SID))
-	}
-	if e.SenderNumber != nil {
-		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnSenderNumber, *e.SenderNumber))
+	e, err := assertEvent[*instance.SMSConfigTwilioChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
-	return handler.NewMultiStatement(
-		e,
-		handler.AddUpdateStatement(
+	stmts := make([]func(eventstore.Event) handler.Exec, 0, 2)
+	columns := []handler.Column{
+		handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
+		handler.NewCol(SMSColumnSequence, e.Sequence()),
+	}
+	if e.Description != nil {
+		columns = append(columns, handler.NewCol(SMSColumnDescription, *e.Description))
+	}
+	if len(columns) > 0 {
+		stmts = append(stmts, handler.AddUpdateStatement(
 			columns,
-			[]handler.Condition{
-				handler.NewCond(SMSTwilioConfigColumnSMSID, e.ID),
-				handler.NewCond(SMSTwilioColumnInstanceID, e.Aggregate().InstanceID),
-			},
-			handler.WithTableSuffix(smsTwilioTableSuffix),
-		),
-		handler.AddUpdateStatement(
-			[]handler.Column{
-				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
-				handler.NewCol(SMSColumnSequence, e.Sequence()),
-			},
 			[]handler.Condition{
 				handler.NewCond(SMSColumnID, e.ID),
 				handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
 			},
-		),
-	), nil
+		))
+	}
+
+	twilioColumns := make([]handler.Column, 0)
+	if e.SID != nil {
+		twilioColumns = append(twilioColumns, handler.NewCol(SMSTwilioColumnSID, *e.SID))
+	}
+	if e.SenderNumber != nil {
+		twilioColumns = append(twilioColumns, handler.NewCol(SMSTwilioColumnSenderNumber, *e.SenderNumber))
+	}
+	if len(twilioColumns) > 0 {
+		stmts = append(stmts, handler.AddUpdateStatement(
+			twilioColumns,
+			[]handler.Condition{
+				handler.NewCond(SMSTwilioColumnSMSID, e.ID),
+				handler.NewCond(SMSTwilioColumnInstanceID, e.Aggregate().InstanceID),
+			},
+			handler.WithTableSuffix(smsTwilioTableSuffix),
+		))
+	}
+
+	return handler.NewMultiStatement(e, stmts...), nil
 }
 
 func (p *smsConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigTwilioTokenChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigTwilioTokenChangedEventType)
-	}
-	columns := make([]handler.Column, 0)
-	if e.Token != nil {
-		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnToken, e.Token))
+	e, err := assertEvent[*instance.SMSConfigTwilioTokenChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewMultiStatement(
 		e,
 		handler.AddUpdateStatement(
-			columns,
+			[]handler.Column{
+				handler.NewCol(SMSTwilioColumnToken, e.Token),
+			},
 			[]handler.Condition{
-				handler.NewCond(SMSTwilioConfigColumnSMSID, e.ID),
+				handler.NewCond(SMSTwilioColumnSMSID, e.ID),
 				handler.NewCond(SMSTwilioColumnInstanceID, e.Aggregate().InstanceID),
 			},
 			handler.WithTableSuffix(smsTwilioTableSuffix),
@@ -246,9 +255,9 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioTokenChanged(event eventstore
 }
 
 func (p *smsConfigProjection) reduceSMSConfigHTTPAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigHTTPAddedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-s8efs", "reduce.wrong.event.type %s", instance.SMSConfigHTTPAddedEventType)
+	e, err := assertEvent[*instance.SMSConfigHTTPAddedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewMultiStatement(
@@ -263,13 +272,14 @@ func (p *smsConfigProjection) reduceSMSConfigHTTPAdded(event eventstore.Event) (
 				handler.NewCol(SMSColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMSColumnState, domain.SMSConfigStateInactive),
 				handler.NewCol(SMSColumnSequence, e.Sequence()),
+				handler.NewCol(SMSColumnDescription, e.Description),
 			},
 		),
 		handler.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(SMSHTTPConfigColumnSMSID, e.ID),
+				handler.NewCol(SMSHTTPColumnSMSID, e.ID),
 				handler.NewCol(SMSHTTPColumnInstanceID, e.Aggregate().InstanceID),
-				handler.NewCol(SMSHTTPConfigColumnEndpoint, e.Endpoint),
+				handler.NewCol(SMSHTTPColumnEndpoint, e.Endpoint),
 			},
 			handler.WithTableSuffix(smsHTTPTableSuffix),
 		),
@@ -277,27 +287,68 @@ func (p *smsConfigProjection) reduceSMSConfigHTTPAdded(event eventstore.Event) (
 }
 
 func (p *smsConfigProjection) reduceSMSConfigHTTPChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigHTTPChangedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", instance.SMSConfigHTTPChangedEventType)
+	e, err := assertEvent[*instance.SMSConfigHTTPChangedEvent](event)
+	if err != nil {
+		return nil, err
 	}
-	columns := make([]handler.Column, 0)
+
+	stmts := make([]func(eventstore.Event) handler.Exec, 0, 2)
+	columns := []handler.Column{
+		handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
+		handler.NewCol(SMSColumnSequence, e.Sequence()),
+	}
+	if e.Description != nil {
+		columns = append(columns, handler.NewCol(SMSColumnDescription, *e.Description))
+	}
+	if len(columns) > 0 {
+		stmts = append(stmts, handler.AddUpdateStatement(
+			columns,
+			[]handler.Condition{
+				handler.NewCond(SMSColumnID, e.ID),
+				handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
+			},
+		))
+	}
+
 	if e.Endpoint != nil {
-		columns = append(columns, handler.NewCol(SMSHTTPConfigColumnEndpoint, *e.Endpoint))
+		stmts = append(stmts, handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(SMSHTTPColumnEndpoint, *e.Endpoint),
+			},
+			[]handler.Condition{
+				handler.NewCond(SMSHTTPColumnSMSID, e.ID),
+				handler.NewCond(SMSHTTPColumnInstanceID, e.Aggregate().InstanceID),
+			},
+			handler.WithTableSuffix(smsHTTPTableSuffix),
+		))
+	}
+
+	return handler.NewMultiStatement(e, stmts...), nil
+}
+
+func (p *smsConfigProjection) reduceSMSConfigTwilioActivated(event eventstore.Event) (*handler.Statement, error) {
+	e, err := assertEvent[*instance.SMSConfigTwilioActivatedEvent](event)
+	if err != nil {
+		return nil, err
 	}
 
 	return handler.NewMultiStatement(
 		e,
 		handler.AddUpdateStatement(
-			columns,
-			[]handler.Condition{
-				handler.NewCond(SMSHTTPConfigColumnSMSID, e.ID),
-				handler.NewCond(SMSHTTPColumnInstanceID, e.Aggregate().InstanceID),
+			[]handler.Column{
+				handler.NewCol(SMSColumnState, domain.SMSConfigStateInactive),
+				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
+				handler.NewCol(SMSColumnSequence, e.Sequence()),
 			},
-			handler.WithTableSuffix(smsHTTPTableSuffix),
+			[]handler.Condition{
+				handler.Not(handler.NewCond(SMSColumnID, e.ID)),
+				handler.NewCond(SMSColumnState, domain.SMSConfigStateActive),
+				handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
+			},
 		),
 		handler.AddUpdateStatement(
 			[]handler.Column{
+				handler.NewCol(SMSColumnState, domain.SMSConfigStateActive),
 				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
 				handler.NewCol(SMSColumnSequence, e.Sequence()),
 			},
@@ -309,30 +360,12 @@ func (p *smsConfigProjection) reduceSMSConfigHTTPChanged(event eventstore.Event)
 	), nil
 }
 
-func (p *smsConfigProjection) reduceSMSConfigTwilioActivated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigTwilioActivatedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fj9Ef", "reduce.wrong.event.type %s", instance.SMSConfigTwilioActivatedEventType)
-	}
-	return handler.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(SMSColumnState, domain.SMSConfigStateActive),
-			handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
-			handler.NewCol(SMSColumnSequence, e.Sequence()),
-		},
-		[]handler.Condition{
-			handler.NewCond(SMSColumnID, e.ID),
-			handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
-		},
-	), nil
-}
-
 func (p *smsConfigProjection) reduceSMSConfigTwilioDeactivated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigTwilioDeactivatedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dj9Js", "reduce.wrong.event.type %s", instance.SMSConfigTwilioDeactivatedEventType)
+	e, err := assertEvent[*instance.SMSConfigTwilioDeactivatedEvent](event)
+	if err != nil {
+		return nil, err
 	}
+
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
@@ -348,10 +381,11 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioDeactivated(event eventstore.
 }
 
 func (p *smsConfigProjection) reduceSMSConfigTwilioRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigTwilioRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-s9JJf", "reduce.wrong.event.type %s", instance.SMSConfigTwilioRemovedEventType)
+	e, err := assertEvent[*instance.SMSConfigTwilioRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
+
 	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{
@@ -362,29 +396,45 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioRemoved(event eventstore.Even
 }
 
 func (p *smsConfigProjection) reduceSMSConfigActivated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigActivatedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-fj9Ef", "reduce.wrong.event.type %s", instance.SMSConfigTwilioActivatedEventType)
+	e, err := assertEvent[*instance.SMSConfigActivatedEvent](event)
+	if err != nil {
+		return nil, err
 	}
-	return handler.NewUpdateStatement(
+
+	return handler.NewMultiStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(SMSColumnState, domain.SMSConfigStateActive),
-			handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
-			handler.NewCol(SMSColumnSequence, e.Sequence()),
-		},
-		[]handler.Condition{
-			handler.NewCond(SMSColumnID, e.ID),
-			handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
-		},
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(SMSColumnState, domain.SMSConfigStateInactive),
+				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
+				handler.NewCol(SMSColumnSequence, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.Not(handler.NewCond(SMSColumnID, e.ID)),
+				handler.NewCond(SMSColumnState, domain.SMSConfigStateActive),
+				handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
+			},
+		),
+		handler.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(SMSColumnState, domain.SMSConfigStateActive),
+				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
+				handler.NewCol(SMSColumnSequence, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(SMSColumnID, e.ID),
+				handler.NewCond(SMSColumnInstanceID, e.Aggregate().InstanceID),
+			},
+		),
 	), nil
 }
 
 func (p *smsConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigDeactivatedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-dj9Js", "reduce.wrong.event.type %s", instance.SMSConfigTwilioDeactivatedEventType)
+	e, err := assertEvent[*instance.SMSConfigDeactivatedEvent](event)
+	if err != nil {
+		return nil, err
 	}
+
 	return handler.NewUpdateStatement(
 		e,
 		[]handler.Column{
@@ -400,10 +450,11 @@ func (p *smsConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event)
 }
 
 func (p *smsConfigProjection) reduceSMSConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*instance.SMSConfigRemovedEvent)
-	if !ok {
-		return nil, zerrors.ThrowInvalidArgumentf(nil, "HANDL-s9JJf", "reduce.wrong.event.type %s", instance.SMSConfigTwilioRemovedEventType)
+	e, err := assertEvent[*instance.SMSConfigRemovedEvent](event)
+	if err != nil {
+		return nil, err
 	}
+
 	return handler.NewDeleteStatement(
 		e,
 		[]handler.Condition{

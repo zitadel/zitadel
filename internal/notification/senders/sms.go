@@ -44,16 +44,18 @@ func SMSChannels(
 			"instance", authz.GetInstance(ctx).InstanceID(),
 			"callurl", smsConfig.WebhookConfig.CallURL,
 		).OnError(err).Debug("initializing JSON channel failed")
-		channels = append(
-			channels,
-			instrumenting.Wrap(
-				ctx,
-				webhookChannel,
-				webhookSpanName,
-				successMetricName,
-				failureMetricName,
-			),
-		)
+		if err != nil {
+			channels = append(
+				channels,
+				instrumenting.Wrap(
+					ctx,
+					webhookChannel,
+					webhookSpanName,
+					successMetricName,
+					failureMetricName,
+				),
+			)
+		}
 	}
 	channels = append(channels, debugChannels(ctx, getFileSystemProvider, getLogProvider)...)
 	return ChainChannels(channels...), nil

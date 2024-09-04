@@ -34,23 +34,23 @@ func (s *Server) GetSMSProvider(ctx context.Context, req *admin_pb.GetSMSProvide
 }
 
 func (s *Server) AddSMSProviderTwilio(ctx context.Context, req *admin_pb.AddSMSProviderTwilioRequest) (*admin_pb.AddSMSProviderTwilioResponse, error) {
-	id, result, err := s.command.AddSMSConfigTwilio(ctx, authz.GetInstance(ctx).InstanceID(), AddSMSConfigTwilioToConfig(req))
-	if err != nil {
+	smsConfig := addSMSConfigTwilioToConfig(ctx, req)
+	if err := s.command.AddSMSConfigTwilio(ctx, smsConfig); err != nil {
 		return nil, err
 	}
 	return &admin_pb.AddSMSProviderTwilioResponse{
-		Details: object.DomainToAddDetailsPb(result),
-		Id:      id,
+		Details: object.DomainToAddDetailsPb(smsConfig.Details),
+		Id:      smsConfig.ID,
 	}, nil
 }
 
 func (s *Server) UpdateSMSProviderTwilio(ctx context.Context, req *admin_pb.UpdateSMSProviderTwilioRequest) (*admin_pb.UpdateSMSProviderTwilioResponse, error) {
-	result, err := s.command.ChangeSMSConfigTwilio(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, UpdateSMSConfigTwilioToConfig(req))
-	if err != nil {
+	smsConfig := updateSMSConfigTwilioToConfig(ctx, req)
+	if err := s.command.ChangeSMSConfigTwilio(ctx, smsConfig); err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateSMSProviderTwilioResponse{
-		Details: object.DomainToChangeDetailsPb(result),
+		Details: object.DomainToChangeDetailsPb(smsConfig.Details),
 	}, nil
 }
 
@@ -66,35 +66,28 @@ func (s *Server) UpdateSMSProviderTwilioToken(ctx context.Context, req *admin_pb
 }
 
 func (s *Server) AddSMSProviderHTTP(ctx context.Context, req *admin_pb.AddSMSProviderHTTPRequest) (*admin_pb.AddSMSProviderHTTPResponse, error) {
-	id, result, err := s.command.AddSMSConfigHTTP(ctx, authz.GetInstance(ctx).InstanceID(), AddSMSConfigTHTTPToConfig(req))
-	if err != nil {
+	smsConfig := addSMSConfigHTTPToConfig(ctx, req)
+	if err := s.command.AddSMSConfigHTTP(ctx, smsConfig); err != nil {
 		return nil, err
 	}
 	return &admin_pb.AddSMSProviderHTTPResponse{
-		Details: object.DomainToAddDetailsPb(result),
-		Id:      id,
+		Details: object.DomainToAddDetailsPb(smsConfig.Details),
+		Id:      smsConfig.ID,
 	}, nil
 }
 
 func (s *Server) UpdateSMSProviderHTTP(ctx context.Context, req *admin_pb.UpdateSMSProviderHTTPRequest) (*admin_pb.UpdateSMSProviderHTTPResponse, error) {
-	result, err := s.command.ChangeSMSConfigHTTP(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, UpdateSMSConfigHTTPToConfig(req))
-	if err != nil {
+	smsConfig := updateSMSConfigHTTPToConfig(ctx, req)
+	if err := s.command.ChangeSMSConfigHTTP(ctx, smsConfig); err != nil {
 		return nil, err
 	}
 	return &admin_pb.UpdateSMSProviderHTTPResponse{
-		Details: object.DomainToChangeDetailsPb(result),
+		Details: object.DomainToChangeDetailsPb(smsConfig.Details),
 	}, nil
 }
 
 func (s *Server) ActivateSMSProvider(ctx context.Context, req *admin_pb.ActivateSMSProviderRequest) (*admin_pb.ActivateSMSProviderResponse, error) {
-	// Get the ID of current SMTP active provider if any
-	currentActiveProviderID := ""
-	sms, err := s.query.SMSProviderConfigActive(ctx, authz.GetInstance(ctx).InstanceID())
-	if err == nil {
-		currentActiveProviderID = sms.ID
-	}
-
-	result, err := s.command.ActivateSMSConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, currentActiveProviderID)
+	result, err := s.command.ActivateSMSConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
 		return nil, err
 	}

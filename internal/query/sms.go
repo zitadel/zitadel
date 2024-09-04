@@ -30,6 +30,7 @@ type SMSConfig struct {
 	ResourceOwner string
 	State         domain.SMSConfigState
 	Sequence      uint64
+	Description   string
 
 	TwilioConfig *Twilio
 	HTTPConfig   *HTTP
@@ -63,75 +64,79 @@ var (
 		name:          projection.SMSConfigProjectionTable,
 		instanceIDCol: projection.SMSColumnInstanceID,
 	}
-	SMSConfigColumnID = Column{
+	SMSColumnID = Column{
 		name:  projection.SMSColumnID,
 		table: smsConfigsTable,
 	}
-	SMSConfigColumnAggregateID = Column{
+	SMSColumnAggregateID = Column{
 		name:  projection.SMSColumnAggregateID,
 		table: smsConfigsTable,
 	}
-	SMSConfigColumnCreationDate = Column{
+	SMSColumnCreationDate = Column{
 		name:  projection.SMSColumnCreationDate,
 		table: smsConfigsTable,
 	}
-	SMSConfigColumnChangeDate = Column{
+	SMSColumnChangeDate = Column{
 		name:  projection.SMSColumnChangeDate,
 		table: smsConfigsTable,
 	}
-	SMSConfigColumnResourceOwner = Column{
+	SMSColumnResourceOwner = Column{
 		name:  projection.SMSColumnResourceOwner,
 		table: smsConfigsTable,
 	}
-	SMSConfigColumnInstanceID = Column{
+	SMSColumnInstanceID = Column{
 		name:  projection.SMSColumnInstanceID,
 		table: smsConfigsTable,
 	}
-	SMSConfigColumnState = Column{
+	SMSColumnState = Column{
 		name:  projection.SMSColumnState,
 		table: smsConfigsTable,
 	}
-	SMSConfigColumnSequence = Column{
+	SMSColumnSequence = Column{
 		name:  projection.SMSColumnSequence,
+		table: smsConfigsTable,
+	}
+	SMSColumnDescription = Column{
+		name:  projection.SMSColumnDescription,
 		table: smsConfigsTable,
 	}
 )
 
 var (
-	smsTwilioConfigsTable = table{
+	smsTwilioTable = table{
 		name:          projection.SMSTwilioTable,
 		instanceIDCol: projection.SMSTwilioColumnInstanceID,
 	}
-	SMSTwilioConfigColumnSMSID = Column{
-		name:  projection.SMSTwilioConfigColumnSMSID,
-		table: smsTwilioConfigsTable,
+	SMSTwilioColumnSMSID = Column{
+		name:  projection.SMSTwilioColumnSMSID,
+		table: smsTwilioTable,
 	}
-	SMSTwilioConfigColumnSID = Column{
-		name:  projection.SMSTwilioConfigColumnSID,
-		table: smsTwilioConfigsTable,
+	SMSTwilioColumnSID = Column{
+		name:  projection.SMSTwilioColumnSID,
+		table: smsTwilioTable,
 	}
-	SMSTwilioConfigColumnToken = Column{
-		name:  projection.SMSTwilioConfigColumnToken,
-		table: smsTwilioConfigsTable,
+	SMSTwilioColumnToken = Column{
+		name:  projection.SMSTwilioColumnToken,
+		table: smsTwilioTable,
 	}
-	SMSTwilioConfigColumnSenderNumber = Column{
-		name:  projection.SMSTwilioConfigColumnSenderNumber,
-		table: smsTwilioConfigsTable,
+	SMSTwilioColumnSenderNumber = Column{
+		name:  projection.SMSTwilioColumnSenderNumber,
+		table: smsTwilioTable,
 	}
 )
 
 var (
-	smsHTTPConfigsTable = table{
+	smsHTTPTable = table{
 		name:          projection.SMSHTTPTable,
 		instanceIDCol: projection.SMSHTTPColumnInstanceID,
 	}
-	SMSHTTPConfigColumnSMSID = Column{
-		name:  projection.SMSHTTPConfigColumnSMSID,
-		table: smsHTTPConfigsTable,
+	SMSHTTPColumnSMSID = Column{
+		name:  projection.SMSHTTPColumnSMSID,
+		table: smsHTTPTable,
 	}
-	SMSHTTPConfigColumnEndpoint = Column{
-		name:  projection.SMSHTTPConfigColumnEndpoint,
-		table: smsHTTPConfigsTable,
+	SMSHTTPColumnEndpoint = Column{
+		name:  projection.SMSHTTPColumnEndpoint,
+		table: smsHTTPTable,
 	}
 )
 
@@ -142,8 +147,8 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (config 
 	query, scan := prepareSMSConfigQuery(ctx, q.client)
 	stmt, args, err := query.Where(
 		sq.Eq{
-			SMSConfigColumnID.identifier():         id,
-			SMSConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+			SMSColumnID.identifier():         id,
+			SMSColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		},
 	).ToSql()
 	if err != nil {
@@ -164,8 +169,8 @@ func (q *Queries) SMSProviderConfigActive(ctx context.Context, instanceID string
 	query, scan := prepareSMSConfigQuery(ctx, q.client)
 	stmt, args, err := query.Where(
 		sq.Eq{
-			SMSConfigColumnInstanceID.identifier(): instanceID,
-			SMSConfigColumnState.identifier():      domain.SMSConfigStateActive,
+			SMSColumnInstanceID.identifier(): instanceID,
+			SMSColumnState.identifier():      domain.SMSConfigStateActive,
 		},
 	).ToSql()
 	if err != nil {
@@ -186,7 +191,7 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 	query, scan := prepareSMSConfigsQuery(ctx, q.client)
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			SMSConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
+			SMSColumnInstanceID.identifier(): authz.GetInstance(ctx).InstanceID(),
 		}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
@@ -204,29 +209,30 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 }
 
 func NewSMSProviderStateQuery(state domain.SMSConfigState) (SearchQuery, error) {
-	return NewNumberQuery(SMSConfigColumnState, state, NumberEquals)
+	return NewNumberQuery(SMSColumnState, state, NumberEquals)
 }
 
 func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, error)) {
 	return sq.Select(
-			SMSConfigColumnID.identifier(),
-			SMSConfigColumnAggregateID.identifier(),
-			SMSConfigColumnCreationDate.identifier(),
-			SMSConfigColumnChangeDate.identifier(),
-			SMSConfigColumnResourceOwner.identifier(),
-			SMSConfigColumnState.identifier(),
-			SMSConfigColumnSequence.identifier(),
+			SMSColumnID.identifier(),
+			SMSColumnAggregateID.identifier(),
+			SMSColumnCreationDate.identifier(),
+			SMSColumnChangeDate.identifier(),
+			SMSColumnResourceOwner.identifier(),
+			SMSColumnState.identifier(),
+			SMSColumnSequence.identifier(),
+			SMSColumnDescription.identifier(),
 
-			SMSTwilioConfigColumnSMSID.identifier(),
-			SMSTwilioConfigColumnSID.identifier(),
-			SMSTwilioConfigColumnToken.identifier(),
-			SMSTwilioConfigColumnSenderNumber.identifier(),
+			SMSTwilioColumnSMSID.identifier(),
+			SMSTwilioColumnSID.identifier(),
+			SMSTwilioColumnToken.identifier(),
+			SMSTwilioColumnSenderNumber.identifier(),
 
-			SMSHTTPConfigColumnSMSID.identifier(),
-			SMSHTTPConfigColumnEndpoint.identifier(),
+			SMSHTTPColumnSMSID.identifier(),
+			SMSHTTPColumnEndpoint.identifier(),
 		).From(smsConfigsTable.identifier()).
-			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID)).
-			LeftJoin(join(SMSHTTPConfigColumnSMSID, SMSConfigColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SMSTwilioColumnSMSID, SMSColumnID)).
+			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*SMSConfig, error) {
 			config := new(SMSConfig)
 
@@ -243,6 +249,7 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 				&config.ResourceOwner,
 				&config.State,
 				&config.Sequence,
+				&config.Description,
 
 				&twilioConfig.smsID,
 				&twilioConfig.sid,
@@ -269,26 +276,27 @@ func prepareSMSConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectBu
 
 func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, error)) {
 	return sq.Select(
-			SMSConfigColumnID.identifier(),
-			SMSConfigColumnAggregateID.identifier(),
-			SMSConfigColumnCreationDate.identifier(),
-			SMSConfigColumnChangeDate.identifier(),
-			SMSConfigColumnResourceOwner.identifier(),
-			SMSConfigColumnState.identifier(),
-			SMSConfigColumnSequence.identifier(),
+			SMSColumnID.identifier(),
+			SMSColumnAggregateID.identifier(),
+			SMSColumnCreationDate.identifier(),
+			SMSColumnChangeDate.identifier(),
+			SMSColumnResourceOwner.identifier(),
+			SMSColumnState.identifier(),
+			SMSColumnSequence.identifier(),
+			SMSColumnDescription.identifier(),
 
-			SMSTwilioConfigColumnSMSID.identifier(),
-			SMSTwilioConfigColumnSID.identifier(),
-			SMSTwilioConfigColumnToken.identifier(),
-			SMSTwilioConfigColumnSenderNumber.identifier(),
+			SMSTwilioColumnSMSID.identifier(),
+			SMSTwilioColumnSID.identifier(),
+			SMSTwilioColumnToken.identifier(),
+			SMSTwilioColumnSenderNumber.identifier(),
 
-			SMSHTTPConfigColumnSMSID.identifier(),
-			SMSHTTPConfigColumnEndpoint.identifier(),
+			SMSHTTPColumnSMSID.identifier(),
+			SMSHTTPColumnEndpoint.identifier(),
 
 			countColumn.identifier(),
 		).From(smsConfigsTable.identifier()).
-			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID)).
-			LeftJoin(join(SMSHTTPConfigColumnSMSID, SMSConfigColumnID) + db.Timetravel(call.Took(ctx))).
+			LeftJoin(join(SMSTwilioColumnSMSID, SMSColumnID)).
+			LeftJoin(join(SMSHTTPColumnSMSID, SMSColumnID) + db.Timetravel(call.Took(ctx))).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*SMSConfigs, error) {
 			configs := &SMSConfigs{Configs: []*SMSConfig{}}
 
@@ -307,6 +315,7 @@ func prepareSMSConfigsQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 					&config.ResourceOwner,
 					&config.State,
 					&config.Sequence,
+					&config.Description,
 
 					&twilioConfig.smsID,
 					&twilioConfig.sid,

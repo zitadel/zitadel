@@ -1,10 +1,12 @@
 package admin
 
 import (
+	"context"
+
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
 	"github.com/zitadel/zitadel/internal/domain"
-	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
@@ -31,10 +33,11 @@ func SMSConfigsToPb(configs []*query.SMSConfig) []*settings_pb.SMSProvider {
 
 func SMSConfigToProviderPb(config *query.SMSConfig) *settings_pb.SMSProvider {
 	return &settings_pb.SMSProvider{
-		Details: object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
-		Id:      config.ID,
-		State:   smsStateToPb(config.State),
-		Config:  SMSConfigToPb(config),
+		Details:     object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
+		Id:          config.ID,
+		Description: config.Description,
+		State:       smsStateToPb(config.State),
+		Config:      SMSConfigToPb(config),
 	}
 }
 
@@ -76,29 +79,39 @@ func smsStateToPb(state domain.SMSConfigState) settings_pb.SMSProviderConfigStat
 	}
 }
 
-func AddSMSConfigTwilioToConfig(req *admin_pb.AddSMSProviderTwilioRequest) *twilio.Config {
-	return &twilio.Config{
-		SID:          req.Sid,
-		SenderNumber: req.SenderNumber,
-		Token:        req.Token,
+func addSMSConfigTwilioToConfig(ctx context.Context, req *admin_pb.AddSMSProviderTwilioRequest) *command.AddTwilioConfig {
+	return &command.AddTwilioConfig{
+		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+		Description:   req.Description,
+		SID:           req.Sid,
+		SenderNumber:  req.SenderNumber,
+		Token:         req.Token,
 	}
 }
 
-func UpdateSMSConfigTwilioToConfig(req *admin_pb.UpdateSMSProviderTwilioRequest) *twilio.Config {
-	return &twilio.Config{
-		SID:          req.Sid,
-		SenderNumber: req.SenderNumber,
+func updateSMSConfigTwilioToConfig(ctx context.Context, req *admin_pb.UpdateSMSProviderTwilioRequest) *command.ChangeTwilioConfig {
+	return &command.ChangeTwilioConfig{
+		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+		ID:            req.Id,
+		Description:   req.Description,
+		SID:           req.Sid,
+		SenderNumber:  req.SenderNumber,
 	}
 }
 
-func AddSMSConfigTHTTPToConfig(req *admin_pb.AddSMSProviderHTTPRequest) *command.AddSMSHTTP {
+func addSMSConfigHTTPToConfig(ctx context.Context, req *admin_pb.AddSMSProviderHTTPRequest) *command.AddSMSHTTP {
 	return &command.AddSMSHTTP{
-		Endpoint: req.GetEndpoint(),
+		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+		Description:   req.GetDescription(),
+		Endpoint:      req.GetEndpoint(),
 	}
 }
 
-func UpdateSMSConfigHTTPToConfig(req *admin_pb.UpdateSMSProviderHTTPRequest) *command.ChangeSMSHTTP {
+func updateSMSConfigHTTPToConfig(ctx context.Context, req *admin_pb.UpdateSMSProviderHTTPRequest) *command.ChangeSMSHTTP {
 	return &command.ChangeSMSHTTP{
-		Endpoint: req.GetEndpoint(),
+		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
+		ID:            req.Id,
+		Description:   req.Description,
+		Endpoint:      req.Endpoint,
 	}
 }

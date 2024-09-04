@@ -21,6 +21,7 @@ var (
 		` projections.sms_configs3.resource_owner,` +
 		` projections.sms_configs3.state,` +
 		` projections.sms_configs3.sequence,` +
+		` projections.sms_configs3.description,` +
 
 		// twilio config
 		` projections.sms_configs3_twilio.sms_id,` +
@@ -42,6 +43,7 @@ var (
 		` projections.sms_configs3.resource_owner,` +
 		` projections.sms_configs3.state,` +
 		` projections.sms_configs3.sequence,` +
+		` projections.sms_configs3.description,` +
 
 		// twilio config
 		` projections.sms_configs3_twilio.sms_id,` +
@@ -66,6 +68,7 @@ var (
 		"resource_owner",
 		"state",
 		"sequence",
+		"description",
 		// twilio config
 		"sms_id",
 		"sid",
@@ -78,7 +81,7 @@ var (
 	smsConfigsCols = append(smsConfigCols, "count")
 )
 
-func Test_SMSConfigssPrepare(t *testing.T) {
+func Test_SMSConfigsPrepare(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
@@ -117,6 +120,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							"ro",
 							domain.SMSConfigStateInactive,
 							uint64(20211109),
+							"description",
 							// twilio config
 							"sms-id",
 							"sid",
@@ -142,6 +146,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						ResourceOwner: "ro",
 						State:         domain.SMSConfigStateInactive,
 						Sequence:      20211109,
+						Description:   "description",
 						TwilioConfig: &Twilio{
 							SID:          "sid",
 							Token:        &crypto.CryptoValue{},
@@ -167,6 +172,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							"ro",
 							domain.SMSConfigStateInactive,
 							uint64(20211109),
+							"description",
 							// twilio config
 							nil,
 							nil,
@@ -192,6 +198,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						ResourceOwner: "ro",
 						State:         domain.SMSConfigStateInactive,
 						Sequence:      20211109,
+						Description:   "description",
 						HTTPConfig: &HTTP{
 							Endpoint: "endpoint",
 						},
@@ -213,8 +220,9 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							"ro",
-							domain.SMSConfigStateInactive,
+							domain.SMSConfigStateActive,
 							uint64(20211109),
+							"description",
 							// twilio config
 							"sms-id",
 							"sid",
@@ -232,6 +240,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							"ro",
 							domain.SMSConfigStateInactive,
 							uint64(20211109),
+							"description",
 							// twilio config
 							"sms-id2",
 							"sid2",
@@ -249,6 +258,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							"ro",
 							domain.SMSConfigStateInactive,
 							uint64(20211109),
+							"description",
 							// twilio config
 							nil,
 							nil,
@@ -272,8 +282,9 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						CreationDate:  testNow,
 						ChangeDate:    testNow,
 						ResourceOwner: "ro",
-						State:         domain.SMSConfigStateInactive,
+						State:         domain.SMSConfigStateActive,
 						Sequence:      20211109,
+						Description:   "description",
 						TwilioConfig: &Twilio{
 							SID:          "sid",
 							Token:        &crypto.CryptoValue{},
@@ -288,6 +299,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						ResourceOwner: "ro",
 						State:         domain.SMSConfigStateInactive,
 						Sequence:      20211109,
+						Description:   "description",
 						TwilioConfig: &Twilio{
 							SID:          "sid2",
 							Token:        &crypto.CryptoValue{},
@@ -302,6 +314,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						ResourceOwner: "ro",
 						State:         domain.SMSConfigStateInactive,
 						Sequence:      20211109,
+						Description:   "description",
 						HTTPConfig: &HTTP{
 							Endpoint: "endpoint3",
 						},
@@ -376,8 +389,9 @@ func Test_SMSConfigPrepare(t *testing.T) {
 						testNow,
 						testNow,
 						"ro",
-						domain.SMSConfigStateInactive,
+						domain.SMSConfigStateActive,
 						uint64(20211109),
+						"description",
 						// twilio config
 						"sms-id",
 						"sid",
@@ -395,15 +409,17 @@ func Test_SMSConfigPrepare(t *testing.T) {
 				CreationDate:  testNow,
 				ChangeDate:    testNow,
 				ResourceOwner: "ro",
-				State:         domain.SMSConfigStateInactive,
+				State:         domain.SMSConfigStateActive,
 				Sequence:      20211109,
+				Description:   "description",
 				TwilioConfig: &Twilio{
 					SID:          "sid",
 					SenderNumber: "sender-number",
 					Token:        &crypto.CryptoValue{},
 				},
 			},
-		}, {
+		},
+		{
 			name:    "prepareSMSConfigQuery, http, found",
 			prepare: prepareSMSConfigQuery,
 			want: want{
@@ -418,6 +434,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 						"ro",
 						domain.SMSConfigStateInactive,
 						uint64(20211109),
+						"description",
 						// twilio config
 						nil,
 						nil,
@@ -437,6 +454,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 				ResourceOwner: "ro",
 				State:         domain.SMSConfigStateInactive,
 				Sequence:      20211109,
+				Description:   "description",
 				HTTPConfig: &HTTP{
 					Endpoint: "endpoint",
 				},

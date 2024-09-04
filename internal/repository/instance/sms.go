@@ -26,9 +26,10 @@ const (
 )
 
 type SMSConfigTwilioAddedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 
 	ID           string              `json:"id,omitempty"`
+	Description  string              `json:"description,omitempty"`
 	SID          string              `json:"sid,omitempty"`
 	Token        *crypto.CryptoValue `json:"token,omitempty"`
 	SenderNumber string              `json:"senderNumber,omitempty"`
@@ -38,21 +39,27 @@ func NewSMSConfigTwilioAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
+	description string,
 	sid,
 	senderNumber string,
 	token *crypto.CryptoValue,
 ) *SMSConfigTwilioAddedEvent {
 	return &SMSConfigTwilioAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			SMSConfigTwilioAddedEventType,
 		),
 		ID:           id,
+		Description:  description,
 		SID:          sid,
 		Token:        token,
 		SenderNumber: senderNumber,
 	}
+}
+
+func (e *SMSConfigTwilioAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *SMSConfigTwilioAddedEvent) Payload() interface{} {
@@ -63,22 +70,11 @@ func (e *SMSConfigTwilioAddedEvent) UniqueConstraints() []*eventstore.UniqueCons
 	return nil
 }
 
-func SMSConfigTwilioAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smsConfigAdded := &SMSConfigTwilioAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smsConfigAdded)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
-	}
-
-	return smsConfigAdded, nil
-}
-
 type SMSConfigTwilioChangedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 
 	ID           string  `json:"id,omitempty"`
+	Description  *string `json:"description,omitempty"`
 	SID          *string `json:"sid,omitempty"`
 	SenderNumber *string `json:"senderNumber,omitempty"`
 }
@@ -93,7 +89,7 @@ func NewSMSConfigTwilioChangedEvent(
 		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-smn8e", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMSConfigTwilioChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			SMSConfigTwilioChangedEventType,
@@ -114,10 +110,20 @@ func ChangeSMSConfigTwilioSID(sid string) func(event *SMSConfigTwilioChangedEven
 	}
 }
 
+func ChangeSMSConfigTwilioDescription(description string) func(event *SMSConfigTwilioChangedEvent) {
+	return func(e *SMSConfigTwilioChangedEvent) {
+		e.Description = &description
+	}
+}
+
 func ChangeSMSConfigTwilioSenderNumber(senderNumber string) func(event *SMSConfigTwilioChangedEvent) {
 	return func(e *SMSConfigTwilioChangedEvent) {
 		e.SenderNumber = &senderNumber
 	}
+}
+
+func (e *SMSConfigTwilioChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *SMSConfigTwilioChangedEvent) Payload() interface{} {
@@ -128,20 +134,8 @@ func (e *SMSConfigTwilioChangedEvent) UniqueConstraints() []*eventstore.UniqueCo
 	return nil
 }
 
-func SMSConfigTwilioChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smsConfigChanged := &SMSConfigTwilioChangedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smsConfigChanged)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
-	}
-
-	return smsConfigChanged, nil
-}
-
 type SMSConfigTwilioTokenChangedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 
 	ID    string              `json:"id,omitempty"`
 	Token *crypto.CryptoValue `json:"token,omitempty"`
@@ -154,7 +148,7 @@ func NewSMSConfigTokenChangedEvent(
 	token *crypto.CryptoValue,
 ) *SMSConfigTwilioTokenChangedEvent {
 	return &SMSConfigTwilioTokenChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			SMSConfigTwilioTokenChangedEventType,
@@ -162,6 +156,10 @@ func NewSMSConfigTokenChangedEvent(
 		ID:    id,
 		Token: token,
 	}
+}
+
+func (e *SMSConfigTwilioTokenChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *SMSConfigTwilioTokenChangedEvent) Payload() interface{} {
@@ -172,40 +170,35 @@ func (e *SMSConfigTwilioTokenChangedEvent) UniqueConstraints() []*eventstore.Uni
 	return nil
 }
 
-func SMSConfigTwilioTokenChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smtpConfigTokenChagned := &SMSConfigTwilioTokenChangedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smtpConfigTokenChagned)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-fi9Wf", "unable to unmarshal sms config token changed")
-	}
-
-	return smtpConfigTokenChagned, nil
-}
-
 type SMSConfigHTTPAddedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 
-	ID       string `json:"id,omitempty"`
-	Endpoint string `json:"endpoint,omitempty"`
+	ID          string `json:"id,omitempty"`
+	Description string `json:"description,omitempty"`
+	Endpoint    string `json:"endpoint,omitempty"`
 }
 
 func NewSMSConfigHTTPAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id,
+	description,
 	endpoint string,
 ) *SMSConfigHTTPAddedEvent {
 	return &SMSConfigHTTPAddedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			SMSConfigHTTPAddedEventType,
 		),
-		ID:       id,
-		Endpoint: endpoint,
+		ID:          id,
+		Description: description,
+		Endpoint:    endpoint,
 	}
+}
+
+func (e *SMSConfigHTTPAddedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *SMSConfigHTTPAddedEvent) Payload() interface{} {
@@ -216,23 +209,12 @@ func (e *SMSConfigHTTPAddedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 	return nil
 }
 
-func SMSConfigHTTPAddedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smsConfigAdded := &SMSConfigHTTPAddedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smsConfigAdded)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
-	}
-
-	return smsConfigAdded, nil
-}
-
 type SMSConfigHTTPChangedEvent struct {
-	eventstore.BaseEvent `json:"-"`
+	*eventstore.BaseEvent `json:"-"`
 
-	ID       string  `json:"id,omitempty"`
-	Endpoint *string `json:"endpoint,omitempty"`
+	ID          string  `json:"id,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Endpoint    *string `json:"endpoint,omitempty"`
 }
 
 func NewSMSConfigHTTPChangedEvent(
@@ -245,7 +227,7 @@ func NewSMSConfigHTTPChangedEvent(
 		return nil, zerrors.ThrowPreconditionFailed(nil, "IAM-smn8e", "Errors.NoChangesFound")
 	}
 	changeEvent := &SMSConfigHTTPChangedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			SMSConfigHTTPChangedEventType,
@@ -260,10 +242,19 @@ func NewSMSConfigHTTPChangedEvent(
 
 type SMSConfigHTTPChanges func(event *SMSConfigHTTPChangedEvent)
 
+func ChangeSMSConfigHTTPDescription(description string) func(event *SMSConfigHTTPChangedEvent) {
+	return func(e *SMSConfigHTTPChangedEvent) {
+		e.Description = &description
+	}
+}
 func ChangeSMSConfigHTTPEndpoint(endpoint string) func(event *SMSConfigHTTPChangedEvent) {
 	return func(e *SMSConfigHTTPChangedEvent) {
 		e.Endpoint = &endpoint
 	}
+}
+
+func (e *SMSConfigHTTPChangedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *SMSConfigHTTPChangedEvent) Payload() interface{} {
@@ -274,21 +265,13 @@ func (e *SMSConfigHTTPChangedEvent) UniqueConstraints() []*eventstore.UniqueCons
 	return nil
 }
 
-func SMSConfigHTTPChangedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smsConfigChanged := &SMSConfigHTTPChangedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smsConfigChanged)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-smwiR", "unable to unmarshal sms config twilio added")
-	}
-
-	return smsConfigChanged, nil
+type SMSConfigTwilioActivatedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+	ID                    string `json:"id,omitempty"`
 }
 
-type SMSConfigTwilioActivatedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	ID                   string `json:"id,omitempty"`
+func (e *SMSConfigTwilioActivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *SMSConfigTwilioActivatedEvent) Payload() interface{} {
@@ -299,21 +282,9 @@ func (e *SMSConfigTwilioActivatedEvent) UniqueConstraints() []*eventstore.Unique
 	return nil
 }
 
-func SMSConfigTwilioActivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smsConfigActivated := &SMSConfigTwilioActivatedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smsConfigActivated)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio activated changed")
-	}
-
-	return smsConfigActivated, nil
-}
-
 type SMSConfigActivatedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	ID                   string `json:"id,omitempty"`
+	*eventstore.BaseEvent `json:"-"`
+	ID                    string `json:"id,omitempty"`
 }
 
 func NewSMSConfigActivatedEvent(
@@ -322,13 +293,17 @@ func NewSMSConfigActivatedEvent(
 	id string,
 ) *SMSConfigActivatedEvent {
 	return &SMSConfigActivatedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			SMSConfigActivatedEventType,
 		),
 		ID: id,
 	}
+}
+
+func (e *SMSConfigActivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *SMSConfigActivatedEvent) Payload() interface{} {
@@ -339,21 +314,13 @@ func (e *SMSConfigActivatedEvent) UniqueConstraints() []*eventstore.UniqueConstr
 	return nil
 }
 
-func SMSConfigActivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smsConfigActivated := &SMSConfigActivatedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smsConfigActivated)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio activated changed")
-	}
-
-	return smsConfigActivated, nil
+type SMSConfigTwilioDeactivatedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+	ID                    string `json:"id,omitempty"`
 }
 
-type SMSConfigTwilioDeactivatedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	ID                   string `json:"id,omitempty"`
+func (e *SMSConfigTwilioDeactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *SMSConfigTwilioDeactivatedEvent) Payload() interface{} {
@@ -364,21 +331,9 @@ func (e *SMSConfigTwilioDeactivatedEvent) UniqueConstraints() []*eventstore.Uniq
 	return nil
 }
 
-func SMSConfigTwilioDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smsConfigDeactivated := &SMSConfigTwilioDeactivatedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smsConfigDeactivated)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio deactivated changed")
-	}
-
-	return smsConfigDeactivated, nil
-}
-
 type SMSConfigDeactivatedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	ID                   string `json:"id,omitempty"`
+	*eventstore.BaseEvent `json:"-"`
+	ID                    string `json:"id,omitempty"`
 }
 
 func NewSMSConfigDeactivatedEvent(
@@ -387,13 +342,17 @@ func NewSMSConfigDeactivatedEvent(
 	id string,
 ) *SMSConfigDeactivatedEvent {
 	return &SMSConfigDeactivatedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			SMSConfigDeactivatedEventType,
 		),
 		ID: id,
 	}
+}
+
+func (e *SMSConfigDeactivatedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *SMSConfigDeactivatedEvent) Payload() interface{} {
@@ -404,21 +363,13 @@ func (e *SMSConfigDeactivatedEvent) UniqueConstraints() []*eventstore.UniqueCons
 	return nil
 }
 
-func SMSConfigDeactivatedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smsConfigDeactivated := &SMSConfigDeactivatedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smsConfigDeactivated)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-dn92f", "unable to unmarshal sms config twilio deactivated changed")
-	}
-
-	return smsConfigDeactivated, nil
+type SMSConfigTwilioRemovedEvent struct {
+	*eventstore.BaseEvent `json:"-"`
+	ID                    string `json:"id,omitempty"`
 }
 
-type SMSConfigTwilioRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	ID                   string `json:"id,omitempty"`
+func (e *SMSConfigTwilioRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
 }
 
 func (e *SMSConfigTwilioRemovedEvent) Payload() interface{} {
@@ -429,21 +380,9 @@ func (e *SMSConfigTwilioRemovedEvent) UniqueConstraints() []*eventstore.UniqueCo
 	return nil
 }
 
-func SMSConfigTwilioRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smsConfigRemoved := &SMSConfigTwilioRemovedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smsConfigRemoved)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal sms config removed")
-	}
-
-	return smsConfigRemoved, nil
-}
-
 type SMSConfigRemovedEvent struct {
-	eventstore.BaseEvent `json:"-"`
-	ID                   string `json:"id,omitempty"`
+	*eventstore.BaseEvent `json:"-"`
+	ID                    string `json:"id,omitempty"`
 }
 
 func NewSMSConfigRemovedEvent(
@@ -452,7 +391,7 @@ func NewSMSConfigRemovedEvent(
 	id string,
 ) *SMSConfigRemovedEvent {
 	return &SMSConfigRemovedEvent{
-		BaseEvent: *eventstore.NewBaseEventForPush(
+		BaseEvent: eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			SMSConfigRemovedEventType,
@@ -461,22 +400,14 @@ func NewSMSConfigRemovedEvent(
 	}
 }
 
+func (e *SMSConfigRemovedEvent) SetBaseEvent(event *eventstore.BaseEvent) {
+	e.BaseEvent = event
+}
+
 func (e *SMSConfigRemovedEvent) Payload() interface{} {
 	return e
 }
 
 func (e *SMSConfigRemovedEvent) UniqueConstraints() []*eventstore.UniqueConstraint {
 	return nil
-}
-
-func SMSConfigRemovedEventMapper(event eventstore.Event) (eventstore.Event, error) {
-	smsConfigRemoved := &SMSConfigRemovedEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := event.Unmarshal(smsConfigRemoved)
-	if err != nil {
-		return nil, zerrors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal sms config removed")
-	}
-
-	return smsConfigRemoved, nil
 }

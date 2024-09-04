@@ -19,13 +19,15 @@ type IAMSMSConfigWriteModel struct {
 }
 
 type TwilioConfig struct {
+	Description  string
 	SID          string
 	Token        *crypto.CryptoValue
 	SenderNumber string
 }
 
 type HTTPConfig struct {
-	Endpoint string
+	Description string
+	Endpoint    string
 }
 
 func NewIAMSMSConfigWriteModel(instanceID, id string) *IAMSMSConfigWriteModel {
@@ -141,7 +143,7 @@ func (wm *IAMSMSConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *IAMSMSConfigWriteModel) NewTwilioChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, sid, senderNumber string) (*instance.SMSConfigTwilioChangedEvent, bool, error) {
+func (wm *IAMSMSConfigWriteModel) NewTwilioChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id string, description, sid, senderNumber *string) (*instance.SMSConfigTwilioChangedEvent, bool, error) {
 	changes := make([]instance.SMSConfigTwilioChanges, 0)
 	var err error
 
@@ -149,11 +151,14 @@ func (wm *IAMSMSConfigWriteModel) NewTwilioChangedEvent(ctx context.Context, agg
 		return nil, false, nil
 	}
 
-	if wm.Twilio.SID != sid {
-		changes = append(changes, instance.ChangeSMSConfigTwilioSID(sid))
+	if description != nil && wm.Twilio.Description != *description {
+		changes = append(changes, instance.ChangeSMSConfigTwilioDescription(*description))
 	}
-	if wm.Twilio.SenderNumber != senderNumber {
-		changes = append(changes, instance.ChangeSMSConfigTwilioSenderNumber(senderNumber))
+	if sid != nil && wm.Twilio.SID != *sid {
+		changes = append(changes, instance.ChangeSMSConfigTwilioSID(*sid))
+	}
+	if senderNumber != nil && wm.Twilio.SenderNumber != *senderNumber {
+		changes = append(changes, instance.ChangeSMSConfigTwilioSenderNumber(*senderNumber))
 	}
 
 	if len(changes) == 0 {
@@ -166,7 +171,7 @@ func (wm *IAMSMSConfigWriteModel) NewTwilioChangedEvent(ctx context.Context, agg
 	return changeEvent, true, nil
 }
 
-func (wm *IAMSMSConfigWriteModel) NewHTTPChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, endpoint string) (*instance.SMSConfigHTTPChangedEvent, bool, error) {
+func (wm *IAMSMSConfigWriteModel) NewHTTPChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id string, description, endpoint *string) (*instance.SMSConfigHTTPChangedEvent, bool, error) {
 	changes := make([]instance.SMSConfigHTTPChanges, 0)
 	var err error
 
@@ -174,8 +179,11 @@ func (wm *IAMSMSConfigWriteModel) NewHTTPChangedEvent(ctx context.Context, aggre
 		return nil, false, nil
 	}
 
-	if wm.HTTP.Endpoint != endpoint {
-		changes = append(changes, instance.ChangeSMSConfigHTTPEndpoint(endpoint))
+	if description != nil && wm.HTTP.Description != *description {
+		changes = append(changes, instance.ChangeSMSConfigHTTPDescription(*description))
+	}
+	if endpoint != nil && wm.HTTP.Endpoint != *endpoint {
+		changes = append(changes, instance.ChangeSMSConfigHTTPEndpoint(*endpoint))
 	}
 
 	if len(changes) == 0 {
