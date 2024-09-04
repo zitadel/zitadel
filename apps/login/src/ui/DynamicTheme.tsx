@@ -13,15 +13,8 @@ export default function DynamicTheme({
   children: React.ReactNode;
   branding?: BrandingSettings;
 }) {
-  let partial: Partial<BrandingSettings> | undefined;
-  if (branding) {
-    partial = {
-      lightTheme: branding?.lightTheme,
-      darkTheme: branding?.darkTheme,
-    };
-  }
   return (
-    <ThemeWrapper branding={partial}>
+    <ThemeWrapper branding={branding}>
       {/* <ThemeProvider> */}
       <LayoutProviders>
         <div className="rounded-lg bg-vc-border-gradient dark:bg-dark-vc-border-gradient p-px shadow-lg shadow-black/5 dark:shadow-black/20 mb-10">

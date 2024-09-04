@@ -4,7 +4,5 @@ export type ZitadelReactProps = {
 };
 
 export function ZitadelReactProvider({ dark, children }: ZitadelReactProps) {
-  return (
-    <div className={`${dark ? "ztdl-dark" : "ztdl-light"} `}>{children}</div>
-  );
+  return <div className={`${dark ? "ztdl-dark" : "ztdl-light"} `}>{children}</div>;
 }

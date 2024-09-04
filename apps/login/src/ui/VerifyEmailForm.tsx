@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
 import Alert from "@/ui/Alert";
+import { resendVerifyEmail, verifyUserByEmail } from "@/lib/server/email";
 
 type Inputs = {
   code: string;
@@ -50,71 +51,49 @@ export default function VerifyEmailForm({
 
   const router = useRouter();
 
-  async function submitCode(values: Inputs) {
-    setLoading(true);
-    const res = await fetch("/api/verifyemail", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        code: values.code,
-        userId,
-        organization,
-      }),
-    });
-
-    const response = await res.json();
-
-    setLoading(false);
-    if (!res.ok) {
-      setError(response.rawMessage);
-      return Promise.reject(response);
-    } else {
-      return response;
-    }
-  }
-
   async function resendCode() {
     setLoading(true);
-    const res = await fetch("/api/resendverifyemail", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId,
-      }),
+    const response = await resendVerifyEmail({
+      userId,
+    }).catch((error: Error) => {
+      setLoading(false);
+      setError(error.message);
     });
 
-    const response = await res.json();
-
-    if (!res.ok) {
-      setLoading(false);
-      setError(response.details);
-      return Promise.reject(response);
-    } else {
-      setLoading(false);
-      return response;
-    }
+    setLoading(false);
+    return response;
   }
 
-  function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
-    return submitCode(value).then((resp: any) => {
-      const params = new URLSearchParams({});
-
-      if (organization) {
-        params.set("organization", organization);
-      }
-
-      if (authRequestId && sessionId) {
-        params.set("authRequest", authRequestId);
-        params.set("sessionId", sessionId);
-        return router.push(`/login?` + params);
-      } else {
-        return router.push(`/loginname?` + params);
-      }
+  async function submitCodeAndContinue(value: Inputs): Promise<boolean | void> {
+    setLoading(true);
+    const verifyResponse = await verifyUserByEmail({
+      code: value.code,
+      userId,
+    }).catch((error: Error) => {
+      setLoading(false);
+      setError(error.message);
     });
+
+    setLoading(false);
+
+    if (!verifyResponse) {
+      setError("Could not verify email");
+      return;
+    }
+
+    const params = new URLSearchParams({});
+
+    if (organization) {
+      params.set("organization", organization);
+    }
+
+    if (authRequestId && sessionId) {
+      params.set("authRequest", authRequestId);
+      params.set("sessionId", sessionId);
+      return router.push(`/login?` + params);
+    } else {
+      return router.push(`/loginname?` + params);
+    }
   }
 
   return (

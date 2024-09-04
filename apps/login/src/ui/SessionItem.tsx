@@ -6,6 +6,9 @@ import { Avatar } from "./Avatar";
 import moment from "moment";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { timestampDate } from "@zitadel/client";
+import { deleteSession } from "@/lib/zitadel";
+import { cleanupSession } from "@/lib/server/session";
 
 export default function SessionItem({
   session,
@@ -16,41 +19,30 @@ export default function SessionItem({
   reload: () => void;
   authRequestId?: string;
 }) {
-  // TODO: remove casting when bufbuild/protobuf-es@v2 is released
-  session = Session.fromJson(session as any);
   const [loading, setLoading] = useState<boolean>(false);
 
   async function clearSession(id: string) {
     setLoading(true);
-    const res = await fetch("/api/session?" + new URLSearchParams({ id }), {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: id,
-      }),
+    const response = await cleanupSession({
+      sessionId: id,
+    }).catch((error) => {
+      setError(error.message);
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      //   setError(response.details);
-      return Promise.reject(response);
-    } else {
-      return response;
-    }
+    return response;
   }
 
   const validPassword = session?.factors?.password?.verifiedAt;
   const validPasskey = session?.factors?.webAuthN?.verifiedAt;
   const stillValid = session.expirationDate
-    ? session.expirationDate.toDate() > new Date()
+    ? timestampDate(session.expirationDate) > new Date()
     : true;
 
   const validDate = validPassword || validPasskey;
   const validUser = (validPassword || validPasskey) && stillValid;
+
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <Link
@@ -106,7 +98,7 @@ export default function SessionItem({
         </span>
         {validUser && (
           <span className="text-xs opacity-80">
-            {validDate && moment(validDate.toDate()).fromNow()}
+            {validDate && moment(timestampDate(validDate)).fromNow()}
           </span>
         )}
       </div>

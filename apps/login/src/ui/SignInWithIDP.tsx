@@ -12,6 +12,7 @@ import Alert from "./Alert";
 import { IdentityProvider } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
 import { idpTypeToSlug } from "@/lib/idp";
 import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { startIDPFlow } from "@/lib/server/idp";
 
 export interface SignInWithIDPProps {
   children?: ReactNode;
@@ -27,11 +28,6 @@ export function SignInWithIDP({
   authRequestId,
   organization,
 }: SignInWithIDPProps) {
-  // TODO: remove casting when bufbuild/protobuf-es@v2 is released
-  identityProviders = identityProviders.map((idp) =>
-    IdentityProvider.fromJson(idp as any),
-  );
-
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const router = useRouter();
@@ -49,28 +45,30 @@ export function SignInWithIDP({
       params.set("organization", organization);
     }
 
-    const res = await fetch("/api/idp/start", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        idpId,
-        successUrl:
-          `${host}/idp/${provider}/success?` + new URLSearchParams(params),
-        failureUrl:
-          `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
-      }),
+    const response = await startIDPFlow({
+      idpId,
+      successUrl:
+        `${host}/idp/${provider}/success?` + new URLSearchParams(params),
+      failureUrl:
+        `${host}/idp/${provider}/failure?` + new URLSearchParams(params),
+    }).catch((error: Error) => {
+      setError(error.message ?? "Could not start IDP flow");
     });
 
-    const response = await res.json();
-
     setLoading(false);
-    if (!res.ok) {
-      setError(response.details);
-      return Promise.reject(response.details);
-    }
+
     return response;
+  }
+
+  async function navigateToAuthUrl(id: string, type: IdentityProviderType) {
+    const startFlowResponse = await startFlow(id, idpTypeToSlug(type));
+    if (
+      startFlowResponse &&
+      startFlowResponse.nextStep.case === "authUrl" &&
+      startFlowResponse?.nextStep.value
+    ) {
+      router.push(startFlowResponse.nextStep.value);
+    }
   }
 
   return (
@@ -83,12 +81,7 @@ export function SignInWithIDP({
                 <SignInWithGithub
                   key={`idp-${i}`}
                   onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.GITHUB),
-                    ).then(({ authUrl }) => {
-                      router.push(authUrl);
-                    })
+                    navigateToAuthUrl(idp.id, IdentityProviderType.GITHUB)
                   }
                 ></SignInWithGithub>
               );
@@ -96,7 +89,9 @@ export function SignInWithIDP({
               return (
                 <SignInWithGithub
                   key={`idp-${i}`}
-                  onClick={() => alert("TODO: unimplemented")}
+                  onClick={() =>
+                    navigateToAuthUrl(idp.id, IdentityProviderType.GITHUB_ES)
+                  }
                 ></SignInWithGithub>
               );
             case IdentityProviderType.AZURE_AD:
@@ -104,12 +99,7 @@ export function SignInWithIDP({
                 <SignInWithAzureAD
                   key={`idp-${i}`}
                   onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.AZURE_AD),
-                    ).then(({ authUrl }) => {
-                      router.push(authUrl);
-                    })
+                    navigateToAuthUrl(idp.id, IdentityProviderType.AZURE_AD)
                   }
                 ></SignInWithAzureAD>
               );
@@ -120,12 +110,7 @@ export function SignInWithIDP({
                   e2e="google"
                   name={idp.name}
                   onClick={() =>
-                    startFlow(
-                      idp.id,
-                      idpTypeToSlug(IdentityProviderType.GOOGLE),
-                    ).then(({ authUrl }) => {
-                      router.push(authUrl);
-                    })
+                    navigateToAuthUrl(idp.id, IdentityProviderType.GOOGLE)
                   }
                 ></SignInWithGoogle>
               );
@@ -133,14 +118,21 @@ export function SignInWithIDP({
               return (
                 <SignInWithGitlab
                   key={`idp-${i}`}
-                  onClick={() => alert("TODO: unimplemented")}
+                  onClick={() =>
+                    navigateToAuthUrl(idp.id, IdentityProviderType.GITLAB)
+                  }
                 ></SignInWithGitlab>
               );
             case IdentityProviderType.GITLAB_SELF_HOSTED:
               return (
                 <SignInWithGitlab
                   key={`idp-${i}`}
-                  onClick={() => alert("TODO: unimplemented")}
+                  onClick={() =>
+                    navigateToAuthUrl(
+                      idp.id,
+                      IdentityProviderType.GITLAB_SELF_HOSTED,
+                    )
+                  }
                 ></SignInWithGitlab>
               );
             default:

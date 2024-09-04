@@ -4,7 +4,5 @@ export type ZitadelNextProps = {
 };
 
 export function ZitadelNextProvider({ dark, children }: ZitadelNextProps) {
-  return (
-    <div className={`${dark ? "ztdl-dark" : "ztdl-light"} `}>{children}</div>
-  );
+  return <div className={`${dark ? "ztdl-dark" : "ztdl-light"} `}>{children}</div>;
 }
