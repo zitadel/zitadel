@@ -6,10 +6,12 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/zitadel/logging"
 	"sigs.k8s.io/yaml"
 )
 
 type Config struct {
+	Log          *logging.Config
 	Hostname     string
 	Port         uint16
 	Secure       bool
@@ -42,6 +44,9 @@ func init() {
 	tmpDir = filepath.Join(string(bytes.TrimSpace(out)), "tmp")
 
 	if err := yaml.Unmarshal(clientYAML, &loadedConfig); err != nil {
+		panic(err)
+	}
+	if err := loadedConfig.Log.SetLogger(); err != nil {
 		panic(err)
 	}
 	SystemToken = systemUserToken()

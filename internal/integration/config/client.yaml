@@ -1,3 +1,7 @@
+Log:
+  Level: info
+  Formatter:
+    Format: text
 Hostname: localhost
 Port: 8080
 Secure: false
