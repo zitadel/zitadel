@@ -71,7 +71,7 @@ export default function VerifyEmailForm({
       userId,
     }).catch((error: Error) => {
       setLoading(false);
-      setError(error.message);
+      setError("The provided code is invalid.");
     });
 
     setLoading(false);
