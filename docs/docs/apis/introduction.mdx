@@ -59,7 +59,7 @@ The [OIDC Playground](/docs/apis/openidoauth/authrequest) is for testing OpenID 
 
 ### Custom
 
-ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service_v2) or get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service).
+ZITADEL allows to authenticate users by creating a session with the [Session API](/docs/apis/resources/session_service_v2) or get OIDC authentication request details with the [OIDC service API](/docs/apis/resources/oidc_service_v2).
 User authorizations can be [retrieved as roles from our APIs](/docs/guides/integrate/retrieve-user-roles).
 
 Refer to our guide to learn how to [build your own login UI](/docs/guides/integrate/login-ui)
@@ -72,7 +72,7 @@ The context of a request is explicit and provided as part of the request, like a
 
 :::info
 We are migrating to a resource-based API approach.
-You might need to use the existing [service-based](#zitadel-apis-service-based) APIs for now to manage Organizations, Instances, Assets etc.
+You might need to use the existing [service-based](#zitadel-api-v1-service-based) APIs for now to manage Organizations, Instances, Assets etc.
 :::
 
 ### API V2
@@ -186,7 +186,7 @@ For a full proto example, have a look at the [ZITADELIdentityProviders service](
 
 #### Resource Services
 
-All resource services by default support the following CRUD operations [as described above](#standard-resources-behavior).
+All resource services by default support the following CRUD operations [as described above](#standard-resources).
 
 - Create
 - Read (get, search)

@@ -47,7 +47,7 @@ To apply best practices to your production setup we created a step by step check
 ### Security
 
 - [ ] Ensure that your ZITADEL does not use [the default, example or _easy-to-guess_ credentials](/docs/self-hosting/manage/database#zitadel-credentials)
-- [ ] Use a FQDN and a trusted valid certificate for external [TLS](/docs/self-hosting/manage/tls_modes#http2) connections
+- [ ] Use a FQDN and a trusted valid certificate for external [TLS](/docs/self-hosting/manage/tls_modes) connections
 - [ ] Create service accounts for applications that interact with ZITADEL's APIs
 - [ ] Make use of a CDN service to decrease the load for static assets served by ZITADEL
 - [ ] Make use of a [security scanner](https://owasp.org/www-community/Vulnerability_Scanning_Tools) to test your application and deployment environment

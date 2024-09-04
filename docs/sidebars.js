@@ -905,6 +905,24 @@ module.exports = {
         },
         {
           type: "category",
+          label: "OIDC Sessions",
+          items: [
+            {
+              type: "category",
+              label: "v2 (stable)",
+              link: {
+                type: "generated-index",
+                title: "OIDC Service API",
+                slug: "/apis/resources/oidc_service_v2",
+                description:
+                    "Get OIDC Auth Request details and create callback URLs.\n"
+              },
+              items: require("./docs/apis/resources/oidc_service_v2/sidebar.ts"),
+            },
+          ],
+        },
+        {
+          type: "category",
           label: "Organizations",
           items: [
             {
@@ -1106,25 +1124,7 @@ module.exports = {
                     "This API is intended to manage sessions in a ZITADEL instance.\n"
               },
               items: require("./docs/apis/resources/session_service_v2/sidebar.ts"),
-            },
-            {
-              type: "category",
-              label: "OIDC Extension",
-              items: [
-                {
-                  type: "category",
-                  label: "v2 (stable)",
-                  link: {
-                    type: "generated-index",
-                    title: "OIDC Service API",
-                    slug: "/apis/resources/oidc_service_v2",
-                    description:
-                        "Get OIDC Auth Request details and create callback URLs.\n"
-                  },
-                  items: require("./docs/apis/resources/oidc_service_v2/sidebar.ts"),
-                },
-              ],
-            },
+            }
           ],
         },
         {
