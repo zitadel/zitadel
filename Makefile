@@ -109,7 +109,7 @@ clean:
 
 .PHONY: core_unit_test
 core_unit_test:
-	go test -race -coverprofile=profile.cov ./...
+	go test -race -coverprofile=profile.cov -coverpkg=./internal/...  ./...
 
 .PHONY: core_integration_db_up
 core_integration_db_up:
@@ -149,7 +149,7 @@ core_integration_server_stop:
 
 .PHONY: core_integration_reports
 core_integration_reports:
-	go tool covdata textfmt -i tmp/coverage -o profile.cov
+	go tool covdata textfmt -i=tmp/coverage -pkg=github.com/zitadel/zitadel/internal/...,github.com/zitadel/zitadel/cmd/... -o profile.cov
 	$(RM) -r tmp/coverage
 	cat tmp/zitadel.log
 
