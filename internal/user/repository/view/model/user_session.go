@@ -63,6 +63,11 @@ type UserSessionView struct {
 	ID                           sql.NullString `json:"id" gorm:"-"`
 }
 
+type ActiveUserAgentUserIDs struct {
+	UserAgentID string
+	UserIDs     []string
+}
+
 type userAgentIDPayload struct {
 	ID string `json:"userAgentID"`
 }
