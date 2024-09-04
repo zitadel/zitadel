@@ -114,6 +114,7 @@ type SMTPConfig struct {
 	AggregateID   string
 	ID            string
 	Sequence      uint64
+	Description   string
 
 	SMTPConfig *SMTP
 	HTTPConfig *HTTP
@@ -122,7 +123,6 @@ type SMTPConfig struct {
 }
 
 type SMTP struct {
-	Description    string
 	TLS            bool
 	SenderAddress  string
 	SenderName     string
@@ -186,6 +186,7 @@ func prepareSMTPConfigQuery(ctx context.Context, db prepareDatabase) (sq.SelectB
 			SMTPConfigColumnChangeDate.identifier(),
 			SMTPConfigColumnResourceOwner.identifier(),
 			SMTPConfigColumnSequence.identifier(),
+
 			SMTPConfigColumnTLS.identifier(),
 			SMTPConfigColumnSenderAddress.identifier(),
 			SMTPConfigColumnSenderName.identifier(),

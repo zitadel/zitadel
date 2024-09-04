@@ -15,138 +15,189 @@ import (
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
 
-func (c *Commands) AddSMTPConfig(ctx context.Context, instanceID string, config *smtp.Config) (string, *domain.ObjectDetails, error) {
-	id, err := c.idGenerator.Next()
-	if err != nil {
-		return "", nil, err
+type AddSMTPConfig struct {
+	Details       *domain.ObjectDetails
+	ResourceOwner string
+	ID            string
+
+	Description    string
+	Host           string
+	User           string
+	Password       string
+	Tls            bool
+	From           string
+	FromName       string
+	ReplyToAddress string
+}
+
+type SMTP struct {
+}
+
+func (c *Commands) AddSMTPConfig(ctx context.Context, config *AddSMTPConfig) (err error) {
+	if config.ResourceOwner == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-PQN0wsqSyi", "Errors.ResourceOwnerMissing")
+	}
+	if config.ID == "" {
+		config.ID, err = c.idGenerator.Next()
+		if err != nil {
+			return err
+		}
 	}
 
 	from := strings.TrimSpace(config.From)
 	if from == "" {
-		return "", nil, zerrors.ThrowInvalidArgument(nil, "INST-ASv2d", "Errors.Invalid.Argument")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-SAAFpV8VKV", "Errors.Invalid.Argument")
 	}
 	fromSplitted := strings.Split(from, "@")
 	senderDomain := fromSplitted[len(fromSplitted)-1]
 	description := strings.TrimSpace(config.Description)
 	replyTo := strings.TrimSpace(config.ReplyToAddress)
-	hostAndPort := strings.TrimSpace(config.SMTP.Host)
+	hostAndPort := strings.TrimSpace(config.Host)
 
 	if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
-		return "", nil, zerrors.ThrowInvalidArgument(nil, "INST-9JdRe", "Errors.Invalid.Argument")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-EvAtufIinh", "Errors.Invalid.Argument")
 	}
 
 	var smtpPassword *crypto.CryptoValue
-	if config.SMTP.Password != "" {
-		smtpPassword, err = crypto.Encrypt([]byte(config.SMTP.Password), c.smtpEncryption)
+	if config.Password != "" {
+		smtpPassword, err = crypto.Encrypt([]byte(config.Password), c.smtpEncryption)
 		if err != nil {
-			return "", nil, err
+			return err
 		}
 	}
 
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, senderDomain)
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, config.ResourceOwner, config.ID, senderDomain)
 	if err != nil {
-		return "", nil, err
+		return err
 	}
 
 	err = checkSenderAddress(smtpConfigWriteModel)
 	if err != nil {
-		return "", nil, err
+		return err
 	}
 
 	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, instance.NewSMTPConfigAddedEvent(
 		ctx,
 		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
-		id,
+		config.ID,
 		description,
 		config.Tls,
 		config.From,
 		config.FromName,
 		replyTo,
 		hostAndPort,
-		config.SMTP.User,
+		config.User,
 		smtpPassword,
 	))
 	if err != nil {
-		return "", nil, err
+		return err
 	}
-	return id, writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
+	config.Details = writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel)
+	return nil
 }
 
-func (c *Commands) ChangeSMTPConfig(ctx context.Context, instanceID string, id string, config *smtp.Config) (*domain.ObjectDetails, error) {
-	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-x8vo9", "Errors.IDMissing")
+type ChangeSMTPConfig struct {
+	Details       *domain.ObjectDetails
+	ResourceOwner string
+	ID            string
+
+	Description    string
+	Host           string
+	User           string
+	Password       string
+	Tls            bool
+	From           string
+	FromName       string
+	ReplyToAddress string
+}
+
+func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *ChangeSMTPConfig) error {
+	if config.ResourceOwner == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-jwA8gxldy3", "Errors.ResourceOwnerMissing")
+	}
+	if config.ID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-2JPlSRzuHy", "Errors.IDMissing")
 	}
 
 	from := strings.TrimSpace(config.From)
 	if from == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INST-HSv2d", "Errors.Invalid.Argument")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-gyPUXOTA4N", "Errors.Invalid.Argument")
 	}
 	fromSplitted := strings.Split(from, "@")
 	senderDomain := fromSplitted[len(fromSplitted)-1]
 	description := strings.TrimSpace(config.Description)
 	replyTo := strings.TrimSpace(config.ReplyToAddress)
-	hostAndPort := strings.TrimSpace(config.SMTP.Host)
+	hostAndPort := strings.TrimSpace(config.Host)
 	if _, _, err := net.SplitHostPort(hostAndPort); err != nil {
-		return nil, zerrors.ThrowInvalidArgument(nil, "INST-Kv875", "Errors.Invalid.Argument")
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-kZNVkuL32L", "Errors.Invalid.Argument")
 	}
 
 	var smtpPassword *crypto.CryptoValue
 	var err error
-	if config.SMTP.Password != "" {
-		smtpPassword, err = crypto.Encrypt([]byte(config.SMTP.Password), c.smtpEncryption)
+	if config.Password != "" {
+		smtpPassword, err = crypto.Encrypt([]byte(config.Password), c.smtpEncryption)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, senderDomain)
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, config.ResourceOwner, config.ID, senderDomain)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if !smtpConfigWriteModel.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-7j8gv", "Errors.SMTPConfig.NotFound")
+		return zerrors.ThrowNotFound(nil, "COMMAND-j5IDFtt3T1", "Errors.SMTPConfig.NotFound")
 	}
 
 	err = checkSenderAddress(smtpConfigWriteModel)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	changedEvent, hasChanged, err := smtpConfigWriteModel.NewChangedEvent(
 		ctx,
 		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
-		id,
+		config.ID,
 		description,
 		config.Tls,
 		from,
 		config.FromName,
 		replyTo,
 		hostAndPort,
-		config.SMTP.User,
+		config.User,
 		smtpPassword,
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lh3op", "Errors.NoChangesFound")
+		config.Details = writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel)
+		return nil
 	}
 
 	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, changedEvent)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
+	config.Details = writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel)
+	return nil
 }
 
-func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, id string, password string) (*domain.ObjectDetails, error) {
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, resourceOwner, id string, password string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-gHAyvUXCAF", "Errors.ResourceOwnerMissing")
+	}
+	if id == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-BCkAf7LcJA", "Errors.IDMissing")
+	}
+
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, resourceOwner, id, "")
 	if err != nil {
 		return nil, err
 	}
 	if smtpConfigWriteModel.State != domain.SMTPConfigStateActive {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-rDHzqjGuKQ", "Errors.SMTPConfig.NotFound")
 	}
 
 	var smtpPassword *crypto.CryptoValue
@@ -165,120 +216,140 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, instanceID, id 
 	if err != nil {
 		return nil, err
 	}
-
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddSMTPConfigHTTP(ctx context.Context, instanceID string, config *smtp.ConfigHTTP) (string, *domain.ObjectDetails, error) {
-	id, err := c.idGenerator.Next()
-	if err != nil {
-		return "", nil, err
+type AddSMTPConfigHTTP struct {
+	Details       *domain.ObjectDetails
+	ResourceOwner string
+	ID            string
+
+	Description string
+	Endpoint    string
+}
+
+func (c *Commands) AddSMTPConfigHTTP(ctx context.Context, config *AddSMTPConfigHTTP) (err error) {
+	if config.ResourceOwner == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-FTNDXc8ACS", "Errors.ResourceOwnerMissing")
+	}
+	if config.ID == "" {
+		config.ID, err = c.idGenerator.Next()
+		if err != nil {
+			return err
+		}
 	}
 
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, config.ResourceOwner, config.ID, "")
 	if err != nil {
-		return "", nil, err
+		return err
 	}
 
 	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, instance.NewSMTPConfigHTTPAddedEvent(
 		ctx,
 		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
-		id,
+		config.ID,
 		config.Description,
 		config.Endpoint,
 	))
 	if err != nil {
-		return "", nil, err
+		return err
 	}
-	return id, writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
+	config.Details = writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel)
+	return nil
 }
 
-func (c *Commands) ChangeSMTPConfigHTTP(ctx context.Context, instanceID string, id string, config *smtp.ConfigHTTP) (*domain.ObjectDetails, error) {
-	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-x8vo9", "Errors.IDMissing")
+type ChangeSMTPConfigHTTP struct {
+	Details       *domain.ObjectDetails
+	ResourceOwner string
+	ID            string
+
+	Description string
+	Endpoint    string
+}
+
+func (c *Commands) ChangeSMTPConfigHTTP(ctx context.Context, config *ChangeSMTPConfigHTTP) (err error) {
+	if config.ResourceOwner == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-k7QCGOWyJA", "Errors.ResourceOwnerMissing")
+	}
+	if config.ID == "" {
+		return zerrors.ThrowInvalidArgument(nil, "COMMAND-2MHkV8ObWo", "Errors.IDMissing")
 	}
 
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, config.ResourceOwner, config.ID, "")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if !smtpConfigWriteModel.State.Exists() || smtpConfigWriteModel.HTTPConfig == nil {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-7j8gv", "Errors.SMTPConfig.NotFound")
-	}
-
-	err = checkSenderAddress(smtpConfigWriteModel)
-	if err != nil {
-		return nil, err
+		return zerrors.ThrowNotFound(nil, "COMMAND-xIrdledqv4", "Errors.SMTPConfig.NotFound")
 	}
 
 	changedEvent, hasChanged, err := smtpConfigWriteModel.NewHTTPChangedEvent(
 		ctx,
 		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
-		id,
+		config.ID,
 		config.Description,
 		config.Endpoint,
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if !hasChanged {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-lh3op", "Errors.NoChangesFound")
+		config.Details = writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel)
+		return nil
 	}
 
 	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, changedEvent)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
+	config.Details = writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel)
+	return nil
 }
 
-func (c *Commands) ActivateSMTPConfig(ctx context.Context, instanceID, id, activatedId string) (*domain.ObjectDetails, error) {
+func (c *Commands) ActivateSMTPConfig(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-h5htMCebv3", "Errors.ResourceOwnerMissing")
+	}
 	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-nm56k", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-1hPl6oVMJa", "Errors.IDMissing")
 	}
 
-	if len(activatedId) > 0 {
-		_, err := c.DeactivateSMTPConfig(ctx, instanceID, activatedId)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, resourceOwner, id, "")
 	if err != nil {
 		return nil, err
 	}
 
 	if !smtpConfigWriteModel.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-kg8yr", "Errors.SMTPConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-E9K20hxOS9", "Errors.SMTPConfig.NotFound")
 	}
-
 	if smtpConfigWriteModel.State == domain.SMTPConfigStateActive {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-ed3lr", "Errors.SMTPConfig.AlreadyActive")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-vUHBSmBzaw", "Errors.SMTPConfig.AlreadyActive")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigActivatedEvent(
-		ctx,
-		iamAgg,
-		id))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	err = c.pushAppendAndReduce(ctx,
+		smtpConfigWriteModel,
+		instance.NewSMTPConfigActivatedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
+			id,
+		),
+	)
 	if err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) DeactivateSMTPConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) DeactivateSMTPConfig(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-pvNHou89Tw", "Errors.ResourceOwnerMissing")
+	}
 	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-98ikl", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-jLTIMrtApO", "Errors.IDMissing")
 	}
 
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, resourceOwner, id, "")
 	if err != nil {
 		return nil, err
 	}
@@ -286,46 +357,47 @@ func (c *Commands) DeactivateSMTPConfig(ctx context.Context, instanceID, id stri
 		return nil, zerrors.ThrowNotFound(nil, "COMMAND-k39PJ", "Errors.SMTPConfig.NotFound")
 	}
 	if smtpConfigWriteModel.State == domain.SMTPConfigStateInactive {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-km8g3", "Errors.SMTPConfig.AlreadyDeactivated")
+		return nil, zerrors.ThrowPreconditionFailed(nil, "COMMAND-km8g3", "Errors.SMTPConfig.AlreadyDeactivated")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigDeactivatedEvent(
-		ctx,
-		iamAgg,
-		id))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	err = c.pushAppendAndReduce(ctx,
+		smtpConfigWriteModel,
+		instance.NewSMTPConfigDeactivatedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
+			id,
+		),
+	)
 	if err != nil {
 		return nil, err
 	}
 	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveSMTPConfig(ctx context.Context, instanceID, id string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveSMTPConfig(ctx context.Context, resourceOwner, id string) (*domain.ObjectDetails, error) {
+	if resourceOwner == "" {
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-t2WsPRgGaK", "Errors.ResourceOwnerMissing")
+	}
 	if id == "" {
-		return nil, zerrors.ThrowInvalidArgument(nil, "SMTP-7f5cv", "Errors.IDMissing")
+		return nil, zerrors.ThrowInvalidArgument(nil, "COMMAND-0ZV5whuUfu", "Errors.IDMissing")
 	}
 
-	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, instanceID, id, "")
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx, resourceOwner, id, "")
 	if err != nil {
 		return nil, err
 	}
 	if !smtpConfigWriteModel.State.Exists() {
-		return nil, zerrors.ThrowNotFound(nil, "COMMAND-kg8rt", "Errors.SMTPConfig.NotFound")
+		return nil, zerrors.ThrowNotFound(nil, "COMMAND-09CXlTDL6w", "Errors.SMTPConfig.NotFound")
 	}
 
-	iamAgg := InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMTPConfigRemovedEvent(
-		ctx,
-		iamAgg,
-		id))
-	if err != nil {
-		return nil, err
-	}
-	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	err = c.pushAppendAndReduce(ctx,
+		smtpConfigWriteModel,
+		instance.NewSMTPConfigRemovedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
+			id,
+		),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -420,7 +492,7 @@ func checkSenderAddress(writeModel *IAMSMTPConfigWriteModel) error {
 		return nil
 	}
 	if !writeModel.domainState.Exists() {
-		return zerrors.ThrowInvalidArgument(nil, "INST-83nl8", "Errors.SMTPConfig.SenderAdressNotCustomDomain")
+		return zerrors.ThrowInvalidArgument(nil, "INST-xtWIiR2ZbR", "Errors.SMTPConfig.SenderAdressNotCustomDomain")
 	}
 	return nil
 }
