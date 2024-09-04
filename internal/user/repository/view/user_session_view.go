@@ -65,6 +65,7 @@ func scanUserSession(row *sql.Row) (*model.UserSessionView, error) {
 		&session.MultiFactorVerificationType,
 		&session.Sequence,
 		&session.InstanceID,
+		&session.ID,
 	)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, zerrors.ThrowNotFound(nil, "VIEW-NGBs1", "Errors.UserSession.NotFound")
@@ -97,6 +98,7 @@ func scanUserSessions(rows *sql.Rows) ([]*model.UserSessionView, error) {
 			&session.MultiFactorVerificationType,
 			&session.Sequence,
 			&session.InstanceID,
+			&session.ID,
 		)
 		if err != nil {
 			return nil, err

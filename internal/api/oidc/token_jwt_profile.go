@@ -53,6 +53,7 @@ func (s *Server) JWTProfile(ctx context.Context, r *op.Request[oidc.JWTProfileGr
 		domain.TokenReasonJWTProfile,
 		nil,
 		false,
+		"",
 	)
 	if err != nil {
 		return nil, err
