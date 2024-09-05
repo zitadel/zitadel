@@ -57,6 +57,7 @@ func (m *SystemFeaturesReadModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemActionsEventType,
 			feature_v2.SystemImprovedPerformanceEventType,
+			feature_v2.SystemInMemoryProjectionsEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }

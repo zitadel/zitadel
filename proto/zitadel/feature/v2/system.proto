@@ -61,6 +61,13 @@ message SetSystemFeaturesRequest{
       description: "Improves performance of specified execution paths.";
     }
   ];
+
+  optional bool allow_in_memory_projections = 8 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enables the POC for in-memory projections. This feature is not production-ready yet and should only be enabled for testing purposes.";
+    }
+  ];
 }
 
 message SetSystemFeaturesResponse {
@@ -123,6 +130,13 @@ message GetSystemFeaturesResponse {
     (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
       example: "[1]";
       description: "Improves performance of specified execution paths.";
+    }
+  ];
+
+  FeatureFlag allow_in_memory_projections = 9 [
+    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+      example: "true";
+      description: "Enables the POC for in-memory projections. This feature is not production-ready yet and should only be enabled for testing purposes.";
     }
   ];
 }

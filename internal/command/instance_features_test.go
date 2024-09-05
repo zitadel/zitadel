@@ -168,6 +168,24 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 			},
 		},
 		{
+			name: "set InMemoryProjections",
+			eventstore: expectEventstore(
+				expectFilter(),
+				expectPush(
+					feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceInMemoryProjectionsEventType, true,
+					),
+				),
+			),
+			args: args{ctx, &InstanceFeatures{
+				InMemoryProjections: gu.Ptr(true),
+			}},
+			want: &domain.ObjectDetails{
+				ResourceOwner: "instance1",
+			},
+		},
+		{
 			name: "push error",
 			eventstore: expectEventstore(
 				expectFilter(),
@@ -216,6 +234,7 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 				LegacyIntrospection:             gu.Ptr(true),
 				UserSchema:                      gu.Ptr(true),
 				Actions:                         gu.Ptr(true),
+				InMemoryProjections:             gu.Ptr(true),
 			}},
 			want: &domain.ObjectDetails{
 				ResourceOwner: "instance1",

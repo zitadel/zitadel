@@ -17,6 +17,7 @@ type SystemFeatures struct {
 	UserSchema                      *bool
 	Actions                         *bool
 	ImprovedPerformance             []feature.ImprovedPerformanceType
+	InMemoryProjections             *bool
 }
 
 func (m *SystemFeatures) isEmpty() bool {

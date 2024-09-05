@@ -60,6 +60,7 @@ func (m *SystemFeaturesWriteModel) Query() *eventstore.SearchQueryBuilder {
 			feature_v2.SystemTokenExchangeEventType,
 			feature_v2.SystemActionsEventType,
 			feature_v2.SystemImprovedPerformanceEventType,
+			feature_v2.SystemInMemoryProjectionsEventType,
 		).
 		Builder().ResourceOwner(m.ResourceOwner)
 }
@@ -105,6 +106,7 @@ func (wm *SystemFeaturesWriteModel) setCommands(ctx context.Context, f *SystemFe
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.TokenExchange, f.TokenExchange, feature_v2.SystemTokenExchangeEventType)
 	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.Actions, f.Actions, feature_v2.SystemActionsEventType)
 	cmds = appendFeatureSliceUpdate(ctx, cmds, aggregate, wm.ImprovedPerformance, f.ImprovedPerformance, feature_v2.SystemImprovedPerformanceEventType)
+	cmds = appendFeatureUpdate(ctx, cmds, aggregate, wm.InMemoryProjections, f.InMemoryProjections, feature_v2.SystemInMemoryProjectionsEventType)
 	return cmds
 }
 
