@@ -540,10 +540,6 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return []*Statement{stmt}, false, nil
 	}
 
-	if h.ProjectionName() == "projections.secret_generators2" {
-		h.log().Debug("gugus")
-	}
-
 	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil {
 		h.log().WithError(err).Debug("filter eventstore failed")
