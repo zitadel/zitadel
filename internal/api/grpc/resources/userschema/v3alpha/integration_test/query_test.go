@@ -43,7 +43,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+				ctx: Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.SearchUserSchemasRequest{},
 			},
 			wantErr: true,
@@ -79,7 +79,7 @@ func TestServer_ListUserSchemas(t *testing.T) {
 				req: &schema.SearchUserSchemasRequest{},
 				prepare: func(request *schema.SearchUserSchemasRequest, resp *schema.SearchUserSchemasResponse) error {
 					schemaType := gofakeit.Name()
-					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
+					createResp := Instance.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
 					request.Filters = []*schema.SearchFilter{
 						{
 							Filter: &schema.SearchFilter_IdFilter{
@@ -127,8 +127,8 @@ func TestServer_ListUserSchemas(t *testing.T) {
 					schemaType := gofakeit.Name()
 					schemaType1 := schemaType + "_1"
 					schemaType2 := schemaType + "_2"
-					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType1)
-					createResp2 := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType2)
+					createResp := Instance.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType1)
+					createResp2 := Instance.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType2)
 
 					request.SortingColumn = gu.Ptr(schema.FieldName_FIELD_NAME_TYPE)
 					request.Query = &object.SearchQuery{Desc: false}
@@ -238,11 +238,11 @@ func TestServer_GetUserSchema(t *testing.T) {
 		{
 			name: "missing permission",
 			args: args{
-				ctx: Tester.WithAuthorization(context.Background(), integration.OrgOwner),
+				ctx: Instance.WithAuthorization(context.Background(), integration.UserTypeOrgOwner),
 				req: &schema.GetUserSchemaRequest{},
 				prepare: func(request *schema.GetUserSchemaRequest, resp *schema.GetUserSchemaResponse) error {
 					schemaType := gofakeit.Name()
-					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
+					createResp := Instance.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 					return nil
 				},
@@ -266,7 +266,7 @@ func TestServer_GetUserSchema(t *testing.T) {
 				req: &schema.GetUserSchemaRequest{},
 				prepare: func(request *schema.GetUserSchemaRequest, resp *schema.GetUserSchemaResponse) error {
 					schemaType := gofakeit.Name()
-					createResp := Tester.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
+					createResp := Instance.CreateUserSchemaEmptyWithType(IAMOwnerCTX, schemaType)
 					request.Id = createResp.GetDetails().GetId()
 
 					resp.UserSchema.Config.Type = schemaType

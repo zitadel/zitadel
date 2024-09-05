@@ -1,6 +1,6 @@
 //go:build integration
 
-package userschema_test
+package user_test
 
 import (
 	"context"
@@ -14,40 +14,40 @@ import (
 
 	"github.com/zitadel/zitadel/internal/integration"
 	"github.com/zitadel/zitadel/pkg/grpc/feature/v2"
-	schema "github.com/zitadel/zitadel/pkg/grpc/resources/userschema/v3alpha"
+	user "github.com/zitadel/zitadel/pkg/grpc/resources/user/v3alpha"
 )
 
 var (
 	IAMOwnerCTX, SystemCTX context.Context
-	Tester                 *integration.Tester
-	Client                 schema.ZITADELUserSchemasClient
+	UserCTX                context.Context
+	Instance               *integration.Instance
+	Client                 user.ZITADELUsersClient
 )
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, _, cancel := integration.Contexts(5 * time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 		defer cancel()
 
-		Tester = integration.NewTester(ctx)
-		defer Tester.Done()
+		Instance = integration.NewInstance(ctx)
 
-		IAMOwnerCTX = Tester.WithAuthorization(ctx, integration.IAMOwner)
-		SystemCTX = Tester.WithAuthorization(ctx, integration.SystemUser)
-		Client = Tester.Client.UserSchemaV3
-
+		IAMOwnerCTX = Instance.WithAuthorization(ctx, integration.UserTypeIAMOwner)
+		SystemCTX = integration.WithSystemAuthorization(ctx)
+		UserCTX = Instance.WithAuthorization(ctx, integration.UserTypeLogin)
+		Client = Instance.Client.UserV3Alpha
 		return m.Run()
 	}())
 }
 
 func ensureFeatureEnabled(t *testing.T, iamOwnerCTX context.Context) {
-	f, err := Tester.Client.FeatureV2.GetInstanceFeatures(iamOwnerCTX, &feature.GetInstanceFeaturesRequest{
+	f, err := Instance.Client.FeatureV2.GetInstanceFeatures(iamOwnerCTX, &feature.GetInstanceFeaturesRequest{
 		Inheritance: true,
 	})
 	require.NoError(t, err)
 	if f.UserSchema.GetEnabled() {
 		return
 	}
-	_, err = Tester.Client.FeatureV2.SetInstanceFeatures(iamOwnerCTX, &feature.SetInstanceFeaturesRequest{
+	_, err = Instance.Client.FeatureV2.SetInstanceFeatures(iamOwnerCTX, &feature.SetInstanceFeaturesRequest{
 		UserSchema: gu.Ptr(true),
 	})
 	require.NoError(t, err)
@@ -57,7 +57,7 @@ func ensureFeatureEnabled(t *testing.T, iamOwnerCTX context.Context) {
 	}
 	require.EventuallyWithT(t,
 		func(ttt *assert.CollectT) {
-			f, err := Tester.Client.FeatureV2.GetInstanceFeatures(iamOwnerCTX, &feature.GetInstanceFeaturesRequest{
+			f, err := Instance.Client.FeatureV2.GetInstanceFeatures(iamOwnerCTX, &feature.GetInstanceFeaturesRequest{
 				Inheritance: true,
 			})
 			require.NoError(ttt, err)
@@ -66,6 +66,6 @@ func ensureFeatureEnabled(t *testing.T, iamOwnerCTX context.Context) {
 			}
 		},
 		retryDuration,
-		100*time.Millisecond,
+		time.Second,
 		"timed out waiting for ensuring instance feature")
 }

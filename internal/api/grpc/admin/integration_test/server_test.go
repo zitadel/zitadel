@@ -47,7 +47,7 @@ func await(t *testing.T, ctx context.Context, cb func(*assert.CollectT)) {
 			cb(tt)
 		},
 		time.Until(deadline),
-		100*time.Millisecond,
+		time.Second,
 		"awaiting successful callback failed",
 	)
 }

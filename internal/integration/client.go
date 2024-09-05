@@ -95,6 +95,7 @@ func newClient(ctx context.Context, target string) (*Client, error) {
 		UserSchemaV3:   userschema_v3alpha.NewZITADELUserSchemasClient(cc),
 		WebKeyV3Alpha:  webkey_v3alpha.NewZITADELWebKeysClient(cc),
 		IDPv2:          idp_pb.NewIdentityProviderServiceClient(cc),
+		UserV3Alpha:    user_v3alpha.NewZITADELUsersClient(cc),
 	}
 	return client, client.pollHealth(ctx)
 }
@@ -795,18 +796,34 @@ func (i *Instance) SetExecution(ctx context.Context, t *testing.T, cond *action.
 	return target
 }
 
-func (i *Instance) CreateUserSchema(ctx context.Context, t *testing.T) *userschema_v3alpha.CreateUserSchemaResponse {
-	return i.CreateUserSchemaWithType(ctx, t, fmt.Sprint(time.Now().UnixNano()+1))
+func (i *Instance) CreateUserSchemaEmpty(ctx context.Context) *userschema_v3alpha.CreateUserSchemaResponse {
+	return i.CreateUserSchemaEmptyWithType(ctx, fmt.Sprint(time.Now().UnixNano()+1))
 }
 
-func (i *Instance) CreateUserSchemaWithType(ctx context.Context, t *testing.T, schemaType string) *userschema_v3alpha.CreateUserSchemaResponse {
+func (i *Instance) CreateUserSchema(ctx context.Context, schemaData []byte) *userschema_v3alpha.CreateUserSchemaResponse {
+	userSchema := new(structpb.Struct)
+	err := userSchema.UnmarshalJSON(schemaData)
+	logging.OnError(err).Fatal("create userschema unmarshal")
+	schema, err := i.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
+		UserSchema: &userschema_v3alpha.UserSchema{
+			Type: fmt.Sprint(time.Now().UnixNano() + 1),
+			DataType: &userschema_v3alpha.UserSchema_Schema{
+				Schema: userSchema,
+			},
+		},
+	})
+	logging.OnError(err).Fatal("create userschema")
+	return schema
+}
+
+func (i *Instance) CreateUserSchemaEmptyWithType(ctx context.Context, schemaType string) *userschema_v3alpha.CreateUserSchemaResponse {
 	userSchema := new(structpb.Struct)
 	err := userSchema.UnmarshalJSON([]byte(`{
 		"$schema": "urn:zitadel:schema:v1",
 		"type": "object",
 		"properties": {}
 	}`))
-	require.NoError(t, err)
+	logging.OnError(err).Fatal("create userschema unmarshal")
 	schema, err := i.Client.UserSchemaV3.CreateUserSchema(ctx, &userschema_v3alpha.CreateUserSchemaRequest{
 		UserSchema: &userschema_v3alpha.UserSchema{
 			Type: schemaType,

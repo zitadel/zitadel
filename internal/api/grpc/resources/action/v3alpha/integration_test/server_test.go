@@ -56,7 +56,7 @@ func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
 			assert.True(ttt, f.Actions.GetEnabled())
 		},
 		retryDuration,
-		100*time.Millisecond,
+		time.Second,
 		"timed out waiting for ensuring instance feature")
 
 	require.EventuallyWithT(t,
@@ -65,6 +65,6 @@ func ensureFeatureEnabled(t *testing.T, instance *integration.Instance) {
 			assert.NoError(ttt, err)
 		},
 		retryDuration,
-		100*time.Millisecond,
+		time.Second,
 		"timed out waiting for ensuring instance feature call")
 }

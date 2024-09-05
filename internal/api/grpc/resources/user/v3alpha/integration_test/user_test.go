@@ -29,7 +29,7 @@ func TestServer_CreateUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Tester.CreateUserSchema(IAMOwnerCTX, schema)
+	schemaResp := Instance.CreateUserSchema(IAMOwnerCTX, schema)
 	permissionSchema := []byte(`{
 		"$schema": "urn:zitadel:schema:v1",
 			"type": "object",
@@ -43,8 +43,8 @@ func TestServer_CreateUser(t *testing.T) {
 			}
 		}
 	}`)
-	permissionSchemaResp := Tester.CreateUserSchema(IAMOwnerCTX, permissionSchema)
-	orgResp := Tester.CreateOrganization(IAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	permissionSchemaResp := Instance.CreateUserSchema(IAMOwnerCTX, permissionSchema)
+	orgResp := Instance.CreateOrganization(IAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	type res struct {
 		want            *resource_object.Details
@@ -204,7 +204,7 @@ func TestServer_CreateUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Tester.Client.UserV3Alpha.CreateUser(tt.ctx, tt.req)
+			got, err := Instance.Client.UserV3Alpha.CreateUser(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
@@ -232,8 +232,8 @@ func TestServer_DeleteUser(t *testing.T) {
 			}
 		}
 	}`)
-	schemaResp := Tester.CreateUserSchema(IAMOwnerCTX, schema)
-	orgResp := Tester.CreateOrganization(IAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
+	schemaResp := Instance.CreateUserSchema(IAMOwnerCTX, schema)
+	orgResp := Instance.CreateOrganization(IAMOwnerCTX, gofakeit.Name(), gofakeit.Email())
 
 	tests := []struct {
 		name    string
@@ -273,7 +273,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "user delete, no context",
 			ctx:  context.Background(),
 			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
-				userResp := Tester.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := Instance.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.UserId = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -290,7 +290,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "user delete, no permission",
 			ctx:  UserCTX,
 			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
-				userResp := Tester.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := Instance.CreateSchemaUser(IAMOwnerCTX, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.UserId = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -307,7 +307,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			name: "user delete, ok",
 			ctx:  IAMOwnerCTX,
 			dep: func(ctx context.Context, req *user.DeleteUserRequest) error {
-				userResp := Tester.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
+				userResp := Instance.CreateSchemaUser(ctx, orgResp.GetOrganizationId(), schemaResp.GetDetails().GetId(), []byte("{\"name\": \"user\"}"))
 				req.UserId = userResp.GetDetails().GetId()
 				return nil
 			},
@@ -333,7 +333,7 @@ func TestServer_DeleteUser(t *testing.T) {
 				err := tt.dep(tt.ctx, tt.req)
 				require.NoError(t, err)
 			}
-			got, err := Tester.Client.UserV3Alpha.DeleteUser(tt.ctx, tt.req)
+			got, err := Instance.Client.UserV3Alpha.DeleteUser(tt.ctx, tt.req)
 			if tt.wantErr {
 				require.Error(t, err)
 				return
