@@ -1,9 +1,9 @@
 "use client";
 
-import {
-  ChecksJson,
-  ChecksSchema,
-} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { updateSession } from "@/lib/server/session";
+import { create } from "@zitadel/client";
+import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,9 +12,6 @@ import BackButton from "./BackButton";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
 import { Spinner } from "./Spinner";
-import { create } from "@zitadel/client";
-import { RequestChallengesSchema } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { updateSession } from "@/lib/server/session";
 
 // either loginName or sessionId must be provided
 type Props = {
