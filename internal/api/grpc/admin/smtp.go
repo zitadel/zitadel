@@ -20,10 +20,7 @@ func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigR
 }
 
 func (s *Server) GetSMTPConfigById(ctx context.Context, req *admin_pb.GetSMTPConfigByIdRequest) (*admin_pb.GetSMTPConfigByIdResponse, error) {
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	resourceOwner := instanceID // Will be replaced when orgs have smtp configs
-
-	smtp, err := s.query.SMTPConfigByID(ctx, instanceID, resourceOwner, req.Id)
+	smtp, err := s.query.SMTPConfigByID(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
 		return nil, err
 	}
