@@ -3,6 +3,8 @@ package admin
 import (
 	"context"
 
+	"github.com/muhlemmer/gu"
+
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
@@ -93,9 +95,9 @@ func updateSMSConfigTwilioToConfig(ctx context.Context, req *admin_pb.UpdateSMSP
 	return &command.ChangeTwilioConfig{
 		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 		ID:            req.Id,
-		Description:   req.Description,
-		SID:           req.Sid,
-		SenderNumber:  req.SenderNumber,
+		Description:   gu.Ptr(req.Description),
+		SID:           gu.Ptr(req.Sid),
+		SenderNumber:  gu.Ptr(req.SenderNumber),
 	}
 }
 
@@ -111,7 +113,7 @@ func updateSMSConfigHTTPToConfig(ctx context.Context, req *admin_pb.UpdateSMSPro
 	return &command.ChangeSMSHTTP{
 		ResourceOwner: authz.GetInstance(ctx).InstanceID(),
 		ID:            req.Id,
-		Description:   req.Description,
-		Endpoint:      req.Endpoint,
+		Description:   gu.Ptr(req.Description),
+		Endpoint:      gu.Ptr(req.Endpoint),
 	}
 }

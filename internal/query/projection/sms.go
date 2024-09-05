@@ -184,7 +184,7 @@ func (p *smsConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 		return nil, err
 	}
 
-	stmts := make([]func(eventstore.Event) handler.Exec, 0, 2)
+	stmts := make([]func(eventstore.Event) handler.Exec, 0, 3)
 	columns := []handler.Column{
 		handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
 		handler.NewCol(SMSColumnSequence, e.Sequence()),
@@ -292,7 +292,7 @@ func (p *smsConfigProjection) reduceSMSConfigHTTPChanged(event eventstore.Event)
 		return nil, err
 	}
 
-	stmts := make([]func(eventstore.Event) handler.Exec, 0, 2)
+	stmts := make([]func(eventstore.Event) handler.Exec, 0, 3)
 	columns := []handler.Column{
 		handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
 		handler.NewCol(SMSColumnSequence, e.Sequence()),
