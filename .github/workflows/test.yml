@@ -17,6 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         command:
+          - format --check
           - lint
           - test:unit
           - test:integration

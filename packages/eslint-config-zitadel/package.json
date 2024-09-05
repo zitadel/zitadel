@@ -6,6 +6,7 @@
   "publishConfig": {
     "access": "public"
   },
+  "type":"module",
   "dependencies": {
     "eslint-config-next": "^14.2.3",
     "@typescript-eslint/parser": "^7.9.0",
