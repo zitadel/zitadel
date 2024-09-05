@@ -134,7 +134,6 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		Actions:                         gu.Ptr(true),
 		ImprovedPerformance:             nil,
 		WebKey:                          gu.Ptr(true),
-		InMemoryProjections:             gu.Ptr(true),
 	}
 	got := instanceFeaturesToCommand(arg)
 	assert.Equal(t, want, got)

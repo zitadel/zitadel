@@ -226,6 +226,10 @@ func TestCommands_SetInstanceFeatures(t *testing.T) {
 						ctx, aggregate,
 						feature_v2.InstanceActionsEventType, true,
 					),
+					feature_v2.NewSetEvent[bool](
+						ctx, aggregate,
+						feature_v2.InstanceInMemoryProjectionsEventType, true,
+					),
 				),
 			),
 			args: args{ctx, &InstanceFeatures{

@@ -124,6 +124,7 @@ func Test_instanceFeaturesToCommand(t *testing.T) {
 		Actions:                             gu.Ptr(true),
 		ImprovedPerformance:                 nil,
 		WebKey:                              gu.Ptr(true),
+		AllowInMemoryProjections:            gu.Ptr(true),
 	}
 	want := &command.InstanceFeatures{
 		LoginDefaultOrg:                 gu.Ptr(true),
@@ -179,6 +180,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 			Level: feature.LevelInstance,
 			Value: true,
 		},
+		InMemoryProjections: query.FeatureSource[bool]{
+			Level: feature.LevelInstance,
+			Value: true,
+		},
 	}
 	want := &feature_pb.GetInstanceFeaturesResponse{
 		Details: &object.Details{
@@ -221,6 +226,10 @@ func Test_instanceFeaturesToPb(t *testing.T) {
 		DebugOidcParentError: &feature_pb.FeatureFlag{
 			Enabled: false,
 			Source:  feature_pb.Source_SOURCE_UNSPECIFIED,
+		},
+		AllowInMemoryProjections: &feature_pb.FeatureFlag{
+			Enabled: true,
+			Source:  feature_pb.Source_SOURCE_INSTANCE,
 		},
 	}
 	got := instanceFeaturesToPb(arg)
