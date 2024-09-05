@@ -42,16 +42,6 @@ func TestServer_Limits_Block(t *testing.T) {
 					ClientSecret: "client-secret",
 				})
 				assertGrpcError(tt, err, expectBlocked)
-				/*
-					//nolint:contextcheck
-					idpExists := idpExistsCondition(tt, isoInstance.ID(), randomGrpcIdpName)
-					if expectBlocked {
-						// We ensure that the idp really is not created
-						assert.Neverf(tt, idpExists, 5*time.Second, 1*time.Second, "idp should never be created")
-					} else {
-						assert.Eventuallyf(tt, idpExists, 5*time.Second, 1*time.Second, "idp should be created")
-					}
-				*/
 			},
 			testHttp: func(tt assert.TestingT) (*http.Request, error, func(assert.TestingT, *http.Response, bool)) {
 				randomHttpIdpName := randomString("idp-http", 5)
@@ -272,22 +262,3 @@ func assertLimitResponse(t assert.TestingT, response *http.Response, expectBlock
 	assert.GreaterOrEqual(t, response.StatusCode, 200)
 	assert.Less(t, response.StatusCode, 300)
 }
-
-/*
-func idpExistsCondition(t assert.TestingT, instanceID, idpName string) func() bool {
-	return func() bool {
-		nameQuery, err := query.NewIDPTemplateNameSearchQuery(query.TextEquals, idpName)
-		assert.NoError(t, err)
-		instanceQuery, err := query.NewIDPTemplateResourceOwnerSearchQuery(instanceID)
-		assert.NoError(t, err)
-		idps, err := Instance.Queries.IDPTemplates(authz.WithInstanceID(CTX, instanceID), &query.IDPTemplateSearchQueries{
-			Queries: []query.SearchQuery{
-				instanceQuery,
-				nameQuery,
-			},
-		}, false)
-		assert.NoError(t, err)
-		return len(idps.Templates) > 0
-	}
-}
-*/
