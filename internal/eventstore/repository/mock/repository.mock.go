@@ -154,3 +154,15 @@ func (mr *MockPusherMockRecorder) Push(arg0 any, arg1 ...any) *gomock.Call {
 	varargs := append([]any{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Push", reflect.TypeOf((*MockPusher)(nil).Push), varargs...)
 }
+
+// Subscribe mocks base method.
+func (m *MockPusher) Subscribe(arg0 eventstore.EventType, arg1 chan<- eventstore.Event) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Subscribe", arg0, arg1)
+}
+
+// Subscribe indicates an expected call of Subscribe.
+func (mr *MockPusherMockRecorder) Subscribe(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockPusher)(nil).Subscribe), arg0, arg1)
+}
