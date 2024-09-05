@@ -1,4 +1,5 @@
 .next/
+.changeset/
 dist/
 packages/zitadel-proto/google
 packages/zitadel-proto/protoc-gen-openapiv2
