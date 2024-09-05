@@ -14,6 +14,7 @@ import (
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/zitadel/logging"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/protobuf/proto"
 
 	http_util "github.com/zitadel/zitadel/internal/api/http"
 	"github.com/zitadel/zitadel/internal/webauthn"
@@ -21,10 +22,10 @@ import (
 	"github.com/zitadel/zitadel/pkg/grpc/auth"
 	"github.com/zitadel/zitadel/pkg/grpc/instance"
 	"github.com/zitadel/zitadel/pkg/grpc/management"
-	mgmt "github.com/zitadel/zitadel/pkg/grpc/management"
 	"github.com/zitadel/zitadel/pkg/grpc/org"
 	"github.com/zitadel/zitadel/pkg/grpc/system"
 	"github.com/zitadel/zitadel/pkg/grpc/user"
+	user_v2 "github.com/zitadel/zitadel/pkg/grpc/user/v2"
 )
 
 // NotEmpty can be used as placeholder, when the returned values is unknown.
@@ -152,17 +153,24 @@ func (i *Instance) ID() string {
 func (i *Instance) awaitFirstUser(ctx context.Context) {
 	var allErrs []error
 	for {
-		resp, err := i.Client.Mgmt.ImportHumanUser(ctx, &mgmt.ImportHumanUserRequest{
-			UserName: "zitadel-admin@zitadel.localhost",
-			Email: &mgmt.ImportHumanUserRequest_Email{
-				Email:           "zitadel-admin@zitadel.localhost",
-				IsEmailVerified: true,
+		resp, err := i.Client.UserV2.AddHumanUser(ctx, &user_v2.AddHumanUserRequest{
+			Username: proto.String("zitadel-admin@zitadel.localhost"),
+			Profile: &user_v2.SetHumanProfile{
+				GivenName:  "hodor",
+				FamilyName: "hodor",
+				NickName:   proto.String("hodor"),
 			},
-			Password: "Password1!",
-			Profile: &mgmt.ImportHumanUserRequest_Profile{
-				FirstName: "hodor",
-				LastName:  "hodor",
-				NickName:  "hodor",
+			Email: &user_v2.SetHumanEmail{
+				Email: "zitadel-admin@zitadel.localhost",
+				Verification: &user_v2.SetHumanEmail_IsVerified{
+					IsVerified: true,
+				},
+			},
+			PasswordType: &user_v2.AddHumanUserRequest_Password{
+				Password: &user_v2.Password{
+					Password:       "Password1!",
+					ChangeRequired: false,
+				},
 			},
 		})
 		if err == nil {
