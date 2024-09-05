@@ -47,7 +47,6 @@ export default function LoginPasskey({
       setLoading(true);
       updateSessionForChallenge()
         .then((response) => {
-          console.log(response);
           const pK =
             response?.challenges?.webAuthN?.publicKeyCredentialRequestOptions
               ?.publicKey;
