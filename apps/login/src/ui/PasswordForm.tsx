@@ -108,6 +108,8 @@ export default function PasswordForm({
         m !== AuthenticationMethodType.PASSKEY,
     );
 
+    console.log(availableSecondFactors, loginSettings);
+
     if (availableSecondFactors.length == 1) {
       const params = new URLSearchParams({
         loginName: submitted.factors.user.loginName,

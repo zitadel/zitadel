@@ -103,38 +103,6 @@ export async function updateSession(options: UpdateSessionCommand) {
 
   const recent = await sessionPromise;
 
-  // if (
-  //   (recent &&
-  //     challenges &&
-  //     challenges.otpEmail &&
-  //     !challenges.otpEmail?.deliveryType) ||
-  //   (challenges?.otpSms && !challenges.otpSms.returnCode)
-  // ) {
-  //   const sessionResponse = await getSession(recent.id, recent.token);
-
-  //   if (sessionResponse && sessionResponse?.session?.factors?.user?.id) {
-  //     const userResponse = await getUserByID(
-  //       sessionResponse.session.factors.user.id,
-  //     );
-  //     const humanUser =
-  //       userResponse.user?.type.case === "human"
-  //         ? userResponse.user.type.value
-  //         : undefined;
-
-  //     if (!challenges.otpEmail && humanUser?.email?.email) {
-  //       challenges = create(RequestChallengesSchema, {
-  //         otpEmail: { deliveryType: { case: "sendCode", value: {} } },
-  //       });
-  //     }
-
-  //     if (!challenges.otpEmail && humanUser?.email?.email) {
-  //       challenges = create(RequestChallengesSchema, {
-  //         otpSms: { returnCode: true },
-  //       });
-  //     }
-  //   }
-  // }
-
   const session = await setSessionAndUpdateCookie(
     recent,
     checks,
