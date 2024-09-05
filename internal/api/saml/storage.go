@@ -137,6 +137,9 @@ func (p *Storage) SetUserinfoWithUserID(ctx context.Context, applicationID strin
 	if err != nil {
 		return err
 	}
+	if user.State != domain.UserStateActive {
+		return zerrors.ThrowPreconditionFailed(nil, "SAML-S3gFd", "Errors.User.NotActive")
+	}
 
 	userGrants, err := p.getGrants(ctx, userID, applicationID)
 	if err != nil {
@@ -162,6 +165,9 @@ func (p *Storage) SetUserinfoWithLoginName(ctx context.Context, userinfo models.
 	user, err := p.query.GetUserByLoginName(ctx, true, loginName)
 	if err != nil {
 		return err
+	}
+	if user.State != domain.UserStateActive {
+		return zerrors.ThrowPreconditionFailed(nil, "SAML-FJ262", "Errors.User.NotActive")
 	}
 
 	setUserinfo(user, userinfo, attributes, map[string]*customAttribute{})
