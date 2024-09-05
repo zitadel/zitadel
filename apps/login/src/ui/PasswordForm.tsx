@@ -148,22 +148,6 @@ export default function PasswordForm({
       }
 
       return router.push(`/mfa?` + params);
-    } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
-      const params = new URLSearchParams({
-        loginName: submitted.factors.user.loginName,
-        checkAfter: "true", // this defines if the check is directly made after the setup
-      });
-
-      if (authRequestId) {
-        params.append("authRequestId", authRequestId);
-      }
-
-      if (organization) {
-        params.append("organization", organization);
-      }
-
-      // TODO: provide a way to setup passkeys on mfa page?
-      return router.push(`/mfa/set?` + params);
     } else if (
       submitted.factors &&
       !submitted.factors.webAuthN && // if session was not verified with a passkey
@@ -184,6 +168,22 @@ export default function PasswordForm({
       }
 
       return router.push(`/passkey/add?` + params);
+    } else if (loginSettings?.forceMfa && !availableSecondFactors.length) {
+      const params = new URLSearchParams({
+        loginName: submitted.factors.user.loginName,
+        checkAfter: "true", // this defines if the check is directly made after the setup
+      });
+
+      if (authRequestId) {
+        params.append("authRequestId", authRequestId);
+      }
+
+      if (organization) {
+        params.append("organization", organization);
+      }
+
+      // TODO: provide a way to setup passkeys on mfa page?
+      return router.push(`/mfa/set?` + params);
     } else if (authRequestId && submitted.sessionId) {
       const params = new URLSearchParams({
         sessionId: submitted.sessionId,
