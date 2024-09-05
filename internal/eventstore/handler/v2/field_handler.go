@@ -157,7 +157,7 @@ func (h *FieldHandler) fetchEvents(ctx context.Context, tx *sql.Tx, currentState
 
 	idx, offset := skipPreviouslyReducedEvents(events, currentState)
 
-	if currentState.position == events[len(events)-1].Position() {
+	if currentState.position.Equal(events[len(events)-1].Position()) {
 		offset += currentState.offset
 	}
 	currentState.position = events[len(events)-1].Position()

@@ -540,6 +540,10 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 		return []*Statement{stmt}, false, nil
 	}
 
+	if h.ProjectionName() == "projections.secret_generators2" {
+		h.log().Debug("gugus")
+	}
+
 	events, err := h.es.Filter(ctx, h.eventQuery(currentState).SetTx(tx))
 	if err != nil {
 		h.log().WithError(err).Debug("filter eventstore failed")
@@ -576,7 +580,7 @@ func (h *Handler) generateStatements(ctx context.Context, tx *sql.Tx, currentSta
 
 func skipPreviouslyReducedStatements(statements []*Statement, currentState *state) int {
 	for i, statement := range statements {
-		if statement.Position == currentState.position &&
+		if statement.Position.Equal(currentState.position) &&
 			statement.AggregateID == currentState.aggregateID &&
 			statement.AggregateType == currentState.aggregateType &&
 			statement.Sequence == currentState.sequence {
