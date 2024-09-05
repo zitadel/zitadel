@@ -1,11 +1,13 @@
 "use server";
 
+import { addSessionToCookie, updateSessionCookie } from "@/lib/cookies";
 import {
-  createSessionFromChecks,
   createSessionForUserIdAndIdpIntent,
+  createSessionFromChecks,
   getSession,
   setSession,
 } from "@/lib/zitadel";
+import { create, timestampDate, toDate } from "@zitadel/client";
 import {
   Challenges,
   RequestChallenges,
@@ -15,9 +17,6 @@ import {
   Checks,
   ChecksSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { timestampDate, toDate } from "@zitadel/client";
-import { create } from "@zitadel/client";
-import { addSessionToCookie, updateSessionCookie } from "@/lib/cookies";
 
 type CustomCookieData = {
   id: string;

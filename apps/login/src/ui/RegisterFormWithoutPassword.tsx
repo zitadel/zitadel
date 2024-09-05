@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Button, ButtonVariants } from "./Button";
-import { TextInput } from "./Input";
-import { PrivacyPolicyCheckboxes } from "./PrivacyPolicyCheckboxes";
-import { FieldValues, useForm } from "react-hook-form";
+import { registerUser } from "@/lib/server/register";
+import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
 import { useRouter } from "next/navigation";
-import { Spinner } from "./Spinner";
+import { useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
+import Alert from "./Alert";
 import AuthenticationMethodRadio, {
   methods,
 } from "./AuthenticationMethodRadio";
-import Alert from "./Alert";
 import BackButton from "./BackButton";
-import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
-import { registerUser } from "@/lib/server/register";
+import { Button, ButtonVariants } from "./Button";
+import { TextInput } from "./Input";
+import { PrivacyPolicyCheckboxes } from "./PrivacyPolicyCheckboxes";
+import { Spinner } from "./Spinner";
 
 type Inputs =
   | {

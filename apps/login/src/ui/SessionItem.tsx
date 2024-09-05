@@ -1,14 +1,13 @@
 "use client";
 
+import { cleanupSession } from "@/lib/server/session";
+import { XCircleIcon } from "@heroicons/react/24/outline";
+import { timestampDate } from "@zitadel/client";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import moment from "moment";
 import Link from "next/link";
 import { useState } from "react";
 import { Avatar } from "./Avatar";
-import moment from "moment";
-import { XCircleIcon } from "@heroicons/react/24/outline";
-import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
-import { timestampDate } from "@zitadel/client";
-import { deleteSession } from "@/lib/zitadel";
-import { cleanupSession } from "@/lib/server/session";
 
 export default function SessionItem({
   session,

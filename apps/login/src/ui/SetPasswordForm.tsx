@@ -1,21 +1,21 @@
 "use client";
 
-import PasswordComplexity from "./PasswordComplexity";
-import { useState } from "react";
-import { Button, ButtonVariants } from "./Button";
-import { TextInput } from "./Input";
-import { FieldValues, useForm } from "react-hook-form";
+import { registerUser } from "@/lib/server/register";
 import {
   lowerCaseValidator,
   numberValidator,
   symbolValidator,
   upperCaseValidator,
 } from "@/utils/validators";
-import { useRouter } from "next/navigation";
-import { Spinner } from "./Spinner";
-import Alert from "./Alert";
 import { PasswordComplexitySettings } from "@zitadel/proto/zitadel/settings/v2/password_settings_pb";
-import { registerUser } from "@/lib/server/register";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
+import Alert from "./Alert";
+import { Button, ButtonVariants } from "./Button";
+import { TextInput } from "./Input";
+import PasswordComplexity from "./PasswordComplexity";
+import { Spinner } from "./Spinner";
 
 type Inputs =
   | {

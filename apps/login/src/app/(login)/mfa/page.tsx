@@ -4,7 +4,6 @@ import {
   getBrandingSettings,
   getSession,
   listAuthenticationMethodTypes,
-  sessionService,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import BackButton from "@/ui/BackButton";
@@ -28,7 +27,7 @@ export default async function Page({
     loginName?: string,
     organization?: string,
   ) {
-    return loadMostRecentSession(sessionService, {
+    return loadMostRecentSession({
       loginName,
       organization,
     }).then((session) => {

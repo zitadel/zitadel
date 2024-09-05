@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
 import { Logo } from "@/ui/Logo";
-import ThemeWrapper from "./ThemeWrapper";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
+import React from "react";
+import ThemeWrapper from "./ThemeWrapper";
 
 export default function DynamicTheme({
   branding,

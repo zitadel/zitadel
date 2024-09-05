@@ -1,8 +1,8 @@
 "use client";
 
 import { setTheme } from "@/utils/colors";
-import { ReactNode, useEffect } from "react";
 import { BrandingSettings } from "@zitadel/proto/zitadel/settings/v2/branding_settings_pb";
+import { ReactNode, useEffect } from "react";
 
 type Props = {
   branding: BrandingSettings | undefined;

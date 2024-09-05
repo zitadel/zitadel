@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Spinner } from "./Spinner";
-import Alert from "./Alert";
-import { useRouter } from "next/navigation";
 import { createNewSession } from "@/lib/server/session";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Alert from "./Alert";
+import { Spinner } from "./Spinner";
 
 type Props = {
   userId: string;

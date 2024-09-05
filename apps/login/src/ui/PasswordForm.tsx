@@ -1,23 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Button, ButtonVariants } from "./Button";
-import { TextInput } from "./Input";
-import { useForm } from "react-hook-form";
+import { resetPassword } from "@/lib/server/password";
+import { updateSession } from "@/lib/server/session";
+import { create } from "@zitadel/client";
+import { ChecksSchema } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
+import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
+import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { useRouter } from "next/navigation";
-import { Spinner } from "./Spinner";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import Alert from "./Alert";
 import BackButton from "./BackButton";
-import { LoginSettings } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import {
-  CheckPassword,
-  Checks,
-  ChecksSchema,
-} from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { create } from "@zitadel/client";
-import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { updateSession } from "@/lib/server/session";
-import { resetPassword } from "@/lib/server/password";
+import { Button, ButtonVariants } from "./Button";
+import { TextInput } from "./Input";
+import { Spinner } from "./Spinner";
 
 type Inputs = {
   password: string;

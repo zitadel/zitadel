@@ -1,8 +1,8 @@
 "use client";
-import React, { useState } from "react";
-import Link from "next/link";
-import { Checkbox } from "./Checkbox";
 import { LegalAndSupportSettings } from "@zitadel/proto/zitadel/settings/v2/legal_settings_pb";
+import Link from "next/link";
+import { useState } from "react";
+import { Checkbox } from "./Checkbox";
 
 type Props = {
   legal: LegalAndSupportSettings;

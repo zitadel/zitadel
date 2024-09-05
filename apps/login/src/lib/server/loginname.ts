@@ -1,6 +1,8 @@
 "use server";
 
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { createSessionForUserIdAndUpdateCookie } from "../../utils/session";
 import { idpTypeToSlug } from "../idp";
 import {
   getActiveIdentityProviders,
@@ -9,8 +11,6 @@ import {
   listUsers,
   startIdentityProviderFlow,
 } from "../zitadel";
-import { createSessionForUserIdAndUpdateCookie } from "../../utils/session";
-import { redirect } from "next/navigation";
 
 export type SendLoginnameCommand = {
   loginName: string;

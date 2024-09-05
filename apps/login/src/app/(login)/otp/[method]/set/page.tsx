@@ -1,3 +1,4 @@
+import { loadMostRecentSession } from "@/lib/session";
 import {
   addOTPEmail,
   addOTPSMS,
@@ -11,9 +12,8 @@ import { Button, ButtonVariants } from "@/ui/Button";
 import DynamicTheme from "@/ui/DynamicTheme";
 import TOTPRegister from "@/ui/TOTPRegister";
 import UserAvatar from "@/ui/UserAvatar";
-import Link from "next/link";
 import { RegisterTOTPResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
-import { loadMostRecentSession } from "@/lib/session";
+import Link from "next/link";
 
 export default async function Page({
   searchParams,

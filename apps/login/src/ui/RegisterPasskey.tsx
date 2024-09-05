@@ -1,15 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Button, ButtonVariants } from "./Button";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { Spinner } from "./Spinner";
-import Alert from "./Alert";
-import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
-import BackButton from "./BackButton";
-import { RegisterPasskeyResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { registerPasskeyLink, verifyPasskey } from "@/lib/server/passkeys";
+import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import Alert from "./Alert";
+import BackButton from "./BackButton";
+import { Button, ButtonVariants } from "./Button";
+import { Spinner } from "./Spinner";
 
 type Inputs = {};
 

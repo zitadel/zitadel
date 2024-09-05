@@ -1,23 +1,14 @@
 "use server";
 
-import {
-  deleteSession,
-  getSession,
-  getUserByID,
-  listAuthenticationMethodTypes,
-} from "@/lib/zitadel";
+import { deleteSession, listAuthenticationMethodTypes } from "@/lib/zitadel";
 import {
   createSessionAndUpdateCookie,
   createSessionForIdpAndUpdateCookie,
   setSessionAndUpdateCookie,
 } from "@/utils/session";
-import { headers } from "next/headers";
+import { RequestChallenges } from "@zitadel/proto/zitadel/session/v2/challenge_pb";
 import { Checks } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import {
-  RequestChallenges,
-  RequestChallengesSchema,
-} from "@zitadel/proto/zitadel/session/v2/challenge_pb";
-import { create } from "@zitadel/client";
+import { headers } from "next/headers";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,

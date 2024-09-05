@@ -1,10 +1,5 @@
 import clsx from "clsx";
-import React, {
-  ButtonHTMLAttributes,
-  DetailedHTMLProps,
-  ReactNode,
-  forwardRef,
-} from "react";
+import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from "react";
 
 export enum ButtonSizes {
   Small = "Small",

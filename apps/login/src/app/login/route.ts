@@ -7,6 +7,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = false;
 export const fetchCache = "default-no-store";
 
+import { getAllSessions } from "@/lib/cookies";
+import { idpTypeToSlug } from "@/lib/idp";
 import {
   createCallback,
   getActiveIdentityProviders,
@@ -15,16 +17,13 @@ import {
   listSessions,
   startIdentityProviderFlow,
 } from "@/lib/zitadel";
-import { NextRequest, NextResponse } from "next/server";
-import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { create } from "@zitadel/client";
 import {
   AuthRequest,
   Prompt,
 } from "@zitadel/proto/zitadel/oidc/v2/authorization_pb";
-import { IdentityProviderType } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import { idpTypeToSlug } from "@/lib/idp";
-import { create } from "@zitadel/client";
-import { getAllSessions } from "@/lib/cookies";
+import { Session } from "@zitadel/proto/zitadel/session/v2/session_pb";
+import { NextRequest, NextResponse } from "next/server";
 
 async function loadSessions(ids: string[]): Promise<Session[]> {
   const response = await listSessions(

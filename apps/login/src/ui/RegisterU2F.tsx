@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { Button, ButtonVariants } from "./Button";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { Spinner } from "./Spinner";
-import Alert from "./Alert";
-import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
-import BackButton from "./BackButton";
-import { RegisterU2FResponse } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { addU2F, verifyU2F } from "@/lib/server/u2f";
+import { coerceToArrayBuffer, coerceToBase64Url } from "@/utils/base64";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Alert from "./Alert";
+import BackButton from "./BackButton";
+import { Button, ButtonVariants } from "./Button";
+import { Spinner } from "./Spinner";
 
 type Inputs = {};
 

@@ -26,13 +26,20 @@ function setSessionHttpOnlyCookie<T>(sessions: SessionCookie<T>[]) {
   });
 }
 
-export async function addSessionToCookie<T>(session: SessionCookie<T>, cleanup: boolean = false): Promise<any> {
+export async function addSessionToCookie<T>(
+  session: SessionCookie<T>,
+  cleanup: boolean = false,
+): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  let currentSessions: SessionCookie<T>[] = stringifiedCookie?.value ? JSON.parse(stringifiedCookie?.value) : [];
+  let currentSessions: SessionCookie<T>[] = stringifiedCookie?.value
+    ? JSON.parse(stringifiedCookie?.value)
+    : [];
 
-  const index = currentSessions.findIndex((s) => s.loginName === session.loginName);
+  const index = currentSessions.findIndex(
+    (s) => s.loginName === session.loginName,
+  );
 
   if (index > -1) {
     currentSessions[index] = session;
@@ -51,11 +58,17 @@ export async function addSessionToCookie<T>(session: SessionCookie<T>, cleanup: 
   }
 }
 
-export async function updateSessionCookie<T>(id: string, session: SessionCookie<T>, cleanup: boolean = false): Promise<any> {
+export async function updateSessionCookie<T>(
+  id: string,
+  session: SessionCookie<T>,
+  cleanup: boolean = false,
+): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  const sessions: SessionCookie<T>[] = stringifiedCookie?.value ? JSON.parse(stringifiedCookie?.value) : [session];
+  const sessions: SessionCookie<T>[] = stringifiedCookie?.value
+    ? JSON.parse(stringifiedCookie?.value)
+    : [session];
 
   const foundIndex = sessions.findIndex((session) => session.id === id);
 
@@ -75,11 +88,16 @@ export async function updateSessionCookie<T>(id: string, session: SessionCookie<
   }
 }
 
-export async function removeSessionFromCookie<T>(session: SessionCookie<T>, cleanup: boolean = false): Promise<any> {
+export async function removeSessionFromCookie<T>(
+  session: SessionCookie<T>,
+  cleanup: boolean = false,
+): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
-  const sessions: SessionCookie<T>[] = stringifiedCookie?.value ? JSON.parse(stringifiedCookie?.value) : [session];
+  const sessions: SessionCookie<T>[] = stringifiedCookie?.value
+    ? JSON.parse(stringifiedCookie?.value)
+    : [session];
 
   const reducedSessions = sessions.filter((s) => s.id !== session.id);
   if (cleanup) {
@@ -101,7 +119,10 @@ export async function getMostRecentSessionCookie<T>(): Promise<any> {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
 
     const latest = sessions.reduce((prev, current) => {
-      return new Date(prev.changeDate).getTime() > new Date(current.changeDate).getTime() ? prev : current;
+      return new Date(prev.changeDate).getTime() >
+        new Date(current.changeDate).getTime()
+        ? prev
+        : current;
     });
 
     return latest;
@@ -124,7 +145,9 @@ export async function getSessionCookieById<T>({
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
 
     const found = sessions.find((s) =>
-      organization ? s.organization === organization && s.id === sessionId : s.id === sessionId,
+      organization
+        ? s.organization === organization && s.id === sessionId
+        : s.id === sessionId,
     );
     if (found) {
       return found;
@@ -149,7 +172,9 @@ export async function getSessionCookieByLoginName<T>({
   if (stringifiedCookie?.value) {
     const sessions: SessionCookie<T>[] = JSON.parse(stringifiedCookie?.value);
     const found = sessions.find((s) =>
-      organization ? s.organization === organization && s.loginName === loginName : s.loginName === loginName,
+      organization
+        ? s.organization === organization && s.loginName === loginName
+        : s.loginName === loginName,
     );
     if (found) {
       return found;
@@ -166,7 +191,9 @@ export async function getSessionCookieByLoginName<T>({
  * @param cleanup when true, removes all expired sessions, default true
  * @returns Session Cookies
  */
-export async function getAllSessionCookieIds<T>(cleanup: boolean = false): Promise<any> {
+export async function getAllSessionCookieIds<T>(
+  cleanup: boolean = false,
+): Promise<any> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -176,7 +203,11 @@ export async function getAllSessionCookieIds<T>(cleanup: boolean = false): Promi
     if (cleanup) {
       const now = new Date();
       return sessions
-        .filter((session) => (session.expirationDate ? new Date(session.expirationDate) > now : true))
+        .filter((session) =>
+          session.expirationDate
+            ? new Date(session.expirationDate) > now
+            : true,
+        )
         .map((session) => session.id);
     } else {
       return sessions.map((session) => session.id);
@@ -191,7 +222,9 @@ export async function getAllSessionCookieIds<T>(cleanup: boolean = false): Promi
  * @param cleanup when true, removes all expired sessions, default true
  * @returns Session Cookies
  */
-export async function getAllSessions<T>(cleanup: boolean = false): Promise<SessionCookie<T>[]> {
+export async function getAllSessions<T>(
+  cleanup: boolean = false,
+): Promise<SessionCookie<T>[]> {
   const cookiesList = cookies();
   const stringifiedCookie = cookiesList.get("sessions");
 
@@ -200,7 +233,9 @@ export async function getAllSessions<T>(cleanup: boolean = false): Promise<Sessi
 
     if (cleanup) {
       const now = new Date();
-      return sessions.filter((session) => (session.expirationDate ? new Date(session.expirationDate) > now : true));
+      return sessions.filter((session) =>
+        session.expirationDate ? new Date(session.expirationDate) > now : true,
+      );
     } else {
       return sessions;
     }
@@ -240,7 +275,10 @@ export async function getMostRecentCookieWithLoginname<T>({
     const latest =
       filtered && filtered.length
         ? filtered.reduce((prev, current) => {
-            return new Date(prev.changeDate).getTime() > new Date(current.changeDate).getTime() ? prev : current;
+            return new Date(prev.changeDate).getTime() >
+              new Date(current.changeDate).getTime()
+              ? prev
+              : current;
           })
         : undefined;
 

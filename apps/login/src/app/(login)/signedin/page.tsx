@@ -1,13 +1,13 @@
+import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
 import { createCallback, getBrandingSettings, getSession } from "@/lib/zitadel";
 import DynamicTheme from "@/ui/DynamicTheme";
 import UserAvatar from "@/ui/UserAvatar";
 import { create } from "@zitadel/client";
-import { redirect } from "next/navigation";
 import {
   CreateCallbackRequestSchema,
   SessionSchema,
 } from "@zitadel/proto/zitadel/oidc/v2/oidc_service_pb";
-import { getMostRecentCookieWithLoginname } from "@/lib/cookies";
+import { redirect } from "next/navigation";
 
 async function loadSession(loginName: string, authRequestId?: string) {
   const recent = await getMostRecentCookieWithLoginname({ loginName });

@@ -1,7 +1,7 @@
 "use client";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import React, {
+import {
   ChangeEvent,
   DetailedHTMLProps,
   forwardRef,

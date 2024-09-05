@@ -1,10 +1,10 @@
 "use server";
 
 import { getSession, registerU2F, verifyU2FRegistration } from "@/lib/zitadel";
-import { userAgent } from "next/server";
-import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { create } from "@zitadel/client";
+import { VerifyU2FRegistrationRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
 import { headers } from "next/headers";
+import { userAgent } from "next/server";
 import { getSessionCookieById } from "../cookies";
 
 type RegisterU2FCommand = {

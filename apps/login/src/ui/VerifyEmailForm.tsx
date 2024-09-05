@@ -1,13 +1,13 @@
 "use client";
 
+import { resendVerifyEmail, verifyUserByEmail } from "@/lib/server/email";
+import Alert from "@/ui/Alert";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Button, ButtonVariants } from "./Button";
 import { TextInput } from "./Input";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { Spinner } from "./Spinner";
-import Alert from "@/ui/Alert";
-import { resendVerifyEmail, verifyUserByEmail } from "@/lib/server/email";
 
 type Inputs = {
   code: string;

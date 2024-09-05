@@ -1,5 +1,5 @@
 import classNames from "clsx";
-import React, {
+import {
   DetailedHTMLProps,
   forwardRef,
   InputHTMLAttributes,

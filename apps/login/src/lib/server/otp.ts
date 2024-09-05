@@ -1,12 +1,12 @@
 "use server";
 
 import { setSessionAndUpdateCookie } from "@/utils/session";
+import { create } from "@zitadel/client";
 import {
   CheckOTPSchema,
   ChecksSchema,
   CheckTOTPSchema,
 } from "@zitadel/proto/zitadel/session/v2/session_service_pb";
-import { create } from "@zitadel/client";
 import {
   getMostRecentSessionCookie,
   getSessionCookieById,

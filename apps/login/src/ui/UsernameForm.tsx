@@ -1,19 +1,19 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
-import { Button, ButtonVariants } from "./Button";
-import { TextInput } from "./Input";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
-import { Spinner } from "./Spinner";
-import Alert from "./Alert";
+import { sendLoginname } from "@/lib/server/loginname";
 import {
   LoginSettings,
   PasskeysType,
 } from "@zitadel/proto/zitadel/settings/v2/login_settings_pb";
-import BackButton from "./BackButton";
-import { sendLoginname } from "@/lib/server/loginname";
 import { AuthenticationMethodType } from "@zitadel/proto/zitadel/user/v2/user_service_pb";
+import { useRouter } from "next/navigation";
+import { ReactNode, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import Alert from "./Alert";
+import BackButton from "./BackButton";
+import { Button, ButtonVariants } from "./Button";
+import { TextInput } from "./Input";
+import { Spinner } from "./Spinner";
 
 type Inputs = {
   loginName: string;
