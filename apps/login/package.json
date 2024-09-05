@@ -72,6 +72,7 @@
     "env-cmd": "^10.1.0",
     "eslint-config-zitadel": "workspace:*",
     "grpc-tools": "1.12.4",
+    "jsdom": "^25.0.0",
     "lint-staged": "15.2.8",
     "make-dir-cli": "4.0.0",
     "nodemon": "^3.1.4",
