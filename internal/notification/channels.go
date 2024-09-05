@@ -5,7 +5,7 @@ import (
 
 	"github.com/zitadel/logging"
 
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
+	"github.com/zitadel/zitadel/internal/notification/channels/email"
 	"github.com/zitadel/zitadel/internal/notification/channels/twilio"
 	"github.com/zitadel/zitadel/internal/notification/channels/webhook"
 	"github.com/zitadel/zitadel/internal/notification/handlers"
@@ -62,20 +62,20 @@ func registerCounter(counter, desc string) {
 	logging.WithFields("metric", counter).OnError(err).Panic("unable to register counter")
 }
 
-func (c *channels) Email(ctx context.Context) (*senders.Chain, *smtp.Config, error) {
-	smtpCfg, err := c.q.GetSMTPConfig(ctx)
+func (c *channels) Email(ctx context.Context) (*senders.Chain, *email.Config, error) {
+	emailCfg, err := c.q.GetActiveEmailConfig(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
 	chain, err := senders.EmailChannels(
 		ctx,
-		smtpCfg,
+		emailCfg,
 		c.q.GetFileSystemProvider,
 		c.q.GetLogProvider,
 		c.counters.success.email,
 		c.counters.failed.email,
 	)
-	return chain, smtpCfg, err
+	return chain, emailCfg, err
 }
 
 func (c *channels) SMS(ctx context.Context) (*senders.Chain, *twilio.Config, error) {
