@@ -1381,7 +1381,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1468,6 +1469,8 @@
       "USERSCHEMA_DESCRIPTION": "Benutzerschemata ermöglichen das Verwalten von Datenschemata von Benutzern. Wenn die Flagge aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
       "ACTIONS": "Aktionen",
       "ACTIONS_DESCRIPTION": "Aktionen v2 ermöglichen die Verwaltung von Datenausführungen und Zielen. Wenn das Flag aktiviert ist, können Sie die neue API und ihre Funktionen verwenden.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sitzungsbeendigung",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Wenn das Flag aktiviert ist, können Sie eine einzelne Sitzung über die Login-Benutzeroberfläche beenden, indem Sie einen id_token mit einem `sid` Claim als id_token_hint am Endpunkt end_session übergeben. Beachten Sie, dass derzeit alle Sitzungen desselben Benutzeragenten (Browser) in der Login-Benutzeroberfläche beendet werden. Sitzungen, die über die Session API verwaltet werden, ermöglichen bereits die Beendigung einzelner Sitzungen.",
       "STATES": {
         "INHERITED": "Erben",
         "ENABLED": "Aktiviert",
@@ -1613,7 +1616,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "Email Verification erfolgreich",
@@ -1628,7 +1632,6 @@
         "initPasswordText": "Passwort Initialisierung",
         "initializeDoneText": "Benutzereinrichtung erfolgreich",
         "initializeUserText": "Benutzereinrichtung",
-        "linkingUserPromptText": "Aufforderung zur Benutzerverlinkung",
         "linkingUserDoneText": "Benutzerverlinkung erfolgreich",
         "loginText": "Anmelden",
         "logoutText": "Abmelden",
@@ -2553,7 +2556,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Manager hinzufügen",

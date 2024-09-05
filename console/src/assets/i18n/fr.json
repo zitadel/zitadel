@@ -1381,7 +1381,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1468,6 +1469,8 @@
       "USERSCHEMA_DESCRIPTION": "Les schémas utilisateur permettent de gérer les schémas de données des utilisateurs. Si le drapeau est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
       "ACTIONS": "Actions",
       "ACTIONS_DESCRIPTION": "Les actions v2 permettent de gérer les exécutions et les cibles de données. Si l'indicateur est activé, vous pourrez utiliser la nouvelle API et ses fonctionnalités.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Fin de session",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Si l'indicateur est activé, vous pourrez terminer une seule session à partir de l'interface utilisateur de connexion en fournissant un id_token avec une revendication `sid` en tant que id_token_hint sur le point de terminaison end_session. Notez que toutes les sessions du même agent utilisateur (navigateur) sont actuellement terminées dans l'interface utilisateur de connexion. Les sessions gérées via l'API de session permettent déjà la terminaison de sessions individuelles.",
       "STATES": {
         "INHERITED": "Hérité",
         "ENABLED": "Activé",
@@ -1613,7 +1616,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "Vérification de l'e-mail effectuée",
@@ -1628,7 +1632,6 @@
         "initPasswordText": "Initialiser le mot de passe",
         "initializeDoneText": "Initialiser l'utilisateur terminé",
         "initializeUserText": "Initialiser l'utilisateur",
-        "linkingUserPromptText": "Message de liaison utilisateur",
         "linkingUserDoneText": "Lier l'utilisateur fait",
         "loginText": "Connexion",
         "logoutText": "Déconnexion",
@@ -2554,7 +2557,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Ajouter un responsable",

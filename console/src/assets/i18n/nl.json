@@ -1468,6 +1468,8 @@
       "USERSCHEMA_DESCRIPTION": "Met gebruikerschema's kunt u de dataschema's van gebruikers beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
       "ACTIONS": "Acties",
       "ACTIONS_DESCRIPTION": "Actions v2 maken het mogelijk om data-uitvoeringen en doelen te beheren. Als de vlag is ingeschakeld, kunt u de nieuwe API en zijn functies gebruiken.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Sessiebeëindiging",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Als het vlagje is ingeschakeld, kunt u een enkele sessie beëindigen via de login-gebruikersinterface door een id_token met een `sid`-claim als id_token_hint op het eindpunt end_session te verstrekken. Houd er rekening mee dat momenteel alle sessies van dezelfde gebruikersagent (browser) worden beëindigd in de login-gebruikersinterface. Sessies die worden beheerd via de Session API staan al toe om individuele sessies te beëindigen.",
       "STATES": {
         "INHERITED": "Overgenomen",
         "ENABLED": "Ingeschakeld",
@@ -1613,7 +1615,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-mail verificatie voltooid",
@@ -1628,7 +1631,6 @@
         "initPasswordText": "Initialiseer wachtwoord",
         "initializeDoneText": "Gebruiker initialisatie voltooid",
         "initializeUserText": "Initialiseer gebruiker",
-        "linkingUserPromptText": "Gebruiker koppelingsprompt",
         "linkingUserDoneText": "Gebruiker koppeling voltooid",
         "loginText": "Login",
         "logoutText": "Uitloggen",
@@ -2571,7 +2573,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Voeg een Manager toe",

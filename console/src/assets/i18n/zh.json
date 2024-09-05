@@ -1381,7 +1381,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1468,6 +1469,8 @@
       "USERSCHEMA_DESCRIPTION": "用户架构允许管理用户的数据架构。如果启用此标志，您将可以使用新的 API 及其功能。",
       "ACTIONS": "操作",
       "ACTIONS_DESCRIPTION": "Actions v2 可以管理数据执行和目标。如果启用此标志，您将可以使用新的 API 及其功能。",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 终止会话",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "如果启用了标志，您可以通过在 end_session 端点上提供带有 `sid` 声明的 id_token 作为 id_token_hint 来从登录 UI 终止单个会话。 请注意，目前所有来自同一用户代理（浏览器）的会话都在登录 UI 中终止。 通过会话 API 管理的会话已经允许终止单个会话。",
       "STATES": {
         "INHERITED": "继承",
         "ENABLED": "已启用",
@@ -1612,7 +1615,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "电子邮件验证完成",
@@ -1627,7 +1631,6 @@
         "initPasswordText": "初始化密码",
         "initializeDoneText": "初始化用户完成",
         "initializeUserText": "初始化用户",
-        "linkingUserPromptText": "用户链接提示",
         "linkingUserDoneText": "链接用户完成",
         "loginText": "登录",
         "logoutText": "登出",
@@ -2553,7 +2556,8 @@
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "添加管理者",

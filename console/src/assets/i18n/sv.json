@@ -1385,7 +1385,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       }
     },
     "SMTP": {
@@ -1472,6 +1473,8 @@
       "USERSCHEMA_DESCRIPTION": "Användarscheman tillåter att hantera datascheman för användare. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
       "ACTIONS": "Åtgärder",
       "ACTIONS_DESCRIPTION": "Åtgärder v2 tillåter att hantera dataexekveringar och mål. Om flaggan är aktiverad kommer du att kunna använda det nya API:et och dess funktioner.",
+      "OIDCSINGLEV1SESSIONTERMINATION": "OIDC Single V1 Session avslutning",
+      "OIDCSINGLEV1SESSIONTERMINATION_DESCRIPTION": "Om flaggan är aktiverad, kan du avsluta en enskild session från inloggningsgränssnittet genom att ange en id_token med ett `sid`-krav som id_token_hint på slutpunkten end_session. Observera att för närvarande alla sessioner från samma användaragent (webbläsare) avslutas i inloggningsgränssnittet. Sessioner som hanteras via Session API tillåter redan avslutning av enskilda sessioner.",
       "STATES": {
         "INHERITED": "Ärv",
         "ENABLED": "Aktiverad",
@@ -1617,7 +1620,8 @@
         "cs": "Čeština",
         "ru": "Русский",
         "nl": "Nederlands",
-        "sv": "Svenska"
+        "sv": "Svenska",
+        "id": "Bahasa Indonesia"
       },
       "KEYS": {
         "emailVerificationDoneText": "E-postverifiering klar",
@@ -1632,7 +1636,6 @@
         "initPasswordText": "Initiera lösenord",
         "initializeDoneText": "Initiera användare klart",
         "initializeUserText": "Initiera användare",
-        "linkingUserPromptText": "Länka användarprompt",
         "linkingUserDoneText": "Länka användare klart",
         "loginText": "Inloggning",
         "logoutText": "Utloggning",
@@ -2577,12 +2580,13 @@
     "pl": "Polski",
     "zh": "简体中文",
     "bg": "Български",
-    "pt": "Português",
+    "pt": "Portuguese",
     "mk": "Македонски",
     "cs": "Čeština",
     "ru": "Русский",
     "nl": "Nederlands",
-    "sv": "Svenska"
+    "sv": "Svenska",
+    "id": "Bahasa Indonesia"
   },
   "MEMBER": {
     "ADD": "Lägg till en administratör",
