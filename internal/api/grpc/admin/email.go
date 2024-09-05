@@ -5,7 +5,6 @@ import (
 
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
-	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 )
 
@@ -15,20 +14,17 @@ func (s *Server) GetEmailProvider(ctx context.Context, req *admin_pb.GetEmailPro
 		return nil, err
 	}
 	return &admin_pb.GetEmailProviderResponse{
-		Config: EmailProviderToProviderPb(smtp),
+		Config: emailProviderToProviderPb(smtp),
 	}, nil
 }
 
 func (s *Server) GetEmailProviderById(ctx context.Context, req *admin_pb.GetEmailProviderByIdRequest) (*admin_pb.GetEmailProviderByIdResponse, error) {
-	instanceID := authz.GetInstance(ctx).InstanceID()
-	resourceOwner := instanceID // Will be replaced when orgs have smtp configs
-
-	smtp, err := s.query.SMTPConfigByID(ctx, instanceID, resourceOwner, req.Id)
+	smtp, err := s.query.SMTPConfigByID(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.GetEmailProviderByIdResponse{
-		Config: EmailProviderToProviderPb(smtp),
+		Config: emailProviderToProviderPb(smtp),
 	}, nil
 }
 
@@ -105,7 +101,7 @@ func (s *Server) ListEmailProviders(ctx context.Context, req *admin_pb.ListEmail
 	}
 	return &admin_pb.ListEmailProvidersResponse{
 		Details: object.ToListDetails(result.Count, result.Sequence, result.LastRun),
-		Result:  EmailProvidersToPb(result.Configs),
+		Result:  emailProvidersToPb(result.Configs),
 	}, nil
 }
 
@@ -113,7 +109,6 @@ func (s *Server) ActivateEmailProvider(ctx context.Context, req *admin_pb.Activa
 	result, err := s.command.ActivateSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
 		return nil, err
-
 	}
 	return &admin_pb.ActivateEmailProviderResponse{
 		Details: object.DomainToAddDetailsPb(result),
@@ -124,7 +119,6 @@ func (s *Server) DeactivateEmailProvider(ctx context.Context, req *admin_pb.Deac
 	result, err := s.command.DeactivateSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id)
 	if err != nil {
 		return nil, err
-
 	}
 	return &admin_pb.DeactivateEmailProviderResponse{
 		Details: object.DomainToAddDetailsPb(result),
@@ -132,27 +126,15 @@ func (s *Server) DeactivateEmailProvider(ctx context.Context, req *admin_pb.Deac
 }
 
 func (s *Server) TestEmailProviderById(ctx context.Context, req *admin_pb.TestEmailProviderSMTPByIdRequest) (*admin_pb.TestEmailProviderSMTPByIdResponse, error) {
-	err := s.command.TestSMTPConfigById(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.ReceiverAddress)
-	if err != nil {
+	if err := s.command.TestSMTPConfigById(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.ReceiverAddress); err != nil {
 		return nil, err
 	}
-
 	return &admin_pb.TestEmailProviderSMTPByIdResponse{}, nil
 }
 
 func (s *Server) TestEmailProviderSMTP(ctx context.Context, req *admin_pb.TestEmailProviderSMTPRequest) (*admin_pb.TestEmailProviderSMTPResponse, error) {
-	config := smtp.Config{}
-	config.Tls = req.Tls
-	config.From = req.SenderAddress
-	config.FromName = req.SenderName
-	config.SMTP.Host = req.Host
-	config.SMTP.User = req.User
-	config.SMTP.Password = req.Password
-
-	err := s.command.TestSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.ReceiverAddress, &config)
-	if err != nil {
+	if err := s.command.TestSMTPConfig(ctx, authz.GetInstance(ctx).InstanceID(), req.Id, req.ReceiverAddress, testEmailProviderSMTPToConfig(req)); err != nil {
 		return nil, err
 	}
-
 	return &admin_pb.TestEmailProviderSMTPResponse{}, nil
 }

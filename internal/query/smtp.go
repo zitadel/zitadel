@@ -174,15 +174,14 @@ func (q *Queries) SMTPConfigActive(ctx context.Context, resourceOwner string) (c
 	return config, err
 }
 
-func (q *Queries) SMTPConfigByID(ctx context.Context, instanceID, resourceOwner, id string) (config *SMTPConfig, err error) {
+func (q *Queries) SMTPConfigByID(ctx context.Context, instanceID, id string) (config *SMTPConfig, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	stmt, scan := prepareSMTPConfigQuery(ctx, q.client)
 	query, args, err := stmt.Where(sq.Eq{
-		SMTPConfigColumnResourceOwner.identifier(): resourceOwner,
-		SMTPConfigColumnInstanceID.identifier():    instanceID,
-		SMTPConfigColumnID.identifier():            id,
+		SMTPConfigColumnInstanceID.identifier(): instanceID,
+		SMTPConfigColumnID.identifier():         id,
 	}).ToSql()
 	if err != nil {
 		return nil, zerrors.ThrowInternal(err, "QUERY-8f8gw", "Errors.Query.SQLStatement")

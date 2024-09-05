@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
+	"github.com/zitadel/zitadel/internal/domain"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
@@ -26,7 +27,7 @@ func SMTPConfigToProviderPb(config *query.SMTPConfig) *settings_pb.SMTPConfig {
 		Tls:           config.SMTPConfig.TLS,
 		Host:          config.SMTPConfig.Host,
 		User:          config.SMTPConfig.User,
-		State:         settings_pb.SMTPConfigState(config.State),
+		State:         SMTPConfigStateToPb(config.State),
 		SenderAddress: config.SMTPConfig.SenderAddress,
 		SenderName:    config.SMTPConfig.SenderName,
 	}
@@ -38,4 +39,17 @@ func SMTPConfigsToPb(configs []*query.SMTPConfig) []*settings_pb.SMTPConfig {
 		c[i] = SMTPConfigToProviderPb(config)
 	}
 	return c
+}
+
+func SMTPConfigStateToPb(state domain.SMTPConfigState) settings_pb.SMTPConfigState {
+	switch state {
+	case domain.SMTPConfigStateUnspecified, domain.SMTPConfigStateRemoved:
+		return settings_pb.SMTPConfigState_SMTP_CONFIG_STATE_UNSPECIFIED
+	case domain.SMTPConfigStateActive:
+		return settings_pb.SMTPConfigState_SMTP_CONFIG_ACTIVE
+	case domain.SMTPConfigStateInactive:
+		return settings_pb.SMTPConfigState_SMTP_CONFIG_INACTIVE
+	default:
+		return settings_pb.SMTPConfigState_SMTP_CONFIG_STATE_UNSPECIFIED
+	}
 }

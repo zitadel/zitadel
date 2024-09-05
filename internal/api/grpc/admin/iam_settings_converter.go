@@ -176,9 +176,6 @@ func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 			State:          settings_pb.SMTPConfigState(smtp.State),
 		}
 	}
-	if smtp.HTTPConfig != nil {
-		return nil
-	}
 	return nil
 }
 

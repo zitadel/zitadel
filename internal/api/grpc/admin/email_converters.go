@@ -6,6 +6,8 @@ import (
 	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/api/grpc/object"
 	"github.com/zitadel/zitadel/internal/command"
+	"github.com/zitadel/zitadel/internal/domain"
+	"github.com/zitadel/zitadel/internal/notification/channels/smtp"
 	"github.com/zitadel/zitadel/internal/query"
 	admin_pb "github.com/zitadel/zitadel/pkg/grpc/admin"
 	settings_pb "github.com/zitadel/zitadel/pkg/grpc/settings"
@@ -22,35 +24,48 @@ func listEmailProvidersToModel(req *admin_pb.ListEmailProvidersRequest) (*query.
 	}, nil
 }
 
-func EmailProvidersToPb(configs []*query.SMTPConfig) []*settings_pb.EmailProvider {
+func emailProvidersToPb(configs []*query.SMTPConfig) []*settings_pb.EmailProvider {
 	c := make([]*settings_pb.EmailProvider, len(configs))
 	for i, config := range configs {
-		c[i] = EmailProviderToProviderPb(config)
+		c[i] = emailProviderToProviderPb(config)
 	}
 	return c
 }
 
-func EmailProviderToProviderPb(config *query.SMTPConfig) *settings_pb.EmailProvider {
+func emailProviderToProviderPb(config *query.SMTPConfig) *settings_pb.EmailProvider {
 	return &settings_pb.EmailProvider{
 		Details:     object.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.ResourceOwner),
 		Id:          config.ID,
 		Description: config.Description,
-		State:       settings_pb.EmailProviderState(config.State),
-		Config:      EmailProviderToPb(config),
+		State:       emailProviderStateToPb(config.State),
+		Config:      emailProviderToPb(config),
 	}
 }
 
-func EmailProviderToPb(config *query.SMTPConfig) settings_pb.EmailConfig {
+func emailProviderStateToPb(state domain.SMTPConfigState) settings_pb.EmailProviderState {
+	switch state {
+	case domain.SMTPConfigStateUnspecified, domain.SMTPConfigStateRemoved:
+		return settings_pb.EmailProviderState_EMAIL_PROVIDER_STATE_UNSPECIFIED
+	case domain.SMTPConfigStateActive:
+		return settings_pb.EmailProviderState_EMAIL_PROVIDER_ACTIVE
+	case domain.SMTPConfigStateInactive:
+		return settings_pb.EmailProviderState_EMAIL_PROVIDER_INACTIVE
+	default:
+		return settings_pb.EmailProviderState_EMAIL_PROVIDER_STATE_UNSPECIFIED
+	}
+}
+
+func emailProviderToPb(config *query.SMTPConfig) settings_pb.EmailConfig {
 	if config.SMTPConfig != nil {
-		return SMTPToPb(config.SMTPConfig)
+		return smtpToPb(config.SMTPConfig)
 	}
 	if config.HTTPConfig != nil {
-		return HTTPToPb(config.HTTPConfig)
+		return httpToPb(config.HTTPConfig)
 	}
 	return nil
 }
 
-func HTTPToPb(http *query.HTTP) *settings_pb.EmailProvider_Http {
+func httpToPb(http *query.HTTP) *settings_pb.EmailProvider_Http {
 	return &settings_pb.EmailProvider_Http{
 		Http: &settings_pb.EmailProviderHTTP{
 			Endpoint: http.Endpoint,
@@ -58,7 +73,7 @@ func HTTPToPb(http *query.HTTP) *settings_pb.EmailProvider_Http {
 	}
 }
 
-func SMTPToPb(config *query.SMTP) *settings_pb.EmailProvider_Smtp {
+func smtpToPb(config *query.SMTP) *settings_pb.EmailProvider_Smtp {
 	return &settings_pb.EmailProvider_Smtp{
 		Smtp: &settings_pb.EmailProviderSMTP{
 			Tls:           config.TLS,
@@ -113,5 +128,18 @@ func updateEmailProviderHTTPToConfig(ctx context.Context, req *admin_pb.UpdateEm
 		ID:            req.Id,
 		Description:   req.Description,
 		Endpoint:      req.Endpoint,
+	}
+}
+
+func testEmailProviderSMTPToConfig(req *admin_pb.TestEmailProviderSMTPRequest) *smtp.Config {
+	return &smtp.Config{
+		Tls:      req.Tls,
+		From:     req.SenderAddress,
+		FromName: req.SenderName,
+		SMTP: smtp.SMTP{
+			Host:     req.Host,
+			User:     req.User,
+			Password: req.Password,
+		},
 	}
 }

@@ -30,9 +30,6 @@ type AddSMTPConfig struct {
 	ReplyToAddress string
 }
 
-type SMTP struct {
-}
-
 func (c *Commands) AddSMTPConfig(ctx context.Context, config *AddSMTPConfig) (err error) {
 	if config.ResourceOwner == "" {
 		return zerrors.ThrowInvalidArgument(nil, "COMMAND-PQN0wsqSyi", "Errors.ResourceOwnerMissing")
@@ -76,19 +73,22 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *AddSMTPConfig) (er
 		return err
 	}
 
-	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, instance.NewSMTPConfigAddedEvent(
-		ctx,
-		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
-		config.ID,
-		description,
-		config.Tls,
-		config.From,
-		config.FromName,
-		replyTo,
-		hostAndPort,
-		config.User,
-		smtpPassword,
-	))
+	err = c.pushAppendAndReduce(ctx,
+		smtpConfigWriteModel,
+		instance.NewSMTPConfigAddedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
+			config.ID,
+			description,
+			config.Tls,
+			config.From,
+			config.FromName,
+			replyTo,
+			hostAndPort,
+			config.User,
+			smtpPassword,
+		),
+	)
 	if err != nil {
 		return err
 	}
@@ -208,11 +208,15 @@ func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, resourceOwner, 
 		}
 	}
 
-	err = c.pushAppendAndReduce(ctx, smtpConfigWriteModel, instance.NewSMTPConfigPasswordChangedEvent(
-		ctx,
-		InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
-		id,
-		smtpPassword))
+	err = c.pushAppendAndReduce(ctx,
+		smtpConfigWriteModel,
+		instance.NewSMTPConfigPasswordChangedEvent(
+			ctx,
+			InstanceAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel),
+			id,
+			smtpPassword,
+		),
+	)
 	if err != nil {
 		return nil, err
 	}
