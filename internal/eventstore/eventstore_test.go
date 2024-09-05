@@ -340,6 +340,9 @@ func (repo *testPusher) Health(ctx context.Context) error {
 	return nil
 }
 
+func (repo *testPusher) Subscribe(eventType EventType, queue chan<- Event) {
+}
+
 func (repo *testPusher) Push(ctx context.Context, commands ...Command) (events []Event, err error) {
 	if len(repo.errs) != 0 {
 		err, repo.errs = repo.errs[0], repo.errs[1:]

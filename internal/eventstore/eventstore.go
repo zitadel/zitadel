@@ -81,6 +81,12 @@ func (es *Eventstore) Health(ctx context.Context) error {
 	return es.querier.Health(ctx)
 }
 
+// Subscribe sends notifications to the queue every time a new event of the given type was pushed
+// TODO: what type should the queue have?
+func (es *Eventstore) Subscribe(eventType EventType, queue chan<- Event) {
+	es.pusher.Subscribe(eventType, queue)
+}
+
 // Push pushes the events in a single transaction
 // an event needs at least an aggregate
 func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
@@ -277,6 +283,9 @@ type Pusher interface {
 	Health(ctx context.Context) error
 	// Push stores the actions
 	Push(ctx context.Context, commands ...Command) (_ []Event, err error)
+	// Subscribe sends notifications to the queue every time a new event of the given type was pushed
+	// TODO: what type should the queue have?
+	Subscribe(eventType EventType, queue chan<- Event)
 }
 
 type FillFieldsEvent interface {

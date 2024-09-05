@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/zitadel/zitadel/internal/database"
+	"github.com/zitadel/zitadel/internal/eventstore"
 )
 
 var (
@@ -15,6 +16,9 @@ var (
 
 type Eventstore struct {
 	client *database.DB
+	// used to send a pgnotify event on push to the postgres channel named after the event type
+	// the channels can be used to send a trigger to the projection
+	subscribedEventTypes map[eventstore.EventType][]chan<- eventstore.Event
 }
 
 func NewEventstore(client *database.DB) *Eventstore {
@@ -27,7 +31,11 @@ func NewEventstore(client *database.DB) *Eventstore {
 		uniqueConstraintPlaceholderFmt = "(%s, %s, %s)"
 	}
 
-	return &Eventstore{client: client}
+	return &Eventstore{client: client, subscribedEventTypes: make(map[eventstore.EventType][]chan<- eventstore.Event)}
+}
+
+func (es *Eventstore) Subscribe(eventType eventstore.EventType, queue chan<- eventstore.Event) {
+	es.subscribedEventTypes[eventType] = append(es.subscribedEventTypes[eventType], queue)
 }
 
 func (es *Eventstore) Health(ctx context.Context) error {

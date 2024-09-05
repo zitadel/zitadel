@@ -13,6 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/zitadel/logging"
 
+	"github.com/zitadel/zitadel/internal/api/authz"
 	"github.com/zitadel/zitadel/internal/eventstore"
 	"github.com/zitadel/zitadel/internal/zerrors"
 )
@@ -42,6 +43,10 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 			return err
 		}
 
+		if err = es.handleNotifications(ctx, tx, commands); err != nil {
+			return err
+		}
+
 		// CockroachDB by default does not allow multiple modifications of the same table using ON CONFLICT
 		// Thats why we enable it manually
 		if es.client.Type() == "cockroach" {
@@ -59,6 +64,24 @@ func (es *Eventstore) Push(ctx context.Context, commands ...eventstore.Command) 
 	}
 
 	return events, nil
+}
+
+func (es *Eventstore) handleNotifications(ctx context.Context, tx *sql.Tx, cmds []eventstore.Command) error {
+	if !authz.GetFeatures(ctx).InMemoryProjections {
+		return nil
+	}
+
+	for _, cmd := range cmds {
+		_, hasSubscribers := es.subscribedEventTypes[cmd.Type()]
+		if !hasSubscribers {
+			continue
+		}
+		_, err := tx.ExecContext(ctx, "SELECT pg_notify($1)", cmd.Type())
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 //go:embed push.sql
