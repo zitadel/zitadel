@@ -62,6 +62,8 @@ type AuthRequest struct {
 	SAMLRequestID            string
 	// orgID the policies were last loaded with
 	policyOrgID string
+	// SessionID is set to the computed sessionID of the login session table
+	SessionID string
 }
 
 func (a *AuthRequest) SetPolicyOrgID(id string) {
