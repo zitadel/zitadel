@@ -62,11 +62,12 @@ export async function verifyU2F(command: VerifyU2FCommand) {
     throw new Error("Could not get session");
   }
 
-  const req = create(
-    VerifyU2FRegistrationRequestSchema,
-    // TODO: why did we passed the request instead of body here?
-    command,
-  );
+  const req = create(VerifyU2FRegistrationRequestSchema, {
+    u2fId: command.u2fId,
+    publicKeyCredential: command.publicKeyCredential,
+    tokenName: passkeyName,
+    userId,
+  });
 
   return verifyU2FRegistration(req);
 }
