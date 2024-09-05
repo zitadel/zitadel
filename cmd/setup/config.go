@@ -117,6 +117,7 @@ type Steps struct {
 	s30FillFieldsForOrgDomainVerified      *FillFieldsForOrgDomainVerified
 	s31AddAggregateIndexToFields           *AddAggregateIndexToFields
 	s32AddAuthSessionID                    *AddAuthSessionID
+	S33EventstoreIndexes                   *EventstoreIndexes
 }
 
 func MustNewSteps(v *viper.Viper) *Steps {

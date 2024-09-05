@@ -161,6 +161,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 	steps.s30FillFieldsForOrgDomainVerified = &FillFieldsForOrgDomainVerified{eventstore: eventstoreClient}
 	steps.s31AddAggregateIndexToFields = &AddAggregateIndexToFields{dbClient: esPusherDBClient}
 	steps.s32AddAuthSessionID = &AddAuthSessionID{dbClient: esPusherDBClient}
+	steps.S33EventstoreIndexes = &EventstoreIndexes{dbClient: esPusherDBClient}
 
 	err = projection.Create(ctx, projectionDBClient, eventstoreClient, config.Projections, nil, nil, nil)
 	logging.OnError(err).Fatal("unable to start projections")
@@ -203,6 +204,7 @@ func Setup(ctx context.Context, config *Config, steps *Steps, masterKey string) 
 		steps.s26AuthUsers3,
 		steps.s29FillFieldsForProjectGrant,
 		steps.s30FillFieldsForOrgDomainVerified,
+		steps.S33EventstoreIndexes,
 	} {
 		mustExecuteMigration(ctx, eventstoreClient, step, "migration failed")
 	}
