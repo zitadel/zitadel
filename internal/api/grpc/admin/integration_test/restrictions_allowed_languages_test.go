@@ -26,7 +26,7 @@ import (
 func TestServer_Restrictions_AllowedLanguages(t *testing.T) {
 	t.Parallel()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Hour/2)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 	defer cancel()
 
 	var (

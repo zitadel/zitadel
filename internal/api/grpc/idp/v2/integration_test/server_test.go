@@ -22,7 +22,7 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Exit(func() int {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Hour/2)
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 		defer cancel()
 
 		Instance = integration.NewInstance(ctx)
