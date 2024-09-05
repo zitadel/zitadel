@@ -54,9 +54,6 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 	if err != nil {
 		return nil, err
 	}
-	if client.State != domain.AppStateActive {
-		return nil, zerrors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
-	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultLoginURLV2), nil
 }
 
@@ -981,13 +978,10 @@ func (s *Server) VerifyClient(ctx context.Context, r *op.Request[op.ClientCreden
 	}
 	client, err := s.query.GetOIDCClientByID(ctx, clientID, assertion)
 	if zerrors.IsNotFound(err) {
-		return nil, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("client not found")
+		return nil, oidc.ErrInvalidClient().WithParent(err).WithReturnParentToClient(authz.GetFeatures(ctx).DebugOIDCParentError).WithDescription("no active client not found")
 	}
 	if err != nil {
 		return nil, err // defaults to server error
-	}
-	if client.State != domain.AppStateActive {
-		return nil, oidc.ErrInvalidClient().WithDescription("client is not active")
 	}
 	if client.Settings == nil {
 		client.Settings = &query.OIDCSettings{

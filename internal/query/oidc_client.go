@@ -45,6 +45,7 @@ type OIDCClient struct {
 //go:embed oidc_client_by_id.sql
 var oidcClientQuery string
 
+// GetOIDCClientByID returns only active OIDCClient
 func (q *Queries) GetOIDCClientByID(ctx context.Context, clientID string, getKeys bool) (client *OIDCClient, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
