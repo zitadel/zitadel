@@ -1,5 +1,5 @@
 import { loadMostRecentSession } from "@/lib/session";
-import { getBrandingSettings, sessionService } from "@/lib/zitadel";
+import { getBrandingSettings } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import DynamicTheme from "@/ui/DynamicTheme";
 import LoginOTP from "@/ui/LoginOTP";
@@ -17,7 +17,7 @@ export default async function Page({
 
   const { method } = params;
 
-  const session = await loadMostRecentSession(sessionService, {
+  const session = await loadMostRecentSession({
     loginName,
     organization,
   });

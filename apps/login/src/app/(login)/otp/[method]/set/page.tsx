@@ -4,7 +4,6 @@ import {
   addOTPSMS,
   getBrandingSettings,
   registerTOTP,
-  sessionService,
 } from "@/lib/zitadel";
 import Alert from "@/ui/Alert";
 import BackButton from "@/ui/BackButton";
@@ -27,7 +26,7 @@ export default async function Page({
   const { method } = params;
 
   const branding = await getBrandingSettings(organization);
-  const session = await loadMostRecentSession(sessionService, {
+  const session = await loadMostRecentSession({
     loginName,
     organization,
   });
